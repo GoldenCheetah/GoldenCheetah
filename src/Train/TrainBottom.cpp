@@ -47,7 +47,6 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     m_connectButton->setAutoDefault(false);
     m_connectButton->setFlat(true);
     m_connectButton->setShortcut(Qt::Key_MediaPrevious);
-    m_connectButton->setToolTip(tr("Connect"));
     toolbuttons->addWidget(m_connectButton);
 
     toolbuttons->addSpacing(5);
@@ -62,7 +61,6 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     m_rewindButton->setAutoRepeat(true);
     m_rewindButton->setAutoRepeatDelay(400);
     m_rewindButton->setShortcut(Qt::Key_MediaPrevious);
-    m_rewindButton->setToolTip(tr("Rewind"));
     toolbuttons->addWidget(m_rewindButton);
 
     m_stopButton = new QPushButton(this);
@@ -71,7 +69,6 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     m_stopButton->setAutoDefault(false);
     m_stopButton->setFlat(true);
     m_stopButton->setShortcut(Qt::Key_MediaStop);
-    m_stopButton->setToolTip(tr("Stop"));
     toolbuttons->addWidget(m_stopButton);
 
     m_playButton = new QPushButton(this);
@@ -80,7 +77,6 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     m_playButton->setAutoDefault(false);
     m_playButton->setFlat(true);
     m_playButton->setShortcut(Qt::Key_MediaTogglePlayPause);
-    m_playButton->setToolTip(tr("Start"));
     toolbuttons->addWidget(m_playButton);
 
     m_forwardButton = new QPushButton(this);
@@ -91,7 +87,6 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     m_forwardButton->setAutoRepeat(true);
     m_forwardButton->setAutoRepeatDelay(400);
     m_forwardButton->setShortcut(Qt::Key_MediaNext);
-    m_forwardButton->setToolTip(tr("Fast forward"));
     toolbuttons->addWidget(m_forwardButton);
 
     toolbuttons->addSpacing(5);
@@ -105,7 +100,6 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     backLap->setFlat(true);
     backLap->setAutoRepeat(true);
     backLap->setAutoRepeatDelay(400);
-    backLap->setToolTip(tr("Back 1 lap"));
     toolbuttons->addWidget(backLap);
 
     m_lapButton = new QPushButton(this);
@@ -114,7 +108,6 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     m_lapButton->setAutoDefault(false);
     m_lapButton->setFlat(true);
     m_lapButton->setShortcut(Qt::Key_0);
-    m_lapButton->setToolTip(tr("Lap"));
     toolbuttons->addWidget(m_lapButton);
 
     fwdLap = new QPushButton(this);
@@ -125,7 +118,6 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     fwdLap->setAutoRepeat(true);
     fwdLap->setAutoRepeatDelay(400);
     fwdLap->setShortcut(Qt::Key_MediaLast);
-    fwdLap->setToolTip(tr("Forward 1 lap"));
     toolbuttons->addWidget(fwdLap);
 
     toolbuttons->addSpacing(5);
@@ -138,7 +130,6 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     cal->setAutoDefault(false);
     cal->setFlat(true);
     cal->setShortcut(Qt::Key_C);
-    cal->setToolTip(tr("Calibrate"));
     toolbuttons->addWidget(cal);
 
     toolbuttons->addSpacing(5);
@@ -153,7 +144,6 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     loadDown->setAutoRepeat(true);
     loadDown->setAutoRepeatInterval(50);
     loadDown->setShortcut(Qt::Key_Minus);
-    loadDown->setToolTip(tr("Decrease intensity"));
     toolbuttons->addWidget(loadDown);
 
     loadUp = new QPushButton(this);
@@ -164,7 +154,6 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     loadUp->setAutoRepeat(true);
     loadUp->setAutoRepeatInterval(50);
     loadUp->setShortcut(Qt::Key_Plus);
-    loadUp->setToolTip(tr("Increase intensity"));
     toolbuttons->addWidget(loadUp);
 
     intensitySlider = new QSlider(Qt::Vertical, this);
@@ -260,6 +249,8 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     connect(notificationTimer, SIGNAL(timeout()), SLOT(clearNotification()));
 
     updateStyles();
+    m_tooltips = appsettings->value(this, TRAIN_TOOLTIPS, true).toBool();
+    updateTooltips();
 }
 
 void TrainBottom::updatePlayButtonIcon()
@@ -267,14 +258,26 @@ void TrainBottom::updatePlayButtonIcon()
     if (m_trainSidebar->currentStatus() & RT_PAUSED)
     {
         applyIcon(m_playButton, "play");
+        if (m_tooltips)
+        {
+            m_playButton->setToolTip(tr("Resume"));
+        }
     }
     else if (m_trainSidebar->currentStatus() & RT_RUNNING)
     {
         applyIcon(m_playButton, "pause");
+        if (m_tooltips)
+        {
+            m_playButton->setToolTip(tr("Pause"));
+        }
     }
     else // Not running or paused means stopped
     {
         applyIcon(m_playButton, "play");
+        if (m_tooltips)
+        {
+            m_playButton->setToolTip(tr("Start"));
+        }
     }
 }
 
@@ -289,148 +292,104 @@ void TrainBottom::statusChanged(int status)
     // not yet connected
     if ((status&RT_CONNECTED) == 0) {
         applyIcon(m_connectButton, "offline");
+        if (m_tooltips) {
+            m_connectButton->setToolTip(tr("Connect"));
+        }
         m_connectButton->setEnabled(true);
-        m_connectButton->setToolTip(tr("Connect"));
         m_playButton->setEnabled(false);
-        m_playButton->setToolTip("");
         m_stopButton->setEnabled(false);
-        m_stopButton->setToolTip("");
         m_forwardButton->setEnabled(false);
-        m_forwardButton->setToolTip("");
         m_rewindButton->setEnabled(false);
-        m_rewindButton->setToolTip("");
         backLap->setEnabled(false);
-        backLap->setToolTip("");
         m_lapButton->setEnabled(false);
-        m_lapButton->setToolTip("");
         fwdLap->setEnabled(false);
-        fwdLap->setToolTip("");
         cal->setEnabled(false);
-        cal->setToolTip("");
         loadUp->setEnabled(false);
-        loadUp->setToolTip("");
         loadDown->setEnabled(false);
-        loadDown->setToolTip("");
         intensitySlider->setEnabled(false);
-        intensitySlider->setToolTip("");
         return;
     }
 
     // connected, but not running
     if ((status&RT_CONNECTED) && ((status&RT_RUNNING) == 0)) {
         applyIcon(m_connectButton, "online");
+        if (m_tooltips) {
+            m_connectButton->setToolTip(tr("Disconnect"));
+        }
         m_connectButton->setEnabled(true);
-        m_connectButton->setToolTip(tr("Disconnect"));
         m_playButton->setEnabled(true);
-        m_playButton->setToolTip(tr("Start"));
         m_stopButton->setEnabled(false);
-        m_stopButton->setToolTip("");
         m_forwardButton->setEnabled(false);
-        m_forwardButton->setToolTip("");
         m_rewindButton->setEnabled(false);
-        m_rewindButton->setToolTip("");
         backLap->setEnabled(false);
-        backLap->setToolTip("");
         m_lapButton->setEnabled(false);
-        m_lapButton->setToolTip("");
         fwdLap->setEnabled(false);
-        fwdLap->setToolTip("");
         cal->setEnabled(false);
-        cal->setToolTip("");
         loadUp->setEnabled(false);
-        loadUp->setToolTip("");
         loadDown->setEnabled(false);
-        loadDown->setToolTip("");
         intensitySlider->setEnabled(false);
-        intensitySlider->setToolTip("");
         return;
     }
 
     // paused - important to check for paused before running
     if (status&RT_PAUSED) {
         applyIcon(m_connectButton, "online");
+        if (m_tooltips) {
+            m_connectButton->setToolTip(tr("Disconnect"));
+        }
         m_connectButton->setEnabled(false);
-        m_connectButton->setToolTip("");
         m_playButton->setEnabled(true);
-        m_playButton->setToolTip(tr("Resume"));
         m_stopButton->setEnabled(true);
-        m_stopButton->setToolTip(tr("Stop"));
         m_forwardButton->setEnabled(false);
-        m_forwardButton->setToolTip("");
         m_rewindButton->setEnabled(false);
-        m_rewindButton->setToolTip("");
         backLap->setEnabled(false);
-        backLap->setToolTip("");
         m_lapButton->setEnabled(false);
-        m_lapButton->setToolTip("");
         fwdLap->setEnabled(false);
-        fwdLap->setToolTip("");
         cal->setEnabled(false);
-        cal->setToolTip("");
         loadUp->setEnabled(false);
-        loadUp->setToolTip("");
         loadDown->setEnabled(false);
-        loadDown->setToolTip("");
         intensitySlider->setEnabled(false);
-        intensitySlider->setToolTip("");
         return;
     }
 
     // running & calibrating
     if ((status&RT_CALIBRATING) && (status&RT_RUNNING)) {
         applyIcon(m_connectButton, "online");
+        if (m_tooltips) {
+            m_connectButton->setToolTip(tr("Disconnect"));
+        }
         m_connectButton->setEnabled(false);
-        m_connectButton->setToolTip("");
         m_playButton->setEnabled(false);
-        m_playButton->setToolTip("");
         m_stopButton->setEnabled(true);
-        m_stopButton->setToolTip(tr("Stop"));
         m_forwardButton->setEnabled(false);
-        m_forwardButton->setToolTip("");
         m_rewindButton->setEnabled(false);
-        m_rewindButton->setToolTip("");
         backLap->setEnabled(false);
-        backLap->setToolTip("");
         m_lapButton->setEnabled(false);
-        m_lapButton->setToolTip("");
         fwdLap->setEnabled(false);
-        fwdLap->setToolTip("");
         cal->setEnabled(true);
-        cal->setToolTip(tr("Calibrate"));
         loadUp->setEnabled(false);
-        loadUp->setToolTip("");
         loadDown->setEnabled(false);
-        loadDown->setToolTip("");
         intensitySlider->setEnabled(false);
-        intensitySlider->setToolTip("");
         return;
     }
 
     // running
     if (status&RT_RUNNING) {
         applyIcon(m_connectButton, "online");
+        if (m_tooltips) {
+            m_connectButton->setToolTip(tr("Disconnect"));
+        }
         m_connectButton->setEnabled(false);
-        m_connectButton->setToolTip("");
         m_playButton->setEnabled(true);
-        m_playButton->setToolTip(tr("Pause"));
         m_stopButton->setEnabled(true);
-        m_stopButton->setToolTip(tr("Stop"));
         m_forwardButton->setEnabled(true);
-        m_forwardButton->setToolTip(tr("Fast forward"));
         m_rewindButton->setEnabled(true);
-        m_rewindButton->setToolTip(tr("Rewind"));
         backLap->setEnabled(true);
-        backLap->setToolTip(tr("Back 1 lap"));
         m_lapButton->setEnabled(true);
-        m_lapButton->setToolTip(tr("Lap"));
         fwdLap->setEnabled(true);
-        fwdLap->setToolTip(tr("Forward 1 lap"));
         cal->setEnabled(true);
-        cal->setToolTip(tr("Calibrate"));
         loadUp->setEnabled(true);
-        loadUp->setToolTip(tr("Increase intensity"));
         loadDown->setEnabled(true);
-        loadDown->setToolTip(tr("Decrease intensity"));
         intensitySlider->setEnabled(true);
         intensitySlider->setToolTip(tr("Adjust intensity"));
         return;
@@ -490,7 +449,36 @@ void TrainBottom::updateStyles()
     setStyleSheet(bss);
 }
 
-
+void TrainBottom::updateTooltips()
+{
+    if (m_tooltips) {
+        m_connectButton->setToolTip(tr("Connect"));
+        m_rewindButton->setToolTip(tr("Rewind"));
+        m_stopButton->setToolTip(tr("Stop"));
+        m_playButton->setToolTip(tr("Start"));
+        m_forwardButton->setToolTip(tr("Fast forward"));
+        backLap->setToolTip(tr("Back 1 lap"));
+        m_lapButton->setToolTip(tr("Lap"));
+        fwdLap->setToolTip(tr("Forward 1 lap"));
+        cal->setToolTip(tr("Calibrate"));
+        loadDown->setToolTip(tr("Decrease intensity"));
+        loadUp->setToolTip(tr("Increase intensity"));
+    }
+    else {
+        m_connectButton->setToolTip("");
+        m_playButton->setToolTip("");
+        m_stopButton->setToolTip("");
+        m_forwardButton->setToolTip("");
+        m_rewindButton->setToolTip("");
+        backLap->setToolTip("");
+        m_lapButton->setToolTip("");
+        fwdLap->setToolTip("");
+        cal->setToolTip("");
+        loadUp->setToolTip("");
+        loadDown->setToolTip("");
+        intensitySlider->setToolTip("");
+    }
+}
 QFrame* TrainBottom::newSep()
 {
     QFrame *sep = new QFrame(this);
@@ -504,6 +492,11 @@ QFrame* TrainBottom::newSep()
 void TrainBottom::configChanged(qint32)
 {
     updateStyles();
+    const bool tooltips = appsettings->value(this, TRAIN_TOOLTIPS, true).toBool();
+    if (m_tooltips != tooltips) {
+        m_tooltips = tooltips;
+        updateTooltips();
+    }
 }
 
 

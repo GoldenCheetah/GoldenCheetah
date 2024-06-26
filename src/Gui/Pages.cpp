@@ -757,6 +757,9 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
     coalesce = new QCheckBox(tr("Coalesce contiguous sections of same wattage"), this);
     coalesce->setChecked(appsettings->value(this, TRAIN_COALESCE_SECTIONS, false).toBool());
 
+    tooltips = new QCheckBox(tr("Enable Tooltips"), this);
+    tooltips->setChecked(appsettings->value(this, TRAIN_TOOLTIPS, true).toBool());
+
     telemetryScalingLabel = new QLabel(tr("Telemetry font scaling"));
     telemetryScaling = new QComboBox();
     telemetryScaling->addItem(tr("Fit to height only"), 0);
@@ -785,6 +788,7 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
     all->addRow("", autoHide);
     all->addRow("", lapAlert);
     all->addRow("", coalesce);
+    all->addRow("", tooltips);
     all->addRow(delayLabel, startDelay);
     all->addRow(telemetryScalingLabel, telemetryScaling);
 }
@@ -803,6 +807,7 @@ TrainOptionsPage::saveClicked()
     appsettings->setValue(TRAIN_AUTOHIDE, autoHide->isChecked());
     appsettings->setValue(TRAIN_LAPALERT, lapAlert->isChecked());
     appsettings->setValue(TRAIN_COALESCE_SECTIONS, coalesce->isChecked());
+    appsettings->setValue(TRAIN_TOOLTIPS, tooltips->isChecked());
     appsettings->setValue(TRAIN_TELEMETRY_FONT_SCALING, telemetryScaling->currentIndex());
 
     return 0;
