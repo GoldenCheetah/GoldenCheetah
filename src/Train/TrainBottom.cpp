@@ -249,6 +249,8 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     connect(notificationTimer, SIGNAL(timeout()), SLOT(clearNotification()));
 
     updateStyles();
+    m_tooltips = appsettings->value(this, TRAIN_TOOLTIPS, true).toBool();
+    updateTooltips();
 }
 
 void TrainBottom::updatePlayButtonIcon()
@@ -256,14 +258,26 @@ void TrainBottom::updatePlayButtonIcon()
     if (m_trainSidebar->currentStatus() & RT_PAUSED)
     {
         applyIcon(m_playButton, "play");
+        if (m_tooltips)
+        {
+            m_playButton->setToolTip(tr("Resume"));
+        }
     }
     else if (m_trainSidebar->currentStatus() & RT_RUNNING)
     {
         applyIcon(m_playButton, "pause");
+        if (m_tooltips)
+        {
+            m_playButton->setToolTip(tr("Pause"));
+        }
     }
     else // Not running or paused means stopped
     {
         applyIcon(m_playButton, "play");
+        if (m_tooltips)
+        {
+            m_playButton->setToolTip(tr("Start"));
+        }
     }
 }
 
@@ -278,6 +292,9 @@ void TrainBottom::statusChanged(int status)
     // not yet connected
     if ((status&RT_CONNECTED) == 0) {
         applyIcon(m_connectButton, "offline");
+        if (m_tooltips) {
+            m_connectButton->setToolTip(tr("Connect"));
+        }
         m_connectButton->setEnabled(true);
         m_playButton->setEnabled(false);
         m_stopButton->setEnabled(false);
@@ -296,6 +313,9 @@ void TrainBottom::statusChanged(int status)
     // connected, but not running
     if ((status&RT_CONNECTED) && ((status&RT_RUNNING) == 0)) {
         applyIcon(m_connectButton, "online");
+        if (m_tooltips) {
+            m_connectButton->setToolTip(tr("Disconnect"));
+        }
         m_connectButton->setEnabled(true);
         m_playButton->setEnabled(true);
         m_stopButton->setEnabled(false);
@@ -314,6 +334,9 @@ void TrainBottom::statusChanged(int status)
     // paused - important to check for paused before running
     if (status&RT_PAUSED) {
         applyIcon(m_connectButton, "online");
+        if (m_tooltips) {
+            m_connectButton->setToolTip(tr("Disconnect"));
+        }
         m_connectButton->setEnabled(false);
         m_playButton->setEnabled(true);
         m_stopButton->setEnabled(true);
@@ -332,6 +355,9 @@ void TrainBottom::statusChanged(int status)
     // running & calibrating
     if ((status&RT_CALIBRATING) && (status&RT_RUNNING)) {
         applyIcon(m_connectButton, "online");
+        if (m_tooltips) {
+            m_connectButton->setToolTip(tr("Disconnect"));
+        }
         m_connectButton->setEnabled(false);
         m_playButton->setEnabled(false);
         m_stopButton->setEnabled(true);
@@ -350,6 +376,9 @@ void TrainBottom::statusChanged(int status)
     // running
     if (status&RT_RUNNING) {
         applyIcon(m_connectButton, "online");
+        if (m_tooltips) {
+            m_connectButton->setToolTip(tr("Disconnect"));
+        }
         m_connectButton->setEnabled(false);
         m_playButton->setEnabled(true);
         m_stopButton->setEnabled(true);
@@ -362,6 +391,7 @@ void TrainBottom::statusChanged(int status)
         loadUp->setEnabled(true);
         loadDown->setEnabled(true);
         intensitySlider->setEnabled(true);
+        intensitySlider->setToolTip(tr("Adjust intensity"));
         return;
     }
 
@@ -419,7 +449,36 @@ void TrainBottom::updateStyles()
     setStyleSheet(bss);
 }
 
-
+void TrainBottom::updateTooltips()
+{
+    if (m_tooltips) {
+        m_connectButton->setToolTip(tr("Connect"));
+        m_rewindButton->setToolTip(tr("Rewind"));
+        m_stopButton->setToolTip(tr("Stop"));
+        m_playButton->setToolTip(tr("Start"));
+        m_forwardButton->setToolTip(tr("Fast forward"));
+        backLap->setToolTip(tr("Back 1 lap"));
+        m_lapButton->setToolTip(tr("Lap"));
+        fwdLap->setToolTip(tr("Forward 1 lap"));
+        cal->setToolTip(tr("Calibrate"));
+        loadDown->setToolTip(tr("Decrease intensity"));
+        loadUp->setToolTip(tr("Increase intensity"));
+    }
+    else {
+        m_connectButton->setToolTip("");
+        m_playButton->setToolTip("");
+        m_stopButton->setToolTip("");
+        m_forwardButton->setToolTip("");
+        m_rewindButton->setToolTip("");
+        backLap->setToolTip("");
+        m_lapButton->setToolTip("");
+        fwdLap->setToolTip("");
+        cal->setToolTip("");
+        loadUp->setToolTip("");
+        loadDown->setToolTip("");
+        intensitySlider->setToolTip("");
+    }
+}
 QFrame* TrainBottom::newSep()
 {
     QFrame *sep = new QFrame(this);
@@ -433,6 +492,11 @@ QFrame* TrainBottom::newSep()
 void TrainBottom::configChanged(qint32)
 {
     updateStyles();
+    const bool tooltips = appsettings->value(this, TRAIN_TOOLTIPS, true).toBool();
+    if (m_tooltips != tooltips) {
+        m_tooltips = tooltips;
+        updateTooltips();
+    }
 }
 
 

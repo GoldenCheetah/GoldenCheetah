@@ -240,6 +240,7 @@ class TrainOptionsPage : public QWidget
         QCheckBox   *autoHide;
         QCheckBox   *lapAlert;
         QCheckBox   *coalesce;
+        QCheckBox   *tooltips;
         QLabel      *telemetryScalingLabel;
         QComboBox   *telemetryScaling;
 };

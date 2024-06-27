@@ -47,8 +47,10 @@ private:
     QPlainTextEdit *notificationText;
     QTimer *notificationTimer;
     QMap<void*, QString> iconNames;
+    bool m_tooltips;
 
     void updateStyles();
+    void updateTooltips();
     QFrame *newSep();
     void applyIcon(QPushButton *button, QString iconName, bool dark);
     void applyIcon(QPushButton *button, QString iconName);
