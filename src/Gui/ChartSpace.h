@@ -50,7 +50,7 @@ class ChartSpace;
 class ChartSpaceItemFactory;
 
 // we need a scope for a chart space, one or more of
-enum OverviewScope { ANALYSIS=0x01, TRENDS=0x02, ATHLETES=0x04 };
+enum OverviewScope { ANALYSIS=0x01, TRENDS=0x02, ATHLETES=0x04, EQUIPMENT=0x08 };
 
 // we need to intercept the graphics scene drag and drop
 // events and send them to MainWindow

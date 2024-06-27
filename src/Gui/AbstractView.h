@@ -34,6 +34,7 @@
 #include "Settings.h"
 
 class AthleteTab;
+class EquipmentTab;
 class ViewSplitter;
 class Context;
 class BlankStatePage;
@@ -54,7 +55,7 @@ class AbstractView : public QWidget
 
     public:
 
-        AbstractView(Context *context, int type);
+        AbstractView(Context *context, int type, const QString& name, const QString& heading);
         virtual ~AbstractView();
         virtual void close() {};
 
@@ -78,16 +79,16 @@ class AbstractView : public QWidget
         bool isTiled() const { return _tiled; }
 
         // load/save perspectives
-        void restoreState(bool useDefault = false);
+        virtual void restoreState(bool useDefault = false);
         void saveState();
         void appendPerspective(Perspective *page);
 
-        void setPerspectives(QComboBox *perspectiveSelector, bool selectChart=false); // set the combobox when view selected
+        virtual void setPerspectives(QComboBox *perspectiveSelector, bool selectChart=false); // set the combobox when view selected
         void perspectiveSelected(int index); // combobox selections changed because the user selected a perspective
         int currentPerspective() const { if (pstack && pstack->currentIndex() >=0) return pstack->currentIndex(); else return 0; }
 
         // add a new perspective
-        Perspective *addPerspective(QString);
+        virtual Perspective *addPerspective(QString);
         void removePerspective(Perspective *);
         void swapPerspective(int from, int to); // reorder by moving 1 pos at a time
 
@@ -137,7 +138,7 @@ class AbstractView : public QWidget
 
         // Let the base class handle the splitter movement and
         // hiding the sidebar by dragging it closed.
-        void splitterMoved(int, int);
+        virtual void splitterMoved(int, int);
 
         //void mediaSelected(QString filename);
         //void ergSelected(ErgFile *erg);
@@ -149,9 +150,10 @@ class AbstractView : public QWidget
     protected:
 
         Context *context;
-        int type; // used by windowregistry; e.g VIEW_TRAIN VIEW_ANALYSIS VIEW_DIARY VIEW_TRENDS
-                  // we don't care what values are pass through to the GcWindowRegistry to decide
-                  // what charts are relevant for this view.
+        const int type; // used by windowregistry; e.g VIEW_TRAIN VIEW_ANALYSIS VIEW_DIARY VIEW_TRENDS VIEW_EQUIPMENT
+                        // we don't care what values are pass through to the GcWindowRegistry to decide
+                        // what charts are relevant for this view.
+        const QString name; // name of the view:  "train", "analysis", "diary", "home", "equipment"
 
         // properties
         bool _filtered;
