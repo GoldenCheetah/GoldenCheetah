@@ -70,7 +70,7 @@ if [[ $TRAVIS_PULL_REQUEST == "false" && $TRAVIS_COMMIT_MESSAGE == *"[publish bi
 mkdir out
 mv $FINAL_NAME out
 mv GCversionMacOS.txt out
-ghr -b "Snapshot Builds" -replace snapshot out
+ghr -n "Snapshot Builds" -replace snapshot out
 else
 curl --max-time 300 -F "file=@$FINAL_NAME" https://temp.sh/upload
 fi
