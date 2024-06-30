@@ -89,7 +89,7 @@ OverviewWindow::OverviewWindow(Context *context, int scope, bool blank) : GcChar
     connect(importChart, SIGNAL(triggered(bool)), this, SLOT(importChart()));
     connect(settings, SIGNAL(triggered(bool)), this, SLOT(settings()));
     connect(mincolsEdit, SIGNAL(valueChanged(int)), this, SLOT(setMinimumColumns(int)));
-    connect(space, SIGNAL(itemConfigRequested(ChartSpaceItem*)), this, SLOT(configItem(ChartSpaceItem*)));
+    connect(space, SIGNAL(itemConfigRequested(ChartSpaceItem*, QPoint)), this, SLOT(configItem(ChartSpaceItem*, QPoint)));
 }
 
 void
@@ -176,9 +176,10 @@ nodice:
 }
 
 void
-OverviewWindow::configItem(ChartSpaceItem *item)
+OverviewWindow::configItem(ChartSpaceItem *item, QPoint pos)
 {
     OverviewConfigDialog *p = new OverviewConfigDialog(item);
+    p->move(pos.x()+10, pos.y()+10);
     p->exec(); // no mem leak as delete on close
 }
 
