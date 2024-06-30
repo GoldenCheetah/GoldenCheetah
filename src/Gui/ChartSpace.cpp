@@ -947,67 +947,75 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
             // only respond to clicks not in config corner button
             if (item && ! item->inCorner()) {
 
-               // are we on the boundary of the ChartSpaceItem?
-               double offx = pos.x()-item->geometry().x();
-               double offy = pos.y()-item->geometry().y();
+                if (static_cast<QGraphicsSceneMouseEvent*>(event)->button() == Qt::LeftButton) {
 
+                    // are we on the boundary of the ChartSpaceItem?
+                    double offx = pos.x() - item->geometry().x();
+                    double offy = pos.y() - item->geometry().y();
 
-               if (item->geometry().height()-offy < (gl_near*dpiXFactor)) {
+                    if (item->geometry().height() - offy < (gl_near * dpiXFactor)) {
 
-                    // We can span resize a specific chartspaceitem
-                    // by pressing SHIFT when we click
-                    state = YRESIZE;
+                        // We can span resize a specific chartspaceitem
+                        // by pressing SHIFT when we click
+                        state = YRESIZE;
 
-                    stateData.yresize.item = item;
-                    stateData.yresize.deep = item->deep;
-                    stateData.yresize.posy = pos.y();
+                        stateData.yresize.item = item;
+                        stateData.yresize.deep = item->deep;
+                        stateData.yresize.posy = pos.y();
 
-                    // thanks we'll take that
-                    event->accept();
-                    returning = true;
+                        // thanks we'll take that
+                        event->accept();
+                        returning = true;
 
-               } else if (item->geometry().width()-offx < (gl_near*dpiXFactor)) {
+                    }
+                    else if (item->geometry().width() - offx < (gl_near * dpiXFactor)) {
 
-                    if (QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier)  state = SPAN;
-                    else state = XRESIZE;
+                        if (QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier)  state = SPAN;
+                        else state = XRESIZE;
 
-                    stateData.xresize.item = item;
-                    stateData.xresize.column = item->column+item->span-1;
-                    stateData.xresize.width = columns[item->column];
-                    stateData.xresize.posx = pos.x();
+                        stateData.xresize.item = item;
+                        stateData.xresize.column = item->column + item->span - 1;
+                        stateData.xresize.width = columns[item->column];
+                        stateData.xresize.posx = pos.x();
 
-                    // thanks we'll take that
-                    event->accept();
-                    returning = true;
+                        // thanks we'll take that
+                        event->accept();
+                        returning = true;
 
-               } else {
+                    }
+                    else {
 
-                    // we're grabbing a ChartSpaceItem, so lets
-                    // work out the offset so we can move
-                    // it around when we start dragging
-                    state = DRAG;
+                        // we're grabbing a ChartSpaceItem, so lets
+                        // work out the offset so we can move
+                        // it around when we start dragging
+                        state = DRAG;
 
-                    // warn items we are dragging, they may temporarily
-                    // hide widgets to make things faster
-                    foreach(ChartSpaceItem *item, items) item->dragging(true);
+                        // warn items we are dragging, they may temporarily
+                        // hide widgets to make things faster
+                        foreach(ChartSpaceItem * item, items) item->dragging(true);
 
-                    item->invisible = true;
-                    item->setDrag(true);
-                    item->setZValue(100);
+                        item->invisible = true;
+                        item->setDrag(true);
+                        item->setZValue(100);
 
-                    stateData.drag.item = item;
-                    stateData.drag.offx = offx;
-                    stateData.drag.offy = offy;
-                    stateData.drag.width = columns[item->column];
+                        stateData.drag.item = item;
+                        stateData.drag.offx = offx;
+                        stateData.drag.offy = offy;
+                        stateData.drag.width = columns[item->column];
 
-                    // thanks we'll take that
-                    event->accept();
-                    returning = true;
+                        // thanks we'll take that
+                        event->accept();
+                        returning = true;
 
-                    // what is the offset?
-                    //updateGeometry();
-                    scene->update();
-                    view->update();
+                        // what is the offset?
+                        //updateGeometry();
+                        scene->update();
+                        view->update();
+                    }
+                }
+                else if (static_cast<QGraphicsSceneMouseEvent*>(event)->button() == Qt::RightButton) {
+
+                    item->DisplayMenuOfValues(static_cast<QGraphicsSceneMouseEvent*>(event)->screenPos());
                 }
             }
         }
