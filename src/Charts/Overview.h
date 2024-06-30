@@ -66,6 +66,8 @@ class OverviewWindow : public GcChartWindow
         // config item requested
         virtual void configItem(ChartSpaceItem *);
 
+        const ChartSpace* getSpace() const { return space; };
+
     protected:
 
         virtual QString getChartSource() const;

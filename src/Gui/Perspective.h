@@ -101,6 +101,8 @@ class Perspective : public GcWindow
             return currentTab() >= 0 ? charts[currentTab()] : NULL;
         }
 
+        const QList<GcChartWindow*>& getCharts() { return charts; }
+
     public slots:
 
         // GC signals

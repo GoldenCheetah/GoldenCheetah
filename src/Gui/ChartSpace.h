@@ -39,6 +39,7 @@
 #include <QScrollBar>
 #include <QIcon>
 #include <QTimer>
+#include <QPoint>
 
 // geometry basics
 #define SPACING 80
@@ -87,6 +88,9 @@ class ChartSpaceItem : public QGraphicsWidget
         virtual void setDateRange(DateRange )=0;
         virtual QColor color();
         virtual QRectF hotspot() { return QRectF(0,0,0,0); } // don't steal events from this area of the item
+        
+        // Override to display tile specific popup menu
+        virtual void DisplayMenuOfValues(const QPoint&) {};
 
         virtual QWidget *config()=0; // must supply a widget to configure
         virtual void configChanged(qint32) {}
@@ -288,6 +292,9 @@ class ChartSpace : public QWidget
 
         // remove an item
         void removeItem(ChartSpaceItem *item);
+
+        // move an item between chart spaces
+        void moveItem(ChartSpaceItem* item, ChartSpace* toChartSpace);
 
         // mostly for athlete view, we just set a fixed
         // zoom width, so we don't get a massive athlete

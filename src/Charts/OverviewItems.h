@@ -362,6 +362,8 @@ public:
     void setData(RideItem* item) override;
     void setDateRange(DateRange) override {} // doesn't support trends view
 
+    virtual void DisplayMenuOfValues(const QPoint& pos) override;
+
     QWidget* config() override { return configwidget; }
 
     // create and config
@@ -379,6 +381,11 @@ public:
     Sparkline* sparkline;
 
     OverviewItemConfig* configwidget;
+
+protected slots:
+
+    void popupAction(QAction*);
+
 };
 
 class PMCOverviewItem : public ChartSpaceItem

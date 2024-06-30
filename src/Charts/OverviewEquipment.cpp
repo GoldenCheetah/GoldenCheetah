@@ -59,6 +59,67 @@ OverviewEquipmentWindow::addTile()
 }
 
 void
+OverviewEquipmentWindow::cloneTile(ChartSpaceItem* item)
+{
+    switch (item->type) {
+
+    case OverviewItemType::EQ_ITEM:
+    {
+        EquipmentItem* meta = reinterpret_cast<EquipmentItem*>(item);
+
+        // clone the equipment item
+        EquipmentItem* clonedItem = new EquipmentItem(meta->parent, meta->name + " clone", meta->eqLinkUse_,
+            meta->getNonGCDistanceScaled(), meta->getNonGCElevationScaled(),
+            meta->repDistanceScaled_, meta->repElevationScaled_,
+            meta->notes_);
+
+        space->addItem(meta->order, meta->column, meta->span, meta->deep, clonedItem);
+
+        // update geometry
+        space->updateGeometry();
+        space->updateView();
+
+        eqCalc_->recalculateEquipTile(clonedItem);
+    }
+    break;
+
+    case OverviewItemType::EQ_SUMMARY:
+    {
+        EquipmentSummary* meta = reinterpret_cast<EquipmentSummary*>(item);
+
+        // clone the equipment summary item
+        EquipmentSummary* clonedItem = new EquipmentSummary(meta->parent, meta->name + " clone",
+                                                            meta->eqLinkName_, meta->showActivitiesPerAthlete_);
+
+        space->addItem(meta->order, meta->column, meta->span, meta->deep, clonedItem);
+
+        // update geometry
+        space->updateGeometry();
+        space->updateView();
+
+        eqCalc_->recalculateEquipTile(clonedItem);
+    }
+    break;
+
+    case OverviewItemType::EQ_NOTES:
+    {
+        EquipmentNotes* meta = reinterpret_cast<EquipmentNotes*>(item);
+
+        // clone the equipment notes item
+        EquipmentNotes* clonedItem = new EquipmentNotes(meta->parent, meta->name + " clone", meta->notes_);
+
+        space->addItem(meta->order, meta->column, meta->span, meta->deep, clonedItem);
+
+        // update geometry
+        space->updateGeometry();
+        space->updateView();
+    }
+    break;
+    }
+}
+
+
+void
 OverviewEquipmentWindow::configItem(ChartSpaceItem* item)
 {
     OverviewWindow::configItem(item);
@@ -131,7 +192,7 @@ OverviewEquipmentWindow::getExtraConfiguration(ChartSpaceItem* item, QString& co
 
         eqDoc.setArray(EqLinkUses);
         config += "\"eqUseList\":" + eqDoc.toJson(QJsonDocument::Compact) + ",";
-        config += "\"notes\":\"" + meta->notes_ + "\",";
+        config += "\"notes\":\"" + Utils::jsonprotect(meta->notes_) + "\",";
     }
     break;
 
@@ -146,7 +207,7 @@ OverviewEquipmentWindow::getExtraConfiguration(ChartSpaceItem* item, QString& co
     case OverviewItemType::EQ_NOTES:
     {
         EquipmentNotes* meta = reinterpret_cast<EquipmentNotes*>(item);
-        config += "\"notes\":\"" + QString("%1").arg(meta->notes_) + "\",";
+        config += "\"notes\":\"" + Utils::jsonprotect(meta->notes_) + "\",";
     }
     break;
     }
@@ -223,7 +284,7 @@ OverviewEquipmentWindow::setExtraConfiguration(QJsonObject& obj, int type, Chart
             }
         }
 
-        QString notes = obj["notes"].toString();
+        QString notes = Utils::jsonunprotect(obj["notes"].toString());
 
         add = new EquipmentItem(space, name, eqLinkUse, nonGCDistanceScaled, nonGCElevationScaled,
                                 repDistance, repElevation, notes);
@@ -244,7 +305,7 @@ OverviewEquipmentWindow::setExtraConfiguration(QJsonObject& obj, int type, Chart
 
     case OverviewItemType::EQ_NOTES:
     {
-        QString notes = obj["notes"].toString();
+        QString notes = Utils::jsonunprotect(obj["notes"].toString());
         add = new EquipmentNotes(space, name, notes);
         add->datafilter = datafilter;
         space->addItem(order, column, span, deep, add);

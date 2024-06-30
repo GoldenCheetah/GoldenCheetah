@@ -20,6 +20,10 @@
 #include "ColorButton.h"
 #include "OverviewEquipmentItems.h"
 
+// supports tile move & clone
+#include "OverviewEquipment.h"
+#include "Perspective.h"
+
 bool
 OverviewEquipmentItemConfig::registerItems()
 {
@@ -101,9 +105,13 @@ OverviewEquipmentItemConfig::OverviewEquipmentItemConfig(ChartSpaceItem* item) :
         layout->insertRow(insertRow++, tr("Manual elev"), nonGCElevation);
 
         eqTimeWindows = new QTableWidget(0, 5);
-        QStringList headers = (QStringList() << "EqLink Name" << "Start set" << "Start Date"<< "End set" << "End Date");
+        QStringList headers = (QStringList() << tr("EqLink Name") << tr("Start") << tr("Start Date") << tr("End") << tr("End Date"));
         eqTimeWindows->setHorizontalHeaderLabels(headers);
-        eqTimeWindows->setMinimumWidth(430 * dpiXFactor);
+        eqTimeWindows->setColumnWidth(1, 40 * dpiXFactor);
+        eqTimeWindows->setColumnWidth(2, 90 * dpiXFactor);
+        eqTimeWindows->setColumnWidth(3, 40 * dpiXFactor);
+        eqTimeWindows->setColumnWidth(4, 90 * dpiXFactor);
+        eqTimeWindows->setMinimumWidth(400 * dpiXFactor);
         eqTimeWindows->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
         eqTimeWindows->setSelectionBehavior(QAbstractItemView::SelectRows);
         eqTimeWindows->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -242,6 +250,7 @@ OverviewEquipmentItemConfig::tableCellClicked(int row, int column)
 
             QDateEdit* date = new QDateEdit();
             date->setCalendarPopup(true);
+            date->setStyleSheet(QString("QDateEdit { border: 0px; } "));
             connect(date, SIGNAL(dateChanged(QDate)), this, SLOT(dataChanged()));
             eqTimeWindows->setCellWidget(row, column + 1, date);
         }
@@ -254,6 +263,7 @@ OverviewEquipmentItemConfig::tableCellClicked(int row, int column)
 
             QDateEdit* date = new QDateEdit();
             date->setCalendarPopup(true);
+            date->setStyleSheet(QString("QDateEdit { border: 0px; } "));
             connect(date, SIGNAL(dateChanged(QDate)), this, SLOT(dataChanged()));
             eqTimeWindows->setCellWidget(row, column, date);
 
@@ -283,6 +293,7 @@ OverviewEquipmentItemConfig::setEqLinkRowWidgets(int tableRow, const EqTimeWindo
     if (eqUse && eqUse->startSet_) {
         QDateEdit* startDate = new QDateEdit();
         startDate->setCalendarPopup(true);
+        startDate->setStyleSheet(QString("QDateEdit { border: 0px; } "));
         connect(startDate, SIGNAL(dateChanged(QDate)), this, SLOT(dataChanged()));
         eqTimeWindows->setCellWidget(tableRow, 2, startDate);
     }
@@ -295,6 +306,7 @@ OverviewEquipmentItemConfig::setEqLinkRowWidgets(int tableRow, const EqTimeWindo
     if (eqUse && eqUse->endSet_) {
         QDateEdit* endDate = new QDateEdit();
         endDate->setCalendarPopup(true);
+        endDate->setStyleSheet(QString("QDateEdit { border: 0px; } "));
         connect(endDate, SIGNAL(dateChanged(QDate)), this, SLOT(dataChanged()));
         eqTimeWindows->setCellWidget(tableRow, 4, endDate);
     }
@@ -390,10 +402,71 @@ OverviewEquipmentItemConfig::dataChanged()
 }
 
 //
-// ------------------------------------------ EquipmentItem --------------------------------------------
+// ------------------------------------- Equipment Abstract Item -----------------------------------------
 //
 
-EquipmentItem::EquipmentItem(ChartSpace* parent, const QString& name) : ChartSpaceItem(parent, name)
+CommonEquipmentItem::CommonEquipmentItem(ChartSpace* parent, const QString& name) :
+    ChartSpaceItem(parent, name)
+{
+}
+
+void CommonEquipmentItem::DisplayMenuOfValues(const QPoint& pos)
+{
+    QMenu popMenu;
+
+    for (const GcChartWindow* chart : parent->window->getPerspective()->getCharts()) {
+
+        // add the clone tile option at the top first
+        if (chart == parent->window) {
+            QAction* metaAction = new QAction("Clone Tile");
+            GcChartWindow* tmp = const_cast<GcChartWindow*>(chart);
+            QVariant varPtr(QVariant::fromValue(static_cast<void*>(tmp)));
+            metaAction->setData(varPtr);
+            popMenu.addAction(metaAction);
+        }
+    }
+
+    for (const GcChartWindow* chart : parent->window->getPerspective()->getCharts()) {
+
+        // Add the move to chart options
+        if (chart != parent->window) {
+            QAction* metaAction = new QAction("-->" + chart->title());
+            GcChartWindow* tmp = const_cast<GcChartWindow*>(chart);
+            QVariant varPtr(QVariant::fromValue(static_cast<void*>(tmp)));
+            metaAction->setData(varPtr);
+            popMenu.addAction(metaAction);
+        }
+    }
+
+    if (!popMenu.isEmpty()) {
+
+        connect(&popMenu, SIGNAL(triggered(QAction*)), this, SLOT(popupAction(QAction*)));
+        popMenu.exec(pos);
+    }
+}
+
+void CommonEquipmentItem::popupAction(QAction* action)
+{
+    GcChartWindow* toChart = static_cast<GcChartWindow*>(action->data().value<void*>());
+    const ChartSpace* toChartSpace = static_cast<OverviewEquipmentWindow*>(toChart)->getSpace();
+
+    if (parent == toChartSpace) {
+
+        // clone me
+        static_cast<OverviewEquipmentWindow*>(toChart)->cloneTile(this);
+    }
+    else
+    {
+        // move from existing to new chart
+        parent->moveItem(this, const_cast<ChartSpace*>(toChartSpace));
+    }
+}
+
+//
+// ---------------------------------------- Equipment Item --------------------------------------------
+//
+
+EquipmentItem::EquipmentItem(ChartSpace* parent, const QString& name) : CommonEquipmentItem(parent, name)
 {
     // equipment item
     this->type = OverviewItemType::EQ_ITEM;
@@ -412,7 +485,7 @@ EquipmentItem::EquipmentItem(ChartSpace* parent, const QString& name) : ChartSpa
     configwidget_ = new OverviewEquipmentItemConfig(this);
     configwidget_->hide();
 
-    configChanged(0);
+    configChanged(CONFIG_APPEARANCE);
 }
 
 EquipmentItem::EquipmentItem(ChartSpace* parent, const QString& name, QVector<EqTimeWindow>& eqLinkUse,
@@ -427,12 +500,13 @@ EquipmentItem::EquipmentItem(ChartSpace* parent, const QString& name, QVector<Eq
     repElevationScaled_ = repElevationScaled;
     notes_ = notes;
 
+    // set the widgets again for the passed in parameters
     configwidget_->setWidgets();
 }
 
 EquipmentSummary::EquipmentSummary(ChartSpace* parent, const QString& name,
                                    const QString& eqLinkName, bool showActivitiesPerAthlete) :
-    ChartSpaceItem(parent, name)
+                                   CommonEquipmentItem(parent, name)
 {
     // equipment summary item
     this->type = OverviewItemType::EQ_SUMMARY;
@@ -446,11 +520,11 @@ EquipmentSummary::EquipmentSummary(ChartSpace* parent, const QString& name,
     configwidget_ = new OverviewEquipmentItemConfig(this);
     configwidget_->hide();
 
-    configChanged(0);
+    configChanged(CONFIG_APPEARANCE);
 }
 
 EquipmentNotes::EquipmentNotes(ChartSpace* parent, const QString& name, const QString& notes) :
-    ChartSpaceItem(parent, name)
+                               CommonEquipmentItem(parent, name)
 {
     // equipment summary item
     this->type = OverviewItemType::EQ_NOTES;
@@ -459,7 +533,7 @@ EquipmentNotes::EquipmentNotes(ChartSpace* parent, const QString& name, const QS
     configwidget_ = new OverviewEquipmentItemConfig(this);
     configwidget_->hide();
 
-    configChanged(0);
+    configChanged(CONFIG_APPEARANCE);
 }
 
 void
@@ -582,7 +656,7 @@ EquipmentSummary::addAthleteActivity(const QString& athleteName)
 void
 EquipmentItem::configChanged(qint32 cfg) {
 
-    if ((cfg == 0) || (cfg & CONFIG_APPEARANCE)) {
+    if (cfg & CONFIG_APPEARANCE) {
         inactiveColor = (GCColor::luminance(RGBColor(color())) < 127) ? QColor(QColor(100, 100, 100)) : QColor(QColor(170, 170, 170));
         textColor = (GCColor::luminance(RGBColor(color())) < 127) ? QColor(QColor(200, 200, 200)) : QColor(QColor(70, 70, 70));
         alertColor = QColor(QColor(255, 170, 0));
@@ -740,7 +814,7 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
 void
 EquipmentSummary::configChanged(qint32 cfg) {
 
-    if ((cfg == 0) || (cfg & CONFIG_APPEARANCE)) {
+    if (cfg & CONFIG_APPEARANCE) {
         textColor = (GCColor::luminance(RGBColor(color())) < 127) ? QColor(QColor(200, 200, 200)) : QColor(QColor(70, 70, 70));
     }
 }
@@ -803,7 +877,7 @@ EquipmentSummary::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, 
 void
 EquipmentNotes::configChanged(qint32 cfg) {
 
-    if ((cfg == 0) || (cfg & CONFIG_APPEARANCE)) {
+    if (cfg & CONFIG_APPEARANCE) {
         textColor = (GCColor::luminance(RGBColor(color())) < 127) ? QColor(QColor(200, 200, 200)) : QColor(QColor(70, 70, 70));
     }
 }

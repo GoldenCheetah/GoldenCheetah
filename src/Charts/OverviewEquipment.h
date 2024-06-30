@@ -37,6 +37,7 @@ class OverviewEquipmentWindow : public OverviewWindow
 
         virtual ChartSpaceItem* addTile() override;
         virtual void configItem(ChartSpaceItem*) override;
+        void cloneTile(ChartSpaceItem*);
         void calculationComplete();
 
         // athlete opening
