@@ -3527,10 +3527,6 @@ MetaOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
         painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
                                   mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
 
-
-
-
-
         // paint the range and mean if the chart is shown
         if (showrange && sparkline) {
 
