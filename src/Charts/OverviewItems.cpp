@@ -3472,12 +3472,13 @@ MetaOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
 
         // we align centre and mid
         QFontMetrics fm(parent->bigfont);
-        QRectF rect = QFontMetrics(parent->bigfont, parent->device()).boundingRect(value);
 
         if (fieldtype == FIELD_TEXTBOX) {
             // long texts need to be formatted into a smaller font an word wrapped
             painter->setPen(QColor(150,150,150));
             painter->setFont(parent->smallfont);
+
+            QRectF rect = QFontMetrics(parent->bigfont, parent->device()).boundingRect(value);
 
             // draw text and wrap / truncate to bounding rectangle
             painter->drawText(QRectF(ROWHEIGHT, ROWHEIGHT*2.5, geometry().width()-(ROWHEIGHT*2),
@@ -3487,11 +3488,19 @@ MetaOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
             // any other kind of metadata just paint it
             painter->setPen(GColor(CPLOTMARKER));
             painter->setFont(parent->bigfont);
+
+            QString displayValue(value);
+            if (fieldtype == FIELD_DATE) {
+                displayValue = (QDate(1900, 1, 1).addDays(value.toInt())).toString("dd/MM/yyyy");
+            } else if (fieldtype == FIELD_TIME) {
+                displayValue = (QTime(0,0).addSecs(value.toInt())).toString("hh:mm:ss");
+            }
+
+            QRectF rect = QFontMetrics(parent->bigfont, parent->device()).boundingRect(displayValue);
+
             painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
-                                  mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
+                    mid + (fm.ascent() / 3.0f)), displayValue); // divided by 3 to account for "gap" at top of font
         }
-
-
     }
 
     if (sparkline) { // if its a numeric metadata field
