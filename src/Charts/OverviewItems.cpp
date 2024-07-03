@@ -1734,9 +1734,6 @@ TopNOverviewItem::setDateRange(DateRange dr)
 void
 MetaOverviewItem::setData(RideItem *item)
 {
-    // Ensure fieldtype & sparkline match the metadata symbol
-    configChanged(0);
-
     if (item == NULL || item->ride() == NULL) return;
 
     // non-numeric META
