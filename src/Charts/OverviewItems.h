@@ -111,6 +111,7 @@ class OverviewItemConfig : public QWidget
 
         // background color
         ColorButton *bgcolor;
+
 };
 
 class KPIOverviewItem : public ChartSpaceItem
