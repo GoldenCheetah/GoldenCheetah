@@ -206,6 +206,7 @@ AddTileFinal::validatePage()
             // everthing else is a bit smaller
             wizard->item->parent->addItem(0,0,1,7, wizard->item);
         }
+        wizard->item->configChanged(0);
         wizard->item->parent->updateGeometry();
     }
     return true;
