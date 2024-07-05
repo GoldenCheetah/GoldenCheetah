@@ -927,7 +927,7 @@ MetaOverviewItem::configChanged(qint32)
 
 void MetaOverviewItem::DisplayMenuOfValues(const QPoint& pos)
 {
-    QMenu* popMenu = new QMenu(parent);
+    QMenu popMenu;
 
     // Find the metadata fielddefintion for this tile
     foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
@@ -937,15 +937,15 @@ void MetaOverviewItem::DisplayMenuOfValues(const QPoint& pos)
             for (int i = 0; i < field.values.size(); ++i) {
 
                 QAction* metaAction = new QAction(field.values.at(i));
-                popMenu->addAction(metaAction);
+                popMenu.addAction(metaAction);
             }
         }
     }
 
-    if (!popMenu->isEmpty()) {
+    if (!popMenu.isEmpty()) {
 
-        connect(popMenu, SIGNAL(triggered(QAction*)), this, SLOT(popupAction(QAction*)));
-        popMenu->exec(pos);
+        connect(&popMenu, SIGNAL(triggered(QAction*)), this, SLOT(popupAction(QAction*)));
+        popMenu.exec(pos);
     }
 }
 
@@ -955,19 +955,18 @@ void MetaOverviewItem::popupAction(QAction* action)
 
     if (!rideI) { qDebug() << "rideI error in metadata popup"; return; }
 
-    // ack ! we need to autoprocess, so open the ride
     RideFile* rideF = rideI->ride();
 
-    if (!rideF) { qDebug() << "rideF error in metadata popup"; return;; } // eek!
+    if (!rideF) { qDebug() << "rideF error in metadata popup"; return;; }
 
-    // Set the new metadata value in the tile and ride file.
+    // Update the metadata value in the tile and ride file.
     value = action->text();
     rideF->setTag(symbol, value);
 
     // rideFile is now dirty!
     rideI->setDirty(true);
 
-    // get refresh done, coz overrides state has changed
+    // refresh as state has changed
     rideI->notifyRideMetadataChanged();
 }
 
