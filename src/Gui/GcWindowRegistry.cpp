@@ -101,8 +101,8 @@ GcWindowRegistry::initialize()
     //{ VIEW_ANALYSIS, tr("Bing Map"),GcWindowTypes::BingMap },
     { VIEW_ANALYSIS, tr("Scatter"),GcWindowTypes::Scatter },
     { VIEW_ANALYSIS, tr("Aerolab"),GcWindowTypes::Aerolab },
-    { VIEW_DIARY, tr("Calendar"),GcWindowTypes::Diary },
-    { VIEW_DIARY, tr("Navigator"), GcWindowTypes::ActivityNavigator },
+    { VIEW_TRENDS|VIEW_DIARY, tr("Calendar"),GcWindowTypes::Diary },
+    { VIEW_TRENDS|VIEW_DIARY, tr("Navigator"), GcWindowTypes::ActivityNavigator },
     //{ VIEW_DIARY|VIEW_TRENDS, tr("Summary "), GcWindowTypes::DateRangeSummary }, // DEPRECATED IN V3.6
     { VIEW_TRAIN, tr("Telemetry"),GcWindowTypes::DialWindow },
     { VIEW_TRAIN, tr("Workout"),GcWindowTypes::WorkoutPlot },
