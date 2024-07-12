@@ -2836,7 +2836,10 @@ genericnext:
                             break;
                     case 6: // SPEED
                     case 73:// ENHANCED SPEED
-                            kph = value * 3.6 / 1000.0;
+                            if (field.deve_idx>-1)
+                                 native_num = -1;
+                            else
+                                 kph = value * 3.6 / 1000.0;
                             break;
                     case 7: // POWER
                             watts = value;
