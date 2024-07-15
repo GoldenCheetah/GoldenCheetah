@@ -256,3 +256,10 @@ DEFINES += GC_VIDEO_NONE             # dont add any video playback support
 #DEFINES +=GC_CLOUD_DB_BASIC_AUTH=
 #DEFINES +=GC_CLOUD_DB_APP_NAME=
 #CloudDB = active
+
+
+# TrainerDay API key for downloading workouts
+# API keys can be requested here: https://trainerday.com/api/
+#DEFINES += GC_WANT_TRAINERDAY_API
+#DEFINES += GC_TRAINERDAY_API_KEY=\\\"INSERT YOUR API_KEY\\\"
+#DEFINES += GC_TRAINERDAY_API_PAGESIZE=25

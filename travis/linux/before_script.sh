@@ -39,6 +39,8 @@ echo PYTHONINCLUDES = -I/usr/include/python3.7 >> src/gcconfig.pri
 echo PYTHONLIBS = -L/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu -lpython3.7m >> src/gcconfig.pri
 # GSL
 echo GSL_LIBS = -lgsl -lgslcblas -lm >> src/gcconfig.pri
+# TrainerDay Query API
+echo DEFINES += GC_WANT_TRAINERDAY_API >> src/gcconfig.pri
 
 # Patch Secrets.h
 sed -i "s/__GC_GOOGLE_CALENDAR_CLIENT_SECRET__/"$GC_GOOGLE_CALENDAR_CLIENT_SECRET"/" src/Core/Secrets.h
@@ -63,6 +65,7 @@ sed -i "s/__GC_NOLIO_CLIENT_ID__/"$GC_NOLIO_CLIENT_ID"/" src/Core/Secrets.h
 sed -i "s/__GC_NOLIO_SECRET__/"$GC_NOLIO_SECRET"/" src/Core/Secrets.h
 sed -i "s/__GC_XERT_CLIENT_SECRET__/"$GC_XERT_CLIENT_SECRET"/" src/Core/Secrets.h
 sed -i "s/__GC_AZUM_CLIENT_SECRET__/"$GC_AZUM_CLIENT_SECRET"/" src/Core/Secrets.h
+sed -i "s/__GC_TRAINERDAY_API_KEY__/"$GC_TRAINERDAY_API_KEY"/" src/Core/Secrets.h
 cat src/gcconfig.pri
 # update translations
 lupdate src/src.pro

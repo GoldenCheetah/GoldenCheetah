@@ -570,8 +570,8 @@ ErgFilePlot::setData(ErgFile *ergfile)
         }
 
         // set the axis so we use all the screen estate
-        if (context->currentErgFile() && context->currentErgFile()->Points.count()) {
-            double maxX = (double)context->currentErgFile()->Points.last().x;
+        if (ergFile != nullptr && ergFile->Points.count()) {
+            double maxX = (double) ergFile->Points.last().x;
 
             if (bydist) {
                 if (!GlobalContext::context()->useMetricUnits) maxX *= MILES_PER_KM;
