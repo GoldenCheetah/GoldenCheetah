@@ -13,6 +13,9 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QScrollArea>
+#include <QScrollBar>
+#include <QStyleFactory>
+#include <QStyle>
 
 #include "TrainerDayAPIQuery.h"
 #include "ErgFilePlot.h"
@@ -327,7 +330,7 @@ TrainerDayAPIDialog::parseWorkoutResults
             infoArea->setMinimumWidth(360 * dpiXFactor);
             infoArea->setMaximumWidth(360 * dpiXFactor);
 #ifdef Q_OS_WIN
-            xde = QStyleFactory::create(OS_STYLE);
+            QStyle *xde = QStyleFactory::create(OS_STYLE);
             infoArea->verticalScrollBar()->setStyle(xde);
 #endif
 
