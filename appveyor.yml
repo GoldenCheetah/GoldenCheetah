@@ -135,8 +135,9 @@ before_build:
 # Add Train Robot
 - echo DEFINES+=GC_WANT_ROBOT >> src\gcconfig.pri
 
-# Enable TrainerDay Query API
+# Enable TrainerDay Query API; pagesize depends on the keys remote configuration
 - echo DEFINES+=GC_WANT_TRAINERDAY_API >> src\gcconfig.pri
+- echo DEFINES+=GC_TRAINERDAY_API_PAGESIZE=25 >> src\gcconfig.pri
 
 # Avoid macro redefinition warnings
 - echo DEFINES+=_MATH_DEFINES_DEFINED >> src\gcconfig.pri
