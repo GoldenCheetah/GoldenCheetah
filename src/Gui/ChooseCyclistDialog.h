@@ -40,7 +40,7 @@ class ChooseCyclistDialog : public QDialog
 
 
     public:
-        ChooseCyclistDialog(const QDir &home, bool allowNew);
+        ChooseCyclistDialog(const QDir &home);
         QString choice();
         void getList();
         static QString newCyclistDialog(QDir &homeDir, QWidget *parent);
