@@ -415,6 +415,10 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
         connect(colChooser, SIGNAL(triggered(void)), rideNavigator, SLOT(showColumnChooser()));
         menu.addAction(colChooser);
 
+        QAction *scrollToCurrent = new QAction(tr("Scroll to current Activity"), rideNavigator);
+        connect(scrollToCurrent, SIGNAL(triggered(void)), rideNavigator, SLOT(cursorRide()));
+        menu.addAction(scrollToCurrent);
+
         if (rideNavigator->groupBy() >= 0) {
 
             // already grouped lets ungroup
