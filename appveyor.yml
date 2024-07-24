@@ -42,6 +42,8 @@ environment:
     secure: /1rVLT8LyJCZ4xNJ5W+NtAcZ1rtKaUjW9SYm/T3gHoc=
   GC_AZUM_CLIENT_SECRET:
     secure: 2ZpXsA3TQv1zftYVyZSF6f83ftCzza+K22ZX1doj7Yc/5dmGl1bnsSeVChJgJ8lQ2fRPYpdmun9cjqwcrtG/zXTTsYuTvYWegHz/4Y0u6Mg=
+  GC_TRAINERDAY_API_KEY:
+    secure: nDgxUdgLkp0+gaxKRCaAVD5WYAl9pLmOnZ9JLSx3ulqT346nieakd02V3Q7dZYEU
 
 init:
 # Setup QT 5.15 - 64Bit
@@ -133,6 +135,10 @@ before_build:
 # Add Train Robot
 - echo DEFINES+=GC_WANT_ROBOT >> src\gcconfig.pri
 
+# Enable TrainerDay Query API; pagesize depends on the keys remote configuration
+- echo DEFINES+=GC_WANT_TRAINERDAY_API >> src\gcconfig.pri
+- echo DEFINES+=GC_TRAINERDAY_API_PAGESIZE=25 >> src\gcconfig.pri
+
 # Avoid macro redefinition warnings
 - echo DEFINES+=_MATH_DEFINES_DEFINED >> src\gcconfig.pri
 
@@ -160,6 +166,7 @@ before_build:
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_NOLIO_SECRET__', $env:GC_NOLIO_SECRET | Set-Content src\Core\Secrets.h
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_XERT_CLIENT_SECRET__', $env:GC_XERT_CLIENT_SECRET | Set-Content src\Core\Secrets.h
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_AZUM_CLIENT_SECRET__', $env:GC_AZUM_CLIENT_SECRET | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_TRAINERDAY_API_KEY', $env:GC_TRAINERDAY_API_KEY | Set-Content src\Core\Secrets.h
 
 build_script:
 - qmake.exe build.pro -r -spec win32-msvc

@@ -104,6 +104,12 @@ FilterEditor::keyPressEvent
         e->ignore();
         return;
     }
+    if (   _completer
+        && ! _completer->popup()->isVisible()
+        && e->key() == Qt::Key_Escape) {
+        e->ignore();
+        return;
+    }
     const bool isShortcut = (e->modifiers().testFlag(Qt::ControlModifier) && e->key() == Qt::Key_E); // CTRL+E
     if (! _completer || ! isShortcut) {
         QLineEdit::keyPressEvent(e);

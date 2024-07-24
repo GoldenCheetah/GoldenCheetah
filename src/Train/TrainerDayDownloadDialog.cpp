@@ -20,6 +20,7 @@
 #include "MainWindow.h"
 #include "TrainDB.h"
 #include "HelpWhatsThis.h"
+#include "Secrets.h"
 
 TrainerDayDownloadDialog::TrainerDayDownloadDialog(Context *context) : QDialog(context->mainWindow), context(context)
 {
@@ -32,11 +33,12 @@ TrainerDayDownloadDialog::TrainerDayDownloadDialog(Context *context) : QDialog(c
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Tools_Download_ERGDB));
 
     // make the dialog a resonable size
-    setMinimumWidth(650 * dpiXFactor);
-    setMinimumHeight(400 *dpiYFactor);
+    setMinimumWidth(QApplication::primaryScreen()->geometry().width() * 0.8);
+    setMinimumHeight(QApplication::primaryScreen()->geometry().height() * 0.8);
 
-    QVBoxLayout *layout = new QVBoxLayout;
-    setLayout(layout);
+    legacy = new QWidget();
+    QVBoxLayout *legacyLayout = new QVBoxLayout;
+    legacy->setLayout(legacyLayout);
 
     files = new QTreeWidget;
 #ifdef Q_OS_MAC
@@ -60,28 +62,6 @@ TrainerDayDownloadDialog::TrainerDayDownloadDialog(Context *context) : QDialog(c
     files->setUniformRowHeights(true);
     files->setIndentation(0);
 
-    foreach(TrainerDayItem item, ergdb.items()) {
-
-        QTreeWidgetItem *add = new QTreeWidgetItem(files->invisibleRootItem());
-        add->setFlags(add->flags() | Qt::ItemIsEditable);
-
-        // selector
-        QCheckBox *checkBox = new QCheckBox("", this);
-        checkBox->setChecked(false);
-        files->setItemWidget(add, 0, checkBox);
-
-        add->setText(1, item.name);
-        add->setText(2, item.workoutType);
-        add->setText(3, item.author);
-        add->setText(4, item.added.toString(tr("dd MMM yyyy")));
-
-        // interval action
-        add->setText(5, tr("Download"));
-
-        // hide away the id
-        add->setText(6, QString("%1").arg(item.id));
-    }
-
     all = new QCheckBox(tr("check/uncheck all"), this);
     all->setChecked(false);
 
@@ -90,25 +70,57 @@ TrainerDayDownloadDialog::TrainerDayDownloadDialog(Context *context) : QDialog(c
     status = new QLabel("", this);
     status->hide();
     overwrite = new QCheckBox(tr("Overwrite existing workouts"), this);
-    cancel = new QPushButton(tr("Cancel"), this);
+    cancel = new QPushButton(tr("Close"), this);
+    cancel->setAutoDefault(false);
     ok = new QPushButton(tr("Download"), this);
     buttons->addWidget(overwrite);
     buttons->addWidget(status);
     buttons->addStretch();
-    buttons->addWidget(cancel);
     buttons->addWidget(ok);
 
-    layout->addWidget(all);
-    layout->addWidget(files);
-    layout->addLayout(buttons);
+    legacyLayout->addWidget(all);
+    legacyLayout->addWidget(files);
+    legacyLayout->addLayout(buttons);
 
     downloads = fails = 0;
+
+#if defined(GC_WANT_TRAINERDAY_API)
+    QTabWidget *tabs = new QTabWidget();
+    apiDialog = new TrainerDayAPIDialog(context);
+    apiDialog->setStyleSheet(AbstractView::ourStyleSheet());
+    tabs->addTab(apiDialog, tr("Query workouts"));
+    tabs->addTab(legacy, tr("Classic download"));
+    connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+#endif
+
+    QHBoxLayout *globalButtons = new QHBoxLayout();
+    globalButtons->addStretch();
+    globalButtons->addWidget(cancel);
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+#if defined(GC_WANT_TRAINERDAY_API)
+    mainLayout->addWidget(tabs);
+#else
+    mainLayout->addWidget(legacy);
+    loadWorkoutList();  // Force loading the list of available workouts (classic)
+#endif
+    mainLayout->addLayout(globalButtons);
+    setLayout(mainLayout);
 
     // connect signals and slots up..
     connect(ok, SIGNAL(clicked()), this, SLOT(okClicked()));
     connect(all, SIGNAL(stateChanged(int)), this, SLOT(allClicked()));
     connect(cancel, SIGNAL(clicked()), this, SLOT(cancelClicked()));
 }
+
+
+TrainerDayDownloadDialog::~TrainerDayDownloadDialog
+()
+{
+    if (ergdb != nullptr) {
+        delete ergdb;
+    }
+}
+
 
 void
 TrainerDayDownloadDialog::allClicked()
@@ -188,7 +200,7 @@ TrainerDayDownloadDialog::downloadFiles()
 
             // get the id
             int id = current->text(6).toInt();
-            QString content = ergdb.getWorkout(id);
+            QString content = ergdb->getWorkout(id);
 
             QString filename = workoutDir + "/" + current->text(1) + ".erg2";
             ErgFile *p = ErgFile::fromContent2(content, context);
@@ -247,4 +259,52 @@ TrainerDayDownloadDialog::downloadFiles()
     }
     // for library updating, transactional for 10x performance
     trainDB->endLUW();
+}
+
+
+void
+TrainerDayDownloadDialog::tabChanged
+(int idx)
+{
+    if (idx == 1 && ergdb == nullptr) {
+        loadWorkoutList();
+    }
+}
+
+
+void
+TrainerDayDownloadDialog::loadWorkoutList
+()
+{
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    window()->setEnabled(false);
+
+    if (ergdb == nullptr) {
+        ergdb = new TrainerDay();
+    }
+
+    foreach(TrainerDayItem item, ergdb->items()) {
+
+        QTreeWidgetItem *add = new QTreeWidgetItem(files->invisibleRootItem());
+        add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+        // selector
+        QCheckBox *checkBox = new QCheckBox("", this);
+        checkBox->setChecked(false);
+        files->setItemWidget(add, 0, checkBox);
+
+        add->setText(1, item.name);
+        add->setText(2, item.workoutType);
+        add->setText(3, item.author);
+        add->setText(4, item.added.toString(tr("dd MMM yyyy")));
+
+        // interval action
+        add->setText(5, tr("Download"));
+
+        // hide away the id
+        add->setText(6, QString("%1").arg(item.id));
+    }
+
+    window()->setEnabled(true);
+    QApplication::restoreOverrideCursor();
 }

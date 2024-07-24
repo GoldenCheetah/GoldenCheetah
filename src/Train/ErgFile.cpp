@@ -247,6 +247,8 @@ void ErgFile::parseErg2(QString p)
         }
         if (object.contains("title")) {
             name(object["title"].toString());
+        } else if (object.contains("workoutName")) {
+            name(object["workoutName"].toString());
         }
 
         int time = 0;

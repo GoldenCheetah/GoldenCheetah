@@ -25,12 +25,15 @@
 #include "Units.h"
 
 #include "TrainerDay.h" // for interacting with the TrainerDay site
+#include "TrainerDayAPIDialog.h"
 #include "ErgFile.h" // for interacting with the TrainerDay site
 
 #include "TrainSidebar.h"
 
 #include <QtGui>
+#include <QTabWidget>
 #include <QTableWidget>
+#include <QTabWidget>
 #include <QProgressBar>
 #include <QList>
 #include <QLabel>
@@ -48,6 +51,7 @@ class TrainerDayDownloadDialog : public QDialog
 
 public:
     TrainerDayDownloadDialog(Context *context);
+    ~TrainerDayDownloadDialog();
 
     QTreeWidget *files; // choose files to export
 
@@ -58,10 +62,14 @@ private slots:
     void okClicked();
     void downloadFiles();
     void allClicked();
+    void tabChanged(int idx);
 
 private:
     Context *context;
     bool aborted;
+
+    QWidget *legacy;
+    TrainerDayAPIDialog *apiDialog;
 
     QCheckBox *all;
 
@@ -71,7 +79,9 @@ private:
     int downloads, fails;
     QLabel *status;
 
-    TrainerDay ergdb;
+    TrainerDay *ergdb = nullptr;
+
+    void loadWorkoutList();
 };
 #endif // _TrainerDayDownloadDialog_h
 
