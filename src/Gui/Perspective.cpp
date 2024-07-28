@@ -31,6 +31,7 @@
 #include "ChartBar.h"
 #include "Utils.h"
 #include "SearchBox.h"
+#include "OverviewEquipment.h"
 
 #define PERSPECTIVE_DEBUG false
 
@@ -108,6 +109,7 @@ Perspective::Perspective(Context *context, QString title, int type) :
     case VIEW_DIARY: view="diary"; break;
     case VIEW_TRENDS: view="home"; break;
     case VIEW_TRAIN: view="train"; break;
+    case VIEW_EQUIPMENT: view="equipment"; break;
     }
     setProperty("isManager", true);
     nomenu=true;
@@ -695,8 +697,14 @@ void
 Perspective::showControls()
 {
     SSS;
-    context->tab->chartsettings()->adjustSize();
-    context->tab->chartsettings()->show();
+    if (type_ == VIEW_EQUIPMENT) {
+        context->mainWindow->equipView()->chartsettings->adjustSize();
+        context->mainWindow->equipView()->chartsettings->show();
+    }
+    else {
+        context->tab->chartsettings()->adjustSize();
+        context->tab->chartsettings()->show();
+    }
 }
 
 void
@@ -1299,18 +1307,18 @@ Perspective::drawCursor()
     }
 }
 
-GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcChartWindow **here, bool sidebar, LTMSettings *use) : context(context), type(type), here(here), sidebar(sidebar)
+GcWindowDialog::GcWindowDialog(GcWinID type, Context* context, GcChartWindow** here, bool sidebar, LTMSettings* use) : context(context), type(type), here(here), sidebar(sidebar)
 {
     SSS;
     //setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags());
     setWindowTitle(tr("Chart Setup"));
 
-    QRect size= QGuiApplication::primaryScreen()->availableGeometry();
+    QRect size = QGuiApplication::primaryScreen()->availableGeometry();
     setMinimumHeight(500);
 
     // chart and settings side by side need to be big!
-    if (size.width() >= 1300) setMinimumWidth(1200); 
+    if (size.width() >= 1300) setMinimumWidth(1200);
     else setMinimumWidth(800); // otherwise the old default
     setWindowModality(Qt::ApplicationModal);
 
@@ -1327,10 +1335,9 @@ GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcChartWindow **h
     win = GcWindowRegistry::newGcWindow(type, context);
 
     // before we do anything, we need to set the perspective, in case
-    // the chart uses it to decide something - apologies for the convoluted
-    // method to determine the perspective, but its rare to use this outside
-    // the context of a chart or a view
-    win->setProperty("perspective", QVariant::fromValue<Perspective*>(context->mainWindow->athleteTab()->view(context->mainWindow->athleteTab()->currentView())->page()));
+    // the chart uses it to decide something
+    win->setProperty("perspective", QVariant::fromValue<Perspective*>(context->mainWindow->getCurrentAthletesAbstractView()->page()));
+
     chartLayout->addWidget(win);
     //win->setFrameStyle(QFrame::Box);
 
@@ -1352,6 +1359,8 @@ GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcChartWindow **h
     // special case
     if (type == GcWindowTypes::Overview || type == GcWindowTypes::OverviewTrends) {
         static_cast<OverviewWindow*>(win)->setConfiguration("");
+    } else if (type == GcWindowTypes::OverviewEquipment) {
+        static_cast<OverviewEquipmentWindow*>(win)->setConfiguration("");
     }
 
     RideItem *notconst = (RideItem*)context->currentRideItem();
@@ -1777,6 +1786,7 @@ ImportChartDialog::ImportChartDialog(Context *context, QList<QMap<QString,QStrin
         if (view == "home") view = tr("Trends");
         if (view == "analysis") view = tr("Activities");
         if (view == "train") view = tr("Train");
+        if (view == "equipment") view = tr("Equipment");
 
         QTableWidgetItem *t;
 #ifndef GC_HAVE_ICAL
@@ -1857,14 +1867,14 @@ ImportChartDialog::importClicked()
                 view = table->item(i,1)->text();
             }
 
-            int x=0;
-            if (view == tr("Trends"))      { x=0; context->mainWindow->selectTrends(); }
-            if (view == tr("Activities"))  { x=1; context->mainWindow->selectAnalysis(); }
-            if (view == tr("Diary"))       { x=2; context->mainWindow->selectDiary(); }
-            if (view == tr("Train"))       { x=3; context->mainWindow->selectTrain(); }
+            if (view == tr("Trends"))      { context->mainWindow->selectTrends(); }
+            if (view == tr("Activities"))  { context->mainWindow->selectAnalysis(); }
+            if (view == tr("Diary"))       { context->mainWindow->selectDiary(); }
+            if (view == tr("Train"))       { context->mainWindow->selectTrain(); }
+            if (view == tr("Equipment"))   { context->mainWindow->selectEquipment(); }
 
             // add to the currently selected tab and select if only adding one chart
-            context->mainWindow->athleteTab()->view(x)->importChart(list[i], (list.count()==1));
+            context->mainWindow->getCurrentAthletesAbstractView()->importChart(list[i], (list.count()==1));
         }
     }
     accept();

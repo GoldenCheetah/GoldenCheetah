@@ -1,0 +1,17 @@
+{
+  "CHART": {
+    "VERSION": "1",
+    "VIEW": "equipment",
+    "TYPE": "51",
+    "PROPERTIES": {
+      "title": "EquipmentLink ",
+      "subtitle": " ",
+      "widthFactor": "2",
+      "heightFactor": "2",
+      "style": "0",
+      "resizable": "0",
+      "config": "{\n  \"version\":\"2.0\",\n  \"CHARTS\":[\n    { \"type\":115,\"span\":1,\"deep\":14,\"column\":0,\"order\":0,\"color\":\"#010161\",\"showAthleteActivities\":\"1\",\"datafilter\":\" \",\"name\":\"Bike1 Summary\" },\n    { \"type\":114,\"span\":1,\"deep\":13,\"column\":1,\"order\":7,\"color\":\"#010161\",\"nonGCDistanceScaled\":\"0\",\"nonGCElevationScaled\":\"0\",\"repDistance\":\"0\",\"repElevation\":\"0\",\"startSet\":\"0\",\"endSet\":\"0\",\"notes\":\"Frame notes here\",\"datafilter\":\" \",\"name\":\"Frame\" },\n    { \"type\":116,\"span\":1,\"deep\":7,\"column\":0,\"order\":1,\"color\":\"#010161\",\"notes\":\"Equipment notes here\",\"datafilter\":\" \",\"name\":\"Notes\" },\n    { \"type\":114,\"span\":1,\"deep\":13,\"column\":2,\"order\":0,\"color\":\"#010161\",\"nonGCDistanceScaled\":\"0\",\"nonGCElevationScaled\":\"0\",\"repDistance\":\"0\",\"repElevation\":\"0\",\"startSet\":\"0\",\"endSet\":\"0\",\"notes\":\"Wheelset notes here\",\"datafilter\":\" \",\"name\":\"Wheelset\" }\n  ]\n}\n ",
+      "__LAST__": "1"
+    }
+  }
+}

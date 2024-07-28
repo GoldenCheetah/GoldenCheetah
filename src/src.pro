@@ -582,8 +582,8 @@ QT += charts opengl
 
 # Dashboard uses qt charts, so needs at least Qt 5.7
 DEFINES += GC_HAVE_OVERVIEW
-HEADERS += Gui/ChartSpace.h Charts/OverviewItems.h Charts/Overview.h
-SOURCES += Gui/ChartSpace.cpp Charts/OverviewItems.cpp Charts/Overview.cpp
+HEADERS += Gui/ChartSpace.h Charts/OverviewItems.h Charts/Overview.h Charts/OverviewEquipment.h
+SOURCES += Gui/ChartSpace.cpp Charts/OverviewItems.cpp Charts/Overview.cpp Charts/OverviewEquipment.cpp
 
 # generic chart
 DEFINES += GC_HAVE_GENERIC

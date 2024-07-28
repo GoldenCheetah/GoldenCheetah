@@ -64,7 +64,9 @@ class SaveSingleDialogWidget;
 class ChooseCyclistDialog;
 class SearchFilterBox;
 class NewSideBar;
+class AbstractView;
 class AthleteView;
+class EquipView;
 
 
 class MainWindow;
@@ -73,6 +75,7 @@ class AthleteLoader;
 class Context;
 class AthleteTab;
 class GGraphicsView;
+class EquipCalculator;
 
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
@@ -94,6 +97,8 @@ class MainWindow : public QMainWindow
         // currently selected tab
         AthleteTab *athleteTab() { return currentAthleteTab; }
         NewSideBar *newSidebar() { return sidebar; }
+        EquipView *equipView() { return equipmentView; }
+        AbstractView* getCurrentAthletesAbstractView();
 
         // tab view keeps this up to date
         QAction *showhideSidebar;
@@ -110,6 +115,7 @@ class MainWindow : public QMainWindow
         friend class ::ChooseCyclistDialog;
         friend class ::AthleteLoader;
         friend class ::GGraphicsView;
+        friend class ::EquipCalculator;
         QMap<QString,AthleteTab*> athletetabs;
         AthleteTab *currentAthleteTab;
         QList<AthleteTab*> tabList;
@@ -124,6 +130,9 @@ class MainWindow : public QMainWindow
         SplashScreen *splash;
         void setSplash();
         void clearSplash();
+
+        AbstractView* getAbstractView(int view);
+        unsigned int getChartMask(int view);
 
     signals:
         void backClicked();
@@ -200,6 +209,7 @@ class MainWindow : public QMainWindow
         void selectDiary();
         void selectAnalysis();
         void selectTrain();
+        void selectEquipment();
 
         void setChartMenu();
         void setSubChartMenu();
@@ -303,6 +313,7 @@ class MainWindow : public QMainWindow
         // when loading athlete
         NewSideBar *sidebar;
         AthleteView *athleteView;
+        EquipView* equipmentView;
 
 #ifndef Q_OS_MAC
         QTFullScreen *fullScreen;

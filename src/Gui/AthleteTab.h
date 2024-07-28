@@ -28,6 +28,7 @@ class AthleteLoader;
 class ProgressLine;
 class QPaintEvent;
 class NavigationModel;
+class EquipCalculator;
 
 class AthleteTab: public QWidget
 {
@@ -44,6 +45,7 @@ class AthleteTab: public QWidget
         ChartSettings *chartsettings() { return chartSettings; } // by HomeWindow
         int currentView() { return views->currentIndex(); }
         AbstractView *view(int index);
+        unsigned int getViewMask(int index);
 
         NavigationModel *nav; // back/forward for this tab
 
@@ -52,6 +54,7 @@ class AthleteTab: public QWidget
         friend class ::MainWindow;
         friend class ::NavigationModel;
         friend class ::AthleteLoader;
+        friend class ::EquipCalculator;
         Context *context;
 
     signals:

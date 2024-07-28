@@ -1,0 +1,14 @@
+<layouts>
+<layout name="General" style="0" type="16" expression="" trainswitch="0">
+	<chart id="51" name="" title="Equipment" >
+		<property name="title" type="QString" value="Synpase" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="style" type="int" value="1" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="minimumColumns" type="int" value="5" />
+	</chart>
+</layout>
+</layouts>
+

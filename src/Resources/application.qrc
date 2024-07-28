@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>charts/overview-analysis.gchart</file>
+		<file>charts/overview-equipment.gchart</file>
         <file>charts/overview-trends.gchart</file>
         <file>webservice/httpserver.ini</file>
         <file>sidebar/apps.png</file>
@@ -11,6 +12,7 @@
         <file>sidebar/reflect.png</file>
         <file>sidebar/sync.png</file>
         <file>sidebar/train.png</file>
+        <file>sidebar/equipment.png</file>
         <file>sidebar/trends.png</file>
         <file>images/devices/garminusb.png</file>
         <file>images/devices/computrainer.png</file>
@@ -117,6 +119,7 @@
         <file>xml/train-perspectives.xml</file>
         <file>xml/video-layout.xml</file>
         <file>xml/diary-perspectives.xml</file>
+        <file>xml/equipment-perspectives.xml</file>
         <file>xml/analysis-perspectives.xml</file>
         <file>xml/home-perspectives.xml</file>
         <file>ini/measures.ini</file>

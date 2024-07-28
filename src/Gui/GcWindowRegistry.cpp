@@ -58,6 +58,7 @@
 #include "PlanningWindow.h"
 #ifdef GC_HAVE_OVERVIEW
 #include "Overview.h"
+#include "OverviewEquipment.h"
 #endif
 #include "UserChartWindow.h"
 // Not until v4.0
@@ -69,7 +70,7 @@ GcWindowRegistry* GcWindows;
 void
 GcWindowRegistry::initialize()
 {
-  static GcWindowRegistry GcWindowsInit[34] = {
+  static GcWindowRegistry GcWindowsInit[35] = {
     // name                     GcWinID
     { VIEW_TRENDS|VIEW_DIARY, tr("Season Overview"),GcWindowTypes::OverviewTrends },
     { VIEW_TRENDS|VIEW_DIARY, tr("Blank Overview "),GcWindowTypes::OverviewTrendsBlank },
@@ -112,6 +113,7 @@ GcWindowRegistry::initialize()
     { VIEW_TRAIN, tr("Workout Editor"),GcWindowTypes::WorkoutWindow },
     { VIEW_TRAIN, tr("Live Map"),GcWindowTypes::LiveMapWebPageWindow },
     { VIEW_ANALYSIS|VIEW_TRENDS|VIEW_TRAIN, tr("Web page"),GcWindowTypes::WebPageWindow },
+    { VIEW_EQUIPMENT, tr("Equipment Overview"),GcWindowTypes::OverviewEquipment },
     { 0, "", GcWindowTypes::None }};
   // initialize the global registry
   GcWindows = GcWindowsInit;
@@ -255,6 +257,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::SeasonPlan: returning = new PlanningWindow(context); break;
     case GcWindowTypes::UserAnalysis: returning = new UserChartWindow(context, false); break;
     case GcWindowTypes::UserTrends: returning = new UserChartWindow(context, true); break;
+    case GcWindowTypes::OverviewEquipment: returning = new OverviewEquipmentWindow(context, EQUIPMENT); break;
     default: return NULL; break;
     }
     if (returning) returning->setProperty("type", QVariant::fromValue<GcWinID>(id));

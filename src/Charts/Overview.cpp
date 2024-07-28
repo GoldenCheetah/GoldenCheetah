@@ -64,6 +64,7 @@ OverviewWindow::OverviewWindow(Context *context, int scope, bool blank) : GcChar
 
     HelpWhatsThis *help = new HelpWhatsThis(space);
     if (scope & OverviewScope::ANALYSIS) space->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Overview));
+    else if (scope & OverviewScope::EQUIPMENT) space->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartEquip_Overview));
     else space->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Chart_Overview));
 
     // all the widgets
@@ -92,7 +93,7 @@ OverviewWindow::OverviewWindow(Context *context, int scope, bool blank) : GcChar
     connect(space, SIGNAL(itemConfigRequested(ChartSpaceItem*)), this, SLOT(configItem(ChartSpaceItem*)));
 }
 
-void
+ChartSpaceItem*
 OverviewWindow::addTile()
 {
     ChartSpaceItem *added = NULL; // tell us what you added...
@@ -112,6 +113,7 @@ OverviewWindow::addTile()
         space->updateView();
 
     }
+    return added;
 }
 
 void
@@ -304,6 +306,40 @@ OverviewWindow::getConfiguration() const
                 config += "\"settings\":\"" + QString("%1").arg(Utils::jsonprotect(uc->getConfig())) + "\",";
             }
             break;
+        case OverviewItemType::EQ_ITEM:
+            {
+                // Due to lazy loading of perspectives, always save distances in metric units in case
+                // the units are changed before the equipment perspective is loaded.
+                EquipmentItem* meta = reinterpret_cast<EquipmentItem*>(item);
+                uint64_t expGCDistanceScaled = (GlobalContext::context()->useMetricUnits) ? meta->getNonGCDistanceScaled() : round(meta->getNonGCDistanceScaled() * KM_PER_MILE);
+                config += "\"nonGCDistanceScaled\":\"" + QString("%1").arg(expGCDistanceScaled) + "\",";
+                uint64_t expGCElevationScaled = (GlobalContext::context()->useMetricUnits) ? meta->getNonGCElevationScaled() : round(meta->getNonGCElevationScaled() * METERS_PER_FOOT);
+                config += "\"nonGCElevationScaled\":\"" + QString("%1").arg(expGCElevationScaled) + "\",";
+                double expRepDistance = (GlobalContext::context()->useMetricUnits) ? meta->repDistance_ : meta->repDistance_ * KM_PER_MILE;
+                config += "\"repDistance\":\"" + QString("%1").arg(expRepDistance) + "\",";
+                double expRepElevation = (GlobalContext::context()->useMetricUnits) ? meta->repElevation_ : meta->repElevation_ * METERS_PER_FOOT;
+                config += "\"repElevation\":\"" + QString("%1").arg(expRepElevation) + "\",";
+                config += "\"startSet\":\"" + QString("%1").arg(meta->startSet_ ? "1" : "0") + "\",";
+                if (meta->startSet_) config += "\"startDate\":\"" + QString("%1").arg(meta->startDate_.toString()) + "\",";
+                config += "\"endSet\":\"" + QString("%1").arg(meta->endSet_ ? "1" : "0") + "\",";
+                if (meta->endSet_) config += "\"endDate\":\"" + QString("%1").arg(meta->endDate_.toString()) + "\",";
+                config += "\"notes\":\"" + QString("%1").arg(meta->notes_) + "\",";
+            }
+            break;
+        case OverviewItemType::EQ_SUMMARY:
+            {
+                EquipmentSummary* meta = reinterpret_cast<EquipmentSummary*>(item);
+                config += "\"showAthleteActivities\":\"" + QString("%1").arg(meta->showActivitiesPerAthlete_ ? "1" : "0") + "\",";
+            }
+            break;
+        case OverviewItemType::EQ_NOTES:
+            {
+                EquipmentNotes* meta = reinterpret_cast<EquipmentNotes*>(item);
+                config += "\"notes\":\"" + QString("%1").arg(meta->notes_) + "\",";
+            }
+            break;
+
+        default: qDebug() << "Getting configuration for unknown chart type:" << item->type; break;
         }
 
         config += "\"datafilter\":\"" + Utils::jsonprotect(item->datafilter) + "\",";
@@ -350,6 +386,7 @@ defaultsetup:
         QString source;
         if (scope == OverviewScope::ANALYSIS) source = ":charts/overview-analysis.gchart";
         if (scope == OverviewScope::TRENDS) source = ":charts/overview-trends.gchart";
+        if (scope == OverviewScope::EQUIPMENT) source = ":charts/overview-equipment.gchart";
 
         QFile file(source);
         if (file.open(QIODevice::ReadOnly)) {
@@ -556,6 +593,52 @@ badconfig:
                 space->addItem(order,column,span,deep, add);
             }
             break;
+
+        case OverviewItemType::EQ_ITEM:
+            {
+                // Due to lazy loading of perspectives, distances are in metric units in case
+                // the units are changed before the equipment perspective is loaded.
+                uint64_t nonGCDistanceScaled = obj["nonGCDistanceScaled"].toString().toULongLong();
+                if (!GlobalContext::context()->useMetricUnits) { nonGCDistanceScaled = round(nonGCDistanceScaled * MILES_PER_KM); }
+                uint64_t nonGCElevationScaled = obj["nonGCElevationScaled"].toString().toULongLong();
+                if (!GlobalContext::context()->useMetricUnits) { nonGCElevationScaled = round(nonGCElevationScaled * FEET_PER_METER); }
+                double repDistance = obj["repDistance"].toString().toDouble();
+                if (!GlobalContext::context()->useMetricUnits) { repDistance *= MILES_PER_KM; }
+                double repElevation = obj["repElevation"].toString().toDouble();
+                if (!GlobalContext::context()->useMetricUnits) { repElevation *= FEET_PER_METER; }
+                bool startSet = (obj["startSet"].toString() == "1") ? true : false;
+                QDate startDate;
+                if (startSet) startDate = QDate::fromString(obj["startDate"].toString());
+                bool endSet = (obj["endSet"].toString() == "1") ? true : false;
+                QDate endDate;
+                if (endSet) endDate = QDate::fromString(obj["endDate"].toString());
+                QString notes = obj["notes"].toString();
+                add = new EquipmentItem(space, name, nonGCDistanceScaled, nonGCElevationScaled,
+                    repDistance, repElevation, startSet, startDate, endSet, endDate, notes);
+                add->datafilter = datafilter;
+                space->addItem(order, column, span, deep, add);
+            }
+            break;
+
+        case OverviewItemType::EQ_SUMMARY:
+            {
+                bool showActivitiesPerAthlete = (obj["showAthleteActivities"].toString() == "1") ? true : false;
+                add = new EquipmentSummary(space, name, showActivitiesPerAthlete);
+                add->datafilter = datafilter;
+                space->addItem(order, column, span, deep, add);
+            }
+            break;
+
+        case OverviewItemType::EQ_NOTES:
+            {
+                QString notes = obj["notes"].toString();
+                add = new EquipmentNotes(space, name, notes);
+                add->datafilter = datafilter;
+                space->addItem(order, column, span, deep, add);
+            }
+            break;
+
+        default: qDebug() << "Setting configuration for unknown chart type:" << type; break;
         }
 
         // color is common- if we actuall added one...

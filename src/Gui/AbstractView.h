@@ -54,7 +54,7 @@ class AbstractView : public QWidget
 
     public:
 
-        AbstractView(Context *context, int type);
+        AbstractView(Context *context, int type, const QString& name, const QString& heading);
         virtual ~AbstractView();
         virtual void close() {};
 
@@ -149,9 +149,10 @@ class AbstractView : public QWidget
     protected:
 
         Context *context;
-        int type; // used by windowregistry; e.g VIEW_TRAIN VIEW_ANALYSIS VIEW_DIARY VIEW_TRENDS
-                  // we don't care what values are pass through to the GcWindowRegistry to decide
-                  // what charts are relevant for this view.
+        const int type; // used by windowregistry; e.g VIEW_TRAIN VIEW_ANALYSIS VIEW_DIARY VIEW_TRENDS VIEW_EQUIPMENT
+                        // we don't care what values are pass through to the GcWindowRegistry to decide
+                        // what charts are relevant for this view.
+        const QString view; // type of view:  "train", "analysis", "diary", "home", "equipment"
 
         // properties
         bool _filtered;

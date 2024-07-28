@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020 Mark Liversedge (liversedge@gmail.com)
+ * Equipment Items Copyright (c) 2024 Paul Johnson (paulj49457@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -31,6 +32,16 @@
 #include <QBarSeries>
 #include <QLineSeries>
 #include <QCursor>
+#include <QMap>
+
+// Atomics
+#include <memory>
+
+// to allow integral type atomics (c++11) to be used and to get them to hold values to 3 decimal places the following
+// factors are used to scale the values, this is sufficient for equipment overview usage. When c++23 is available
+// this can changed to use atomic<double> and the scaling can be removed.
+#define EQ_REAL_TO_SCALED_ACC 10000
+#define EQ_SCALED_ACC_TO_REAL 0.0001
 
 // subwidgets for viz inside each overview item
 class RPErating;
@@ -50,7 +61,8 @@ class ColorButton;
 
 // types we use start from 100 to avoid clashing with main chart types
 enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE, KPI,
-                        TOPN, DONUT, ACTIVITIES, ATHLETE, DATATABLE, USERCHART };
+                        TOPN, DONUT, ACTIVITIES, ATHLETE, DATATABLE, USERCHART,
+                        EQ_ITEM, EQ_SUMMARY, EQ_NOTES };
 
 //
 // Configuration widget for ALL Overview Items
@@ -82,7 +94,7 @@ class OverviewItemConfig : public QWidget
 
     protected:
 
-        // before show, lets make sure the widgets are set correctly
+        // before show, lets make sure the background color and widgets are set correctly
         void showEvent(QShowEvent *) override { setWidgets(); }
 
     private:
@@ -108,6 +120,13 @@ class OverviewItemConfig : public QWidget
         MetricSelect *metric1, *metric2, *metric3; // Metric/Interval/PMC
         MetricSelect *meta1; // Meta
         SeriesSelect *series1; // Zone Histogram
+
+        // Equipment items
+        QLineEdit *nonGCDistance, *nonGCElevation;
+        QLineEdit *replaceDistance, *replaceElevation;
+        QCheckBox *startSet, *endSet;
+        QDateEdit *startDate, *endDate;
+        QPlainTextEdit *notes;
 
         // background color
         ColorButton *bgcolor;
@@ -347,33 +366,182 @@ class MetaOverviewItem : public ChartSpaceItem
 {
     Q_OBJECT
 
+public:
+
+    MetaOverviewItem(ChartSpace* parent, QString name, QString symbol);
+    ~MetaOverviewItem();
+
+    void itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) override;
+    void itemGeometryChanged() override;
+    void setData(RideItem* item) override;
+    void setDateRange(DateRange) override {} // doesn't support trends view
+
+    QWidget* config() override { return configwidget; }
+
+    // create and config
+    static ChartSpaceItem* create(ChartSpace* parent) { return new MetaOverviewItem(parent, tr("Workout Code"), "Workout Code"); }
+
+    void configChanged(qint32) override;
+
+    QString symbol;
+    int fieldtype;
+
+    // for numeric metadata items
+    bool up, showrange;
+    QString value, upper, lower, mean;
+
+    Sparkline* sparkline;
+
+    OverviewItemConfig* configwidget;
+};
+
+class EquipmentItem : public ChartSpaceItem
+{
+    Q_OBJECT
+
     public:
 
-        MetaOverviewItem(ChartSpace *parent, QString name, QString symbol);
-        ~MetaOverviewItem();
+        EquipmentItem(ChartSpace *parent,const QString& name,
+                        const uint64_t nonGCDistanceScaled, const uint64_t nonGCElevationScaled,
+                        const double repDistance, const double repElevation,
+                        bool startSet, const QDate& startDate, bool endSet, const QDate& endDate,
+                        const QString& notes);
+        virtual ~EquipmentItem() {}
 
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override;
-        void itemGeometryChanged() override;
-        void setData(RideItem *item) override;
-        void setDateRange(DateRange) override {} // doesn't support trends view
+        void configChanged(qint32) override;
+
+        // The following don't apply to the Equipment Item.
+        void setData(RideItem*) override {}
+        void setDateRange(DateRange) override {}
+        void itemGeometryChanged() override {}
+
+
+        bool isWithin(const QDate& actDate) const;
+        bool rangeIsValid() const;
+
+        void resetEqItem();
+        void unitsChanged();
+        void addActivity(uint64_t rideDistanceScaled, uint64_t rideElevationScaled, uint64_t rideTimeInSecs);
+        uint64_t getNumActivities() const { return activities_; }
+
+        void setNonGCDistance(double nonGCDistance);
+        uint64_t getNonGCDistanceScaled() const { return nonGCDistanceScaled_; }
+        uint64_t getGCDistanceScaled() const { return gcDistanceScaled_; }
+        uint64_t getTotalDistanceScaled() const { return totalDistanceScaled_; }
+
+        void setNonGCElevation(double nonGCElevation);
+        uint64_t getNonGCElevationScaled() const { return nonGCElevationScaled_; }
+        uint64_t getGCElevationScaled() const { return gcElevationScaled_; }
+        uint64_t getTotalElevationScaled() const { return totalElevationScaled_; }
 
         QWidget *config() override { return configwidget; }
 
         // create and config
-        static ChartSpaceItem *create(ChartSpace *parent) { return new MetaOverviewItem(parent, tr("Workout Code"), "Workout Code"); }
+        static ChartSpaceItem *create(ChartSpace *parent) {
+            return new EquipmentItem(parent, tr("Equipment Item"), 0, 0, 0, 0,
+                                          false, QDate(), false, QDate(), ""); }
 
+        double repDistance_, repElevation_;
+        QDate startDate_, endDate_;
+        bool startSet_, endSet_;
+        QString notes_;
+
+        OverviewItemConfig* configwidget;
+
+    private:
+        std::atomic<uint64_t> activities_;
+        std::atomic<uint64_t> activityTimeInSecs_;
+
+        uint64_t nonGCDistanceScaled_;
+        std::atomic<uint64_t> gcDistanceScaled_;
+        std::atomic<uint64_t> totalDistanceScaled_;
+
+        uint64_t nonGCElevationScaled_;
+        std::atomic<uint64_t> gcElevationScaled_;
+        std::atomic<uint64_t> totalElevationScaled_;
+
+        QColor inactiveColor, textColor, alertColor;
+};
+
+class EquipmentSummary : public ChartSpaceItem
+{
+    Q_OBJECT
+
+    public:
+
+        EquipmentSummary(ChartSpace* parent, const QString& name, bool showActivitiesPerAthlete);
+        virtual ~EquipmentSummary() {}
+
+        void itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) override;
         void configChanged(qint32) override;
 
-        QString symbol;
-        int fieldtype;
+        // The following don't apply to the Equipment Summary Item.
+        void setData(RideItem*) override {}
+        void setDateRange(DateRange) override {}
+        void itemGeometryChanged() override {}
 
-        // for numeric metadata items
-        bool up, showrange;
-        QString value, upper, lower, mean;
+        void resetEqSummary();
+        void addAthleteActivity(const QString& athleteName);
+        void updateSummaryItem(const uint64_t eqNumActivities, const uint64_t eqTotalTimeInSecs,
+                                const uint64_t eqTotalDistanceScaled, const uint64_t eqTotalElevationScaled,
+                                const QDate& earliestDate, const QDate& eqLinkLatestDate_);
 
-        Sparkline *sparkline;
+        QWidget* config() override { return configwidget; }
 
-        OverviewItemConfig *configwidget;
+        // create and config
+        static ChartSpaceItem* create(ChartSpace* parent) {
+            return new EquipmentSummary(parent, "", true); }
+
+        bool showActivitiesPerAthlete_;
+
+        OverviewItemConfig* configwidget;
+
+    private:
+
+        QColor textColor;
+        uint64_t eqLinkTotalTimeInSecs_;
+        uint64_t eqLinkTotalDistanceScaled_;
+        uint64_t eqLinkTotalElevationScaled_;
+        uint64_t eqLinkNumActivities_;
+        QDate eqLinkEarliestDate_, eqLinkLatestDate_;
+
+        QMutex mapMutex_;
+        QMap<QString, uint32_t> map_;
+};
+
+class EquipmentNotes : public ChartSpaceItem
+{
+    Q_OBJECT
+
+    public:
+
+        EquipmentNotes(ChartSpace* parent, const QString& name, const QString& notes);
+        virtual ~EquipmentNotes() {}
+
+        void itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) override;
+        void configChanged(qint32) override;
+
+        // The following don't apply to the Equipment Notes Item.
+        void setData(RideItem*) override {}
+        void setDateRange(DateRange) override {}
+        void itemGeometryChanged() override {}
+
+        QWidget* config() override { return configwidget; }
+
+        // create and config
+        static ChartSpaceItem* create(ChartSpace* parent) {
+            return new EquipmentNotes(parent, tr("Notes"), "");
+        }
+
+        QString notes_;
+
+        OverviewItemConfig* configwidget;
+
+    private:
+
+        QColor textColor;
+
 };
 
 class PMCOverviewItem : public ChartSpaceItem

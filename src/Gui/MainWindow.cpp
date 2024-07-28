@@ -220,16 +220,18 @@ MainWindow::MainWindow(const QDir &home)
 
     sidebar->addItem(QImage(":sidebar/train.png"), tr("train"), 5, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Train));
 
+    sidebar->addItem(QImage(":sidebar/equipment.png"), tr("equipment"), 6, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Equipment));
+
     sidebar->addStretch();
-    sidebar->addItem(QImage(":sidebar/apps.png"), tr("apps"), 6, tr("Feature not implemented yet"));
-    sidebar->setItemEnabled(6, false);
+    sidebar->addItem(QImage(":sidebar/apps.png"), tr("apps"), 7, tr("Feature not implemented yet"));
+    sidebar->setItemEnabled(7, false);
     sidebar->addStretch();
 
     // we can click on the quick icons, but they aren't selectable views
-    sidebar->addItem(QImage(":sidebar/sync.png"), tr("sync"), 7, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Sync));
-    sidebar->setItemSelectable(7, false);
-    sidebar->addItem(QImage(":sidebar/prefs.png"), tr("options"), 8, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Options));
+    sidebar->addItem(QImage(":sidebar/sync.png"), tr("sync"), 8, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Sync));
     sidebar->setItemSelectable(8, false);
+    sidebar->addItem(QImage(":sidebar/prefs.png"), tr("options"), 9, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Options));
+    sidebar->setItemSelectable(9, false);
 
     connect(sidebar, SIGNAL(itemClicked(int)), this, SLOT(sidebarClicked(int)));
     connect(sidebar, SIGNAL(itemSelected(int)), this, SLOT(sidebarSelected(int)));
@@ -409,6 +411,10 @@ MainWindow::MainWindow(const QDir &home)
 
     tabStack = new QStackedWidget(this);
     viewStack->addWidget(tabStack);
+
+    QStackedWidget* equipControls = new QStackedWidget(this);
+    equipmentView = new EquipView(context, equipControls);
+    viewStack->addWidget(equipmentView);
 
     // first tab
     athletetabs.insert(currentAthleteTab->context->athlete->home->root().dirName(), currentAthleteTab);
@@ -837,6 +843,20 @@ MainWindow::showTabbar(bool want)
     setUpdatesEnabled(true);
 }
 
+unsigned int
+MainWindow::getChartMask(int view)
+{
+    unsigned int mask = 0;
+
+    switch (viewStack->currentIndex()) {
+    case 1: mask = currentAthleteTab->getViewMask(view); break; // on an athlete specific view...
+    case 2: mask = VIEW_EQUIPMENT; break;
+    default: qDebug() << "Unhandled view stack chart mask:" << viewStack->currentIndex(); break;
+    }
+
+    return mask;
+}
+
 void
 MainWindow::showToolbar(bool want)
 {
@@ -854,18 +874,7 @@ MainWindow::showToolbar(bool want)
 void
 MainWindow::setChartMenu()
 {
-    unsigned int mask=0;
-
-    // called when chart menu about to be shown
-    // setup to only show charts that are relevant
-    // to this view
-    switch(currentAthleteTab->currentView()) {
-        case 0 : mask = VIEW_TRENDS; break;
-        default:
-        case 1 : mask = VIEW_ANALYSIS; break;
-        case 2 : mask = VIEW_DIARY; break;
-        case 3 : mask = VIEW_TRAIN; break;
-    }
+    unsigned int mask = getChartMask(currentAthleteTab->currentView());
 
     chartMenu->clear();
     if (!mask) return;
@@ -885,17 +894,7 @@ MainWindow::setSubChartMenu()
 void
 MainWindow::setChartMenu(QMenu *menu)
 {
-    unsigned int mask=0;
-    // called when chart menu about to be shown
-    // setup to only show charts that are relevant
-    // to this view
-    switch(currentAthleteTab->currentView()) {
-        case 0 : mask = VIEW_TRENDS; break;
-        default:
-        case 1 : mask = VIEW_ANALYSIS; break;
-        case 2 : mask = VIEW_DIARY; break;
-        case 3 : mask = VIEW_TRAIN; break;
-    }
+    unsigned int mask = getChartMask(currentAthleteTab->currentView());
 
     menu->clear();
     if (!mask) return;
@@ -906,20 +905,40 @@ MainWindow::setChartMenu(QMenu *menu)
     }
 }
 
+AbstractView*
+MainWindow::getCurrentAthletesAbstractView()
+{
+    return getAbstractView(currentAthleteTab->currentView());
+}
+
+AbstractView*
+MainWindow::getAbstractView(int view)
+{
+    AbstractView* abstractView = nullptr;
+
+    switch (viewStack->currentIndex()) { 
+    case 1: abstractView = currentAthleteTab->view(view); break; // get the view for the current athlete
+    case 2: abstractView = equipmentView; break;
+    default: qDebug() << "Unhandled view stack:" << viewStack->currentIndex(); break;
+    }
+
+    return abstractView;
+}
+
 void
-MainWindow::addChart(QAction*action)
+MainWindow::addChart(QAction* action)
 {
     // & removed to avoid issues with kde AutoCheckAccelerators
     QString actionText = QString(action->text()).replace("&", "");
     GcWinID id = GcWindowTypes::None;
-    for (int i=0; GcWindows[i].relevance; i++) {
+    for (int i = 0; GcWindows[i].relevance; i++) {
         if (GcWindows[i].name == actionText) {
             id = GcWindows[i].id;
             break;
         }
     }
     if (id != GcWindowTypes::None)
-        currentAthleteTab->addChart(id); // called from MainWindow to inset chart
+        getAbstractView(currentAthleteTab->currentView())->addChart(id); // called from MainWindow to inset chart
 }
 
 void
@@ -937,21 +956,13 @@ MainWindow::importChart()
 void
 MainWindow::exportPerspective()
 {
-    int view = currentAthleteTab->currentView();
-    AbstractView *current = NULL;
-
     QString typedesc;
 
-    switch (view) {
-    case 0:  current = currentAthleteTab->homeView; typedesc = "Trends"; break;
-    case 1:  current = currentAthleteTab->analysisView; typedesc = "Analysis"; break;
-    case 2:  current = currentAthleteTab->diaryView; typedesc = "Diary"; break;
-    case 3:  current = currentAthleteTab->trainView; typedesc = "Train"; break;
-    }
+    AbstractView* current = getAbstractView(currentAthleteTab->currentView());
 
     // export the current perspective to a file
     QString suffix;
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Export Persepctive"),
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export Perspective"),
                        QDir::homePath()+"/"+ typedesc + " " + current->perspective_->title() + ".gchartset",
                        ("*.gchartset;;"), &suffix, QFileDialog::DontUseNativeDialog); // native dialog hangs when threads in use (!)
 
@@ -966,15 +977,8 @@ void
 MainWindow::importPerspective()
 {
     int view = currentAthleteTab->currentView();
-    AbstractView *current = NULL;
-
-    switch (view) {
-    case 0:  current = currentAthleteTab->homeView; break;
-    case 1:  current = currentAthleteTab->analysisView; break;
-    case 2:  current = currentAthleteTab->diaryView; break;
-    case 3:  current = currentAthleteTab->trainView; break;
-    }
-
+    AbstractView* current = getAbstractView(view);
+    
     // import a new perspective from a file
     QString fileName = QFileDialog::getOpenFileName(this, tr("Select Perspective file to export"), "", tr("GoldenCheetah Perspective Files (*.gchartset)"));
     if (fileName.isEmpty()) {
@@ -1290,10 +1294,10 @@ void
 MainWindow::sidebarClicked(int id)
 {
     // sync quick link
-    if (id == 7) checkCloud();
+    if (id == 8) checkCloud();
 
     // prefs
-    if (id == 8) showOptions();
+    if (id == 9) showOptions();
 
 }
 
@@ -1309,7 +1313,8 @@ MainWindow::sidebarSelected(int id)
     case 4: // reflect not written yet
             break;
     case 5: selectTrain(); break;
-    case 6: // apps not written yet
+    case 6: selectEquipment(); break;
+    case 7: // apps not written yet
             break;
     }
 }
@@ -1324,9 +1329,9 @@ MainWindow::selectAthlete()
 void
 MainWindow::selectAnalysis()
 {
+    viewStack->setCurrentIndex(1);
     resetPerspective(1);
     //currentTab->analysisView->setPerspectives(perspectiveSelector);
-    viewStack->setCurrentIndex(1);
     sidebar->setItemSelected(3, true);
     currentAthleteTab->selectView(1);
     perspectiveSelector->show();
@@ -1336,9 +1341,9 @@ MainWindow::selectAnalysis()
 void
 MainWindow::selectTrain()
 {
+    viewStack->setCurrentIndex(1);
     resetPerspective(3);
     //currentTab->trainView->setPerspectives(perspectiveSelector);
-    viewStack->setCurrentIndex(1);
     sidebar->setItemSelected(5, true);
     currentAthleteTab->selectView(3);
     perspectiveSelector->show();
@@ -1346,11 +1351,20 @@ MainWindow::selectTrain()
 }
 
 void
+MainWindow::selectEquipment()
+{
+    viewStack->setCurrentIndex(2);
+    resetPerspective(4);
+    sidebar->setItemSelected(6, true);
+    perspectiveSelector->hide();
+}
+
+void
 MainWindow::selectDiary()
 {
+    viewStack->setCurrentIndex(1);
     resetPerspective(2);
     //currentTab->diaryView->setPerspectives(perspectiveSelector);
-    viewStack->setCurrentIndex(1);
     currentAthleteTab->selectView(2);
     perspectiveSelector->show();
     setToolButtons();
@@ -1359,9 +1373,9 @@ MainWindow::selectDiary()
 void
 MainWindow::selectTrends()
 {
+    viewStack->setCurrentIndex(1);
     resetPerspective(0);
     //currentTab->homeView->setPerspectives(perspectiveSelector);
-    viewStack->setCurrentIndex(1);
     sidebar->setItemSelected(2, true);
     currentAthleteTab->selectView(0);
     perspectiveSelector->show();
@@ -1444,14 +1458,7 @@ MainWindow::resetPerspective(int view, bool force)
     lastview = view;
 
     // don't argue just reset the perspective for this view
-    AbstractView *current = NULL;
-    switch (view) {
-
-    case 0:  current = currentAthleteTab->homeView; break;
-    case 1:  current = currentAthleteTab->analysisView; break;
-    case 2:  current = currentAthleteTab->diaryView; break;
-    case 3:  current = currentAthleteTab->trainView; break;
-    }
+    AbstractView* current = getAbstractView(view);
 
     // set the perspective
     pactive=true;
@@ -1466,14 +1473,7 @@ MainWindow::perspectiveSelected(int index)
     if (pactive) return;
 
     // set the perspective for the current view
-    int view = currentAthleteTab->currentView();
-    AbstractView *current = NULL;
-    switch (view) {
-    case 0:  current = currentAthleteTab->homeView; break;
-    case 1:  current = currentAthleteTab->analysisView; break;
-    case 2:  current = currentAthleteTab->diaryView; break;
-    case 3:  current = currentAthleteTab->trainView; break;
-    }
+    AbstractView* current = getAbstractView(currentAthleteTab->currentView());
 
     // which perspective is currently being shown?
     int prior = current->perspectives_.indexOf(current->perspective_);
@@ -1481,12 +1481,7 @@ MainWindow::perspectiveSelected(int index)
     if (index < current->perspectives_.count()) {
 
         // a perspectives was selected
-        switch (view) {
-        case 0:  current->perspectiveSelected(index); break;
-        case 1:  current->perspectiveSelected(index); break;
-        case 2:  current->perspectiveSelected(index); break;
-        case 3:  current->perspectiveSelected(index); break;
-        }
+        current->perspectiveSelected(index);
 
     } else {
 
@@ -1536,14 +1531,7 @@ void
 MainWindow::perspectivesChanged()
 {
     int view = currentAthleteTab->currentView();
-    AbstractView *current = NULL;
-
-    switch (view) {
-    case 0:  current = currentAthleteTab->homeView; break;
-    case 1:  current = currentAthleteTab->analysisView; break;
-    case 2:  current = currentAthleteTab->diaryView; break;
-    case 3:  current = currentAthleteTab->trainView; break;
-    }
+    AbstractView* current = getAbstractView(view);
 
     // which perspective is currently being selected (before we go setting the combobox)
     Perspective *prior = current->perspective_;
@@ -2303,18 +2291,18 @@ MainWindow::saveGCState(Context *context)
 void
 MainWindow::restoreGCState(Context *context)
 {
-    if (viewStack->currentIndex() != 0) {
+    // for an athlete specific view, not athlete or equipment view
+    if (viewStack->currentIndex() == 1) {
 
-        // not on athlete view...
         resetPerspective(currentAthleteTab->currentView()); // will lazy load, hence doing it first
 
         // restore window state from the supplied context
-            switch(currentAthleteTab->currentView()) {
-            case 0: sidebar->setItemSelected(2,true); break;
-            case 1: sidebar->setItemSelected(3,true); break;
-            case 2: break; // diary not an icon
-            case 3: sidebar->setItemSelected(5, true); break;
-            default: sidebar->setItemSelected(0, true); break;
+        switch(currentAthleteTab->currentView()) {
+        case 0: sidebar->setItemSelected(2,true); break;
+        case 1: sidebar->setItemSelected(3,true); break;
+        case 2: break; // diary not an icon
+        case 3: sidebar->setItemSelected(5, true); break;
+        default: sidebar->setItemSelected(0, true); break;
         }
     }
 

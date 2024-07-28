@@ -20,6 +20,8 @@
 #define _GC_Views_h 1
 
 #include "AbstractView.h"
+#include "ChartSettings.h"
+
 class TrainSidebar;
 class AnalysisSidebar;
 class IntervalSidebar;
@@ -123,6 +125,30 @@ class TrendsView : public AbstractView
         void justSelected();
         void dateRangeChanged(DateRange);
         void compareChanged(bool);
+};
+
+class EquipView : public AbstractView
+{
+    Q_OBJECT
+
+    public:
+
+        EquipView(Context* context, QStackedWidget* controls);
+        ~EquipView();
+
+        // Don't want the base class behaviour for this...
+        virtual void setRide(RideItem*) override {}
+
+        ChartSettings* chartsettings;
+
+    public slots:
+
+        bool isBlank() override;
+
+    private:
+        Perspective* hw;
+        QStackedWidget* masterControls;
+
 };
 
 #endif // _GC_Views_h
