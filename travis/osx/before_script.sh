@@ -62,6 +62,7 @@ echo PYTHONLIBS = `python3.7-config --ldflags` >> src/gcconfig.pri
 echo GSL_LIBS = -lgsl -lgslcblas -lm >> src/gcconfig.pri
 # TrainerDay Query API
 echo DEFINES += GC_WANT_TRAINERDAY_API >> src/gcconfig.pri
+echo DEFINES += GC_TRAINERDAY_API_PAGESIZE=25 >> src/gcconfig.pri
 # macOS version config
 echo "QMAKE_CXXFLAGS += -mmacosx-version-min=10.7 -arch x86_64" >> src/gcconfig.pri
 echo "QMAKE_CFLAGS_RELEASE += -mmacosx-version-min=10.7 -arch x86_64" >> src/gcconfig.pri

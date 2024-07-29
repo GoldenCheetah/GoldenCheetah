@@ -41,6 +41,7 @@ echo PYTHONLIBS = -L/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu -lpython3.7m
 echo GSL_LIBS = -lgsl -lgslcblas -lm >> src/gcconfig.pri
 # TrainerDay Query API
 echo DEFINES += GC_WANT_TRAINERDAY_API >> src/gcconfig.pri
+echo DEFINES += GC_TRAINERDAY_API_PAGESIZE=25 >> src/gcconfig.pri
 
 # Patch Secrets.h
 sed -i "s/__GC_GOOGLE_CALENDAR_CLIENT_SECRET__/"$GC_GOOGLE_CALENDAR_CLIENT_SECRET"/" src/Core/Secrets.h
