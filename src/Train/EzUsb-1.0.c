@@ -136,7 +136,7 @@ static int ezusb_write(libusb_device_handle *device, const char *label,
         printf("%s: %s\n", label, libusb_error_name(status));
     else if ((unsigned)status != len)
         printf("%s ==> %d\n", label, status);
-	return (status < 0) ? -EIO : 0;
+    return (status < 0) ? -EIO : 0;
 }
 
 /*
@@ -157,7 +157,7 @@ static int ezusb_read(libusb_device_handle *device, const char *label,
         printf("%s: %s\n", label, libusb_error_name(status));
     else if ((unsigned)status != len)
         printf("%s ==> %d\n", label, status);
-	return (status < 0) ? -EIO : 0;
+    return (status < 0) ? -EIO : 0;
 }
 
 /*
@@ -487,7 +487,7 @@ static int parse_iic(FILE *image, void *context,
 int parse_imagic (
     FILE	*image,
     void	*context,
-    int 	(*poke) (void *context, unsigned short addr, int external,
+    int 	(*poke) (void *context, uint32_t addr, bool external,
               const unsigned char *data, size_t len),
     libusb_device_handle *device
 )
@@ -966,7 +966,7 @@ int libezusb_load_ram_imagic (libusb_device_handle *device, const char *path, Pr
     }
 
     if (verbose)
-    printf("... WROTE: %d bytes, %d segments, avg %d\n",
+    printf("... WROTE: %ld bytes, %ld segments, avg %ld\n",
         ctx.total, ctx.count, ctx.total / ctx.count);
 
     return 0;
