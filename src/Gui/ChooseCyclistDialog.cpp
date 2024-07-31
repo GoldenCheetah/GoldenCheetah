@@ -25,7 +25,7 @@
 #include <QtGui>
 
 static void recursiveDelete(QDir dir)
-{   
+{
     // delete the directory contents recursively before
     // removing the directory itself
     foreach(QString name, dir.entryList()) {
@@ -48,7 +48,7 @@ static void recursiveDelete(QDir dir)
 #endif
 }
 
-ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home, bool allowNew) : home(home)
+ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home) : home(home)
 {
     setWindowTitle(tr("Choose an Athlete"));
     setMinimumHeight(300 * dpiYFactor);
@@ -62,24 +62,23 @@ ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home, bool allowNew) : home
 
     getList();
 
-    if (allowNew)
-        newButton = new QPushButton(tr("&New..."), this);
-    okButton = new QPushButton(tr("&Open"), this);
-    cancelButton = new QPushButton(tr("&Cancel"), this);
+    newButton = new QPushButton(tr("&New..."), this);
     deleteButton = new QPushButton(tr("Delete"), this);
+    cancelButton = new QPushButton(tr("&Cancel"), this);
+    okButton = new QPushButton(tr("&Open"), this);
 
     okButton->setEnabled(false);
     deleteButton->setEnabled(false);
 
     connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-    if (allowNew) connect(newButton, SIGNAL(clicked()), this, SLOT(newClicked()));
+    connect(newButton, SIGNAL(clicked()), this, SLOT(newClicked()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
     connect(listWidget, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(enableOkDelete(QListWidgetItem*)));
     connect(listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(accept()));
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
-    if (allowNew) buttonLayout->addWidget(newButton);
+    buttonLayout->addWidget(newButton);
     buttonLayout->addWidget(deleteButton);
     buttonLayout->addStretch();
     buttonLayout->addWidget(cancelButton);
@@ -138,8 +137,13 @@ ChooseCyclistDialog::choice()
 void
 ChooseCyclistDialog::enableOkDelete(QListWidgetItem *item)
 {
-    okButton->setEnabled(item != NULL);
-    deleteButton->setEnabled(item != NULL);
+    okButton->setEnabled(item != nullptr);
+    if (listWidget->count() > 0) {
+        okButton->setDefault(item != nullptr);
+    } else {
+        newButton->setDefault(true);
+    }
+    deleteButton->setEnabled(item != nullptr);
 }
 
 void
@@ -196,7 +200,7 @@ ChooseCyclistDialog::newCyclistDialog(QDir &homeDir, QWidget *)
 
     // get new one..
     QString name;
-    if (newone->exec() == QDialog::Accepted) 
+    if (newone->exec() == QDialog::Accepted)
         name = newone->name->text();
     else
         name = "";

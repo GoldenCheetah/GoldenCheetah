@@ -744,7 +744,7 @@ main(int argc, char *argv[])
         // and the upgradeWarning was
         // lets ask the user which / create a new one
         if (!anyOpened) {
-            ChooseCyclistDialog d(home, true);
+            ChooseCyclistDialog d(home);
             d.setModal(true);
 
             // choose cancel?
