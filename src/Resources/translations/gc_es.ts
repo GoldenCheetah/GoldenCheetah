@@ -2639,7 +2639,7 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="418"/>
         <source>Scroll to current Activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Desplazarse a la siguiente actividad</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="425"/>
@@ -4307,7 +4307,7 @@ Presione siguiente para continuar
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="105"/>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="502"/>
         <source>hh:mm:ss</source>
-        <translation type="unfinished"></translation>
+        <translation>hh:mm:ss</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="119"/>
@@ -4351,7 +4351,7 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="200"/>
         <source>Update Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Actualizar metadatos</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="232"/>
@@ -4414,12 +4414,12 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="443"/>
         <source>Processing failed due date format error...</source>
-        <translation type="unfinished"></translation>
+        <translation>Fallo debido a un error de formato...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="447"/>
         <source>Processing failed due time format error...</source>
-        <translation type="unfinished"></translation>
+        <translation>Fallo debido a un error en el formato de tiempo...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="451"/>
@@ -4450,22 +4450,22 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="490"/>
         <source>0</source>
-        <translation type="unfinished">0</translation>
+        <translation>0</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="494"/>
         <source>0.00</source>
-        <translation type="unfinished">0.00</translation>
+        <translation>0.00</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="498"/>
         <source>dd/mm/yyyy</source>
-        <translation type="unfinished"></translation>
+        <translation>dd/mm/yyyy</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="506"/>
         <source>1|0</source>
-        <translation type="unfinished"></translation>
+        <translation>1|0</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="547"/>
@@ -4475,7 +4475,7 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="555"/>
         <source>Update Metadata field - </source>
-        <translation type="unfinished"></translation>
+        <translation>Actualizar el campo de metadatos - </translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="562"/>
@@ -4531,12 +4531,12 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="133"/>
         <source>To  </source>
-        <translation type="unfinished"></translation>
+        <translation>Hasta  </translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="459"/>
         <source>%1 successful, %2 failed or skipped.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 con éxito, %2 fallos u omitidos.</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="681"/>
@@ -4551,7 +4551,7 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="815"/>
         <source>Metadata Tag Set</source>
-        <translation type="unfinished"></translation>
+        <translation>Etiqueta de metadatos asignada</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="825"/>
@@ -9232,7 +9232,7 @@ le sugerirá los posibles nombres
     <message>
         <location filename="../../Core/NamedSearch.cpp" line="305"/>
         <source>Close</source>
-        <translation type="unfinished">Cerrar</translation>
+        <translation>Cerrar</translation>
     </message>
 </context>
 <context>
@@ -9991,7 +9991,7 @@ le sugerirá los posibles nombres
     <message>
         <location filename="../../Train/ErgFilePlot.cpp" line="211"/>
         <source>W&apos; Balance (J)</source>
-        <translation type="unfinished"></translation>
+        <translation>Balance de W&apos; (J)</translation>
     </message>
     <message>
         <location filename="../../Train/ErgFilePlot.cpp" line="845"/>
@@ -10027,37 +10027,37 @@ le sugerirá los posibles nombres
     <message>
         <location filename="../../Train/ErgOverview.cpp" line="37"/>
         <source>Duration</source>
-        <translation type="unfinished">Duración</translation>
+        <translation>Duración</translation>
     </message>
     <message>
         <location filename="../../Train/ErgOverview.cpp" line="38"/>
         <source>Intensity</source>
-        <translation type="unfinished">Intensidad</translation>
+        <translation>Intensidad</translation>
     </message>
     <message>
         <location filename="../../Train/ErgOverview.cpp" line="39"/>
         <source>Stress</source>
-        <translation type="unfinished">Estrés</translation>
+        <translation>Estrés</translation>
     </message>
     <message>
         <location filename="../../Train/ErgOverview.cpp" line="56"/>
         <source>Relative Intensity</source>
-        <translation type="unfinished">Intensidad relativa</translation>
+        <translation>Intensidad relativa</translation>
     </message>
     <message>
         <location filename="../../Train/ErgOverview.cpp" line="57"/>
         <source>BikeScore</source>
-        <translation type="unfinished"></translation>
+        <translation>BikeScore</translation>
     </message>
     <message>
         <location filename="../../Train/ErgOverview.cpp" line="69"/>
         <source>Variability Index</source>
-        <translation type="unfinished">Índice de variabilidad</translation>
+        <translation>Índice de variabilidad</translation>
     </message>
     <message>
         <location filename="../../Train/ErgOverview.cpp" line="70"/>
         <source>Skiba Variability Index</source>
-        <translation type="unfinished">Índice de variabilidad de Skiba</translation>
+        <translation>Índice de variabilidad de Skiba</translation>
     </message>
 </context>
 <context>
@@ -15932,22 +15932,22 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/InfoWidget.cpp" line="193"/>
         <source>Distance</source>
-        <translation type="unfinished">Distancia</translation>
+        <translation>Distancia</translation>
     </message>
     <message>
         <location filename="../../Train/InfoWidget.cpp" line="196"/>
         <source>Elevation Gain</source>
-        <translation type="unfinished">Desnivel positivo</translation>
+        <translation>Desnivel positivo</translation>
     </message>
     <message>
         <location filename="../../Train/InfoWidget.cpp" line="201"/>
         <source>Min Elevation</source>
-        <translation type="unfinished"></translation>
+        <translation>Altitud mínima</translation>
     </message>
     <message>
         <location filename="../../Train/InfoWidget.cpp" line="204"/>
         <source>Max Elevation</source>
-        <translation type="unfinished"></translation>
+        <translation>Altitud máxima</translation>
     </message>
 </context>
 <context>
@@ -18594,7 +18594,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/Library.cpp" line="204"/>
         <source>%1 cannot be written to videoSync library %2, check permissions and free space</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 no se pudieron escribir en la biblioteca de vídeos Sync %2, compruebe los permisos y el espacio libre</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="250"/>
@@ -18604,7 +18604,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/Library.cpp" line="254"/>
         <source>%1 cannot be written to workout library %2, check permissions and free space</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 no se pudieron escribir en la biblioteca de entrenamientos %2, compruebe los permisos y el espacio libre</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="240"/>
@@ -24943,17 +24943,17 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Train/PowerInfoWidget.cpp" line="133"/>
         <source>Average Power</source>
-        <translation type="unfinished">Potencia media</translation>
+        <translation>Potencia media</translation>
     </message>
     <message>
         <location filename="../../Train/PowerInfoWidget.cpp" line="146"/>
         <source>xPower</source>
-        <translation type="unfinished">xPower</translation>
+        <translation>xPower</translation>
     </message>
     <message>
         <location filename="../../Train/PowerInfoWidget.cpp" line="148"/>
         <source>Iso Power</source>
-        <translation type="unfinished"></translation>
+        <translation>Potencia normalizada</translation>
     </message>
 </context>
 <context>
@@ -30890,17 +30890,17 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     <message>
         <location filename="../../Train/TagBar.cpp" line="72"/>
         <source>Add Tag...</source>
-        <translation type="unfinished"></translation>
+        <translation>Añadir etiqueta...</translation>
     </message>
     <message>
         <location filename="../../Train/TagBar.cpp" line="236"/>
         <source>Create new tag</source>
-        <translation type="unfinished"></translation>
+        <translation>Crear nueva etiqueta</translation>
     </message>
     <message>
         <location filename="../../Train/TagBar.cpp" line="237"/>
         <source>The tag &quot;&lt;b&gt;%1&lt;/b&gt;&quot; does not exist yet.&lt;br&gt;Should it really be created?</source>
-        <translation type="unfinished"></translation>
+        <translation>La etiqueta &quot;&lt;b&gt;%1&lt;/b&gt;&quot; no existe.&lt;br&gt;¿Quiere crearla?</translation>
     </message>
 </context>
 <context>
@@ -31199,24 +31199,24 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     <message>
         <location filename="../../Train/TrainBottom.cpp" line="263"/>
         <source>Resume</source>
-        <translation type="unfinished"></translation>
+        <translation>Reanudar</translation>
     </message>
     <message>
         <location filename="../../Train/TrainBottom.cpp" line="271"/>
         <source>Pause</source>
-        <translation type="unfinished"></translation>
+        <translation>Pausar</translation>
     </message>
     <message>
         <location filename="../../Train/TrainBottom.cpp" line="279"/>
         <location filename="../../Train/TrainBottom.cpp" line="458"/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Comenzar</translation>
     </message>
     <message>
         <location filename="../../Train/TrainBottom.cpp" line="296"/>
         <location filename="../../Train/TrainBottom.cpp" line="455"/>
         <source>Connect</source>
-        <translation type="unfinished"></translation>
+        <translation>Conectar</translation>
     </message>
     <message>
         <location filename="../../Train/TrainBottom.cpp" line="317"/>
@@ -31224,57 +31224,57 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
         <location filename="../../Train/TrainBottom.cpp" line="359"/>
         <location filename="../../Train/TrainBottom.cpp" line="380"/>
         <source>Disconnect</source>
-        <translation type="unfinished"></translation>
+        <translation>Desconectar</translation>
     </message>
     <message>
         <location filename="../../Train/TrainBottom.cpp" line="394"/>
         <source>Adjust intensity</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajustar intensidad</translation>
     </message>
     <message>
         <location filename="../../Train/TrainBottom.cpp" line="456"/>
         <source>Rewind</source>
-        <translation type="unfinished"></translation>
+        <translation>Rebobinar</translation>
     </message>
     <message>
         <location filename="../../Train/TrainBottom.cpp" line="457"/>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation>Detener</translation>
     </message>
     <message>
         <location filename="../../Train/TrainBottom.cpp" line="459"/>
         <source>Fast forward</source>
-        <translation type="unfinished"></translation>
+        <translation>Avance rápido</translation>
     </message>
     <message>
         <location filename="../../Train/TrainBottom.cpp" line="460"/>
         <source>Back 1 lap</source>
-        <translation type="unfinished"></translation>
+        <translation>Retroceder un intervalo</translation>
     </message>
     <message>
         <location filename="../../Train/TrainBottom.cpp" line="461"/>
         <source>Lap</source>
-        <translation type="unfinished">Intervalo</translation>
+        <translation>Intervalo</translation>
     </message>
     <message>
         <location filename="../../Train/TrainBottom.cpp" line="462"/>
         <source>Forward 1 lap</source>
-        <translation type="unfinished"></translation>
+        <translation>Avanzar un intervalo</translation>
     </message>
     <message>
         <location filename="../../Train/TrainBottom.cpp" line="463"/>
         <source>Calibrate</source>
-        <translation type="unfinished">Calibrar</translation>
+        <translation>Calibrar</translation>
     </message>
     <message>
         <location filename="../../Train/TrainBottom.cpp" line="464"/>
         <source>Decrease intensity</source>
-        <translation type="unfinished"></translation>
+        <translation>Disminuir intensidad</translation>
     </message>
     <message>
         <location filename="../../Train/TrainBottom.cpp" line="465"/>
         <source>Increase intensity</source>
-        <translation type="unfinished"></translation>
+        <translation>Incrementar intensidad</translation>
     </message>
 </context>
 <context>
@@ -31302,7 +31302,7 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="440"/>
         <source>Workout Tags</source>
-        <translation type="unfinished"></translation>
+        <translation>Etiquetas de la actividad</translation>
     </message>
 </context>
 <context>
@@ -31409,22 +31409,22 @@ de acuerdo a la altitud y la configuración.</translation>
     <message>
         <location filename="../../Gui/Pages.cpp" line="760"/>
         <source>Enable Tooltips</source>
-        <translation type="unfinished"></translation>
+        <translation>Activar consejos</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="763"/>
         <source>Telemetry font scaling</source>
-        <translation type="unfinished"></translation>
+        <translation>Tamaño de la fuente para la telemetría</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="765"/>
         <source>Fit to height only</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajustar sólo al alto</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="766"/>
         <source>Fit to height and width</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajustar al alto y al ancho</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="769"/>
@@ -31475,12 +31475,12 @@ de acuerdo a la altitud y la configuración.</translation>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="280"/>
         <source>Filter...</source>
-        <translation type="unfinished">Filtrar...</translation>
+        <translation>Filtrar...</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="310"/>
         <source>Workout Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Información de la actividad</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="317"/>
@@ -31876,73 +31876,73 @@ Presionar F3 en el controlador al finalizar.</translation>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="36"/>
         <source>Query TrainerDay...</source>
-        <translation type="unfinished"></translation>
+        <translation>Buscar en TrainerDay...</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="40"/>
         <source>Search</source>
-        <translation type="unfinished">Buscar</translation>
+        <translation>Buscar</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="51"/>
         <source>Select all</source>
-        <translation type="unfinished">Seleccionar todo</translation>
+        <translation>Seleccionar todo</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="55"/>
         <source>Allow overwriting of existing workouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Permitir la asobrescritura de actividades existentes</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="57"/>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="447"/>
         <source>Import selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Importación seleccionada</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="81"/>
         <source>Download workouts from &lt;a href=&apos;https://trainerday.com&apos;&gt;TrainerDay&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Descargar actividades de &lt;a href=&apos;https://trainerday.com&apos;&gt;TrainerDay&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="116"/>
         <source>TrainerDay workout querying is disabled in this build.</source>
-        <translation type="unfinished"></translation>
+        <translation>La búsqueda de actividades en TrainerDay no está disponible en esta compilación.</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="152"/>
         <source>Page %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Página %1</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="160"/>
         <source>Syntax error in query &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Error de sintaxis en la consulta &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="445"/>
         <source>Import selected (%1/%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Importación seleccionada (%1/%2)</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="520"/>
         <source>successfully imported</source>
-        <translation type="unfinished"></translation>
+        <translation>importado correctamente</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="526"/>
         <source>already imported</source>
-        <translation type="unfinished"></translation>
+        <translation>ya importado</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="532"/>
         <source>import failed</source>
-        <translation type="unfinished"></translation>
+        <translation>fallo en la importación</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="538"/>
         <source>available in filesystem but not imported</source>
-        <translation type="unfinished"></translation>
+        <translation>disponible en disco, pero no importado</translation>
     </message>
 </context>
 <context>
@@ -31980,17 +31980,17 @@ Presionar F3 en el controlador al finalizar.</translation>
     <message>
         <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="73"/>
         <source>Close</source>
-        <translation type="unfinished">Cerrar</translation>
+        <translation>Cerrar</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="91"/>
         <source>Query workouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Buscar actividades</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="92"/>
         <source>Classic download</source>
-        <translation type="unfinished"></translation>
+        <translation>Descarga clásica</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="299"/>
@@ -33724,32 +33724,32 @@ Puede eliminar las referencias cuando administra la biblioteca usando el menú d
     <message>
         <location filename="../../Gui/Pages.cpp" line="1227"/>
         <source>Tag</source>
-        <translation type="unfinished"></translation>
+        <translation>Etiqueta</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1228"/>
         <source>Assigned to # workouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Asignado a # actividades</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1250"/>
         <source>+</source>
-        <translation type="unfinished">+</translation>
+        <translation>+</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1251"/>
         <source>-</source>
-        <translation type="unfinished">-</translation>
+        <translation>-</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1253"/>
         <source>Add</source>
-        <translation type="unfinished">Agregar</translation>
+        <translation>Añadir</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1254"/>
         <source>Delete</source>
-        <translation type="unfinished">Eliminar</translation>
+        <translation>Eliminar</translation>
     </message>
 </context>
 <context>
