@@ -26,6 +26,10 @@
 #include "TrainDB.h"
 #include "Secrets.h"
 
+#if !defined(GC_TRAINERDAY_API_PAGESIZE)
+#define GC_TRAINERDAY_API_PAGESIZE 25
+#endif
+
 
 #if defined(GC_WANT_TRAINERDAY_API)
 TrainerDayAPIDialog::TrainerDayAPIDialog
