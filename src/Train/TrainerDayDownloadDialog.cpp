@@ -33,8 +33,11 @@ TrainerDayDownloadDialog::TrainerDayDownloadDialog(Context *context) : QDialog(c
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Tools_Download_ERGDB));
 
     // make the dialog a resonable size
-    setMinimumWidth(QApplication::primaryScreen()->geometry().width() * 0.8);
-    setMinimumHeight(QApplication::primaryScreen()->geometry().height() * 0.8);
+    int screenWidth = QApplication::primaryScreen()->geometry().width();
+    int screenHeight = QApplication::primaryScreen()->geometry().height();
+    double widthFactor = 0.8;
+    double heightFactor = 0.8;
+    setGeometry(screenWidth * (1.0 - widthFactor) / 2.0, screenHeight * (1.0 - heightFactor) / 2.0, screenWidth * widthFactor, screenHeight * heightFactor);
 
     legacy = new QWidget();
     QVBoxLayout *legacyLayout = new QVBoxLayout;
