@@ -97,6 +97,15 @@ class ANTChannel : public QObject {
         uint8_t fecPrevRawDistance;
         uint8_t  fecCapabilities;
 
+        // sensor capabilities, requested capabilities and enabled capabilities
+        uint16_t  pwrCapabilities;
+        uint16_t  pwrReqCapabilities;
+        uint16_t  pwrEnCapabilities;
+        uint8_t   pwrCapabilitiesMsgDelay;
+        bool      pwrSkipCapability1Rqst;
+        bool      pwrSkipCapability1Setup;
+        bool      pwrCapabilitiesSetupComplete;
+
         double blanking_timestamp;
         int blanked;
         char id[10]; // short identifier
@@ -109,6 +118,7 @@ class ANTChannel : public QObject {
         qint64 lastMessageTimestamp; // for time comparisons
         qint64 lastMessageTimestamp2;
         uint16_t lastHRmeasurement;
+        uint8_t  lastPositionData;
 
         unsigned char rx_burst_data[RX_BURST_DATA_LEN];
         int           rx_burst_data_index;
@@ -165,6 +175,7 @@ class ANTChannel : public QObject {
         bool is_old_cinqo; // bool, set for cinqo needing separate control channel
         bool is_srm;
         bool is_fec;
+        bool is_power;
         bool is_alt; // is alternative channel for power
         bool is_master; // is a master channel (for remote control)
 
@@ -202,12 +213,15 @@ class ANTChannel : public QObject {
         double channelValue() { return value; }
         double channelValue2() { return value2; }
         double value,value2; // used during config, rather than rtData
-        uint8_t capabilities();
+        uint16_t capabilities();
 
         // search
         int isSearching();
 
         QTimer *channelTimer; // timer for master channel broadcast events
+
+        // timer for sensors setup
+        QTimer *sensorSetupTimer;
 
         // Cinqo support
         void sendCinqoError();
@@ -218,6 +232,12 @@ class ANTChannel : public QObject {
 
         void setAlt(bool value) { is_alt = value; }
 
+    public slots:
+       // setup sensors
+        void slotStartSensorSetupTimer();
+        void slotStopSensorSetupTimer();
+        void slotSensorSetupTimerEvent();
+
     signals:
         void channelInfo(int number, int device_number, int device_id); // we got a channel info message
         void dropInfo(int number, int dropped, int received);    // we dropped a packet
@@ -227,9 +247,13 @@ class ANTChannel : public QObject {
         void searchComplete(int number); // search completed successfully
         void broadcastTimerStart(int number);
         void broadcastTimerStop(int number);
+        void sensorSetupTimerStart(); // setup sensors timer
+        void sensorSetupTimerStop();
 
         // signal instantly on data receipt for R-R data
         void rrData(uint16_t  rrtime, uint8_t heartrateBeats, uint8_t instantHeartrate);
+
+        void posData(uint8_t position);
 
         // signal for passing remote control commands
         void antRemoteControl(uint16_t command);
