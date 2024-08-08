@@ -131,11 +131,10 @@ FilterEditor::keyPressEvent
 
     if (   e->text().endsWith(" ")
         || e->text().endsWith(",")
-        || e->text().endsWith(".")) {
+        || e->text().endsWith(".")
+        || ! isSelectorPosition()
+        || isQuoted()) {
         _completer->popup()->hide();
-        return;
-    }
-    if (! isSelectorPosition()) {
         return;
     }
 
@@ -229,6 +228,14 @@ FilterEditor::isSelectorPosition
 () const
 {
     return feh.isSelectorPosition(text(), cursorPosition());
+}
+
+
+bool
+FilterEditor::isQuoted
+() const
+{
+    return feh.isQuoted(text(), cursorPosition());
 }
 
 
@@ -363,6 +370,20 @@ FilterEditorHelper::isSelectorPosition
         }
     }
     return true;
+}
+
+
+bool
+FilterEditorHelper::isQuoted
+(const QString &t, int cp) const
+{
+    int count = 0;
+    for (int pos = 0; pos < cp; ++pos) {
+        if (t[pos] == '"') {
+            ++count;
+        }
+    }
+    return count % 2 == 1;
 }
 
 
