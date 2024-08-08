@@ -68,6 +68,7 @@ extern YYSTYPE yylval;
 [Ee][Ll][Ee][Vv][Aa][Tt][Ii][Oo][Nn]               { return ELEVATION; }
 [Gg][Rr][Aa][Dd][Ee]                               { return GRADE; }
 [zZ]([1-9]|10)                                     { yytext += 1; WorkoutFilterlval.numValue = atoi(yytext); return ZONE; }
+\"[^\"]+\"                                         { yytext[strlen(yytext) - 1] = '\0'; WorkoutFilterlval.word = yytext + 1; return WORD; }
 [^ ,.]+                                            { WorkoutFilterlval.word = yytext; return WORD; }
 .                                                  { return yytext[0]; }
 

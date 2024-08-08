@@ -41,6 +41,7 @@ public:
     QString wordLeftOfCursor(const QString &t, int cp) const;
     QString wordRightOfCursor(const QString &t, int cp) const;
     bool isSelectorPosition(const QString &t, int cp) const;
+    bool isQuoted(const QString &t, int cp) const;
     bool isWordChar(QChar ch) const;
 
     std::pair<QString, int> evaluateCompletion(const QString &originalText, const QString &completion, int cursorPosition, int selectionStart, int selectionLength) const;
@@ -76,6 +77,7 @@ private:
     QString wordLeftOfCursor() const;
     QString wordRightOfCursor() const;
     bool isSelectorPosition() const;
+    bool isQuoted() const;
 };
 
 #endif

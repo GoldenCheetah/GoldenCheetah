@@ -240,7 +240,8 @@ words: word words  { *$1 << *$2; delete $2; $$ = $1; }
     |  word        { $$ = $1; }
     ;
 
-word: WORD  { $$ = new QStringList($1); }
+word: WORD   { $$ = new QStringList($1); }
+    | NUMBER { $$ = new QStringList(QString::number($1)); }
     ;
 
 mixedNumValue: FLOAT   { $$ = $1; }

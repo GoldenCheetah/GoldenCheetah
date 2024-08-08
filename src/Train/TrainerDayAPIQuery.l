@@ -51,6 +51,7 @@ extern YYSTYPE yylval;
 [Vv][Oo][2][Mm][Aa][Xx]                            { return ZONE_VO2MAX; }
 [Aa][Nn][Aa][Ee][Rr][Oo][Bb][Ii][Cc]               { return ZONE_ANAEROBIC; }
 [Tt][Ee][Ss][Tt]                                   { return ZONE_TEST; }
+\"[^\"]+\"                                         { yytext[strlen(yytext) - 1] = '\0'; TrainerDayAPIQuerylval.word = yytext + 1; return WORD; }
 [^ ,.]+                                            { TrainerDayAPIQuerylval.word = yytext; return WORD; }
 .                                                  { return yytext[0]; }
 
