@@ -41,6 +41,7 @@
 class ChartBar;
 class LTMSettings;
 class AbstractView;
+class AnalysisView;
 class ViewParser;
 class PerspectiveDialog;
 class QTextStream;
@@ -55,6 +56,7 @@ class Perspective : public GcWindow
     G_OBJECT
 
     friend ::AbstractView;
+    friend ::AnalysisView;
     friend ::TrendsView;
     friend ::ViewParser;
     friend ::PerspectiveDialog;
