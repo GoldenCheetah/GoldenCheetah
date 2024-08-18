@@ -232,9 +232,9 @@ Library::importFiles(Context *context, QStringList files, LibraryBatchImportConf
 
                 // Some (highly advanced) files can be both workouts and videosync.
                 // If we find a videosync here in the workout list then it was
-                // emplaced above so don't the file copy again.
+                // emplaced above so don't the file copy again when it is present.
 
-                if (!VideoSyncFile::isVideoSync(QFileInfo(source).fileName())) {
+                if (!(VideoSyncFile::isVideoSync(QFileInfo(source).fileName()) && QFile(targetWorkout).exists())) {
                     if (targetWorkout != QFileInfo(source).absoluteFilePath() && QFile(targetWorkout).exists()) {
                         if (showDialog != LibraryBatchImportConfirmation::noDialog) {
                             QMessageBox::warning(NULL, tr("Copy Workout Failed"),
