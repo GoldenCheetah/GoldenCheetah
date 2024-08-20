@@ -213,16 +213,7 @@ EquipCalculator::threadCompleted(EquipCalculationThread* thread)
     // if the final thread is finished, then update the summary items.
     if (recalculationThreads_.count() == 0) {
 
-        // Add all the non GC values to the totals
-        for (ChartSpaceItem* item : spaceItems_) {
-            if (item->type == OverviewItemType::EQ_ITEM)
-            {
-                eqLinkTotalDistanceScaled_ += static_cast<EquipmentItem*>(item)->getNonGCDistanceScaled();
-                eqLinkTotalElevationScaled_ += static_cast<EquipmentItem*>(item)->getNonGCElevationScaled();
-            }
-        }
-
-        // Now update any summary instances
+        // update any summary instances
         for (ChartSpaceItem* item : spaceItems_) {
 
             if (item->type == OverviewItemType::EQ_SUMMARY) {
