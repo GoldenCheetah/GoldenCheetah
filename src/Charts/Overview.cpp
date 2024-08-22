@@ -311,19 +311,16 @@ OverviewWindow::getConfiguration() const
                 // Due to lazy loading of perspectives, always save distances in metric units in case
                 // the units are changed before the equipment perspective is loaded.
                 EquipmentItem* meta = reinterpret_cast<EquipmentItem*>(item);
-                uint64_t expGCDistanceScaled = (GlobalContext::context()->useMetricUnits) ? meta->getNonGCDistanceScaled() : round(meta->getNonGCDistanceScaled() * KM_PER_MILE);
-                config += "\"nonGCDistanceScaled\":\"" + QString("%1").arg(expGCDistanceScaled) + "\",";
-                uint64_t expGCElevationScaled = (GlobalContext::context()->useMetricUnits) ? meta->getNonGCElevationScaled() : round(meta->getNonGCElevationScaled() * METERS_PER_FOOT);
-                config += "\"nonGCElevationScaled\":\"" + QString("%1").arg(expGCElevationScaled) + "\",";
-                double expRepDistance = (GlobalContext::context()->useMetricUnits) ? meta->repDistance_ : meta->repDistance_ * KM_PER_MILE;
-                config += "\"repDistance\":\"" + QString("%1").arg(expRepDistance) + "\",";
-                double expRepElevation = (GlobalContext::context()->useMetricUnits) ? meta->repElevation_ : meta->repElevation_ * METERS_PER_FOOT;
-                config += "\"repElevation\":\"" + QString("%1").arg(expRepElevation) + "\",";
-                config += "\"startSet\":\"" + QString("%1").arg(meta->startSet_ ? "1" : "0") + "\",";
-                if (meta->startSet_) config += "\"startDate\":\"" + QString("%1").arg(meta->startDate_.toString()) + "\",";
-                config += "\"endSet\":\"" + QString("%1").arg(meta->endSet_ ? "1" : "0") + "\",";
-                if (meta->endSet_) config += "\"endDate\":\"" + QString("%1").arg(meta->endDate_.toString()) + "\",";
-                config += "\"notes\":\"" + QString("%1").arg(meta->notes_) + "\",";
+                config += "\"metric\":\"" + QString(GlobalContext::context()->useMetricUnits ? "1" : "0") + "\",";
+                config += "\"nonGCDistanceScaled\":\"" + QString("%1").arg(meta->getNonGCDistanceScaled()) + "\",";
+                config += "\"nonGCElevationScaled\":\"" + QString("%1").arg(meta->getNonGCElevationScaled()) + "\",";
+                config += "\"repDistance\":\"" + QString("%1").arg(meta->repDistanceScaled_) + "\",";
+                config += "\"repElevation\":\"" + QString("%1").arg(meta->repElevationScaled_) + "\",";
+                config += "\"startSet\":\"" + QString(meta->startSet_ ? "1" : "0") + "\",";
+                if (meta->startSet_) config += "\"startDate\":\"" + meta->startDate_.toString() + "\",";
+                config += "\"endSet\":\"" + QString(meta->endSet_ ? "1" : "0") + "\",";
+                if (meta->endSet_) config += "\"endDate\":\"" + meta->endDate_.toString() + "\",";
+                config += "\"notes\":\"" + meta->notes_ + "\",";
             }
             break;
         case OverviewItemType::EQ_SUMMARY:
@@ -596,16 +593,30 @@ badconfig:
 
         case OverviewItemType::EQ_ITEM:
             {
-                // Due to lazy loading of perspectives, distances are in metric units in case
-                // the units are changed before the equipment perspective is loaded.
+                bool savedAsMetric = (obj["metric"].toString() == "1") ? true : false;
                 uint64_t nonGCDistanceScaled = obj["nonGCDistanceScaled"].toString().toULongLong();
-                if (!GlobalContext::context()->useMetricUnits) { nonGCDistanceScaled = round(nonGCDistanceScaled * MILES_PER_KM); }
                 uint64_t nonGCElevationScaled = obj["nonGCElevationScaled"].toString().toULongLong();
-                if (!GlobalContext::context()->useMetricUnits) { nonGCElevationScaled = round(nonGCElevationScaled * FEET_PER_METER); }
-                double repDistance = obj["repDistance"].toString().toDouble();
-                if (!GlobalContext::context()->useMetricUnits) { repDistance *= MILES_PER_KM; }
-                double repElevation = obj["repElevation"].toString().toDouble();
-                if (!GlobalContext::context()->useMetricUnits) { repElevation *= FEET_PER_METER; }
+                uint64_t repDistance = obj["repDistance"].toString().toULongLong();
+                uint64_t repElevation = obj["repElevation"].toString().toULongLong();
+
+                // Due to lazy loading of perspectives, saved distances might need converting 
+                // as the units might have changed before the equipment perspective is loaded.
+                if (savedAsMetric && !GlobalContext::context()->useMetricUnits) {
+
+                    nonGCDistanceScaled = round(nonGCDistanceScaled * KM_PER_MILE);
+                    nonGCElevationScaled = round(nonGCElevationScaled * METERS_PER_FOOT);
+                    repDistance = round(repDistance * KM_PER_MILE);
+                    repElevation = round(repElevation * METERS_PER_FOOT);
+
+                }
+                if (!savedAsMetric && GlobalContext::context()->useMetricUnits) {
+
+                    nonGCDistanceScaled = round(nonGCDistanceScaled * MILES_PER_KM);
+                    nonGCElevationScaled = round(nonGCElevationScaled * FEET_PER_METER);
+                    repDistance = round(repDistance * MILES_PER_KM);
+                    repElevation = round(repElevation * FEET_PER_METER);
+                }
+
                 bool startSet = (obj["startSet"].toString() == "1") ? true : false;
                 QDate startDate;
                 if (startSet) startDate = QDate::fromString(obj["startDate"].toString());

@@ -234,13 +234,13 @@ EquipCalculator::recalculateEq(RideItem* rideItem)
         // get the date of the activity 
         QDate actDate(QDate(1900, 01, 01).addDays(rideItem->getText("Start Date", "0").toInt()));
 
-        // using integral type atomics (c++11) but to retain accuracy multiply by EQ_REAL_TO_SCALED_ACC, see overviewItems.h
+        // using integral type atomics (c++11) but to retain accuracy multiply by EQ_REAL_TO_SCALED, see overviewItems.h
         double rideDistance = rideItem->getForSymbol("total_distance", GlobalContext::context()->useMetricUnits);
-        uint64_t rideDistanceScaled = static_cast<uint64_t>(round(rideDistance*EQ_REAL_TO_SCALED_ACC));
+        uint64_t rideDistanceScaled = static_cast<uint64_t>(round(rideDistance*EQ_REAL_TO_SCALED));
         eqLinkTotalDistanceScaled_ += rideDistanceScaled;
 
         double rideElevation = rideItem->getForSymbol("elevation_gain", GlobalContext::context()->useMetricUnits);
-        uint64_t eqElevationScaled_ = static_cast<uint64_t>(round(rideElevation*EQ_REAL_TO_SCALED_ACC));
+        uint64_t eqElevationScaled_ = static_cast<uint64_t>(round(rideElevation*EQ_REAL_TO_SCALED));
         eqLinkTotalElevationScaled_ += eqElevationScaled_;
 
         uint64_t rideTimeInSecs = static_cast<uint64_t>(rideItem->getForSymbol("time_riding"));

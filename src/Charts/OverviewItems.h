@@ -40,8 +40,8 @@
 // to allow integral type atomics (c++11) to be used and to get them to hold values to 3 decimal places the following
 // factors are used to scale the values, this is sufficient for equipment overview usage. When c++23 is available
 // this can changed to use atomic<double> and the scaling can be removed.
-#define EQ_REAL_TO_SCALED_ACC 10000
-#define EQ_SCALED_ACC_TO_REAL 0.0001
+#define EQ_REAL_TO_SCALED 10000
+#define EQ_SCALED_TO_REAL 0.0001
 
 // subwidgets for viz inside each overview item
 class RPErating;
@@ -403,7 +403,7 @@ class EquipmentItem : public ChartSpaceItem
 
         EquipmentItem(ChartSpace *parent,const QString& name,
                         const uint64_t nonGCDistanceScaled, const uint64_t nonGCElevationScaled,
-                        const double repDistance, const double repElevation,
+                        const uint64_t repDistanceScaled, const uint64_t repElevationScaled,
                         bool startSet, const QDate& startDate, bool endSet, const QDate& endDate,
                         const QString& notes);
         virtual ~EquipmentItem() {}
@@ -442,7 +442,7 @@ class EquipmentItem : public ChartSpaceItem
             return new EquipmentItem(parent, tr("Equipment Item"), 0, 0, 0, 0,
                                           false, QDate(), false, QDate(), ""); }
 
-        double repDistance_, repElevation_;
+        uint64_t repDistanceScaled_, repElevationScaled_;
         QDate startDate_, endDate_;
         bool startSet_, endSet_;
         QString notes_;

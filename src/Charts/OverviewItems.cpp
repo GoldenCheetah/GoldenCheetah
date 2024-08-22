@@ -936,7 +936,7 @@ MetaOverviewItem::~MetaOverviewItem()
 
 EquipmentItem::EquipmentItem(ChartSpace* parent, const QString& name,
                                     const uint64_t nonGCDistanceScaled, const uint64_t nonGCElevationScaled,
-                                    const double repDistance, const double repElevation,
+                                    const uint64_t repDistanceScaled, const uint64_t repElevationScaled,
                                     bool startSet, const QDate& startDate, bool endSet, const QDate& endDate,
                                     const QString& notes) : ChartSpaceItem(parent, name)
 {
@@ -951,8 +951,8 @@ EquipmentItem::EquipmentItem(ChartSpace* parent, const QString& name,
     nonGCElevationScaled_ = nonGCElevationScaled;
     gcElevationScaled_ = 0;
     totalElevationScaled_ = 0;
-    repDistance_ = repDistance;
-    repElevation_ = repElevation;
+    repDistanceScaled_ = repDistanceScaled;
+    repElevationScaled_ = repElevationScaled;
     startSet_ = startSet;
     startDate_ = startDate;
     endSet_ = endSet;
@@ -1902,25 +1902,25 @@ void
 EquipmentItem::unitsChanged()
 {
     // Need to rescale for the units change for the user entered data.
-    nonGCDistanceScaled_ = (GlobalContext::context()->useMetricUnits) ? round(nonGCDistanceScaled_*KM_PER_MILE) : round (nonGCDistanceScaled_* MILES_PER_KM);
-    repDistance_ = (GlobalContext::context()->useMetricUnits) ? repDistance_*KM_PER_MILE : repDistance_*MILES_PER_KM;
+    nonGCDistanceScaled_ = (GlobalContext::context()->useMetricUnits) ? round(nonGCDistanceScaled_ * KM_PER_MILE) : round (nonGCDistanceScaled_ * MILES_PER_KM);
+    repDistanceScaled_ = (GlobalContext::context()->useMetricUnits) ? round(repDistanceScaled_ * KM_PER_MILE) : round(repDistanceScaled_ * MILES_PER_KM);
     nonGCElevationScaled_ = (GlobalContext::context()->useMetricUnits) ? round(nonGCElevationScaled_ * METERS_PER_FOOT) : round(nonGCElevationScaled_ * FEET_PER_METER);
-    repElevation_ = (GlobalContext::context()->useMetricUnits) ? repElevation_ * METERS_PER_FOOT : repElevation_ * FEET_PER_METER;
+    repElevationScaled_ = (GlobalContext::context()->useMetricUnits) ? round (repElevationScaled_ * METERS_PER_FOOT) : round (repElevationScaled_ * FEET_PER_METER);
 }
 
 void
 EquipmentItem::setNonGCDistance(double nonGCDistance)
 {
-    // using integral type atomics (c++11) but to retain accuracy multiply by EQ_REAL_TO_SCALED_ACC, see overviewItems.h
-    nonGCDistanceScaled_ = round(nonGCDistance*EQ_REAL_TO_SCALED_ACC);
+    // using integral type atomics (c++11) but to retain accuracy multiply by EQ_REAL_TO_SCALED, see overviewItems.h
+    nonGCDistanceScaled_ = round(nonGCDistance*EQ_REAL_TO_SCALED);
     totalDistanceScaled_ = gcElevationScaled_ + nonGCDistanceScaled_;
 }
 
 void
 EquipmentItem::setNonGCElevation(double nonGCElevation)
 {
-    // using integral type atomics (c++11) but to retain accuracy multiply by EQ_REAL_TO_SCALED_ACC, see overviewItems.h
-    nonGCElevationScaled_ = round(nonGCElevation*EQ_REAL_TO_SCALED_ACC);
+    // using integral type atomics (c++11) but to retain accuracy multiply by EQ_REAL_TO_SCALED, see overviewItems.h
+    nonGCElevationScaled_ = round(nonGCElevation*EQ_REAL_TO_SCALED);
     totalElevationScaled_ = gcElevationScaled_ + nonGCElevationScaled_;
 }
 
@@ -1954,10 +1954,7 @@ EquipmentItem::isWithin(const QDate& actDate) const
 bool
 EquipmentItem::rangeIsValid() const
 {
-    if (startSet_ && endSet_)
-        return endDate_ >= startDate_;
-    else
-        return true;
+    return (startSet_ && endSet_) ? endDate_ >= startDate_ : true;
 }
 
 void
@@ -3747,7 +3744,7 @@ EquipmentItem::configChanged(qint32 cfg) {
     if ((cfg == 0) || (cfg & CONFIG_APPEARANCE)) {
         inactiveColor = (GCColor::luminance(RGBColor(color())) < 127) ? QColor(QColor(100, 100, 100)) : QColor(QColor(170, 170, 170));
         textColor = (GCColor::luminance(RGBColor(color())) < 127) ? QColor(QColor(200, 200, 200)) : QColor(QColor(70, 70, 70));
-        alertColor = GColor(CHEARTRATE).darker(130);  // red
+        alertColor = QColor(QColor(255, 170, 0));
     }
 }
 
@@ -3757,29 +3754,30 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
     // mid is slightly higher to account for space around title, move mid up
     static double mid = ROWHEIGHT * 3.0f;
 
-    QString totalDistanceStr(QString::number(getTotalDistanceScaled()*EQ_SCALED_ACC_TO_REAL, 'f', 1));
-
-    QColor activeDateColor;
-    if (isWithin(QDate::currentDate())) {
-        activeDateColor = GColor(CPLOTMARKER);
-    } else {
-        activeDateColor = inactiveColor;
-    }
+    bool overDistance = (repDistanceScaled_ !=0) && (getTotalDistanceScaled() > repDistanceScaled_);
+    bool overElevation = (repElevationScaled_ !=0) && (getTotalElevationScaled() > repElevationScaled_);
 
     // we align centre and mid
     QFontMetrics fm(parent->bigfont);
+    QString totalDistanceStr(QString::number(getTotalDistanceScaled() * EQ_SCALED_TO_REAL, 'f', 1));
     QRectF rect = QFontMetrics(parent->bigfont, parent->device()).boundingRect(totalDistanceStr);
     painter->setFont(parent->bigfont);
 
+    if ((!rangeIsValid()) || overDistance || overElevation) {
+        painter->setPen(alertColor);
+    } else if (isWithin(QDate::currentDate())) {
+        painter->setPen(GColor(CPLOTMARKER));
+    } else {
+        painter->setPen(inactiveColor);
+    }
+
     // display the total distance
-    painter->setPen(activeDateColor);
     painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
                         mid + (fm.ascent() / 3.0f)), totalDistanceStr); // divided by 3 to account for "gap" at top of font
 
-    double addy = QFontMetrics(parent->smallfont).height();
-
     painter->setPen(QColor(100, 100, 100));
     painter->setFont(parent->smallfont);
+    double addy = QFontMetrics(parent->smallfont).height();
 
     QString distUnits = GlobalContext::context()->useMetricUnits ? tr(" km") : tr(" miles");
 
@@ -3787,10 +3785,13 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
         mid + (fm.ascent() / 3.0f) + addy), distUnits); // divided by 3 to account for "gap" at top of font
 
     // display the date in either active, inactive or out of range colours
+
     if (!rangeIsValid()) {
         painter->setPen(alertColor);
+    } else if (isWithin(QDate::currentDate())) {
+        painter->setPen(GColor(CPLOTMARKER));
     } else {
-        painter->setPen(activeDateColor);
+        painter->setPen(inactiveColor);
     }
    
     QString dateString;
@@ -3822,58 +3823,65 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
     painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth,rowHeight),
         QString(tr("Activities: ")) + QString::number(getNumActivities()));
 
-    rowY += (ROWHEIGHT * 1.25);
+    rowY += (ROWHEIGHT * 1.3);
     painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-        QString(tr("Distance: ")) + QString::number(getGCDistanceScaled() * EQ_SCALED_ACC_TO_REAL, 'f', 1) + distUnits);
+        QString(tr("Distance: ")) + QString::number(getGCDistanceScaled() * EQ_SCALED_TO_REAL, 'f', 1) + distUnits);
 
     rowY += ROWHEIGHT;
     QString elevUnits = GlobalContext::context()->useMetricUnits ? tr(" meters") : tr(" feet");
     painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-        QString(tr("Elevation: ")) + QString::number(getGCElevationScaled() * EQ_SCALED_ACC_TO_REAL, 'f', 1) + elevUnits);
+        QString(tr("Elevation: ")) + QString::number(getGCElevationScaled() * EQ_SCALED_TO_REAL, 'f', 1) + elevUnits);
 
     rowY += ROWHEIGHT;
     painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
         QString(tr("Time: ")) + QString::number(activityTimeInSecs_ * HOURS_PER_SECOND, 'f', 1) + " hrs");
 
-    if (getNonGCDistanceScaled() > 0) {
+    bool addNotesOffset = false;
+    rowY += (ROWHEIGHT * 0.3);
 
-        rowY += (ROWHEIGHT * 1.5);
+    if (getNonGCDistanceScaled() != 0) {
+
+        rowY += (ROWHEIGHT);
+        addNotesOffset = true;
         painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-            QString(tr("Manual dst: ")) + QString::number(getNonGCDistanceScaled() * EQ_SCALED_ACC_TO_REAL, 'f', 1) + distUnits);
+            QString(tr("Manual dst: ")) + QString::number(getNonGCDistanceScaled() * EQ_SCALED_TO_REAL, 'f', 1) + distUnits);
     }
 
-    if (getNonGCElevationScaled() > 0) {
+    if (getNonGCElevationScaled() != 0) {
 
         rowY += ROWHEIGHT;
+        addNotesOffset = true;
         painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-            QString(tr("Manual elev: ")) + QString::number(getNonGCElevationScaled() * EQ_SCALED_ACC_TO_REAL, 'f', 1) + elevUnits);
+            QString(tr("Manual elev: ")) + QString::number(getNonGCElevationScaled() * EQ_SCALED_TO_REAL, 'f', 1) + elevUnits);
     }
 
-    if (repDistance_ > 0.0f) {
+    if (repDistanceScaled_ != 0) {
 
-        if ((double(getTotalDistanceScaled()) * EQ_SCALED_ACC_TO_REAL) > repDistance_) painter->setPen(alertColor);
+        if (overDistance) painter->setPen(alertColor);
 
         rowY += ROWHEIGHT;
+        addNotesOffset = true;
         painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-            QString(tr("Replace dist: ")) + QString::number(repDistance_, 'f', 1) + distUnits);
+            QString(tr("Replace dist: ")) + QString::number(repDistanceScaled_ * EQ_SCALED_TO_REAL, 'f', 1) + distUnits);
 
-        painter->setPen(textColor);
+        if (overDistance) painter->setPen(textColor);
     }
 
-    if (repElevation_ > 0.0f) {
+    if (repElevationScaled_ != 0) {
 
-        if ((double(getTotalElevationScaled()) * EQ_SCALED_ACC_TO_REAL) > repElevation_) painter->setPen(alertColor);
+        if (overElevation) painter->setPen(alertColor);
 
         rowY += ROWHEIGHT;
+        addNotesOffset = true;
         painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-            QString(tr("Replace elev: ")) + QString::number(repElevation_, 'f', 1) + elevUnits);
+            QString(tr("Replace elev: ")) + QString::number(repElevationScaled_ * EQ_SCALED_TO_REAL, 'f', 1) + elevUnits);
 
-        painter->setPen(textColor);
+        if (overElevation) painter->setPen(textColor);
     }
 
     if (!notes_.isEmpty()) {
 
-        rowY += (ROWHEIGHT*1.25);
+        rowY +=  (addNotesOffset) ? ROWHEIGHT*1.3 : ROWHEIGHT;
         painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), "Notes:");
         rowY += (ROWHEIGHT);
         painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), notes_);
@@ -3926,12 +3934,12 @@ EquipmentSummary::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, 
     rowY += (ROWHEIGHT * 1.25);
     QString distUnits = GlobalContext::context()->useMetricUnits ? tr(" km") : tr(" miles");
     painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-        QString(tr("Distance: ")) + QString::number(eqLinkTotalDistanceScaled_*EQ_SCALED_ACC_TO_REAL, 'f', 1) + distUnits);
+        QString(tr("Distance: ")) + QString::number(eqLinkTotalDistanceScaled_*EQ_SCALED_TO_REAL, 'f', 1) + distUnits);
 
     rowY += (ROWHEIGHT);
     QString elevUnits = GlobalContext::context()->useMetricUnits ? tr(" meters") : tr(" feet");
     painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-        QString(tr("Elevation: ")) + QString::number(eqLinkTotalElevationScaled_*EQ_SCALED_ACC_TO_REAL, 'f', 1) + elevUnits);
+        QString(tr("Elevation: ")) + QString::number(eqLinkTotalElevationScaled_*EQ_SCALED_TO_REAL, 'f', 1) + elevUnits);
 
     rowY += ROWHEIGHT;
     painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
@@ -4165,6 +4173,7 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), it
         // prevent negative values
         QDoubleValidator* eqValidator = new QDoubleValidator();
         eqValidator->setBottom(0);
+        eqValidator->setDecimals(1);
         eqValidator->setNotation(QDoubleValidator::StandardNotation);
 
         nonGCDistance = new QLineEdit(this);
@@ -4513,10 +4522,10 @@ OverviewItemConfig::setWidgets()
         {
             EquipmentItem* mi = dynamic_cast<EquipmentItem*>(item);
             name->setText(mi->name);
-            nonGCDistance->setText(QString::number(double(mi->getNonGCDistanceScaled())*EQ_SCALED_ACC_TO_REAL));
-            nonGCElevation->setText(QString::number(double(mi->getNonGCElevationScaled()) * EQ_SCALED_ACC_TO_REAL));
-            replaceDistance->setText(QString::number(mi->repDistance_));
-            replaceElevation->setText(QString::number(mi->repElevation_));
+            nonGCDistance->setText(QString::number(mi->getNonGCDistanceScaled() * EQ_SCALED_TO_REAL, 'f', 1));
+            nonGCElevation->setText(QString::number(mi->getNonGCElevationScaled() * EQ_SCALED_TO_REAL, 'f', 1));
+            replaceDistance->setText(QString::number(mi->repDistanceScaled_ * EQ_SCALED_TO_REAL, 'f', 1));
+            replaceElevation->setText(QString::number(mi->repElevationScaled_ * EQ_SCALED_TO_REAL, 'f', 1));
             startSet->setChecked(mi->startSet_);
             startDate->setVisible(mi->startSet_); // show/hide date field
             startDate->setDate(mi->startDate_);
@@ -4673,16 +4682,16 @@ OverviewItemConfig::dataChanged()
         {
             EquipmentItem* mi = dynamic_cast<EquipmentItem*>(item);
             mi->name = name->text();
-            mi->setNonGCDistance(nonGCDistance->text().toDouble());
-            mi->setNonGCElevation(nonGCElevation->text().toDouble());
+            mi->setNonGCDistance(nonGCDistance->text().toDouble()); // validator restricts 1 dp
+            mi->setNonGCElevation(nonGCElevation->text().toDouble()); // validator restricts 1 dp
             mi->startSet_ = startSet->isChecked();
             startDate->setVisible(mi->startSet_); // show/hide date field
             mi->startDate_ = startDate->date();
             mi->endSet_ = endSet->isChecked();
             endDate->setVisible(mi->endSet_); // show/hide date field
             mi->endDate_ = endDate->date();
-            mi->repDistance_ = replaceDistance->text().toDouble();
-            mi->repElevation_ = replaceElevation->text().toDouble();
+            mi->repDistanceScaled_ = round(replaceDistance->text().toDouble() * EQ_REAL_TO_SCALED); // validator restricts 1 dp
+            mi->repElevationScaled_ = round(replaceElevation->text().toDouble() * EQ_REAL_TO_SCALED); // validator restricts 1 dp
             mi->notes_ = notes->toPlainText();
             mi->bgcolor = bgcolor->getColor().name();
         }
