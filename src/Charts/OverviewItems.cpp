@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2020 Mark Liversedge (liversedge@gmail.com)
- * Equipment Items Copyright (c) 2024 Paul Johnson (paulj49457@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -31,7 +30,6 @@
 #include "PMCData.h"
 #include "RideMetadata.h"
 
-#include "Units.h"
 #include "DataFilter.h"
 #include "Utils.h"
 #include "TimeUtils.h"
@@ -69,9 +67,6 @@ OverviewItemConfig::registerItems()
     registry.addItem(OverviewItemType::PMC,         QObject::tr("PMC"),             QObject::tr("PMC Status Summary"),                 OverviewScope::ANALYSIS,                       PMCOverviewItem::create);
     registry.addItem(OverviewItemType::ROUTE,       QObject::tr("Route"),           QObject::tr("Route Summary"),                      OverviewScope::ANALYSIS,                       RouteOverviewItem::create);
     registry.addItem(OverviewItemType::DONUT,       QObject::tr("Donut"),           QObject::tr("Metric breakdown by category"),       OverviewScope::TRENDS,                         DonutOverviewItem::create);
-    registry.addItem(OverviewItemType::EQ_ITEM,     QObject::tr("Equipment"),       QObject::tr("Equipment Item"),                     OverviewScope::EQUIPMENT,                      EquipmentItem::create);
-    registry.addItem(OverviewItemType::EQ_SUMMARY,  QObject::tr("Eq Link Summary"), QObject::tr("Equipment Summary"),                  OverviewScope::EQUIPMENT,                      EquipmentSummary::create);
-    registry.addItem(OverviewItemType::EQ_NOTES,    QObject::tr("Eq Link Notes"),   QObject::tr("Equipment Notes"),                    OverviewScope::EQUIPMENT,                      EquipmentNotes::create);
 
     return true;
 }
@@ -932,67 +927,6 @@ MetaOverviewItem::configChanged(qint32)
 MetaOverviewItem::~MetaOverviewItem()
 {
     if (sparkline) delete sparkline;
-}
-
-EquipmentItem::EquipmentItem(ChartSpace* parent, const QString& name,
-                                    const uint64_t nonGCDistanceScaled, const uint64_t nonGCElevationScaled,
-                                    const uint64_t repDistanceScaled, const uint64_t repElevationScaled,
-                                    bool startSet, const QDate& startDate, bool endSet, const QDate& endDate,
-                                    const QString& notes) : ChartSpaceItem(parent, name)
-{
-    // equipment item
-    this->type = OverviewItemType::EQ_ITEM;
-
-    activities_ = 0;
-    activityTimeInSecs_ = 0;
-    nonGCDistanceScaled_ = nonGCDistanceScaled;
-    gcDistanceScaled_ = 0;
-    totalDistanceScaled_ = 0;
-    nonGCElevationScaled_ = nonGCElevationScaled;
-    gcElevationScaled_ = 0;
-    totalElevationScaled_ = 0;
-    repDistanceScaled_ = repDistanceScaled;
-    repElevationScaled_ = repElevationScaled;
-    startSet_ = startSet;
-    startDate_ = startDate;
-    endSet_ = endSet;
-    endDate_ = endDate;
-    notes_ = notes;
-
-    configwidget = new OverviewItemConfig(this);
-    configwidget->hide();
-
-    configChanged(0);
-}
-
-EquipmentSummary::EquipmentSummary(ChartSpace* parent, const QString& /* name */, bool showActivitiesPerAthlete) :
-    ChartSpaceItem(parent, parent->window->title() + tr(" Summary"))
-{
-    // equipment summary item
-    this->type = OverviewItemType::EQ_SUMMARY;
-    showActivitiesPerAthlete_ = showActivitiesPerAthlete;
-    eqLinkTotalTimeInSecs_ = 0;
-    eqLinkTotalDistanceScaled_ = 0;
-    eqLinkTotalElevationScaled_ = 0;
-    eqLinkNumActivities_ = 0;
-
-    configwidget = new OverviewItemConfig(this);
-    configwidget->hide();
-
-    configChanged(0);
-}
-
-EquipmentNotes::EquipmentNotes(ChartSpace* parent, const QString& name, const QString& notes) :
-    ChartSpaceItem(parent, name)
-{
-    // equipment summary item
-    this->type = OverviewItemType::EQ_NOTES;
-    notes_ = notes;
-  
-    configwidget = new OverviewItemConfig(this);
-    configwidget->hide();
-
-    configChanged(0);
 }
 
 IntervalOverviewItem::IntervalOverviewItem(ChartSpace *parent, QString name, QString xsymbol, QString ysymbol, QString zsymbol) : ChartSpaceItem(parent, name)
@@ -1885,106 +1819,6 @@ MetaOverviewItem::setData(RideItem *item)
         lower = QString("%1").arg(min);
         mean = QString("%1").arg(avg, 0, 'f', 0);
     }
-}
-
-void
-EquipmentItem::resetEqItem()
-{
-    activities_ = 0;
-    activityTimeInSecs_ = 0;
-    gcDistanceScaled_ = 0;
-    totalDistanceScaled_ = nonGCDistanceScaled_;
-    gcElevationScaled_ = 0;
-    totalElevationScaled_ = nonGCElevationScaled_;
-}
-
-void
-EquipmentItem::unitsChanged()
-{
-    // Need to rescale for the units change for the user entered data.
-    nonGCDistanceScaled_ = (GlobalContext::context()->useMetricUnits) ? round(nonGCDistanceScaled_ * KM_PER_MILE) : round (nonGCDistanceScaled_ * MILES_PER_KM);
-    repDistanceScaled_ = (GlobalContext::context()->useMetricUnits) ? round(repDistanceScaled_ * KM_PER_MILE) : round(repDistanceScaled_ * MILES_PER_KM);
-    nonGCElevationScaled_ = (GlobalContext::context()->useMetricUnits) ? round(nonGCElevationScaled_ * METERS_PER_FOOT) : round(nonGCElevationScaled_ * FEET_PER_METER);
-    repElevationScaled_ = (GlobalContext::context()->useMetricUnits) ? round (repElevationScaled_ * METERS_PER_FOOT) : round (repElevationScaled_ * FEET_PER_METER);
-}
-
-void
-EquipmentItem::setNonGCDistance(double nonGCDistance)
-{
-    // using integral type atomics (c++11) but to retain accuracy multiply by EQ_REAL_TO_SCALED, see overviewItems.h
-    nonGCDistanceScaled_ = round(nonGCDistance*EQ_REAL_TO_SCALED);
-    totalDistanceScaled_ = gcElevationScaled_ + nonGCDistanceScaled_;
-}
-
-void
-EquipmentItem::setNonGCElevation(double nonGCElevation)
-{
-    // using integral type atomics (c++11) but to retain accuracy multiply by EQ_REAL_TO_SCALED, see overviewItems.h
-    nonGCElevationScaled_ = round(nonGCElevation*EQ_REAL_TO_SCALED);
-    totalElevationScaled_ = gcElevationScaled_ + nonGCElevationScaled_;
-}
-
-void
-EquipmentItem::addActivity(uint64_t rideDistanceScaled, uint64_t rideElevationScaled, uint64_t rideTimeInSecs)
-{
-    // Atomic safe additions
-    activities_ += 1;
-    activityTimeInSecs_ += rideTimeInSecs;
-    gcDistanceScaled_ += rideDistanceScaled;
-    totalDistanceScaled_ += rideDistanceScaled;
-    gcElevationScaled_ += rideElevationScaled;
-    totalElevationScaled_ += rideElevationScaled;
-}
-
-bool
-EquipmentItem::isWithin(const QDate& actDate) const
-{
-    if (!startSet_)
-        if (!endSet_)
-            return true; // no range set
-        else
-            return (actDate <= endDate_); // end set but not beginning !
-    else
-        if (!endSet_)
-            return (startDate_ <= actDate);
-        else
-            return (startDate_ <= actDate) && (actDate <= endDate_);
-}
-
-bool
-EquipmentItem::rangeIsValid() const
-{
-    return (startSet_ && endSet_) ? endDate_ >= startDate_ : true;
-}
-
-void
-EquipmentSummary::resetEqSummary()
-{
-    eqLinkTotalTimeInSecs_ = 0;
-    eqLinkTotalDistanceScaled_ = 0;
-    eqLinkTotalElevationScaled_ = 0;
-    map_.clear();
-}
-
-void
-EquipmentSummary::updateSummaryItem(const uint64_t eqNumActivities, const uint64_t eqTotalTimeInSecs,
-                                    const uint64_t eqTotalDistanceScaled, const uint64_t eqTotalElevationScaled,
-                                    const QDate& earliestDate, const QDate& latestDate)
-{
-    eqLinkNumActivities_ = eqNumActivities;
-    eqLinkTotalTimeInSecs_ = eqTotalTimeInSecs;
-    eqLinkTotalDistanceScaled_ = eqTotalDistanceScaled;
-    eqLinkTotalElevationScaled_ = eqTotalElevationScaled;
-    eqLinkEarliestDate_ = earliestDate;
-    eqLinkLatestDate_ = latestDate;
-}
-
-void
-EquipmentSummary::addAthleteActivity(const QString& athleteName)
-{
-    mapMutex_.lock();
-    map_[athleteName] += 1;
-    mapMutex_.unlock();
 }
 
 void
@@ -3739,235 +3573,6 @@ MetaOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
 }
 
 void
-EquipmentItem::configChanged(qint32 cfg) {
-
-    if ((cfg == 0) || (cfg & CONFIG_APPEARANCE)) {
-        inactiveColor = (GCColor::luminance(RGBColor(color())) < 127) ? QColor(QColor(100, 100, 100)) : QColor(QColor(170, 170, 170));
-        textColor = (GCColor::luminance(RGBColor(color())) < 127) ? QColor(QColor(200, 200, 200)) : QColor(QColor(70, 70, 70));
-        alertColor = QColor(QColor(255, 170, 0));
-    }
-}
-
-void
-EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) {
-    
-    // mid is slightly higher to account for space around title, move mid up
-    static double mid = ROWHEIGHT * 3.0f;
-
-    bool overDistance = (repDistanceScaled_ !=0) && (getTotalDistanceScaled() > repDistanceScaled_);
-    bool overElevation = (repElevationScaled_ !=0) && (getTotalElevationScaled() > repElevationScaled_);
-
-    // we align centre and mid
-    QFontMetrics fm(parent->bigfont);
-    QString totalDistanceStr(QString::number(getTotalDistanceScaled() * EQ_SCALED_TO_REAL, 'f', 1));
-    QRectF rect = QFontMetrics(parent->bigfont, parent->device()).boundingRect(totalDistanceStr);
-    painter->setFont(parent->bigfont);
-
-    if ((!rangeIsValid()) || overDistance || overElevation) {
-        painter->setPen(alertColor);
-    } else if (isWithin(QDate::currentDate())) {
-        painter->setPen(GColor(CPLOTMARKER));
-    } else {
-        painter->setPen(inactiveColor);
-    }
-
-    // display the total distance
-    painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
-                        mid + (fm.ascent() / 3.0f)), totalDistanceStr); // divided by 3 to account for "gap" at top of font
-
-    painter->setPen(QColor(100, 100, 100));
-    painter->setFont(parent->smallfont);
-    double addy = QFontMetrics(parent->smallfont).height();
-
-    QString distUnits = GlobalContext::context()->useMetricUnits ? tr(" km") : tr(" miles");
-
-    painter->drawText(QPointF((geometry().width() - QFontMetrics(parent->smallfont).horizontalAdvance(distUnits)) / 2.0f,
-        mid + (fm.ascent() / 3.0f) + addy), distUnits); // divided by 3 to account for "gap" at top of font
-
-    // display the date in either active, inactive or out of range colours
-
-    if (!rangeIsValid()) {
-        painter->setPen(alertColor);
-    } else if (isWithin(QDate::currentDate())) {
-        painter->setPen(GColor(CPLOTMARKER));
-    } else {
-        painter->setPen(inactiveColor);
-    }
-   
-    QString dateString;
-
-    // Format date field
-    if (!startSet_) {
-        if (!endSet_) {
-            dateString = tr("All Dates");
-        } else {
-            dateString = endDate_.toString("-->d MMM yyyy");
-        }
-    } else {
-        if (!endSet_) {
-            dateString = startDate_.toString("d MMM yyyy -->");
-        } else {
-            dateString = (startDate_.toString("d MMM yyyy --> ") + endDate_.toString("d MMM yyyy"));
-        }
-    }
-
-    double rowY(ROWHEIGHT*5.5);
-    double rowWidth(geometry().width() - (ROWHEIGHT * 2));
-    double rowHeight(geometry().height() - (ROWHEIGHT * 4));
-
-    painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), dateString);
-
-    painter->setPen(textColor);
-
-    rowY += (ROWHEIGHT);
-    painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth,rowHeight),
-        QString(tr("Activities: ")) + QString::number(getNumActivities()));
-
-    rowY += (ROWHEIGHT * 1.3);
-    painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-        QString(tr("Distance: ")) + QString::number(getGCDistanceScaled() * EQ_SCALED_TO_REAL, 'f', 1) + distUnits);
-
-    rowY += ROWHEIGHT;
-    QString elevUnits = GlobalContext::context()->useMetricUnits ? tr(" meters") : tr(" feet");
-    painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-        QString(tr("Elevation: ")) + QString::number(getGCElevationScaled() * EQ_SCALED_TO_REAL, 'f', 1) + elevUnits);
-
-    rowY += ROWHEIGHT;
-    painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-        QString(tr("Time: ")) + QString::number(activityTimeInSecs_ * HOURS_PER_SECOND, 'f', 1) + " hrs");
-
-    bool addNotesOffset = false;
-    rowY += (ROWHEIGHT * 0.3);
-
-    if (getNonGCDistanceScaled() != 0) {
-
-        rowY += (ROWHEIGHT);
-        addNotesOffset = true;
-        painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-            QString(tr("Manual dst: ")) + QString::number(getNonGCDistanceScaled() * EQ_SCALED_TO_REAL, 'f', 1) + distUnits);
-    }
-
-    if (getNonGCElevationScaled() != 0) {
-
-        rowY += ROWHEIGHT;
-        addNotesOffset = true;
-        painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-            QString(tr("Manual elev: ")) + QString::number(getNonGCElevationScaled() * EQ_SCALED_TO_REAL, 'f', 1) + elevUnits);
-    }
-
-    if (repDistanceScaled_ != 0) {
-
-        if (overDistance) painter->setPen(alertColor);
-
-        rowY += ROWHEIGHT;
-        addNotesOffset = true;
-        painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-            QString(tr("Replace dist: ")) + QString::number(repDistanceScaled_ * EQ_SCALED_TO_REAL, 'f', 1) + distUnits);
-
-        if (overDistance) painter->setPen(textColor);
-    }
-
-    if (repElevationScaled_ != 0) {
-
-        if (overElevation) painter->setPen(alertColor);
-
-        rowY += ROWHEIGHT;
-        addNotesOffset = true;
-        painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-            QString(tr("Replace elev: ")) + QString::number(repElevationScaled_ * EQ_SCALED_TO_REAL, 'f', 1) + elevUnits);
-
-        if (overElevation) painter->setPen(textColor);
-    }
-
-    if (!notes_.isEmpty()) {
-
-        rowY +=  (addNotesOffset) ? ROWHEIGHT*1.3 : ROWHEIGHT;
-        painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), "Notes:");
-        rowY += (ROWHEIGHT);
-        painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), notes_);
-    }
-}
-
-void
-EquipmentSummary::configChanged(qint32 cfg) {
-
-    if ((cfg == 0) || (cfg & CONFIG_APPEARANCE)) {
-        textColor = (GCColor::luminance(RGBColor(color())) < 127) ? QColor(QColor(200, 200, 200)) : QColor(QColor(70, 70, 70));
-    }
-}
-
-void
-EquipmentSummary::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) {
-
-    painter->setPen(textColor);
-    painter->setFont(parent->smallfont);
-
-    double rowY(ROWHEIGHT * 2.5);
-    double rowWidth(geometry().width() - (ROWHEIGHT * 2));
-    double rowHeight(geometry().height() - (ROWHEIGHT * 4));
-
-    painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-        QString(tr("Activities: ")) + QString::number(eqLinkNumActivities_));
-
-    rowY += ROWHEIGHT;
-
-    if (showActivitiesPerAthlete_) {
-        for (auto it = map_.keyValueBegin(); it != map_.keyValueEnd(); ++it) {
-
-            painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-                QString("   ") + it->first + ": " + QString::number(it->second));
-
-            rowY += ROWHEIGHT;
-        }
-    }
-
-    rowY += (ROWHEIGHT * 0.25);
-    QString eqLinkEarliestDate = (eqLinkNumActivities_ != 0) ? eqLinkEarliestDate_.toString("d MMM yyyy") : " --";
-    painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-        QString(tr("Earliest Activity: ")) + eqLinkEarliestDate);
-
-    rowY += (ROWHEIGHT);
-    QString eqLinkLatestDate = (eqLinkNumActivities_ != 0) ? eqLinkLatestDate_.toString("d MMM yyyy") : " --";
-    painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-        QString(tr("Latest Activity: ")) + eqLinkLatestDate);
-
-    rowY += (ROWHEIGHT * 1.25);
-    QString distUnits = GlobalContext::context()->useMetricUnits ? tr(" km") : tr(" miles");
-    painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-        QString(tr("Distance: ")) + QString::number(eqLinkTotalDistanceScaled_*EQ_SCALED_TO_REAL, 'f', 1) + distUnits);
-
-    rowY += (ROWHEIGHT);
-    QString elevUnits = GlobalContext::context()->useMetricUnits ? tr(" meters") : tr(" feet");
-    painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-        QString(tr("Elevation: ")) + QString::number(eqLinkTotalElevationScaled_*EQ_SCALED_TO_REAL, 'f', 1) + elevUnits);
-
-    rowY += ROWHEIGHT;
-    painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-        QString(tr("Time: ")) + QString::number(eqLinkTotalTimeInSecs_*HOURS_PER_SECOND, 'f', 1) + " hrs");
-}
-
-void
-EquipmentNotes::configChanged(qint32 cfg) {
-
-    if ((cfg == 0) || (cfg & CONFIG_APPEARANCE)) {
-        textColor = (GCColor::luminance(RGBColor(color())) < 127) ? QColor(QColor(200, 200, 200)) : QColor(QColor(70, 70, 70));
-    }
-}
-
-void
-EquipmentNotes::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) {
-
-    painter->setPen(textColor);
-    painter->setFont(parent->smallfont);
-
-    double rowY(ROWHEIGHT * 2.5);
-    double rowWidth(geometry().width() - (ROWHEIGHT * 2));
-    double rowHeight(geometry().height() - (ROWHEIGHT * 4));
-
-    painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), notes_);
-}
-
-void
 PMCOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
     // Lets use friendly names for TSB et al, as described on the TrainingPeaks website
@@ -4097,7 +3702,7 @@ static bool insensitiveLessThan(const QString &a, const QString &b)
 OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), item(item), block(false)
 {
     QVBoxLayout *main = new QVBoxLayout(this);
-    QFormLayout *layout = new QFormLayout();
+    layout = new QFormLayout();
     main->addLayout(layout);
 
     if (item->type != OverviewItemType::KPI && item->type != OverviewItemType::DATATABLE) main->addStretch();
@@ -4166,76 +3771,6 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), it
         meta1 = new MetricSelect(this, item->parent->context, MetricSelect::Meta);
         connect(meta1, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
         layout->addRow(tr("Field Name"), meta1);
-    }
-
-    if (item->type == OverviewItemType::EQ_ITEM) {
-
-        // prevent negative values
-        QDoubleValidator* eqValidator = new QDoubleValidator();
-        eqValidator->setBottom(0);
-        eqValidator->setDecimals(1);
-        eqValidator->setNotation(QDoubleValidator::StandardNotation);
-
-        nonGCDistance = new QLineEdit(this);
-        nonGCDistance->setValidator(eqValidator);
-        connect(nonGCDistance, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
-        layout->addRow(tr("Manual dst"), nonGCDistance);
-       
-        nonGCElevation = new QLineEdit(this);
-        nonGCElevation->setValidator(eqValidator);
-        connect(nonGCElevation, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
-        layout->addRow(tr("Manual elev"), nonGCElevation);
-
-        QHBoxLayout* startRow = new QHBoxLayout();
-        startSet = new QCheckBox();
-        connect(startSet, SIGNAL(stateChanged(int)), this, SLOT(dataChanged()));
-        startDate = new QDateEdit();
-        startDate->setCalendarPopup(true);
-        connect(startDate, SIGNAL(dateChanged(QDate)), this, SLOT(dataChanged()));
-        startRow->addWidget(startSet);
-        startRow->addWidget(startDate);
-        startRow->addStretch();
-        layout->addRow(tr("Start Date"), startRow);
-
-        QHBoxLayout* endRow = new QHBoxLayout();
-        endSet = new QCheckBox();
-        connect(endSet, SIGNAL(stateChanged(int)), this, SLOT(dataChanged()));
-        endDate = new QDateEdit();
-        endDate->setCalendarPopup(true);
-        connect(endDate, SIGNAL(dateChanged(QDate)), this, SLOT(dataChanged()));
-        endRow->addWidget(endSet);
-        endRow->addWidget(endDate);
-        endRow->addStretch();
-        layout->addRow(tr("End Date"), endRow);
-
-        replaceDistance = new QLineEdit(this);
-        replaceDistance->setValidator(eqValidator);
-        connect(replaceDistance, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
-        layout->addRow(tr("Replacement dst"), replaceDistance);
-
-        replaceElevation = new QLineEdit(this);
-        replaceElevation->setValidator(eqValidator);
-        connect(replaceElevation, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
-        layout->addRow(tr("Replacement elev"), replaceElevation);
-
-        notes = new QPlainTextEdit();
-        connect(notes, SIGNAL(textChanged()), this, SLOT(dataChanged()));
-        layout->addRow(tr("Notes"), notes);
-    }
-
-    if (item->type == OverviewItemType::EQ_SUMMARY) {
-
-        // nothing to do here
-        startSet = new QCheckBox();
-        connect(startSet, SIGNAL(stateChanged(int)), this, SLOT(dataChanged()));
-        layout->addRow(tr("Show Athlete's Activities"), startSet);
-    }
-
-    if (item->type == OverviewItemType::EQ_NOTES) {
-
-        notes = new QPlainTextEdit();
-        connect(notes, SIGNAL(textChanged()), this, SLOT(dataChanged()));
-        layout->addRow(tr("Notes"), notes);
     }
 
     if (item->type == OverviewItemType::ZONE) {
@@ -4518,40 +4053,6 @@ OverviewItemConfig::setWidgets()
         }
         break;
 
-    case OverviewItemType::EQ_ITEM:
-        {
-            EquipmentItem* mi = dynamic_cast<EquipmentItem*>(item);
-            name->setText(mi->name);
-            nonGCDistance->setText(QString::number(mi->getNonGCDistanceScaled() * EQ_SCALED_TO_REAL, 'f', 1));
-            nonGCElevation->setText(QString::number(mi->getNonGCElevationScaled() * EQ_SCALED_TO_REAL, 'f', 1));
-            replaceDistance->setText(QString::number(mi->repDistanceScaled_ * EQ_SCALED_TO_REAL, 'f', 1));
-            replaceElevation->setText(QString::number(mi->repElevationScaled_ * EQ_SCALED_TO_REAL, 'f', 1));
-            startSet->setChecked(mi->startSet_);
-            startDate->setVisible(mi->startSet_); // show/hide date field
-            startDate->setDate(mi->startDate_);
-            endSet->setChecked(mi->endSet_);
-            endDate->setVisible(mi->endSet_); // show/hide date field
-            endDate->setDate(mi->endDate_);
-            notes->setPlainText(mi->notes_);
-        }
-        break;
-
-    case OverviewItemType::EQ_SUMMARY:
-        {
-            EquipmentSummary* mi = dynamic_cast<EquipmentSummary*>(item);
-            startSet->setChecked(mi->showActivitiesPerAthlete_);
-            name->setText(mi->name);
-        }
-        break;
-
-    case OverviewItemType::EQ_NOTES:
-        {
-            EquipmentNotes* mi = dynamic_cast<EquipmentNotes*>(item);
-            name->setText(mi->name);
-            notes->setPlainText(mi->notes_);
-        }
-        break;
-
     case OverviewItemType::ZONE:
         {
             ZoneOverviewItem *mi = dynamic_cast<ZoneOverviewItem*>(item);
@@ -4674,43 +4175,6 @@ OverviewItemConfig::dataChanged()
             MetaOverviewItem *mi = dynamic_cast<MetaOverviewItem*>(item);
             mi->name = name->text();
             if (meta1->isValid()) mi->symbol = meta1->metaname();
-            mi->bgcolor = bgcolor->getColor().name();
-        }
-        break;
-
-    case OverviewItemType::EQ_ITEM:
-        {
-            EquipmentItem* mi = dynamic_cast<EquipmentItem*>(item);
-            mi->name = name->text();
-            mi->setNonGCDistance(nonGCDistance->text().toDouble()); // validator restricts 1 dp
-            mi->setNonGCElevation(nonGCElevation->text().toDouble()); // validator restricts 1 dp
-            mi->startSet_ = startSet->isChecked();
-            startDate->setVisible(mi->startSet_); // show/hide date field
-            mi->startDate_ = startDate->date();
-            mi->endSet_ = endSet->isChecked();
-            endDate->setVisible(mi->endSet_); // show/hide date field
-            mi->endDate_ = endDate->date();
-            mi->repDistanceScaled_ = round(replaceDistance->text().toDouble() * EQ_REAL_TO_SCALED); // validator restricts 1 dp
-            mi->repElevationScaled_ = round(replaceElevation->text().toDouble() * EQ_REAL_TO_SCALED); // validator restricts 1 dp
-            mi->notes_ = notes->toPlainText();
-            mi->bgcolor = bgcolor->getColor().name();
-        }
-        break;
-
-    case OverviewItemType::EQ_SUMMARY:
-        {
-            EquipmentSummary* mi = dynamic_cast<EquipmentSummary*>(item);
-            mi->name = name->text();
-            mi->showActivitiesPerAthlete_ = startSet->isChecked();
-            mi->bgcolor = bgcolor->getColor().name();
-        }
-        break;
-
-    case OverviewItemType::EQ_NOTES:
-        {
-            EquipmentNotes* mi = dynamic_cast<EquipmentNotes*>(item);
-            mi->name = name->text();
-            mi->notes_ = notes->toPlainText();
             mi->bgcolor = bgcolor->getColor().name();
         }
         break;

@@ -50,7 +50,6 @@ class AnalysisView : public AbstractView
         void compareChanged(bool);
 
     private:
-        Perspective *hw;
 
 };
 
@@ -72,7 +71,6 @@ class DiaryView : public AbstractView
 
     private:
         DiarySidebar *diarySidebar;
-        Perspective *hw;
 
 };
 
@@ -95,7 +93,6 @@ class TrainView : public AbstractView
 
         TrainSidebar *trainTool;
         TrainBottom *trainBottom;
-        Perspective *hw;
 
 private slots:
         void onAutoHideChanged(bool enabled);
@@ -112,7 +109,6 @@ class TrendsView : public AbstractView
         ~TrendsView();
 
         LTMSidebar *sidebar;
-        Perspective *hw;
 
         int countActivities(Perspective *, DateRange dr);
 
@@ -146,8 +142,6 @@ class EquipView : public AbstractView
         bool isBlank() override;
 
     private:
-        Perspective* hw;
-        QStackedWidget* masterControls;
 
 };
 

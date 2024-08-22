@@ -84,6 +84,8 @@ AbstractView::AbstractView(Context* context, int type, const QString& view, cons
 
 AbstractView::~AbstractView()
 {
+    saveState(); // writes xxx-perspectives.xml
+
     foreach(Perspective *p, perspectives_) delete p;
     perspectives_.clear();
 }

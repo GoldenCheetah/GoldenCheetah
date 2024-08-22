@@ -16,15 +16,17 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "OverviewEquipment.h"
-#include "ChartSpace.h"
-#include "OverviewItems.h"
 #include "AthleteTab.h"
+#include "OverviewEquipment.h"
+#include "EquipmentCalculator.h"
+#include "OverviewEquipmentItems.h"
 
 OverviewEquipmentWindow::OverviewEquipmentWindow(Context* context, int scope, bool blank) :
-    OverviewWindow(context, scope, blank), reCalcOnVisible(false)
+    OverviewWindow(context, scope, blank), reCalcOnVisible_(false)
 {
-    eqCalc = new EquipCalculator(context->mainWindow);
+    eqCalc_ = new EquipCalculator(context->mainWindow, this);
+
+    space->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartEquip_Overview));
 
     // cannot use athlete specific signals, as there is only one equipment view.
     connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
@@ -33,15 +35,26 @@ OverviewEquipmentWindow::OverviewEquipmentWindow(Context* context, int scope, bo
 
 OverviewEquipmentWindow::~OverviewEquipmentWindow()
 {
-    delete eqCalc;
+    delete eqCalc_;
 }
+
+void
+OverviewEquipmentWindow::showChart(bool visible)
+{
+    reCalcOnVisible_ = visible;
+    eqCalc_->recalculateEquipSpace(space->allItems());
+
+    GcChartWindow::showChart(visible);
+}
+
+
 
 ChartSpaceItem*
 OverviewEquipmentWindow::addTile()
 {
     ChartSpaceItem* item = OverviewWindow::addTile();
 
-    if ((item != nullptr) && reCalcOnVisible) eqCalc->recalculateEquipTile(title(), item);
+    if (item != nullptr) eqCalc_->recalculateEquipTile(item);
     return item;
 }
 
@@ -55,7 +68,7 @@ OverviewEquipmentWindow::configItem(ChartSpaceItem* item)
     if (space->allItems().indexOf(item) != -1) {
 
         // recalculate the affected tile
-        if (reCalcOnVisible) eqCalc->recalculateEquipTile(title(), item);
+        eqCalc_->recalculateEquipTile(item);
     }
 }
 
@@ -74,14 +87,176 @@ OverviewEquipmentWindow::configChanged(qint32 cfg) {
             }
         }
 
-        if (reCalcOnVisible) eqCalc->recalculateEquipSpace(title(), space->allItems());
+        if (reCalcOnVisible_) eqCalc_->recalculateEquipSpace(space->allItems());
+    }
+}
+
+QString
+OverviewEquipmentWindow::getChartSource() const
+{
+    return ":charts/overview-equipment.gchart";
+}
+
+void
+OverviewEquipmentWindow::getExtraConfiguration(ChartSpaceItem* item, QString& config) const
+{
+    // now the actual card settings
+    switch (item->type) {
+
+    case OverviewItemType::EQ_ITEM:
+    {
+        // Due to lazy loading of perspectives, save the units in case
+        // they are changed before the equipment perspective is loaded.
+        EquipmentItem* meta = reinterpret_cast<EquipmentItem*>(item);
+        config += "\"metric\":\"" + QString(GlobalContext::context()->useMetricUnits ? "1" : "0") + "\",";
+        config += "\"nonGCDistanceScaled\":\"" + QString("%1").arg(meta->getNonGCDistanceScaled()) + "\",";
+        config += "\"nonGCElevationScaled\":\"" + QString("%1").arg(meta->getNonGCElevationScaled()) + "\",";
+        config += "\"repDistance\":\"" + QString("%1").arg(meta->repDistanceScaled_) + "\",";
+        config += "\"repElevation\":\"" + QString("%1").arg(meta->repElevationScaled_) + "\",";
+
+        QJsonArray EqLinkUses;
+        QJsonDocument eqDoc;
+
+        for (const auto& eqUse : meta->eqLinkUse_) {
+
+            QJsonObject EqLinkUse;
+            EqLinkUse["eqLink"] = eqUse.eqLinkName_;
+            EqLinkUse["startSet"] = eqUse.startSet_ ? "1" : "0";
+            EqLinkUse["startDate"] = eqUse.startDate_.toString();
+            EqLinkUse["endSet"] = eqUse.endSet_ ? "1" : "0";
+            EqLinkUse["endDate"] = eqUse.endDate_.toString();
+
+            EqLinkUses.push_back(EqLinkUse);
+        }
+
+        eqDoc.setArray(EqLinkUses);
+        config += "\"eqUseList\":" + eqDoc.toJson(QJsonDocument::Compact) + ",";
+        config += "\"notes\":\"" + meta->notes_ + "\",";
+    }
+    break;
+
+    case OverviewItemType::EQ_SUMMARY:
+    {
+        EquipmentSummary* meta = reinterpret_cast<EquipmentSummary*>(item);
+        config += "\"eqLink\":\"" + meta->eqLinkName_ + "\",";
+        config += "\"showAthleteActivities\":\"" + QString("%1").arg(meta->showActivitiesPerAthlete_ ? "1" : "0") + "\",";
+    }
+    break;
+
+    case OverviewItemType::EQ_NOTES:
+    {
+        EquipmentNotes* meta = reinterpret_cast<EquipmentNotes*>(item);
+        config += "\"notes\":\"" + QString("%1").arg(meta->notes_) + "\",";
+    }
+    break;
+    }
+}
+
+void
+OverviewEquipmentWindow::setExtraConfiguration(QJsonObject& obj, int type, ChartSpaceItem* add, QString& name, QString& datafilter, int order, int column, int span, int deep) const
+{
+    // now the actual card settings
+    switch (type) {
+
+    case OverviewItemType::EQ_ITEM:
+    {
+        bool savedAsMetric = (obj["metric"].toString() == "1") ? true : false;
+        uint64_t nonGCDistanceScaled = obj["nonGCDistanceScaled"].toString().toULongLong();
+        uint64_t nonGCElevationScaled = obj["nonGCElevationScaled"].toString().toULongLong();
+        uint64_t repDistance = obj["repDistance"].toString().toULongLong();
+        uint64_t repElevation = obj["repElevation"].toString().toULongLong();
+
+        // Due to lazy loading of perspectives, saved distances might need converting 
+        // as the units might have changed before the equipment perspective is loaded.
+        if (savedAsMetric && !GlobalContext::context()->useMetricUnits) {
+
+            nonGCDistanceScaled = round(nonGCDistanceScaled * KM_PER_MILE);
+            nonGCElevationScaled = round(nonGCElevationScaled * METERS_PER_FOOT);
+            repDistance = round(repDistance * KM_PER_MILE);
+            repElevation = round(repElevation * METERS_PER_FOOT);
+
+        }
+        if (!savedAsMetric && GlobalContext::context()->useMetricUnits) {
+
+            nonGCDistanceScaled = round(nonGCDistanceScaled * MILES_PER_KM);
+            nonGCElevationScaled = round(nonGCElevationScaled * FEET_PER_METER);
+            repDistance = round(repDistance * MILES_PER_KM);
+            repElevation = round(repElevation * FEET_PER_METER);
+        }
+
+        QJsonValue eqUseValues = obj["eqUseList"];
+        QVector<EqTimeWindow> eqLinkUse;
+
+        if (eqUseValues.isNull()) {
+            // parse in the old separate single attributes format, supports
+            // conversion to the new format EqTimeWindow. This option can be 
+            // removed if once the initial testers have updated their data.
+
+            bool startSet = (obj["startSet"].toString() == "1") ? true : false;
+            QDate startDate;
+            if (startSet) startDate = QDate::fromString(obj["startDate"].toString());
+            bool endSet = (obj["endSet"].toString() == "1") ? true : false;
+            QDate endDate;
+            if (endSet) endDate = QDate::fromString(obj["endDate"].toString());
+            QString notes = obj["notes"].toString();
+
+            eqLinkUse.push_back(EqTimeWindow(title(), startSet, startDate, endSet, endDate));
+        }
+        else
+        {
+            // parse in the new EqTimeWindow format
+            QJsonArray jsonArray = eqUseValues.toArray();
+
+            foreach(const QJsonValue & value, jsonArray) {
+
+                QJsonObject objVals = value.toObject();
+
+                QString eqLinkName = objVals["eqLink"].toString();
+                bool startSet = (objVals["startSet"].toString() == "1") ? true : false;
+                QDate startDate;
+                if (startSet) startDate = QDate::fromString(objVals["startDate"].toString());
+                bool endSet = (objVals["endSet"].toString() == "1") ? true : false;
+                QDate endDate;
+                if (endSet) endDate = QDate::fromString(objVals["endDate"].toString());
+
+                eqLinkUse.push_back(EqTimeWindow(eqLinkName, startSet, startDate, endSet, endDate));
+            }
+        }
+
+        QString notes = obj["notes"].toString();
+
+        add = new EquipmentItem(space, name, eqLinkUse, nonGCDistanceScaled, nonGCElevationScaled,
+                                repDistance, repElevation, notes);
+        add->datafilter = datafilter;
+        space->addItem(order, column, span, deep, add);
+    }
+    break;
+
+    case OverviewItemType::EQ_SUMMARY:
+    {
+        QString eqLinkName = obj["eqLink"].toString();
+        bool showActivitiesPerAthlete = (obj["showAthleteActivities"].toString() == "1") ? true : false;
+        add = new EquipmentSummary(space, name, eqLinkName, showActivitiesPerAthlete);
+        add->datafilter = datafilter;
+        space->addItem(order, column, span, deep, add);
+    }
+    break;
+
+    case OverviewItemType::EQ_NOTES:
+    {
+        QString notes = obj["notes"].toString();
+        add = new EquipmentNotes(space, name, notes);
+        add->datafilter = datafilter;
+        space->addItem(order, column, span, deep, add);
+    }
+    break;
     }
 }
 
 void
 OverviewEquipmentWindow::openingAthlete(QString, Context* context)
 {
-    if (reCalcOnVisible) {
+    if (reCalcOnVisible_) {
 
         // If a new athlete is opened whilst the equipment window is displayed then this openingAthlete event
         // for the new athelete is too early, so need to wait for their activities to be loaded so register
@@ -95,177 +270,12 @@ OverviewEquipmentWindow::loadDone(QString, Context* context)
 {
     // de-register the athlete's load event, and recalculate if currently visible.
     disconnect(context, SIGNAL(loadDone(QString, Context*)), this, SLOT(loadDone(QString, Context*)));
-    if (reCalcOnVisible) eqCalc->recalculateEquipSpace(title(), space->allItems());
+    if (reCalcOnVisible_) eqCalc_->recalculateEquipSpace(space->allItems());
 }
 
 void
-OverviewEquipmentWindow::hideEvent(QHideEvent*)
+OverviewEquipmentWindow::calculationComplete()
 {
-    reCalcOnVisible = false;
-}
-
-void
-OverviewEquipmentWindow::showEvent(QShowEvent*)
-{
-    reCalcOnVisible = true;
-    if (reCalcOnVisible) eqCalc->recalculateEquipSpace(title(), space->allItems());
-}
-
-
-EquipCalculator::EquipCalculator(const MainWindow* mainWindow) : mainWindow_(mainWindow)
-{
-}
-
-EquipCalculator::~EquipCalculator()
-{
-}
-
-void
-EquipCalculator::recalculateEquipTile(const QString& eqLinkName, ChartSpaceItem* item)
-{
-    spaceItems_.clear();
-    spaceItems_.append(item);
-    recalculateTiles(eqLinkName);
-}
-
-void
-EquipCalculator::recalculateEquipSpace(const QString& eqLinkName, QList<ChartSpaceItem*> items)
-{
-    spaceItems_ = items;
-    recalculateTiles(eqLinkName);
-}
-
-void
-EquipCalculator::recalculateTiles(const QString& eqLinkName)
-{
-    // already recalcuating !
-    if (recalculationThreads_.count()) return;
-
-    eqLinkName_ = eqLinkName;
-    eqLinkNumActivities_ = 0;
-    eqLinkTotalDistanceScaled_ = 0;
-    eqLinkTotalElevationScaled_ = 0;
-    eqLinkTotalTimeInSecs_ = 0;
-    eqLinkEarliestDate_ = QDate(1900, 01, 01);
-    eqLinkLatestDate_ = eqLinkEarliestDate_;
-
-    // take a copy of the rides through the athlete's rides creating a ride List to process
-    for (auto it = mainWindow_->athletetabs.keyValueBegin(); it != mainWindow_->athletetabs.keyValueEnd(); ++it) {
-        rideItemList_ += it->second->context->athlete->rideCache->rides();
-    }
-
-    // Reset all the tiles distances
-    for (ChartSpaceItem* item : spaceItems_) {
-        
-        if (item->type == OverviewItemType::EQ_ITEM)
-        {
-            static_cast<EquipmentItem*>(item)->resetEqItem();
-        }
-        else if (item->type == OverviewItemType::EQ_SUMMARY)
-        {
-            static_cast<EquipmentSummary*>(item)->resetEqSummary();
-        }
-    }
-
-    // calculate number of threads and work per thread
-    int maxthreads = QThreadPool::globalInstance()->maxThreadCount();
-    int threads = maxthreads / 4; // Don't need many threads
-    if (threads == 0) threads = 1; // but need at least one!
-
-    // keep launching the threads
-    while (threads--) {
-
-        EquipCalculationThread* thread = new EquipCalculationThread(this);
-        recalculationThreads_ << thread;
-        thread->start();
-    }
-}
-
-RideItem*
-EquipCalculator::nextRideToCheck()
-{
-    updateMutex_.lock();
-    RideItem*  item = rideItemList_.isEmpty() ? nullptr : rideItemList_.takeLast();
-    updateMutex_.unlock();
-
-    return(item);
-}
-
-void
-EquipCalculationThread::run() {
-
-    RideItem* item = eqCalc_->nextRideToCheck();
-    while (item != nullptr) {
-        eqCalc_->recalculateEq(item);
-        item = eqCalc_->nextRideToCheck();
-    }
-    eqCalc_->threadCompleted(this);
-    return;
-}
-
-void
-EquipCalculator::threadCompleted(EquipCalculationThread* thread)
-{
-    updateMutex_.lock();
-    recalculationThreads_.removeOne(thread);
-    updateMutex_.unlock();
-
-    // if the final thread is finished, then update the summary items.
-    if (recalculationThreads_.count() == 0) {
-
-        // update any summary instances
-        for (ChartSpaceItem* item : spaceItems_) {
-
-            if (item->type == OverviewItemType::EQ_SUMMARY) {
-
-                static_cast<EquipmentSummary*>(item)->updateSummaryItem(eqLinkNumActivities_, eqLinkTotalTimeInSecs_,
-                                                                        eqLinkTotalDistanceScaled_, eqLinkTotalElevationScaled_,
-                                                                        eqLinkEarliestDate_, eqLinkLatestDate_);
-            }
-        }
-    }
-}
-
-void
-EquipCalculator::recalculateEq(RideItem* rideItem)
-{
-    if (rideItem->getText("EquipmentLink", "abcde") == eqLinkName_) {
-
-        // get the date of the activity 
-        QDate actDate(QDate(1900, 01, 01).addDays(rideItem->getText("Start Date", "0").toInt()));
-
-        // using integral type atomics (c++11) but to retain accuracy multiply by EQ_REAL_TO_SCALED, see overviewItems.h
-        double rideDistance = rideItem->getForSymbol("total_distance", GlobalContext::context()->useMetricUnits);
-        uint64_t rideDistanceScaled = static_cast<uint64_t>(round(rideDistance*EQ_REAL_TO_SCALED));
-        eqLinkTotalDistanceScaled_ += rideDistanceScaled;
-
-        double rideElevation = rideItem->getForSymbol("elevation_gain", GlobalContext::context()->useMetricUnits);
-        uint64_t eqElevationScaled_ = static_cast<uint64_t>(round(rideElevation*EQ_REAL_TO_SCALED));
-        eqLinkTotalElevationScaled_ += eqElevationScaled_;
-
-        uint64_t rideTimeInSecs = static_cast<uint64_t>(rideItem->getForSymbol("time_riding"));
-        eqLinkTotalTimeInSecs_ += rideTimeInSecs;
-
-        if (eqLinkNumActivities_++) {
-            if (actDate < eqLinkEarliestDate_) eqLinkEarliestDate_ = actDate;
-            if (actDate > eqLinkLatestDate_) eqLinkLatestDate_ = actDate;
-        } else {
-             eqLinkEarliestDate_ = actDate;
-            eqLinkLatestDate_ = actDate;
-        }
-
-        for (ChartSpaceItem* item : spaceItems_) {
-
-            if (item->type == OverviewItemType::EQ_ITEM)
-            {
-                if (static_cast<EquipmentItem*>(item)->isWithin(actDate)) {
-
-                    static_cast<EquipmentItem*>(item)->addActivity(rideDistanceScaled, eqElevationScaled_, rideTimeInSecs);
-                }
-            } else if (item->type == OverviewItemType::EQ_SUMMARY)
-            {
-                static_cast<EquipmentSummary*>(item)->addAthleteActivity(rideItem->context->athlete->cyclist);
-            }
-        }
-    }
+    // ensure the display is up to date now calculation has finished
+    QApplication::processEvents();
 }

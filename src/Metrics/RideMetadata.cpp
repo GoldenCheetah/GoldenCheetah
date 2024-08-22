@@ -1831,7 +1831,7 @@ RideMetadata::readXML(QString filename, QList<KeywordDefinition>&keywordDefiniti
     if (!hasEquipment) {
         FieldDefinition add;
         add.name = "EquipmentLink";
-        add.type = FIELD_SHORTTEXT;
+        add.type = FIELD_TEXT;
         add.diary = false;
         add.tab = "Workout";
 

@@ -277,6 +277,8 @@ public:
     void reveal();
     void unreveal();
 
+    virtual void showChart(bool visible) { if (visible) show(); }
+
     // overlay widget
     GcOverlayWidget *overlayWidget;
     bool wantOverlay;

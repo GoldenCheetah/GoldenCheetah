@@ -473,7 +473,9 @@ Perspective::tabSelected(int index)
         if (currentStyle == 0) charts[index]->setContentsMargins(0,0,0,0);
 
         // show
-        charts[index]->show();
+        for (int i = 0; i < charts.count(); i++) {
+            charts[index]->showChart(i == index);
+        }
         controlStack->setCurrentIndex(index);
         titleEdit->setText(charts[index]->property("title").toString());
         tabbed->setCurrentIndex(index);
@@ -496,7 +498,9 @@ Perspective::tabSelected(int index, bool forride)
     active = true;
 
     if (index >= 0) {
-        charts[index]->show();
+        for (int i = 0; i < charts.count(); i++) {
+            charts[index]->showChart(i == index);
+        }
         if (forride) charts[index]->setProperty("ride", property("ride"));
         else charts[index]->setProperty("dateRange", property("dateRange"));
         controlStack->setCurrentIndex(index);
@@ -510,8 +514,7 @@ void
 Perspective::tabMoved(int to, int from)
 {
     SSS;
-     GcChartWindow *me = charts.takeAt(from);
-     charts.insert(to, me);
+     charts.move(from, to);
 
     // re-order the controls - to reflect new indexes
     controlStack->blockSignals(true);

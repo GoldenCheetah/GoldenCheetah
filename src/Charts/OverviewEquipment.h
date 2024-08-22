@@ -22,58 +22,6 @@
 #include "Overview.h"
 #include "ChartSpace.h"
 
-class EquipCalculator;
-
-class EquipCalculationThread : public QThread
-{
-public:
-    EquipCalculationThread(EquipCalculator* eqCalc) : eqCalc_(eqCalc) {}
-
-protected:
-
-    // recalculate distances
-    virtual void run() override;
-
-private:
-    EquipCalculator* eqCalc_;
-};
-
-class EquipCalculator
-{
-    public:
-        EquipCalculator(const MainWindow* mainWindow);
-        virtual ~EquipCalculator();
-
-        void recalculateEquipTile(const QString& eqLinkName, ChartSpaceItem* item);
-        void recalculateEquipSpace(const QString& eqLinkName, QList<ChartSpaceItem*> items);
-
-    protected:
-
-        friend class ::EquipCalculationThread;
-
-        void recalculateTiles(const QString& eqLinkName);
-
-        // distance calculation
-        void recalculateEq(RideItem* rideItem);
-        RideItem* nextRideToCheck();
-        void threadCompleted(EquipCalculationThread* thread);
-
-        // Equipment distance recalculation
-        QMutex updateMutex_;
-        QVector<EquipCalculationThread*> recalculationThreads_;
-        QVector<RideItem*>  rideItemList_;
-        QDate eqLinkEarliestDate_, eqLinkLatestDate_;
-        std::atomic<uint64_t> eqLinkTotalTimeInSecs_;
-        std::atomic<uint64_t> eqLinkTotalDistanceScaled_;
-        std::atomic<uint64_t> eqLinkTotalElevationScaled_;
-        std::atomic<uint64_t> eqLinkNumActivities_;
-
-        QString eqLinkName_;
-        QList<ChartSpaceItem*> spaceItems_;
-        const MainWindow* mainWindow_;
-
-};
-
 class OverviewEquipmentWindow : public OverviewWindow
 {
     Q_OBJECT
@@ -83,13 +31,13 @@ class OverviewEquipmentWindow : public OverviewWindow
         OverviewEquipmentWindow(Context* context, int scope = OverviewScope::EQUIPMENT, bool blank = false);
         virtual ~OverviewEquipmentWindow();
 
+        virtual void showChart(bool visible) override;
+
     public slots:
 
         virtual ChartSpaceItem* addTile() override;
         virtual void configItem(ChartSpaceItem*) override;
-
-        void showEvent(QShowEvent*);
-        void hideEvent(QHideEvent*);
+        void calculationComplete();
 
         // athlete opening
         void openingAthlete(QString, Context*);
@@ -97,9 +45,16 @@ class OverviewEquipmentWindow : public OverviewWindow
 
         void configChanged(qint32 cfg);
 
+    protected:
+
+        virtual QString getChartSource() const override;
+        virtual void getExtraConfiguration( ChartSpaceItem* item, QString& config) const override;
+        virtual void setExtraConfiguration(QJsonObject& obj, int type, ChartSpaceItem* add, QString& name,
+                                            QString& datafilter, int order, int column, int span, int deep) const override;
+
     private:
-        bool reCalcOnVisible;
-        EquipCalculator* eqCalc;
+        bool reCalcOnVisible_;
+        EquipCalculator* eqCalc_;
 
 };
 

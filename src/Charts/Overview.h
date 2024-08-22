@@ -33,6 +33,7 @@
 
 #include "ChartSpace.h"
 #include "OverviewItems.h"
+#include "HelpWhatsThis.h"
 
 class OverviewWindow : public GcChartWindow
 {
@@ -66,6 +67,13 @@ class OverviewWindow : public GcChartWindow
         virtual void configItem(ChartSpaceItem *);
 
     protected:
+
+        virtual QString getChartSource() const;
+        virtual void getExtraConfiguration(ChartSpaceItem* /*item*/, QString& /*config*/) const {};
+        virtual void setExtraConfiguration(QJsonObject& /*obj*/, int /*type*/, ChartSpaceItem* /*add*/, QString& /*name*/,
+                                            QString& /*datafilter*/, int /*order*/, int /*column*/, int /*span*/, int /*deep*/) const {};
+
+        HelpWhatsThis* help;
         ChartSpace* space;
 
     private:
