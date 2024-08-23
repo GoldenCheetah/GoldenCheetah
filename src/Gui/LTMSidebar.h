@@ -22,7 +22,8 @@
 
 #include "Context.h"
 #include "GcSideBarItem.h"
-#include "Season.h"
+#include "Seasons.h"
+#include "SeasonDialogs.h"
 #include "RideMetric.h"
 #include "LTMSettings.h"
 #include "LTMChartParser.h"

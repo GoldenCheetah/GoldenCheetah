@@ -34,6 +34,7 @@
 #include "Units.h" // for MILES_PER_KM
 #include "HelpWhatsThis.h"
 #include "GcOverlayWidget.h"
+#include "Seasons.h"
 
 #include <QWebEngineSettings>
 

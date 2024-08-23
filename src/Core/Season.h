@@ -18,21 +18,15 @@
 
 #ifndef SEASON_H_
 #define SEASON_H_
-#include "GoldenCheetah.h"
 
 #include <QString>
 #include <QDate>
-#include <QDialog>
-#include <QFile>
-#include <QApplication>
-#include <QTreeWidget>
-#include <QLabel>
-#include <QLineEdit>
-#include <QTextEdit>
-
-#include "Context.h"
+#include <QCoreApplication>
+#include <QUuid>
 
 class Phase;
+class Season;
+
 
 class SeasonEvent
 {
@@ -50,9 +44,12 @@ class SeasonEvent
         QString id; // unique id
 };
 
+
 class SeasonOffset
 {
     public:
+        enum SeasonOffsetType { invalid = -1, year = 0, month = 1, week = 2 };
+
         // by default, the offset is invalid
         SeasonOffset();
 
@@ -60,34 +57,44 @@ class SeasonOffset
         // of the season with respect to the year/month/week that
         // contains the reference date (i.e. either the current date, or
         // the date of the selected activity)
-        SeasonOffset(int _years, int _months, qint64 _weeks);
+        // When align is true start the season on the entities start
+        // (i.e. weeks: monday, month: 1., year: 1.1.)
+        SeasonOffset(int _years, int _months, int _weeks, bool _align = true);
+        SeasonOffset(std::pair<SeasonOffsetType, int> item, bool _align = true);
 
-        // get the start of the season, or QDate() if the offset is
-        // invalid
-        QDate getStart(QDate reference) const;
+        bool operator==(const SeasonOffset& offset) const;
+        bool operator!=(const SeasonOffset& offset) const;
+
+        // get the offest date, or QDate() if the offset is invalid
+        QDate getDate(QDate reference) const;
+
+        std::pair<SeasonOffsetType, int> getSignificantItem() const;
+
+        bool isValid() const;
 
     private:
         // if <=0, offset in years of the season with respect to the
         // current year
         // if >0, unused: go to `months`
-        int years;
+        int years = 1;
 
         // if <=0, offset in months of the season with respect to the
         // current month
         // if >0, unused: go to `weeks`
-        int months;
+        int months = 1;
 
         // if <=0, offset in weeks of the season with respect to the
         // current week (Qt weeks start on Monday)
         // if >0, the whole offset is unused (either the season is
         // fixed, or it ends on the reference day)
-        qint64 weeks;
+        int weeks = 1;
 
+        bool align = true;
 };
+
 
 class SeasonLength
 {
-
     public:
         // by default, the length is invalid
         SeasonLength();
@@ -95,20 +102,28 @@ class SeasonLength
         // if different from the default, the length represent the
         // number of years, months and days from the start to the end,
         // included (i.e. if start==end, the length is (0,0,1))
-        SeasonLength(int _years, int _months, qint64 _days);
+        SeasonLength(int _years, int _months, int _days);
 
-        bool operator==(const SeasonLength& length);
+        bool operator==(const SeasonLength& length) const;
+        bool operator!=(const SeasonLength& length) const;
 
         QDate addTo(QDate start) const;
         QDate substractFrom(QDate end) const;
 
+        int getYears() const;
+        int getMonths() const;
+        int getDays() const;
+
+        bool isValid() const;
+
     private:
-        // if (0,0,0), the length is invalid (the season is fixed)
-        int years;
-        int months;
-        qint64 days;
+        // if (-1,-1,-1), the length is invalid (the season is fixed)
+        int years = -1;
+        int months = -1;
+        int days = -1;
 
 };
+
 
 class Season
 {
@@ -117,170 +132,94 @@ class Season
     public:
         static QList<QString> types;
         enum SeasonType { season=0, cycle=1, adhoc=2, temporary=3 };
-        //typedef enum seasontype SeasonType;
 
         Season();
 
+        void resetTimeRange();
+
         // get the date range (if relative, use today as reference)
-        QDate getStart() const ;
-        QDate getEnd() const ;
+        QDate getStart() const;
+        QDate getEnd() const;
+
         // get the date range (if relative, use the specified date as reference)
         QDate getStart(QDate reference) const;
         QDate getEnd(QDate reference) const;
 
-        int getSeed() { return _seed; }
-        int getLow() { return _low; }
-        int getMaxRamp() { return _ramp; }
-        QString getName();
+        void setName(QString _name);
+        QString getName() const;
 
-        // length of a relative season, SeasonLength() if fixed
-        SeasonLength getLength() const { return _length; }
+        void setId(QUuid x) { _id = x; }
+        QUuid id() const { return _id; }
 
+        void setType(int _type);
         int getType();
-        static bool LessThanForStarts(const Season &a, const Season &b);
 
-        // make the season fixed (by invalidating _offset and _length)
+        // make the season fixed (by invalidating _offsetStart and _length)
         // and set the limits of a fixed season
-        void setStart(QDate _start);
-        void setEnd(QDate _end);
+        void setAbsoluteStart(QDate _start);
+        QDate getAbsoluteStart() const;
+
+        void setAbsoluteEnd(QDate _end);
+        QDate getAbsoluteEnd() const;
+
+        void setOffsetStart(int offsetYears, int offsetMonths, int offsetWeeks, bool align = true);
+        void setOffsetStart(SeasonOffset offset);
+        SeasonOffset getOffsetStart() const;
+
+        void setOffsetEnd(int offsetYears, int offsetMonths, int offsetWeeks, bool align = true);
+        void setOffsetEnd(SeasonOffset offset);
+        SeasonOffset getOffsetEnd() const;
 
         // make the season relative (by setting _length; also
         // invalidates _start and _end) and set the offset of the start
         // with respect to the reference
-        void setOffsetAndLength(int offetYears, int offsetMonths, qint64 offsetWeeks, int years, int months, qint64 days);
+        void setOffsetAndLength(int offetYears, int offsetMonths, int offsetWeeks, int years, int months, int days);
 
         // make the season relative (by setting _length; also
         // invalidates _start and _end) and invalidates the offset to
         // make the season end on the reference
-        void setLength(int years, int months, qint64 days);
+        void setLengthOnly(int years, int months, int days);
 
-        void setName(QString _name);
-        void setType(int _type);
+        void setLength(int years, int months, int days);
+        void setLength(SeasonLength length);
+
+        // length of a relative season, SeasonLength() if fixed
+        SeasonLength getLength() const { return _length; }
+
+        void setYtd();
+        bool isYtd() const;
+
         void setSeed(int x) { _seed = x; }
+        int getSeed() { return _seed; }
+
         void setLow(int x) { _low = x; }
-        void setMaxRamp(int x) { _ramp = x; }
-        QUuid id() const { return _id; }
-        void setId(QUuid x) { _id = x; }
+        int getLow() { return _low; }
+
+        bool isAbsolute() const;
+        bool hasPhaseOrEvent() const;
+
+        static bool LessThanForStarts(const Season &a, const Season &b);
+
         QVector<int> &load() { return _load; }
-
-        int type;
-
-        QString name; // name, typically users name them by year e.g. "2011 Season"
-
-        QVector<int> _load; // array of daily planned load
 
         QList<Phase> phases;
         QList<SeasonEvent> events;
 
     protected:
-        SeasonOffset _offset; // offset of the start (relative season)
-        SeasonLength _length; // length (relative season)
-        QDate _start; // first day (fixed season)
-        QDate _end; // last day (fixed season)
-        int _seed;
-        int _low; // low point for SB .. default to -50
-        int _ramp; // max ramp rate for CTL we want to see
+        QString name; // name, typically users name them by year e.g. "2011 Season"
         QUuid _id; // unique id
-
+        int type = season;
+        QDate _absoluteStart; // first day (fixed season)
+        QDate _absoluteEnd; // last day (fixed season)
+        SeasonOffset _offsetStart; // offset of the start (relative season)
+        SeasonOffset _offsetEnd; // offset of the end (relative season)
+        SeasonLength _length; // length (relative season)
+        bool _ytd = false;
+        int _seed = 0;
+        int _low = -50; // low point for SB .. default to -50
+        QVector<int> _load; // array of daily planned load
 };
 
-class EditSeasonDialog : public QDialog
-{
-    Q_OBJECT
-    G_OBJECT
-
-
-    public:
-        EditSeasonDialog(Context *, Season *);
-
-    public slots:
-        void applyClicked();
-        void cancelClicked();
-        void nameChanged();
-
-    private:
-        Context *context;
-        Season *season;
-
-        QPushButton *applyButton, *cancelButton;
-        QLineEdit *nameEdit;
-        QComboBox *typeEdit;
-        QDateEdit *fromEdit, *toEdit;
-        QDoubleSpinBox *seedEdit;
-        QDoubleSpinBox *lowEdit;
-};
-
-class EditSeasonEventDialog : public QDialog
-{
-    Q_OBJECT
-    G_OBJECT
-
-
-    public:
-        EditSeasonEventDialog(Context *, SeasonEvent *, Season &);
-
-    public slots:
-        void applyClicked();
-        void cancelClicked();
-        void nameChanged();
-
-    private:
-        Context *context;
-        SeasonEvent *event;
-
-        QPushButton *applyButton, *cancelButton;
-        QLineEdit *nameEdit;
-        QDateEdit *dateEdit;
-        QComboBox *priorityEdit;
-        QTextEdit *descriptionEdit;
-};
-
-class Seasons : public QObject {
-
-    Q_OBJECT;
-
-    public:
-        Seasons(QDir home) : home(home) { readSeasons(); }
-        void readSeasons();
-        int newSeason(QString name, QDate start, QDate end, int type);
-        void updateSeason(int index, QString name, QDate start, QDate end, int type);
-        void deleteSeason(int);
-        void writeSeasons();
-        QList<Season> seasons;
-
-    signals:
-        void seasonsChanged();
-
-
-    private:
-        QDir home;
-};
-
-class SeasonTreeView : public QTreeWidget
-{
-    Q_OBJECT
-
-    public:
-        SeasonTreeView(Context *);
-
-        // for drag/drop
-        QStringList mimeTypes () const override;
-#if QT_VERSION < 0x060000
-        QMimeData *mimeData(const QList<QTreeWidgetItem *> items) const override;
-#else
-        QMimeData *mimeData(const QList<QTreeWidgetItem *> &items) const override;
-#endif
-
-    signals:
-        void itemMoved(QTreeWidgetItem* item, int previous, int actual);
-
-    protected:
-        void dragEnterEvent(QDragEnterEvent* event) override;
-        void dropEvent(QDropEvent* event) override;
-        Context *context;
-
-
-};
 
 class Phase : public Season
 {
@@ -295,43 +234,4 @@ class Phase : public Season
 
 };
 
-class EditPhaseDialog : public QDialog
-{
-    Q_OBJECT
-    G_OBJECT
-
-
-    public:
-        EditPhaseDialog(Context *, Phase *, Season &);
-
-    public slots:
-        void applyClicked();
-        void cancelClicked();
-        void nameChanged();
-
-    private:
-        Context *context;
-        Phase *phase;
-
-        QPushButton *applyButton, *cancelButton;
-        QLineEdit *nameEdit;
-        QComboBox *typeEdit;
-        QDateEdit *fromEdit, *toEdit;
-        QDoubleSpinBox *seedEdit;
-        QDoubleSpinBox *lowEdit;
-};
-
-class SeasonEventTreeView : public QTreeWidget
-{
-    Q_OBJECT
-
-    public:
-        SeasonEventTreeView();
-
-    signals:
-        void itemMoved(QTreeWidgetItem* item, int previous, int actual);
-
-    protected:
-        void dropEvent(QDropEvent* event);
-};
 #endif /* SEASON_H_ */

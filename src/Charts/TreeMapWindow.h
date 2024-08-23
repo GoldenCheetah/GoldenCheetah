@@ -24,13 +24,14 @@
 #include <QTimer>
 #include "Context.h"
 #include "RideMetadata.h"
-#include "Season.h"
 #include "LTMPopup.h"
 #include "GcPane.h"
 #include "SpecialFields.h"
 #include "Specification.h"
 
 #include <cmath>
+
+#include <QTreeWidget>
 
 #include <qwt_plot_picker.h>
 #include <qwt_text_engine.h>
