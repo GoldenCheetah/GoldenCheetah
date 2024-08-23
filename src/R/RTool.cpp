@@ -31,6 +31,7 @@
 #include "PMCData.h"
 #include "WPrime.h"
 #include "Season.h"
+#include "Seasons.h"
 #include "DataFilter.h"
 #include "Specification.h"
 #include "Zones.h"
