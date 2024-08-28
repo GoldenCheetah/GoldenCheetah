@@ -148,6 +148,8 @@ ComparePane::ComparePane(Context *context, QWidget *parent, CompareMode mode) : 
 
     configChanged(CONFIG_APPEARANCE | CONFIG_METRICS); // set up ready to go...
 
+    connect(context, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
+    connect(context, SIGNAL(homeFilterChanged()), this, SLOT(filterChanged()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(table->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(itemsWereSorted()));
 }
@@ -161,6 +163,26 @@ ComparePane::configChanged(qint32)
     // refresh table...
     refreshTable();
 }
+
+
+void
+ComparePane::filterChanged
+()
+{
+    if (context->compareDateRanges.length() > 0) {
+        for (int i = 0; i < context->compareDateRanges.length(); ++i) {
+            context->compareDateRanges[i].specification.setDateRange(DateRange(context->compareDateRanges[i].start, context->compareDateRanges[i].end));
+            FilterSet fs;
+            fs.addFilter(context->isfiltered, context->filters);
+            fs.addFilter(context->ishomefiltered, context->homeFilters);
+            context->compareDateRanges[i].specification.setFilterSet(fs);
+        }
+
+        refreshTable();
+        context->notifyCompareDateRangesChanged();
+    }
+}
+
 
 void
 ComparePane::refreshTable()

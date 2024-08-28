@@ -3158,28 +3158,30 @@ CPPlot::plotCache(QVector<double> vector, QColor intervalColor)
     }
     if (maxNonZero == 0) maxNonZero = y.size();
 
-    // create a curve!
-    QwtPlotCurve *curve = new QwtPlotCurve();
-    if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
-        curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    if (maxNonZero > 0) {
+        // create a curve, but only if we have any data!
+        QwtPlotCurve *curve = new QwtPlotCurve();
+        if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
+            curve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
-    // set its color - based upon index in intervals!
-    QPen pen(intervalColor);
-    double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
-    pen.setWidth(width);
-    //pen.setStyle(Qt::DotLine);
-    intervalColor.setAlpha(64);
-    QBrush brush = QBrush(intervalColor);
-    if (wantShadeIntervals) curve->setBrush(brush);
-    else curve->setBrush(Qt::NoBrush);
-    curve->setPen(pen);
-    curve->setSamples(x.data(), y.data(), maxNonZero-1);
+        // set its color - based upon index in intervals!
+        QPen pen(intervalColor);
+        double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+        pen.setWidth(width);
+        //pen.setStyle(Qt::DotLine);
+        intervalColor.setAlpha(64);
+        QBrush brush = QBrush(intervalColor);
+        if (wantShadeIntervals) curve->setBrush(brush);
+        else curve->setBrush(Qt::NoBrush);
+        curve->setPen(pen);
+        curve->setSamples(x.data(), y.data(), maxNonZero-1);
 
-    // attach and register
-    curve->attach(this);
+        // attach and register
+        curve->attach(this);
 
-    intervalCurves.append(curve);
-    zoomer->setZoomBase(false);
+        intervalCurves.append(curve);
+        zoomer->setZoomBase(false);
+    }
 }
 
 QString
