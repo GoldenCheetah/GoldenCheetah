@@ -63,6 +63,7 @@
 { "manu":260, "prod":-1, "name":"Zwift" },
 { "manu":263, "prod":-1, "name":"Favero" },
 { "manu":263, "prod":12, "name":"Favero Assioma Duo" },
+{ "manu":263, "prod":22, "name":"Favero Assioma Pro MX" },
 { "manu":267, "prod":-1, "name":"Bryton" },
 { "manu":268, "prod":-1, "name":"SRAM" },
 { "manu":268, "prod":1037, "name":"SRAM Rival eTap AXS" },
