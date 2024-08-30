@@ -364,7 +364,7 @@ EditSeasonDialog::transferUIToSeason
 
 void
 EditSeasonDialog::transferSeasonToUI
-(Season &season)
+(const Season &season)
 {
     nameEdit->setText(season.getName());
     typeCombo->setCurrentIndex(typeCombo->findData(season.getType()));

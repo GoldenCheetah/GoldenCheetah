@@ -89,7 +89,7 @@ class EditSeasonDialog : public QDialog
         QLabel *warningLabel;
 
         void transferUIToSeason(Season &season) const;
-        void transferSeasonToUI(Season &season);
+        void transferSeasonToUI(const Season &season);
         void setEnabledItem(QComboBox *combo, int data, bool enabled);
         void getSeasonOffset(int offset, int typeIndex, int &years, int &months, int &weeks) const;
 };

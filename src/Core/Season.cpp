@@ -342,7 +342,7 @@ void Season::setType(int _type)
 }
 
 
-int Season::getType()
+int Season::getType() const
 {
     return type;
 }

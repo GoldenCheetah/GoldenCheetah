@@ -152,7 +152,7 @@ class Season
         QUuid id() const { return _id; }
 
         void setType(int _type);
-        int getType();
+        int getType() const;
 
         // make the season fixed (by invalidating _offsetStart and _length)
         // and set the limits of a fixed season
@@ -190,10 +190,10 @@ class Season
         bool isYtd() const;
 
         void setSeed(int x) { _seed = x; }
-        int getSeed() { return _seed; }
+        int getSeed() const { return _seed; }
 
         void setLow(int x) { _low = x; }
-        int getLow() { return _low; }
+        int getLow() const { return _low; }
 
         bool isAbsolute() const;
         bool hasPhaseOrEvent() const;
