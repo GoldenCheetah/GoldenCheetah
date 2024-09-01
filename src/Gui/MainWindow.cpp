@@ -960,6 +960,9 @@ MainWindow::exportPerspective()
 
     AbstractView* current = getAbstractView(currentAthleteTab->currentView());
 
+    // Equipment view has a single hidden unchangeable perspective
+    if (current->viewType() == VIEW_EQUIPMENT) return;
+
     // export the current perspective to a file
     QString suffix;
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export Perspective"),
@@ -979,6 +982,9 @@ MainWindow::importPerspective()
     int view = currentAthleteTab->currentView();
     AbstractView* current = getAbstractView(view);
     
+    // Equipment view has a single hidden unchangeable perspective
+    if (current->viewType() == VIEW_EQUIPMENT) return;
+
     // import a new perspective from a file
     QString fileName = QFileDialog::getOpenFileName(this, tr("Select Perspective file to export"), "", tr("GoldenCheetah Perspective Files (*.gchartset)"));
     if (fileName.isEmpty()) {
@@ -1460,6 +1466,9 @@ MainWindow::resetPerspective(int view, bool force)
     // don't argue just reset the perspective for this view
     AbstractView* current = getAbstractView(view);
 
+    // Equipment view has a single unchangeable perspective
+    if (current->viewType() == VIEW_EQUIPMENT) return;
+
     // set the perspective
     pactive=true;
     current->setPerspectives(perspectiveSelector);
@@ -1474,6 +1483,9 @@ MainWindow::perspectiveSelected(int index)
 
     // set the perspective for the current view
     AbstractView* current = getAbstractView(currentAthleteTab->currentView());
+
+    // Equipment view has a single unchangeable perspective
+    if (current->viewType() == VIEW_EQUIPMENT) return;
 
     // which perspective is currently being shown?
     int prior = current->perspectives_.indexOf(current->perspective_);
@@ -1532,6 +1544,9 @@ MainWindow::perspectivesChanged()
 {
     int view = currentAthleteTab->currentView();
     AbstractView* current = getAbstractView(view);
+
+    // Equipment view has a single unchangeable perspective
+    if (current->viewType() == VIEW_EQUIPMENT) return;
 
     // which perspective is currently being selected (before we go setting the combobox)
     Perspective *prior = current->perspective_;

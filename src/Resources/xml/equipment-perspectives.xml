@@ -1,7 +1,7 @@
 <layouts>
-<layout name="General" style="0" type="16" expression="" trainswitch="0">
+<layout name="Equipment" style="0" type="16" expression="" trainswitch="0">
 	<chart id="51" name="" title="Equipment" >
-		<property name="title" type="QString" value="Synpase" />
+		<property name="title" type="QString" value="Bike1" />
 		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="2" />
 		<property name="heightFactor" type="double" value="2" />

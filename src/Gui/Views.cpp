@@ -361,6 +361,11 @@ EquipView::EquipView(Context* context, QStackedWidget* controls) :
     chartsettings->setFixedWidth(650);
     chartsettings->setFixedHeight(600);
     chartsettings->hide();
+
+    // load the default single hidden perspective
+    restoreState(false);
+    loaded = true;
+    perspectiveSelected(0);
 }
 
 EquipView::~EquipView()
