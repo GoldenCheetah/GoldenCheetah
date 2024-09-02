@@ -629,29 +629,38 @@ void
 EquipmentSummary::resetAthleteActivity()
 {
     athleteActivityMap_.clear();
+    eqLinkNumActivities_ = 0;
+    eqLinkTotalDistanceScaled_ = 0;
+    eqLinkTotalElevationScaled_ = 0;
+    eqLinkTotalTimeInSecs_ = 0;
+    eqLinkEarliestDate_ = QDate(1900, 01, 01);
+    eqLinkLatestDate_ = eqLinkEarliestDate_;
 }
 
 void
-EquipmentSummary::updateSummaryItem(const uint64_t eqNumActivities, const uint64_t eqTotalTimeInSecs,
-                                    const uint64_t eqTotalDistanceScaled, const uint64_t eqTotalElevationScaled,
-                                    const QDate& earliestDate, const QDate& latestDate)
+EquipmentSummary::addActivity(const QString& athleteName, const QDate& activityDate,
+                            const uint64_t rideDistanceScaled, const uint64_t eqElevationScaled,
+                            const uint64_t rideTimeInSecs)
 {
-    eqLinkNumActivities_ = eqNumActivities;
-    eqLinkTotalTimeInSecs_ = eqTotalTimeInSecs;
-    eqLinkTotalDistanceScaled_ = eqTotalDistanceScaled;
-    eqLinkTotalElevationScaled_ = eqTotalElevationScaled;
-    eqLinkEarliestDate_ = earliestDate;
-    eqLinkLatestDate_ = latestDate;
-}
+    activityMutex_.lock();
 
-void
-EquipmentSummary::addAthleteActivity(const QString& athleteName)
-{
-    athleteActivityMutex_.lock();
     athleteActivityMap_[athleteName] += 1;
-    athleteActivityMutex_.unlock();
-}
 
+    if (eqLinkNumActivities_++) {
+        if (activityDate < eqLinkEarliestDate_) eqLinkEarliestDate_ = activityDate;
+        if (activityDate > eqLinkLatestDate_) eqLinkLatestDate_ = activityDate;
+    }
+    else {
+        eqLinkEarliestDate_ = activityDate;
+        eqLinkLatestDate_ = activityDate;
+    }
+
+    activityMutex_.unlock();
+
+    eqLinkTotalDistanceScaled_ += rideDistanceScaled;
+    eqLinkTotalElevationScaled_ += eqElevationScaled;
+    eqLinkTotalTimeInSecs_ += rideTimeInSecs;
+}
 
 void
 EquipmentItem::configChanged(qint32 cfg) {

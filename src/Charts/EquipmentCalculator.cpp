@@ -57,13 +57,6 @@ EquipCalculator::recalculateEquipSpace(QList<ChartSpaceItem*> items)
 void
 EquipCalculator::recalculateTiles()
 {
-    eqLinkNumActivities_ = 0;
-    eqLinkTotalDistanceScaled_ = 0;
-    eqLinkTotalElevationScaled_ = 0;
-    eqLinkTotalTimeInSecs_ = 0;
-    eqLinkEarliestDate_ = QDate(1900, 01, 01);
-    eqLinkLatestDate_ = eqLinkEarliestDate_;
-
     // take a copy of the rides through the athlete's rides creating a ride List to process
     for (auto it = mainWindow_->athletetabs.keyValueBegin(); it != mainWindow_->athletetabs.keyValueEnd(); ++it) {
         rideItemList_ += it->second->context->athlete->rideCache->rides();
@@ -128,17 +121,6 @@ EquipCalculator::threadCompleted(EquipCalculationThread* thread)
     // if the final thread is finished, then update the summary items.
     if (recalculationThreads_.count() == 0) {
 
-        // update any summary instances
-        for (ChartSpaceItem* item : spaceItems_) {
-
-            if (item->type == OverviewItemType::EQ_SUMMARY) {
-
-                static_cast<EquipmentSummary*>(item)->updateSummaryItem(eqLinkNumActivities_, eqLinkTotalTimeInSecs_,
-                                                                        eqLinkTotalDistanceScaled_, eqLinkTotalElevationScaled_,
-                                                                        eqLinkEarliestDate_, eqLinkLatestDate_);
-            }
-        }
-
         eqOverviewWindow_->calculationComplete();
         eqCalculationInProgress_ = false;
     }
@@ -171,35 +153,13 @@ EquipCalculator::recalculateEq(RideItem* rideItem)
             }
         } else if (item->type == OverviewItemType::EQ_SUMMARY)
         {
-            if (static_cast<EquipmentSummary*>(item)->eqLinkName_ == "") {
+            if ((static_cast<EquipmentSummary*>(item)->eqLinkName_ == "") ||
+                (rideEqLinkNameList.contains(static_cast<EquipmentSummary*>(item)->eqLinkName_))) {
 
-                static_cast<EquipmentSummary*>(item)->addAthleteActivity(rideItem->context->athlete->cyclist);
-                addToSummary(actDate, rideDistanceScaled, eqElevationScaled, rideTimeInSecs);
-
-            }
-            else if (rideEqLinkNameList.contains(static_cast<EquipmentSummary*>(item)->eqLinkName_)) {
-
-                static_cast<EquipmentSummary*>(item)->addAthleteActivity(rideItem->context->athlete->cyclist);
-                addToSummary(actDate, rideDistanceScaled, eqElevationScaled, rideTimeInSecs);
+                static_cast<EquipmentSummary*>(item)->addActivity(rideItem->context->athlete->cyclist,
+                                                                    actDate, rideDistanceScaled,
+                                                                    eqElevationScaled, rideTimeInSecs);
             }
         }
-    }
-}
-
-void
-EquipCalculator::addToSummary(const QDate& actDate, uint64_t rideDistanceScaled,
-                                uint64_t eqElevationScaled, uint64_t rideTimeInSecs)
-{
-    eqLinkTotalDistanceScaled_ += rideDistanceScaled;
-    eqLinkTotalElevationScaled_ += eqElevationScaled;
-    eqLinkTotalTimeInSecs_ += rideTimeInSecs;
-
-    if (eqLinkNumActivities_++) {
-        if (actDate < eqLinkEarliestDate_) eqLinkEarliestDate_ = actDate;
-        if (actDate > eqLinkLatestDate_) eqLinkLatestDate_ = actDate;
-    }
-    else {
-        eqLinkEarliestDate_ = actDate;
-        eqLinkLatestDate_ = actDate;
     }
 }

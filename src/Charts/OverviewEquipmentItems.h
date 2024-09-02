@@ -192,10 +192,8 @@ class EquipmentSummary : public CommonEquipmentItem
         void configChanged(qint32) override;
 
         void resetAthleteActivity();
-        void addAthleteActivity(const QString& athleteName);
-        void updateSummaryItem(const uint64_t eqNumActivities, const uint64_t eqTotalTimeInSecs,
-                                const uint64_t eqTotalDistanceScaled, const uint64_t eqTotalElevationScaled,
-                                const QDate& earliestDate, const QDate& eqLinkLatestDate_);
+        void addActivity(const QString& athleteName, const QDate& activityDate, const uint64_t rideDistanceScaled,
+                            const uint64_t eqElevationScaled, const uint64_t rideTimeInSecs);
 
         // create and config
         static ChartSpaceItem* create(ChartSpace* parent) {
@@ -203,17 +201,17 @@ class EquipmentSummary : public CommonEquipmentItem
 
         QString eqLinkName_;
         bool showActivitiesPerAthlete_;
-        QDate eqLinkEarliestDate_, eqLinkLatestDate_;
 
     private:
 
         QColor textColor;
-        uint64_t eqLinkTotalTimeInSecs_;
-        uint64_t eqLinkTotalDistanceScaled_;
-        uint64_t eqLinkTotalElevationScaled_;
-        uint64_t eqLinkNumActivities_;
-        
-        QMutex athleteActivityMutex_;
+        std::atomic<uint64_t> eqLinkTotalTimeInSecs_;
+        std::atomic<uint64_t> eqLinkTotalDistanceScaled_;
+        std::atomic<uint64_t> eqLinkTotalElevationScaled_;
+        std::atomic<uint64_t> eqLinkNumActivities_;
+
+        QMutex activityMutex_;
+        QDate eqLinkEarliestDate_, eqLinkLatestDate_;
         QMap<QString, uint32_t> athleteActivityMap_;
 };
 

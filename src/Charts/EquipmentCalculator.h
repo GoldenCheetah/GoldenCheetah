@@ -63,12 +63,8 @@ class EquipCalculator
         QMutex updateMutex_;
         QVector<EquipCalculationThread*> recalculationThreads_;
         QVector<RideItem*>  rideItemList_;
-        QDate eqLinkEarliestDate_, eqLinkLatestDate_;
+
         std::atomic<bool> eqCalculationInProgress_;
-        std::atomic<uint64_t> eqLinkTotalTimeInSecs_;
-        std::atomic<uint64_t> eqLinkTotalDistanceScaled_;
-        std::atomic<uint64_t> eqLinkTotalElevationScaled_;
-        std::atomic<uint64_t> eqLinkNumActivities_;
 
         QList<ChartSpaceItem*> spaceItems_;
         const MainWindow* mainWindow_;
