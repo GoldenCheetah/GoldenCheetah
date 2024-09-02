@@ -42,12 +42,11 @@ void
 OverviewEquipmentWindow::showChart(bool visible)
 {
     reCalcOnVisible_ = visible;
-    eqCalc_->recalculateEquipSpace(space->allItems());
 
-    GcChartWindow::showChart(visible);
+    if (reCalcOnVisible_) eqCalc_->recalculateEquipSpace(space->allItems());
+
+    GcChartWindow::showChart(reCalcOnVisible_);
 }
-
-
 
 ChartSpaceItem*
 OverviewEquipmentWindow::addTile()
@@ -337,6 +336,8 @@ OverviewEquipmentWindow::loadDone(QString, Context* context)
 void
 OverviewEquipmentWindow::calculationComplete()
 {
-    // ensure the display is up to date now calculation has finished
-    QApplication::processEvents();
+    // ensure the displayed tiles are up to date now calculation has finished
+    foreach(ChartSpaceItem * item, space->allItems()) {
+        item->update();
+    }
 }
