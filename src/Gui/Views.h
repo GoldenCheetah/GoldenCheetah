@@ -135,6 +135,9 @@ class EquipView : public AbstractView
         // Don't want the base class behaviour for this...
         virtual void setRide(RideItem*) override {}
 
+        // Need to modify the behaviour
+        virtual void setSelected(bool) override;
+
         ChartSettings* chartsettings;
 
     public slots:

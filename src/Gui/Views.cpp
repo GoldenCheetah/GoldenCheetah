@@ -373,6 +373,15 @@ EquipView::~EquipView()
     // No sidebar to delete
 }
 
+void
+EquipView::setSelected(bool selected)
+{
+    _selected = selected;
+
+    // selects the equipment tab which invokes the tile calculation.
+    if (selected) perspective_->tabSelected(perspective_->currentTab());
+}
+
 bool
 EquipView::isBlank()
 {

@@ -103,7 +103,7 @@ class AbstractView : public QWidget
         ViewSplitter *bottomSplitter() { return mainSplitter; }
 
         // select / deselect view
-        void setSelected(bool x) { _selected=x; selectionChanged(); }
+        virtual void setSelected(bool x) { _selected=x; selectionChanged(); }
         bool isSelected() const { return _selected; }
 
         int viewType() { return type; }

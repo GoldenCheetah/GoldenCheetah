@@ -960,7 +960,7 @@ MainWindow::exportPerspective()
 
     AbstractView* current = getAbstractView(currentAthleteTab->currentView());
 
-    // Equipment view has a single hidden unchangeable perspective
+    // Equipment view has a single unchangeable perspective
     if (current->viewType() == VIEW_EQUIPMENT) return;
 
     // export the current perspective to a file
@@ -982,7 +982,7 @@ MainWindow::importPerspective()
     int view = currentAthleteTab->currentView();
     AbstractView* current = getAbstractView(view);
     
-    // Equipment view has a single hidden unchangeable perspective
+    // Equipment view has a single unchangeable perspective
     if (current->viewType() == VIEW_EQUIPMENT) return;
 
     // import a new perspective from a file
@@ -1360,9 +1360,10 @@ void
 MainWindow::selectEquipment()
 {
     viewStack->setCurrentIndex(2);
-    resetPerspective(4);
+    resetPerspective(4); // Remember the last athlete & view, otherwise not required.
     sidebar->setItemSelected(6, true);
-    perspectiveSelector->hide();
+    perspectiveSelector->hide(); // Equipment view has a single unchangeable perspective.
+    equipmentView->setSelected(true); // Ensure selected tab is recalculated.
 }
 
 void
@@ -1466,7 +1467,7 @@ MainWindow::resetPerspective(int view, bool force)
     // don't argue just reset the perspective for this view
     AbstractView* current = getAbstractView(view);
 
-    // Equipment view has a single unchangeable perspective
+    // Equipment view has a single unchangeable perspective.
     if (current->viewType() == VIEW_EQUIPMENT) return;
 
     // set the perspective
