@@ -33,7 +33,7 @@
 #include "GcUpgrade.h"
 #include "LTMWindow.h"
 
-AbstractView::AbstractView(Context* context, int type, const QString& view, const QString& heading) :
+AbstractView::AbstractView(Context *context, int type, const QString& view, const QString& heading) :
     QWidget(context->tab), context(context), type(type), view(view),
     _sidebar(true), _tiled(false), _selected(false), lastHeight(130*dpiYFactor), sidewidth(0),
     active(false), bottomRequested(false), bottomHideOnIdle(false), perspectiveactive(false),

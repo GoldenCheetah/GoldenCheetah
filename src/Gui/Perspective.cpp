@@ -1310,14 +1310,14 @@ Perspective::drawCursor()
     }
 }
 
-GcWindowDialog::GcWindowDialog(GcWinID type, Context* context, GcChartWindow** here, bool sidebar, LTMSettings* use) : context(context), type(type), here(here), sidebar(sidebar)
+GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcChartWindow **here, bool sidebar, LTMSettings *use) : context(context), type(type), here(here), sidebar(sidebar)
 {
     SSS;
     //setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags());
     setWindowTitle(tr("Chart Setup"));
 
-    QRect size = QGuiApplication::primaryScreen()->availableGeometry();
+    QRect size= QGuiApplication::primaryScreen()->availableGeometry();
     setMinimumHeight(500);
 
     // chart and settings side by side need to be big!

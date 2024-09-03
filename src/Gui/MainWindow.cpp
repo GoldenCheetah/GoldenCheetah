@@ -926,12 +926,12 @@ MainWindow::getAbstractView(int view)
 }
 
 void
-MainWindow::addChart(QAction* action)
+MainWindow::addChart(QAction *action)
 {
     // & removed to avoid issues with kde AutoCheckAccelerators
     QString actionText = QString(action->text()).replace("&", "");
     GcWinID id = GcWindowTypes::None;
-    for (int i = 0; GcWindows[i].relevance; i++) {
+    for (int i=0; GcWindows[i].relevance; i++) {
         if (GcWindows[i].name == actionText) {
             id = GcWindows[i].id;
             break;
@@ -958,7 +958,7 @@ MainWindow::exportPerspective()
 {
     QString typedesc;
 
-    AbstractView* current = getAbstractView(currentAthleteTab->currentView());
+    AbstractView *current = getAbstractView(currentAthleteTab->currentView());
 
     // Equipment view has a single unchangeable perspective
     if (current->viewType() == VIEW_EQUIPMENT) return;
@@ -980,7 +980,7 @@ void
 MainWindow::importPerspective()
 {
     int view = currentAthleteTab->currentView();
-    AbstractView* current = getAbstractView(view);
+    AbstractView *current = getAbstractView(view);
     
     // Equipment view has a single unchangeable perspective
     if (current->viewType() == VIEW_EQUIPMENT) return;
@@ -1465,7 +1465,7 @@ MainWindow::resetPerspective(int view, bool force)
     lastview = view;
 
     // don't argue just reset the perspective for this view
-    AbstractView* current = getAbstractView(view);
+    AbstractView *current = getAbstractView(view);
 
     // Equipment view has a single unchangeable perspective.
     if (current->viewType() == VIEW_EQUIPMENT) return;
@@ -1483,7 +1483,7 @@ MainWindow::perspectiveSelected(int index)
     if (pactive) return;
 
     // set the perspective for the current view
-    AbstractView* current = getAbstractView(currentAthleteTab->currentView());
+    AbstractView *current = getAbstractView(currentAthleteTab->currentView());
 
     // Equipment view has a single unchangeable perspective
     if (current->viewType() == VIEW_EQUIPMENT) return;

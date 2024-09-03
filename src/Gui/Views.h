@@ -129,7 +129,7 @@ class EquipView : public AbstractView
 
     public:
 
-        EquipView(Context* context, QStackedWidget* controls);
+        EquipView(Context *context, QStackedWidget *controls);
         ~EquipView();
 
         // Don't want the base class behaviour for this...

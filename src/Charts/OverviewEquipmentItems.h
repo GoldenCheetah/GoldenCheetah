@@ -81,17 +81,14 @@ class OverviewEquipmentItemConfig : public OverviewItemConfig
         void setEqLinkRowWidgets(int tableRow, const EqTimeWindow* eqUse);
 
         // Equipment items
-        QLineEdit* eqLinkName;
+        QLineEdit *eqLinkName;
         QLineEdit *nonGCDistance, *nonGCElevation;
         QLineEdit *replaceDistance, *replaceElevation;
-
-        QTableWidget *eqTimeWindows;
-        QPushButton *addEqLink, *removeEqLink;
-
-        QCheckBox *startSet, *endSet;
-        QDateEdit *startDate, *endDate;
-
+        QPushButton *addEqLink, * removeEqLink;
+        QCheckBox *eqCheckBox;
         QPlainTextEdit *notes;
+        QTableWidget *eqTimeWindows;
+
 };
 
 class CommonEquipmentItem : public ChartSpaceItem
@@ -107,7 +104,9 @@ class CommonEquipmentItem : public ChartSpaceItem
         void setData(RideItem*) override {}
         void setDateRange(DateRange) override {}
         void itemGeometryChanged() override {}
+        void itemPaint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override {}
 
+        virtual void resetEqItem() {}
         virtual void DisplayMenuOfValues(const QPoint& pos) override;
 
         QWidget* config() override { return configwidget_; }
@@ -141,7 +140,7 @@ class EquipmentItem : public CommonEquipmentItem
         bool isWithin(const QStringList& rideEqLinkNameList, const QDate& actDate) const;
         bool rangeIsValid() const;
 
-        void resetEqItem();
+        virtual void resetEqItem() override;
         void unitsChanged();
         void addActivity(uint64_t rideDistanceScaled, uint64_t rideElevationScaled, uint64_t rideTimeInSecs);
                         uint64_t getNumActivities() const { return activities_; }
@@ -191,7 +190,7 @@ class EquipmentSummary : public CommonEquipmentItem
         void itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) override;
         void configChanged(qint32) override;
 
-        void resetAthleteActivity();
+        virtual void resetEqItem() override;
         void addActivity(const QString& athleteName, const QDate& activityDate, const uint64_t rideDistanceScaled,
                             const uint64_t eqElevationScaled, const uint64_t rideTimeInSecs);
 

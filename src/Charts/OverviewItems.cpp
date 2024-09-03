@@ -54,20 +54,20 @@ OverviewItemConfig::registerItems()
     // get the factory
     ChartSpaceItemRegistry &registry = ChartSpaceItemRegistry::instance();
 
-    // Register      TYPE                           SHORT                           DESCRIPTION                                        SCOPE            CREATOR
-    registry.addItem(OverviewItemType::USERCHART,   QObject::tr("User Chart"),      QObject::tr("User defined interactive chart"),     OverviewScope::ANALYSIS|OverviewScope::TRENDS, UserChartOverviewItem::create);
-    registry.addItem(OverviewItemType::METRIC,      QObject::tr("Metric"),          QObject::tr("Metric and Sparkline"),               OverviewScope::ANALYSIS|OverviewScope::TRENDS, MetricOverviewItem::create);
-    registry.addItem(OverviewItemType::KPI,         QObject::tr("KPI"),             QObject::tr("KPI calculation and progress bar"),   OverviewScope::ANALYSIS|OverviewScope::TRENDS, KPIOverviewItem::create);
-    registry.addItem(OverviewItemType::DATATABLE,   QObject::tr("Table"),           QObject::tr("Table of data"),                      OverviewScope::ANALYSIS|OverviewScope::TRENDS, DataOverviewItem::create);
-    registry.addItem(OverviewItemType::TOPN,        QObject::tr("Bests"),           QObject::tr("Ranked list of bests"),               OverviewScope::TRENDS,                         TopNOverviewItem::create);
-    registry.addItem(OverviewItemType::META,        QObject::tr("Metadata"),        QObject::tr("Metadata and Sparkline"),             OverviewScope::ANALYSIS,                       MetaOverviewItem::create);
-    registry.addItem(OverviewItemType::ZONE,        QObject::tr("Zones"),           QObject::tr("Zone Histogram"),                     OverviewScope::ANALYSIS|OverviewScope::TRENDS, ZoneOverviewItem::create);
-    registry.addItem(OverviewItemType::RPE,         QObject::tr("RPE"),             QObject::tr("RPE Widget"),                         OverviewScope::ANALYSIS,                       RPEOverviewItem::create);
-    registry.addItem(OverviewItemType::INTERVAL,    QObject::tr("Intervals"),       QObject::tr("Interval Bubble Chart"),              OverviewScope::ANALYSIS,                       IntervalOverviewItem::createInterval);
-    registry.addItem(OverviewItemType::ACTIVITIES,  QObject::tr("Activities"),      QObject::tr("Activities Bubble Chart"),            OverviewScope::TRENDS,                         IntervalOverviewItem::createActivities);
-    registry.addItem(OverviewItemType::PMC,         QObject::tr("PMC"),             QObject::tr("PMC Status Summary"),                 OverviewScope::ANALYSIS,                       PMCOverviewItem::create);
-    registry.addItem(OverviewItemType::ROUTE,       QObject::tr("Route"),           QObject::tr("Route Summary"),                      OverviewScope::ANALYSIS,                       RouteOverviewItem::create);
-    registry.addItem(OverviewItemType::DONUT,       QObject::tr("Donut"),           QObject::tr("Metric breakdown by category"),       OverviewScope::TRENDS,                         DonutOverviewItem::create);
+    // Register      TYPE                          SHORT                      DESCRIPTION                                        SCOPE            CREATOR
+    registry.addItem(OverviewItemType::USERCHART,  QObject::tr("User Chart"), QObject::tr("User defined interactive chart"),     OverviewScope::ANALYSIS|OverviewScope::TRENDS, UserChartOverviewItem::create);
+    registry.addItem(OverviewItemType::METRIC,     QObject::tr("Metric"),     QObject::tr("Metric and Sparkline"),               OverviewScope::ANALYSIS|OverviewScope::TRENDS, MetricOverviewItem::create);
+    registry.addItem(OverviewItemType::KPI,        QObject::tr("KPI"),        QObject::tr("KPI calculation and progress bar"),   OverviewScope::ANALYSIS|OverviewScope::TRENDS, KPIOverviewItem::create);
+    registry.addItem(OverviewItemType::DATATABLE,  QObject::tr("Table"),      QObject::tr("Table of data"),                      OverviewScope::ANALYSIS|OverviewScope::TRENDS, DataOverviewItem::create);
+    registry.addItem(OverviewItemType::TOPN,       QObject::tr("Bests"),      QObject::tr("Ranked list of bests"),               OverviewScope::TRENDS,                         TopNOverviewItem::create);
+    registry.addItem(OverviewItemType::META,       QObject::tr("Metadata"),   QObject::tr("Metadata and Sparkline"),             OverviewScope::ANALYSIS,                       MetaOverviewItem::create);
+    registry.addItem(OverviewItemType::ZONE,       QObject::tr("Zones"),      QObject::tr("Zone Histogram"),                     OverviewScope::ANALYSIS|OverviewScope::TRENDS, ZoneOverviewItem::create);
+    registry.addItem(OverviewItemType::RPE,        QObject::tr("RPE"),        QObject::tr("RPE Widget"),                         OverviewScope::ANALYSIS,                       RPEOverviewItem::create);
+    registry.addItem(OverviewItemType::INTERVAL,   QObject::tr("Intervals"),  QObject::tr("Interval Bubble Chart"),              OverviewScope::ANALYSIS,                       IntervalOverviewItem::createInterval);
+    registry.addItem(OverviewItemType::ACTIVITIES, QObject::tr("Activities"), QObject::tr("Activities Bubble Chart"),            OverviewScope::TRENDS,                         IntervalOverviewItem::createActivities);
+    registry.addItem(OverviewItemType::PMC,        QObject::tr("PMC"),        QObject::tr("PMC Status Summary"),                 OverviewScope::ANALYSIS,                       PMCOverviewItem::create);
+    registry.addItem(OverviewItemType::ROUTE,      QObject::tr("Route"),      QObject::tr("Route Summary"),                      OverviewScope::ANALYSIS,                       RouteOverviewItem::create);
+    registry.addItem(OverviewItemType::DONUT,      QObject::tr("Donut"),      QObject::tr("Metric breakdown by category"),       OverviewScope::TRENDS,                         DonutOverviewItem::create);
 
     return true;
 }

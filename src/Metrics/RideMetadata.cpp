@@ -587,7 +587,7 @@ RideMetadata::sports()
     foreach (FieldDefinition field, getFields()) {
         if (field.name == "Sport") {
             sportList = field.values;
-        break;
+            break;
         }
     }
 

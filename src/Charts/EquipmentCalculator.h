@@ -65,8 +65,8 @@ class EquipCalculator
         QVector<RideItem*>  rideItemList_;
 
         std::atomic<bool> eqCalculationInProgress_;
-
         QList<ChartSpaceItem*> spaceItems_;
+
         const MainWindow* mainWindow_;
         OverviewEquipmentWindow* eqOverviewWindow_;
 };

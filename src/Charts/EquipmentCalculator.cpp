@@ -64,15 +64,8 @@ EquipCalculator::recalculateTiles()
 
     // Reset all the tiles distances
     for (ChartSpaceItem* item : spaceItems_) {
-        
-        if (item->type == OverviewItemType::EQ_ITEM)
-        {
-            static_cast<EquipmentItem*>(item)->resetEqItem();
-        }
-        else if (item->type == OverviewItemType::EQ_SUMMARY)
-        {
-            static_cast<EquipmentSummary*>(item)->resetAthleteActivity();
-        }
+
+        static_cast<CommonEquipmentItem*>(item)->resetEqItem();
     }
 
     // calculate number of threads and work per thread

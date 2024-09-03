@@ -152,27 +152,20 @@ ChartSpace::removeItem(ChartSpaceItem *item)
 void
 ChartSpace::moveItem(ChartSpaceItem* item, ChartSpace* toChartSpace)
 {
-    for (int i = 0; i < items.count(); i++) {
-        ChartSpaceItem* p = items.at(i);
-        if (p == item) {
+    // remove from existing chart space
+    scene->removeItem(item);
+    items.removeOne(item);
+    updateGeometry();
+    updateView();
 
-            // remove from existing chart space
-            scene->removeItem(p);
-            items.removeAt(i);
-            updateGeometry();
-            updateView();
+    // prepare for new chart space
+    item->onscene = false;
+    item->parent = toChartSpace;
 
-            // prepare for new chart space
-            item->onscene = false;
-            item->parent = toChartSpace;
-
-            // add to new chart space
-            toChartSpace->addItem(item->order, item->column, item->span, item->deep, item);
-            toChartSpace->updateGeometry();
-            toChartSpace->updateView();
-            return;
-        }
-    }
+    // add to new chart space
+    toChartSpace->addItem(item->order, item->column, item->span, item->deep, item);
+    toChartSpace->updateGeometry();
+    toChartSpace->updateView();
 }
 
 // when a ride is selected we need to notify all the ChartSpaceItems
@@ -993,8 +986,7 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                         event->accept();
                         returning = true;
 
-                    }
-                    else if (item->geometry().width() - offx < (gl_near * dpiXFactor)) {
+                    } else if (item->geometry().width() - offx < (gl_near * dpiXFactor)) {
 
                         if (QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier)  state = SPAN;
                         else state = XRESIZE;
@@ -1008,8 +1000,7 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                         event->accept();
                         returning = true;
 
-                    }
-                    else {
+                    } else {
 
                         // we're grabbing a ChartSpaceItem, so lets
                         // work out the offset so we can move
@@ -1038,8 +1029,7 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                         scene->update();
                         view->update();
                     }
-                }
-                else if (static_cast<QGraphicsSceneMouseEvent*>(event)->button() == Qt::RightButton) {
+                } else if (static_cast<QGraphicsSceneMouseEvent*>(event)->button() == Qt::RightButton) {
 
                     item->DisplayMenuOfValues(static_cast<QGraphicsSceneMouseEvent*>(event)->screenPos());
                 }

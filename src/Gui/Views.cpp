@@ -342,7 +342,7 @@ TrainView::onSelectionChanged()
     }
 }
 
-EquipView::EquipView(Context* context, QStackedWidget* controls) :
+EquipView::EquipView(Context *context, QStackedWidget *controls) :
         AbstractView(context, VIEW_EQUIPMENT, "equipment", "Equipment Management")
 {
     // perspectives are stacked

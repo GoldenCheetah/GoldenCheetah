@@ -153,9 +153,9 @@ OverviewEquipmentItemConfig::OverviewEquipmentItemConfig(ChartSpaceItem* item) :
         connect(eqLinkName, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
         layout->insertRow(insertRow++, tr("EqLink Name"), eqLinkName);
 
-        startSet = new QCheckBox();
-        connect(startSet, SIGNAL(stateChanged(int)), this, SLOT(dataChanged()));
-        layout->insertRow(insertRow++, tr("Show Athlete's Activities"), startSet);
+        eqCheckBox = new QCheckBox();
+        connect(eqCheckBox, SIGNAL(stateChanged(int)), this, SLOT(dataChanged()));
+        layout->insertRow(insertRow++, tr("Show Athlete's Activities"), eqCheckBox);
     }
 
     if (item->type == OverviewItemType::EQ_NOTES) {
@@ -216,7 +216,7 @@ OverviewEquipmentItemConfig::setWidgets()
         EquipmentSummary* mi = dynamic_cast<EquipmentSummary*>(item);
         name->setText(mi->name);
         eqLinkName->setText(mi->eqLinkName_);
-        startSet->setChecked(mi->showActivitiesPerAthlete_);
+        eqCheckBox->setChecked(mi->showActivitiesPerAthlete_);
 
     }
     break;
@@ -385,7 +385,7 @@ OverviewEquipmentItemConfig::dataChanged()
         EquipmentSummary* mi = dynamic_cast<EquipmentSummary*>(item);
         mi->name = name->text();
         mi->eqLinkName_ = eqLinkName->text();
-        mi->showActivitiesPerAthlete_ = startSet->isChecked();
+        mi->showActivitiesPerAthlete_ = eqCheckBox->isChecked();
         mi->bgcolor = bgcolor->getColor().name();
     }
     break;
@@ -626,7 +626,7 @@ EquipmentItem::rangeIsValid() const
 }
 
 void
-EquipmentSummary::resetAthleteActivity()
+EquipmentSummary::resetEqItem()
 {
     athleteActivityMap_.clear();
     eqLinkNumActivities_ = 0;

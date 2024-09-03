@@ -87,9 +87,9 @@ class OverviewItemConfig : public QWidget
         void showEvent(QShowEvent *) override { setWidgets(); }
 
         // the widget we are configuring
-        ChartSpaceItem* item;
+        ChartSpaceItem *item;
 
-        QFormLayout* layout;
+        QFormLayout *layout;
 
         // block updates during initialisation
         bool block;
@@ -354,12 +354,12 @@ class MetaOverviewItem : public ChartSpaceItem
 
 public:
 
-    MetaOverviewItem(ChartSpace* parent, QString name, QString symbol);
+    MetaOverviewItem(ChartSpace *parent, QString name, QString symbol);
     ~MetaOverviewItem();
 
-    void itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) override;
+    void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*) override;
     void itemGeometryChanged() override;
-    void setData(RideItem* item) override;
+    void setData(RideItem *item) override;
     void setDateRange(DateRange) override {} // doesn't support trends view
 
     virtual void DisplayMenuOfValues(const QPoint& pos) override;
@@ -367,7 +367,7 @@ public:
     QWidget* config() override { return configwidget; }
 
     // create and config
-    static ChartSpaceItem* create(ChartSpace* parent) { return new MetaOverviewItem(parent, tr("Workout Code"), "Workout Code"); }
+    static ChartSpaceItem *create(ChartSpace* parent) { return new MetaOverviewItem(parent, tr("Workout Code"), "Workout Code"); }
 
     void configChanged(qint32) override;
 
@@ -378,9 +378,9 @@ public:
     bool up, showrange;
     QString value, upper, lower, mean;
 
-    Sparkline* sparkline;
+    Sparkline *sparkline;
 
-    OverviewItemConfig* configwidget;
+    OverviewItemConfig *configwidget;
 
 protected slots:
 

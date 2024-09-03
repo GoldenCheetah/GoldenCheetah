@@ -292,7 +292,7 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("ChartTypes_Train#workout-editor").arg(tr("Edition and diplay of ergometer type workout files"));
     case ChartTrain_LiveMap:
         return text.arg("ChartTypes_Train#live-map").arg(tr("Real time display of the route of simulation workouts in an Open Street Map"));
-	
+
     // Sidebars
     case SideBarTrendsView_DateRanges:
         return text.arg("Side-Bar_Trends-view#date-ranges").arg(tr("Predefined and configurable set of data ranges for selection of activities to be analysed"));

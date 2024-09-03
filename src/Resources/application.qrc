@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>charts/overview-analysis.gchart</file>
-		<file>charts/overview-equipment.gchart</file>
+        <file>charts/overview-equipment.gchart</file>
         <file>charts/overview-trends.gchart</file>
         <file>webservice/httpserver.ini</file>
         <file>sidebar/apps.png</file>

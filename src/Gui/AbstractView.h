@@ -54,7 +54,7 @@ class AbstractView : public QWidget
 
     public:
 
-        AbstractView(Context *context, int type, const QString& name, const QString& heading);
+        AbstractView(Context *context, int type, const QString& view, const QString& heading);
         virtual ~AbstractView();
         virtual void close() {};
 

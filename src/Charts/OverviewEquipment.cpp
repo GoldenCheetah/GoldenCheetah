@@ -117,7 +117,6 @@ OverviewEquipmentWindow::cloneTile(ChartSpaceItem* item)
     }
 }
 
-
 void
 OverviewEquipmentWindow::configItem(ChartSpaceItem* item)
 {
@@ -213,7 +212,8 @@ OverviewEquipmentWindow::getExtraConfiguration(ChartSpaceItem* item, QString& co
 }
 
 void
-OverviewEquipmentWindow::setExtraConfiguration(QJsonObject& obj, int type, ChartSpaceItem* add, QString& name, QString& datafilter, int order, int column, int span, int deep) const
+OverviewEquipmentWindow::setExtraConfiguration(QJsonObject& obj, int type, ChartSpaceItem* add, QString& name,
+                                                QString& datafilter, int order, int column, int span, int deep) const
 {
     // now the actual card settings
     switch (type) {
@@ -337,7 +337,7 @@ void
 OverviewEquipmentWindow::calculationComplete()
 {
     // ensure the displayed tiles are up to date now calculation has finished
-    foreach(ChartSpaceItem * item, space->allItems()) {
+    foreach(ChartSpaceItem *item, space->allItems()) {
         item->update();
     }
 }
