@@ -122,6 +122,21 @@ ChartSpace::ChartSpace(Context *context, int scope, GcWindow *window) :
     currentRideItem=NULL;
 }
 
+void
+ChartSpace::adjustItemHeight(ChartSpaceItem* item, int heightInRows)
+{
+    state = YRESIZE;
+
+    stateData.yresize.item = item;
+    stateData.yresize.posy = 0;
+    stateData.yresize.item->deep = heightInRows;
+
+    updateGeometry();
+    updateView();
+
+    state = NONE;
+}
+
 // add the item
 void
 ChartSpace::addItem(int order, int column, int span, int deep, ChartSpaceItem *item)
@@ -1032,6 +1047,10 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                 } else if (static_cast<QGraphicsSceneMouseEvent*>(event)->button() == Qt::RightButton) {
 
                     item->DisplayMenuOfValues(static_cast<QGraphicsSceneMouseEvent*>(event)->screenPos());
+
+                    // thanks we'll take that
+                    event->accept();
+                    returning = true;
                 }
             }
         }

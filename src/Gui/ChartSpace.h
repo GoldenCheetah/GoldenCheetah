@@ -287,6 +287,9 @@ class ChartSpace : public QWidget
         // set scale, zoom etc appropriately
         void updateView();
 
+        // adjust the items height
+        void adjustItemHeight(ChartSpaceItem* item, int heightInRows);
+
         // add a ChartSpaceItem to the view
         void addItem(int row, int column, int span, int deep, ChartSpaceItem *item);
 

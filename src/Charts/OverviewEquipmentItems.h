@@ -111,6 +111,7 @@ class CommonEquipmentItem : public ChartSpaceItem
 
         QWidget* config() override { return configwidget_; }
 
+        double tileDisplayHeight_;
         OverviewEquipmentItemConfig* configwidget_ = nullptr;
 
     protected slots:

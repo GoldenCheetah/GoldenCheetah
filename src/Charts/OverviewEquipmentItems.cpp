@@ -406,7 +406,7 @@ OverviewEquipmentItemConfig::dataChanged()
 //
 
 CommonEquipmentItem::CommonEquipmentItem(ChartSpace* parent, const QString& name) :
-    ChartSpaceItem(parent, name)
+    ChartSpaceItem(parent, name), tileDisplayHeight_(ROWHEIGHT * 5)
 {
 }
 
@@ -418,12 +418,29 @@ void CommonEquipmentItem::DisplayMenuOfValues(const QPoint& pos)
 
         // add the clone tile option at the top first
         if (chart == parent->window) {
-            QAction* metaAction = new QAction("Clone Tile");
-            GcChartWindow* tmp = const_cast<GcChartWindow*>(chart);
-            QVariant varPtr(QVariant::fromValue(static_cast<void*>(tmp)));
+            QAction* metaAction = new QAction("Clone");
+            GcChartWindow* thisChart = const_cast<GcChartWindow*>(chart);
+            QVariant varPtr(QVariant::fromValue(static_cast<void*>(thisChart)));
             metaAction->setData(varPtr);
             popMenu.addAction(metaAction);
         }
+    }
+
+    // equipment notes are difficult to understand the tile height
+    // so are not supported at the moment
+    if (type != OverviewItemType::EQ_NOTES) {
+
+        QAction* metaAction = new QAction("Expand");
+        popMenu.addAction(metaAction);
+
+        metaAction = new QAction("Collapse");
+        popMenu.addAction(metaAction);
+
+        metaAction = new QAction("Expand Tiles");
+        popMenu.addAction(metaAction);
+
+        metaAction = new QAction("Collapse Tiles");
+        popMenu.addAction(metaAction);
     }
 
     for (const GcChartWindow* chart : parent->window->getPerspective()->getCharts()) {
@@ -431,8 +448,8 @@ void CommonEquipmentItem::DisplayMenuOfValues(const QPoint& pos)
         // Add the move to chart options
         if (chart != parent->window) {
             QAction* metaAction = new QAction("-->" + chart->title());
-            GcChartWindow* tmp = const_cast<GcChartWindow*>(chart);
-            QVariant varPtr(QVariant::fromValue(static_cast<void*>(tmp)));
+            GcChartWindow* anotherChart = const_cast<GcChartWindow*>(chart);
+            QVariant varPtr(QVariant::fromValue(static_cast<void*>(anotherChart)));
             metaAction->setData(varPtr);
             popMenu.addAction(metaAction);
         }
@@ -447,6 +464,39 @@ void CommonEquipmentItem::DisplayMenuOfValues(const QPoint& pos)
 
 void CommonEquipmentItem::popupAction(QAction* action)
 {
+
+    if (action->text() == "Expand") {
+        parent->adjustItemHeight(this, round(tileDisplayHeight_/ROWHEIGHT));
+        return;
+    }
+    if (action->text() == "Collapse") {
+        parent->adjustItemHeight(this, 5);
+        return;
+    }
+
+    if (action->text() == "Expand Tiles") {
+
+        for (ChartSpaceItem* item : parent->allItems()) {
+            if (item->type != OverviewItemType::EQ_NOTES) {
+
+                parent->adjustItemHeight(item, round(static_cast<CommonEquipmentItem*>(item)->tileDisplayHeight_ / ROWHEIGHT));
+                updateGeometry();
+            }
+        }
+        return;
+    }
+    if (action->text() == "Collapse Tiles") {
+        for (ChartSpaceItem* item : parent->allItems()) {
+            if (item->type != OverviewItemType::EQ_NOTES) {
+
+                parent->adjustItemHeight(item, 5);
+                updateGeometry();
+            }
+        }
+        return;
+
+    }
+
     GcChartWindow* toChart = static_cast<GcChartWindow*>(action->data().value<void*>());
     const ChartSpace* toChartSpace = static_cast<OverviewEquipmentWindow*>(toChart)->getSpace();
 
@@ -706,9 +756,9 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
     QString distUnits = GlobalContext::context()->useMetricUnits ? tr(" km") : tr(" miles");
 
     painter->drawText(QPointF((geometry().width() - QFontMetrics(parent->smallfont).horizontalAdvance(distUnits)) / 2.0f,
-        mid + (fm.ascent() / 3.0f) + addy), distUnits); // divided by 3 to account for "gap" at top of font
+        mid + (fm.ascent() / 3.6f) + addy), distUnits); // divided by 3 to account for "gap" at top of font
 
-    double rowY(ROWHEIGHT * 5.5);
+    double rowY(ROWHEIGHT * 5);
     double rowWidth(geometry().width() - (ROWHEIGHT * 2));
     double rowHeight(geometry().height() - (ROWHEIGHT * 4));
 
@@ -751,11 +801,10 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
 
     painter->setPen(textColor);
 
-    rowY += (ROWHEIGHT * 0.3);
     painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth,rowHeight),
         QString(tr("Activities: ")) + QString::number(getNumActivities()));
 
-    rowY += (ROWHEIGHT * 1.3);
+    rowY += (ROWHEIGHT * 1.2);
     painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
         QString(tr("Distance: ")) + QString::number(getGCDistanceScaled() * EQ_SCALED_TO_REAL, 'f', 1) + distUnits);
 
@@ -769,7 +818,7 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
         QString(tr("Time: ")) + QString::number(activityTimeInSecs_ * HOURS_PER_SECOND, 'f', 1) + " hrs");
 
     bool addNotesOffset = false;
-    rowY += (ROWHEIGHT * 0.3);
+    rowY += (ROWHEIGHT * 0.2);
 
     if (getNonGCDistanceScaled() != 0) {
 
@@ -818,6 +867,7 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
         rowY += (ROWHEIGHT);
         painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), notes_);
     }
+    tileDisplayHeight_ = rowY + (ROWHEIGHT * 1.5);
 }
 
 void
@@ -881,6 +931,8 @@ EquipmentSummary::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, 
     rowY += ROWHEIGHT;
     painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
         QString(tr("Time: ")) + QString::number(eqLinkTotalTimeInSecs_*HOURS_PER_SECOND, 'f', 1) + " hrs");
+
+    tileDisplayHeight_ = rowY + (ROWHEIGHT * 1.5);
 }
 
 void
