@@ -168,18 +168,6 @@ AthleteTab::view(int index)
     }
 }
 
-unsigned int
-AthleteTab::getViewMask(int index)
-{
-    switch (index) {
-    case 0: return VIEW_TRENDS;
-    default:
-    case 1: return VIEW_ANALYSIS;
-    case 2: return VIEW_DIARY;
-    case 3: return VIEW_TRAIN;
-    }
-}
-
 void
 AthleteTab::selectView(int index)
 {

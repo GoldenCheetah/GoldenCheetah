@@ -83,7 +83,7 @@ class OverviewItemConfig : public QWidget
 
     protected:
 
-        // before show, lets make sure the background color and widgets are set correctly
+        // before show, lets make sure the widgets are set correctly
         void showEvent(QShowEvent *) override { setWidgets(); }
 
         // the widget we are configuring

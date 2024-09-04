@@ -987,6 +987,7 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                     double offx = pos.x() - item->geometry().x();
                     double offy = pos.y() - item->geometry().y();
 
+
                     if (item->geometry().height() - offy < (gl_near * dpiXFactor)) {
 
                         // We can span resize a specific chartspaceitem

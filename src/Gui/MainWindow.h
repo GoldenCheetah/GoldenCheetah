@@ -98,7 +98,6 @@ class MainWindow : public QMainWindow
         AthleteTab *athleteTab() { return currentAthleteTab; }
         NewSideBar *newSidebar() { return sidebar; }
         EquipView *equipView() { return equipmentView; }
-        AbstractView *getCurrentAthletesAbstractView();
 
         // tab view keeps this up to date
         QAction *showhideSidebar;
@@ -132,7 +131,6 @@ class MainWindow : public QMainWindow
         void clearSplash();
 
         AbstractView *getAbstractView(int view);
-        unsigned int getChartMask(int view);
 
     signals:
         void backClicked();

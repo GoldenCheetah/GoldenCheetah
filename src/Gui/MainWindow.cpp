@@ -843,20 +843,6 @@ MainWindow::showTabbar(bool want)
     setUpdatesEnabled(true);
 }
 
-unsigned int
-MainWindow::getChartMask(int view)
-{
-    unsigned int mask = 0;
-
-    switch (viewStack->currentIndex()) {
-    case 1: mask = currentAthleteTab->getViewMask(view); break; // on an athlete specific view...
-    case 2: mask = VIEW_EQUIPMENT; break;
-    default: qDebug() << "Unhandled view stack chart mask:" << viewStack->currentIndex(); break;
-    }
-
-    return mask;
-}
-
 void
 MainWindow::showToolbar(bool want)
 {
@@ -874,7 +860,18 @@ MainWindow::showToolbar(bool want)
 void
 MainWindow::setChartMenu()
 {
-    unsigned int mask = getChartMask(currentAthleteTab->currentView());
+    unsigned int mask=0;
+
+    // called when chart menu about to be shown
+    // setup to only show charts that are relevant
+    // to this view
+    switch(currentAthleteTab->currentView()) {
+        case 0 : mask = VIEW_TRENDS; break;
+        default:
+        case 1 : mask = VIEW_ANALYSIS; break;
+        case 2 : mask = VIEW_DIARY; break;
+        case 3 : mask = VIEW_TRAIN; break;
+    }
 
     chartMenu->clear();
     if (!mask) return;
@@ -894,7 +891,17 @@ MainWindow::setSubChartMenu()
 void
 MainWindow::setChartMenu(QMenu *menu)
 {
-    unsigned int mask = getChartMask(currentAthleteTab->currentView());
+    unsigned int mask=0;
+    // called when chart menu about to be shown
+    // setup to only show charts that are relevant
+    // to this view
+    switch(currentAthleteTab->currentView()) {
+        case 0 : mask = VIEW_TRENDS; break;
+        default:
+        case 1 : mask = VIEW_ANALYSIS; break;
+        case 2 : mask = VIEW_DIARY; break;
+        case 3 : mask = VIEW_TRAIN; break;
+    }
 
     menu->clear();
     if (!mask) return;
@@ -905,40 +912,24 @@ MainWindow::setChartMenu(QMenu *menu)
     }
 }
 
-AbstractView*
-MainWindow::getCurrentAthletesAbstractView()
-{
-    return getAbstractView(currentAthleteTab->currentView());
-}
-
-AbstractView*
-MainWindow::getAbstractView(int view)
-{
-    AbstractView* abstractView = nullptr;
-
-    switch (viewStack->currentIndex()) { 
-    case 1: abstractView = currentAthleteTab->view(view); break; // get the view for the current athlete
-    case 2: abstractView = equipmentView; break;
-    default: qDebug() << "Unhandled view stack:" << viewStack->currentIndex(); break;
-    }
-
-    return abstractView;
-}
-
 void
-MainWindow::addChart(QAction *action)
+MainWindow::addChart(QAction* action)
 {
     // & removed to avoid issues with kde AutoCheckAccelerators
     QString actionText = QString(action->text()).replace("&", "");
     GcWinID id = GcWindowTypes::None;
-    for (int i=0; GcWindows[i].relevance; i++) {
+    for (int i = 0; GcWindows[i].relevance; i++) {
         if (GcWindows[i].name == actionText) {
             id = GcWindows[i].id;
             break;
         }
     }
-    if (id != GcWindowTypes::None)
-        getAbstractView(currentAthleteTab->currentView())->addChart(id); // called from MainWindow to inset chart
+    if (id != GcWindowTypes::None) {
+        if (viewStack->currentIndex() == 2)
+            equipmentView->addChart(id);
+        else
+            currentAthleteTab->addChart(id); // called from MainWindow to inset chart
+    }
 }
 
 void
@@ -956,12 +947,20 @@ MainWindow::importChart()
 void
 MainWindow::exportPerspective()
 {
+    // Equipment view has a single unchangeable perspective
+    if (viewStack->currentIndex() == 2) return;
+
+    int view = currentAthleteTab->currentView();
+    AbstractView* current = NULL;
+
     QString typedesc;
 
-    AbstractView *current = getAbstractView(currentAthleteTab->currentView());
-
-    // Equipment view has a single unchangeable perspective
-    if (current->viewType() == VIEW_EQUIPMENT) return;
+    switch (view) {
+    case 0:  current = currentAthleteTab->homeView; typedesc = "Trends"; break;
+    case 1:  current = currentAthleteTab->analysisView; typedesc = "Analysis"; break;
+    case 2:  current = currentAthleteTab->diaryView; typedesc = "Diary"; break;
+    case 3:  current = currentAthleteTab->trainView; typedesc = "Train"; break;
+    }
 
     // export the current perspective to a file
     QString suffix;
@@ -979,11 +978,18 @@ MainWindow::exportPerspective()
 void
 MainWindow::importPerspective()
 {
-    int view = currentAthleteTab->currentView();
-    AbstractView *current = getAbstractView(view);
-    
     // Equipment view has a single unchangeable perspective
-    if (current->viewType() == VIEW_EQUIPMENT) return;
+    if (viewStack->currentIndex() == 2) return;
+
+    int view = currentAthleteTab->currentView();
+    AbstractView *current = NULL;
+    
+    switch (view) {
+    case 0:  current = currentAthleteTab->homeView; break;
+    case 1:  current = currentAthleteTab->analysisView; break;
+    case 2:  current = currentAthleteTab->diaryView; break;
+    case 3:  current = currentAthleteTab->trainView; break;
+    }
 
     // import a new perspective from a file
     QString fileName = QFileDialog::getOpenFileName(this, tr("Select Perspective file to export"), "", tr("GoldenCheetah Perspective Files (*.gchartset)"));
@@ -1359,7 +1365,7 @@ MainWindow::selectTrain()
 void
 MainWindow::selectEquipment()
 {
-    viewStack->setCurrentIndex(2);
+    viewStack->setCurrentIndex(2); // set the view stack first
     resetPerspective(4); // Remember the last athlete & view, otherwise not required.
     sidebar->setItemSelected(6, true);
     perspectiveSelector->hide(); // Equipment view has a single unchangeable perspective.
@@ -1464,11 +1470,18 @@ MainWindow::resetPerspective(int view, bool force)
     lastathlete = currentAthleteTab;
     lastview = view;
 
-    // don't argue just reset the perspective for this view
-    AbstractView *current = getAbstractView(view);
+    // Equipment view has a single unchangeable perspective
+    if (viewStack->currentIndex() == 2) return;
 
-    // Equipment view has a single unchangeable perspective.
-    if (current->viewType() == VIEW_EQUIPMENT) return;
+    // don't argue just reset the perspective for this view
+    AbstractView *current = NULL;
+    switch (view) {
+
+    case 0:  current = currentAthleteTab->homeView; break;
+    case 1:  current = currentAthleteTab->analysisView; break;
+    case 2:  current = currentAthleteTab->diaryView; break;
+    case 3:  current = currentAthleteTab->trainView; break;
+    }
 
     // set the perspective
     pactive=true;
@@ -1480,13 +1493,20 @@ MainWindow::resetPerspective(int view, bool force)
 void
 MainWindow::perspectiveSelected(int index)
 {
+    // Equipment view has a single unchangeable perspective
+    if (viewStack->currentIndex() == 2) return;
+
     if (pactive) return;
 
     // set the perspective for the current view
-    AbstractView *current = getAbstractView(currentAthleteTab->currentView());
-
-    // Equipment view has a single unchangeable perspective
-    if (current->viewType() == VIEW_EQUIPMENT) return;
+    int view = currentAthleteTab->currentView();
+    AbstractView *current = NULL;
+    switch (view) {
+    case 0:  current = currentAthleteTab->homeView; break;
+    case 1:  current = currentAthleteTab->analysisView; break;
+    case 2:  current = currentAthleteTab->diaryView; break;
+    case 3:  current = currentAthleteTab->trainView; break;
+    }
 
     // which perspective is currently being shown?
     int prior = current->perspectives_.indexOf(current->perspective_);
@@ -1494,7 +1514,12 @@ MainWindow::perspectiveSelected(int index)
     if (index < current->perspectives_.count()) {
 
         // a perspectives was selected
-        current->perspectiveSelected(index);
+        switch (view) {
+        case 0:  current->perspectiveSelected(index); break;
+        case 1:  current->perspectiveSelected(index); break;
+        case 2:  current->perspectiveSelected(index); break;
+        case 3:  current->perspectiveSelected(index); break;
+        }
 
     } else {
 
@@ -1543,11 +1568,18 @@ MainWindow::perspectiveSelected(int index)
 void
 MainWindow::perspectivesChanged()
 {
-    int view = currentAthleteTab->currentView();
-    AbstractView* current = getAbstractView(view);
-
     // Equipment view has a single unchangeable perspective
-    if (current->viewType() == VIEW_EQUIPMENT) return;
+    if (viewStack->currentIndex() == 2) return;
+
+    int view = currentAthleteTab->currentView();
+    AbstractView *current = NULL;
+
+    switch (view) {
+    case 0:  current = currentAthleteTab->homeView; break;
+    case 1:  current = currentAthleteTab->analysisView; break;
+    case 2:  current = currentAthleteTab->diaryView; break;
+    case 3:  current = currentAthleteTab->trainView; break;
+    }
 
     // which perspective is currently being selected (before we go setting the combobox)
     Perspective *prior = current->perspective_;

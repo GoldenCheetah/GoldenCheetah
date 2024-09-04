@@ -1338,8 +1338,13 @@ GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcChartWindow **h
     win = GcWindowRegistry::newGcWindow(type, context);
 
     // before we do anything, we need to set the perspective, in case
-    // the chart uses it to decide something
-    win->setProperty("perspective", QVariant::fromValue<Perspective*>(context->mainWindow->getCurrentAthletesAbstractView()->page()));
+    // the chart uses it to decide something - apologies for the convoluted
+    // method to determine the perspective, but its rare to use this outside
+    // the context of a chart or a view
+    if (type == GcWindowTypes::OverviewEquipment)
+        win->setProperty("perspective", QVariant::fromValue<Perspective*>(context->mainWindow->equipView()->page()));
+    else
+        win->setProperty("perspective", QVariant::fromValue<Perspective*>(context->mainWindow->athleteTab()->view(context->mainWindow->athleteTab()->currentView())->page()));
 
     chartLayout->addWidget(win);
     //win->setFrameStyle(QFrame::Box);
@@ -1870,14 +1875,18 @@ ImportChartDialog::importClicked()
                 view = table->item(i,1)->text();
             }
 
-            if (view == tr("Trends"))      { context->mainWindow->selectTrends(); }
-            if (view == tr("Activities"))  { context->mainWindow->selectAnalysis(); }
-            if (view == tr("Diary"))       { context->mainWindow->selectDiary(); }
-            if (view == tr("Train"))       { context->mainWindow->selectTrain(); }
-            if (view == tr("Equipment"))   { context->mainWindow->selectEquipment(); }
+            int x=0;
+            if (view == tr("Trends"))      { x=0; context->mainWindow->selectTrends(); }
+            if (view == tr("Activities"))  { x=1; context->mainWindow->selectAnalysis(); }
+            if (view == tr("Diary"))       { x=2; context->mainWindow->selectDiary(); }
+            if (view == tr("Train"))       { x=3; context->mainWindow->selectTrain(); }
+            if (view == tr("Equipment"))   { x=4; context->mainWindow->selectEquipment(); }
 
             // add to the currently selected tab and select if only adding one chart
-            context->mainWindow->getCurrentAthletesAbstractView()->importChart(list[i], (list.count()==1));
+            if (x == 4)
+                context->mainWindow->equipView()->importChart(list[i], (list.count() == 1));
+            else
+                context->mainWindow->athleteTab()->view(x)->importChart(list[i], (list.count() == 1));
         }
     }
     accept();
