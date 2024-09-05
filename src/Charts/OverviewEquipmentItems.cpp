@@ -430,16 +430,16 @@ void CommonEquipmentItem::DisplayMenuOfValues(const QPoint& pos)
     // so are not supported at the moment
     if (type != OverviewItemType::EQ_NOTES) {
 
-        QAction* metaAction = new QAction("Expand");
+        QAction* metaAction = new QAction(tr("Expand"));
         popMenu.addAction(metaAction);
 
-        metaAction = new QAction("Collapse");
+        metaAction = new QAction(tr("Collapse"));
         popMenu.addAction(metaAction);
 
-        metaAction = new QAction("Expand Tiles");
+        metaAction = new QAction(tr("Expand Tiles"));
         popMenu.addAction(metaAction);
 
-        metaAction = new QAction("Collapse Tiles");
+        metaAction = new QAction(tr("Collapse Tiles"));
         popMenu.addAction(metaAction);
     }
 
@@ -464,17 +464,15 @@ void CommonEquipmentItem::DisplayMenuOfValues(const QPoint& pos)
 
 void CommonEquipmentItem::popupAction(QAction* action)
 {
-
-    if (action->text() == "Expand") {
+    if (action->text() == tr("Expand")) {
         parent->adjustItemHeight(this, round(tileDisplayHeight_/ROWHEIGHT));
         return;
     }
-    if (action->text() == "Collapse") {
+    if (action->text() == tr("Collapse")) {
         parent->adjustItemHeight(this, 5);
         return;
     }
-
-    if (action->text() == "Expand Tiles") {
+    if (action->text() == tr("Expand Tiles")) {
 
         for (ChartSpaceItem* item : parent->allItems()) {
             if (item->type != OverviewItemType::EQ_NOTES) {
@@ -485,7 +483,7 @@ void CommonEquipmentItem::popupAction(QAction* action)
         }
         return;
     }
-    if (action->text() == "Collapse Tiles") {
+    if (action->text() == tr("Collapse Tiles")) {
         for (ChartSpaceItem* item : parent->allItems()) {
             if (item->type != OverviewItemType::EQ_NOTES) {
 
@@ -494,7 +492,6 @@ void CommonEquipmentItem::popupAction(QAction* action)
             }
         }
         return;
-
     }
 
     GcChartWindow* toChart = static_cast<GcChartWindow*>(action->data().value<void*>());

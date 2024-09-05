@@ -149,7 +149,6 @@ class MainWindow : public QMainWindow
         void helpView();
         void logBug();
         void support();
-        void actionClicked(int);
 
         void loadProgress(QString folder, double progress);
 
@@ -209,7 +208,6 @@ class MainWindow : public QMainWindow
         void selectTrain();
         void selectEquipment();
 
-        void setChartMenu();
         void setSubChartMenu();
         void setChartMenu(QMenu *);
         void addChart(QAction*);
@@ -349,7 +347,6 @@ class MainWindow : public QMainWindow
         QSignalMapper *deleteMapper;
 
         // chart menus
-        QMenu *chartMenu;
         QMenu *subChartMenu;
 
         // Toolbar state checkables in View menu / context
