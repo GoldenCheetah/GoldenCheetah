@@ -131,6 +131,7 @@ class MainWindow : public QMainWindow
         void clearSplash();
 
         AbstractView *getAbstractView(int view);
+        void setEquipmentView(bool equipmentDisplayed);
 
     signals:
         void backClicked();
@@ -355,6 +356,10 @@ class MainWindow : public QMainWindow
         QAction *showhideLowbar;
         QAction *showhideToolbar;
         QAction *showhideTabbar;
+
+        QAction *impPerspective;
+        QAction *expPerspective;
+        QAction *resetCharts;
 
         QAction *shareAction;
         QAction *checkAction;

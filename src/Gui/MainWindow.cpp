@@ -669,8 +669,8 @@ MainWindow::MainWindow(const QDir &home)
     viewMenu->addAction(tr("Trends"), this, SLOT(selectTrends()));
     viewMenu->addAction(tr("Train"), this, SLOT(selectTrain()));
     viewMenu->addSeparator();
-    viewMenu->addAction(tr("Import Perspective..."), this, SLOT(importPerspective()));
-    viewMenu->addAction(tr("Export Perspective..."), this, SLOT(exportPerspective()));
+    impPerspective = viewMenu->addAction(tr("Import Perspective..."), this, SLOT(importPerspective()));
+    expPerspective = viewMenu->addAction(tr("Export Perspective..."), this, SLOT(exportPerspective()));
     viewMenu->addSeparator();
     subChartMenu = viewMenu->addMenu(tr("Add Chart"));
     viewMenu->addAction(tr("Import Chart..."), this, SLOT(importChart()));
@@ -680,6 +680,7 @@ MainWindow::MainWindow(const QDir &home)
     viewMenu->addSeparator();
 #endif
     viewMenu->addAction(tr("Reset Layout"), this, SLOT(resetWindowLayout()));
+    resetCharts = viewMenu->addAction(tr("Reset Layout"), this, SLOT(resetWindowLayout()));
     styleAction = viewMenu->addAction(tr("Tabbed not Tiled"), this, SLOT(toggleStyle()));
     styleAction->setCheckable(true);
     styleAction->setChecked(true);
@@ -1314,6 +1315,7 @@ MainWindow::sidebarSelected(int id)
 void
 MainWindow::selectAthlete()
 {
+    setEquipmentView(false);
     viewStack->setCurrentIndex(0);
     perspectiveSelector->hide();
 }
@@ -1321,6 +1323,7 @@ MainWindow::selectAthlete()
 void
 MainWindow::selectAnalysis()
 {
+    setEquipmentView(false);
     viewStack->setCurrentIndex(1);
     resetPerspective(1);
     //currentTab->analysisView->setPerspectives(perspectiveSelector);
@@ -1333,6 +1336,7 @@ MainWindow::selectAnalysis()
 void
 MainWindow::selectTrain()
 {
+    setEquipmentView(false);
     viewStack->setCurrentIndex(1);
     resetPerspective(3);
     //currentTab->trainView->setPerspectives(perspectiveSelector);
@@ -1346,6 +1350,7 @@ void
 MainWindow::selectEquipment()
 {
     viewStack->setCurrentIndex(2); // set the view stack first
+    setEquipmentView(true); // set the available menu options
     resetPerspective(4); // Remember the last athlete & view, otherwise not required.
     sidebar->setItemSelected(6, true);
     perspectiveSelector->hide(); // Equipment view has a single unchangeable perspective.
@@ -1355,6 +1360,7 @@ MainWindow::selectEquipment()
 void
 MainWindow::selectDiary()
 {
+    setEquipmentView(false);
     viewStack->setCurrentIndex(1);
     resetPerspective(2);
     //currentTab->diaryView->setPerspectives(perspectiveSelector);
@@ -1366,6 +1372,7 @@ MainWindow::selectDiary()
 void
 MainWindow::selectTrends()
 {
+    setEquipmentView(false);
     viewStack->setCurrentIndex(1);
     resetPerspective(0);
     //currentTab->homeView->setPerspectives(perspectiveSelector);
@@ -1375,6 +1382,77 @@ MainWindow::selectTrends()
     setToolButtons();
 }
 
+void
+MainWindow::setEquipmentView(bool equipmentDisplayed)
+{
+    // Only update menus if entering equipment view or leaving it
+    if (viewStack->currentIndex() == 2) {
+
+        // The following code remembers the menu and window states on entering equipment view
+        // and restores the original states when leaving the equipment view.
+
+        static bool viewbarState;
+        if (equipmentDisplayed) {
+            viewbarState = showhideViewbar->isChecked();
+            showhideViewbar->setChecked(false);
+        }
+        else {
+            showhideViewbar->setChecked(viewbarState);
+        }
+        showhideViewbar->setEnabled(!equipmentDisplayed);
+
+        static bool sidebarState;
+        if (equipmentDisplayed) {
+            sidebarState = showhideSidebar->isChecked();
+            showhideSidebar->setChecked(false);
+        }
+        else {
+            showhideSidebar->setChecked(sidebarState);
+        }
+        showhideSidebar->setEnabled(!equipmentDisplayed);
+
+        static bool lowbarState;
+        if (equipmentDisplayed) {
+            lowbarState = showhideLowbar->isChecked();
+            showhideLowbar->setChecked(false);
+        }
+        else {
+            showhideLowbar->setChecked(lowbarState);
+        }
+        showhideLowbar->setEnabled(!equipmentDisplayed);
+
+        static bool toolbarState;
+        if (equipmentDisplayed) {
+            toolbarState = showhideToolbar->isChecked();
+            showhideToolbar->setChecked(false);
+            head->hide();
+        }
+        else {
+            showhideToolbar->setEnabled(true);
+            showhideToolbar->setChecked(toolbarState);
+            if (toolbarState) head->show(); else head->hide();
+        }
+        showhideToolbar->setEnabled(!equipmentDisplayed);
+
+        static bool athleteTabbarState;
+        if (equipmentDisplayed) {
+            athleteTabbarState = showhideTabbar->isChecked();
+            showhideTabbar->setChecked(true);
+            tabbar->show();
+        }
+        else {
+            showhideTabbar->setChecked(athleteTabbarState);
+            if (athleteTabbarState) tabbar->show(); else tabbar->hide();
+        }
+        showhideTabbar->setEnabled(!equipmentDisplayed);
+
+        impPerspective->setEnabled(!equipmentDisplayed);
+        expPerspective->setEnabled(!equipmentDisplayed);
+
+        resetCharts->setEnabled(!equipmentDisplayed);
+        styleAction->setEnabled(!equipmentDisplayed);
+    }
+}
 
 bool
 MainWindow::isStarting
