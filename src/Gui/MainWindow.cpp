@@ -679,7 +679,6 @@ MainWindow::MainWindow(const QDir &home)
     viewMenu->addAction(tr("Download Chart..."), this, SLOT(addChartFromCloudDB()));
     viewMenu->addSeparator();
 #endif
-    viewMenu->addAction(tr("Reset Layout"), this, SLOT(resetWindowLayout()));
     resetCharts = viewMenu->addAction(tr("Reset Layout"), this, SLOT(resetWindowLayout()));
     styleAction = viewMenu->addAction(tr("Tabbed not Tiled"), this, SLOT(toggleStyle()));
     styleAction->setCheckable(true);
