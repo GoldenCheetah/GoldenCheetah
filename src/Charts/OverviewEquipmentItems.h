@@ -59,17 +59,18 @@ class OverviewEquipmentItemConfig : public OverviewItemConfig
 
         static bool registerItems();
 
-    public slots:
+        // set the config widgets to reflect current config
+        virtual void setWidgets() override;
+
+    protected slots:
 
         // retrieve values when user edits them (if they're valid)
         virtual void dataChanged() override;
 
-        // set the config widgets to reflect current config
-        virtual void setWidgets() override;
-
         void addEqLinkRow();
         void removeEqLinkRow();
         void tableCellClicked(int row, int column);
+        void repDateSetClicked();
 
     protected:
 
@@ -84,6 +85,8 @@ class OverviewEquipmentItemConfig : public OverviewItemConfig
         QLineEdit *eqLinkName;
         QLineEdit *nonGCDistance, *nonGCElevation;
         QLineEdit *replaceDistance, *replaceElevation;
+        QPushButton* replaceDateSet;
+        QDateEdit* replaceDate;
         QPushButton *addEqLink, * removeEqLink;
         QCheckBox *eqCheckBox;
         QPlainTextEdit *notes;
@@ -130,7 +133,7 @@ class EquipmentItem : public CommonEquipmentItem
         EquipmentItem(ChartSpace *parent, const QString& name, QVector<EqTimeWindow>& eqLinkUse,
                         const uint64_t nonGCDistanceScaled, const uint64_t nonGCElevationScaled,
                         const uint64_t repDistanceScaled, const uint64_t repElevationScaled,
-                        const QString& notes);
+                        const bool repDateSet, const QDate& repDate, const QString& notes);
         virtual ~EquipmentItem() {}
 
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override;
@@ -161,6 +164,8 @@ class EquipmentItem : public CommonEquipmentItem
             return new EquipmentItem(parent, tr("Equipment Item")); }
 
         QVector<EqTimeWindow> eqLinkUse_;
+        bool repDateSet_;
+        QDate repDate_;
         uint64_t repDistanceScaled_, repElevationScaled_;
         QString notes_;
 

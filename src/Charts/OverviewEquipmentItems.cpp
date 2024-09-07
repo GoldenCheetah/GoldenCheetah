@@ -142,6 +142,21 @@ OverviewEquipmentItemConfig::OverviewEquipmentItemConfig(ChartSpaceItem* item) :
         connect(replaceElevation, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
         layout->insertRow(insertRow++, tr("Replacement elev"), replaceElevation);
 
+        QHBoxLayout *replaceLayout = new QHBoxLayout();
+        replaceDateSet = new QPushButton();
+        replaceDateSet->setMaximumWidth(60 * dpiXFactor);
+        connect(replaceDateSet, SIGNAL(clicked()), this, SLOT(repDateSetClicked()));
+        replaceDate = new QDateEdit();
+        replaceDate->setCalendarPopup(true);
+        replaceDate->setStyleSheet(QString("QDateEdit { border: 0px; } "));
+        QSizePolicy sp_retain = replaceDate->sizePolicy();
+        sp_retain.setRetainSizeWhenHidden(true);
+        replaceDate->setSizePolicy(sp_retain);
+        connect(replaceDate, SIGNAL(dateChanged(QDate)), this, SLOT(dataChanged()));
+        replaceLayout->addWidget(replaceDateSet);
+        replaceLayout->addWidget(replaceDate);
+        layout->insertRow(insertRow++, tr("Replacement date"), replaceLayout);
+
         notes = new QPlainTextEdit();
         connect(notes, SIGNAL(textChanged()), this, SLOT(dataChanged()));
         layout->insertRow(insertRow++, tr("Notes"), notes);
@@ -184,6 +199,9 @@ OverviewEquipmentItemConfig::setWidgets()
         nonGCElevation->setText(QString::number(mi->getNonGCElevationScaled() * EQ_SCALED_TO_REAL, 'f', 1));
         replaceDistance->setText(QString::number(mi->repDistanceScaled_ * EQ_SCALED_TO_REAL, 'f', 1));
         replaceElevation->setText(QString::number(mi->repElevationScaled_ * EQ_SCALED_TO_REAL, 'f', 1));
+        replaceDateSet->setText((mi->repDateSet_) ? "set" : "unset");
+        replaceDate->setVisible(mi->repDateSet_);
+        if (mi->repDateSet_) replaceDate->setDate(mi->repDate_);
 
         // clear the table
         eqTimeWindows->setRowCount(0);
@@ -205,7 +223,6 @@ OverviewEquipmentItemConfig::setWidgets()
             if (eqUse.endSet_) {
                 static_cast<QDateEdit*>(eqTimeWindows->cellWidget(tableRow, 4))->setDate(eqUse.endDate_);
             }
-            
         }
         notes->setPlainText(mi->notes_);
     }
@@ -230,6 +247,22 @@ OverviewEquipmentItemConfig::setWidgets()
     break;
     }
     block = false;
+}
+
+void
+OverviewEquipmentItemConfig::repDateSetClicked()
+{
+    if (replaceDateSet->text() == "set") {
+
+        replaceDateSet->setText("unset");
+        replaceDate->setVisible(false);
+    }
+    else
+    {
+        replaceDateSet->setText("set");
+        replaceDate->setVisible(true);
+    }
+    dataChanged();
 }
 
 void
@@ -285,7 +318,7 @@ OverviewEquipmentItemConfig::setEqLinkRowWidgets(int tableRow, const EqTimeWindo
     connect(eqLink, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
     eqTimeWindows->setCellWidget(tableRow, 0, eqLink);
 
-    QLabel* startSet = new QLabel();
+    QLabel *startSet = new QLabel();
     startSet->setAlignment(Qt::AlignHCenter);
     startSet->setText((eqUse && eqUse->startSet_) ? "set" : "unset");
     eqTimeWindows->setCellWidget(tableRow, 1, startSet);
@@ -298,7 +331,7 @@ OverviewEquipmentItemConfig::setEqLinkRowWidgets(int tableRow, const EqTimeWindo
         eqTimeWindows->setCellWidget(tableRow, 2, startDate);
     }
 
-    QLabel* endSet = new QLabel();
+    QLabel *endSet = new QLabel();
     endSet->setAlignment(Qt::AlignHCenter);
     endSet->setText((eqUse && eqUse->endSet_) ? "set" : "unset");
     eqTimeWindows->setCellWidget(tableRow, 3, endSet);
@@ -375,6 +408,10 @@ OverviewEquipmentItemConfig::dataChanged()
 
         mi->repDistanceScaled_ = round(replaceDistance->text().toDouble() * EQ_REAL_TO_SCALED); // validator restricts 1 dp
         mi->repElevationScaled_ = round(replaceElevation->text().toDouble() * EQ_REAL_TO_SCALED); // validator restricts 1 dp
+
+        mi->repDateSet_ = replaceDateSet->text() == "set";
+        if (mi->repDateSet_) mi->repDate_ = replaceDate->date();
+
         mi->notes_ = notes->toPlainText();
         mi->bgcolor = bgcolor->getColor().name();
     }
@@ -528,6 +565,7 @@ EquipmentItem::EquipmentItem(ChartSpace* parent, const QString& name) : CommonEq
     totalElevationScaled_ = 0;
     repDistanceScaled_ = 0;
     repElevationScaled_ = 0;
+    repDateSet_ = false;
 
     configwidget_ = new OverviewEquipmentItemConfig(this);
     configwidget_->hide();
@@ -538,13 +576,15 @@ EquipmentItem::EquipmentItem(ChartSpace* parent, const QString& name) : CommonEq
 EquipmentItem::EquipmentItem(ChartSpace* parent, const QString& name, QVector<EqTimeWindow>& eqLinkUse,
                             const uint64_t nonGCDistanceScaled, const uint64_t nonGCElevationScaled,
                             const uint64_t repDistanceScaled, const uint64_t repElevationScaled,
-                            const QString& notes) : EquipmentItem(parent, name)
+                            const bool repDateSet, const QDate& repDate, const QString& notes) : EquipmentItem(parent, name)
 {
     eqLinkUse_ = eqLinkUse;
     nonGCDistanceScaled_ = nonGCDistanceScaled;
     nonGCElevationScaled_ = nonGCElevationScaled;
     repDistanceScaled_ = repDistanceScaled;
     repElevationScaled_ = repElevationScaled;
+    repDateSet_ = repDateSet;
+    repDate_ = repDate;
     notes_ = notes;
 
     // set the widgets again for the passed in parameters
@@ -727,6 +767,7 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
 
     bool overDistance = (repDistanceScaled_ !=0) && (getTotalDistanceScaled() > repDistanceScaled_);
     bool overElevation = (repElevationScaled_ !=0) && (getTotalElevationScaled() > repElevationScaled_);
+    bool overDate = (repDateSet_) && (QDate::currentDate() > repDate_);
 
     // we align centre and mid
     QFontMetrics fm(parent->bigfont);
@@ -734,7 +775,7 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
     QRectF rect = QFontMetrics(parent->bigfont, parent->device()).boundingRect(totalDistanceStr);
     painter->setFont(parent->bigfont);
 
-    if ((!rangeIsValid()) || overDistance || overElevation) {
+    if ((!rangeIsValid()) || overDistance || overElevation || overDate) {
         painter->setPen(alertColor);
     } else if (isWithin(QDate::currentDate())) {
         painter->setPen(GColor(CPLOTMARKER));
@@ -855,6 +896,18 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
             QString(tr("Replace elev: ")) + QString::number(repElevationScaled_ * EQ_SCALED_TO_REAL, 'f', 1) + elevUnits);
 
         if (overElevation) painter->setPen(textColor);
+    }
+
+    if (repDateSet_) {
+
+        if (overDate) painter->setPen(alertColor);
+
+        rowY += ROWHEIGHT;
+        addNotesOffset = true;
+        painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
+            QString(tr("Replace date: ")) + repDate_.toString("->d MMM yy"));
+
+        if (overDate) painter->setPen(textColor);
     }
 
     if (!notes_.isEmpty()) {

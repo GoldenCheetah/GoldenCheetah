@@ -70,7 +70,7 @@ OverviewEquipmentWindow::cloneTile(ChartSpaceItem* item)
         EquipmentItem* clonedItem = new EquipmentItem(meta->parent, meta->name + " clone", meta->eqLinkUse_,
             meta->getNonGCDistanceScaled(), meta->getNonGCElevationScaled(),
             meta->repDistanceScaled_, meta->repElevationScaled_,
-            meta->notes_);
+            meta->repDateSet_, meta->repDate_, meta->notes_);
 
         space->addItem(meta->order, meta->column, meta->span, meta->deep, clonedItem);
 
@@ -172,6 +172,9 @@ OverviewEquipmentWindow::getExtraConfiguration(ChartSpaceItem* item, QString& co
         config += "\"nonGCElevationScaled\":\"" + QString("%1").arg(meta->getNonGCElevationScaled()) + "\",";
         config += "\"repDistance\":\"" + QString("%1").arg(meta->repDistanceScaled_) + "\",";
         config += "\"repElevation\":\"" + QString("%1").arg(meta->repElevationScaled_) + "\",";
+        QString repDateSetStr = meta->repDateSet_ ? "1" : "0";
+        config += "\"repDateSet\":\"" + repDateSetStr + "\",";
+        config += "\"repDate\":\"" + meta->repDate_.toString() + "\",";
 
         QJsonArray EqLinkUses;
         QJsonDocument eqDoc;
@@ -225,6 +228,9 @@ OverviewEquipmentWindow::setExtraConfiguration(QJsonObject& obj, int type, Chart
         uint64_t nonGCElevationScaled = obj["nonGCElevationScaled"].toString().toULongLong();
         uint64_t repDistance = obj["repDistance"].toString().toULongLong();
         uint64_t repElevation = obj["repElevation"].toString().toULongLong();
+        bool repDateSet = (obj["repDateSet"].toString() == "1") ? true : false;
+        QDate repDate;
+        if (repDateSet) repDate = QDate::fromString(obj["repDate"].toString());
 
         // Due to lazy loading of perspectives, saved distances might need converting 
         // as the units might have changed before the equipment perspective is loaded.
@@ -286,7 +292,7 @@ OverviewEquipmentWindow::setExtraConfiguration(QJsonObject& obj, int type, Chart
         QString notes = Utils::jsonunprotect(obj["notes"].toString());
 
         add = new EquipmentItem(space, name, eqLinkUse, nonGCDistanceScaled, nonGCElevationScaled,
-                                repDistance, repElevation, notes);
+                                repDistance, repElevation, repDateSet, repDate, notes);
         add->datafilter = datafilter;
         space->addItem(order, column, span, deep, add);
     }
