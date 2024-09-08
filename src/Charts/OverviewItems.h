@@ -51,7 +51,7 @@ class ColorButton;
 // types we use start from 100 to avoid clashing with main chart types
 enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE, KPI,
                         TOPN, DONUT, ACTIVITIES, ATHLETE, DATATABLE, USERCHART,
-                        EQ_ITEM, EQ_SUMMARY, EQ_HISTORY, EQ_NOTES };
+                        EQ_ITEM, EQ_SUMMARY, EQ_NOTES, EQ_HISTORY };
 
 //
 // Configuration widget for ALL Overview Items
