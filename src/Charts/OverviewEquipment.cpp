@@ -67,7 +67,7 @@ OverviewEquipmentWindow::cloneTile(ChartSpaceItem* item)
         EquipmentItem* meta = reinterpret_cast<EquipmentItem*>(item);
 
         // clone the equipment item
-        EquipmentItem* clonedItem = new EquipmentItem(meta->parent, meta->name + " clone", meta->eqLinkUse_,
+        EquipmentItem* clonedItem = new EquipmentItem(meta->parent, meta->name + " clone", meta->eqLinkUseList_,
             meta->getNonGCDistanceScaled(), meta->getNonGCElevationScaled(),
             meta->repDistanceScaled_, meta->repElevationScaled_,
             meta->repDateSet_, meta->repDate_, meta->notes_);
@@ -97,6 +97,21 @@ OverviewEquipmentWindow::cloneTile(ChartSpaceItem* item)
         space->updateView();
 
         eqCalc_->recalculateEquipTile(clonedItem);
+    }
+    break;
+
+    case OverviewItemType::EQ_HISTORY:
+    {
+        EquipmentHistory* meta = reinterpret_cast<EquipmentHistory*>(item);
+
+        // clone the equipment summary item
+        EquipmentHistory* clonedItem = new EquipmentHistory(meta->parent, meta->name + " clone");
+
+        space->addItem(meta->order, meta->column, meta->span, meta->deep, clonedItem);
+
+        // update geometry
+        space->updateGeometry();
+        space->updateView();
     }
     break;
 
@@ -178,8 +193,7 @@ OverviewEquipmentWindow::getExtraConfiguration(ChartSpaceItem* item, QString& co
 
         QJsonArray EqLinkUses;
         QJsonDocument eqDoc;
-
-        for (const auto& eqUse : meta->eqLinkUse_) {
+        for (const auto& eqUse : meta->eqLinkUseList_) {
 
             QJsonObject EqLinkUse;
             EqLinkUse["eqLink"] = eqUse.eqLinkName_;
@@ -202,6 +216,28 @@ OverviewEquipmentWindow::getExtraConfiguration(ChartSpaceItem* item, QString& co
         EquipmentSummary* meta = reinterpret_cast<EquipmentSummary*>(item);
         config += "\"eqLink\":\"" + meta->eqLinkName_ + "\",";
         config += "\"showAthleteActivities\":\"" + QString("%1").arg(meta->showActivitiesPerAthlete_ ? "1" : "0") + "\",";
+    }
+    break;
+
+    case OverviewItemType::EQ_HISTORY:
+    {
+        EquipmentHistory* meta = reinterpret_cast<EquipmentHistory*>(item);
+
+        config += "\"sortMostRecentFirst\":\"" + QString("%1").arg(meta->sortMostRecentFirst_ ? "1" : "0") + "\",";
+
+        QJsonArray EquipHistory;
+        QJsonDocument historyDoc;
+        for (const auto& eqHistory : meta->eqHistoryList_) {
+
+            QJsonObject historyRow;
+            historyRow["historyDate"] = eqHistory.date_.toString();
+            historyRow["historyText"] = eqHistory.text_;
+
+            EquipHistory.push_back(historyRow);
+        }
+
+        historyDoc.setArray(EquipHistory);
+        config += "\"historyList\":" + historyDoc.toJson(QJsonDocument::Compact) + ",";
     }
     break;
 
@@ -303,6 +339,31 @@ OverviewEquipmentWindow::setExtraConfiguration(QJsonObject& obj, int type, Chart
         QString eqLinkName = obj["eqLink"].toString();
         bool showActivitiesPerAthlete = (obj["showAthleteActivities"].toString() == "1") ? true : false;
         add = new EquipmentSummary(space, name, eqLinkName, showActivitiesPerAthlete);
+        add->datafilter = datafilter;
+        space->addItem(order, column, span, deep, add);
+    }
+    break;
+
+    case OverviewItemType::EQ_HISTORY:
+    {
+        bool sortMostRecentFirst = (obj["sortMostRecentFirst"].toString() == "1") ? true : false;
+
+        QVector<EqHistoryEntry> eqHistory;
+
+        // parse in the new EqTimeWindow format
+        QJsonArray jsonArray = obj["historyList"].toArray();
+
+        foreach(const QJsonValue & value, jsonArray) {
+
+            QJsonObject objVals = value.toObject();
+
+            QDate historyDate = QDate::fromString(objVals["historyDate"].toString());
+            QString historyText = objVals["historyText"].toString();
+
+            eqHistory.push_back(EqHistoryEntry(historyDate, historyText));
+        }
+
+        add = new EquipmentHistory(space, name, eqHistory, sortMostRecentFirst);
         add->datafilter = datafilter;
         space->addItem(order, column, span, deep, add);
     }

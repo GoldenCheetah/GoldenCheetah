@@ -43,6 +43,7 @@ public:
 
     bool isWithin(const QDate& actDate) const;
     bool rangeIsValid() const;
+    int displayImportance() const;
 };
 
 //
@@ -69,6 +70,8 @@ class OverviewEquipmentItemConfig : public OverviewItemConfig
 
         void addEqLinkRow();
         void removeEqLinkRow();
+        void addHistoryRow();
+        void removeHistoryRow();
         void tableCellClicked(int row, int column);
         void repDateSetClicked();
 
@@ -80,6 +83,7 @@ class OverviewEquipmentItemConfig : public OverviewItemConfig
     private:
 
         void setEqLinkRowWidgets(int tableRow, const EqTimeWindow* eqUse);
+        void setEqHistoryEntryRowWidgets(int tableRow);
 
         // Equipment items
         QLineEdit *eqLinkName;
@@ -87,7 +91,6 @@ class OverviewEquipmentItemConfig : public OverviewItemConfig
         QLineEdit *replaceDistance, *replaceElevation;
         QPushButton* replaceDateSet;
         QDateEdit* replaceDate;
-        QPushButton *addEqLink, * removeEqLink;
         QCheckBox *eqCheckBox;
         QPlainTextEdit *notes;
         QTableWidget *eqTimeWindows;
@@ -159,11 +162,13 @@ class EquipmentItem : public CommonEquipmentItem
         uint64_t getGCElevationScaled() const { return gcElevationScaled_; }
         uint64_t getTotalElevationScaled() const { return totalElevationScaled_; }
 
+        void sortEquipmentWindows();
+
         // create and config
         static ChartSpaceItem* create(ChartSpace* parent) {
             return new EquipmentItem(parent, tr("Equipment Item")); }
 
-        QVector<EqTimeWindow> eqLinkUse_;
+        QVector<EqTimeWindow> eqLinkUseList_;
         bool repDateSet_;
         QDate repDate_;
         uint64_t repDistanceScaled_, repElevationScaled_;
@@ -218,6 +223,44 @@ class EquipmentSummary : public CommonEquipmentItem
         QMutex activityMutex_;
         QDate eqLinkEarliestDate_, eqLinkLatestDate_;
         QMap<QString, uint32_t> athleteActivityMap_;
+};
+
+class EqHistoryEntry
+{
+public:
+    EqHistoryEntry();
+    EqHistoryEntry(const QDate& date, const QString& text);
+
+    QDate date_;
+    QString text_;
+};
+
+class EquipmentHistory : public CommonEquipmentItem
+{
+    Q_OBJECT
+
+    public:
+
+        EquipmentHistory(ChartSpace* parent, const QString& name);
+        EquipmentHistory(ChartSpace* parent, const QString& name, const QVector<EqHistoryEntry>& eqHistory, const bool sortMostRecentFirst);
+        virtual ~EquipmentHistory() {}
+
+        void itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) override;
+        void configChanged(qint32) override;
+
+        void sortHistoryEntries();
+
+        // create and config
+        static ChartSpaceItem* create(ChartSpace* parent) {
+            return new EquipmentHistory(parent, tr("History"));
+        }
+
+        bool sortMostRecentFirst_;
+        QVector<EqHistoryEntry> eqHistoryList_;
+
+    private:
+
+        QColor textColor;
 };
 
 class EquipmentNotes : public CommonEquipmentItem

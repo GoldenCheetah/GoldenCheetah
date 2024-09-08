@@ -33,6 +33,7 @@ OverviewEquipmentItemConfig::registerItems()
     // Register      TYPE                           SHORT                           DESCRIPTION                         SCOPE                        CREATOR
     registry.addItem(OverviewItemType::EQ_ITEM,     QObject::tr("Equipment"),       QObject::tr("Equipment Item"),      OverviewScope::EQUIPMENT,    EquipmentItem::create);
     registry.addItem(OverviewItemType::EQ_SUMMARY,  QObject::tr("Eq Link Summary"), QObject::tr("Equipment Summary"),   OverviewScope::EQUIPMENT,    EquipmentSummary::create);
+    registry.addItem(OverviewItemType::EQ_HISTORY,  QObject::tr("Eq Link History"), QObject::tr("Equipment History"),   OverviewScope::EQUIPMENT,    EquipmentHistory::create);
     registry.addItem(OverviewItemType::EQ_NOTES,    QObject::tr("Eq Link Notes"),   QObject::tr("Equipment Notes"),     OverviewScope::EQUIPMENT,    EquipmentNotes::create);
 
     return true;
@@ -74,6 +75,43 @@ bool
 EqTimeWindow::rangeIsValid() const
 {
     return (startSet_ && endSet_) ? endDate_ >= startDate_ : true;
+}
+
+int
+EqTimeWindow::displayImportance() const
+{
+   if (!rangeIsValid()) return 9;
+
+   int importance = 0;
+
+   if (isWithin(QDate::currentDate())) {
+
+       if (!startSet_)
+           if (!endSet_)
+               importance = 8; // no range set
+           else
+               importance = 6; // end set but not beginning !
+       else
+           if (!endSet_)
+               importance = 7; // start but no end
+           else
+               importance = 5; // start & end set
+   }
+   else
+   {
+       if (!startSet_)
+           if (!endSet_)
+               importance = 4; // no range set
+           else
+               importance = 2; // end set but not beginning !
+       else
+           if (!endSet_)
+               importance = 3; // start but no end
+           else
+               importance = 1; // start & end set
+   }
+
+    return importance;
 }
 
 //
@@ -124,8 +162,8 @@ OverviewEquipmentItemConfig::OverviewEquipmentItemConfig(ChartSpaceItem* item) :
         layout->insertRow(insertRow++, "EqLink History", eqTimeWindows);
 
         QHBoxLayout* buttonRow = new QHBoxLayout();
-        addEqLink = new QPushButton("Add EqLink");
-        removeEqLink = new QPushButton("Remove EqLink");
+        QPushButton *addEqLink = new QPushButton("Add EqLink");
+        QPushButton *removeEqLink = new QPushButton("Remove EqLink");
         buttonRow->addWidget(addEqLink);
         connect(addEqLink, SIGNAL(clicked(bool)), this, SLOT(addEqLinkRow()));
         buttonRow->addWidget(removeEqLink);
@@ -173,6 +211,39 @@ OverviewEquipmentItemConfig::OverviewEquipmentItemConfig(ChartSpaceItem* item) :
         layout->insertRow(insertRow++, tr("Show Athlete's Activities"), eqCheckBox);
     }
 
+    if (item->type == OverviewItemType::EQ_HISTORY) {
+
+        eqCheckBox = new QCheckBox();
+        connect(eqCheckBox, SIGNAL(stateChanged(int)), this, SLOT(dataChanged()));
+        layout->insertRow(insertRow++, tr("Most Recent First"), eqCheckBox);
+
+        eqTimeWindows = new QTableWidget(0, 2);
+        QStringList headers = (QStringList() << tr("Date") << tr("Description"));
+        eqTimeWindows->setHorizontalHeaderLabels(headers);
+        eqTimeWindows->setColumnWidth(0, 90 * dpiXFactor);
+        eqTimeWindows->setColumnWidth(1, 410 * dpiXFactor);
+        eqTimeWindows->setMinimumWidth(400 * dpiXFactor);
+        eqTimeWindows->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+        eqTimeWindows->setSelectionBehavior(QAbstractItemView::SelectRows);
+        eqTimeWindows->setSelectionMode(QAbstractItemView::SingleSelection);
+        QPalette palette = eqTimeWindows->palette();
+        palette.setBrush(QPalette::Highlight, palette.brush(QPalette::Base));
+        palette.setBrush(QPalette::HighlightedText, palette.brush(QPalette::Text));
+        eqTimeWindows->setPalette(palette);
+        eqTimeWindows->verticalHeader()->setVisible(false);
+        connect(eqTimeWindows, SIGNAL(cellClicked(int, int)), this, SLOT(dataChanged()));
+        layout->insertRow(insertRow++, "History", eqTimeWindows);
+
+        QHBoxLayout* buttonRow = new QHBoxLayout();
+        QPushButton *addHistory = new QPushButton("Add History");
+        QPushButton *removeHistory = new QPushButton("Remove History");
+        buttonRow->addWidget(addHistory);
+        connect(addHistory, SIGNAL(clicked(bool)), this, SLOT(addHistoryRow()));
+        buttonRow->addWidget(removeHistory);
+        connect(removeHistory, SIGNAL(clicked(bool)), this, SLOT(removeHistoryRow()));
+        layout->insertRow(insertRow++, "", buttonRow);
+    }
+
     if (item->type == OverviewItemType::EQ_NOTES) {
 
         notes = new QPlainTextEdit();
@@ -193,7 +264,7 @@ OverviewEquipmentItemConfig::setWidgets()
 
     case OverviewItemType::EQ_ITEM:
     {
-        EquipmentItem* mi = dynamic_cast<EquipmentItem*>(item);
+        EquipmentItem *mi = dynamic_cast<EquipmentItem*>(item);
         name->setText(mi->name);
         nonGCDistance->setText(QString::number(mi->getNonGCDistanceScaled() * EQ_SCALED_TO_REAL, 'f', 1));
         nonGCElevation->setText(QString::number(mi->getNonGCElevationScaled() * EQ_SCALED_TO_REAL, 'f', 1));
@@ -206,10 +277,10 @@ OverviewEquipmentItemConfig::setWidgets()
         // clear the table
         eqTimeWindows->setRowCount(0);
 
-        for (int tableRow = 0; tableRow < mi->eqLinkUse_.size(); tableRow++) {
+        for (int tableRow = 0; tableRow < mi->eqLinkUseList_.size(); tableRow++) {
 
             eqTimeWindows->insertRow(tableRow);
-            const EqTimeWindow& eqUse = mi->eqLinkUse_[tableRow];
+            const EqTimeWindow& eqUse = mi->eqLinkUseList_[tableRow];
             setEqLinkRowWidgets(tableRow, &eqUse);
 
             static_cast<QLineEdit*>(eqTimeWindows->cellWidget(tableRow, 0))->setText(eqUse.eqLinkName_);
@@ -230,17 +301,38 @@ OverviewEquipmentItemConfig::setWidgets()
 
     case OverviewItemType::EQ_SUMMARY:
     {
-        EquipmentSummary* mi = dynamic_cast<EquipmentSummary*>(item);
+        EquipmentSummary *mi = dynamic_cast<EquipmentSummary*>(item);
         name->setText(mi->name);
         eqLinkName->setText(mi->eqLinkName_);
         eqCheckBox->setChecked(mi->showActivitiesPerAthlete_);
+    }
+    break;
 
+    case OverviewItemType::EQ_HISTORY:
+    {
+        EquipmentHistory *mi = dynamic_cast<EquipmentHistory*>(item);
+        name->setText(mi->name);
+        eqCheckBox->setChecked(mi->sortMostRecentFirst_);
+
+        // clear the table
+        eqTimeWindows->setRowCount(0);
+
+        int tableRow = 0;
+        for (const auto& eqHistory : mi->eqHistoryList_) {
+
+            eqTimeWindows->insertRow(tableRow);
+            setEqHistoryEntryRowWidgets(tableRow);
+
+            static_cast<QDateEdit*>(eqTimeWindows->cellWidget(tableRow, 0))->setDate(eqHistory.date_);
+            static_cast<QLineEdit*>(eqTimeWindows->cellWidget(tableRow, 1))->setText(eqHistory.text_);
+            tableRow++;
+        }
     }
     break;
 
     case OverviewItemType::EQ_NOTES:
     {
-        EquipmentNotes* mi = dynamic_cast<EquipmentNotes*>(item);
+        EquipmentNotes *mi = dynamic_cast<EquipmentNotes*>(item);
         name->setText(mi->name);
         notes->setPlainText(mi->notes_);
     }
@@ -313,7 +405,7 @@ OverviewEquipmentItemConfig::tableCellClicked(int row, int column)
 void
 OverviewEquipmentItemConfig::setEqLinkRowWidgets(int tableRow, const EqTimeWindow* eqUse)
 {
-    QLineEdit* eqLink = new QLineEdit();
+    QLineEdit *eqLink = new QLineEdit();
     eqLink->setFrame(false);
     connect(eqLink, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
     eqTimeWindows->setCellWidget(tableRow, 0, eqLink);
@@ -355,10 +447,46 @@ OverviewEquipmentItemConfig::addEqLinkRow()
     setEqLinkRowWidgets(tableRow, nullptr);
 
     block = false;
+    dataChanged();
 }
 
 void
 OverviewEquipmentItemConfig::removeEqLinkRow()
+{
+    eqTimeWindows->removeRow(eqTimeWindows->currentRow());
+    dataChanged();
+}
+
+void
+OverviewEquipmentItemConfig::setEqHistoryEntryRowWidgets(int tableRow)
+{
+    QDateEdit* historyDate = new QDateEdit();
+    historyDate->setCalendarPopup(true);
+    historyDate->setStyleSheet(QString("QDateEdit { border: 0px; } "));
+    connect(historyDate, SIGNAL(dateChanged(QDate)), this, SLOT(dataChanged()));
+    eqTimeWindows->setCellWidget(tableRow, 0, historyDate);
+
+    QLineEdit* historyText = new QLineEdit();
+    historyText->setFrame(false);
+    connect(historyText, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
+    eqTimeWindows->setCellWidget(tableRow, 1, historyText);
+}
+
+void
+OverviewEquipmentItemConfig::addHistoryRow()
+{
+    block = true;
+
+    int tableRow = eqTimeWindows->rowCount();
+    eqTimeWindows->insertRow(tableRow);
+    setEqHistoryEntryRowWidgets(tableRow);
+
+    block = false;
+    dataChanged();
+}
+
+void
+OverviewEquipmentItemConfig::removeHistoryRow()
 {
     eqTimeWindows->removeRow(eqTimeWindows->currentRow());
     dataChanged();
@@ -404,7 +532,8 @@ OverviewEquipmentItemConfig::dataChanged()
                 eqLinkUse.push_back(EqTimeWindow(eqLinkName, startSet, startDate, endSet, endDate));
             }
         }
-        mi->eqLinkUse_ = eqLinkUse;
+        mi->eqLinkUseList_ = eqLinkUse;
+        mi->sortEquipmentWindows();
 
         mi->repDistanceScaled_ = round(replaceDistance->text().toDouble() * EQ_REAL_TO_SCALED); // validator restricts 1 dp
         mi->repElevationScaled_ = round(replaceElevation->text().toDouble() * EQ_REAL_TO_SCALED); // validator restricts 1 dp
@@ -427,6 +556,25 @@ OverviewEquipmentItemConfig::dataChanged()
     }
     break;
 
+    case OverviewItemType::EQ_HISTORY:
+    {
+        EquipmentHistory* mi = dynamic_cast<EquipmentHistory*>(item);
+        mi->name = name->text();
+        mi->sortMostRecentFirst_ = eqCheckBox->isChecked();
+
+        QVector<EqHistoryEntry> eqHistory;
+        for (int tableRow = 0; tableRow < eqTimeWindows->rowCount(); tableRow++) {
+
+            eqHistory.push_back(EqHistoryEntry(static_cast<QDateEdit*>(eqTimeWindows->cellWidget(tableRow, 0))->date(),
+                                          static_cast<QLineEdit*>(eqTimeWindows->cellWidget(tableRow, 1))->text()));
+        }
+        mi->eqHistoryList_ = eqHistory;
+        mi->sortHistoryEntries();
+
+        mi->bgcolor = bgcolor->getColor().name();
+    }
+    break;
+
     case OverviewItemType::EQ_NOTES:
     {
         EquipmentNotes* mi = dynamic_cast<EquipmentNotes*>(item);
@@ -439,7 +587,7 @@ OverviewEquipmentItemConfig::dataChanged()
 }
 
 //
-// ------------------------------------- Equipment Abstract Item -----------------------------------------
+// ------------------------------------- Common Equipment Item -----------------------------------------
 //
 
 CommonEquipmentItem::CommonEquipmentItem(ChartSpace* parent, const QString& name) :
@@ -578,7 +726,9 @@ EquipmentItem::EquipmentItem(ChartSpace* parent, const QString& name, QVector<Eq
                             const uint64_t repDistanceScaled, const uint64_t repElevationScaled,
                             const bool repDateSet, const QDate& repDate, const QString& notes) : EquipmentItem(parent, name)
 {
-    eqLinkUse_ = eqLinkUse;
+    eqLinkUseList_ = eqLinkUse;
+    sortEquipmentWindows();
+
     nonGCDistanceScaled_ = nonGCDistanceScaled;
     nonGCElevationScaled_ = nonGCElevationScaled;
     repDistanceScaled_ = repDistanceScaled;
@@ -591,38 +741,6 @@ EquipmentItem::EquipmentItem(ChartSpace* parent, const QString& name, QVector<Eq
     configwidget_->setWidgets();
 }
 
-EquipmentSummary::EquipmentSummary(ChartSpace* parent, const QString& name,
-                                   const QString& eqLinkName, bool showActivitiesPerAthlete) :
-                                   CommonEquipmentItem(parent, name)
-{
-    // equipment summary item
-    this->type = OverviewItemType::EQ_SUMMARY;
-    eqLinkName_ = eqLinkName;
-    showActivitiesPerAthlete_ = showActivitiesPerAthlete;
-    eqLinkTotalTimeInSecs_ = 0;
-    eqLinkTotalDistanceScaled_ = 0;
-    eqLinkTotalElevationScaled_ = 0;
-    eqLinkNumActivities_ = 0;
-
-    configwidget_ = new OverviewEquipmentItemConfig(this);
-    configwidget_->hide();
-
-    configChanged(CONFIG_APPEARANCE);
-}
-
-EquipmentNotes::EquipmentNotes(ChartSpace* parent, const QString& name, const QString& notes) :
-                               CommonEquipmentItem(parent, name)
-{
-    // equipment summary item
-    this->type = OverviewItemType::EQ_NOTES;
-    notes_ = notes;
-  
-    configwidget_ = new OverviewEquipmentItemConfig(this);
-    configwidget_->hide();
-
-    configChanged(CONFIG_APPEARANCE);
-}
-
 void
 EquipmentItem::resetEqItem()
 {
@@ -632,6 +750,13 @@ EquipmentItem::resetEqItem()
     totalDistanceScaled_ = nonGCDistanceScaled_;
     gcElevationScaled_ = 0;
     totalElevationScaled_ = nonGCElevationScaled_;
+}
+
+void
+EquipmentItem::sortEquipmentWindows()
+{
+    qSort(eqLinkUseList_.begin(), eqLinkUseList_.end(), [](const EqTimeWindow& a, const EqTimeWindow& b) {
+        return a.displayImportance() > b.displayImportance(); });
 }
 
 void
@@ -675,7 +800,7 @@ EquipmentItem::addActivity(uint64_t rideDistanceScaled, uint64_t rideElevationSc
 bool
 EquipmentItem::isWithin(const QStringList& rideEqLinkNameList, const QDate& actDate) const
 {
-    for (const auto& eqUse : eqLinkUse_) {
+    for (const auto& eqUse : eqLinkUseList_) {
 
         if (rideEqLinkNameList.contains(eqUse.eqLinkName_) && eqUse.isWithin(actDate)) return true;
     }
@@ -685,7 +810,7 @@ EquipmentItem::isWithin(const QStringList& rideEqLinkNameList, const QDate& actD
 bool
 EquipmentItem::isWithin(const QString& rideEqLinkName, const QDate& actDate) const
 {
-    for (const auto& eqUse : eqLinkUse_) {
+    for (const auto& eqUse : eqLinkUseList_) {
 
         if ((eqUse.eqLinkName_ == rideEqLinkName) && eqUse.isWithin(actDate)) return true;
     }
@@ -695,7 +820,7 @@ EquipmentItem::isWithin(const QString& rideEqLinkName, const QDate& actDate) con
 bool
 EquipmentItem::isWithin(const QDate& actDate) const
 {
-    for (const auto& eqUse : eqLinkUse_) {
+    for (const auto& eqUse : eqLinkUseList_) {
 
         if (eqUse.isWithin(actDate)) return true;
     }
@@ -706,47 +831,10 @@ bool
 EquipmentItem::rangeIsValid() const
 {
     bool rangeIsValid = true;
-    for (const auto& eqUse : eqLinkUse_) {
+    for (const auto& eqUse : eqLinkUseList_) {
         rangeIsValid &= (eqUse.startSet_ && eqUse.endSet_) ? eqUse.endDate_ >= eqUse.startDate_ : true;
     }
     return rangeIsValid;
-}
-
-void
-EquipmentSummary::resetEqItem()
-{
-    athleteActivityMap_.clear();
-    eqLinkNumActivities_ = 0;
-    eqLinkTotalDistanceScaled_ = 0;
-    eqLinkTotalElevationScaled_ = 0;
-    eqLinkTotalTimeInSecs_ = 0;
-    eqLinkEarliestDate_ = QDate(1900, 01, 01);
-    eqLinkLatestDate_ = eqLinkEarliestDate_;
-}
-
-void
-EquipmentSummary::addActivity(const QString& athleteName, const QDate& activityDate,
-                            const uint64_t rideDistanceScaled, const uint64_t eqElevationScaled,
-                            const uint64_t rideTimeInSecs)
-{
-    activityMutex_.lock();
-
-    athleteActivityMap_[athleteName] += 1;
-
-    if (eqLinkNumActivities_++) {
-        if (activityDate < eqLinkEarliestDate_) eqLinkEarliestDate_ = activityDate;
-        if (activityDate > eqLinkLatestDate_) eqLinkLatestDate_ = activityDate;
-    }
-    else {
-        eqLinkEarliestDate_ = activityDate;
-        eqLinkLatestDate_ = activityDate;
-    }
-
-    activityMutex_.unlock();
-
-    eqLinkTotalDistanceScaled_ += rideDistanceScaled;
-    eqLinkTotalElevationScaled_ += eqElevationScaled;
-    eqLinkTotalTimeInSecs_ += rideTimeInSecs;
 }
 
 void
@@ -800,7 +888,7 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
     double rowWidth(geometry().width() - (ROWHEIGHT * 2));
     double rowHeight(geometry().height() - (ROWHEIGHT * 4));
 
-    for (const auto& eqUse : eqLinkUse_) {
+    for (const auto& eqUse : eqLinkUseList_) {
 
         // display the date in either active, inactive or out of range colours
         if (!eqUse.rangeIsValid()) {
@@ -833,8 +921,10 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
             }
         }
 
+        rect = QFontMetrics(parent->smallfont, parent->device()).boundingRect(dateString);
         painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), dateString);
-        rowY += (ROWHEIGHT);
+
+        rowY += (ROWHEIGHT * ceil(rect.width() / rowWidth));
     }
 
     painter->setPen(textColor);
@@ -920,6 +1010,66 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
     tileDisplayHeight_ = rowY + (ROWHEIGHT * 1.5);
 }
 
+//
+// ---------------------------------------- Equipment Summary --------------------------------------------
+//
+
+EquipmentSummary::EquipmentSummary(ChartSpace* parent, const QString& name,
+    const QString& eqLinkName, bool showActivitiesPerAthlete) :
+    CommonEquipmentItem(parent, name)
+{
+    // equipment summary item
+    this->type = OverviewItemType::EQ_SUMMARY;
+    eqLinkName_ = eqLinkName;
+    showActivitiesPerAthlete_ = showActivitiesPerAthlete;
+    eqLinkTotalTimeInSecs_ = 0;
+    eqLinkTotalDistanceScaled_ = 0;
+    eqLinkTotalElevationScaled_ = 0;
+    eqLinkNumActivities_ = 0;
+
+    configwidget_ = new OverviewEquipmentItemConfig(this);
+    configwidget_->hide();
+
+    configChanged(CONFIG_APPEARANCE);
+}
+
+void
+EquipmentSummary::resetEqItem()
+{
+    athleteActivityMap_.clear();
+    eqLinkNumActivities_ = 0;
+    eqLinkTotalDistanceScaled_ = 0;
+    eqLinkTotalElevationScaled_ = 0;
+    eqLinkTotalTimeInSecs_ = 0;
+    eqLinkEarliestDate_ = QDate(1900, 01, 01);
+    eqLinkLatestDate_ = eqLinkEarliestDate_;
+}
+
+void
+EquipmentSummary::addActivity(const QString& athleteName, const QDate& activityDate,
+    const uint64_t rideDistanceScaled, const uint64_t eqElevationScaled,
+    const uint64_t rideTimeInSecs)
+{
+    activityMutex_.lock();
+
+    athleteActivityMap_[athleteName] += 1;
+
+    if (eqLinkNumActivities_++) {
+        if (activityDate < eqLinkEarliestDate_) eqLinkEarliestDate_ = activityDate;
+        if (activityDate > eqLinkLatestDate_) eqLinkLatestDate_ = activityDate;
+    }
+    else {
+        eqLinkEarliestDate_ = activityDate;
+        eqLinkLatestDate_ = activityDate;
+    }
+
+    activityMutex_.unlock();
+
+    eqLinkTotalDistanceScaled_ += rideDistanceScaled;
+    eqLinkTotalElevationScaled_ += eqElevationScaled;
+    eqLinkTotalTimeInSecs_ += rideTimeInSecs;
+}
+
 void
 EquipmentSummary::configChanged(qint32 cfg) {
 
@@ -983,6 +1133,105 @@ EquipmentSummary::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, 
         QString(tr("Time: ")) + QString::number(eqLinkTotalTimeInSecs_*HOURS_PER_SECOND, 'f', 1) + " hrs");
 
     tileDisplayHeight_ = rowY + (ROWHEIGHT * 1.5);
+}
+
+//
+// ------------------------------------------ EqTimeWindow --------------------------------------------
+//
+
+EqHistoryEntry::EqHistoryEntry()
+{
+}
+
+EqHistoryEntry::EqHistoryEntry(const QDate& date, const QString& text) :
+    date_(date), text_(text)
+{
+}
+
+//
+// ---------------------------------------- Equipment History --------------------------------------------
+//
+
+EquipmentHistory::EquipmentHistory(ChartSpace* parent, const QString& name) :
+    CommonEquipmentItem(parent, name)
+{
+    // equipment summary item
+    this->type = OverviewItemType::EQ_HISTORY;
+
+    sortMostRecentFirst_ = false;
+
+    configwidget_ = new OverviewEquipmentItemConfig(this);
+    configwidget_->hide();
+
+    configChanged(CONFIG_APPEARANCE);
+}
+
+EquipmentHistory::EquipmentHistory(ChartSpace* parent, const QString& name, const QVector<EqHistoryEntry>& eqHistory, const bool sortMostRecentFirst) :
+    EquipmentHistory(parent, name)
+{
+    sortMostRecentFirst_ = sortMostRecentFirst;
+    eqHistoryList_ = eqHistory;
+    sortHistoryEntries();
+}
+
+void
+EquipmentHistory::configChanged(qint32 cfg) {
+
+    if (cfg & CONFIG_APPEARANCE) {
+        textColor = (GCColor::luminance(RGBColor(color())) < 127) ? QColor(QColor(200, 200, 200)) : QColor(QColor(70, 70, 70));
+    }
+}
+
+void
+EquipmentHistory::sortHistoryEntries()
+{
+    if (sortMostRecentFirst_)
+        qSort(eqHistoryList_.begin(), eqHistoryList_.end(), [](const EqHistoryEntry& a, const EqHistoryEntry& b) { return a.date_ > b.date_; });
+    else
+        qSort(eqHistoryList_.begin(), eqHistoryList_.end(), [](const EqHistoryEntry& a, const EqHistoryEntry& b) { return a.date_ < b.date_; });
+}
+
+void
+EquipmentHistory::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) {
+
+    double rowY(ROWHEIGHT * 2.5);
+    double rowWidth(geometry().width() - (ROWHEIGHT * 2));
+    double rowHeight(geometry().height() - (ROWHEIGHT * 4));
+
+    painter->setFont(parent->smallfont);
+    painter->setPen(textColor);
+
+    for (const auto& eqHistory : eqHistoryList_) {
+
+        QString historyEntryStr(eqHistory.date_.toString("dd MMM yyyy") + ": " + eqHistory.text_);
+        QRectF rect = QFontMetrics(parent->smallfont, parent->device()).boundingRect(historyEntryStr);
+
+        painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), historyEntryStr);
+        painter->setPen(GColor(CPLOTMARKER));
+        painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), eqHistory.date_.toString("dd MMM yyyy") + ":");
+        painter->setPen(textColor);
+
+        rowY += (ROWHEIGHT * ceil(rect.width() / rowWidth));
+    }
+
+    tileDisplayHeight_ = rowY + (ROWHEIGHT * 1.5);
+}
+
+//
+// ---------------------------------------- Equipment Notes --------------------------------------------
+//
+
+EquipmentNotes::EquipmentNotes(ChartSpace* parent, const QString& name, const QString& notes) :
+    CommonEquipmentItem(parent, name)
+{
+    // equipment summary item
+    this->type = OverviewItemType::EQ_NOTES;
+    notes_ = notes;
+
+    configwidget_ = new OverviewEquipmentItemConfig(this);
+    configwidget_->hide();
+
+    configChanged(CONFIG_APPEARANCE);
 }
 
 void
