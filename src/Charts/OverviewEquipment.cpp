@@ -105,7 +105,7 @@ OverviewEquipmentWindow::cloneTile(ChartSpaceItem* item)
         EquipmentHistory* meta = reinterpret_cast<EquipmentHistory*>(item);
 
         // clone the equipment summary item
-        EquipmentHistory* clonedItem = new EquipmentHistory(meta->parent, meta->name + " clone");
+        EquipmentHistory* clonedItem = new EquipmentHistory(meta->parent, meta->name + " clone", meta->eqHistoryList_, meta->sortMostRecentFirst_);
 
         space->addItem(meta->order, meta->column, meta->span, meta->deep, clonedItem);
 
@@ -286,43 +286,22 @@ OverviewEquipmentWindow::setExtraConfiguration(QJsonObject& obj, int type, Chart
             repElevation = round(repElevation * FEET_PER_METER);
         }
 
-        QJsonValue eqUseValues = obj["eqUseList"];
         QVector<EqTimeWindow> eqLinkUse;
+        QJsonArray jsonArray = obj["eqUseList"].toArray();
 
-        if (eqUseValues.isNull()) {
-            // parse in the old separate single attributes format, supports
-            // conversion to the new format EqTimeWindow. This option can be 
-            // removed if once the initial testers have updated their data.
+        foreach(const QJsonValue & value, jsonArray) {
 
-            bool startSet = (obj["startSet"].toString() == "1") ? true : false;
+            QJsonObject objVals = value.toObject();
+
+            QString eqLinkName = objVals["eqLink"].toString();
+            bool startSet = (objVals["startSet"].toString() == "1") ? true : false;
             QDate startDate;
-            if (startSet) startDate = QDate::fromString(obj["startDate"].toString());
-            bool endSet = (obj["endSet"].toString() == "1") ? true : false;
+            if (startSet) startDate = QDate::fromString(objVals["startDate"].toString());
+            bool endSet = (objVals["endSet"].toString() == "1") ? true : false;
             QDate endDate;
-            if (endSet) endDate = QDate::fromString(obj["endDate"].toString());
-            QString notes = obj["notes"].toString();
+            if (endSet) endDate = QDate::fromString(objVals["endDate"].toString());
 
-            eqLinkUse.push_back(EqTimeWindow(title(), startSet, startDate, endSet, endDate));
-        }
-        else
-        {
-            // parse in the new EqTimeWindow format
-            QJsonArray jsonArray = eqUseValues.toArray();
-
-            foreach(const QJsonValue & value, jsonArray) {
-
-                QJsonObject objVals = value.toObject();
-
-                QString eqLinkName = objVals["eqLink"].toString();
-                bool startSet = (objVals["startSet"].toString() == "1") ? true : false;
-                QDate startDate;
-                if (startSet) startDate = QDate::fromString(objVals["startDate"].toString());
-                bool endSet = (objVals["endSet"].toString() == "1") ? true : false;
-                QDate endDate;
-                if (endSet) endDate = QDate::fromString(objVals["endDate"].toString());
-
-                eqLinkUse.push_back(EqTimeWindow(eqLinkName, startSet, startDate, endSet, endDate));
-            }
+            eqLinkUse.push_back(EqTimeWindow(eqLinkName, startSet, startDate, endSet, endDate));
         }
 
         QString notes = Utils::jsonunprotect(obj["notes"].toString());
