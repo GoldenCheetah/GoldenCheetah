@@ -275,6 +275,8 @@ Aerolab::configChanged(qint32)
   palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
   axisWidget(QwtAxis::XBottom)->setPalette(palette);
   axisWidget(QwtAxis::YLeft)->setPalette(palette);
+
+  setXTitle(); // Just in case metric/imperial changed
 }
 
 void
@@ -511,7 +513,7 @@ Aerolab::setYMax(bool new_zoom)
 
              {
 
-                 setAxisTitle( QwtAxis::YLeft, tr("Elevation (')") );
+                 setAxisTitle( QwtAxis::YLeft, tr("Elevation (ft)") );
 
              }
 
