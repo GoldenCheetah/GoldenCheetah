@@ -247,6 +247,8 @@ class EquipmentHistory : public CommonEquipmentItem
 
         void itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) override;
         void configChanged(qint32) override;
+        void itemGeometryChanged() override;
+        void wheelEvent(QGraphicsSceneWheelEvent* event) override;
 
         void sortHistoryEntries();
 
@@ -260,7 +262,9 @@ class EquipmentHistory : public CommonEquipmentItem
 
     private:
 
+        int scrollPosn;
         QColor textColor;
+        VScrollBar* scrollbar;
 };
 
 class EquipmentNotes : public CommonEquipmentItem

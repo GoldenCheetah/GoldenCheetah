@@ -480,6 +480,7 @@ OverviewEquipmentItemConfig::addHistoryRow()
     int tableRow = eqTimeWindows->rowCount();
     eqTimeWindows->insertRow(tableRow);
     setEqHistoryEntryRowWidgets(tableRow);
+    static_cast<QDateEdit*>(eqTimeWindows->cellWidget(tableRow, 0))->setDate(QDate::currentDate());
 
     block = false;
     dataChanged();
@@ -755,7 +756,7 @@ EquipmentItem::resetEqItem()
 void
 EquipmentItem::sortEquipmentWindows()
 {
-    qSort(eqLinkUseList_.begin(), eqLinkUseList_.end(), [](const EqTimeWindow& a, const EqTimeWindow& b) {
+    std::sort(eqLinkUseList_.begin(), eqLinkUseList_.end(), [](const EqTimeWindow& a, const EqTimeWindow& b) {
         return a.displayImportance() > b.displayImportance(); });
 }
 
@@ -1158,11 +1159,14 @@ EquipmentHistory::EquipmentHistory(ChartSpace* parent, const QString& name) :
     // equipment summary item
     this->type = OverviewItemType::EQ_HISTORY;
 
+    scrollPosn = 0;
     sortMostRecentFirst_ = false;
 
     configwidget_ = new OverviewEquipmentItemConfig(this);
     configwidget_->hide();
 
+    scrollbar = new VScrollBar(this, parent);
+    scrollbar->show();
     configChanged(CONFIG_APPEARANCE);
 }
 
@@ -1172,6 +1176,7 @@ EquipmentHistory::EquipmentHistory(ChartSpace* parent, const QString& name, cons
     sortMostRecentFirst_ = sortMostRecentFirst;
     eqHistoryList_ = eqHistory;
     sortHistoryEntries();
+    itemGeometryChanged();
 }
 
 void
@@ -1186,13 +1191,48 @@ void
 EquipmentHistory::sortHistoryEntries()
 {
     if (sortMostRecentFirst_)
-        qSort(eqHistoryList_.begin(), eqHistoryList_.end(), [](const EqHistoryEntry& a, const EqHistoryEntry& b) { return a.date_ > b.date_; });
+        std::sort(eqHistoryList_.begin(), eqHistoryList_.end(), [](const EqHistoryEntry& a, const EqHistoryEntry& b) { return a.date_ > b.date_; });
     else
-        qSort(eqHistoryList_.begin(), eqHistoryList_.end(), [](const EqHistoryEntry& a, const EqHistoryEntry& b) { return a.date_ < b.date_; });
+        std::sort(eqHistoryList_.begin(), eqHistoryList_.end(), [](const EqHistoryEntry& a, const EqHistoryEntry& b) { return a.date_ < b.date_; });
+}
+
+void
+EquipmentHistory::itemGeometryChanged()
+{
+    QFontMetrics fm(parent->smallfont, parent->device());
+    double scrollwidth = fm.boundingRect("X").width();
+
+    if ((geometry().height() - 40)  < ((eqHistoryList_.size() + 4) * ROWHEIGHT ))
+    {
+        // set the scrollbar to the rhs
+        scrollbar->show();
+        scrollbar->setGeometry(geometry().width() - scrollwidth, ROWHEIGHT * 2.5, scrollwidth, geometry().height() - (ROWHEIGHT * 2.5) - 40);
+        scrollbar->setAreaHeight(eqHistoryList_.size() * ROWHEIGHT);
+        scrollbar->setPos(scrollPosn * ROWHEIGHT - (ROWHEIGHT / 2));
+    }
+    else
+    {
+        scrollbar->hide();
+    }
+}
+
+void
+EquipmentHistory::wheelEvent(QGraphicsSceneWheelEvent* w)
+{
+    if (scrollbar->canscroll) {
+
+        scrollbar->movePos(w->delta());
+        scrollPosn = (scrollbar->pos() + (ROWHEIGHT/2)) / ROWHEIGHT;
+        w->accept();
+    }
 }
 
 void
 EquipmentHistory::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) {
+
+    // don't paint on the edges
+    QRectF geom = geometry();
+    painter->setClipRect(40, 40, geom.width() - 80, geom.height() - 80);
 
     double rowY(ROWHEIGHT * 2.5);
     double rowWidth(geometry().width() - (ROWHEIGHT * 2));
@@ -1201,17 +1241,23 @@ EquipmentHistory::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, 
     painter->setFont(parent->smallfont);
     painter->setPen(textColor);
 
+    scrollPosn = (scrollbar->pos() + (ROWHEIGHT / 2)) / ROWHEIGHT;
+
+    int listPosn = 0;
     for (const auto& eqHistory : eqHistoryList_) {
 
-        QString historyEntryStr(eqHistory.date_.toString("dd MMM yyyy") + ": " + eqHistory.text_);
-        QRectF rect = QFontMetrics(parent->smallfont, parent->device()).boundingRect(historyEntryStr);
+        if (listPosn >= scrollPosn) {
+            QString historyEntryStr(eqHistory.date_.toString("dd MMM yyyy") + ": " + eqHistory.text_);
+            QRectF rect = QFontMetrics(parent->smallfont, parent->device()).boundingRect(historyEntryStr);
 
-        painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), historyEntryStr);
-        painter->setPen(GColor(CPLOTMARKER));
-        painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), eqHistory.date_.toString("dd MMM yyyy") + ":");
-        painter->setPen(textColor);
+            painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), historyEntryStr);
+            painter->setPen(GColor(CPLOTMARKER));
+            painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), eqHistory.date_.toString("dd MMM yyyy") + ":");
+            painter->setPen(textColor);
 
-        rowY += (ROWHEIGHT * ceil(rect.width() / rowWidth));
+            rowY += (ROWHEIGHT * ceil(rect.width() / rowWidth));
+        }
+        listPosn++;
     }
 
     tileDisplayHeight_ = rowY + (ROWHEIGHT * 1.5);
