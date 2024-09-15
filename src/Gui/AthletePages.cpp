@@ -949,9 +949,11 @@ ZonePage::saveClicked()
             if (zonesFile.exists()) context->athlete->zones_[i]->read(zonesFile);
         }
 
+        // which model to use?
+        appsettings->setCValue(context->athlete->cyclist, zones[i]->useCPModelSetting(), cpPage[i]->useModel->currentIndex());
+
         // use CP for FTP?
         appsettings->setCValue(context->athlete->cyclist, zones[i]->useCPforFTPSetting(), cpPage[i]->useCPForFTPCombo->currentIndex());
-
 
         // did cp for ftp change ?
         cppageChanged |= cpPage[i]->saveClicked();
@@ -982,38 +984,33 @@ SchemePage::SchemePage(Zones* zones) : zones(zones)
     actionButtons->addWidget(addButton);
     actionButtons->addWidget(deleteButton);
 
+    zoneFromDelegate = new SpinBoxEditDelegate();
+    zoneFromDelegate->setRange(0, 1000);
+    zoneFromDelegate->setSingleStep(1);
+    zoneFromDelegate->setSuffix(" " + tr("%"));
+
     scheme = new QTreeWidget;
+    scheme->setAlternatingRowColors(true);
     scheme->headerItem()->setText(0, tr("Short"));
     scheme->headerItem()->setText(1, tr("Long"));
     scheme->headerItem()->setText(2, tr("Percent of CP"));
     scheme->setColumnCount(3);
     scheme->setSelectionMode(QAbstractItemView::SingleSelection);
-    scheme->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
+    scheme->setEditTriggers(  QAbstractItemView::DoubleClicked
+                            | QAbstractItemView::SelectedClicked
+                            | QAbstractItemView::AnyKeyPressed);
     scheme->setUniformRowHeights(true);
     scheme->setIndentation(0);
-    //scheme->header()->resizeSection(0,90);
-    //scheme->header()->resizeSection(1,200);
-    //scheme->header()->resizeSection(2,80);
+    scheme->setItemDelegateForColumn(2, zoneFromDelegate);
 
     // setup list
-    for (int i=0; i< zones->getScheme().nzones_default; i++) {
-
+    for (int i = 0; i < zones->getScheme().nzones_default; i++) {
         QTreeWidgetItem *add = new QTreeWidgetItem(scheme->invisibleRootItem());
         add->setFlags(add->flags() | Qt::ItemIsEditable);
 
-        // tab name
-        add->setText(0, zones->getScheme().zone_default_name[i]);
-        // field name
-        add->setText(1, zones->getScheme().zone_default_desc[i]);
-
-        // low
-        QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
-        loedit->setMinimum(0);
-        loedit->setMaximum(1000);
-        loedit->setSingleStep(1.0);
-        loedit->setDecimals(0);
-        loedit->setValue(zones->getScheme().zone_default[i]);
-        scheme->setItemWidget(add, 2, loedit);
+        add->setData(0, Qt::DisplayRole, zones->getScheme().zone_default_name[i]);
+        add->setData(1, Qt::DisplayRole, zones->getScheme().zone_default_desc[i]);
+        add->setData(2, Qt::DisplayRole, zones->getScheme().zone_default[i]);
     }
 
     mainLayout->addWidget(scheme);
@@ -1023,6 +1020,14 @@ SchemePage::SchemePage(Zones* zones) : zones(zones)
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
 }
+
+
+SchemePage::~SchemePage
+()
+{
+    delete zoneFromDelegate;
+}
+
 
 void
 SchemePage::addClicked()
@@ -1042,29 +1047,23 @@ SchemePage::addClicked()
     QTreeWidgetItem *add = new QTreeWidgetItem;
     add->setFlags(add->flags() | Qt::ItemIsEditable);
 
-    QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
-    loedit->setMinimum(0);
-    loedit->setMaximum(1000);
-    loedit->setSingleStep(1.0);
-    loedit->setDecimals(0);
-    loedit->setValue(100);
-
     scheme->invisibleRootItem()->insertChild(index, add);
-    scheme->setItemWidget(add, 2, loedit);
 
     // Short
     QString text = tr("New");
     for (int i=0; scheme->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
         text = QString(tr("New (%1)")).arg(i+1);
     }
-    add->setText(0, text);
+    add->setData(0, Qt::DisplayRole, text);
 
     // long
     text = tr("New");
     for (int i=0; scheme->findItems(text, Qt::MatchExactly, 1).count() > 0; i++) {
         text = QString(tr("New (%1)")).arg(i+1);
     }
-    add->setText(1, text);
+    add->setData(1, Qt::DisplayRole, text);
+
+    add->setData(2, Qt::DisplayRole, 100);
 }
 
 void
@@ -1100,11 +1099,10 @@ SchemePage::getScheme()
 
     // read back the details from the table
     for (int i=0; i<scheme->invisibleRootItem()->childCount(); i++) {
-
         schemeitem add;
-        add.name = scheme->invisibleRootItem()->child(i)->text(0);
-        add.desc = scheme->invisibleRootItem()->child(i)->text(1);
-        add.lo = ((QDoubleSpinBox *)(scheme->itemWidget(scheme->invisibleRootItem()->child(i), 2)))->value();
+        add.name = scheme->invisibleRootItem()->child(i)->data(0, Qt::DisplayRole).toString();
+        add.desc = scheme->invisibleRootItem()->child(i)->data(1, Qt::DisplayRole).toString();
+        add.lo = scheme->invisibleRootItem()->child(i)->data(2, Qt::DisplayRole).toInt();
         table.append(add);
     }
 
@@ -1125,24 +1123,57 @@ SchemePage::getScheme()
 }
 
 
+#define CPPAGE_DEFAULT_CP 250
+#define CPPAGE_DEFAULT_FACTOR_AETP 0.85
+#define CPPAGE_DEFAULT_WPRIME 20000
+#define CPPAGE_DEFAULT_PMAX 1000
+
+#define CPPAGE_RANGES_COL_STARTDATE 0
+#define CPPAGE_RANGES_COL_CP 1
+#define CPPAGE_RANGES_COL_AETP 2
+#define CPPAGE_RANGES_COL_FTP 3
+#define CPPAGE_RANGES_COL_WPRIME 4
+#define CPPAGE_RANGES_COL_PMAX 5
+#define CPPAGE_RANGES_COL_MODELFIT 6
+#define CPPAGE_RANGES_COL_CLOSEST 7
+#define CPPAGE_RANGES_COL_EST_DEVIATION 8
+#define CPPAGE_RANGES_COL_EST_OFFSET 9
+#define CPPAGE_RANGES_COL_EST_CP 10
+#define CPPAGE_RANGES_COL_EST_FTP 11
+#define CPPAGE_RANGES_COL_EST_WPRIME 12
+#define CPPAGE_RANGES_COL_EST_PMAX 13
+#define CPPAGE_RANGES_COUNT_COL 14
+
+#define CPPAGE_RANGES_EST_MATCH 0
+#define CPPAGE_RANGES_EST_DEVIATE 1
+#define CPPAGE_RANGES_EST_NA 2
+
+#define CPPAGE_EST_MODEL_NONE 0
+#define CPPAGE_EST_MODEL_CP2 1
+#define CPPAGE_EST_MODEL_CP3 2
+#define CPPAGE_EST_MODEL_EXT 3
+
+
 CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
                context(context), zones_(zones_), schemePage(schemePage)
 {
     active = false;
 
-    QGridLayout *mainLayout = new QGridLayout(this);
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(10 *dpiXFactor);
 
-    updateButton = new QPushButton(tr("Update"));
-    updateButton->hide();
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
+    adoptButton = new QPushButton(tr("Adopt"));
+    adoptButton->setVisible(false);
+    newZoneRequired = new QPushButton(tr("Your estimated power values have changed, a new range should be created"));
+    newZoneRequired->setFlat(true);
+    newZoneRequired->setVisible(false);
 #ifndef Q_OS_MAC
     addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
     deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #else
     addButton->setText(tr("Add"));
-    updateButton->setText(tr("Update"));
     deleteButton->setText(tr("Delete"));
 #endif
     defaultButton = new QPushButton(tr("Def"));
@@ -1166,81 +1197,85 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     zoneButtons->addWidget(defaultButton);
 
     QHBoxLayout *addLayout = new QHBoxLayout;
-    QLabel *dateLabel = new QLabel(tr("From Date"));
-    QLabel *cpLabel = new QLabel(tr("Critical Power"));
-    QLabel *aetLabel = new QLabel(tr("AeTP"));
-    QLabel *ftpLabel = new QLabel(tr("FTP"));
-    QLabel *wLabel = new QLabel(tr("W'"));
-    QLabel *pmaxLabel = new QLabel(tr("Pmax"));
-    dateEdit = new QDateEdit;
-    dateEdit->setDate(QDate::currentDate());
-    dateEdit->setCalendarPopup(true);
+
+    useModel = new QComboBox(this);
+    useModel->addItem(tr("Manual"), "manual");
+    useModel->addItem(tr("Semi-Automatic (CP2)"), "cp2");
+    useModel->addItem(tr("Semi-Automatic (CP3)"), "cp3");
+    useModel->addItem(tr("Semi-Automatic (Extended)"), "ext");
 
      // Use CP for FTP
     useCPForFTPCombo = new QComboBox(this);
     useCPForFTPCombo->addItem(tr("Use CP for all metrics"));
     useCPForFTPCombo->addItem(tr("Use FTP for Coggan metrics"));
 
+    b4.modelIdx = appsettings->cvalue(context->athlete->cyclist, zones_->useCPModelSetting(), 1).toInt();
+    useModel->setCurrentIndex(b4.modelIdx);
+
     b4.cpforftp = appsettings->cvalue(context->athlete->cyclist, zones_->useCPforFTPSetting(), 0).toInt() ? 1 : 0;
     useCPForFTPCombo->setCurrentIndex(b4.cpforftp);
 
-    cpEdit = new QDoubleSpinBox;
-    cpEdit->setMinimum(0);
-    cpEdit->setMaximum(1000);
-    cpEdit->setSingleStep(1.0);
-    cpEdit->setDecimals(0);
-
-    aetEdit = new QDoubleSpinBox;
-    aetEdit->setMinimum(0);
-    aetEdit->setMaximum(1000);
-    aetEdit->setSingleStep(1.0);
-    aetEdit->setDecimals(0);
-
-    ftpEdit = new QDoubleSpinBox;
-    ftpEdit->setMinimum(0);
-    ftpEdit->setMaximum(100000);
-    ftpEdit->setSingleStep(100);
-    ftpEdit->setDecimals(0);
-
-    wEdit = new QDoubleSpinBox;
-    wEdit->setMinimum(0);
-    wEdit->setMaximum(100000);
-    wEdit->setSingleStep(100);
-    wEdit->setDecimals(0);
-
-    pmaxEdit = new QDoubleSpinBox;
-    pmaxEdit->setMinimum(0);
-    pmaxEdit->setMaximum(3000);
-    pmaxEdit->setSingleStep(1.0);
-    pmaxEdit->setDecimals(0);
-
     QHBoxLayout *actionButtons = new QHBoxLayout;
     actionButtons->setSpacing(2 *dpiXFactor);
-    actionButtons->addWidget(cpLabel);
-    actionButtons->addWidget(cpEdit);
 
-
-    actionButtons->addWidget(aetLabel);
-    actionButtons->addWidget(aetEdit);
-    actionButtons->addWidget(ftpLabel);
-    actionButtons->addWidget(ftpEdit);
-
-    actionButtons->addWidget(wLabel);
-    actionButtons->addWidget(wEdit);
-    actionButtons->addWidget(pmaxLabel);
-    actionButtons->addWidget(pmaxEdit);
+    actionButtons->addWidget(newZoneRequired);
     actionButtons->addStretch();
-    actionButtons->addWidget(updateButton);
     actionButtons->addWidget(addButton);
     actionButtons->addWidget(deleteButton);
+    actionButtons->addWidget(adoptButton);
 
-    addLayout->addWidget(dateLabel);
-    addLayout->addWidget(dateEdit);
     addLayout->addStretch();
+    addLayout->addWidget(useModel);
     addLayout->addWidget(useCPForFTPCombo);
 
-    ranges = new QTreeWidget;
+    ranges = new TreeWidget6();
+    ranges->setAlternatingRowColors(true);
     initializeRanges();
+
+    dateDelegate = new DateEditDelegate();
+    dateDelegate->setCalendarPopup(true);
+
+    cpDelegate = new SpinBoxEditDelegate();
+    cpDelegate->setRange(1, 999);
+    cpDelegate->setSingleStep(1);
+    cpDelegate->setSuffix(" " + tr("W"));
+
+    aetDelegate = new SpinBoxEditDelegate();
+    aetDelegate->setRange(1, 999);
+    aetDelegate->setSingleStep(1);
+    aetDelegate->setSuffix(" " + tr("W"));
+
+    ftpDelegate = new SpinBoxEditDelegate();
+    ftpDelegate->setRange(1, 999);
+    ftpDelegate->setSingleStep(1);
+    ftpDelegate->setSuffix(" " + tr("W"));
+
+    wDelegate = new SpinBoxEditDelegate();
+    wDelegate->setRange(1, 99999);
+    wDelegate->setSingleStep(100);
+    wDelegate->setSuffix(" " + tr("J"));
+
+    pmaxDelegate = new SpinBoxEditDelegate();
+    pmaxDelegate->setRange(1, 9999);
+    pmaxDelegate->setSingleStep(10);
+    pmaxDelegate->setSuffix(" " + tr("W"));
+
+    statusDelegate = new NoEditDelegate();
+    closestDelegate = new NoEditDelegate();
+
+    ranges->setItemDelegateForColumn(CPPAGE_RANGES_COL_STARTDATE, dateDelegate);
+    ranges->setItemDelegateForColumn(CPPAGE_RANGES_COL_CP, cpDelegate);
+    ranges->setItemDelegateForColumn(CPPAGE_RANGES_COL_AETP, aetDelegate);
+    ranges->setItemDelegateForColumn(CPPAGE_RANGES_COL_FTP, ftpDelegate);
+    ranges->setItemDelegateForColumn(CPPAGE_RANGES_COL_WPRIME, wDelegate);
+    ranges->setItemDelegateForColumn(CPPAGE_RANGES_COL_PMAX, pmaxDelegate);
+    ranges->setItemDelegateForColumn(CPPAGE_RANGES_COL_MODELFIT, statusDelegate);
+    ranges->setItemDelegateForColumn(CPPAGE_RANGES_COL_CLOSEST, closestDelegate);
+
+    zoneFromDelegate = new SpinBoxEditDelegate();
+    zoneFromDelegate->setRange(0, 1000);
+    zoneFromDelegate->setSingleStep(1);
+    zoneFromDelegate->setSuffix(" " + tr("W"));
 
     zones = new QTreeWidget;
     zones->headerItem()->setText(0, tr("Short"));
@@ -1248,61 +1283,95 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     zones->headerItem()->setText(2, tr("From Watts"));
     zones->setColumnCount(3);
     zones->setSelectionMode(QAbstractItemView::SingleSelection);
-    zones->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
+    zones->setEditTriggers(  QAbstractItemView::DoubleClicked
+                           | QAbstractItemView::SelectedClicked
+                           | QAbstractItemView::AnyKeyPressed);
     zones->setUniformRowHeights(true);
     zones->setIndentation(0);
+    zones->setAlternatingRowColors(true);
 
-    mainLayout->addLayout(addLayout, 0,0);
-    mainLayout->addLayout(actionButtons, 1,0);
-    mainLayout->addWidget(ranges, 2,0);
-    mainLayout->addLayout(zoneButtons, 3,0);
-    mainLayout->addWidget(zones, 4,0);
+    zones->setItemDelegateForColumn(2, zoneFromDelegate);
 
-    // edit connect
-    connect(dateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(rangeEdited()));
-    connect(cpEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(aetEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(ftpEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(wEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(pmaxEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
+    mainLayout->addLayout(addLayout);
+    mainLayout->addWidget(ranges);
+    mainLayout->addLayout(actionButtons);
+    mainLayout->addWidget(zones);
+    mainLayout->addLayout(zoneButtons);
+
     // button connect
+    connect(newZoneRequired, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
-    connect(updateButton, SIGNAL(clicked()), this, SLOT(editClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+    connect(adoptButton, SIGNAL(clicked()), this, SLOT(estimate()));
     connect(defaultButton, SIGNAL(clicked()), this, SLOT(defaultClicked()));
     connect(addZoneButton, SIGNAL(clicked()), this, SLOT(addZoneClicked()));
     connect(deleteZoneButton, SIGNAL(clicked()), this, SLOT(deleteZoneClicked()));
     connect(useCPForFTPCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(initializeRanges()));
+    connect(useModel, SIGNAL(currentIndexChanged(int)), this, SLOT(initializeRanges()));
     connect(ranges, SIGNAL(itemSelectionChanged()), this, SLOT(rangeSelectionChanged()));
     connect(zones, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(zonesChanged()));
+    connect(zones->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(zonesChanged()));
 }
+
+
+CPPage::~CPPage
+()
+{
+    delete dateDelegate;
+    delete cpDelegate;
+    delete aetDelegate;
+    delete ftpDelegate;
+    delete wDelegate;
+    delete pmaxDelegate;
+    delete zoneFromDelegate;
+    delete statusDelegate;
+    delete closestDelegate;
+}
+
 
 qint32
 CPPage::saveClicked()
 {
-    if (b4.cpforftp != useCPForFTPCombo->currentIndex())
+    if (   b4.cpforftp != useCPForFTPCombo->currentIndex()
+        || b4.modelIdx != useModel->currentIndex()) {
         return CONFIG_ZONES;
-    else
+    } else {
         return 0;
+    }
 }
+
 
 void
 CPPage::initializeRanges() {
+    disconnect(ranges->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(rangeEdited(const QModelIndex&)));
 
-    while( int nb = ranges->topLevelItemCount () )
-    {
-        delete ranges->takeTopLevelItem( nb - 1 );
+    while (int nb = ranges->topLevelItemCount()) {
+        delete ranges->takeTopLevelItem(nb - 1);
     }
 
-    int column = 0;
-    ranges->headerItem()->setText(column++, tr("From Date"));
-    ranges->headerItem()->setText(column++, tr("Critical Power"));
-    ranges->headerItem()->setText(column++, tr("AeTP"));
-    ranges->headerItem()->setText(column++, tr("FTP"));
-    ranges->headerItem()->setText(column++, tr("W'"));
-    ranges->headerItem()->setText(column++, tr("Pmax"));
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_STARTDATE, tr("Start Date"));
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_CP, tr("Critical Power"));
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_AETP, tr("AeTP"));
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_FTP, tr("FTP"));
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_WPRIME, tr("W'"));
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_PMAX, tr("Pmax"));
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_MODELFIT, tr("Model Fit"));
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_CLOSEST, tr("Closest Estimate"));
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_EST_DEVIATION, "_deviation");
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_EST_OFFSET, "_offset");
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_EST_CP, "_cp");
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_EST_FTP, "_ftp");
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_EST_WPRIME, "_wprime");
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_EST_PMAX, "_pmax");
 
-    ranges->setColumnCount(column);
+    ranges->setColumnCount(CPPAGE_RANGES_COUNT_COL);
+
+    ranges->setColumnHidden(CPPAGE_RANGES_COL_EST_DEVIATION, true);
+    ranges->setColumnHidden(CPPAGE_RANGES_COL_EST_OFFSET, true);
+    ranges->setColumnHidden(CPPAGE_RANGES_COL_EST_CP, true);
+    ranges->setColumnHidden(CPPAGE_RANGES_COL_EST_FTP, true);
+    ranges->setColumnHidden(CPPAGE_RANGES_COL_EST_WPRIME, true);
+    ranges->setColumnHidden(CPPAGE_RANGES_COL_EST_PMAX, true);
 
     bool useCPForFTP = (useCPForFTPCombo->currentIndex() == 0 ? true : false);
     ranges->setColumnHidden(3, useCPForFTP);
@@ -1311,151 +1380,483 @@ CPPage::initializeRanges() {
     ranges->setUniformRowHeights(true);
     ranges->setIndentation(0);
 
-    // setup list of ranges
-    for (int i=0; i< zones_->getRangeSize(); i++) {
+    ranges->setEditTriggers(  QAbstractItemView::DoubleClicked
+                            | QAbstractItemView::SelectedClicked
+                            | QAbstractItemView::AnyKeyPressed);
 
+    // setup list of ranges
+    for (int i = 0; i < zones_->getRangeSize(); i++) {
         QTreeWidgetItem *add = new QTreeWidgetItem(ranges->invisibleRootItem());
-        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
+        add->setFlags(add->flags() | Qt::ItemIsEditable);
 
         // Embolden ranges with manually configured zones
         QFont font;
-        font.setWeight(zones_->getZoneRange(i).zonesSetFromCP ?
-                                        QFont::Normal : QFont::Black);
+        font.setWeight(zones_->getZoneRange(i).zonesSetFromCP ? QFont::Normal : QFont::Black);
 
-        int column = 0;
-        // date
-        add->setText(column, zones_->getStartDate(i).toString(tr("MMM d, yyyy")));
-        add->setFont(column++, font);
+        add->setData(CPPAGE_RANGES_COL_STARTDATE, Qt::DisplayRole, zones_->getStartDate(i));
+        add->setFont(CPPAGE_RANGES_COL_STARTDATE, font);
+        add->setData(CPPAGE_RANGES_COL_CP, Qt::DisplayRole, zones_->getCP(i));
+        add->setFont(CPPAGE_RANGES_COL_CP, font);
+        add->setData(CPPAGE_RANGES_COL_AETP, Qt::DisplayRole, zones_->getAeT(i));
+        add->setFont(CPPAGE_RANGES_COL_AETP, font);
+        add->setData(CPPAGE_RANGES_COL_FTP, Qt::DisplayRole, zones_->getFTP(i));
+        add->setFont(CPPAGE_RANGES_COL_FTP, font);
+        add->setData(CPPAGE_RANGES_COL_WPRIME, Qt::DisplayRole, zones_->getWprime(i));
+        add->setFont(CPPAGE_RANGES_COL_WPRIME, font);
+        add->setData(CPPAGE_RANGES_COL_PMAX, Qt::DisplayRole, zones_->getPmax(i));
+        add->setFont(CPPAGE_RANGES_COL_PMAX, font);
+        add->setFont(CPPAGE_RANGES_COL_MODELFIT, font);
+        add->setFont(CPPAGE_RANGES_COL_CLOSEST, font);
 
-        // CP
-        add->setText(column, QString("%1").arg(zones_->getCP(i)));
-        add->setFont(column++, font);
-
-        // AeT
-        add->setText(column, QString("%1").arg(zones_->getAeT(i)));
-        add->setFont(column++, font);
-
-        // FTP
-        add->setText(column, QString("%1").arg(zones_->getFTP(i)));
-        add->setFont(column++, font);
-
-        // W'
-        add->setText(column, QString("%1").arg(zones_->getWprime(i)));
-        add->setFont(column++, font);
-
-        // Pmax
-        add->setText(column, QString("%1").arg(zones_->getPmax(i)));
-        add->setFont(column++, font);
+        if (useModel->currentIndex() != CPPAGE_EST_MODEL_NONE) {
+            ranges->setColumnHidden(CPPAGE_RANGES_COL_MODELFIT, false);
+            ranges->setColumnHidden(CPPAGE_RANGES_COL_CLOSEST, false);
+            int cp = 0;
+            int aetp = 0;
+            int ftp = 0;
+            int wprime = 0;
+            int pmax = 0;
+            int estOffset = 0;
+            bool defaults = false;
+            if (getValuesFor(zones_->getStartDate(i), false, cp, aetp, ftp, wprime, pmax, estOffset, defaults)) {
+                add->setData(CPPAGE_RANGES_COL_EST_OFFSET, Qt::DisplayRole, estOffset);
+                add->setData(CPPAGE_RANGES_COL_EST_CP, Qt::DisplayRole, cp);
+                add->setData(CPPAGE_RANGES_COL_EST_FTP, Qt::DisplayRole, ftp);
+                add->setData(CPPAGE_RANGES_COL_EST_WPRIME, Qt::DisplayRole, wprime);
+                add->setData(CPPAGE_RANGES_COL_EST_PMAX, Qt::DisplayRole, pmax);
+            } else {
+                add->setData(CPPAGE_RANGES_COL_EST_CP, Qt::DisplayRole, 0);
+            }
+        } else {
+            ranges->setColumnHidden(CPPAGE_RANGES_COL_MODELFIT, true);
+            ranges->setColumnHidden(CPPAGE_RANGES_COL_CLOSEST, true);
+        }
+        setEstimateStatus(add);
     }
-    for(int i = 0; i < ranges->columnCount(); i++)
+    for (int i = 0; i < ranges->columnCount(); i++) {
         ranges->resizeColumnToContents(i);
+    }
+
+    newZoneRequired->setVisible(needsNewRange());
+
+    connect(ranges->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(rangeEdited(const QModelIndex&)));
 }
 
+
+void
+CPPage::rangeEdited
+(const QModelIndex &modelIndex)
+{
+    zones_->setScheme(schemePage->getScheme());
+    int index = modelIndex.row();
+    switch (modelIndex.column()) {
+    case CPPAGE_RANGES_COL_STARTDATE: {
+        QDate date = modelIndex.data().toDate();
+        zones_->setStartDate(index, date);
+        estimate();
+        setEstimateStatus(ranges->itemFromIndex(modelIndex));
+        newZoneRequired->setVisible(needsNewRange());
+        break;
+    }
+    case CPPAGE_RANGES_COL_CP: {
+        int cp = modelIndex.data().toInt();
+        zones_->setCP(index, cp);
+        if (useCPForFTPCombo->currentIndex() == 0) {
+            zones_->setFTP(index, cp);
+        }
+        setEstimateStatus(ranges->itemFromIndex(modelIndex));
+        break;
+    }
+    case CPPAGE_RANGES_COL_AETP:
+        zones_->setAeT(index, modelIndex.data().toInt());
+        setEstimateStatus(ranges->itemFromIndex(modelIndex));
+        break;
+    case CPPAGE_RANGES_COL_FTP:
+        zones_->setFTP(index, modelIndex.data().toInt());
+        setEstimateStatus(ranges->itemFromIndex(modelIndex));
+        break;
+    case CPPAGE_RANGES_COL_WPRIME: {
+        int wp = modelIndex.data().toInt();
+        wp = wp ? wp : 20000;
+        if (wp < 1000) {
+            wp *= 1000; // entered in kJ we want joules
+        }
+        zones_->setWprime(index, wp);
+        setEstimateStatus(ranges->itemFromIndex(modelIndex));
+        break;
+    }
+    case CPPAGE_RANGES_COL_PMAX: {
+        int pmax = modelIndex.data().toInt();
+        pmax = pmax ? pmax : 1000;
+        zones_->setPmax(index, pmax);
+        setEstimateStatus(ranges->itemFromIndex(modelIndex));
+        break;
+    }
+    default:
+        break;
+    }
+    if (useModel->currentIndex() == CPPAGE_EST_MODEL_NONE) {
+        adoptButton->setVisible(false);
+    } else if (ranges->currentItem() != nullptr && ranges->indexFromItem(ranges->currentItem()).row() == modelIndex.row()) {
+        adoptButton->setVisible(ranges->currentItem()->data(CPPAGE_RANGES_COL_EST_DEVIATION, Qt::DisplayRole).toInt() == CPPAGE_RANGES_EST_DEVIATE);
+    }
+}
+
+
+void
+CPPage::estimate
+()
+{
+    bool preActive = active;
+    active = false;
+    QTreeWidgetItem *item = ranges->currentItem();
+    if (item != nullptr) {
+        QDate date = item->data(CPPAGE_RANGES_COL_STARTDATE, Qt::DisplayRole).toDate();
+        QModelIndex modelIndex = ranges->indexFromItem(item);
+        int cp = 0;
+        int aetp = 0;
+        int ftp = 0;
+        int wprime = 0;
+        int pmax = 0;
+        int estOffset = 0;
+        bool defaults = false;
+        if (getValuesFor(date, false, cp, aetp, ftp, wprime, pmax, estOffset, defaults)) {
+            setRangeData(modelIndex, CPPAGE_RANGES_COL_CP, cp);
+            setRangeData(modelIndex, CPPAGE_RANGES_COL_EST_CP, cp);
+            setRangeData(modelIndex, CPPAGE_RANGES_COL_AETP, aetp);
+            setRangeData(modelIndex, CPPAGE_RANGES_COL_FTP, ftp);
+            setRangeData(modelIndex, CPPAGE_RANGES_COL_EST_FTP, ftp);
+            setRangeData(modelIndex, CPPAGE_RANGES_COL_WPRIME, wprime);
+            setRangeData(modelIndex, CPPAGE_RANGES_COL_EST_WPRIME, wprime);
+            setRangeData(modelIndex, CPPAGE_RANGES_COL_PMAX, pmax);
+            setRangeData(modelIndex, CPPAGE_RANGES_COL_EST_PMAX, pmax);
+            setRangeData(modelIndex, CPPAGE_RANGES_COL_EST_OFFSET, estOffset);
+        }
+    }
+    active = preActive;
+}
+
+
+bool
+CPPage::getValuesFor
+(const QDate &date, bool allowDefaults, int &cp, int &aetp, int &ftp, int &wprime, int &pmax, int &estOffset, bool &defaults, QDate *startDate) const
+{
+    estOffset = 0;
+    defaults = false;
+    if (useModel->currentIndex() != CPPAGE_EST_MODEL_NONE) {
+        PDEstimate pde = context->athlete->getPDEstimateClosestFor(date, useModel->currentData().toString(), false, zones_->sport());
+        cp = pde.CP;
+        aetp = pde.CP * CPPAGE_DEFAULT_FACTOR_AETP;
+        ftp = int(pde.FTP) > 0 ? pde.FTP : cp;
+        if (useCPForFTPCombo->currentIndex() == 0) {
+            ftp = cp;
+        }
+        wprime = int(pde.WPrime) > 0 ? pde.WPrime : CPPAGE_DEFAULT_WPRIME;
+        pmax = int(pde.PMax) > 0 ? pde.PMax : CPPAGE_DEFAULT_PMAX;
+        if (pde.from <= date && date <= pde.to) {
+            estOffset = 0;
+        } else if (date > pde.to) {
+            estOffset = pde.to.daysTo(date);
+        } else if (date < pde.from) {
+            estOffset = pde.from.daysTo(date);
+        }
+        if (startDate != nullptr) {
+            *startDate = pde.from;
+        }
+    }
+
+    bool ret = false;
+    if (cp > 0) {
+        ret = true;
+    } else if (allowDefaults) {
+        cp = CPPAGE_DEFAULT_CP;
+        aetp = cp * CPPAGE_DEFAULT_FACTOR_AETP;
+        ftp = cp;
+        wprime = CPPAGE_DEFAULT_WPRIME;
+        pmax = CPPAGE_DEFAULT_PMAX;
+        estOffset = 0;
+        defaults = true;
+        if (startDate != nullptr) {
+            *startDate = QDate();
+        }
+        ret = true;
+    }
+    return ret;
+}
+
+
+void
+CPPage::setEstimateStatus
+(QTreeWidgetItem *item)
+{
+    bool preActive = active;
+    active = true;
+
+    QModelIndex modelIndex = ranges->indexFromItem(item);
+
+    int cp = item->data(CPPAGE_RANGES_COL_CP, Qt::DisplayRole).toInt();
+    int ftp = item->data(CPPAGE_RANGES_COL_FTP, Qt::DisplayRole).toInt();
+    int wprime = item->data(CPPAGE_RANGES_COL_WPRIME, Qt::DisplayRole).toInt();
+    int pmax = item->data(CPPAGE_RANGES_COL_PMAX, Qt::DisplayRole).toInt();
+    int estCp = item->data(CPPAGE_RANGES_COL_EST_CP, Qt::DisplayRole).toInt();
+    int estFtp = item->data(CPPAGE_RANGES_COL_EST_FTP, Qt::DisplayRole).toInt();
+    int estWprime = item->data(CPPAGE_RANGES_COL_EST_WPRIME, Qt::DisplayRole).toInt();
+    int estPmax = item->data(CPPAGE_RANGES_COL_EST_PMAX, Qt::DisplayRole).toInt();
+    int estOffset = item->data(CPPAGE_RANGES_COL_EST_OFFSET, Qt::DisplayRole).toInt();
+    if (estCp > 0) {
+        if (   (   useModel->currentIndex() == CPPAGE_EST_MODEL_CP2
+                && cp == estCp
+                && wprime == estWprime)
+            || (   useModel->currentIndex() == CPPAGE_EST_MODEL_CP3
+                && cp == estCp
+                && wprime == estWprime
+                && pmax == estPmax)
+            || (   useModel->currentIndex() == CPPAGE_EST_MODEL_EXT
+                && cp == estCp
+                && wprime == estWprime
+                && ftp == estFtp
+                && pmax == estPmax)) {
+            setRangeData(modelIndex, CPPAGE_RANGES_COL_EST_DEVIATION, CPPAGE_RANGES_EST_MATCH);
+            setRangeData(modelIndex, CPPAGE_RANGES_COL_MODELFIT, tr("✓"));
+        } else {
+            setRangeData(modelIndex, CPPAGE_RANGES_COL_EST_DEVIATION, CPPAGE_RANGES_EST_DEVIATE);
+            setRangeData(modelIndex, CPPAGE_RANGES_COL_MODELFIT, tr("Δ"));
+        }
+        if (estOffset == 0) {
+            setRangeData(modelIndex, CPPAGE_RANGES_COL_CLOSEST, tr("exact match"));
+        } else if (estOffset < 0) {
+            setRangeData(modelIndex, CPPAGE_RANGES_COL_CLOSEST, tr("%1 days after").arg(-1 * estOffset));
+        } else if (estOffset > 0) {
+            setRangeData(modelIndex, CPPAGE_RANGES_COL_CLOSEST, tr("%1 days before").arg(estOffset));
+        }
+    } else {
+        setRangeData(modelIndex, CPPAGE_RANGES_COL_EST_DEVIATION, CPPAGE_RANGES_EST_NA);
+        setRangeData(modelIndex, CPPAGE_RANGES_COL_MODELFIT, tr("∅"));
+        setRangeData(modelIndex, CPPAGE_RANGES_COL_CLOSEST, tr("-"));
+    }
+    active = preActive;
+}
+
+
+void
+CPPage::setRangeData
+(QModelIndex modelIndex, int column, QVariant data)
+{
+    ranges->model()->setData(modelIndex.siblingAtColumn(column), data, Qt::DisplayRole);
+}
+
+
+bool
+CPPage::needsNewRange
+() const
+{
+    zones_->setScheme(schemePage->getScheme());
+    if (useModel->currentIndex() == CPPAGE_EST_MODEL_NONE) {
+        return false;
+    }
+    QDate today = QDate::currentDate();
+    int todayCp = 0;
+    int todayAetp = 0;
+    int todayFtp = 0;
+    int todayWprime = 0;
+    int todayPmax = 0;
+    int todayEstOffset = 0;
+    bool defaults = false;
+    bool todayOk = getValuesFor(today, false, todayCp, todayAetp, todayFtp, todayWprime, todayPmax, todayEstOffset, defaults);
+
+    int activeRange = zones_->whichRange(today);
+    if (activeRange < 0) {
+        return todayOk;
+    }
+    QDate activeDate = zones_->getZoneRange(activeRange).begin;
+
+    int activeCp = 0;
+    int activeAetp = 0;
+    int activeFtp = 0;
+    int activeWprime = 0;
+    int activePmax = 0;
+    int activeEstOffset = 0;
+    return    todayOk
+           && getValuesFor(activeDate, false, activeCp, activeAetp, activeFtp, activeWprime, activePmax, activeEstOffset, defaults)
+           && ! (   (   useModel->currentIndex() == CPPAGE_EST_MODEL_CP2
+                     && todayCp == activeCp
+                     && todayWprime == activeWprime)
+                 || (   useModel->currentIndex() == CPPAGE_EST_MODEL_CP3
+                     && todayCp == activeCp
+                     && todayWprime == activeWprime
+                     && todayPmax == activePmax)
+                 || (   useModel->currentIndex() == CPPAGE_EST_MODEL_EXT
+                     && todayCp == activeCp
+                     && todayWprime == activeWprime
+                     && todayFtp == activeFtp
+                     && todayPmax == activePmax));
+}
 
 
 void
 CPPage::addClicked()
 {
-
     // get current scheme
     zones_->setScheme(schemePage->getScheme());
 
-    int cp = cpEdit->value();
-    if( cp <= 0 ) {
-        QMessageBox err;
-        err.setText(tr("Critical Power must be > 0"));
-        err.setIcon(QMessageBox::Warning);
-        err.exec();
-        return;
+    QDate date = QDate::currentDate();
+    int cp = 0;
+    int aetp = 0;
+    int ftp = 0;
+    int wprime = 0;
+    int pmax = 0;
+    int estOffset = 0;
+    bool defaults = false;
+    QDate startDate;
+    bool ok = getValuesFor(date, true, cp, aetp, ftp, wprime, pmax, estOffset, defaults, &startDate);
+    if (ok && startDate.isValid() &&  startDate < date) {
+        date = startDate;
+        estOffset = 0;
+    }
+    if (! ok || defaults || estOffset != 0) {
+        QDialog dataDialog;
+
+        QDialogButtonBox *buttonBox = new QDialogButtonBox();
+        QPushButton *discardButton = buttonBox->addButton(QDialogButtonBox::Discard);
+        QPushButton *applyButton = buttonBox->addButton(QDialogButtonBox::Apply);
+        connect(discardButton, SIGNAL(clicked()), &dataDialog, SLOT(reject()));
+        connect(applyButton, SIGNAL(clicked()), &dataDialog, SLOT(accept()));
+
+        QLabel *hintLabel = nullptr;
+        if (! ok || defaults) {
+            dataDialog.setWindowTitle(tr("Manual entry"));
+        } else {
+            dataDialog.setWindowTitle(tr("Semi-automativ entry"));
+            hintLabel = new QLabel();
+            if (estOffset < 0) {
+                hintLabel->setText(tr("starts %1 days after").arg(-1 * estOffset));
+            } else if (estOffset > 0) {
+                hintLabel->setText(tr("ends %1 days before").arg(estOffset));
+            }
+        }
+
+        QDateEdit *dateEdit = new QDateEdit(date);
+        dateEdit->setCalendarPopup(true);
+
+        QSpinBox *cpEdit = new QSpinBox();
+        cpEdit->setRange(1, 999);
+        cpEdit->setSingleStep(1);
+        cpEdit->setSuffix(" " + tr("W"));
+        cpEdit->setValue(cp);
+
+        QSpinBox *aetpEdit = new QSpinBox();
+        aetpEdit->setRange(1, 999);
+        aetpEdit->setSingleStep(1);
+        aetpEdit->setSuffix(" " + tr("W"));
+        aetpEdit->setValue(aetp);
+
+        QSpinBox *ftpEdit = nullptr;
+        if (useCPForFTPCombo->currentIndex() != 0) {
+            ftpEdit = new QSpinBox();
+            ftpEdit->setRange(1, 999);
+            ftpEdit->setSingleStep(1);
+            ftpEdit->setSuffix(" " + tr("W"));
+            ftpEdit->setValue(ftp);
+        }
+
+        QSpinBox *wprimeEdit = new QSpinBox();
+        wprimeEdit->setRange(1, 99999);
+        wprimeEdit->setSingleStep(100);
+        wprimeEdit->setSuffix(" " + tr("J"));
+        wprimeEdit->setValue(wprime);
+
+        QSpinBox *pmaxEdit = new QSpinBox();
+        pmaxEdit->setRange(1, 9999);
+        pmaxEdit->setSingleStep(10);
+        pmaxEdit->setSuffix(" " + tr("W"));
+        pmaxEdit->setValue(pmax);
+
+        QLabel *distanceLabel = nullptr;
+
+        if (! defaults && estOffset != 0) {
+            connect(
+                dateEdit, &QDateEdit::dateChanged,
+                [=](QDate newDate) {
+                    int cp = 0;
+                    int aetp = 0;
+                    int ftp = 0;
+                    int wprime = 0;
+                    int pmax = 0;
+                    int estOffset = 0;
+                    bool defaults = false;
+                    bool ok = getValuesFor(newDate, false, cp, aetp, ftp, wprime, pmax, estOffset, defaults);
+                    if (ok) {
+                        cpEdit->setValue(cp);
+                        aetpEdit->setValue(aetp);
+                        if (ftpEdit != nullptr) {
+                            ftpEdit->setValue(ftp);
+                        }
+                        wprimeEdit->setValue(wprime);
+                        pmaxEdit->setValue(pmax);
+                        if (estOffset == 0) {
+                            hintLabel->setText(tr("exact match"));
+                        } else if (estOffset < 0) {
+                            hintLabel->setText(tr("starts %1 days after").arg(-1 * estOffset));
+                        } else if (estOffset > 0) {
+                            hintLabel->setText(tr("ends %1 days before").arg(estOffset));
+                        }
+                    }
+                }
+            );
+        }
+
+        QFormLayout *dataFormLayout = new QFormLayout(&dataDialog);
+        dataFormLayout->addRow(tr("Start Date"), dateEdit);
+        dataFormLayout->addRow(tr("Critical Power"), cpEdit);
+        dataFormLayout->addRow(tr("AeTP (Aerobic Threshold)"), aetpEdit);
+        if (ftpEdit != nullptr) {
+            dataFormLayout->addRow(tr("FTP (Functional Threshold Power)"), ftpEdit);
+        }
+        dataFormLayout->addRow(tr("W'"), wprimeEdit);
+        dataFormLayout->addRow(tr("PMax (Maximum Power)"), pmaxEdit);
+        if (hintLabel != nullptr) {
+            dataFormLayout->addRow(tr("Closest Estimate"), hintLabel);
+        }
+        dataFormLayout->addRow(buttonBox);
+
+        int dialogRet = dataDialog.exec();
+        if (dialogRet == QDialog::Accepted) {
+            date = dateEdit->date();
+            cp = cpEdit->value();
+            aetp = aetpEdit->value();
+            ftp = ftpEdit != nullptr ? ftpEdit->value() : cp;
+            wprime = wprimeEdit->value();
+            pmax = pmaxEdit->value();
+        } else if (dialogRet == QDialog::Rejected) {
+            return;
+        }
     }
 
-    int wp = wEdit->value() ? wEdit->value() : 20000;
-    if (wp < 1000) wp *= 1000; // entered in kJ we want joules
+    int index = zones_->addZoneRange(date, cp, aetp, ftp, wprime, pmax);
 
-    int pmax = pmaxEdit->value() ? pmaxEdit->value() : 1000;
-
-    int index = zones_->addZoneRange(dateEdit->date(), cpEdit->value(), aetEdit->value(), ftpEdit->value(), wp, pmax);
-
-    // new item
-    QTreeWidgetItem *add = new QTreeWidgetItem;
-    add->setFlags(add->flags() & ~Qt::ItemIsEditable);
+    QTreeWidgetItem *add = new QTreeWidgetItem();
+    add->setFlags(add->flags() | Qt::ItemIsEditable);
     ranges->invisibleRootItem()->insertChild(index, add);
+    ranges->setCurrentItem(add);
 
-    int column = 0;
+    add->setData(CPPAGE_RANGES_COL_STARTDATE, Qt::DisplayRole, date);
+    add->setData(CPPAGE_RANGES_COL_CP, Qt::DisplayRole, cp);
+    add->setData(CPPAGE_RANGES_COL_AETP, Qt::DisplayRole, aetp);
+    add->setData(CPPAGE_RANGES_COL_FTP, Qt::DisplayRole, ftp);
+    add->setData(CPPAGE_RANGES_COL_WPRIME, Qt::DisplayRole, wprime);
+    add->setData(CPPAGE_RANGES_COL_PMAX, Qt::DisplayRole, pmax);
 
-    // date
-    add->setText(column++, dateEdit->date().toString(tr("MMM d, yyyy")));
-
-    // CP
-    add->setText(column++, QString("%1").arg(cpEdit->value()));
-
-    // AeT
-    add->setText(column++, QString("%1").arg(aetEdit->value()));
-
-    // FTP
-    add->setText(column++, QString("%1").arg(ftpEdit->value()));
-
-    // W'
-    add->setText(column++, QString("%1").arg(wp));
-
-    // Pmax
-    add->setText(column++, QString("%1").arg(pmax));
-
-}
-
-void
-CPPage::editClicked()
-{
-    // get current scheme
-    zones_->setScheme(schemePage->getScheme());
-
-    int cp = cpEdit->value();
-
-    if( cp <= 0 ){
-        QMessageBox err;
-        err.setText(tr("Critical Power must be > 0"));
-        err.setIcon(QMessageBox::Warning);
-        err.exec();
-        return;
+    if (getValuesFor(date, false, cp, aetp, ftp, wprime, pmax, estOffset, defaults)) {
+        add->setData(CPPAGE_RANGES_COL_EST_OFFSET, Qt::DisplayRole, estOffset);
+        add->setData(CPPAGE_RANGES_COL_EST_CP, Qt::DisplayRole, cp);
+        add->setData(CPPAGE_RANGES_COL_EST_FTP, Qt::DisplayRole, ftp);
+        add->setData(CPPAGE_RANGES_COL_EST_WPRIME, Qt::DisplayRole, wprime);
+        add->setData(CPPAGE_RANGES_COL_EST_PMAX, Qt::DisplayRole, pmax);
+    } else {
+        add->setData(CPPAGE_RANGES_COL_EST_CP, Qt::DisplayRole, 0);
     }
-
-    int ftp = ftpEdit->value() ? ftpEdit->value() : cp;
-    int wp = wEdit->value() ? wEdit->value() : 20000;
-    if (wp < 1000) wp *= 1000; // entered in kJ we want joules
-
-    int pmax = pmaxEdit->value() ? pmaxEdit->value() : 1000;
-
-    QTreeWidgetItem *edit = ranges->selectedItems().at(0);
-    int index = ranges->indexOfTopLevelItem(edit);
-
-
-    int columns = 0;
-
-    // date
-    zones_->setStartDate(index, dateEdit->date());
-    edit->setText(columns++, dateEdit->date().toString(tr("MMM d, yyyy")));
-
-    // CP
-    zones_->setCP(index, cp);
-    edit->setText(columns++, QString("%1").arg(cp));
-
-    // AeT
-    zones_->setAeT(index, aetEdit->value());
-    edit->setText(columns++, QString("%1").arg(aetEdit->value()));
-
-    // show FTP if we use FTP for Coggan Metrics
-    zones_->setFTP(index, ftp);
-    edit->setText(columns++, QString("%1").arg(ftp));
-
-    // W'
-    zones_->setWprime(index, wp);
-    edit->setText(columns++, QString("%1").arg(wp));
-
-    // Pmax
-    zones_->setPmax(index, pmax);
-    edit->setText(columns++, QString("%1").arg(pmax));
-
 }
+
 
 void
 CPPage::deleteClicked()
@@ -1464,6 +1865,7 @@ CPPage::deleteClicked()
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
         delete ranges->invisibleRootItem()->takeChild(index);
         zones_->deleteRange(index);
+        newZoneRequired->setVisible(needsNewRange());
     }
 }
 
@@ -1471,17 +1873,20 @@ void
 CPPage::defaultClicked()
 {
     if (ranges->currentItem()) {
-
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
         ZoneRange current = zones_->getZoneRange(index);
 
         // unbold
         QFont font;
         font.setWeight(QFont::Normal);
-        ranges->currentItem()->setFont(0, font);
-        ranges->currentItem()->setFont(1, font);
-        ranges->currentItem()->setFont(2, font);
-
+        ranges->currentItem()->setFont(CPPAGE_RANGES_COL_STARTDATE, font);
+        ranges->currentItem()->setFont(CPPAGE_RANGES_COL_CP, font);
+        ranges->currentItem()->setFont(CPPAGE_RANGES_COL_AETP, font);
+        ranges->currentItem()->setFont(CPPAGE_RANGES_COL_FTP, font);
+        ranges->currentItem()->setFont(CPPAGE_RANGES_COL_WPRIME, font);
+        ranges->currentItem()->setFont(CPPAGE_RANGES_COL_PMAX, font);
+        ranges->currentItem()->setFont(CPPAGE_RANGES_COL_MODELFIT, font);
+        ranges->currentItem()->setFont(CPPAGE_RANGES_COL_CLOSEST, font);
 
         // set the range to use defaults on the scheme page
         zones_->setScheme(schemePage->getScheme());
@@ -1495,36 +1900,6 @@ CPPage::defaultClicked()
     }
 }
 
-void
-CPPage::rangeEdited()
-{
-    if (ranges->currentItem()) {
-        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-
-        QDate date = dateEdit->date();
-        QDate odate = zones_->getStartDate(index);
-
-        int cp = cpEdit->value();
-        int ocp = zones_->getCP(index);
-
-        int aet = aetEdit->value();
-        int oaet = zones_->getAeT(index);
-
-        int ftp = ftpEdit->value();
-        int oftp = zones_->getFTP(index);
-
-        int wp = wEdit->value();
-        int owp = zones_->getWprime(index);
-
-        int pmax = pmaxEdit->value();
-        int opmax = zones_->getPmax(index);
-
-        if (date != odate || cp != ocp || aet != oaet || ftp != oftp || wp != owp || pmax != opmax)
-            updateButton->show();
-        else
-            updateButton->hide();
-    }
-}
 
 void
 CPPage::rangeSelectionChanged()
@@ -1533,57 +1908,42 @@ CPPage::rangeSelectionChanged()
 
     // wipe away current contents of zones
     foreach (QTreeWidgetItem *item, zones->invisibleRootItem()->takeChildren()) {
-        delete zones->itemWidget(item, 2);
         delete item;
     }
 
     // fill with current details
-    if (ranges->currentItem()) {
+    QTreeWidgetItem *item = ranges->currentItem();
+    if (item != nullptr) {
+        adoptButton->setVisible(   useModel->currentIndex() != CPPAGE_EST_MODEL_NONE
+                                && item->data(CPPAGE_RANGES_COL_EST_DEVIATION, Qt::DisplayRole).toInt() == CPPAGE_RANGES_EST_DEVIATE);
 
-
-        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
+        int index = ranges->invisibleRootItem()->indexOfChild(item);
         ZoneRange current = zones_->getZoneRange(index);
 
-        dateEdit->setDate(zones_->getStartDate(index));
-        cpEdit->setValue(zones_->getCP(index));
-        aetEdit->setValue(zones_->getAeT(index));
-        ftpEdit->setValue(zones_->getFTP(index));
-        wEdit->setValue(zones_->getWprime(index));
-        pmaxEdit->setValue(zones_->getPmax(index));
-
         if (current.zonesSetFromCP) {
-
             // reapply the scheme in case it has been changed
             zones_->setScheme(schemePage->getScheme());
             zones_->setZonesFromCP(index);
             current = zones_->getZoneRange(index);
 
             defaultButton->hide();
-
-        } else defaultButton->show();
+        } else {
+            defaultButton->show();
+        }
 
         for (int i=0; i< current.zones.count(); i++) {
-
             QTreeWidgetItem *add = new QTreeWidgetItem(zones->invisibleRootItem());
             add->setFlags(add->flags() | Qt::ItemIsEditable);
 
-            // tab name
-            add->setText(0, current.zones[i].name);
-            // field name
-            add->setText(1, current.zones[i].desc);
-
-            // low
-            QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
-            loedit->setMinimum(0);
-            loedit->setMaximum(1000);
-            loedit->setSingleStep(1.0);
-            loedit->setDecimals(0);
-            loedit->setValue(current.zones[i].lo);
-            zones->setItemWidget(add, 2, loedit);
-            connect(loedit, SIGNAL(valueChanged(double)), this, SLOT(zonesChanged()));
+            add->setData(0, Qt::DisplayRole, current.zones[i].name);
+            add->setData(1, Qt::DisplayRole, current.zones[i].desc);
+            add->setData(2, Qt::DisplayRole, current.zones[i].lo);
         }
-        for(int i = 0; i < zones->columnCount(); i++)
+        for (int i = 0; i < zones->columnCount(); i++) {
             zones->resizeColumnToContents(i);
+        }
+    } else {
+        adoptButton->setVisible(false);
     }
 
     active = false;
@@ -1611,30 +1971,23 @@ CPPage::addZoneClicked()
     QTreeWidgetItem *add = new QTreeWidgetItem;
     add->setFlags(add->flags() | Qt::ItemIsEditable);
 
-    QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
-    loedit->setMinimum(0);
-    loedit->setMaximum(1000);
-    loedit->setSingleStep(1.0);
-    loedit->setDecimals(0);
-    loedit->setValue(100);
-
     zones->invisibleRootItem()->insertChild(index, add);
-    zones->setItemWidget(add, 2, loedit);
-    connect(loedit, SIGNAL(editingFinished()), this, SLOT(zonesChanged()));
 
     // Short
     QString text = tr("New");
     for (int i=0; zones->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
         text = QString(tr("New (%1)")).arg(i+1);
     }
-    add->setText(0, text);
+    add->setData(0, Qt::DisplayRole, text);
 
     // long
     text = tr("New");
     for (int i=0; zones->findItems(text, Qt::MatchExactly, 1).count() > 0; i++) {
         text = QString(tr("New (%1)")).arg(i+1);
     }
-    add->setText(1, text);
+    add->setData(1, Qt::DisplayRole, text);
+
+    add->setData(2, Qt::DisplayRole, 100);
     active = false;
 
     zonesChanged();
@@ -1666,16 +2019,20 @@ CPPage::zonesChanged()
     if (active == false) {
         // get the current zone range
         if (ranges->currentItem()) {
-
             int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
             ZoneRange current = zones_->getZoneRange(index);
 
             // embolden that range on the list to show it has been edited
             QFont font;
             font.setWeight(QFont::Black);
-            ranges->currentItem()->setFont(0, font);
-            ranges->currentItem()->setFont(1, font);
-            ranges->currentItem()->setFont(2, font);
+            ranges->currentItem()->setFont(CPPAGE_RANGES_COL_STARTDATE, font);
+            ranges->currentItem()->setFont(CPPAGE_RANGES_COL_CP, font);
+            ranges->currentItem()->setFont(CPPAGE_RANGES_COL_AETP, font);
+            ranges->currentItem()->setFont(CPPAGE_RANGES_COL_FTP, font);
+            ranges->currentItem()->setFont(CPPAGE_RANGES_COL_WPRIME, font);
+            ranges->currentItem()->setFont(CPPAGE_RANGES_COL_PMAX, font);
+            ranges->currentItem()->setFont(CPPAGE_RANGES_COL_MODELFIT, font);
+            ranges->currentItem()->setFont(CPPAGE_RANGES_COL_CLOSEST, font);
 
             // show the default button to undo
             defaultButton->show();
@@ -1687,9 +2044,9 @@ CPPage::zonesChanged()
             QList<ZoneInfo> zoneinfos;
             for (int i=0; i< zones->invisibleRootItem()->childCount(); i++) {
                 QTreeWidgetItem *item = zones->invisibleRootItem()->child(i);
-                zoneinfos << ZoneInfo(item->text(0),
-                                      item->text(1),
-                                      ((QDoubleSpinBox*)zones->itemWidget(item, 2))->value(),
+                zoneinfos << ZoneInfo(item->data(0, Qt::DisplayRole).toString(),
+                                      item->data(1, Qt::DisplayRole).toString(),
+                                      item->data(2, Qt::DisplayRole).toInt(),
                                       0);
             }
 
@@ -2016,7 +2373,7 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
     zoneButtons->addWidget(defaultButton);
 
     QHBoxLayout *addLayout = new QHBoxLayout;
-    QLabel *dateLabel = new QLabel(tr("From Date"));
+    QLabel *dateLabel = new QLabel(tr("Start Date"));
     dateEdit = new QDateEdit;
     dateEdit->setDate(QDate::currentDate());
     dateEdit->setCalendarPopup(true);
@@ -2071,7 +2428,7 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
     actionButtons->addWidget(deleteButton);
 
     ranges = new QTreeWidget;
-    ranges->headerItem()->setText(0, tr("From Date"));
+    ranges->headerItem()->setText(0, tr("Start Date"));
     ranges->headerItem()->setText(1, tr("Lactate Threshold"));
     ranges->headerItem()->setText(2, tr("Aerobic Threshold"));
     ranges->headerItem()->setText(3, tr("Rest HR"));
@@ -2771,7 +3128,7 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     zoneButtons->addWidget(deleteZoneButton);
 
     QHBoxLayout *addLayout = new QHBoxLayout;
-    QLabel *dateLabel = new QLabel(tr("From Date"));
+    QLabel *dateLabel = new QLabel(tr("Start Date"));
     QLabel *cpLabel = new QLabel(tr("Critical Velocity"));
     QLabel *aetLabel = new QLabel(tr("Aerobic Threshold"));
     dateEdit = new QDateEdit;
@@ -2809,7 +3166,7 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     addLayout->addStretch();
 
     ranges = new QTreeWidget;
-    ranges->headerItem()->setText(0, tr("From Date"));
+    ranges->headerItem()->setText(0, tr("Start Date"));
     ranges->headerItem()->setText(1, tr("Critical Velocity"));
     ranges->headerItem()->setText(2, tr("Aerobic Threshold"));
     ranges->setColumnCount(3);

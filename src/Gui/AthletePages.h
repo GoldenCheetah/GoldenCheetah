@@ -52,6 +52,7 @@
 #include "RideAutoImportConfig.h"
 #include "RemoteControl.h"
 #include "Measures.h"
+#include "StyledItemDelegates.h"
 
 class MeasuresPage : public QWidget
 {
@@ -223,11 +224,11 @@ class CredentialsPage : public QScrollArea
 class SchemePage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
         SchemePage(Zones *zones);
+        ~SchemePage();
+
         ZoneScheme getScheme();
         qint32 saveClicked();
 
@@ -240,52 +241,95 @@ class SchemePage : public QWidget
         Zones *zones;
         QTreeWidget *scheme;
         QPushButton *addButton, *renameButton, *deleteButton;
+        SpinBoxEditDelegate *zoneFromDelegate;
 };
+
+
+// Compatibility helper for Qt5
+// exposes methods that turned public in Qt6 from protected in Qt5
+#if QT_VERSION < 0x060000
+class TreeWidget6 : public QTreeWidget
+{
+    Q_OBJECT
+
+    public:
+        TreeWidget6(QWidget *parent = nullptr): QTreeWidget(parent) {
+        }
+
+        QModelIndex indexFromItem(const QTreeWidgetItem *item, int column = 0) const {
+            return QTreeWidget::indexFromItem(item, column);
+        }
+
+        QTreeWidgetItem* itemFromIndex(const QModelIndex &index) const {
+            return QTreeWidget::itemFromIndex(index);
+        }
+
+};
+#else
+typedef QTreeWidget TreeWidget6;
+#endif
+
 
 class CPPage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
         CPPage(Context *context, Zones *zones, SchemePage *schemePage);
-        QComboBox *useCPForFTPCombo;
+        ~CPPage();
+
         qint32 saveClicked();
 
-    struct {
-        int cpforftp;
-    } b4;
+        QComboBox *useModel;
+        QComboBox *useCPForFTPCombo;
+
+        struct {
+            int modelIdx;
+            int cpforftp;
+        } b4;
 
     public slots:
         void addClicked();
-        void editClicked();
         void deleteClicked();
         void defaultClicked();
-        void rangeEdited();
         void rangeSelectionChanged();
         void addZoneClicked();
         void deleteZoneClicked();
         void zonesChanged();
         void initializeRanges();
 
+    private slots:
+        void rangeEdited(const QModelIndex &modelIndex);
+        void estimate();
+
     private:
         bool active;
 
-        QDateEdit *dateEdit;
-        QDoubleSpinBox *cpEdit;
-        QDoubleSpinBox *aetEdit;
-        QDoubleSpinBox *ftpEdit;
-        QDoubleSpinBox *wEdit;
-        QDoubleSpinBox *pmaxEdit;
+        DateEditDelegate *dateDelegate;
+        SpinBoxEditDelegate *cpDelegate;
+        SpinBoxEditDelegate *aetDelegate;
+        SpinBoxEditDelegate *ftpDelegate;
+        SpinBoxEditDelegate *wDelegate;
+        SpinBoxEditDelegate *pmaxDelegate;
+        NoEditDelegate *statusDelegate;
+        NoEditDelegate *closestDelegate;
+
+        SpinBoxEditDelegate *zoneFromDelegate;
 
         Context *context;
         Zones *zones_;
         SchemePage *schemePage;
-        QTreeWidget *ranges;
+        TreeWidget6 *ranges;
         QTreeWidget *zones;
-        QPushButton *addButton, *updateButton, *deleteButton;
+        QPushButton *addButton, *deleteButton;
+        QPushButton *adoptButton;
         QPushButton *addZoneButton, *deleteZoneButton, *defaultButton;
+        QPushButton *newZoneRequired;
+
+        bool getValuesFor(const QDate &date, bool allowDefaults, int &cp, int &aetp, int &ftp, int &wprime, int &pmax, int &estOffset, bool &defaults, QDate *startDate = nullptr) const;
+        void setEstimateStatus(QTreeWidgetItem *item);
+        void setRangeData(QModelIndex modelIndex, int column, QVariant data);
+        bool needsNewRange() const;
 };
 
 class ZonePage : public QWidget
