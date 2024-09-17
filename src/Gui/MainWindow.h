@@ -131,7 +131,7 @@ class MainWindow : public QMainWindow
         void clearSplash();
 
         AbstractView *getAbstractView(int view);
-        void setEquipmentView(bool equipmentDisplayed);
+        void setViewStack(int newViewStack);
 
     signals:
         void backClicked();
@@ -311,6 +311,12 @@ class MainWindow : public QMainWindow
         NewSideBar *sidebar;
         AthleteView *athleteView;
         EquipView *equipmentView;
+
+        bool eqViewbarState;
+        bool eqSidebarState;
+        bool eqLowbarState;
+        bool eqToolbarState;
+        bool eqAthleteTabbarState;
 
 #ifndef Q_OS_MAC
         QTFullScreen *fullScreen;

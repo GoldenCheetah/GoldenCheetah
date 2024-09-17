@@ -124,6 +124,10 @@ class CommonEquipmentItem : public ChartSpaceItem
 
         void popupAction(QAction*);
 
+    protected:
+
+        int setupScrollableText(const QFontMetrics& fm, const QString& tileText, QMap<int, QString>& rowTextMap, int rowOffset = 0);
+
 };
 
 class EquipmentItem : public CommonEquipmentItem
@@ -141,6 +145,8 @@ class EquipmentItem : public CommonEquipmentItem
 
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override;
         void configChanged(qint32) override;
+        void itemGeometryChanged() override;
+        void showEvent(QShowEvent* event) override;
 
         bool isWithin(const QDate& actDate) const;
         bool isWithin(const QString& rideEqLinkName, const QDate& actDate) const;
@@ -175,6 +181,9 @@ class EquipmentItem : public CommonEquipmentItem
         QString notes_;
 
     private:
+
+        int numRowsInNotes_;
+
         std::atomic<uint64_t> activities_;
         std::atomic<uint64_t> activityTimeInSecs_;
 
@@ -186,7 +195,7 @@ class EquipmentItem : public CommonEquipmentItem
         std::atomic<uint64_t> gcElevationScaled_;
         std::atomic<uint64_t> totalElevationScaled_;
 
-        QColor inactiveColor, textColor, alertColor;
+        QColor inactiveColor_, textColor_, alertColor_;
 };
 
 class EquipmentSummary : public CommonEquipmentItem
@@ -207,14 +216,14 @@ class EquipmentSummary : public CommonEquipmentItem
 
         // create and config
         static ChartSpaceItem* create(ChartSpace* parent) {
-            return new EquipmentSummary(parent, tr("Summary"), "", true); }
+            return new EquipmentSummary(parent, tr("Summary Item"), "", true); }
 
         QString eqLinkName_;
         bool showActivitiesPerAthlete_;
 
     private:
 
-        QColor textColor;
+        QColor textColor_;
         std::atomic<uint64_t> eqLinkTotalTimeInSecs_;
         std::atomic<uint64_t> eqLinkTotalDistanceScaled_;
         std::atomic<uint64_t> eqLinkTotalElevationScaled_;
@@ -249,12 +258,13 @@ class EquipmentHistory : public CommonEquipmentItem
         void configChanged(qint32) override;
         void itemGeometryChanged() override;
         void wheelEvent(QGraphicsSceneWheelEvent* event) override;
+        void showEvent(QShowEvent* event) override;
 
         void sortHistoryEntries();
 
         // create and config
         static ChartSpaceItem* create(ChartSpace* parent) {
-            return new EquipmentHistory(parent, tr("History"));
+            return new EquipmentHistory(parent, tr("History Item"));
         }
 
         bool sortMostRecentFirst_;
@@ -262,9 +272,10 @@ class EquipmentHistory : public CommonEquipmentItem
 
     private:
 
-        int scrollPosn;
-        QColor textColor;
-        VScrollBar* scrollbar;
+        int scrollPosn_;
+        QMap<int, QString> scrollableDisplayText_;
+        QColor textColor_;
+        VScrollBar* scrollbar_;
 };
 
 class EquipmentNotes : public CommonEquipmentItem
@@ -278,17 +289,23 @@ class EquipmentNotes : public CommonEquipmentItem
 
         void itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) override;
         void configChanged(qint32) override;
+        void itemGeometryChanged() override;
+        void wheelEvent(QGraphicsSceneWheelEvent* event) override;
+        void showEvent(QShowEvent* event) override;
 
         // create and config
         static ChartSpaceItem* create(ChartSpace* parent) {
-            return new EquipmentNotes(parent, tr("Notes"), "");
+            return new EquipmentNotes(parent, tr("Notes Item"), "");
         }
 
         QString notes_;
 
     private:
 
-        QColor textColor;
+        int scrollPosn_;
+        QMap<int, QString> scrollableDisplayText_;
+        QColor textColor_;
+        VScrollBar* scrollbar_;
 
 };
 

@@ -87,28 +87,14 @@ EqTimeWindow::displayImportance() const
    if (isWithin(QDate::currentDate())) {
 
        if (!startSet_)
-           if (!endSet_)
-               importance = 8; // no range set
-           else
-               importance = 6; // end set but not beginning !
+           importance = (!endSet_) ? 8 : 6;
        else
-           if (!endSet_)
-               importance = 7; // start but no end
-           else
-               importance = 5; // start & end set
-   }
-   else
-   {
+           importance = (!endSet_) ? 7 : 5;
+   } else {
        if (!startSet_)
-           if (!endSet_)
-               importance = 4; // no range set
-           else
-               importance = 2; // end set but not beginning !
+           importance = (!endSet_) ? 4 : 2;
        else
-           if (!endSet_)
-               importance = 3; // start but no end
-           else
-               importance = 1; // start & end set
+           importance = (!endSet_) ? 3 : 1;
    }
 
     return importance;
@@ -612,22 +598,17 @@ void CommonEquipmentItem::DisplayMenuOfValues(const QPoint& pos)
         }
     }
 
-    // equipment notes are difficult to understand the tile height
-    // so are not supported at the moment
-    if (type != OverviewItemType::EQ_NOTES) {
+    QAction* metaAction = new QAction(tr("Expand"));
+    popMenu.addAction(metaAction);
 
-        QAction* metaAction = new QAction(tr("Expand"));
-        popMenu.addAction(metaAction);
+    metaAction = new QAction(tr("Collapse"));
+    popMenu.addAction(metaAction);
 
-        metaAction = new QAction(tr("Collapse"));
-        popMenu.addAction(metaAction);
+    metaAction = new QAction(tr("Expand Tiles"));
+    popMenu.addAction(metaAction);
 
-        metaAction = new QAction(tr("Expand Tiles"));
-        popMenu.addAction(metaAction);
-
-        metaAction = new QAction(tr("Collapse Tiles"));
-        popMenu.addAction(metaAction);
-    }
+    metaAction = new QAction(tr("Collapse Tiles"));
+    popMenu.addAction(metaAction);
 
     for (const GcChartWindow* chart : parent->window->getPerspective()->getCharts()) {
 
@@ -695,6 +676,58 @@ void CommonEquipmentItem::popupAction(QAction* action)
     }
 }
 
+int
+CommonEquipmentItem::setupScrollableText(const QFontMetrics& fm, const QString& tileText,
+                                        QMap<int, QString>& rowTextMap, int rowOffset /* = 0 */)
+{
+    // Using the QFontMetrics rectangle on the whole string doesn't always give the correct number
+    // of rows as the painter will not render partial words, and there maybe newline characters,
+    // this algorithm calculates the rows for whole words like the painter.
+
+    QChar chr;
+    int lastSpace = 0;
+    int beginingOfRow = 0;
+    int widthOfLineChars = 0;
+    int numRowsInNotes = 0;
+    int rowWidth = round(geometry().width() - (ROWHEIGHT * 2));
+
+    // determine the number of rows and the scrollable text for each scrollbar position,
+    // based upon only whole words per row and any newline characters.
+    int i = 0;
+    while (i <= tileText.length())
+    {
+        chr = tileText.at(i);
+
+        if (chr.isSpace()) lastSpace = i;
+
+        int charWidth = fm.horizontalAdvance(chr);
+        widthOfLineChars += charWidth;
+
+        if (chr == '\n') { // check for carriage return
+            rowTextMap[numRowsInNotes+ rowOffset] = tileText.mid(beginingOfRow, i - beginingOfRow);
+            numRowsInNotes++;
+            widthOfLineChars = 0;
+            beginingOfRow = i + 1;
+        }
+        else {
+
+            if (widthOfLineChars > rowWidth) { // characters exceed row capacity
+
+                if (i != lastSpace) i = lastSpace; // revert to last whole word
+                rowTextMap[numRowsInNotes+ rowOffset] = tileText.mid(beginingOfRow, i - beginingOfRow);
+                numRowsInNotes++;
+                widthOfLineChars = 0;
+                beginingOfRow = i + 1;
+            }
+        }
+
+        i++; // advance to next character
+    }
+    rowTextMap[numRowsInNotes+ rowOffset] = tileText.mid(beginingOfRow, i - beginingOfRow);
+
+    return numRowsInNotes+1;
+}
+
 //
 // ---------------------------------------- Equipment Item --------------------------------------------
 //
@@ -715,6 +748,7 @@ EquipmentItem::EquipmentItem(ChartSpace* parent, const QString& name) : CommonEq
     repDistanceScaled_ = 0;
     repElevationScaled_ = 0;
     repDateSet_ = false;
+    numRowsInNotes_ = 0;
 
     configwidget_ = new OverviewEquipmentItemConfig(this);
     configwidget_->hide();
@@ -740,6 +774,22 @@ EquipmentItem::EquipmentItem(ChartSpace* parent, const QString& name, QVector<Eq
 
     // set the widgets again for the passed in parameters
     configwidget_->setWidgets();
+}
+
+void
+EquipmentItem::showEvent(QShowEvent*)
+{
+    // wait for tile geometry to be defined
+    itemGeometryChanged();
+}
+
+void
+EquipmentItem::itemGeometryChanged()
+{
+    QMap<int, QString> scrollableDisplayText;
+    QFontMetrics fm(parent->smallfont, parent->device());
+
+    numRowsInNotes_ = setupScrollableText(fm, notes_, scrollableDisplayText);
 }
 
 void
@@ -842,9 +892,9 @@ void
 EquipmentItem::configChanged(qint32 cfg) {
 
     if (cfg & CONFIG_APPEARANCE) {
-        inactiveColor = (GCColor::luminance(RGBColor(color())) < 127) ? QColor(QColor(100, 100, 100)) : QColor(QColor(170, 170, 170));
-        textColor = (GCColor::luminance(RGBColor(color())) < 127) ? QColor(QColor(200, 200, 200)) : QColor(QColor(70, 70, 70));
-        alertColor = QColor(QColor(255, 170, 0));
+        inactiveColor_ = (GCColor::luminance(RGBColor(color())) < 127) ? QColor(QColor(100, 100, 100)) : QColor(QColor(170, 170, 170));
+        textColor_ = (GCColor::luminance(RGBColor(color())) < 127) ? QColor(QColor(200, 200, 200)) : QColor(QColor(70, 70, 70));
+        alertColor_ = QColor(QColor(255, 170, 0));
     }
 }
 
@@ -865,11 +915,11 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
     painter->setFont(parent->bigfont);
 
     if ((!rangeIsValid()) || overDistance || overElevation || overDate) {
-        painter->setPen(alertColor);
+        painter->setPen(alertColor_);
     } else if (isWithin(QDate::currentDate())) {
         painter->setPen(GColor(CPLOTMARKER));
     } else {
-        painter->setPen(inactiveColor);
+        painter->setPen(inactiveColor_);
     }
 
     // display the total distance
@@ -893,13 +943,13 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
 
         // display the date in either active, inactive or out of range colours
         if (!eqUse.rangeIsValid()) {
-            painter->setPen(alertColor);
+            painter->setPen(alertColor_);
         }
         else if (isWithin(eqUse.eqLinkName_, QDate::currentDate())) {
             painter->setPen(GColor(CPLOTMARKER));
         }
         else {
-            painter->setPen(inactiveColor);
+            painter->setPen(inactiveColor_);
         }
 
         QString dateString(eqUse.eqLinkName_ + ": ");
@@ -928,7 +978,7 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
         rowY += (ROWHEIGHT * ceil(rect.width() / rowWidth));
     }
 
-    painter->setPen(textColor);
+    painter->setPen(textColor_);
 
     painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth,rowHeight),
         QString(tr("Activities: ")) + QString::number(getNumActivities()));
@@ -967,38 +1017,38 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
 
     if (repDistanceScaled_ != 0) {
 
-        if (overDistance) painter->setPen(alertColor);
+        if (overDistance) painter->setPen(alertColor_);
 
         rowY += ROWHEIGHT;
         addNotesOffset = true;
         painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
             QString(tr("Replace dist: ")) + QString::number(repDistanceScaled_ * EQ_SCALED_TO_REAL, 'f', 1) + distUnits);
 
-        if (overDistance) painter->setPen(textColor);
+        if (overDistance) painter->setPen(textColor_);
     }
 
     if (repElevationScaled_ != 0) {
 
-        if (overElevation) painter->setPen(alertColor);
+        if (overElevation) painter->setPen(alertColor_);
 
         rowY += ROWHEIGHT;
         addNotesOffset = true;
         painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
             QString(tr("Replace elev: ")) + QString::number(repElevationScaled_ * EQ_SCALED_TO_REAL, 'f', 1) + elevUnits);
 
-        if (overElevation) painter->setPen(textColor);
+        if (overElevation) painter->setPen(textColor_);
     }
 
     if (repDateSet_) {
 
-        if (overDate) painter->setPen(alertColor);
+        if (overDate) painter->setPen(alertColor_);
 
         rowY += ROWHEIGHT;
         addNotesOffset = true;
         painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
             QString(tr("Replace date: ")) + repDate_.toString("->d MMM yy"));
 
-        if (overDate) painter->setPen(textColor);
+        if (overDate) painter->setPen(textColor_);
     }
 
     if (!notes_.isEmpty()) {
@@ -1008,7 +1058,8 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
         rowY += (ROWHEIGHT);
         painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), notes_);
     }
-    tileDisplayHeight_ = rowY + (ROWHEIGHT * 1.5);
+
+    tileDisplayHeight_ = rowY + (ROWHEIGHT * (numRowsInNotes_+1));
 }
 
 //
@@ -1075,7 +1126,7 @@ void
 EquipmentSummary::configChanged(qint32 cfg) {
 
     if (cfg & CONFIG_APPEARANCE) {
-        textColor = (GCColor::luminance(RGBColor(color())) < 127) ? QColor(QColor(200, 200, 200)) : QColor(QColor(70, 70, 70));
+        textColor_ = (GCColor::luminance(RGBColor(color())) < 127) ? QColor(QColor(200, 200, 200)) : QColor(QColor(70, 70, 70));
     }
 }
 
@@ -1094,7 +1145,7 @@ EquipmentSummary::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, 
     painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), eqLinkName);
 
     rowY += (ROWHEIGHT * 1.3);
-    painter->setPen(textColor);
+    painter->setPen(textColor_);
     painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
         QString(tr("Activities: ")) + QString::number(eqLinkNumActivities_));
 
@@ -1159,14 +1210,14 @@ EquipmentHistory::EquipmentHistory(ChartSpace* parent, const QString& name) :
     // equipment summary item
     this->type = OverviewItemType::EQ_HISTORY;
 
-    scrollPosn = 0;
+    scrollPosn_ = 0;
     sortMostRecentFirst_ = false;
 
     configwidget_ = new OverviewEquipmentItemConfig(this);
     configwidget_->hide();
 
-    scrollbar = new VScrollBar(this, parent);
-    scrollbar->show();
+    scrollbar_ = new VScrollBar(this, parent);
+    scrollbar_->show();
     configChanged(CONFIG_APPEARANCE);
 }
 
@@ -1176,15 +1227,21 @@ EquipmentHistory::EquipmentHistory(ChartSpace* parent, const QString& name, cons
     sortMostRecentFirst_ = sortMostRecentFirst;
     eqHistoryList_ = eqHistory;
     sortHistoryEntries();
-    itemGeometryChanged();
 }
 
 void
 EquipmentHistory::configChanged(qint32 cfg) {
 
     if (cfg & CONFIG_APPEARANCE) {
-        textColor = (GCColor::luminance(RGBColor(color())) < 127) ? QColor(QColor(200, 200, 200)) : QColor(QColor(70, 70, 70));
+        textColor_ = (GCColor::luminance(RGBColor(color())) < 127) ? QColor(QColor(200, 200, 200)) : QColor(QColor(70, 70, 70));
     }
+}
+
+void
+EquipmentHistory::showEvent(QShowEvent*)
+{
+    // wait for tile geometry to be defined
+    itemGeometryChanged();
 }
 
 void
@@ -1200,29 +1257,37 @@ void
 EquipmentHistory::itemGeometryChanged()
 {
     QFontMetrics fm(parent->smallfont, parent->device());
+
+    int numHistoryRows = 0;
+    scrollableDisplayText_.clear();
+
+    for (const auto& eqHistory : eqHistoryList_) {
+
+        QString historyEntryStr(eqHistory.date_.toString("dd MMM yyyy") + ": " + eqHistory.text_);
+        numHistoryRows += setupScrollableText(fm, historyEntryStr, scrollableDisplayText_, numHistoryRows);
+    }
+
     double scrollwidth = fm.boundingRect("X").width();
 
-    if ((geometry().height() - 40)  < ((eqHistoryList_.size() + 4) * ROWHEIGHT ))
+    if ((geometry().height() - 40)  < ((numHistoryRows + 2.5) * ROWHEIGHT ))
     {
         // set the scrollbar to the rhs
-        scrollbar->show();
-        scrollbar->setGeometry(geometry().width() - scrollwidth, ROWHEIGHT * 2.5, scrollwidth, geometry().height() - (ROWHEIGHT * 2.5) - 40);
-        scrollbar->setAreaHeight(eqHistoryList_.size() * ROWHEIGHT);
-        scrollbar->setPos(scrollPosn * ROWHEIGHT - (ROWHEIGHT / 2));
+        scrollbar_->show();
+        scrollbar_->setGeometry(geometry().width() - scrollwidth, ROWHEIGHT * 2.5, scrollwidth, geometry().height() - (ROWHEIGHT * 2.5) - 40);
+        scrollbar_->setAreaHeight(numHistoryRows * ROWHEIGHT);
     }
     else
     {
-        scrollbar->hide();
+        scrollbar_->hide();
     }
 }
 
 void
 EquipmentHistory::wheelEvent(QGraphicsSceneWheelEvent* w)
 {
-    if (scrollbar->canscroll) {
+    if (scrollbar_->canscroll) {
 
-        scrollbar->movePos(w->delta());
-        scrollPosn = (scrollbar->pos() + (ROWHEIGHT/2)) / ROWHEIGHT;
+        scrollbar_->movePos(w->delta());
         w->accept();
     }
 }
@@ -1230,37 +1295,38 @@ EquipmentHistory::wheelEvent(QGraphicsSceneWheelEvent* w)
 void
 EquipmentHistory::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) {
 
-    // don't paint on the edges
-    QRectF geom = geometry();
-    painter->setClipRect(40, 40, geom.width() - 80, geom.height() - 80);
-
     double rowY(ROWHEIGHT * 2.5);
     double rowWidth(geometry().width() - (ROWHEIGHT * 2));
-    double rowHeight(geometry().height() - (ROWHEIGHT * 4));
+    double rowHeight(geometry().height() - rowY);
 
     painter->setFont(parent->smallfont);
-    painter->setPen(textColor);
+    painter->setPen(textColor_);
 
-    scrollPosn = (scrollbar->pos() + (ROWHEIGHT / 2)) / ROWHEIGHT;
+    // Scale scrollbarPosn based on ratio of displayed rows and eqHistoryList_ entries
+    scrollPosn_ = (scrollbar_->pos() + (ROWHEIGHT/2)) / ROWHEIGHT;
+
+    // don't paint on the edges
+    painter->setClipRect(40, 40, geometry().width() - 80, geometry().height() - 80);
 
     int listPosn = 0;
-    for (const auto& eqHistory : eqHistoryList_) {
+    for (const auto& eqHistory : scrollableDisplayText_) {
 
-        if (listPosn >= scrollPosn) {
-            QString historyEntryStr(eqHistory.date_.toString("dd MMM yyyy") + ": " + eqHistory.text_);
-            QRectF rect = QFontMetrics(parent->smallfont, parent->device()).boundingRect(historyEntryStr);
+        if (listPosn >= scrollPosn_) {
 
-            painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), historyEntryStr);
-            painter->setPen(GColor(CPLOTMARKER));
-            painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), eqHistory.date_.toString("dd MMM yyyy") + ":");
-            painter->setPen(textColor);
+            painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), eqHistory);
 
-            rowY += (ROWHEIGHT * ceil(rect.width() / rowWidth));
+            if (eqHistory.at(11) == ":") {
+                painter->setPen(GColor(CPLOTMARKER));
+                painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), eqHistory.mid(0, 12));
+            }
+            painter->setPen(textColor_);
+
+            rowY += ROWHEIGHT;
         }
         listPosn++;
     }
 
-    tileDisplayHeight_ = rowY + (ROWHEIGHT * 1.5);
+    tileDisplayHeight_ = rowY;
 }
 
 //
@@ -1274,9 +1340,13 @@ EquipmentNotes::EquipmentNotes(ChartSpace* parent, const QString& name, const QS
     this->type = OverviewItemType::EQ_NOTES;
     notes_ = notes;
 
+    scrollPosn_ = 0;
+
     configwidget_ = new OverviewEquipmentItemConfig(this);
     configwidget_->hide();
 
+    scrollbar_ = new VScrollBar(this, parent);
+    scrollbar_->show();
     configChanged(CONFIG_APPEARANCE);
 }
 
@@ -1284,20 +1354,75 @@ void
 EquipmentNotes::configChanged(qint32 cfg) {
 
     if (cfg & CONFIG_APPEARANCE) {
-        textColor = (GCColor::luminance(RGBColor(color())) < 127) ? QColor(QColor(200, 200, 200)) : QColor(QColor(70, 70, 70));
+        textColor_ = (GCColor::luminance(RGBColor(color())) < 127) ? QColor(QColor(200, 200, 200)) : QColor(QColor(70, 70, 70));
+    }
+}
+
+void
+EquipmentNotes::showEvent(QShowEvent*)
+{
+    // wait for tile geometry to be defined
+    itemGeometryChanged();
+}
+
+void
+EquipmentNotes::itemGeometryChanged()
+{
+    QFontMetrics fm(parent->smallfont, parent->device());
+
+    scrollableDisplayText_.clear();
+    int numRowsInNotes = setupScrollableText(fm, notes_, scrollableDisplayText_);
+
+    // set the scrollbar width
+    double charWidth = fm.boundingRect("X").width();
+
+    if ((geometry().height() - 40) < ((numRowsInNotes+2) * ROWHEIGHT))
+    {
+        // set the scrollbar to the rhs
+        scrollbar_->show();
+        scrollbar_->setGeometry(geometry().width() - charWidth, ROWHEIGHT * 2.5, charWidth, geometry().height() - (3 * ROWHEIGHT));
+        scrollbar_->setAreaHeight(numRowsInNotes * ROWHEIGHT);
+    }
+    else
+    {
+        scrollbar_->hide();
+    }
+}
+
+void
+EquipmentNotes::wheelEvent(QGraphicsSceneWheelEvent* w)
+{
+    if (scrollbar_->canscroll) {
+
+        scrollbar_->movePos(w->delta());
+        w->accept();
     }
 }
 
 void
 EquipmentNotes::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) {
 
-    painter->setPen(textColor);
+    painter->setPen(textColor_);
     painter->setFont(parent->smallfont);
 
     double rowY(ROWHEIGHT * 2.5);
     double rowWidth(geometry().width() - (ROWHEIGHT * 2));
-    double rowHeight(geometry().height() - (ROWHEIGHT * 4));
 
-    painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), notes_);
+    scrollPosn_ = (scrollbar_->pos() + (ROWHEIGHT /2)) / ROWHEIGHT;
+
+    // don't paint on the edges
+    painter->setClipRect(40, 40, geometry().width() - 80, geometry().height() - 80);
+
+    int listPosn = 0;
+    for (const auto& eqNotes : scrollableDisplayText_) {
+
+        if (listPosn >= scrollPosn_) {
+            painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, ROWHEIGHT), eqNotes);
+            rowY += ROWHEIGHT;
+        }
+        listPosn++;
+    }
+
+    tileDisplayHeight_ = rowY;
 }
 
