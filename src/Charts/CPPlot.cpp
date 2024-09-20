@@ -57,37 +57,6 @@
 #include "qwt_spline_curve_fitter.h"
 #include "LTMTrend.h"
 
-QString
-CPPlot::paceString(double secs, double kph)
-{
-    QString paceStr;
-    const PaceZones *zones = context->athlete->paceZones(sport=="Swim");
-    const bool metricPace = zones ? appsettings->value(this, zones->paceSetting(), GlobalContext::context()->useMetricUnits).toBool() : GlobalContext::context()->useMetricUnits;
-
-    if (sport == "Run" || sport == "Swim") {
-
-        if (zones) paceStr = QString("\n%1 %2").arg(zones->kphToPaceString(kph, metricPace))
-                                               .arg(zones->paceUnits(metricPace));
-    } else if (sport == "Row") {
-
-        paceStr = QString("\n%1 %2").arg(kphToPace(kph*2, true, false)).arg(tr("min/500m"));
-    }
-
-    const double km = kph*secs/60.0; // distance in km
-    if (sport == "Swim") {
-
-        if (metricPace) paceStr += tr("\n%1 m").arg(1000*km, 0, 'f', 0);
-        else paceStr += tr("\n%1 yd").arg(1000*km/METERS_PER_YARD, 0, 'f', 0);
-
-    } else {
-
-        if (metricPace) paceStr += tr("\n%1 km").arg(km, 0, 'f', 3);
-        else  paceStr += tr("\n%1 mi").arg(MILES_PER_KM*km, 0, 'f', 3);
-
-    }
-    return paceStr;
-}
-
 CPPlot::CPPlot(CriticalPowerWindow *parent, Context *context, bool rangemode) : QwtPlot(parent), parent(parent),
 
     // model
@@ -1158,7 +1127,7 @@ CPPlot::plotTests(RideItem *rideitem)
                                                              .arg(interval_to_str(duration))
                                                              .arg(interval->name)
                                                              .arg(criticalSeries == CriticalPowerWindow::work ? tr("kJ") : RideFile::unitName(rideSeries, context))
-                                                             .arg(criticalSeries == CriticalPowerWindow::kph ? paceString(duration/60.0, watts) : "");
+                                                             .arg(criticalSeries == CriticalPowerWindow::kph ? paceString(duration, watts) : "");
                         QwtText text(desc);
                         QFont font; // default
                         font.setPointSize(8);
@@ -2234,7 +2203,7 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
                .arg(units1)
                .arg(units2)
                .arg(currentRidePercentStr)
-               .arg(criticalSeries == CriticalPowerWindow::kph ? paceString(xvalue, yvalue) : "")
+               .arg(criticalSeries == CriticalPowerWindow::kph ? paceString(xvalue*60.0, yvalue) : "")
                .arg(dateStr);
 
         // set that text up
@@ -3205,4 +3174,35 @@ CPPlot::kmToString(double km)
     } else {
         return tr("%1 mi").arg(km*MILES_PER_KM, 0, 'f', 3);
     }
+}
+
+QString
+CPPlot::paceString(double secs, double kph)
+{
+    QString paceStr;
+    const PaceZones *zones = context->athlete->paceZones(sport=="Swim");
+    const bool metricPace = zones ? appsettings->value(this, zones->paceSetting(), GlobalContext::context()->useMetricUnits).toBool() : GlobalContext::context()->useMetricUnits;
+
+    if (sport == "Run" || sport == "Swim") {
+
+        if (zones) paceStr = QString("\n%1 %2").arg(zones->kphToPaceString(kph, metricPace))
+                                               .arg(zones->paceUnits(metricPace));
+    } else if (sport == "Row") {
+
+        paceStr = QString("\n%1 %2").arg(kphToPace(kph*2, true, false)).arg(tr("min/500m"));
+    }
+
+    const double km = kph*secs/3600.0; // distance in km
+    if (sport == "Swim") {
+
+        if (metricPace) paceStr += tr("\n%1 m").arg(1000*km, 0, 'f', 0);
+        else paceStr += tr("\n%1 yd").arg(1000*km/METERS_PER_YARD, 0, 'f', 0);
+
+    } else {
+
+        if (metricPace) paceStr += tr("\n%1 km").arg(km, 0, 'f', 3);
+        else  paceStr += tr("\n%1 mi").arg(MILES_PER_KM*km, 0, 'f', 3);
+
+    }
+    return paceStr;
 }
