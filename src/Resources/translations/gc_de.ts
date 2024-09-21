@@ -208,7 +208,7 @@ Sie müssen diesen möglicherweise manuell deaktivieren.</translation>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="366"/>
         <source>Images (*.png *.jpg *.bmp)</source>
-        <translation>Bilder (*.png, *.jpg, *.bmp)</translation>
+        <translation>Bilder (*.png *.jpg *.bmp)</translation>
     </message>
 </context>
 <context>
@@ -21633,7 +21633,7 @@ Keine Aktivitäten zum Importieren gefunden.
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="220"/>
         <source>Images (*.png *.jpg *.bmp)</source>
-        <translation>Bilder (*.png, *.jpg, *.bmp)</translation>
+        <translation>Bilder (*.png *.jpg *.bmp)</translation>
     </message>
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="368"/>

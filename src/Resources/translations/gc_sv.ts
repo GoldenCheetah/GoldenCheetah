@@ -207,7 +207,7 @@ Det kan behövas göras manuellt.</translation>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="366"/>
         <source>Images (*.png *.jpg *.bmp)</source>
-        <translation>Bilder (*.png, *.jpg, *.bmp)</translation>
+        <translation>Bilder (*.png *.jpg *.bmp)</translation>
     </message>
 </context>
 <context>
@@ -21563,7 +21563,7 @@ Inga Aktiviteter att importera.
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="220"/>
         <source>Images (*.png *.jpg *.bmp)</source>
-        <translation>Bilder (*.png, *.jpg, *.bmp)</translation>
+        <translation>Bilder (*.png *.jpg *.bmp)</translation>
     </message>
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="368"/>
