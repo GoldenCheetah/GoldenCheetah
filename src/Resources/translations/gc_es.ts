@@ -207,7 +207,7 @@ Puede que sea necesario deshabilitarlo de forma manual.</translation>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="366"/>
         <source>Images (*.png *.jpg *.bmp)</source>
-        <translation>Imágenes (*.png *.jpg *.bmp)</translation>
+        <translation>Imágenes</translation>
     </message>
 </context>
 <context>
@@ -21563,7 +21563,7 @@ No se han encontrado actividades para importar.
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="220"/>
         <source>Images (*.png *.jpg *.bmp)</source>
-        <translation>Imágenes (*.png *.jpg *.bmp)</translation>
+        <translation>Imágenes</translation>
     </message>
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="368"/>
