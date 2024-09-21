@@ -207,7 +207,7 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="366"/>
         <source>Images (*.png *.jpg *.bmp)</source>
-        <translation>影像格式 (*.png *.jpg *.bmp)</translation>
+        <translation>影像格式</translation>
     </message>
 </context>
 <context>
@@ -21428,7 +21428,7 @@ No rides found to import.
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="220"/>
         <source>Images (*.png *.jpg *.bmp)</source>
-        <translation>影像格式 (*.png *.jpg *.bmp)</translation>
+        <translation>影像格式</translation>
     </message>
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="368"/>

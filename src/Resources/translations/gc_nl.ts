@@ -208,7 +208,7 @@ Misschien is het handmatig stoppen hiervan nodig.</translation>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="366"/>
         <source>Images (*.png *.jpg *.bmp)</source>
-        <translation>Afbeeldingen (*.png *.jpg *.bmp)</translation>
+        <translation>Afbeeldingen</translation>
     </message>
 </context>
 <context>
@@ -21448,7 +21448,7 @@ Geen ritten gevonden om te importeren.
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="220"/>
         <source>Images (*.png *.jpg *.bmp)</source>
-        <translation>Afbeeldingen (*.png *.jpg *.bmp)</translation>
+        <translation>Afbeeldingen</translation>
     </message>
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="368"/>
