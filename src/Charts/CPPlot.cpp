@@ -57,7 +57,6 @@
 #include "qwt_spline_curve_fitter.h"
 #include "LTMTrend.h"
 
-
 CPPlot::CPPlot(CriticalPowerWindow *parent, Context *context, bool rangemode) : QwtPlot(parent), parent(parent),
 
     // model
@@ -1064,7 +1063,8 @@ CPPlot::plotTests(RideItem *rideitem)
     QVector<QPointF> points;
 
     // just plot tests as power duration for now, will reiterate to add others later.
-    if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || criticalSeries == CriticalPowerWindow::work) {
+    if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg ||
+        criticalSeries == CriticalPowerWindow::work || rideSeries == RideFile::kph) {
 
         // rides to search, this one only -or- all in the date range selected?
         QList<RideItem*> rides;
@@ -1091,7 +1091,9 @@ CPPlot::plotTests(RideItem *rideitem)
                 if (interval->istest()) {
 
                     double duration = (interval->stop - interval->start) + 1; // add offset used on log axis
-                    double watts = interval->getForSymbol("average_power",  GlobalContext::context()->useMetricUnits);
+                    double watts = rideSeries == RideFile::kph ?
+                                   interval->getForSymbol("average_speed",  GlobalContext::context()->useMetricUnits) :
+                                   interval->getForSymbol("average_power",  GlobalContext::context()->useMetricUnits);
 
 
                     // ignore where no power present
@@ -1121,10 +1123,11 @@ CPPlot::plotTests(RideItem *rideitem)
                         test->setSymbol(sym);
                         test->setValue(duration/60.00f, watts);
 
-                        QString desc = QString("%3\n%1 %4\n%2").arg(watts,0, 'f', rideSeries == RideFile::watts ? 0 : 2)
+                        QString desc = QString("%3\n%1 %4%5\n%2").arg(watts,0, 'f', rideSeries == RideFile::watts ? 0 : 2)
                                                              .arg(interval_to_str(duration))
                                                              .arg(interval->name)
-                                                             .arg(criticalSeries == CriticalPowerWindow::work ? tr("kJ") : RideFile::unitName(rideSeries, context));
+                                                             .arg(criticalSeries == CriticalPowerWindow::work ? tr("kJ") : RideFile::unitName(rideSeries, context))
+                                                             .arg(criticalSeries == CriticalPowerWindow::kph ? paceString(duration, watts) : "");
                         QwtText text(desc);
                         QFont font; // default
                         font.setPointSize(8);
@@ -2114,7 +2117,7 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
 
         const double xvalue = curve->sample(index).x();
         const double yvalue = curve->sample(index).y();
-        QString text, dateStr, paceStr;
+        QString text, dateStr;
         QString currentRidePercentStr;
         QString units1;
         QString units2;
@@ -2192,35 +2195,6 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
         }
 #endif
 
-
-        // for speed series add pace with units according to settings
-        if (criticalSeries == CriticalPowerWindow::kph) {
-
-            if (sport == "Run" || sport == "Swim") {
-
-                const PaceZones *zones = context->athlete->paceZones(sport=="Swim");
-                if (zones) paceStr = QString("\n%1 %2").arg(zones->kphToPaceString(yvalue, metricPace))
-                                                       .arg(zones->paceUnits(metricPace));
-
-            } else if (sport == "Row") {
-
-                paceStr = QString("\n%1 %2").arg(kphToPace(yvalue*2, true, false)).arg(tr("min/500m"));
-            }
-            
-            const double km = yvalue*xvalue/60.0; // distance in km
-            if (sport == "Swim") {
-
-                if (metricPace) paceStr += tr("\n%1 m").arg(1000*km, 0, 'f', 0);
-                else paceStr += tr("\n%1 yd").arg(1000*km/METERS_PER_YARD, 0, 'f', 0);
-
-            } else {
-
-                if (metricPace) paceStr += tr("\n%1 km").arg(km, 0, 'f', 3);
-                else  paceStr += tr("\n%1 mi").arg(MILES_PER_KM*km, 0, 'f', 3);
-
-            }
-        }
-
         // output the tooltip
         text = QString("%1%2\n%3 %4%5%6")
                .arg(criticalSeries == CriticalPowerWindow::veloclinicplot ?
@@ -2229,7 +2203,7 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
                .arg(units1)
                .arg(units2)
                .arg(currentRidePercentStr)
-               .arg(paceStr)
+               .arg(criticalSeries == CriticalPowerWindow::kph ? paceString(xvalue*60.0, yvalue) : "")
                .arg(dateStr);
 
         // set that text up
@@ -3202,4 +3176,35 @@ CPPlot::kmToString(double km)
     } else {
         return tr("%1 mi").arg(km*MILES_PER_KM, 0, 'f', 3);
     }
+}
+
+QString
+CPPlot::paceString(double secs, double kph)
+{
+    QString paceStr;
+    const PaceZones *zones = context->athlete->paceZones(sport=="Swim");
+    const bool metricPace = zones ? appsettings->value(this, zones->paceSetting(), GlobalContext::context()->useMetricUnits).toBool() : GlobalContext::context()->useMetricUnits;
+
+    if (sport == "Run" || sport == "Swim") {
+
+        if (zones) paceStr = QString("\n%1 %2").arg(zones->kphToPaceString(kph, metricPace))
+                                               .arg(zones->paceUnits(metricPace));
+    } else if (sport == "Row") {
+
+        paceStr = QString("\n%1 %2").arg(kphToPace(kph*2, true, false)).arg(tr("min/500m"));
+    }
+
+    const double km = kph*secs/3600.0; // distance in km
+    if (sport == "Swim") {
+
+        if (metricPace) paceStr += tr("\n%1 m").arg(1000*km, 0, 'f', 0);
+        else paceStr += tr("\n%1 yd").arg(1000*km/METERS_PER_YARD, 0, 'f', 0);
+
+    } else {
+
+        if (metricPace) paceStr += tr("\n%1 km").arg(km, 0, 'f', 3);
+        else  paceStr += tr("\n%1 mi").arg(MILES_PER_KM*km, 0, 'f', 3);
+
+    }
+    return paceStr;
 }

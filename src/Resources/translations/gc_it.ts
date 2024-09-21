@@ -207,7 +207,7 @@ Potrebbe essere necessario disabilitarlo manualmente.</translation>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="366"/>
         <source>Images (*.png *.jpg *.bmp)</source>
-        <translation>Immagini (*.png *.jpg *.bmp)</translation>
+        <translation>Immagini</translation>
     </message>
 </context>
 <context>
@@ -21559,7 +21559,7 @@ Nessuna uscita in bici trovata da importare.
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="220"/>
         <source>Images (*.png *.jpg *.bmp)</source>
-        <translation>Immagini (*.png *.jpg *.bmp)</translation>
+        <translation>Immagini</translation>
     </message>
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="368"/>

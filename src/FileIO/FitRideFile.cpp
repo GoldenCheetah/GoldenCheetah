@@ -258,7 +258,7 @@ static void loadMetadata()
                     if (obj.contains("units")) add.unit = obj["unit"].toString().toStdString();
                     else add.unit="";
 
-                    if (obj.contains("scale")) add.scale = obj["scale"].toDouble();
+                    if (obj.contains("scale")) add.scale = obj["scale"].toString().toDouble();
                     else add.scale=-1;
 
                     if (obj.contains("offset")) add.offset = obj["offset"].toInt();
@@ -1916,7 +1916,7 @@ struct FitFileParser
             // if we get here we have metadata about the field in question
             // so lets apply scaling and add to the XDATA section
             scaledvalue = value;
-            if (metadata.scale != -1) scaledvalue /= double(metadata.scale);
+            if (metadata.scale > 0) scaledvalue /= double(metadata.scale);
 
             // if we get here then the field is going to be transferred into
             // the XDATA section, so lets see if it is a start_time field?
