@@ -149,6 +149,7 @@ class CPPlot : public QwtPlot
         void refreshReferenceLines(RideItem*);
         QString kphToString(double kph);
         QString kmToString(double km);
+        QString paceString(double secs, double kph);
 
         // Models and Extended Models
         int model, modelVariant;

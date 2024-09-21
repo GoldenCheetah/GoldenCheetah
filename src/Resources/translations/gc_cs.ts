@@ -207,7 +207,7 @@ Může být nezbytné ji vypnout ručně.</translation>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="366"/>
         <source>Images (*.png *.jpg *.bmp)</source>
-        <translation>Obrázky (*.png *.jpg *.bmp)</translation>
+        <translation>Obrázky</translation>
     </message>
 </context>
 <context>
@@ -21451,7 +21451,7 @@ Nebyly nalezeny žádné jízdy k importu.
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="220"/>
         <source>Images (*.png *.jpg *.bmp)</source>
-        <translation>Obrázky (*.png *.jpg *.bmp)</translation>
+        <translation>Obrázky</translation>
     </message>
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="368"/>
