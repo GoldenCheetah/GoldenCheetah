@@ -364,7 +364,7 @@ void
 AboutRiderPage::chooseAvatar()
 {
     QString filename = QFileDialog::getOpenFileName(this, tr("Choose Picture"),
-                            "", tr("Images (*.png *.jpg *.bmp)"));
+                            "", tr("Images") + " (*.png *.jpg *.bmp)");
     if (filename != "") {
 
         avatar = QPixmap(filename);

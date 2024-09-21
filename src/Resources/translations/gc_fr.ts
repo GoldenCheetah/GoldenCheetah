@@ -209,7 +209,7 @@ Si non cochée, le stress de l&apos;entraînement d&apos;un jour donné sera pri
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="366"/>
         <source>Images (*.png *.jpg *.bmp)</source>
-        <translation>Images (*.png *.jpg *.bmp)</translation>
+        <translation>Images</translation>
     </message>
 </context>
 <context>
@@ -21712,7 +21712,7 @@ Pas d&apos;activité trouvée à importer.
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="220"/>
         <source>Images (*.png *.jpg *.bmp)</source>
-        <translation>Images (*.png *.jpg *.bmp)</translation>
+        <translation>Images</translation>
     </message>
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="368"/>
