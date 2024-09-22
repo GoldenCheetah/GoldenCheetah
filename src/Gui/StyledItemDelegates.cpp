@@ -139,7 +139,17 @@ SpinBoxEditDelegate::setModelData
     int newValue = spinbox->value();
     if (model->data(index, Qt::EditRole).toInt() != newValue) {
         model->setData(index, newValue, Qt::EditRole);
+        model->setData(index, editor->sizeHint(), Qt::SizeHintRole);
     }
+}
+
+
+QSize
+SpinBoxEditDelegate::staticSizeHint
+()
+{
+    QSpinBox widget;
+    return widget.sizeHint();
 }
 
 
@@ -237,7 +247,17 @@ DoubleSpinBoxEditDelegate::setModelData
     double newValue = spinbox->value();
     if (model->data(index, Qt::EditRole).toDouble() != newValue) {
         model->setData(index, newValue, Qt::EditRole);
+        model->setData(index, editor->sizeHint(), Qt::SizeHintRole);
     }
+}
+
+
+QSize
+DoubleSpinBoxEditDelegate::staticSizeHint
+()
+{
+    QDoubleSpinBox widget;
+    return widget.sizeHint();
 }
 
 
@@ -290,5 +310,15 @@ DateEditDelegate::setModelData
     QDate newValue = dateEdit->date();
     if (model->data(index, Qt::EditRole).toDate() != newValue) {
         model->setData(index, newValue, Qt::EditRole);
+        model->setData(index, editor->sizeHint(), Qt::SizeHintRole);
     }
+}
+
+
+QSize
+DateEditDelegate::staticSizeHint
+()
+{
+    QDateEdit widget;
+    return widget.sizeHint();
 }

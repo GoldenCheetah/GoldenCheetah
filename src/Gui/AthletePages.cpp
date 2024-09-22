@@ -53,6 +53,13 @@
 #endif
 #include "MainWindow.h"
 
+
+#define CPPAGE_DEFAULT_CP 250
+#define CPPAGE_DEFAULT_FACTOR_AETP 0.85
+#define CPPAGE_DEFAULT_WPRIME 20000
+#define CPPAGE_DEFAULT_PMAX 1000
+
+
 //
 // Passwords page
 //
@@ -1011,6 +1018,7 @@ SchemePage::SchemePage(Zones* zones) : zones(zones)
         add->setData(0, Qt::DisplayRole, zones->getScheme().zone_default_name[i]);
         add->setData(1, Qt::DisplayRole, zones->getScheme().zone_default_desc[i]);
         add->setData(2, Qt::DisplayRole, zones->getScheme().zone_default[i]);
+        add->setData(2, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
     }
 
     mainLayout->addWidget(scheme);
@@ -1064,6 +1072,7 @@ SchemePage::addClicked()
     add->setData(1, Qt::DisplayRole, text);
 
     add->setData(2, Qt::DisplayRole, 100);
+    add->setData(2, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
 }
 
 void
@@ -1123,11 +1132,6 @@ SchemePage::getScheme()
 }
 
 
-#define CPPAGE_DEFAULT_CP 250
-#define CPPAGE_DEFAULT_FACTOR_AETP 0.85
-#define CPPAGE_DEFAULT_WPRIME 20000
-#define CPPAGE_DEFAULT_PMAX 1000
-
 #define CPPAGE_RANGES_COL_STARTDATE 0
 #define CPPAGE_RANGES_COL_CP 1
 #define CPPAGE_RANGES_COL_AETP 2
@@ -1135,14 +1139,13 @@ SchemePage::getScheme()
 #define CPPAGE_RANGES_COL_WPRIME 4
 #define CPPAGE_RANGES_COL_PMAX 5
 #define CPPAGE_RANGES_COL_MODELFIT 6
-#define CPPAGE_RANGES_COL_CLOSEST 7
-#define CPPAGE_RANGES_COL_EST_DEVIATION 8
-#define CPPAGE_RANGES_COL_EST_OFFSET 9
-#define CPPAGE_RANGES_COL_EST_CP 10
-#define CPPAGE_RANGES_COL_EST_FTP 11
-#define CPPAGE_RANGES_COL_EST_WPRIME 12
-#define CPPAGE_RANGES_COL_EST_PMAX 13
-#define CPPAGE_RANGES_COUNT_COL 14
+#define CPPAGE_RANGES_COL_EST_DEVIATION 7
+#define CPPAGE_RANGES_COL_EST_OFFSET 8
+#define CPPAGE_RANGES_COL_EST_CP 9
+#define CPPAGE_RANGES_COL_EST_FTP 10
+#define CPPAGE_RANGES_COL_EST_WPRIME 11
+#define CPPAGE_RANGES_COL_EST_PMAX 12
+#define CPPAGE_RANGES_COUNT_COL 13
 
 #define CPPAGE_RANGES_EST_MATCH 0
 #define CPPAGE_RANGES_EST_DEVIATE 1
@@ -1191,7 +1194,7 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
 
     QHBoxLayout *zoneButtons = new QHBoxLayout;
     zoneButtons->addStretch();
-    zoneButtons->setSpacing(0);
+    zoneButtons->setSpacing(2 * dpiXFactor);
     zoneButtons->addWidget(addZoneButton);
     zoneButtons->addWidget(deleteZoneButton);
     zoneButtons->addWidget(defaultButton);
@@ -1236,27 +1239,27 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     dateDelegate->setCalendarPopup(true);
 
     cpDelegate = new SpinBoxEditDelegate();
-    cpDelegate->setRange(1, 999);
-    cpDelegate->setSingleStep(1);
+    cpDelegate->setRange(50, 500);
+    cpDelegate->setSingleStep(5);
     cpDelegate->setSuffix(" " + tr("W"));
 
     aetDelegate = new SpinBoxEditDelegate();
-    aetDelegate->setRange(1, 999);
-    aetDelegate->setSingleStep(1);
+    aetDelegate->setRange(50, 500);
+    aetDelegate->setSingleStep(5);
     aetDelegate->setSuffix(" " + tr("W"));
 
     ftpDelegate = new SpinBoxEditDelegate();
-    ftpDelegate->setRange(1, 999);
-    ftpDelegate->setSingleStep(1);
+    ftpDelegate->setRange(50, 500);
+    ftpDelegate->setSingleStep(5);
     ftpDelegate->setSuffix(" " + tr("W"));
 
     wDelegate = new SpinBoxEditDelegate();
-    wDelegate->setRange(1, 99999);
+    wDelegate->setRange(1, 100000);
     wDelegate->setSingleStep(100);
     wDelegate->setSuffix(" " + tr("J"));
 
     pmaxDelegate = new SpinBoxEditDelegate();
-    pmaxDelegate->setRange(1, 9999);
+    pmaxDelegate->setRange(100, 3000);
     pmaxDelegate->setSingleStep(10);
     pmaxDelegate->setSuffix(" " + tr("W"));
 
@@ -1270,7 +1273,6 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     ranges->setItemDelegateForColumn(CPPAGE_RANGES_COL_WPRIME, wDelegate);
     ranges->setItemDelegateForColumn(CPPAGE_RANGES_COL_PMAX, pmaxDelegate);
     ranges->setItemDelegateForColumn(CPPAGE_RANGES_COL_MODELFIT, statusDelegate);
-    ranges->setItemDelegateForColumn(CPPAGE_RANGES_COL_CLOSEST, closestDelegate);
 
     zoneFromDelegate = new SpinBoxEditDelegate();
     zoneFromDelegate->setRange(0, 1000);
@@ -1356,7 +1358,6 @@ CPPage::initializeRanges() {
     ranges->headerItem()->setText(CPPAGE_RANGES_COL_WPRIME, tr("W'"));
     ranges->headerItem()->setText(CPPAGE_RANGES_COL_PMAX, tr("Pmax"));
     ranges->headerItem()->setText(CPPAGE_RANGES_COL_MODELFIT, tr("Model Fit"));
-    ranges->headerItem()->setText(CPPAGE_RANGES_COL_CLOSEST, tr("Closest Estimate"));
     ranges->headerItem()->setText(CPPAGE_RANGES_COL_EST_DEVIATION, "_deviation");
     ranges->headerItem()->setText(CPPAGE_RANGES_COL_EST_OFFSET, "_offset");
     ranges->headerItem()->setText(CPPAGE_RANGES_COL_EST_CP, "_cp");
@@ -1394,23 +1395,27 @@ CPPage::initializeRanges() {
         font.setWeight(zones_->getZoneRange(i).zonesSetFromCP ? QFont::Normal : QFont::Black);
 
         add->setData(CPPAGE_RANGES_COL_STARTDATE, Qt::DisplayRole, zones_->getStartDate(i));
+        add->setData(CPPAGE_RANGES_COL_STARTDATE, Qt::SizeHintRole, zones_->getStartDate(i));
         add->setFont(CPPAGE_RANGES_COL_STARTDATE, font);
         add->setData(CPPAGE_RANGES_COL_CP, Qt::DisplayRole, zones_->getCP(i));
+        add->setData(CPPAGE_RANGES_COL_CP, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
         add->setFont(CPPAGE_RANGES_COL_CP, font);
         add->setData(CPPAGE_RANGES_COL_AETP, Qt::DisplayRole, zones_->getAeT(i));
+        add->setData(CPPAGE_RANGES_COL_AETP, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
         add->setFont(CPPAGE_RANGES_COL_AETP, font);
         add->setData(CPPAGE_RANGES_COL_FTP, Qt::DisplayRole, zones_->getFTP(i));
+        add->setData(CPPAGE_RANGES_COL_FTP, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
         add->setFont(CPPAGE_RANGES_COL_FTP, font);
         add->setData(CPPAGE_RANGES_COL_WPRIME, Qt::DisplayRole, zones_->getWprime(i));
+        add->setData(CPPAGE_RANGES_COL_WPRIME, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
         add->setFont(CPPAGE_RANGES_COL_WPRIME, font);
         add->setData(CPPAGE_RANGES_COL_PMAX, Qt::DisplayRole, zones_->getPmax(i));
+        add->setData(CPPAGE_RANGES_COL_PMAX, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
         add->setFont(CPPAGE_RANGES_COL_PMAX, font);
         add->setFont(CPPAGE_RANGES_COL_MODELFIT, font);
-        add->setFont(CPPAGE_RANGES_COL_CLOSEST, font);
 
         if (useModel->currentIndex() != CPPAGE_EST_MODEL_NONE) {
             ranges->setColumnHidden(CPPAGE_RANGES_COL_MODELFIT, false);
-            ranges->setColumnHidden(CPPAGE_RANGES_COL_CLOSEST, false);
             int cp = 0;
             int aetp = 0;
             int ftp = 0;
@@ -1429,7 +1434,6 @@ CPPage::initializeRanges() {
             }
         } else {
             ranges->setColumnHidden(CPPAGE_RANGES_COL_MODELFIT, true);
-            ranges->setColumnHidden(CPPAGE_RANGES_COL_CLOSEST, true);
         }
         setEstimateStatus(add);
     }
@@ -1603,6 +1607,8 @@ CPPage::setEstimateStatus
     int estWprime = item->data(CPPAGE_RANGES_COL_EST_WPRIME, Qt::DisplayRole).toInt();
     int estPmax = item->data(CPPAGE_RANGES_COL_EST_PMAX, Qt::DisplayRole).toInt();
     int estOffset = item->data(CPPAGE_RANGES_COL_EST_OFFSET, Qt::DisplayRole).toInt();
+    QString fitText;
+    QString toolTipText = "<center>";
     if (estCp > 0) {
         if (   (   useModel->currentIndex() == CPPAGE_EST_MODEL_CP2
                 && cp == estCp
@@ -1617,23 +1623,32 @@ CPPage::setEstimateStatus
                 && ftp == estFtp
                 && pmax == estPmax)) {
             setRangeData(modelIndex, CPPAGE_RANGES_COL_EST_DEVIATION, CPPAGE_RANGES_EST_MATCH);
-            setRangeData(modelIndex, CPPAGE_RANGES_COL_MODELFIT, tr("✓"));
+            fitText = tr("🗹");
+            toolTipText += tr("Estimate and settings <b>match</b>");
         } else {
             setRangeData(modelIndex, CPPAGE_RANGES_COL_EST_DEVIATION, CPPAGE_RANGES_EST_DEVIATE);
-            setRangeData(modelIndex, CPPAGE_RANGES_COL_MODELFIT, tr("Δ"));
+            fitText = tr("☐");
+            toolTipText += tr("Estimate and settings <b>differ</b>");
         }
-        if (estOffset == 0) {
-            setRangeData(modelIndex, CPPAGE_RANGES_COL_CLOSEST, tr("exact match"));
-        } else if (estOffset < 0) {
-            setRangeData(modelIndex, CPPAGE_RANGES_COL_CLOSEST, tr("%1 days after").arg(-1 * estOffset));
-        } else if (estOffset > 0) {
-            setRangeData(modelIndex, CPPAGE_RANGES_COL_CLOSEST, tr("%1 days before").arg(estOffset));
+        if (estOffset != 0) {
+            fitText += " ";
+            fitText += tr("⏲");
+            toolTipText += "<br><small>";
+            if (estOffset < 0) {
+                toolTipText += tr("Range is %1 days older than closest estimate").arg(-1 * estOffset);
+            } else if (estOffset > 0) {
+                toolTipText += tr("Range is %1 days younger than closest estimate").arg(estOffset);
+            }
+            toolTipText += "</small>";
         }
     } else {
         setRangeData(modelIndex, CPPAGE_RANGES_COL_EST_DEVIATION, CPPAGE_RANGES_EST_NA);
-        setRangeData(modelIndex, CPPAGE_RANGES_COL_MODELFIT, tr("∅"));
-        setRangeData(modelIndex, CPPAGE_RANGES_COL_CLOSEST, tr("-"));
+        fitText = tr("∅");
+        toolTipText += tr("No estimate available");
     }
+    toolTipText += "</center>";
+    setRangeData(modelIndex, CPPAGE_RANGES_COL_MODELFIT, fitText);
+    item->setToolTip(CPPAGE_RANGES_COL_MODELFIT, toolTipText);
     active = preActive;
 }
 
@@ -1840,11 +1855,17 @@ CPPage::addClicked()
     ranges->setCurrentItem(add);
 
     add->setData(CPPAGE_RANGES_COL_STARTDATE, Qt::DisplayRole, date);
+    add->setData(CPPAGE_RANGES_COL_STARTDATE, Qt::SizeHintRole, DateEditDelegate::staticSizeHint());
     add->setData(CPPAGE_RANGES_COL_CP, Qt::DisplayRole, cp);
+    add->setData(CPPAGE_RANGES_COL_CP, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
     add->setData(CPPAGE_RANGES_COL_AETP, Qt::DisplayRole, aetp);
+    add->setData(CPPAGE_RANGES_COL_AETP, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
     add->setData(CPPAGE_RANGES_COL_FTP, Qt::DisplayRole, ftp);
+    add->setData(CPPAGE_RANGES_COL_FTP, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
     add->setData(CPPAGE_RANGES_COL_WPRIME, Qt::DisplayRole, wprime);
+    add->setData(CPPAGE_RANGES_COL_WPRIME, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
     add->setData(CPPAGE_RANGES_COL_PMAX, Qt::DisplayRole, pmax);
+    add->setData(CPPAGE_RANGES_COL_PMAX, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
 
     if (getValuesFor(date, false, cp, aetp, ftp, wprime, pmax, estOffset, defaults)) {
         add->setData(CPPAGE_RANGES_COL_EST_OFFSET, Qt::DisplayRole, estOffset);
@@ -1886,7 +1907,6 @@ CPPage::defaultClicked()
         ranges->currentItem()->setFont(CPPAGE_RANGES_COL_WPRIME, font);
         ranges->currentItem()->setFont(CPPAGE_RANGES_COL_PMAX, font);
         ranges->currentItem()->setFont(CPPAGE_RANGES_COL_MODELFIT, font);
-        ranges->currentItem()->setFont(CPPAGE_RANGES_COL_CLOSEST, font);
 
         // set the range to use defaults on the scheme page
         zones_->setScheme(schemePage->getScheme());
@@ -1938,6 +1958,7 @@ CPPage::rangeSelectionChanged()
             add->setData(0, Qt::DisplayRole, current.zones[i].name);
             add->setData(1, Qt::DisplayRole, current.zones[i].desc);
             add->setData(2, Qt::DisplayRole, current.zones[i].lo);
+            add->setData(2, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
         }
         for (int i = 0; i < zones->columnCount(); i++) {
             zones->resizeColumnToContents(i);
@@ -1988,6 +2009,7 @@ CPPage::addZoneClicked()
     add->setData(1, Qt::DisplayRole, text);
 
     add->setData(2, Qt::DisplayRole, 100);
+    add->setData(2, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
     active = false;
 
     zonesChanged();
@@ -2032,7 +2054,6 @@ CPPage::zonesChanged()
             ranges->currentItem()->setFont(CPPAGE_RANGES_COL_WPRIME, font);
             ranges->currentItem()->setFont(CPPAGE_RANGES_COL_PMAX, font);
             ranges->currentItem()->setFont(CPPAGE_RANGES_COL_MODELFIT, font);
-            ranges->currentItem()->setFont(CPPAGE_RANGES_COL_CLOSEST, font);
 
             // show the default button to undo
             defaultButton->show();
@@ -2368,6 +2389,7 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
 
     QHBoxLayout *zoneButtons = new QHBoxLayout;
     zoneButtons->addStretch();
+    zoneButtons->setSpacing(2 * dpiXFactor);
     zoneButtons->addWidget(addZoneButton);
     zoneButtons->addWidget(deleteZoneButton);
     zoneButtons->addWidget(defaultButton);
@@ -3123,7 +3145,7 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
 
     QHBoxLayout *zoneButtons = new QHBoxLayout;
     zoneButtons->addStretch();
-    zoneButtons->setSpacing(0);
+    zoneButtons->setSpacing(2 * dpiXFactor);
     zoneButtons->addWidget(addZoneButton);
     zoneButtons->addWidget(deleteZoneButton);
 
