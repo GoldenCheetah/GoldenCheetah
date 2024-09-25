@@ -51,6 +51,7 @@
         { "manu":95, "prod":-1, "name":"Stryd" },
         { "manu":98, "prod":-1, "name":"BSX" },
         { "manu":98, "prod":2, "name":"BSX Insight 2" },
+        { "manu":106, "prod":5, "name":"Morpheus M7" },
         { "manu":107, "prod":-1, "name":"Magene" },
         { "manu":108, "prod":-1, "name":"Giant" },
         { "manu":108, "prod":21845, "name":"Giant Power Pro" },
