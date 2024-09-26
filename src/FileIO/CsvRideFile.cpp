@@ -1475,6 +1475,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
  }
     if (csvType == rowpro) rideFile->setTag("Sport","Row");
 
+    if (gcSeries != NULL) delete gcSeries; // no data, used to map fields
+
     if (trainSeries != NULL) {
         if (trainSeries->datapoints.count()>0)
             rideFile->addXData("TRAIN", trainSeries);
@@ -1606,7 +1608,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 if (lineno > 1) {
 
                     // split comma separated secs, hr, msecs
-                    QStringList values = line.split(",", QString::KeepEmptyParts);
+                    QStringList values = line.split(",", Qt::KeepEmptyParts);
 
                     // and add
                     XDataPoint *p = new XDataPoint();
@@ -1670,7 +1672,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 if (lineno > 1) {
 
                     // split comma separated secs, hr, msecs
-                    QStringList values = line.split(",", QString::KeepEmptyParts);
+                    QStringList values = line.split(",", Qt::KeepEmptyParts);
 
                     // and add
                     XDataPoint *p = new XDataPoint();
@@ -1862,6 +1864,7 @@ CsvFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file, CsvTy
             }
             out << csvLineData.join(",") << "\n";
         }
+        delete gcSeries;
     }
     else if (format == powertap) {
         if (!bIsMetric)
