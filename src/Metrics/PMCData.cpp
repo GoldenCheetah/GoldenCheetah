@@ -25,6 +25,7 @@
 #include "RideItem.h"
 #include "Specification.h"
 #include "Season.h"
+#include "Seasons.h"
 #include "Context.h"
 
 #include <stdio.h>

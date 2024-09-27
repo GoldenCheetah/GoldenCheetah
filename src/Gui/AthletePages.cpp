@@ -26,6 +26,7 @@
 #include "AthletePages.h"
 #include "Units.h"
 #include "Settings.h"
+#include "Seasons.h"
 #include "UserMetricParser.h"
 #include "Units.h"
 #include "Colors.h"
@@ -3283,15 +3284,15 @@ SeasonsPage::SeasonsPage(QWidget *parent, Context *context) : QWidget(parent), c
     foreach(Season season, array) {
         QTreeWidgetItem *add;
 
-        if (season.type == Season::temporary) continue;
+        if (season.getType() == Season::temporary) continue;
 
         add = new QTreeWidgetItem(seasons->invisibleRootItem());
         add->setFlags(add->flags() & ~Qt::ItemIsEditable);
 
         // tab name
-        add->setText(0, season.name);
+        add->setText(0, season.getName());
         // type
-        add->setText(1, Season::types[static_cast<int>(season.type)]);
+        add->setText(1, Season::types[static_cast<int>(season.getType())]);
         // from
         add->setText(2, season.getStart().toString(tr("ddd MMM d, yyyy")));
         // to
@@ -3396,8 +3397,8 @@ SeasonsPage::addClicked()
     clearEdit();
 
     Season addSeason;
-    addSeason.setStart(fromEdit->date());
-    addSeason.setEnd(toEdit->date());
+    addSeason.setAbsoluteStart(fromEdit->date());
+    addSeason.setAbsoluteEnd(toEdit->date());
     addSeason.setName(nameEdit->text());
     addSeason.setType(typeEdit->currentIndex());
     addSeason.setId(QUuid(id));
@@ -3428,8 +3429,8 @@ SeasonsPage::saveClicked()
 
         array[i].setName(item->text(0));
         array[i].setType(Season::types.indexOf(item->text(1)));
-        array[i].setStart(QDate::fromString(item->text(2), "ddd MMM d, yyyy"));
-        array[i].setEnd(QDate::fromString(item->text(3), "ddd MMM d, yyyy"));
+        array[i].setAbsoluteStart(QDate::fromString(item->text(2), "ddd MMM d, yyyy"));
+        array[i].setAbsoluteEnd(QDate::fromString(item->text(3), "ddd MMM d, yyyy"));
         array[i].setId(QUuid(item->text(4)));
     }
 

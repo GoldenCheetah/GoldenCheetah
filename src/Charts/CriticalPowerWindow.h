@@ -24,6 +24,7 @@
 #include "GoldenCheetah.h"
 #include "MainWindow.h" // for isfiltered and filters
 #include "Season.h"
+#include "Seasons.h"
 #include "RideFile.h"
 #include "SearchFilterBox.h"
 #include "Perspective.h"

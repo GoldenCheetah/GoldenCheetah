@@ -39,6 +39,7 @@
 
 #include "PMCData.h" // for LTS/STS calculation
 #include "Zones.h"
+#include "Seasons.h"
 #include "HrZones.h"
 #include "PaceZones.h"
 
@@ -4308,7 +4309,7 @@ LTMPlot::refreshMarkers(LTMSettings *settings, QDate from, QDate to, int groupby
             // for each season that intersects the date range
             if (s.getStart() <= to && s.getEnd() >= from) {
                 // add a season marker
-                if (s.type != Season::temporary && s.getName() != settings->title && s.getStart() >= from) {
+                if (s.getType() != Season::temporary && s.getName() != settings->title && s.getStart() >= from) {
                     QwtIndPlotMarker *mrk = new QwtIndPlotMarker;
                     markers.append(mrk);
                     mrk->attach(this);

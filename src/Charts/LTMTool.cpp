@@ -35,12 +35,6 @@
 // charts.xml support
 #include "LTMChartParser.h"
 
-// seasons.xml support
-#include "Season.h"
-#include "SeasonParser.h"
-#include <QXmlInputSource>
-#include <QXmlSimpleReader>
-
 // metadata.xml support
 #include "RideMetadata.h"
 #include "SpecialFields.h"
