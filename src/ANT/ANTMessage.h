@@ -89,6 +89,12 @@ class ANTMessage {
         // Power meter calibration
         static ANTMessage requestPwrCalibration(const uint8_t channel, const uint8_t type);
 
+        // Power meter capabilities
+        static ANTMessage requestPwrCapabilities1(const uint8_t channel);
+        static ANTMessage requestPwrCapabilities2(const uint8_t channel);
+        static ANTMessage enablePwrCapabilities1(const uint8_t channel, const uint8_t capabilitiesMask, const uint8_t capabilitiesSetup);
+        static ANTMessage enablePwrCapabilities2(const uint8_t channel, const uint8_t capabilitiesMask, const uint8_t capabilitiesSetup);
+
         // remote control
         static ANTMessage controlDeviceAvailability(const uint8_t channel);
 
@@ -144,6 +150,14 @@ class ANTMessage {
         uint16_t accumulatedTorque;
         uint8_t  elapsedTime;
         uint8_t instantCadence; // cadence
+        double  instantStartAngle;
+        double  instantEndAngle;
+        double  instantStartPeakAngle;
+        double  instantEndPeakAngle;
+        uint8_t riderPosition;
+        uint8_t rightPCO;
+        uint8_t leftPCO;
+
         uint8_t autoZeroStatus, autoZeroEnable;
         bool utcTimeRequired; // moxy
         uint8_t moxyCapabilities; //moxy
@@ -154,6 +168,7 @@ class ANTMessage {
         uint16_t vortexId, vortexSpeed, vortexPower, vortexCadence;
         uint8_t vortexCalibration, vortexCalibrationState, vortexPage;
         uint8_t vortexUsingVirtualSpeed;
+        uint8_t  pwrCapabilities1, pwrEnCapabilities1, pwrCapabilities2, pwrEnCapabilities2;
 
         // fitness equipment data fields
         uint16_t fecSpeed, fecInstantPower, fecAccumulatedPower;

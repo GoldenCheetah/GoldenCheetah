@@ -183,6 +183,8 @@
  *                                                operating_time_msb,voltage_lsb,descriptive_bits
  */
 
+#define bradToDeg(brads) (static_cast<double>(brads)/256.0*360.0)
+
 // construct a null message
 ANTMessage::ANTMessage(void) {
     init();
@@ -354,6 +356,13 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
             //   0x12 - Crank Torque (Quarq)
             //   0x13 - Torque Efficiency and Pedal Smoothness - optional extension to 0x10 Standard Power or 0x11/0x12 Wheel/Crank Torque
             //   0x20 - Crank Torque Frequency (SRM)
+            //   0x50 - Manufacturer’s Identification
+            //   0x51 - Product Information
+            //   0xE0 - Pedal right force angle
+            //   0xE1 - Pedal left force angle
+            //   0xE2 - Pedal position data
+            //   0xFD - Capabilities #1
+            //   0xFE - Capabilities #2
             //   0x50 - Manufacturer UD
             //   0x52 - Battery Voltage
 
@@ -420,13 +429,42 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                 switch (data_page) {
 
                 case ANT_STANDARD_POWER: // 0x10 - standard power
-
                     eventCount = message[5];
                     pedalPowerContribution = (( message[6] != 0xFF ) && ( message[6]&0x80) ) ; // left/right is defined if NOT 0xFF (= no Pedal Power) AND BIT 7 is set
                     pedalPower = (message[6]&0x7F); // right pedalPower % - stored in bit 0-6
                     instantCadence = message[7];
                     sumPower = message[8] + (message[9]<<8);
                     instantPower = message[10] + (message[11]<<8);
+                    break;
+
+                // subpages 0xE0/E1/E2: cycling dynamics from power device
+                case POWER_CYCL_DYN_R_FORCE_ANGLE_PAGE:
+                case POWER_CYCL_DYN_L_FORCE_ANGLE_PAGE:
+                    eventCount = message[5];
+                    if (message[6]==POWER_CYCL_DYN_INVALID  && message[7]==POWER_CYCL_DYN_INVALID)
+                    {
+                        // change invalid data (0xC0 as per ANT+ specification) to "0"
+                        instantStartAngle=instantEndAngle=0.0;
+                    } else
+                    {
+                        instantStartAngle     = bradToDeg(message[6]);
+                        instantEndAngle       = bradToDeg(message[7]);
+                    }
+                    if (message[8]==POWER_CYCL_DYN_INVALID  && message[9]==POWER_CYCL_DYN_INVALID)
+                    {
+                        instantStartPeakAngle=instantEndPeakAngle=0.0;
+                    } else
+                    {
+                        instantStartPeakAngle = bradToDeg(message[8]);
+                        instantEndPeakAngle   = bradToDeg(message[9]);
+                    }
+                    torque                = message[10] + (message[11]<<8);
+                    break;
+                case POWER_CYCL_DYN_PEDALPOSITION_PAGE:
+                    eventCount = message[5];
+                    riderPosition         = message[6] >> 6;
+                    rightPCO              = message[8];
+                    leftPCO               = message[9];
                     break;
 
                 case ANT_WHEELTORQUE_POWER: // 0x11 - wheel torque (Powertap)
@@ -512,6 +550,43 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
 
                     }
                     break;
+
+                case POWER_GETSET_PARAM_PAGE:
+                {
+                    uint8_t data_subpage = message[5];
+
+                    switch(data_subpage) {
+                        case POWER_ADV_CAPABILITIES1_SUBPAGE:
+                            pwrCapabilities1         = message[8];
+                            pwrEnCapabilities1       = message[10];
+                            // qDebug()<<channel
+                            //     << qPrintable(QString("Received power advanced capabilities page 1, pwrCapabilities1=0x")+QString("%1").arg(pwrCapabilities1, 2, 16, QChar('0')).toUpper()
+                            //     +  QString(", enCapabilities1=0x")+QString("%1").arg(pwrEnCapabilities1, 2, 16, QChar('0')).toUpper());
+                            break;
+
+                        case POWER_ADV_CAPABILITIES2_SUBPAGE:
+                            pwrCapabilities2         = message[8];
+                            pwrEnCapabilities2       = message[10];
+                            // qDebug()<<channel
+                            //     << qPrintable(QString("Received power advanced capabilities page 2, pwrCapabilities2=0x")+QString("%1").arg(pwrCapabilities2, 2, 16, QChar('0')).toUpper()
+                            //     +  QString(", enCapabilities2=0x")+QString("%1").arg(pwrEnCapabilities2, 2, 16, QChar('0')).toUpper());
+                            break;
+                    }
+                    break;
+                }
+
+                case POWER_MANUFACTURER_ID:
+                {
+                    uint16_t manuf_id = (message[8] + (static_cast<uint16_t>(message[9])<<8));
+                    uint16_t product_id = (message[10] + (static_cast<uint16_t>(message[11])<<8));
+                    // qDebug()<<channel<<"Received power sensor info: Manufacturer id:" << manuf_id << ", Product id:" << product_id;
+                    break;
+                }
+
+                case POWER_PRODUCT_INFO:
+                    // qDebug()<<channel<<"Received power product info page";
+                    break;
+
                 } // data_page
                 break;
 
@@ -845,6 +920,9 @@ void ANTMessage::init()
     autoZeroStatus = autoZeroEnable = 0;
     pedalPowerContribution = false;
     pedalPower = 0;
+    instantStartAngle = instantEndAngle = instantStartPeakAngle = instantEndPeakAngle = 0;
+    riderPosition = 0;
+    rightPCO = leftPCO = 0;
     leftTorqueEffectiveness = rightTorqueEffectiveness = 0;
     leftOrCombinedPedalSmoothness = rightPedalSmoothness = 0;
     fecSpeed = fecInstantPower = fecAccumulatedPower = 0;
@@ -1183,6 +1261,72 @@ ANTMessage ANTMessage::requestPwrCalibration(const uint8_t channel, const uint8_
                       0xFF, 0xFF,                           // reserved
                       0xFF, 0xFF,                           // reserved
                       0xFF, 0xFF);                          // reserved
+}
+
+ANTMessage ANTMessage::requestPwrCapabilities1(const uint8_t channel)
+{
+    // qDebug()<<channel<<"Requesting Capabilities sub-page 1 from power device";
+
+    // based on ANT+ Common Pages, Rev 2.4 p 14: 6.2  Common Data Page 70: Request Data Page
+    return ANTMessage(9, ANT_ACK_DATA, channel,
+                      ANT_REQUEST_DATA_PAGE,              // data page request
+                      0xFF, 0xFF,                         // reserved
+                      POWER_ADV_CAPABILITIES1_SUBPAGE,    // descriptor 1 sub page
+                      0xFF,                               // descriptor 2
+                      POWER_CAPABILITIES_RQST_NBR,        // requested transmission response
+                      POWER_GETSET_PARAM_PAGE,            // requested page
+                      ANT_RQST_MST_DATA_PAGE);            // request data page from master
+}
+
+ANTMessage ANTMessage::requestPwrCapabilities2(const uint8_t channel)
+{
+    // qDebug()<<channel<<"Requesting Capabilities sub-page 2 from power device";
+
+    // based on ANT+ Common Pages, Rev 2.4 p 14: 6.2  Common Data Page 70: Request Data Page
+    return ANTMessage(9, ANT_ACK_DATA, channel,
+                      ANT_REQUEST_DATA_PAGE,              // data page request
+                      0xFF, 0xFF,                         // reserved
+                      POWER_ADV_CAPABILITIES2_SUBPAGE,    // descriptor 1 sub page
+                      0xFF,                               // descriptor 2
+                      POWER_CAPABILITIES_RQST_NBR,        // requested transmission response
+                      POWER_GETSET_PARAM_PAGE,            // requested page
+                      ANT_RQST_MST_DATA_PAGE);            // request data page from master
+}
+
+ANTMessage ANTMessage::enablePwrCapabilities1(const uint8_t channel, const uint8_t capabilitiesMask, const uint8_t capabilitiesSetup)
+{
+    // qDebug()<<channel<<"Setup power sensor capabilities from sub-page 1 to"
+    //     << qPrintable(QString("0x")+QString("%1").arg(capabilitiesSetup, 2, 16, QChar('0')).toUpper());
+
+    // based on ANT+ Device Profile - Bicycle Power Rev 5.1
+    // page 21: 4.5.2 Enabling Cycling Dynamics
+    // page 71: 15.2.3 Subpage 0x04 – Rider Position Configuration
+    return ANTMessage(9, ANT_ACK_DATA, channel,
+                      POWER_GETSET_PARAM_PAGE,              // data page
+                      POWER_ADV_CAPABILITIES1_SUBPAGE,      // subpage
+                      0xFF, 0xFF,                           // reserved
+                      capabilitiesMask,                     // capabilities mask
+                      0xFF,                                 // reserved
+                      capabilitiesSetup,                    // capabilities details
+                      0xFF);                                // reserved
+}
+
+ANTMessage ANTMessage::enablePwrCapabilities2(const uint8_t channel, const uint8_t capabilitiesMask, const uint8_t capabilitiesSetup)
+{
+    // qDebug()<<channel<<"Setup power sensor capabilities from sub-page 2 to"
+    //     << qPrintable(QString("0x")+QString("%1").arg(capabilitiesSetup, 2, 16, QChar('0')).toUpper());
+
+    // based on ANT+ Device Profile - Bicycle Power Rev 5.1
+    // page 21: 4.5.2 Enabling Cycling Dynamics
+    // page 71: 15.2.3 Subpage 0x04 – Rider Position Configuration
+    return ANTMessage(9, ANT_ACK_DATA, channel,
+                      POWER_GETSET_PARAM_PAGE,              // data page
+                      POWER_ADV_CAPABILITIES2_SUBPAGE,      // subpage
+                      0xFF, 0xFF,                           // reserved
+                      capabilitiesMask,                     // capabilities mask
+                      0xFF,                                 // reserved
+                      capabilitiesSetup,                    // capabilities details
+                      0xFF);                                // reserved
 }
 
 ANTMessage ANTMessage::controlDeviceAvailability(const uint8_t channel)

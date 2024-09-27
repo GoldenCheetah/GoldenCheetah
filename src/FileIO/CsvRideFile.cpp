@@ -125,9 +125,11 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     int currentInterval = 0;
     int prevInterval = 0;
     double lastKM=0; // when deriving distance from speed
+    XDataSeries *gcSeries=NULL;
     XDataSeries *rowSeries=NULL;
     XDataSeries *trainSeries=NULL;
     XDataSeries *rrSeries=NULL;
+    XDataSeries *posSeries=NULL;
     XDataSeries *ibikeSeries=NULL;
     XDataSeries *xdataSeries=NULL;
     XDataSeries *vo2Series=NULL;
@@ -327,6 +329,35 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     unitsHeader = 1;
                     recInterval = 1;
 
+                    gcSeries = new XDataSeries();
+                    gcSeries->name = "GoldenCheetah";
+
+                    // Note: first fields are madatory and standard ones which allows to identify GC CSV file
+                    QStringList csvHeader = line.split(",");
+                    for (int i=0; i<csvHeader.count() && i<GC_MAXFIELDS; i++) {
+                        QString valueName = csvHeader[i].trimmed();
+                        if (valueName!="") {
+                            QString unitName;
+                            //        field            unit
+                            if (valueName == "secs")
+                                unitName="secs";
+                            if (valueName == "cad")
+                                unitName="rpm";
+                            if (valueName == "km")
+                                unitName="km";
+                            if (valueName == "kph")
+                                unitName="kph";
+                            if (valueName == "watts")
+                                unitName="watts";
+                            if (valueName == "alt")
+                                unitName="m";
+                            else
+                                unitName="";
+
+                            gcSeries->valuename << valueName;
+                            gcSeries->unitname  << unitName;
+                        }
+                    }
                     ++lineno;
                     continue;
                }
@@ -632,6 +663,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 double lrbalance = RideFile::NA;
                 double lte = 0.0, rte = 0.0;
                 double lps = 0.0, rps = 0.0;
+                double rppb = 0.0, rppe = 0.0, rpppb = 0.0, rpppe = 0.0;
+                double lppb = 0.0, lppe = 0.0, lpppb = 0.0, lpppe = 0.0;
                 double smo2 = 0.0, thb = 0.0;
                 double gct = 0.0, vo = 0.0, rcad = 0.0;
                 //UNUSED double o2hb = 0.0, hhb = 0.0;
@@ -672,31 +705,86 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 } else if (csvType == gc) {
                     // GoldenCheetah CVS Format "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb, target\n";
 
-                    seconds = line.section(',', 0, 0).toDouble();
-                    minutes = seconds / 60.0f;
-                    cad = line.section(',', 1, 1).toDouble();
-                    hr = line.section(',', 2, 2).toDouble();
-                    km = line.section(',', 3, 3).toDouble();
-                    kph = line.section(',', 4, 4).toDouble();
-                    nm = line.section(',', 5, 5).toDouble();
-                    watts = line.section(',', 6, 6).toDouble();
-                    alt = line.section(',', 7, 7).toDouble();
-                    lon = line.section(',', 8, 8).toDouble();
-                    lat = line.section(',', 9, 9).toDouble();
-                    headwind = line.section(',', 10, 10).toDouble();
-                    slope = line.section(',', 11, 11).toDouble();
-                    temp = line.section(',', 12, 12)=="" ? double(RideFile::NA) : line.section(',', 12, 12).toDouble();
-                    interval = line.section(',', 13, 13).toInt();
-                    lrbalance = line.section(',', 14, 14).toDouble();
-                    lte = line.section(',', 15, 15).toDouble();
-                    rte = line.section(',', 16, 16).toDouble();
-                    lps = line.section(',', 17, 17).toDouble();
-                    rps = line.section(',', 18, 18).toDouble();
-                    smo2 = line.section(',', 19, 19).toDouble();
-                    thb = line.section(',', 20, 20).toDouble();
-                    //UNUSED o2hb = line.section(',', 21, 21).toDouble();
-                    //UNUSED hhb = line.section(',', 22, 22).toDouble();
-                    target = line.section(',', 23, 23).toInt();
+                    for (int i=0; i<gcSeries->valuename.count(); i++) {
+                        QString valueName = gcSeries->valuename.at(i);
+                        QString valueStr = line.section(',', i, i);
+                        if (valueStr!="") {
+                            if (valueName == "secs") {
+                                seconds = valueStr.toDouble();
+                                minutes = seconds / 60.0f;
+                            } else if (valueName == "cad") {
+                                cad = valueStr.toDouble();
+                            } else if (valueName == "hr") {
+                                hr = valueStr.toDouble();
+                            } else if (valueName == "km") {
+                                km = valueStr.toDouble();
+                            } else if (valueName == "kph") {
+                                kph = valueStr.toDouble();
+                            } else if (valueName == "nm") {
+                                nm = valueStr.toDouble();
+                            } else if (valueName == "watts") {
+                                watts = valueStr.toDouble();
+                            } else if (valueName == "alt") {
+                                alt = valueStr.toDouble();
+                            } else if (valueName == "lon") {
+                                lon = valueStr.toDouble();
+                            } else if (valueName == "lat") {
+                                lat = valueStr.toDouble();
+                            } else if (valueName == "headwind") {
+                                headwind = valueStr.toDouble();
+                            } else if (valueName == "slope") {
+                                slope = valueStr.toDouble();
+                            } else if (valueName == "temp") {
+                                temp = valueStr=="" ? double(RideFile::NA) : valueStr.toDouble();
+                            } else if (valueName == "interval") {
+                                interval = valueStr.toInt();
+                            } else if (valueName == "lrbalance") {
+                                lrbalance = valueStr.toDouble();
+                            } else if (valueName == "lte") {
+                                lte = valueStr.toDouble();
+                            } else if (valueName == "rte") {
+                                rte = valueStr.toDouble();
+                            } else if (valueName == "lps") {
+                                lps = valueStr.toDouble();
+                            } else if (valueName == "rps") {
+                                rps = valueStr.toDouble();
+                            } else if (valueName == "rppb") {
+                                rppb = valueStr.toDouble();
+                            } else if (valueName == "rppe") {
+                                rppe = valueStr.toDouble();
+                            } else if (valueName == "rpppb") {
+                                rpppb = valueStr.toDouble();
+                            } else if (valueName == "rpppe") {
+                                rpppe = valueStr.toDouble();
+                            } else if (valueName == "lppb") {
+                                lppb = valueStr.toDouble();
+                            } else if (valueName == "lppe") {
+                                lppe = valueStr.toDouble();
+                            } else if (valueName == "lpppb") {
+                                lpppb = valueStr.toDouble();
+                            } else if (valueName == "lpppe") {
+                                lpppe = valueStr.toDouble();
+                            } else if (valueName == "smo2") {
+                                smo2 = valueStr.toDouble();
+                            } else if (valueName == "thb") {
+                                thb = valueStr.toDouble();
+                            // UNUSED
+                            } else if (valueName == "o2hb") {
+                            //     o2hb = valueStr.toDouble();
+                            } else if (valueName == "hhb") {
+                            //     hhb = valueStr.toDouble();
+                            } else if (valueName == "target") {
+                                target = valueStr.toDouble();
+                            } else {
+                                // print debug message but only once
+                                static bool debugMessageFlag=false;
+                                if (!debugMessageFlag) {
+                                    qDebug() << "Unknown field '" << valueName << "' in GoldenCheetah CSV file";
+                                    debugMessageFlag=true;
+                                }
+                            }
+                        }
+                    }
 
                 } else if (csvType == peripedal) {
 
@@ -1242,6 +1330,25 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                                           smo2, thb,
                                           vo, rcad, gct, 0.0, interval);
 
+                    if (csvType == gc) {
+                        if (gcSeries->valuename.indexOf("rppb")!=-1)
+                            rideFile->setPointValue(minutes * 60.0, RideFile::rppb, rppb);
+                        if (gcSeries->valuename.indexOf("rppe")!=-1)
+                            rideFile->setPointValue(minutes * 60.0, RideFile::rppe, rppe);
+                        if (gcSeries->valuename.indexOf("rpppb")!=-1)
+                            rideFile->setPointValue(minutes * 60.0, RideFile::rpppb, rpppb);
+                        if (gcSeries->valuename.indexOf("rpppe")!=-1)
+                            rideFile->setPointValue(minutes * 60.0, RideFile::rpppe, rpppe);
+                        if (gcSeries->valuename.indexOf("lppb")!=-1)
+                            rideFile->setPointValue(minutes * 60.0, RideFile::lppb, lppb);
+                        if (gcSeries->valuename.indexOf("lppe")!=-1)
+                            rideFile->setPointValue(minutes * 60.0, RideFile::lppe, lppe);
+                        if (gcSeries->valuename.indexOf("lpppb")!=-1)
+                            rideFile->setPointValue(minutes * 60.0, RideFile::lpppb, lpppb);
+                        if (gcSeries->valuename.indexOf("lpppe")!=-1)
+                            rideFile->setPointValue(minutes * 60.0, RideFile::lpppe, lpppe);
+                    }
+
                     if (target > 0.0) {
                         if (trainSeries == NULL)  {
                             // add XDATA
@@ -1368,6 +1475,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
  }
     if (csvType == rowpro) rideFile->setTag("Sport","Row");
 
+    if (gcSeries != NULL) delete gcSeries; // no data, used to map fields
+
     if (trainSeries != NULL) {
         if (trainSeries->datapoints.count()>0)
             rideFile->addXData("TRAIN", trainSeries);
@@ -1457,67 +1566,133 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     }
 
 
-    // last, is there an associated rr file?
+    // is there an associated rr file?
     //
     // typically only for GC csv, but lets not constrain that
     // so long as the filename matches we'll import it into XDATA
     QFile rrfile(file.fileName().replace(".csv",".rr"));
-    if (!rrfile.open(QFile::ReadOnly)) return rideFile;
+    if (rrfile.open(QFile::ReadOnly))
+    {
 
-    // create the XDATA series
-    rrSeries = new XDataSeries();
-    rrSeries->name = "HRV"; // using same format as Polar HRV imports
-    rrSeries->valuename << "R-R";
-    rrSeries->unitname << "msecs";
+        // create the XDATA series
+        rrSeries = new XDataSeries();
+        rrSeries->name = "HRV"; // using same format as Polar HRV imports
+        rrSeries->valuename << "R-R";
+        rrSeries->unitname << "msecs";
 
-    // attempt to read and add the data
-    lineno=1;
-    QTextStream rs(&rrfile);
+        // attempt to read and add the data
+        lineno=1;
+        QTextStream rs(&rrfile);
 
-    // loop through lines and truncate etc
-    while (!rs.atEnd()) {
-        // the readLine() method doesn't handle old Macintosh CR line endings
-        // this workaround will load the the entire file if it has CR endings
-        // then split and loop through each line
-        // otherwise, there will be nothing to split and it will read each line as expected.
-        QString linesIn = rs.readLine();
-        QStringList lines = linesIn.split('\r');
-        // workaround for empty lines
-        if(lines.isEmpty()) {
-            lineno++;
-            continue;
-        }
-        for (int li = 0; li < lines.size(); ++li) {
-            QString line = lines[li];
-
-            if (line.length()==0) {
+        // loop through lines and truncate etc
+        while (!rs.atEnd()) {
+            // the readLine() method doesn't handle old Macintosh CR line endings
+            // this workaround will load the the entire file if it has CR endings
+            // then split and loop through each line
+            // otherwise, there will be nothing to split and it will read each line as expected.
+            QString linesIn = rs.readLine();
+            QStringList lines = linesIn.split('\r');
+            // workaround for empty lines
+            if(lines.isEmpty()) {
+                lineno++;
                 continue;
             }
+            for (int li = 0; li < lines.size(); ++li) {
+                QString line = lines[li];
 
-            // first line is a header line
-            if (lineno > 1) {
+                if (line.length()==0) {
+                    continue;
+                }
 
-                // split comma separated secs, hr, msecs
-                QStringList values = line.split(",", Qt::KeepEmptyParts);
+                // first line is a header line
+                if (lineno > 1) {
 
-                // and add
-                XDataPoint *p = new XDataPoint();
-                p->secs = values.at(0).toDouble();
-                p->km = 0;
-                p->number[0] = values.at(2).toDouble();
+                    // split comma separated secs, hr, msecs
+                    QStringList values = line.split(",", Qt::KeepEmptyParts);
 
-                rrSeries->datapoints.append(p);
+                    // and add
+                    XDataPoint *p = new XDataPoint();
+                    p->secs = values.at(0).toDouble();
+                    p->km = 0;
+                    p->number[0] = values.at(2).toDouble();
+
+                    rrSeries->datapoints.append(p);
+                }
+
+                // onto next line
+                ++lineno;
             }
-
-            // onto next line
-            ++lineno;
         }
-    }
-    // free handle
-    rrfile.close();
+        // free handle
+        rrfile.close();
 
-    // add if we got any ....
-    if (rrSeries->datapoints.count() > 0) rideFile->addXData("HRV", rrSeries);
+        // add if we got any ....
+        if (rrSeries->datapoints.count() > 0) rideFile->addXData("HRV", rrSeries);
+    }
+
+    // is there an associated cyclist position file?
+    //
+    // typically only for GC csv, but lets not constrain that
+    // so long as the filename matches we'll import it into XDATA
+    QFile posFile(file.fileName().replace(".csv",".pos.csv"));
+    if (posFile.open(QFile::ReadOnly))
+    {
+
+        // create the XDATA series
+        posSeries = new XDataSeries();
+        posSeries->name = "position";
+        posSeries->valuename << "position";
+        posSeries->unitname << "";
+
+        // attempt to read and add the data
+        lineno=1;
+        QTextStream rs(&posFile);
+
+        // loop through lines and truncate etc
+        while (!rs.atEnd()) {
+            // the readLine() method doesn't handle old Macintosh CR line endings
+            // this workaround will load the the entire file if it has CR endings
+            // then split and loop through each line
+            // otherwise, there will be nothing to split and it will read each line as expected.
+            QString linesIn = rs.readLine();
+            QStringList lines = linesIn.split('\r');
+            // workaround for empty lines
+            if(lines.isEmpty()) {
+                lineno++;
+                continue;
+            }
+            for (int li = 0; li < lines.size(); ++li) {
+                QString line = lines[li];
+
+                if (line.length()==0) {
+                    continue;
+                }
+
+                // first line is a header line
+                if (lineno > 1) {
+
+                    // split comma separated secs, hr, msecs
+                    QStringList values = line.split(",", Qt::KeepEmptyParts);
+
+                    // and add
+                    XDataPoint *p = new XDataPoint();
+                    p->secs = values.at(0).toDouble();
+                    p->km = 0;
+                    p->number[0] = values.at(1).toDouble();
+
+                    posSeries->datapoints.append(p);
+                }
+
+                // onto next line
+                ++lineno;
+            }
+        }
+        // free handle
+        posFile.close();
+
+        // add if we got any ....
+        if (posSeries->datapoints.count() > 0) rideFile->addXData("position", posSeries);
+    }
 
     // all done
     return rideFile;
@@ -1526,6 +1701,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 bool
 CsvFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file, CsvType format) const
 {
+    XDataSeries *gcSeries=NULL;
+
     if (!file.open(QIODevice::WriteOnly)) return(false);
 
     // always save CSV in metric format
@@ -1536,58 +1713,158 @@ CsvFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file, CsvTy
     QTextStream out(&file);
 
     if (format == gc) {
-        // CSV File header
-        out << "secs,cad,hr,km,kph,nm,watts,alt,lon,lat,headwind,slope,temp,interval,lrbalance,lte,rte,lps,rps,smo2,thb,o2hb,hhb\n";
+
+        gcSeries = new XDataSeries();
+        gcSeries->name = "GoldenCheetah";
+
+        // Note: first fields are madatory and standard ones which allows to identify GC CSV file
+        gcSeries->valuename << "secs"; gcSeries->unitname  << "secs";
+        gcSeries->valuename << "cad"; gcSeries->unitname  << "rpm";
+        gcSeries->valuename << "hr"; gcSeries->unitname  << "bpm";
+        gcSeries->valuename << "km"; gcSeries->unitname  << "km";
+        gcSeries->valuename << "kph"; gcSeries->unitname  << "kph";
+        gcSeries->valuename << "nm"; gcSeries->unitname  << "";
+        gcSeries->valuename << "watts"; gcSeries->unitname  << "watts";
+        gcSeries->valuename << "alt"; gcSeries->unitname  << "m";
+        gcSeries->valuename << "lon"; gcSeries->unitname  << "";
+        gcSeries->valuename << "lat"; gcSeries->unitname  << "";
+        gcSeries->valuename << "headwind"; gcSeries->unitname  << "";
+        gcSeries->valuename << "slope"; gcSeries->unitname  << "";
+        gcSeries->valuename << "temp"; gcSeries->unitname  << "";
+        gcSeries->valuename << "interval"; gcSeries->unitname  << "";
+        gcSeries->valuename << "lrbalance"; gcSeries->unitname  << "";
+        gcSeries->valuename << "lte"; gcSeries->unitname  << "";
+        gcSeries->valuename << "rte"; gcSeries->unitname  << "";
+        gcSeries->valuename << "lps"; gcSeries->unitname  << "";
+        gcSeries->valuename << "rps"; gcSeries->unitname  << "";
+        gcSeries->valuename << "smo2"; gcSeries->unitname  << "";
+        gcSeries->valuename << "thb"; gcSeries->unitname  << "";
+        gcSeries->valuename << "o2hb"; gcSeries->unitname  << "";
+        gcSeries->valuename << "hhb"; gcSeries->unitname  << "";
+
+        const RideFileDataPresent *present = ride->areDataPresent();
+        if (present->lpco) {
+            gcSeries->valuename << "lpco";
+            gcSeries->unitname  << "";
+        }
+        if (present->rpco) {
+            gcSeries->valuename << "rpco";
+            gcSeries->unitname  << "";
+        }
+        if (present->lppb) {
+            gcSeries->valuename << "lppb";
+            gcSeries->unitname  << "";
+        }
+        if (present->rppb) {
+            gcSeries->valuename << "rppb";
+            gcSeries->unitname  << "";
+        }
+        if (present->lppe) {
+            gcSeries->valuename << "lppe";
+            gcSeries->unitname  << "";
+        }
+        if (present->rppe) {
+            gcSeries->valuename << "rppe";
+            gcSeries->unitname  << "";
+        }
+        if (present->lpppb) {
+            gcSeries->valuename << "lpppb";
+            gcSeries->unitname  << "";
+        }
+        if (present->rpppb) {
+            gcSeries->valuename << "rpppb";
+            gcSeries->unitname  << "";
+        }
+        if (present->lpppe) {
+            gcSeries->valuename << "lpppe";
+            gcSeries->unitname  << "";
+        }
+        if (present->rpppe) {
+            gcSeries->valuename << "rpppe";
+            gcSeries->unitname  << "";
+        }
+
+        out << gcSeries->valuename.join(",") << "\n";
 
         foreach (const RideFilePoint *point, ride->dataPoints()) {
-            out << point->secs;
-            out << ",";
-            out << (ride->isRun() ? point->rcad : point->cad);
-            out << ",";
-            out << point->hr;
-            out << ",";
-            out << point->km;
-            out << ",";
-            out << ((point->kph >= 0) ? point->kph : 0.0);
-            out << ",";
-            out << ((point->nm >= 0) ? point->nm : 0.0);
-            out << ",";
-            out << ((point->watts >= 0) ? point->watts : 0.0);
-            out << ",";
-            out << point->alt;
-            out << ",";
-            out << QString::number(point->lon, 'f', 8);
-            out << ",";
-            out << QString::number(point->lat, 'f', 8);
-            out << ",";
-            out << point->headwind;
-            out << ",";
-            out << point->slope;
-            out << ",";
-            out << point->temp;
-            out << ",";
-            out << point->interval;
-            out << ",";
-            out << point->lrbalance;
-            out << ",";
-            out << point->lte;
-            out << ",";
-            out << point->rte;
-            out << ",";
-            out << point->lps;
-            out << ",";
-            out << point->rps;
-            out << ",";
-            out << point->smo2;
-            out << ",";
-            out << point->thb;
-            out << ",";
-            out << point->o2hb;
-            out << ",";
-            out << point->hhb;
 
-            out << "\n";
+            QStringList csvLineData;
+            for (int i=0; i<gcSeries->valuename.count(); i++) {
+                QString valueName = gcSeries->valuename.at(i);
+                if (valueName == "secs") {
+                    csvLineData << QString::number(point->secs);
+                } else if (valueName == "cad") {
+                    csvLineData << QString::number((ride->isRun() ? point->rcad : point->cad));
+                } else if (valueName == "hr") {
+                    csvLineData << QString::number(point->hr);
+                } else if (valueName == "km") {
+                    csvLineData << QString::number(point->km);
+                } else if (valueName == "kph") {
+                    csvLineData << QString::number((point->kph >= 0) ? point->kph : 0.0);
+                } else if (valueName == "nm") {
+                    csvLineData << QString::number((point->nm >= 0) ? point->nm : 0.0);
+                } else if (valueName == "watts") {
+                    csvLineData << QString::number((point->watts >= 0) ? point->watts : 0.0);
+                } else if (valueName == "alt") {
+                    csvLineData << QString::number(point->alt);
+                } else if (valueName == "lon") {
+                    csvLineData << QString::number(point->lon, 'f', 8);
+                } else if (valueName == "lat") {
+                    csvLineData << QString::number(point->lat, 'f', 8);
+                } else if (valueName == "headwind") {
+                    csvLineData << QString::number(point->headwind);
+                } else if (valueName == "slope") {
+                    csvLineData << QString::number(point->slope);
+                } else if (valueName == "temp") {
+                    csvLineData << QString::number(point->temp);
+                } else if (valueName == "interval") {
+                    csvLineData << QString::number(point->interval);
+                } else if (valueName == "lrbalance") {
+                    csvLineData << QString::number(point->lrbalance);
+                } else if (valueName == "lte") {
+                    csvLineData << QString::number(point->lte);
+                } else if (valueName == "rte") {
+                    csvLineData << QString::number(point->rte);
+                } else if (valueName == "lps") {
+                    csvLineData << QString::number(point->lps);
+                } else if (valueName == "rps") {
+                    csvLineData << QString::number(point->rps);
+                } else if (valueName == "smo2") {
+                    csvLineData << QString::number(point->smo2);
+                } else if (valueName == "thb") {
+                    csvLineData << QString::number(point->thb);
+                } else if (valueName == "o2hb") {
+                    csvLineData << QString::number(point->o2hb);
+                } else if (valueName == "hhb") {
+                    csvLineData << QString::number(point->hhb);
+                } else if (valueName == "lpco") {
+                    csvLineData << QString::number(point->lpco);
+                } else if (valueName == "rpco") {
+                    csvLineData << QString::number(point->rpco);
+                } else if (valueName == "lppb") {
+                    csvLineData << QString::number(point->lppb);
+                } else if (valueName == "rppb") {
+                    csvLineData << QString::number(point->rppb);
+                } else if (valueName == "lppe") {
+                    csvLineData << QString::number(point->lppe);
+                } else if (valueName == "rppe") {
+                    csvLineData << QString::number(point->rppe);
+                } else if (valueName == "lpppb") {
+                    csvLineData << QString::number(point->lpppb);
+                } else if (valueName == "rpppb") {
+                    csvLineData << QString::number(point->rpppb);
+                } else if (valueName == "lpppe") {
+                    csvLineData << QString::number(point->lpppe);
+                } else if (valueName == "rpppe") {
+                    csvLineData << QString::number(point->rpppe);
+                }
+                else {
+                    csvLineData << QString("");
+                }
+            }
+            out << csvLineData.join(",") << "\n";
         }
+        delete gcSeries;
     }
     else if (format == powertap) {
         if (!bIsMetric)

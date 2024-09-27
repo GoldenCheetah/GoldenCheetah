@@ -2667,6 +2667,13 @@ genericnext:
         }
 
         // In the new file format lap messages come first
+        if (start_time == 0 && this_start_time >0) {
+            start_time = this_start_time;
+            last_reference_time = start_time;
+            QDateTime t;
+            t.setSecsSinceEpoch(start_time);
+            rideFile->setStartTime(t);
+        }
         // and timestamp doesn't match lap stop time anymore
         if (time <= this_start_time) {
             time = this_start_time + total_elapsed_time - 1;
