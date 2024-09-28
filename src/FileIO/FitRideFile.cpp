@@ -3854,6 +3854,7 @@ genericnext:
         fieldDef.scale = -1;
         fieldDef.offset = -1;
         fieldDef.native = -1;
+        int native_mesg_num = RECORD_MSG_NUM; // just in case it is missing, for backward compatibility
 
         foreach(const FitField &field, def.fields) {
             FitValue value = values[i++];
@@ -3889,7 +3890,9 @@ genericnext:
                 case 9:  // bits
                 case 10: // accumulate
                 case 13: // fit_base_unit_id
+                        break;
                 case 14: // native_mesg_num
+                        native_mesg_num = value.v;
                         break;
                 case 15: // native field number
                         if (value.v == NA_VALUE) fieldDef.native = -1; // FIX applied in refactor
@@ -3920,7 +3923,7 @@ genericnext:
         local_deve_fields.insert((key), fieldDef);
 
 
-        if (fieldDef.native > -1 && !record_deve_native_fields.values().contains(fieldDef.native)) {
+        if (native_mesg_num == RECORD_MSG_NUM && fieldDef.native > -1 && !record_deve_native_fields.values().contains(fieldDef.native)) {
             record_deve_native_fields.insert(key, fieldDef.native);
 
             /*RideFile::SeriesType series = getSeriesForNative(fieldDef.native);
