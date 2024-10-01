@@ -694,7 +694,7 @@ CommonEquipmentItem::setupScrollableText(const QFontMetrics& fm, const QString& 
     // determine the number of rows and the scrollable text for each scrollbar position,
     // based upon only whole words per row and any newline characters.
     int i = 0;
-    while (i <= tileText.length())
+    while (i < tileText.length())
     {
         chr = tileText.at(i);
 
@@ -1315,7 +1315,7 @@ EquipmentHistory::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, 
 
             painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), eqHistory);
 
-            if (eqHistory.at(11) == ":") {
+            if (eqHistory.at(11) == ':') {
                 painter->setPen(GColor(CPLOTMARKER));
                 painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), eqHistory.mid(0, 12));
             }
