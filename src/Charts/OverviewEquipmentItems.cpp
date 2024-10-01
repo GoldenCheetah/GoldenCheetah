@@ -48,7 +48,7 @@ EqTimeWindow::EqTimeWindow()
     startSet_ = true;
     startDate_ = QDate(1900, 01, 01);
     endSet_ = true;
-    endDate_ = QDate(2024, 01, 12);
+    endDate_ = QDate(9999, 12, 31);
 }
 
 EqTimeWindow::EqTimeWindow(const QString& eqLinkName, bool startSet, const QDate& startDate, bool endSet, const QDate& endDate) :
@@ -910,7 +910,7 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
 
     // we align centre and mid
     QFontMetrics fm(parent->bigfont);
-    QString totalDistanceStr(QString::number(getTotalDistanceScaled() * EQ_SCALED_TO_REAL, 'f', 1));
+    QString totalDistanceStr(QString("%L1").arg(getTotalDistanceScaled() * EQ_SCALED_TO_REAL, 0, 'f', 0));
     QRectF rect = QFontMetrics(parent->bigfont, parent->device()).boundingRect(totalDistanceStr);
     painter->setFont(parent->bigfont);
 
@@ -981,20 +981,20 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
     painter->setPen(textColor_);
 
     painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth,rowHeight),
-        QString(tr("Activities: ")) + QString::number(getNumActivities()));
+        QString(tr("Activities: ")) + QString("%L1").arg(getNumActivities()));
 
     rowY += (ROWHEIGHT * 1.2);
     painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-        QString(tr("Distance: ")) + QString::number(getGCDistanceScaled() * EQ_SCALED_TO_REAL, 'f', 1) + distUnits);
+        QString(tr("Distance: ")) + QString("%L1").arg(getGCDistanceScaled() * EQ_SCALED_TO_REAL, 0, 'f', 0) + distUnits);
 
     rowY += ROWHEIGHT;
     QString elevUnits = GlobalContext::context()->useMetricUnits ? tr(" meters") : tr(" feet");
     painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-        QString(tr("Elevation: ")) + QString::number(getGCElevationScaled() * EQ_SCALED_TO_REAL, 'f', 1) + elevUnits);
+        QString(tr("Elevation: ")) + QString("%L1").arg(getGCElevationScaled() * EQ_SCALED_TO_REAL, 0, 'f', 0) + elevUnits);
 
     rowY += ROWHEIGHT;
     painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-        QString(tr("Time: ")) + QString::number(activityTimeInSecs_ * HOURS_PER_SECOND, 'f', 1) + " hrs");
+        QString(tr("Time: ")) + QString("%L1").arg(activityTimeInSecs_ * HOURS_PER_SECOND, 0, 'f', 0) + " hrs");
 
     bool addNotesOffset = false;
     rowY += (ROWHEIGHT * 0.2);
@@ -1004,7 +1004,7 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
         rowY += (ROWHEIGHT);
         addNotesOffset = true;
         painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-            QString(tr("Manual dst: ")) + QString::number(getNonGCDistanceScaled() * EQ_SCALED_TO_REAL, 'f', 1) + distUnits);
+            QString(tr("Manual dst: ")) + QString("%L1").arg(getNonGCDistanceScaled() * EQ_SCALED_TO_REAL, 0, 'f', 0) + distUnits);
     }
 
     if (getNonGCElevationScaled() != 0) {
@@ -1012,7 +1012,7 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
         rowY += ROWHEIGHT;
         addNotesOffset = true;
         painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-            QString(tr("Manual elev: ")) + QString::number(getNonGCElevationScaled() * EQ_SCALED_TO_REAL, 'f', 1) + elevUnits);
+            QString(tr("Manual elev: ")) + QString("%L1").arg(getNonGCElevationScaled() * EQ_SCALED_TO_REAL, 0, 'f', 0) + elevUnits);
     }
 
     if (repDistanceScaled_ != 0) {
@@ -1022,7 +1022,7 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
         rowY += ROWHEIGHT;
         addNotesOffset = true;
         painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-            QString(tr("Replace dist: ")) + QString::number(repDistanceScaled_ * EQ_SCALED_TO_REAL, 'f', 1) + distUnits);
+            QString(tr("Replace dist: ")) + QString("%L1").arg(repDistanceScaled_ * EQ_SCALED_TO_REAL, 0, 'f', 0) + distUnits);
 
         if (overDistance) painter->setPen(textColor_);
     }
@@ -1034,7 +1034,7 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
         rowY += ROWHEIGHT;
         addNotesOffset = true;
         painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-            QString(tr("Replace elev: ")) + QString::number(repElevationScaled_ * EQ_SCALED_TO_REAL, 'f', 1) + elevUnits);
+            QString(tr("Replace elev: ")) + QString("%L1").arg(repElevationScaled_ * EQ_SCALED_TO_REAL, 0, 'f', 0) + elevUnits);
 
         if (overElevation) painter->setPen(textColor_);
     }
@@ -1147,14 +1147,14 @@ EquipmentSummary::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, 
     rowY += (ROWHEIGHT * 1.3);
     painter->setPen(textColor_);
     painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-        QString(tr("Activities: ")) + QString::number(eqLinkNumActivities_));
+        QString(tr("Activities: ")) + QString("%L1").arg(eqLinkNumActivities_));
 
     rowY += ROWHEIGHT;
     if (showActivitiesPerAthlete_) {
         for (auto itr = athleteActivityMap_.keyValueBegin(); itr != athleteActivityMap_.keyValueEnd(); ++itr) {
 
             painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-                QString("   ") + itr->first + ": " + QString::number(itr->second));
+                QString("   ") + itr->first + ": " + QString("%L1").arg(itr->second));
 
             rowY += ROWHEIGHT;
         }
@@ -1173,16 +1173,16 @@ EquipmentSummary::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, 
     rowY += (ROWHEIGHT * 1.25);
     QString distUnits = GlobalContext::context()->useMetricUnits ? tr(" km") : tr(" miles");
     painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-        QString(tr("Distance: ")) + QString::number(eqLinkTotalDistanceScaled_*EQ_SCALED_TO_REAL, 'f', 1) + distUnits);
+        QString(tr("Distance: ")) + QString("%L1").arg(eqLinkTotalDistanceScaled_*EQ_SCALED_TO_REAL, 0, 'f', 0) + distUnits);
 
     rowY += (ROWHEIGHT);
     QString elevUnits = GlobalContext::context()->useMetricUnits ? tr(" meters") : tr(" feet");
     painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-        QString(tr("Elevation: ")) + QString::number(eqLinkTotalElevationScaled_*EQ_SCALED_TO_REAL, 'f', 1) + elevUnits);
+        QString(tr("Elevation: ")) + QString("%L1").arg(eqLinkTotalElevationScaled_*EQ_SCALED_TO_REAL, 0, 'f', 0) + elevUnits);
 
     rowY += ROWHEIGHT;
     painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight),
-        QString(tr("Time: ")) + QString::number(eqLinkTotalTimeInSecs_*HOURS_PER_SECOND, 'f', 1) + " hrs");
+        QString(tr("Time: ")) + QString("%L1").arg(eqLinkTotalTimeInSecs_*HOURS_PER_SECOND, 0, 'f', 0) + " hrs");
 
     tileDisplayHeight_ = rowY + (ROWHEIGHT * 1.5);
 }
