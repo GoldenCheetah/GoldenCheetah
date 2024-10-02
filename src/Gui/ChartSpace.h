@@ -185,7 +185,7 @@ class ChartSpaceItem : public QGraphicsWidget
 
         // base paint
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
-   
+
     public slots:
 
         void geometryChanged();

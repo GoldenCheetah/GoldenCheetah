@@ -317,7 +317,7 @@ ChartSpaceItem::inEdit()
     if (geometry().contains(spos.x(), spos.y())) {
         if (spos.y() - geometry().top() < (ROWHEIGHT + 40) &&
             geometry().width() - (spos.x() - geometry().x()) > (ROWHEIGHT + 40) &&
-            geometry().width() - (spos.x() - geometry().x()) < (2 * ROWHEIGHT + 80)) {
+            geometry().width() - (spos.x() - geometry().x()) < (2*ROWHEIGHT + 80)) {
             return true;
         }
     }
@@ -403,21 +403,21 @@ ChartSpaceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QW
                 painter->setPen(Qt::NoPen);
                 QColor darkgray(RGBColor(color()).lighter(200));
                 painter->setBrush(darkgray);
-                painter->fillRect(QRectF(geometry().width() - 80 - 2*ROWHEIGHT, 0, ROWHEIGHT + 40, ROWHEIGHT + 40), QBrush(darkgray));
+                painter->fillRect(QRectF(geometry().width()-80-2*ROWHEIGHT, 0, ROWHEIGHT + 40, ROWHEIGHT + 40), QBrush(darkgray));
 
                 // draw the edit button and make it more obvious
                 // when hovering over the card
-                painter->drawPixmap(geometry().width() - 60 - (2*ROWHEIGHT), 20, ROWHEIGHT, ROWHEIGHT, accentEdit.pixmap(QSize(ROWHEIGHT, ROWHEIGHT)));
+                painter->drawPixmap(geometry().width()-60-(2*ROWHEIGHT), 20, ROWHEIGHT, ROWHEIGHT, accentEdit.pixmap(QSize(ROWHEIGHT, ROWHEIGHT)));
 
             }
             else {
 
                 // hover on card - make it more obvious there is a edit button
-                painter->drawPixmap(geometry().width() - 60 - (2*ROWHEIGHT), 20, ROWHEIGHT, ROWHEIGHT, whiteEdit.pixmap(QSize(ROWHEIGHT, ROWHEIGHT)));
+                painter->drawPixmap(geometry().width()-60-(2*ROWHEIGHT), 20, ROWHEIGHT, ROWHEIGHT, whiteEdit.pixmap(QSize(ROWHEIGHT, ROWHEIGHT)));
             }
 
         }
-        else painter->drawPixmap(geometry().width() - 60 - (2*ROWHEIGHT), 20, ROWHEIGHT, ROWHEIGHT, grayEdit.pixmap(QSize(ROWHEIGHT, ROWHEIGHT)));
+        else painter->drawPixmap(geometry().width()-60-(2*ROWHEIGHT), 20, ROWHEIGHT, ROWHEIGHT, grayEdit.pixmap(QSize(ROWHEIGHT, ROWHEIGHT)));
     }
 
     // thin border
@@ -1015,10 +1015,10 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
             if (item && ! item->inCorner()) {
 
                 // are we on the boundary of the ChartSpaceItem?
-                double offx = pos.x() - item->geometry().x();
-                double offy = pos.y() - item->geometry().y();
+                double offx = pos.x()-item->geometry().x();
+                double offy = pos.y()-item->geometry().y();
 
-                if (item->geometry().height() - offy < (gl_near * dpiXFactor)) {
+                if (item->geometry().height()-offy < (gl_near*dpiXFactor)) {
 
                     // We can span resize a specific chartspaceitem
                     // by pressing SHIFT when we click
@@ -1032,14 +1032,13 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                     event->accept();
                     returning = true;
 
-                }
-                else if (item->geometry().width() - offx < (gl_near * dpiXFactor)) {
+                } else if (item->geometry().width()-offx < (gl_near*dpiXFactor)) {
 
                     if (QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier)  state = SPAN;
                     else state = XRESIZE;
 
                     stateData.xresize.item = item;
-                    stateData.xresize.column = item->column + item->span - 1;
+                    stateData.xresize.column = item->column+item->span-1;
                     stateData.xresize.width = columns[item->column];
                     stateData.xresize.posx = pos.x();
 
@@ -1047,8 +1046,7 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                     event->accept();
                     returning = true;
 
-                }
-                else {
+                } else {
 
                     // we're grabbing a ChartSpaceItem, so lets
                     // work out the offset so we can move
@@ -1057,7 +1055,7 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
 
                     // warn items we are dragging, they may temporarily
                     // hide widgets to make things faster
-                    foreach(ChartSpaceItem * item, items) item->dragging(true);
+                    foreach(ChartSpaceItem *item, items) item->dragging(true);
 
                     item->invisible = true;
                     item->setDrag(true);
