@@ -99,6 +99,10 @@ class ChartSpaceItem : public QGraphicsWidget
         void setShowConfig(bool x) { showconfig=x; update(); }
         bool showConfig() const { return showconfig; }
 
+        // turn off/on the edit corner button
+        void setShowEdit(bool x) { showedit = x; update(); }
+        bool showEdit() const { return showedit; }
+
         // let item know that dragging is in process
         // for some widgets (e.g. UserChart) this means
         // its best to hide the widgets as rendering into
@@ -112,8 +116,8 @@ class ChartSpaceItem : public QGraphicsWidget
         ChartSpaceItem(ChartSpace *parent, QString name) : QGraphicsWidget(NULL),
                                        parent(parent), name(name),
                                        column(0), order(0), deep(5), onscene(false),
-                                       placing(false), drag(false), incorner(false), invisible(false),
-                                       showconfig(true)  {
+                                       placing(false), drag(false), incorner(false), inedit(false),
+                                       invisible(false), showconfig(true), showedit(false) {
 
             setAutoFillBackground(false);
             setFlags(flags() | QGraphicsItem::ItemClipsToShape); // don't paint outside the card
@@ -144,6 +148,7 @@ class ChartSpaceItem : public QGraphicsWidget
         // watch mouse enter/leave
         bool sceneEvent(QEvent *event);
         bool inCorner();
+        bool inEdit();
         bool inHotspot();
         bool underMouse();
 
@@ -171,14 +176,16 @@ class ChartSpaceItem : public QGraphicsWidget
         int column, span, order, deep;
         bool onscene, placing, drag;
         bool incorner;
+        bool inedit;
         bool invisible;
         bool showconfig;
+        bool showedit;
         QString bgcolor;
         QGraphicsDropShadowEffect *effect;
 
         // base paint
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
-
+   
     public slots:
 
         void geometryChanged();
@@ -192,7 +199,7 @@ class LayoutChartSpaceItem {
     public:
         LayoutChartSpaceItem(ChartSpaceItem *from) :
             column(from->column), span(from->span), order (from->order ), deep(from->deep), onscene(from->onscene),
-            placing(from->placing), drag(from->drag), incorner(from->incorner), invisible(from->invisible),
+            placing(from->placing), drag(from->drag), incorner(from->incorner), inedit(from->inedit), invisible(from->invisible),
             item(from), geometry(from->geometry()) {}
 
         static bool LayoutChartSpaceItemSort(const LayoutChartSpaceItem left, const LayoutChartSpaceItem right);
@@ -200,6 +207,7 @@ class LayoutChartSpaceItem {
         int column, span, order, deep;
         bool onscene, placing, drag;
         bool incorner;
+        bool inedit;
         bool invisible;
 
         ChartSpaceItem *item;
