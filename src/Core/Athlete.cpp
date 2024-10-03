@@ -20,7 +20,7 @@
 
 #include "MainWindow.h"
 #include "Context.h"
-#include "Season.h"
+#include "Seasons.h"
 #include "Colors.h"
 #include "RideMetadata.h"
 #include "RideCache.h"

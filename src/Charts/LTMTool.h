@@ -21,7 +21,6 @@
 #include "GoldenCheetah.h"
 
 #include "Context.h"
-#include "Season.h"
 #include "RideMetric.h"
 #include "LTMSettings.h"
 #include "PDModel.h"
@@ -32,6 +31,7 @@
 #include <QFileDialog>
 #include <QtGui>
 #include <QTableWidget>
+#include <QTreeWidget>
 #include <QButtonGroup>
 #include <QStackedWidget>
 #include <QTextEdit>

@@ -31,6 +31,7 @@
 #include "PMCData.h"
 #include "WPrime.h"
 #include "Season.h"
+#include "Seasons.h"
 #include "DataFilter.h"
 #include "Specification.h"
 #include "Zones.h"
@@ -1636,7 +1637,7 @@ RTool::season(SEXP pAll, SEXP pCompare)
     } else if (all) {
         // list all seasons
         foreach(Season season, rtool->context->athlete->seasons->seasons) {
-            worklist << DateRange(season.getStart(), season.getEnd(), season.name, QColor(127,127,127));
+            worklist << DateRange(season.getStart(), season.getEnd(), season.getName(), QColor(127,127,127));
         }
 
     } else {

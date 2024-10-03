@@ -18,6 +18,7 @@
 
 #include "ComparePane.h"
 #include "Season.h"
+#include "Seasons.h"
 #include "Settings.h"
 #include "Colors.h"
 #include "RideCache.h"

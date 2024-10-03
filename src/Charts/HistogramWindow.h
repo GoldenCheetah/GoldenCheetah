@@ -35,9 +35,6 @@
 #include "Zones.h"
 #include "HrZones.h"
 
-#include "Season.h"
-#include "SeasonParser.h"
-
 #include "SearchFilterBox.h"
 
 #include "qxtstringspinbox.h"

@@ -41,9 +41,7 @@
 
 // seasons support
 #include "Season.h"
-#include "SeasonParser.h"
-#include <QXmlInputSource>
-#include <QXmlSimpleReader>
+#include "Seasons.h"
 #ifdef GC_HAVE_ICAL
 #include "CalDAV.h" // upload Events to remote calendar
 #endif
@@ -327,17 +325,17 @@ LTMSidebar::selectDateRange(DateRange dr)
 {
     for(int i=0; i<seasons->seasons.count(); i++) {
         Season s = seasons->seasons.at(i);
-        if (s.getStart() == dr.from && s.getEnd() == dr.to && s.name == dr.name) {
+        if (s.getStart() == dr.from && s.getEnd() == dr.to && s.getName() == dr.name) {
             // bingo
             dateRangeTree->selectionModel()->clearSelection(); // clear selection
             allDateRanges->child(i)->setSelected(true); // select ours
             return;
         } else {
             QStringList names=dr.name.split("/");
-            if (names.count() == 2 && s.name == names.at(0)) {
+            if (names.count() == 2 && s.getName() == names.at(0)) {
                 for (int j=0; j<s.phases.count(); j++) {
                     Phase p = s.phases.at(j);
-                    if (p.getStart() == dr.from && p.getEnd() == dr.to && p.name == names.at(1)) {
+                    if (p.getStart() == dr.from && p.getEnd() == dr.to && p.getName() == names.at(1)) {
                         // bingo
                         dateRangeTree->selectionModel()->clearSelection(); // clear selection
                         allDateRanges->child(i)->child(j)->setSelected(true); // select ours
@@ -407,8 +405,8 @@ LTMSidebar::dateRangeTreeWidgetSelectionChanged()
     }
 
     // Let the view know its changed....
-    if (phase) emit dateRangeChanged(DateRange(phase->getStart(), phase->getEnd(), dateRange->name + "/" + phase->name));
-    else if (dateRange) emit dateRangeChanged(DateRange(dateRange->getStart(), dateRange->getEnd(), dateRange->name));
+    if (phase) emit dateRangeChanged(DateRange(phase->getStart(), phase->getEnd(), dateRange->getName() + "/" + phase->getName()));
+    else if (dateRange) emit dateRangeChanged(DateRange(dateRange->getStart(), dateRange->getEnd(), dateRange->getName()));
     else emit dateRangeChanged(DateRange());
 
 }
@@ -547,6 +545,11 @@ LTMSidebar::dateRangePopup(QPoint pos)
             QAction *season = new QAction(tr("Add season"), dateRangeTree);
             QAction *event = new QAction(tr("Add Event"), dateRangeTree);
             QAction *phase = new QAction(tr("Add Phase"), dateRangeTree);
+
+            if (! seasons->seasons[seasonIdx].isAbsolute()) {
+                event->setEnabled(false);
+                phase->setEnabled(false);
+            }
 
             menu.addAction(edit);
             menu.addAction(del);
@@ -1152,11 +1155,11 @@ LTMSidebar::addRange()
         // check dates are right way round...
         if (newOne.getStart() > newOne.getEnd()) {
             QDate temp = newOne.getStart();
-            newOne.setStart(newOne.getEnd());
-            newOne.setEnd(temp);
+            newOne.setAbsoluteStart(newOne.getEnd());
+            newOne.setAbsoluteEnd(temp);
         }
 
-        // save 
+        // save
         seasons->seasons.insert(0, newOne);
         seasons->writeSeasons();
         active = false;
@@ -1203,8 +1206,8 @@ LTMSidebar::editRange()
             // check dates are right way round...
             if (seasons->seasons[seasonIdx].phases[phaseIdx].getStart() > seasons->seasons[seasonIdx].phases[phaseIdx].getEnd()) {
                 QDate temp = seasons->seasons[seasonIdx].phases[phaseIdx].getStart();
-                seasons->seasons[seasonIdx].phases[phaseIdx].setStart(seasons->seasons[seasonIdx].phases[phaseIdx].getEnd());
-                seasons->seasons[seasonIdx].phases[phaseIdx].setEnd(temp);
+                seasons->seasons[seasonIdx].phases[phaseIdx].setAbsoluteStart(seasons->seasons[seasonIdx].phases[phaseIdx].getEnd());
+                seasons->seasons[seasonIdx].phases[phaseIdx].setAbsoluteEnd(temp);
             }
 
             // update name
@@ -1213,8 +1216,8 @@ LTMSidebar::editRange()
             // check dates are right way round...
             if (seasons->seasons[seasonIdx].getStart() > seasons->seasons[seasonIdx].getEnd()) {
                 QDate temp = seasons->seasons[seasonIdx].getStart();
-                seasons->seasons[seasonIdx].setStart(seasons->seasons[seasonIdx].getEnd());
-                seasons->seasons[seasonIdx].setEnd(temp);
+                seasons->seasons[seasonIdx].setAbsoluteStart(seasons->seasons[seasonIdx].getEnd());
+                seasons->seasons[seasonIdx].setAbsoluteEnd(temp);
             }
 
             // update name

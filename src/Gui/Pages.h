@@ -47,8 +47,6 @@
 #include "DeviceConfiguration.h"
 #include "RideMetadata.h"
 #include "DataProcessor.h"
-#include "Season.h"
-#include "SeasonParser.h"
 #include "RideAutoImportConfig.h"
 #include "RemoteControl.h"
 #include "Measures.h"
@@ -67,7 +65,6 @@ class FieldsPage;
 class Colors;
 class AboutRiderPage;
 class BackupPage;
-class SeasonsPage;
 class DevicePage;
 class RemotePage;
 class SimBicyclePage;

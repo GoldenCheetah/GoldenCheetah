@@ -32,6 +32,7 @@
 #include "DataProcessor.h"
 #include "GenericSelectTool.h" // for generic calculator
 #include "SearchFilterBox.h" // for SearchFilterBox::matches
+#include "Seasons.h" // for SearchFilterBox::matches
 #include <QDebug>
 #include <QMutex>
 #include "lmcurve.h"

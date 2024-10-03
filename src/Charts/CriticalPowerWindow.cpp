@@ -41,7 +41,7 @@
 #include <qwt_scale_div.h>
 #include <QFile>
 #include "Season.h"
-#include "SeasonParser.h"
+#include "Seasons.h"
 #include "Colors.h"
 #include "Zones.h"
 #include <QXmlInputSource>

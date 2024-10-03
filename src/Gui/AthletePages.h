@@ -48,7 +48,6 @@
 #include "RideMetadata.h"
 #include "DataProcessor.h"
 #include "Season.h"
-#include "SeasonParser.h"
 #include "RideAutoImportConfig.h"
 #include "RemoteControl.h"
 #include "Measures.h"
