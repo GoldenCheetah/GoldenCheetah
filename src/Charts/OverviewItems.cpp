@@ -933,7 +933,7 @@ MetaOverviewItem::configChanged(qint32)
     }
 }
 
-void MetaOverviewItem::DisplayMenuOfValues(const QPoint& pos)
+void MetaOverviewItem::DisplayTileEditMenu(const QPoint& pos)
 {
     QMenu popMenu;
 

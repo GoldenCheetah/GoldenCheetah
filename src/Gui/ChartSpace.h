@@ -89,8 +89,8 @@ class ChartSpaceItem : public QGraphicsWidget
         virtual QColor color();
         virtual QRectF hotspot() { return QRectF(0,0,0,0); } // don't steal events from this area of the item
         
-        // Override to display tile specific popup menu
-        virtual void DisplayMenuOfValues(const QPoint&) {};
+        // Override to display tile specific edit menu
+        virtual void DisplayTileEditMenu(const QPoint&) {};
 
         virtual QWidget *config()=0; // must supply a widget to configure
         virtual void configChanged(qint32) {}

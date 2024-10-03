@@ -279,7 +279,7 @@ ChartSpaceItem::sceneEvent(QEvent *event)
 bool
 ChartSpaceItem::inHotspot()
 {
-    if (showconfig == false || showedit == false) return false;
+    if (showconfig == false && showedit == false) return false;
 
     QPoint vpos = parent->view->mapFromGlobal(QCursor::pos());
     QPointF spos = parent->view->mapToScene(vpos);
@@ -1007,16 +1007,17 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
             if (item && item->inEdit()) {
 
                 block = false; // reeentry is allowed
-                item->DisplayMenuOfValues(static_cast<QGraphicsSceneMouseEvent*>(event)->screenPos());
+                item->DisplayTileEditMenu(static_cast<QGraphicsSceneMouseEvent*>(event)->screenPos());
                 return true;
             }
 
-            // only respond to clicks not in config corner button
-            if (item && ! item->inCorner()) {
+            // only respond to clicks not in config corner or edit button
+            if (item && !item->inCorner() && !item->inEdit()) {
 
                 // are we on the boundary of the ChartSpaceItem?
                 double offx = pos.x()-item->geometry().x();
                 double offy = pos.y()-item->geometry().y();
+
 
                 if (item->geometry().height()-offy < (gl_near*dpiXFactor)) {
 

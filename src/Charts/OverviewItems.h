@@ -357,7 +357,7 @@ class MetaOverviewItem : public ChartSpaceItem
         void setData(RideItem *item) override;
         void setDateRange(DateRange) override {} // doesn't support trends view
 
-        virtual void DisplayMenuOfValues(const QPoint& pos) override;
+        virtual void DisplayTileEditMenu(const QPoint& pos) override;
 
         QWidget *config() override { return configwidget; }
 
