@@ -1019,7 +1019,7 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                 double offy = pos.y()-item->geometry().y();
 
 
-                if (item->geometry().height()-offy < (gl_near*dpiXFactor)) {
+               if (item->geometry().height()-offy < (gl_near*dpiXFactor)) {
 
                     // We can span resize a specific chartspaceitem
                     // by pressing SHIFT when we click
@@ -1033,7 +1033,7 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                     event->accept();
                     returning = true;
 
-                } else if (item->geometry().width()-offx < (gl_near*dpiXFactor)) {
+               } else if (item->geometry().width()-offx < (gl_near*dpiXFactor)) {
 
                     if (QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier)  state = SPAN;
                     else state = XRESIZE;
@@ -1047,7 +1047,7 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                     event->accept();
                     returning = true;
 
-                } else {
+               } else {
 
                     // we're grabbing a ChartSpaceItem, so lets
                     // work out the offset so we can move
