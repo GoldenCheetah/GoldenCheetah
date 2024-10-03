@@ -866,8 +866,7 @@ MainWindow::setSubChartMenu()
 void
 MainWindow::setChartMenu(QMenu *menu)
 {
-    unsigned int mask = 0;
-
+    unsigned int mask=0;
     // called when chart menu about to be shown
     // setup to only show charts that are relevant
     // to this view
@@ -875,11 +874,11 @@ MainWindow::setChartMenu(QMenu *menu)
         mask = VIEW_EQUIPMENT;
     } else {
         switch (currentAthleteTab->currentView()) {
-        case 0: mask = VIEW_TRENDS; break;
+        case 0 : mask = VIEW_TRENDS; break;
         default:
-        case 1: mask = VIEW_ANALYSIS; break;
-        case 2: mask = VIEW_DIARY; break;
-        case 3: mask = VIEW_TRAIN; break;
+        case 1 : mask = VIEW_ANALYSIS; break;
+        case 2 : mask = VIEW_DIARY; break;
+        case 3 : mask = VIEW_TRAIN; break;
         }
     }
 
@@ -893,12 +892,12 @@ MainWindow::setChartMenu(QMenu *menu)
 }
 
 void
-MainWindow::addChart(QAction* action)
+MainWindow::addChart(QAction*action)
 {
     // & removed to avoid issues with kde AutoCheckAccelerators
     QString actionText = QString(action->text()).replace("&", "");
     GcWinID id = GcWindowTypes::None;
-    for (int i = 0; GcWindows[i].relevance; i++) {
+    for (int i=0; GcWindows[i].relevance; i++) {
         if (GcWindows[i].name == actionText) {
             id = GcWindows[i].id;
             break;
@@ -931,7 +930,7 @@ MainWindow::exportPerspective()
     if (viewStack->currentIndex() == 2) return;
 
     int view = currentAthleteTab->currentView();
-    AbstractView* current = NULL;
+    AbstractView *current = NULL;
 
     QString typedesc;
 
@@ -963,7 +962,7 @@ MainWindow::importPerspective()
 
     int view = currentAthleteTab->currentView();
     AbstractView *current = NULL;
-    
+
     switch (view) {
     case 0:  current = currentAthleteTab->homeView; break;
     case 1:  current = currentAthleteTab->analysisView; break;
@@ -2390,12 +2389,12 @@ MainWindow::restoreGCState(Context *context)
         resetPerspective(currentAthleteTab->currentView()); // will lazy load, hence doing it first
 
         // restore window state from the supplied context
-        switch(currentAthleteTab->currentView()) {
-        case 0: sidebar->setItemSelected(2,true); break;
-        case 1: sidebar->setItemSelected(3,true); break;
-        case 2: break; // diary not an icon
-        case 3: sidebar->setItemSelected(5, true); break;
-        default: sidebar->setItemSelected(0, true); break;
+            switch(currentAthleteTab->currentView()) {
+            case 0: sidebar->setItemSelected(2,true); break;
+            case 1: sidebar->setItemSelected(3,true); break;
+            case 2: break; // diary not an icon
+            case 3: sidebar->setItemSelected(5, true); break;
+            default: sidebar->setItemSelected(0, true); break;
         }
     }
 

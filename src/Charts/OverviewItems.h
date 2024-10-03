@@ -352,39 +352,39 @@ class MetaOverviewItem : public ChartSpaceItem
 {
     Q_OBJECT
 
-public:
+    public:
 
-    MetaOverviewItem(ChartSpace *parent, QString name, QString symbol);
-    ~MetaOverviewItem();
+        MetaOverviewItem(ChartSpace *parent, QString name, QString symbol);
+        ~MetaOverviewItem();
 
-    void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*) override;
-    void itemGeometryChanged() override;
-    void setData(RideItem *item) override;
-    void setDateRange(DateRange) override {} // doesn't support trends view
+        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override;
+        void itemGeometryChanged() override;
+        void setData(RideItem *item) override;
+        void setDateRange(DateRange) override {} // doesn't support trends view
 
-    virtual void DisplayMenuOfValues(const QPoint& pos) override;
+        virtual void DisplayTileEditMenu(const QPoint& pos) override;
 
-    QWidget* config() override { return configwidget; }
+        QWidget *config() override { return configwidget; }
 
-    // create and config
-    static ChartSpaceItem *create(ChartSpace* parent) { return new MetaOverviewItem(parent, tr("Workout Code"), "Workout Code"); }
+        // create and config
+        static ChartSpaceItem *create(ChartSpace *parent) { return new MetaOverviewItem(parent, tr("Workout Code"), "Workout Code"); }
 
-    void configChanged(qint32) override;
+        void configChanged(qint32) override;
 
-    QString symbol;
-    int fieldtype;
+        QString symbol;
+        int fieldtype;
 
-    // for numeric metadata items
-    bool up, showrange;
-    QString value, upper, lower, mean;
+        // for numeric metadata items
+        bool up, showrange;
+        QString value, upper, lower, mean;
 
-    Sparkline *sparkline;
+        Sparkline *sparkline;
 
-    OverviewItemConfig *configwidget;
+        OverviewItemConfig *configwidget;
 
-protected slots:
+    protected slots:
 
-    void popupAction(QAction*);
+        void popupAction(QAction*);
 
 };
 

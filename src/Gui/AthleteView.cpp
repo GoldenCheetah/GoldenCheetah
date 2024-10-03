@@ -101,8 +101,9 @@ AthleteView::configItem(ChartSpaceItem*item)
 
 AthleteCard::AthleteCard(ChartSpace *parent, QString path) : ChartSpaceItem(parent, path), path(path), refresh(false)
 {
-    // no config icon thanks
+    // no config or edit icon thanks
     setShowConfig(false);
+    setShowEdit(false);
 
     // avatar
     QRectF img(ROWHEIGHT,ROWHEIGHT*2,ROWHEIGHT* gl_avatar_width, ROWHEIGHT* gl_avatar_width);

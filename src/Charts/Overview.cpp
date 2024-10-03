@@ -24,8 +24,6 @@
 #include "Utils.h"
 #include "HelpWhatsThis.h"
 
-static QIcon grayConfig, whiteConfig, accentConfig;
-
 OverviewWindow::OverviewWindow(Context *context, int scope, bool blank) : GcChartWindow(context), context(context), configured(false), scope(scope), blank(blank)
 {
     setContentsMargins(0,0,0,0);

@@ -113,7 +113,7 @@ class CommonEquipmentItem : public ChartSpaceItem
         void itemPaint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override {}
 
         virtual void resetEqItem() {}
-        virtual void DisplayMenuOfValues(const QPoint& pos) override;
+        virtual void DisplayTileEditMenu(const QPoint& pos) override;
 
         QWidget* config() override { return configwidget_; }
 

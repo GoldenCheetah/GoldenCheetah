@@ -203,6 +203,7 @@
         <file>images/sidebar/sync.png</file>
         <file>audio/lap.wav</file>
         <file>images/configure.png</file>
+        <file>images/tile-edit.png</file>
         <file>images/toolbar/cloud.png</file>
         <file>images/services/strava_compatible.png</file>
         <file>images/services/strava_connect.png</file>

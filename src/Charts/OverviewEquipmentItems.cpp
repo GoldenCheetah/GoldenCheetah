@@ -580,9 +580,10 @@ OverviewEquipmentItemConfig::dataChanged()
 CommonEquipmentItem::CommonEquipmentItem(ChartSpace* parent, const QString& name) :
     ChartSpaceItem(parent, name), tileDisplayHeight_(ROWHEIGHT * 5)
 {
+    setShowEdit(true);
 }
 
-void CommonEquipmentItem::DisplayMenuOfValues(const QPoint& pos)
+void CommonEquipmentItem::DisplayTileEditMenu(const QPoint& pos)
 {
     QMenu popMenu;
 
@@ -604,10 +605,10 @@ void CommonEquipmentItem::DisplayMenuOfValues(const QPoint& pos)
     metaAction = new QAction(tr("Collapse"));
     popMenu.addAction(metaAction);
 
-    metaAction = new QAction(tr("Expand Tiles"));
+    metaAction = new QAction(tr("Expand All"));
     popMenu.addAction(metaAction);
 
-    metaAction = new QAction(tr("Collapse Tiles"));
+    metaAction = new QAction(tr("Collapse All"));
     popMenu.addAction(metaAction);
 
     for (const GcChartWindow* chart : parent->window->getPerspective()->getCharts()) {
@@ -639,24 +640,20 @@ void CommonEquipmentItem::popupAction(QAction* action)
         parent->adjustItemHeight(this, 5);
         return;
     }
-    if (action->text() == tr("Expand Tiles")) {
+    if (action->text() == tr("Expand All")) {
 
         for (ChartSpaceItem* item : parent->allItems()) {
-            if (item->type != OverviewItemType::EQ_NOTES) {
 
-                parent->adjustItemHeight(item, round(static_cast<CommonEquipmentItem*>(item)->tileDisplayHeight_ / ROWHEIGHT));
-                updateGeometry();
-            }
+            parent->adjustItemHeight(item, round(static_cast<CommonEquipmentItem*>(item)->tileDisplayHeight_ / ROWHEIGHT));
+            updateGeometry();
         }
         return;
     }
-    if (action->text() == tr("Collapse Tiles")) {
+    if (action->text() == tr("Collapse All")) {
         for (ChartSpaceItem* item : parent->allItems()) {
-            if (item->type != OverviewItemType::EQ_NOTES) {
 
-                parent->adjustItemHeight(item, 5);
-                updateGeometry();
-            }
+            parent->adjustItemHeight(item, 5);
+            updateGeometry();
         }
         return;
     }

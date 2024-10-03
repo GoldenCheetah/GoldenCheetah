@@ -923,9 +923,17 @@ MetaOverviewItem::configChanged(qint32)
             sparkline = NULL;
         }
     }
+    // Find the metadata fielddefintion for this tile
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
+        if (field.name == symbol) {
+            // only display the edit icon for fields with values set.
+            setShowEdit(field.values.size() != 0);
+            break;
+        }
+    }
 }
 
-void MetaOverviewItem::DisplayMenuOfValues(const QPoint& pos)
+void MetaOverviewItem::DisplayTileEditMenu(const QPoint& pos)
 {
     QMenu popMenu;
 
@@ -939,6 +947,7 @@ void MetaOverviewItem::DisplayMenuOfValues(const QPoint& pos)
                 QAction* metaAction = new QAction(field.values.at(i));
                 popMenu.addAction(metaAction);
             }
+            break;
         }
     }
 

@@ -1321,7 +1321,7 @@ GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcChartWindow **h
     setMinimumHeight(500);
 
     // chart and settings side by side need to be big!
-    if (size.width() >= 1300) setMinimumWidth(1200);
+    if (size.width() >= 1300) setMinimumWidth(1200); 
     else setMinimumWidth(800); // otherwise the old default
     setWindowModality(Qt::ApplicationModal);
 
@@ -1884,9 +1884,9 @@ ImportChartDialog::importClicked()
 
             // add to the currently selected tab and select if only adding one chart
             if (x == 4)
-                context->mainWindow->equipView()->importChart(list[i], (list.count() == 1));
+                context->mainWindow->equipView()->importChart(list[i], (list.count()==1));
             else
-                context->mainWindow->athleteTab()->view(x)->importChart(list[i], (list.count() == 1));
+                context->mainWindow->athleteTab()->view(x)->importChart(list[i], (list.count()==1));
         }
     }
     accept();
