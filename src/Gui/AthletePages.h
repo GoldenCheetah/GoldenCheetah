@@ -649,4 +649,6 @@ class AutoImportPage : public QWidget
 
 };
 
+extern void basicTreeWidgetStyle(QTreeWidget *tree);
+
 #endif

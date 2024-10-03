@@ -45,8 +45,7 @@ public:
     virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
     virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
     virtual QString displayText(const QVariant &value, const QLocale &locale) const override;
-
-    static QSize staticSizeHint();
+    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
 private:
     int minimum = 0;
@@ -77,8 +76,7 @@ public:
     virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
     virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
     virtual QString displayText(const QVariant &value, const QLocale &locale) const override;
-
-    static QSize staticSizeHint();
+    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
 private:
     double minimum = 0;
@@ -103,8 +101,7 @@ public:
     virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
     virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
     virtual QString displayText(const QVariant &value, const QLocale &locale) const override;
-
-    static QSize staticSizeHint();
+    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
 private:
     bool calendarPopup = false;
@@ -127,8 +124,7 @@ public:
     virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
     virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
     virtual QString displayText(const QVariant &value, const QLocale &locale) const override;
-
-    static QSize staticSizeHint();
+    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
 private:
     QString format;

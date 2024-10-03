@@ -130,7 +130,11 @@ SpinBoxEditDelegate::createEditor
     QSpinBox *spinbox = new QSpinBox(parent);
     spinbox->setRange(minimum, maximum);
     spinbox->setSingleStep(singleStep);
-    spinbox->setSuffix(suffix);
+    if (suffix.length() > 0) {
+        spinbox->setSuffix(" " + suffix);
+    } else {
+        spinbox->setSuffix("");
+    }
 
     return spinbox;
 }
@@ -155,7 +159,6 @@ SpinBoxEditDelegate::setModelData
     int newValue = spinbox->value();
     if (model->data(index, Qt::EditRole).toInt() != newValue) {
         model->setData(index, newValue, Qt::EditRole);
-        model->setData(index, editor->sizeHint(), Qt::SizeHintRole);
     }
 }
 
@@ -175,10 +178,18 @@ SpinBoxEditDelegate::displayText
 
 
 QSize
-SpinBoxEditDelegate::staticSizeHint
-()
+SpinBoxEditDelegate::sizeHint
+(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    Q_UNUSED(option)
+    Q_UNUSED(index)
+
     QSpinBox widget;
+    if ((showSuffixOnEdit || showSuffixOnDisplay) && ! suffix.isEmpty()) {
+        widget.setSuffix(" " + suffix);
+    }
+    widget.setMaximum(maximum);
+    widget.setValue(maximum);
     return widget.sizeHint();
 }
 
@@ -268,7 +279,11 @@ DoubleSpinBoxEditDelegate::createEditor
     spinbox->setRange(minimum, maximum);
     spinbox->setSingleStep(singleStep);
     spinbox->setDecimals(prec);
-    spinbox->setSuffix(suffix);
+    if (suffix.length() > 0) {
+        spinbox->setSuffix(" " + suffix);
+    } else {
+        spinbox->setSuffix("");
+    }
 
     return spinbox;
 }
@@ -293,7 +308,6 @@ DoubleSpinBoxEditDelegate::setModelData
     double newValue = spinbox->value();
     if (model->data(index, Qt::EditRole).toDouble() != newValue) {
         model->setData(index, newValue, Qt::EditRole);
-        model->setData(index, editor->sizeHint(), Qt::SizeHintRole);
     }
 }
 
@@ -313,10 +327,19 @@ DoubleSpinBoxEditDelegate::displayText
 
 
 QSize
-DoubleSpinBoxEditDelegate::staticSizeHint
-()
+DoubleSpinBoxEditDelegate::sizeHint
+(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    Q_UNUSED(option)
+    Q_UNUSED(index)
+
     QDoubleSpinBox widget;
+    if ((showSuffixOnEdit || showSuffixOnDisplay) && ! suffix.isEmpty()) {
+        widget.setSuffix(" " + suffix);
+    }
+    widget.setMaximum(maximum);
+    widget.setValue(maximum);
+    widget.setDecimals(prec);
     return widget.sizeHint();
 }
 
@@ -370,7 +393,6 @@ DateEditDelegate::setModelData
     QDate newValue = dateEdit->date();
     if (model->data(index, Qt::EditRole).toDate() != newValue) {
         model->setData(index, newValue, Qt::EditRole);
-        model->setData(index, editor->sizeHint(), Qt::SizeHintRole);
     }
 }
 
@@ -384,9 +406,12 @@ DateEditDelegate::displayText
 
 
 QSize
-DateEditDelegate::staticSizeHint
-()
+DateEditDelegate::sizeHint
+(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    Q_UNUSED(option)
+    Q_UNUSED(index)
+
     QDateEdit widget;
     return widget.sizeHint();
 }
@@ -486,7 +511,6 @@ TimeEditDelegate::setModelData
     QTime newValue = timeEdit->time();
     if (model->data(index, Qt::EditRole).toTime() != newValue) {
         model->setData(index, newValue, Qt::EditRole);
-        model->setData(index, editor->sizeHint(), Qt::SizeHintRole);
     }
 }
 
@@ -510,9 +534,21 @@ TimeEditDelegate::displayText
 
 
 QSize
-TimeEditDelegate::staticSizeHint
-()
+TimeEditDelegate::sizeHint
+(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    Q_UNUSED(option)
+    Q_UNUSED(index)
+
     QTimeEdit widget;
+    widget.setTime(QTime(0, 0, 0));
+    QString f = format;
+    if (f.isEmpty()) {
+        f = "mm:ss";
+    }
+    if ((showSuffixOnEdit || showSuffixOnDisplay) && ! suffix.isEmpty()) {
+        f += " '" + suffix + "'";
+    }
+    widget.setDisplayFormat(f);
     return widget.sizeHint();
 }

@@ -998,13 +998,8 @@ SchemePage::SchemePage(Zones* zones) : zones(zones)
     scheme->headerItem()->setText(1, tr("Long"));
     scheme->headerItem()->setText(2, tr("Percent of CP"));
     scheme->setColumnCount(3);
-    scheme->setSelectionMode(QAbstractItemView::SingleSelection);
-    scheme->setEditTriggers(  QAbstractItemView::DoubleClicked
-                            | QAbstractItemView::SelectedClicked
-                            | QAbstractItemView::AnyKeyPressed);
-    scheme->setUniformRowHeights(true);
-    scheme->setIndentation(0);
     scheme->setItemDelegateForColumn(2, &zoneFromDelegate);
+    basicTreeWidgetStyle(scheme);
 
     // setup list
     for (int i = 0; i < zones->getScheme().nzones_default; i++) {
@@ -1014,7 +1009,6 @@ SchemePage::SchemePage(Zones* zones) : zones(zones)
         add->setData(0, Qt::DisplayRole, zones->getScheme().zone_default_name[i]);
         add->setData(1, Qt::DisplayRole, zones->getScheme().zone_default_desc[i]);
         add->setData(2, Qt::DisplayRole, zones->getScheme().zone_default[i]);
-        add->setData(2, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
     }
 
     mainLayout->addWidget(scheme);
@@ -1061,7 +1055,6 @@ SchemePage::addClicked()
     add->setData(1, Qt::DisplayRole, text);
 
     add->setData(2, Qt::DisplayRole, 100);
-    add->setData(2, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
 }
 
 void
@@ -1235,10 +1228,6 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     addLayout->addWidget(useModel);
     addLayout->addWidget(useCPForFTPCombo);
 
-    ranges = new TreeWidget6();
-    ranges->setAlternatingRowColors(true);
-    initializeRanges();
-
     dateDelegate.setCalendarPopup(true);
 
     cpDelegate.setRange(50, 500);
@@ -1271,6 +1260,27 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     pmaxDelegate.setShowSuffixOnEdit(true);
     pmaxDelegate.setShowSuffixOnDisplay(true);
 
+    ranges = new TreeWidget6();
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_STARTDATE, tr("Start Date"));
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_CP, tr("Critical Power"));
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_AETP, tr("AeTP"));
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_FTP, tr("FTP"));
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_WPRIME, tr("W'"));
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_PMAX, tr("Pmax"));
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_MODELFIT, tr("Model Fit"));
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_EST_DEVIATION, "_deviation");
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_EST_OFFSET, "_offset");
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_EST_CP, "_cp");
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_EST_FTP, "_ftp");
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_EST_WPRIME, "_wprime");
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_EST_PMAX, "_pmax");
+    ranges->setColumnCount(CPPAGE_RANGES_COUNT_COL);
+    ranges->setColumnHidden(CPPAGE_RANGES_COL_EST_DEVIATION, true);
+    ranges->setColumnHidden(CPPAGE_RANGES_COL_EST_OFFSET, true);
+    ranges->setColumnHidden(CPPAGE_RANGES_COL_EST_CP, true);
+    ranges->setColumnHidden(CPPAGE_RANGES_COL_EST_FTP, true);
+    ranges->setColumnHidden(CPPAGE_RANGES_COL_EST_WPRIME, true);
+    ranges->setColumnHidden(CPPAGE_RANGES_COL_EST_PMAX, true);
     ranges->setItemDelegateForColumn(CPPAGE_RANGES_COL_STARTDATE, &dateDelegate);
     ranges->setItemDelegateForColumn(CPPAGE_RANGES_COL_CP, &cpDelegate);
     ranges->setItemDelegateForColumn(CPPAGE_RANGES_COL_AETP, &aetDelegate);
@@ -1278,6 +1288,15 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     ranges->setItemDelegateForColumn(CPPAGE_RANGES_COL_WPRIME, &wDelegate);
     ranges->setItemDelegateForColumn(CPPAGE_RANGES_COL_PMAX, &pmaxDelegate);
     ranges->setItemDelegateForColumn(CPPAGE_RANGES_COL_MODELFIT, &statusDelegate);
+    ranges->header()->setSectionResizeMode(CPPAGE_RANGES_COL_STARTDATE, QHeaderView::ResizeToContents);
+    ranges->header()->setSectionResizeMode(CPPAGE_RANGES_COL_CP, QHeaderView::ResizeToContents);
+    ranges->header()->setSectionResizeMode(CPPAGE_RANGES_COL_AETP, QHeaderView::ResizeToContents);
+    ranges->header()->setSectionResizeMode(CPPAGE_RANGES_COL_FTP, QHeaderView::ResizeToContents);
+    ranges->header()->setSectionResizeMode(CPPAGE_RANGES_COL_WPRIME, QHeaderView::ResizeToContents);
+    ranges->header()->setSectionResizeMode(CPPAGE_RANGES_COL_PMAX, QHeaderView::ResizeToContents);
+    ranges->header()->setSectionResizeMode(CPPAGE_RANGES_COL_MODELFIT, QHeaderView::ResizeToContents);
+    basicTreeWidgetStyle(ranges);
+    initializeRanges();
 
     zoneFromDelegate.setRange(0, 1000);
     zoneFromDelegate.setSingleStep(1);
@@ -1290,15 +1309,8 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     zones->headerItem()->setText(1, tr("Long"));
     zones->headerItem()->setText(2, tr("From Watts"));
     zones->setColumnCount(3);
-    zones->setSelectionMode(QAbstractItemView::SingleSelection);
-    zones->setEditTriggers(  QAbstractItemView::DoubleClicked
-                           | QAbstractItemView::SelectedClicked
-                           | QAbstractItemView::AnyKeyPressed);
-    zones->setUniformRowHeights(true);
-    zones->setIndentation(0);
-    zones->setAlternatingRowColors(true);
-
     zones->setItemDelegateForColumn(2, &zoneFromDelegate);
+    basicTreeWidgetStyle(zones);
 
     mainLayout->addLayout(addLayout);
     mainLayout->addWidget(ranges);
@@ -1348,39 +1360,9 @@ CPPage::initializeRanges() {
         delete ranges->takeTopLevelItem(nb - 1);
     }
 
-    ranges->headerItem()->setText(CPPAGE_RANGES_COL_STARTDATE, tr("Start Date"));
-    ranges->headerItem()->setText(CPPAGE_RANGES_COL_CP, tr("Critical Power"));
-    ranges->headerItem()->setText(CPPAGE_RANGES_COL_AETP, tr("AeTP"));
-    ranges->headerItem()->setText(CPPAGE_RANGES_COL_FTP, tr("FTP"));
-    ranges->headerItem()->setText(CPPAGE_RANGES_COL_WPRIME, tr("W'"));
-    ranges->headerItem()->setText(CPPAGE_RANGES_COL_PMAX, tr("Pmax"));
-    ranges->headerItem()->setText(CPPAGE_RANGES_COL_MODELFIT, tr("Model Fit"));
-    ranges->headerItem()->setText(CPPAGE_RANGES_COL_EST_DEVIATION, "_deviation");
-    ranges->headerItem()->setText(CPPAGE_RANGES_COL_EST_OFFSET, "_offset");
-    ranges->headerItem()->setText(CPPAGE_RANGES_COL_EST_CP, "_cp");
-    ranges->headerItem()->setText(CPPAGE_RANGES_COL_EST_FTP, "_ftp");
-    ranges->headerItem()->setText(CPPAGE_RANGES_COL_EST_WPRIME, "_wprime");
-    ranges->headerItem()->setText(CPPAGE_RANGES_COL_EST_PMAX, "_pmax");
-
-    ranges->setColumnCount(CPPAGE_RANGES_COUNT_COL);
-
-    ranges->setColumnHidden(CPPAGE_RANGES_COL_EST_DEVIATION, true);
-    ranges->setColumnHidden(CPPAGE_RANGES_COL_EST_OFFSET, true);
-    ranges->setColumnHidden(CPPAGE_RANGES_COL_EST_CP, true);
-    ranges->setColumnHidden(CPPAGE_RANGES_COL_EST_FTP, true);
-    ranges->setColumnHidden(CPPAGE_RANGES_COL_EST_WPRIME, true);
-    ranges->setColumnHidden(CPPAGE_RANGES_COL_EST_PMAX, true);
-
     bool useCPForFTP = (useCPForFTPCombo->currentIndex() == 0 ? true : false);
     ranges->setColumnHidden(3, useCPForFTP);
 
-    ranges->setSelectionMode(QAbstractItemView::SingleSelection);
-    ranges->setUniformRowHeights(true);
-    ranges->setIndentation(0);
-
-    ranges->setEditTriggers(  QAbstractItemView::DoubleClicked
-                            | QAbstractItemView::SelectedClicked
-                            | QAbstractItemView::AnyKeyPressed);
 
     // setup list of ranges
     for (int i = 0; i < zones_->getRangeSize(); i++) {
@@ -1392,22 +1374,16 @@ CPPage::initializeRanges() {
         font.setWeight(zones_->getZoneRange(i).zonesSetFromCP ? QFont::Normal : QFont::Black);
 
         add->setData(CPPAGE_RANGES_COL_STARTDATE, Qt::DisplayRole, zones_->getStartDate(i));
-        add->setData(CPPAGE_RANGES_COL_STARTDATE, Qt::SizeHintRole, zones_->getStartDate(i));
         add->setFont(CPPAGE_RANGES_COL_STARTDATE, font);
         add->setData(CPPAGE_RANGES_COL_CP, Qt::DisplayRole, zones_->getCP(i));
-        add->setData(CPPAGE_RANGES_COL_CP, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
         add->setFont(CPPAGE_RANGES_COL_CP, font);
         add->setData(CPPAGE_RANGES_COL_AETP, Qt::DisplayRole, zones_->getAeT(i));
-        add->setData(CPPAGE_RANGES_COL_AETP, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
         add->setFont(CPPAGE_RANGES_COL_AETP, font);
         add->setData(CPPAGE_RANGES_COL_FTP, Qt::DisplayRole, zones_->getFTP(i));
-        add->setData(CPPAGE_RANGES_COL_FTP, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
         add->setFont(CPPAGE_RANGES_COL_FTP, font);
         add->setData(CPPAGE_RANGES_COL_WPRIME, Qt::DisplayRole, zones_->getWprime(i));
-        add->setData(CPPAGE_RANGES_COL_WPRIME, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
         add->setFont(CPPAGE_RANGES_COL_WPRIME, font);
         add->setData(CPPAGE_RANGES_COL_PMAX, Qt::DisplayRole, zones_->getPmax(i));
-        add->setData(CPPAGE_RANGES_COL_PMAX, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
         add->setFont(CPPAGE_RANGES_COL_PMAX, font);
         add->setFont(CPPAGE_RANGES_COL_MODELFIT, font);
 
@@ -1433,9 +1409,6 @@ CPPage::initializeRanges() {
             ranges->setColumnHidden(CPPAGE_RANGES_COL_MODELFIT, true);
         }
         setEstimateStatus(add);
-    }
-    for (int i = 0; i < ranges->columnCount(); i++) {
-        ranges->resizeColumnToContents(i);
     }
 
     newZoneRequired->setVisible(needsNewRange());
@@ -1873,17 +1846,11 @@ CPPage::addClicked()
     bool wasBlocked = ranges->model()->blockSignals(true);  // Prevent adoption-dialog
     add->setData(CPPAGE_RANGES_COL_STARTDATE, Qt::DisplayRole, date);
     ranges->model()->blockSignals(wasBlocked);
-    add->setData(CPPAGE_RANGES_COL_STARTDATE, Qt::SizeHintRole, DateEditDelegate::staticSizeHint());
     add->setData(CPPAGE_RANGES_COL_CP, Qt::DisplayRole, cp);
-    add->setData(CPPAGE_RANGES_COL_CP, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
     add->setData(CPPAGE_RANGES_COL_AETP, Qt::DisplayRole, aetp);
-    add->setData(CPPAGE_RANGES_COL_AETP, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
     add->setData(CPPAGE_RANGES_COL_FTP, Qt::DisplayRole, ftp);
-    add->setData(CPPAGE_RANGES_COL_FTP, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
     add->setData(CPPAGE_RANGES_COL_WPRIME, Qt::DisplayRole, wprime);
-    add->setData(CPPAGE_RANGES_COL_WPRIME, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
     add->setData(CPPAGE_RANGES_COL_PMAX, Qt::DisplayRole, pmax);
-    add->setData(CPPAGE_RANGES_COL_PMAX, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
 }
 
 
@@ -1966,10 +1933,6 @@ CPPage::rangeSelectionChanged()
             add->setData(0, Qt::DisplayRole, current.zones[i].name);
             add->setData(1, Qt::DisplayRole, current.zones[i].desc);
             add->setData(2, Qt::DisplayRole, current.zones[i].lo);
-            add->setData(2, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
-        }
-        for (int i = 0; i < zones->columnCount(); i++) {
-            zones->resizeColumnToContents(i);
         }
     } else {
         adoptButton->setVisible(false);
@@ -2017,7 +1980,6 @@ CPPage::addZoneClicked()
     add->setData(1, Qt::DisplayRole, text);
 
     add->setData(2, Qt::DisplayRole, 100);
-    add->setData(2, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
     active = false;
 
     zonesChanged();
@@ -2439,19 +2401,9 @@ HrSchemePage::HrSchemePage(HrZones *hrZones) : hrZones(hrZones)
     scheme->headerItem()->setText(2, tr("Percent of LT"));
     scheme->headerItem()->setText(3, tr("Trimp k"));
     scheme->setColumnCount(4);
-    scheme->setAlternatingRowColors(true);
-    scheme->setSelectionMode(QAbstractItemView::SingleSelection);
-    scheme->setEditTriggers(  QAbstractItemView::DoubleClicked
-                            | QAbstractItemView::SelectedClicked
-                            | QAbstractItemView::AnyKeyPressed);
-    scheme->setUniformRowHeights(true);
-    scheme->setIndentation(0);
     scheme->setItemDelegateForColumn(2, &ltDelegate);
     scheme->setItemDelegateForColumn(3, &trimpkDelegate);
-    //scheme->header()->resizeSection(0,60);
-    //scheme->header()->resizeSection(1,180);
-    //scheme->header()->resizeSection(2,65);
-    //scheme->header()->resizeSection(3,65);
+    basicTreeWidgetStyle(scheme);
 
     // setup list
     for (int i=0; i< hrZones->getScheme().nzones_default; i++) {
@@ -2465,11 +2417,9 @@ HrSchemePage::HrSchemePage(HrZones *hrZones) : hrZones(hrZones)
 
         // low
         add->setData(2, Qt::DisplayRole, hrZones->getScheme().zone_default[i]);
-        add->setData(2, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
 
         // trimp
         add->setData(3, Qt::DisplayRole, hrZones->getScheme().zone_default_trimp[i]);
-        add->setData(3, Qt::SizeHintRole, DoubleSpinBoxEditDelegate::staticSizeHint());
     }
 
     mainLayout->addWidget(scheme);
@@ -2516,11 +2466,9 @@ HrSchemePage::addClicked()
 
     // lo
     add->setData(2, Qt::DisplayRole, 100);
-    add->setData(2, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
 
     // trimp
     add->setData(3, Qt::DisplayRole, 1);
-    add->setData(3, Qt::SizeHintRole, DoubleSpinBoxEditDelegate::staticSizeHint());
 }
 
 void
@@ -2639,18 +2587,12 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
     ranges->headerItem()->setText(3, tr("Rest HR"));
     ranges->headerItem()->setText(4, tr("Max HR"));
     ranges->setColumnCount(5);
-    ranges->setAlternatingRowColors(true);
-    ranges->setSelectionMode(QAbstractItemView::SingleSelection);
-    ranges->setEditTriggers(  QAbstractItemView::DoubleClicked
-                            | QAbstractItemView::SelectedClicked
-                            | QAbstractItemView::AnyKeyPressed);
-    ranges->setUniformRowHeights(true);
-    ranges->setIndentation(0);
     ranges->setItemDelegateForColumn(0, &dateDelegate);
     ranges->setItemDelegateForColumn(1, &ltDelegate);
     ranges->setItemDelegateForColumn(2, &aetDelegate);
     ranges->setItemDelegateForColumn(3, &restHrDelegate);
     ranges->setItemDelegateForColumn(4, &maxHrDelegate);
+    basicTreeWidgetStyle(ranges);
 
     // setup list of ranges
     for (int i = 0; i < hrZones->getRangeSize(); i++) {
@@ -2663,23 +2605,16 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
                        QFont::Normal : QFont::Black);
 
         add->setData(0, Qt::DisplayRole, hrZones->getStartDate(i));
-        add->setData(0, Qt::SizeHintRole, DateEditDelegate::staticSizeHint());
         add->setFont(0, font);
         add->setData(1, Qt::DisplayRole, hrZones->getLT(i));
-        add->setData(1, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
         add->setFont(1, font);
         add->setData(2, Qt::DisplayRole, hrZones->getAeT(i));
-        add->setData(2, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
         add->setFont(2, font);
         add->setData(3, Qt::DisplayRole, hrZones->getRestHr(i));
-        add->setData(3, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
         add->setFont(3, font);
         add->setData(4, Qt::DisplayRole, hrZones->getMaxHr(i));
-        add->setData(4, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
         add->setFont(4, font);
     }
-    for(int i = 0; i < ranges->columnCount(); i++)
-        ranges->resizeColumnToContents(i);
 
     zoneLoDelegate.setRange(0, 1000);
     zoneLoDelegate.setSuffix(tr("%"));
@@ -2698,15 +2633,9 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
     zones->headerItem()->setText(2, tr("From BPM"));
     zones->headerItem()->setText(3, tr("Trimp k"));
     zones->setColumnCount(4);
-    zones->setAlternatingRowColors(true);
-    zones->setSelectionMode(QAbstractItemView::SingleSelection);
-    zones->setEditTriggers(  QAbstractItemView::DoubleClicked
-                           | QAbstractItemView::SelectedClicked
-                           | QAbstractItemView::AnyKeyPressed);
-    zones->setUniformRowHeights(true);
-    zones->setIndentation(0);
     zones->setItemDelegateForColumn(2, &zoneLoDelegate);
     zones->setItemDelegateForColumn(3, &zoneTrimpDelegate);
+    basicTreeWidgetStyle(zones);
 
     mainLayout->addWidget(ranges);
     mainLayout->addLayout(actionButtons);
@@ -2803,15 +2732,10 @@ LTPage::addClicked()
     ranges->invisibleRootItem()->insertChild(index, add);
 
     add->setData(0, Qt::DisplayRole, dateEdit->date());
-    add->setData(0, Qt::SizeHintRole, DateEditDelegate::staticSizeHint());
     add->setData(1, Qt::DisplayRole, ltEdit->value());
-    add->setData(1, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
     add->setData(2, Qt::DisplayRole, aetEdit->value());
-    add->setData(2, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
     add->setData(3, Qt::DisplayRole, restHrEdit->value());
-    add->setData(3, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
     add->setData(4, Qt::DisplayRole, maxHrEdit->value());
-    add->setData(4, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
 }
 
 
@@ -2917,12 +2841,7 @@ LTPage::rangeSelectionChanged()
             add->setData(0, Qt::DisplayRole, current.zones[i].name);
             add->setData(1, Qt::DisplayRole, current.zones[i].desc);
             add->setData(2, Qt::DisplayRole, current.zones[i].lo);
-            add->setData(2, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
             add->setData(3, Qt::DisplayRole, current.zones[i].trimp);
-            add->setData(3, Qt::SizeHintRole, DoubleSpinBoxEditDelegate::staticSizeHint());
-        }
-        for (int i = 0; i < zones->columnCount(); i++) {
-            zones->resizeColumnToContents(i);
         }
     }
 
@@ -2969,9 +2888,7 @@ LTPage::addZoneClicked()
     add->setData(1, Qt::DisplayRole, text);
 
     add->setData(2, Qt::DisplayRole, 0);
-    add->setData(2, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
     add->setData(2, Qt::DisplayRole, 0);
-    add->setData(3, Qt::SizeHintRole, DoubleSpinBoxEditDelegate::staticSizeHint());
 
     active = false;
 
@@ -3160,17 +3077,8 @@ PaceSchemePage::PaceSchemePage(PaceZones* paceZones) : paceZones(paceZones)
     scheme->headerItem()->setText(1, tr("Long"));
     scheme->headerItem()->setText(2, tr("Percent of CV"));
     scheme->setColumnCount(3);
-    scheme->setAlternatingRowColors(true);
-    scheme->setSelectionMode(QAbstractItemView::SingleSelection);
-    scheme->setEditTriggers(  QAbstractItemView::DoubleClicked
-                            | QAbstractItemView::SelectedClicked
-                            | QAbstractItemView::AnyKeyPressed);
-    scheme->setUniformRowHeights(true);
-    scheme->setIndentation(0);
     scheme->setItemDelegateForColumn(2, &fromDelegate);
-    //scheme->header()->resizeSection(0,90);
-    //scheme->header()->resizeSection(1,200);
-    //scheme->header()->resizeSection(2,80);
+    basicTreeWidgetStyle(scheme);
 
     // setup list
     for (int i=0; i< paceZones->getScheme().nzones_default; i++) {
@@ -3184,7 +3092,6 @@ PaceSchemePage::PaceSchemePage(PaceZones* paceZones) : paceZones(paceZones)
 
         // low
         add->setData(2, Qt::DisplayRole, paceZones->getScheme().zone_default[i]);
-        add->setData(2, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
     }
 
     mainLayout->addWidget(scheme);
@@ -3231,7 +3138,6 @@ PaceSchemePage::addClicked()
     add->setData(1, Qt::DisplayRole, text);
 
     add->setData(2, Qt::DisplayRole, 100);
-    add->setData(2, Qt::SizeHintRole, SpinBoxEditDelegate::staticSizeHint());
 }
 
 void
@@ -3347,13 +3253,10 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     ranges->headerItem()->setText(1, tr("Critical Velocity"));
     ranges->headerItem()->setText(2, tr("Aerobic Threshold"));
     ranges->setColumnCount(3);
-    ranges->setSelectionMode(QAbstractItemView::SingleSelection);
-    ranges->setUniformRowHeights(true);
-    ranges->setIndentation(0);
-    ranges->setAlternatingRowColors(true);
     ranges->setItemDelegateForColumn(0, &dateDelegate);
     ranges->setItemDelegateForColumn(1, &cvDelegate);
     ranges->setItemDelegateForColumn(2, &aetDelegate);
+    basicTreeWidgetStyle(ranges);
 
     // setup list of ranges
     for (int i = 0; i < paceZones->getRangeSize(); i++) {
@@ -3367,21 +3270,16 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
 
         // date
         add->setData(0, Qt::DisplayRole, paceZones->getStartDate(i));
-        add->setData(0, Qt::SizeHintRole, DateEditDelegate::staticSizeHint());
         add->setFont(0, font);
 
         // CV
         add->setData(1, Qt::DisplayRole, paceZones->kphToPaceTime(paceZones->getCV(i), metricPace));
-        add->setData(1, Qt::SizeHintRole, TimeEditDelegate::staticSizeHint());
         add->setFont(1, font);
 
         // AeT
         add->setData(2, Qt::DisplayRole, paceZones->kphToPaceTime(paceZones->getAeT(i), metricPace));
-        add->setData(2, Qt::SizeHintRole, TimeEditDelegate::staticSizeHint());
         add->setFont(2, font);
     }
-    for(int i = 0; i < ranges->columnCount(); i++)
-        ranges->resizeColumnToContents(i);
 
     zoneFromDelegate.setTimeRange(QTime(0, 0, 0), QTime(0, 20, 0));
     zoneFromDelegate.setFormat("mm:ss");
@@ -3394,14 +3292,8 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     zones->headerItem()->setText(1, tr("Long"));
     zones->headerItem()->setText(2, tr("From"));
     zones->setColumnCount(3);
-    zones->setSelectionMode(QAbstractItemView::SingleSelection);
-    zones->setEditTriggers(  QAbstractItemView::DoubleClicked
-                           | QAbstractItemView::SelectedClicked
-                           | QAbstractItemView::AnyKeyPressed);
-    zones->setUniformRowHeights(true);
-    zones->setIndentation(0);
-    zones->setAlternatingRowColors(true);
     zones->setItemDelegateForColumn(2, &zoneFromDelegate);
+    basicTreeWidgetStyle(zones);
 
     mainLayout->addWidget(ranges);
     mainLayout->addLayout(actionButtons);
@@ -3514,11 +3406,8 @@ CVPage::addClicked()
     ranges->invisibleRootItem()->insertChild(index, add);
 
     add->setData(0, Qt::DisplayRole, date);
-    add->setData(0, Qt::SizeHintRole, DateEditDelegate::staticSizeHint());
     add->setData(1, Qt::DisplayRole, cv);
-    add->setData(1, Qt::SizeHintRole, TimeEditDelegate::staticSizeHint());
     add->setData(2, Qt::DisplayRole, aet);
-    add->setData(2, Qt::SizeHintRole, TimeEditDelegate::staticSizeHint());
 }
 
 
@@ -3627,10 +3516,7 @@ CVPage::rangeSelectionChanged()
 
             // low
             add->setData(2, Qt::DisplayRole, QTime::fromString(paceZones->kphToPaceString(current.zones[i].lo, metricPace), "mm:ss"));
-            add->setData(2, Qt::SizeHintRole, TimeEditDelegate::staticSizeHint());
         }
-        for(int i = 0; i < zones->columnCount(); i++)
-            zones->resizeColumnToContents(i);
     }
 
     active = false;
@@ -4188,5 +4074,22 @@ AutoImportPage::browseImportDir()
                 fields->currentItem()->setText(0, dir);
             }
         }
+    }
+}
+
+
+extern void
+basicTreeWidgetStyle
+(QTreeWidget *tree)
+{
+    tree->setSelectionMode(QAbstractItemView::SingleSelection);
+    tree->setEditTriggers(  QAbstractItemView::DoubleClicked
+                          | QAbstractItemView::SelectedClicked
+                          | QAbstractItemView::AnyKeyPressed);
+    tree->setUniformRowHeights(true);
+    tree->setIndentation(0);
+    tree->setAlternatingRowColors(true);
+    for (int i = 0; i < tree->columnCount(); ++i) {
+        tree->header()->setSectionResizeMode(i, QHeaderView::ResizeToContents);
     }
 }
