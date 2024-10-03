@@ -104,6 +104,22 @@ SpinBoxEditDelegate::setSuffix
 }
 
 
+void
+SpinBoxEditDelegate::setShowSuffixOnEdit
+(bool show)
+{
+    showSuffixOnEdit = show;
+}
+
+
+void
+SpinBoxEditDelegate::setShowSuffixOnDisplay
+(bool show)
+{
+    showSuffixOnDisplay = show;
+}
+
+
 QWidget*
 SpinBoxEditDelegate::createEditor
 (QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -141,6 +157,20 @@ SpinBoxEditDelegate::setModelData
         model->setData(index, newValue, Qt::EditRole);
         model->setData(index, editor->sizeHint(), Qt::SizeHintRole);
     }
+}
+
+
+QString
+SpinBoxEditDelegate::displayText
+(const QVariant &value, const QLocale &locale) const
+{
+    Q_UNUSED(locale)
+
+    QString ret = QString::number(value.toInt());
+    if (showSuffixOnDisplay && ! suffix.isEmpty()) {
+        ret += " " + suffix;
+    }
+    return ret;
 }
 
 
@@ -211,6 +241,22 @@ DoubleSpinBoxEditDelegate::setSuffix
 }
 
 
+void
+DoubleSpinBoxEditDelegate::setShowSuffixOnEdit
+(bool show)
+{
+    showSuffixOnEdit = show;
+}
+
+
+void
+DoubleSpinBoxEditDelegate::setShowSuffixOnDisplay
+(bool show)
+{
+    showSuffixOnDisplay = show;
+}
+
+
 QWidget*
 DoubleSpinBoxEditDelegate::createEditor
 (QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -249,6 +295,20 @@ DoubleSpinBoxEditDelegate::setModelData
         model->setData(index, newValue, Qt::EditRole);
         model->setData(index, editor->sizeHint(), Qt::SizeHintRole);
     }
+}
+
+
+QString
+DoubleSpinBoxEditDelegate::displayText
+(const QVariant &value, const QLocale &locale) const
+{
+    Q_UNUSED(locale)
+
+    QString ret = QString::number(value.toDouble(), 'f', prec);
+    if (showSuffixOnDisplay && ! suffix.isEmpty()) {
+        ret += " " + suffix;
+    }
+    return ret;
 }
 
 
@@ -315,10 +375,144 @@ DateEditDelegate::setModelData
 }
 
 
+QString
+DateEditDelegate::displayText
+(const QVariant &value, const QLocale &locale) const
+{
+    return value.toDate().toString(locale.dateFormat(QLocale::ShortFormat));
+}
+
+
 QSize
 DateEditDelegate::staticSizeHint
 ()
 {
     QDateEdit widget;
+    return widget.sizeHint();
+}
+
+
+// TimeEditDelegate ///////////////////////////////////////////////////////////////
+
+TimeEditDelegate::TimeEditDelegate
+(QObject *parent)
+: QStyledItemDelegate(parent)
+{
+}
+
+
+void
+TimeEditDelegate::setFormat
+(const QString &format)
+{
+    this->format = format;
+}
+
+
+void
+TimeEditDelegate::setSuffix
+(const QString &suffix)
+{
+    this->suffix = suffix;
+}
+
+
+void
+TimeEditDelegate::setShowSuffixOnEdit
+(bool show)
+{
+    showSuffixOnEdit = show;
+}
+
+
+void
+TimeEditDelegate::setShowSuffixOnDisplay
+(bool show)
+{
+    showSuffixOnDisplay = show;
+}
+
+
+void
+TimeEditDelegate::setTimeRange
+(const QTime &min, const QTime &max)
+{
+    this->min = min;
+    this->max = max;
+}
+
+
+QWidget*
+TimeEditDelegate::createEditor
+(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    Q_UNUSED(option)
+    Q_UNUSED(index)
+
+    QTimeEdit *timeEdit = new QTimeEdit(parent);
+    QString f = format;
+    if (f.isEmpty()) {
+        f = "mm:ss";
+    }
+    if (showSuffixOnEdit && ! suffix.isEmpty()) {
+        f += " '" + suffix + "'";
+    }
+    timeEdit->setDisplayFormat(f);
+    if (min.isValid()) {
+        timeEdit->setMinimumTime(min);
+    }
+    if (max.isValid()) {
+        timeEdit->setMaximumTime(max);
+    }
+
+    return timeEdit;
+}
+
+
+void
+TimeEditDelegate::setEditorData
+(QWidget *editor, const QModelIndex &index) const
+{
+    QTimeEdit *timeEdit = static_cast<QTimeEdit*>(editor);
+    timeEdit->setTime(index.data(Qt::DisplayRole).toTime());
+}
+
+
+void
+TimeEditDelegate::setModelData
+(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+    QTimeEdit *timeEdit = static_cast<QTimeEdit*>(editor);
+    QTime newValue = timeEdit->time();
+    if (model->data(index, Qt::EditRole).toTime() != newValue) {
+        model->setData(index, newValue, Qt::EditRole);
+        model->setData(index, editor->sizeHint(), Qt::SizeHintRole);
+    }
+}
+
+
+QString
+TimeEditDelegate::displayText
+(const QVariant &value, const QLocale &locale) const
+{
+    Q_UNUSED(locale)
+
+    QString f = format;
+    if (f.isEmpty()) {
+        f = "mm:ss";
+    }
+    if (showSuffixOnDisplay && ! suffix.isEmpty()) {
+        f += " '" + suffix + "'";
+    }
+
+    return value.toTime().toString(f);
+}
+
+
+QSize
+TimeEditDelegate::staticSizeHint
+()
+{
+    QTimeEdit widget;
     return widget.sizeHint();
 }

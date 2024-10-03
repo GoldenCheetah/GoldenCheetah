@@ -2,6 +2,7 @@
 #define STYLEDITEMSDELEGATES_H
 
 #include <QStyledItemDelegate>
+#include <QTime>
 
 
 class NoEditDelegate: public QStyledItemDelegate
@@ -37,10 +38,13 @@ public:
     void setRange(int minimum, int maximum);
     void setSingleStep(int val);
     void setSuffix(const QString &suffix);
+    void setShowSuffixOnEdit(bool show);
+    void setShowSuffixOnDisplay(bool show);
 
     virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
     virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+    virtual QString displayText(const QVariant &value, const QLocale &locale) const override;
 
     static QSize staticSizeHint();
 
@@ -49,6 +53,8 @@ private:
     int maximum = 100;
     int singleStep = 1;
     QString suffix;
+    bool showSuffixOnEdit = true;
+    bool showSuffixOnDisplay = true;
 };
 
 
@@ -64,10 +70,13 @@ public:
     void setSingleStep(double val);
     void setDecimals(int prec);
     void setSuffix(const QString &suffix);
+    void setShowSuffixOnEdit(bool show);
+    void setShowSuffixOnDisplay(bool show);
 
     virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
     virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+    virtual QString displayText(const QVariant &value, const QLocale &locale) const override;
 
     static QSize staticSizeHint();
 
@@ -77,6 +86,8 @@ private:
     double singleStep = 1;
     double prec = 0;
     QString suffix;
+    bool showSuffixOnEdit = true;
+    bool showSuffixOnDisplay = true;
 };
 
 
@@ -91,11 +102,41 @@ public:
     virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
     virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+    virtual QString displayText(const QVariant &value, const QLocale &locale) const override;
 
     static QSize staticSizeHint();
 
 private:
     bool calendarPopup = false;
+};
+
+
+
+class TimeEditDelegate: public QStyledItemDelegate
+{
+public:
+    TimeEditDelegate(QObject *parent = nullptr);
+
+    void setFormat(const QString &format);
+    void setSuffix(const QString &suffix);
+    void setShowSuffixOnEdit(bool show);
+    void setShowSuffixOnDisplay(bool show);
+    void setTimeRange(const QTime &min, const QTime &max);
+
+    virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+    virtual QString displayText(const QVariant &value, const QLocale &locale) const override;
+
+    static QSize staticSizeHint();
+
+private:
+    QString format;
+    QString suffix;
+    bool showSuffixOnEdit = true;
+    bool showSuffixOnDisplay = true;
+    QTime min;
+    QTime max;
 };
 
 #endif

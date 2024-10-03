@@ -226,7 +226,6 @@ class SchemePage : public QWidget
 
     public:
         SchemePage(Zones *zones);
-        ~SchemePage();
 
         ZoneScheme getScheme();
         qint32 saveClicked();
@@ -234,13 +233,12 @@ class SchemePage : public QWidget
     public slots:
         void addClicked();
         void deleteClicked();
-        void renameClicked();
 
     private:
         Zones *zones;
         QTreeWidget *scheme;
-        QPushButton *addButton, *renameButton, *deleteButton;
-        SpinBoxEditDelegate *zoneFromDelegate;
+        QPushButton *addButton, *deleteButton;
+        SpinBoxEditDelegate zoneFromDelegate;
 };
 
 
@@ -275,7 +273,6 @@ class CPPage : public QWidget
 
     public:
         CPPage(Context *context, Zones *zones, SchemePage *schemePage);
-        ~CPPage();
 
         qint32 saveClicked();
 
@@ -298,22 +295,26 @@ class CPPage : public QWidget
         void initializeRanges();
 
     private slots:
-        void rangeEdited(const QModelIndex &modelIndex);
-        void estimate();
+#if QT_VERSION < 0x060000
+        void rangeChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
+#else
+        void rangeChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles = QList<int>());
+#endif
+
+        void adopt();
 
     private:
         bool active;
 
-        DateEditDelegate *dateDelegate;
-        SpinBoxEditDelegate *cpDelegate;
-        SpinBoxEditDelegate *aetDelegate;
-        SpinBoxEditDelegate *ftpDelegate;
-        SpinBoxEditDelegate *wDelegate;
-        SpinBoxEditDelegate *pmaxDelegate;
-        NoEditDelegate *statusDelegate;
-        NoEditDelegate *closestDelegate;
+        DateEditDelegate dateDelegate;
+        SpinBoxEditDelegate cpDelegate;
+        SpinBoxEditDelegate aetDelegate;
+        SpinBoxEditDelegate ftpDelegate;
+        SpinBoxEditDelegate wDelegate;
+        SpinBoxEditDelegate pmaxDelegate;
+        NoEditDelegate statusDelegate;
 
-        SpinBoxEditDelegate *zoneFromDelegate;
+        SpinBoxEditDelegate zoneFromDelegate;
 
         Context *context;
         Zones *zones_;
@@ -329,6 +330,13 @@ class CPPage : public QWidget
         void setEstimateStatus(QTreeWidgetItem *item);
         void setRangeData(QModelIndex modelIndex, int column, QVariant data);
         bool needsNewRange() const;
+        void mkAdoptionRow(QGridLayout *grid, int row, int labelId, const QString &unit, int cur, int est, QCheckBox *&accept, const QString &infoText = QString()) const;
+        void connectAdoptionDialogApplyButton(QVector<QCheckBox*> checkboxes, QPushButton *applyButton) const;
+        bool modelHasFtp() const;
+        bool modelHasPmax() const;
+        QWidget *mkInfoLabel(int labelId, const QString &infoText = QString()) const;
+        QString getText(int id, int value = 0) const;
+        bool addDialogManual(QDate &date, int &cp, int &aetp, int &wprime, int &ftp, int &pmax) const;
 };
 
 class ZonePage : public QWidget
@@ -368,47 +376,46 @@ class ZonePage : public QWidget
 
 };
 
+
 //
 // Heartrate Zones
 //
 class HrSchemePage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
         HrSchemePage(HrZones *hrZones);
+
         HrZoneScheme getScheme();
         qint32 saveClicked();
 
     public slots:
         void addClicked();
         void deleteClicked();
-        void renameClicked();
 
     private:
         HrZones *hrZones;
         QTreeWidget *scheme;
-        QPushButton *addButton, *renameButton, *deleteButton;
+        QPushButton *addButton, *deleteButton;
+
+        SpinBoxEditDelegate ltDelegate;
+        DoubleSpinBoxEditDelegate trimpkDelegate;
 };
 
 
 class LTPage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
         LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage);
 
-    public slots:
+    private slots:
         void addClicked();
-        void editClicked();
         void deleteClicked();
         void defaultClicked();
-        void rangeEdited();
+        void rangeChanged(const QModelIndex &modelIndex);
         void rangeSelectionChanged();
         void addZoneClicked();
         void deleteZoneClicked();
@@ -417,44 +424,39 @@ class LTPage : public QWidget
     private:
         bool active;
 
-        QDateEdit *dateEdit;
-        QDoubleSpinBox *ltEdit;
-        QDoubleSpinBox *aetEdit;
-        QDoubleSpinBox *restHrEdit;
-        QDoubleSpinBox *maxHrEdit;
+        DateEditDelegate dateDelegate;
+        SpinBoxEditDelegate ltDelegate;
+        SpinBoxEditDelegate aetDelegate;
+        SpinBoxEditDelegate restHrDelegate;
+        SpinBoxEditDelegate maxHrDelegate;
+
+        SpinBoxEditDelegate zoneLoDelegate;
+        DoubleSpinBoxEditDelegate zoneTrimpDelegate;
 
         Context *context;
         HrZones *hrZones;
         HrSchemePage *schemePage;
         QTreeWidget *ranges;
         QTreeWidget *zones;
-        QPushButton *addButton, *updateButton, *deleteButton;
+        QPushButton *addButton, *deleteButton;
         QPushButton *addZoneButton, *deleteZoneButton, *defaultButton;
 };
 
 class HrZonePage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
-
         HrZonePage(Context *);
         ~HrZonePage();
         qint32 saveClicked();
 
-    public slots:
-
-
     protected:
-
         Context *context;
 
         QTabWidget *tabs;
 
     private:
-
         QLabel *sportLabel;
         QComboBox *sportCombo;
 
@@ -464,7 +466,6 @@ class HrZonePage : public QWidget
         QHash<QString, LTPage*> ltPage;
 
     private slots:
-        
         void changeSport();
 
 };
@@ -475,41 +476,42 @@ class HrZonePage : public QWidget
 class PaceSchemePage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
         PaceSchemePage(PaceZones* paceZones);
+
         PaceZoneScheme getScheme();
         qint32 saveClicked();
 
     public slots:
         void addClicked();
         void deleteClicked();
-        void renameClicked();
 
     private:
         PaceZones* paceZones;
         QTreeWidget *scheme;
-        QPushButton *addButton, *renameButton, *deleteButton;
+        QPushButton *addButton, *deleteButton;
+        SpinBoxEditDelegate fromDelegate;
 };
 
 class CVPage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
         CVPage(PaceZones* paceZones, PaceSchemePage *schemePage);
+
         bool metricPace;
 
     public slots:
         void addClicked();
-        void editClicked();
         void deleteClicked();
         void defaultClicked();
-        void rangeEdited();
+#if QT_VERSION < 0x060000
+        void rangeChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
+#else
+        void rangeChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles = QList<int>());
+#endif
         void rangeSelectionChanged();
         void addZoneClicked();
         void deleteZoneClicked();
@@ -518,15 +520,17 @@ class CVPage : public QWidget
     private:
         bool active;
 
-        QDateEdit *dateEdit;
-        QTimeEdit *cvEdit;
-        QTimeEdit *aetEdit;
+        DateEditDelegate dateDelegate;
+        TimeEditDelegate cvDelegate;
+        TimeEditDelegate aetDelegate;
+
+        TimeEditDelegate zoneFromDelegate;
 
         PaceZones* paceZones;
         PaceSchemePage *schemePage;
         QTreeWidget *ranges;
         QTreeWidget *zones;
-        QPushButton *addButton, *updateButton, *deleteButton;
+        QPushButton *addButton, *deleteButton;
         QPushButton *addZoneButton, *deleteZoneButton, *defaultButton;
         QLabel *per;
 };
