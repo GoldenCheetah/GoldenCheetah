@@ -1014,9 +1014,9 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
             // only respond to clicks not in config corner or edit button
             if (item && !item->inCorner() && !item->inEdit()) {
 
-                // are we on the boundary of the ChartSpaceItem?
-                double offx = pos.x()-item->geometry().x();
-                double offy = pos.y()-item->geometry().y();
+               // are we on the boundary of the ChartSpaceItem?
+               double offx = pos.x()-item->geometry().x();
+               double offy = pos.y()-item->geometry().y();
 
 
                if (item->geometry().height()-offy < (gl_near*dpiXFactor)) {
