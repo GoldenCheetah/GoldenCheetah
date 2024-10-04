@@ -2186,7 +2186,7 @@ CPPage::getText
 {
     switch (id) {
     case CPPAGE_INFO_AETP:
-        return tr("The proposed value for AeTP is a very rough estimate, assuming %1 \% of CP. Usually it is determined by a<ul><li>Metabolic test</li><li>Lactate ramp test</li><li>Run / Cycling ‘conversational’ test</li><li>Run Decoupling test</li></ul>").arg(value);
+        return tr("The proposed value for AeTP is a very rough estimate, assuming %1 % of CP. Usually it is determined by a<ul><li>Metabolic test</li><li>Lactate ramp test</li><li>Run / Cycling ‘conversational’ test</li><li>Run Decoupling test</li></ul>").arg(value);
     case CPPAGE_INFO_FTP_CP:
         return tr("Updating FTP internally to match CP");
     case CPPAGE_INFO_MODEL_FTP:
@@ -2261,8 +2261,6 @@ CPPage::addDialogManual
     pmaxEdit->setSingleStep(10);
     pmaxEdit->setSuffix(" " + tr("W"));
     pmaxEdit->setValue(pmax);
-
-    QLabel *distanceLabel = nullptr;
 
     QFormLayout *form = new QFormLayout(&dialog);
     form->addRow(getText(CPPAGE_LABEL_STARTDATE), dateEdit);
