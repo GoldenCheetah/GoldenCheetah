@@ -230,9 +230,10 @@ class SchemePage : public QWidget
         ZoneScheme getScheme();
         qint32 saveClicked();
 
-    public slots:
+    private slots:
         void addClicked();
         void deleteClicked();
+        void updateButtons();
 
     private:
         Zones *zones;
@@ -302,6 +303,7 @@ class CPPage : public QWidget
 #endif
 
         void adopt();
+        void updateButtons();
 
     private:
         bool active;
@@ -390,9 +392,10 @@ class HrSchemePage : public QWidget
         HrZoneScheme getScheme();
         qint32 saveClicked();
 
-    public slots:
+    private slots:
         void addClicked();
         void deleteClicked();
+        void updateButtons();
 
     private:
         HrZones *hrZones;
@@ -420,6 +423,7 @@ class LTPage : public QWidget
         void addZoneClicked();
         void deleteZoneClicked();
         void zonesChanged();
+        void updateButtons();
 
     private:
         bool active;
@@ -483,9 +487,10 @@ class PaceSchemePage : public QWidget
         PaceZoneScheme getScheme();
         qint32 saveClicked();
 
-    public slots:
+    private slots:
         void addClicked();
         void deleteClicked();
+        void updateButtons();
 
     private:
         PaceZones* paceZones;
@@ -503,7 +508,7 @@ class CVPage : public QWidget
 
         bool metricPace;
 
-    public slots:
+    private slots:
         void addClicked();
         void deleteClicked();
         void defaultClicked();
@@ -516,6 +521,7 @@ class CVPage : public QWidget
         void addZoneClicked();
         void deleteZoneClicked();
         void zonesChanged();
+        void updateButtons();
 
     private:
         bool active;

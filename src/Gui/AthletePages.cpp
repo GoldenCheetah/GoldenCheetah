@@ -1010,6 +1010,7 @@ SchemePage::SchemePage(Zones* zones) : zones(zones)
         add->setData(1, Qt::DisplayRole, zones->getScheme().zone_default_desc[i]);
         add->setData(2, Qt::DisplayRole, zones->getScheme().zone_default[i]);
     }
+    updateButtons();
 
     mainLayout->addWidget(scheme);
     mainLayout->addLayout(actionButtons);
@@ -1017,21 +1018,13 @@ SchemePage::SchemePage(Zones* zones) : zones(zones)
     // button connect
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+    connect(scheme, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(updateButtons()));
 }
 
 
 void
 SchemePage::addClicked()
 {
-    // are we at maximum already?
-    if (scheme->invisibleRootItem()->childCount() == 10) {
-        QMessageBox err;
-        err.setText(tr("Maximum of 10 zones reached."));
-        err.setIcon(QMessageBox::Warning);
-        err.exec();
-        return;
-    }
-
     int index = scheme->invisibleRootItem()->childCount();
 
     // new item
@@ -1053,8 +1046,9 @@ SchemePage::addClicked()
         text = QString(tr("New (%1)")).arg(i+1);
     }
     add->setData(1, Qt::DisplayRole, text);
-
     add->setData(2, Qt::DisplayRole, 100);
+
+    updateButtons();
 }
 
 void
@@ -1063,7 +1057,17 @@ SchemePage::deleteClicked()
     if (scheme->currentItem()) {
         int index = scheme->invisibleRootItem()->indexOfChild(scheme->currentItem());
         delete scheme->invisibleRootItem()->takeChild(index);
+        updateButtons();
     }
+}
+
+
+void
+SchemePage::updateButtons
+()
+{
+    addButton->setEnabled(scheme->invisibleRootItem()->childCount() < 10);
+    deleteButton->setEnabled(scheme->invisibleRootItem()->childCount() > 0 && scheme->currentItem() != nullptr);
 }
 
 // just for sorting
@@ -1166,7 +1170,7 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     deleteButton = new QPushButton(tr("-"));
     adoptButton = new QPushButton(tr("Adopt"));
     adoptButton->setVisible(false);
-    newZoneRequired = new QPushButton(tr("Your estimated power values have changed, a new range should be created"));
+    newZoneRequired = new QPushButton(tr("Changed power estimates are available"));
     newZoneRequired->setFlat(true);
     newZoneRequired->setVisible(false);
 #ifndef Q_OS_MAC
@@ -1190,11 +1194,12 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
 #endif
 
     QHBoxLayout *zoneButtons = new QHBoxLayout;
-    zoneButtons->addStretch();
     zoneButtons->setSpacing(2 * dpiXFactor);
-    zoneButtons->addWidget(addZoneButton);
-    zoneButtons->addWidget(deleteZoneButton);
+    zoneButtons->addStretch();
     zoneButtons->addWidget(defaultButton);
+    zoneButtons->addItem(new QSpacerItem(5 * dpiXFactor, defaultButton->sizeHint().height()));
+    zoneButtons->addWidget(addZoneButton, 0, Qt::AlignHCenter | Qt::AlignTop);
+    zoneButtons->addWidget(deleteZoneButton, 0, Qt::AlignHCenter | Qt::AlignTop);
 
     QHBoxLayout *addLayout = new QHBoxLayout;
 
@@ -1217,12 +1222,12 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
 
     QHBoxLayout *actionButtons = new QHBoxLayout;
     actionButtons->setSpacing(2 *dpiXFactor);
-
     actionButtons->addWidget(newZoneRequired);
     actionButtons->addStretch();
-    actionButtons->addWidget(addButton);
-    actionButtons->addWidget(deleteButton);
     actionButtons->addWidget(adoptButton);
+    actionButtons->addItem(new QSpacerItem(5 * dpiXFactor, adoptButton->sizeHint().height()));
+    actionButtons->addWidget(addButton, 0, Qt::AlignHCenter | Qt::AlignTop);
+    actionButtons->addWidget(deleteButton, 0, Qt::AlignHCenter | Qt::AlignTop);
 
     addLayout->addStretch();
     addLayout->addWidget(useModel);
@@ -1296,7 +1301,6 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     ranges->header()->setSectionResizeMode(CPPAGE_RANGES_COL_PMAX, QHeaderView::ResizeToContents);
     ranges->header()->setSectionResizeMode(CPPAGE_RANGES_COL_MODELFIT, QHeaderView::ResizeToContents);
     basicTreeWidgetStyle(ranges);
-    initializeRanges();
 
     zoneFromDelegate.setRange(0, 1000);
     zoneFromDelegate.setSingleStep(1);
@@ -1318,6 +1322,8 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     mainLayout->addWidget(zones);
     mainLayout->addLayout(zoneButtons);
 
+    initializeRanges();
+
     // button connect
     connect(newZoneRequired, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
@@ -1330,6 +1336,7 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     connect(useModel, SIGNAL(currentIndexChanged(int)), this, SLOT(initializeRanges()));
     connect(ranges, SIGNAL(itemSelectionChanged()), this, SLOT(rangeSelectionChanged()));
     connect(zones, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(zonesChanged()));
+    connect(zones, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(updateButtons()));
     connect(zones->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(zonesChanged()));
 }
 
@@ -1412,6 +1419,7 @@ CPPage::initializeRanges() {
     }
 
     newZoneRequired->setVisible(needsNewRange());
+    updateButtons();
 
 #if QT_VERSION < 0x060000
     connect(ranges->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)),
@@ -1533,11 +1541,10 @@ CPPage::adopt
             QCheckBox *wprimeAccept = nullptr;
             QCheckBox *pmaxAccept = nullptr;
 
-            QDialogButtonBox *buttonBox = new QDialogButtonBox();
-            QPushButton *discardButton = buttonBox->addButton(QDialogButtonBox::Discard);
-            QPushButton *applyButton = buttonBox->addButton(QDialogButtonBox::Apply);
-            connect(discardButton, SIGNAL(clicked()), &dialog, SLOT(reject()));
-            connect(applyButton, SIGNAL(clicked()), &dialog, SLOT(accept()));
+            QDialogButtonBox *buttonBox = new QDialogButtonBox(  QDialogButtonBox::Apply
+                                                               | QDialogButtonBox::Discard);
+            connect(buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), &dialog, SLOT(accept()));
+            connect(buttonBox->button(QDialogButtonBox::Discard), SIGNAL(clicked()), &dialog, SLOT(reject()));
 
             int row = 0;
             QGridLayout *grid = new QGridLayout();
@@ -1569,8 +1576,7 @@ CPPage::adopt
             }
             mkAdoptionRow(grid, row++, CPPAGE_LABEL_PMAX, tr("W"), curPmax, estPmax, pmaxAccept, infoTextPmax);
 
-            //connectAdoptionDialogApplyButton(QVector<QCheckBox const * const>() checkBoxes, QPushButton *applyButton) const
-            connectAdoptionDialogApplyButton(QVector<QCheckBox*>({cpAccept, aetpAccept, ftpAccept, wprimeAccept, pmaxAccept}), applyButton);
+            connectAdoptionDialogApplyButton(QVector<QCheckBox*>({cpAccept, aetpAccept, ftpAccept, wprimeAccept, pmaxAccept}), buttonBox->button(QDialogButtonBox::Apply));
 
             QVBoxLayout *mainLayout = new QVBoxLayout(&dialog);
             mainLayout->addLayout(grid);
@@ -1606,6 +1612,17 @@ CPPage::adopt
         }
     }
     active = preActive;
+}
+
+
+void
+CPPage::updateButtons
+()
+{
+    addButton->setEnabled(true);
+    deleteButton->setEnabled(ranges->currentItem() != nullptr);
+    addZoneButton->setEnabled(zones->invisibleRootItem()->childCount() < 10 && ranges->currentItem() != nullptr);
+    deleteZoneButton->setEnabled(zones->invisibleRootItem()->childCount() > 0 && zones->currentItem() != nullptr);
 }
 
 
@@ -1851,6 +1868,7 @@ CPPage::addClicked()
     add->setData(CPPAGE_RANGES_COL_FTP, Qt::DisplayRole, ftp);
     add->setData(CPPAGE_RANGES_COL_WPRIME, Qt::DisplayRole, wprime);
     add->setData(CPPAGE_RANGES_COL_PMAX, Qt::DisplayRole, pmax);
+    updateButtons();
 }
 
 
@@ -1862,6 +1880,7 @@ CPPage::deleteClicked()
         delete ranges->invisibleRootItem()->takeChild(index);
         zones_->deleteRange(index);
         newZoneRequired->setVisible(needsNewRange());
+        updateButtons();
     }
 }
 
@@ -1892,6 +1911,7 @@ CPPage::defaultClicked()
 
         // update the zones display
         rangeSelectionChanged();
+        updateButtons();
     }
 }
 
@@ -1939,6 +1959,7 @@ CPPage::rangeSelectionChanged()
     }
 
     active = false;
+    updateButtons();
 }
 
 void
@@ -1946,15 +1967,6 @@ CPPage::addZoneClicked()
 {
     // no range selected
     if (!ranges->currentItem()) return;
-
-    // are we at maximum already?
-    if (zones->invisibleRootItem()->childCount() == 10) {
-        QMessageBox err;
-        err.setText(tr("Maximum of 10 zones reached."));
-        err.setIcon(QMessageBox::Warning);
-        err.exec();
-        return;
-    }
 
     active = true;
     int index = zones->invisibleRootItem()->childCount();
@@ -1983,6 +1995,7 @@ CPPage::addZoneClicked()
     active = false;
 
     zonesChanged();
+    updateButtons();
 }
 
 void
@@ -2000,6 +2013,7 @@ CPPage::deleteZoneClicked()
     active = false;
 
     zonesChanged();
+    updateButtons();
 }
 
 void
@@ -2204,14 +2218,13 @@ bool
 CPPage::addDialogManual
 (QDate &date, int &cp, int &aetp, int &wprime, int &ftp, int &pmax) const
 {
-    QDialog dataDialog;
-    dataDialog.setWindowTitle(tr("Manual range"));
+    QDialog dialog;
+    dialog.setWindowTitle(tr("Manual range"));
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox();
-    QPushButton *discardButton = buttonBox->addButton(QDialogButtonBox::Discard);
-    QPushButton *applyButton = buttonBox->addButton(QDialogButtonBox::Apply);
-    connect(discardButton, SIGNAL(clicked()), &dataDialog, SLOT(reject()));
-    connect(applyButton, SIGNAL(clicked()), &dataDialog, SLOT(accept()));
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(  QDialogButtonBox::Apply
+                                                       | QDialogButtonBox::Discard);
+    connect(buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), &dialog, SLOT(accept()));
+    connect(buttonBox->button(QDialogButtonBox::Discard), SIGNAL(clicked()), &dialog, SLOT(reject()));
 
     QDateEdit *dateEdit = new QDateEdit(date);
     dateEdit->setCalendarPopup(true);
@@ -2251,7 +2264,7 @@ CPPage::addDialogManual
 
     QLabel *distanceLabel = nullptr;
 
-    QFormLayout *form = new QFormLayout(&dataDialog);
+    QFormLayout *form = new QFormLayout(&dialog);
     form->addRow(getText(CPPAGE_LABEL_STARTDATE), dateEdit);
     form->addRow(getText(CPPAGE_LABEL_CP), cpEdit);
     form->addRow(getText(CPPAGE_LABEL_AETP), aetpEdit);
@@ -2263,7 +2276,7 @@ CPPage::addDialogManual
     form->addItem(new QSpacerItem(1, 30 * dpiYFactor));
     form->addRow(buttonBox);
 
-    if (dataDialog.exec() == QDialog::Accepted) {
+    if (dialog.exec() == QDialog::Accepted) {
         date = dateEdit->date();
         cp = cpEdit->value();
         aetp = aetpEdit->value();
@@ -2421,6 +2434,7 @@ HrSchemePage::HrSchemePage(HrZones *hrZones) : hrZones(hrZones)
         // trimp
         add->setData(3, Qt::DisplayRole, hrZones->getScheme().zone_default_trimp[i]);
     }
+    updateButtons();
 
     mainLayout->addWidget(scheme);
     mainLayout->addLayout(actionButtons);
@@ -2428,21 +2442,13 @@ HrSchemePage::HrSchemePage(HrZones *hrZones) : hrZones(hrZones)
     // button connect
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+    connect(scheme, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(updateButtons()));
 }
 
 
 void
 HrSchemePage::addClicked()
 {
-    // are we at maximum already?
-    if (scheme->invisibleRootItem()->childCount() == 10) {
-        QMessageBox err;
-        err.setText(tr("Maximum of 10 zones reached."));
-        err.setIcon(QMessageBox::Warning);
-        err.exec();
-        return;
-    }
-
     int index = scheme->invisibleRootItem()->childCount();
 
     // new item
@@ -2469,6 +2475,8 @@ HrSchemePage::addClicked()
 
     // trimp
     add->setData(3, Qt::DisplayRole, 1);
+
+    updateButtons();
 }
 
 void
@@ -2477,8 +2485,18 @@ HrSchemePage::deleteClicked()
     if (scheme->currentItem()) {
         int index = scheme->invisibleRootItem()->indexOfChild(scheme->currentItem());
         delete scheme->invisibleRootItem()->takeChild(index);
+        updateButtons();
     }
 }
+
+void
+HrSchemePage::updateButtons
+()
+{
+    addButton->setEnabled(scheme->invisibleRootItem()->childCount() < 10);
+    deleteButton->setEnabled(scheme->invisibleRootItem()->childCount() > 0 && scheme->currentItem() != nullptr);
+}
+
 
 HrZoneScheme
 HrSchemePage::getScheme()
@@ -2523,8 +2541,8 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(10 *dpiXFactor);
 
-    QPushButton *addButton = new QPushButton(tr("+"));
-    QPushButton *deleteButton = new QPushButton(tr("-"));
+    addButton = new QPushButton(tr("+"));
+    deleteButton = new QPushButton(tr("-"));
 #ifndef Q_OS_MAC
     addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
     deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
@@ -2548,9 +2566,10 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
     QHBoxLayout *zoneButtons = new QHBoxLayout;
     zoneButtons->addStretch();
     zoneButtons->setSpacing(2 * dpiXFactor);
-    zoneButtons->addWidget(addZoneButton);
-    zoneButtons->addWidget(deleteZoneButton);
     zoneButtons->addWidget(defaultButton);
+    zoneButtons->addItem(new QSpacerItem(5 * dpiXFactor, defaultButton->sizeHint().height()));
+    zoneButtons->addWidget(addZoneButton, 0, Qt::AlignHCenter | Qt::AlignTop);
+    zoneButtons->addWidget(deleteZoneButton, 0, Qt::AlignHCenter | Qt::AlignTop);
 
     dateDelegate.setCalendarPopup(true);
 
@@ -2577,8 +2596,9 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
     QHBoxLayout *actionButtons = new QHBoxLayout;
     actionButtons->setSpacing(2 *dpiXFactor);
     actionButtons->addStretch();
-    actionButtons->addWidget(addButton);
-    actionButtons->addWidget(deleteButton);
+    actionButtons->addItem(new QSpacerItem(5 * dpiXFactor, defaultButton->sizeHint().height()));
+    actionButtons->addWidget(addButton, 0, Qt::AlignHCenter | Qt::AlignTop);
+    actionButtons->addWidget(deleteButton, 0, Qt::AlignHCenter | Qt::AlignTop);
 
     ranges = new QTreeWidget;
     ranges->headerItem()->setText(0, tr("Start Date"));
@@ -2642,6 +2662,8 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
     mainLayout->addWidget(zones);
     mainLayout->addLayout(zoneButtons);
 
+    updateButtons();
+
     // button connect
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
@@ -2650,8 +2672,10 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
     connect(deleteZoneButton, SIGNAL(clicked()), this, SLOT(deleteZoneClicked()));
 
     connect(ranges, SIGNAL(itemSelectionChanged()), this, SLOT(rangeSelectionChanged()));
+    connect(ranges, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(updateButtons()));
     connect(ranges->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(rangeChanged(const QModelIndex&)));
     connect(zones, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(zonesChanged()));
+    connect(zones, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(updateButtons()));
     connect(zones->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(zonesChanged()));
 }
 
@@ -2659,7 +2683,7 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
 void
 LTPage::addClicked()
 {
-    QDialog dataDialog;
+    QDialog dialog;
 
     int lt = 1;
     int aet = 0;
@@ -2679,11 +2703,10 @@ LTPage::addClicked()
         restHr = hrZones->getRestHr(index);
     }
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox();
-    QPushButton *discardButton = buttonBox->addButton(QDialogButtonBox::Discard);
-    QPushButton *applyButton = buttonBox->addButton(QDialogButtonBox::Apply);
-    connect(discardButton, SIGNAL(clicked()), &dataDialog, SLOT(reject()));
-    connect(applyButton, SIGNAL(clicked()), &dataDialog, SLOT(accept()));
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(  QDialogButtonBox::Apply
+                                                       | QDialogButtonBox::Discard);
+    connect(buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), &dialog, SLOT(accept()));
+    connect(buttonBox->button(QDialogButtonBox::Discard), SIGNAL(clicked()), &dialog, SLOT(reject()));
 
     QDateEdit *dateEdit = new QDateEdit(QDate::currentDate());
     dateEdit->setCalendarPopup(true);
@@ -2708,7 +2731,7 @@ LTPage::addClicked()
     maxHrEdit->setSuffix(" " + tr("bpm"));
     maxHrEdit->setValue(maxHr);
 
-    QFormLayout *form = new QFormLayout(&dataDialog);
+    QFormLayout *form = new QFormLayout(&dialog);
     form->addRow(tr("Start Date"), dateEdit);
     form->addRow(tr("Lactate Threshold"), ltEdit);
     form->addRow(tr("Aerobic Threshold"), aetEdit);
@@ -2716,7 +2739,7 @@ LTPage::addClicked()
     form->addRow(tr("Max HR"), maxHrEdit);
     form->addRow(buttonBox);
 
-    int dialogRet = dataDialog.exec();
+    int dialogRet = dialog.exec();
     if (dialogRet != QDialog::Accepted) {
         return;
     }
@@ -2736,6 +2759,7 @@ LTPage::addClicked()
     add->setData(2, Qt::DisplayRole, aetEdit->value());
     add->setData(3, Qt::DisplayRole, restHrEdit->value());
     add->setData(4, Qt::DisplayRole, maxHrEdit->value());
+    updateButtons();
 }
 
 
@@ -2746,6 +2770,7 @@ LTPage::deleteClicked()
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
         delete ranges->invisibleRootItem()->takeChild(index);
         hrZones->deleteRange(index);
+        updateButtons();
     }
 }
 
@@ -2774,6 +2799,7 @@ LTPage::defaultClicked()
 
         // update the zones display
         rangeSelectionChanged();
+        updateButtons();
     }
 }
 
@@ -2893,6 +2919,7 @@ LTPage::addZoneClicked()
     active = false;
 
     zonesChanged();
+    updateButtons();
 }
 
 void
@@ -2910,6 +2937,7 @@ LTPage::deleteZoneClicked()
     active = false;
 
     zonesChanged();
+    updateButtons();
 }
 
 void
@@ -2967,7 +2995,19 @@ LTPage::zonesChanged()
             // now replace the current range struct
             hrZones->setHrZoneRange(index, current);
         }
+        updateButtons();
     }
+}
+
+
+void
+LTPage::updateButtons
+()
+{
+    addButton->setEnabled(true);
+    deleteButton->setEnabled(ranges->currentItem() != nullptr);
+    addZoneButton->setEnabled(zones->invisibleRootItem()->childCount() < 10 && ranges->currentItem() != nullptr);
+    deleteZoneButton->setEnabled(zones->invisibleRootItem()->childCount() > 0 && zones->currentItem() != nullptr);
 }
 
 
@@ -3093,6 +3133,7 @@ PaceSchemePage::PaceSchemePage(PaceZones* paceZones) : paceZones(paceZones)
         // low
         add->setData(2, Qt::DisplayRole, paceZones->getScheme().zone_default[i]);
     }
+    updateButtons();
 
     mainLayout->addWidget(scheme);
     mainLayout->addLayout(actionButtons);
@@ -3100,21 +3141,13 @@ PaceSchemePage::PaceSchemePage(PaceZones* paceZones) : paceZones(paceZones)
     // button connect
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+    connect(scheme, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(updateButtons()));
 }
 
 
 void
 PaceSchemePage::addClicked()
 {
-    // are we at maximum already?
-    if (scheme->invisibleRootItem()->childCount() == 10) {
-        QMessageBox err;
-        err.setText(tr("Maximum of 10 zones reached."));
-        err.setIcon(QMessageBox::Warning);
-        err.exec();
-        return;
-    }
-
     int index = scheme->invisibleRootItem()->childCount();
 
     // new item
@@ -3138,6 +3171,8 @@ PaceSchemePage::addClicked()
     add->setData(1, Qt::DisplayRole, text);
 
     add->setData(2, Qt::DisplayRole, 100);
+
+    updateButtons();
 }
 
 void
@@ -3146,7 +3181,17 @@ PaceSchemePage::deleteClicked()
     if (scheme->currentItem()) {
         int index = scheme->invisibleRootItem()->indexOfChild(scheme->currentItem());
         delete scheme->invisibleRootItem()->takeChild(index);
+        updateButtons();
     }
+}
+
+
+void
+PaceSchemePage::updateButtons
+()
+{
+    addButton->setEnabled(scheme->invisibleRootItem()->childCount() < 10);
+    deleteButton->setEnabled(scheme->invisibleRootItem()->childCount() > 0 && scheme->currentItem() != nullptr);
 }
 
 // just for sorting
@@ -3222,17 +3267,19 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
 #endif
 
     QHBoxLayout *zoneButtons = new QHBoxLayout;
-    zoneButtons->addStretch();
     zoneButtons->setSpacing(2 * dpiXFactor);
-    zoneButtons->addWidget(addZoneButton);
-    zoneButtons->addWidget(deleteZoneButton);
+    zoneButtons->addStretch();
+    zoneButtons->addWidget(defaultButton);
+    zoneButtons->addItem(new QSpacerItem(5 * dpiXFactor, defaultButton->sizeHint().height()));
+    zoneButtons->addWidget(addZoneButton, 0, Qt::AlignCenter | Qt::AlignTop);
+    zoneButtons->addWidget(deleteZoneButton, 0, Qt::AlignCenter | Qt::AlignTop);
 
     QHBoxLayout *actionButtons = new QHBoxLayout;
-    actionButtons->setSpacing(2 *dpiXFactor);
+    actionButtons->setSpacing(2 * dpiXFactor);
     actionButtons->addStretch();
-    actionButtons->addWidget(addButton);
-    actionButtons->addWidget(deleteButton);
-    actionButtons->addWidget(defaultButton);
+    actionButtons->addItem(new QSpacerItem(5 * dpiXFactor, defaultButton->sizeHint().height()));
+    actionButtons->addWidget(addButton, 0, Qt::AlignCenter | Qt::AlignTop);
+    actionButtons->addWidget(deleteButton, 0, Qt::AlignCenter | Qt::AlignTop);
 
     dateDelegate.setCalendarPopup(true);
 
@@ -3300,6 +3347,8 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     mainLayout->addWidget(zones);
     mainLayout->addLayout(zoneButtons);
 
+    updateButtons();
+
     // button connect
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
@@ -3308,6 +3357,7 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     connect(deleteZoneButton, SIGNAL(clicked()), this, SLOT(deleteZoneClicked()));
 
     connect(ranges, SIGNAL(itemSelectionChanged()), this, SLOT(rangeSelectionChanged()));
+    connect(ranges, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(updateButtons()));
 #if QT_VERSION < 0x060000
     connect(ranges->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)),
             this, SLOT(rangeChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)));
@@ -3315,6 +3365,7 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     connect(ranges->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QList<int>&)),
             this, SLOT(rangeChanged(const QModelIndex&, const QModelIndex&, const QList<int>&)));
 #endif
+    connect(zones, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(updateButtons()));
     connect(zones, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(zonesChanged()));
 }
 
@@ -3362,11 +3413,10 @@ CVPage::addClicked()
     QDialog dialog;
     dialog.setWindowTitle(tr("New range"));
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox();
-    QPushButton *discardButton = buttonBox->addButton(QDialogButtonBox::Discard);
-    QPushButton *applyButton = buttonBox->addButton(QDialogButtonBox::Apply);
-    connect(discardButton, SIGNAL(clicked()), &dialog, SLOT(reject()));
-    connect(applyButton, SIGNAL(clicked()), &dialog, SLOT(accept()));
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(  QDialogButtonBox::Apply
+                                                       | QDialogButtonBox::Discard);
+    connect(buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), &dialog, SLOT(accept()));
+    connect(buttonBox->button(QDialogButtonBox::Discard), SIGNAL(clicked()), &dialog, SLOT(reject()));
 
     QDateEdit *dateEdit = new QDateEdit(date);
     dateEdit->setCalendarPopup(true);
@@ -3408,6 +3458,8 @@ CVPage::addClicked()
     add->setData(0, Qt::DisplayRole, date);
     add->setData(1, Qt::DisplayRole, cv);
     add->setData(2, Qt::DisplayRole, aet);
+
+    updateButtons();
 }
 
 
@@ -3418,6 +3470,7 @@ CVPage::deleteClicked()
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
         delete ranges->invisibleRootItem()->takeChild(index);
         paceZones->deleteRange(index);
+        updateButtons();
     }
 }
 
@@ -3445,6 +3498,8 @@ CVPage::defaultClicked()
 
         // update the zones display
         rangeSelectionChanged();
+
+        updateButtons();
     }
 }
 
@@ -3561,6 +3616,7 @@ CVPage::addZoneClicked()
     active = false;
 
     zonesChanged();
+    updateButtons();
 }
 
 void
@@ -3578,6 +3634,7 @@ CVPage::deleteZoneClicked()
     active = false;
 
     zonesChanged();
+    updateButtons();
 }
 
 void
@@ -3632,9 +3689,22 @@ CVPage::zonesChanged()
 
             // now replace the current range struct
             paceZones->setZoneRange(index, current);
+            updateButtons();
         }
     }
 }
+
+
+void
+CVPage::updateButtons
+()
+{
+    addButton->setEnabled(true);
+    deleteButton->setEnabled(ranges->currentItem() != nullptr);
+    addZoneButton->setEnabled(zones->invisibleRootItem()->childCount() < 10 && ranges->currentItem() != nullptr);
+    deleteZoneButton->setEnabled(zones->invisibleRootItem()->childCount() > 0 && zones->currentItem() != nullptr);
+}
+
 
 //
 // Season Editor
