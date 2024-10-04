@@ -84,18 +84,12 @@ EqTimeWindow::displayImportance() const
 
    int importance = 0;
 
-   if (isWithin(QDate::currentDate())) {
-
-       if (!startSet_)
-           importance = (!endSet_) ? 8 : 6;
-       else
-           importance = (!endSet_) ? 7 : 5;
-   } else {
-       if (!startSet_)
-           importance = (!endSet_) ? 4 : 2;
-       else
-           importance = (!endSet_) ? 3 : 1;
-   }
+   if (!startSet_)
+       importance = (!endSet_) ? 4 : 1;
+   else
+       importance = (!endSet_) ? 3 : 2;
+   
+   if (isWithin(QDate::currentDate())) importance += 4;
 
     return importance;
 }
@@ -256,7 +250,7 @@ OverviewEquipmentItemConfig::setWidgets()
         nonGCElevation->setText(QString::number(mi->getNonGCElevationScaled() * EQ_SCALED_TO_REAL, 'f', 1));
         replaceDistance->setText(QString::number(mi->repDistanceScaled_ * EQ_SCALED_TO_REAL, 'f', 1));
         replaceElevation->setText(QString::number(mi->repElevationScaled_ * EQ_SCALED_TO_REAL, 'f', 1));
-        replaceDateSet->setText((mi->repDateSet_) ? "set" : "unset");
+        replaceDateSet->setText((mi->repDateSet_) ? "reset" : "set");
         replaceDate->setVisible(mi->repDateSet_);
         if (mi->repDateSet_) replaceDate->setDate(mi->repDate_);
 
@@ -271,12 +265,12 @@ OverviewEquipmentItemConfig::setWidgets()
 
             static_cast<QLineEdit*>(eqTimeWindows->cellWidget(tableRow, 0))->setText(eqUse.eqLinkName_);
 
-            static_cast<QLabel*>(eqTimeWindows->cellWidget(tableRow, 1))->setText((eqUse.startSet_) ? "set" : "unset");
+            static_cast<QLabel*>(eqTimeWindows->cellWidget(tableRow, 1))->setText((eqUse.startSet_) ? "reset" : "set");
             if (eqUse.startSet_) {
                 static_cast<QDateEdit*>(eqTimeWindows->cellWidget(tableRow, 2))->setDate(eqUse.startDate_);
             }
 
-            static_cast<QLabel*>(eqTimeWindows->cellWidget(tableRow, 3))->setText((eqUse.endSet_) ? "set" : "unset");
+            static_cast<QLabel*>(eqTimeWindows->cellWidget(tableRow, 3))->setText((eqUse.endSet_) ? "reset" : "set");
             if (eqUse.endSet_) {
                 static_cast<QDateEdit*>(eqTimeWindows->cellWidget(tableRow, 4))->setDate(eqUse.endDate_);
             }
@@ -330,14 +324,14 @@ OverviewEquipmentItemConfig::setWidgets()
 void
 OverviewEquipmentItemConfig::repDateSetClicked()
 {
-    if (replaceDateSet->text() == "set") {
+    if (replaceDateSet->text() == "reset") {
 
-        replaceDateSet->setText("unset");
+        replaceDateSet->setText("set");
         replaceDate->setVisible(false);
     }
     else
     {
-        replaceDateSet->setText("set");
+        replaceDateSet->setText("reset");
         replaceDate->setVisible(true);
     }
     dataChanged();
@@ -349,15 +343,15 @@ OverviewEquipmentItemConfig::tableCellClicked(int row, int column)
     // only handle cell clicks on the checkboxs
     if (column == 1 || column == 3) {
 
-        if (static_cast<QLabel*>(eqTimeWindows->cellWidget(row, column))->text() == "set") {
+        if (static_cast<QLabel*>(eqTimeWindows->cellWidget(row, column))->text() == "reset") {
 
-            static_cast<QLabel*>(eqTimeWindows->cellWidget(row, column))->setText("unset");
+            static_cast<QLabel*>(eqTimeWindows->cellWidget(row, column))->setText("set");
 
             eqTimeWindows->setCellWidget(row, column + 1, nullptr);
         }
         else
         {
-            static_cast<QLabel*>(eqTimeWindows->cellWidget(row, column))->setText("set");
+            static_cast<QLabel*>(eqTimeWindows->cellWidget(row, column))->setText("reset");
 
             QDateEdit* date = new QDateEdit();
             date->setCalendarPopup(true);
@@ -378,7 +372,7 @@ OverviewEquipmentItemConfig::tableCellClicked(int row, int column)
             connect(date, SIGNAL(dateChanged(QDate)), this, SLOT(dataChanged()));
             eqTimeWindows->setCellWidget(row, column, date);
 
-            static_cast<QLabel*>(eqTimeWindows->cellWidget(row, column - 1))->setText("set");
+            static_cast<QLabel*>(eqTimeWindows->cellWidget(row, column - 1))->setText("reset");
         }
         else
         {
@@ -398,7 +392,7 @@ OverviewEquipmentItemConfig::setEqLinkRowWidgets(int tableRow, const EqTimeWindo
 
     QLabel *startSet = new QLabel();
     startSet->setAlignment(Qt::AlignHCenter);
-    startSet->setText((eqUse && eqUse->startSet_) ? "set" : "unset");
+    startSet->setText((eqUse && eqUse->startSet_) ? "reset" : "set");
     eqTimeWindows->setCellWidget(tableRow, 1, startSet);
 
     if (eqUse && eqUse->startSet_) {
@@ -411,7 +405,7 @@ OverviewEquipmentItemConfig::setEqLinkRowWidgets(int tableRow, const EqTimeWindo
 
     QLabel *endSet = new QLabel();
     endSet->setAlignment(Qt::AlignHCenter);
-    endSet->setText((eqUse && eqUse->endSet_) ? "set" : "unset");
+    endSet->setText((eqUse && eqUse->endSet_) ? "reset" : "set");
     eqTimeWindows->setCellWidget(tableRow, 3, endSet);
 
     if (eqUse && eqUse->endSet_) {
@@ -428,9 +422,8 @@ OverviewEquipmentItemConfig::addEqLinkRow()
 {
     block = true;
 
-    int tableRow = eqTimeWindows->rowCount();
-    eqTimeWindows->insertRow(tableRow);
-    setEqLinkRowWidgets(tableRow, nullptr);
+    eqTimeWindows->insertRow(0);
+    setEqLinkRowWidgets(0, nullptr);
 
     block = false;
     dataChanged();
@@ -463,10 +456,9 @@ OverviewEquipmentItemConfig::addHistoryRow()
 {
     block = true;
 
-    int tableRow = eqTimeWindows->rowCount();
-    eqTimeWindows->insertRow(tableRow);
-    setEqHistoryEntryRowWidgets(tableRow);
-    static_cast<QDateEdit*>(eqTimeWindows->cellWidget(tableRow, 0))->setDate(QDate::currentDate());
+    eqTimeWindows->insertRow(0);
+    setEqHistoryEntryRowWidgets(0);
+    static_cast<QDateEdit*>(eqTimeWindows->cellWidget(0, 0))->setDate(QDate::currentDate());
 
     block = false;
     dataChanged();
@@ -505,13 +497,13 @@ OverviewEquipmentItemConfig::dataChanged()
 
             if (eqLinkName != "") { // don't accept time windows without any eqLinkName text
                 QDate startDate;
-                bool startSet = static_cast<QLabel*>(eqTimeWindows->cellWidget(tableRow, 1))->text() == "set";
+                bool startSet = static_cast<QLabel*>(eqTimeWindows->cellWidget(tableRow, 1))->text() == "reset";
                 if (startSet) {
                     startDate = static_cast<QDateEdit*>(eqTimeWindows->cellWidget(tableRow, 2))->date();
                 }
 
                 QDate endDate;
-                bool endSet = static_cast<QLabel*>(eqTimeWindows->cellWidget(tableRow, 3))->text() == "set";
+                bool endSet = static_cast<QLabel*>(eqTimeWindows->cellWidget(tableRow, 3))->text() == "reset";
                 if (endSet) {
                     endDate = static_cast<QDateEdit*>(eqTimeWindows->cellWidget(tableRow, 4))->date();
                 }
@@ -520,12 +512,11 @@ OverviewEquipmentItemConfig::dataChanged()
             }
         }
         mi->eqLinkUseList_ = eqLinkUse;
-        mi->sortEquipmentWindows();
 
         mi->repDistanceScaled_ = round(replaceDistance->text().toDouble() * EQ_REAL_TO_SCALED); // validator restricts 1 dp
         mi->repElevationScaled_ = round(replaceElevation->text().toDouble() * EQ_REAL_TO_SCALED); // validator restricts 1 dp
 
-        mi->repDateSet_ = replaceDateSet->text() == "set";
+        mi->repDateSet_ = replaceDateSet->text() == "reset";
         if (mi->repDateSet_) mi->repDate_ = replaceDate->date();
 
         mi->notes_ = notes->toPlainText();
@@ -774,6 +765,13 @@ EquipmentItem::EquipmentItem(ChartSpace* parent, const QString& name, QVector<Eq
 }
 
 void
+EquipmentItem::setData(RideItem*)
+{
+    // called when the item's config dialog is closed.
+    sortEquipmentWindows();
+}
+
+void
 EquipmentItem::showEvent(QShowEvent*)
 {
     // wait for tile geometry to be defined
@@ -803,8 +801,26 @@ EquipmentItem::resetEqItem()
 void
 EquipmentItem::sortEquipmentWindows()
 {
-    std::sort(eqLinkUseList_.begin(), eqLinkUseList_.end(), [](const EqTimeWindow& a, const EqTimeWindow& b) {
-        return a.displayImportance() > b.displayImportance(); });
+    std::sort(eqLinkUseList_.begin(), eqLinkUseList_.end(), [](const EqTimeWindow& a, const EqTimeWindow& b)
+    {
+        if (a.displayImportance() > b.displayImportance()) return true;
+        if (a.displayImportance() < b.displayImportance()) return false;
+
+        // same priority, so now order them on date
+        switch (a.displayImportance())
+        {
+            case 1: // start & end set inactive
+            case 5: // start & end set active
+            case 3: // only start set inactive
+            case 7: // only start set active
+                return a.startDate_ < b.startDate_;
+            case 2: // only end set inactive
+            case 6: // only end set active
+                return a.endDate_ < b.endDate_;
+            default: // no start or end active, or invalid
+                return a.eqLinkName_ < b.eqLinkName_;
+        }
+    });
 }
 
 void
@@ -851,16 +867,6 @@ EquipmentItem::isWithin(const QStringList& rideEqLinkNameList, const QDate& actD
     for (const auto& eqUse : eqLinkUseList_) {
 
         if (rideEqLinkNameList.contains(eqUse.eqLinkName_) && eqUse.isWithin(actDate)) return true;
-    }
-    return false;
-}
-
-bool
-EquipmentItem::isWithin(const QString& rideEqLinkName, const QDate& actDate) const
-{
-    for (const auto& eqUse : eqLinkUseList_) {
-
-        if ((eqUse.eqLinkName_ == rideEqLinkName) && eqUse.isWithin(actDate)) return true;
     }
     return false;
 }
@@ -942,7 +948,7 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
         if (!eqUse.rangeIsValid()) {
             painter->setPen(alertColor_);
         }
-        else if (isWithin(eqUse.eqLinkName_, QDate::currentDate())) {
+        else if (eqUse.isWithin(QDate::currentDate())) {
             painter->setPen(GColor(CPLOTMARKER));
         }
         else {

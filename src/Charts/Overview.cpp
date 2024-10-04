@@ -659,6 +659,7 @@ OverviewConfigDialog::close()
         // update after config changed
         if (item->parent->scope & OverviewScope::ANALYSIS && item->parent->currentRideItem) item->setData(item->parent->currentRideItem);
         if (item->parent->scope & OverviewScope::TRENDS ) item->setDateRange(item->parent->currentDateRange);
+        if (item->parent->scope & OverviewScope::EQUIPMENT) item->setData(nullptr);
 
         item=NULL;
     }

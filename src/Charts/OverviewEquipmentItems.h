@@ -106,7 +106,7 @@ class CommonEquipmentItem : public ChartSpaceItem
         CommonEquipmentItem(ChartSpace* parent, const QString& name);
         virtual ~CommonEquipmentItem() {}
 
-        // The following don't apply to the Equipment Items.
+        // The following don't apply to most Equipment Items.
         void setData(RideItem*) override {}
         void setDateRange(DateRange) override {}
         void itemGeometryChanged() override {}
@@ -146,10 +146,10 @@ class EquipmentItem : public CommonEquipmentItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override;
         void configChanged(qint32) override;
         void itemGeometryChanged() override;
+        void setData(RideItem*) override;
         void showEvent(QShowEvent* event) override;
 
         bool isWithin(const QDate& actDate) const;
-        bool isWithin(const QString& rideEqLinkName, const QDate& actDate) const;
         bool isWithin(const QStringList& rideEqLinkNameList, const QDate& actDate) const;
         bool rangeIsValid() const;
 
