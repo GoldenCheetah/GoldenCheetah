@@ -1428,6 +1428,9 @@ CPPage::initializeRanges() {
     connect(ranges->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QList<int>&)),
             this, SLOT(rangeChanged(const QModelIndex&, const QModelIndex&, const QList<int>&)));
 #endif
+
+    QApplication::sendPostedEvents();
+    ranges->scrollToBottom();
 }
 
 
@@ -1549,8 +1552,8 @@ CPPage::adopt
             int row = 0;
             QGridLayout *grid = new QGridLayout();
             grid->setSpacing(10 * dpiXFactor);
-            grid->addWidget(new QLabel(tr("Current")), row, 2);
-            grid->addWidget(new QLabel(tr("Estimate")), row, 4);
+            grid->addWidget(new QLabel(tr("Current")), row, 2, Qt::AlignCenter);
+            grid->addWidget(new QLabel(tr("Estimate")), row, 4, Qt::AlignCenter);
             grid->addWidget(new QLabel(tr("Accept")), row, 5, Qt::AlignCenter);
             ++row;
             mkAdoptionRow(grid, row++, CPPAGE_LABEL_CP, tr("W"), curCp, estCp, cpAccept);
@@ -1559,7 +1562,6 @@ CPPage::adopt
                 infoTextAetp = getText(CPPAGE_INFO_AETP, CPPAGE_DEFAULT_FACTOR_AETP * 100);
             }
             mkAdoptionRow(grid, row++, CPPAGE_LABEL_AETP, tr("W"), curAetp, estAetp, aetpAccept, infoTextAetp);
-            aetpAccept->setChecked(Qt::Unchecked);
             if (estFtp != curFtp || useCPForFTPCombo->currentIndex() == 1) {
                 QString infoTextFtp = "";
                 if (useCPForFTPCombo->currentIndex() == 0) {
@@ -1577,6 +1579,7 @@ CPPage::adopt
             mkAdoptionRow(grid, row++, CPPAGE_LABEL_PMAX, tr("W"), curPmax, estPmax, pmaxAccept, infoTextPmax);
 
             connectAdoptionDialogApplyButton(QVector<QCheckBox*>({cpAccept, aetpAccept, ftpAccept, wprimeAccept, pmaxAccept}), buttonBox->button(QDialogButtonBox::Apply));
+            aetpAccept->setChecked(Qt::Unchecked);
 
             QVBoxLayout *mainLayout = new QVBoxLayout(&dialog);
             mainLayout->addLayout(grid);
@@ -2078,37 +2081,50 @@ void
 CPPage::mkAdoptionRow
 (QGridLayout *grid, int row, int labelId, const QString &unit, int cur, int est, QCheckBox *&accept, const QString &infoText) const
 {
-    QLineEdit *current = new QLineEdit(QString("%1 %2").arg(cur).arg(unit));
-    current->setReadOnly(true);
-    current->setEnabled(cur != est);
-    QLabel *relation = new QLabel("=");
-    if (cur < est) {
-        relation->setText("<");
-    } else if (cur > est) {
-        relation->setText(">");
-    }
-    QLineEdit *estimate = new QLineEdit(QString("%1 %2").arg(est).arg(unit));
-    estimate->setReadOnly(true);
-    estimate->setEnabled(cur != est);
-    accept = new QCheckBox();
-    accept->setCheckState(cur != est ? Qt::Checked : Qt::Unchecked);
-    accept->setVisible(cur != est);
-
     QFormLayout dummy;
 
+    accept = new QCheckBox();
+    accept->setVisible(cur != est);
+
+    QLineEdit *current = new QLineEdit(QString("%1 %2").arg(cur).arg(unit));
+    current->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+    current->setAlignment(Qt::AlignCenter);
+    current->setReadOnly(true);
+    current->setEnabled(false);
+
+    if (cur != est) {
+        QLabel *relation = new QLabel();
+        relation->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        if (cur < est) {
+            relation->setText("<");
+        } else if (cur > est) {
+            relation->setText(">");
+        }
+        QLineEdit *estimate = new QLineEdit(QString("%1 %2").arg(est).arg(unit));
+        estimate->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+        estimate->setAlignment(Qt::AlignCenter);
+        estimate->setReadOnly(true);
+        estimate->setEnabled(true);
+
+        grid->addWidget(current, row, 2);
+        grid->addWidget(relation, row, 3);
+        grid->addWidget(estimate, row, 4);
+
+        connect(
+            accept, &QCheckBox::toggled,
+            [=](bool checked) {
+                current->setEnabled(! checked);
+                estimate->setEnabled(checked);
+            }
+        );
+    } else {
+        grid->addWidget(current, row, 2, 1, 3);
+    }
+
     grid->addWidget(mkInfoLabel(labelId, infoText), row, 0, dummy.labelAlignment());
-    grid->addWidget(current, row, 2, Qt::AlignCenter);
-    grid->addWidget(relation, row, 3, Qt::AlignCenter);
-    grid->addWidget(estimate, row, 4, Qt::AlignCenter);
     grid->addWidget(accept, row, 5, Qt::AlignCenter);
 
-    connect(
-        accept, &QCheckBox::toggled,
-        [=](bool checked) {
-            current->setEnabled(checked);
-            estimate->setEnabled(checked);
-        }
-    );
+    accept->setCheckState(cur != est ? Qt::Checked : Qt::Unchecked);
 }
 
 
