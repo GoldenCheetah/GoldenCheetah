@@ -289,6 +289,7 @@
 #define GC_CRANKLENGTH                  "<athlete-preferences>crankLength"
 #define GC_WHEELSIZE                    "<athlete-preferences>wheelsize"
 #define GC_USE_CP_FOR_FTP               "<athlete-preferences>cp/useforftp"                       // use CP for FTP
+#define GC_USE_CP_MODEL                 "<athlete-preferences>cp/useModel"
 #define GC_NETWORKFILESTORE_FOLDER      "<athlete-preferences>networkfilestore/folder"            // folder to sync with
 #define GC_AUTOBACKUP_FOLDER            "<athlete-preferences>autobackup/folder"
 #define GC_AUTOBACKUP_PERIOD            "<athlete-preferences>autobackup/period"                  // how often is the Athlete Folder backuped up / 0 == never

@@ -6,4 +6,4 @@ GC_OBJS = Seasons \
           Season \
           Utils
 
-include(../unittests.pri)
+include(../../unittests.pri)

@@ -471,7 +471,7 @@ AthleteDirectoryStructure::upgradedDirectoriesHaveData() {
 }
 
 QList<PDEstimate>
-Athlete::getPDEstimates()
+Athlete::getPDEstimates() const
 {
     // returns whatever estimator has, if not running
     QList<PDEstimate> returning;
@@ -592,13 +592,37 @@ Athlete::getPMCFor(Leaf *expr, DataFilterRuntime *df, int stsdays, int ltsdays)
 }
 
 PDEstimate
-Athlete::getPDEstimateFor(QDate date, QString model, bool wpk, QString sport)
+Athlete::getPDEstimateFor(QDate date, QString model, bool wpk, QString sport) const
 {
     // whats the estimate for this date
     foreach(PDEstimate est, getPDEstimates()) {
-        if (est.model == model && est.wpk == wpk && est.sport == sport && est.from <= date && est.to >= date)
+        if (est.model == model && est.wpk == wpk && est.sport == sport && est.from <= date && est.to >= date) {
             return est;
+        }
     }
     return PDEstimate();
 }
 
+
+PDEstimate
+Athlete::getPDEstimateClosestFor
+(QDate date, QString model, bool wpk, QString sport) const
+{
+    qint64 dist = INT64_MAX;
+    PDEstimate ret;
+    foreach (PDEstimate est, getPDEstimates()) {
+        if (est.model != model || est.wpk != wpk || est.sport != sport) {
+            continue;
+        }
+        if (est.from <= date && date <= est.to) {
+            return est;
+        } else if (date < est.from && dist > date.daysTo(est.from)) {
+            dist = date.daysTo(est.from);
+            ret = est;
+        } else if (est.to < date && dist > est.to.daysTo(date)) {
+            dist = est.to.daysTo(date);
+            ret = est;
+        }
+    }
+    return ret;
+}

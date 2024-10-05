@@ -220,6 +220,8 @@ class Zones : public QObject
 
         // USE_CP_FOR_FTP setting differenciated by sport
         QString useCPforFTPSetting() const;
+
+        QString useCPModelSetting() const;
 };
 
 QColor zoneColor(int zone, int num_zones);

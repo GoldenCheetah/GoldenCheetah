@@ -1123,3 +1123,9 @@ Zones::useCPforFTPSetting() const
 {
     return GC_USE_CP_FOR_FTP + ((sport_.isEmpty() || sport_ == "Bike") ? "" : sport_.toLower());
 }
+
+QString
+Zones::useCPModelSetting() const
+{
+    return GC_USE_CP_MODEL + ((sport_.isEmpty() || sport_ == "Bike") ? "" : sport_.toLower());
+}

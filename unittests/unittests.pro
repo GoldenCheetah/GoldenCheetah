@@ -5,9 +5,10 @@ exists(unittests.pri) {
 }
 
 equals(GC_UNITTESTS, active) {
-	SUBDIRS += seasonOffset \
-			   season \
-			   seasonParser
+	SUBDIRS += Core/seasonOffset \
+			   Core/season \
+			   Core/seasonParser \
+			   Core/units
 	CONFIG += ordered
 } else {
 	message("Unittests are disabled; to enable copy unittests/unittests.pri.in to unittests/unittests.pri")

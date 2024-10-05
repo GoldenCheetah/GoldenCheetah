@@ -5,7 +5,7 @@ GC_UNITTESTS = active
 
 include(../src/gcconfig.pri)
 
-GC_SRC_DIR = ../../src
+GC_SRC_DIR = ../../../src
 GC_OBJECTS_DIR = $$GC_SRC_DIR/$(OBJECTS_DIR)
 INCLUDEPATH += $$GC_SRC_DIR
 win32 {

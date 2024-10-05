@@ -1043,7 +1043,17 @@ PaceZones::kphFromTime(QTimeEdit *cvedit, bool metric) const
     // get the value from a time edit and convert
     // it to kph so we can store it in the zones file
 
-    double secs = cvedit->time().secsTo(QTime(0,0,0)) * -1;
+    return kphFromTime(cvedit->time(), metric);
+}
+
+
+double
+PaceZones::kphFromTime
+(const QTime &time, bool metric) const
+{
+    // convert a time to kph so we can store it in the zones file
+
+    double secs = QTime(0, 0, 0).secsTo(time);
     if (secs == 0) return 0; // avoid division by zero
     if (swim)
         return (metric ? 1.00f : METERS_PER_YARD ) * (360.00f / secs);
@@ -1051,10 +1061,18 @@ PaceZones::kphFromTime(QTimeEdit *cvedit, bool metric) const
         return (metric ? 1.00f : KM_PER_MILE ) * (3600.00f / secs);
 }
 
+
 QString
 PaceZones::kphToPaceString(double kph, bool metric) const
 {
     return kphToPace(kph, metric, swim);
+}
+
+
+QTime
+PaceZones::kphToPaceTime(double kph, bool metric) const
+{
+    return ::kphToPaceTime(kph, metric, swim);
 }
 
 QString

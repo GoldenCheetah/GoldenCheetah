@@ -100,8 +100,9 @@ class Athlete : public QObject
         CloudServiceAutoDownload *cloudAutoDownload;
 
         // Estimates
-        PDEstimate getPDEstimateFor(QDate, QString model, bool wpk, QString sport);
-        QList<PDEstimate> getPDEstimates();
+        PDEstimate getPDEstimateFor(QDate, QString model, bool wpk, QString sport) const;
+        PDEstimate getPDEstimateClosestFor(QDate date, QString model, bool wpk, QString sport) const;
+        QList<PDEstimate> getPDEstimates() const;
 
         // PMC Data
         PMCData *getPMCFor(QString metricName, int stsDays = -1, int ltsDays = -1); // no Specification used!
