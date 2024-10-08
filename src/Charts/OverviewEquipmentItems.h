@@ -113,6 +113,7 @@ class CommonEquipmentItem : public ChartSpaceItem
         void itemPaint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override {}
 
         virtual void resetEqItem() {}
+        void showEvent(QShowEvent* event) override;
         virtual void DisplayTileEditMenu(const QPoint& pos) override;
 
         QWidget* config() override { return configwidget_; }
@@ -126,7 +127,9 @@ class CommonEquipmentItem : public ChartSpaceItem
 
     protected:
 
-        int setupScrollableText(const QFontMetrics& fm, const QString& tileText, QMap<int, QString>& rowTextMap, int rowOffset = 0);
+        QMap<int, QString> scrollableDisplayText_;
+        int setupScrollableText(const QFontMetrics& fm, const QString& tileText, QMap<int, QString>& rowTextMap,
+                                int rowOffset = 0, int protectOffset = -1);
 
 };
 
@@ -147,7 +150,6 @@ class EquipmentItem : public CommonEquipmentItem
         void configChanged(qint32) override;
         void itemGeometryChanged() override;
         void setData(RideItem*) override;
-        void showEvent(QShowEvent* event) override;
 
         bool isWithin(const QDate& actDate) const;
         bool isWithin(const QStringList& rideEqLinkNameList, const QDate& actDate) const;
@@ -181,8 +183,6 @@ class EquipmentItem : public CommonEquipmentItem
         QString notes_;
 
     private:
-
-        int numRowsInNotes_;
 
         std::atomic<uint64_t> activities_;
         std::atomic<uint64_t> activityTimeInSecs_;
@@ -258,7 +258,6 @@ class EquipmentHistory : public CommonEquipmentItem
         void configChanged(qint32) override;
         void itemGeometryChanged() override;
         void wheelEvent(QGraphicsSceneWheelEvent* event) override;
-        void showEvent(QShowEvent* event) override;
 
         void sortHistoryEntries();
 
@@ -273,7 +272,6 @@ class EquipmentHistory : public CommonEquipmentItem
     private:
 
         int scrollPosn_;
-        QMap<int, QString> scrollableDisplayText_;
         QColor textColor_;
         VScrollBar* scrollbar_;
 };
@@ -291,7 +289,6 @@ class EquipmentNotes : public CommonEquipmentItem
         void configChanged(qint32) override;
         void itemGeometryChanged() override;
         void wheelEvent(QGraphicsSceneWheelEvent* event) override;
-        void showEvent(QShowEvent* event) override;
 
         // create and config
         static ChartSpaceItem* create(ChartSpace* parent) {
@@ -303,7 +300,6 @@ class EquipmentNotes : public CommonEquipmentItem
     private:
 
         int scrollPosn_;
-        QMap<int, QString> scrollableDisplayText_;
         QColor textColor_;
         VScrollBar* scrollbar_;
 

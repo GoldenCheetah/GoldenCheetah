@@ -574,6 +574,13 @@ CommonEquipmentItem::CommonEquipmentItem(ChartSpace* parent, const QString& name
     setShowEdit(true);
 }
 
+void
+CommonEquipmentItem::showEvent(QShowEvent*)
+{
+    // wait for tile geometry to be defined
+    itemGeometryChanged();
+}
+
 void CommonEquipmentItem::DisplayTileEditMenu(const QPoint& pos)
 {
     QMenu popMenu;
@@ -664,9 +671,11 @@ void CommonEquipmentItem::popupAction(QAction* action)
     }
 }
 
+
 int
 CommonEquipmentItem::setupScrollableText(const QFontMetrics& fm, const QString& tileText,
-                                        QMap<int, QString>& rowTextMap, int rowOffset /* = 0 */)
+                                        QMap<int, QString>& rowTextMap,
+                                        int rowOffset /* = 0 */, int protectOffset /* = -1 */)
 {
     // Using the QFontMetrics rectangle on the whole string doesn't always give the correct number
     // of rows as the painter will not render partial words, and there maybe newline characters,
@@ -685,35 +694,47 @@ CommonEquipmentItem::setupScrollableText(const QFontMetrics& fm, const QString& 
     while (i < tileText.length())
     {
         chr = tileText.at(i);
-
-        if (chr.isSpace()) lastSpace = i;
-
-        int charWidth = fm.horizontalAdvance(chr);
-        widthOfLineChars += charWidth;
+        widthOfLineChars += fm.horizontalAdvance(chr);
+        if (chr == ' ' && (i > protectOffset)) lastSpace = i;
 
         if (chr == '\n') { // check for carriage return
-            rowTextMap[numRowsInNotes+ rowOffset] = tileText.mid(beginingOfRow, i - beginingOfRow);
+            rowTextMap[numRowsInNotes + rowOffset] = tileText.mid(beginingOfRow, i - beginingOfRow);
+            i++;
+            while (tileText.at(i) == ' ') i++; // remove any spaces after carriage return
+            lastSpace = beginingOfRow = i;
             numRowsInNotes++;
             widthOfLineChars = 0;
-            beginingOfRow = i + 1;
         }
-        else {
+        else if (widthOfLineChars > rowWidth) { // characters exceed row capacity
 
-            if (widthOfLineChars > rowWidth) { // characters exceed row capacity
-
-                if (i != lastSpace) i = lastSpace; // revert to last whole word
-                rowTextMap[numRowsInNotes+ rowOffset] = tileText.mid(beginingOfRow, i - beginingOfRow);
-                numRowsInNotes++;
-                widthOfLineChars = 0;
-                beginingOfRow = i + 1;
+            if (chr.isSpace()) // the last character causing the overflow is a space
+            {
+                rowTextMap[numRowsInNotes + rowOffset] = tileText.mid(beginingOfRow, i - beginingOfRow);
+                while (tileText.at(i) == ' ') i++;
+                lastSpace = beginingOfRow = i;
             }
+            else if (lastSpace > beginingOfRow) // space character exists in the row, so revert to last whole word
+            {
+                rowTextMap[numRowsInNotes + rowOffset] = tileText.mid(beginingOfRow, lastSpace - beginingOfRow);
+                while (tileText.at(i) == ' ') i++;
+                lastSpace = beginingOfRow = i = lastSpace+1;
+            }
+            else  // otherwise total string flow
+            {
+                rowTextMap[numRowsInNotes + rowOffset] = tileText.mid(beginingOfRow, i - beginingOfRow);
+                lastSpace = beginingOfRow = i;
+            }
+            numRowsInNotes++;
+            widthOfLineChars = 0;
         }
-
-        i++; // advance to next character
+        else
+        {
+            i++; // advance to next character
+        }
     }
-    rowTextMap[numRowsInNotes+ rowOffset] = tileText.mid(beginingOfRow, i - beginingOfRow);
 
-    return numRowsInNotes+1;
+    rowTextMap[numRowsInNotes + rowOffset] = tileText.mid(beginingOfRow, i - beginingOfRow);
+    return numRowsInNotes + 1;
 }
 
 //
@@ -736,7 +757,6 @@ EquipmentItem::EquipmentItem(ChartSpace* parent, const QString& name) : CommonEq
     repDistanceScaled_ = 0;
     repElevationScaled_ = 0;
     repDateSet_ = false;
-    numRowsInNotes_ = 0;
 
     configwidget_ = new OverviewEquipmentItemConfig(this);
     configwidget_->hide();
@@ -772,19 +792,12 @@ EquipmentItem::setData(RideItem*)
 }
 
 void
-EquipmentItem::showEvent(QShowEvent*)
-{
-    // wait for tile geometry to be defined
-    itemGeometryChanged();
-}
-
-void
 EquipmentItem::itemGeometryChanged()
 {
-    QMap<int, QString> scrollableDisplayText;
+    scrollableDisplayText_.clear();
     QFontMetrics fm(parent->smallfont, parent->device());
 
-    numRowsInNotes_ = setupScrollableText(fm, notes_, scrollableDisplayText);
+    setupScrollableText(fm, notes_, scrollableDisplayText_);
 }
 
 void
@@ -1054,15 +1067,20 @@ EquipmentItem::itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
         if (overDate) painter->setPen(textColor_);
     }
 
-    if (!notes_.isEmpty()) {
+    if (!scrollableDisplayText_.isEmpty()) {
 
         rowY +=  (addNotesOffset) ? ROWHEIGHT*1.3 : ROWHEIGHT;
         painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), "Notes:");
-        rowY += (ROWHEIGHT);
-        painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, rowHeight), notes_);
+        rowY += ROWHEIGHT;
+
+        for (const auto& eqNotes : scrollableDisplayText_) {
+
+            painter->drawText(QRectF(ROWHEIGHT, rowY, rowWidth, ROWHEIGHT), eqNotes);
+            rowY += ROWHEIGHT;
+        }
     }
 
-    tileDisplayHeight_ = rowY + (ROWHEIGHT * (numRowsInNotes_+1));
+    tileDisplayHeight_ = rowY + ROWHEIGHT;
 }
 
 //
@@ -1241,13 +1259,6 @@ EquipmentHistory::configChanged(qint32 cfg) {
 }
 
 void
-EquipmentHistory::showEvent(QShowEvent*)
-{
-    // wait for tile geometry to be defined
-    itemGeometryChanged();
-}
-
-void
 EquipmentHistory::sortHistoryEntries()
 {
     if (sortMostRecentFirst_)
@@ -1267,7 +1278,7 @@ EquipmentHistory::itemGeometryChanged()
     for (const auto& eqHistory : eqHistoryList_) {
 
         QString historyEntryStr(eqHistory.date_.toString("dd MMM yyyy") + ": " + eqHistory.text_);
-        numHistoryRows += setupScrollableText(fm, historyEntryStr, scrollableDisplayText_, numHistoryRows);
+        numHistoryRows += setupScrollableText(fm, historyEntryStr, scrollableDisplayText_, numHistoryRows, 13);
     }
 
     double scrollwidth = fm.boundingRect("X").width();
@@ -1359,13 +1370,6 @@ EquipmentNotes::configChanged(qint32 cfg) {
     if (cfg & CONFIG_APPEARANCE) {
         textColor_ = (GCColor::luminance(RGBColor(color())) < 127) ? QColor(QColor(200, 200, 200)) : QColor(QColor(70, 70, 70));
     }
-}
-
-void
-EquipmentNotes::showEvent(QShowEvent*)
-{
-    // wait for tile geometry to be defined
-    itemGeometryChanged();
 }
 
 void
