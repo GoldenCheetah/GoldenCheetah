@@ -31,6 +31,7 @@
 #include "ChartBar.h"
 #include "Utils.h"
 #include "SearchBox.h"
+#include "OverviewEquipment.h"
 
 #define PERSPECTIVE_DEBUG false
 
@@ -108,6 +109,7 @@ Perspective::Perspective(Context *context, QString title, int type) :
     case VIEW_DIARY: view="diary"; break;
     case VIEW_TRENDS: view="home"; break;
     case VIEW_TRAIN: view="train"; break;
+    case VIEW_EQUIPMENT: view="equipment"; break;
     }
     setProperty("isManager", true);
     nomenu=true;
@@ -471,7 +473,9 @@ Perspective::tabSelected(int index)
         if (currentStyle == 0) charts[index]->setContentsMargins(0,0,0,0);
 
         // show
-        charts[index]->show();
+        for (int i = 0; i < charts.count(); i++) {
+            charts[index]->showChart(i == index);
+        }
         controlStack->setCurrentIndex(index);
         titleEdit->setText(charts[index]->property("title").toString());
         tabbed->setCurrentIndex(index);
@@ -494,7 +498,9 @@ Perspective::tabSelected(int index, bool forride)
     active = true;
 
     if (index >= 0) {
-        charts[index]->show();
+        for (int i = 0; i < charts.count(); i++) {
+            charts[index]->showChart(i == index);
+        }
         if (forride) charts[index]->setProperty("ride", property("ride"));
         else charts[index]->setProperty("dateRange", property("dateRange"));
         controlStack->setCurrentIndex(index);
@@ -508,8 +514,7 @@ void
 Perspective::tabMoved(int to, int from)
 {
     SSS;
-     GcChartWindow *me = charts.takeAt(from);
-     charts.insert(to, me);
+     charts.move(from, to);
 
     // re-order the controls - to reflect new indexes
     controlStack->blockSignals(true);
@@ -695,8 +700,14 @@ void
 Perspective::showControls()
 {
     SSS;
-    context->tab->chartsettings()->adjustSize();
-    context->tab->chartsettings()->show();
+    if (type_ == VIEW_EQUIPMENT) {
+        context->mainWindow->equipView()->chartsettings->adjustSize();
+        context->mainWindow->equipView()->chartsettings->show();
+    }
+    else {
+        context->tab->chartsettings()->adjustSize();
+        context->tab->chartsettings()->show();
+    }
 }
 
 void
@@ -1330,7 +1341,11 @@ GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcChartWindow **h
     // the chart uses it to decide something - apologies for the convoluted
     // method to determine the perspective, but its rare to use this outside
     // the context of a chart or a view
-    win->setProperty("perspective", QVariant::fromValue<Perspective*>(context->mainWindow->athleteTab()->view(context->mainWindow->athleteTab()->currentView())->page()));
+    if (type == GcWindowTypes::OverviewEquipment)
+        win->setProperty("perspective", QVariant::fromValue<Perspective*>(context->mainWindow->equipView()->page()));
+    else
+        win->setProperty("perspective", QVariant::fromValue<Perspective*>(context->mainWindow->athleteTab()->view(context->mainWindow->athleteTab()->currentView())->page()));
+
     chartLayout->addWidget(win);
     //win->setFrameStyle(QFrame::Box);
 
@@ -1352,6 +1367,8 @@ GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcChartWindow **h
     // special case
     if (type == GcWindowTypes::Overview || type == GcWindowTypes::OverviewTrends) {
         static_cast<OverviewWindow*>(win)->setConfiguration("");
+    } else if (type == GcWindowTypes::OverviewEquipment) {
+        static_cast<OverviewEquipmentWindow*>(win)->setConfiguration("");
     }
 
     RideItem *notconst = (RideItem*)context->currentRideItem();
@@ -1777,6 +1794,7 @@ ImportChartDialog::ImportChartDialog(Context *context, QList<QMap<QString,QStrin
         if (view == "home") view = tr("Trends");
         if (view == "analysis") view = tr("Activities");
         if (view == "train") view = tr("Train");
+        if (view == "equipment") view = tr("Equipment");
 
         QTableWidgetItem *t;
 #ifndef GC_HAVE_ICAL
@@ -1862,9 +1880,13 @@ ImportChartDialog::importClicked()
             if (view == tr("Activities"))  { x=1; context->mainWindow->selectAnalysis(); }
             if (view == tr("Diary"))       { x=2; context->mainWindow->selectDiary(); }
             if (view == tr("Train"))       { x=3; context->mainWindow->selectTrain(); }
+            if (view == tr("Equipment"))   { x=4; context->mainWindow->selectEquipment(); }
 
             // add to the currently selected tab and select if only adding one chart
-            context->mainWindow->athleteTab()->view(x)->importChart(list[i], (list.count()==1));
+            if (x == 4)
+                context->mainWindow->equipView()->importChart(list[i], (list.count()==1));
+            else
+                context->mainWindow->athleteTab()->view(x)->importChart(list[i], (list.count()==1));
         }
     }
     accept();

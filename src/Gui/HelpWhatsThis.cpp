@@ -77,6 +77,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
          return text.arg("ScopeBar_Views#activities").arg(tr("Analysis of a single activity with diagrams like activity plot, W'bal, ... and Chung's Aerolab"));
     case ScopeBar_Train:
         return text.arg("ScopeBar_Views#train").arg(tr("Ride indoors, following pre-programmed workouts - with multi device and video playback support"));
+    case ScopeBar_Equipment:
+        return text.arg("ScopeBar_Views#equipment").arg(tr("Tracks equipment wear & tear, supporting proactive equipment maintenance"));
     case ScopeBar_Sync:
         return text.arg("ScopeBar_Views#sync").arg(tr("Sync with all Cloud Services with Sync on Start Up option enabled"));
     case ScopeBar_Options:
@@ -221,6 +223,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("ChartTypes_Activities#Overview").arg(tr("Dashboard for a single activity - the tiles shown here are configurable"));
     case ChartRides_Overview_Config:
         return text.arg("ChartTypes_Activities#Overview-%1");
+    case ChartEquip_Overview:
+        return text.arg("ChartTypes_Activities#Overview").arg(tr("Dashboard for equipment management - the tiles shown here are configurable"));
     case ChartRides_Summary:
         return text.arg("ChartTypes_Activities#activity-summary").arg(tr("Detailed information of a single activity - the metrics shown here are configurable"));
     case ChartRides_Details:

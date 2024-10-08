@@ -50,7 +50,8 @@ class ColorButton;
 
 // types we use start from 100 to avoid clashing with main chart types
 enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE, KPI,
-                        TOPN, DONUT, ACTIVITIES, ATHLETE, DATATABLE, USERCHART };
+                        TOPN, DONUT, ACTIVITIES, ATHLETE, DATATABLE, USERCHART,
+                        EQ_ITEM, EQ_SUMMARY, EQ_NOTES, EQ_HISTORY };
 
 //
 // Configuration widget for ALL Overview Items
@@ -62,17 +63,17 @@ class OverviewItemConfig : public QWidget
     public:
 
         OverviewItemConfig(ChartSpaceItem *);
-        ~OverviewItemConfig();
+        virtual ~OverviewItemConfig();
 
         static bool registerItems();
 
     public slots:
 
         // retrieve values when user edits them (if they're valid)
-        void dataChanged();
+        virtual void dataChanged();
 
         // set the config widgets to reflect current config
-        void setWidgets();
+        virtual void setWidgets();
 
         // program editor
         void setErrors(QStringList &errors);
@@ -85,10 +86,20 @@ class OverviewItemConfig : public QWidget
         // before show, lets make sure the widgets are set correctly
         void showEvent(QShowEvent *) override { setWidgets(); }
 
-    private:
-
         // the widget we are configuring
         ChartSpaceItem *item;
+
+        QFormLayout *layout;
+
+        // block updates during initialisation
+        bool block;
+
+        QLineEdit* name; // all of them
+
+        // background color
+        ColorButton* bgcolor;
+
+    private:
 
         // export data button (data table)
         QPushButton *exp;
@@ -99,18 +110,12 @@ class OverviewItemConfig : public QWidget
         SearchFilterBox *filterEditor;
         QLabel *errors;
 
-        // block updates during initialisation
-        bool block;
-
-        QLineEdit *name, *string1; // all of them
+        QLineEdit *string1; // all of them
         QDoubleSpinBox *double1, *double2; // KPI
         QCheckBox *cb1; // KPI/Zone
         MetricSelect *metric1, *metric2, *metric3; // Metric/Interval/PMC
         MetricSelect *meta1; // Meta
         SeriesSelect *series1; // Zone Histogram
-
-        // background color
-        ColorButton *bgcolor;
 
 };
 
@@ -357,6 +362,8 @@ class MetaOverviewItem : public ChartSpaceItem
         void setData(RideItem *item) override;
         void setDateRange(DateRange) override {} // doesn't support trends view
 
+        virtual void DisplayTileEditMenu(const QPoint& pos) override;
+
         QWidget *config() override { return configwidget; }
 
         // create and config
@@ -374,6 +381,11 @@ class MetaOverviewItem : public ChartSpaceItem
         Sparkline *sparkline;
 
         OverviewItemConfig *configwidget;
+
+    protected slots:
+
+        void popupAction(QAction*);
+
 };
 
 class PMCOverviewItem : public ChartSpaceItem

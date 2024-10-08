@@ -38,6 +38,7 @@ Q_OBJECT
                  ScopeBar_Trends,
                  ScopeBar_Rides,
                  ScopeBar_Train,
+                 ScopeBar_Equipment,
                  ScopeBar_Sync,
                  ScopeBar_Options,
 
@@ -118,6 +119,7 @@ Q_OBJECT
                  ChartDiary_Calendar,
                  ChartDiary_Navigator,
 
+                 ChartEquip_Overview,
                  ChartRides_Overview,
                  ChartRides_Overview_Config,
                  ChartRides_Summary,
