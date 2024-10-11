@@ -1007,7 +1007,7 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
             if (item && item->inEdit()) {
 
                 block = false; // reeentry is allowed
-                item->DisplayTileEditMenu(static_cast<QGraphicsSceneMouseEvent*>(event)->screenPos());
+                item->displayTileEditMenu(static_cast<QGraphicsSceneMouseEvent*>(event)->screenPos());
                 return true;
             }
 

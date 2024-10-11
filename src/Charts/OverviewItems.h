@@ -24,6 +24,7 @@
 #include "MetricSelect.h"
 #include "DataFilter.h"
 #include <QGraphicsItem>
+#include "MetadataDialog.h"
 
 // qt charts for zone chart
 #include <QtCharts>
@@ -357,7 +358,7 @@ class MetaOverviewItem : public ChartSpaceItem
         void setData(RideItem *item) override;
         void setDateRange(DateRange) override {} // doesn't support trends view
 
-        virtual void DisplayTileEditMenu(const QPoint& pos) override;
+        virtual void displayTileEditMenu(const QPoint& pos) override;
 
         QWidget *config() override { return configwidget; }
 
@@ -379,7 +380,12 @@ class MetaOverviewItem : public ChartSpaceItem
 
     protected slots:
 
-        void popupAction(QAction*);
+        void updateTile(int ret);
+        void metadataChanged();
+
+    protected:
+
+        RideItem* rideItem = nullptr;
 
 };
 
