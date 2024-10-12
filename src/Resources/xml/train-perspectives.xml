@@ -36,7 +36,7 @@
 		<property name="showInstant" type="bool" value="1" />
 		<property name="avgsecs" type="int" value="1" />
 		<property name="avgType" type="int" value="32695" />
-		<property name="dataSeries" type="int" value="12" />
+		<property name="dataSeries" type="int" value="16" />
 		<property name="style" type="int" value="2" />
 	</chart>
 	<chart id="22" name="" title="W&apos; bal" >
@@ -109,7 +109,7 @@
 		<property name="showInstant" type="bool" value="0" />
 		<property name="avgsecs" type="int" value="1" />
 		<property name="avgType" type="int" value="32526" />
-		<property name="dataSeries" type="int" value="2" />
+		<property name="dataSeries" type="int" value="4" />
 		<property name="style" type="int" value="2" />
 	</chart>
 	<chart id="22" name="" title="Distance" >
@@ -122,7 +122,7 @@
 		<property name="showInstant" type="bool" value="0" />
 		<property name="avgsecs" type="int" value="1" />
 		<property name="avgType" type="int" value="1083336304" />
-		<property name="dataSeries" type="int" value="4" />
+		<property name="dataSeries" type="int" value="3" />
 		<property name="style" type="int" value="2" />
 	</chart>
 </layout>
@@ -163,7 +163,7 @@
 		<property name="showInstant" type="bool" value="1" />
 		<property name="avgsecs" type="int" value="1" />
 		<property name="avgType" type="int" value="32695" />
-		<property name="dataSeries" type="int" value="12" />
+		<property name="dataSeries" type="int" value="16" />
 		<property name="style" type="int" value="2" />
 	</chart>
 	<chart id="22" name="" title="W&apos; bal" >
@@ -236,7 +236,7 @@
 		<property name="showInstant" type="bool" value="0" />
 		<property name="avgsecs" type="int" value="1" />
 		<property name="avgType" type="int" value="32526" />
-		<property name="dataSeries" type="int" value="2" />
+		<property name="dataSeries" type="int" value="4" />
 		<property name="style" type="int" value="2" />
 	</chart>
 	<chart id="22" name="" title="Distance" >
@@ -249,7 +249,7 @@
 		<property name="showInstant" type="bool" value="0" />
 		<property name="avgsecs" type="int" value="1" />
 		<property name="avgType" type="int" value="1083336304" />
-		<property name="dataSeries" type="int" value="4" />
+		<property name="dataSeries" type="int" value="3" />
 		<property name="style" type="int" value="2" />
 	</chart>
 </layout>
@@ -290,7 +290,7 @@
 		<property name="showInstant" type="bool" value="1" />
 		<property name="avgsecs" type="int" value="1" />
 		<property name="avgType" type="int" value="32695" />
-		<property name="dataSeries" type="int" value="12" />
+		<property name="dataSeries" type="int" value="16" />
 		<property name="style" type="int" value="2" />
 	</chart>
 	<chart id="22" name="" title="W&apos; bal" >
@@ -372,7 +372,7 @@
 		<property name="showInstant" type="bool" value="0" />
 		<property name="avgsecs" type="int" value="1" />
 		<property name="avgType" type="int" value="32526" />
-		<property name="dataSeries" type="int" value="2" />
+		<property name="dataSeries" type="int" value="4" />
 		<property name="style" type="int" value="2" />
 	</chart>
 	<chart id="22" name="" title="Distance" >
@@ -385,7 +385,7 @@
 		<property name="showInstant" type="bool" value="0" />
 		<property name="avgsecs" type="int" value="1" />
 		<property name="avgType" type="int" value="1083336304" />
-		<property name="dataSeries" type="int" value="4" />
+		<property name="dataSeries" type="int" value="3" />
 		<property name="style" type="int" value="2" />
 	</chart>
 </layout>
