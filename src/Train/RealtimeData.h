@@ -35,6 +35,9 @@ public:
     ErgFileFormat mode;
 
     // abstract to dataseries
+    // the order matters. if we remove any entry, the corresponding layouts
+    // will break since the data series is defined by its enum value. new data
+    // series need to be appended.
     enum dataseries { None=0, Time, LapTime, Distance, Lap,
                       Watts, Speed, Cadence, HeartRate, Load,
                       XPower, BikeScore, RI, Joules, SkibaVI,
@@ -46,12 +49,12 @@ public:
                       VirtualSpeed, AltWatts, LRBalance, LapTimeRemaining,
                       LeftTorqueEffectiveness, RightTorqueEffectiveness,
                       LeftPedalSmoothness, RightPedalSmoothness, Slope, 
-                      RightPowerPhaseBegin, RightPowerPhaseEnd,
-                      RightPowerPhasePeakBegin, RightPowerPhasePeakEnd,
-                      Position, RightPCO, LeftPCO,
                       LapDistance, LapDistanceRemaining, ErgTimeRemaining,
                       Latitude, Longitude, Altitude, RouteDistance,
-                      DistanceRemaining };
+                      DistanceRemaining,
+                      RightPowerPhaseBegin, RightPowerPhaseEnd,
+                      RightPowerPhasePeakBegin, RightPowerPhasePeakEnd,
+                      Position, RightPCO, LeftPCO };
 
     typedef enum dataseries DataSeries;
 
