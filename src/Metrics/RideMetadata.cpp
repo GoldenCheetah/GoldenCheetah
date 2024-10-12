@@ -1577,7 +1577,6 @@ FormField::metadataChanged()
             ((QCheckBox*)widget)->setChecked((value == "1") ? true : false);
             }
             break;
-
         }
     }
     active = false;
