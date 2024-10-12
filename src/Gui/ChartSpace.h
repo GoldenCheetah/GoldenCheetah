@@ -323,7 +323,8 @@ class ChartSpace : public QWidget
 
         // content
         QVector<int> columns;                // column widths
-        QList<ChartSpaceItem*> items;         // tiles
+        QList<ChartSpaceItem*> items;        // tiles
+        QGraphicsRectItem *landingzone = nullptr;   // marker where the dragged ChartSpaceItem will be placed
 
         // state data
         bool yresizecursor;          // is the cursor set to resize?
