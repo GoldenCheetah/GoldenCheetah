@@ -1024,7 +1024,7 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
             }
         }
 
-    } else  if (event->type() == QEvent::GraphicsSceneMouseRelease) {
+    } else if (event->type() == QEvent::GraphicsSceneMouseRelease) {
 
         // stop dragging
         if (state == DRAG || state == YRESIZE || state == SPAN || state == XRESIZE) {
@@ -1167,15 +1167,28 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                     }
                 }
 
-                // Find all items placed in my targetcol
+                // Find
+                // * the highest column in active use
+                // * all items currently placed in targetcol (excluding the dragged item)
                 // This excludes items "only" spanning over this column
                 QList<ChartSpaceItem*> columnItems;
+                int highestcol = -1;
                 for (ChartSpaceItem *item : items) {
                     if (item->column == targetcol && item != stateData.drag.item) {
                         columnItems << item;
                     }
+                    highestcol = std::max(highestcol, item->column + item->span - 1);
                 }
                 std::sort(columnItems.begin(), columnItems.end(), LayoutChartSpaceItem::LayoutChartSpaceItemSort);
+
+                // Correct targetcol if it exceeds highestcol with a (then) empty highestcol
+                targetcol = std::min(targetcol, highestcol + 1);
+                if (   highestcol >= 0
+                    && targetcol > highestcol
+                    && columnCount(highestcol) == 1
+                    && stateData.drag.item->column == highestcol) {
+                    targetcol = highestcol;
+                }
 
                 if (over != nullptr) {
                     if (pos.y() - over->geometry().y() > over->geometry().height() / 2) {
@@ -1214,14 +1227,11 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                 } else {
                     qDebug() << "    No overlap"
                              << "/ items.last()->name =" << items.last()->name
-                             << "/ targetcol =" << targetcol;
+                             << "/ targetcol =" << targetcol
+                             << "/ highestcol =" << highestcol;
 
                     if (targetcol < 0) {
                         // create a new column to the right?
-                        int highestcol = -1;
-                        for (ChartSpaceItem *item : items) {
-                            highestcol = std::max(highestcol, item->column + item->span - 1);
-                        }
                         if (highestcol < 9 && columnCount(0) > 1) {
                             qDebug() << "    asking for new first column, space available";
                             // Drop as new first column
@@ -1280,10 +1290,10 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                                 }
                             }
                         } else {
-                            // Add as first item of existing column
+                            // Add as first item
                             if (   stateData.drag.item->column != targetcol
                                 || stateData.drag.item->order != 0) {
-                                qDebug() << "    dropped at the end as only item in the column";
+                                qDebug() << "    dropped at the end as only item in the column" << stateData.drag.item->column << stateData.drag.item->order;
                                 stateData.drag.item->column = targetcol;
                                 stateData.drag.item->order = 0;
                                 changed = true;
