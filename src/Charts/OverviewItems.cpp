@@ -46,7 +46,6 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
-#include <QMenu>
 
 bool
 OverviewItemConfig::registerItems()
@@ -898,8 +897,6 @@ MetaOverviewItem::MetaOverviewItem(ChartSpace *parent, QString name, QString sym
 
     configwidget = new OverviewItemConfig(this);
     configwidget->hide();
-
-
 
     configChanged(0);
 }
