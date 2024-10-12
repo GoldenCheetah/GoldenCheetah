@@ -26,19 +26,6 @@ static int MINTOOLHEIGHT = 350; // smaller than this, lose the toolbar
 
 WorkoutWindow::WorkoutWindow(Context *context) :
     GcChartWindow(context), draw(true), context(context), active(false), recording(false)
-    //plotHr(true),
-    //plotPwr(true),
-    //plotCadence(true),
-    //plotWbal(true),
-    //plotVo2(true),
-    //plotVentilation(true),
-    //plotSpeed(true),
-    //plotHrAvg(1),
-    //plotPwrAvg(1),
-    //plotCadenceAvg(1),
-    //plotVo2Avg(1),
-    //plotVentilationAvg(1),
-    //plotSpeedAvg(1)
 {
     HelpWhatsThis *helpContents = new HelpWhatsThis(this);
     this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::ChartTrain_WorkoutEditor));

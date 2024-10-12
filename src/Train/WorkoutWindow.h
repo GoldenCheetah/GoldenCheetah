@@ -210,8 +210,6 @@ class WorkoutWindow : public GcChartWindow
 
         bool active;
         bool recording;
-        //bool plotHr, plotPwr, plotCadence, plotWbal, plotVo2, plotVentilation, plotSpeed;
-        //int plotHrAvg, plotPwrAvg, plotCadenceAvg, plotVo2Avg, plotVentilationAvg, plotSpeedAvg;
 };
 
 #endif // _GC_WorkoutWindow_h
