@@ -609,6 +609,18 @@ ChartSpace::updateGeometry()
             } else animation->setEasingCurve(QEasingCurve(QEasingCurve::OutQuint));
 
             group->addAnimation(animation);
+        } else if (item.invisible) {
+            if (landingzone == nullptr) {
+                QColor bgColor = GColor(CCARDBACKGROUND);
+                bgColor.setAlpha(200);
+                QPen pen(bgColor);
+                pen.setWidth(10 * dpiXFactor);
+                bgColor.setAlpha(100);
+                QBrush brush(bgColor);
+                landingzone = scene->addRect(item.geometry, pen, brush);
+            } else if (landingzone->rect() != item.geometry) {
+                landingzone->setRect(item.geometry);
+            }
         }
     }
 
@@ -1016,6 +1028,11 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
 
         // stop dragging
         if (state == DRAG || state == YRESIZE || state == SPAN || state == XRESIZE) {
+            if (landingzone != nullptr) {
+                scene->removeItem(landingzone);
+                delete landingzone;
+                landingzone = nullptr;
+            }
 
             // we want this one
             event->accept();
@@ -1114,162 +1131,181 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
             }
 
         } else if (state == DRAG && !scrolling) {          // dragging?
+            qDebug() << "------------------------------------------------------------";
+            qDebug() << "->" << stateData.drag.item->name
+                     << ": item->column =" << stateData.drag.item->column
+                     << "/ item->order =" << stateData.drag.item->order;
             // whilst mouse moves, only update geom when changed
             bool changed = false;
 
             // move the ChartSpaceItem being dragged
             stateData.drag.item->setPos(pos.x() - stateData.drag.offx, pos.y() - stateData.drag.offy);
 
-            // should I move?
-            QList<QGraphicsItem*> overlaps;
-            for (QGraphicsItem *p : scene->items(pos)) {
-                if (items.contains(static_cast<ChartSpaceItem*>(p))) {
-                    overlaps << p;
-                }
-            }
-
-            // What is my target column? Because of spans we can't rely only on overlaps
-            int x = SPACING;
-            int targetcol = -1;
-            for (int i = 0; i < 10; i++) {
-                if (pos.x() > x && pos.x() < (x + columns[i] + SPACING)) {
-                    targetcol = i;
-                    break;
-                }
-                x += columns[i] + SPACING;
-            }
-            ChartSpaceItem *over = nullptr;
-            if (overlaps.count() > 1) {
-                // we always overlap with ourself, so see if more, but accept only in the same column
-                for (int i = 1; i < overlaps.count(); ++i) {
-                    ChartSpaceItem *item = static_cast<ChartSpaceItem*>(overlaps[i]);
-                    if (item->column == targetcol) {
-                        over = item;
+            // Nothing to do when mouse is over the landingzone
+            if (   landingzone == nullptr
+                || ! landingzone->contains(pos)) {
+                // What is my target column? Because of spans we can't rely only on overlaps
+                int x = SPACING;
+                int targetcol = -1;
+                for (int i = 0; i < 10; i++) {
+                    if (pos.x() > x && pos.x() < (x + columns[i] + SPACING)) {
+                        targetcol = i;
                         break;
                     }
+                    x += columns[i] + SPACING;
                 }
-            }
 
-            qDebug() << "------------------------------------------------------------" << stateData.drag.item->name;
-            if (over != nullptr) {
-                if (pos.y() - over->geometry().y() > over->geometry().height() / 2) {
-                    qDebug() << "Overlap below - over->column =" << over->column << "/ over->name =" << over->name;
-
-                    // place below the one its over
-                    stateData.drag.item->column = over->column;
-                    stateData.drag.item->order = over->order + 1;
-                    for (int i = items.indexOf(over); i < items.count(); i++) {
-                        if (   i >= 0
-                            && items[i]->column == over->column
-                            && items[i]->order > over->order
-                            && items[i] != stateData.drag.item) {
-                            items[i]->order += 1;
-                            changed = true;
-                        }
-                    }
-                } else {
-                    qDebug() << "Overlap above - over->column =" << over->column << "/ over->name =" << over->name;
-
-                    // place above the one its over
-                    stateData.drag.item->column = over->column;
-                    stateData.drag.item->order = over->order;
-                    for (int i = 0; i < items.count(); i++) {
-                        if (   i >= 0
-                            && items[i]->column == over->column
-                            && items[i]->order >= (over->order)
-                            && items[i] != stateData.drag.item) {
-                            items[i]->order += 1;
-                            changed = true;
+                // Do we overlap?
+                ChartSpaceItem *over = nullptr;
+                for (QGraphicsItem *p : scene->items(pos)) {
+                    if (p != landingzone) {
+                        ChartSpaceItem *testItem = static_cast<ChartSpaceItem*>(p);
+                        if (items.contains(testItem) && testItem != stateData.drag.item && testItem->column == targetcol) {
+                            over = testItem;
+                            break;
                         }
                     }
                 }
-            } else {
-                // columns are now variable width
-                // create a new column to the right?
-                int highestcol = -1;
+
+                // Find all items placed in my targetcol
+                // This excludes items "only" spanning over this column
+                QList<ChartSpaceItem*> columnItems;
                 for (ChartSpaceItem *item : items) {
-                    highestcol = std::max(highestcol, item->column + item->span - 1);
+                    if (item->column == targetcol && item != stateData.drag.item) {
+                        columnItems << item;
+                    }
                 }
-                qDebug() << "No overlap"
-                         << "/ items.last()->name =" << items.last()->name
-                         << "/ targetcol =" << targetcol
-                         << "/ highestcol =" << highestcol
-                         << "/ items.last()->column =" << items.last()->column;
+                std::sort(columnItems.begin(), columnItems.end(), LayoutChartSpaceItem::LayoutChartSpaceItemSort);
 
-                if (targetcol < 0) {
-                    if (highestcol < 9 && columnCount(0) > 0) {
-                        qDebug() << "asking for new first column, space available";
-                        // Drop as new first column
-                        // don't keep moving - if we're already alone in column 0 then no move is needed
-                        // new col to left
-                        for (ChartSpaceItem *item : items) {
-                            item->column += 1;
-                        }
-                        stateData.drag.item->column = 0;
-                        stateData.drag.item->order = 0;
+                if (over != nullptr) {
+                    if (pos.y() - over->geometry().y() > over->geometry().height() / 2) {
+                        qDebug() << "    Overlap below - over->column =" << over->column << "/ over->name =" << over->name;
 
-                        // shift columns widths to the right
-                        for (int i = 9; i > 0; i--) {
-                            columns[i] = columns[i - 1];
-                        }
-                        columns[0] = stateData.drag.width;
-
-                        changed = true;
-                    }
-                } else if (targetcol <= 9) {
-                    qDebug() << "targetcol <= 9?" << targetcol;
-
-                    QList<ChartSpaceItem*> columnItems;
-                    for (ChartSpaceItem *item : items) {
-                        if (item->column == targetcol && item != stateData.drag.item) {
-                            columnItems << item;
-                        }
-                    }
-                    std::sort(columnItems.begin(), columnItems.end(), LayoutChartSpaceItem::LayoutChartSpaceItemSort);
-                    if (columnItems.count() > 0) {
-                        if (pos.y() > columnItems.last()->geometry().bottom()) {
-                            // Append below last
-                            qDebug() << "dropped at the end";
-                            stateData.drag.item->column = targetcol;
-                            stateData.drag.item->order = columnItems.last()->order + 1;
+                        // place below the one its over
+                        if (   stateData.drag.item->column != over->column
+                            || stateData.drag.item->order <= over->order) {
+                            stateData.drag.item->column = over->column;
+                            stateData.drag.item->order = over->order + 1;
                             changed = true;
-                        } else {
-                            // Insert above item
-                            for (ChartSpaceItem *colItem : columnItems) {
-                                qDebug() << "walking:" << colItem->name
-                                         << "/ order =" << colItem->order
-                                         << "/ geometry().top() =" << colItem->geometry().top()
-                                         << "/ pos.y() =" << pos.y();
-                                if (! changed && pos.y() < colItem->geometry().top()) {
-                                    qDebug() << "inserting above" << colItem->name;
-                                    stateData.drag.item->column = targetcol;
-                                    stateData.drag.item->order = colItem->order;
-                                    changed = true;
-                                }
-                                if (changed) {
-                                    qDebug() << "shifting down" << colItem->name;
-                                    ++colItem->order;
+                            for (int i = columnItems.indexOf(over); i < columnItems.count(); i++) {
+                                if (   columnItems[i]->order > over->order
+                                    && columnItems[i] != stateData.drag.item) {
+                                    columnItems[i]->order += 1;
                                 }
                             }
                         }
                     } else {
-                        // Add as first item of existing column
-                        qDebug() << "dropped at the end";
-                        stateData.drag.item->column = targetcol;
-                        stateData.drag.item->order = 0;
-                        changed = true;
+                        qDebug() << "    Overlap above - over->column =" << over->column << "/ over->name =" << over->name;
+
+                        // place above the one its over
+                        if (   stateData.drag.item->column != over->column
+                            || stateData.drag.item->order >= over->order) {
+                            stateData.drag.item->column = over->column;
+                            stateData.drag.item->order = over->order;
+                            changed = true;
+                            for (ChartSpaceItem *colItem : columnItems) {
+                                if (   colItem->order >= (over->order)
+                                    && colItem != stateData.drag.item) {
+                                    colItem->order += 1;
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    qDebug() << "    No overlap"
+                             << "/ items.last()->name =" << items.last()->name
+                             << "/ targetcol =" << targetcol;
+
+                    if (targetcol < 0) {
+                        // create a new column to the right?
+                        int highestcol = -1;
+                        for (ChartSpaceItem *item : items) {
+                            highestcol = std::max(highestcol, item->column + item->span - 1);
+                        }
+                        if (highestcol < 9 && columnCount(0) > 1) {
+                            qDebug() << "    asking for new first column, space available";
+                            // Drop as new first column
+                            // don't keep moving - if we're already alone in column 0 then no move is needed
+                            // new col to left
+                            for (ChartSpaceItem *item : items) {
+                                item->column += 1;
+                            }
+                            stateData.drag.item->column = 0;
+                            stateData.drag.item->order = 0;
+
+                            // shift columns widths to the right
+                            for (int i = 9; i > 0; i--) {
+                                columns[i] = columns[i - 1];
+                            }
+                            columns[0] = stateData.drag.width;
+
+                            changed = true;
+                        }
+                    } else if (targetcol <= 9) {
+                        qDebug() << "    targetcol <= 9?" << targetcol;
+
+                        if (columnItems.count() > 0) {
+                            if (pos.y() > columnItems.last()->geometry().bottom()) {
+                                // Append below last
+                                qDebug() << "    dropped at the end with items above";
+                                if (   stateData.drag.item->column != targetcol
+                                    || (   stateData.drag.item->column == targetcol
+                                        && stateData.drag.item->order <= columnItems.last()->order)) {
+                                    stateData.drag.item->column = targetcol;
+                                    stateData.drag.item->order = columnItems.last()->order + 1;
+                                    changed = true;
+                                }
+                            } else {
+                                // Insert above item
+                                for (ChartSpaceItem *colItem : columnItems) {
+                                    qDebug() << "    walking:" << colItem->name
+                                             << "/ order =" << colItem->order
+                                             << "/ geometry().top() =" << colItem->geometry().top()
+                                             << "/ pos.y() =" << pos.y();
+                                    if (! changed && pos.y() < colItem->geometry().top()) {
+                                        if (   stateData.drag.item->column != targetcol
+                                            || (   stateData.drag.item->column == targetcol
+                                                && stateData.drag.item->order >= colItem->order)) {
+                                            stateData.drag.item->column = targetcol;
+                                            stateData.drag.item->order = colItem->order;
+                                            changed = true;
+                                        }
+                                        if (! changed) {
+                                            break;
+                                        }
+                                    }
+                                    if (changed) {
+                                        ++colItem->order;
+                                    }
+                                }
+                            }
+                        } else {
+                            // Add as first item of existing column
+                            if (   stateData.drag.item->column != targetcol
+                                || stateData.drag.item->order != 0) {
+                                qDebug() << "    dropped at the end as only item in the column";
+                                stateData.drag.item->column = targetcol;
+                                stateData.drag.item->order = 0;
+                                changed = true;
+                            }
+                        }
                     }
                 }
             }
-            qDebug() << "->" << stateData.drag.item->name
-                     << "/ changed:" << changed
-                     << "/ column =" << stateData.drag.item->column
-                     << "/ order =" << stateData.drag.item->order;
 
-            if (changed) {
+            if (changed || landingzone == nullptr) {
                 // drop it down
                 updateGeometry();
                 updateView();
+                qDebug() << "<>" << stateData.drag.item->name
+                         << ": changed:" << changed
+                         << "/ column =" << stateData.drag.item->column
+                         << "/ order =" << stateData.drag.item->order;
+            } else {
+                qDebug() << "==" << stateData.drag.item->name
+                         << ": unchanged"
+                         << "/ column =" << stateData.drag.item->column
+                         << "/ order =" << stateData.drag.item->order;
             }
         } else if (state == YRESIZE) {
 
