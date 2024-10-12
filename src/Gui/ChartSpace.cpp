@@ -1131,10 +1131,6 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
             }
 
         } else if (state == DRAG && !scrolling) {          // dragging?
-            qDebug() << "------------------------------------------------------------";
-            qDebug() << "->" << stateData.drag.item->name
-                     << ": item->column =" << stateData.drag.item->column
-                     << "/ item->order =" << stateData.drag.item->order;
             // whilst mouse moves, only update geom when changed
             bool changed = false;
 
@@ -1192,8 +1188,6 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
 
                 if (over != nullptr) {
                     if (pos.y() - over->geometry().y() > over->geometry().height() / 2) {
-                        qDebug() << "    Overlap below - over->column =" << over->column << "/ over->name =" << over->name;
-
                         // place below the one its over
                         if (   stateData.drag.item->column != over->column
                             || stateData.drag.item->order <= over->order) {
@@ -1208,8 +1202,6 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                             }
                         }
                     } else {
-                        qDebug() << "    Overlap above - over->column =" << over->column << "/ over->name =" << over->name;
-
                         // place above the one its over
                         if (   stateData.drag.item->column != over->column
                             || stateData.drag.item->order >= over->order) {
@@ -1225,15 +1217,9 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                         }
                     }
                 } else {
-                    qDebug() << "    No overlap"
-                             << "/ items.last()->name =" << items.last()->name
-                             << "/ targetcol =" << targetcol
-                             << "/ highestcol =" << highestcol;
-
                     if (targetcol < 0) {
                         // create a new column to the right?
                         if (highestcol < 9 && columnCount(0) > 1) {
-                            qDebug() << "    asking for new first column, space available";
                             // Drop as new first column
                             // don't keep moving - if we're already alone in column 0 then no move is needed
                             // new col to left
@@ -1252,12 +1238,9 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                             changed = true;
                         }
                     } else if (targetcol <= 9) {
-                        qDebug() << "    targetcol <= 9?" << targetcol;
-
                         if (columnItems.count() > 0) {
                             if (pos.y() > columnItems.last()->geometry().bottom()) {
                                 // Append below last
-                                qDebug() << "    dropped at the end with items above";
                                 if (   stateData.drag.item->column != targetcol
                                     || (   stateData.drag.item->column == targetcol
                                         && stateData.drag.item->order <= columnItems.last()->order)) {
@@ -1268,10 +1251,6 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                             } else {
                                 // Insert above item
                                 for (ChartSpaceItem *colItem : columnItems) {
-                                    qDebug() << "    walking:" << colItem->name
-                                             << "/ order =" << colItem->order
-                                             << "/ geometry().top() =" << colItem->geometry().top()
-                                             << "/ pos.y() =" << pos.y();
                                     if (! changed && pos.y() < colItem->geometry().top()) {
                                         if (   stateData.drag.item->column != targetcol
                                             || (   stateData.drag.item->column == targetcol
@@ -1293,7 +1272,6 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                             // Add as first item
                             if (   stateData.drag.item->column != targetcol
                                 || stateData.drag.item->order != 0) {
-                                qDebug() << "    dropped at the end as only item in the column" << stateData.drag.item->column << stateData.drag.item->order;
                                 stateData.drag.item->column = targetcol;
                                 stateData.drag.item->order = 0;
                                 changed = true;
@@ -1307,15 +1285,6 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                 // drop it down
                 updateGeometry();
                 updateView();
-                qDebug() << "<>" << stateData.drag.item->name
-                         << ": changed:" << changed
-                         << "/ column =" << stateData.drag.item->column
-                         << "/ order =" << stateData.drag.item->order;
-            } else {
-                qDebug() << "==" << stateData.drag.item->name
-                         << ": unchanged"
-                         << "/ column =" << stateData.drag.item->column
-                         << "/ order =" << stateData.drag.item->order;
             }
         } else if (state == YRESIZE) {
 
