@@ -49,7 +49,15 @@ DialWindow::DialWindow(Context *context) :
     QLabel *seriesLabel = new QLabel(tr("Data Series"), this);
     seriesLabel->setAutoFillBackground(true);
     seriesSelector = new QComboBox(this);
-    foreach (RealtimeData::DataSeries x, RealtimeData::listDataSeries()) {
+    QList<RealtimeData::DataSeries> all_series = RealtimeData::listDataSeries();
+    // sort the data series by the translated name for a better usability, since
+    // we have a lot of data series in the combobox.
+    auto sortByNameFun = [](const RealtimeData::DataSeries s1, const RealtimeData::DataSeries s2) {
+      // make the sorting case insensitive
+      return RealtimeData::seriesName(s1).toLower() < RealtimeData::seriesName(s2).toLower();
+    };
+    std::sort(all_series.begin(), all_series.end(), sortByNameFun);
+    foreach (RealtimeData::DataSeries x, all_series) {
         seriesSelector->addItem(RealtimeData::seriesName(x), static_cast<int>(x));
     }
     controlsLayout->addRow(seriesLabel, seriesSelector);
