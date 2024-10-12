@@ -72,7 +72,7 @@ class DialWindow : public GcChartWindow
         // get properties - the setters are below
         bool isInstant() const { return _instant; }
         int avgType() const { return _avgType; }
-        int dataSeries() const { return seriesSelector->currentIndex(); }
+        int dataSeries() const { return seriesSelector->itemData(seriesSelector->currentIndex()).toInt(); }
         int style() const { return _style; }
         int avgSecs() const { return average; }
 
@@ -92,7 +92,10 @@ class DialWindow : public GcChartWindow
         void setInstant(bool x) { _instant=x; }
         void setAvgSecs(int x) { average=x; averageSlider->setValue(x); setAverageFromSlider(); }
         void setAvgType(int x) { _avgType=x; }
-        void setDataSeries(int x) { seriesSelector->setCurrentIndex(x); }
+        void setDataSeries(int x) {
+          int index = seriesSelector->findData(x);
+          seriesSelector->setCurrentIndex(index); 
+        }
         void setStyle(int x) { _style=x; }
 
     private:
