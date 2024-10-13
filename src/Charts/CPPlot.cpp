@@ -533,7 +533,7 @@ CPPlot::plotLinearWorkModel()
 
         // curve cosmetics
         QPen pen(GColor(CCP));
-        double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+        double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
         pen.setWidth(width);
         if (showBest) pen.setStyle(Qt::DashLine);
         workModelCurve->setPen(pen);
@@ -632,7 +632,7 @@ CPPlot::plotModel()
 
             // curve cosmetics
             QPen pen(GColor(CCP));
-            double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+            double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
             pen.setWidth(width);
             if (showBest) pen.setStyle(Qt::DashLine);
             modelCurve->setPen(pen);
@@ -936,7 +936,7 @@ CPPlot::plotModel(QVector<double> vector, QColor plotColor, PDModel *baseline)
 
     // curve cosmetics
     QPen pen(plotColor);
-    double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+    double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
     pen.setWidth(width);
     if (showBest) pen.setStyle(Qt::DashLine);
     curve->setPen(pen);
@@ -1350,7 +1350,7 @@ CPPlot::plotBests(RideItem *rideItem)
             }
 
             fill.setAlpha(64);
-            line.setWidth(appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble());
+            line.setWidth(appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble());
 
             curve->setPen(line);
             if (criticalSeries == CriticalPowerWindow::work || rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || rideSeries == RideFile::aPower || rideSeries == RideFile::aPowerKg || rideSeries == RideFile::kph)
@@ -1530,7 +1530,7 @@ CPPlot::plotBests(RideItem *rideItem)
                     curve->setRenderHint(QwtPlotItem::RenderAntialiased);
                 QPen pen(color.darker(200));
                 pen.setColor(GColor(CCP)); //XXX color ?
-                double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+                double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
                 pen.setWidth(width);
                 curve->setPen(pen);
 
@@ -1618,7 +1618,7 @@ CPPlot::plotBests(RideItem *rideItem)
                     curve->setRenderHint(QwtPlotItem::RenderAntialiased);
                 QPen pen(color.darker(200));
                 pen.setColor(GColor(CCP)); //XXX color ?
-                double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+                double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
                 pen.setWidth(width);
                 curve->setPen(pen);
 
@@ -1884,7 +1884,7 @@ CPPlot::plotRide(RideItem *rideItem)
     // curve that gets any special colour treatment.
     QPen ridePen;
     ridePen.setColor(GColor(CRIDECP));
-    double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+    double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
     ridePen.setWidth(width);
     rideCurve->setPen(ridePen);
 
@@ -2435,7 +2435,7 @@ CPPlot::refreshReferenceLines(RideItem *rideItem)
                     QwtPlotMarker *referenceLine = new QwtPlotMarker;
                     QPen p;
                     p.setColor(GColor(CPLOTMARKER));
-                    double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+                    double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
                     p.setWidth(width);
                     p.setStyle(Qt::DashLine);
                     referenceLine->setLinePen(p);
@@ -2697,7 +2697,7 @@ CPPlot::plotCentile(RideItem *rideItem)
             QColor std = GColor(CRIDECP);
             QPen pen(QColor(250-(i*20),std.green(),std.blue()));
             pen.setStyle(Qt::DashLine); // Qt::SolidLine
-            double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+            double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
             pen.setWidth(width);
             rideCurve->setPen(pen);
             rideCurve->attach(this);
@@ -3136,7 +3136,7 @@ CPPlot::plotCache(QVector<double> vector, QColor intervalColor)
 
     // set its color - based upon index in intervals!
     QPen pen(intervalColor);
-    double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+    double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
     pen.setWidth(width);
     //pen.setStyle(Qt::DotLine);
     intervalColor.setAlpha(64);
