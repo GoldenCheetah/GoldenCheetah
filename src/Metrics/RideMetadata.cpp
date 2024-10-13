@@ -1022,26 +1022,8 @@ FormField::FormField(Form *form, FieldDefinition field, RideMetadata *meta) : fo
 FormField::~FormField()
 {
     delete label;
-
-    switch (definition.type) {
-        case FIELD_TEXT:
-        case FIELD_SHORTTEXT:
-            if (definition.name == "Keywords")
-                delete (QLineEdit*)widget;
-            if (completer)
-                delete completer;
-            break;
-        case FIELD_TEXTBOX : delete ((GTextEdit*)widget); break;
-        case FIELD_INTEGER : delete ((QSpinBox*)widget); break;
-        case FIELD_DOUBLE : {
-                                if (!isTime) delete ((QDoubleSpinBox*)widget);
-                                else delete ((QTimeEdit*)widget);
-                            }
-                            break;
-        case FIELD_DATE : delete ((QDateEdit*)widget); break;
-        case FIELD_TIME : delete ((QTimeEdit*)widget); break;
-        case FIELD_CHECKBOX : delete ((QCheckBox*)widget); break;
-    }
+    delete widget; // QWidget destructor is virtual
+    if (completer) delete completer;
     if (enabled) delete enabled;
 }
 
