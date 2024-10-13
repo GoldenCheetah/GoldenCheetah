@@ -63,7 +63,7 @@ class OverviewWindow : public GcChartWindow
         void settings();
 
         // config item requested
-        void configItem(ChartSpaceItem *);
+        void configItem(ChartSpaceItem *, QPoint);
 
     private:
 
