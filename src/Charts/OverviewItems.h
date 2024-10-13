@@ -24,7 +24,6 @@
 #include "MetricSelect.h"
 #include "DataFilter.h"
 #include <QGraphicsItem>
-#include "MetadataDialog.h"
 
 // qt charts for zone chart
 #include <QtCharts>
@@ -63,7 +62,7 @@ class OverviewItemConfig : public QWidget
     public:
 
         OverviewItemConfig(ChartSpaceItem *);
-        ~OverviewItemConfig();
+        virtual ~OverviewItemConfig();
 
         static bool registerItems();
 
@@ -84,12 +83,16 @@ class OverviewItemConfig : public QWidget
     protected:
 
         // before show, lets make sure the widgets are set correctly
-        void showEvent(QShowEvent *) override { setWidgets(); }
+        void showEvent(QShowEvent*) override { setWidgets(); }
+
+        // store data on exit
+        void hideEvent(QHideEvent*) override;
 
     private:
 
         // the widget we are configuring
         ChartSpaceItem *item;
+        QFormLayout* layout;
 
         // export data button (data table)
         QPushButton *exp;
@@ -109,6 +112,11 @@ class OverviewItemConfig : public QWidget
         MetricSelect *metric1, *metric2, *metric3; // Metric/Interval/PMC
         MetricSelect *meta1; // Meta
         SeriesSelect *series1; // Zone Histogram
+
+        // metadata editor
+        QCompleter* completer_ = nullptr;
+        QLabel* metaLabel_ = nullptr;
+        QWidget* metaEdit_ = nullptr;
 
         // background color
         ColorButton *bgcolor;
@@ -358,7 +366,7 @@ class MetaOverviewItem : public ChartSpaceItem
         void setData(RideItem *item) override;
         void setDateRange(DateRange) override {} // doesn't support trends view
 
-        virtual void displayTileEditMenu(const QPoint& pos) override;
+        bool isEditable();
 
         QWidget *config() override { return configwidget; }
 
@@ -369,6 +377,7 @@ class MetaOverviewItem : public ChartSpaceItem
 
         QString symbol;
         int fieldtype;
+        RideItem* rideItem = nullptr;
 
         // for numeric metadata items
         bool up, showrange;
@@ -380,12 +389,7 @@ class MetaOverviewItem : public ChartSpaceItem
 
     protected slots:
 
-        void updateTile(int ret);
         void metadataChanged();
-
-    protected:
-
-        RideItem* rideItem = nullptr;
 
 };
 

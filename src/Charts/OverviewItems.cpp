@@ -904,18 +904,11 @@ MetaOverviewItem::MetaOverviewItem(ChartSpace *parent, QString name, QString sym
 void
 MetaOverviewItem::configChanged(qint32)
 {
-    SpecialFields specialFields;
-
     //  Get the field type
     fieldtype = -1;
     foreach(FieldDefinition p, GlobalContext::context()->rideMetadata->getFields()) {
         if (p.name == symbol) {
             fieldtype = p.type;
-
-            // display the edit icon for relevant metadata fields
-            setShowEdit((p.name != "Interval Goal") && // cannot specify which interval
-                        (p.name != "Interval Notes") && // cannot specify which interval
-                        specialFields.isUser(p.name)); // user mutable metadata fields
             break;
          }
     }
@@ -934,21 +927,13 @@ MetaOverviewItem::configChanged(qint32)
     }
 }
 
-void MetaOverviewItem::displayTileEditMenu(const QPoint& pos)
-{
-    MetadataDialog* metadataDialog = new MetadataDialog(parent->context, symbol, value);
-    connect(metadataDialog, SIGNAL(finished(int)), this, SLOT(updateTile(int)));
-    metadataDialog->move(pos.x()+10, pos.y()+10);
-    metadataDialog->show(); // configured for delete on close
-}
+bool
+MetaOverviewItem::isEditable() {
 
-void MetaOverviewItem::updateTile(int ret)
-{
-    // Ensure tile contents are updated
-    if (ret == QDialog::Accepted) {
-        if (rideItem) value = rideItem->getText(symbol, "");
-        update();
-    }
+    // display the addtional metadata value field for relevant metadata types
+    return  ((symbol != "Interval Goal") && // cannot specify which interval
+             (symbol != "Interval Notes") && // cannot specify which interval
+              GlobalContext::context()->specialFields.isUser(symbol)); // user mutable metadata fields
 }
 
 void MetaOverviewItem::metadataChanged() {
@@ -3745,7 +3730,7 @@ static bool insensitiveLessThan(const QString &a, const QString &b)
 OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), item(item), block(false)
 {
     QVBoxLayout *main = new QVBoxLayout(this);
-    QFormLayout *layout = new QFormLayout();
+    layout = new QFormLayout();
     main->addLayout(layout);
 
     if (item->type != OverviewItemType::KPI && item->type != OverviewItemType::DATATABLE) main->addStretch();
@@ -3810,7 +3795,14 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), it
         layout->addRow(tr("Bubble Size Metric"), metric3);
     }
 
-    if (item->type == OverviewItemType::META || item->type == OverviewItemType::DONUT) {
+    if (item->type == OverviewItemType::DONUT) {
+        meta1 = new MetricSelect(this, item->parent->context, MetricSelect::Meta);
+        connect(meta1, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
+        layout->addRow(tr("Field Name"), meta1);
+    }
+
+    if (item->type == OverviewItemType::META) {
+
         meta1 = new MetricSelect(this, item->parent->context, MetricSelect::Meta);
         connect(meta1, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
         layout->addRow(tr("Field Name"), meta1);
@@ -4085,11 +4077,132 @@ OverviewItemConfig::setWidgets()
         }
         break;
 
+        // set widgets
     case OverviewItemType::META:
+    {
+        MetaOverviewItem* mi = dynamic_cast<MetaOverviewItem*>(item); 
+        name->setText(mi->name);
+        meta1->setMeta(mi->symbol);
+        meta1->setEnabled(true);
+
+        // not valid or not editable
+        if (!(meta1->isValid() && mi->isEditable())) {
+            if (metaEdit_) { layout->removeRow(2); metaEdit_ = nullptr; }
+            if (completer_) { delete completer_; completer_ = nullptr; }
+        }
+        else  // valid and editable 
         {
-            MetaOverviewItem *mi = dynamic_cast<MetaOverviewItem*>(item);
-            name->setText(mi->name);
-            meta1->setMeta(mi->symbol);
+            // items need to be created
+            if (!metaEdit_) {
+
+                if (!mi->rideItem) { qDebug() << "rideI error in overview item config popup"; return; }
+
+                RideFile* rideF = mi->rideItem->ride();
+                if (!rideF) { qDebug() << "rideF error in overview item config popup"; return; }
+
+                QString value = rideF->getTag(mi->symbol, "");
+
+                switch (mi->fieldtype) {
+
+                case FIELD_TEXT: // text
+                case FIELD_SHORTTEXT: { // shorttext
+                    metaEdit_ = new QLineEdit(this);
+                    // Find the metadata field defintion
+                    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
+                        if (field.name == mi->symbol) {
+                            completer_ = field.getCompleter(this, item->parent->context->athlete->rideCache);
+                            break;
+                        }
+                    }
+                    if (completer_) dynamic_cast<QLineEdit*>(metaEdit_)->setCompleter(completer_);
+                    connect(metaEdit_, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
+                    dynamic_cast<QLineEdit*>(metaEdit_)->setText(value);
+                } break;
+
+                case FIELD_TEXTBOX: { // textbox
+                    GTextEdit* gedit = new GTextEdit(this);
+                    metaEdit_ = dynamic_cast<QWidget*>(gedit);
+                    gedit->setObjectName("metadata"); // use special style sheet ..
+                    // rich text hangs 'fontd' for some users
+                    gedit->setAcceptRichText(false);
+                    gedit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+                    gedit->setMinimumWidth(250);
+                    connect(metaEdit_, SIGNAL(textChanged()), this, SLOT(dataChanged()));
+                    gedit->setText(value);
+                } break;
+
+                case FIELD_INTEGER: { // integer
+                    QSpinBox* spin = new QSpinBox(this);
+                    metaEdit_ = dynamic_cast<QWidget*>(spin);
+                    spin->setMinimum(-9999999);
+                    spin->setMaximum(9999999);
+                    spin->setButtonSymbols(QAbstractSpinBox::NoButtons);
+                    connect(metaEdit_, SIGNAL(valueChanged(int)), this, SLOT(dataChanged()));
+                    spin->setValue(value.toInt());
+                } break;
+
+                case FIELD_DOUBLE: { // double
+                    QDoubleSpinBox* dspin = new QDoubleSpinBox(this);
+                    metaEdit_ = dynamic_cast<QWidget*>(dspin);
+                    dspin->setButtonSymbols(QAbstractSpinBox::NoButtons);
+                    dspin->setMinimum(-9999999.99);
+                    dspin->setMaximum(9999999.99);
+                    connect(metaEdit_, SIGNAL(valueChanged(double)), this, SLOT(dataChanged()));
+                    dspin->setValue(value.toDouble());
+                } break;
+
+                case FIELD_DATE: { // date
+                    QDateEdit* dedit = new QDateEdit(this);
+                    metaEdit_ = dynamic_cast<QWidget*>(dedit);
+                    dedit->setButtonSymbols(QAbstractSpinBox::NoButtons);
+                    dedit->setDisplayFormat("dd/MM/yyyy");
+                    dedit->setCalendarPopup(true);
+                    dedit->setMinimumWidth(100);
+                    connect(metaEdit_, SIGNAL(dateChanged(QDate)), this, SLOT(dataChanged()));
+                    if (mi->symbol == "Start Date") {
+                        dedit->setDate(QDate(1900, 1, 1).addDays(value.toInt()));
+                    } else {
+                        if (value == "") {
+                            dedit->setDate(QDate(2000, 1, 1));
+                        } else {
+                            QDate date(/* year*/value.mid(6, 4).toInt(),
+                                /* month */value.mid(3, 2).toInt(),
+                                /* day */value.mid(0, 2).toInt());
+                            dedit->setDate(date);
+                        }
+                    }
+                } break;
+
+                case FIELD_TIME: { // time
+                    QTimeEdit* tedit = new QTimeEdit(this);
+                    metaEdit_ = dynamic_cast<QWidget*>(tedit);
+                    tedit->setButtonSymbols(QAbstractSpinBox::NoButtons);
+                    tedit->setDisplayFormat("hh:mm:ss");
+                    connect(metaEdit_, SIGNAL(timeChanged(QTime)), this, SLOT(dataChanged()));
+                    if (mi->symbol == "Start Time") {
+                        tedit->setTime(QTime(0, 0, 0).addSecs(value.toInt()));
+                    } else {
+                        if (value == "") {
+                            tedit->setTime(QTime(0, 0, 0));
+                        } else {
+                            QTime time(/* hours*/ value.mid(0, 2).toInt(),
+                                /* minutes */ value.mid(3, 2).toInt(),
+                                /* seconds */ value.mid(6, 2).toInt());
+                            tedit->setTime(time);
+                        }
+                    }
+                } break;
+
+                case FIELD_CHECKBOX: { // check
+                    QCheckBox* cbox = new QCheckBox(this);
+                    metaEdit_ = dynamic_cast<QWidget*>(cbox);
+                    connect(metaEdit_, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(()));
+                    cbox->setChecked((value == "1") ? true : false);
+                } break;
+                }
+                layout->insertRow(2, tr("Field Value"), metaEdit_);
+            }
+        }
         }
         break;
 
@@ -4214,7 +4327,40 @@ OverviewItemConfig::dataChanged()
         {
             MetaOverviewItem *mi = dynamic_cast<MetaOverviewItem*>(item);
             mi->name = name->text();
-            if (meta1->isValid()) mi->symbol = meta1->metaname();
+            mi->symbol = meta1->metaname();
+
+            if (meta1->isValid() && mi->isEditable() && metaEdit_) {
+
+                switch (mi->fieldtype) {
+                case FIELD_TEXT:
+                case FIELD_SHORTTEXT: mi->value = ((QLineEdit*)metaEdit_)->text(); break;
+                case FIELD_TEXTBOX: mi->value = ((GTextEdit*)metaEdit_)->document()->toPlainText(); break;
+                case FIELD_INTEGER: mi->value = QString("%1").arg(((QSpinBox*)metaEdit_)->value()); break;
+                case FIELD_DOUBLE: mi->value = QString("%1").arg(((QDoubleSpinBox*)metaEdit_)->value()); break;
+                case FIELD_CHECKBOX: mi->value = ((QCheckBox*)metaEdit_)->isChecked() ? "1" : "0"; break;
+                case FIELD_DATE: {
+                    if (mi->symbol == "Start Date") {
+                        mi->value = QDate(1900, 1, 1).daysTo(((QDateEdit*)metaEdit_)->date());
+                    } else {
+                        if (((QDateEdit*)metaEdit_)->date().isValid()) {
+                            mi->value = ((QDateEdit*)metaEdit_)->date().toString("dd/MM/yyyy");
+                        }
+                    }
+                } break;
+                case FIELD_TIME: {
+                    if (mi->symbol == "Start Time") {
+                        mi->value = QTime(0, 0, 0).secsTo(((QTimeEdit*)metaEdit_)->time());
+                    } else {
+                        if (((QTimeEdit*)metaEdit_)->time().isValid()) {
+                            mi->value = ((QTimeEdit*)metaEdit_)->time().toString("hh:mm:ss"); break;
+                        }
+                    }
+                } break;
+                }
+            } else {
+                mi->configChanged(0); // re-calculate the field type
+                setWidgets();
+            }
             mi->bgcolor = bgcolor->getColor().name();
         }
         break;
@@ -4276,6 +4422,39 @@ OverviewItemConfig::dataChanged()
             mi->stop = double2->value();
             mi->bgcolor = bgcolor->getColor().name();
         }
+    }
+}
+
+void
+OverviewItemConfig::hideEvent(QHideEvent*)
+{  
+    switch (item->type) {
+    case OverviewItemType::META:
+    {
+        // set the widget values from the item
+        MetaOverviewItem* mi = dynamic_cast<MetaOverviewItem*>(item);
+
+        if (!mi->rideItem) { qDebug() << "rideI error in metadata popup"; return; }
+
+        RideFile* rideF = mi->rideItem->ride();
+        if (!rideF) { qDebug() << "rideF error in metadata popup"; return; }
+
+        // Update special field
+        if ((mi->symbol == "Device") && (rideF->deviceType() != mi->value)) {
+            rideF->setDeviceType(mi->value);
+
+        } else if (rideF->getTag(mi->symbol, "") != mi->value) {
+
+            // Update the metadata value in the tile and ride file.
+            rideF->setTag(mi->symbol, mi->value);
+
+            // rideFile is now dirty!
+            mi->rideItem->setDirty(true);
+
+            // get refresh done, as state has changed
+            mi->rideItem->notifyRideMetadataChanged();
+        }
+    } break;
     }
 }
 

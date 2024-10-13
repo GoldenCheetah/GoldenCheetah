@@ -39,8 +39,6 @@ static double gl_wheelscale = 6; // rate we scroll for wheel events
 static double gl_near = 20; // close to boundary in pixels (will be factored by dpiXFactor)
 
 static QIcon grayConfig, whiteConfig, accentConfig;
-static QIcon grayEdit, whiteEdit, accentEdit;
-
 ChartSpaceItemRegistry *ChartSpaceItemRegistry::_instance;
 
 ChartSpace::ChartSpace(Context *context, int scope, GcWindow *window) :
@@ -265,13 +263,6 @@ ChartSpaceItem::sceneEvent(QEvent *event)
         incorner = inCorner();
         update();
         scene()->update();
-
-    // repaint when in the edit
-    } else if (event->type() == QEvent::GraphicsSceneHoverMove && inEdit() != inedit) {
-
-         inedit = inEdit();
-         update();
-         scene()->update();
     }
     return false;
 }
@@ -279,7 +270,7 @@ ChartSpaceItem::sceneEvent(QEvent *event)
 bool
 ChartSpaceItem::inHotspot()
 {
-    if (showconfig == false && showedit == false) return false;
+    if (showconfig == false) return false;
 
     QPoint vpos = parent->view->mapFromGlobal(QCursor::pos());
     QPointF spos = parent->view->mapToScene(vpos);
@@ -304,24 +295,6 @@ ChartSpaceItem::inCorner()
     }
     return false;
 
-}
-
-bool
-ChartSpaceItem::inEdit()
-{
-    if (showedit == false) return false;
-
-    QPoint vpos = parent->view->mapFromGlobal(QCursor::pos());
-    QPointF spos = parent->view->mapToScene(vpos);
-
-    if (geometry().contains(spos.x(), spos.y())) {
-        if (spos.y() - geometry().top() < (ROWHEIGHT + 40) &&
-            geometry().width() - (spos.x() - geometry().x()) > (ROWHEIGHT + 40) &&
-            geometry().width() - (spos.x() - geometry().x()) < (2*ROWHEIGHT + 80)) {
-            return true;
-        }
-    }
-    return false;
 }
 
 bool
@@ -390,34 +363,6 @@ ChartSpaceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QW
             }
 
         } else painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, grayConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
-    }
-
-    // edit icon
-    if (showedit) {
-        if (parent->state != ChartSpace::DRAG && underMouse()) {
-
-            if (inEdit()) {
-
-                // if hovering over the button show a background to indicate
-                // that pressing a button is good
-                painter->setPen(Qt::NoPen);
-                QColor darkgray(RGBColor(color()).lighter(200));
-                painter->setBrush(darkgray);
-                painter->fillRect(QRectF(geometry().width()-80-2*ROWHEIGHT, 0, ROWHEIGHT + 40, ROWHEIGHT + 40), QBrush(darkgray));
-
-                // draw the edit button and make it more obvious
-                // when hovering over the card
-                painter->drawPixmap(geometry().width()-60-(2*ROWHEIGHT), 20, ROWHEIGHT, ROWHEIGHT, accentEdit.pixmap(QSize(ROWHEIGHT, ROWHEIGHT)));
-
-            }
-            else {
-
-                // hover on card - make it more obvious there is a edit button
-                painter->drawPixmap(geometry().width()-60-(2*ROWHEIGHT), 20, ROWHEIGHT, ROWHEIGHT, whiteEdit.pixmap(QSize(ROWHEIGHT, ROWHEIGHT)));
-            }
-
-        }
-        else painter->drawPixmap(geometry().width()-60-(2*ROWHEIGHT), 20, ROWHEIGHT, ROWHEIGHT, grayEdit.pixmap(QSize(ROWHEIGHT, ROWHEIGHT)));
     }
 
     // thin border
@@ -680,10 +625,6 @@ ChartSpace::configChanged(qint32 why)
     grayConfig = colouredIconFromPNG(":images/configure.png", GColor(COVERVIEWBACKGROUND).lighter(75));
     whiteConfig = colouredIconFromPNG(":images/configure.png", QColor(100,100,100));
     accentConfig = colouredIconFromPNG(":images/configure.png", QColor(150,150,150));
-
-    grayEdit = colouredIconFromPNG(":images/tile-edit.png", GColor(COVERVIEWBACKGROUND).lighter(75));
-    whiteEdit = colouredIconFromPNG(":images/tile-edit.png", QColor(100, 100, 100));
-    accentEdit = colouredIconFromPNG(":images/tile-edit.png", QColor(150, 150, 150));
 
     // set fonts
     bigfont.setPixelSize(pixelSizeForFont(bigfont, ROWHEIGHT *2.5f));
@@ -1003,16 +944,8 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                 return true;
             }
 
-            // trigger date edit menu
-            if (item && item->inEdit()) {
-
-                block = false; // reeentry is allowed
-                item->displayTileEditMenu(static_cast<QGraphicsSceneMouseEvent*>(event)->screenPos());
-                return true;
-            }
-
-            // only respond to clicks not in config corner or edit button
-            if (item && !item->inCorner() && !item->inEdit()) {
+            // only respond to clicks not in config corner button
+            if (item && ! item->inCorner()) {
 
                // are we on the boundary of the ChartSpaceItem?
                double offx = pos.x()-item->geometry().x();
