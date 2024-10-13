@@ -4077,7 +4077,6 @@ OverviewItemConfig::setWidgets()
         }
         break;
 
-        // set widgets
     case OverviewItemType::META:
     {
         MetaOverviewItem* mi = dynamic_cast<MetaOverviewItem*>(item); 
