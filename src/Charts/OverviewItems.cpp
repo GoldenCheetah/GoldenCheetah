@@ -46,6 +46,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
+#include <QMenu>
 
 bool
 OverviewItemConfig::registerItems()
@@ -922,6 +923,60 @@ MetaOverviewItem::configChanged(qint32)
             sparkline = NULL;
         }
     }
+    // Find the metadata fielddefintion for this tile
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
+        if (field.name == symbol) {
+            // only display the edit icon for fields with values set.
+            setShowEdit(field.values.size() != 0);
+            break;
+        }
+    }
+}
+
+void MetaOverviewItem::DisplayTileEditMenu(const QPoint& pos)
+{
+    QMenu popMenu;
+
+    // Find the metadata fielddefintion for this tile
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
+        if (field.name == symbol) {
+
+            // Add any configured field values to the menu
+            for (int i = 0; i < field.values.size(); ++i) {
+
+                QAction* metaAction = new QAction(field.values.at(i));
+                popMenu.addAction(metaAction);
+            }
+            break;
+        }
+    }
+
+    if (!popMenu.isEmpty()) {
+
+        connect(&popMenu, SIGNAL(triggered(QAction*)), this, SLOT(popupAction(QAction*)));
+        popMenu.exec(pos);
+    }
+}
+
+void MetaOverviewItem::popupAction(QAction* action)
+{
+    RideItem* rideI = parent->context->rideItem();
+
+    if (!rideI) { qDebug() << "rideI error in metadata popup"; return; }
+
+    RideFile* rideF = rideI->ride();
+
+    if (!rideF) { qDebug() << "rideF error in metadata popup"; return;; }
+
+    // Update the metadata value in the tile and ride file.
+    value = action->text();
+    rideF->setTag(symbol, value);
+
+    // rideFile is now dirty!
+    rideI->setDirty(true);
+
+    // refresh as state has changed
+    rideI->notifyRideMetadataChanged();
 }
 
 MetaOverviewItem::~MetaOverviewItem()
@@ -3702,7 +3757,7 @@ static bool insensitiveLessThan(const QString &a, const QString &b)
 OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), item(item), block(false)
 {
     QVBoxLayout *main = new QVBoxLayout(this);
-    QFormLayout *layout = new QFormLayout();
+    layout = new QFormLayout();
     main->addLayout(layout);
 
     if (item->type != OverviewItemType::KPI && item->type != OverviewItemType::DATATABLE) main->addStretch();
@@ -4003,6 +4058,9 @@ void
 OverviewItemConfig::setWidgets()
 {
     block = true;
+
+    // ensure bkgd color is initialised.
+    bgcolor->setColor(item->color());
 
     // always have a filter on trends view
     if (item->parent->scope & OverviewScope::TRENDS)  filterEditor->setFilter(item->datafilter);

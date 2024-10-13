@@ -28,7 +28,8 @@
 #include "TrainBottom.h"
 #include "Specification.h"
 
-AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_ANALYSIS)
+AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) :
+        AbstractView(context, VIEW_ANALYSIS, "analysis", "Compare Activities and Intervals")
 {
     analSidebar = new AnalysisSidebar(context);
     BlankStateAnalysisPage *b = new BlankStateAnalysisPage(context);
@@ -62,7 +63,6 @@ AnalysisView::~AnalysisView()
 {
     appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "analysis", _sidebar);
     delete analSidebar;
-    //delete hw; tabview deletes after save state
 }
 
 void
@@ -126,7 +126,8 @@ AnalysisView::isBlank()
     else return true;
 }
 
-DiaryView::DiaryView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_DIARY)
+DiaryView::DiaryView(Context *context, QStackedWidget *controls) :
+        AbstractView(context, VIEW_DIARY, "diary", "Compare Activities and Intervals")
 {
     diarySidebar = new DiarySidebar(context);
     BlankStateDiaryPage *b = new BlankStateDiaryPage(context);
@@ -150,7 +151,6 @@ DiaryView::~DiaryView()
 {
     appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "diary", _sidebar);
     delete diarySidebar;
-    //delete hw; tabview deletes after save state
 }
 
 void
@@ -176,7 +176,8 @@ DiaryView::isBlank()
     else return true;
 }
 
-TrendsView::TrendsView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_TRENDS)
+TrendsView::TrendsView(Context *context, QStackedWidget *controls) :
+        AbstractView(context, VIEW_TRENDS, "home", "Compare Date Ranges")
 {
     sidebar = new LTMSidebar(context);
     BlankStateHomePage *b = new BlankStateHomePage(context);
@@ -204,7 +205,6 @@ TrendsView::~TrendsView()
 {
     appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "trend", _sidebar);
     delete sidebar;
-    //delete hw; tabview deletes after save state
 }
 
 void
@@ -282,7 +282,8 @@ TrendsView::justSelected()
     }
 }
 
-TrainView::TrainView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_TRAIN)
+TrainView::TrainView(Context *context, QStackedWidget *controls) :
+        AbstractView(context, VIEW_TRAIN, "train", "Intensity Adjustments and Workout Control")
 {
     trainTool = new TrainSidebar(context);
     trainTool->setTrainView(this);
@@ -318,7 +319,6 @@ TrainView::~TrainView()
 {
     appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "train", _sidebar);
     delete trainTool;
-    //delete hw; tabview deletes after save state
 }
 
 void
@@ -340,4 +340,50 @@ TrainView::onSelectionChanged()
     if (isSelected()) {
         setBottomRequested(true);
     }
+}
+
+EquipView::EquipView(Context *context, QStackedWidget *controls) :
+        AbstractView(context, VIEW_EQUIPMENT, "equipment", "Equipment Management")
+{
+    // perspectives are stacked
+    pstack = new QStackedWidget(this);
+    setPages(pstack);
+
+    setSidebarEnabled(false);
+
+    // each perspective has a stack of controls
+    cstack = new QStackedWidget(this);
+    controls->addWidget(cstack);
+    controls->setCurrentIndex(0);
+
+    // the dialog box for the chart settings
+    chartsettings = new ChartSettings(this, controls);
+    chartsettings->setFixedWidth(650);
+    chartsettings->setFixedHeight(600);
+    chartsettings->hide();
+
+    // load the default single hidden perspective
+    restoreState(false);
+    loaded = true;
+    perspectiveSelected(0);
+}
+
+EquipView::~EquipView()
+{
+    // No sidebar to delete
+}
+
+void
+EquipView::setSelected(bool selected)
+{
+    _selected = selected;
+
+    // selects the equipment tab which invokes the tile calculation.
+    if (selected) perspective_->tabSelected(perspective_->currentTab());
+}
+
+bool
+EquipView::isBlank()
+{
+    return true;
 }
