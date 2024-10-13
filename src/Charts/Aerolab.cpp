@@ -252,10 +252,10 @@ Aerolab::configChanged(qint32)
   // set colors
   setCanvasBackground(GColor(CPLOTBACKGROUND));
   QPen vePen = QPen(GColor(CAEROVE));
-  vePen.setWidth(appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble());
+  vePen.setWidth(appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble());
   veCurve->setPen(vePen);
   QPen altPen = QPen(GColor(CAEROEL));
-  altPen.setWidth(appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble());
+  altPen.setWidth(appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble());
   altCurve->setPen(altPen);
   QPen gridPen(GColor(CPLOTGRID));
   gridPen.setStyle(Qt::DotLine);

@@ -1057,7 +1057,7 @@ AllPlot::configChanged(qint32 what)
 
     if (what & CONFIG_APPEARANCE) {
 
-        double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+        double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
         labelFont.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
         labelFont.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
 

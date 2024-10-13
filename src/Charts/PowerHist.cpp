@@ -185,7 +185,7 @@ PowerHist::configChanged(qint32)
         }
     }
 
-    double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+    double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
     if (appsettings->value(this, GC_ANTIALIAS, true).toBool()==true) {
         curve->setRenderHint(QwtPlotItem::RenderAntialiased);
         curveSelected->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -1443,7 +1443,7 @@ PowerHist::setDataFromCompare()
     // not for metric plots sonny
     if (source == Metric) return;
 
-    double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+    double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
 
     // set all the curves based upon whats in the compare intervals array
     // first lets clear the old data
@@ -1590,7 +1590,7 @@ PowerHist::setComparePens()
     if ((!rangemode && !context->isCompareIntervals) ||
         (rangemode && !context->isCompareDateRanges)) return;
 
-    double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+    double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
     for (int i=0; (!rangemode && i<context->compareIntervals.count()) ||
                   (rangemode && i<context->compareDateRanges.count()); i++) {
 
@@ -1627,7 +1627,7 @@ PowerHist::setDataFromCompare(QString totalMetric, QString distMetric)
     // set the data for each compare date range using
     // the metric results in the compare data range
     // and create the HistData and curves associated
-    double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+    double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
 
     // remove old data and curves
     compareData.clear();
