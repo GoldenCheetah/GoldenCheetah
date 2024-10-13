@@ -152,17 +152,7 @@ MetadataDialog::MetadataDialog(Context* context, const QString& fieldName, const
 MetadataDialog::~MetadataDialog()
 {
     delete metaLabel_;
-
-    switch (field_.type) {
-    case FIELD_TEXT:
-    case FIELD_SHORTTEXT: delete (QLineEdit*) metaEdit_; break;
-    case FIELD_TEXTBOX: delete ((GTextEdit*)metaEdit_); break;
-    case FIELD_INTEGER: delete ((QSpinBox*)metaEdit_); break;
-    case FIELD_DOUBLE: delete ((QDoubleSpinBox*)metaEdit_); break;
-    case FIELD_DATE: delete ((QDateEdit*)metaEdit_); break;
-    case FIELD_TIME: delete ((QTimeEdit*)metaEdit_); break;
-    case FIELD_CHECKBOX: delete ((QCheckBox*)metaEdit_); break;
-    }
+    delete metaEdit_; // QWidget destructor is virtual
     if (completer_) delete completer_;
 }
 
