@@ -385,7 +385,7 @@ RealtimePlot::setAxisTitle(int axis, QString label)
 void
 RealtimePlot::configChanged(qint32)
 {
-    double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+    double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
 
     setCanvasBackground(GColor(CTRAINPLOTBACKGROUND));
     QPen pwr30pen = QPen(GColor(CPOWER), width, Qt::DashLine);

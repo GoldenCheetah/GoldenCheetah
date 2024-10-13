@@ -1219,7 +1219,7 @@ CriticalPowerWindow::intervalHover(IntervalItem* x)
         for (size_t i=0; i<intervalCurves[index]->data()->size(); i++) array << intervalCurves[index]->data()->sample(i);
 
         QPen pen(Qt::gray);
-        double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+        double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
         pen.setWidth(width);
 
         // create the hover curve
@@ -1308,7 +1308,7 @@ CriticalPowerWindow::showIntervalCurve(IntervalItem *current, int index)
     int count=myRideItem->intervals().count();
     intervalColor.setHsv(index * (255/count), 255,255);
     QPen pen(intervalColor);
-    double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+    double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
     pen.setWidth(width);
     //pen.setStyle(Qt::DotLine);
     intervalColor.setAlpha(64);
