@@ -1428,9 +1428,6 @@ CPPage::initializeRanges() {
     connect(ranges->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QList<int>&)),
             this, SLOT(rangeChanged(const QModelIndex&, const QModelIndex&, const QList<int>&)));
 #endif
-
-    QApplication::sendPostedEvents();
-    ranges->scrollToBottom();
 }
 
 
@@ -1925,9 +1922,7 @@ CPPage::rangeSelectionChanged()
     active = true;
 
     // wipe away current contents of zones
-    foreach (QTreeWidgetItem *item, zones->invisibleRootItem()->takeChildren()) {
-        delete item;
-    }
+    zones->clear();
 
     // fill with current details
     QTreeWidgetItem *item = ranges->currentItem();
@@ -2650,8 +2645,8 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
         add->setFont(4, font);
     }
 
-    zoneLoDelegate.setRange(0, 1000);
-    zoneLoDelegate.setSuffix(tr("%"));
+    zoneLoDelegate.setRange(0, 240);
+    zoneLoDelegate.setSuffix(tr("bpm"));
     zoneLoDelegate.setShowSuffixOnEdit(true);
     zoneLoDelegate.setShowSuffixOnDisplay(true);
 
@@ -2853,10 +2848,7 @@ LTPage::rangeSelectionChanged()
     active = true;
 
     // wipe away current contents of zones
-    foreach (QTreeWidgetItem *item, zones->invisibleRootItem()->takeChildren()) {
-        delete zones->itemWidget(item, 2);
-        delete item;
-    }
+    zones->clear();
 
     // fill with current details
     if (ranges->currentItem()) {
@@ -3555,9 +3547,7 @@ CVPage::rangeSelectionChanged()
     active = true;
 
     // wipe away current contents of zones
-    foreach (QTreeWidgetItem *item, zones->invisibleRootItem()->takeChildren()) {
-        delete item;
-    }
+    zones->clear();
 
     // fill with current details
     if (ranges->currentItem()) {
