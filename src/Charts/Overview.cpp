@@ -621,7 +621,7 @@ OverviewConfigDialog::OverviewConfigDialog(ChartSpaceItem*item, QPoint pos) : QD
 }
 
 void
-OverviewConfigDialog::showEvent(QShowEvent* event)
+OverviewConfigDialog::showEvent(QShowEvent*)
 {
     QSize gcWindowSize = item->parent->context->mainWindow->size();
     QPoint gcWindowPosn = item->parent->context->mainWindow->pos();

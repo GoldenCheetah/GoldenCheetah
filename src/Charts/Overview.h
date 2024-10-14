@@ -93,7 +93,7 @@ class OverviewConfigDialog : public QDialog
 
     protected:
 
-        void showEvent(QShowEvent* event);
+        void showEvent(QShowEvent*) override;
 
     private:
         QPoint pos;
