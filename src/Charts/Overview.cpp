@@ -178,8 +178,7 @@ nodice:
 void
 OverviewWindow::configItem(ChartSpaceItem *item, QPoint pos)
 {
-    OverviewConfigDialog *p = new OverviewConfigDialog(item);
-    p->move(pos.x()+10, pos.y()+10);
+    OverviewConfigDialog *p = new OverviewConfigDialog(item, pos);
     p->exec(); // no mem leak as delete on close
 }
 
@@ -573,7 +572,7 @@ badconfig:
 //
 // Config dialog that pops up when you click on the config button
 //
-OverviewConfigDialog::OverviewConfigDialog(ChartSpaceItem*item) : QDialog(NULL), item(item)
+OverviewConfigDialog::OverviewConfigDialog(ChartSpaceItem*item, QPoint pos) : QDialog(NULL), item(item), pos(pos)
 {
     if (item->type == OverviewItemType::USERCHART) setWindowTitle(tr("Chart Settings"));
     else setWindowTitle(tr("Tile Settings"));
@@ -619,6 +618,21 @@ OverviewConfigDialog::OverviewConfigDialog(ChartSpaceItem*item) : QDialog(NULL),
     connect(ok, SIGNAL(clicked()), this, SLOT(close()));
     connect(remove, SIGNAL(clicked()), this, SLOT(removeItem()));
 
+}
+
+void
+OverviewConfigDialog::showEvent(QShowEvent* event)
+{
+    QSize gcWindowSize = item->parent->context->mainWindow->size();
+    QPoint gcWindowPosn = item->parent->context->mainWindow->pos();
+
+    int xLimit = gcWindowPosn.x() + gcWindowSize.width() - geometry().width() -10;
+    int yLimit = gcWindowPosn.y() + gcWindowSize.height() - geometry().height() -10;
+
+    int xDialog = (pos.x() > xLimit) ? xLimit : pos.x();
+    int yDialog = (pos.y() > yLimit) ? yLimit : pos.y();
+
+    move(xDialog, yDialog);
 }
 
 OverviewConfigDialog::~OverviewConfigDialog()

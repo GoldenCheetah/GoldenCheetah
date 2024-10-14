@@ -81,7 +81,7 @@ class OverviewConfigDialog : public QDialog
     Q_OBJECT
 
     public:
-        OverviewConfigDialog(ChartSpaceItem*);
+        OverviewConfigDialog(ChartSpaceItem*, QPoint pos);
         ~OverviewConfigDialog();
 
 
@@ -91,7 +91,12 @@ class OverviewConfigDialog : public QDialog
         void exportChart();
         void close();
 
+    protected:
+
+        void showEvent(QShowEvent* event);
+
     private:
+        QPoint pos;
         ChartSpaceItem *item;
         QVBoxLayout *main;
         QPushButton *remove, *ok, *exp;
