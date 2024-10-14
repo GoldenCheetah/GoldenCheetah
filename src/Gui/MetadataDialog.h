@@ -45,8 +45,12 @@ class MetadataDialog : public QDialog
         G_OBJECT
 
     public:
-        MetadataDialog(Context *context, const QString& fieldName, const QString& value);
+        MetadataDialog(Context *context, const QString& fieldName, const QString& value, QPoint pos);
         virtual ~MetadataDialog();
+
+    protected:
+
+        void showEvent(QShowEvent*) override;
 
     private slots:
 
@@ -56,7 +60,7 @@ class MetadataDialog : public QDialog
     private:
 
         bool isTime = false; // when we edit metrics but they are really times
-
+        QPoint pos_;
         Context *context_ = nullptr;
         FieldDefinition field_;
         QCompleter* completer_ = nullptr;

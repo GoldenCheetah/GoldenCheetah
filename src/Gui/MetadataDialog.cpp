@@ -23,8 +23,8 @@
 #include "RideCache.h"
 #include "RideMetadata.h"
 
-MetadataDialog::MetadataDialog(Context* context, const QString& fieldName, const QString& value) :
-    QDialog(context->mainWindow), context_(context), completer_(nullptr)
+MetadataDialog::MetadataDialog(Context* context, const QString& fieldName, const QString& value, QPoint pos) :
+    QDialog(context->mainWindow), context_(context), completer_(nullptr), pos_(pos)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("Metadata Editor"));
@@ -154,6 +154,21 @@ MetadataDialog::~MetadataDialog()
     delete metaLabel_;
     delete metaEdit_; // QWidget destructor is virtual
     if (completer_) delete completer_;
+}
+
+void
+MetadataDialog::showEvent(QShowEvent*) {
+
+    QSize gcWindowSize = context_->mainWindow->size();
+    QPoint gcWindowPosn = context_->mainWindow->pos();
+
+    int xLimit = gcWindowPosn.x() + gcWindowSize.width() - geometry().width() - 10;
+    int yLimit = gcWindowPosn.y() + gcWindowSize.height() - geometry().height() - 10;
+
+    int xDialog = (pos_.x() > xLimit) ? xLimit : pos_.x();
+    int yDialog = (pos_.y() > yLimit) ? yLimit : pos_.y();
+
+    move(xDialog, yDialog);
 }
 
 void

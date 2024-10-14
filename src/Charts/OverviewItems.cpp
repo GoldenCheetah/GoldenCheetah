@@ -936,9 +936,8 @@ MetaOverviewItem::configChanged(qint32)
 
 void MetaOverviewItem::displayTileEditMenu(const QPoint& pos)
 {
-    MetadataDialog* metadataDialog = new MetadataDialog(parent->context, symbol, value);
+    MetadataDialog* metadataDialog = new MetadataDialog(parent->context, symbol, value, pos);
     connect(metadataDialog, SIGNAL(finished(int)), this, SLOT(updateTile(int)));
-    metadataDialog->move(pos.x()+10, pos.y()+10);
     metadataDialog->show(); // configured for delete on close
 }
 
