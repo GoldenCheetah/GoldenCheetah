@@ -187,7 +187,7 @@ MetadataDialog::okClicked()
     case FIELD_CHECKBOX: text = ((QCheckBox*)metaEdit_)->isChecked() ? "1" : "0"; break;
     case FIELD_DATE: {
         if (field_.name == "Start Date") {
-            text = QDate(1900, 1, 1).daysTo(((QDateEdit*)metaEdit_)->date());
+            text = QString::number(QDate(1900, 1, 1).daysTo(((QDateEdit*)metaEdit_)->date()));
         } else {
             if (((QDateEdit*)metaEdit_)->date().isValid()) {
                 text = ((QDateEdit*)metaEdit_)->date().toString("dd/MM/yyyy");
@@ -195,7 +195,7 @@ MetadataDialog::okClicked()
         } } break;
     case FIELD_TIME: {
         if (field_.name == "Start Time") {
-            text = QTime(0, 0, 0).secsTo(((QTimeEdit*)metaEdit_)->time());
+            text = QString::number(QTime(0, 0, 0).secsTo(((QTimeEdit*)metaEdit_)->time()));
         } else {
             if (((QTimeEdit*)metaEdit_)->time().isValid()) {
                 text = ((QTimeEdit*)metaEdit_)->time().toString("hh:mm:ss"); break;
