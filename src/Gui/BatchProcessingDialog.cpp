@@ -206,8 +206,13 @@ processed(0), fails(0), numFilesToProcess(0) {
     // Now add the ride metadata fields to the comboBox
     foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
 
-        // Add the display names for the user mutable metadata fields
-        if (specialFields.isUser(field.name)) metadataFieldToSet->addItem(specialFields.displayName(field.name));
+        // display the edit icon for relevant metadata fields
+        if ((field.name != "Interval Goal") && // cannot specify which interval
+            (field.name != "Interval Notes") && // cannot specify which interval
+            specialFields.isUser(field.name)) { // user mutable metadata fields
+
+            metadataFieldToSet->addItem(specialFields.displayName(field.name));
+        }
     }
 
     // Setup the type field to match the selected metadata field

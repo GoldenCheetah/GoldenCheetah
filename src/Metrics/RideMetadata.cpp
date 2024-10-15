@@ -987,6 +987,7 @@ FormField::FormField(Form *form, FieldDefinition field, RideMetadata *meta) : fo
     case FIELD_DATE : // date
         widget = new QDateEdit(this);
         ((QDateEdit*)widget)->setButtonSymbols(QAbstractSpinBox::NoButtons);
+        ((QDateEdit*)widget)->setDisplayFormat("dd/MM/yyyy");
         //widget->setFixedHeight(18);
         connect (widget, SIGNAL(dateChanged(const QDate)), this, SLOT(dataChanged()));
         connect (widget, SIGNAL(editingFinished()), this, SLOT(editFinished()));
@@ -1021,26 +1022,8 @@ FormField::FormField(Form *form, FieldDefinition field, RideMetadata *meta) : fo
 FormField::~FormField()
 {
     delete label;
-
-    switch (definition.type) {
-        case FIELD_TEXT:
-        case FIELD_SHORTTEXT:
-            if (definition.name == "Keywords")
-                delete (QLineEdit*)widget;
-            if (completer)
-                delete completer;
-            break;
-        case FIELD_TEXTBOX : delete ((GTextEdit*)widget); break;
-        case FIELD_INTEGER : delete ((QSpinBox*)widget); break;
-        case FIELD_DOUBLE : {
-                                if (!isTime) delete ((QDoubleSpinBox*)widget);
-                                else delete ((QTimeEdit*)widget);
-                            }
-                            break;
-        case FIELD_DATE : delete ((QDateEdit*)widget); break;
-        case FIELD_TIME : delete ((QTimeEdit*)widget); break;
-        case FIELD_CHECKBOX : delete ((QCheckBox*)widget); break;
-    }
+    delete widget; // QWidget destructor is virtual
+    if (completer) delete completer;
     if (enabled) delete enabled;
 }
 
@@ -1103,7 +1086,7 @@ FormField::metadataFlush()
     case FIELD_CHECKBOX :
         text = ((QCheckBox *)widget)->isChecked() ? "1" : "0";
         break;
-    case FIELD_DATE : text = ((QDateEdit*)widget)->date().toString("dd.MM.yyyy"); break;
+    case FIELD_DATE : text = ((QDateEdit*)widget)->date().toString("dd/MM/yyyy"); break;
     case FIELD_TIME : text = ((QTimeEdit*)widget)->time().toString("hh:mm:ss.zzz"); break;
     }
 
@@ -1549,24 +1532,25 @@ FormField::metadataChanged()
             }
             break;
 
-        case FIELD_DATE : // date
-            {
-            if (value == "") value = "          ";
-            QDate date(/* year*/value.mid(6,4).toInt(),
-                    /* month */value.mid(3,2).toInt(),
-                    /* day */value.mid(0,2).toInt());
-            ((QDateEdit*)widget)->setDate(date);
+        case FIELD_DATE: { // date
+            if (value == "") ((QDateEdit*)widget)->setDate(QDate(2000, 1, 1));
+            else {
+                QDate date(/* year*/value.mid(6, 4).toInt(),
+                           /* month */value.mid(3, 2).toInt(),
+                           /* day */value.mid(0, 2).toInt());
+                ((QDateEdit*)widget)->setDate(date);
+            }
             }
             break;
 
-        case FIELD_TIME : // time
-            {
-            if (value == "") value = "            ";
-            QTime time(/* hours*/ value.mid(0,2).toInt(),
-                    /* minutes */ value.mid(3,2).toInt(),
-                    /* seconds */ value.mid(6,2).toInt(),
-                    /* milliseconds */ value.mid(9,3).toInt());
-            ((QTimeEdit*)widget)->setTime(time);
+        case FIELD_TIME: { // time
+            if (value == "") ((QTimeEdit*)widget)->setTime(QTime(0,0,0)); else {
+                QTime time(/* hours*/ value.mid(0, 2).toInt(),
+                           /* minutes */ value.mid(3, 2).toInt(),
+                           /* seconds */ value.mid(6, 2).toInt(),
+                           /* milliseconds */ value.mid(9, 3).toInt());
+                ((QTimeEdit*)widget)->setTime(time);
+            }
             }
             break;
 
