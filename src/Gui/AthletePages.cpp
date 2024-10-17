@@ -1214,7 +1214,7 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     useCPForFTPCombo->addItem(tr("Use CP for all metrics"));
     useCPForFTPCombo->addItem(tr("Use FTP for Coggan metrics"));
 
-    b4.modelIdx = appsettings->cvalue(context->athlete->cyclist, zones_->useCPModelSetting(), 1).toInt();
+    b4.modelIdx = appsettings->cvalue(context->athlete->cyclist, zones_->useCPModelSetting(), CPPAGE_EST_MODEL_NONE).toInt();
     useModel->setCurrentIndex(b4.modelIdx);
 
     b4.cpforftp = appsettings->cvalue(context->athlete->cyclist, zones_->useCPforFTPSetting(), 0).toInt() ? 1 : 0;
