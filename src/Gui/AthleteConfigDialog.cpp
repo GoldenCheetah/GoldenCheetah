@@ -163,12 +163,20 @@ AthleteConfig::AthleteConfig(QDir home, Context *context) :
 
     QWidget *zc = new QWidget(this);
     QVBoxLayout *zl = new QVBoxLayout(zc);
-    QTabWidget *zonesTab = new QTabWidget(this);
-    zl->addWidget(zonesTab);
-    zonesTab->setContentsMargins(10*dpiXFactor,10*dpiXFactor,10*dpiXFactor,10*dpiXFactor);
-    zonesTab->addTab(zonePage, tr("Power"));
-    zonesTab->addTab(hrZonePage, tr("Heartrate"));
-    zonesTab->addTab(paceZonePage, tr("Pace"));
+    QTabWidget *zonesTab = nullptr;
+    if (context->athlete->rideCache->isRunning()) {
+        QLabel *warn = new QLabel(QString("<center><h1>%1</h1>%2</center>")
+                                         .arg(tr("Refresh in Progress"))
+                                         .arg(tr("A metric refresh is currently running, please try again once that has completed.")));
+        zl->addWidget(warn, 0, Qt::AlignCenter);
+    } else {
+        zonesTab = new QTabWidget(this);
+        zl->addWidget(zonesTab);
+        zonesTab->setContentsMargins(10*dpiXFactor,10*dpiXFactor,10*dpiXFactor,10*dpiXFactor);
+        zonesTab->addTab(zonePage, tr("Power"));
+        zonesTab->addTab(hrZonePage, tr("Heartrate"));
+        zonesTab->addTab(paceZonePage, tr("Pace"));
+    }
 
     // if the plot background and window background
     // are the same color, lets use the accent color since
@@ -196,7 +204,9 @@ AthleteConfig::AthleteConfig(QDir home, Context *context) :
                           .arg(2*dpiXFactor)                                          // 4 padding
                           .arg(75*dpiXFactor)                                         // 5 tab minimum width
                           .arg(std.color(QPalette::Text).name()); // 6 tab text color
-    zonesTab->setStyleSheet(styling);
+    if (zonesTab != nullptr) {
+        zonesTab->setStyleSheet(styling);
+    }
     measuresTab->setStyleSheet(styling);
 #endif
 
