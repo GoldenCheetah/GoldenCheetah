@@ -3138,6 +3138,17 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
             QRectF bound = fm.boundingRect(values[i]);
             xoffset = geometry().width() - (bound.width() + hmargin);
 
+            double heatvalue = heat.count() > i ? heat[i] : 0;
+
+            // if no heat then no brush
+            if (heatvalue == 0) painter->setBrush(Qt::NoBrush);
+            else {
+                // lets use the heat color, but with a little translucency
+                QColor brushcolor = Utils::heatcolor(heatvalue);
+                brushcolor.setAlpha(127);
+                painter->fillRect(xoffset,yoffset-(lineheight*0.8), columnWidths[i]+(hspace/2), lineheight, QBrush(brushcolor));
+            }
+
             painter->drawText(xoffset, yoffset, values[i]);
             yoffset += lineheight;
         }
