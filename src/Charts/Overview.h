@@ -63,7 +63,7 @@ class OverviewWindow : public GcChartWindow
         void settings();
 
         // config item requested
-        void configItem(ChartSpaceItem *);
+        void configItem(ChartSpaceItem *, QPoint);
 
     private:
 
@@ -81,7 +81,7 @@ class OverviewConfigDialog : public QDialog
     Q_OBJECT
 
     public:
-        OverviewConfigDialog(ChartSpaceItem*);
+        OverviewConfigDialog(ChartSpaceItem*, QPoint pos);
         ~OverviewConfigDialog();
 
 
@@ -91,7 +91,12 @@ class OverviewConfigDialog : public QDialog
         void exportChart();
         void close();
 
+    protected:
+
+        void showEvent(QShowEvent*) override;
+
     private:
+        QPoint pos;
         ChartSpaceItem *item;
         QVBoxLayout *main;
         QPushButton *remove, *ok, *exp;

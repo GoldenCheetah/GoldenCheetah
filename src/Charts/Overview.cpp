@@ -87,7 +87,7 @@ OverviewWindow::OverviewWindow(Context *context, int scope, bool blank) : GcChar
     connect(importChart, SIGNAL(triggered(bool)), this, SLOT(importChart()));
     connect(settings, SIGNAL(triggered(bool)), this, SLOT(settings()));
     connect(mincolsEdit, SIGNAL(valueChanged(int)), this, SLOT(setMinimumColumns(int)));
-    connect(space, SIGNAL(itemConfigRequested(ChartSpaceItem*)), this, SLOT(configItem(ChartSpaceItem*)));
+    connect(space, SIGNAL(itemConfigRequested(ChartSpaceItem*, QPoint)), this, SLOT(configItem(ChartSpaceItem*, QPoint)));
 }
 
 void
@@ -174,9 +174,9 @@ nodice:
 }
 
 void
-OverviewWindow::configItem(ChartSpaceItem *item)
+OverviewWindow::configItem(ChartSpaceItem *item, QPoint pos)
 {
-    OverviewConfigDialog *p = new OverviewConfigDialog(item);
+    OverviewConfigDialog *p = new OverviewConfigDialog(item, pos);
     p->exec(); // no mem leak as delete on close
 }
 
@@ -570,7 +570,7 @@ badconfig:
 //
 // Config dialog that pops up when you click on the config button
 //
-OverviewConfigDialog::OverviewConfigDialog(ChartSpaceItem*item) : QDialog(NULL), item(item)
+OverviewConfigDialog::OverviewConfigDialog(ChartSpaceItem*item, QPoint pos) : QDialog(NULL), item(item), pos(pos)
 {
     if (item->type == OverviewItemType::USERCHART) setWindowTitle(tr("Chart Settings"));
     else setWindowTitle(tr("Tile Settings"));
@@ -616,6 +616,21 @@ OverviewConfigDialog::OverviewConfigDialog(ChartSpaceItem*item) : QDialog(NULL),
     connect(ok, SIGNAL(clicked()), this, SLOT(close()));
     connect(remove, SIGNAL(clicked()), this, SLOT(removeItem()));
 
+}
+
+void
+OverviewConfigDialog::showEvent(QShowEvent*)
+{
+    QSize gcWindowSize = item->parent->context->mainWindow->size();
+    QPoint gcWindowPosn = item->parent->context->mainWindow->pos();
+
+    int xLimit = gcWindowPosn.x() + gcWindowSize.width() - geometry().width() -10;
+    int yLimit = gcWindowPosn.y() + gcWindowSize.height() - geometry().height() -10;
+
+    int xDialog = (pos.x() > xLimit) ? xLimit : pos.x();
+    int yDialog = (pos.y() > yLimit) ? yLimit : pos.y();
+
+    move(xDialog, yDialog);
 }
 
 OverviewConfigDialog::~OverviewConfigDialog()

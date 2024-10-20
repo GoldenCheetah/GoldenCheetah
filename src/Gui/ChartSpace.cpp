@@ -1011,7 +1011,7 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
             if (item && item->inCorner()) {
 
                 block = false; // reeentry is allowed
-                emit itemConfigRequested(item);
+                emit itemConfigRequested(item, static_cast<QGraphicsSceneMouseEvent*>(event)->screenPos());
                 return true;
             }
 

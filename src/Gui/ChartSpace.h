@@ -253,7 +253,7 @@ class ChartSpace : public QWidget
 
 
     signals:
-        void itemConfigRequested(ChartSpaceItem*);
+        void itemConfigRequested(ChartSpaceItem*, QPoint);
 
     public slots:
 
