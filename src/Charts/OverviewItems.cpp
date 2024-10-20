@@ -904,14 +904,24 @@ MetaOverviewItem::MetaOverviewItem(ChartSpace *parent, QString name, QString sym
 void
 MetaOverviewItem::configChanged(qint32)
 {
+    SpecialFields specialFields;
+
     //  Get the field type
     fieldtype = -1;
     foreach(FieldDefinition p, GlobalContext::context()->rideMetadata->getFields()) {
         if (p.name == symbol) {
             fieldtype = p.type;
+
+            // display the edit icon for relevant metadata fields
+            setShowEdit((p.name != "Interval Goal") && // cannot specify which interval
+                        (p.name != "Interval Notes") && // cannot specify which interval
+                        specialFields.isUser(p.name)); // user mutable metadata fields
             break;
          }
     }
+
+    // Update the value
+    if (rideItem) value = rideItem->getText(symbol, "");
 
     // sparkline if are we numeric?
     if (fieldtype == FIELD_INTEGER || fieldtype == FIELD_DOUBLE) {
@@ -921,6 +931,32 @@ MetaOverviewItem::configChanged(qint32)
             delete sparkline;
             sparkline = NULL;
         }
+    }
+}
+
+void MetaOverviewItem::displayTileEditMenu(const QPoint& pos)
+{
+    MetadataDialog* metadataDialog = new MetadataDialog(parent->context, symbol, value, pos);
+    connect(metadataDialog, SIGNAL(finished(int)), this, SLOT(updateTile(int)));
+    metadataDialog->show(); // configured for delete on close
+}
+
+void MetaOverviewItem::updateTile(int ret)
+{
+    // Ensure tile contents are updated
+    if (ret == QDialog::Accepted) {
+        if (rideItem) value = rideItem->getText(symbol, "");
+        update();
+    }
+}
+
+void MetaOverviewItem::metadataChanged() {
+
+    // Ensure when metadata is edited in the details tab it
+    // is updated on the tile.
+    if (rideItem) {
+        value = rideItem->getText(symbol, "");
+        update();
     }
 }
 
@@ -1734,6 +1770,11 @@ TopNOverviewItem::setDateRange(DateRange dr)
 void
 MetaOverviewItem::setData(RideItem *item)
 {
+    if (rideItem) disconnect(rideItem, SIGNAL(rideMetadataChanged()), this, SLOT(metadataChanged()));
+    if (item) connect(item, SIGNAL(rideMetadataChanged()), this, SLOT(metadataChanged()));
+
+    rideItem = item;
+
     if (item == NULL || item->ride() == NULL) return;
 
     // non-numeric META
@@ -3501,10 +3542,11 @@ MetaOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
             painter->setFont(parent->bigfont);
 
             QString displayValue(value);
-            if (fieldtype == FIELD_DATE) {
+            if ((fieldtype == FIELD_DATE) && (symbol == "Start Date")) {
                 displayValue = (QDate(1900, 1, 1).addDays(value.toInt())).toString("dd/MM/yyyy");
-            } else if (fieldtype == FIELD_TIME) {
-                displayValue = (QTime(0,0).addSecs(value.toInt())).toString("hh:mm:ss");
+
+            } else if ((fieldtype == FIELD_TIME) && (symbol == "Start Time")) {
+                displayValue = (QTime(0, 0).addSecs(value.toInt())).toString("hh:mm:ss");
             }
 
             QRectF rect = QFontMetrics(parent->bigfont, parent->device()).boundingRect(displayValue);

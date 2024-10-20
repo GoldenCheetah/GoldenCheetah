@@ -39,6 +39,7 @@
 #include <QScrollBar>
 #include <QIcon>
 #include <QTimer>
+#include <QPoint>
 
 // geometry basics
 #define SPACING 80
@@ -87,6 +88,9 @@ class ChartSpaceItem : public QGraphicsWidget
         virtual void setDateRange(DateRange )=0;
         virtual QColor color();
         virtual QRectF hotspot() { return QRectF(0,0,0,0); } // don't steal events from this area of the item
+        
+        // Override to display tile specific edit menu
+        virtual void displayTileEditMenu(const QPoint&) {};
 
         virtual QWidget *config()=0; // must supply a widget to configure
         virtual void configChanged(qint32) {}
@@ -94,6 +98,10 @@ class ChartSpaceItem : public QGraphicsWidget
         // turn off/on the config corner button
         void setShowConfig(bool x) { showconfig=x; update(); }
         bool showConfig() const { return showconfig; }
+
+        // turn off/on the edit corner button
+        void setShowEdit(bool x) { showedit = x; update(); }
+        bool showEdit() const { return showedit; }
 
         // let item know that dragging is in process
         // for some widgets (e.g. UserChart) this means
@@ -108,8 +116,8 @@ class ChartSpaceItem : public QGraphicsWidget
         ChartSpaceItem(ChartSpace *parent, QString name) : QGraphicsWidget(NULL),
                                        parent(parent), name(name),
                                        column(0), order(0), deep(5), onscene(false),
-                                       placing(false), drag(false), incorner(false), invisible(false),
-                                       showconfig(true)  {
+                                       placing(false), drag(false), incorner(false), inedit(false),
+                                       invisible(false), showconfig(true), showedit(false) {
 
             setAutoFillBackground(false);
             setFlags(flags() | QGraphicsItem::ItemClipsToShape); // don't paint outside the card
@@ -140,6 +148,7 @@ class ChartSpaceItem : public QGraphicsWidget
         // watch mouse enter/leave
         bool sceneEvent(QEvent *event);
         bool inCorner();
+        bool inEdit();
         bool inHotspot();
         bool underMouse();
 
@@ -167,8 +176,10 @@ class ChartSpaceItem : public QGraphicsWidget
         int column, span, order, deep;
         bool onscene, placing, drag;
         bool incorner;
+        bool inedit;
         bool invisible;
         bool showconfig;
+        bool showedit;
         QString bgcolor;
         QGraphicsDropShadowEffect *effect;
 
@@ -188,7 +199,7 @@ class LayoutChartSpaceItem {
     public:
         LayoutChartSpaceItem(ChartSpaceItem *from) :
             column(from->column), span(from->span), order (from->order ), deep(from->deep), onscene(from->onscene),
-            placing(from->placing), drag(from->drag), incorner(from->incorner), invisible(from->invisible),
+            placing(from->placing), drag(from->drag), incorner(from->incorner), inedit(from->inedit), invisible(from->invisible),
             item(from), geometry(from->geometry()) {}
 
         static bool LayoutChartSpaceItemSort(const LayoutChartSpaceItem left, const LayoutChartSpaceItem right);
@@ -196,6 +207,7 @@ class LayoutChartSpaceItem {
         int column, span, order, deep;
         bool onscene, placing, drag;
         bool incorner;
+        bool inedit;
         bool invisible;
 
         ChartSpaceItem *item;
