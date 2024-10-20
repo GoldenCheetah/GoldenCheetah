@@ -123,8 +123,8 @@ WPrime::setRide(RideFile *input)
 
     EXP = PCP_ = CP = WPRIME = TAU=0;
 
-    // no data or no power data then forget it.
-    if (!input || input->dataPoints().count() == 0 || input->areDataPresent()->watts == false) {
+    // less than 2 samples or no power data then forget it.
+    if (!input || input->dataPoints().count() < 2 || input->areDataPresent()->watts == false) {
         return;
     }
 

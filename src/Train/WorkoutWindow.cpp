@@ -25,20 +25,7 @@
 static int MINTOOLHEIGHT = 350; // smaller than this, lose the toolbar
 
 WorkoutWindow::WorkoutWindow(Context *context) :
-    GcChartWindow(context), draw(true), context(context), active(false), recording(false),
-    plotHr(true),
-    plotPwr(true),
-    plotCadence(true),
-    plotWbal(true),
-    plotVo2(true),
-    plotVentilation(true),
-    plotSpeed(true),
-    plotHrAvg(1),
-    plotPwrAvg(1),
-    plotCadenceAvg(1),
-    plotVo2Avg(1),
-    plotVentilationAvg(1),
-    plotSpeedAvg(1)
+    GcChartWindow(context), draw(true), context(context), active(false), recording(false)
 {
     HelpWhatsThis *helpContents = new HelpWhatsThis(this);
     this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::ChartTrain_WorkoutEditor));
@@ -73,21 +60,15 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     plotVentilationSB = new QSpinBox(); plotVentilationSB->setMinimum(1);
     plotSpeedSB = new QSpinBox(); plotSpeedSB->setMinimum(1);
 
-    plotHrCB->setCheckState(plotHr ? Qt::Checked : Qt::Unchecked);
-    plotPwrCB->setCheckState(plotPwr ? Qt::Checked : Qt::Unchecked);
-    plotCadenceCB->setCheckState(plotCadence ? Qt::Checked : Qt::Unchecked);
-    plotWbalCB->setCheckState(plotWbal ? Qt::Checked : Qt::Unchecked);
-    plotVo2CB->setCheckState(plotVo2 ? Qt::Checked : Qt::Unchecked);
-    plotVentilationCB->setCheckState(plotVentilation ? Qt::Checked : Qt::Unchecked);
-    plotSpeedCB->setCheckState(plotSpeed ? Qt::Checked : Qt::Unchecked);
-
-    connect(plotHrCB, SIGNAL(stateChanged(int)), this, SLOT(plotHrChanged(int)));
-    connect(plotPwrCB, SIGNAL(stateChanged(int)), this, SLOT(plotPwrChanged(int)));
-    connect(plotCadenceCB, SIGNAL(stateChanged(int)), this, SLOT(plotCadenceChanged(int)));
-    connect(plotWbalCB, SIGNAL(stateChanged(int)), this, SLOT(plotWbalChanged(int)));
-    connect(plotVo2CB, SIGNAL(stateChanged(int)), this, SLOT(plotVo2Changed(int)));
-    connect(plotVentilationCB, SIGNAL(stateChanged(int)), this, SLOT(plotVentilationChanged(int)));
-    connect(plotSpeedCB, SIGNAL(stateChanged(int)), this, SLOT(plotSpeedChanged(int)));
+    // enable all plots by default. gets overriden by the corresponding property
+    // stored in the layout xml.
+    plotHrCB->setChecked(true);
+    plotPwrCB->setChecked(true);
+    plotCadenceCB->setChecked(true);
+    plotWbalCB->setChecked(true);
+    plotVo2CB->setChecked(true);
+    plotVentilationCB->setChecked(true);
+    plotSpeedCB->setChecked(true);
 
     connect(plotHrSB, SIGNAL(valueChanged(int)), this, SLOT(plotHrAvgChanged(int)));
     connect(plotPwrSB, SIGNAL(valueChanged(int)), this, SLOT(plotPwrAvgChanged(int)));
@@ -688,86 +669,133 @@ WorkoutWindow::stop()
     workout->stop();
 }
 
-void
-WorkoutWindow::plotHrChanged(int value)
+void WorkoutWindow::setShouldPlotHr(bool value)
 {
-    plotHr = (value != Qt::Unchecked);
+    plotHrCB->setChecked(value);
+}
+
+void WorkoutWindow::setShouldPlotPwr(bool value)
+{
+    plotPwrCB->setChecked(value);
+}
+
+void WorkoutWindow::setShouldPlotCadence(bool value)
+{
+    plotCadenceCB->setChecked(value);
+}
+
+void WorkoutWindow::setShouldPlotWbal(bool value)
+{
+    plotWbalCB->setChecked(value);
+}
+
+void WorkoutWindow::setShouldPlotVo2(bool value)
+{
+    plotVo2CB->setChecked(value);
+}
+
+void WorkoutWindow::setShouldPlotVentilation(bool value)
+{
+    plotVentilationCB->setChecked(value);
+}
+
+void WorkoutWindow::setShouldPlotSpeed(bool value)
+{
+    plotSpeedCB->setChecked(value);
+}
+
+int WorkoutWindow::hrPlotAvgLength()
+{
+    return plotHrSB->value();
+}
+
+int WorkoutWindow::pwrPlotAvgLength()
+{
+    return plotPwrSB->value();
+}
+
+int WorkoutWindow::cadencePlotAvgLength()
+{
+    return plotCadenceSB->value();
+}
+
+int WorkoutWindow::vo2PlotAvgLength()
+{
+  return plotVo2SB->value();
+}
+
+int WorkoutWindow::ventilationPlotAvgLength()
+{
+  return plotVentilationSB->value();
+}
+
+int WorkoutWindow::speedPlotAvgLength()
+{
+    return plotSpeedSB->value();
+}
+
+void WorkoutWindow::setPlotHrAvgLength(int value)
+{
+    plotHrSB->setValue(value);
+}
+
+void WorkoutWindow::setPlotPwrAvgLength(int value)
+{
+    plotPwrSB->setValue(value);
+}
+
+void WorkoutWindow::setPlotCadenceAvgLength(int value)
+{
+    plotCadenceSB->setValue(value);
+}
+
+void WorkoutWindow::setPlotVo2AvgLength(int value)
+{
+    plotVo2SB->setValue(value);
+}
+
+void WorkoutWindow::setPlotVentilationAvgLength(int value)
+{
+    plotVentilationSB->setValue(value);
+}
+
+void WorkoutWindow::setPlotSpeedAvgLength(int value)
+{
+    plotSpeedSB->setValue(value);
 }
 
 void
-WorkoutWindow::plotPwrChanged(int value)
+WorkoutWindow::plotHrAvgChanged(int)
 {
-    plotPwr = (value != Qt::Unchecked);
-}
-
-void
-WorkoutWindow::plotCadenceChanged(int value)
-{
-    plotCadence = (value != Qt::Unchecked);
-}
-
-void
-WorkoutWindow::plotWbalChanged(int value)
-{
-    plotWbal = (value != Qt::Unchecked);
-}
-
-void
-WorkoutWindow::plotVo2Changed(int value)
-{
-    plotVo2 = (value != Qt::Unchecked);
-}
-
-void
-WorkoutWindow::plotVentilationChanged(int value)
-{
-    plotVentilation = (value != Qt::Unchecked);
-}
-
-void
-WorkoutWindow::plotSpeedChanged(int value)
-{
-    plotSpeed = (value != Qt::Unchecked);
-}
-
-void
-WorkoutWindow::plotHrAvgChanged(int value)
-{
-    plotHrAvg = value;
     workout->hrAvg.clear();
 }
 
 void
-WorkoutWindow::plotPwrAvgChanged(int value)
+WorkoutWindow::plotPwrAvgChanged(int)
 {
-    plotPwrAvg = value;
     workout->pwrAvg.clear();
 }
 
 void
-WorkoutWindow::plotCadenceAvgChanged(int value)
+WorkoutWindow::plotCadenceAvgChanged(int)
 {
-    plotCadenceAvg = value;
     workout->cadenceAvg.clear();
 }
 
 void
-WorkoutWindow::plotVo2AvgChanged(int value)
+WorkoutWindow::plotVo2AvgChanged(int)
 {
-    plotVo2Avg = value;
     workout->vo2Avg.clear();
 }
 
 void
-WorkoutWindow::plotVentilationAvgChanged(int value)
+WorkoutWindow::plotVentilationAvgChanged(int)
 {
-    plotVentilationAvg = value;
     workout->ventilationAvg.clear();
 }
 
 void
-WorkoutWindow::plotSpeedAvgChanged(int value)
+WorkoutWindow::plotSpeedAvgChanged(int)
 {
-    plotSpeedAvg = value;
     workout->speedAvg.clear();
 }

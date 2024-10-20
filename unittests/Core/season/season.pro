@@ -4,4 +4,4 @@ SOURCES = testSeason.cpp
 GC_OBJS = Season \
           Utils
 
-include(../unittests.pri)
+include(../../unittests.pri)

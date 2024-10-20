@@ -114,7 +114,7 @@ class CommonEquipmentItem : public ChartSpaceItem
 
         virtual void resetEqItem() {}
         void showEvent(QShowEvent* event) override;
-        virtual void DisplayTileEditMenu(const QPoint& pos) override;
+        void displayTileEditMenu(const QPoint& pos) override;
 
         QWidget* config() override { return configwidget_; }
 
@@ -155,7 +155,7 @@ class EquipmentItem : public CommonEquipmentItem
         bool isWithin(const QStringList& rideEqLinkNameList, const QDate& actDate) const;
         bool rangeIsValid() const;
 
-        virtual void resetEqItem() override;
+        void resetEqItem() override;
         void unitsChanged();
         void addActivity(uint64_t rideDistanceScaled, uint64_t rideElevationScaled, uint64_t rideTimeInSecs);
                         uint64_t getNumActivities() const { return activities_; }
@@ -210,7 +210,7 @@ class EquipmentSummary : public CommonEquipmentItem
         void itemPaint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) override;
         void configChanged(qint32) override;
 
-        virtual void resetEqItem() override;
+        void resetEqItem() override;
         void addActivity(const QString& athleteName, const QDate& activityDate, const uint64_t rideDistanceScaled,
                             const uint64_t eqElevationScaled, const uint64_t rideTimeInSecs);
 

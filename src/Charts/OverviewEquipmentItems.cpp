@@ -581,7 +581,7 @@ CommonEquipmentItem::showEvent(QShowEvent*)
     itemGeometryChanged();
 }
 
-void CommonEquipmentItem::DisplayTileEditMenu(const QPoint& pos)
+void CommonEquipmentItem::displayTileEditMenu(const QPoint& pos)
 {
     QMenu popMenu;
 

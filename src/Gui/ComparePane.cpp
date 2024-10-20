@@ -699,7 +699,7 @@ ComparePane::dropEvent(QDropEvent *event)
 
             foreach(RideFilePoint *p, ride->dataPoints()) {
 
-                if (p->secs >= stop) break;
+                if (p->secs > stop) break;
 
                 if (p->secs >= start) {
 
@@ -746,7 +746,7 @@ ComparePane::dropEvent(QDropEvent *event)
 
                 foreach(XDataPoint *p, xi.value()->datapoints) {
 
-                    if (p->secs >= stop) break;
+                    if (p->secs > stop) break;
 
                     if (p->secs >= start) {
 

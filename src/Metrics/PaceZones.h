@@ -216,7 +216,9 @@ class PaceZones : public QObject
 
         // convert to/from Pace
         double kphFromTime(QTimeEdit *cvedit, bool metric) const;
+        double kphFromTime(const QTime &time, bool metric) const;
         QString kphToPaceString(double kph, bool metric) const;
+        QTime kphToPaceTime(double kph, bool metric) const;
         QString paceUnits(bool metric) const;
         QString paceSetting() const;
         static bool isPaceUnit(QString unit);

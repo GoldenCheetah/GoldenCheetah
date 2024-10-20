@@ -41,6 +41,7 @@
         <file>images/toolbar/main/train.png</file>
         <file>images/toolbar/clear.png</file>
         <file>images/toolbar/edit.png</file>
+        <file>images/toolbar/info.png</file>
         <file>images/toolbar/select.png</file>
         <file>images/toolbar/new doc.png</file>
         <file>images/toolbar/properties.png</file>
@@ -100,6 +101,7 @@
         <file>images/settings.png</file>
         <file>images/addchart.png</file>
         <file>images/library.png</file>
+        <file>images/tile-edit.png</file>
         <file>translations/gc_fr.qm</file>
         <file>translations/gc_ja.qm</file>
         <file>translations/gc_it.qm</file>

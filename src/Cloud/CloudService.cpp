@@ -724,7 +724,7 @@ CloudServiceSyncDialog::CloudServiceSyncDialog(Context *context, CloudService *s
     QWidget * download = new QWidget(this);
     QWidget * sync = new QWidget(this);
     tabs->addTab(download, tr("Download"));
-    tabs->addTab(upload, tr("Upload"));
+    if (store->capabilities() & CloudService::Upload) tabs->addTab(upload, tr("Upload"));
     tabs->addTab(sync, tr("Synchronize"));
     tabs->setCurrentIndex(2);
     QVBoxLayout *downloadLayout = new QVBoxLayout(download);
@@ -1117,7 +1117,8 @@ CloudServiceSyncDialog::refreshClicked()
     //
     // Now setup the upload list
     //
-    for(int i=0; i<context->athlete->rideCache->rides().count(); i++) {
+    bool uploadEnabled = (store->capabilities() & CloudService::Upload);
+    for(int i=0; uploadEnabled && i<context->athlete->rideCache->rides().count(); i++) {
 
         RideItem *ride = context->athlete->rideCache->rides().at(i);
         if (!specification.pass(ride)) continue;
