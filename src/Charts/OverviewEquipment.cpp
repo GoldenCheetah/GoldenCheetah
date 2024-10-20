@@ -27,6 +27,9 @@ OverviewEquipmentWindow::OverviewEquipmentWindow(Context* context, int scope, bo
     eqCalc_ = new EquipCalculator(context->mainWindow, this);
 
     space->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartEquip_Overview));
+    space->configIcon = ":images/tile-edit.png";
+    space->editIcon = ":images/equipment-popup.png";
+    space->configChanged(CONFIG_APPEARANCE);
 
     // cannot use athlete specific signals, as there is only one equipment view.
     connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));

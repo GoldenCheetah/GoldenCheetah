@@ -102,6 +102,7 @@
         <file>images/addchart.png</file>
         <file>images/library.png</file>
         <file>images/tile-edit.png</file>
+        <file>images/equipment-popup.png</file>
         <file>translations/gc_fr.qm</file>
         <file>translations/gc_ja.qm</file>
         <file>translations/gc_it.qm</file>
@@ -205,7 +206,6 @@
         <file>images/sidebar/sync.png</file>
         <file>audio/lap.wav</file>
         <file>images/configure.png</file>
-        <file>images/tile-edit.png</file>
         <file>images/toolbar/cloud.png</file>
         <file>images/services/strava_compatible.png</file>
         <file>images/services/strava_connect.png</file>

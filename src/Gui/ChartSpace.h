@@ -81,6 +81,9 @@ class ChartSpaceItem : public QGraphicsWidget
 
     public:
 
+        ChartSpaceItem(ChartSpace* parent, const QString& name);
+        virtual ~ChartSpaceItem() {};
+
         // When subclassing you must reimplement these
         virtual void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) =0;
         virtual void itemGeometryChanged() =0;
@@ -112,38 +115,6 @@ class ChartSpaceItem : public QGraphicsWidget
 
         // what type am I- managed by user
         int type;
-
-        ChartSpaceItem(ChartSpace *parent, QString name) : QGraphicsWidget(NULL),
-                                       parent(parent), name(name),
-                                       column(0), order(0), deep(5), onscene(false),
-                                       placing(false), drag(false), incorner(false), inedit(false),
-                                       invisible(false), showconfig(true), showedit(false) {
-
-            setAutoFillBackground(false);
-            setFlags(flags() | QGraphicsItem::ItemClipsToShape); // don't paint outside the card
-            setAcceptHoverEvents(true);
-
-            setZValue(10);
-
-            // a sensible default?
-            span = 1;
-            type = 0;
-            delcounter=0;
-
-#if 0
-            effect = new QGraphicsDropShadowEffect();
-            effect->setXOffset(6);
-            effect->setYOffset(6);
-            effect->setColor(QColor(127,127,127,64));
-            effect->setBlurRadius(10);
-            this->setGraphicsEffect(effect);
-#endif
-
-            bgcolor = StandardColor(CCARDBACKGROUND).name();
-
-            // watch geom changes
-            connect(this, SIGNAL(geometryChanged()), SLOT(geometryChanged()));
-        }
 
         // watch mouse enter/leave
         bool sceneEvent(QEvent *event);
@@ -239,6 +210,9 @@ class ChartSpace : public QWidget
 
         QGraphicsView *view;
         QFont titlefont, bigfont, midfont, smallfont, tinyfont;
+        QString configIcon, editIcon;
+        QIcon grayConfig, whiteConfig, accentConfig;
+        QIcon grayEdit, whiteEdit, accentEdit;
 
         // the item we are currently showing
         RideItem *currentRideItem;
