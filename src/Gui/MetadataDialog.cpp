@@ -84,17 +84,13 @@ MetadataDialog::MetadataDialog(Context* context, const QString& fieldName, const
         ((QDateEdit*)metaEdit_)->setDisplayFormat("dd/MM/yyyy");
         ((QDateEdit*)metaEdit_)->setCalendarPopup(true);
         ((QDateEdit*)metaEdit_)->setMinimumWidth(100);
-        if (field_.name == "Start Date") {
-            ((QDateEdit*)metaEdit_)->setDate(QDate(1900, 1, 1).addDays(value.toInt()));
+        if (value == "") {
+            ((QDateEdit*)metaEdit_)->setDate(QDate(2000,1,1));
         } else {
-            if (value == "") {
-                ((QDateEdit*)metaEdit_)->setDate(QDate(2000,1,1));
-            } else {
-                QDate date(/* year*/value.mid(6, 4).toInt(),
-                    /* month */value.mid(3, 2).toInt(),
-                    /* day */value.mid(0, 2).toInt());
-                ((QDateEdit*)metaEdit_)->setDate(date);
-            }
+            QDate date(/* year*/value.mid(6, 4).toInt(),
+                       /* month */value.mid(3, 2).toInt(),
+                       /* day */value.mid(0, 2).toInt());
+            ((QDateEdit*)metaEdit_)->setDate(date);
         } } break;
 
     case FIELD_TIME: { // time
@@ -102,17 +98,13 @@ MetadataDialog::MetadataDialog(Context* context, const QString& fieldName, const
         metaEdit_ = new QTimeEdit(this);
         ((QTimeEdit*)metaEdit_)->setButtonSymbols(QAbstractSpinBox::NoButtons);
         ((QTimeEdit*)metaEdit_)->setDisplayFormat("hh:mm:ss");
-        if (field_.name == "Start Time") {
-            ((QTimeEdit*)metaEdit_)->setTime(QTime(0,0,0).addSecs(value.toInt()));
+        if (value == "") {
+            ((QTimeEdit*)metaEdit_)->setTime(QTime(0,0,0));
         } else {
-            if (value == "") {
-                ((QTimeEdit*)metaEdit_)->setTime(QTime(0,0,0));
-            } else {
-                QTime time(/* hours*/ value.mid(0, 2).toInt(),
-                           /* minutes */ value.mid(3, 2).toInt(),
-                           /* seconds */ value.mid(6, 2).toInt());
-                ((QTimeEdit*)metaEdit_)->setTime(time);
-            }
+            QTime time(/* hours*/ value.mid(0, 2).toInt(),
+                       /* minutes */ value.mid(3, 2).toInt(),
+                       /* seconds */ value.mid(6, 2).toInt());
+            ((QTimeEdit*)metaEdit_)->setTime(time);
         } } break;
 
     case FIELD_CHECKBOX: { // check
@@ -185,22 +177,16 @@ MetadataDialog::okClicked()
     case FIELD_INTEGER: text = QString("%1").arg(((QSpinBox*)metaEdit_)->value()); break;
     case FIELD_DOUBLE: text = QString("%1").arg(((QDoubleSpinBox*)metaEdit_)->value()); break;
     case FIELD_CHECKBOX: text = ((QCheckBox*)metaEdit_)->isChecked() ? "1" : "0"; break;
-    case FIELD_DATE: {
-        if (field_.name == "Start Date") {
-            text = QString::number(QDate(1900, 1, 1).daysTo(((QDateEdit*)metaEdit_)->date()));
-        } else {
-            if (((QDateEdit*)metaEdit_)->date().isValid()) {
-                text = ((QDateEdit*)metaEdit_)->date().toString("dd/MM/yyyy");
-            }
-        } } break;
-    case FIELD_TIME: {
-        if (field_.name == "Start Time") {
-            text = QString::number(QTime(0, 0, 0).secsTo(((QTimeEdit*)metaEdit_)->time()));
-        } else {
-            if (((QTimeEdit*)metaEdit_)->time().isValid()) {
-                text = ((QTimeEdit*)metaEdit_)->time().toString("hh:mm:ss"); break;
-            }
-        } } break; 
+    case FIELD_DATE:
+        if (((QDateEdit*)metaEdit_)->date().isValid()) {
+            text = ((QDateEdit*)metaEdit_)->date().toString("dd/MM/yyyy");
+        }
+        break;
+    case FIELD_TIME:
+        if (((QTimeEdit*)metaEdit_)->time().isValid()) {
+            text = ((QTimeEdit*)metaEdit_)->time().toString("hh:mm:ss"); break;
+        }
+        break;
     }
 
     RideItem* rideI = context_->rideItem();
@@ -214,7 +200,7 @@ MetadataDialog::okClicked()
         rideF->setDeviceType(text);
 
     } else if (rideF->getTag(field_.name, "") != text) {
-  
+ 
         // Update the metadata value in the tile and ride file.
         rideF->setTag(field_.name, text);
 
