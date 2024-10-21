@@ -1168,7 +1168,7 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
 
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
-    adoptButton = new QPushButton(tr("Adopt"));
+    adoptButton = new QPushButton(tr("Review..."));
     adoptButton->setVisible(false);
     newZoneRequired = new QPushButton(tr("Changed power estimates are available"));
     newZoneRequired->setFlat(true);
@@ -1533,7 +1533,7 @@ CPPage::adopt
                 || estPmax != curPmax)) {
             QLocale locale;
             QDialog dialog;
-            dialog.setWindowTitle(tr("Adopt estimates for range starting on %1").arg(date.toString(locale.dateFormat(QLocale::ShortFormat))));
+            dialog.setWindowTitle(tr("Review range starting on %1").arg(date.toString(locale.dateFormat(QLocale::ShortFormat))));
 
             QCheckBox *cpAccept = nullptr;
             QCheckBox *aetpAccept = nullptr;
@@ -1594,7 +1594,7 @@ CPPage::adopt
                 if (aetpAccept->checkState() == Qt::Checked) {
                     setRangeData(modelIndex, CPPAGE_RANGES_COL_AETP, estAetp);
                 }
-                if (ftpAccept->checkState() == Qt::Checked) {
+                if (ftpAccept != nullptr && ftpAccept->checkState() == Qt::Checked) {
                     setRangeData(modelIndex, CPPAGE_RANGES_COL_FTP, estFtp);
                 }
                 if (wprimeAccept->checkState() == Qt::Checked) {
