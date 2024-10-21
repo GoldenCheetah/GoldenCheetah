@@ -46,6 +46,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
+#include <QMenu>
 
 bool
 OverviewItemConfig::registerItems()
@@ -930,6 +931,14 @@ MetaOverviewItem::configChanged(qint32)
         if (sparkline) {
             delete sparkline;
             sparkline = NULL;
+        }
+    }
+    // Find the metadata fielddefintion for this tile
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
+        if (field.name == symbol) {
+            // only display the edit icon for fields with values set.
+            setShowEdit(field.values.size() != 0);
+            break;
         }
     }
 }
@@ -3755,7 +3764,7 @@ static bool insensitiveLessThan(const QString &a, const QString &b)
 OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), item(item), block(false)
 {
     QVBoxLayout *main = new QVBoxLayout(this);
-    QFormLayout *layout = new QFormLayout();
+    layout = new QFormLayout();
     main->addLayout(layout);
 
     if (item->type != OverviewItemType::KPI && item->type != OverviewItemType::DATATABLE) main->addStretch();
@@ -4056,6 +4065,9 @@ void
 OverviewItemConfig::setWidgets()
 {
     block = true;
+
+    // ensure bkgd color is initialised.
+    bgcolor->setColor(item->color());
 
     // always have a filter on trends view
     if (item->parent->scope & OverviewScope::TRENDS)  filterEditor->setFilter(item->datafilter);
