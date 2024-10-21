@@ -31,12 +31,12 @@ class OverviewEquipmentWindow : public OverviewWindow
         OverviewEquipmentWindow(Context* context, int scope = OverviewScope::EQUIPMENT, bool blank = false);
         virtual ~OverviewEquipmentWindow();
 
-        virtual void showChart(bool visible) override;
+        void showChart(bool visible) override;
 
     public slots:
 
-        virtual ChartSpaceItem* addTile() override;
-        virtual void configItem(ChartSpaceItem*) override;
+        ChartSpaceItem* addTile() override;
+        void configItem(ChartSpaceItem*, QPoint) override;
         void cloneTile(ChartSpaceItem*);
         void calculationComplete();
 
@@ -48,10 +48,10 @@ class OverviewEquipmentWindow : public OverviewWindow
 
     protected:
 
-        virtual QString getChartSource() const override;
-        virtual void getExtraConfiguration( ChartSpaceItem* item, QString& config) const override;
-        virtual void setExtraConfiguration(QJsonObject& obj, int type, ChartSpaceItem* add, QString& name,
-                                            QString& datafilter, int order, int column, int span, int deep) const override;
+        QString getChartSource() const override;
+        void getExtraConfiguration( ChartSpaceItem* item, QString& config) const override;
+        void setExtraConfiguration(QJsonObject& obj, int type, ChartSpaceItem* add, QString& name,
+                                   QString& datafilter, int order, int column, int span, int deep) const override;
 
     private:
         bool reCalcOnVisible_;

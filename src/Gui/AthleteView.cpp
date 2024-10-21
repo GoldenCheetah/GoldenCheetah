@@ -46,7 +46,7 @@ AthleteView::AthleteView(Context *context) : ChartSpace(context, OverviewScope::
     configChanged(0);
 
     // athlete config dialog...
-    connect(this, SIGNAL(itemConfigRequested(ChartSpaceItem*)), this, SLOT(configItem(ChartSpaceItem*)));
+    connect(this, SIGNAL(itemConfigRequested(ChartSpaceItem*, QPoint)), this, SLOT(configItem(ChartSpaceItem*, QPoint)));
     // new athlete
     connect(context->mainWindow, SIGNAL(newAthlete(QString)), this, SLOT(newAthlete(QString)));
     // delete athlete
@@ -93,7 +93,7 @@ AthleteView::configChanged(qint32)
 }
 
 void
-AthleteView::configItem(ChartSpaceItem*item)
+AthleteView::configItem(ChartSpaceItem*item, QPoint)
 {
     AthleteCard *card = static_cast<AthleteCard*>(item);
     card->configAthlete();

@@ -136,9 +136,9 @@ OverviewEquipmentWindow::cloneTile(ChartSpaceItem* item)
 }
 
 void
-OverviewEquipmentWindow::configItem(ChartSpaceItem* item)
+OverviewEquipmentWindow::configItem(ChartSpaceItem* item, QPoint pos)
 {
-    OverviewWindow::configItem(item);
+    OverviewWindow::configItem(item, pos);
 
     // Called for both item updates and deletion, if the item is still in the chart space list then
     // its an update, otherwise it's a tile deletion which requires no recaculation.

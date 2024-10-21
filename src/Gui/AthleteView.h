@@ -1,5 +1,6 @@
 #include "ChartSpace.h"
 #include "OverviewItems.h"
+#include <QPoint>
 
 class AthleteView : public ChartSpace
 {
@@ -10,7 +11,7 @@ public:
 
 public slots:
     void configChanged(qint32);
-    void configItem(ChartSpaceItem*);
+    void configItem(ChartSpaceItem*, QPoint);
     void newAthlete(QString);
     void deleteAthlete(QString);
 
