@@ -302,7 +302,7 @@ class CPPage : public QWidget
         void rangeChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles = QList<int>());
 #endif
 
-        void adopt();
+        void review();
         void updateButtons();
 
     private:
@@ -324,7 +324,7 @@ class CPPage : public QWidget
         TreeWidget6 *ranges;
         QTreeWidget *zones;
         QPushButton *addButton, *deleteButton;
-        QPushButton *adoptButton;
+        QPushButton *reviewButton;
         QPushButton *addZoneButton, *deleteZoneButton, *defaultButton;
         QPushButton *newZoneRequired;
 
@@ -332,8 +332,8 @@ class CPPage : public QWidget
         void setEstimateStatus(QTreeWidgetItem *item);
         void setRangeData(QModelIndex modelIndex, int column, QVariant data);
         bool needsNewRange() const;
-        void mkAdoptionRow(QGridLayout *grid, int row, int labelId, const QString &unit, int cur, int est, QCheckBox *&accept, const QString &infoText = QString()) const;
-        void connectAdoptionDialogApplyButton(QVector<QCheckBox*> checkboxes, QPushButton *applyButton) const;
+        void mkReviewRow(QGridLayout *grid, int row, int labelId, const QString &unit, int cur, int est, QCheckBox *&accept, const QString &infoText = QString()) const;
+        void connectReviewDialogApplyButton(QVector<QCheckBox*> checkboxes, QPushButton *applyButton) const;
         bool modelHasFtp() const;
         bool modelHasPmax() const;
         QWidget *mkInfoLabel(int labelId, const QString &infoText = QString()) const;
