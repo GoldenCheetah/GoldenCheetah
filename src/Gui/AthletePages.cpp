@@ -1117,20 +1117,21 @@ SchemePage::getScheme()
 #define CPPAGE_DEFAULT_WPRIME 20000
 #define CPPAGE_DEFAULT_PMAX 1000
 
-#define CPPAGE_RANGES_COL_STARTDATE 0
-#define CPPAGE_RANGES_COL_CP 1
-#define CPPAGE_RANGES_COL_AETP 2
-#define CPPAGE_RANGES_COL_FTP 3
-#define CPPAGE_RANGES_COL_WPRIME 4
-#define CPPAGE_RANGES_COL_PMAX 5
-#define CPPAGE_RANGES_COL_MODELFIT 6
-#define CPPAGE_RANGES_COL_EST_DEVIATION 7
-#define CPPAGE_RANGES_COL_EST_OFFSET 8
-#define CPPAGE_RANGES_COL_EST_CP 9
-#define CPPAGE_RANGES_COL_EST_FTP 10
-#define CPPAGE_RANGES_COL_EST_WPRIME 11
-#define CPPAGE_RANGES_COL_EST_PMAX 12
-#define CPPAGE_RANGES_COUNT_COL 13
+#define CPPAGE_RANGES_COL_RNUM 0
+#define CPPAGE_RANGES_COL_STARTDATE 1
+#define CPPAGE_RANGES_COL_CP 2
+#define CPPAGE_RANGES_COL_AETP 3
+#define CPPAGE_RANGES_COL_FTP 4
+#define CPPAGE_RANGES_COL_WPRIME 5
+#define CPPAGE_RANGES_COL_PMAX 6
+#define CPPAGE_RANGES_COL_MODELFIT 7
+#define CPPAGE_RANGES_COL_EST_DEVIATION 8
+#define CPPAGE_RANGES_COL_EST_OFFSET 9
+#define CPPAGE_RANGES_COL_EST_CP 10
+#define CPPAGE_RANGES_COL_EST_FTP 11
+#define CPPAGE_RANGES_COL_EST_WPRIME 12
+#define CPPAGE_RANGES_COL_EST_PMAX 13
+#define CPPAGE_RANGES_COUNT_COL 14
 
 #define CPPAGE_RANGES_EST_MATCH 0
 #define CPPAGE_RANGES_EST_DEVIATE 1
@@ -1266,6 +1267,7 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     pmaxDelegate.setShowSuffixOnDisplay(true);
 
     ranges = new TreeWidget6();
+    ranges->headerItem()->setText(CPPAGE_RANGES_COL_RNUM, "_rnum");
     ranges->headerItem()->setText(CPPAGE_RANGES_COL_STARTDATE, tr("Start Date"));
     ranges->headerItem()->setText(CPPAGE_RANGES_COL_CP, tr("Critical Power"));
     ranges->headerItem()->setText(CPPAGE_RANGES_COL_AETP, tr("AeTP"));
@@ -1280,6 +1282,7 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     ranges->headerItem()->setText(CPPAGE_RANGES_COL_EST_WPRIME, "_wprime");
     ranges->headerItem()->setText(CPPAGE_RANGES_COL_EST_PMAX, "_pmax");
     ranges->setColumnCount(CPPAGE_RANGES_COUNT_COL);
+    ranges->setColumnHidden(CPPAGE_RANGES_COL_RNUM, true);
     ranges->setColumnHidden(CPPAGE_RANGES_COL_EST_DEVIATION, true);
     ranges->setColumnHidden(CPPAGE_RANGES_COL_EST_OFFSET, true);
     ranges->setColumnHidden(CPPAGE_RANGES_COL_EST_CP, true);
@@ -1322,7 +1325,7 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     mainLayout->addWidget(zones);
     mainLayout->addLayout(zoneButtons);
 
-    initializeRanges();
+    initializeRanges(zones_->getRangeSize() - 1);
 
     // button connect
     connect(newZoneRequired, SIGNAL(clicked()), this, SLOT(addClicked()));
@@ -1332,8 +1335,8 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     connect(defaultButton, SIGNAL(clicked()), this, SLOT(defaultClicked()));
     connect(addZoneButton, SIGNAL(clicked()), this, SLOT(addZoneClicked()));
     connect(deleteZoneButton, SIGNAL(clicked()), this, SLOT(deleteZoneClicked()));
-    connect(useCPForFTPCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(initializeRanges()));
-    connect(useModel, SIGNAL(currentIndexChanged(int)), this, SLOT(initializeRanges()));
+    connect(useCPForFTPCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(reInitializeRanges()));
+    connect(useModel, SIGNAL(currentIndexChanged(int)), this, SLOT(reInitializeRanges()));
     connect(ranges, SIGNAL(itemSelectionChanged()), this, SLOT(rangeSelectionChanged()));
     connect(zones, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(zonesChanged()));
     connect(zones, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(updateButtons()));
@@ -1354,7 +1357,9 @@ CPPage::saveClicked()
 
 
 void
-CPPage::initializeRanges() {
+CPPage::initializeRanges
+(int selectIndex)
+{
 #if QT_VERSION < 0x060000
     disconnect(ranges->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)),
                this, SLOT(rangeChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)));
@@ -1363,23 +1368,28 @@ CPPage::initializeRanges() {
                this, SLOT(rangeChanged(const QModelIndex&, const QModelIndex&, const QList<int>&)));
 #endif
 
-    while (int nb = ranges->topLevelItemCount()) {
-        delete ranges->takeTopLevelItem(nb - 1);
-    }
+    ranges->blockSignals(true);
+    ranges->clear();
+    ranges->blockSignals(false);
 
     bool useCPForFTP = (useCPForFTPCombo->currentIndex() == 0 ? true : false);
-    ranges->setColumnHidden(3, useCPForFTP);
-
+    ranges->setColumnHidden(CPPAGE_RANGES_COL_FTP, useCPForFTP);
 
     // setup list of ranges
+    QTreeWidgetItem *selectedItem = nullptr;
+    int selectIndex2 = std::min(selectIndex, zones_->getRangeSize() - 1);
     for (int i = 0; i < zones_->getRangeSize(); i++) {
         QTreeWidgetItem *add = new QTreeWidgetItem(ranges->invisibleRootItem());
         add->setFlags(add->flags() | Qt::ItemIsEditable);
+        if (i == selectIndex2) {
+            selectedItem = add;
+        }
 
         // Embolden ranges with manually configured zones
         QFont font;
         font.setWeight(zones_->getZoneRange(i).zonesSetFromCP ? QFont::Normal : QFont::Black);
 
+        add->setData(CPPAGE_RANGES_COL_RNUM, Qt::DisplayRole, i);
         add->setData(CPPAGE_RANGES_COL_STARTDATE, Qt::DisplayRole, zones_->getStartDate(i));
         add->setFont(CPPAGE_RANGES_COL_STARTDATE, font);
         add->setData(CPPAGE_RANGES_COL_CP, Qt::DisplayRole, zones_->getCP(i));
@@ -1417,6 +1427,13 @@ CPPage::initializeRanges() {
         }
         setEstimateStatus(add);
     }
+    ranges->sortByColumn(CPPAGE_RANGES_COL_RNUM, Qt::DescendingOrder);
+
+    if (selectedItem != nullptr) {
+        ranges->setCurrentItem(selectedItem);
+        ranges->scrollTo(ranges->currentIndex());
+    }
+    rangeSelectionChanged();
 
     newZoneRequired->setVisible(needsNewRange());
     updateButtons();
@@ -1428,6 +1445,18 @@ CPPage::initializeRanges() {
     connect(ranges->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QList<int>&)),
             this, SLOT(rangeChanged(const QModelIndex&, const QModelIndex&, const QList<int>&)));
 #endif
+}
+
+
+void
+CPPage::reInitializeRanges
+()
+{
+    int rnum = -1;
+    if (ranges->currentItem() != nullptr) {
+        rnum = ranges->currentItem()->data(CPPAGE_RANGES_COL_RNUM, Qt::DisplayRole).toInt();
+    }
+    initializeRanges(rnum);
 }
 
 
@@ -1447,11 +1476,12 @@ CPPage::rangeChanged
         return;
     }
     zones_->setScheme(schemePage->getScheme());
-    int index = topLeft.row();
+    QModelIndex rnumIdx = topLeft.siblingAtColumn(CPPAGE_RANGES_COL_RNUM);
+    int rnum = rnumIdx.data(Qt::DisplayRole).toInt();
     switch (topLeft.column()) {
     case CPPAGE_RANGES_COL_STARTDATE: {
         QDate date = topLeft.data().toDate();
-        zones_->setStartDate(index, date);
+        zones_->setStartDate(rnum, date);
         if (useModel->currentIndex() != CPPAGE_EST_MODEL_NONE) {
             review();
             setEstimateStatus(ranges->itemFromIndex(topLeft));
@@ -1460,19 +1490,19 @@ CPPage::rangeChanged
     }
     case CPPAGE_RANGES_COL_CP: {
         int cp = topLeft.data().toInt();
-        zones_->setCP(index, cp);
+        zones_->setCP(rnum, cp);
         if (useCPForFTPCombo->currentIndex() == 0) {
-            zones_->setFTP(index, cp);
+            zones_->setFTP(rnum, cp);
         }
         setEstimateStatus(ranges->itemFromIndex(topLeft));
         break;
     }
     case CPPAGE_RANGES_COL_AETP:
-        zones_->setAeT(index, topLeft.data().toInt());
+        zones_->setAeT(rnum, topLeft.data().toInt());
         setEstimateStatus(ranges->itemFromIndex(topLeft));
         break;
     case CPPAGE_RANGES_COL_FTP:
-        zones_->setFTP(index, topLeft.data().toInt());
+        zones_->setFTP(rnum, topLeft.data().toInt());
         setEstimateStatus(ranges->itemFromIndex(topLeft));
         break;
     case CPPAGE_RANGES_COL_WPRIME: {
@@ -1481,14 +1511,14 @@ CPPage::rangeChanged
         if (wp < 1000) {
             wp *= 1000; // entered in kJ we want joules
         }
-        zones_->setWprime(index, wp);
+        zones_->setWprime(rnum, wp);
         setEstimateStatus(ranges->itemFromIndex(topLeft));
         break;
     }
     case CPPAGE_RANGES_COL_PMAX: {
         int pmax = topLeft.data().toInt();
         pmax = pmax ? pmax : 1000;
-        zones_->setPmax(index, pmax);
+        zones_->setPmax(rnum, pmax);
         setEstimateStatus(ranges->itemFromIndex(topLeft));
         break;
     }
@@ -1662,7 +1692,7 @@ CPPage::getValuesFor
         if (ranges->currentItem() != nullptr) {
             sourceItem = ranges->currentItem();
         } else if (ranges->invisibleRootItem()->childCount() > 0) {
-            sourceItem = ranges->invisibleRootItem()->child(ranges->invisibleRootItem()->childCount() - 1);
+            sourceItem = ranges->invisibleRootItem()->child(0);
         }
 
         if (sourceItem != nullptr) {
@@ -1839,35 +1869,9 @@ CPPage::addClicked()
         return;
     }
 
-    int index = zones_->addZoneRange(date, cp, aetp, ftp, wprime, pmax);
+    int rnum = zones_->addZoneRange(date, cp, aetp, ftp, wprime, pmax);
 
-    QTreeWidgetItem *add = new QTreeWidgetItem();
-    add->setFlags(add->flags() | Qt::ItemIsEditable);
-    ranges->invisibleRootItem()->insertChild(index, add);
-    ranges->setCurrentItem(add);
-
-    int estCp = 0;
-    int estAetp = 0;
-    int estFtp = 0;
-    int estWprime = 0;
-    int estPmax = 0;
-    if (getValuesFor(date, false, estCp, estAetp, estFtp, estWprime, estPmax, estOffset, defaults)) {
-        add->setData(CPPAGE_RANGES_COL_EST_CP, Qt::DisplayRole, estCp);
-        add->setData(CPPAGE_RANGES_COL_EST_FTP, Qt::DisplayRole, estFtp);
-        add->setData(CPPAGE_RANGES_COL_EST_WPRIME, Qt::DisplayRole, estWprime);
-        add->setData(CPPAGE_RANGES_COL_EST_PMAX, Qt::DisplayRole, estPmax);
-        add->setData(CPPAGE_RANGES_COL_EST_OFFSET, Qt::DisplayRole, estOffset);
-    } else {
-        add->setData(CPPAGE_RANGES_COL_EST_CP, Qt::DisplayRole, 0);
-    }
-    bool wasBlocked = ranges->model()->blockSignals(true);  // Prevent review-dialog
-    add->setData(CPPAGE_RANGES_COL_STARTDATE, Qt::DisplayRole, date);
-    ranges->model()->blockSignals(wasBlocked);
-    add->setData(CPPAGE_RANGES_COL_CP, Qt::DisplayRole, cp);
-    add->setData(CPPAGE_RANGES_COL_AETP, Qt::DisplayRole, aetp);
-    add->setData(CPPAGE_RANGES_COL_FTP, Qt::DisplayRole, ftp);
-    add->setData(CPPAGE_RANGES_COL_WPRIME, Qt::DisplayRole, wprime);
-    add->setData(CPPAGE_RANGES_COL_PMAX, Qt::DisplayRole, pmax);
+    initializeRanges(rnum);
     updateButtons();
 }
 
@@ -1876,10 +1880,9 @@ void
 CPPage::deleteClicked()
 {
     if (ranges->currentItem()) {
-        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-        delete ranges->invisibleRootItem()->takeChild(index);
-        zones_->deleteRange(index);
-        newZoneRequired->setVisible(needsNewRange());
+        int rnum = ranges->currentItem()->data(CPPAGE_RANGES_COL_RNUM, Qt::DisplayRole).toInt();
+        zones_->deleteRange(rnum);
+        initializeRanges(rnum);
         updateButtons();
     }
 }
@@ -1888,8 +1891,8 @@ void
 CPPage::defaultClicked()
 {
     if (ranges->currentItem()) {
-        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-        ZoneRange current = zones_->getZoneRange(index);
+        int rnum = ranges->currentItem()->data(CPPAGE_RANGES_COL_RNUM, Qt::DisplayRole).toInt();
+        ZoneRange current = zones_->getZoneRange(rnum);
 
         // unbold
         QFont font;
@@ -1904,7 +1907,7 @@ CPPage::defaultClicked()
 
         // set the range to use defaults on the scheme page
         zones_->setScheme(schemePage->getScheme());
-        zones_->setZonesFromCP(index);
+        zones_->setZonesFromCP(rnum);
 
         // hide the default button since we are now using defaults
         defaultButton->hide();
@@ -1930,14 +1933,14 @@ CPPage::rangeSelectionChanged()
         reviewButton->setVisible(   useModel->currentIndex() != CPPAGE_EST_MODEL_NONE
                                 && item->data(CPPAGE_RANGES_COL_EST_DEVIATION, Qt::DisplayRole).toInt() == CPPAGE_RANGES_EST_DEVIATE);
 
-        int index = ranges->invisibleRootItem()->indexOfChild(item);
-        ZoneRange current = zones_->getZoneRange(index);
+        int rnum = ranges->currentItem()->data(CPPAGE_RANGES_COL_RNUM, Qt::DisplayRole).toInt();
+        ZoneRange current = zones_->getZoneRange(rnum);
 
         if (current.zonesSetFromCP) {
             // reapply the scheme in case it has been changed
             zones_->setScheme(schemePage->getScheme());
-            zones_->setZonesFromCP(index);
-            current = zones_->getZoneRange(index);
+            zones_->setZonesFromCP(rnum);
+            current = zones_->getZoneRange(rnum);
 
             defaultButton->hide();
         } else {
@@ -1954,6 +1957,7 @@ CPPage::rangeSelectionChanged()
         }
     } else {
         reviewButton->setVisible(false);
+        zones->clear();
     }
 
     active = false;
@@ -1967,13 +1971,13 @@ CPPage::addZoneClicked()
     if (!ranges->currentItem()) return;
 
     active = true;
-    int index = zones->invisibleRootItem()->childCount();
+    int rnum = zones->invisibleRootItem()->childCount();
 
     // new item
     QTreeWidgetItem *add = new QTreeWidgetItem;
     add->setFlags(add->flags() | Qt::ItemIsEditable);
 
-    zones->invisibleRootItem()->insertChild(index, add);
+    zones->invisibleRootItem()->insertChild(rnum, add);
 
     // Short
     QString text = tr("New");
@@ -1999,17 +2003,15 @@ CPPage::addZoneClicked()
 void
 CPPage::deleteZoneClicked()
 {
-    // no range selected
-    if (ranges->invisibleRootItem()->indexOfChild(ranges->currentItem()) == -1)
+    // range and zone must be selected
+    if (ranges->currentItem() == nullptr || zones->currentItem() == nullptr) {
         return;
+    }
 
     active = true;
-    if (zones->currentItem()) {
-        int index = zones->invisibleRootItem()->indexOfChild(zones->currentItem());
-        delete zones->invisibleRootItem()->takeChild(index);
-    }
+    int index = zones->invisibleRootItem()->indexOfChild(zones->currentItem());
+    delete zones->invisibleRootItem()->takeChild(index);
     active = false;
-
     zonesChanged();
     updateButtons();
 }
@@ -2023,8 +2025,8 @@ CPPage::zonesChanged()
     if (active == false) {
         // get the current zone range
         if (ranges->currentItem()) {
-            int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-            ZoneRange current = zones_->getZoneRange(index);
+            int rnum = ranges->currentItem()->data(CPPAGE_RANGES_COL_RNUM, Qt::DisplayRole).toInt();
+            ZoneRange current = zones_->getZoneRange(rnum);
 
             // embolden that range on the list to show it has been edited
             QFont font;
@@ -2066,7 +2068,7 @@ CPPage::zonesChanged()
             current.zones = zoneinfos;
 
             // now replace the current range struct
-            zones_->setZoneRange(index, current);
+            zones_->setZoneRange(rnum, current);
         }
     }
 }
@@ -2615,7 +2617,9 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
     ranges->headerItem()->setText(2, tr("Aerobic Threshold"));
     ranges->headerItem()->setText(3, tr("Rest HR"));
     ranges->headerItem()->setText(4, tr("Max HR"));
-    ranges->setColumnCount(5);
+    ranges->headerItem()->setText(5, "_rnum");
+    ranges->setColumnCount(6);
+    ranges->setColumnHidden(5, true);
     ranges->setItemDelegateForColumn(0, &dateDelegate);
     ranges->setItemDelegateForColumn(1, &ltDelegate);
     ranges->setItemDelegateForColumn(2, &aetDelegate);
@@ -2643,7 +2647,9 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
         add->setFont(3, font);
         add->setData(4, Qt::DisplayRole, hrZones->getMaxHr(i));
         add->setFont(4, font);
+        add->setData(5, Qt::DisplayRole, i);
     }
+    ranges->sortByColumn(5, Qt::DescendingOrder);
 
     zoneLoDelegate.setRange(0, 240);
     zoneLoDelegate.setSuffix(tr("bpm"));
@@ -2686,6 +2692,10 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
     connect(zones, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(zonesChanged()));
     connect(zones, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(updateButtons()));
     connect(zones->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(zonesChanged()));
+
+    if (ranges->invisibleRootItem()->childCount() > 0) {
+        ranges->setCurrentItem(ranges->invisibleRootItem()->child(0));
+    }
 }
 
 
@@ -2699,17 +2709,17 @@ LTPage::addClicked()
     int restHr = 0;
     int maxHr = 0;
 
-    int index = -1;
+    int rnum = -1;
     if (ranges->currentItem()) {
-        index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-    } else {
-        index = ranges->invisibleRootItem()->childCount() - 1;
+        rnum = ranges->currentItem()->data(5, Qt::DisplayRole).toInt();
+    } else if (ranges->invisibleRootItem()->childCount() > 0) {
+        rnum = ranges->invisibleRootItem()->child(0)->data(5, Qt::DisplayRole).toInt();
     }
-    if (index >= 0) {
-        lt = hrZones->getLT(index);
-        aet = hrZones->getAeT(index);
-        maxHr = hrZones->getMaxHr(index);
-        restHr = hrZones->getRestHr(index);
+    if (rnum >= 0) {
+        lt = hrZones->getLT(rnum);
+        aet = hrZones->getAeT(rnum);
+        maxHr = hrZones->getMaxHr(rnum);
+        restHr = hrZones->getRestHr(rnum);
     }
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(  QDialogButtonBox::Apply
@@ -2756,18 +2766,28 @@ LTPage::addClicked()
     // get current scheme
     hrZones->setScheme(schemePage->getScheme());
 
-    index = hrZones->addHrZoneRange(dateEdit->date(), ltEdit->value(), aetEdit->value(), restHrEdit->value(), maxHrEdit->value());
+    rnum = hrZones->addHrZoneRange(dateEdit->date(), ltEdit->value(), aetEdit->value(), restHrEdit->value(), maxHrEdit->value());
+
+    for (int i = 0; i < ranges->invisibleRootItem()->childCount(); i++) {
+        QTreeWidgetItem *item = ranges->invisibleRootItem()->child(i);
+        int itemRnum = item->data(5, Qt::DisplayRole).toInt();
+        if (itemRnum >= rnum) {
+            item->setData(5, Qt::DisplayRole, itemRnum + 1);
+        }
+    }
 
     // new item
-    QTreeWidgetItem *add = new QTreeWidgetItem;
+    QTreeWidgetItem *add = new QTreeWidgetItem(ranges->invisibleRootItem());
     add->setFlags(add->flags() | Qt::ItemIsEditable);
-    ranges->invisibleRootItem()->insertChild(index, add);
-
     add->setData(0, Qt::DisplayRole, dateEdit->date());
     add->setData(1, Qt::DisplayRole, ltEdit->value());
     add->setData(2, Qt::DisplayRole, aetEdit->value());
     add->setData(3, Qt::DisplayRole, restHrEdit->value());
     add->setData(4, Qt::DisplayRole, maxHrEdit->value());
+    add->setData(5, Qt::DisplayRole, rnum),
+
+    ranges->sortByColumn(CPPAGE_RANGES_COL_RNUM, Qt::DescendingOrder);
+    ranges->setCurrentItem(add);
     updateButtons();
 }
 
@@ -2776,9 +2796,20 @@ void
 LTPage::deleteClicked()
 {
     if (ranges->currentItem()) {
+        int rnum = ranges->currentItem()->data(5, Qt::DisplayRole).toInt();
+
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
         delete ranges->invisibleRootItem()->takeChild(index);
-        hrZones->deleteRange(index);
+        hrZones->deleteRange(rnum);
+
+        for (int i = 0; i < ranges->invisibleRootItem()->childCount(); i++) {
+            QTreeWidgetItem *item = ranges->invisibleRootItem()->child(i);
+            int itemRnum = item->data(5, Qt::DisplayRole).toInt();
+            if (itemRnum >= rnum) {
+                item->setData(5, Qt::DisplayRole, itemRnum - 1);
+            }
+        }
+
         updateButtons();
     }
 }
@@ -2787,8 +2818,8 @@ void
 LTPage::defaultClicked()
 {
     if (ranges->currentItem()) {
-        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-        HrZoneRange current = hrZones->getHrZoneRange(index);
+        int rnum = ranges->currentItem()->data(5, Qt::DisplayRole).toInt();
+        HrZoneRange current = hrZones->getHrZoneRange(rnum);
 
         // unbold
         QFont font;
@@ -2801,7 +2832,7 @@ LTPage::defaultClicked()
 
         // set the range to use defaults on the scheme page
         hrZones->setScheme(schemePage->getScheme());
-        hrZones->setHrZonesFromLT(index);
+        hrZones->setHrZonesFromLT(rnum);
 
         // hide the default button since we are now using defaults
         defaultButton->hide();
@@ -2818,22 +2849,23 @@ LTPage::rangeChanged
 (const QModelIndex &modelIndex)
 {
     hrZones->setScheme(schemePage->getScheme());
-    int index = modelIndex.row();
+    QModelIndex rnumIdx = modelIndex.siblingAtColumn(5);
+    int rnum = rnumIdx.data(Qt::DisplayRole).toInt();
     switch (modelIndex.column()) {
     case 0:
-        hrZones->setStartDate(index, modelIndex.data().toDate());
+        hrZones->setStartDate(rnum, modelIndex.data().toDate());
         break;
     case 1:
-        hrZones->setLT(index, modelIndex.data().toInt());
+        hrZones->setLT(rnum, modelIndex.data().toInt());
         break;
     case 2:
-        hrZones->setAeT(index, modelIndex.data().toInt());
+        hrZones->setAeT(rnum, modelIndex.data().toInt());
         break;
     case 3:
-        hrZones->setRestHr(index, modelIndex.data().toInt());
+        hrZones->setRestHr(rnum, modelIndex.data().toInt());
         break;
     case 4:
-        hrZones->setMaxHr(index, modelIndex.data().toInt());
+        hrZones->setMaxHr(rnum, modelIndex.data().toInt());
         break;
     default:
         break;
@@ -2852,14 +2884,14 @@ LTPage::rangeSelectionChanged()
 
     // fill with current details
     if (ranges->currentItem()) {
-        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-        HrZoneRange current = hrZones->getHrZoneRange(index);
+        int rnum = ranges->currentItem()->data(5, Qt::DisplayRole).toInt();
+        HrZoneRange current = hrZones->getHrZoneRange(rnum);
 
         if (current.hrZonesSetFromLT) {
             // reapply the scheme in case it has been changed
             hrZones->setScheme(schemePage->getScheme());
-            hrZones->setHrZonesFromLT(index);
-            current = hrZones->getHrZoneRange(index);
+            hrZones->setHrZonesFromLT(rnum);
+            current = hrZones->getHrZoneRange(rnum);
 
             defaultButton->hide();
         } else {
@@ -2886,15 +2918,6 @@ LTPage::addZoneClicked()
 {
     // no range selected
     if (!ranges->currentItem()) return;
-
-    // are we at maximum already?
-    if (zones->invisibleRootItem()->childCount() == 10) {
-        QMessageBox err;
-        err.setText(tr("Maximum of 10 zones reached."));
-        err.setIcon(QMessageBox::Warning);
-        err.exec();
-        return;
-    }
 
     active = true;
     int index = zones->invisibleRootItem()->childCount();
@@ -2931,17 +2954,15 @@ LTPage::addZoneClicked()
 void
 LTPage::deleteZoneClicked()
 {
-    // no range selected
-    if (ranges->invisibleRootItem()->indexOfChild(ranges->currentItem()) == -1)
+    // range and zone must be selected
+    if (ranges->currentItem() == nullptr || zones->currentItem() == nullptr) {
         return;
+    }
 
     active = true;
-    if (zones->currentItem()) {
-        int index = zones->invisibleRootItem()->indexOfChild(zones->currentItem());
-        delete zones->invisibleRootItem()->takeChild(index);
-    }
+    int index = zones->invisibleRootItem()->indexOfChild(zones->currentItem());
+    delete zones->invisibleRootItem()->takeChild(index);
     active = false;
-
     zonesChanged();
     updateButtons();
 }
@@ -2955,19 +2976,17 @@ LTPage::zonesChanged()
     if (active == false) {
         // get the current zone range
         if (ranges->currentItem()) {
-            int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-            HrZoneRange current = hrZones->getHrZoneRange(index);
+            int rnum = ranges->currentItem()->data(5, Qt::DisplayRole).toInt();
+            HrZoneRange current = hrZones->getHrZoneRange(rnum);
 
             // embolden that range on the list to show it has been edited
             QFont font;
             font.setWeight(QFont::Black);
-            ranges->model()->blockSignals(true);
             ranges->currentItem()->setFont(0, font);
             ranges->currentItem()->setFont(1, font);
             ranges->currentItem()->setFont(2, font);
             ranges->currentItem()->setFont(3, font);
             ranges->currentItem()->setFont(4, font);
-            ranges->model()->blockSignals(false);
 
             // show the default button to undo
             defaultButton->show();
@@ -2999,7 +3018,7 @@ LTPage::zonesChanged()
             current.zones = zoneinfos;
 
             // now replace the current range struct
-            hrZones->setHrZoneRange(index, current);
+            hrZones->setHrZoneRange(rnum, current);
         }
         updateButtons();
     }
@@ -3305,7 +3324,9 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     ranges->headerItem()->setText(0, tr("Start Date"));
     ranges->headerItem()->setText(1, tr("Critical Velocity"));
     ranges->headerItem()->setText(2, tr("Aerobic Threshold"));
-    ranges->setColumnCount(3);
+    ranges->headerItem()->setText(3, "_rnum");
+    ranges->setColumnCount(4);
+    ranges->setColumnHidden(3, true);
     ranges->setItemDelegateForColumn(0, &dateDelegate);
     ranges->setItemDelegateForColumn(1, &cvDelegate);
     ranges->setItemDelegateForColumn(2, &aetDelegate);
@@ -3332,7 +3353,10 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
         // AeT
         add->setData(2, Qt::DisplayRole, paceZones->kphToPaceTime(paceZones->getAeT(i), metricPace));
         add->setFont(2, font);
+
+        add->setData(3, Qt::DisplayRole, i);
     }
+    ranges->sortByColumn(3, Qt::DescendingOrder);
 
     zoneFromDelegate.setTimeRange(QTime(0, 0, 0), QTime(0, 20, 0));
     zoneFromDelegate.setFormat("mm:ss");
@@ -3373,6 +3397,10 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
 #endif
     connect(zones, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(updateButtons()));
     connect(zones, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(zonesChanged()));
+
+    if (ranges->invisibleRootItem()->childCount() > 0) {
+        ranges->setCurrentItem(ranges->invisibleRootItem()->child(0));
+    }
 }
 
 
@@ -3390,7 +3418,7 @@ CVPage::addClicked()
     if (ranges->currentItem() != nullptr) {
         sourceItem = ranges->currentItem();
     } else if (ranges->invisibleRootItem()->childCount() > 0) {
-        sourceItem = ranges->invisibleRootItem()->child(ranges->invisibleRootItem()->childCount() - 1);
+        sourceItem = ranges->invisibleRootItem()->child(0);
     }
 
     if (sourceItem != nullptr) {
@@ -3454,17 +3482,26 @@ CVPage::addClicked()
         return;
     }
 
-    int index = paceZones->addZoneRange(date, paceZones->kphFromTime(cv, metricPace), paceZones->kphFromTime(aet, metricPace));
+    int rnum = paceZones->addZoneRange(date, paceZones->kphFromTime(cv, metricPace), paceZones->kphFromTime(aet, metricPace));
+    for (int i = 0; i < ranges->invisibleRootItem()->childCount(); i++) {
+        QTreeWidgetItem *item = ranges->invisibleRootItem()->child(i);
+        int itemRnum = item->data(3, Qt::DisplayRole).toInt();
+        if (itemRnum >= rnum) {
+            item->setData(3, Qt::DisplayRole, itemRnum + 1);
+        }
+    }
 
     // new item
-    QTreeWidgetItem *add = new QTreeWidgetItem;
+    QTreeWidgetItem *add = new QTreeWidgetItem(ranges->invisibleRootItem());
     add->setFlags(add->flags() | Qt::ItemIsEditable);
-    ranges->invisibleRootItem()->insertChild(index, add);
 
     add->setData(0, Qt::DisplayRole, date);
     add->setData(1, Qt::DisplayRole, cv);
     add->setData(2, Qt::DisplayRole, aet);
+    add->setData(3, Qt::DisplayRole, rnum);
 
+    ranges->sortByColumn(3, Qt::DescendingOrder);
+    ranges->setCurrentItem(add);
     updateButtons();
 }
 
@@ -3473,9 +3510,17 @@ void
 CVPage::deleteClicked()
 {
     if (ranges->currentItem()) {
+        int rnum = ranges->currentItem()->data(3, Qt::DisplayRole).toInt();
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
         delete ranges->invisibleRootItem()->takeChild(index);
-        paceZones->deleteRange(index);
+        paceZones->deleteRange(rnum);
+        for (int i = 0; i < ranges->invisibleRootItem()->childCount(); ++i) {
+            QTreeWidgetItem *item = ranges->invisibleRootItem()->child(i);
+            int itemRnum = item->data(3, Qt::DisplayRole).toInt();
+            if (itemRnum >= rnum) {
+                item->setData(3, Qt::DisplayRole, itemRnum - 1);
+            }
+        }
         updateButtons();
     }
 }
@@ -3484,9 +3529,8 @@ void
 CVPage::defaultClicked()
 {
     if (ranges->currentItem()) {
-
-        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-        PaceZoneRange current = paceZones->getZoneRange(index);
+        int rnum = ranges->currentItem()->data(3, Qt::DisplayRole).toInt();
+        PaceZoneRange current = paceZones->getZoneRange(rnum);
 
         // unbold
         QFont font;
@@ -3497,7 +3541,7 @@ CVPage::defaultClicked()
 
         // set the range to use defaults on the scheme page
         paceZones->setScheme(schemePage->getScheme());
-        paceZones->setZonesFromCV(index);
+        paceZones->setZonesFromCV(rnum);
 
         // hide the default button since we are now using defaults
         defaultButton->hide();
@@ -3525,16 +3569,17 @@ CVPage::rangeChanged
         return;
     }
     paceZones->setScheme(schemePage->getScheme());
-    int index = topLeft.row();
+    QModelIndex rnumIdx = topLeft.siblingAtColumn(3);
+    int rnum = rnumIdx.data(Qt::DisplayRole).toInt();
     switch (topLeft.column()) {
     case 0:
-        paceZones->setStartDate(index, topLeft.data(Qt::DisplayRole).toDate());
+        paceZones->setStartDate(rnum, topLeft.data(Qt::DisplayRole).toDate());
         break;
     case 1:
-        paceZones->setCV(index, paceZones->kphFromTime(topLeft.data(Qt::DisplayRole).toTime(), metricPace));
+        paceZones->setCV(rnum, paceZones->kphFromTime(topLeft.data(Qt::DisplayRole).toTime(), metricPace));
         break;
     case 2:
-        paceZones->setAeT(index, paceZones->kphFromTime(topLeft.data(Qt::DisplayRole).toTime(), metricPace));
+        paceZones->setAeT(rnum, paceZones->kphFromTime(topLeft.data(Qt::DisplayRole).toTime(), metricPace));
         break;
     default:
         break;
@@ -3551,14 +3596,14 @@ CVPage::rangeSelectionChanged()
 
     // fill with current details
     if (ranges->currentItem()) {
-        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-        PaceZoneRange current = paceZones->getZoneRange(index);
+        int rnum = ranges->currentItem()->data(3, Qt::DisplayRole).toInt();
+        PaceZoneRange current = paceZones->getZoneRange(rnum);
 
         if (current.zonesSetFromCV) {
             // reapply the scheme in case it has been changed
             paceZones->setScheme(schemePage->getScheme());
-            paceZones->setZonesFromCV(index);
-            current = paceZones->getZoneRange(index);
+            paceZones->setZonesFromCV(rnum);
+            current = paceZones->getZoneRange(rnum);
 
             defaultButton->hide();
 
@@ -3586,15 +3631,6 @@ CVPage::addZoneClicked()
 {
     // no range selected
     if (!ranges->currentItem()) return;
-
-    // are we at maximum already?
-    if (zones->invisibleRootItem()->childCount() == 10) {
-        QMessageBox err;
-        err.setText(tr("Maximum of 10 zones reached."));
-        err.setIcon(QMessageBox::Warning);
-        err.exec();
-        return;
-    }
 
     active = true;
     int index = zones->invisibleRootItem()->childCount();
@@ -3627,16 +3663,14 @@ void
 CVPage::deleteZoneClicked()
 {
     // no range selected
-    if (ranges->invisibleRootItem()->indexOfChild(ranges->currentItem()) == -1)
+    if (ranges->currentItem() == nullptr || zones->currentItem() == nullptr) {
         return;
+    }
 
     active = true;
-    if (zones->currentItem()) {
-        int index = zones->invisibleRootItem()->indexOfChild(zones->currentItem());
-        delete zones->invisibleRootItem()->takeChild(index);
-    }
+    int index = zones->invisibleRootItem()->indexOfChild(zones->currentItem());
+    delete zones->invisibleRootItem()->takeChild(index);
     active = false;
-
     zonesChanged();
     updateButtons();
 }
@@ -3650,9 +3684,8 @@ CVPage::zonesChanged()
     if (active == false) {
         // get the current zone range
         if (ranges->currentItem()) {
-
-            int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-            PaceZoneRange current = paceZones->getZoneRange(index);
+            int rnum = ranges->currentItem()->data(3, Qt::DisplayRole).toInt();
+            PaceZoneRange current = paceZones->getZoneRange(rnum);
 
             // embolden that range on the list to show it has been edited
             QFont font;
@@ -3692,9 +3725,9 @@ CVPage::zonesChanged()
             current.zones = zoneinfos;
 
             // now replace the current range struct
-            paceZones->setZoneRange(index, current);
-            updateButtons();
+            paceZones->setZoneRange(rnum, current);
         }
+        updateButtons();
     }
 }
 
