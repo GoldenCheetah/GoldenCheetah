@@ -933,14 +933,6 @@ MetaOverviewItem::configChanged(qint32)
             sparkline = NULL;
         }
     }
-    // Find the metadata fielddefintion for this tile
-    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
-        if (field.name == symbol) {
-            // only display the edit icon for fields with values set.
-            setShowEdit(field.values.size() != 0);
-            break;
-        }
-    }
 }
 
 void MetaOverviewItem::displayTileEditMenu(const QPoint& pos)
