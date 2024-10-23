@@ -293,7 +293,8 @@ class CPPage : public QWidget
         void addZoneClicked();
         void deleteZoneClicked();
         void zonesChanged();
-        void initializeRanges();
+        void initializeRanges(int selectIndex = -1);
+        void reInitializeRanges();
 
     private slots:
 #if QT_VERSION < 0x060000
