@@ -23,6 +23,8 @@
 #include "RideCache.h"
 #include "RideMetadata.h"
 
+#include <QFormLayout>
+
 MetadataDialog::MetadataDialog(Context* context, const QString& fieldName, const QString& value, QPoint pos) :
     QDialog(context->mainWindow), context_(context), completer_(nullptr), pos_(pos)
 {
@@ -45,19 +47,19 @@ MetadataDialog::MetadataDialog(Context* context, const QString& fieldName, const
     case FIELD_SHORTTEXT: { // shorttext
         metaEdit_ = new QLineEdit(this);
         completer_ = field_.getCompleter(this, context_->athlete->rideCache);
-        if (completer_) dynamic_cast<QLineEdit*>(metaEdit_)->setCompleter(completer_);
-        static_cast<QLineEdit*>(metaEdit_)->setText(value);
+        if (completer_) ((QLineEdit*)metaEdit_)->setCompleter(completer_);
+        ((QLineEdit*)metaEdit_)->setMinimumWidth(225);
+        ((QLineEdit*)metaEdit_)->setText(value);
         } break;
 
     case FIELD_TEXTBOX: { // textbox
         metaEdit_ = new GTextEdit(this);
-
         // use special style sheet ..
-        dynamic_cast<GTextEdit*>(metaEdit_)->setObjectName("metadata");
-
+        ((GTextEdit*)metaEdit_)->setObjectName("metadata");
         // rich text hangs 'fontd' for some users
-        dynamic_cast<GTextEdit*>(metaEdit_)->setAcceptRichText(false);
-        dynamic_cast<GTextEdit*>(metaEdit_)->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        ((GTextEdit*)metaEdit_)->setAcceptRichText(false);
+        ((GTextEdit*)metaEdit_)->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        ((GTextEdit*)metaEdit_)->setMinimumSize(QSize(300, 100));
         ((GTextEdit*)metaEdit_)->setText(value);
         } break;
 
@@ -66,7 +68,8 @@ MetadataDialog::MetadataDialog(Context* context, const QString& fieldName, const
         ((QSpinBox*)metaEdit_)->setMinimum(-9999999);
         ((QSpinBox*)metaEdit_)->setMaximum(9999999);
         ((QSpinBox*)metaEdit_)->setButtonSymbols(QAbstractSpinBox::NoButtons);
-        static_cast<QSpinBox*>(metaEdit_)->setValue(value.toInt());
+        ((QSpinBox*)metaEdit_)->setMinimumWidth(150);
+        ((QSpinBox*)metaEdit_)->setValue(value.toInt());
         } break;
 
     case FIELD_DOUBLE: { // double
@@ -74,16 +77,16 @@ MetadataDialog::MetadataDialog(Context* context, const QString& fieldName, const
         ((QDoubleSpinBox*)metaEdit_)->setButtonSymbols(QAbstractSpinBox::NoButtons);
         ((QDoubleSpinBox*)metaEdit_)->setMinimum(-9999999.99);
         ((QDoubleSpinBox*)metaEdit_)->setMaximum(9999999.99);
+        ((QDoubleSpinBox*)metaEdit_)->setMinimumWidth(150);
         ((QDoubleSpinBox*)metaEdit_)->setValue(value.toDouble());
         } break;
 
     case FIELD_DATE: { // date
-
         metaEdit_ = new QDateEdit(this);
         ((QDateEdit*)metaEdit_)->setButtonSymbols(QAbstractSpinBox::NoButtons);
         ((QDateEdit*)metaEdit_)->setDisplayFormat("dd/MM/yyyy");
         ((QDateEdit*)metaEdit_)->setCalendarPopup(true);
-        ((QDateEdit*)metaEdit_)->setMinimumWidth(100);
+        ((QDateEdit*)metaEdit_)->setMinimumWidth(130);
         if (value == "") {
             ((QDateEdit*)metaEdit_)->setDate(QDate(2000,1,1));
         } else {
@@ -94,10 +97,10 @@ MetadataDialog::MetadataDialog(Context* context, const QString& fieldName, const
         } } break;
 
     case FIELD_TIME: { // time
-
         metaEdit_ = new QTimeEdit(this);
         ((QTimeEdit*)metaEdit_)->setButtonSymbols(QAbstractSpinBox::NoButtons);
         ((QTimeEdit*)metaEdit_)->setDisplayFormat("hh:mm:ss");
+        ((QTimeEdit*)metaEdit_)->setMinimumWidth(100);
         if (value == "") {
             ((QTimeEdit*)metaEdit_)->setTime(QTime(0,0,0));
         } else {
@@ -126,14 +129,14 @@ MetadataDialog::MetadataDialog(Context* context, const QString& fieldName, const
     QHBoxLayout* buttons = new QHBoxLayout;
     QPushButton* cancel = new QPushButton(tr("Cancel"), this);
     QPushButton* ok = new QPushButton(tr("Ok"), this);
-    buttons->addSpacing(75);
+    buttons->addStretch(75);
     buttons->addWidget(cancel);
     buttons->addWidget(ok);
 
     // Layout
-    QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->addLayout(metaDataLayout);
-    layout->addLayout(buttons);
+    QFormLayout* layout = new QFormLayout(this);
+    layout->addRow(metaDataLayout);
+    layout->addRow(buttons);
 
     adjustSize(); // Window to contents
 
@@ -149,7 +152,8 @@ MetadataDialog::~MetadataDialog()
 }
 
 void
-MetadataDialog::showEvent(QShowEvent*) {
+MetadataDialog::showEvent(QShowEvent*)
+{
 
     QSize gcWindowSize = context_->mainWindow->size();
     QPoint gcWindowPosn = context_->mainWindow->pos();

@@ -1168,8 +1168,8 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
 
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
-    adoptButton = new QPushButton(tr("Adopt"));
-    adoptButton->setVisible(false);
+    reviewButton = new QPushButton(tr("Review..."));
+    reviewButton->setVisible(false);
     newZoneRequired = new QPushButton(tr("Changed power estimates are available"));
     newZoneRequired->setFlat(true);
     newZoneRequired->setVisible(false);
@@ -1224,8 +1224,8 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     actionButtons->setSpacing(2 *dpiXFactor);
     actionButtons->addWidget(newZoneRequired);
     actionButtons->addStretch();
-    actionButtons->addWidget(adoptButton);
-    actionButtons->addItem(new QSpacerItem(5 * dpiXFactor, adoptButton->sizeHint().height()));
+    actionButtons->addWidget(reviewButton);
+    actionButtons->addItem(new QSpacerItem(5 * dpiXFactor, reviewButton->sizeHint().height()));
     actionButtons->addWidget(addButton, 0, Qt::AlignHCenter | Qt::AlignTop);
     actionButtons->addWidget(deleteButton, 0, Qt::AlignHCenter | Qt::AlignTop);
 
@@ -1328,7 +1328,7 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     connect(newZoneRequired, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-    connect(adoptButton, SIGNAL(clicked()), this, SLOT(adopt()));
+    connect(reviewButton, SIGNAL(clicked()), this, SLOT(review()));
     connect(defaultButton, SIGNAL(clicked()), this, SLOT(defaultClicked()));
     connect(addZoneButton, SIGNAL(clicked()), this, SLOT(addZoneClicked()));
     connect(deleteZoneButton, SIGNAL(clicked()), this, SLOT(deleteZoneClicked()));
@@ -1453,7 +1453,7 @@ CPPage::rangeChanged
         QDate date = topLeft.data().toDate();
         zones_->setStartDate(index, date);
         if (useModel->currentIndex() != CPPAGE_EST_MODEL_NONE) {
-            adopt();
+            review();
             setEstimateStatus(ranges->itemFromIndex(topLeft));
         }
         break;
@@ -1496,16 +1496,16 @@ CPPage::rangeChanged
         break;
     }
     if (useModel->currentIndex() == CPPAGE_EST_MODEL_NONE) {
-        adoptButton->setVisible(false);
+        reviewButton->setVisible(false);
     } else if (ranges->currentItem() != nullptr && ranges->indexFromItem(ranges->currentItem()).row() == topLeft.row()) {
-        adoptButton->setVisible(ranges->currentItem()->data(CPPAGE_RANGES_COL_EST_DEVIATION, Qt::DisplayRole).toInt() == CPPAGE_RANGES_EST_DEVIATE);
+        reviewButton->setVisible(ranges->currentItem()->data(CPPAGE_RANGES_COL_EST_DEVIATION, Qt::DisplayRole).toInt() == CPPAGE_RANGES_EST_DEVIATE);
         newZoneRequired->setVisible(needsNewRange());
     }
 }
 
 
 void
-CPPage::adopt
+CPPage::review
 ()
 {
     bool preActive = active;
@@ -1533,7 +1533,7 @@ CPPage::adopt
                 || estPmax != curPmax)) {
             QLocale locale;
             QDialog dialog;
-            dialog.setWindowTitle(tr("Adopt estimates for range starting on %1").arg(date.toString(locale.dateFormat(QLocale::ShortFormat))));
+            dialog.setWindowTitle(tr("Review range starting on %1").arg(date.toString(locale.dateFormat(QLocale::ShortFormat))));
 
             QCheckBox *cpAccept = nullptr;
             QCheckBox *aetpAccept = nullptr;
@@ -1553,12 +1553,12 @@ CPPage::adopt
             grid->addWidget(new QLabel(tr("Estimate")), row, 4, Qt::AlignCenter);
             grid->addWidget(new QLabel(tr("Accept")), row, 5, Qt::AlignCenter);
             ++row;
-            mkAdoptionRow(grid, row++, CPPAGE_LABEL_CP, tr("W"), curCp, estCp, cpAccept);
+            mkReviewRow(grid, row++, CPPAGE_LABEL_CP, tr("W"), curCp, estCp, cpAccept);
             QString infoTextAetp = "";
             if (curAetp != estAetp) {
                 infoTextAetp = getText(CPPAGE_INFO_AETP, CPPAGE_DEFAULT_FACTOR_AETP * 100);
             }
-            mkAdoptionRow(grid, row++, CPPAGE_LABEL_AETP, tr("W"), curAetp, estAetp, aetpAccept, infoTextAetp);
+            mkReviewRow(grid, row++, CPPAGE_LABEL_AETP, tr("W"), curAetp, estAetp, aetpAccept, infoTextAetp);
             if (estFtp != curFtp || useCPForFTPCombo->currentIndex() == 1) {
                 QString infoTextFtp = "";
                 if (useCPForFTPCombo->currentIndex() == 0) {
@@ -1566,16 +1566,16 @@ CPPage::adopt
                 } else if (! modelHasFtp()) {
                     infoTextFtp += getText(CPPAGE_INFO_MODEL_FTP);
                 }
-                mkAdoptionRow(grid, row++, CPPAGE_LABEL_FTP, tr("W"), curFtp, estFtp, ftpAccept, infoTextFtp);
+                mkReviewRow(grid, row++, CPPAGE_LABEL_FTP, tr("W"), curFtp, estFtp, ftpAccept, infoTextFtp);
             }
-            mkAdoptionRow(grid, row++, CPPAGE_LABEL_WPRIME, tr("J"), curWprime, estWprime, wprimeAccept);
+            mkReviewRow(grid, row++, CPPAGE_LABEL_WPRIME, tr("J"), curWprime, estWprime, wprimeAccept);
             QString infoTextPmax = "";
             if (! modelHasPmax()) {
                 infoTextPmax += getText(CPPAGE_INFO_MODEL_PMAX, estPmax);
             }
-            mkAdoptionRow(grid, row++, CPPAGE_LABEL_PMAX, tr("W"), curPmax, estPmax, pmaxAccept, infoTextPmax);
+            mkReviewRow(grid, row++, CPPAGE_LABEL_PMAX, tr("W"), curPmax, estPmax, pmaxAccept, infoTextPmax);
 
-            connectAdoptionDialogApplyButton(QVector<QCheckBox*>({cpAccept, aetpAccept, ftpAccept, wprimeAccept, pmaxAccept}), buttonBox->button(QDialogButtonBox::Apply));
+            connectReviewDialogApplyButton(QVector<QCheckBox*>({cpAccept, aetpAccept, ftpAccept, wprimeAccept, pmaxAccept}), buttonBox->button(QDialogButtonBox::Apply));
             aetpAccept->setChecked(Qt::Unchecked);
 
             QVBoxLayout *mainLayout = new QVBoxLayout(&dialog);
@@ -1594,7 +1594,7 @@ CPPage::adopt
                 if (aetpAccept->checkState() == Qt::Checked) {
                     setRangeData(modelIndex, CPPAGE_RANGES_COL_AETP, estAetp);
                 }
-                if (ftpAccept->checkState() == Qt::Checked) {
+                if (ftpAccept != nullptr && ftpAccept->checkState() == Qt::Checked) {
                     setRangeData(modelIndex, CPPAGE_RANGES_COL_FTP, estFtp);
                 }
                 if (wprimeAccept->checkState() == Qt::Checked) {
@@ -1860,7 +1860,7 @@ CPPage::addClicked()
     } else {
         add->setData(CPPAGE_RANGES_COL_EST_CP, Qt::DisplayRole, 0);
     }
-    bool wasBlocked = ranges->model()->blockSignals(true);  // Prevent adoption-dialog
+    bool wasBlocked = ranges->model()->blockSignals(true);  // Prevent review-dialog
     add->setData(CPPAGE_RANGES_COL_STARTDATE, Qt::DisplayRole, date);
     ranges->model()->blockSignals(wasBlocked);
     add->setData(CPPAGE_RANGES_COL_CP, Qt::DisplayRole, cp);
@@ -1927,7 +1927,7 @@ CPPage::rangeSelectionChanged()
     // fill with current details
     QTreeWidgetItem *item = ranges->currentItem();
     if (item != nullptr) {
-        adoptButton->setVisible(   useModel->currentIndex() != CPPAGE_EST_MODEL_NONE
+        reviewButton->setVisible(   useModel->currentIndex() != CPPAGE_EST_MODEL_NONE
                                 && item->data(CPPAGE_RANGES_COL_EST_DEVIATION, Qt::DisplayRole).toInt() == CPPAGE_RANGES_EST_DEVIATE);
 
         int index = ranges->invisibleRootItem()->indexOfChild(item);
@@ -1953,7 +1953,7 @@ CPPage::rangeSelectionChanged()
             add->setData(2, Qt::DisplayRole, current.zones[i].lo);
         }
     } else {
-        adoptButton->setVisible(false);
+        reviewButton->setVisible(false);
     }
 
     active = false;
@@ -2073,7 +2073,7 @@ CPPage::zonesChanged()
 
 
 void
-CPPage::mkAdoptionRow
+CPPage::mkReviewRow
 (QGridLayout *grid, int row, int labelId, const QString &unit, int cur, int est, QCheckBox *&accept, const QString &infoText) const
 {
     QFormLayout dummy;
@@ -2124,7 +2124,7 @@ CPPage::mkAdoptionRow
 
 
 void
-CPPage::connectAdoptionDialogApplyButton
+CPPage::connectReviewDialogApplyButton
 (QVector<QCheckBox*> checkboxes, QPushButton *applyButton) const
 {
     bool hasChecked = false;
