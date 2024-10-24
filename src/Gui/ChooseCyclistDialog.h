@@ -43,7 +43,7 @@ class ChooseCyclistDialog : public QDialog
         ChooseCyclistDialog(const QDir &home);
         QString choice();
         void getList();
-        static QString newCyclistDialog(QDir &homeDir, QWidget *parent);
+        static QString newAthleteWizard(QDir &homeDir);
         static bool deleteAthlete(QDir &homeDir, QString name, QWidget *parent);
 
     private slots:

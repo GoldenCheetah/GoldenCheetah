@@ -19,6 +19,7 @@
 #include <QtGui>
 #include <QSettings>
 #include <QWidget>
+#include <QDialogButtonBox>
 
 #include "Context.h"
 #include "Athlete.h"
@@ -37,30 +38,23 @@ AthleteConfigDialog::AthleteConfigDialog(QDir _home, Context *context) :
     setAttribute(Qt::WA_DeleteOnClose);
     setMinimumSize(800 *dpiXFactor,650 *dpiYFactor);   //changed for hidpi sizing
 
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-
     athlete = new AthleteConfig(_home, context);
     HelpWhatsThis *athleteHelp = new HelpWhatsThis(athlete);
     athlete->setWhatsThis(athleteHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_About));
+
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(  QDialogButtonBox::Close
+                                                       | QDialogButtonBox::Save);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(athlete);
+    mainLayout->addWidget(buttonBox);
 
-    closeButton = new QPushButton(tr("Close"));
-    saveButton = new QPushButton(tr("Save"));
-
-    QHBoxLayout *buttonsLayout = new QHBoxLayout;
-    buttonsLayout->addStretch();
-    buttonsLayout->setSpacing(5 *dpiXFactor);
-    buttonsLayout->addWidget(closeButton);
-    buttonsLayout->addWidget(saveButton);
-
-    mainLayout->addLayout(buttonsLayout);
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &AthleteConfigDialog::saveClicked);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &AthleteConfigDialog::closeClicked);
 
     // We go fixed width to ensure a consistent layout for
     // tabs, sub-tabs and internal widgets and lists
-    setWindowTitle(tr("Athlete Settings"));
-
-    connect(closeButton, SIGNAL(clicked()), this, SLOT(closeClicked()));
-    connect(saveButton, SIGNAL(clicked()), this, SLOT(saveClicked()));
+    setWindowTitle(tr("Athlete settings for %1").arg(context->athlete->cyclist));
 }
 
 AthleteConfigDialog::~AthleteConfigDialog()
