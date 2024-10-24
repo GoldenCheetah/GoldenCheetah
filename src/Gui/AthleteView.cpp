@@ -115,7 +115,7 @@ AthleteCard::AthleteCard(ChartSpace *parent, QString path) : ChartSpaceItem(pare
     QPixmap canvas(img.width(), img.height());
     canvas.fill(Qt::transparent);
     QPainter painter(&canvas);
-    painter.setBrush(original.scaled(img.width(), img.height()));
+    painter.setBrush(original.scaled(img.width(), img.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
     painter.setPen(Qt::NoPen);
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.drawEllipse(0, 0, img.width(), img.height());
