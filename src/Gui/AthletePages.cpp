@@ -217,8 +217,7 @@ WheelSizeCalculator::WheelSizeCalculator
                                      | QDialogButtonBox::Discard);
     buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
 
-    QFormLayout *form = new QFormLayout();
-    form->setFormAlignment(Qt::AlignHCenter | Qt::AlignTop);
+    QFormLayout *form = newQFormLayout();
     form->addRow(tr("Rim Size"), rimSizeCombo);
     form->addRow(tr("Tire Size"), tireSizeCombo);
     form->addRow(tr("Wheel Size"), wheelSizeLabel);
@@ -363,7 +362,7 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
         wheelSizeCalculatorButton->setText(QString::fromUcs4(calculatorGlyph.c_str()));
     }
 
-    QFormLayout *form = new QFormLayout();
+    QFormLayout *form = newQFormLayout();
 
     QHBoxLayout *wheelSizeLayout = new QHBoxLayout();
     wheelSizeLayout->addWidget(wheelSizeEdit, form->fieldGrowthPolicy() == QFormLayout::AllNonFixedFieldsGrow ? 1 : 0);
@@ -528,8 +527,7 @@ AboutModelPage::AboutModelPage(Context *context) : context(context)
 
     resetButton = new QPushButton(tr("Restore Defaults"));
 
-    QFormLayout *form = new QFormLayout(this);
-    form->setFormAlignment(Qt::AlignHCenter | Qt::AlignTop);
+    QFormLayout *form = newQFormLayout(this);
 
     form->addRow(tr("W'bal tau"), wbaltau);
     form->addRow(tr("Short Term Stress (STS) average"), perfManSTSavg);
@@ -615,15 +613,15 @@ BackupPage::BackupPage
     autoBackupPeriod->setMaximum(9999);
     autoBackupPeriod->setSingleStep(1);
     autoBackupPeriod->setValue(appsettings->cvalue(context->athlete->cyclist, GC_AUTOBACKUP_PERIOD, 0).toInt());
+    autoBackupPeriod->setPrefix(tr("every") + " ");
     autoBackupPeriod->setSuffix(" " + tr("times"));
     autoBackupPeriod->setSpecialValueText(tr("never"));
 
     QPushButton *backupNow = new QPushButton(tr("Backup now"));
 
-    QFormLayout *form = new QFormLayout(this);
-    form->setFormAlignment(Qt::AlignHCenter | Qt::AlignTop);
+    QFormLayout *form = newQFormLayout(this);
     form->addRow(tr("Auto Backup Folder"), autoBackupFolder);
-    form->addRow(tr("Auto Backup after closing the athlete every"), autoBackupPeriod);
+    form->addRow(tr("Auto Backup after closing the athlete"), autoBackupPeriod);
     form->addItem(new QSpacerItem(1, 15 * dpiYFactor));
     form->addRow("", backupNow);
 
@@ -2359,7 +2357,7 @@ CPPage::addDialogManual
     pmaxEdit->setSuffix(" " + tr("W"));
     pmaxEdit->setValue(pmax);
 
-    QFormLayout *form = new QFormLayout(&dialog);
+    QFormLayout *form = newQFormLayout(&dialog);
     form->addRow(getText(CPPAGE_LABEL_STARTDATE), dateEdit);
     form->addRow(getText(CPPAGE_LABEL_CP), cpEdit);
     form->addRow(getText(CPPAGE_LABEL_AETP), aetpEdit);
@@ -2834,7 +2832,7 @@ LTPage::addClicked()
     maxHrEdit->setSuffix(" " + tr("bpm"));
     maxHrEdit->setValue(maxHr);
 
-    QFormLayout *form = new QFormLayout(&dialog);
+    QFormLayout *form = newQFormLayout(&dialog);
     form->addRow(tr("Start Date"), dateEdit);
     form->addRow(tr("Lactate Threshold"), ltEdit);
     form->addRow(tr("Aerobic Threshold"), aetEdit);
@@ -3551,7 +3549,7 @@ CVPage::addClicked()
     aetEdit->setDisplayFormat("mm:ss '" + paceZones->paceUnits(metricPace) + "'");
     aetEdit->setTime(aet);
 
-    QFormLayout *form = new QFormLayout(&dialog);
+    QFormLayout *form = newQFormLayout(&dialog);
     form->addRow(tr("Start Date"), dateEdit);
     form->addRow(tr("Critical Velocity (CV)"), cvEdit);
     form->addRow(tr("Aerobic Threshold (AeT)"), aetEdit);
@@ -3833,8 +3831,7 @@ CVPage::updateButtons
 SeasonsPage::SeasonsPage(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
     QGridLayout *mainLayout = new QGridLayout(this);
-    QFormLayout *editLayout = new QFormLayout;
-    editLayout->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
+    QFormLayout *editLayout = newQFormLayout();
 
     // get the list
     array = context->athlete->seasons->seasons;
@@ -4232,21 +4229,4 @@ AutoImportPage::addRuleTypes(QComboBox *p)
 {
     RideAutoImportRule config;
     p->addItems(config.getRuleDescriptions());
-}
-
-
-extern void
-basicTreeWidgetStyle
-(QTreeWidget *tree)
-{
-    tree->setSelectionMode(QAbstractItemView::SingleSelection);
-    tree->setEditTriggers(  QAbstractItemView::DoubleClicked
-                          | QAbstractItemView::SelectedClicked
-                          | QAbstractItemView::AnyKeyPressed);
-    tree->setUniformRowHeights(true);
-    tree->setIndentation(0);
-    tree->setAlternatingRowColors(true);
-    for (int i = 0; i < tree->columnCount(); ++i) {
-        tree->header()->setSectionResizeMode(i, QHeaderView::ResizeToContents);
-    }
 }

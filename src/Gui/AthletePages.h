@@ -33,6 +33,7 @@
 #include <QListWidget>
 #include <QList>
 #include <QFileDialog>
+#include <QFormLayout>
 #include "Zones.h"
 #include "HrZones.h"
 #include "PaceZones.h"
@@ -663,7 +664,5 @@ class AutoImportPage : public QWidget
         QPushButton *addButton, *renameButton, *deleteButton, *browseButton;
 
 };
-
-extern void basicTreeWidgetStyle(QTreeWidget *tree);
 
 #endif

@@ -254,8 +254,7 @@ NewAthletePageUser::NewAthletePageUser
     connect(name, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged()));
     connect(unitCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(unitChanged(int)));
 
-    QFormLayout *form = new QFormLayout();
-    form->setFormAlignment(Qt::AlignHCenter | Qt::AlignTop);
+    QFormLayout *form = newQFormLayout();
     form->addRow(tr("Athlete Name") + "<sup>*</sup>", name);
     form->addRow(tr("Date of Birth"), dob);
     form->addRow(tr("Sex"), sex);
@@ -433,8 +432,7 @@ NewAthletePagePerformance::NewAthletePagePerformance
     cvSw->setDisplayFormat("mm:ss '" + (useMetricUnits ? tr("min/100m") : tr("min/100yd")) +"'");
     registerField("perf.cvSw", cvSw);
 
-    QFormLayout *form = new QFormLayout(this);
-    form->setFormAlignment(Qt::AlignHCenter | Qt::AlignTop);
+    QFormLayout *form = newQFormLayout(this);
     form->addRow(tr("Maximum Power (PMax)"), pmax);
     form->addRow(tr("Critical Power (CP) / FTP"), cp);
     form->addRow(tr("Anaerobic Capacity (W')"), w);
