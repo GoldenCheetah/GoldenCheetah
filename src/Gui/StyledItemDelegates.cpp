@@ -21,10 +21,6 @@
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QFileDialog>
-#if 0
-#include <QEvent>
-#include <QFocusEvent>
-#endif
 #include <QStandardPaths>
 #include <QDoubleSpinBox>
 #include <QDateEdit>
