@@ -43,7 +43,7 @@ class AthleteConfig : public QWidget
 
     public slots:
         qint32 saveClicked();
-    
+
     private:
         QDir home;
         Context *context;
@@ -72,9 +72,6 @@ class AthleteConfigDialog : public QDialog
         QSettings *settings;
         QDir home;
         Context *context;
-
-        QPushButton *saveButton;
-	    QPushButton *closeButton;
 
         // the config pages
         AthleteConfig *athlete;

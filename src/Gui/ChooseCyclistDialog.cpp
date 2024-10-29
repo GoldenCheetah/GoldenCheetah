@@ -17,12 +17,13 @@
  */
 
 #include "ChooseCyclistDialog.h"
-#include "NewCyclistDialog.h"
+#include "NewAthleteWizard.h"
 #include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "Colors.h"
 #include <QtGui>
+#include <QMessageBox>
 
 static void recursiveDelete(QDir dir)
 {
@@ -87,6 +88,10 @@ ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home) : home(home)
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(listWidget);
     mainLayout->addLayout(buttonLayout);
+
+    if (listWidget->count() == 0) {
+        newClicked();
+    }
 }
 
 void
@@ -122,7 +127,6 @@ ChooseCyclistDialog::getList()
                 t.next();
                 if (t.key() == name)
                     newone->setFlags(newone->flags() & ~Qt::ItemIsEnabled);
-
             }
         }
     }
@@ -194,28 +198,20 @@ ChooseCyclistDialog::deleteClicked()
 }
 
 QString
-ChooseCyclistDialog::newCyclistDialog(QDir &homeDir, QWidget *)
+ChooseCyclistDialog::newAthleteWizard(QDir &homeDir)
 {
-    NewCyclistDialog *newone = new NewCyclistDialog(homeDir);
-
-    // get new one..
-    QString name;
-    if (newone->exec() == QDialog::Accepted)
-        name = newone->name->text();
-    else
-        name = "";
-
-    // zap the dialog now we have the results
-    delete newone;
-
-    // blank if cancelled
-    return name;
+    NewAthleteWizard newAthleteWizard(homeDir);
+    if (newAthleteWizard.exec() == QDialog::Accepted) {
+        return newAthleteWizard.getName();
+    } else {
+        return "";
+    }
 }
 
 void
 ChooseCyclistDialog::newClicked()
 {
-    QString name = newCyclistDialog(home, this);
+    QString name = newAthleteWizard(home);
     if (!name.isEmpty()) {
         QListWidgetItem *newone = new QListWidgetItem(name, listWidget);
 

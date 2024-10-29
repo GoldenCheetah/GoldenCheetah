@@ -839,6 +839,7 @@ breakout:
     // best settings for UI as now designed
     returning.theme = 5; // team purple colors
     returning.antialias = true;
+    returning.macForms = true;
     returning.scrollbar = true;
     returning.head = false;
     returning.sideanalysis = false;

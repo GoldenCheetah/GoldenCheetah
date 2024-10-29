@@ -1,7 +1,27 @@
+/*
+ * Copyright (c) 2024 Joachim Kohlhammer (joachim.kohlhammer@gmx.de)
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #ifndef STYLEDITEMSDELEGATES_H
 #define STYLEDITEMSDELEGATES_H
 
 #include <QStyledItemDelegate>
+#include <QPushButton>
+#include <QLineEdit>
 #include <QTime>
 
 
@@ -24,6 +44,81 @@ public:
 
 private:
     int uniqueColumn;
+};
+
+
+
+class ComboBoxDelegate: public QStyledItemDelegate
+{
+    Q_OBJECT
+
+public:
+    ComboBoxDelegate(QObject *parent = nullptr);
+
+    virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+    virtual QString displayText(const QVariant &value, const QLocale &locale) const override;
+    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+
+    void addItems(const QStringList &texts);
+
+private slots:
+    void commitAndCloseEditor();
+
+private:
+    QStringList texts;
+};
+
+
+
+class DirectoryPathWidget: public QWidget
+{
+    Q_OBJECT
+
+public:
+    DirectoryPathWidget(QWidget *parent = nullptr);
+
+    void setPath(const QString &path);
+    QString getPath() const;
+    void setPlaceholderText(const QString &placeholder);
+
+signals:
+    void editingFinished();
+
+private:
+    QPushButton *openButton;
+    QLineEdit *lineEdit;
+    bool lineEditAlreadyFinished = false;
+
+private slots:
+    void openDialog();
+    void lineEditFinished();
+};
+
+
+class DirectoryPathDelegate: public QStyledItemDelegate
+{
+    Q_OBJECT
+
+public:
+    DirectoryPathDelegate(QObject *parent = nullptr);
+
+    virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+    virtual QString displayText(const QVariant &value, const QLocale &locale) const override;
+    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+
+    void setMaxWidth(int maxWidth);
+    void setPlaceholderText(const QString &placeholderText);
+
+private slots:
+    void commitAndCloseEditor();
+
+private:
+    int maxWidth = -1;
+    QString placeholderText;
 };
 
 

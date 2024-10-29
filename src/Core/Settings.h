@@ -153,6 +153,7 @@
 #define GC_WORKOUTDIR                   "<global-general>workoutDir"                         // used for Workouts and Videosyn files
 #define GC_LINEWIDTH                    "<global-general>linewidth"
 #define GC_ANTIALIAS                    "<global-general>antialias"
+#define GC_MAC_FORMS                    "<global-general>macForms"
 #define GC_RIDEBG                       "<global-general>rideBG"
 #define GC_RIDESCROLL                   "<global-general>rideScroll"
 #define GC_RIDEHEAD                     "<global-general>rideHead"
@@ -468,6 +469,7 @@ typedef struct {
     // ui elements, mostly standard defaults
     int theme; // theme number to use
     bool antialias; // antialias fonts- always true
+    bool macForms; // simulate MAC-style forms
     bool scrollbar; //scroller on ride list- always false
     bool head; // false for MAC, true for everyone else
     int sidebarwidth; // width of sidebars in pixels

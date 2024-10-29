@@ -1118,3 +1118,39 @@ QIcon colouredIconFromPNG(QString filename, QColor color)
     return QIcon(colouredPixmapFromPNG(filename, color));
 }
 
+
+extern void
+basicTreeWidgetStyle
+(QTreeWidget *tree, bool editable)
+{
+    tree->setSelectionMode(QAbstractItemView::SingleSelection);
+    if (editable) {
+        tree->setEditTriggers(  QAbstractItemView::DoubleClicked
+                              | QAbstractItemView::SelectedClicked
+                              | QAbstractItemView::AnyKeyPressed);
+    } else {
+        tree->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    }
+    tree->setUniformRowHeights(true);
+    tree->setIndentation(0);
+    tree->setAlternatingRowColors(true);
+    for (int i = 0; i < tree->columnCount(); ++i) {
+        tree->header()->setSectionResizeMode(i, QHeaderView::ResizeToContents);
+    }
+}
+
+
+extern QFormLayout*
+newQFormLayout
+(QWidget *parent)
+{
+    QFormLayout *form = new QFormLayout(parent);
+    form->setFormAlignment(Qt::AlignHCenter | Qt::AlignTop);
+    if (appsettings->value(nullptr, GC_MAC_FORMS, true).toBool()) {
+        form->setRowWrapPolicy(QFormLayout::DontWrapRows);
+        form->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
+        form->setFormAlignment(Qt::AlignHCenter | Qt::AlignTop);
+        form->setLabelAlignment(Qt::AlignRight);
+    }
+    return form;
+}

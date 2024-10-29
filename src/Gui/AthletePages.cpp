@@ -53,6 +53,7 @@
 #include "CloudDBUserMetric.h"
 #endif
 #include "MainWindow.h"
+#include "AthleteBackup.h"
 
 
 //
@@ -89,6 +90,7 @@ CredentialsPage::CredentialsPage(Context *context) : context(context)
     accounts->setSelectionMode(QAbstractItemView::SingleSelection);
     //fields->setUniformRowHeights(true);
     accounts->setIndentation(0);
+    accounts->setAlternatingRowColors(true);
 
     mainLayout->addWidget(accounts, 0,0);
     mainLayout->addLayout(actionButtons, 1,0);
@@ -188,6 +190,73 @@ CredentialsPage::editClicked()
 
 }
 
+
+//
+// Wheel Size Calculator
+//
+
+WheelSizeCalculator::WheelSizeCalculator
+(QWidget *parent)
+: QDialog(parent)
+{
+    setWindowTitle(tr("Wheel Size Calculator"));
+
+    rimSizeCombo = new QComboBox();
+    rimSizeCombo->addItems(WheelSize::RIM_SIZES);
+
+    tireSizeCombo = new QComboBox();
+    tireSizeCombo->addItems(WheelSize::TIRE_SIZES);
+
+    wheelSizeLabel = new QLabel("---");
+    QFont font(wheelSizeLabel->font());
+    font.setWeight(QFont::Black);
+    wheelSizeLabel->setFont(font);
+    wheelSizeLabel->setEnabled(false);
+
+    buttonBox = new QDialogButtonBox(  QDialogButtonBox::Apply
+                                     | QDialogButtonBox::Discard);
+    buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
+
+    QFormLayout *form = newQFormLayout();
+    form->addRow(tr("Rim Size"), rimSizeCombo);
+    form->addRow(tr("Tire Size"), tireSizeCombo);
+    form->addRow(tr("Wheel Size"), wheelSizeLabel);
+    form->addItem(new QSpacerItem(1, 10 * dpiYFactor));
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->addLayout(form);
+    mainLayout->addWidget(buttonBox);
+
+    connect(rimSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calc()));
+    connect(tireSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calc()));
+    connect(buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(accept()));
+    connect(buttonBox->button(QDialogButtonBox::Discard), SIGNAL(clicked()), this, SLOT(reject()));
+}
+
+void
+WheelSizeCalculator::calc
+()
+{
+    if (rimSizeCombo->currentIndex() > 0 && tireSizeCombo->currentIndex() > 0) {
+        wheelSize = WheelSize::calcPerimeter(rimSizeCombo->currentIndex(), tireSizeCombo->currentIndex());
+        wheelSizeLabel->setText(QString::number(wheelSize) + " " + tr("mm"));
+        wheelSizeLabel->setEnabled(true);
+        buttonBox->button(QDialogButtonBox::Apply)->setEnabled(true);
+    } else {
+        wheelSizeLabel->setText("---");
+        buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
+        wheelSizeLabel->setEnabled(false);
+    }
+}
+
+int
+WheelSizeCalculator::getWheelSize
+() const
+{
+    return wheelSize;
+}
+
+
 //
 // About me
 //
@@ -195,23 +264,16 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
 {
     metricUnits = GlobalContext::context()->useMetricUnits;
 
-    QVBoxLayout *all = new QVBoxLayout(this);
-    QGridLayout *grid = new QGridLayout;
-
-    QLabel *nicklabel = new QLabel(tr("Nickname"));
-    QLabel *doblabel = new QLabel(tr("Date of Birth"));
-    QLabel *sexlabel = new QLabel(tr("Sex"));
-    weightlabel = new QLabel(tr("Weight"));
-    heightlabel = new QLabel(tr("Height"));
-
     nickname = new QLineEdit(this);
     nickname->setText(appsettings->cvalue(context->athlete->cyclist, GC_NICKNAME, "").toString());
     if (nickname->text() == "0") nickname->setText("");
 
+    QLocale locale;
+
     dob = new QDateEdit(this);
     dob->setDate(appsettings->cvalue(context->athlete->cyclist, GC_DOB).toDate());
     dob->setCalendarPopup(true);
-    dob->setDisplayFormat("yyyy/MM/dd");
+    dob->setDisplayFormat(locale.dateFormat(QLocale::ShortFormat));
 
     sex = new QComboBox(this);
     sex->addItem(tr("Male"));
@@ -239,19 +301,22 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
         avatar = QPixmap(context->athlete->home->config().canonicalPath() + "/" + "avatar.png");
     else
         avatar = QPixmap(":/images/noavatar.png");
+    int newHeight = std::min(avatar.width(), avatar.height());
+    avatar = avatar.copy(0, 0, newHeight, newHeight);
 
     avatarButton = new QPushButton(this);
     avatarButton->setContentsMargins(0,0,0,0);
     avatarButton->setFlat(true);
-    avatarButton->setIcon(avatar.scaled(140,140));
+    avatarButton->setIcon(avatar.scaledToHeight(140, Qt::SmoothTransformation));
     avatarButton->setIconSize(QSize(140,140));
     avatarButton->setFixedHeight(140);
     avatarButton->setFixedWidth(140);
+    QRegion region(0, 0, avatarButton->width() - 1, avatarButton->height() - 1, QRegion::Ellipse);
+    avatarButton->setMask(region);
 
     //
     // Crank length - only used by PfPv chart (should move there!)
     //
-    QLabel *crankLengthLabel = new QLabel(tr("Crank Length"));
     QVariant crankLength = appsettings->cvalue(context->athlete->cyclist, GC_CRANKLENGTH, "175");
     crankLengthCombo = new QComboBox();
     crankLengthCombo->addItem("130");
@@ -283,54 +348,58 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
     //
     // Wheel size
     //
-    QLabel *wheelSizeLabel = new QLabel(tr("Wheelsize"), this);
     int wheelSize = appsettings->cvalue(context->athlete->cyclist, GC_WHEELSIZE, 2100).toInt();
 
-    rimSizeCombo = new QComboBox();
-    rimSizeCombo->addItems(WheelSize::RIM_SIZES);
+    wheelSizeEdit = new QSpinBox();
+    wheelSizeEdit->setRange(1, 9999);
+    wheelSizeEdit->setSingleStep(1);
+    wheelSizeEdit->setSuffix(" " + tr("mm"));
+    wheelSizeEdit->setValue(wheelSize);
 
-    tireSizeCombo = new QComboBox();
-    tireSizeCombo->addItems(WheelSize::TIRE_SIZES);
+    wheelSizeCalculatorButton = new QPushButton(tr("Calculate..."));
+    std::u32string calculatorGlyph = U"🖩";
+    if (wheelSizeCalculatorButton->fontMetrics().inFontUcs4(calculatorGlyph[0])) {
+        wheelSizeCalculatorButton->setText(QString::fromUcs4(calculatorGlyph.c_str()));
+    }
 
-
-    wheelSizeEdit = new QLineEdit(QString("%1").arg(wheelSize),this);
-    wheelSizeEdit->setInputMask("0000");
-    wheelSizeEdit->setFixedWidth(40 *dpiXFactor);
-
-    QLabel *wheelSizeUnitLabel = new QLabel(tr("mm"), this);
+    QFormLayout *form = newQFormLayout();
 
     QHBoxLayout *wheelSizeLayout = new QHBoxLayout();
-    wheelSizeLayout->addWidget(rimSizeCombo);
-    wheelSizeLayout->addWidget(tireSizeCombo);
-    wheelSizeLayout->addWidget(wheelSizeEdit);
-    wheelSizeLayout->addWidget(wheelSizeUnitLabel);
+    wheelSizeLayout->addWidget(wheelSizeEdit, form->fieldGrowthPolicy() == QFormLayout::AllNonFixedFieldsGrow ? 1 : 0);
+    wheelSizeLayout->addWidget(wheelSizeCalculatorButton, 0);
 
-    connect(rimSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
-    connect(tireSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
-    connect(wheelSizeEdit, SIGNAL(textEdited(QString)), this, SLOT(resetWheelSize()));
+    form->setFormAlignment(Qt::AlignHCenter | Qt::AlignTop);
+    form->addRow(tr("Nickname"), nickname);
+    form->addRow(tr("Date of Birth"), dob);
+    form->addRow(tr("Sex"), sex);
+    form->addRow(tr("Height"), height);
+    form->addRow(tr("Weight"), weight);
+    form->addItem(new QSpacerItem(1, 15 * dpiYFactor));
+    form->addRow("", new QLabel(tr("Bike")));
+    form->addRow(tr("Crank Length"), crankLengthCombo);
+    form->addRow(tr("Wheelsize"), wheelSizeLayout);
 
-    Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
+    QVBoxLayout *avatarLayout = new QVBoxLayout();
+    avatarLayout->addWidget(avatarButton);
+    avatarLayout->addStretch();
 
-    grid->addWidget(nicklabel, 0, 0, alignment);
-    grid->addWidget(doblabel, 1, 0, alignment);
-    grid->addWidget(sexlabel, 2, 0, alignment);
-    grid->addWidget(heightlabel, 3, 0, alignment);
-    grid->addWidget(weightlabel, 4, 0, alignment);
+    QHBoxLayout *mainLayout = new QHBoxLayout();
+    mainLayout->addLayout(avatarLayout);
+    mainLayout->addSpacing(20 * dpiXFactor);
+    mainLayout->addLayout(form);
 
-    grid->addWidget(nickname, 0, 1, alignment);
-    grid->addWidget(dob, 1, 1, alignment);
-    grid->addWidget(sex, 2, 1, alignment);
-    grid->addWidget(height, 3, 1, alignment);
-    grid->addWidget(weight, 4, 1, alignment);
+    QLabel *athleteLabel = new QLabel(context->athlete->cyclist);
+    athleteLabel->setAlignment(Qt::AlignCenter);
+    QFont athleteFont = athleteLabel->font();
+    athleteFont.setBold(true);
+    athleteFont.setPointSize(athleteFont.pointSize() * 1.3);
+    athleteLabel->setFont(athleteFont);
 
-    grid->addWidget(crankLengthLabel, 5, 0, alignment);
-    grid->addWidget(crankLengthCombo, 5, 1, alignment);
-    grid->addWidget(wheelSizeLabel, 6, 0, alignment);
-    grid->addLayout(wheelSizeLayout, 6, 1, 1, 2, alignment);
-
-    grid->addWidget(avatarButton, 0, 1, 4, 2, Qt::AlignRight|Qt::AlignVCenter);
-    all->addLayout(grid);
-    all->addStretch();
+    QVBoxLayout *mainMainLayout = new QVBoxLayout(this);
+    mainLayout->addSpacing(10 * dpiYFactor);
+    mainMainLayout->addWidget(athleteLabel);
+    mainMainLayout->addSpacing(30 * dpiXFactor);
+    mainMainLayout->addLayout(mainLayout);
 
     // save initial values for things we care about
     // note we don't worry about age or sex at this point
@@ -342,7 +411,8 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
     b4.wheel = wheelSize;
     b4.crank = crankLengthCombo->currentIndex();
 
-    connect (avatarButton, SIGNAL(clicked()), this, SLOT(chooseAvatar()));
+    connect(wheelSizeCalculatorButton, SIGNAL(clicked()), this, SLOT(openWheelSizeCalculator()));
+    connect(avatarButton, SIGNAL(clicked()), this, SLOT(chooseAvatar()));
 }
 
 void
@@ -367,26 +437,24 @@ AboutRiderPage::chooseAvatar()
     QString filename = QFileDialog::getOpenFileName(this, tr("Choose Picture"),
                             "", tr("Images") + " (*.png *.jpg *.bmp)");
     if (filename != "") {
-
         avatar = QPixmap(filename);
-        avatarButton->setIcon(avatar.scaled(140,140));
+        int s = std::min(avatar.width(), avatar.height());
+        avatar = avatar.copy((avatar.width() - s) / 2, (avatar.height() - s) / 2, s, s);
+        avatarButton->setIcon(avatar.scaledToHeight(140, Qt::SmoothTransformation));
         avatarButton->setIconSize(QSize(140,140));
     }
 }
 
 void
-AboutRiderPage::calcWheelSize()
+AboutRiderPage::openWheelSizeCalculator
+()
 {
-   int diameter = WheelSize::calcPerimeter(rimSizeCombo->currentIndex(), tireSizeCombo->currentIndex());
-   if (diameter>0)
-        wheelSizeEdit->setText(QString("%1").arg(diameter));
-}
+    WheelSizeCalculator wsDialog(this);
 
-void
-AboutRiderPage::resetWheelSize()
-{
-   rimSizeCombo->setCurrentIndex(0);
-   tireSizeCombo->setCurrentIndex(0);
+    int dialogRet = wsDialog.exec();
+    if (dialogRet == QDialog::Accepted) {
+        wheelSizeEdit->setValue(wsDialog.getWheelSize());
+    }
 }
 
 qint32
@@ -402,7 +470,7 @@ AboutRiderPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_HEIGHT, height->value() * (metricUnits ? 1.0/100.0 : CM_PER_INCH/100.0));
 
     appsettings->setCValue(context->athlete->cyclist, GC_CRANKLENGTH, crankLengthCombo->currentText());
-    appsettings->setCValue(context->athlete->cyclist, GC_WHEELSIZE, wheelSizeEdit->text().toInt());
+    appsettings->setCValue(context->athlete->cyclist, GC_WHEELSIZE, wheelSizeEdit->value());
 
     qint32 state=0;
 
@@ -417,7 +485,7 @@ AboutRiderPage::saveClicked()
     }
 
     // general stuff changed ?
-    if (b4.wheel != wheelSizeEdit->text().toInt() ||
+    if (b4.wheel != wheelSizeEdit->value() ||
         b4.crank != crankLengthCombo->currentIndex() )
         state += CONFIG_GENERAL;
 
@@ -426,63 +494,63 @@ AboutRiderPage::saveClicked()
 
 AboutModelPage::AboutModelPage(Context *context) : context(context)
 {
-    QVBoxLayout *all = new QVBoxLayout(this);
-    QGridLayout *grid = new QGridLayout;
-
     //
     // W'bal Tau
     //
-    wbaltaulabel = new QLabel(tr("W'bal tau (s)"));
     wbaltau = new QSpinBox(this);
     wbaltau->setMinimum(30);
     wbaltau->setMaximum(1200);
     wbaltau->setSingleStep(10);
-    wbaltau->setValue(appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toInt());
+    wbaltau->setSuffix(" " + tr("s"));
+    wbaltau->setValue(appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, defaultWbaltau).toInt());
 
     //
     // Performance manager
     //
 
-    perfManSTSLabel = new QLabel(tr("STS average (days)"));
-    perfManLTSLabel = new QLabel(tr("LTS average (days)"));
-    perfManSTSavgValidator = new QIntValidator(1,21,this);
-    perfManLTSavgValidator = new QIntValidator(7,56,this);
-
     // get config or set to defaults
-    QVariant perfManSTSVal = appsettings->cvalue(context->athlete->cyclist, GC_STS_DAYS);
-    if (perfManSTSVal.isNull() || perfManSTSVal.toInt() == 0) perfManSTSVal = 7;
-    QVariant perfManLTSVal = appsettings->cvalue(context->athlete->cyclist, GC_LTS_DAYS);
-    if (perfManLTSVal.isNull() || perfManLTSVal.toInt() == 0) perfManLTSVal = 42;
+    int perfManSTSVal = appsettings->cvalue(context->athlete->cyclist, GC_STS_DAYS, defaultSTSavg).toInt();
+    int perfManLTSVal = appsettings->cvalue(context->athlete->cyclist, GC_LTS_DAYS, defaultLTSavg).toInt();
 
-    perfManSTSavg = new QLineEdit(perfManSTSVal.toString(),this);
-    perfManSTSavg->setValidator(perfManSTSavgValidator);
-    perfManLTSavg = new QLineEdit(perfManLTSVal.toString(),this);
-    perfManLTSavg->setValidator(perfManLTSavgValidator);
+    perfManSTSavg = new QSpinBox();
+    perfManSTSavg->setRange(1, 21);
+    perfManSTSavg->setSuffix(" " + tr("days"));
+    perfManSTSavg->setValue(perfManSTSVal);
+
+    perfManLTSavg = new QSpinBox();
+    perfManLTSavg->setRange(7, 56);
+    perfManLTSavg->setSuffix(" " + tr("days"));
+    perfManLTSavg->setValue(perfManLTSVal);
 
     showSBToday = new QCheckBox(tr("PMC Stress Balance Today"), this);
-    showSBToday->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_SB_TODAY).toInt());
+    showSBToday->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_SB_TODAY, defaultSBToday).toInt());
 
-    Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
+    resetButton = new QPushButton(tr("Restore Defaults"));
 
-    grid->addWidget(wbaltaulabel, 9, 0, alignment);
-    grid->addWidget(wbaltau, 9, 1, alignment);
+    QFormLayout *form = newQFormLayout(this);
 
-    grid->addWidget(perfManSTSLabel, 10, 0, alignment);
-    grid->addWidget(perfManSTSavg, 10, 1, alignment);
-    grid->addWidget(perfManLTSLabel, 11, 0, alignment);
-    grid->addWidget(perfManLTSavg, 11, 1, alignment);
-    grid->addWidget(showSBToday, 12, 1, alignment);
-
-    all->addLayout(grid);
-    all->addStretch();
+    form->addRow(tr("W'bal tau"), wbaltau);
+    form->addRow(tr("Short Term Stress (STS) average"), perfManSTSavg);
+    form->addRow(tr("Long Term Stress (LTS) average"), perfManLTSavg);
+    form->addRow("", showSBToday);
+    form->addItem(new QSpacerItem(1, 15 * dpiYFactor));
+    form->addRow("", resetButton);
 
     // save initial values for things we care about
     // note we don't worry about age or sex at this point
     // since they are not used, nor the W'bal tau used in
     // the realtime code. This is limited to stuff we
     // care about tracking as it is used by metrics
-    b4.lts = perfManLTSVal.toInt();
-    b4.sts = perfManSTSVal.toInt();
+    b4.lts = perfManLTSVal;
+    b4.sts = perfManSTSVal;
+
+    connect(resetButton, SIGNAL(clicked()), this, SLOT(restoreDefaults()));
+    connect(wbaltau, SIGNAL(valueChanged(int)), this, SLOT(anyChanged()));
+    connect(perfManSTSavg, SIGNAL(valueChanged(int)), this, SLOT(anyChanged()));
+    connect(perfManLTSavg, SIGNAL(valueChanged(int)), this, SLOT(anyChanged()));
+    connect(showSBToday, SIGNAL(toggled(bool)), this, SLOT(anyChanged()));
+
+    anyChanged();
 }
 
 qint32
@@ -492,73 +560,87 @@ AboutModelPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_WBALTAU, wbaltau->value());
 
     // Performance Manager
-    appsettings->setCValue(context->athlete->cyclist, GC_STS_DAYS, perfManSTSavg->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_LTS_DAYS, perfManLTSavg->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_STS_DAYS, perfManSTSavg->value());
+    appsettings->setCValue(context->athlete->cyclist, GC_LTS_DAYS, perfManLTSavg->value());
     appsettings->setCValue(context->athlete->cyclist, GC_SB_TODAY, (int) showSBToday->isChecked());
 
     qint32 state=0;
 
     // PMC constants changed ?
-    if(b4.lts != perfManLTSavg->text().toInt() || b4.sts != perfManSTSavg->text().toInt())
+    if(b4.lts != perfManLTSavg->value() || b4.sts != perfManSTSavg->value())
         state += CONFIG_PMC;
 
     return state;
 }
 
-BackupPage::BackupPage(Context *context) : context(context)
-{
-    QVBoxLayout *all = new QVBoxLayout(this);
-    QGridLayout *grid = new QGridLayout;
 
+void
+AboutModelPage::restoreDefaults
+()
+{
+    wbaltau->setValue(defaultWbaltau);
+    perfManSTSavg->setValue(defaultSTSavg);
+    perfManLTSavg->setValue(defaultLTSavg);
+    showSBToday->setChecked(defaultSBToday);
+}
+
+
+void
+AboutModelPage::anyChanged
+()
+{
+    resetButton->setEnabled(   wbaltau->value() != defaultWbaltau
+                            || perfManSTSavg->value() != defaultSTSavg
+                            || perfManLTSavg->value() != defaultLTSavg
+                            || showSBToday->isChecked() != defaultSBToday);
+}
+
+
+BackupPage::BackupPage
+(Context *context)
+: context(context)
+{
     //
     // Auto Backup
     //
     // Selecting the storage folder folder of the Local File Store
-    QLabel *autoBackupFolderLabel = new QLabel(tr("Auto Backup Folder"));
-    autoBackupFolder = new QLineEdit(this);
-    autoBackupFolder->setText(appsettings->cvalue(context->athlete->cyclist, GC_AUTOBACKUP_FOLDER, "").toString());
-    autoBackupFolderBrowse = new QPushButton(tr("Browse"));
-    connect(autoBackupFolderBrowse, SIGNAL(clicked()), this, SLOT(chooseAutoBackupFolder()));
-    autoBackupPeriod = new QSpinBox(this);
+    autoBackupFolder = new DirectoryPathWidget();
+    autoBackupFolder->setPlaceholderText(tr("Enter a directory"));
+    autoBackupFolder->setPath(appsettings->cvalue(context->athlete->cyclist, GC_AUTOBACKUP_FOLDER, "").toString());
+
+    autoBackupPeriod = new QSpinBox();
     autoBackupPeriod->setMinimum(0);
     autoBackupPeriod->setMaximum(9999);
     autoBackupPeriod->setSingleStep(1);
-    QLabel *autoBackupPeriodLabel = new QLabel(tr("Auto Backup execution every"));
     autoBackupPeriod->setValue(appsettings->cvalue(context->athlete->cyclist, GC_AUTOBACKUP_PERIOD, 0).toInt());
-    QLabel *autoBackupUnitLabel = new QLabel(tr("times the athlete is closed - 0 means never"));
-    QHBoxLayout *backupInput = new QHBoxLayout();
-    backupInput->addWidget(autoBackupPeriod);
-    //backupInput->addStretch();
-    backupInput->addWidget(autoBackupUnitLabel);
+    autoBackupPeriod->setPrefix(tr("every") + " ");
+    autoBackupPeriod->setSuffix(" " + tr("times"));
+    autoBackupPeriod->setSpecialValueText(tr("never"));
 
-    Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
+    QPushButton *backupNow = new QPushButton(tr("Backup now"));
 
-    grid->addWidget(autoBackupFolderLabel, 7,0, alignment);
-    grid->addWidget(autoBackupFolder, 7, 1, alignment);
-    grid->addWidget(autoBackupFolderBrowse, 7, 2, alignment);
-    grid->addWidget(autoBackupPeriodLabel, 8, 0,alignment);
-    grid->addLayout(backupInput, 8, 1, alignment);
+    QFormLayout *form = newQFormLayout(this);
+    form->addRow(tr("Auto Backup Folder"), autoBackupFolder);
+    form->addRow(tr("Auto Backup after closing the athlete"), autoBackupPeriod);
+    form->addItem(new QSpacerItem(1, 15 * dpiYFactor));
+    form->addRow("", backupNow);
 
-    all->addLayout(grid);
-    all->addStretch();
+    connect(backupNow, SIGNAL(clicked()), this, SLOT(backupNow()));
 }
 
-void BackupPage::chooseAutoBackupFolder()
+void
+BackupPage::backupNow
+()
 {
-    // did the user type something ? if not, get it from the Settings
-    QString path = autoBackupFolder->text();
-    if (path == "") path = appsettings->cvalue(context->athlete->cyclist, GC_AUTOBACKUP_FOLDER, "").toString();
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Backup Directory"),
-                            path, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    if (dir != "") autoBackupFolder->setText(dir);  //only overwrite current dir, if a new was selected
-
+    AthleteBackup backup(context->athlete->home->root());
+    backup.backupImmediate();
 }
 
 qint32
 BackupPage::saveClicked()
 {
     // Auto Backup
-    appsettings->setCValue(context->athlete->cyclist, GC_AUTOBACKUP_FOLDER, autoBackupFolder->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_AUTOBACKUP_FOLDER, autoBackupFolder->getPath());
     appsettings->setCValue(context->athlete->cyclist, GC_AUTOBACKUP_PERIOD, autoBackupPeriod->value());
     return 0;
 }
@@ -2275,7 +2357,7 @@ CPPage::addDialogManual
     pmaxEdit->setSuffix(" " + tr("W"));
     pmaxEdit->setValue(pmax);
 
-    QFormLayout *form = new QFormLayout(&dialog);
+    QFormLayout *form = newQFormLayout(&dialog);
     form->addRow(getText(CPPAGE_LABEL_STARTDATE), dateEdit);
     form->addRow(getText(CPPAGE_LABEL_CP), cpEdit);
     form->addRow(getText(CPPAGE_LABEL_AETP), aetpEdit);
@@ -2750,7 +2832,7 @@ LTPage::addClicked()
     maxHrEdit->setSuffix(" " + tr("bpm"));
     maxHrEdit->setValue(maxHr);
 
-    QFormLayout *form = new QFormLayout(&dialog);
+    QFormLayout *form = newQFormLayout(&dialog);
     form->addRow(tr("Start Date"), dateEdit);
     form->addRow(tr("Lactate Threshold"), ltEdit);
     form->addRow(tr("Aerobic Threshold"), aetEdit);
@@ -3467,7 +3549,7 @@ CVPage::addClicked()
     aetEdit->setDisplayFormat("mm:ss '" + paceZones->paceUnits(metricPace) + "'");
     aetEdit->setTime(aet);
 
-    QFormLayout *form = new QFormLayout(&dialog);
+    QFormLayout *form = newQFormLayout(&dialog);
     form->addRow(tr("Start Date"), dateEdit);
     form->addRow(tr("Critical Velocity (CV)"), cvEdit);
     form->addRow(tr("Aerobic Threshold (AeT)"), aetEdit);
@@ -3749,8 +3831,7 @@ CVPage::updateButtons
 SeasonsPage::SeasonsPage(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
     QGridLayout *mainLayout = new QGridLayout(this);
-    QFormLayout *editLayout = new QFormLayout;
-    editLayout->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
+    QFormLayout *editLayout = newQFormLayout();
 
     // get the list
     array = context->athlete->seasons->seasons;
@@ -3986,11 +4067,13 @@ SeasonsPage::saveClicked()
 
 AutoImportPage::AutoImportPage(Context *context) : context(context)
 {
+    RideAutoImportRule config;
+    QStringList ruleDescriptions = config.getRuleDescriptions();
+
     QGridLayout *mainLayout = new QGridLayout(this);
 
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
-    browseButton = new QPushButton(tr("Browse"));
 #ifndef Q_OS_MAC
     upButton = new QToolButton(this);
     downButton = new QToolButton(this);
@@ -4011,21 +4094,29 @@ AutoImportPage::AutoImportPage(Context *context) : context(context)
     actionButtons->addWidget(upButton);
     actionButtons->addWidget(downButton);
     actionButtons->addStretch();
-    actionButtons->addWidget(browseButton);
-    actionButtons->addStretch();
     actionButtons->addWidget(addButton);
     actionButtons->addWidget(deleteButton);
+
+    dirDelegate.setMaxWidth(400 * dpiXFactor);
+    dirDelegate.setPlaceholderText(tr("Enter a directory"));
+
+    ruleDelegate.addItems(config.getRuleDescriptions());
 
     fields = new QTreeWidget;
     fields->headerItem()->setText(0, tr("Directory"));
     fields->headerItem()->setText(1, tr("Import Rule"));
-    fields->setColumnWidth(0,400 *dpiXFactor);
-    fields->setColumnWidth(1,100 *dpiXFactor);
+    fields->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    fields->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
     fields->setColumnCount(2);
     fields->setSelectionMode(QAbstractItemView::SingleSelection);
-    //fields->setUniformRowHeights(true);
+    fields->setUniformRowHeights(true);
     fields->setIndentation(0);
-
+    fields->setAlternatingRowColors(true);
+    fields->setItemDelegateForColumn(0, &dirDelegate);
+    fields->setItemDelegateForColumn(1, &ruleDelegate);
+    fields->setEditTriggers(  QAbstractItemView::DoubleClicked
+                            | QAbstractItemView::SelectedClicked
+                            | QAbstractItemView::AnyKeyPressed);
     fields->setCurrentItem(fields->invisibleRootItem()->child(0));
 
     mainLayout->addWidget(fields, 0,0);
@@ -4035,18 +4126,13 @@ AutoImportPage::AutoImportPage(Context *context) : context(context)
     QList<RideAutoImportRule> rules = context->athlete->autoImportConfig->getConfig();
     int index = 0;
     foreach (RideAutoImportRule rule, rules) {
-        QComboBox *comboButton = new QComboBox(this);
-        addRuleTypes(comboButton);
         QTreeWidgetItem *add = new QTreeWidgetItem;
         fields->invisibleRootItem()->insertChild(index, add);
         add->setFlags(add->flags() | Qt::ItemIsEditable);
-
         add->setTextAlignment(0, Qt::AlignLeft | Qt::AlignVCenter);
-        add->setText(0, rule.getDirectory());
-
-        add->setTextAlignment(1, Qt::AlignHCenter | Qt::AlignVCenter);
-        comboButton->setCurrentIndex(rule.getImportRule());
-        fields->setItemWidget(add, 1, comboButton);
+        add->setTextAlignment(1, Qt::AlignLeft | Qt::AlignVCenter);
+        add->setData(0, Qt::DisplayRole, rule.getDirectory());
+        add->setData(1, Qt::DisplayRole, rule.getImportRule());
         index++;
     }
 
@@ -4055,24 +4141,20 @@ AutoImportPage::AutoImportPage(Context *context) : context(context)
     connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-    connect(browseButton, SIGNAL(clicked()), this, SLOT(browseImportDir()));
 }
+
 
 void
 AutoImportPage::upClicked()
 {
     if (fields->currentItem()) {
         int index = fields->invisibleRootItem()->indexOfChild(fields->currentItem());
-        if (index == 0) return; // its at the top already
+        if (index == 0)
+            return; // its at the top already
 
         //movin on up!
-        QWidget *button = fields->itemWidget(fields->currentItem(),1);
-        QComboBox *comboButton = new QComboBox(this);
-        addRuleTypes(comboButton);
-        comboButton->setCurrentIndex(((QComboBox*)button)->currentIndex());
         QTreeWidgetItem* moved = fields->invisibleRootItem()->takeChild(index);
-        fields->invisibleRootItem()->insertChild(index-1, moved);
-        fields->setItemWidget(moved, 1, comboButton);
+        fields->invisibleRootItem()->insertChild(index - 1, moved);
         fields->setCurrentItem(moved);
     }
 }
@@ -4082,15 +4164,11 @@ AutoImportPage::downClicked()
 {
     if (fields->currentItem()) {
         int index = fields->invisibleRootItem()->indexOfChild(fields->currentItem());
-        if (index == (fields->invisibleRootItem()->childCount()-1)) return; // its at the bottom already
+        if (index == (fields->invisibleRootItem()->childCount() - 1))
+            return; // its at the bottom already
 
-        QWidget *button = fields->itemWidget(fields->currentItem(),1);
-        QComboBox *comboButton = new QComboBox(this);
-        addRuleTypes(comboButton);
-        comboButton->setCurrentIndex(((QComboBox*)button)->currentIndex());
         QTreeWidgetItem* moved = fields->invisibleRootItem()->takeChild(index);
-        fields->invisibleRootItem()->insertChild(index+1, moved);
-        fields->setItemWidget(moved, 1, comboButton);
+        fields->invisibleRootItem()->insertChild(index + 1, moved);
         fields->setCurrentItem(moved);
     }
 }
@@ -4099,22 +4177,20 @@ AutoImportPage::downClicked()
 void
 AutoImportPage::addClicked()
 {
-
+    RideAutoImportRule config;
+    QStringList ruleDescriptions = config.getRuleDescriptions();
     int index = fields->invisibleRootItem()->indexOfChild(fields->currentItem());
-    if (index < 0) index = 0;
-
-    QComboBox *comboButton = new QComboBox(this);
-    addRuleTypes(comboButton);
+    if (index < 0) {
+        index = 0;
+    }
 
     QTreeWidgetItem *add = new QTreeWidgetItem;
     fields->invisibleRootItem()->insertChild(index, add);
     add->setFlags(add->flags() | Qt::ItemIsEditable);
-
     add->setTextAlignment(0, Qt::AlignLeft | Qt::AlignVCenter);
-    add->setText(0, tr("Enter directory or press [Browse] to select"));
-    add->setTextAlignment(1, Qt::AlignHCenter | Qt::AlignVCenter);
-    fields->setItemWidget(add, 1, comboButton);
-
+    add->setTextAlignment(1, Qt::AlignLeft | Qt::AlignVCenter);
+    add->setData(0, Qt::DisplayRole, QStandardPaths::writableLocation(QStandardPaths::HomeLocation));
+    add->setData(1, Qt::DisplayRole, 0);
 }
 
 void
@@ -4131,17 +4207,12 @@ AutoImportPage::deleteClicked()
 qint32
 AutoImportPage::saveClicked()
 {
-
     rules.clear();
-    for(int i=0; i<fields->invisibleRootItem()->childCount(); i++) {
-
+    for(int i = 0; i < fields->invisibleRootItem()->childCount(); i++) {
         RideAutoImportRule rule;
-        rule.setDirectory(fields->invisibleRootItem()->child(i)->text(0));
-
-        QWidget *button = fields->itemWidget(fields->invisibleRootItem()->child(i),1);
-        rule.setImportRule(((QComboBox*)button)->currentIndex());
+        rule.setDirectory(fields->invisibleRootItem()->child(i)->data(0, Qt::DisplayRole).toString());
+        rule.setImportRule(fields->invisibleRootItem()->child(i)->data(1, Qt::DisplayRole).toInt());
         rules.append(rule);
-
     }
 
     // write to disk
@@ -4154,49 +4225,8 @@ AutoImportPage::saveClicked()
 }
 
 void
-AutoImportPage::addRuleTypes(QComboBox *p) {
-
+AutoImportPage::addRuleTypes(QComboBox *p)
+{
     RideAutoImportRule config;
-    QList<QString> descriptions = config.getRuleDescriptions();
-
-    foreach(QString description, descriptions) {
-           p->addItem(description);
-    }
-}
-
-void
-AutoImportPage::browseImportDir()
-{
-    QStringList selectedDirs;
-    if (fields->currentItem()) {
-        QFileDialog fileDialog(this);
-        fileDialog.setFileMode(QFileDialog::Directory);
-        fileDialog.setOptions(QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-        if (fileDialog.exec()) {
-            selectedDirs = fileDialog.selectedFiles();
-        }
-        if (selectedDirs.count() > 0) {
-            QString dir = selectedDirs.at(0);
-            if (dir != "") {
-                fields->currentItem()->setText(0, dir);
-            }
-        }
-    }
-}
-
-
-extern void
-basicTreeWidgetStyle
-(QTreeWidget *tree)
-{
-    tree->setSelectionMode(QAbstractItemView::SingleSelection);
-    tree->setEditTriggers(  QAbstractItemView::DoubleClicked
-                          | QAbstractItemView::SelectedClicked
-                          | QAbstractItemView::AnyKeyPressed);
-    tree->setUniformRowHeights(true);
-    tree->setIndentation(0);
-    tree->setAlternatingRowColors(true);
-    for (int i = 0; i < tree->columnCount(); ++i) {
-        tree->header()->setSectionResizeMode(i, QHeaderView::ResizeToContents);
-    }
+    p->addItems(config.getRuleDescriptions());
 }
