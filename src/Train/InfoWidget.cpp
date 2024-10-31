@@ -122,31 +122,31 @@ void
 InfoWidget::setContent
 (const ErgFileBase &ergFileBase, int rating, qlonglong lastRun)
 {
+    QString when = tr("Never");
     if (lastRun > 0) {
         QDateTime timestamp;
         timestamp.setSecsSinceEpoch(lastRun);
         int daysAgo = timestamp.daysTo(QDateTime::currentDateTime());
         QString ago;
         if (daysAgo == 0) {
-            ago = "today";
+            when = tr("today");
         } else if (daysAgo == 1) {
-            ago = "yesterday";
+            when = tr("yesterday");
         } else if (daysAgo < 21) {
-            ago = QString("%1 days ago").arg(daysAgo);
+            when = tr("%1 days ago").arg(daysAgo);
         } else if (daysAgo < 56) {
-            ago = QString("%1 weeks ago").arg(daysAgo / 7);
+            when = tr("%1 weeks ago").arg(daysAgo / 7);
         } else if (daysAgo < 365) {
-            ago = QString("%1 months ago").arg(daysAgo / 30);
+            when = tr("%1 months ago").arg(daysAgo / 30);
         } else if (daysAgo < 730) {
-            ago = QString("1 year ago");
+            when = tr("1 year ago");
         } else {
-            ago = QString("%1 years ago").arg(daysAgo / 365);
+            when = tr("%1 years ago").arg(daysAgo / 365);
         }
-        lastRunLabel->setText(QString("Last Run: <b>%1 (%2)</b>")
-                                     .arg(ago, timestamp.toString(QLocale::system().dateTimeFormat(QLocale::ShortFormat))));
-    } else {
-        lastRunLabel->setText(QString("Last Run: <b>Never</b>"));
+        when += QString(" (%1)").arg(timestamp.toString(QLocale::system().dateTimeFormat(QLocale::ShortFormat)));
     }
+    when = QString("<b>%1</b>").arg(when);
+    lastRunLabel->setText(tr("Last Run: %1").arg(when));
     ratingWidget->setRating(rating);
 
     if (filepath == ergFileBase.filename()) {
