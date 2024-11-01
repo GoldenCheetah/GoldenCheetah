@@ -1890,7 +1890,8 @@ CPPage::needsNewRange
     int todayEstPmax = 0;
     int todayEstEstOffset = 0;
     bool defaults = false;
-    bool todayOk = getValuesFor(today, false, todayEstCp, todayEstAetp, todayEstFtp, todayEstWprime, todayEstPmax, todayEstEstOffset, defaults);
+    QDate startDate;
+    bool todayOk = getValuesFor(today, false, todayEstCp, todayEstAetp, todayEstFtp, todayEstWprime, todayEstPmax, todayEstEstOffset, defaults, &startDate);
 
     int activeRange = zones_->whichRange(today);
     if (activeRange < 0) {
@@ -1901,8 +1902,10 @@ CPPage::needsNewRange
     int currentSetFtp = zones_->getZoneRange(activeRange).ftp;
     int currentSetWprime = zones_->getZoneRange(activeRange).wprime;
     int currentSetPmax = zones_->getZoneRange(activeRange).pmax;
+    QDate currentSetStart = zones_->getZoneRange(activeRange).begin;
 
     return    todayOk
+           && startDate > currentSetStart
            && ! (   (   useModel->currentIndex() == CPPAGE_EST_MODEL_CP2
                      && std::abs(todayEstCp - currentSetCp) <= CPPAGE_EST_TOLERANCE_CP
                      && std::abs(todayEstWprime - currentSetWprime) <= CPPAGE_EST_TOLERANCE_WPRIME)
@@ -2175,9 +2178,9 @@ CPPage::mkReviewRow
         QLabel *relation = new QLabel();
         relation->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         if (cur < est) {
-            relation->setText("<");
+            relation->setText("↗");
         } else if (cur > est) {
-            relation->setText(">");
+            relation->setText("↘");
         }
         QLineEdit *estimate = new QLineEdit(QString("%1 %2").arg(est).arg(unit));
         estimate->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
