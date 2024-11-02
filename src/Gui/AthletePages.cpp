@@ -653,64 +653,18 @@ MeasuresPage::MeasuresPage(QWidget *parent, Context *context, MeasuresGroup *mea
     metricUnits = GlobalContext::context()->useMetricUnits;
     QList<double> unitsFactors = measuresGroup->getFieldUnitsFactors();
 
-    QVBoxLayout *all = new QVBoxLayout(this);
-    QGridLayout *measuresGrid = new QGridLayout;
-    Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
-
-    QLabel* seperatorText = new QLabel(tr("Time dependent %1 measures").arg(measuresGroup->getName()));
-    all->addWidget(seperatorText);
-
     QString dateTimetext = tr("From Date - Time");
-    dateLabel = new QLabel(dateTimetext);
-    dateTimeEdit = new QDateTimeEdit;
-    dateTimeEdit->setDateTime(QDateTime::currentDateTime());
-    dateTimeEdit->setCalendarPopup(true);
-    dateTimeEdit->setDisplayFormat(tr("MMM d, yyyy - hh:mm:ss"));
-
-    measuresGrid->addWidget(dateLabel, 1, 0, alignment);
-    measuresGrid->addWidget(dateTimeEdit, 1, 1, alignment);
-
     QStringList fieldNames = measuresGroup->getFieldNames();
-    valuesLabel = QVector<QLabel*>(fieldNames.count());
-    valuesEdit = QVector<QDoubleSpinBox*>(fieldNames.count());
-    int k = 0;
-    foreach (QString fieldName, fieldNames) {
-
-        valuesLabel[k] = new QLabel(fieldName);
-        valuesEdit[k] = new QDoubleSpinBox(this);
-        valuesEdit[k]->setMaximum(9999.99);
-        valuesEdit[k]->setMinimum(0.0);
-        valuesEdit[k]->setDecimals(2);
-        valuesEdit[k]->setValue(0.0);
-        valuesEdit[k]->setSuffix(QString(" %1").arg(measuresGroup->getFieldUnits(k, metricUnits)));
-
-        measuresGrid->addWidget(valuesLabel[k], k+2, 0, alignment);
-        measuresGrid->addWidget(valuesEdit[k], k+2, 1, alignment);
-
-        k++;
-    }
 
     QString commenttext = tr("Comment");
-    commentlabel = new QLabel(commenttext);
-    comment = new QLineEdit(this);
-    comment->setText("");
-
-    measuresGrid->addWidget(commentlabel, k+2, 0, alignment);
-    measuresGrid->addWidget(comment, k+2, 1, alignment);
-
-    all->addLayout(measuresGrid);
-
 
     // Buttons
-    updateButton = new QPushButton(tr("Update"));
-    updateButton->hide();
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
 #ifndef Q_OS_MAC
     addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
     deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #else
-    updateButton->setText(tr("Update"));
     addButton->setText(tr("Add"));
     deleteButton->setText(tr("Delete"));
 #endif
@@ -718,81 +672,52 @@ MeasuresPage::MeasuresPage(QWidget *parent, Context *context, MeasuresGroup *mea
     QHBoxLayout *actionButtons = new QHBoxLayout;
     actionButtons->setSpacing(2 *dpiXFactor);
     actionButtons->addStretch();
-    actionButtons->addWidget(updateButton);
     actionButtons->addWidget(addButton);
     actionButtons->addWidget(deleteButton);
-    all->addLayout(actionButtons);
 
     // Measures
     measuresTree = new QTreeWidget;
     measuresTree->headerItem()->setText(0, dateTimetext);
-    measuresTree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 
-    k = 0;
-    foreach (QString fieldName, fieldNames) {
-        measuresTree->headerItem()->setText(k+1, fieldName);
-        measuresTree->header()->setSectionResizeMode(k+1, QHeaderView::ResizeToContents);
+    measuresTree->setItemDelegateForColumn(0, &dateTimeDelegate);
+    int k = 0;
+    for (const QString &fieldName : fieldNames) {
+        measuresTree->headerItem()->setText(k + 1, fieldName);
+        DoubleSpinBoxEditDelegate *ed = new DoubleSpinBoxEditDelegate;
+        ed->setRange(0.0, 9999.99);
+        ed->setDecimals(2);
+        ed->setSuffix(measuresGroup->getFieldUnits(k, metricUnits));
+        valueDelegates << ed;
+        measuresTree->setItemDelegateForColumn(k + 1, ed);
         k++;
     }
+    measuresTree->setItemDelegateForColumn(k + 2, &sourceDelegate);
+    measuresTree->setItemDelegateForColumn(k + 3, &origSourceDelegate);
 
     measuresTree->headerItem()->setText(k+1, commenttext);
-    measuresTree->header()->setSectionResizeMode(k+1, QHeaderView::ResizeToContents);
     measuresTree->headerItem()->setText(k+2, tr("Source"));
-    measuresTree->header()->setSectionResizeMode(k+2, QHeaderView::ResizeToContents);
     measuresTree->headerItem()->setText(k+3, tr("Original Source"));
     measuresTree->setColumnCount(k+4);
-    measuresTree->setSelectionMode(QAbstractItemView::SingleSelection);
-    measuresTree->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
-    measuresTree->setUniformRowHeights(true);
-    measuresTree->setIndentation(0);
+    basicTreeWidgetStyle(measuresTree);
 
     // get a copy of group measures if the file exists
     measures = QList<Measure>(measuresGroup->measures());
     std::reverse(measures.begin(), measures.end());
 
     // setup measuresTree
-    for (int i=0; i<measures.count(); i++) {
+    for (int i = 0; i < measures.count(); i++) {
         QTreeWidgetItem *add = new QTreeWidgetItem(measuresTree->invisibleRootItem());
-        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
-        // date & time
-        add->setText(0, measures[i].when.toString(tr("MMM d, yyyy - hh:mm:ss")));
-        // measures data
-        k = 0;
-        foreach (QString fieldName, fieldNames) {
-            const double unitsFactor = (metricUnits ? 1.0 : unitsFactors[k]);
-            add->setText(k+1, QString("%1").arg(measures[i].values[k]*unitsFactor, 0, 'f', 2));
-            k++;
-        }
-
-        add->setText(k+1, measures[i].comment);
-        // source
-        add->setText(k+2, measures[i].getSourceDescription());
-        add->setText(k+3, measures[i].originalSource);
+        add->setFlags(add->flags() | Qt::ItemIsEditable);
+        fillItemFromMeasures(i, add);
     }
 
+    QVBoxLayout *all = new QVBoxLayout(this);
     all->addWidget(measuresTree);
+    all->addLayout(actionButtons);
 
-    // set default edit values to newest measures (if one exists)
-    if (measures.count() > 0) {
-        for (int k = 0; k < fieldNames.count(); k++) {
-            const double unitsFactor = (metricUnits ? 1.0 : unitsFactors[k]);
-            valuesEdit[k]->setValue(measures[0].values[k]*unitsFactor);
-        }
-    }
-
-    // edit connect
-    connect(dateTimeEdit, SIGNAL(dateTimeChanged(QDateTime)), this, SLOT(rangeEdited()));
-    for (int k = 0; k < fieldNames.count(); k++)
-        connect(valuesEdit[k], SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(comment, SIGNAL(textEdited(QString)), this, SLOT(rangeEdited()));
-
-    // button connect
-    connect(updateButton, SIGNAL(clicked()), this, SLOT(addOReditClicked()));
-    connect(addButton, SIGNAL(clicked()), this, SLOT(addOReditClicked()));
+    connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-
-    // list selection connect
-    connect(measuresTree, SIGNAL(itemSelectionChanged()), this, SLOT(rangeSelectionChanged()));
+    connect(measuresTree->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(rangeChanged(const QModelIndex&)));
 
     // save initial values for things we care about
     b4.fingerprint = 0;
@@ -801,29 +726,16 @@ MeasuresPage::MeasuresPage(QWidget *parent, Context *context, MeasuresGroup *mea
     }
 }
 
-void
-MeasuresPage::unitChanged(int currentIndex)
+
+MeasuresPage::~MeasuresPage
+()
 {
-    metricUnits = (currentIndex == 0);
-    QList<double> unitsFactors = measuresGroup->getFieldUnitsFactors();
-
-    // update edit fields
-    for (int k = 0; k < valuesEdit.count(); k++) {
-        const double unitsFactor = (metricUnits ? 1.0/unitsFactors[k] : unitsFactors[k]);
-        valuesEdit[k]->setValue(valuesEdit[k]->value() * unitsFactor);
-        valuesEdit[k]->setSuffix(QString(" %1").arg(measuresGroup->getFieldUnits(k, metricUnits)));
+    for (DoubleSpinBoxEditDelegate *ed : valueDelegates) {
+        delete ed;
     }
-
-    // update measuresTree
-    for (int i=0; i<measuresTree->invisibleRootItem()->childCount(); i++) {
-        QTreeWidgetItem *edit = measuresTree->invisibleRootItem()->child(i);
-
-        for (int k = 0; k < valuesEdit.count(); k++) {
-            const double unitsFactor = (metricUnits ? 1.0 : unitsFactors[k]);
-            edit->setText(k+1, QString("%1").arg(measures[i].values[k]*unitsFactor, 0, 'f', 2));
-        }
-    }
+    valueDelegates.clear();
 }
+
 
 qint32
 MeasuresPage::saveClicked()
@@ -848,56 +760,83 @@ MeasuresPage::saveClicked()
 }
 
 void
-MeasuresPage::addOReditClicked()
+MeasuresPage::addClicked()
 {
-    int index;
-    QTreeWidgetItem *add;
-    Measure addMeasure;
-    QString dateTimeTxt = dateTimeEdit->dateTime().toString(tr("MMM d, yyyy - hh:mm:ss"));
+    QDialog dialog;
 
-    // if an entry for this date & time already exists, edit item otherwise add new
-    QList<QTreeWidgetItem*> matches = measuresTree->findItems(dateTimeTxt, Qt::MatchExactly, 0);
-    if (matches.count() > 0) {
-        // edit existing
-        add = matches[0];
-        index = measuresTree->invisibleRootItem()->indexOfChild(matches[0]);
-        measures.removeAt(index);
-    } else {
-        // add new
-        index = measures.count();
-        for (int i = 0; i < measures.count(); i++) {
-            if (dateTimeEdit->dateTime() > measures[i].when) {
-                index = i;
-                break;
-            }
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(  QDialogButtonBox::Apply
+                                                       | QDialogButtonBox::Discard);
+    connect(buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), &dialog, SLOT(accept()));
+    connect(buttonBox->button(QDialogButtonBox::Discard), SIGNAL(clicked()), &dialog, SLOT(reject()));
+
+    QFormLayout *form = newQFormLayout(&dialog);
+
+    QDateTime now = QDateTime::currentDateTime();
+    QTime nowT = now.time();
+    nowT.setHMS(nowT.hour(), nowT.minute(), nowT.second(), 0);
+    now.setTime(nowT);
+    QDateTimeEdit *dtEdit = new QDateTimeEdit(now);
+    dtEdit->setCalendarPopup(true);
+    form->addRow(tr("Start Date"), dtEdit);
+
+    QStringList fieldNames = measuresGroup->getFieldNames();
+    QList<QLabel*> valuesLabel;
+    QList<QDoubleSpinBox*> valuesEdit;
+    int k = 0;
+    for (QString &fieldName : fieldNames) {
+        valuesLabel << new QLabel(fieldName);
+        valuesEdit << new QDoubleSpinBox(this);
+        valuesEdit[k]->setMaximum(9999.99);
+        valuesEdit[k]->setMinimum(0.0);
+        valuesEdit[k]->setDecimals(2);
+        if (measures.count() > 0) {
+            valuesEdit[k]->setValue(measures[0].values[k]);
+        } else {
+            valuesEdit[k]->setValue(0.0);
         }
-        add = new QTreeWidgetItem;
-        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
-        measuresTree->invisibleRootItem()->insertChild(index, add);
+        valuesEdit[k]->setSuffix(QString(" %1").arg(measuresGroup->getFieldUnits(k, metricUnits)));
+
+        form->addRow(valuesLabel[k], valuesEdit[k]);
+
+        k++;
     }
 
-    addMeasure.when = dateTimeEdit->dateTime();
-    QList<double> unitsFactors = measuresGroup->getFieldUnitsFactors();
-    for (int k = 0; k < valuesEdit.count(); k++) {
-        const double unitsFactor = (metricUnits ? 1.0 : unitsFactors[k]);
-        addMeasure.values[k] = valuesEdit[k]->value() / unitsFactor;
+    QLineEdit *commentEdit = new QLineEdit();
+    form->addRow(tr("Comment"), commentEdit);
+
+    form->addRow(buttonBox);
+
+    int dialogRet = dialog.exec();
+    if (dialogRet != QDialog::Accepted) {
+        return;
     }
-    addMeasure.comment = comment->text();
-    addMeasure.source = Measure::Manual;
-    addMeasure.originalSource = "";
-    measures.insert(index, addMeasure);
 
-    // date and time
-    add->setText(0, dateTimeTxt);
-    // values
-    int k;
-    for (k = 0; k < valuesEdit.count(); k++)
-        add->setText(k+1, QString("%1").arg(valuesEdit[k]->value(), 0, 'f', 2));
-    add->setText(k+1, QString("%1").arg(comment->text()));
-    add->setText(k+2, QString("%1").arg(tr("Manual entry")));
-    add->setText(k+3, ""); // Original Source
-
-    updateButton->hide();
+    int i = 0;
+    int rnum = 0;
+    while (i < measures.count() && measures[i].when != dtEdit->dateTime()) {
+        if (measures[i].when > dtEdit->dateTime()) {
+            ++rnum;
+        }
+        ++i;
+    }
+    QTreeWidgetItem *add;
+    if (i == measures.count()) {
+        add = new QTreeWidgetItem();
+        add->setFlags(add->flags() | Qt::ItemIsEditable);
+        Measure measure;
+        measure.source = Measure::Manual;
+        measures.insert(rnum, measure);
+        measuresTree->invisibleRootItem()->insertChild(rnum, add);
+    } else {
+        rnum = i;
+        add = measuresTree->invisibleRootItem()->child(rnum);
+    }
+    measures[rnum].when = dtEdit->dateTime();
+    for (k = 0; k < valuesEdit.count(); ++k) {
+        measures[rnum].values[k] = valuesEdit[k]->value();
+    }
+    measures[rnum].comment = commentEdit->text();
+    fillItemFromMeasures(rnum, add);
 }
 
 void
@@ -911,48 +850,54 @@ MeasuresPage::deleteClicked()
 }
 
 void
-MeasuresPage::rangeEdited()
+MeasuresPage::rangeChanged(const QModelIndex &topLeft)
 {
-    if (measuresTree->currentItem()) {
-        int index = measuresTree->invisibleRootItem()->indexOfChild(measuresTree->currentItem());
-
-        QDateTime dateTime = dateTimeEdit->dateTime();
-        QDateTime odateTime = measures[index].when;
-
-        bool valuesChanged = false;
-        for (int k = 0; !valuesChanged && k < valuesEdit.count(); k++)
-            if (valuesEdit[k]->value() != measures[index].values[k])
-                valuesChanged = true;
-        QString ncomment = comment->text();
-        QString ocomment = measures[index].comment;
-
-        if (dateTime == odateTime && (valuesChanged || ncomment != ocomment))
-            updateButton->show();
-        else
-            updateButton->hide();
+    // Ignore first and last two columns
+    if (   topLeft.column() == 0
+        || topLeft.column() >= topLeft.model()->columnCount() - 2) {
+        return;
+    }
+    QDateTime dt = topLeft.siblingAtColumn(0).data(Qt::UserRole).toDateTime();
+    int col = topLeft.column();
+    int rnum = 0;
+    while (rnum < measures.count() && measures[rnum].when != dt) {
+        ++rnum;
+    }
+    // No matching measure found
+    if (rnum == measures.count()) {
+        return;
+    }
+    if (col > 0 && col <= valueDelegates.count()) {
+        measures[rnum].values[col - 1] = topLeft.data(Qt::DisplayRole).toDouble();
+    } else if (col == valueDelegates.count() + 1) {
+        measures[rnum].comment = topLeft.data(Qt::DisplayRole).toString();
+    }
+    // Set measures source to manual
+    if (measures[rnum].source != Measure::Manual) {
+        measures[rnum].source = Measure::Manual;
+        QModelIndex sourceIndex = topLeft.siblingAtColumn(topLeft.model()->columnCount() - 2);
+        measuresTree->model()->setData(sourceIndex, measures[rnum].getSourceDescription(), Qt::DisplayRole);
     }
 }
+
 
 void
-MeasuresPage::rangeSelectionChanged()
+MeasuresPage::fillItemFromMeasures
+(int rnum, QTreeWidgetItem *item) const
 {
-    // fill with current details
-    if (measuresTree->currentItem()) {
-
-        int index = measuresTree->invisibleRootItem()->indexOfChild(measuresTree->currentItem());
-        Measure current = measures[index];
-
-        dateTimeEdit->setDateTime(current.when);
-        QList<double> unitsFactors = measuresGroup->getFieldUnitsFactors();
-        for (int k = 0; k < valuesEdit.count(); k++) {
-            const double unitsFactor = (metricUnits ? 1.0 : unitsFactors[k]);
-            valuesEdit[k]->setValue(current.values[k]*unitsFactor);
-        }
-        comment->setText(current.comment);
-
-        updateButton->hide();
+    item->setData(0, Qt::DisplayRole, measures[rnum].when.toString(tr("MMM d, yyyy - hh:mm:ss")));
+    item->setData(0, Qt::UserRole, measures[rnum].when);
+    int k;
+    QList<double> unitsFactors = measuresGroup->getFieldUnitsFactors();
+    for (k = 0; k < unitsFactors.count(); ++k) {
+        const double unitsFactor = (metricUnits ? 1.0 : unitsFactors[k]);
+        item->setData(k + 1, Qt::DisplayRole, measures[rnum].values[k] * unitsFactor);
     }
+    item->setData(k + 1, Qt::DisplayRole, measures[rnum].comment);
+    item->setData(k + 2, Qt::DisplayRole, measures[rnum].getSourceDescription());
+    item->setData(k + 3, Qt::DisplayRole, measures[rnum].originalSource);
 }
+
 
 //
 // Power Zone Config page

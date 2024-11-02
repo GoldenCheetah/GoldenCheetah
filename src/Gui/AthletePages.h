@@ -57,19 +57,17 @@
 class MeasuresPage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
         MeasuresPage(QWidget *parent, Context *context, MeasuresGroup *measuresGroup);
+        ~MeasuresPage();
+
         qint32 saveClicked();
 
-    public slots:
-        void unitChanged(int currentIndex);
-        void addOReditClicked();
+    private slots:
+        void addClicked();
         void deleteClicked();
-        void rangeEdited();
-        void rangeSelectionChanged();
+        void rangeChanged(const QModelIndex &topLeft);
 
     private:
         Context *context;
@@ -77,23 +75,19 @@ class MeasuresPage : public QWidget
         bool metricUnits;
         QList<Measure> measures;
 
-        QLabel *dateLabel;
-        QDateTimeEdit *dateTimeEdit;
-
-        QVector<QLabel*> valuesLabel;
-        QVector<QDoubleSpinBox*> valuesEdit;
-
-        QLabel *commentlabel;
-        QLineEdit *comment;
+        QList<DoubleSpinBoxEditDelegate*> valueDelegates;
+        NoEditDelegate dateTimeDelegate;
+        NoEditDelegate sourceDelegate;
+        NoEditDelegate origSourceDelegate;
 
         QTreeWidget *measuresTree;
-        QPushButton *addButton, *updateButton, *deleteButton;
+        QPushButton *addButton, *deleteButton;
+
+        void fillItemFromMeasures(int rnum, QTreeWidgetItem *item) const;
 
     struct {
         unsigned long fingerprint;
     } b4;
-
-    private slots:
 };
 
 class WheelSizeCalculator : public QDialog
