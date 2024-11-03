@@ -510,14 +510,16 @@ DoubleSpinBoxEditDelegate::DoubleSpinBoxEditDelegate
 (QObject *parent)
 : QStyledItemDelegate(parent)
 {
+    fillSizeHint();
 }
 
 
 void
-DoubleSpinBoxEditDelegate::setMininum
+DoubleSpinBoxEditDelegate::setMinimum
 (double minimum)
 {
     this->minimum = minimum;
+    fillSizeHint();
 }
 
 
@@ -526,6 +528,7 @@ DoubleSpinBoxEditDelegate::setMaximum
 (double maximum)
 {
     this->maximum = maximum;
+    fillSizeHint();
 }
 
 
@@ -535,6 +538,7 @@ DoubleSpinBoxEditDelegate::setRange
 {
     this->minimum = minimum;
     this->maximum = maximum;
+    fillSizeHint();
 }
 
 
@@ -551,6 +555,7 @@ DoubleSpinBoxEditDelegate::setDecimals
 (int prec)
 {
     this->prec = prec;
+    fillSizeHint();
 }
 
 
@@ -559,6 +564,7 @@ DoubleSpinBoxEditDelegate::setSuffix
 (const QString &suffix)
 {
     this->suffix = suffix;
+    fillSizeHint();
 }
 
 
@@ -567,6 +573,7 @@ DoubleSpinBoxEditDelegate::setShowSuffixOnEdit
 (bool show)
 {
     showSuffixOnEdit = show;
+    fillSizeHint();
 }
 
 
@@ -575,6 +582,7 @@ DoubleSpinBoxEditDelegate::setShowSuffixOnDisplay
 (bool show)
 {
     showSuffixOnDisplay = show;
+    fillSizeHint();
 }
 
 
@@ -643,6 +651,14 @@ DoubleSpinBoxEditDelegate::sizeHint
     Q_UNUSED(option)
     Q_UNUSED(index)
 
+    return _sizeHint;
+}
+
+
+void
+DoubleSpinBoxEditDelegate::fillSizeHint
+()
+{
     QDoubleSpinBox widget;
     if ((showSuffixOnEdit || showSuffixOnDisplay) && ! suffix.isEmpty()) {
         widget.setSuffix(" " + suffix);
@@ -650,7 +666,7 @@ DoubleSpinBoxEditDelegate::sizeHint
     widget.setMaximum(maximum);
     widget.setValue(maximum);
     widget.setDecimals(prec);
-    return widget.sizeHint();
+    _sizeHint = widget.sizeHint();
 }
 
 
