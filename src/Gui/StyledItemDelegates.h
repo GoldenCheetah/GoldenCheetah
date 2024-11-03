@@ -158,7 +158,7 @@ class DoubleSpinBoxEditDelegate: public QStyledItemDelegate
 public:
     DoubleSpinBoxEditDelegate(QObject *parent = nullptr);
 
-    void setMininum(double minimum);
+    void setMinimum(double minimum);
     void setMaximum(double maximum);
     void setRange(double minimum, double maximum);
     void setSingleStep(double val);
@@ -181,6 +181,9 @@ private:
     QString suffix;
     bool showSuffixOnEdit = true;
     bool showSuffixOnDisplay = true;
+    QSize _sizeHint;
+
+    void fillSizeHint();
 };
 
 
