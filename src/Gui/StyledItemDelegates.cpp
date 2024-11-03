@@ -82,6 +82,7 @@ ComboBoxDelegate::ComboBoxDelegate
 (QObject *parent)
 : QStyledItemDelegate(parent)
 {
+    fillSizeHint();
 }
 
 
@@ -90,6 +91,7 @@ ComboBoxDelegate::addItems
 (const QStringList &texts)
 {
     this->texts = texts;
+    fillSizeHint();
 }
 
 
@@ -162,9 +164,17 @@ ComboBoxDelegate::sizeHint
     Q_UNUSED(option)
     Q_UNUSED(index)
 
+    return _sizeHint;
+}
+
+
+void
+ComboBoxDelegate::fillSizeHint
+()
+{
     QComboBox widget;
     widget.addItems(texts);
-    return widget.sizeHint();
+    _sizeHint = widget.sizeHint();
 }
 
 
@@ -370,14 +380,16 @@ SpinBoxEditDelegate::SpinBoxEditDelegate
 (QObject *parent)
 : QStyledItemDelegate(parent)
 {
+    fillSizeHint();
 }
 
 
 void
-SpinBoxEditDelegate::setMininum
+SpinBoxEditDelegate::setMinimum
 (int minimum)
 {
     this->minimum = minimum;
+    fillSizeHint();
 }
 
 
@@ -386,6 +398,7 @@ SpinBoxEditDelegate::setMaximum
 (int maximum)
 {
     this->maximum = maximum;
+    fillSizeHint();
 }
 
 
@@ -395,6 +408,7 @@ SpinBoxEditDelegate::setRange
 {
     this->minimum = minimum;
     this->maximum = maximum;
+    fillSizeHint();
 }
 
 
@@ -411,6 +425,7 @@ SpinBoxEditDelegate::setSuffix
 (const QString &suffix)
 {
     this->suffix = suffix;
+    fillSizeHint();
 }
 
 
@@ -419,6 +434,7 @@ SpinBoxEditDelegate::setShowSuffixOnEdit
 (bool show)
 {
     showSuffixOnEdit = show;
+    fillSizeHint();
 }
 
 
@@ -427,6 +443,7 @@ SpinBoxEditDelegate::setShowSuffixOnDisplay
 (bool show)
 {
     showSuffixOnDisplay = show;
+    fillSizeHint();
 }
 
 
@@ -494,13 +511,21 @@ SpinBoxEditDelegate::sizeHint
     Q_UNUSED(option)
     Q_UNUSED(index)
 
+    return _sizeHint;
+}
+
+
+void
+SpinBoxEditDelegate::fillSizeHint
+()
+{
     QSpinBox widget;
     if ((showSuffixOnEdit || showSuffixOnDisplay) && ! suffix.isEmpty()) {
         widget.setSuffix(" " + suffix);
     }
     widget.setMaximum(maximum);
     widget.setValue(maximum);
-    return widget.sizeHint();
+    _sizeHint = widget.sizeHint();
 }
 
 
@@ -676,6 +701,7 @@ DateEditDelegate::DateEditDelegate
 (QObject *parent)
 : QStyledItemDelegate(parent)
 {
+    fillSizeHint();
 }
 
 
@@ -684,6 +710,7 @@ DateEditDelegate::setCalendarPopup
 (bool enable)
 {
     calendarPopup = enable;
+    fillSizeHint();
 }
 
 
@@ -738,8 +765,17 @@ DateEditDelegate::sizeHint
     Q_UNUSED(option)
     Q_UNUSED(index)
 
+    return _sizeHint;
+}
+
+
+void
+DateEditDelegate::fillSizeHint
+()
+{
     QDateEdit widget;
-    return widget.sizeHint();
+    widget.setCalendarPopup(calendarPopup);
+    _sizeHint = widget.sizeHint();
 }
 
 
@@ -749,6 +785,7 @@ TimeEditDelegate::TimeEditDelegate
 (QObject *parent)
 : QStyledItemDelegate(parent)
 {
+    fillSizeHint();
 }
 
 
@@ -757,6 +794,7 @@ TimeEditDelegate::setFormat
 (const QString &format)
 {
     this->format = format;
+    fillSizeHint();
 }
 
 
@@ -765,6 +803,7 @@ TimeEditDelegate::setSuffix
 (const QString &suffix)
 {
     this->suffix = suffix;
+    fillSizeHint();
 }
 
 
@@ -773,6 +812,7 @@ TimeEditDelegate::setShowSuffixOnEdit
 (bool show)
 {
     showSuffixOnEdit = show;
+    fillSizeHint();
 }
 
 
@@ -781,6 +821,7 @@ TimeEditDelegate::setShowSuffixOnDisplay
 (bool show)
 {
     showSuffixOnDisplay = show;
+    fillSizeHint();
 }
 
 
@@ -866,6 +907,14 @@ TimeEditDelegate::sizeHint
     Q_UNUSED(option)
     Q_UNUSED(index)
 
+    return _sizeHint;
+}
+
+
+void
+TimeEditDelegate::fillSizeHint
+()
+{
     QTimeEdit widget;
     widget.setTime(QTime(0, 0, 0));
     QString f = format;
@@ -876,5 +925,5 @@ TimeEditDelegate::sizeHint
         f += " '" + suffix + "'";
     }
     widget.setDisplayFormat(f);
-    return widget.sizeHint();
+    _sizeHint = widget.sizeHint();
 }

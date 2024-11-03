@@ -68,6 +68,9 @@ private slots:
 
 private:
     QStringList texts;
+    QSize _sizeHint;
+
+    void fillSizeHint();
 };
 
 
@@ -128,7 +131,7 @@ class SpinBoxEditDelegate: public QStyledItemDelegate
 public:
     SpinBoxEditDelegate(QObject *parent = nullptr);
 
-    void setMininum(int minimum);
+    void setMinimum(int minimum);
     void setMaximum(int maximum);
     void setRange(int minimum, int maximum);
     void setSingleStep(int val);
@@ -149,6 +152,9 @@ private:
     QString suffix;
     bool showSuffixOnEdit = true;
     bool showSuffixOnDisplay = true;
+    QSize _sizeHint;
+
+    void fillSizeHint();
 };
 
 
@@ -203,6 +209,9 @@ public:
 
 private:
     bool calendarPopup = false;
+    QSize _sizeHint;
+
+    void fillSizeHint();
 };
 
 
@@ -231,6 +240,9 @@ private:
     bool showSuffixOnDisplay = true;
     QTime min;
     QTime max;
+    QSize _sizeHint;
+
+    void fillSizeHint();
 };
 
 #endif
