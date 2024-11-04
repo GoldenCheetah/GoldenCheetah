@@ -1,5 +1,4 @@
-#!/usr/bin/python
-
+#!/usr/bin/env python3
 #
 # Dump timestamps & formatted 12 byte ANT messages from a GC antlog.raw file;
 #
@@ -18,26 +17,14 @@ file = open(sys.argv[1], 'rb')
 for line in range(0, os.path.getsize(sys.argv[1]), 21):
 
   data = file.read(1)
-  RS = data[0];
+  RS = chr(data[0])
 
   data = file.read(8)
   timestamp = struct.unpack('L', data)[0]
 
   data = file.read(12)
-  print str(timestamp) + ' - ' \
-      + RS  + ': ' \
-      + '0x' + (data[0]).encode('hex').upper()  + ', ' \
-      + '0x' + (data[1]).encode('hex').upper()  + ', ' \
-      + '0x' + (data[2]).encode('hex').upper()  + ', ' \
-      + '0x' + (data[3]).encode('hex').upper()  + ', ' \
-      + '0x' + (data[4]).encode('hex').upper()  + ', ' \
-      + '0x' + (data[5]).encode('hex').upper()  + ', ' \
-      + '0x' + (data[6]).encode('hex').upper()  + ', ' \
-      + '0x' + (data[7]).encode('hex').upper()  + ', ' \
-      + '0x' + (data[8]).encode('hex').upper()  + ', ' \
-      + '0x' + (data[9]).encode('hex').upper()  + ', ' \
-      + '0x' + (data[10]).encode('hex').upper() + ', ' \
-      + '0x' + (data[11]).encode('hex').upper()
+  hex_data = ['0x{:02X}, '.format(x) for x in data]
+  print(f"{timestamp} - {RS}: {''.join(hex_data)}")
 
 file.close()
 
