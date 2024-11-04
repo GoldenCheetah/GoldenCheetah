@@ -109,7 +109,7 @@
 // 5000 - V3.6 RELEASE (August 2023)
 // 5001 - V3.7 DEVELOPMENT 2404 (APR 2024)
 // 5002 - V3.7 DEVELOPMENT 2408 (AUG 2024)
-// 5003 - V3.7 DEVELOPMENT 2410 (OCT 2024) - latest snapshot 26/10/2024
+// 5003 - V3.7 DEVELOPMENT 2410 (OCT 2024) - latest snapshot 4/11/2024
 
 #define VERSION3_BUILD    3010 // released
 #define VERSION3_SP1      3030 // released
@@ -129,7 +129,7 @@
 // the next two will with each build/release
 #define VERSION_LATEST 5002
 #define VERSION_STRING "V3.7-DEV"
-#define GC_VERSION VERSION_STRING // To force version string on non-tagged ci builds
+//#define GC_VERSION VERSION_STRING // To force version string on non-tagged ci builds
 
 // default config for this release cycle
 #define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/3.7"

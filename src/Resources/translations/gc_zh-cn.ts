@@ -3435,12 +3435,12 @@ Press Next to Continue
 <context>
     <name>AutoImportPage</name>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="4075"/>
+        <location filename="../../Gui/AthletePages.cpp" line="4023"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="4076"/>
+        <location filename="../../Gui/AthletePages.cpp" line="4024"/>
         <source>-</source>
         <translation>-</translation>
     </message>
@@ -3449,37 +3449,37 @@ Press Next to Continue
         <translation type="vanished">浏览</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="4087"/>
+        <location filename="../../Gui/AthletePages.cpp" line="4035"/>
         <source>Add</source>
         <translation>新增</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="4088"/>
+        <location filename="../../Gui/AthletePages.cpp" line="4036"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="4089"/>
+        <location filename="../../Gui/AthletePages.cpp" line="4037"/>
         <source>Up</source>
         <translation>上</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="4090"/>
+        <location filename="../../Gui/AthletePages.cpp" line="4038"/>
         <source>Down</source>
         <translation>下</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="4101"/>
+        <location filename="../../Gui/AthletePages.cpp" line="4049"/>
         <source>Enter a directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="4106"/>
+        <location filename="../../Gui/AthletePages.cpp" line="4054"/>
         <source>Directory</source>
         <translation>文件夹</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="4107"/>
+        <location filename="../../Gui/AthletePages.cpp" line="4055"/>
         <source>Import Rule</source>
         <translation>导入规则</translation>
     </message>
@@ -5149,41 +5149,41 @@ Let&apos;s get you setup.</source>
         <translation type="vanished">更新</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1252"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1269"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1197"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1214"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1253"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1270"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1198"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1215"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1254"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1199"/>
         <source>Review...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1256"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1201"/>
         <source>Changed power estimates are available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1263"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1275"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1208"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1220"/>
         <source>Add</source>
         <translation>新增</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1264"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1276"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1209"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1221"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1266"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1211"/>
         <source>Def</source>
         <translation>确定</translation>
     </message>
@@ -5192,27 +5192,27 @@ Let&apos;s get you setup.</source>
         <translation type="vanished">开始日期</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1354"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1299"/>
         <source>Critical Power</source>
         <translation>临界功率</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1355"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1300"/>
         <source>AeTP</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1356"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1301"/>
         <source>FTP</source>
         <translation>FTP</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1357"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1302"/>
         <source>W&apos;</source>
         <translation>W&apos;</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1358"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1303"/>
         <source>Pmax</source>
         <translation>P-max</translation>
     </message>
@@ -5225,207 +5225,207 @@ Let&apos;s get you setup.</source>
         <translation type="vanished">临界功率必须大于0</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1397"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1342"/>
         <source>Short</source>
         <translation>序号</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1297"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1242"/>
         <source>Use CP for all metrics</source>
         <translation>所有指标使用CP</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1290"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1235"/>
         <source>Manual</source>
         <translation type="unfinished">手动</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1291"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1236"/>
         <source>Semi-Automatic (CP2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1292"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1237"/>
         <source>Semi-Automatic (CP3)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1293"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1238"/>
         <source>Semi-Automatic (Extended)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1298"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1243"/>
         <source>Use FTP for Coggan metrics</source>
         <translation>Coggan指标使用FTP</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1323"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1329"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1335"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1347"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1392"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1668"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1673"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1681"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1688"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2330"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2336"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2344"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2357"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1268"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1274"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1280"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1292"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1337"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1613"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1618"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1626"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1633"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2278"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2284"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2292"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2305"/>
         <source>W</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1341"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1683"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2351"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1286"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1628"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2299"/>
         <source>J</source>
         <translation type="unfinished">J</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1353"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2295"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1298"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2243"/>
         <source>Start Date</source>
         <translation type="unfinished">开始日期</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1359"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1304"/>
         <source>Model Fit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1398"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1343"/>
         <source>Long</source>
         <translation>区间</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1399"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1344"/>
         <source>From Watts</source>
         <translation>最低功率</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1648"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1593"/>
         <source>Review range starting on %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1664"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1609"/>
         <source>Current</source>
         <translation type="unfinished">目前</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1665"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1610"/>
         <source>Estimate</source>
         <translation type="unfinished">估计</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1666"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1611"/>
         <source>Accept</source>
         <translation type="unfinished">接受</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1838"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1783"/>
         <source>🗹</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1839"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1784"/>
         <source>Estimate and settings &lt;b&gt;match&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1842"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1787"/>
         <source>☐</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1843"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1788"/>
         <source>Estimate and settings &lt;b&gt;differ&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1847"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1792"/>
         <source>⏲</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1850"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1795"/>
         <source>Range is %1 days older than closest estimate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1852"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1797"/>
         <source>Range is %1 days younger than closest estimate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1858"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1803"/>
         <source>∅</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1859"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1804"/>
         <source>No estimate available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1949"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1897"/>
         <source>New range from estimate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2284"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2232"/>
         <source>The proposed value for AeTP is a very rough estimate, assuming %1 % of CP. Usually it is determined by a&lt;ul&gt;&lt;li&gt;Metabolic test&lt;/li&gt;&lt;li&gt;Lactate ramp test&lt;/li&gt;&lt;li&gt;Run / Cycling ‘conversational’ test&lt;/li&gt;&lt;li&gt;Run Decoupling test&lt;/li&gt;&lt;/ul&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2286"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2234"/>
         <source>Updating FTP internally to match CP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2289"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2237"/>
         <source>Your selected model does not deliver values for&lt;ul&gt;&lt;li&gt;FTP, using CP instead&lt;/li&gt;&lt;/ul&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2291"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2239"/>
         <source>Your selected model does not deliver values for PMax, using default value of %1 W instead</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2293"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2241"/>
         <source>Your selected model does not deliver values for&lt;ul&gt;&lt;li&gt;FTP, using CP instead&lt;/li&gt;&lt;li&gt;PMax, assuming a default of %1 W&lt;/li&gt;&lt;/ul&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2297"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2245"/>
         <source>Critical Power (CP)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2299"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2247"/>
         <source>Aerobic Threshold Power (AeTP)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2301"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2249"/>
         <source>Functional Threshold Power (FTP)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2303"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2251"/>
         <source>Anaerobic Work Capacity (W&apos;)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2305"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2253"/>
         <source>Maximum Power (PMax)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2317"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2265"/>
         <source>Manual range</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5434,14 +5434,14 @@ Let&apos;s get you setup.</source>
         <translation type="vanished">最多10个区间</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2065"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2072"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2013"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2020"/>
         <source>New</source>
         <translation>新的</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2067"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2074"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2015"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2022"/>
         <source>New (%1)</source>
         <translation>新的(%1)</translation>
     </message>
@@ -5890,52 +5890,52 @@ yyyy年M月d日,ddd</translation>
         <translation type="vanished">更新</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3354"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3366"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3302"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3314"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3355"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3367"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3303"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3315"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3360"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3372"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3308"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3320"/>
         <source>Add</source>
         <translation>新增</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3361"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3373"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3309"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3321"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3363"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3311"/>
         <source>Def</source>
         <translation>确定</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3406"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3553"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3354"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3501"/>
         <source>Start Date</source>
         <translation type="unfinished">开始日期</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3530"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3478"/>
         <source>New range</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3554"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3502"/>
         <source>Critical Velocity (CV)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3555"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3503"/>
         <source>Aerobic Threshold (AeT)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5944,12 +5944,12 @@ yyyy年M月d日,ddd</translation>
         <translation type="vanished">开始日期</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3407"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3355"/>
         <source>Critical Velocity</source>
         <translation>临界速度</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3408"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3356"/>
         <source>Aerobic Threshold</source>
         <translation>有氧阈值</translation>
     </message>
@@ -5962,17 +5962,17 @@ yyyy年M月d日,ddd</translation>
         <translation type="vanished">yyyy年M月d日</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3450"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3398"/>
         <source>Short</source>
         <translation>序号</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3451"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3399"/>
         <source>Long</source>
         <translation>区间</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3452"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3400"/>
         <source>From</source>
         <translation>最低速度</translation>
     </message>
@@ -5981,14 +5981,14 @@ yyyy年M月d日,ddd</translation>
         <translation type="vanished">最多10个区间</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3726"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3733"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3674"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3681"/>
         <source>New</source>
         <translation>新的</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3728"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3735"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3676"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3683"/>
         <source>New (%1)</source>
         <translation>新的(%1)</translation>
     </message>
@@ -8605,7 +8605,7 @@ Do you want to apply and restart GoldenCheetah?</source>
 <context>
     <name>DirectoryPathWidget</name>
     <message>
-        <location filename="../../Gui/StyledItemDelegates.cpp" line="179"/>
+        <location filename="../../Gui/StyledItemDelegates.cpp" line="189"/>
         <source>Browse</source>
         <translation type="unfinished">浏览</translation>
     </message>
@@ -14897,48 +14897,48 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>HrSchemePage</name>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2484"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2432"/>
         <source>Add</source>
         <translation>新增</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2485"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2433"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2478"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2426"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2479"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2427"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2494"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2442"/>
         <source>%</source>
         <translation type="unfinished">%</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2505"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2453"/>
         <source>Short</source>
         <translation>简称</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2506"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2454"/>
         <source>Long</source>
         <translation>全称</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2507"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2455"/>
         <source>Percent of LT</source>
         <translatorcomment>いまいち</translatorcomment>
         <translation>LT百分比</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2508"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2456"/>
         <source>Trimp k</source>
         <translation>TRIMP K系数</translation>
     </message>
@@ -14947,14 +14947,14 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="vanished">最多10个区间</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2553"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2560"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2501"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2508"/>
         <source>New</source>
         <translation>新的</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2555"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2562"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2503"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2510"/>
         <source>New (%1)</source>
         <translation>新的(%1)</translation>
     </message>
@@ -15144,17 +15144,17 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>HrZonePage</name>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2395"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2343"/>
         <source>Sport</source>
         <translation>运动</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2442"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2390"/>
         <source>Lactate Threshold</source>
         <translation>乳酸阈值</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2443"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2391"/>
         <source>Default</source>
         <translation>默认</translation>
     </message>
@@ -18049,31 +18049,31 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="vanished">更新</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2637"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2649"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2585"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2597"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2638"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2650"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2586"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2598"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2643"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2655"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2591"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2603"/>
         <source>Add</source>
         <translation>新增</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2644"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2656"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2592"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2604"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2646"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2594"/>
         <source>Def</source>
         <translation>确定</translation>
     </message>
@@ -18082,14 +18082,14 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="vanished">开始日期</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2698"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2837"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2646"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2785"/>
         <source>Lactate Threshold</source>
         <translation>乳酸阈值</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2699"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2838"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2647"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2786"/>
         <source>Aerobic Threshold</source>
         <translation>有氧阈值</translation>
     </message>
@@ -18102,45 +18102,45 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="vanished">最多10个区间</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3014"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3021"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2962"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2969"/>
         <source>New</source>
         <translation>新的</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3016"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3023"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2964"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2971"/>
         <source>New (%1)</source>
         <translation>新的(%1)</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2700"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2839"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2648"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2787"/>
         <source>Rest HR</source>
         <translation>静止時心率</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2670"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2675"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2680"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2618"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2623"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2628"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2633"/>
         <location filename="../../Gui/AthletePages.cpp" line="2685"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2737"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2817"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2822"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2827"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2832"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2765"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2770"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2775"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2780"/>
         <source>bpm</source>
         <translation type="unfinished">bpm</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2697"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2836"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2645"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2784"/>
         <source>Start Date</source>
         <translation type="unfinished">开始日期</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2701"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2840"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2649"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2788"/>
         <source>Max HR</source>
         <translation>最大心率</translation>
     </message>
@@ -18149,22 +18149,22 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="vanished">yyyy年M月d日</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2748"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2696"/>
         <source>Short</source>
         <translation>简称</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2749"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2697"/>
         <source>Long</source>
         <translation>全称</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2750"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2698"/>
         <source>From BPM</source>
         <translation>最低心率</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2751"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2699"/>
         <source>Trimp k</source>
         <translation>TRIMP K系数</translation>
     </message>
@@ -20906,67 +20906,67 @@ Please check your preference settings.</source>
 <context>
     <name>MeasuresPage</name>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="660"/>
         <source>Time dependent %1 measures</source>
-        <translation>时域1%参数</translation>
+        <translation type="vanished">时域1%参数</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="663"/>
+        <location filename="../../Gui/AthletePages.cpp" line="656"/>
         <source>From Date - Time</source>
         <translation>从日期 - 时间</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="668"/>
-        <location filename="../../Gui/AthletePages.cpp" line="758"/>
-        <location filename="../../Gui/AthletePages.cpp" line="856"/>
+        <location filename="../../Gui/AthletePages.cpp" line="780"/>
+        <source>Start Date</source>
+        <translation type="unfinished">开始日期</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/AthletePages.cpp" line="888"/>
         <source>MMM d, yyyy - hh:mm:ss</source>
         <translation>yyyy年M月d日, hh:mm:ss</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="693"/>
+        <location filename="../../Gui/AthletePages.cpp" line="659"/>
+        <location filename="../../Gui/AthletePages.cpp" line="805"/>
         <source>Comment</source>
         <translation>注释</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="705"/>
-        <location filename="../../Gui/AthletePages.cpp" line="713"/>
         <source>Update</source>
-        <translation>更新</translation>
+        <translation type="vanished">更新</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="707"/>
+        <location filename="../../Gui/AthletePages.cpp" line="662"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="708"/>
+        <location filename="../../Gui/AthletePages.cpp" line="663"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="714"/>
+        <location filename="../../Gui/AthletePages.cpp" line="668"/>
         <source>Add</source>
         <translation>新增</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="715"/>
+        <location filename="../../Gui/AthletePages.cpp" line="669"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="740"/>
+        <location filename="../../Gui/AthletePages.cpp" line="698"/>
         <source>Source</source>
         <translation>来源</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="742"/>
+        <location filename="../../Gui/AthletePages.cpp" line="699"/>
         <source>Original Source</source>
         <translation>原始来源</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="897"/>
         <source>Manual entry</source>
-        <translation>手动创建</translation>
+        <translation type="vanished">手动创建</translation>
     </message>
 </context>
 <context>
@@ -22685,42 +22685,42 @@ No rides found to import.
 <context>
     <name>PaceSchemePage</name>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3201"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3149"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3202"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3150"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3207"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3155"/>
         <source>Add</source>
         <translation>新增</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3208"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3156"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3218"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3166"/>
         <source>%</source>
         <translation type="unfinished">%</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3223"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3171"/>
         <source>Short</source>
         <translation>简称</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3224"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3172"/>
         <source>Long</source>
         <translation>全称</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3225"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3173"/>
         <source>Percent of CV</source>
         <translation>CV百分比</translation>
     </message>
@@ -22729,14 +22729,14 @@ No rides found to import.
         <translation type="vanished">最多10个区间</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3267"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3274"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3215"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3222"/>
         <source>New</source>
         <translation>新的</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3269"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3276"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3217"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3224"/>
         <source>New (%1)</source>
         <translation>新的(%1)</translation>
     </message>
@@ -22936,27 +22936,27 @@ No rides found to import.
 <context>
     <name>PaceZonePage</name>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3129"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3077"/>
         <source>Sport</source>
         <translation>运动</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3131"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3079"/>
         <source>Run</source>
         <translation>跑步</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3132"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3080"/>
         <source>Swim</source>
         <translation>游泳</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3173"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3121"/>
         <source>Critical Velocity</source>
         <translation>临界速度</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3174"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3122"/>
         <source>Default</source>
         <translation>默认</translation>
     </message>
@@ -29497,42 +29497,42 @@ native format. Should we do so?
 <context>
     <name>SchemePage</name>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1062"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1007"/>
         <source>Add</source>
         <translation>新增</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1063"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1008"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1056"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1001"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1057"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1002"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1073"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1018"/>
         <source>%</source>
         <translation type="unfinished">%</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1079"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1024"/>
         <source>Short</source>
         <translation>简称</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1080"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1025"/>
         <source>Long</source>
         <translation>全称</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1081"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1026"/>
         <source>Percent of CP</source>
         <translation>CP百分比</translation>
     </message>
@@ -29541,14 +29541,14 @@ native format. Should we do so?
         <translation type="vanished">最多10个区间</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1119"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1126"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1064"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1071"/>
         <source>New</source>
         <translation>新的</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1121"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1128"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1066"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1073"/>
         <source>New (%1)</source>
         <translation>新的(%1)</translation>
     </message>
@@ -29721,64 +29721,64 @@ native format. Should we do so?
 <context>
     <name>SeasonsPage</name>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3868"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3816"/>
         <source>Add</source>
         <translation>新增</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3869"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3817"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3870"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3818"/>
         <source>Up</source>
         <translation>上</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3871"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3819"/>
         <source>Down</source>
         <translation>下</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3917"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3919"/>
-        <location filename="../../Gui/AthletePages.cpp" line="4010"/>
-        <location filename="../../Gui/AthletePages.cpp" line="4012"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3865"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3867"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3958"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3960"/>
         <source>ddd MMM d, yyyy</source>
         <translation>yyyy年M月d日 ddd</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3856"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3804"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3857"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3805"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3851"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3882"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3799"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3830"/>
         <source>Name</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3852"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3883"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3800"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3831"/>
         <source>Type</source>
         <translation>类型</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3853"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3884"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3801"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3832"/>
         <source>From</source>
         <translation>从</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3854"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3885"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3802"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3833"/>
         <source>To</source>
         <translation>到</translation>
     </message>
@@ -35025,17 +35025,17 @@ You can remove references when managing the library via the context menu options
 <context>
     <name>ZonePage</name>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="965"/>
+        <location filename="../../Gui/AthletePages.cpp" line="910"/>
         <source>Sport</source>
         <translation>运动</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1012"/>
+        <location filename="../../Gui/AthletePages.cpp" line="957"/>
         <source>Critical Power</source>
         <translation>临界功率</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1013"/>
+        <location filename="../../Gui/AthletePages.cpp" line="958"/>
         <source>Default</source>
         <translation>默认</translation>
     </message>
