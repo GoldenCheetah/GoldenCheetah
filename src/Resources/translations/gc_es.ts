@@ -5236,7 +5236,7 @@ Comencemos la configuración.</translation>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="1342"/>
         <source>Short</source>
-        <translation>Corto</translation>
+        <translation>Código</translation>
     </message>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="1242"/>
@@ -5306,12 +5306,12 @@ Comencemos la configuración.</translation>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="1343"/>
         <source>Long</source>
-        <translation>Longitud</translation>
+        <translation>Nombre descriptivo</translation>
     </message>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="1344"/>
         <source>From Watts</source>
-        <translation>Desde vatios</translation>
+        <translation>Potencia de inicio</translation>
     </message>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="1593"/>
@@ -9673,19 +9673,19 @@ le sugerirá los posibles nombres
         <location filename="../../Core/SeasonDialogs.cpp" line="76"/>
         <location filename="../../Core/SeasonDialogs.cpp" line="130"/>
         <source>Years</source>
-        <translation>Años</translation>
+        <translation>años</translation>
     </message>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="82"/>
         <location filename="../../Core/SeasonDialogs.cpp" line="136"/>
         <source>Months</source>
-        <translation>Meses</translation>
+        <translation>meses</translation>
     </message>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="88"/>
         <location filename="../../Core/SeasonDialogs.cpp" line="142"/>
         <source>Days</source>
-        <translation>Días</translation>
+        <translation>días</translation>
     </message>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="99"/>
@@ -21003,7 +21003,7 @@ Por favor, verifique la configuración de preferencias.</translation>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="780"/>
         <source>Start Date</source>
-        <translation type="unfinished">Fecha de inicio</translation>
+        <translation>Fecha de inicio</translation>
     </message>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="888"/>
