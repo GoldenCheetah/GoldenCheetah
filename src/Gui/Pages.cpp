@@ -2329,6 +2329,11 @@ MetadataPage::MetadataPage(Context *context) : context(context)
     keywordsPage = new KeywordsPage(this, keywordDefinitions);
     defaultsPage = new DefaultsPage(this, defaultDefinitions);
     processorPage = new ProcessorPage(context);
+#ifdef GC_WANT_PYTHON
+    if (appsettings->value(nullptr, GC_EMBED_PYTHON, true).toBool()) {
+        pyFixPage = new PyFixPage(context);
+    }
+#endif
 
 
     tabs = new QTabWidget(this);
@@ -2336,6 +2341,11 @@ MetadataPage::MetadataPage(Context *context) : context(context)
     tabs->addTab(keywordsPage, tr("Colour Keywords"));
     tabs->addTab(defaultsPage, tr("Defaults"));
     tabs->addTab(processorPage, tr("Processing"));
+#ifdef GC_WANT_PYTHON
+    if (appsettings->value(nullptr, GC_EMBED_PYTHON, true).toBool()) {
+        tabs->addTab(pyFixPage, tr("Python Data Processors"));
+    }
+#endif
 
 
     // refresh the keywords combo when change tabs .. will do more often than
@@ -2366,6 +2376,12 @@ MetadataPage::saveClicked()
 
     // save processors config
     processorPage->saveClicked();
+
+#ifdef GC_WANT_PYTHON
+    if (appsettings->value(nullptr, GC_EMBED_PYTHON, true).toBool()) {
+        pyFixPage->saveClicked();
+    }
+#endif
 
     qint32 state = 0;
 
@@ -2948,6 +2964,28 @@ ProcessorPage::saveClicked()
 
     return 0;
 }
+
+
+//////////////////////////////////////////////////////////////////////
+// PyFixPage
+//
+
+#ifdef GC_WANT_PYTHON
+PyFixPage::PyFixPage
+(Context *context)
+: ManageFixPyScriptsWidget(context)
+{
+}
+
+
+qint32
+PyFixPage::saveClicked
+()
+{
+    return 0;
+}
+#endif
+
 
 //
 // Default values page

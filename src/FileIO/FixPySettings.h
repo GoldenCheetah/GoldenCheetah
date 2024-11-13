@@ -26,7 +26,7 @@ private:
     const QString PYFIXES_DIR_NAME = ".pyfixes";
     const QString PYFIXES_SETTINGS_FILE_NAME = "configglobal-pyfixes.ini";
 
-    bool readPyFixFile(QString fixName, QString fixPath, QString iniKey);
+    bool readPyFixFile(QString fixName, bool fixAutomatedOnly, QString fixPath, QString iniKey);
     int getMaxKey();
 
     bool isInitialied;

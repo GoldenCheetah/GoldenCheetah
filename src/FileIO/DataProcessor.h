@@ -80,7 +80,8 @@ class DataProcessor
         virtual bool postProcess(RideFile *, DataProcessorConfig*settings=0, QString op="") = 0;
         virtual DataProcessorConfig *processorConfig(QWidget *parent, const RideFile* ride = NULL) = 0;
         virtual QString name() = 0; // Localized Name for user interface
-        virtual bool isCoreProcessor() { return true; }
+        virtual bool isCoreProcessor() const { return true; }
+        virtual bool isAutomatedOnly() const { return false; }
 };
 
 // all data processors

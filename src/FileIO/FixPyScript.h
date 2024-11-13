@@ -5,6 +5,7 @@
 
 struct FixPyScript {
     QString name, path, source, iniKey, oldPath;
+    bool automatedOnly = false;
     bool changed;
 };
 

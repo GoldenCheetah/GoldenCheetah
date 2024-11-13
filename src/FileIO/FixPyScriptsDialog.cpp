@@ -7,71 +7,69 @@
 #include "PythonEmbed.h"
 #include "PythonSyntax.h"
 
-ManageFixPyScriptsDialog::ManageFixPyScriptsDialog(Context *context)
-    : context(context)
+
+ManageFixPyScriptsWidget::ManageFixPyScriptsWidget
+(Context *context, QWidget *parent)
+: QGroupBox(tr("Select a Python Fix to manage"), parent), context(context)
 {
-    setWindowTitle(tr("Manage Python Fixes"));
-    setMinimumSize(QSize(700 * dpiXFactor, 600 * dpiYFactor));
-
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-
-    QGroupBox *groupBox = new QGroupBox(tr("Select a Python Fix to manage"));
-    QHBoxLayout *manageBox = new QHBoxLayout();
-
     scripts = new QListWidget;
+    scripts->setAlternatingRowColors(true);
+
+    QDialogButtonBox *manageButtonBox = new QDialogButtonBox();
+    manageButtonBox->setOrientation(Qt::Vertical);
+    QPushButton *newButton = manageButtonBox->addButton(tr("New"), QDialogButtonBox::ActionRole);
+    edit = manageButtonBox->addButton(tr("Edit"), QDialogButtonBox::ActionRole);
+    del = manageButtonBox->addButton(tr("Delete"), QDialogButtonBox::ActionRole);
+
+    QHBoxLayout *manageBox = new QHBoxLayout(this);
     manageBox->addWidget(scripts);
+    manageBox->addWidget(manageButtonBox);
 
-    QVBoxLayout *manageButtons = new QVBoxLayout();
-    edit = new QPushButton(tr("Edit"));
-    del = new QPushButton(tr("Delete"));
-    manageButtons->addWidget(edit);
-    manageButtons->addWidget(del);
-    manageButtons->addStretch();
-    manageBox->addLayout(manageButtons);
-
-    groupBox->setLayout(manageBox);
-    mainLayout->addWidget(groupBox);
-
-    QPushButton *close = new QPushButton(tr("Close"));
-    QHBoxLayout *buttons = new QHBoxLayout();
-    buttons->addStretch();
-    buttons->addWidget(close);
-
-    mainLayout->addLayout(buttons);
+    connect(newButton, &QPushButton::clicked, this, &ManageFixPyScriptsWidget::newClicked);
+    connect(scripts, &QListWidget::itemDoubleClicked, this, &ManageFixPyScriptsWidget::editClicked);
+    connect(scripts, &QListWidget::itemSelectionChanged, this, &ManageFixPyScriptsWidget::scriptSelected);
+    connect(edit, &QPushButton::clicked, this, &ManageFixPyScriptsWidget::editClicked);
+    connect(del, &QPushButton::clicked, this, &ManageFixPyScriptsWidget::delClicked);
 
     reload(0);
-
-    connect(edit, SIGNAL(clicked()), this, SLOT(editClicked()));
-    connect(del, SIGNAL(clicked()), this, SLOT(delClicked()));
-    connect(close, SIGNAL(clicked()), this, SLOT(reject()));
 }
 
-void ManageFixPyScriptsDialog::editClicked()
+
+void
+ManageFixPyScriptsWidget::newClicked
+()
 {
-    QList<QListWidgetItem*> selItems = scripts->selectedItems();
-    if (selItems.length() == 0) {
+    EditFixPyScriptDialog editDlg(context, nullptr, this);
+    if (editDlg.exec() == QDialog::Accepted) {
+        reload(editDlg.getName());
+    }
+}
+
+
+void
+ManageFixPyScriptsWidget::editClicked
+()
+{
+    if (scripts->currentItem() == nullptr) {
         return;
     }
-
-    QListWidgetItem *selItem = selItems[0];
-    int selRow = scripts->row(selItem);
-    FixPyScript *script = fixPySettings->getScript(selItem->text());
+    FixPyScript *script = fixPySettings->getScript(scripts->currentItem()->text());
 
     EditFixPyScriptDialog editDlg(context, script, this);
     if (editDlg.exec() == QDialog::Accepted) {
-        reload(selRow);
+        reload(editDlg.getName());
     }
 }
 
-void ManageFixPyScriptsDialog::delClicked()
+
+void
+ManageFixPyScriptsWidget::delClicked
+()
 {
-    QList<QListWidgetItem*> selItems = scripts->selectedItems();
-    if (selItems.length() == 0) {
+    if (scripts->currentItem() == nullptr) {
         return;
     }
-
-    QListWidgetItem *selItem = selItems[0];
-    QString name = selItem->text();
+    QString name = scripts->currentItem()->text();
 
     QString msg = QString(tr("Are you sure you want to delete %1?")).arg(name);
     QMessageBox::StandardButtons result = QMessageBox::question(this, "GoldenCheetah", msg);
@@ -81,24 +79,80 @@ void ManageFixPyScriptsDialog::delClicked()
 
     fixPySettings->deleteScript(name);
 
-    reload(0);
+    reload(scripts->currentRow());
 }
 
-void ManageFixPyScriptsDialog::reload(int selRow)
+
+void
+ManageFixPyScriptsWidget::scriptSelected
+()
+{
+    edit->setEnabled(scripts->currentItem() != nullptr);
+    del->setEnabled(scripts->currentItem() != nullptr);
+}
+
+
+void
+ManageFixPyScriptsWidget::reload
+()
 {
     scripts->clear();
-    QList<FixPyScript *> fixes = fixPySettings->getScripts();
+    QList<FixPyScript*> fixes = fixPySettings->getScripts();
     for (int i = 0; i < fixes.size(); i++) {
-        scripts->addItem(fixes[i]->name);
+        QListWidgetItem *item = new QListWidgetItem();
+        QFont font = item->font();
+        font.setItalic(fixes[i]->automatedOnly);
+        item->setText(fixes[i]->name);
+        item->setData(Qt::FontRole, font);
+        scripts->addItem(item);
     }
+    edit->setEnabled(false);
+    del->setEnabled(false);
+}
 
+
+void
+ManageFixPyScriptsWidget::reload
+(int selRow)
+{
+    reload();
+    QList<FixPyScript*> fixes = fixPySettings->getScripts();
     if (scripts->count() > 0) {
-        scripts->setCurrentRow(selRow);
-    } else {
-        edit->setEnabled(false);
-        del->setEnabled(false);
+        scripts->setCurrentRow(std::max(0, std::min(selRow, scripts->count() - 1)));
     }
 }
+
+
+void
+ManageFixPyScriptsWidget::reload
+(const QString &selName)
+{
+    reload();
+    QList<FixPyScript*> fixes = fixPySettings->getScripts();
+    for (int i = 0; i < fixes.size(); i++) {
+        if (fixes[i]->name == selName) {
+            scripts->setCurrentRow(i);
+            return;
+        }
+    }
+}
+
+
+
+ManageFixPyScriptsDialog::ManageFixPyScriptsDialog
+(Context *context)
+{
+    setWindowTitle(tr("Manage Python Fixes"));
+    setMinimumSize(QSize(700 * dpiXFactor, 600 * dpiYFactor));
+
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->addWidget(new ManageFixPyScriptsWidget(context));
+    mainLayout->addWidget(buttonBox);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+}
+
 
 EditFixPyScriptDialog::EditFixPyScriptDialog(Context *context, FixPyScript *fix, QWidget *parent)
     : QDialog(parent), context(context), pyFixScript(fix)
@@ -119,16 +173,14 @@ EditFixPyScriptDialog::EditFixPyScriptDialog(Context *context, FixPyScript *fix,
     // LHS
     QFrame *scriptBox = new QFrame;
     scriptBox->setFrameStyle(QFrame::NoFrame);
-    QVBoxLayout *scriptLayout = new QVBoxLayout;
+    QFormLayout *scriptLayout = newQFormLayout();
     scriptLayout->setContentsMargins(0, 0, 0, 10);
     scriptBox->setLayout(scriptLayout);
 
-    QHBoxLayout *nameLayout = new QHBoxLayout;
-    QLabel *scriptNameLbl = new QLabel(tr("Name:"));
     scriptName = new QLineEdit(fix ? fix->name : "");
-    nameLayout->addWidget(scriptNameLbl);
-    nameLayout->addWidget(scriptName);
-    scriptLayout->addLayout(nameLayout);
+
+    automatedOnly = new QCheckBox(tr("Automated execution only"));
+    automatedOnly->setChecked(fix ? fix->automatedOnly : false);
 
     script = new QTextEdit;
     script->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
@@ -141,13 +193,16 @@ EditFixPyScriptDialog::EditFixPyScriptDialog(Context *context, FixPyScript *fix,
     p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     script->setPalette(p);
     script->setStyleSheet(AbstractView::ourStyleSheet());
-    scriptLayout->addWidget(script);
 
     // syntax highlighter
     setScript(fix ? fix->source : "");
 
     QPushButton *run = new QPushButton(tr("Run"));
-    scriptLayout->addWidget(run);
+
+    scriptLayout->addRow(tr("Name"), scriptName);
+    scriptLayout->addRow("", automatedOnly);
+    scriptLayout->addRow(script);
+    scriptLayout->addRow(run);
 
     splitter->addWidget(scriptBox);
     console = new PythonConsole(context, this, this);
@@ -183,6 +238,19 @@ EditFixPyScriptDialog::EditFixPyScriptDialog(Context *context, FixPyScript *fix,
     connect(save, SIGNAL(clicked()), this, SLOT(saveClicked()));
     connect(cancel, SIGNAL(clicked()), this, SLOT(reject()));
 }
+
+
+QString
+EditFixPyScriptDialog::getName
+() const
+{
+    if (pyFixScript != nullptr) {
+        return pyFixScript->name;
+    } else {
+        return QString();
+    }
+}
+
 
 void EditFixPyScriptDialog::closeEvent(QCloseEvent *event)
 {
@@ -224,8 +292,9 @@ void EditFixPyScriptDialog::setScript(QString string)
 
 bool EditFixPyScriptDialog::isModified()
 {
-    return scriptName->isModified() ||
-           script->document()->isModified();
+    return    scriptName->isModified()
+           || script->document()->isModified()
+           || automatedOnly->isChecked() != pyFixScript->automatedOnly;
 }
 
 void EditFixPyScriptDialog::saveClicked()
@@ -285,6 +354,7 @@ void EditFixPyScriptDialog::saveClicked()
     }
 
     pyFixScript->name = name;
+    pyFixScript->automatedOnly = automatedOnly->isChecked();
     pyFixScript->source = script->toPlainText();
     pyFixScript->path = path;
     pyFixScript->changed = true;

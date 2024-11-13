@@ -51,6 +51,9 @@
 #include "RemoteControl.h"
 #include "Measures.h"
 #include "TagStore.h"
+#ifdef GC_WANT_PYTHON
+#include "FixPyScriptsDialog.h"
+#endif
 
 class QGroupBox;
 class QHBoxLayout;
@@ -582,6 +585,19 @@ class ProcessorPage : public QWidget
 
 };
 
+
+#ifdef GC_WANT_PYTHON
+class PyFixPage : public ManageFixPyScriptsWidget
+{
+    Q_OBJECT
+
+    public:
+        PyFixPage(Context *context);
+        qint32 saveClicked();
+};
+#endif
+
+
 class DefaultsPage : public QWidget
 {
     Q_OBJECT
@@ -635,8 +651,11 @@ class MetadataPage : public QWidget
         QTabWidget *tabs;
         KeywordsPage *keywordsPage;
         FieldsPage *fieldsPage;
-        ProcessorPage *processorPage;
         DefaultsPage *defaultsPage;
+        ProcessorPage *processorPage;
+#ifdef GC_WANT_PYTHON
+        PyFixPage *pyFixPage;
+#endif
 
         // local versions for modification
         QList<KeywordDefinition> keywordDefinitions;

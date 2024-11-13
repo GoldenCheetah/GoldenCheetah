@@ -42,6 +42,7 @@ FixPyScript *FixPySettings::createScript(QString name)
 {
     FixPyScript *script = new FixPyScript;
     script->name = name;
+    script->automatedOnly = false;
     FixPyDataProcessor *fixPyDp = new FixPyDataProcessor(script);
     DataProcessorFactory::instance().registerProcessor(name, fixPyDp);
     scripts.append(script);
@@ -50,6 +51,7 @@ FixPyScript *FixPySettings::createScript(QString name)
 
 void FixPySettings::deleteScript(QString name)
 {
+    DataProcessorFactory::instance().unregisterProcessor(name);
     QList<FixPyScript *> scripts = getScripts();
     for (int i = 0; i < scripts.size(); i++) {
         FixPyScript *script = scripts[i];
@@ -92,6 +94,7 @@ void FixPySettings::save()
         if (script->changed) {
             iniSettings.setValue(script->iniKey + "/name", script->name);
             iniSettings.setValue(script->iniKey + "/path", script->path);
+            iniSettings.setValue(script->iniKey + "/automatedOnly", script->automatedOnly);
 
             QFile pyFile(gcroot + "/" + PYFIXES_DIR_NAME + "/" + script->path);
             if (!pyFile.open(QIODevice::WriteOnly | QIODevice::Text)){
@@ -131,6 +134,7 @@ void FixPySettings::initialize()
     foreach (QString group, iniSettings.childGroups()) {
         QString fixName = iniSettings.value(group + "/name").toString();
         QString fixPath = iniSettings.value(group + "/path").toString();
+        bool fixAutomatedOnly = iniSettings.value(group + "/automatedOnly").toBool();
         if (fixName.isNull() || fixName.isEmpty()) {
             fixName = fixPath;
         }
@@ -140,7 +144,7 @@ void FixPySettings::initialize()
             continue;
         }
 
-        if (!readPyFixFile(fixName, fixPath, group)) {
+        if (!readPyFixFile(fixName, fixAutomatedOnly, fixPath, group)) {
             pyFixFiles.removeAt(pyFixFileIdx);
             continue;
         }
@@ -161,7 +165,7 @@ void FixPySettings::initialize()
             }
         }
 
-        readPyFixFile(fixName, pyFixFile, QString());
+        readPyFixFile(fixName, false, pyFixFile, QString());
     }
 
     save();
@@ -180,7 +184,7 @@ void FixPySettings::disableFixPy()
     scripts.clear();
 }
 
-bool FixPySettings::readPyFixFile(QString fixName, QString fixPath, QString iniKey)
+bool FixPySettings::readPyFixFile(QString fixName, bool fixAutomatedOnly, QString fixPath, QString iniKey)
 {
     QFile pyFile(gcroot + "/" + PYFIXES_DIR_NAME + "/" + fixPath);
     if (!pyFile.open(QIODevice::ReadOnly | QIODevice::Text)){
@@ -192,6 +196,7 @@ bool FixPySettings::readPyFixFile(QString fixName, QString fixPath, QString iniK
 
     FixPyScript *script = createScript(fixName);
     script->path = fixPath;
+    script->automatedOnly = fixAutomatedOnly;
     script->source = fixSource;
     script->iniKey = iniKey;
     return true;

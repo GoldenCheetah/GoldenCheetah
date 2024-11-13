@@ -46,3 +46,11 @@ DataProcessorConfig *FixPyDataProcessor::processorConfig(QWidget *parent, const 
     Q_UNUSED(ride);
     return new FixPyDataProcessorConfig(parent);
 }
+
+
+bool
+FixPyDataProcessor::isAutomatedOnly
+() const
+{
+    return pyScript->automatedOnly;
+}

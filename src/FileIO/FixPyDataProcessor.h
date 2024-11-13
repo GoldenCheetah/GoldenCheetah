@@ -11,7 +11,8 @@ public:
     bool postProcess(RideFile *rideFile, DataProcessorConfig *settings, QString op);
     DataProcessorConfig *processorConfig(QWidget *parent, const RideFile* ride = NULL);
     QString name() { return pyScript->name; }
-    bool isCoreProcessor() { return false; }
+    bool isCoreProcessor() const { return false; }
+    bool isAutomatedOnly() const;
 
 private:
     FixPyScript *pyScript;
