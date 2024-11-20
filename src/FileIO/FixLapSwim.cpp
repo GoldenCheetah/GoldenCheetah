@@ -38,6 +38,8 @@ class FixLapSwimConfig : public DataProcessorConfig
         QHBoxLayout *layout;
         QLabel *plLabel;
         QSpinBox *pl;
+        QLabel *minRestLabel;
+        QSpinBox *minRest;
 
     public:
         FixLapSwimConfig(QWidget *parent) : DataProcessorConfig(parent) {
@@ -59,6 +61,16 @@ class FixLapSwimConfig : public DataProcessorConfig
             layout->addWidget(plLabel);
             layout->addWidget(pl);
             layout->addStretch();
+
+            minRestLabel = new QLabel(tr("Min Rest (s)"));
+
+            minRest = new QSpinBox();
+            minRest->setMaximum(10);
+            minRest->setMinimum(1);
+            minRest->setSingleStep(1);
+            layout->addWidget(minRestLabel);
+            layout->addWidget(minRest);
+            layout->addStretch();
         }
 
         //~FixLapSwimConfig() {}  // deliberately not declared since Qt will
@@ -72,17 +84,22 @@ class FixLapSwimConfig : public DataProcessorConfig
                       "in Editor SWIM tab: TYPE, DURATION and STROKES.\n"
                       "This tool recompute accumulated time, distance "
                       "and sample Speed/Cadence from the updated lengths.\n"
-                      "Laps are recreated using pause lengths as markers\n\n"
+                      "Laps are recreated using length distance changes as markers\n\n"
                       "Pool Length (in meters) allows to re-define the "
-                      "field if value is > 0");
+                      "field if value is > 0\n\n"
+                      "Lengths shorter than Min Rest (in seconds) "
+                      "are removed and their duration carried to "
+                      "the next length.\n\n");
         }
 
         void readConfig() {
             pl->setValue(appsettings->value(NULL, GC_DPFLS_PL, "0").toDouble());
+            minRest->setValue(appsettings->value(NULL, GC_DPFLS_MR, "3").toDouble());
         }
 
         void saveConfig() {
             appsettings->setValue(GC_DPFLS_PL, pl->value());
+            appsettings->setValue(GC_DPFLS_MR, minRest->value());
         }
 };
 
@@ -120,11 +137,14 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
 {
     // get settings
     double pl;
+    double minRest;
     if (config == NULL) { // being called automatically
         // when the file is created use poll length in the file
         pl = (op == "NEW") ? 0.0 : appsettings->value(NULL, GC_DPFLS_PL, "0").toDouble();
+        minRest = appsettings->value(NULL, GC_DPFLS_MR, "3").toDouble();
     } else { // being called manually
         pl = ((FixLapSwimConfig*)(config))->pl->value();
+        minRest = ((FixLapSwimConfig*)(config))->minRest->value();
     }
 
     if (pl == 0.0) // If Pool Length is not configured, get from metadata
@@ -150,6 +170,20 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
     }
     // Stroke Type or Duration are mandatory, Strokes only to compute cadence
     if (typeIdx == -1 || durationIdx == -1) return false;
+
+    // Remove lengths shorter than minRest secs and carry that time over the next length
+    double prev_length_duration = 0.0;
+    for (int i=0; i< series->datapoints.count(); i++) {
+
+        double length_duration = series->datapoints.at(i)->number[durationIdx];
+        if (length_duration < minRest) {
+            ride->command->deleteXDataPoints("SWIM", i, 1);
+            prev_length_duration += length_duration;
+        } else if (prev_length_duration > 0.0) {
+            ride->command->setXDataPointValue("SWIM", i, durationIdx, prev_length_duration + length_duration);
+            prev_length_duration = 0.0;
+        }
+    }
 
     QVariant GarminHWM = appsettings->value(NULL, GC_GARMIN_HWMARK);
     if (GarminHWM.isNull() || GarminHWM.toInt() == 0) GarminHWM.setValue(25); // default to 25 seconds.
