@@ -168,8 +168,9 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
     double last_time = 0.0;
     double last_distance = 0.0;
     double frac_time = 0.0;
-    int interval = 1;
+    int interval = 0;
     double kph, cad;
+    double prev_length_distance = 0;
 
     for (int i=0; i< series->datapoints.count(); i++) {
 
@@ -202,7 +203,7 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
            QVector<struct RideFilePoint> newRows;
            kph = 3600.0 * length_distance / p->number[durationIdx];
            double deltaDist = length_duration > 1 ? length_distance / (length_duration - 1) : 0.0;
-           if (length_distance == 0.0) interval++; // pauses mark laps
+           if (length_distance != prev_length_distance) interval++; // length distance changes mark laps
            for (int i = 0; i < length_duration; i++) {
                // recover previous data or create a new sample point,
                // and fix time/speed/distance/cadence/interval
@@ -217,7 +218,7 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
             ride->command->appendPoints(newRows);
             last_time += length_duration;
             last_distance += length_distance;
-            if (length_distance == 0.0) interval++; // pauses mark laps
+            prev_length_distance = length_distance;
        }
        // Alternative way to mark pauses: Rest seconds after each length
        if (restIdx>0 && p->number[restIdx]>0) {
