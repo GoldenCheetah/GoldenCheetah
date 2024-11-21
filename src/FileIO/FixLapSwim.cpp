@@ -171,20 +171,6 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
     // Stroke Type or Duration are mandatory, Strokes only to compute cadence
     if (typeIdx == -1 || durationIdx == -1) return false;
 
-    // Remove lengths shorter than minRest secs and carry that time over the next length
-    double prev_length_duration = 0.0;
-    for (int i=0; i< series->datapoints.count(); i++) {
-
-        double length_duration = series->datapoints.at(i)->number[durationIdx];
-        if (length_duration < minRest) {
-            ride->command->deleteXDataPoints("SWIM", i, 1);
-            prev_length_duration += length_duration;
-        } else if (prev_length_duration > 0.0) {
-            ride->command->setXDataPointValue("SWIM", i, durationIdx, prev_length_duration + length_duration);
-            prev_length_duration = 0.0;
-        }
-    }
-
     QVariant GarminHWM = appsettings->value(NULL, GC_GARMIN_HWMARK);
     if (GarminHWM.isNull() || GarminHWM.toInt() == 0) GarminHWM.setValue(25); // default to 25 seconds.
 
@@ -198,6 +184,23 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
     // ok, lets start a transaction and drop existing samples
     ride->command->startLUW("Fix Lap Swim");
     ride->command->deletePoints(0, ride->dataPoints().count());
+
+    // Remove lengths shorter than minRest secs and carry that time over the next length
+    double prev_length_duration = 0.0;
+    for (int i=0; i<series->datapoints.count(); i++) {
+
+        double length_duration = series->datapoints.at(i)->number[durationIdx];
+        if (length_duration < minRest) {
+            // remove shorter than minRest length, update row index and carry duration
+            ride->command->deleteXDataPoints("SWIM", i, 1);
+            i--;
+            prev_length_duration += length_duration;
+        } else if (prev_length_duration > 0.0) {
+            // increaase duration from removed lengths
+            ride->command->setXDataPointValue("SWIM", i, durationIdx+2, prev_length_duration+length_duration);
+            prev_length_duration = 0.0;
+        }
+    }
 
     double last_time = 0.0;
     double last_distance = 0.0;
