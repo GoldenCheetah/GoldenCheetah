@@ -51,6 +51,10 @@
 #include "RemoteControl.h"
 #include "Measures.h"
 #include "TagStore.h"
+#include "StyledItemDelegates.h"
+#ifdef GC_WANT_PYTHON
+#include "FixPyScriptsDialog.h"
+#endif
 
 class QGroupBox;
 class QHBoxLayout;
@@ -559,28 +563,49 @@ class FieldsPage : public QWidget
 class ProcessorPage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
-
         ProcessorPage(Context *context);
         qint32 saveClicked();
 
-    public slots:
-
-        //void upClicked();
-        //void downClicked();
+    private slots:
+        void processorSelected(QTreeWidgetItem *selectedItem);
+        void reload();
+        void reload(const QString &selectName);
+        void reload(int selectRow);
+#ifdef GC_WANT_PYTHON
+        void addProcessor();
+        void delProcessor();
+        void editProcessor();
+        void dblClickProcessor(QTreeWidgetItem *item, int col);
+        void toggleCoreProcessors(bool checked);
+#endif
+        void automationChanged(int index);
+        void toggleAutomatedOnly(bool checked);
+        void dataChanged(const QModelIndex &topLeft);
 
     protected:
-
         Context *context;
-        QMap<QString, DataProcessor*> processors;
 
         QTreeWidget *processorTree;
-        //QPushButton *upButton, *downButton;
 
+    private:
+        NoEditDelegate processorDelegate;
+        ComboBoxDelegate automationDelegate;
+        QList<QComboBox*> automationCombos;
+        QList<QCheckBox*> automatedCheckBoxes;
+        QList<DataProcessorConfig*> configs;
+
+#ifdef GC_WANT_PYTHON
+        QPushButton *addButton = nullptr;
+        QPushButton *delButton = nullptr;
+        QPushButton *editButton = nullptr;
+        QCheckBox *hideButton = nullptr;
+#endif
+
+        QStackedWidget *settingsStack;
 };
+
 
 class DefaultsPage : public QWidget
 {
@@ -635,8 +660,8 @@ class MetadataPage : public QWidget
         QTabWidget *tabs;
         KeywordsPage *keywordsPage;
         FieldsPage *fieldsPage;
-        ProcessorPage *processorPage;
         DefaultsPage *defaultsPage;
+        ProcessorPage *processorPage;
 
         // local versions for modification
         QList<KeywordDefinition> keywordDefinitions;

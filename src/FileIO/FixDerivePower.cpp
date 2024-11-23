@@ -20,6 +20,7 @@
 #include "LTMOutliers.h"
 #include "Settings.h"
 #include "Units.h"
+#include "Colors.h"
 #include "HelpWhatsThis.h"
 #include "LocationInterpolation.h"
 #include <algorithm>
@@ -37,20 +38,11 @@ class FixDerivePowerConfig : public DataProcessorConfig
 
     friend class ::FixDerivePower;
     protected:
-        QVBoxLayout *layoutV;
-        QHBoxLayout *layout;
-        QHBoxLayout *windLayout;
-        QLabel *bikeWeightLabel;
         QDoubleSpinBox *bikeWeight;
-        QLabel *crrLabel;
         QDoubleSpinBox *crr;
-        QLabel *cdALabel;
         QDoubleSpinBox *cdA;
-        QLabel *draftMLabel;
         QDoubleSpinBox *draftM;
-        QLabel *windSpeedLabel;
         QDoubleSpinBox *windSpeed;
-        QLabel *windHeadingLabel;
         QDoubleSpinBox *windHeading;
 
     public:
@@ -59,23 +51,16 @@ class FixDerivePowerConfig : public DataProcessorConfig
             HelpWhatsThis *help = new HelpWhatsThis(parent);
             parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_EstimatePowerValues));
 
-            layout = new QHBoxLayout(this);
-
+            QFormLayout *layout = newQFormLayout(this);
             layout->setContentsMargins(0,0,0,0);
             setContentsMargins(0,0,0,0);
-
-            bikeWeightLabel = new QLabel(tr("Bike Weight (kg)"));
-            crrLabel = new QLabel(tr("Crr"));
-            cdALabel = new QLabel(tr("CdA"));
-            draftMLabel = new QLabel(tr("Draft mult."));
-            windSpeedLabel = new QLabel(tr("Wind (kph)"));
-            windHeadingLabel = new QLabel(tr(", direction"));
 
             bikeWeight = new QDoubleSpinBox();
             bikeWeight->setMaximum(99.9);
             bikeWeight->setMinimum(0);
             bikeWeight->setSingleStep(0.1);
             bikeWeight->setDecimals(1);
+            bikeWeight->setSuffix(" " + tr("kg"));
 
             crr = new QDoubleSpinBox();
             crr->setMaximum(0.0999);
@@ -100,59 +85,25 @@ class FixDerivePowerConfig : public DataProcessorConfig
             windSpeed->setMinimum(0);
             windSpeed->setSingleStep(0.1);
             windSpeed->setDecimals(1);
+            windSpeed->setSuffix(" " + tr("km/h"));
 
             windHeading = new QDoubleSpinBox();
             windHeading->setMaximum(180.0);
             windHeading->setMinimum(-179.0);
             windHeading->setSingleStep(1);
             windHeading->setDecimals(0);
+            windHeading->setSuffix(" " + tr("°"));
 
-            layout->addWidget(bikeWeightLabel);
-            layout->addWidget(bikeWeight);
-            layout->addWidget(crrLabel);
-            layout->addWidget(crr);
-            layout->addWidget(cdALabel);
-            layout->addWidget(cdA);
-            layout->addWidget(draftMLabel);
-            layout->addWidget(draftM);
-            layout->addWidget(windSpeedLabel);
-            layout->addWidget(windSpeed);
-            layout->addWidget(windHeadingLabel);
-            layout->addWidget(windHeading);
-
-            layout->addStretch();
-
+            layout->addRow(tr("Bike Weight"), bikeWeight);
+            layout->addRow(tr("Crr"), crr);
+            layout->addRow(tr("CdA"), cdA);
+            layout->addRow(tr("Draft mult."), draftM);
+            layout->addRow(tr("Wind Speed"), windSpeed);
+            layout->addRow(tr("Wind Direction"), windHeading);
         }
 
         //~FixDerivePowerConfig() {} // deliberately not declared since Qt will delete
                               // the widget and its children when the config pane is deleted
-
-        QString explain() {
-            return(QString(tr("Derive estimated power data based on "
-                              "speed/elevation/weight etc\n\n"
-                              "Bike Weight parameter is added to athlete's "
-                              "weight to compound total mass, it should "
-                              "include apparel, shoes, etc\n\n"
-                              "CRR parameter is the coefficient of rolling "
-                              "resistance, it depends on tires and surface\n\n"
-                              "CdA parameter is the effective frontal area "
-                              "in m^2, it depends on position and equipment. "
-                              "If 0 estimated from anthropometric data\n\n"
-                              "Draft Mult. parameter is the multiplier "
-                              "to adjust for drafting, 1 is no drafting "
-                              " and 0.7 seems legit for drafting in a group\n\n"
-                              "wind speed shall be indicated in kph\n"
-                              "wind direction (origin) unit is degrees "
-                              "from -179 to +180 (-90=W, 0=N, 90=E, 180=S)\n"
-                              "Note: when the file already contains wind data, "
-                              "it will be overridden if wind speed is set\n\n"
-                              "The activity has to be a Ride with Speed and "
-                              "Altitude.\n\n"
-                              "Warning: the accuracy of power estimation can be "
-                              "too low to be of practical use for power analysis "
-                              "of general outdoor rides using typical GPS data. "
-                              "A power meter is recommended.")));
-        }
 
         void readConfig() {
             double MBik = appsettings->value(NULL, GC_DPDP_BIKEWEIGHT, "9.5").toDouble();
@@ -187,21 +138,56 @@ class FixDerivePower : public DataProcessor {
         ~FixDerivePower() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op) override;
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) const override {
             Q_UNUSED(ride);
             return new FixDerivePowerConfig(parent);
         }
 
         // Localized Name
-        QString name() {
-            return (tr("Estimate Power Values"));
+        QString name() const override {
+            return tr("Estimate Power Values");
+        }
+
+        QString id() const override {
+            return "::FixDerivePower";
+        }
+
+        QString legacyId() const override {
+            return "Estimate Power Values";
+        }
+
+        QString explain() const override {
+            return tr("Derive estimated power data based on "
+                      "speed/elevation/weight etc\n\n"
+                      "Bike Weight parameter is added to athlete's "
+                      "weight to compound total mass, it should "
+                      "include apparel, shoes, etc\n\n"
+                      "CRR parameter is the coefficient of rolling "
+                      "resistance, it depends on tires and surface\n\n"
+                      "CdA parameter is the effective frontal area "
+                      "in m^2, it depends on position and equipment. "
+                      "If 0 estimated from anthropometric data\n\n"
+                      "Draft Mult. parameter is the multiplier "
+                      "to adjust for drafting, 1 is no drafting "
+                      " and 0.7 seems legit for drafting in a group\n\n"
+                      "wind speed shall be indicated in km/h\n"
+                      "wind direction (origin) unit is degrees "
+                      "from -179 to +180 (-90=W, 0=N, 90=E, 180=S)\n"
+                      "Note: when the file already contains wind data, "
+                      "it will be overridden if wind speed is set\n\n"
+                      "The activity has to be a Ride with Speed and "
+                      "Altitude.\n\n"
+                      "Warning: the accuracy of power estimation can be "
+                      "too low to be of practical use for power analysis "
+                      "of general outdoor rides using typical GPS data. "
+                      "A power meter is recommended.");
         }
 };
 
-static bool FixDerivePowerAdded = DataProcessorFactory::instance().registerProcessor(QString("Estimate Power Values"), new FixDerivePower());
+static bool FixDerivePowerAdded = DataProcessorFactory::instance().registerProcessor(new FixDerivePower());
 
 bool
 FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")

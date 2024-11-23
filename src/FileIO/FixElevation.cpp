@@ -53,14 +53,6 @@ class FixElevationConfig : public DataProcessorConfig
             parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_FixElevationErrors));
         }
 
-        QString explain() {
-            return tr("Fix or add elevation data. If elevation data is "
-                      "present it will be removed and overwritten."
-                      "\nElevation data is provided by Open-Elevation.com public API,"
-                      " consider a donation if you find it useful."
-                      "\n\nINTERNET CONNECTION REQUIRED.");
-        }
-
         void readConfig() {}
         void saveConfig() {}
 
@@ -79,24 +71,40 @@ class FixElevation : public DataProcessor {
         ~FixElevation() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op) override;
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) const override {
             Q_UNUSED(ride);
             return new FixElevationConfig(parent);
         }
 
         // Localized Name
-        QString name() {
+        QString name() const override {
             return tr("Fix Elevation errors");
+        }
+
+        QString id() const override {
+            return "::FixElevation";
+        }
+
+        QString legacyId() const override {
+            return "Fix Elevation errors";
+        }
+
+        QString explain() const override {
+            return tr("Fix or add elevation data. If elevation data is "
+                      "present it will be removed and overwritten."
+                      "\nElevation data is provided by Open-Elevation.com public API,"
+                      " consider a donation if you find it useful."
+                      "\n\nINTERNET CONNECTION REQUIRED.");
         }
 
     private:
         QList<double> FetchElevationData(QString latLngCollection);
 };
 
-static bool fixElevationAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix Elevation errors"), new FixElevation());
+static bool fixElevationAdded = DataProcessorFactory::instance().registerProcessor(new FixElevation());
 
 bool
 FixElevation::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")

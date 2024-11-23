@@ -20,6 +20,7 @@
 #include "LTMOutliers.h"
 #include "Settings.h"
 #include "Units.h"
+#include "Colors.h"
 #include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
@@ -32,57 +33,35 @@ class FixSmO2Config : public DataProcessorConfig
 
     friend class ::FixSmO2;
     protected:
-        QHBoxLayout *layout;
         QCheckBox *fixSmO2Box, *fixtHbBox;
-        QLabel *maxtHbLabel;
         QDoubleSpinBox *maxtHbInput;
 
     public:
         FixSmO2Config(QWidget *parent) : DataProcessorConfig(parent) {
-
             HelpWhatsThis *help = new HelpWhatsThis(parent);
             parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_FixSmO2));
 
-            layout = new QHBoxLayout(this);
-
+            QFormLayout *layout = newQFormLayout(this);
             layout->setContentsMargins(0,0,0,0);
             setContentsMargins(0,0,0,0);
 
             fixSmO2Box = new QCheckBox(tr("Fix SmO2"));
             fixtHbBox = new QCheckBox(tr("Fix tHb"));
-            maxtHbLabel = new QLabel(tr("Max. tHb"));
 
             maxtHbInput = new QDoubleSpinBox();
             maxtHbInput->setMaximum(100);
             maxtHbInput->setMinimum(0);
             maxtHbInput->setSingleStep(1);
             maxtHbInput->setDecimals(2);
+            maxtHbInput->setSuffix(" " + tr("%"));
 
-            layout->addWidget(fixSmO2Box);
-            layout->addWidget(fixtHbBox);
-            layout->addWidget(maxtHbLabel);
-            layout->addWidget(maxtHbInput);
-
-            layout->addStretch();
-
+            layout->addRow("", fixSmO2Box);
+            layout->addRow("", fixtHbBox);
+            layout->addRow(tr("Max. tHb"), maxtHbInput);
         }
 
         //~FixSmO2Config() {} // deliberately not declared since Qt will delete
                               // the widget and its children when the config pane is deleted
-
-        QString explain() {
-            return(QString(tr("Occasionally SmO2 (%) and/or tHb (%) will erroneously "
-                           "report missing or high values (SmO2: 0% or >100% / tHb: 0% or > max. tHb parameter). \n\n "
-                           "This function will look for those anomalies "
-                           "in SmO2 and tHb data and depending on the configuration replace the erroneous data "
-                           "by smoothing/interpolating the data from either "
-                           "side of the 3 points in question. It takes the following parameters:\n\n"
-                           "Fix SmO2 - check to fix anomalies in SmO2 data \n"
-                           "Fix tHb - check to fix anomalies in tHb data \n"
-                           "Max. tHb - any tHb above is considered an outlier \n")));
-
-
-        }
 
         void readConfig() {
             bool fixSmO2 = appsettings->value(NULL, GC_MOXY_FIX_SMO2, Qt::Checked).toBool();
@@ -111,27 +90,47 @@ class FixSmO2 : public DataProcessor {
         ~FixSmO2() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op) override;
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) const override {
             Q_UNUSED(ride);
             return new FixSmO2Config(parent);
         }
 
         // Localized Name
-        QString name() {
-            return (tr("Fix SmO2 and/or tHb Anomaly"));
+        QString name() const override {
+            return tr("Fix SmO2 and/or tHb Anomaly");
+        }
+
+        QString id() const override {
+            return "::FixSmO2";
+        }
+
+        QString legacyId() const override {
+            return "Fix SmO2/tHb Anomaly";
+        }
+
+        QString explain() const override {
+            return tr("Occasionally SmO2 (%) and/or tHb (%) will erroneously "
+                      "report missing or high values (SmO2: 0% or >100% / tHb: 0% or > max. tHb parameter). \n\n "
+                      "This function will look for those anomalies "
+                      "in SmO2 and tHb data and depending on the configuration replace the erroneous data "
+                      "by smoothing/interpolating the data from either "
+                      "side of the 3 points in question. It takes the following parameters:\n\n"
+                      "Fix SmO2 - check to fix anomalies in SmO2 data \n"
+                      "Fix tHb - check to fix anomalies in tHb data \n"
+                      "Max. tHb - any tHb above is considered an outlier \n");
         }
 };
 
-static bool fixSmO2Added = DataProcessorFactory::instance().registerProcessor(QString("Fix SmO2/tHb Anomaly"), new FixSmO2());
+static bool fixSmO2Added = DataProcessorFactory::instance().registerProcessor(new FixSmO2());
 
 bool
 FixSmO2::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
     Q_UNUSED(op)
-    
+
     // get settings
     bool fixSmO2;
     bool fixtHb;

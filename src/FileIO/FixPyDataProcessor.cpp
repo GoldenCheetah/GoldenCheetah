@@ -10,7 +10,6 @@ class FixPyDataProcessorConfig : public DataProcessorConfig
 public:
     // there is no config
     FixPyDataProcessorConfig(QWidget *parent) : DataProcessorConfig(parent) {}
-    QString explain() { return tr("Custom Python Data Processor"); }
     void readConfig() {}
     void saveConfig() {}
 };
@@ -41,8 +40,16 @@ bool FixPyDataProcessor::postProcess(RideFile *rideFile, DataProcessorConfig *se
     return pyRunner.run(pyScript->source, pyScript->iniKey, errText) == 0;
 }
 
-DataProcessorConfig *FixPyDataProcessor::processorConfig(QWidget *parent, const RideFile* ride)
+DataProcessorConfig *FixPyDataProcessor::processorConfig(QWidget *parent, const RideFile* ride) const
 {
     Q_UNUSED(ride);
     return new FixPyDataProcessorConfig(parent);
+}
+
+
+QString
+FixPyDataProcessor::explain
+() const
+{
+    return tr("Custom Python Data Processor");
 }

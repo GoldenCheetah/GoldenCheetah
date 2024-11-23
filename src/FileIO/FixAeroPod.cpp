@@ -33,11 +33,13 @@ class FixAeroPodConfig : public DataProcessorConfig
 
     friend class ::FixAeroPod;
     protected:
+#if 0
         QHBoxLayout *layout;
         QLabel *paLabel;
         QLabel *percentLabel;
         QLineEdit *pa;
         QCheckBox *hrConv;
+#endif
 
     public:
         FixAeroPodConfig(QWidget *parent) : DataProcessorConfig(parent) {
@@ -45,33 +47,27 @@ class FixAeroPodConfig : public DataProcessorConfig
             HelpWhatsThis *help = new HelpWhatsThis(parent);
             parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_FixMoxy));
 
+#if 0
 	    layout = new QHBoxLayout(this);
-
 	    layout->setContentsMargins(0,0,0,0);
 	    setContentsMargins(0,0,0,0);
-        //paLabel = new QLabel(tr("Field Adjustment"));
 
-        //hrConv = new QCheckBox(tr("Heartrate to XData.CdA"));
+            paLabel = new QLabel(tr("Field Adjustment"));
+            hrConv = new QCheckBox(tr("Heartrate to XData.CdA"));
 
-        //layout->addWidget(paLabel);
-        //layout->addWidget(hrConv);
+            layout->addWidget(paLabel);
+            layout->addWidget(hrConv);
 	    layout->addStretch();
+#endif
 	}
 
         //~FixAeroPodConfig() {} // deliberately not declared since Qt will delete
                               // the widget and its children when the config pane is deleted
 
-        QString explain() {
-            return(QString(tr("When recording with an iBike AeroPod (in HR"
-                           " mode) the CdA data is sent as HR. This tool will"
-                           " update the activity file to move the values from HR"
-                           " into the XData.CdA series."
-                           )));
-        }
         void readConfig() {
         //bool isHr = appsettings->value(NULL, GC_HR2XDATACDA, Qt::Checked).toBool();
         //hrConv->setCheckState(isHr ? Qt::Checked : Qt::Unchecked);
-	    
+
 	}
         void saveConfig() {
         //appsettings->setValue(GC_CAD2SMO2, hrConv->checkState());
@@ -91,21 +87,36 @@ class FixAeroPod : public DataProcessor {
         ~FixAeroPod() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op) override;
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) const override {
             Q_UNUSED(ride);
             return new FixAeroPodConfig(parent);
         }
 
         // Localized Name
-        QString name() {
+        QString name() const override {
             return tr("Set XData.CdA from HR");
+        }
+
+        QString id() const override {
+            return "::FixAeroPod";
+        }
+
+        QString legacyId() const override {
+            return "FixAeroPod";
+        }
+
+        QString explain() const override {
+            return tr("When recording with an iBike AeroPod (in HR"
+                      " mode) the CdA data is sent as HR. This tool will"
+                      " update the activity file to move the values from HR"
+                      " into the XData.CdA series.");
         }
 };
 
-static bool FixAeroPodAdded = DataProcessorFactory::instance().registerProcessor(QString("FixAeroPod"), new FixAeroPod());
+static bool FixAeroPodAdded = DataProcessorFactory::instance().registerProcessor(new FixAeroPod());
 
 bool
 FixAeroPod::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")

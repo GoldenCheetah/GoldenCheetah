@@ -4726,7 +4726,7 @@ genericnext:
 
             if (rideFile->xdata("SWIM")) {
                 // Build synthetic kph, km and cad sample data for Lap Swims
-                DataProcessor* fixLapDP = DataProcessorFactory::instance().getProcessors(true).value("Fix Lap Swim");
+                DataProcessor* fixLapDP = DataProcessorFactory::instance().getProcessors(true).value("::FixLapSwim");
                 if (fixLapDP) fixLapDP->postProcess(rideFile, NULL, "NEW");
                 else qDebug()<<"Fix Lap Swim Data Processor not found.";
             }
