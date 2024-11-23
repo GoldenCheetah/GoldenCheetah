@@ -496,8 +496,9 @@ public:
     ~GSettings();
 
     // standard access to global config
-    QVariant value(const QObject *me, const QString key, const QVariant def = 0) ;
+    QVariant value(const QObject *me, const QString key, const QVariant def = 0);
     void setValue(QString key, QVariant value);
+    void remove(const QString &key);
 
     // access to athleteName specific config
     QVariant cvalue(QString athleteName, QString key, QVariant def = 0);

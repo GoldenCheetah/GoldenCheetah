@@ -7429,7 +7429,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                         QString dp_name = *(leaf->fparms[0]->lvalue.n);
 
                         // lookup processor
-                        DataProcessor* dp = DataProcessorFactory::instance().getProcessors().value(dp_name, NULL);
+                        DataProcessor* dp = DataProcessorFactory::instance().getProcessor(dp_name);
 
                         if (!dp) return Result(0); // No such data processor
 

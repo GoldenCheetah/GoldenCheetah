@@ -19,6 +19,7 @@
 #include "DataProcessor.h"
 #include "Settings.h"
 #include "Units.h"
+#include "Colors.h"
 #include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
@@ -31,8 +32,6 @@ class FixGapsConfig : public DataProcessorConfig
 
     friend class ::FixGaps;
     protected:
-        QHBoxLayout *layout;
-        QLabel *toleranceLabel, *beerandburritoLabel;
         QDoubleSpinBox *tolerance,
                        *beerandburrito;
 
@@ -42,55 +41,28 @@ class FixGapsConfig : public DataProcessorConfig
             HelpWhatsThis *help = new HelpWhatsThis(parent);
             parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_FixGapsInRecording));
 
-            layout = new QHBoxLayout(this);
-
+            QFormLayout *layout = newQFormLayout(this);
             layout->setContentsMargins(0,0,0,0);
             setContentsMargins(0,0,0,0);
-
-            toleranceLabel = new QLabel(tr("Tolerance"));
-            beerandburritoLabel = new QLabel(tr("Stop"));
 
             tolerance = new QDoubleSpinBox();
             tolerance->setMaximum(99.99);
             tolerance->setMinimum(0);
             tolerance->setSingleStep(0.1);
+            tolerance->setSuffix(" " + tr("s"));
 
             beerandburrito = new QDoubleSpinBox();
             beerandburrito->setMaximum(99999.99);
             beerandburrito->setMinimum(0);
             beerandburrito->setSingleStep(0.1);
+            beerandburrito->setSuffix(" " + tr("s"));
 
-            layout->addWidget(toleranceLabel);
-            layout->addWidget(tolerance);
-            layout->addWidget(beerandburritoLabel);
-            layout->addWidget(beerandburrito);
-            layout->addStretch();
+            layout->addRow(tr("Tolerance"), tolerance);
+            layout->addRow(tr("Stop"), beerandburrito);
         }
 
         //~FixGapsConfig() {} // deliberately not declared since Qt will delete
                               // the widget and its children when the config pane is deleted
-
-        QString explain() {
-            return(QString(tr("Many devices, especially wireless devices, will "
-                           "drop connections to the bike computer. This leads "
-                           "to lost samples in the resulting data, or so-called "
-                           "drops in recording.\n\n"
-                           "In order to calculate peak powers and averages, it "
-                           "is very helpful to remove these gaps, and either "
-                           "smooth the data where it is missing or just "
-                           "replace with zero value samples\n\n"
-                           "This function performs this task, taking two "
-                           "parameters;\n\n"
-                           "tolerance - this defines the minimum size of a "
-                           "recording gap (in seconds) that will be processed. "
-                           "any gap shorter than this will not be affected.\n\n"
-                           "stop - this defines the maximum size of "
-                           "gap (in seconds) that will have a smoothing algorithm "
-                           "applied. Where a gap is shorter than this value it will "
-                           "be filled with values interpolated from the values "
-                           "recorded before and after the gap. If it is longer "
-                           "than this value, it will be filled with zero values.")));
-        }
 
         void readConfig() {
             double tol = appsettings->value(NULL, GC_DPFG_TOLERANCE, "1.0").toDouble();
@@ -118,21 +90,51 @@ class FixGaps : public DataProcessor {
         ~FixGaps() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op) override;
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) const override{
             Q_UNUSED(ride);
             return new FixGapsConfig(parent);
         }
 
         // Localized Name
-        QString name() {
-            return (tr("Fix Gaps in Recording"));
+        QString name() const override {
+            return tr("Fix Gaps in Recording");
+        }
+
+        QString id() const override {
+            return "::FixGaps";
+        }
+
+        QString legacyId() const override {
+            return "Fix Gaps in Recording";
+        }
+
+        QString explain() const override {
+            return tr("Many devices, especially wireless devices, will "
+                      "drop connections to the bike computer. This leads "
+                      "to lost samples in the resulting data, or so-called "
+                      "drops in recording.\n\n"
+                      "In order to calculate peak powers and averages, it "
+                      "is very helpful to remove these gaps, and either "
+                      "smooth the data where it is missing or just "
+                      "replace with zero value samples\n\n"
+                      "This function performs this task, taking two "
+                      "parameters;\n\n"
+                      "tolerance - this defines the minimum size of a "
+                      "recording gap (in seconds) that will be processed. "
+                      "any gap shorter than this will not be affected.\n\n"
+                      "stop - this defines the maximum size of "
+                      "gap (in seconds) that will have a smoothing algorithm "
+                      "applied. Where a gap is shorter than this value it will "
+                      "be filled with values interpolated from the values "
+                      "recorded before and after the gap. If it is longer "
+                      "than this value, it will be filled with zero values.");
         }
 };
 
-static bool fixGapsAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix Gaps in Recording"), new FixGaps());
+static bool fixGapsAdded = DataProcessorFactory::instance().registerProcessor(new FixGaps());
 
 bool
 FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")

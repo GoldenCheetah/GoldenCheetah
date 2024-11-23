@@ -45,11 +45,6 @@ class FixRunningCadenceConfig : public DataProcessorConfig
         //~FixRunningCadenceConfig() {} // deliberately not declared since Qt will delete
                               // the widget and its children when the config pane is deleted
 
-        QString explain() {
-            return(QString(tr("Some file report cadence in steps per minutes.\n"
-                              "This tools convert to revolutions or cycles per minute")));
-        }
-
         void readConfig() { }
         void saveConfig() { }
 
@@ -64,21 +59,34 @@ class FixRunningCadence : public DataProcessor {
         ~FixRunningCadence() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op) override;
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) const override {
             Q_UNUSED(ride);
             return new FixRunningCadenceConfig(parent);
         }
 
         // Localized Name
-        QString name() {
+        QString name() const override {
             return (tr("Fix Running Cadence"));
+        }
+
+        QString id() const override {
+            return "::FixRunningCadence";
+        }
+
+        QString legacyId() const override {
+            return "Fix Running Cadence";
+        }
+
+        QString explain() const override {
+            return tr("Some file report cadence in steps per minutes.\n"
+                      "This tools convert to revolutions or cycles per minute");
         }
 };
 
-static bool FixRunningCadenceAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix Running Cadence"), new FixRunningCadence());
+static bool FixRunningCadenceAdded = DataProcessorFactory::instance().registerProcessor(new FixRunningCadence());
 
 bool
 FixRunningCadence::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")

@@ -24,6 +24,7 @@
 #include "MeasuresDownload.h"
 #include "Measures.h"
 #include "Athlete.h"
+#include "Colors.h"
 
 void FilterHrv(XDataSeries *rr, double rr_min, double rr_max, double filt, int hwin)
 {
@@ -128,15 +129,10 @@ class FilterHrvOutliersConfig : public DataProcessorConfig
 
     friend class ::FilterHrvOutliers;
 protected:
-    QHBoxLayout *layout;
-    QLabel *hrvMaxLabel;
     QDoubleSpinBox *hrvMax;
-    QLabel *hrvMinLabel;
     QDoubleSpinBox *hrvMin;
 
-    QLabel *hrvFiltLabel;
     QDoubleSpinBox *hrvFilt;
-    QLabel *hrvWindowLabel;
     QDoubleSpinBox *hrvWindow;
 
     QCheckBox *setRestHrv;
@@ -146,27 +142,23 @@ public:
         HelpWhatsThis *help = new HelpWhatsThis(parent);
         parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_FilterHrv));
 
-        layout = new QHBoxLayout(this);
-
+        QFormLayout *layout = newQFormLayout(this);
         layout->setContentsMargins(0,0,0,0);
         setContentsMargins(0,0,0,0);
-
-        hrvMaxLabel = new QLabel(tr("R-R maximum (msec)"));
-        hrvMinLabel = new QLabel(tr("R-R minimum (msec)"));
-        hrvFiltLabel = new QLabel(tr("Filter range"));
-        hrvWindowLabel = new QLabel(tr("Filter window size (#)"));
 
         hrvMax = new QDoubleSpinBox();
         hrvMax->setMaximum(5000);
         hrvMax->setMinimum(0);
         hrvMax->setSingleStep(1);
         hrvMax->setDecimals(0);
+        hrvMax->setSuffix(" " + tr("ms"));
 
         hrvMin = new QDoubleSpinBox();
         hrvMin->setMaximum(5000);
         hrvMin->setMinimum(0);
         hrvMin->setSingleStep(1);
         hrvMin->setDecimals(0);
+        hrvMin->setSuffix(" " + tr("ms"));
 
         hrvFilt = new QDoubleSpinBox();
         hrvFilt->setMaximum(10.0);
@@ -179,30 +171,17 @@ public:
         hrvWindow->setMinimum(4);
         hrvWindow->setSingleStep(1);
         hrvWindow->setDecimals(0);
+        hrvWindow->setSuffix(" " + tr("#"));
 
         setRestHrv = new QCheckBox(tr("Set Rest Hrv"));
 
-        layout->addWidget(hrvMaxLabel);
-        layout->addWidget(hrvMax);
-        layout->addWidget(hrvMinLabel);
-        layout->addWidget(hrvMin);
-        layout->addWidget(hrvFiltLabel);
-        layout->addWidget(hrvFilt);
-        layout->addWidget(hrvWindowLabel);
-        layout->addWidget(hrvWindow);
-        layout->addWidget(setRestHrv);
+        layout->addRow(tr("R-R maximum"), hrvMax);
+        layout->addRow(tr("R-R minimum"), hrvMin);
+        layout->addRow(tr("Filter range"), hrvFilt);
+        layout->addRow(tr("Filter window size"), hrvWindow);
+        layout->addRow("", setRestHrv);
+    }
 
-        layout->addStretch();
-    }
-    QString explain() {
-        return(QString(tr("Filter R-R outliers (see \"R-R flag\" in HRV Xdata). Non outliers are marked \"1\".\n"
-                          "  - \"R-R min and maximum\" exclude samples outside (flag -1). Also excluded when filtering range.\n"
-                          "  - \"Filter range\" of the average within a window (flag 0)\n"
-                          "  - \"Filter window size\" distance on either side of the current interval\n"
-                          "  - \"Set Rest HRV\" if checked on interactive use the computed HRV metrics are set as Rest HRV Measures\n"
-                          ""
-                          )));
-    }
     void readConfig() {
         double MaxVal = appsettings->value(NULL, GC_RR_MAX, "2000.0").toDouble();
         double MinVal = appsettings->value(NULL, GC_RR_MIN, "270.0").toDouble();
@@ -233,21 +212,37 @@ public:
     FilterHrvOutliers() {}
     ~FilterHrvOutliers() {}
     // the processor
-    bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
+    bool postProcess(RideFile *, DataProcessorConfig* config, QString op) override;
 
     // the config widget
-    DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+    DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) const override {
         Q_UNUSED(ride);
         return new FilterHrvOutliersConfig(parent);
     }
 
     // Localized Name
-    QString name() {
-        return (tr("Filter R-R Outliers"));
+    QString name() const override {
+        return tr("Filter R-R Outliers");
+    }
+
+    QString id() const override {
+        return "::FilterHrvOutliers";
+    }
+
+    QString legacyId() const override {
+        return "Filter R-R Outliers";
+    }
+
+    QString explain() const override {
+        return tr("Filter R-R outliers (see \"R-R flag\" in HRV Xdata). Non outliers are marked \"1\".\n"
+                  "  - \"R-R min and maximum\" exclude samples outside (flag -1). Also excluded when filtering range.\n"
+                  "  - \"Filter range\" of the average within a window (flag 0)\n"
+                  "  - \"Filter window size\" distance on either side of the current interval\n"
+                  "  - \"Set Rest HRV\" if checked on interactive use the computed HRV metrics are set as Rest HRV Measures\n");
     }
 };
 
-static bool FilterHrvOutliersAdded = DataProcessorFactory::instance().registerProcessor(QString("Filter R-R Outliers"), new FilterHrvOutliers());
+static bool FilterHrvOutliersAdded = DataProcessorFactory::instance().registerProcessor(new FilterHrvOutliers());
 
 bool
 FilterHrvOutliers::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")

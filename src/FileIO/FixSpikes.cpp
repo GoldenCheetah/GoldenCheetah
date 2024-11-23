@@ -21,6 +21,7 @@
 #include "LTMOutliers.h"
 #include "Settings.h"
 #include "Units.h"
+#include "Colors.h"
 #include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
@@ -35,8 +36,6 @@ class FixSpikesConfig : public DataProcessorConfig
 
     friend class ::FixSpikes;
     protected:
-        QHBoxLayout *layout;
-        QLabel *maxLabel, *varianceLabel, *medWinLabel;
         QDoubleSpinBox *max,
                        *variance;
         QSpinBox* medWinSize;
@@ -44,82 +43,46 @@ class FixSpikesConfig : public DataProcessorConfig
 
     public:
         FixSpikesConfig(QWidget *parent) : DataProcessorConfig(parent) {
-
             HelpWhatsThis *help = new HelpWhatsThis(parent);
             parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_FixPowerSpikes));
 
-            layout = new QHBoxLayout(this);
-
+            QFormLayout *layout = newQFormLayout(this);
             layout->setContentsMargins(0,0,0,0);
             setContentsMargins(0,0,0,0);
 
             algo = new QCheckBox(tr("Median"));
 
-            maxLabel = new QLabel(tr("Max"));
-            varianceLabel = new QLabel(tr("Variance"));
-
             max = new QDoubleSpinBox();
             max->setMaximum(9999.99);
             max->setMinimum(0);
             max->setSingleStep(1);
+            max->setSuffix(" " + tr("W"));
 
             variance = new QDoubleSpinBox();
             variance->setMaximum(9999);
             variance->setMinimum(0);
             variance->setSingleStep(5);
-
-            medWinLabel = new QLabel(tr("Window"));
+            variance->setSuffix(" " + tr("W"));
 
             medWinSize = new QSpinBox();
             medWinSize->setMaximum(21);
             medWinSize->setMinimum(5);
             medWinSize->setSingleStep(2);
             medWinSize->setValue(13);
+            medWinSize->setSuffix(" " + tr("Points"));
 
             // Ensure only odd numbers are set for the median window
             connect(medWinSize, QOverload<int>::of(&QSpinBox::valueChanged),
                 [=](int i) {(i % 2) ? medWinSize->setValue(i) : medWinSize->setValue(i + 1); });
 
-            layout->addWidget(algo);
-            layout->addWidget(maxLabel);
-            layout->addWidget(max);
-            layout->addWidget(varianceLabel);
-            layout->addWidget(variance);
-            layout->addWidget(medWinLabel);
-            layout->addWidget(medWinSize);
-
-            layout->addStretch();
+            layout->addRow("", algo);
+            layout->addRow(tr("Max"), max);
+            layout->addRow(tr("Variance"), variance);
+            layout->addRow(tr("Window"), medWinSize);
         }
 
         //~FixSpikesConfig() {} // deliberately not declared since Qt will delete
                               // the widget and its children when the config pane is deleted
-
-        QString explain() {
-            return(QString(tr("Power meters will occasionally report erroneously high values "
-                           "for power. For crank based power meters such as SRM and Quarq this "
-                           "is caused by an erroneous cadence reading as a result of triggering "
-                           "a reed switch whilst pushing off.\n\n"
-                           "This function provides two algorithms that look for spikes/anomalies "
-                           "in power data and replace the erroneous data by: \n\n"
-                           "i) Replacing the point in question with smoothed/interpolated data from "
-                           "either side of the point in question, it takes the following parameters:\n\n"
-                           "Absolute Max (Watts)- this defines an absolute value for watts, and will "
-                           "smooth any values above this absolute value that have been identified "
-                           "as being anomalies (i.e. at odds with the data surrounding it)\n\n"
-                           "Variance (Watts) - This determines the threshold beyond which a data point "
-                           "will be smoothed/interpolated, if the difference between the data point "
-                           "value and the 30 second rolling average wattage prior to the spike exceeds "
-                           "this parameter.\n\n"
-                           "ii) Replacing the point in question with the median value of a window "
-                           "centred upon the erronous data point. This approach is robust to local "
-                           "outliers, and preserves sharp edges, it takes the following parameters:\n\n"
-                           "Window Size - this defines the number of neighbouring points used to "
-                           "determine a median value; the window size is always odd to ensure we "
-                           "have a central median value.\n\n"
-                           "Variance (Watts) - Determines the threshold beyond which a data point will "
-                           "be fixed, if the difference between the data point value and the median "
-                           "value exceeds this parameter.\n\n")));
-        }
 
         void readConfig() {
             double tol = appsettings->value(NULL, GC_DPFS_MAX, "200").toDouble();
@@ -154,21 +117,56 @@ class FixSpikes : public DataProcessor {
         ~FixSpikes() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op) override;
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) const override {
             Q_UNUSED(ride);
             return new FixSpikesConfig(parent);
         }
 
         // Localized Name
-        QString name() {
-            return (tr("Fix Power Spikes"));
+        QString name() const override {
+            return tr("Fix Power Spikes");
+        }
+
+        QString id() const override {
+            return "::FixSpikes";
+        }
+
+        QString legacyId() const override {
+            return "Fix Power Spikes";
+        }
+
+        QString explain() const override {
+            return tr("Power meters will occasionally report erroneously high values "
+                      "for power. For crank based power meters such as SRM and Quarq this "
+                      "is caused by an erroneous cadence reading as a result of triggering "
+                      "a reed switch whilst pushing off.\n\n"
+                      "This function provides two algorithms that look for spikes/anomalies "
+                      "in power data and replace the erroneous data by: \n\n"
+                      "i) Replacing the point in question with smoothed/interpolated data from "
+                      "either side of the point in question, it takes the following parameters:\n\n"
+                      "Absolute Max (Watts)- this defines an absolute value for watts, and will "
+                      "smooth any values above this absolute value that have been identified "
+                      "as being anomalies (i.e. at odds with the data surrounding it)\n\n"
+                      "Variance (Watts) - This determines the threshold beyond which a data point "
+                      "will be smoothed/interpolated, if the difference between the data point "
+                      "value and the 30 second rolling average wattage prior to the spike exceeds "
+                      "this parameter.\n\n"
+                      "ii) Replacing the point in question with the median value of a window "
+                      "centred upon the erronous data point. This approach is robust to local "
+                      "outliers, and preserves sharp edges, it takes the following parameters:\n\n"
+                      "Window Size - this defines the number of neighbouring points used to "
+                      "determine a median value; the window size is always odd to ensure we "
+                      "have a central median value.\n\n"
+                      "Variance (Watts) - Determines the threshold beyond which a data point will "
+                      "be fixed, if the difference between the data point value and the median "
+                      "value exceeds this parameter.\n\n");
         }
 };
 
-static bool fixSpikesAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix Power Spikes"), new FixSpikes());
+static bool fixSpikesAdded = DataProcessorFactory::instance().registerProcessor(new FixSpikes());
 
 bool
 FixSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
@@ -181,7 +179,7 @@ FixSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op
     // Keep track of the power outliers
     int spikes = 0;
     double spiketime = 0.0;
-    
+
     bool medAlgo;
     double variance, max;
     int medianWinSize; // this nummber must be odd to align the centre of the median window with the point being tested/corrected

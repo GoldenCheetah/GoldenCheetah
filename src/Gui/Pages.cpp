@@ -42,7 +42,6 @@
 #include "LocalFileStore.h"
 #include "Secrets.h"
 #include "Utils.h"
-#include "StyledItemDelegates.h"
 #ifdef GC_WANT_PYTHON
 #include "PythonEmbed.h"
 #include "FixPySettings.h"
@@ -83,7 +82,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     langCombo->addItem(tr("Czech"));
     langCombo->addItem(tr("Spanish"));
     langCombo->addItem(tr("Portugese"));
-    langCombo->addItem(tr("Chinese (Simplified)"));    
+    langCombo->addItem(tr("Chinese (Simplified)"));
     langCombo->addItem(tr("Chinese (Traditional)"));
     langCombo->addItem(tr("Dutch"));
     langCombo->addItem(tr("Swedish"));
@@ -101,7 +100,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     else if(lang.toString().startsWith("cs")) langCombo->setCurrentIndex(7);
     else if(lang.toString().startsWith("es")) langCombo->setCurrentIndex(8);
     else if(lang.toString().startsWith("pt")) langCombo->setCurrentIndex(9);
-    else if(lang.toString().startsWith("zh-cn")) langCombo->setCurrentIndex(10);    
+    else if(lang.toString().startsWith("zh-cn")) langCombo->setCurrentIndex(10);
     else if (lang.toString().startsWith("zh-tw")) langCombo->setCurrentIndex(11);
     else if (lang.toString().startsWith("nl")) langCombo->setCurrentIndex(12);
     else if (lang.toString().startsWith("sv")) langCombo->setCurrentIndex(13);
@@ -2330,13 +2329,11 @@ MetadataPage::MetadataPage(Context *context) : context(context)
     defaultsPage = new DefaultsPage(this, defaultDefinitions);
     processorPage = new ProcessorPage(context);
 
-
     tabs = new QTabWidget(this);
     tabs->addTab(fieldsPage, tr("Fields"));
     tabs->addTab(keywordsPage, tr("Colour Keywords"));
     tabs->addTab(defaultsPage, tr("Defaults"));
-    tabs->addTab(processorPage, tr("Processing"));
-
+    tabs->addTab(processorPage, tr("Processors && Automation"));
 
     // refresh the keywords combo when change tabs .. will do more often than
     // needed but better that than less often than needed
@@ -2859,95 +2856,424 @@ FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
 //
 // Data processors config page
 //
+
+#define PROCESSORTREE_COL_PROCESSOR 0
+#define PROCESSORTREE_COL_AUTOMATION 1
+#define PROCESSORTREE_COL_ROWNUM 2
+#define PROCESSORTREE_COL_CORE 3
+#define PROCESSORTREE_COL_AUTOMATEDONLY 4
+#define PROCESSORTREE_COL_ID 5
+#define PROCESSORTREE_NUM_COLS 6
 ProcessorPage::ProcessorPage(Context *context) : context(context)
 {
-    // get the available processors
-    const DataProcessorFactory &factory = DataProcessorFactory::instance();
-    processors = factory.getProcessors();
+    automationDelegate.addItems({ tr("None"), tr("On Import"), tr("On Save") });
 
-    QGridLayout *mainLayout = new QGridLayout(this);
-
-    processorTree = new QTreeWidget;
-    processorTree->headerItem()->setText(0, tr("Processor"));
-    processorTree->headerItem()->setText(1, tr("Apply"));
-    processorTree->headerItem()->setText(2, tr("Settings"));
-    processorTree->headerItem()->setText(3, "Technical Name of Processor"); // add invisible Column with technical name
-    processorTree->setColumnCount(4);
-    processorTree->setSelectionMode(QAbstractItemView::NoSelection);
-    processorTree->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
-    processorTree->setUniformRowHeights(true);
-    processorTree->setIndentation(0);
-    //processorTree->header()->resizeSection(0,150);
+    processorTree = new QTreeWidget();
+    processorTree->headerItem()->setText(PROCESSORTREE_COL_PROCESSOR, tr("Processor"));
+    processorTree->headerItem()->setText(PROCESSORTREE_COL_AUTOMATION, tr("Automation"));
+    processorTree->headerItem()->setText(PROCESSORTREE_COL_ROWNUM, "_rownum");
+    processorTree->headerItem()->setText(PROCESSORTREE_COL_CORE, "_core");
+    processorTree->headerItem()->setText(PROCESSORTREE_COL_AUTOMATEDONLY, "_automatedonly");
+    processorTree->headerItem()->setText(PROCESSORTREE_COL_ID, "_id");
+    processorTree->setColumnCount(PROCESSORTREE_NUM_COLS);
+    processorTree->setItemDelegateForColumn(PROCESSORTREE_COL_PROCESSOR, &processorDelegate);
+    processorTree->setItemDelegateForColumn(PROCESSORTREE_COL_AUTOMATION, &automationDelegate);
+    processorTree->setColumnHidden(PROCESSORTREE_COL_ROWNUM, true);
+    processorTree->setColumnHidden(PROCESSORTREE_COL_CORE, true);
+    processorTree->setColumnHidden(PROCESSORTREE_COL_AUTOMATEDONLY, true);
+    processorTree->setColumnHidden(PROCESSORTREE_COL_ID, true);
     HelpWhatsThis *help = new HelpWhatsThis(processorTree);
     processorTree->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_DataFields_Processing));
+    basicTreeWidgetStyle(processorTree);
 
-    // iterate over all the processors and add an entry to the
-    QMapIterator<QString, DataProcessor*> i(processors);
-    i.toFront();
-    while (i.hasNext()) {
-        i.next();
+    QWidget *leftWidget = new QWidget();
+    QVBoxLayout *leftLayout = new QVBoxLayout(leftWidget);
+    leftLayout->addWidget(processorTree);
+#ifdef GC_WANT_PYTHON
+    if (appsettings->value(nullptr, GC_EMBED_PYTHON, true).toBool()) {
+        addButton = new QPushButton(tr("+"));
+        delButton = new QPushButton(tr("-"));
+        editButton = new QPushButton(tr("Edit..."));
+        hideButton = new QCheckBox(tr("Hide Core Processors"));
+#ifndef Q_OS_MAC
+        addButton->setFixedSize(20 * dpiXFactor, 20 * dpiYFactor);
+        delButton->setFixedSize(20 * dpiXFactor, 20 * dpiYFactor);
+#else
+        addButton->setText(tr("Add"));
+        delButton->setText(tr("Delete"));
+#endif
+        QHBoxLayout *actionButtons = new QHBoxLayout();
+        actionButtons->setSpacing(2 * dpiXFactor);
+        actionButtons->addWidget(hideButton);
+        actionButtons->addStretch();
+        actionButtons->addWidget(editButton);
+        actionButtons->addItem(new QSpacerItem(5 * dpiXFactor, editButton->sizeHint().height()));
+        actionButtons->addWidget(addButton, 0, Qt::AlignHCenter | Qt::AlignTop);
+        actionButtons->addWidget(delButton, 0, Qt::AlignHCenter | Qt::AlignTop);
 
-        QTreeWidgetItem *add;
+        leftLayout->addLayout(actionButtons);
 
-        add = new QTreeWidgetItem(processorTree->invisibleRootItem());
-        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
-
-        // Processor Name: it shows the localized name
-        add->setText(0, i.value()->name());
-        // Processer Key - for Settings
-        add->setText(3, i.key());
-
-        // Auto or Manual run?
-        QComboBox *comboButton = new QComboBox(this);
-        comboButton->addItem(tr("Manual"));
-        comboButton->addItem(tr("Import"));
-        comboButton->addItem(tr("Save"));
-        processorTree->setItemWidget(add, 1, comboButton);
-
-        QString configsetting = QString("dp/%1/apply").arg(i.key());
-        if (appsettings->value(NULL, GC_QSETTINGS_GLOBAL_GENERAL+configsetting, "Manual").toString() == "Manual")
-            comboButton->setCurrentIndex(0);
-        else if (appsettings->value(NULL, GC_QSETTINGS_GLOBAL_GENERAL+configsetting, "Save").toString() == "Save")
-            comboButton->setCurrentIndex(2);
-        else
-            comboButton->setCurrentIndex(1);
-
-        // Get and Set the Config Widget
-        DataProcessorConfig *config = i.value()->processorConfig(this);
-        config->readConfig();
-
-        processorTree->setItemWidget(add, 2, config);
-
+        connect(addButton, &QPushButton::clicked, this, &ProcessorPage::addProcessor);
+        connect(delButton, &QPushButton::clicked, this, &ProcessorPage::delProcessor);
+        connect(editButton, &QPushButton::clicked, this, &ProcessorPage::editProcessor);
+        connect(hideButton, SIGNAL(toggled(bool)), this, SLOT(toggleCoreProcessors(bool)));
     }
-    processorTree->setColumnHidden(3, true);
+#endif
 
-    mainLayout->addWidget(processorTree, 0,0);
+    settingsStack = new QStackedWidget();
+    settingsStack->addWidget(new QLabel(tr("<center><h1>No Processor selected</h1></center>")));
+
+    QSplitter *splitter = new QSplitter();
+    splitter->addWidget(leftWidget);
+    splitter->addWidget(settingsStack);
+    splitter->setSizes(QList<int>({INT_MAX / 3, INT_MAX / 2}));
+
+    QHBoxLayout *mainLayout = new QHBoxLayout(this);
+    mainLayout->addWidget(splitter);
+
+    connect(processorTree, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(processorSelected(QTreeWidgetItem*)));
+    connect(processorTree->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(dataChanged(const QModelIndex&)));
+#ifdef GC_WANT_PYTHON
+    connect(processorTree, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(dblClickProcessor(QTreeWidgetItem*, int)));
+#endif
+
+    reload(0);
 }
 
 qint32
 ProcessorPage::saveClicked()
 {
+    QMap<QString, DataProcessor*> dps = DataProcessorFactory::instance().getProcessors(false);
+
     // call each processor config widget's saveConfig() to
     // write away separately
-    for (int i=0; i<processorTree->invisibleRootItem()->childCount(); i++) {
-        // auto (which means run on import) or manual?
-        QString configsetting = QString("dp/%1/apply").arg(processorTree->invisibleRootItem()->child(i)->text(3));
-        QString apply;
+    for (int i = 0; i < processorTree->invisibleRootItem()->childCount(); i++) {
+        QTreeWidgetItem *item = processorTree->invisibleRootItem()->child(i);
+        QString id = item->data(PROCESSORTREE_COL_ID, Qt::DisplayRole).toString();
 
-        // which mode is selected?
-        switch(((QComboBox*)(processorTree->itemWidget(processorTree->invisibleRootItem()->child(i), 1)))->currentIndex())  {
-            default:
-            case 0: apply = "Manual"; break;
-            case 1: apply = "Auto"; break;
-            case 2: apply = "Save"; break;
+        if (dps.contains(id)) {
+            dps[id]->setAutomation(static_cast<DataProcessor::Automation>(item->data(PROCESSORTREE_COL_AUTOMATION, Qt::DisplayRole).toInt()));
+            dps[id]->setAutomatedOnly(item->data(PROCESSORTREE_COL_AUTOMATEDONLY, Qt::DisplayRole).toBool());
         }
-
-        appsettings->setValue(GC_QSETTINGS_GLOBAL_GENERAL+configsetting, apply);
-        ((DataProcessorConfig*)(processorTree->itemWidget(processorTree->invisibleRootItem()->child(i), 2)))->saveConfig();
+        if (configs[i] != nullptr) {
+            configs[i]->saveConfig();
+        }
     }
 
     return 0;
 }
+
+
+void
+ProcessorPage::processorSelected
+(QTreeWidgetItem *selectedItem)
+{
+    if (selectedItem == nullptr) {
+        settingsStack->setCurrentIndex(0);
+    } else {
+        int rownum = selectedItem->data(PROCESSORTREE_COL_ROWNUM, Qt::DisplayRole).toInt();
+        if (rownum >= 0 && rownum < settingsStack->count() - 1) {
+            settingsStack->setCurrentIndex(rownum + 1);
+            if (delButton != nullptr && editButton != nullptr) {
+                bool isCoreProcessor = selectedItem->data(PROCESSORTREE_COL_CORE, Qt::DisplayRole).toBool();
+                delButton->setEnabled(! isCoreProcessor);
+                editButton->setEnabled(! isCoreProcessor);
+            }
+        }
+    }
+}
+
+
+void
+ProcessorPage::reload
+()
+{
+    processorTree->model()->blockSignals(true);
+    configs.clear();
+    automationCombos.clear();
+    automatedCheckBoxes.clear();
+    processorTree->blockSignals(true);
+    processorTree->clear();
+    processorTree->blockSignals(false);
+    while (settingsStack->count() > 1) {
+        QWidget *widget = settingsStack->widget(settingsStack->count() - 1);
+        delete widget;
+    }
+
+    // get the available processors
+    const DataProcessorFactory &factory = DataProcessorFactory::instance();
+    QList<DataProcessor*> processors = factory.getProcessorsSorted();
+
+    // iterate over all the processors and add an entry to the
+    int rownum = 0;
+    for (QList<DataProcessor*>::iterator iter = processors.begin(); iter != processors.end(); ++iter) {
+        QTreeWidgetItem *add = new QTreeWidgetItem(processorTree->invisibleRootItem());
+        QFont font = add->font(0);
+        font.setWeight((*iter)->isAutomatedOnly() ? QFont::ExtraLight : QFont::Normal);
+        add->setFlags(add->flags() | Qt::ItemIsEditable);
+        add->setData(PROCESSORTREE_COL_PROCESSOR, Qt::DisplayRole, (*iter)->name()); // Processor Name: it shows the localized name
+        add->setData(PROCESSORTREE_COL_PROCESSOR, Qt::FontRole, font);
+        add->setData(PROCESSORTREE_COL_AUTOMATION, Qt::DisplayRole, (*iter)->getAutomation());
+        add->setData(PROCESSORTREE_COL_ROWNUM, Qt::DisplayRole, rownum);
+        add->setData(PROCESSORTREE_COL_CORE, Qt::DisplayRole, (*iter)->isCoreProcessor());
+        add->setData(PROCESSORTREE_COL_AUTOMATEDONLY, Qt::DisplayRole, (*iter)->isAutomatedOnly());
+        add->setData(PROCESSORTREE_COL_ID, Qt::DisplayRole, (*iter)->id());
+
+        // Get and Set the Config Widget
+        DataProcessorConfig *config = (*iter)->processorConfig(this);
+        config->readConfig();
+        configs << config;
+
+        QLabel *detailsHL = new QLabel();
+        if (appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool()) {
+            detailsHL->setText(QString("<center><h2>%1<br><small>%2</small></h2></center>")
+                                     .arg((*iter)->name())
+                                     .arg((*iter)->isCoreProcessor() ? tr("Core Processor") : tr("Custom Python Processor")));
+        } else {
+            detailsHL->setText(QString("<center><h2>%1</h2></center>").arg((*iter)->name()));
+        }
+        detailsHL->setWordWrap(true);
+        QLabel *automationHL = new QLabel("<h3>" + tr("Automation") + "</h3>");
+
+        QFormLayout *setupLayout = newQFormLayout();
+        QCheckBox *automatedOnly = new QCheckBox(tr("Automated execution only"));
+        automatedOnly->setChecked((*iter)->isAutomatedOnly());
+        automatedCheckBoxes << automatedOnly;
+
+        QComboBox *automationCombo = new QComboBox();
+        automationCombo->addItems({ tr("None"), tr("On Import"), tr("On Save") });
+        automationCombo->setCurrentIndex((*iter)->getAutomation());
+        automationCombos << automationCombo;
+
+        QLabel *postprocess = new QLabel(QString("<tt>postprocess(\"%1\", <i>&lt;YOUR FILTER&gt;</i>)</tt>").arg((*iter)->id()));
+        postprocess->setTextInteractionFlags(Qt::TextSelectableByMouse);
+
+        setupLayout->addRow(tr("Automation"), automationCombo);
+        setupLayout->addRow("", automatedOnly);
+        setupLayout->addRow(tr("Use as Filter"), postprocess);
+
+        connect(automationCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(automationChanged(int)));
+        connect(automatedOnly, SIGNAL(toggled(bool)), this, SLOT(toggleAutomatedOnly(bool)));
+
+        QLabel *configHL = new QLabel("<h3>" + tr("Default Settings") + "</h3>");
+        QLabel *descriptionHL = new QLabel("<h3>" + tr("Description") + "</h3>");
+        QLabel *explainLabel = new QLabel((*iter)->explain());
+        explainLabel->setWordWrap(true);
+
+        QWidget *detailsContent = new QWidget();
+        QVBoxLayout *detailsScrollLayout = new QVBoxLayout(detailsContent);
+        detailsScrollLayout->addWidget(automationHL);
+        detailsScrollLayout->addLayout(setupLayout);
+        detailsScrollLayout->addSpacing(10 * dpiYFactor);
+        detailsScrollLayout->addWidget(configHL);
+        detailsScrollLayout->addWidget(config);
+        if (! config->sizeHint().isValid()) {
+            configHL->setHidden(true);
+            config->setHidden(true);
+        } else {
+            detailsScrollLayout->addSpacing(10 * dpiYFactor);
+        }
+        detailsScrollLayout->addWidget(descriptionHL);
+        detailsScrollLayout->addWidget(explainLabel);
+        detailsScrollLayout->addStretch();
+
+        QScrollArea *detailsScroller = new QScrollArea();
+        detailsScroller->setWidgetResizable(true);
+        detailsScroller->setWidget(detailsContent);
+
+        QWidget *details = new QWidget();
+        QVBoxLayout *detailsLayout = new QVBoxLayout(details);
+        detailsLayout->addWidget(detailsHL);
+        detailsLayout->addWidget(detailsScroller);
+
+        settingsStack->addWidget(details);
+
+        ++rownum;
+    }
+
+    if (hideButton != nullptr) {
+        toggleCoreProcessors(hideButton->isChecked());
+    }
+    processorTree->model()->blockSignals(false);
+}
+
+
+void
+ProcessorPage::reload
+(const QString &selectName)
+{
+    reload();
+    QTreeWidgetItem *selItem = nullptr;
+    for (int i = 0; i < processorTree->invisibleRootItem()->childCount(); ++i) {
+        QTreeWidgetItem *nextItem = processorTree->invisibleRootItem()->child(i);
+        if (! nextItem->isHidden()) {
+            selItem = nextItem;
+        }
+        if (nextItem->data(PROCESSORTREE_COL_ID, Qt::DisplayRole).toString() == selectName) {
+            break;
+        }
+    }
+    processorTree->setCurrentItem(selItem);
+}
+
+
+void
+ProcessorPage::reload
+(int selectRow)
+{
+    reload();
+    QTreeWidgetItem *selItem = nullptr;
+    for (int i = 0; i <= selectRow && i < processorTree->invisibleRootItem()->childCount(); ++i) {
+        QTreeWidgetItem *nextItem = processorTree->invisibleRootItem()->child(i);
+        if (! nextItem->isHidden()) {
+            selItem = nextItem;
+        }
+    }
+    processorTree->setCurrentItem(selItem);
+}
+
+
+#ifdef GC_WANT_PYTHON
+void
+ProcessorPage::addProcessor
+()
+{
+    EditFixPyScriptDialog editDlg(context, nullptr, this);
+    if (editDlg.exec() == QDialog::Accepted) {
+        reload(editDlg.getName());
+    }
+}
+
+
+void
+ProcessorPage::delProcessor
+()
+{
+    QTreeWidgetItem *item = processorTree->currentItem();
+    if (item == nullptr || item->data(PROCESSORTREE_COL_CORE, Qt::DisplayRole).toBool()) {
+        return;
+    }
+    QString name = item->data(PROCESSORTREE_COL_ID, Qt::DisplayRole).toString();
+    QString msg = tr("Are you sure you want to delete %1?").arg(name);
+    if (QMessageBox::question(this, "GoldenCheetah", msg) == QMessageBox::No) {
+        return;
+    }
+    fixPySettings->deleteScript(name);
+    reload(item->data(PROCESSORTREE_COL_ROWNUM, Qt::DisplayRole).toInt());
+}
+
+
+void
+ProcessorPage::editProcessor
+()
+{
+    QTreeWidgetItem *item = processorTree->currentItem();
+    if (item == nullptr || item->data(PROCESSORTREE_COL_CORE, Qt::DisplayRole).toBool()) {
+        return;
+    }
+    QVariant automation = item->data(PROCESSORTREE_COL_AUTOMATION, Qt::DisplayRole);
+    QVariant automatedOnly = item->data(PROCESSORTREE_COL_AUTOMATEDONLY, Qt::DisplayRole);
+    QString name = item->data(PROCESSORTREE_COL_PROCESSOR, Qt::DisplayRole).toString();
+    FixPyScript *script = fixPySettings->getScript(name);
+    EditFixPyScriptDialog editDlg(context, script, this);
+    if (editDlg.exec() == QDialog::Accepted) {
+        reload(script->name);
+        item = processorTree->currentItem();
+        if (item != nullptr && item->data(PROCESSORTREE_COL_PROCESSOR, Qt::DisplayRole).toString() == script->name) {
+            item->setData(PROCESSORTREE_COL_AUTOMATION, Qt::DisplayRole, automation);
+            item->setData(PROCESSORTREE_COL_AUTOMATEDONLY, Qt::DisplayRole, automatedOnly);
+        }
+    }
+}
+
+
+void
+ProcessorPage::dblClickProcessor
+(QTreeWidgetItem *item, int col)
+{
+    Q_UNUSED(item)
+
+    if (col != PROCESSORTREE_COL_AUTOMATION) {
+        editProcessor();
+    }
+}
+
+
+void
+ProcessorPage::toggleCoreProcessors
+(bool checked)
+{
+    QTreeWidgetItem *current = processorTree->currentItem();
+    QTreeWidgetItem *firstVisible = nullptr;
+    for (int i = 0; i < processorTree->invisibleRootItem()->childCount(); ++i) {
+        QTreeWidgetItem *item = processorTree->invisibleRootItem()->child(i);
+        bool isCore = item->data(PROCESSORTREE_COL_CORE, Qt::DisplayRole).toBool();
+        item->setHidden(checked && (! checked || isCore));
+        if (firstVisible == nullptr && ! item->isHidden()) {
+            firstVisible = item;
+        }
+    }
+    if (current == nullptr || current->isHidden()) {
+        processorTree->setCurrentItem(firstVisible);
+    }
+    if (processorTree->currentItem() != nullptr) {
+        processorTree->scrollToItem(processorTree->currentItem(), QAbstractItemView::PositionAtCenter);
+    }
+}
+#endif
+
+
+void
+ProcessorPage::automationChanged
+(int index)
+{
+    QTreeWidgetItem *current = processorTree->currentItem();
+    if (current == nullptr) {
+        return;
+    }
+    current->setData(PROCESSORTREE_COL_AUTOMATION, Qt::DisplayRole, index);
+}
+
+
+void
+ProcessorPage::toggleAutomatedOnly
+(bool checked)
+{
+    QTreeWidgetItem *current = processorTree->currentItem();
+    if (current == nullptr) {
+        return;
+    }
+    QFont font = current->font(0);
+    font.setWeight(checked ? QFont::ExtraLight : QFont::Normal);
+    current->setData(PROCESSORTREE_COL_PROCESSOR, Qt::FontRole, font);
+    current->setData(PROCESSORTREE_COL_AUTOMATEDONLY, Qt::DisplayRole, checked);
+}
+
+
+void
+ProcessorPage::dataChanged
+(const QModelIndex &topLeft)
+{
+    int rowNum = topLeft.siblingAtColumn(PROCESSORTREE_COL_ROWNUM).data(Qt::DisplayRole).toInt();
+    if (topLeft.column() == PROCESSORTREE_COL_AUTOMATION) {
+        if (rowNum < automationCombos.count()) {
+            automationCombos[rowNum]->blockSignals(true);
+            automationCombos[rowNum]->setCurrentIndex(topLeft.data(Qt::DisplayRole).toInt());
+            automationCombos[rowNum]->blockSignals(false);
+        }
+    } else if (topLeft.column() == PROCESSORTREE_COL_AUTOMATEDONLY) {
+        if (rowNum < automatedCheckBoxes.count()) {
+            bool checked = topLeft.data(Qt::DisplayRole).toBool();
+            automatedCheckBoxes[rowNum]->blockSignals(true);
+            automatedCheckBoxes[rowNum]->setChecked(checked);
+            automatedCheckBoxes[rowNum]->blockSignals(false);
+            processorTree->model()->blockSignals(true);
+            toggleAutomatedOnly(checked);
+            processorTree->model()->blockSignals(false);
+        }
+    }
+}
+
 
 //
 // Default values page

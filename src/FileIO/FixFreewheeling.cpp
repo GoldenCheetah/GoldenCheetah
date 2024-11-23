@@ -43,14 +43,6 @@ class FixFreewheelingConfig : public DataProcessorConfig
         //~FixFreewheelingConfig() {} // deliberately not declared since Qt will delete
                               // the widget and its children when the config pane is deleted
 
-        QString explain() {
-            return(QString(tr("ANT+ crank based power meters will send "
-                           " 3 duplicate values for power and cadence when the "
-                           " rider starts to freewheel. The duplicates should "
-                           " not be retained. This tool removes the duplicates."
-                           )));
-        }
-
         void readConfig() { }
         void saveConfig() { }
 };
@@ -68,21 +60,36 @@ class FixFreewheeling : public DataProcessor {
         ~FixFreewheeling() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op) override;
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) const override {
             Q_UNUSED(ride);
             return new FixFreewheelingConfig(parent);
         }
 
         // Localized Name
-        QString name() {
+        QString name() const override {
             return tr("Fix freewheeling power/cadence.");
+        }
+
+        QString id() const override {
+            return "::FixFreewheeling";
+        }
+
+        QString legacyId() const override {
+            return "Fix Freewheeling";
+        }
+
+        QString explain() const override {
+            return tr("ANT+ crank based power meters will send "
+                      " 3 duplicate values for power and cadence when the "
+                      " rider starts to freewheel. The duplicates should "
+                      " not be retained. This tool removes the duplicates.");
         }
 };
 
-static bool FixFreewheelingAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix Freewheeling"), new FixFreewheeling());
+static bool FixFreewheelingAdded = DataProcessorFactory::instance().registerProcessor(new FixFreewheeling());
 
 bool
 FixFreewheeling::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
@@ -112,7 +119,7 @@ FixFreewheeling::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStr
                 // set previous 2 back to zero
                 ride->command->setPointValue(i-2, RideFile::cad, 0.00f);
                 ride->command->setPointValue(i-1, RideFile::cad, 0.00f);
-                
+
                 ride->command->setPointValue(i-2, RideFile::watts, 0.00f);
                 ride->command->setPointValue(i-1, RideFile::watts, 0.00f);
             }

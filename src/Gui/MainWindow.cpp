@@ -76,9 +76,6 @@
 #include "AddCloudWizard.h"
 #include "LocalFileStore.h"
 #include "CloudService.h"
-#ifdef GC_WANT_PYTHON
-#include "FixPyScriptsDialog.h"
-#endif
 
 // GUI Widgets
 #include "AthleteTab.h"
@@ -603,37 +600,11 @@ MainWindow::MainWindow(const QDir &home)
     optionsMenu->setWhatsThis(optionsMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Tools));
 
 
-    QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
-    // Add all the data processors to the tools menu
-    const DataProcessorFactory &factory = DataProcessorFactory::instance();
-    QMap<QString, DataProcessor*> processors = factory.getProcessors();
+    processMenu = menuBar()->addMenu(tr("&Process"));
+    connect(processMenu, SIGNAL(aboutToShow()), this, SLOT(onProcessMenuAboutToShow()));
 
-    if (processors.count()) {
-
-        toolMapper = new QSignalMapper(this); // maps each option
-        QMapIterator<QString, DataProcessor*> i(processors);
-        connect(toolMapper, &QSignalMapper::mappedString, this, &MainWindow::manualProcess);
-
-        i.toFront();
-        while (i.hasNext()) {
-            i.next();
-            // The localized processor name is shown in menu
-            QAction *action = new QAction(QString("%1...").arg(i.value()->name()), this);
-            editMenu->addAction(action);
-            connect(action, SIGNAL(triggered()), toolMapper, SLOT(map()));
-            toolMapper->setMapping(action, i.key());
-        }
-    }
-
-#ifdef GC_WANT_PYTHON
-    // add custom python fix entry to edit menu
-    pyFixesMenu = editMenu->addMenu(tr("Python fixes"));
-    connect(editMenu, SIGNAL(aboutToShow()), this, SLOT(onEditMenuAboutToShow()));
-    connect(pyFixesMenu, SIGNAL(aboutToShow()), this, SLOT(buildPyFixesMenu()));
-#endif
-
-    HelpWhatsThis *editMenuHelp = new HelpWhatsThis(editMenu);
-    editMenu->setWhatsThis(editMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Edit));
+    HelpWhatsThis *editMenuHelp = new HelpWhatsThis(processMenu);
+    processMenu->setWhatsThis(editMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Edit));
 
     // VIEW MENU
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
@@ -1237,21 +1208,6 @@ void MainWindow::manualProcess(QString name)
     // then call it!
     RideItem *rideitem = (RideItem*)currentAthleteTab->context->currentRideItem();
     if (rideitem) {
-
-#ifdef GC_WANT_PYTHON
-        if (name.startsWith("_fix_py_")) {
-            name = name.remove(0, 8);
-
-            FixPyScript *script = fixPySettings->getScript(name);
-            if (script) {
-                EditFixPyScriptDialog editDlg(currentAthleteTab->context, script, this);
-                editDlg.exec();
-            }
-
-            return;
-        }
-#endif
-
         ManualDataProcessorDialog *p = new ManualDataProcessorDialog(currentAthleteTab->context, name, rideitem);
         p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
         p->exec();
@@ -2657,40 +2613,29 @@ MainWindow::ridesAutoImport() {
 
 }
 
-#ifdef GC_WANT_PYTHON
-void MainWindow::onEditMenuAboutToShow()
+void MainWindow::onProcessMenuAboutToShow()
 {
-    bool embedPython = appsettings->value(nullptr, GC_EMBED_PYTHON, true).toBool();
-    pyFixesMenu->menuAction()->setVisible(embedPython);
-}
-
-void MainWindow::buildPyFixesMenu()
-{
-    pyFixesMenu->clear();
-
-    QList<FixPyScript *> fixPyScripts = fixPySettings->getScripts();
-    foreach (FixPyScript *fixPyScript, fixPyScripts) {
-        QAction *action = new QAction(QString("%1...").arg(fixPyScript->name), this);
-        pyFixesMenu->addAction(action);
-        connect(action, SIGNAL(triggered()), toolMapper, SLOT(map()));
-        toolMapper->setMapping(action, "_fix_py_" + fixPyScript->name);
+    processMenu->clear();
+    if (toolMapper != nullptr) {
+        delete toolMapper;
     }
 
-    pyFixesMenu->addSeparator();
-    pyFixesMenu->addAction(tr("New Python Fix..."), this, SLOT (showCreateFixPyScriptDlg()));
-    pyFixesMenu->addAction(tr("Manage Python Fixes..."), this, SLOT (showManageFixPyScriptsDlg()));
-}
+    // Add all the data processors to the tools menu
+    const DataProcessorFactory &factory = DataProcessorFactory::instance();
+    QList<DataProcessor*> processors = factory.getProcessorsSorted();
+    toolMapper = new QSignalMapper(this); // maps each option
+    connect(toolMapper, &QSignalMapper::mappedString, this, &MainWindow::manualProcess);
 
-void MainWindow::showManageFixPyScriptsDlg() {
-    ManageFixPyScriptsDialog dlg(currentAthleteTab->context);
-    dlg.exec();
+    for (QList<DataProcessor*>::iterator iter = processors.begin(); iter != processors.end(); ++iter) {
+        if (! (*iter)->isAutomatedOnly()) {
+            // The localized processor name is shown in menu
+            QAction *action = new QAction(QString("%1...").arg((*iter)->name()), this);
+            processMenu->addAction(action);
+            connect(action, SIGNAL(triggered()), toolMapper, SLOT(map()));
+            toolMapper->setMapping(action, (*iter)->id());
+        }
+    }
 }
-
-void MainWindow::showCreateFixPyScriptDlg() {
-    EditFixPyScriptDialog dlg(currentAthleteTab->context, nullptr, this);
-    dlg.exec();
-}
-#endif
 
 #ifdef GC_HAS_CLOUD_DB
 void

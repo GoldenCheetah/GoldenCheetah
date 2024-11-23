@@ -1625,7 +1625,7 @@ Bindings::postProcess(QString processor, PyObject *activity) const
     RideFile *f = selectRideFile(activity);
     if (f == nullptr) return false;
 
-    DataProcessor* dp = DataProcessorFactory::instance().getProcessors().value(processor, nullptr);
+    DataProcessor* dp = DataProcessorFactory::instance().getProcessor(processor);
     if (!dp) return false;
     return dp->postProcess(f, nullptr, "PYTHON");
 }
