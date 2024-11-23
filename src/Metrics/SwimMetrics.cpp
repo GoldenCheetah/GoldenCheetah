@@ -661,3 +661,108 @@ static bool addAllStrokePace() {
 }
 
 static bool allStrokePaceAdded = addAllStrokePace();
+
+///////////////////////////////////////////////////////////////////////////////
+class SwimStroke : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(SwimStroke)
+
+    public:
+
+    enum StrokeType { na = -1, rest = 0, free = 1, back = 2, breast = 3, fly = 4, drill = 5, mixed = 6 };
+
+    SwimStroke() : strokeType(na)
+    {
+        setType(RideMetric::Peak); // TODO: We need a different type for this metric with aggregateWith override
+        setPrecision(0);
+        setSymbol("swim_stroke");
+        setInternalName("Swim Stroke");
+    }
+
+    QString toString(bool) const {
+        return toString(value(true));
+    }
+
+    QString toString(double type) const {
+        switch (static_cast<StrokeType>((int)type)) {
+            case rest   : return tr("rest");
+            case free   : return tr("free");
+            case back   : return tr("back");
+            case breast : return tr("breast");
+            case fly    : return tr("fly");
+            case drill  : return tr("drill");
+            case mixed  : return tr("mixed");
+            default     : return tr("na");
+        }
+    }
+
+    void initialize() {
+        setName(tr("Swim Stroke"));
+        setMetricUnits(tr("Stroke"));
+        setImperialUnits(tr("Stroke"));
+        setDescription(tr("Swim Stroke: 0 - rest, 1 - free, 2 - back, 3 - breast, 4 - fly, 5 - drill, 6 - mixed"));
+    }
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        setValue(na);
+
+        // no ride or no samples or not a swim
+        if (spec.isEmpty(item->ride()) || !item->isSwim)
+            return;
+
+        XDataSeries *series = item->ride()->xdata("SWIM");
+        if (!series) // no SWIM specific data
+            return;
+        int typeIdx = -1;
+        for (int a=0; a<series->valuename.count(); a++) {
+            if (series->valuename.at(a) == "TYPE")
+                typeIdx = a;
+        }
+        if (typeIdx == -1) // no Stroke Type
+            return;
+
+        int b=0;
+        StrokeType type=na;
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
+            for (int j=b; j<series->datapoints.count(); j++) {
+                if (series->datapoints.at(j)->secs > point->secs)
+                    break;
+                b=j;
+                // Stroke Type
+                type = static_cast<StrokeType>((int)series->datapoints.at(j)->number[typeIdx]);
+            }
+            if (strokeType < 0) {
+                strokeType = type; // first length indicates stroke
+            } else if (strokeType != type && type != rest) {
+                strokeType = mixed; // anything different other than rest indicates mixed
+            }
+        }
+        setValue(strokeType);
+    }
+
+    void aggregateWith(const RideMetric &other) override {
+        // anything different than the first one, other than rest, indicates mixed
+        if (value(true) != other.value(true) && other.value(true) != rest) setValue(mixed);
+    }
+
+    bool isRelevantForRide(const RideItem *ride) const { return ride->isSwim; }
+
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new SwimStroke(*this); }
+
+    private:
+
+    StrokeType strokeType;
+};
+
+static bool addSwimStroke() {
+    RideMetricFactory::instance().addMetric(SwimStroke());
+    return true;
+}
+
+static bool swimStrokeAdded = addSwimStroke();

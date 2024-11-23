@@ -171,6 +171,7 @@ GColorDialog::GColorDialog(QColor selected, QWidget *parent, bool all) : QDialog
 
     connect(ok, SIGNAL(clicked()), this, SLOT(gcOKClicked()));
     connect(cancel, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+    connect(colordialog, SIGNAL(rejected()), this, SLOT(cancelClicked()));
     connect(colordialog, SIGNAL(colorSelected(QColor)), this, SLOT(standardOKClicked(QColor)));
     connect(searchEdit, SIGNAL(textChanged(QString)), this, SLOT(searchFilter(QString)));
 

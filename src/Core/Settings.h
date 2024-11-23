@@ -198,6 +198,7 @@
 #define GC_CAD2SMO2                     "<global-general>dataprocess/fixmoxy/cad2smo2"
 #define GC_SPD2THB		            	"<global-general>dataprocess/fixmoxy/spd2thb"
 #define GC_DPFLS_PL                     "<global-general>dataprocess/fixlapswim/pool_length"
+#define GC_DPFLS_MR                     "<global-general>dataprocess/fixlapswim/min_rest"
 #define GC_RR_MAX                       "<global-general>dataprocess/filterhrv/rr_max"                 //
 #define GC_RR_MIN                       "<global-general>dataprocess/filterhrv/rr_min"                 //
 #define GC_RR_FILT                      "<global-general>dataprocess/filterhrv/rr_filt"                 //
