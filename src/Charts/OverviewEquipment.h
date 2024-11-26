@@ -50,8 +50,8 @@ class OverviewEquipmentWindow : public OverviewWindow
 
         QString getChartSource() const override;
         void getExtraConfiguration( ChartSpaceItem* item, QString& config) const override;
-        void setExtraConfiguration(QJsonObject& obj, int type, ChartSpaceItem* add, QString& name,
-                                   QString& datafilter, int order, int column, int span, int deep) const override;
+        ChartSpaceItem* setExtraConfiguration(QJsonObject& obj, int type, QString& name, QString& datafilter,
+                                              int order, int column, int span, int deep) const override;
 
     private:
         bool reCalcOnVisible_;

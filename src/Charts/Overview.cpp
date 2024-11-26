@@ -565,7 +565,7 @@ badconfig:
             }
             break;
 
-        default: setExtraConfiguration(obj, type, add, name, datafilter, order, column, span, deep); break;
+        default: add = setExtraConfiguration(obj, type, name, datafilter, order, column, span, deep); break;
         }
 
         // color is common- if we actuall added one...

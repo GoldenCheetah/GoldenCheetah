@@ -276,6 +276,7 @@ OverviewEquipmentItemConfig::setWidgets()
             }
         }
         notes->setPlainText(mi->notes_);
+        bgcolor->setColor(mi->bgcolor);
     }
     break;
 
@@ -285,6 +286,7 @@ OverviewEquipmentItemConfig::setWidgets()
         name->setText(mi->name);
         eqLinkName->setText(mi->eqLinkName_);
         eqCheckBox->setChecked(mi->showActivitiesPerAthlete_);
+        bgcolor->setColor(mi->bgcolor);
     }
     break;
 
@@ -307,6 +309,7 @@ OverviewEquipmentItemConfig::setWidgets()
             static_cast<QLineEdit*>(eqTimeWindows->cellWidget(tableRow, 1))->setText(eqHistory.text_);
             tableRow++;
         }
+        bgcolor->setColor(mi->bgcolor);
     }
     break;
 
@@ -315,6 +318,7 @@ OverviewEquipmentItemConfig::setWidgets()
         EquipmentNotes *mi = dynamic_cast<EquipmentNotes*>(item);
         name->setText(mi->name);
         notes->setPlainText(mi->notes_);
+        bgcolor->setColor(mi->bgcolor);
     }
     break;
     }

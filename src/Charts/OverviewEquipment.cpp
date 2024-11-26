@@ -75,6 +75,7 @@ OverviewEquipmentWindow::cloneTile(ChartSpaceItem* item)
             meta->repDistanceScaled_, meta->repElevationScaled_,
             meta->repDateSet_, meta->repDate_, meta->notes_);
 
+        clonedItem->bgcolor = meta->bgcolor;
         space->addItem(meta->order, meta->column, meta->span, meta->deep, clonedItem);
 
         // update geometry
@@ -93,6 +94,7 @@ OverviewEquipmentWindow::cloneTile(ChartSpaceItem* item)
         EquipmentSummary* clonedItem = new EquipmentSummary(meta->parent, meta->name + " clone",
                                                             meta->eqLinkName_, meta->showActivitiesPerAthlete_);
 
+        clonedItem->bgcolor = meta->bgcolor;
         space->addItem(meta->order, meta->column, meta->span, meta->deep, clonedItem);
 
         // update geometry
@@ -110,6 +112,7 @@ OverviewEquipmentWindow::cloneTile(ChartSpaceItem* item)
         // clone the equipment summary item
         EquipmentHistory* clonedItem = new EquipmentHistory(meta->parent, meta->name + " clone", meta->eqHistoryList_, meta->sortMostRecentFirst_);
 
+        clonedItem->bgcolor = meta->bgcolor;
         space->addItem(meta->order, meta->column, meta->span, meta->deep, clonedItem);
 
         // update geometry
@@ -125,6 +128,7 @@ OverviewEquipmentWindow::cloneTile(ChartSpaceItem* item)
         // clone the equipment notes item
         EquipmentNotes* clonedItem = new EquipmentNotes(meta->parent, meta->name + " clone", meta->notes_);
 
+        clonedItem->bgcolor = meta->bgcolor;
         space->addItem(meta->order, meta->column, meta->span, meta->deep, clonedItem);
 
         // update geometry
@@ -253,10 +257,13 @@ OverviewEquipmentWindow::getExtraConfiguration(ChartSpaceItem* item, QString& co
     }
 }
 
-void
-OverviewEquipmentWindow::setExtraConfiguration(QJsonObject& obj, int type, ChartSpaceItem* add, QString& name,
-                                                QString& datafilter, int order, int column, int span, int deep) const
+ChartSpaceItem*
+OverviewEquipmentWindow::setExtraConfiguration(QJsonObject& obj, int type, QString& name, QString& datafilter,
+                                               int order, int column, int span, int deep) const
 {
+
+    ChartSpaceItem* add = nullptr;
+
     // now the actual card settings
     switch (type) {
 
@@ -360,6 +367,7 @@ OverviewEquipmentWindow::setExtraConfiguration(QJsonObject& obj, int type, Chart
     }
     break;
     }
+    return add;
 }
 
 void

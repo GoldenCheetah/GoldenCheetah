@@ -72,9 +72,10 @@ class OverviewWindow : public GcChartWindow
 
         virtual QString getChartSource() const;
         virtual void getExtraConfiguration(ChartSpaceItem* /*item*/, QString& /*config*/) const {}
-        virtual void setExtraConfiguration(QJsonObject& /*obj*/, int /*type*/, ChartSpaceItem* /*add*/,
-                                            QString& /*name*/, QString& /*datafilter*/, int /*order*/,
-                                            int /*column*/, int /*span*/, int /*deep*/) const {}
+        virtual ChartSpaceItem* setExtraConfiguration(QJsonObject& /*obj*/, int /*type*/,
+                                                    QString& /*name*/, QString& /*datafilter*/, int /*order*/,
+                                                    int /*column*/, int /*span*/, int /*deep*/) const
+                                                    { return nullptr; }
 
         HelpWhatsThis* help;
         ChartSpace* space;
