@@ -167,8 +167,9 @@
 // 157 27  May 2021 Ale Martinez       Added Pace Row
 // 158 28  Feb 2024 Ale Martinez       Enabled Pace for Walking
 // 159 28  Apr 2024 Ale Martinez       Fix Avg Speed aggregation
+// 160 22  Nov 2024 Ale Martinez       Added Swim Stroke metric for lap swims
 
-int DBSchemaVersion = 159;
+int DBSchemaVersion = 160;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;

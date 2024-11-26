@@ -26,6 +26,8 @@
 #include <QLabel>
 #include <QGradient>
 #include <QLinearGradient>
+#include <QFormLayout>
+#include <QTreeWidget>
 
 
 // A selection of distinct colours, user can adjust also
@@ -35,6 +37,10 @@ extern QPixmap colouredPixmapFromPNG(QString filename, QColor color);
 // dialog scaling
 extern double dpiXFactor, dpiYFactor;
 extern QFont baseFont;
+
+// layout and widget styling
+extern void basicTreeWidgetStyle(QTreeWidget *tree, bool editable = true);
+extern QFormLayout *newQFormLayout(QWidget *parent = nullptr);
 
 // turn color to rgb, checks if a named color
 #define StandardColor(x) (QColor(1,1,x))

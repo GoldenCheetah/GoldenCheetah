@@ -774,7 +774,7 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
     startDelay->setValue(appsettings->value(this, TRAIN_STARTDELAY, 0).toUInt());
     startDelay->setToolTip(tr("Countdown for workout start"));
 
-    QFormLayout *all = new QFormLayout(this);
+    QFormLayout *all = newQFormLayout(this);
 
     QGridLayout *wdLayout = new QGridLayout;
     wdLayout->addWidget(workoutDirectory, 0,1);
@@ -1433,15 +1433,14 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     colors->setIndentation(0);
     //colors->header()->resizeSection(0,300);
 
-    QLabel *antiAliasLabel = new QLabel(tr("Antialias"));
-    antiAliased = new QCheckBox;
+    antiAliased = new QCheckBox(tr("Antialias"));
     antiAliased->setChecked(appsettings->value(this, GC_ANTIALIAS, true).toBool());
 #ifndef Q_OS_MAC
-    QLabel *rideScrollLabel = new QLabel(tr("Activity Scrollbar"));
-    rideScroll = new QCheckBox;
+    macForms = new QCheckBox(tr("Mac styled Forms"));
+    macForms->setChecked(appsettings->value(this, GC_MAC_FORMS, true).toBool());
+    rideScroll = new QCheckBox(tr("Activity Scrollbar"));
     rideScroll->setChecked(appsettings->value(this, GC_RIDESCROLL, true).toBool());
-    QLabel *rideHeadLabel = new QLabel(tr("Activity Headings"));
-    rideHead = new QCheckBox;
+    rideHead = new QCheckBox(tr("Activity Headings"));
     rideHead->setChecked(appsettings->value(this, GC_RIDEHEAD, true).toBool());
 #endif
     lineWidth = new QDoubleSpinBox;
@@ -1450,10 +1449,6 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     lineWidth->setSingleStep(0.5);
     applyTheme = new QPushButton(tr("Apply Theme"));
     lineWidth->setValue(appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble());
-
-    QLabel *lineWidthLabel = new QLabel(tr("Line Width"));
-    QLabel *defaultLabel = new QLabel(tr("Font"));
-    QLabel *scaleLabel = new QLabel(tr("Font Scaling" ));
 
     def = new QFontComboBox(this);
 
@@ -1481,39 +1476,30 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     QFont font=baseFont;
     font.setPointSizeF(baseFont.pointSizeF() * scale);
     fonttext = new QLabel(this);
-    fonttext->setText(tr("The quick brown fox jumped over the lazy dog"));
+    fonttext->setText(tr("The quick brown fox jumps over the lazy dog"));
     fonttext->setFont(font);
     fonttext->setFixedHeight(90 * dpiYFactor);
-    fonttext->setFixedWidth(330 * dpiXFactor);
 
-    QGridLayout *grid = new QGridLayout;
-    grid->setSpacing(5 *dpiXFactor);
+    QFormLayout *lForm = newQFormLayout();
+    lForm->addRow(tr("Font"), def);
+    lForm->addRow(tr("Font Scaling"), fontscale);
+    lForm->addRow(fonttext);
 
-    grid->addWidget(defaultLabel, 0,0);
-    grid->addWidget(scaleLabel, 1,0);
-
-    grid->addWidget(lineWidthLabel, 0,3);
-    grid->addWidget(lineWidth, 0,4);
-    grid->addWidget(antiAliasLabel, 1,3);
-    grid->addWidget(antiAliased, 1,4);
+    QFormLayout *rForm = newQFormLayout();
+    rForm->addRow(tr("Line Width"), lineWidth);
+    rForm->addRow("", antiAliased);
 #ifndef Q_OS_MAC
-    grid->addWidget(rideScrollLabel, 2,3, Qt::AlignLeft|Qt::AlignTop);
-    grid->addWidget(rideScroll, 2,4, Qt::AlignLeft|Qt::AlignTop);
-    //grid->addWidget(rideHeadLabel, 3,3); // Disabled in RideNavigator
-    //grid->addWidget(rideHead, 3,4);      // better don't display
+    rForm->addRow("", macForms);
+    rForm->addRow("", rideScroll);
+    rForm->addRow("", rideHead);    // add to prevent memory leak...
+    rideHead->setVisible(false);    // ...but hide
 #endif
 
-    grid->addWidget(def, 0,1, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget(fontscale, 1,1);
-    grid->addWidget(fonttext, 2,0,1,2);
-
-    grid->setColumnStretch(0,1);
-    grid->setColumnStretch(1,4);
-    grid->setColumnStretch(2,1);
-    grid->setColumnStretch(3,1);
-    grid->setColumnStretch(4,4);
-
-    mainLayout->addLayout(grid);
+    QHBoxLayout *formsContainer = new QHBoxLayout();
+    formsContainer->addLayout(lForm, 3);
+    formsContainer->addSpacerItem(new QSpacerItem(15 * dpiXFactor, 0));
+    formsContainer->addLayout(rForm, 1);
+    mainLayout->addLayout(formsContainer);
 
     colorTab = new QTabWidget(this);
     colorTab->addTab(themes, tr("Theme"));
@@ -1563,6 +1549,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     // save initial values
     b4.alias = antiAliased->isChecked();
 #ifndef Q_OS_MAC
+    b4.macForms = macForms->isChecked();
     b4.scroll = rideScroll->isChecked();
     b4.head = rideHead->isChecked();
 #endif
@@ -1665,6 +1652,7 @@ ColorsPage::resetClicked()
     lineWidth->setValue(defaults.linewidth);
     antiAliased->setChecked(defaults.antialias);
 #ifndef Q_OS_MAC // they do scrollbars nicely
+    macForms->setChecked(defaults.macForms);
     rideHead->setChecked(defaults.head);
     rideScroll->setChecked(defaults.scrollbar);
 #endif
@@ -1680,6 +1668,7 @@ ColorsPage::saveClicked()
     appsettings->setValue(GC_FONT_SCALE, scalefactors[fontscale->value()]);
     appsettings->setValue(GC_FONT_DEFAULT, def->font().family());
 #ifndef Q_OS_MAC
+    appsettings->setValue(GC_MAC_FORMS, macForms->isChecked());
     appsettings->setValue(GC_RIDESCROLL, rideScroll->isChecked());
     appsettings->setValue(GC_RIDEHEAD, rideHead->isChecked());
 #endif
@@ -3483,7 +3472,7 @@ MeasuresSettingsDialog::MeasuresSettingsDialog(QWidget *parent, QString &symbol,
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    QFormLayout *form = new QFormLayout();
+    QFormLayout *form = newQFormLayout();
     mainLayout->addLayout(form);
 
 
@@ -3538,7 +3527,7 @@ MeasuresFieldSettingsDialog::MeasuresFieldSettingsDialog(QWidget *parent, Measur
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    QFormLayout *form = new QFormLayout();
+    QFormLayout *form = newQFormLayout();
     mainLayout->addLayout(form);
 
 

@@ -2054,7 +2054,7 @@ MainWindow::newCyclistTab()
 {
     QDir newHome = currentAthleteTab->context->athlete->home->root();
     newHome.cdUp();
-    QString name = ChooseCyclistDialog::newCyclistDialog(newHome, this);
+    QString name = ChooseCyclistDialog::newAthleteWizard(newHome);
     if (!name.isEmpty()) {
         emit newAthlete(name);
         openAthleteTab(name);

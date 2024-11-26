@@ -1252,7 +1252,7 @@ TrainSidebar::workoutFilterChanged
         sortModel->setFilters(parseWorkoutFilter(input, ok, msg));
         if (! ok) {
             workoutFilterErrorAction->setVisible(true);
-            workoutFilterErrorAction->setToolTip(QString("ERROR: %1").arg(msg));
+            workoutFilterErrorAction->setToolTip(tr("ERROR: %1").arg(msg));
         }
     } else {
         sortModel->removeFilters();
