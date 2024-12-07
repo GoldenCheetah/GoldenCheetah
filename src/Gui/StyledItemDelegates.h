@@ -22,7 +22,14 @@
 #include <QStyledItemDelegate>
 #include <QPushButton>
 #include <QLineEdit>
+#include <QLabel>
+#include <QDialog>
 #include <QTime>
+#include <QStringList>
+#include <QStringListModel>
+#include <QListWidget>
+
+#include "ActionButtonBox.h"
 
 
 class NoEditDelegate: public QStyledItemDelegate
@@ -38,12 +45,35 @@ public:
 class UniqueLabelEditDelegate: public QStyledItemDelegate
 {
 public:
-    UniqueLabelEditDelegate(int uniqueColumn, QObject *parent = nullptr);
+    UniqueLabelEditDelegate(QObject *parent = nullptr);
 
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+};
+
+
+
+class CompleterEditDelegate: public QStyledItemDelegate
+{
+    Q_OBJECT
+
+public:
+    enum DataSource {
+        Column = 0,
+        External
+    };
+
+    CompleterEditDelegate(QObject *parent = nullptr);
+
+    void setDataSource(DataSource source);
+    void setCompletionList(const QStringList &list);
+
+    virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
 
 private:
-    int uniqueColumn;
+    DataSource source = Column;
+    QStringList completionList;
 };
 
 
@@ -122,6 +152,67 @@ private slots:
 private:
     int maxWidth = -1;
     QString placeholderText;
+};
+
+
+
+class ListEditWidget: public QWidget
+{
+    Q_OBJECT
+
+public:
+    ListEditWidget(QWidget *parent = nullptr);
+
+    void setTitle(const QString &text);
+    void setList(const QStringList &list);
+    QStringList getList() const;
+
+public slots:
+    void showDialog();
+
+private slots:
+    void itemChanged(QListWidgetItem *item);
+    void dialogFinished(int result);
+    void moveDown();
+    void moveUp();
+    void addItem();
+    void deleteItem();
+
+signals:
+    void editingFinished();
+
+private:
+    QStringList data;
+
+    QDialog *dialog;
+    QLabel *title;
+    QListWidget *listWidget;
+    ActionButtonBox *actionButtons;
+};
+
+
+class ListEditDelegate: public QStyledItemDelegate
+{
+    Q_OBJECT
+
+public:
+    ListEditDelegate(QObject *parent = nullptr);
+
+    void setTitle(const QString &title);
+    void setDisplayLength(int limit, int reduce = 2);
+
+    virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+    virtual QString displayText(const QVariant &value, const QLocale &locale) const override;
+
+private slots:
+    void commitAndCloseEditor();
+
+private:
+    QString title;
+    int limit = -1;
+    int reduce = 2;
 };
 
 
