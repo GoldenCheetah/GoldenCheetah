@@ -23,7 +23,7 @@ void RemoteCmd::setCmdId(int id)
     cmdId = id;
 }
 
-int RemoteCmd::getCmdId()
+int RemoteCmd::getCmdId() const
 {
     return cmdId;
 }
@@ -33,7 +33,7 @@ void RemoteCmd::setCmdStr(QString string)
     cmdStr = string;
 }
 
-QString RemoteCmd::getCmdStr()
+QString RemoteCmd::getCmdStr() const
 {
     return cmdStr;
 }
@@ -43,7 +43,7 @@ void RemoteCmd::setDisplayStr(QString string)
     displayStr = string;
 }
 
-QString RemoteCmd::getDisplayStr()
+QString RemoteCmd::getDisplayStr() const
 {
     return displayStr;
 }
@@ -58,7 +58,7 @@ void CmdMap::setNativeCmdId(int id)
     nativeCmdId = id;
 }
 
-int CmdMap::getNativeCmdId()
+int CmdMap::getNativeCmdId() const
 {
     return nativeCmdId;
 }
@@ -68,7 +68,7 @@ void CmdMap::setAntCmdId(int id)
     antCmdId = id;
 }
 
-int CmdMap::getAntCmdId()
+int CmdMap::getAntCmdId() const
 {
     return antCmdId;
 }
@@ -237,7 +237,7 @@ RemoteControl::readConfig()
 }
 
 void
-RemoteControl::writeConfig(QList<CmdMap> mappings)
+RemoteControl::writeConfig(QList<CmdMap> mappings) const
 {
     QString key, value;
 
@@ -255,7 +255,7 @@ RemoteControl::writeConfig(QList<CmdMap> mappings)
 }
 
 QString
-RemoteControl::getCmdStr(int index, QList<RemoteCmd> cmdList)
+RemoteControl::getCmdStr(int index, QList<RemoteCmd> cmdList) const
 {
     foreach(RemoteCmd cmd, cmdList) {
         if (cmd.getCmdId() == index)
@@ -265,7 +265,7 @@ RemoteControl::getCmdStr(int index, QList<RemoteCmd> cmdList)
 }
 
 int
-RemoteControl::getNativeCmdId(int antCmd)
+RemoteControl::getNativeCmdId(int antCmd) const
 {
     foreach(CmdMap map, _cmdMaps) {
         if (map.getAntCmdId() == antCmd) {

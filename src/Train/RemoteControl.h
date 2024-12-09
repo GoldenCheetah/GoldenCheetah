@@ -56,11 +56,11 @@ class RemoteCmd
 
     public:
         void    setCmdId(int);
-        int     getCmdId(void);
+        int     getCmdId(void) const;
         void    setCmdStr(QString);
-        QString getCmdStr(void);
+        QString getCmdStr(void) const;
         void    setDisplayStr(QString);
-        QString getDisplayStr(void);
+        QString getDisplayStr(void) const;
 };
 
 class CmdMap
@@ -72,9 +72,9 @@ class CmdMap
     public:
         CmdMap();
         void    setNativeCmdId(int);
-        int     getNativeCmdId(void);
+        int     getNativeCmdId(void) const;
         void    setAntCmdId(int);
-        int     getAntCmdId(void);
+        int     getAntCmdId(void) const;
 };
 
 class RemoteControl
@@ -88,14 +88,14 @@ class RemoteControl
 
     public:
         RemoteControl();
-        void             writeConfig(QList<CmdMap>);
+        void             writeConfig(QList<CmdMap>) const;
         QList<CmdMap>    readConfig();
-        QList<CmdMap>    getMappings()   { return _cmdMaps; }
-        QList<RemoteCmd> getAntCmds()    { return _antCmdList; }
-        QList<RemoteCmd> getNativeCmds() { return _nativeCmdList; }
+        QList<CmdMap>    getMappings() const   { return _cmdMaps; }
+        QList<RemoteCmd> getAntCmds() const    { return _antCmdList; }
+        QList<RemoteCmd> getNativeCmds() const { return _nativeCmdList; }
 
-        QString          getCmdStr(int, QList<RemoteCmd>);  // return the matching command string for an id
-        int              getNativeCmdId(int);               // return the matching native command id for an ant id
+        QString          getCmdStr(int, QList<RemoteCmd>) const;  // return the matching command string for an id
+        int              getNativeCmdId(int) const;               // return the matching native command id for an ant id
 };
 
 #endif // _GC_RemoteControl_h

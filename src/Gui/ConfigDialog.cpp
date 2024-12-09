@@ -78,35 +78,51 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     head->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     head->setIconSize(QSize(32*dpiXFactor,32*dpiXFactor)); // use XFactor for both to ensure aspect ratio maintained
 
+    QActionGroup *actionGroup = new QActionGroup(head);
     QAction *added;
 
     // General settings
     added = head->addAction(generalIcon, tr("General"));
+    added->setCheckable(true);
+    added->setActionGroup(actionGroup);
+    added->setChecked(true);
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 0);
 
     added =head->addAction(appearanceIcon, tr("Appearance"));
+    added->setCheckable(true);
+    added->setActionGroup(actionGroup);
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 1);
 
     added =head->addAction(dataIcon, tr("Data Fields"));
+    added->setCheckable(true);
+    added->setActionGroup(actionGroup);
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 2);
 
     added =head->addAction(metricsIcon, tr("Metrics"));
+    added->setCheckable(true);
+    added->setActionGroup(actionGroup);
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 3);
 
     added =head->addAction(intervalIcon, tr("Intervals"));
+    added->setCheckable(true);
+    added->setActionGroup(actionGroup);
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 4);
 
     added =head->addAction(measuresIcon, tr("Measures"));
+    added->setCheckable(true);
+    added->setActionGroup(actionGroup);
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 5);
 
 
     added =head->addAction(devicesIcon, tr("Training"));
+    added->setCheckable(true);
+    added->setActionGroup(actionGroup);
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 6);
 
@@ -155,19 +171,11 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     train->setWhatsThis(trainHelp->getWhatsThisText(HelpWhatsThis::Preferences_Training));
     pagesWidget->addWidget(train);
 
-    closeButton = new QPushButton(tr("Close"));
-    saveButton = new QPushButton(tr("Save"));
-    resetAppearance = new QPushButton(tr("Reset Appearance to Defaults"));
-
     QHBoxLayout *horizontalLayout = new QHBoxLayout;
     horizontalLayout->addWidget(pagesWidget, 1);
 
-    QHBoxLayout *buttonsLayout = new QHBoxLayout;
-    buttonsLayout->addWidget(resetAppearance);
-    buttonsLayout->addStretch();
-    buttonsLayout->setSpacing(5 *dpiXFactor);
-    buttonsLayout->addWidget(closeButton);
-    buttonsLayout->addWidget(saveButton);
+    QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Close | QDialogButtonBox::Save);
+    reset = buttons->addButton(tr("Reset Appearance to Defaults"), QDialogButtonBox::ResetRole);
 
     QWidget *contents = new QWidget(this);
     setCentralWidget(contents);
@@ -175,7 +183,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(horizontalLayout);
-    mainLayout->addLayout(buttonsLayout);
+    mainLayout->addWidget(buttons);
     mainLayout->setSpacing(0);
     contents->setLayout(mainLayout);
 
@@ -187,11 +195,10 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     setWindowTitle(tr("Options"));
 #endif
 
-    resetAppearance->hide();
+    reset->setVisible(false);
 
-    connect(closeButton, SIGNAL(clicked()), this, SLOT(closeClicked()));
-    connect(saveButton, SIGNAL(clicked()), this, SLOT(saveClicked()));
-    connect(resetAppearance, SIGNAL(clicked()), appearance->appearancePage, SLOT(resetClicked()));
+    connect(buttons, &QDialogButtonBox::rejected, this, &ConfigDialog::closeClicked);
+    connect(buttons, &QDialogButtonBox::accepted, this, &ConfigDialog::saveClicked);
 }
 
 ConfigDialog::~ConfigDialog()
@@ -203,8 +210,18 @@ ConfigDialog::~ConfigDialog()
 void ConfigDialog::changePage(int index)
 {
     // only want reset appearance button on the appearances page
-    if (index == 1) resetAppearance->show();
-    else resetAppearance->hide();
+    reset->disconnect();
+    if (index == 1) {
+        reset->setText(tr("Reset Appearance to Defaults"));
+        reset->setVisible(true);
+        connect(reset, SIGNAL(clicked()), appearance->appearancePage, SLOT(resetClicked()));
+    } else if (index == 5) {
+        reset->setText(tr("Reset Measures to Defaults"));
+        reset->setVisible(true);
+        connect(reset, SIGNAL(clicked()), measures, SLOT(resetClicked()));
+    } else {
+        reset->setVisible(false);
+    }
 
     pagesWidget->setCurrentIndex(index);
 }
@@ -295,6 +312,7 @@ GeneralConfig::GeneralConfig(QDir home, Context *context) :
     layout->addWidget(generalPage);
 
     layout->setSpacing(0);
+    layout->setContentsMargins(0,0,0,0);
     setContentsMargins(0,0,0,0);
 }
 
@@ -312,6 +330,7 @@ AppearanceConfig::AppearanceConfig(QDir home, Context *context) :
     layout->addWidget(appearancePage);
 
     layout->setSpacing(0);
+    layout->setContentsMargins(0,0,0,0);
     setContentsMargins(0,0,0,0);
 }
 
@@ -329,6 +348,7 @@ DataConfig::DataConfig(QDir home, Context *context) :
     layout->addWidget(dataPage);
 
     layout->setSpacing(0);
+    layout->setContentsMargins(0,0,0,0);
     setContentsMargins(0,0,0,0);
 }
 
@@ -348,11 +368,10 @@ MetricConfig::MetricConfig(QDir home, Context *context) :
     setContentsMargins(0,0,0,0);
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(0,0,0,0);
 
     QTabWidget *tabs = new QTabWidget(this);
-    tabs->addTab(customPage, tr("Custom"));
     tabs->addTab(intervalsPage, tr("Favourites"));
+    tabs->addTab(customPage, tr("Custom"));
     mainLayout->addWidget(tabs);
 }
 
@@ -378,6 +397,7 @@ IntervalConfig::IntervalConfig(QDir home, Context *context) :
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
 
+    mainLayout->addStretch();
     mainLayout->addWidget(intervalsPage);
     mainLayout->addStretch();
 }
@@ -415,11 +435,18 @@ qint32 MeasuresConfig::saveClicked()
     return state;
 }
 
+
+void
+MeasuresConfig::resetClicked
+()
+{
+    measuresPage->resetMeasuresClicked();
+}
+
 // TRAIN CONFIG
 TrainConfig::TrainConfig(QDir home, Context *context) :
     home(home), context(context)
 {
-
     // the widgets
     devicePage = new DevicePage(this, context);
     optionsPage = new TrainOptionsPage(this, context);
@@ -430,11 +457,10 @@ TrainConfig::TrainConfig(QDir home, Context *context) :
     setContentsMargins(0,0,0,0);
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
     mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(0,0,0,0);
 
     QTabWidget *tabs = new QTabWidget(this);
-    tabs->addTab(devicePage, tr("Train Devices"));
     tabs->addTab(optionsPage, tr("Preferences"));
+    tabs->addTab(devicePage, tr("Train Devices"));
     tabs->addTab(remotePage, tr("Remote Controls"));
     tabs->addTab(simBicyclePage, tr("Virtual Bicycle Specifications"));
     tabs->addTab(workoutTagManagerPage, tr("Workout Tags"));

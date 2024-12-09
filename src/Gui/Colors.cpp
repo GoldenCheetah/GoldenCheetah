@@ -1154,3 +1154,28 @@ newQFormLayout
     }
     return form;
 }
+
+
+extern QLayout*
+centerLayout
+(QLayout *layout, bool margins)
+{
+    QHBoxLayout *centerLayout = new QHBoxLayout();
+    if (! margins) {
+        centerLayout->setContentsMargins(0, 0, 0, 0);
+    }
+    centerLayout->addStretch(1);
+    centerLayout->addLayout(layout, 3);
+    centerLayout->addStretch(1);
+    return centerLayout;
+}
+
+
+extern QWidget*
+centerLayoutInWidget
+(QLayout *layout, bool margins)
+{
+    QWidget *widget = new QWidget();
+    widget->setLayout(centerLayout(layout, margins));
+    return widget;
+}

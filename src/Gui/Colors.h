@@ -41,6 +41,8 @@ extern QFont baseFont;
 // layout and widget styling
 extern void basicTreeWidgetStyle(QTreeWidget *tree, bool editable = true);
 extern QFormLayout *newQFormLayout(QWidget *parent = nullptr);
+extern QLayout *centerLayout(QLayout *layout, bool margins = true);
+extern QWidget *centerLayoutInWidget(QLayout *layout, bool margins = true);
 
 // turn color to rgb, checks if a named color
 #define StandardColor(x) (QColor(1,1,x))
