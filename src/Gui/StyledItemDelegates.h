@@ -44,6 +44,8 @@ public:
 
 class UniqueLabelEditDelegate: public QStyledItemDelegate
 {
+    Q_OBJECT
+
 public:
     UniqueLabelEditDelegate(QObject *parent = nullptr);
 
