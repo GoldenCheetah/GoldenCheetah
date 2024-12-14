@@ -160,41 +160,34 @@ IntervalTreeView::mimeData
     return returning;
 }
 
-void 
-IntervalColorDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
-               const QModelIndex &index) const 
+void
+IntervalColorDelegate::paint
+(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    //QStyledItemDelegate::paint(painter, option, index);
+    QTreeWidgetItem *item = nullptr;
+    if (index.isValid() && index.parent().isValid()) {
+        item = tree->itemFromIndexPublic(index);
+    }
 
     painter->save();
-
     // Only do this on items !
-    if(index.isValid() && index.parent().isValid()) {
-
-        // extract the state of item
-        bool hover = option.state & QStyle::State_MouseOver;
-        bool selected = option.state & QStyle::State_Selected;
-
-        QTreeWidgetItem *item = tree->itemFromIndexPublic(index);
-        QVariant v =  item->data(0, Qt::UserRole+1);
-        QColor color = v.value<QColor>();
-
-        // indicate color of interval in charts
-        if (!selected && !hover) {
-
-            // 7 pix wide mark on rhs
-            QRect high(option.rect.x()+option.rect.width() - (7*dpiXFactor),
-                       option.rect.y(), (7*dpiXFactor), tree->rowHeightPublic(index));
-
-            // use the interval colour
-            painter->fillRect(high, color);
-
-        }
-
+    if (item != nullptr) {
         // is it a performance test ?
-        QVariant t = item->data(0, Qt::UserRole+2);
+        QVariant t = item->data(0, Qt::UserRole + 2);
         const_cast<QStyleOptionViewItem&>(option).font.setBold(t.toInt() ? true : false);
     }
     QStyledItemDelegate::paint(painter, option, index);
+    if (item != nullptr) {
+        QVariant v =  item->data(0, Qt::UserRole + 1);
+        QColor color = v.value<QColor>();
+
+        // indicate color of interval in charts
+        // 7 pix wide mark on rhs
+        QRect high(option.rect.x() + option.rect.width() - 7 * dpiXFactor,
+                   option.rect.y(),
+                   7 * dpiXFactor,
+                   tree->rowHeightPublic(index));
+        painter->fillRect(high, color);
+    }
     painter->restore();
 }

@@ -177,11 +177,11 @@ RideNavigator::configChanged(qint32 state)
     if (mainwindow) {
         if (appsettings->value(this, GC_RIDESCROLL, true).toBool() == false)
             tableView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        else 
+        else
             tableView->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
         //if (appsettings->value(this, GC_RIDEHEAD, true).toBool() == false)
             //tableView->header()->hide();
-        //else 
+        //else
             tableView->header()->show();
 
         tableView->header()->setStyleSheet(
@@ -240,7 +240,7 @@ RideNavigator::resetView()
     QList<QString> cols = _columns.split("|", Qt::SkipEmptyParts);
     int widco = _widths.split("|", Qt::SkipEmptyParts).count();
 
-    // something is wrong with the config ? reset 
+    // something is wrong with the config ? reset
     if (widco != cols.count() || widco <= 1) {
         _columns = QString(tr("*|Workout Code|Date|"));
         _widths = QString("0|100|100|");
@@ -933,7 +933,7 @@ RideNavigator::removeColumn()
     active = true;
     tableView->setColumnHidden(currentColumn, true);
     active = false;
-    
+
     setWidth(geometry().width()); // calculate width...
     columnsChanged(); // need to do after, just once
     columnsChanged(); // need to do after, and again
@@ -1071,7 +1071,7 @@ void NavigatorCellDelegate::updateEditorGeometry(QWidget *, const QStyleOptionVi
 void NavigatorCellDelegate::setModelData(QWidget *, QAbstractItemModel *, const QModelIndex &) const { }
 bool NavigatorCellDelegate::helpEvent(QHelpEvent*, QAbstractItemView*, const QStyleOptionViewItem&, const QModelIndex&) { return true; }
 
-QSize NavigatorCellDelegate::sizeHint(const QStyleOptionViewItem & /*option*/, const QModelIndex &index) const 
+QSize NavigatorCellDelegate::sizeHint(const QStyleOptionViewItem & /*option*/, const QModelIndex &index) const
 {
     QSize s;
 
@@ -1083,30 +1083,23 @@ QSize NavigatorCellDelegate::sizeHint(const QStyleOptionViewItem & /*option*/, c
 }
 
 // anomalies are underlined in red, otherwise straight paintjob
-void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
-                         const QModelIndex &index) const
+void
+NavigatorCellDelegate::paint
+(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    painter->save();
 
     // paint background for user defined color ?
     bool rideBG = appsettings->value(this,GC_RIDEBG,false).toBool();
 
     // state of item
-    bool hover = false; //disable this, its annoying option.state & QStyle::State_MouseOver;
     bool selected = option.state & QStyle::State_Selected;
-    bool focus = option.state & QStyle::State_HasFocus;
-    //bool isRun = rideNavigator->tableView->model()->data(index, Qt::UserRole+2).toBool();
+    bool active = option.state & QStyle::State_Active;
 
     // format the cell depending upon what it is...
     QString columnName = rideNavigator->tableView->model()->headerData(index.column(), Qt::Horizontal).toString();
     const RideMetric *m;
     QString value;
-
-    // are we a selected cell ? need to paint accordingly
-    //bool selected = false;
-    //if (rideNavigator->tableView->selectionModel()->selectedIndexes().count()) { // zero if no rides in list
-        //if (rideNavigator->tableView->selectionModel()->selectedIndexes().value(0).row() == index.row())
-            //selected = true;
-    //}
 
     if ((m=rideNavigator->columnMetrics.value(columnName, NULL)) != NULL) {
 
@@ -1137,13 +1130,6 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
     QStyleOptionViewItem myOption = option;
 
-    // groupBy in bold please
-    if (columnName == "*") {
-        QFont enbolden = option.font;
-        enbolden.setWeight(QFont::Bold);
-        myOption.font = enbolden;
-    }
-
     // normal render
     bool isnormal=false;
     QString calendarText = rideNavigator->tableView->model()->data(index, Qt::UserRole).toString();
@@ -1154,25 +1140,22 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         userColor = GColor(CPLOTMARKER);
     }
 
-    // basic background
-    QBrush background = QBrush(GColor(CPLOTBACKGROUND));
-
-    // runs are darker
-    //if (isRun) {
-        //background.setColor(background.color().darker(150));
-        //userColor = userColor.darker(150);
-    //}
-
     if (columnName != "*") {
+        QColor backgroundColor;
+        if (selected) {
+            backgroundColor = myOption.palette.color(active ? QPalette::Active : QPalette::Inactive, QPalette::Highlight);
+        } else {
+            backgroundColor = rideBG ? userColor : GColor(CPLOTBACKGROUND);
+        }
+        QColor textColor = GCColor::invertColor(backgroundColor);
+        QColor headerColor = (selected || rideBG) ? GCColor::invertColor(backgroundColor) : userColor;
 
         myOption.displayAlignment = Qt::AlignLeft | Qt::AlignTop;
-        QRectF bigger(myOption.rect.x(), myOption.rect.y(), myOption.rect.width()+1, myOption.rect.height()+1);
+        painter->fillRect(myOption.rect, backgroundColor);
 
-        if (hover) painter->fillRect(myOption.rect, QColor(Qt::lightGray));
-        else painter->fillRect(bigger, rideBG ? userColor : background);
-
-        // clear first
-        drawDisplay(painter, myOption, myOption.rect, ""); //added
+        if (selected || active) {
+            drawDisplay(painter, myOption, myOption.rect, "");  // draw selection background
+        }
 
         // draw border of each cell
         QPen rpen;
@@ -1187,66 +1170,54 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         painter->drawLine(rideNavigator->pwidth-1, myOption.rect.y(), rideNavigator->pwidth-1, myOption.rect.y()+myOption.rect.height());
 
         // indent first column and draw all in plotmarker color
-        myOption.rect.setHeight(rideNavigator->fontHeight + 2); //added
+        myOption.rect.setHeight(rideNavigator->fontHeight + 2);
         myOption.font.setWeight(QFont::Bold);
 
         QFont boldened = painter->font();
         boldened.setWeight(QFont::Bold);
         painter->setFont(boldened);
-        if (!selected) {
-            // not selected, so invert ride plot color
-            if (hover) painter->setPen(QColor(Qt::black));
-            else painter->setPen(rideBG ? rideNavigator->reverseColor : userColor);
-        } else if (!focus) { // selected but out of focus //
-            painter->setPen(QColor(Qt::black));
-        }
+        painter->setPen(headerColor);
 
         QRect normal(myOption.rect.x(), myOption.rect.y()+1, myOption.rect.width(), myOption.rect.height());
-        if (myOption.rect.x() == 0) {
-            // first line ?
+        if (myOption.rect.x() == 0) { // first column?
             QRect indented(myOption.rect.x()+5, myOption.rect.y()+1, myOption.rect.width()-5, myOption.rect.height());
-            painter->drawText(indented, value); //added
+            painter->drawText(indented, value);
         } else {
-            painter->drawText(normal, value); //added
+            painter->drawText(normal, value);
         }
         painter->setPen(isColor);
         painter->setFont(isFont);
 
         // now get the calendar text to appear ...
         if (rideNavigator->hasCalendarText) {
-            QRect high(myOption.rect.x()+myOption.rect.width() - (7*dpiXFactor), myOption.rect.y(), (7*dpiXFactor), (rideNavigator->fontHeight+2) * 4);
+            QRect high(myOption.rect.x()+myOption.rect.width() - (7*dpiXFactor), myOption.rect.y() + 1, (7*dpiXFactor), (rideNavigator->fontHeight+2) * 4 - 1);
 
             myOption.rect.setX(0);
             myOption.rect.setY(myOption.rect.y() + rideNavigator->fontHeight + 2);//was +23
             myOption.rect.setWidth(rideNavigator->pwidth);
             myOption.rect.setHeight(rideNavigator->fontHeight * 3); //was 36
-            //myOption.font.setPointSize(myOption.font.pointSize());
             myOption.font.setWeight(QFont::Normal);
 
-            if (hover) painter->fillRect(myOption.rect, QColor(Qt::lightGray)); 
-            else painter->fillRect(myOption.rect, rideBG ? userColor : background.color());
-
-            drawDisplay(painter, myOption, myOption.rect, "");
+            if (selected || active) {
+                drawDisplay(painter, myOption, myOption.rect, "");  // draw selection background
+            }
             myOption.rect.setX(10); // wider notes display
             myOption.rect.setWidth(pwidth-20);// wider notes display
             painter->setFont(myOption.font);
             QPen isColor = painter->pen();
-            if (!selected) {
-                // not selected, so invert ride plot color
-                if (hover) painter->setPen(QPen(Qt::black));
-                else painter->setPen(rideBG ? rideNavigator->reverseColor : GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-            }
+            painter->setPen(textColor);
             painter->drawText(myOption.rect, Qt::AlignLeft | Qt::TextWordWrap, calendarText);
             painter->setPen(isColor);
 
 #if defined (Q_OS_MAC) // on QT5 the scrollbars have no width
-            if (!selected && !rideBG && high.x()+12 > rideNavigator->geometry().width() && !isnormal) {
+            static const int highOffset = 12;
 #else
-            if (!selected && !rideBG && high.x()+32 > rideNavigator->geometry().width() && !isnormal) {
+            static const int highOffset = 32;
 #endif
+            if (   ! isnormal
+                && high.x() + highOffset > rideNavigator->geometry().width()) {
                 painter->fillRect(high, userColor);
             } else {
-
                 // border
                 QPen rpen;
                 rpen.setWidth(1);
@@ -1258,8 +1229,11 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
                 painter->setPen(isColor);
             }
         }
-
     } else {
+        // groupBy in bold please
+        QFont enbolden = option.font;
+        enbolden.setWeight(QFont::Bold);
+        painter->setFont(enbolden);
 
         if (value != "") {
             myOption.displayAlignment = Qt::AlignLeft | Qt::AlignBottom;
@@ -1274,6 +1248,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         painter->drawText(myOption.rect, value);
         painter->setPen(isColor);
     }
+    painter->restore();
 }
 
 static bool insensitiveLessThan(const QString &a, const QString &b)
@@ -1294,7 +1269,7 @@ ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
     QVBoxLayout *us = new QVBoxLayout(this);
     us->setSpacing(0);
     us->setContentsMargins(0,0,0,0);
-    
+
     scrollarea = new QScrollArea(this);
     us->addWidget(scrollarea);
 

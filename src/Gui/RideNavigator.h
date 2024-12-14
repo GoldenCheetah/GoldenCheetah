@@ -146,7 +146,7 @@ class RideNavigator : public GcChartWindow
 
         int groupBy() const { return _groupBy; }
         void setGroupBy(int x) { _groupBy = x; }
- 
+
         QString columns() const { return _columns; }
         void setColumns(QString x) { _columns = x; }
 
@@ -157,7 +157,7 @@ class RideNavigator : public GcChartWindow
         void noGroups() { currentColumn=-1; setGroupByColumn(); }
 
         QString widths() const { return _widths; }
-        void setWidths (QString x="") { _widths = x; resetView(); } // only reset once widths are set, witdths="" resets to default columns
+        void setWidths(QString x="") { _widths = x; resetView(); } // only reset once widths are set, widths="" resets to default columns
 
         void resetView(); // when columns/width changes
 
@@ -173,7 +173,7 @@ class RideNavigator : public GcChartWindow
         QList<QString> visualHeadings;
 
         // this maps friendly names to metric names
-        QMap <QString, QString> nameMap;
+        QMap<QString, QString> nameMap;
         QMap<QString, const RideMetric *> columnMetrics;
 
     private:
@@ -215,24 +215,22 @@ class RideNavigator : public GcChartWindow
 class NavigatorCellDelegate : public QItemDelegate
 {
     Q_OBJECT
-    G_OBJECT
-
 
 public:
-    NavigatorCellDelegate(RideNavigator *, QObject *parent = 0);
+    NavigatorCellDelegate(RideNavigator *, QObject *parent = nullptr);
 
     // These are all null since we don't allow editing
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    void setEditorData(QWidget *editor, const QModelIndex &index) const;
-    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
-    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
     // We increase the row height if there is a calendar text to display
-    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const ;
+    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
     // override stanard painter to use color config to paint background
     // and perform correct level of rounding for each column before displaying
-    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
     void setWidth(int x) { pwidth=x; }
 
@@ -246,8 +244,8 @@ private slots:
 private:
     RideNavigator *rideNavigator;
     int pwidth;
-
 };
+
 
 //
 // Column Chooser
@@ -297,7 +295,7 @@ class RideTreeView : public QTreeView
          void dragEnterEvent(QDragEnterEvent *e) {
             e->accept();
         }
- 
+
         void dragMoveEvent(QDragMoveEvent *e) {
             e->accept();
         }
