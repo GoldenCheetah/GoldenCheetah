@@ -173,6 +173,31 @@ GSettings::setValue(QString key, QVariant value)
 
 }
 
+void
+GSettings::remove(const QString &key)
+{
+    QString keyVar = QString(key);
+    if (newFormat) {
+        int store;
+        int file;
+        keyVar = DetermineKey(keyVar, store, file);
+        switch (store) {
+        case SETTINGS_SYSTEM:
+            systemsettings->remove(keyVar);
+            break;
+        case SETTINGS_GLOBAL:
+            global->at(file)->remove(keyVar);
+            break;
+        case SETTINGS_ATHLETE:
+            qDebug() << "remove key, keyVar, store:" << key << ":" << keyVar  << ": " << store; // error cases on code configuration
+            break;
+        }
+    } else {
+        keyVar.remove(QRegularExpression("^<.*>"));
+        systemsettings->remove(keyVar);
+    }
+}
+
 // access to athlete specific config
 QVariant
 GSettings::cvalue(QString athleteName, QString key, QVariant def) {

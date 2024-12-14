@@ -19,6 +19,7 @@
 #include "DataProcessor.h"
 #include "Settings.h"
 #include "Units.h"
+#include "Colors.h"
 #include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
@@ -33,8 +34,6 @@ class FixSpeedConfig : public DataProcessorConfig
 
     friend class ::FixSpeed;
     protected:
-        QHBoxLayout *layout;
-        QLabel *maLabel;
         QSpinBox *ma;
 
     public:
@@ -43,37 +42,25 @@ class FixSpeedConfig : public DataProcessorConfig
             HelpWhatsThis *help = new HelpWhatsThis(parent);
             parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_FixSpeed));
 
-            layout = new QHBoxLayout(this);
-
+            QFormLayout *layout = newQFormLayout(this);
             layout->setContentsMargins(0,0,0,0);
             setContentsMargins(0,0,0,0);
-
-            maLabel = new QLabel(tr("Moving Average Seconds"));
 
             ma = new QSpinBox();
             ma->setMaximum(600);
             ma->setMinimum(0);
             ma->setSingleStep(1);
-            layout->addWidget(maLabel);
-            layout->addWidget(ma);
-            layout->addStretch();
+            ma->setSuffix(" " + tr("s"));
+
+            layout->addRow(tr("Moving Average"), ma);
         }
 
         //~FixSpeedConfig() {}  // deliberately not declared since Qt will
                                 // delete the widget and its children when
                                 // the config pane is deleted
 
-        QString explain() {
-            return tr("Some devices report sample speed not matching the "          "change of distance, for example when using a footpod "
-                      "for speed and GPS for distance.\n"
-                      "This tool replaces the existing speed channel, or " "creates a new one if not present, based on travelled "
-                      "distance\n\n"
-                      "Moving Average Seconds parameter allows to set the "
-                      "seconds of the MA filter to smooth speed spikes");
-        }
-
         void readConfig() {
-            ma->setValue(appsettings->value(NULL, GC_DPFV_MA, "1").toInt());
+            ma->setValue(appsettings->value(NULL, GC_DPFV_MA, 1).toInt());
         }
 
         void saveConfig() {
@@ -94,21 +81,39 @@ class FixSpeed : public DataProcessor {
         ~FixSpeed() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op) override;
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) const override {
             Q_UNUSED(ride);
             return new FixSpeedConfig(parent);
         }
 
         // Localized Name
-        QString name() {
-            return (tr("Fix Speed from Distance"));
+        QString name() const override {
+            return tr("Fix Speed from Distance");
+        }
+
+        QString id() const override {
+            return "::FixSpeed";
+        }
+
+        QString legacyId() const override {
+            return "Fix Speed from Distance";
+        }
+
+        QString explain() const override {
+            return tr("Some devices report sample speed not matching the "
+                      "change of distance, for example when using a footpod "
+                      "for speed and GPS for distance.\n"
+                      "This tool replaces the existing speed channel, or "
+                      "creates a new one if not present, based on travelled distance\n\n"
+                      "Moving Average Seconds parameter allows to set the "
+                      "seconds of the MA filter to smooth speed spikes");
         }
 };
 
-static bool FixSpeedAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix Speed from Distance"), new FixSpeed());
+static bool FixSpeedAdded = DataProcessorFactory::instance().registerProcessor(new FixSpeed());
 
 bool
 FixSpeed::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
@@ -118,7 +123,7 @@ FixSpeed::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op=
     // get settings
     int ma;
     if (config == NULL) { // being called automatically
-        ma = appsettings->value(NULL, GC_DPFV_MA, "1").toInt();
+        ma = appsettings->value(NULL, GC_DPFV_MA, 1).toInt();
     } else { // being called manually
         ma = ((FixSpeedConfig*)(config))->ma->value();
     }

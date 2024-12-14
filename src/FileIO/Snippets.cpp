@@ -42,10 +42,6 @@ class SnippetsConfig : public DataProcessorConfig
             //parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_SnippetsInRecording));
         }
 
-        QString explain() {
-            return(QString(tr("Dump metrics for the ride to Athlete_Home/Snippets")));
-        }
-
         void readConfig() {
         }
 
@@ -66,21 +62,33 @@ class Snippets : public DataProcessor {
         ~Snippets() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op) override;
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) const override {
             Q_UNUSED(ride);
             return new SnippetsConfig(parent);
         }
 
         // Localized Name
-        QString name() {
-            return (tr("Snippet export"));
+        QString name() const override {
+            return tr("Snippet export");
+        }
+
+        QString id() const override {
+            return "::Snippets";
+        }
+
+        QString legacyId() const override {
+            return "Snippet export";
+        }
+
+        QString explain() const override {
+            return tr("Dump metrics for the ride to Athlete_Home/Snippets");
         }
 };
 
-static bool SnippetsAdded = DataProcessorFactory::instance().registerProcessor(QString("Snippet export"), new Snippets());
+static bool SnippetsAdded = DataProcessorFactory::instance().registerProcessor(new Snippets());
 
 // how we write the ride time
 #define DATETIME_FORMAT "yyyy/MM/dd hh:mm:ss' UTC'"

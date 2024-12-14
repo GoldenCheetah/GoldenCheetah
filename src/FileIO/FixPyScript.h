@@ -4,7 +4,8 @@
 #include <QString>
 
 struct FixPyScript {
-    QString name, path, source, iniKey, oldPath;
+    QString name, path, source, iniKey;
+    QString oldName, oldPath;
     bool changed;
 };
 

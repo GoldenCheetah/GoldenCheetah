@@ -20,6 +20,7 @@
 #include "LTMOutliers.h"
 #include "Settings.h"
 #include "Units.h"
+#include "Colors.h"
 #include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
@@ -33,50 +34,33 @@ class FixMoxyConfig : public DataProcessorConfig
 
     friend class ::FixMoxy;
     protected:
-        QHBoxLayout *layout;
-        QLabel *paLabel;
-        QLabel *percentLabel;
-        QLineEdit *pa;
 	QCheckBox *cadConv;
 	QCheckBox *spdConv;
     public:
         FixMoxyConfig(QWidget *parent) : DataProcessorConfig(parent) {
-
             HelpWhatsThis *help = new HelpWhatsThis(parent);
             parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_FixMoxy));
 
-	    layout = new QHBoxLayout(this);
-
+	    QFormLayout *layout = newQFormLayout(this);
 	    layout->setContentsMargins(0,0,0,0);
 	    setContentsMargins(0,0,0,0);
-	    paLabel = new QLabel(tr("Field Adjustment"));
 
 	    cadConv = new QCheckBox(tr("Cadence to SMO2"));
 	    spdConv = new QCheckBox(tr("Speed to tHb"));
 
-	    layout->addWidget(paLabel);
-	    layout->addWidget(cadConv);
-	    layout->addWidget(spdConv);
-	    layout->addStretch();
+	    layout->addRow("", new QLabel(tr("<b>Field Adjustment</b>")));
+	    layout->addRow("", cadConv);
+	    layout->addRow("", spdConv);
 	}
 
         //~FixMoxyConfig() {} // deliberately not declared since Qt will delete
                               // the widget and its children when the config pane is deleted
 
-        QString explain() {
-            return(QString(tr("When recording from the Moxy or BSX Insight in Speed and"
-                           " cadence mode the SmO2 and tHb data is sent as"
-                           " cadence and speed respectively. This tool will"
-                           " update the activity file to move the values from speed"
-                           " and cadence into the Moxy series."
-                           )));
-        }
         void readConfig() {
 	    bool isCad = appsettings->value(NULL, GC_CAD2SMO2, Qt::Checked).toBool();
 	    bool isSpd = appsettings->value(NULL, GC_SPD2THB, Qt::Checked).toBool();
 	    cadConv->setCheckState(isCad ? Qt::Checked : Qt::Unchecked);
 	    spdConv->setCheckState(isSpd ? Qt::Checked : Qt::Unchecked);
-	    
 	}
         void saveConfig() {
 	    appsettings->setValue(GC_CAD2SMO2, cadConv->checkState());
@@ -97,21 +81,37 @@ class FixMoxy : public DataProcessor {
         ~FixMoxy() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op) override;
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) const override {
             Q_UNUSED(ride);
             return new FixMoxyConfig(parent);
         }
 
         // Localized Name
-        QString name() {
+        QString name() const override {
             return tr("Set SmO2/tHb from Speed and Cadence");
+        }
+
+        QString id() const override {
+            return "::FixMoxy";
+        }
+
+        QString legacyId() const override {
+            return "Fix Moxy";
+        }
+
+        QString explain() const override{
+            return tr("When recording from the Moxy or BSX Insight in Speed and"
+                      " cadence mode the SmO2 and tHb data is sent as"
+                      " cadence and speed respectively. This tool will"
+                      " update the activity file to move the values from speed"
+                      " and cadence into the Moxy series.");
         }
 };
 
-static bool FixMoxyAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix Moxy"), new FixMoxy());
+static bool FixMoxyAdded = DataProcessorFactory::instance().registerProcessor(new FixMoxy());
 
 bool
 FixMoxy::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")

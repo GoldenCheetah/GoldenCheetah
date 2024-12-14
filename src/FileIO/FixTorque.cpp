@@ -20,6 +20,7 @@
 #include "LTMOutliers.h"
 #include "Settings.h"
 #include "Units.h"
+#include "Colors.h"
 #include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
@@ -32,8 +33,6 @@ class FixTorqueConfig : public DataProcessorConfig
 
     friend class ::FixTorque;
     protected:
-        QHBoxLayout *layout;
-        QLabel *taLabel;
         QLineEdit *ta;
 
     public:
@@ -42,33 +41,16 @@ class FixTorqueConfig : public DataProcessorConfig
             HelpWhatsThis *help = new HelpWhatsThis(parent);
             parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_AdjustTorqueValues));
 
-            layout = new QHBoxLayout(this);
-
+            QFormLayout *layout = newQFormLayout(this);
             layout->setContentsMargins(0,0,0,0);
             setContentsMargins(0,0,0,0);
 
-            taLabel = new QLabel(tr("Torque Adjust"));
-
             ta = new QLineEdit();
-
-            layout->addWidget(taLabel);
-            layout->addWidget(ta);
-            layout->addStretch();
+            layout->addRow(tr("Torque Adjust"), ta);
         }
 
         //~FixTorqueConfig() {} // deliberately not declared since Qt will delete
                               // the widget and its children when the config pane is deleted
-
-        QString explain() {
-            return(QString(tr("Adjusting torque values allows you to "
-                           "uplift or degrade the torque values when the calibration "
-                           "of your power meter was incorrect. It "
-                           "takes a single parameter:\n\n"
-                           "Torque Adjust - this defines an absolute value "
-                           "in poinds per square inch or newton meters to "
-                           "modify values by. Negative values are supported. (e.g. enter \"1.2 nm\" or "
-                           "\"-0.5 pi\").")));
-        }
 
         void readConfig() {
             ta->setText(appsettings->value(NULL, GC_DPTA, "0 nm").toString());
@@ -92,21 +74,40 @@ class FixTorque : public DataProcessor {
         ~FixTorque() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op) override;
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) const override {
             Q_UNUSED(ride);
             return new FixTorqueConfig(parent);
         }
 
         // Localized Name
-        QString name() {
-            return (tr("Adjust Torque Values"));
+        QString name() const override {
+            return tr("Adjust Torque Values");
+        }
+
+        QString id() const override {
+            return "::FixTorque";
+        }
+
+        QString legacyId() const override {
+            return "Adjust Torque Values";
+        }
+
+        QString explain() const override {
+            return tr("Adjusting torque values allows you to "
+                      "uplift or degrade the torque values when the calibration "
+                      "of your power meter was incorrect. It "
+                      "takes a single parameter:\n\n"
+                      "Torque Adjust - this defines an absolute value "
+                      "in poinds per square inch or newton meters to "
+                      "modify values by. Negative values are supported. (e.g. enter \"1.2 nm\" or "
+                      "\"-0.5 pi\").");
         }
 };
 
-static bool fixTorqueAdded = DataProcessorFactory::instance().registerProcessor(QString("Adjust Torque Values"), new FixTorque());
+static bool fixTorqueAdded = DataProcessorFactory::instance().registerProcessor(new FixTorque());
 
 bool
 FixTorque::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")

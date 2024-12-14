@@ -20,6 +20,7 @@
 #include "Settings.h"
 #include "Context.h"
 #include "Units.h"
+#include "Colors.h"
 #include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
@@ -35,10 +36,7 @@ class FixLapSwimConfig : public DataProcessorConfig
 
     friend class ::FixLapSwim;
     protected:
-        QHBoxLayout *layout;
-        QLabel *plLabel;
         QSpinBox *pl;
-        QLabel *minRestLabel;
         QSpinBox *minRest;
 
     public:
@@ -47,50 +45,29 @@ class FixLapSwimConfig : public DataProcessorConfig
             HelpWhatsThis *help = new HelpWhatsThis(parent);
             parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_FixLapSwim));
 
-            layout = new QHBoxLayout(this);
-
+            QFormLayout *layout = newQFormLayout(this);
             layout->setContentsMargins(0,0,0,0);
             setContentsMargins(0,0,0,0);
-
-            plLabel = new QLabel(tr("Pool Length (m)"));
 
             pl = new QSpinBox();
             pl->setMaximum(50);
             pl->setMinimum(0);
             pl->setSingleStep(1);
-            layout->addWidget(plLabel);
-            layout->addWidget(pl);
-            layout->addStretch();
-
-            minRestLabel = new QLabel(tr("Min Rest (s)"));
+            pl->setSuffix(" " + tr("m"));
 
             minRest = new QSpinBox();
             minRest->setMaximum(10);
             minRest->setMinimum(1);
             minRest->setSingleStep(1);
-            layout->addWidget(minRestLabel);
-            layout->addWidget(minRest);
-            layout->addStretch();
+            minRest->setSuffix(" " + tr("s"));
+
+            layout->addRow(tr("Pool Length"), pl);
+            layout->addRow(tr("Min Rest"), minRest);
         }
 
         //~FixLapSwimConfig() {}  // deliberately not declared since Qt will
                                 // delete the widget and its children when
                                 // the config pane is deleted
-
-        QString explain() {
-            return tr("Sometimes length times or distances from "
-                      "lap swimming files are wrong.\n"
-                      "You can fix length-by-length information "
-                      "in Editor SWIM tab: TYPE, DURATION and STROKES.\n"
-                      "This tool recompute accumulated time, distance "
-                      "and sample Speed/Cadence from the updated lengths.\n"
-                      "Laps are recreated using length distance changes as markers\n\n"
-                      "Pool Length (in meters) allows to re-define the "
-                      "field if value is > 0\n\n"
-                      "Lengths shorter than Min Rest (in seconds) "
-                      "are removed and their duration carried to "
-                      "the next length.\n\n");
-        }
 
         void readConfig() {
             pl->setValue(appsettings->value(NULL, GC_DPFLS_PL, "0").toDouble());
@@ -116,21 +93,44 @@ class FixLapSwim : public DataProcessor {
         ~FixLapSwim() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op) override;
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) const override {
             Q_UNUSED(ride);
             return new FixLapSwimConfig(parent);
         }
 
         // Localized Name
-        QString name() {
-            return (tr("Fix Lap Swim from Length Data"));
+        QString name() const override {
+            return tr("Fix Lap Swim from Length Data");
+        }
+
+        QString id() const override {
+            return "::FixLapSwim";
+        }
+
+        QString legacyId() const override {
+            return "Fix Lap Swim";
+        }
+
+        QString explain() const override {
+            return tr("Sometimes length times or distances from "
+                      "lap swimming files are wrong.\n"
+                      "You can fix length-by-length information "
+                      "in Editor SWIM tab: TYPE, DURATION and STROKES.\n"
+                      "This tool recompute accumulated time, distance "
+                      "and sample Speed/Cadence from the updated lengths.\n"
+                      "Laps are recreated using length distance changes as markers\n\n"
+                      "Pool Length (in meters) allows to re-define the "
+                      "field if value is > 0\n\n"
+                      "Lengths shorter than Min Rest (in seconds) "
+                      "are removed and their duration carried to "
+                      "the next length.\n\n");
         }
 };
 
-static bool FixLapSwimAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix Lap Swim"), new FixLapSwim());
+static bool FixLapSwimAdded = DataProcessorFactory::instance().registerProcessor(new FixLapSwim());
 
 bool
 FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")

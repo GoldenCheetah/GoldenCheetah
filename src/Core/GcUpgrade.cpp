@@ -452,6 +452,21 @@ GcUpgrade::upgrade(const QDir &home)
 
             RideMetadata::serialize(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
         }
+
+        // Migrate Data Processor apply-values to new keys
+        {
+            QMap<QString, DataProcessor*> processors = DataProcessorFactory::instance().getProcessors();
+            for (auto it = processors.keyValueBegin(); it != processors.keyValueEnd(); ++it) {
+                QString legacyId = it->second->legacyId();
+                if (! legacyId.isNull()) {
+                    QString id = it->second->id();
+                    if (! appsettings->contains(DataProcessor::configKeyAutomation(id))) {
+                        QVariant data = appsettings->value(nullptr, DataProcessor::configKeyApply(legacyId));
+                        appsettings->setValue(DataProcessor::configKeyAutomation(id), data);
+                    }
+                }
+            }
+        }
     }
 
     //----------------------------------------------------------------------

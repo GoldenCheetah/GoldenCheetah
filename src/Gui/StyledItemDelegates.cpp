@@ -18,12 +18,19 @@
 
 #include "StyledItemDelegates.h"
 
+#include <QLineEdit>
+#include <QCompleter>
+#include <QStringListModel>
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <QDoubleSpinBox>
 #include <QDateEdit>
+#include <QMessageBox>
+#include <QDialogButtonBox>
+
+#include "Colors.h"
 
 
 // NoEditDelegate /////////////////////////////////////////////////////////////////
@@ -49,8 +56,8 @@ NoEditDelegate::createEditor
 // UniqueLabelEditDelegate ////////////////////////////////////////////////////////
 
 UniqueLabelEditDelegate::UniqueLabelEditDelegate
-(int uniqueColumn, QObject *parent)
-: QStyledItemDelegate(parent), uniqueColumn(uniqueColumn)
+(QObject *parent)
+: QStyledItemDelegate(parent)
 {
 }
 
@@ -65,14 +72,95 @@ UniqueLabelEditDelegate::setModelData
     }
     int rowCount = model->rowCount();
     for (int i = 0; i < rowCount; ++i) {
-        if (newData == model->index(i, uniqueColumn).data().toString()) {
+        if (newData == model->index(i, index.column()).data().toString()) {
+            QMessageBox msgBox;
+            msgBox.setText(tr("The given value \"%1\" is not unique").arg(newData));
+            msgBox.setIcon(QMessageBox::Warning);
+            msgBox.exec();
             return;
         }
     }
-    QModelIndex modifiedIndex = model->sibling(index.row(), model->columnCount() - 1, index);
-
     model->setData(index, newData, Qt::EditRole);
-    model->setData(modifiedIndex, true, Qt::EditRole);
+}
+
+
+// CompleterEditDelegate //////////////////////////////////////////////////////////
+
+CompleterEditDelegate::CompleterEditDelegate
+(QObject *parent)
+: QStyledItemDelegate(parent)
+{
+}
+
+
+void
+CompleterEditDelegate::setDataSource
+(DataSource source)
+{
+    this->source = source;
+}
+
+
+void
+CompleterEditDelegate::setCompletionList
+(const QStringList &list)
+{
+    completionList = list;
+}
+
+
+QWidget*
+CompleterEditDelegate::createEditor
+(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    Q_UNUSED(option)
+    Q_UNUSED(index)
+
+    QLineEdit *editor = new QLineEdit(parent);
+    QStringListModel *completionModel = new QStringListModel();
+    QCompleter *completer = new QCompleter(completionModel);
+    completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
+    completer->setWrapAround(true);
+    completer->setFilterMode(Qt::MatchContains);
+    completer->setModelSorting(QCompleter::UnsortedModel);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    editor->setCompleter(completer);
+
+    return editor;
+}
+
+
+void
+CompleterEditDelegate::setEditorData
+(QWidget *editor, const QModelIndex &index) const
+{
+    QLineEdit *lineEdit = static_cast<QLineEdit*>(editor);
+    lineEdit->setText(index.data(Qt::DisplayRole).toString());
+    if (lineEdit->completer() != nullptr) {
+        QStringListModel *completionModel = static_cast<QStringListModel*>(lineEdit->completer()->model());
+        if (source == Column) {
+            QSet<QString> items;
+            int rowCount = index.model()->rowCount();
+            for (int i = 0; i < rowCount; ++i) {
+                items.insert(index.model()->index(i, index.column()).data().toString());
+            }
+            completionModel->setStringList(items.values());
+        } else {
+            completionModel->setStringList(completionList);
+        }
+    }
+}
+
+
+void
+CompleterEditDelegate::setModelData
+(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+    QLineEdit *lineEdit = static_cast<QLineEdit*>(editor);
+    QString newValue = lineEdit->text();
+    if (model->data(index, Qt::DisplayRole).toString() != newValue) {
+        model->setData(index, newValue, Qt::DisplayRole);
+    }
 }
 
 
@@ -374,6 +462,271 @@ DirectoryPathDelegate::commitAndCloseEditor
 }
 
 
+
+// ListEditWidget //////////////////////////////////////////////////////////////////////
+
+ListEditWidget::ListEditWidget
+(QWidget *parent)
+: QWidget(parent)
+{
+    dialog = new QDialog(this);
+    dialog->setModal(true);
+
+    title = new QLabel();
+    title->setWordWrap(true);
+    title->setVisible(false);
+
+    listWidget = new QListWidget();
+    listWidget->setEditTriggers(  QAbstractItemView::DoubleClicked
+                                | QAbstractItemView::SelectedClicked
+                                | QAbstractItemView::AnyKeyPressed);
+    listWidget->setAlternatingRowColors(true);
+    listWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    actionButtons = new ActionButtonBox(ActionButtonBox::UpDownGroup | ActionButtonBox::AddDeleteGroup);
+    actionButtons->defaultConnect(ActionButtonBox::UpDownGroup, listWidget);
+    actionButtons->defaultConnect(ActionButtonBox::AddDeleteGroup, listWidget);
+
+    QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+
+    QVBoxLayout *dialogLayout = new QVBoxLayout(dialog);
+    dialogLayout->addWidget(title);
+    dialogLayout->addWidget(listWidget);
+    dialogLayout->addWidget(actionButtons);
+    dialogLayout->addSpacing(10 * dpiYFactor);
+    dialogLayout->addWidget(buttons);
+
+    connect(listWidget, &QListWidget::itemChanged, this, &ListEditWidget::itemChanged);
+    connect(actionButtons, &ActionButtonBox::upRequested, this, &ListEditWidget::moveUp);
+    connect(actionButtons, &ActionButtonBox::downRequested, this, &ListEditWidget::moveDown);
+    connect(actionButtons, &ActionButtonBox::addRequested, this, &ListEditWidget::addItem);
+    connect(actionButtons, &ActionButtonBox::deleteRequested, this, &ListEditWidget::deleteItem);
+    connect(buttons, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
+    connect(buttons, &QDialogButtonBox::rejected, dialog, &QDialog::reject);
+    connect(dialog, &QDialog::finished, this, &ListEditWidget::dialogFinished);
+}
+
+
+void
+ListEditWidget::setTitle
+(const QString &text)
+{
+    if (text.trimmed().size() > 0) {
+        title->setText(text);
+        title->setVisible(true);
+    } else {
+        title->setVisible(false);
+    }
+}
+
+
+void
+ListEditWidget::setList
+(const QStringList &list)
+{
+    data = list;
+    listWidget->clear();
+    for (const QString &entry : list) {
+        QListWidgetItem *add = new QListWidgetItem(entry, listWidget);
+        add->setFlags(add->flags() | Qt::ItemIsEditable);
+    }
+    listWidget->setCurrentRow(0);
+}
+
+
+QStringList
+ListEditWidget::getList
+() const
+{
+    return data;
+}
+
+
+void
+ListEditWidget::showDialog
+()
+{
+    dialog->show();
+}
+
+
+void
+ListEditWidget::itemChanged
+(QListWidgetItem *item)
+{
+    if (item->data(Qt::DisplayRole).toString().trimmed().isEmpty()) {
+        delete item;
+    }
+}
+
+
+void
+ListEditWidget::dialogFinished
+(int result)
+{
+    if (result == QDialog::Accepted) {
+        data.clear();
+        for (int i = 0; i < listWidget->count(); ++i) {
+            data << listWidget->item(i)->data(Qt::DisplayRole).toString().trimmed();
+        }
+    }
+    emit editingFinished();
+}
+
+
+void
+ListEditWidget::moveDown
+()
+{
+    if (listWidget->currentItem()) {
+        int index = listWidget->row(listWidget->currentItem());
+        if (index > listWidget->count() - 1) {
+            return;
+        }
+        QListWidgetItem *moved = listWidget->takeItem(index);
+        listWidget->insertItem(index + 1, moved);
+        listWidget->setCurrentItem(moved);
+    }
+}
+
+
+void
+ListEditWidget::moveUp
+()
+{
+    if (listWidget->currentItem()) {
+        int index = listWidget->row(listWidget->currentItem());
+        if (index == 0) {
+            return;
+        }
+        QListWidgetItem *moved = listWidget->takeItem(index);
+        listWidget->insertItem(index - 1, moved);
+        listWidget->setCurrentItem(moved);
+    }
+}
+
+
+void
+ListEditWidget::addItem
+()
+{
+    int index = listWidget->count();
+    if (listWidget->currentItem() != nullptr) {
+        index = listWidget->row(listWidget->currentItem());
+    }
+    if (index < 0) {
+        index = 0;
+    }
+    QListWidgetItem *add = new QListWidgetItem();
+    add->setFlags(add->flags() | Qt::ItemIsEditable);
+    listWidget->insertItem(index, add);
+    QString text = tr("New");
+    for (int i = 0; listWidget->findItems(text, Qt::MatchExactly).count() > 0; ++i) {
+        text = tr("New (%1)").arg(i + 1);
+    }
+    add->setData(Qt::DisplayRole, text);
+    listWidget->setCurrentItem(add);
+    listWidget->editItem(add);
+}
+
+
+void
+ListEditWidget::deleteItem
+()
+{
+    if (listWidget->currentItem() != nullptr) {
+        delete listWidget->currentItem();
+    }
+}
+
+
+
+// ListEditDelegate ////////////////////////////////////////////////////////////////////
+
+ListEditDelegate::ListEditDelegate
+(QObject *parent)
+: QStyledItemDelegate(parent)
+{
+}
+
+
+void
+ListEditDelegate::setTitle
+(const QString &title)
+{
+    this->title = title;
+}
+
+
+void
+ListEditDelegate::setDisplayLength
+(int limit, int reduce)
+{
+    this->limit = limit;
+    this->reduce = reduce;
+}
+
+
+QWidget*
+ListEditDelegate::createEditor
+(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    Q_UNUSED(option)
+    Q_UNUSED(index)
+
+    ListEditWidget *editor = new ListEditWidget(parent);
+    editor->setTitle(title);
+    connect(editor, &ListEditWidget::editingFinished, this, &ListEditDelegate::commitAndCloseEditor);
+    editor->showDialog();
+
+    return editor;
+}
+
+
+void
+ListEditDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+{
+    ListEditWidget *listEditor = static_cast<ListEditWidget*>(editor);
+    listEditor->setList(index.data(Qt::DisplayRole).toString().split(','));
+}
+
+
+void
+ListEditDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+    ListEditWidget *listEditor = static_cast<ListEditWidget*>(editor);
+    QString newValue = listEditor->getList().join(',');
+    if (model->data(index, Qt::EditRole).toString() != newValue) {
+        model->setData(index, newValue, Qt::EditRole);
+    }
+}
+
+
+QString
+ListEditDelegate::displayText(const QVariant &value, const QLocale &locale) const
+{
+    Q_UNUSED(locale)
+
+    QString text = value.toString();
+    if (limit > 0 && text.size() > limit) {
+        text.truncate(limit - reduce);
+        text += "...";
+    }
+    return text;
+}
+
+
+void
+ListEditDelegate::commitAndCloseEditor
+()
+{
+    ListEditWidget *editor = qobject_cast<ListEditWidget*>(sender());
+    emit commitData(editor);
+    emit closeEditor(editor);
+}
+
+
+
 // SpinBoxEditDelegate ////////////////////////////////////////////////////////////
 
 SpinBoxEditDelegate::SpinBoxEditDelegate
@@ -662,6 +1015,13 @@ DoubleSpinBoxEditDelegate::displayText
     Q_UNUSED(locale)
 
     QString ret = QString::number(value.toDouble(), 'f', prec);
+    // There doesn't seem to be a built in way to prevent trailing zeros when converting floats to QString
+    while (ret.back() == '0') {
+        ret.chop(1);
+    }
+    if (ret.back() == '.') {
+        ret.chop(1);
+    }
     if (showSuffixOnDisplay && ! suffix.isEmpty()) {
         ret += " " + suffix;
     }

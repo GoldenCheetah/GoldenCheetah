@@ -21,6 +21,7 @@
 #include "Units.h"
 #include "Settings.h"
 #include "Units.h"
+#include "Colors.h"
 #include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
@@ -34,7 +35,6 @@ class FixDeriveDistanceConfig : public DataProcessorConfig
 
     friend class ::FixDeriveDistance;
     protected:
-        QHBoxLayout *layout;
         QCheckBox *useCubicSplines;
 
     public:
@@ -43,16 +43,13 @@ class FixDeriveDistanceConfig : public DataProcessorConfig
             HelpWhatsThis *help = new HelpWhatsThis(parent);
             parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_EstimateDistanceValues));
 
-            layout = new QHBoxLayout(this);
-
-            useCubicSplines = new QCheckBox(tr("Use Cubic Splines"), this);
-            useCubicSplines->setCheckState(Qt::Unchecked);
-            layout->addWidget(useCubicSplines);
-
+            QFormLayout *layout = newQFormLayout(this);
             layout->setContentsMargins(0,0,0,0);
             setContentsMargins(0,0,0,0);
 
-            layout->addStretch();
+            useCubicSplines = new QCheckBox(tr("Use Cubic Splines"));
+            useCubicSplines->setCheckState(Qt::Unchecked);
+            layout->addRow("", useCubicSplines);
         }
 
         //~FixDeriveDistanceConfig() {} // deliberately not declared since Qt will delete
@@ -65,16 +62,6 @@ class FixDeriveDistanceConfig : public DataProcessorConfig
         void saveConfig() {
             appsettings->setValue(GC_DPDD_UCS, useCubicSplines->checkState());
         }
-
-        QString explain() {
-            return(QString(tr("Derive distance based on "
-                              "ridefile's GPS locations\n\n"
-                              "This process will populate distance information (and override existing distance information if present.)"
-                              "The cubic splines processing estimates distance across polynomial curve, "
-                              "otherwise this feature will compute geometric arc distance between ride points."
-                              "\n\n")));
-        }
-
 };
 
 
@@ -88,21 +75,38 @@ class FixDeriveDistance : public DataProcessor {
         ~FixDeriveDistance() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op) override;
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) const override {
             Q_UNUSED(ride);
             return new FixDeriveDistanceConfig(parent);
         }
 
         // Localized Name
-        QString name() {
-            return (tr("Estimate Distance Values"));
+        QString name() const override {
+            return tr("Estimate Distance Values");
+        }
+
+        QString id() const override {
+            return "::FixDeriveDistance";
+        }
+
+        QString legacyId() const override {
+            return "Estimate Distance Values";
+        }
+
+        QString explain() const override {
+            return tr("Derive distance based on "
+                      "ridefile's GPS locations\n\n"
+                      "This process will populate distance information (and override existing distance information if present.)"
+                      "The cubic splines processing estimates distance across polynomial curve, "
+                      "otherwise this feature will compute geometric arc distance between ride points."
+                      "\n\n");
         }
 };
 
-static bool FixDeriveDistanceAdded = DataProcessorFactory::instance().registerProcessor(QString("Estimate Distance Values"), new FixDeriveDistance());
+static bool FixDeriveDistanceAdded = DataProcessorFactory::instance().registerProcessor(new FixDeriveDistance());
 
 double _deg2rad(double deg) {
   return (deg * M_PI / 180);

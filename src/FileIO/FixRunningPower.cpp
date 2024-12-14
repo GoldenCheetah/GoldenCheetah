@@ -20,6 +20,7 @@
 #include "DataProcessor.h"
 #include "Settings.h"
 #include "Units.h"
+#include "Colors.h"
 #include "HelpWhatsThis.h"
 #include "LocationInterpolation.h"
 #include <algorithm>
@@ -37,16 +38,9 @@ class FixRunningPowerConfig : public DataProcessorConfig
 
     friend class ::FixRunningPower;
     protected:
-        QVBoxLayout *layoutV;
-        QHBoxLayout *layout;
-        QHBoxLayout *windLayout;
-        QLabel *equipWeightLabel;
         QDoubleSpinBox *equipWeight;
-        QLabel *draftMLabel;
         QDoubleSpinBox *draftM;
-        QLabel *windSpeedLabel;
         QDoubleSpinBox *windSpeed;
-        QLabel *windHeadingLabel;
         QDoubleSpinBox *windHeading;
 
     public:
@@ -55,21 +49,16 @@ class FixRunningPowerConfig : public DataProcessorConfig
             HelpWhatsThis *help = new HelpWhatsThis(parent);
             parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_EstimatePowerValues));
 
-            layout = new QHBoxLayout(this);
-
+            QFormLayout *layout = newQFormLayout(this);
             layout->setContentsMargins(0,0,0,0);
             setContentsMargins(0,0,0,0);
-
-            equipWeightLabel = new QLabel(tr("Equipment Weight (kg)"));
-            draftMLabel = new QLabel(tr("Draft mult."));
-            windSpeedLabel = new QLabel(tr("Wind (kph)"));
-            windHeadingLabel = new QLabel(tr(", direction"));
 
             equipWeight = new QDoubleSpinBox();
             equipWeight->setMaximum(9.9);
             equipWeight->setMinimum(0);
             equipWeight->setSingleStep(0.1);
             equipWeight->setDecimals(1);
+            equipWeight->setSuffix(" " + tr("kg"));
 
             draftM = new QDoubleSpinBox();
             draftM->setMaximum(1.0);
@@ -82,47 +71,23 @@ class FixRunningPowerConfig : public DataProcessorConfig
             windSpeed->setMinimum(0);
             windSpeed->setSingleStep(0.1);
             windSpeed->setDecimals(1);
+            windSpeed->setSuffix(" " + tr("km/h"));
 
             windHeading = new QDoubleSpinBox();
             windHeading->setMaximum(180.0);
             windHeading->setMinimum(-179.0);
             windHeading->setSingleStep(1);
             windHeading->setDecimals(0);
+            windHeading->setSuffix(" " + tr("°"));
 
-            layout->addWidget(equipWeightLabel);
-            layout->addWidget(equipWeight);
-            layout->addWidget(draftMLabel);
-            layout->addWidget(draftM);
-            layout->addWidget(windSpeedLabel);
-            layout->addWidget(windSpeed);
-            layout->addWidget(windHeadingLabel);
-            layout->addWidget(windHeading);
-
-            layout->addStretch();
-
+            layout->addRow(tr("Equipment Weight"), equipWeight);
+            layout->addRow(tr("Draft Mult."), draftM);
+            layout->addRow(tr("Wind Speed"), windSpeed);
+            layout->addRow(tr("Wind Direction"), windHeading);
         }
 
         //~FixRunningPowerConfig() {} // deliberately not declared since Qt will delete
                               // the widget and its children when the config pane is deleted
-
-        QString explain() {
-            return(QString(tr("Derive estimated running power data based on "
-                              "speed/elevation/weight etc using di Prampero "
-                              "coefficcients\n\n"
-                              "Equipment Weight parameter is added to athlete's"
-                              " weight to compound total mass, it should "
-                              "include apparel, shoes, etc\n\n"
-                              "Draft Mult. parameter is the multiplier "
-                              "to adjust for drafting, 1 is no drafting "
-                              " and 0.7 seems legit for drafting in a group\n\n"
-                              "wind speed shall be indicated in kph\n"
-                              "wind direction (origin) unit is degrees "
-                              "from -179 to +180 (-90=W, 0=N, 90=E, 180=S)\n"
-                              "Note: when the file already contains wind data, "
-                              "it will be overridden if wind speed is set\n\n"
-                              "The activity has to be a Run with Speed and "
-                              "Altitude.")));
-        }
 
         void readConfig() {
             double MEquip = appsettings->value(NULL, GC_DPRP_EQUIPWEIGHT, "0.7").toDouble();
@@ -151,21 +116,48 @@ class FixRunningPower : public DataProcessor {
         ~FixRunningPower() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op) override;
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) const override {
             Q_UNUSED(ride);
             return new FixRunningPowerConfig(parent);
         }
 
         // Localized Name
-        QString name() {
+        QString name() const override {
             return (tr("Estimate Running Power"));
+        }
+
+        QString id() const override {
+            return "::FixRunningPower";
+        }
+
+        QString legacyId() const override {
+            return "Estimate Running Power";
+        }
+
+        QString explain() const override {
+            return tr("Derive estimated running power data based on "
+                      "speed/elevation/weight etc using di Prampero "
+                      "coefficcients\n\n"
+                      "Equipment Weight parameter is added to athlete's"
+                      " weight to compound total mass, it should "
+                      "include apparel, shoes, etc\n\n"
+                      "Draft Mult. parameter is the multiplier "
+                      "to adjust for drafting, 1 is no drafting "
+                      " and 0.7 seems legit for drafting in a group\n\n"
+                      "wind speed shall be indicated in kph\n"
+                      "wind direction (origin) unit is degrees "
+                      "from -179 to +180 (-90=W, 0=N, 90=E, 180=S)\n"
+                      "Note: when the file already contains wind data, "
+                      "it will be overridden if wind speed is set\n\n"
+                      "The activity has to be a Run with Speed and "
+                      "Altitude.");
         }
 };
 
-static bool FixRunningPowerAdded = DataProcessorFactory::instance().registerProcessor(QString("Estimate Running Power"), new FixRunningPower());
+static bool FixRunningPowerAdded = DataProcessorFactory::instance().registerProcessor(new FixRunningPower());
 
 bool
 FixRunningPower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")

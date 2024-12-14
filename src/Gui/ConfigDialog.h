@@ -64,7 +64,7 @@ class AppearanceConfig : public QWidget
 
     public slots:
         qint32 saveClicked();
-    
+
     private:
         QDir home;
         Context *context;
@@ -81,7 +81,7 @@ class DataConfig : public QWidget
 
     public slots:
         qint32 saveClicked();
-    
+
     private:
         QDir home;
         Context *context;
@@ -99,7 +99,7 @@ class MetricConfig : public QWidget
 
     public slots:
         qint32 saveClicked();
-    
+
     private:
         QDir home;
         Context *context;
@@ -118,7 +118,7 @@ class TrainConfig : public QWidget
 
     public slots:
         qint32 saveClicked();
-    
+
     private:
         QDir home;
         Context *context;
@@ -140,7 +140,7 @@ class IntervalConfig : public QWidget
 
     public slots:
         qint32 saveClicked();
-    
+
     private:
         QDir home;
         Context *context;
@@ -158,11 +158,11 @@ class MeasuresConfig : public QWidget
 
     public slots:
         qint32 saveClicked();
+        void resetClicked();
 
     private:
         QDir home;
         Context *context;
-
         MeasuresConfigPage *measuresPage;
 };
 
@@ -186,9 +186,7 @@ class ConfigDialog : public QMainWindow
         Context *context;
 
         QStackedWidget *pagesWidget;
-        QPushButton *saveButton;
-        QPushButton *closeButton;
-        QPushButton *resetAppearance;
+        QPushButton *reset;
 
         // the config pages
         GeneralConfig *general;

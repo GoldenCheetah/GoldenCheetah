@@ -1246,7 +1246,7 @@ void
 AddVirtualPower::myCreateCustomPowerCurve() {
 
     bool state = this->blockSignals(true);
-    if (state) return;
+    if (state || virtualPowerTableWidget->rowCount() < 2) return;
 
     T_MultiRegressionizer<XYVector<double>> fit(fitEpsilonSpinBox->value(), fitOrderSpinBox->value());
 

@@ -39,26 +39,16 @@ class FixDeriveHeadwindConfig : public DataProcessorConfig
     friend class ::FixDeriveHeadwind;
 
     protected:
-        QHBoxLayout *layout;
 
     public:
         FixDeriveHeadwindConfig(QWidget *parent) : DataProcessorConfig(parent) {
 
             HelpWhatsThis *help = new HelpWhatsThis(parent);
             parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_EstimateHeadwindValues));
-
-            layout = new QHBoxLayout(this);
-
-            layout->setContentsMargins(0,0,0,0);
-            setContentsMargins(0,0,0,0);
         }
 
         //~FixDeriveHeadwindConfig() {} // deliberately not declared since Qt will delete
                               // the widget and its children when the config pane is deleted
-
-        QString explain() {
-            return(QString(tr("Use weather broadcasted data in FIT file to derive Headwind.")));
-        }
 
         void readConfig() { }
         void saveConfig() { }
@@ -72,21 +62,33 @@ class FixDeriveHeadwind : public DataProcessor {
         ~FixDeriveHeadwind() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op) override;
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) const override {
             Q_UNUSED(ride);
             return new FixDeriveHeadwindConfig(parent);
         }
 
         // Localized Name
-        QString name() {
+        QString name() const override {
             return tr("Estimate Headwind Values");
+        }
+
+        QString id() const override {
+            return "::FixDeriveHeadwind";
+        }
+
+        QString legacyId() const override {
+            return "Estimate Headwind Values";
+        }
+
+        QString explain() const override{
+            return tr("Use weather broadcasted data in FIT file to derive Headwind.");
         }
 };
 
-static bool FixDeriveHeadwindAdded = DataProcessorFactory::instance().registerProcessor(QString("Estimate Headwind Values"), new FixDeriveHeadwind());
+static bool FixDeriveHeadwindAdded = DataProcessorFactory::instance().registerProcessor(new FixDeriveHeadwind());
 
 bool
 FixDeriveHeadwind::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")

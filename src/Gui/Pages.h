@@ -51,6 +51,11 @@
 #include "RemoteControl.h"
 #include "Measures.h"
 #include "TagStore.h"
+#include "ActionButtonBox.h"
+#include "StyledItemDelegates.h"
+#ifdef GC_WANT_PYTHON
+#include "FixPyScriptsDialog.h"
+#endif
 
 class QGroupBox;
 class QHBoxLayout;
@@ -72,7 +77,6 @@ class SimBicyclePage;
 class GeneralPage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
 
     public:
         GeneralPage(Context *context);
@@ -86,11 +90,9 @@ class GeneralPage : public QWidget
         void browseAthleteDir();
 #ifdef GC_WANT_PYTHON
         void browsePythonDir();
-        void embedPythonchanged(int);
 #endif
 #ifdef GC_WANT_R
         void browseRDir();
-        void embedRchanged(int);
 #endif
 
     private:
@@ -106,29 +108,23 @@ class GeneralPage : public QWidget
 #endif
 #ifdef GC_WANT_R
         QCheckBox *embedR;
+        QWidget *rDirectorySel;
 #endif
 #ifdef GC_WANT_PYTHON
         QCheckBox *embedPython;
+        QWidget *pythonDirectorySel;
 #endif
         QCheckBox *opendata;
-        QLineEdit *garminHWMarkedit;
-        QLineEdit *hystedit;
+        QSpinBox *garminHWMarkedit;
+        QDoubleSpinBox *hystedit;
         QLineEdit *athleteDirectory;
-        QPushButton *athleteBrowseButton;
 
 #ifdef GC_WANT_PYTHON
-        QPushButton *pythonBrowseButton;
         QLineEdit *pythonDirectory;
-        QLabel *pythonLabel;
 #endif
 #ifdef GC_WANT_R
-        QPushButton *rBrowseButton;
         QLineEdit *rDirectory;
-        QLabel *rLabel;
 #endif
-        QLabel *langLabel;
-        QLabel *warningLabel;
-        QLabel *athleteLabel;
 
         struct {
             int unit;
@@ -140,8 +136,6 @@ class GeneralPage : public QWidget
             bool starthttp;
 #endif
         } b4;
-
-
 };
 
 class deviceModel : public QAbstractTableModel
@@ -182,7 +176,6 @@ class deviceModel : public QAbstractTableModel
 class DevicePage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
 
     public:
         DevicePage(QWidget *parent, Context *context);
@@ -198,54 +191,35 @@ class DevicePage : public QWidget
         Context *context;
 
         QList<DeviceType> devices;
-
-        QPushButton *addButton;
-        QPushButton *delButton;
-
-        QGridLayout *leftLayout;
-        QVBoxLayout *rightLayout;
-
-        QGridLayout *inLayout;
-        QVBoxLayout *mainLayout;
-
         deviceModel *deviceListModel;
 };
 
 class TrainOptionsPage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
 
     public:
         TrainOptionsPage(QWidget *parent, Context *context);
         qint32 saveClicked();
 
-    public slots:
-        void browseWorkoutDir();
-
     private:
         Context     *context;
-        QLabel      *workoutLabel;
-        QLineEdit   *workoutDirectory;
-        QPushButton *workoutBrowseButton;
+        DirectoryPathWidget *workoutDirectory;
         QCheckBox   *useSimulatedSpeed;
         QCheckBox   *useSimulatedHypoxia;
         QCheckBox   *multiCheck;
         QCheckBox   *autoConnect;
-        QLabel      *delayLabel;
         QSpinBox    *startDelay;
         QCheckBox   *autoHide;
         QCheckBox   *lapAlert;
         QCheckBox   *coalesce;
         QCheckBox   *tooltips;
-        QLabel      *telemetryScalingLabel;
         QComboBox   *telemetryScaling;
 };
 
 class RemotePage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
 
     public:
         RemotePage(QWidget *parent, Context *context);
@@ -253,8 +227,10 @@ class RemotePage : public QWidget
 
     private:
         RemoteControl *remote;
-        Context       *context;
-        QTreeWidget   *fields;
+        Context *context;
+        QTreeWidget *fields;
+        NoEditDelegate nativeCmdDelegate;
+        ComboBoxDelegate cmdDelegate;
 };
 
 struct SimBicyclePartEntry
@@ -263,13 +239,13 @@ struct SimBicyclePartEntry
     const char*   m_path;
     double        m_defaultValue;
     double        m_decimalPlaces;
+    const QString m_unit;
     const QString m_tooltip;
 };
 
 class SimBicyclePage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
 
 public:
     SimBicyclePage(QWidget *parent, Context *context);
@@ -286,8 +262,7 @@ public:
     };
 
     enum BicycleStats {
-        StatsLabel = 0,
-        StatsTotalKEMass,
+        StatsTotalKEMass = 0,
         StatsFrontWheelKEMass,
         StatsFrontWheelMass,
         StatsFrontWheelEquivMass,
@@ -309,11 +284,11 @@ public slots:
 private:
     void AddSpecBox(int ePart);
 
-
     Context         *context;
 
-    QLabel          *m_LabelArr  [LastPart];
+    QString         m_LabelTextArr[LastPart];
     QDoubleSpinBox  *m_SpinBoxArr[LastPart];
+    QString         m_StatsTextArr[StatsLastPart];
     QLabel          *m_StatsLabelArr[StatsLastPart];
 };
 
@@ -343,6 +318,9 @@ private:
     TagStore *tagStore;
     QTreeWidget *tw;
     QList<int> deleted;
+
+    UniqueLabelEditDelegate labelEditDelegate;
+    NoEditDelegate numDelegate;
 };
 
 
@@ -350,14 +328,11 @@ private:
 class CustomMetricsPage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
 
     public:
-
-    CustomMetricsPage(QWidget *parent, Context *context);
+        CustomMetricsPage(QWidget *parent, Context *context);
 
     public slots:
-
         void refreshTable();
         qint32 saveClicked();
 
@@ -375,15 +350,12 @@ class CustomMetricsPage : public QWidget
     protected:
         Context *context;
 
-        QPushButton *addButton,
-                    *deleteButton,
-                    *editButton,
 #ifdef GC_HAS_CLOUD_DB
-                    *uploadButton,
-                    *downloadButton,
+        QPushButton *uploadButton;
+        QPushButton *downloadButton;
 #endif
-                    *exportButton,
-                    *importButton;
+        QPushButton *exportButton;
+        QPushButton *importButton;
         QTreeWidget *table;
         QList<UserMetricSettings> metrics;
 
@@ -397,15 +369,11 @@ class CustomMetricsPage : public QWidget
 class FavouriteMetricsPage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
-
         FavouriteMetricsPage(QWidget *parent = NULL);
 
     public slots:
-
         void upClicked();
         void downClicked();
         void leftClicked();
@@ -415,18 +383,13 @@ class FavouriteMetricsPage : public QWidget
         qint32 saveClicked();
 
     protected:
-
         bool changed;
         QListWidget *availList;
         QListWidget *selectedList;
 #ifndef Q_OS_MAC
-        QToolButton *upButton;
-        QToolButton *downButton;
         QToolButton *leftButton;
         QToolButton *rightButton;
 #else
-        QPushButton *upButton;
-        QPushButton *downButton;
         QPushButton *leftButton;
         QPushButton *rightButton;
 #endif
@@ -435,8 +398,6 @@ class FavouriteMetricsPage : public QWidget
 class KeywordsPage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
         KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>);
@@ -447,24 +408,18 @@ class KeywordsPage : public QWidget
         void addClicked();
         void upClicked();
         void downClicked();
-        void renameClicked();
         void deleteClicked();
 
         void pageSelected(); // reset the list of fields when we are selected...
         void colorfieldChanged();
 
     private:
-
         QTreeWidget *keywords;
+        ActionButtonBox *actionButtons;
 
-#ifndef Q_OS_MAC
-        QToolButton *upButton, *downButton;
-#else
-        QPushButton *upButton, *downButton;
-#endif
-        QPushButton *addButton, *renameButton, *deleteButton;
         QLabel *fieldLabel;
         QComboBox *fieldChooser;
+        ListEditDelegate relatedDelegate;
 
         MetadataPage *parent;
 };
@@ -529,13 +484,10 @@ class ColorsPage : public QWidget
 class FieldsPage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
         FieldsPage(QWidget *parent, QList<FieldDefinition>);
         void getDefinitions(QList<FieldDefinition>&);
-        static void addFieldTypes(QComboBox *p);
 
     public slots:
         void addClicked();
@@ -545,52 +497,65 @@ class FieldsPage : public QWidget
         void deleteClicked();
 
     private:
-
         QTreeWidget *fields;
-
-#ifndef Q_OS_MAC
-        QToolButton *upButton, *downButton;
-#else
-        QPushButton *upButton, *downButton;
-#endif
-        QPushButton *addButton, *renameButton, *deleteButton;
+        ActionButtonBox *actionButtons;
+        CompleterEditDelegate tabDelegate;
+        UniqueLabelEditDelegate fieldDelegate;
+        ComboBoxDelegate fieldTypeDelegate;
+        ListEditDelegate valueDelegate;
 };
 
 class ProcessorPage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
-
         ProcessorPage(Context *context);
         qint32 saveClicked();
 
-    public slots:
-
-        //void upClicked();
-        //void downClicked();
+    private slots:
+        void processorSelected(QTreeWidgetItem *selectedItem);
+        void reload();
+        void reload(const QString &selectName);
+        void reload(int selectRow);
+#ifdef GC_WANT_PYTHON
+        void addProcessor();
+        void delProcessor();
+        void editProcessor();
+        void dblClickProcessor(QTreeWidgetItem *item, int col);
+        void toggleCoreProcessors(bool checked);
+#endif
+        void automationChanged(int index);
+        void toggleAutomatedOnly(bool checked);
+        void dataChanged(const QModelIndex &topLeft);
 
     protected:
-
         Context *context;
-        QMap<QString, DataProcessor*> processors;
 
         QTreeWidget *processorTree;
-        //QPushButton *upButton, *downButton;
 
+    private:
+        NoEditDelegate processorDelegate;
+        ComboBoxDelegate automationDelegate;
+        QList<QComboBox*> automationCombos;
+        QList<QCheckBox*> automatedCheckBoxes;
+        QList<DataProcessorConfig*> configs;
+
+#ifdef GC_WANT_PYTHON
+        ActionButtonBox *actionButtons = nullptr;
+        QCheckBox *hideButton = nullptr;
+#endif
+
+        QStackedWidget *settingsStack;
 };
+
 
 class DefaultsPage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
-
-        DefaultsPage(QWidget *parent, QList<DefaultDefinition>);
+        DefaultsPage(MetadataPage *parent, QList<DefaultDefinition>);
         void getDefinitions(QList<DefaultDefinition>&);
 
     public slots:
@@ -600,16 +565,12 @@ class DefaultsPage : public QWidget
         void deleteClicked();
 
     protected:
-
         QTreeWidget *defaults;
+        MetadataPage *parent;
+        CompleterEditDelegate fieldDelegate;
+        CompleterEditDelegate linkedDelegate;
 
-#ifndef Q_OS_MAC
-        QToolButton *upButton, *downButton;
-#else
-        QPushButton *upButton, *downButton;
-#endif
-        QPushButton *addButton, *deleteButton;
-
+        bool eventFilter(QObject *obj, QEvent *event) override;
 };
 
 class MetadataPage : public QWidget
@@ -618,6 +579,7 @@ class MetadataPage : public QWidget
     G_OBJECT
 
     friend class ::KeywordsPage;
+    friend class ::DefaultsPage;
 
     public:
 
@@ -635,8 +597,8 @@ class MetadataPage : public QWidget
         QTabWidget *tabs;
         KeywordsPage *keywordsPage;
         FieldsPage *fieldsPage;
-        ProcessorPage *processorPage;
         DefaultsPage *defaultsPage;
+        ProcessorPage *processorPage;
 
         // local versions for modification
         QList<KeywordDefinition> keywordDefinitions;
@@ -681,7 +643,6 @@ class IntervalsPage : public QWidget
 class MeasuresConfigPage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
 
     public:
         MeasuresConfigPage(QWidget *parent, Context *context);
@@ -689,75 +650,37 @@ class MeasuresConfigPage : public QWidget
         qint32 saveClicked();
 
     public slots:
+        void resetMeasuresClicked();
 
     private:
         Context *context;
         Measures *measures;
 
         QTreeWidget *measuresTable;
-        QTreeWidget *measuresFieldsTable;
+        UniqueLabelEditDelegate meNameDelegate;
+        UniqueLabelEditDelegate meSymbolDelegate;
 
-        QPushButton *resetMeasures, *editMeasures, *addMeasures, *removeMeasures;
-        QPushButton *editMeasuresField, *addMeasuresField, *removeMeasuresField;
+        QLabel *mflabel;
+        QTreeWidget *measuresFieldsTable;
+        UniqueLabelEditDelegate meFiNameDelegate;
+        UniqueLabelEditDelegate meFiSymbolDelegate;
+        DoubleSpinBoxEditDelegate meFiFactorDelegate;
+        ListEditDelegate meFiHeaderDelegate;
 
         void refreshMeasuresTable();
         void refreshMeasuresFieldsTable();
 
     private slots:
         void measuresSelected();
-        void measuresDoubleClicked(QTreeWidgetItem *item, int column);
-        void measuresFieldDoubleClicked(QTreeWidgetItem *item, int column);
+        void measureChanged(const QModelIndex &topLeft);
 
-        void resetMeasuresClicked();
-        void editMeasuresClicked();
         void addMeasuresClicked();
         void removeMeasuresClicked();
 
-        void editMeasuresFieldClicked();
+        void measureFieldChanged(const QModelIndex &topLeft);
         void addMeasuresFieldClicked();
         void removeMeasuresFieldClicked();
 };
 
-class MeasuresSettingsDialog : public QDialog
-{
-    Q_OBJECT
-
-    public:
-        MeasuresSettingsDialog(QWidget *parent, QString &symbol, QString &name);
-
-    private slots:
-        void okClicked();
-
-    private:
-        QString &symbol, &name;
-
-        QLineEdit *symbolEdit;
-        QLineEdit *nameEdit;
-
-        QPushButton *cancelButton, *okButton;
-
-};
-
-class MeasuresFieldSettingsDialog : public QDialog
-{
-    Q_OBJECT
-
-    public:
-        MeasuresFieldSettingsDialog(QWidget *parent, MeasuresField &field);
-
-    private slots:
-        void okClicked();
-
-    private:
-        MeasuresField &field;
-        QLineEdit *symbolEdit;
-        QLineEdit *nameEdit;
-        QLineEdit *metricUnitsEdit;
-        QLineEdit *imperialUnitsEdit;
-        QDoubleSpinBox *unitsFactorEdit;
-        QLineEdit *headersEdit;
-
-        QPushButton *cancelButton, *okButton;
-};
 
 #endif

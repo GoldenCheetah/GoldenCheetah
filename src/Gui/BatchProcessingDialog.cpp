@@ -176,7 +176,9 @@ processed(0), fails(0), numFilesToProcess(0) {
     i.toFront();
     while (i.hasNext()) {
         i.next();
-        dataProcessorToRun->addItem(i.value()->name(), i.key());
+        if (! i.value()->isAutomatedOnly()) {
+            dataProcessorToRun->addItem(i.value()->name(), i.key());
+        }
     }
 
     dpButton = new QPushButton(tr("Edit"), this);
