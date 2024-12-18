@@ -65,6 +65,7 @@ class InfoWidget : public QFrame
         PowerZonesWidget *powerZonesWidget;
         QLabel *descriptionLabel;
         QLabel *lastRunLabel;
+        QLabel *categoryLabel;
         TagBar *tagBar;
         QString filepath;
         WorkoutTagWrapper workoutTagWrapper;

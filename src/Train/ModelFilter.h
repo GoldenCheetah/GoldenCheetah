@@ -52,10 +52,10 @@ public:
     ModelNumberRangeFilter(int modelColumn, long minValue, long maxValue = LONG_MAX);
     virtual ~ModelNumberRangeFilter();
 
-    virtual bool accept(const QVariant &data) const;
+    virtual bool accept(const QVariant &data) const override;
 
 protected:
-    virtual QString toStringSuffix() const;
+    virtual QString toStringSuffix() const override;
 
 private:
     long _minValue;
@@ -69,7 +69,7 @@ public:
     virtual ~ModelNumberEqualFilter();
 
 protected:
-    virtual QString toStringSuffix() const;
+    virtual QString toStringSuffix() const override;
 
 private:
     long _value;
@@ -82,10 +82,10 @@ public:
     ModelFloatRangeFilter(int modelColumn, float minValue, float maxValue = FLT_MAX);
     virtual ~ModelFloatRangeFilter();
 
-    virtual bool accept(const QVariant &data) const;
+    virtual bool accept(const QVariant &data) const override;
 
 protected:
-    virtual QString toStringSuffix() const;
+    virtual QString toStringSuffix() const override;
 
 private:
     float _minValue;
@@ -99,7 +99,7 @@ public:
     virtual ~ModelFloatEqualFilter();
 
 protected:
-    virtual QString toStringSuffix() const;
+    virtual QString toStringSuffix() const override;
 
 private:
     float _value;
@@ -112,10 +112,10 @@ public:
     ModelStringContainsFilter(int modelColumn, QStringList values, bool all = false);
     virtual ~ModelStringContainsFilter();
 
-    virtual bool accept(const QVariant &data) const;
+    virtual bool accept(const QVariant &data) const override;
 
 protected:
-    virtual QString toStringSuffix() const;
+    virtual QString toStringSuffix() const override;
 
 private:
     QStringList _values;

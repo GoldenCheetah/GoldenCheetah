@@ -57,6 +57,76 @@ enum class ErgFilePowerZone {
 };
 
 
+class ErgFilePoint
+{
+    public:
+
+        ErgFilePoint() : x(0), y(0), val(0), lat(0), lon(0) {}
+        ErgFilePoint(double x_, double y_, double val_) : x(x_), y(y_), val(val_), lat(0), lon(0) {}
+        ErgFilePoint(double x_, double y_, double val_, double lat_, double lon_) : x(x_), y(y_), val(val_), lat(lat_), lon(lon_) {}
+
+        double x;     // x axis - time in msecs or distance in meters
+        double y;     // y axis - load in watts or altitude
+
+        double val;   // the value to send to the device (watts/gradient)
+
+        double lat, lon; // location (alt is y, above)
+};
+
+
+class ErgFileSection
+{
+    public:
+        ErgFileSection() : duration(0), start(0), end(0) {}
+        ErgFileSection(int duration, int start, int end) : duration(duration), start(start), end(end) {}
+
+        int duration;
+        double start, end;
+};
+
+
+class ErgFileZoneSection
+: public ErgFileSection
+{
+    public:
+        ErgFileZoneSection() : ErgFileSection(), startValue(0), endValue(0), zone(0) {}
+        ErgFileZoneSection(int startMSecs, int startValue, int endMSecs, int endValue, int zone)
+         : ErgFileSection(endMSecs - startMSecs, startMSecs, endMSecs), startValue(startValue), endValue(endValue), zone(zone)
+        {}
+
+        int startValue;
+        int endValue;
+        int zone;
+};
+
+
+class ErgFileText
+{
+    public:
+        ErgFileText() : x(0), duration(0), text("") {}
+        ErgFileText(double x, int duration, const QString &text) : x(x), duration(duration), text(text) {}
+
+        double x;
+        int duration;
+        QString text;
+};
+
+
+class ErgFileLap
+{
+    public:
+        ErgFileLap() : name(""), x(0), LapNum(0), lapRangeId(0), selected(false) {}
+        ErgFileLap(double x, int LapNum, const QString& name) : name(name), x(x), LapNum(LapNum), lapRangeId(0), selected(false) {}
+        ErgFileLap(double x, int LapNum, int lapRangeId, const QString& name) : name(name), x(x), LapNum(LapNum), lapRangeId(lapRangeId), selected(false) {}
+
+        QString name;
+        double x;      // when does this LAP marker occur? (time in msecs or distance in meters
+        int LapNum;    // from 1 - n
+        int lapRangeId;// for grouping lap markers into ranges. Value of zero is considered 'ungrouped'.
+        bool selected; // used by the editor
+};
+
+
 class ErgFileBase
 {
     public:
@@ -106,6 +176,14 @@ class ErgFileBase
         QStringList tags() const;
         void tags(QStringList tags);
 
+        QString category() const;
+        void category(QString category);
+
+        QString subcategory() const;
+        void subcategory(QString subcategory);
+
+        int categoryIndex() const;
+        void categoryIndex(int categoryIndex);
 
         long duration() const;
         void duration(long duration);
@@ -201,41 +279,44 @@ class ErgFileBase
         QString _Version;        // version number / identifer
 
         QString _Units;          // units used
-        QString _originalFilename;       // filename from inside file
+        QString _originalFilename; // filename from inside file
         QString _filename;       // filename on disk
         QString _Name;           // description in file
         QString _Description;    // long narrative for workout
         QString _TrainerDayId;   // if downloaded from TrainerDay
         QString _Source;         // where did this come from
         QStringList _Tags;       // tagged strings
+        QString _Category;
+        QString _Subcategory;
+        int _CategoryIndex = -1;
 
-        long _Duration;          // Duration of this workout in msecs
-        int _Ftp;                // FTP this file was targetted at
-        int _MinWatts;           // minWatts in this ergfile (scaling)
-        int _MaxWatts;           // maxWatts in this ergfile (scaling)
-        ErgFileFormat _mode;
-        bool _StrictGradient; // should gradient be strict or smoothed?
-        bool _fHasGPS;        // has Lat/Lon?
+        long _Duration = 0;      // Duration of this workout in msecs
+        int _Ftp = 0;            // FTP this file was targetted at
+        int _MinWatts = 0;       // minWatts in this ergfile (scaling)
+        int _MaxWatts = 0;       // maxWatts in this ergfile (scaling)
+        ErgFileFormat _mode = ErgFileFormat::unknown;
+        bool _StrictGradient = false; // should gradient be strict or smoothed?
+        bool _fHasGPS = false;   // has Lat/Lon?
 
         // Metrics for this workout
-        double _minY;
-        double _maxY;             // minimum and maximum Y value
-        double _CP;
-        double _AP;
-        double _IsoPower;
-        double _IF;
-        double _BikeStress;
-        double _VI; // Coggan for erg / mrc
-        double _XP;
-        double _RI;
-        double _BS;
-        double _SVI;        // Skiba for erg / mrc
-        double _ele;
-        double _eleDist;
-        double _grade;    // crs
-        double _powerZonesPC[11];    // mrc
-        ErgFilePowerZone _dominantZone;
-        int _numZones;
+        double _minY = 0;
+        double _maxY = 0;        // minimum and maximum Y value
+        double _CP = 0;
+        double _AP = 0;
+        double _IsoPower = 0;
+        double _IF = 0;
+        double _BikeStress = 0;
+        double _VI = 0;          // Coggan for erg / mrc
+        double _XP = 0;
+        double _RI = 0;
+        double _BS = 0;
+        double _SVI = 0;         // Skiba for erg / mrc
+        double _ele = 0;
+        double _eleDist = 0;
+        double _grade = 0;       // crs
+        double _powerZonesPC[11] = {}; // mrc
+        ErgFilePowerZone _dominantZone = ErgFilePowerZone::unknown;
+        int _numZones = 0;
 };
 
 #endif

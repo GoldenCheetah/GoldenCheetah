@@ -62,10 +62,10 @@ extern QString workoutModelErrorMsg;
 %token RANGESYMBOL
 %token SEPARATOR
 %token <floatValue> FLOAT
-%token <numValue> NUMBER ZONE PERCENT DAYS TIME MINPOWER MAXPOWER AVGPOWER ISOPOWER POWER LASTRUN CREATED DISTANCE ELEVATION GRADE
+%token <numValue> NUMBER ZONE PERCENT DAYS TIME MINPOWER MAXPOWER AVGPOWER ISOPOWER POWER LASTRUN CREATED DISTANCE ELEVATION GRADE CATEGORY SUBCATEGORY CATEGORYINDEX
 %token <word> WORD
 
-%type <filter> zone dominantzone duration stress intensity vi xpower ri bikescore svi rating minpower maxpower avgpower isopower lastrun created distance elevation grade
+%type <filter> zone dominantzone duration stress intensity vi xpower ri bikescore svi rating minpower maxpower avgpower isopower lastrun created distance elevation grade category subcategory categoryindex
 %type <filterPair> power
 %type <wordList> word words
 %type <floatValue> mixedNumValue
@@ -98,6 +98,9 @@ statement:  dominantzone  { workoutModelFilters << $1; }
     |       distance      { workoutModelFilters << $1; }
     |       elevation     { workoutModelFilters << $1; }
     |       grade         { workoutModelFilters << $1; }
+    |       category      { workoutModelFilters << $1; }
+    |       subcategory   { workoutModelFilters << $1; }
+    |       categoryindex { workoutModelFilters << $1; }
     |       words         { workoutModelFilters << new ModelStringContainsFilter(TdbWorkoutModelIdx::fulltext, *$1); }
     ;
 
@@ -234,6 +237,18 @@ grade: GRADE PERCENT                      { $$ = new ModelNumberEqualFilter(TdbW
     |  GRADE PERCENT RANGESYMBOL PERCENT  { $$ = new ModelNumberRangeFilter(TdbWorkoutModelIdx::avgGrade, $2, $4); }
     |  GRADE RANGESYMBOL PERCENT          { $$ = new ModelNumberRangeFilter(TdbWorkoutModelIdx::avgGrade, 0, $3); }
     |  GRADE PERCENT RANGESYMBOL          { $$ = new ModelNumberRangeFilter(TdbWorkoutModelIdx::avgGrade, $2); }
+    ;
+
+category: CATEGORY words  { $$ = new ModelStringContainsFilter(TdbWorkoutModelIdx::category, *$2); }
+    ;
+
+subcategory: SUBCATEGORY words  { $$ = new ModelStringContainsFilter(TdbWorkoutModelIdx::subcategory, *$2); }
+    ;
+
+categoryindex: CATEGORYINDEX NUMBER                     { $$ = new ModelNumberEqualFilter(TdbWorkoutModelIdx::categoryIndex, $2); }
+    |          CATEGORYINDEX NUMBER RANGESYMBOL NUMBER  { $$ = new ModelNumberRangeFilter(TdbWorkoutModelIdx::categoryIndex, $2, $4); }
+    |          CATEGORYINDEX RANGESYMBOL NUMBER         { $$ = new ModelNumberRangeFilter(TdbWorkoutModelIdx::categoryIndex, 1, $3); }
+    |          CATEGORYINDEX NUMBER RANGESYMBOL         { $$ = new ModelNumberRangeFilter(TdbWorkoutModelIdx::categoryIndex, $2); }
     ;
 
 words: word words  { *$1 << *$2; delete $2; $$ = $1; }

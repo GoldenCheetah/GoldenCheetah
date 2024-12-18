@@ -18,23 +18,16 @@
 
 #ifndef _zwoparser_h
 #define _zwoparser_h
-#include "GoldenCheetah.h"
 
-#include <QXmlDefaultHandler>
-#include "ErgFile.h"
+#include <QXmlStreamReader>
+#include <QFile>
 
-class ZwoParser : public QXmlDefaultHandler
+#include "ErgFileBase.h"
+
+class ZwoParser
 {
-
 public:
-
-    // unmarshall
-    bool startDocument();
-    bool endDocument();
-    bool endElement( const QString&, const QString&, const QString &qName );
-    bool startElement( const QString&, const QString&, const QString &name, const QXmlAttributes &attrs );
-    bool characters( const QString& str );
-
+    bool parseFile(QFile *file);
 
     QString buffer;
     int secs;  // rolling secs as points read
@@ -50,6 +43,7 @@ public:
     // category
     int categoryIndex;          // <categoryIndex>
     QString category;           // <category>
+    QString subcategory;        // <subcategory>
 
     // all the points - as a percentage of FTP, not scaled
     //                  so range from 0.00 - 1.00
@@ -58,5 +52,12 @@ public:
     // texts
     QList<ErgFileText> texts;
 
+private:
+    bool parseWorkoutFile(QXmlStreamReader &reader);
+    bool parseTags(QXmlStreamReader &reader);
+    bool parseWorkout(QXmlStreamReader &reader);
+
+    void resetData();
 };
+
 #endif //ZwoParser

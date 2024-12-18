@@ -36,6 +36,9 @@ namespace TdbWorkoutModelIdx {
         sortdummy,
         fulltext,
         description,
+        category,
+        subcategory,
+        categoryIndex,
         filepath,
         type,
         created,
@@ -130,7 +133,7 @@ class TrainDB : public QObject, public TagStore
 
         // check the db structure is up to date
         void checkDBVersion() const;
-        bool needsUpgrade() const;
+        std::pair<bool, int> needsUpgrade() const;
 
         // get schema version
         int getDBVersion() const;
@@ -144,7 +147,7 @@ class TrainDB : public QObject, public TagStore
         QAbstractTableModel *getVideoSyncModel() const;
 
 
-        bool importWorkout(QString filepath, const ErgFileBase &ergFileBase, ImportMode importMode = ImportMode::insert) const;
+        bool importWorkout(QString filepath, const ErgFileBase &ergFileBase, ImportMode importMode = ImportMode::insert);
         bool hasWorkout(QString filepath) const;
         bool deleteWorkout(QString filepath) const;
         bool rateWorkout(QString filepath, int rating);
@@ -164,24 +167,24 @@ class TrainDB : public QObject, public TagStore
         virtual QStringList getWorkouts() const;
 
         // Implementation of TagStore
-        virtual void deferTagSignals(bool deferred);
-        virtual bool isDeferredTagSignals();
-        virtual void catchupTagSignals();
-        virtual int addTag(const QString &label);
-        virtual bool updateTag(int id, const QString &label);
-        virtual bool deleteTag(int id);
-        virtual bool deleteTag(const QString &label);
-        virtual int getTagId(const QString &label) const;
-        virtual QString getTagLabel(int id) const;
-        virtual bool hasTag(int id) const;
-        virtual bool hasTag(const QString &label) const;
+        virtual void deferTagSignals(bool deferred) override;
+        virtual bool isDeferredTagSignals() const override;
+        virtual void catchupTagSignals() override;
+        virtual int addTag(const QString &label) override;
+        virtual bool updateTag(int id, const QString &label) override;
+        virtual bool deleteTag(int id) override;
+        virtual bool deleteTag(const QString &label) override;
+        virtual int getTagId(const QString &label) const override;
+        virtual QString getTagLabel(int id) const override;
+        virtual bool hasTag(int id) const override;
+        virtual bool hasTag(const QString &label) const override;
 
-        virtual QList<Tag> getTags() const;
-        virtual QList<int> getTagIds() const;
-        virtual QStringList getTagLabels() const;
-        virtual QStringList getTagLabels(const QList<int> ids) const;
+        virtual QList<Tag> getTags() const override;
+        virtual QList<int> getTagIds() const override;
+        virtual QStringList getTagLabels() const override;
+        virtual QStringList getTagLabels(const QList<int> ids) const override;
 
-        virtual int countTagUsage(int id) const;
+        virtual int countTagUsage(int id) const override;
 
         // Helpers for Taggable
         bool workoutHasTag(const QString &filepath, int id) const;
@@ -193,6 +196,8 @@ class TrainDB : public QObject, public TagStore
         // for 3.3
         // TODO Upgrade-Functions come last - after everything else is running
         bool upgradeDefaultEntriesWorkout();
+
+        bool upgradeSchemaTo3() const;
 
         // drop and recreate tables
         void rebuildDB() const;
@@ -218,11 +223,14 @@ class TrainDB : public QObject, public TagStore
         QList<int> deferredTagsAdded;
         QList<int> deferredTagsDeleted;
         QList<int> deferredTagsUpdated;
+        int startupVersion = -1;
 
         // get connection name
         QSqlDatabase connection() const;
 
         void initDatabase();
+
+        bool importWorkoutNoTags(QString filepath, const ErgFileBase &ergFileBase, ImportMode importMode = ImportMode::insert) const;
 
         /**
          * create database - does nothing if its already there
@@ -258,11 +266,15 @@ class TrainDB : public QObject, public TagStore
 
         bool bindIfValue(QSqlQuery &query, const QString &placeholder, const QString &value) const;
         bool bindIfValue(QSqlQuery &query, const QString &placeholder, double value) const;
-        bool bindIfValue(QSqlQuery &query, const QString &placeholder, qlonglong value) const;
-        bool bindIfValue(QSqlQuery &query, const QString &placeholder, int value) const;
+        bool bindIfValue(QSqlQuery &query, const QString &placeholder, qlonglong value, qlonglong nullValue = 0) const;
+        bool bindIfValue(QSqlQuery &query, const QString &placeholder, int value, int nullValue = 0) const;
         bool bindIfPredecessor(QSqlQuery &query, const QString &placeholder, double value, bool predecessor) const;
 
         void bindWorkout(QSqlQuery &query, const QString &filepath, const ErgFileBase &ergFileBase) const;
+
+        // Helpers for DB-upgrade
+        bool renameTable(const QString &from, const QString &to) const;
+        bool copyData(const QString &from, const QString &to, const QString &fields) const;
 };
 
 extern TrainDB *trainDB;

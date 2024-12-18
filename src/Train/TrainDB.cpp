@@ -30,6 +30,7 @@
 // Rev Date         Who                What Changed
 // 01  21 Dec 2012  Mark Liversedge    Initial Build
 // 02  21 Feb 2023  Joachim Kohlhammer Schema-Update
+// 03  15 Dec 2024  Joachim Kohlhammer Workout: New columns category, subcategory, categoryIndex
 
 #define TABLE_VERSION "version"
 #define FIELDS_VERSION \
@@ -38,17 +39,30 @@
     "creation_date INTEGER NOT NULL," \
     "PRIMARY KEY(table_name)"
 
+
 #define TABLE_TAGSTORE "tagstore"
 #define FIELDS_TAGSTORE \
     "id INTEGER NOT NULL UNIQUE," \
     "label TEXT NOT NULL," \
     "PRIMARY KEY(id)"
 
+#define FIELDNAMES_TAGSTORE_V2 \
+    "id," \
+    "label"
+#define FIELDNAMES_TAGSTORE_V3 FIELDNAMES_TAGSTORE_V2
+
+
 #define TABLE_WORKOUT_TAG "workout_tag"
 #define FIELDS_WORKOUT_TAG \
     "filepath TEXT NOT NULL," \
     "id INTEGER NOT NULL," \
     "PRIMARY KEY(filepath, id)"
+
+#define FIELDNAMES_WORKOUT_TAG_V2 \
+    "filepath," \
+    "id"
+#define FIELDNAMES_WORKOUT_TAG_V3 FIELDNAMES_WORKOUT_TAG_V2
+
 
 #define TABLE_WORKOUT "workout"
 // if: Intensity Factor
@@ -65,6 +79,9 @@
     "source_id TEXT," \
     "displayname TEXT NOT NULL," \
     "description TEXT," \
+    "category TEXT," \
+    "subcategory TEXT," \
+    "categoryIndex INTEGER," \
     "erg_subtype TEXT," \
     "erg_duration INTEGER," \
     "erg_bikestress REAL," \
@@ -97,12 +114,64 @@
     "last_run INTEGER," \
     "PRIMARY KEY(filepath)"
 
+#define FIELDNAMES_WORKOUT_V2 \
+    "filepath," \
+    "type," \
+    "creation_date," \
+    "source," \
+    "source_id," \
+    "displayname," \
+    "description," \
+    "erg_subtype," \
+    "erg_duration," \
+    "erg_bikestress," \
+    "erg_if," \
+    "erg_iso_power," \
+    "erg_vi," \
+    "erg_xp," \
+    "erg_ri," \
+    "erg_bs," \
+    "erg_svi," \
+    "erg_min_power," \
+    "erg_max_power," \
+    "erg_avg_power," \
+    "erg_dominant_zone," \
+    "erg_num_zones," \
+    "erg_duration_z1," \
+    "erg_duration_z2," \
+    "erg_duration_z3," \
+    "erg_duration_z4," \
+    "erg_duration_z5," \
+    "erg_duration_z6," \
+    "erg_duration_z7," \
+    "erg_duration_z8," \
+    "erg_duration_z9," \
+    "erg_duration_z10," \
+    "slp_distance," \
+    "slp_elevation," \
+    "slp_avg_grade," \
+    "rating," \
+    "last_run"
+#define FIELDNAMES_WORKOUT_V3 FIELDNAMES_WORKOUT_V2 \
+    "," \
+    "category," \
+    "subcategory," \
+    "categoryIndex"
+
+
 #define TABLE_VIDEO "video"
 #define FIELDS_VIDEO \
     "filepath TEXT NOT NULL UNIQUE," \
     "creation_date INTEGER NOT NULL DEFAULT (STRFTIME('%s', 'now'))," \
     "displayname TEXT NOT NULL," \
     "PRIMARY KEY(filepath)"
+
+#define FIELDNAMES_VIDEO_V2 \
+    "filepath," \
+    "creation_date," \
+    "displayname"
+#define FIELDNAMES_VIDEO_V3 FIELDNAMES_VIDEO_V2
+
 
 #define TABLE_VIDEOSYNC "videosync"
 #define FIELDS_VIDEOSYNC \
@@ -112,8 +181,15 @@
     "displayname TEXT NOT NULL," \
     "PRIMARY KEY(filepath)"
 
+#define FIELDNAMES_VIDEOSYNC_V2 \
+    "filepath," \
+    "creation_date," \
+    "source," \
+    "displayname"
+#define FIELDNAMES_VIDEOSYNC_V3 FIELDNAMES_VIDEOSYNC_V2
 
-static int TrainDBSchemaVersion = 2;
+
+static int TrainDBSchemaVersion = 3;
 TrainDB *trainDB;
 
 
@@ -174,6 +250,7 @@ TrainDB::initDatabase
     db->setDatabaseName(home.canonicalPath() + "/trainDB");
 
     if (connection().isOpen()) {
+        startupVersion = getDBVersion();
         createDatabase();
     } else {
         QMessageBox::critical(0,
@@ -228,7 +305,7 @@ TrainDB::deferTagSignals
 
 bool
 TrainDB::isDeferredTagSignals
-()
+() const
 {
     return tagSignalsDeferred;
 }
@@ -587,21 +664,20 @@ QStringList
 TrainDB::getMigrateableWorkoutPaths
 () const
 {
-    int dbver = getDBVersion();
-    int oldver = dbver - 1;
+    QStringList ret;
+    if (startupVersion >= TrainDBSchemaVersion) {
+        return ret;
+    }
 
     QSqlQuery query(connection());
-    QStringList ret;
-
-    switch (oldver) {
+    switch (startupVersion) {
     case 1:
         query.prepare("SELECT filepath FROM workouts WHERE filepath NOT LIKE '//%'");
         break;
     case 2:
-        query.prepare("SELECT filepath FROM workout WHERE source != 'gcdefault' AND type != 'code'");
+        query.prepare("SELECT filepath FROM workout WHERE (source != 'gcdefault' or source is null) and type = 'erg'");
         break;
     default:
-        qInfo() << "TrainDB::getMigrateableWorkoutPaths: Nothing to migrate from DB Version" << dbver;
         return ret;
     }
     if (query.exec()) {
@@ -617,21 +693,21 @@ QStringList
 TrainDB::getMigrateableVideoPaths
 () const
 {
-    int dbver = getDBVersion();
-    int oldver = dbver - 1;
+    QStringList ret;
+    if (startupVersion >= TrainDBSchemaVersion) {
+        return ret;
+    }
 
     QSqlQuery query(connection());
-    QStringList ret;
-
-    switch (oldver) {
+    switch (startupVersion) {
     case 1:
         query.prepare("SELECT filepath FROM videos");
         break;
     case 2:
+    case 3:
         query.prepare("SELECT filepath FROM video");
         break;
     default:
-        qInfo() << "TrainDB::getMigrateableVideoPaths: Nothing to migrate from DB Version" << dbver;
         return ret;
     }
     if (query.exec()) {
@@ -647,21 +723,21 @@ QStringList
 TrainDB::getMigrateableVideoSyncPaths
 () const
 {
-    int dbver = getDBVersion();
-    int oldver = dbver - 1;
+    QStringList ret;
+    if (startupVersion >= TrainDBSchemaVersion) {
+        return ret;
+    }
 
     QSqlQuery query(connection());
-    QStringList ret;
-
-    switch (oldver) {
+    switch (startupVersion) {
     case 1:
         query.prepare("SELECT filepath FROM videosyncs WHERE filepath NOT LIKE '//%'");
         break;
     case 2:
+    case 3:
         query.prepare("SELECT filepath FROM videosync WHERE source != 'gcdefault'");
         break;
     default:
-        qInfo() << "TrainDB::getMigrateableVideoSyncPaths: Nothing to migrate from DB Version" << dbver;
         return ret;
     }
     if (query.exec()) {
@@ -702,55 +778,85 @@ void
 TrainDB::checkDBVersion
 () const
 {
-    QSet<QString> dataTables;
-    dataTables << TABLE_WORKOUT
-               << TABLE_VIDEO
-               << TABLE_VIDEOSYNC
-               << TABLE_TAGSTORE
-               << TABLE_WORKOUT_TAG;
+    QMap<QString, std::pair<QString, QMap<int, QString>>> dataTables = {
+        {TABLE_TAGSTORE,
+         std::make_pair<QString, QMap<int, QString>>(
+            FIELDS_TAGSTORE,
+            {{2, FIELDNAMES_TAGSTORE_V2},
+             {3, FIELDNAMES_TAGSTORE_V3}}
+         )},
+        {TABLE_WORKOUT_TAG,
+         std::make_pair<QString, QMap<int, QString>>(
+            FIELDS_WORKOUT_TAG,
+            {{2, FIELDNAMES_WORKOUT_TAG_V2},
+             {3, FIELDNAMES_WORKOUT_TAG_V3}}
+         )},
+        {TABLE_WORKOUT,
+         std::make_pair<QString, QMap<int, QString>>(
+            FIELDS_WORKOUT,
+            {{2, FIELDNAMES_WORKOUT_V2},
+             {3, FIELDNAMES_WORKOUT_V3}}
+         )},
+        {TABLE_VIDEO,
+         std::make_pair<QString, QMap<int, QString>>(
+            FIELDS_VIDEO,
+            {{2, FIELDNAMES_VIDEO_V2},
+             {3, FIELDNAMES_VIDEO_V3}}
+         )},
+        {TABLE_VIDEOSYNC,
+         std::make_pair<QString, QMap<int, QString>>(
+            FIELDS_VIDEOSYNC,
+            {{2, FIELDNAMES_VIDEOSYNC_V2},
+             {3, FIELDNAMES_VIDEOSYNC_V3}}
+         )}
+    };
 
     // can we get a version number?
-    QSqlQuery query("SELECT table_name, schema_version, creation_date FROM version", connection());
-    if (! query.exec()) {
+    QSqlQuery query(connection());
+    if (! query.exec("SELECT table_name, schema_version, creation_date FROM version")) {
         // we couldn't read the version table properly
         // it must be out of date!!
         dropTable(TABLE_VERSION, false);
         createTable(TABLE_VERSION, FIELDS_VERSION, false);
 
         // wipe away whatever (if anything is there)
-        QSetIterator<QString> i(dataTables);
-        while (i.hasNext()) {
-            dropTable(i.next());
+        for (const QString &tablename : dataTables.keys()) {
+            dropTable(tablename);
         }
         return;
     }
 
-    // ok we checked out ok, so lets adjust db schema to reflect
-    // the current version / crc
-    while (query.next()) {
-        QString tableName = query.value(0).toString();
+    QMap<QString, int> tableVersions;
+    while (query.next()) { // Extra loop to avoid SQLite locked table-error
+        QString tablename = query.value(0).toString();
         int currentVersion = query.value(1).toInt();
-
-        if (currentVersion == TrainDBSchemaVersion && dataTables.contains(tableName)) {
-            dataTables.remove(tableName);
+        if (   currentVersion != TrainDBSchemaVersion
+            && dataTables.contains(tablename)
+            && dataTables.value(tablename).second.contains(currentVersion)) {
+            tableVersions[tablename] = currentVersion;
         }
     }
-    QSetIterator<QString> i(dataTables);
-    while (i.hasNext()) {
-        dropTable(i.next());
+
+    for (const QString &tablename : tableVersions.keys()) {
+        int currentVersion = tableVersions.value(tablename);
+        // Upgrade by copy for schemas that only got new columns
+        QString tmpTablename = QString("%1_v%2").arg(tablename).arg(currentVersion);
+        QString fields = dataTables.value(tablename).second.value(currentVersion);
+        QString createFields = dataTables.value(tablename).first;
+
+           renameTable(tablename, tmpTablename)
+        && createTable(tablename, createFields)
+        && copyData(tmpTablename, tablename, fields)
+        && dropTable(tmpTablename, false);
     }
 }
 
 
-bool
+std::pair<bool, int>
 TrainDB::needsUpgrade
 () const
 {
-    QSqlQuery query("SELECT MIN(schema_version) FROM version", connection());
-    if (query.exec() && query.next()) {
-        return query.value(0).toInt() != 2;
-    }
-    return false;
+    return std::pair<bool, int>(startupVersion < TrainDBSchemaVersion, startupVersion);
 }
 
 
@@ -759,9 +865,8 @@ TrainDB::getCount
 () const
 {
     // how many workouts are there?
-    QSqlQuery query("SELECT COUNT(*) FROM workout", connection());
-
-    if (query.exec() && query.next()) {
+    QSqlQuery query(connection());
+    if (query.exec("SELECT COUNT(*) FROM workout") && query.next()) {
         return query.value(0).toInt();
     }
     return 0;
@@ -791,8 +896,8 @@ TrainDB::getWorkoutModel
 {
     QSqlQuery query(connection());
     query.prepare("SELECT w.displayname, w.type || '_' || UPPER(w.displayname) AS _sortdummy, "
-                  "       w.displayname || ' ' || IFNULL(w.description, '') || ' ' || w.type || ' ' || IFNULL(w.erg_subtype, '') || ' ' || IFNULL(w.source, '') || ' ' || IFNULL(t.tag_labels, '') AS _fulltext, "
-                  "       w.description, w.filepath, w.type, w.creation_date, "
+                  "       w.displayname || ' ' || IFNULL(w.description, '') || ' ' || IFNULL(w.category, '') || ' ' || IFNULL(w.subcategory, '') || ' ' || w.type || ' ' || IFNULL(w.erg_subtype, '') || ' ' || IFNULL(w.source, '') || ' ' || IFNULL(t.tag_labels, '') AS _fulltext, "
+                  "       w.description, w.category, w.subcategory, w.categoryIndex, w.filepath, w.type, w.creation_date, "
                   "       w.erg_duration, "
                   "       w.erg_bikestress, w.erg_if, w.erg_iso_power, w.erg_vi, w.erg_xp, w.erg_ri, w.erg_bs, w.erg_svi, "
                   "       w.erg_min_power, w.erg_max_power, w.erg_avg_power, "
@@ -863,8 +968,8 @@ TrainDB::getDBVersion
     int schema_version = -1;
 
     // can we get a version number?
-    QSqlQuery query("SELECT max(schema_version) FROM version", connection());
-    if (query.exec() && query.first()) {
+    QSqlQuery query(connection());
+    if (query.exec("SELECT max(schema_version) FROM version") && query.first()) {
         schema_version = query.value(0).toInt();
     }
     return schema_version;
@@ -960,7 +1065,7 @@ TrainDB::getWorkoutUserInfo
 
 
 bool
-TrainDB::importWorkout
+TrainDB::importWorkoutNoTags
 (QString filepath, const ErgFileBase &ergFileBase, ImportMode importMode) const
 {
     if (importMode == ImportMode::replace) {
@@ -976,6 +1081,7 @@ TrainDB::importWorkout
         query.prepare("INSERT "
                       "  INTO workout "
                       "       (filepath, type, source, source_id, displayname, description, "
+                      "        category, subcategory, categoryIndex, "
                       "        erg_subtype, erg_duration, erg_bikestress, erg_if, "
                       "        erg_iso_power, erg_vi, erg_xp, erg_ri, erg_bs, erg_svi, "
                       "        erg_min_power, erg_max_power, erg_avg_power, "
@@ -984,6 +1090,7 @@ TrainDB::importWorkout
                       "        erg_duration_z6, erg_duration_z7, erg_duration_z8, erg_duration_z9, erg_duration_z10, "
                       "        slp_distance, slp_elevation, slp_avg_grade) "
                       "VALUES (:filepath, :type, :source, :source_id, :displayname, :description, "
+                      "        :category, :subcategory, :categoryIndex, "
                       "        :erg_subtype, :erg_duration,:erg_bikestress, :erg_if, "
                       "        :erg_iso_power, :erg_vi, :erg_xp, :erg_ri, :erg_bs, :erg_svi, "
                       "        :erg_min_power, :erg_max_power, :erg_avg_power, "
@@ -999,6 +1106,7 @@ TrainDB::importWorkout
             || importMode == ImportMode::update)) {
         query.prepare("UPDATE workout "
                       "   SET type = :type, source = :source, source_id = :source_id, displayname = :displayname, description = :description, "
+                      "       category = :category, subcategory = :subcategory, categoryIndex = :categoryIndex, "
                       "       erg_subtype = :erg_subtype, erg_duration = :erg_duration, erg_bikestress = :erg_bikestress, erg_if = :erg_if, "
                       "       erg_iso_power = :erg_iso_power, erg_vi = :erg_vi, erg_xp = :erg_xp, erg_ri = :erg_ri, erg_bs = :erg_bs, erg_svi = :erg_svi, "
                       "       erg_min_power = :erg_min_power, erg_max_power = :erg_max_power, erg_avg_power = erg_avg_power, "
@@ -1014,6 +1122,28 @@ TrainDB::importWorkout
         ok = query.exec();
     }
 
+    return ok;
+}
+
+
+bool
+TrainDB::importWorkout
+(QString filepath, const ErgFileBase &ergFileBase, ImportMode importMode)
+{
+    bool ok = importWorkoutNoTags(filepath, ergFileBase, importMode);
+    if (ok) {
+        for (const QString &tagLabel : ergFileBase.tags()) {
+            if (! tagLabel.isEmpty()) {
+                int tagId = getTagId(tagLabel);
+                if (tagId == TAGSTORE_UNDEFINED_ID) {
+                    tagId = addTag(tagLabel);
+                }
+                if (hasTag(tagId)) {
+                    workoutAddTag(filepath, tagId);
+                }
+            }
+        }
+    }
     return ok;
 }
 
@@ -1148,12 +1278,12 @@ TrainDB::createDefaultEntriesWorkout
     efb.name(tr("Manual Erg Mode"));
     efb.format(ErgFileFormat::code);
     efb.source("gcdefault");
-    rc &= importWorkout("//1", efb);
+    rc &= importWorkoutNoTags("//1", efb);
 
     efb.name(tr("Manual Slope Mode"));
     efb.format(ErgFileFormat::code);
     efb.source("gcdefault");
-    rc &= importWorkout("//2", efb);
+    rc &= importWorkoutNoTags("//2", efb);
 
     return rc;
 }
@@ -1307,8 +1437,10 @@ TrainDB::dropTable
         ok = queryDelete.exec();
     }
     if (ok) {
-        QSqlQuery queryDrop(QString("DROP TABLE IF EXISTS %1").arg(tableName), connection());
-        ok = queryDrop.exec();
+        QSqlQuery queryDrop(connection());
+        if (! (ok = queryDrop.exec(QString("DROP TABLE IF EXISTS %1").arg(tableName)))) {
+            qDebug() << "TrainDB::dropTable(.) -" << queryDrop.lastError() << "/" << queryDrop.lastQuery();
+        }
     }
     return ok;
 }
@@ -1332,7 +1464,7 @@ TrainDB::createTable
         }
     }
     if (force) {
-        dropTable(tableName);
+        dropTable(tableName, hasVersionEntry);
     }
     if (force || ! hasVersionEntry || (hasVersionEntry && version < TrainDBSchemaVersion)) {
         QSqlQuery query(connection());
@@ -1423,9 +1555,9 @@ TrainDB::bindIfValue
 
 bool
 TrainDB::bindIfValue
-(QSqlQuery &query, const QString &placeholder, qlonglong value) const
+(QSqlQuery &query, const QString &placeholder, qlonglong value, qlonglong nullValue) const
 {
-    if (value == 0) {
+    if (value == nullValue) {
         return false;
     }
     query.bindValue(placeholder, value);
@@ -1435,9 +1567,9 @@ TrainDB::bindIfValue
 
 bool
 TrainDB::bindIfValue
-(QSqlQuery &query, const QString &placeholder, int value) const
+(QSqlQuery &query, const QString &placeholder, int value, int nullValue) const
 {
-    if (value == 0) {
+    if (value == nullValue) {
         return false;
     }
     query.bindValue(placeholder, value);
@@ -1469,6 +1601,9 @@ TrainDB::bindWorkout
         query.bindValue(":displayname", QFileInfo(filepath).baseName());
     }
     bindIfValue(query, ":description", ergFileBase.description());
+    bindIfValue(query, ":category", ergFileBase.category());
+    bindIfValue(query, ":subcategory", ergFileBase.subcategory());
+    bindIfValue(query, ":categoryIndex", ergFileBase.categoryIndex(), -1);
     if (ergFileBase.hasWatts()) {
         bindIfValue(query, ":erg_subtype", ergFileBase.ergSubTypeString());
         bindIfValue(query, ":erg_duration", qlonglong(ergFileBase.duration()));
@@ -1500,4 +1635,23 @@ TrainDB::bindWorkout
         query.bindValue(":slp_elevation", ergFileBase.ele());
         query.bindValue(":slp_avg_grade", ergFileBase.grade());
     }
+}
+
+
+bool
+TrainDB::renameTable
+(const QString &from, const QString &to) const
+{
+    dropTable(to, false);
+    QSqlQuery query(connection());
+    return query.exec(QString("ALTER TABLE %1 RENAME TO %2").arg(from).arg(to));
+}
+
+
+bool
+TrainDB::copyData
+(const QString &from, const QString &to, const QString &fields) const
+{
+    QSqlQuery query(connection());
+    return query.exec(QString("INSERT INTO %1 (%2) SELECT %2 from %3").arg(to).arg(fields).arg(from));
 }

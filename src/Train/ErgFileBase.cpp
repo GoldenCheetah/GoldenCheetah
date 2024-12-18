@@ -23,10 +23,7 @@
 
 
 ErgFileBase::ErgFileBase
-() : _format(ErgFileFormat::unknown), _Version(), _Units(), _originalFilename(), _filename(), _Name(), _Description(), _TrainerDayId(), _Source(), _Tags(), _Duration(0),
-     _Ftp(0), _MinWatts(0), _MaxWatts(0), _mode(ErgFileFormat::unknown), _StrictGradient(false),
-     _fHasGPS(false), _minY(0), _maxY(0), _CP(0), _AP(0), _IsoPower(0), _IF(0), _BikeStress(0), _VI(0), _XP(0), _RI(0), _BS(0), _SVI(0), _ele(0), _eleDist(0),
-     _grade(0), _powerZonesPC{}, _dominantZone(ErgFilePowerZone::unknown), _numZones(0)
+()
 {
 }
 
@@ -302,6 +299,54 @@ ErgFileBase::source
 (QString source)
 {
     _Source = source;
+}
+
+
+QString
+ErgFileBase::category
+() const
+{
+    return _Category;
+}
+
+
+void
+ErgFileBase::category
+(QString category)
+{
+    _Category = category;
+}
+
+
+QString
+ErgFileBase::subcategory
+() const
+{
+    return _Subcategory;
+}
+
+
+void
+ErgFileBase::subcategory
+(QString subcategory)
+{
+    _Subcategory = subcategory;
+}
+
+
+int
+ErgFileBase::categoryIndex
+() const
+{
+    return _CategoryIndex;
+}
+
+
+void
+ErgFileBase::categoryIndex
+(int categoryIndex)
+{
+    _CategoryIndex = categoryIndex;
 }
 
 

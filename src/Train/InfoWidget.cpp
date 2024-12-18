@@ -90,6 +90,11 @@ InfoWidget::InfoWidget
     l->addWidget(descriptionShy, row, 0, 1, -1);
     ++row;
 
+    categoryLabel = new QLabel();
+    categoryLabel->setWordWrap(true);
+    l->addWidget(categoryLabel, row, 0, 1, -1);
+    ++row;
+
     lastRunLabel = new QLabel();
     l->addWidget(lastRunLabel, row, 0, 1, -1);
     ++row;
@@ -169,6 +174,20 @@ InfoWidget::setContent
         descriptionLabel->show();
     } else {
         descriptionLabel->hide();
+    }
+
+    if (! ergFileBase.category().isEmpty()) {
+        QString categoryText = tr("Category") + ": <b>" + ergFileBase.category() + "</b>";
+        if (ergFileBase.categoryIndex() >= 0) {
+            categoryText += QString(" (#<b>%1</b>)").arg(ergFileBase.categoryIndex());
+        }
+        if (! ergFileBase.subcategory().isEmpty()) {
+            categoryText += " / <b>" +  ergFileBase.subcategory() + "</b>";
+        }
+        categoryLabel->setText(categoryText);
+        categoryLabel->show();
+    } else {
+        categoryLabel->hide();
     }
 
     // Hide all individual fields

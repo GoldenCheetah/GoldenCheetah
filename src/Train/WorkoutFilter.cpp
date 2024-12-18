@@ -77,7 +77,10 @@ workoutFilterCommands
                    << "created"
                    << "distance"
                    << "elevation"
-                   << "grade";
+                   << "grade"
+                   << "category"
+                   << "subcategory"
+                   << "categoryIndex";
     for (int i = 0; i < numZones; ++i) {
         filterCommands << QString("z%1").arg(i + 1);
     }

@@ -47,30 +47,33 @@ extern YYSTYPE yylval;
 
 [ \t]                ;   /* ignore white space */
 
-[Dd][Uu][Rr][Aa][Tt][Ii][Oo][Nn]                   { return DURATION; }
-[Dd][Oo][Mm][Ii][Nn][Aa][Nn][Tt][Zz][Oo][Nn][Ee]   { return DOMINANTZONE; }
-[Ss][Tt][Rr][Ee][Ss][Ss]                           { return STRESS; }
-[Ii][Nn][Tt][Ee][Nn][Ss][Ii][Tt][Yy]               { return INTENSITY; }
-[Vv][Aa][Rr][Ii][Aa][Bb][Ii][Ll][Ii][Tt][Yy]       { return VI; }
-[Rr][Ii]                                           { return RI; }
-[Bb][Ii][Kk][Ee][Ss][Cc][Oo][Rr][Ee]               { return BIKESCORE; }
-[Ss][Vv][Ii]                                       { return SVI; }
-[Rr][Aa][Tt][Ii][Nn][Gg]                           { return RATING; }
-[Mm][Ii][Nn][Pp][Oo][Ww][Ee][Rr]                   { return MINPOWER; }
-[Mm][Aa][Xx][Pp][Oo][Ww][Ee][Rr]                   { return MAXPOWER; }
-[Aa][Vv][Gg][Pp][Oo][Ww][Ee][Rr]                   { return AVGPOWER; }
-[Xx][Pp][Oo][Ww][Ee][Rr]                           { return XPOWER; }
-[Ii][Ss][Oo][Pp][Oo][Ww][Ee][Rr]                   { return ISOPOWER; }
-[Pp][Oo][Ww][Ee][Rr]                               { return POWER; }
-[Ll][Aa][Ss][Tt][Rr][Uu][Nn]                       { return LASTRUN; }
-[Cc][Rr][Ee][Aa][Tt][Ee][Dd]                       { return CREATED; }
-[Dd][Ii][Ss][Tt][Aa][Nn][Cc][Ee]                   { return DISTANCE; }
-[Ee][Ll][Ee][Vv][Aa][Tt][Ii][Oo][Nn]               { return ELEVATION; }
-[Gg][Rr][Aa][Dd][Ee]                               { return GRADE; }
-[zZ]([1-9]|10)                                     { yytext += 1; WorkoutFilterlval.numValue = atoi(yytext); return ZONE; }
-\"[^\"]+\"                                         { yytext[strlen(yytext) - 1] = '\0'; WorkoutFilterlval.word = yytext + 1; return WORD; }
-[^ ,.]+                                            { WorkoutFilterlval.word = yytext; return WORD; }
-.                                                  { return yytext[0]; }
+[Dd][Uu][Rr][Aa][Tt][Ii][Oo][Nn]                     { return DURATION; }
+[Dd][Oo][Mm][Ii][Nn][Aa][Nn][Tt][Zz][Oo][Nn][Ee]     { return DOMINANTZONE; }
+[Ss][Tt][Rr][Ee][Ss][Ss]                             { return STRESS; }
+[Ii][Nn][Tt][Ee][Nn][Ss][Ii][Tt][Yy]                 { return INTENSITY; }
+[Vv][Aa][Rr][Ii][Aa][Bb][Ii][Ll][Ii][Tt][Yy]         { return VI; }
+[Rr][Ii]                                             { return RI; }
+[Bb][Ii][Kk][Ee][Ss][Cc][Oo][Rr][Ee]                 { return BIKESCORE; }
+[Ss][Vv][Ii]                                         { return SVI; }
+[Rr][Aa][Tt][Ii][Nn][Gg]                             { return RATING; }
+[Mm][Ii][Nn][Pp][Oo][Ww][Ee][Rr]                     { return MINPOWER; }
+[Mm][Aa][Xx][Pp][Oo][Ww][Ee][Rr]                     { return MAXPOWER; }
+[Aa][Vv][Gg][Pp][Oo][Ww][Ee][Rr]                     { return AVGPOWER; }
+[Xx][Pp][Oo][Ww][Ee][Rr]                             { return XPOWER; }
+[Ii][Ss][Oo][Pp][Oo][Ww][Ee][Rr]                     { return ISOPOWER; }
+[Pp][Oo][Ww][Ee][Rr]                                 { return POWER; }
+[Ll][Aa][Ss][Tt][Rr][Uu][Nn]                         { return LASTRUN; }
+[Cc][Rr][Ee][Aa][Tt][Ee][Dd]                         { return CREATED; }
+[Dd][Ii][Ss][Tt][Aa][Nn][Cc][Ee]                     { return DISTANCE; }
+[Ee][Ll][Ee][Vv][Aa][Tt][Ii][Oo][Nn]                 { return ELEVATION; }
+[Gg][Rr][Aa][Dd][Ee]                                 { return GRADE; }
+[Cc][Aa][Tt][Ee][Gg][Oo][Rr][Yy]                     { return CATEGORY; }
+[Ss][Uu][Bb][Cc][Aa][Tt][Ee][Gg][Oo][Rr][Yy]         { return SUBCATEGORY; }
+[Cc][Aa][Tt][Ee][Gg][Oo][Rr][Yy][Ii][Nn][Dd][Ee][Xx] { return CATEGORYINDEX; }
+[zZ]([1-9]|10)                                       { yytext += 1; WorkoutFilterlval.numValue = atoi(yytext); return ZONE; }
+\"[^\"]+\"                                           { yytext[strlen(yytext) - 1] = '\0'; WorkoutFilterlval.word = yytext + 1; return WORD; }
+[^ ,.]+                                              { WorkoutFilterlval.word = yytext; return WORD; }
+.                                                    { return yytext[0]; }
 
 %%
 

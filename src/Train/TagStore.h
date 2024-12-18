@@ -36,7 +36,7 @@ public:
     };
 
     virtual void deferTagSignals(bool deferred) = 0;
-    virtual bool isDeferredTagSignals() = 0;
+    virtual bool isDeferredTagSignals() const = 0;
     virtual void catchupTagSignals() = 0;
 
     virtual int addTag(const QString &label) = 0;

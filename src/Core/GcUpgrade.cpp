@@ -820,14 +820,30 @@ GcUpgrade::upgradeLate(Context *context)
 
     }
 
-    if (trainDB->needsUpgrade()) {
-        QStringList files = trainDB->getMigrateableWorkoutPaths();
-        files << trainDB->getMigrateableVideoPaths();
-        files << trainDB->getMigrateableVideoSyncPaths();
-        if (files.size() > 0) {
-            Library::importFiles(context, files, LibraryBatchImportConfirmation::noDialog);
+    std::pair<bool, int> upgradeTrainDB = trainDB->needsUpgrade();
+    if (upgradeTrainDB.first) {
+        switch (upgradeTrainDB.second) {
+        case 1: {
+            QStringList files = trainDB->getMigrateableWorkoutPaths();
+            files << trainDB->getMigrateableVideoPaths();
+            files << trainDB->getMigrateableVideoSyncPaths();
+            if (files.size() > 0) {
+                Library::importFiles(context, files, LibraryBatchImportConfirmation::noDialog);
+            }
+            trainDB->dropLegacyTables();
+            break;
         }
-        trainDB->dropLegacyTables();
+        case 2: {
+            QStringList files = trainDB->getMigrateableWorkoutPaths();
+            for (const QString &file : files) {
+                ErgFile ergFile(file, ErgFileFormat::unknown, context);
+                trainDB->importWorkout(file, ergFile, ImportMode::update);
+            }
+            break;
+        }
+        default:
+            break;
+        }
     }
 
     return 0;

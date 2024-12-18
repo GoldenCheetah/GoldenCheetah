@@ -167,19 +167,17 @@ void ErgFile::parseZwift()
 
     // parse the file
     QFile zwo(filename());
-    QXmlInputSource source(&zwo);
-    QXmlSimpleReader xmlReader;
     ZwoParser handler;
-    xmlReader.setContentHandler(&handler);
-    xmlReader.setErrorHandler(&handler);
-    xmlReader.parse(source);
+    handler.parseFile(&zwo);
 
     // save the metadata into our fields
-    // we lose category and category index (for now)
     name(handler.name);
     description(handler.description);
     this->source(handler.author);
     tags(handler.tags);
+    category(handler.category);
+    subcategory(handler.subcategory);
+    categoryIndex(handler.categoryIndex);
 
     // extract contents into ErgFile....
     // each watts value is in percent terms so apply CP
