@@ -9,6 +9,7 @@ equals(GC_UNITTESTS, active) {
 			   Core/season \
 			   Core/seasonParser \
 			   Core/units \
+			   Train/filterEditor \
 			   Train/zwoParser
 	CONFIG += ordered
 } else {
