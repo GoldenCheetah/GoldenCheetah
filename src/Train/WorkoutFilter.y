@@ -239,10 +239,10 @@ grade: GRADE PERCENT                      { $$ = new ModelNumberEqualFilter(TdbW
     |  GRADE PERCENT RANGESYMBOL          { $$ = new ModelNumberRangeFilter(TdbWorkoutModelIdx::avgGrade, $2); }
     ;
 
-category: CATEGORY words  { $$ = new ModelStringContainsFilter(TdbWorkoutModelIdx::category, *$2); }
+category: CATEGORY words  { $$ = new ModelStringContainsFilter(TdbWorkoutModelIdx::category, *$2, true); }
     ;
 
-subcategory: SUBCATEGORY words  { $$ = new ModelStringContainsFilter(TdbWorkoutModelIdx::subcategory, *$2); }
+subcategory: SUBCATEGORY words  { $$ = new ModelStringContainsFilter(TdbWorkoutModelIdx::subcategory, *$2, true); }
     ;
 
 categoryindex: CATEGORYINDEX NUMBER                     { $$ = new ModelNumberEqualFilter(TdbWorkoutModelIdx::categoryIndex, $2); }
