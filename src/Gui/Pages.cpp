@@ -2710,11 +2710,13 @@ ProcessorPage::processorSelected
         int rownum = selectedItem->data(PROCESSORTREE_COL_ROWNUM, Qt::DisplayRole).toInt();
         if (rownum >= 0 && rownum < settingsStack->count() - 1) {
             settingsStack->setCurrentIndex(rownum + 1);
+#ifdef GC_WANT_PYTHON
             if (actionButtons != nullptr) {
                 bool isCoreProcessor = selectedItem->data(PROCESSORTREE_COL_CORE, Qt::DisplayRole).toBool();
                 actionButtons->setButtonEnabled(ActionButtonBox::Delete, ! isCoreProcessor);
                 actionButtons->setButtonEnabled(ActionButtonBox::Edit, ! isCoreProcessor);
             }
+#endif
         }
     }
 }
