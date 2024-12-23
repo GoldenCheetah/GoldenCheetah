@@ -778,19 +778,21 @@ MeasuresPage::addClicked()
     QDateTimeEdit *dtEdit = new QDateTimeEdit(now);
     dtEdit->setCalendarPopup(true);
     form->addRow(tr("Start Date"), dtEdit);
+    QList<double> unitsFactors = measuresGroup->getFieldUnitsFactors();
 
     QStringList fieldNames = measuresGroup->getFieldNames();
     QList<QLabel*> valuesLabel;
     QList<QDoubleSpinBox*> valuesEdit;
     int k = 0;
     for (QString &fieldName : fieldNames) {
+        const double unitsFactor = (metricUnits ? 1.0 : unitsFactors[k]);
         valuesLabel << new QLabel(fieldName);
         valuesEdit << new QDoubleSpinBox(this);
         valuesEdit[k]->setMaximum(9999.99);
         valuesEdit[k]->setMinimum(0.0);
         valuesEdit[k]->setDecimals(2);
         if (measures.count() > 0) {
-            valuesEdit[k]->setValue(measures[0].values[k]);
+            valuesEdit[k]->setValue(measures[0].values[k] * unitsFactor);
         } else {
             valuesEdit[k]->setValue(0.0);
         }
@@ -833,7 +835,8 @@ MeasuresPage::addClicked()
     }
     measures[rnum].when = dtEdit->dateTime();
     for (k = 0; k < valuesEdit.count(); ++k) {
-        measures[rnum].values[k] = valuesEdit[k]->value();
+        const double unitsFactor = (metricUnits ? 1.0 : unitsFactors[k]);
+        measures[rnum].values[k] = valuesEdit[k]->value() / unitsFactor;
     }
     measures[rnum].comment = commentEdit->text();
     fillItemFromMeasures(rnum, add);
@@ -867,8 +870,10 @@ MeasuresPage::rangeChanged(const QModelIndex &topLeft)
     if (rnum == measures.count()) {
         return;
     }
+    QList<double> unitsFactors = measuresGroup->getFieldUnitsFactors();
     if (col > 0 && col <= valueDelegates.count()) {
-        measures[rnum].values[col - 1] = topLeft.data(Qt::DisplayRole).toDouble();
+        const double unitsFactor = (metricUnits ? 1.0 : unitsFactors[col - 1]);
+        measures[rnum].values[col - 1] = topLeft.data(Qt::DisplayRole).toDouble() / unitsFactor;
     } else if (col == valueDelegates.count() + 1) {
         measures[rnum].comment = topLeft.data(Qt::DisplayRole).toString();
     }
