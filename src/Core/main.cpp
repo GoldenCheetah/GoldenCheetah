@@ -56,6 +56,12 @@
 
 #include <gsl/gsl_errno.h>
 
+#ifdef Q_OS_WIN
+#if QT_VERSION > 0x060700
+#include <QStyleFactory>
+#endif
+#endif
+
 //
 // bootstrap state
 //
@@ -428,6 +434,15 @@ main(int argc, char *argv[])
 
     // create the application -- only ever ONE regardless of restarts
     application = new QApplication(argc, argv);
+
+#ifdef Q_OS_WIN
+#if QT_VERSION > 0x060700
+    if (application->style()->name() == "windows11") {
+        application->setStyle(QStyleFactory::create("Windows"));
+        qDebug()<<"Replacing windows11 by Windows style to avoid a Qt bug";
+    }
+#endif
+#endif
 
     //XXXIdleEventFilter idleFilter;
     //XXXapplication->installEventFilter(&idleFilter);
