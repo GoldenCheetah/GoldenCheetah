@@ -226,7 +226,7 @@ ModelStringContainsFilter::accept
     }
     bool contains = _all;
     QString dataValue = data.toString();
-    for (const auto &item : std::as_const(_values)) {
+    for (const auto &item : qAsConst(_values)) {
         if (_all) {
             contains &= dataValue.contains(item, Qt::CaseInsensitive);
         } else if (dataValue.contains(item, Qt::CaseInsensitive)) {
