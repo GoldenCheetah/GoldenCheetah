@@ -61,6 +61,7 @@ extern QString workoutModelErrorMsg;
 %token RATING
 %token RANGESYMBOL
 %token SEPARATOR
+%token CONTAINS
 %token <floatValue> FLOAT
 %token <numValue> NUMBER ZONE PERCENT DAYS TIME MINPOWER MAXPOWER AVGPOWER ISOPOWER POWER LASTRUN CREATED DISTANCE ELEVATION GRADE CATEGORY SUBCATEGORY CATEGORYINDEX
 %token <word> WORD
@@ -239,10 +240,16 @@ grade: GRADE PERCENT                      { $$ = new ModelNumberEqualFilter(TdbW
     |  GRADE PERCENT RANGESYMBOL          { $$ = new ModelNumberRangeFilter(TdbWorkoutModelIdx::avgGrade, $2); }
     ;
 
-category: CATEGORY words  { $$ = new ModelStringContainsFilter(TdbWorkoutModelIdx::category, *$2, true); }
+category: CATEGORY words  { $$ = new ModelStringEqualFilter(TdbWorkoutModelIdx::category, *$2); }
     ;
 
-subcategory: SUBCATEGORY words  { $$ = new ModelStringContainsFilter(TdbWorkoutModelIdx::subcategory, *$2, true); }
+category: CATEGORY CONTAINS words  { $$ = new ModelStringContainsFilter(TdbWorkoutModelIdx::category, *$3, true); }
+    ;
+
+subcategory: SUBCATEGORY words  { $$ = new ModelStringEqualFilter(TdbWorkoutModelIdx::subcategory, *$2); }
+    ;
+
+subcategory: SUBCATEGORY CONTAINS words  { $$ = new ModelStringContainsFilter(TdbWorkoutModelIdx::subcategory, *$3, true); }
     ;
 
 categoryindex: CATEGORYINDEX NUMBER                     { $$ = new ModelNumberEqualFilter(TdbWorkoutModelIdx::categoryIndex, $2); }

@@ -123,4 +123,19 @@ private:
 };
 
 
+class ModelStringEqualFilter: public ModelFilter {
+public:
+    ModelStringEqualFilter(int modelColumn, QStringList values);
+    virtual ~ModelStringEqualFilter();
+
+    virtual bool accept(const QVariant &data) const override;
+
+protected:
+    virtual QString toStringSuffix() const override;
+
+private:
+    QString _joinedValues;
+};
+
+
 #endif

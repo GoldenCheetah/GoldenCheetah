@@ -23,6 +23,9 @@
 #include <QDebug>
 
 
+////////////////////////////////////////////////////////////
+// ModelFilter
+
 ModelFilter::ModelFilter
 (int modelColumn, QMetaType::Type type)
 : _modelColumn(modelColumn), _type(type)
@@ -68,7 +71,8 @@ ModelFilter::toStringPrefix
 }
 
 
-///////////////////
+////////////////////////////////////////////////////////////
+// ModelNumberRangeFilter
 
 ModelNumberRangeFilter::ModelNumberRangeFilter
 (int modelColumn, long minValue, long maxValue)
@@ -106,6 +110,8 @@ ModelNumberRangeFilter::toStringSuffix
 }
 
 
+////////////////////////////////////////////////////////////
+// ModelNumberEqualFilter
 
 ModelNumberEqualFilter::ModelNumberEqualFilter
 (int modelColumn, long value, long delta)
@@ -130,7 +136,8 @@ ModelNumberEqualFilter::toStringSuffix() const
 }
 
 
-///////////////////
+////////////////////////////////////////////////////////////
+// ModelFloatRangeFilter
 
 ModelFloatRangeFilter::ModelFloatRangeFilter
 (int modelColumn, float minValue, float maxValue)
@@ -169,6 +176,9 @@ ModelFloatRangeFilter::toStringSuffix
 
 
 
+////////////////////////////////////////////////////////////
+// ModelFloatEqualFilter
+
 ModelFloatEqualFilter::ModelFloatEqualFilter
 (int modelColumn, float value, float delta)
 : ModelFloatRangeFilter(modelColumn, value - delta, value + delta), _value(value), _delta(delta)
@@ -192,7 +202,8 @@ ModelFloatEqualFilter::toStringSuffix() const
 }
 
 
-
+////////////////////////////////////////////////////////////
+// ModelStringContainsFilter
 
 ModelStringContainsFilter::ModelStringContainsFilter
 (int modelColumn, QStringList values, bool all)
@@ -215,7 +226,7 @@ ModelStringContainsFilter::accept
     }
     bool contains = _all;
     QString dataValue = data.toString();
-    for (const auto &item : qAsConst(_values)) {
+    for (const auto &item : std::as_const(_values)) {
         if (_all) {
             contains &= dataValue.contains(item, Qt::CaseInsensitive);
         } else if (dataValue.contains(item, Qt::CaseInsensitive)) {
@@ -235,4 +246,40 @@ ModelStringContainsFilter::toStringSuffix
     } else {
         return QString("contains any of %1").arg(_values.join(", "));
     }
+}
+
+
+////////////////////////////////////////////////////////////
+// ModelStringEqualFilter
+
+ModelStringEqualFilter::ModelStringEqualFilter
+(int modelColumn, QStringList values)
+: ModelFilter(modelColumn, QMetaType::QString)
+{
+    _joinedValues = values.join(" ").simplified();
+}
+
+
+ModelStringEqualFilter::~ModelStringEqualFilter
+()
+{
+}
+
+
+bool
+ModelStringEqualFilter::accept
+(const QVariant &data) const
+{
+    if (! data.canConvert(supportedType())) {
+        return false;
+    }
+    return data.toString().simplified().compare(_joinedValues, Qt::CaseInsensitive) == 0;
+}
+
+
+QString
+ModelStringEqualFilter::toStringSuffix
+() const
+{
+    return QString("equals %1").arg(_joinedValues);
 }

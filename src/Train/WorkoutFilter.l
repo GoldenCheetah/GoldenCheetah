@@ -70,6 +70,7 @@ extern YYSTYPE yylval;
 [Cc][Aa][Tt][Ee][Gg][Oo][Rr][Yy]                     { return CATEGORY; }
 [Ss][Uu][Bb][Cc][Aa][Tt][Ee][Gg][Oo][Rr][Yy]         { return SUBCATEGORY; }
 [Cc][Aa][Tt][Ee][Gg][Oo][Rr][Yy][Ii][Nn][Dd][Ee][Xx] { return CATEGORYINDEX; }
+[Cc][Oo][Nn][Tt][Aa][Ii][Nn][Ss]                     { return CONTAINS; }
 [zZ]([1-9]|10)                                       { yytext += 1; WorkoutFilterlval.numValue = atoi(yytext); return ZONE; }
 \"[^\"]+\"                                           { yytext[strlen(yytext) - 1] = '\0'; WorkoutFilterlval.word = yytext + 1; return WORD; }
 [^ ,.]+                                              { WorkoutFilterlval.word = yytext; return WORD; }
