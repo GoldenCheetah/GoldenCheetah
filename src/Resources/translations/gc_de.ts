@@ -3482,12 +3482,12 @@ gespeichert</translation>
 <context>
     <name>AutoImportPage</name>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="4023"/>
+        <location filename="../../Gui/AthletePages.cpp" line="4028"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="4024"/>
+        <location filename="../../Gui/AthletePages.cpp" line="4029"/>
         <source>-</source>
         <translation>-</translation>
     </message>
@@ -3496,37 +3496,37 @@ gespeichert</translation>
         <translation type="vanished">Durchsuchen</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="4035"/>
+        <location filename="../../Gui/AthletePages.cpp" line="4040"/>
         <source>Add</source>
         <translation>Hinzufügen</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="4036"/>
+        <location filename="../../Gui/AthletePages.cpp" line="4041"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="4037"/>
+        <location filename="../../Gui/AthletePages.cpp" line="4042"/>
         <source>Up</source>
         <translation>Hoch</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="4038"/>
+        <location filename="../../Gui/AthletePages.cpp" line="4043"/>
         <source>Down</source>
         <translation>Runter</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="4049"/>
+        <location filename="../../Gui/AthletePages.cpp" line="4054"/>
         <source>Enter a directory</source>
         <translation>Ein Verzeichnis eingeben</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="4054"/>
+        <location filename="../../Gui/AthletePages.cpp" line="4059"/>
         <source>Directory</source>
         <translation>Verzeichnis</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="4055"/>
+        <location filename="../../Gui/AthletePages.cpp" line="4060"/>
         <source>Import Rule</source>
         <translation>Importregel</translation>
     </message>
@@ -5204,41 +5204,41 @@ Setup durchführen.</translation>
         <translation type="vanished">Aktualisieren</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1197"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1214"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1202"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1219"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1198"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1215"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1203"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1220"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1199"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1204"/>
         <source>Review...</source>
         <translation>Überprüfen...</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1201"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1206"/>
         <source>Changed power estimates are available</source>
         <translation>Geschätzte Leistungswerte aus dem CP-Modell verfügbar</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1208"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1220"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1213"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1225"/>
         <source>Add</source>
         <translation>Hinzufügen</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1209"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1221"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1214"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1226"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1211"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1216"/>
         <source>Def</source>
         <translatorcomment>???</translatorcomment>
         <translation>Standardwert</translation>
@@ -5248,27 +5248,27 @@ Setup durchführen.</translation>
         <translation type="vanished">Ab Datum</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1299"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1304"/>
         <source>Critical Power</source>
         <translation>Critical Power</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1300"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1305"/>
         <source>AeTP</source>
         <translation>Aerobe Schwelle (AeT)</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1301"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1306"/>
         <source>FTP</source>
         <translation>FTP</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1302"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1307"/>
         <source>W&apos;</source>
         <translation>W&apos;</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1303"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1308"/>
         <source>Pmax</source>
         <translation>Pmax</translation>
     </message>
@@ -5281,207 +5281,207 @@ Setup durchführen.</translation>
         <translation type="vanished">Critical Power muss &gt; 0 sein</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1342"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1347"/>
         <source>Short</source>
         <translation>Zone</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1242"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1247"/>
         <source>Use CP for all metrics</source>
         <translation>CP für alle Metriken verwenden</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1235"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1240"/>
         <source>Manual</source>
         <translation>Manuell</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1236"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1241"/>
         <source>Semi-Automatic (CP2)</source>
         <translation>Halbautomatisch (CP2)</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1237"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1242"/>
         <source>Semi-Automatic (CP3)</source>
         <translation>Halbautomatisch (CP3)</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1238"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1243"/>
         <source>Semi-Automatic (Extended)</source>
         <translation>Halbautomatisch (Extended)</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1243"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1248"/>
         <source>Use FTP for Coggan metrics</source>
         <translation>FTP für Coggan-Metriken verwenden</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1268"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1274"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1280"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1292"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1337"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1613"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1273"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1279"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1285"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1297"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1342"/>
         <location filename="../../Gui/AthletePages.cpp" line="1618"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1626"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1633"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2278"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2284"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2292"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2305"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1623"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1631"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1638"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2283"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2289"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2297"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2310"/>
         <source>W</source>
         <translation>W</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1286"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1628"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2299"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1291"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1633"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2304"/>
         <source>J</source>
         <translation>J</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1298"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2243"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1303"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2248"/>
         <source>Start Date</source>
         <translation>Startdatum</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1304"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1309"/>
         <source>Model Fit</source>
         <translation>Modellanpassung</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1343"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1348"/>
         <source>Long</source>
         <translation>Bezeichnung</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1344"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1349"/>
         <source>From Watts</source>
         <translation>Von Leistung</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1593"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1598"/>
         <source>Review range starting on %1</source>
         <translation>Überprüfungsbereich beginnend ab den %1</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1609"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1614"/>
         <source>Current</source>
         <translation>Aktuell</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1610"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1615"/>
         <source>Estimate</source>
         <translation>Schätzung</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1611"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1616"/>
         <source>Accept</source>
         <translation>Akzeptieren</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1783"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1788"/>
         <source>🗹</source>
         <translation>🗹</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1784"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1789"/>
         <source>Estimate and settings &lt;b&gt;match&lt;/b&gt;</source>
         <translation>Schätzung und Einstellungen &lt;b&gt;stimmen überein&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1787"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1792"/>
         <source>☐</source>
         <translation>☐</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1788"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1793"/>
         <source>Estimate and settings &lt;b&gt;differ&lt;/b&gt;</source>
         <translation>Schätzung und Einstellungen sind &lt;b&gt;unterscheidlich&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1792"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1797"/>
         <source>⏲</source>
         <translation>⏲</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1795"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1800"/>
         <source>Range is %1 days older than closest estimate</source>
         <translation>Bereich ist %1 Tage älter als die nächstliegende Schätzung</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1797"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1802"/>
         <source>Range is %1 days younger than closest estimate</source>
         <translation>Bereich ist %1 Tage jünger als die nächstliegende Schätzung</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1803"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1808"/>
         <source>∅</source>
         <translation>∅</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1804"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1809"/>
         <source>No estimate available</source>
         <translation>Keine Schätzung verfügbar</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1897"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1902"/>
         <source>New range from estimate</source>
         <translation>Neuer Bereich aus der Schätzung</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2232"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2237"/>
         <source>The proposed value for AeTP is a very rough estimate, assuming %1 % of CP. Usually it is determined by a&lt;ul&gt;&lt;li&gt;Metabolic test&lt;/li&gt;&lt;li&gt;Lactate ramp test&lt;/li&gt;&lt;li&gt;Run / Cycling ‘conversational’ test&lt;/li&gt;&lt;li&gt;Run Decoupling test&lt;/li&gt;&lt;/ul&gt;</source>
         <translation>Der vorgeschlagene AeT-Wert ist eine sehr grobe Schätzung, er basiert auf %1 % des CP-Wert. In der Regel wird er durch einen&lt;ul&gt;&lt;li&gt;Metabolischen Test&lt;/li&gt;&lt;li&gt;Laktat-Rampentest&lt;/li&gt;&lt;li&gt;Lauf-/Radfahr-„Konversationstest“&lt;/li&gt;&lt;li&gt;Laufen Entkopplungstest&lt;/li&gt;&lt;/ul&gt; ermittelt</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2234"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2239"/>
         <source>Updating FTP internally to match CP</source>
         <translation>FTP intern aktualisieren, um mit CP übereinzustimmen</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2237"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2242"/>
         <source>Your selected model does not deliver values for&lt;ul&gt;&lt;li&gt;FTP, using CP instead&lt;/li&gt;&lt;/ul&gt;</source>
         <translation>Das von Ihnen gewählte Modell liefert keine Werte für&lt;ul&gt;&lt;li&gt;FTP, verwenden Sie stattdessen CP&lt;/li&gt;&lt;/ul&gt;</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2239"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2244"/>
         <source>Your selected model does not deliver values for PMax, using default value of %1 W instead</source>
         <translation>Ihr ausgewähltes Modell liefert keine Werte für PMax, stattdessen wird der Standardwert von %1 W verwendet</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2241"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2246"/>
         <source>Your selected model does not deliver values for&lt;ul&gt;&lt;li&gt;FTP, using CP instead&lt;/li&gt;&lt;li&gt;PMax, assuming a default of %1 W&lt;/li&gt;&lt;/ul&gt;</source>
         <translation>Das von Ihnen gewählte Modell liefert keine Werte für&lt;ul&gt;&lt;li&gt;FTP, stattdessen wird CP verwendet&lt;/li&gt;&lt;li&gt;PMax, wobei ein Standardwert von %1 W angenommen wird&lt;/li&gt;&lt;/ul&gt;</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2245"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2250"/>
         <source>Critical Power (CP)</source>
         <translation>Critical Power (CP)</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2247"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2252"/>
         <source>Aerobic Threshold Power (AeTP)</source>
         <translation>Aerobe Schwellenleistung (AeT)</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2249"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2254"/>
         <source>Functional Threshold Power (FTP)</source>
         <translation>Leistungsbezogene anaerobe Schwelle (FTP)</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2251"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2256"/>
         <source>Anaerobic Work Capacity (W&apos;)</source>
         <translation>Anaerobe Kapazität (W&apos;)</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2253"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2258"/>
         <source>Maximum Power (PMax)</source>
         <translation>Maximale Leistung (PMax)</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2265"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2270"/>
         <source>Manual range</source>
         <translation>Manuelle Eingabe</translation>
     </message>
@@ -5490,14 +5490,14 @@ Setup durchführen.</translation>
         <translation type="vanished">Maximale Anzahl von 10 Zonen erreicht.</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2013"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2020"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2018"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2025"/>
         <source>New</source>
         <translation>Neu</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2015"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2022"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2020"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2027"/>
         <source>New (%1)</source>
         <translation>Neu (%1)</translation>
     </message>
@@ -5950,52 +5950,52 @@ ddd, dd.MMM yyyy</translation>
         <translation type="vanished">Aktualisieren</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3302"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3314"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3307"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3319"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3303"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3315"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3308"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3320"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3308"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3320"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3313"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3325"/>
         <source>Add</source>
         <translation>Hinzufügen</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3309"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3321"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3314"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3326"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3311"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3316"/>
         <source>Def</source>
         <translation>Standardwert</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3354"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3501"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3359"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3506"/>
         <source>Start Date</source>
         <translation>Startdatum</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3478"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3483"/>
         <source>New range</source>
         <translation>Neuen Eintrag erstellen</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3502"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3507"/>
         <source>Critical Velocity (CV)</source>
         <translation>Critical Velocity (CV)</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3503"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3508"/>
         <source>Aerobic Threshold (AeT)</source>
         <translation>Aerobe Schwelle (AeT)</translation>
     </message>
@@ -6004,12 +6004,12 @@ ddd, dd.MMM yyyy</translation>
         <translation type="vanished">Ab Datum</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3355"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3360"/>
         <source>Critical Velocity</source>
         <translation>Critical Velocity</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3356"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3361"/>
         <source>Aerobic Threshold</source>
         <translation>Aerobe Schwelle</translation>
     </message>
@@ -6022,17 +6022,17 @@ ddd, dd.MMM yyyy</translation>
         <translation type="vanished">dd.MMM yyyy</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3398"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3403"/>
         <source>Short</source>
         <translation>Zone</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3399"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3404"/>
         <source>Long</source>
         <translation>Bezeichnung</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3400"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3405"/>
         <source>From</source>
         <translation>Von Geschwindigkeit</translation>
     </message>
@@ -6041,14 +6041,14 @@ ddd, dd.MMM yyyy</translation>
         <translation type="vanished">Maximale Anzahl von 10 Zonen erreicht.</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3674"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3681"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3679"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3686"/>
         <source>New</source>
         <translation>Neu</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3676"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3683"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3681"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3688"/>
         <source>New (%1)</source>
         <translation>Neu (%1)</translation>
     </message>
@@ -8487,32 +8487,32 @@ Möchten Sie die Änderung durchführen und GoldenCheetah neu starten?</translat
         <translation type="vanished">Runter</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3032"/>
+        <location filename="../../Gui/Pages.cpp" line="3034"/>
         <source>Field</source>
         <translation>Feld</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3033"/>
+        <location filename="../../Gui/Pages.cpp" line="3035"/>
         <source>Value</source>
         <translation>Wert</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3034"/>
+        <location filename="../../Gui/Pages.cpp" line="3036"/>
         <source>Linked field</source>
         <translation>Verknüpftes Feld</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3035"/>
+        <location filename="../../Gui/Pages.cpp" line="3037"/>
         <source>Default Value</source>
         <translation>Standardwert</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3113"/>
+        <location filename="../../Gui/Pages.cpp" line="3115"/>
         <source>New</source>
         <translation>Neu</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3115"/>
+        <location filename="../../Gui/Pages.cpp" line="3117"/>
         <source>New (%1)</source>
         <translation>Neu (%1)</translation>
     </message>
@@ -15500,47 +15500,47 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
 <context>
     <name>HrSchemePage</name>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2432"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2437"/>
         <source>Add</source>
         <translation>Hinzufügen</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2433"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2438"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2426"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2431"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2427"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2432"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2442"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2447"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2453"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2458"/>
         <source>Short</source>
         <translation>Zone</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2454"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2459"/>
         <source>Long</source>
         <translation>Bezeichnung</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2455"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2460"/>
         <source>Percent of LT</source>
         <translation>Prozentsatz der Anaerobe Schwelle</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2456"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2461"/>
         <source>Trimp k</source>
         <translation>TRIMP k</translation>
     </message>
@@ -15549,14 +15549,14 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
         <translation type="vanished">Maximale Anzahl von 10 Zonen erreicht.</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2501"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2508"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2506"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2513"/>
         <source>New</source>
         <translation>Neu</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2503"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2510"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2508"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2515"/>
         <source>New (%1)</source>
         <translation>Neu (%1)</translation>
     </message>
@@ -15746,17 +15746,17 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
 <context>
     <name>HrZonePage</name>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2343"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2348"/>
         <source>Sport</source>
         <translation>Sport</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2390"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2395"/>
         <source>Lactate Threshold</source>
         <translation>Anaerobe Schwelle</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2391"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2396"/>
         <source>Default</source>
         <translation>Standardeinstellung</translation>
     </message>
@@ -17058,7 +17058,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
 <context>
     <name>IntervalsPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3182"/>
+        <location filename="../../Gui/Pages.cpp" line="3184"/>
         <source>Enable interval auto-discovery</source>
         <translation>Automatische Intervallerkennung aktivieren</translation>
     </message>
@@ -18745,50 +18745,50 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
         <translation type="vanished">Aktualisieren</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2585"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2597"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2590"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2602"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2586"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2598"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2591"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2603"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2591"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2603"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2596"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2608"/>
         <source>Add</source>
         <translation>Hinzufügen</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2592"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2604"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2597"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2609"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2594"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2599"/>
         <source>Def</source>
         <translation>Standardwert</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2618"/>
         <location filename="../../Gui/AthletePages.cpp" line="2623"/>
         <location filename="../../Gui/AthletePages.cpp" line="2628"/>
         <location filename="../../Gui/AthletePages.cpp" line="2633"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2685"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2765"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2638"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2690"/>
         <location filename="../../Gui/AthletePages.cpp" line="2770"/>
         <location filename="../../Gui/AthletePages.cpp" line="2775"/>
         <location filename="../../Gui/AthletePages.cpp" line="2780"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2785"/>
         <source>bpm</source>
         <translation>1/min</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2645"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2784"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2650"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2789"/>
         <source>Start Date</source>
         <translation>Startdatum</translation>
     </message>
@@ -18797,26 +18797,26 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
         <translation type="vanished">Ab Datum</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2646"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2785"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2651"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2790"/>
         <source>Lactate Threshold</source>
         <translation>Anaerobe Schwelle</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2647"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2786"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2652"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2791"/>
         <source>Aerobic Threshold</source>
         <translation>Aerobe Schwelle</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2648"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2787"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2653"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2792"/>
         <source>Rest HR</source>
         <translation>Ruhe-HF</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2649"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2788"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2654"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2793"/>
         <source>Max HR</source>
         <translation>Max. HF</translation>
     </message>
@@ -18825,22 +18825,22 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
         <translation type="vanished">dd.MMM yyyy</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2696"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2701"/>
         <source>Short</source>
         <translation>Zone</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2697"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2702"/>
         <source>Long</source>
         <translation>Bezeichnung</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2698"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2703"/>
         <source>From BPM</source>
         <translation>Von HF</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2699"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2704"/>
         <source>Trimp k</source>
         <translation>TRIMP K</translation>
     </message>
@@ -18853,14 +18853,14 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
         <translation type="vanished">Maximal Anzahl von 10 Zonen erreicht.</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2962"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2969"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2967"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2974"/>
         <source>New</source>
         <translation>Neu</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="2964"/>
-        <location filename="../../Gui/AthletePages.cpp" line="2971"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2969"/>
+        <location filename="../../Gui/AthletePages.cpp" line="2976"/>
         <source>New (%1)</source>
         <translation>Neu (%1)</translation>
     </message>
@@ -20047,11 +20047,6 @@ on and that its display says, &quot;PC Link&quot;</source>
         <translation>Metriken als .CSV exportieren...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="603"/>
-        <source>&amp;Process</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../../Gui/MainWindow.cpp" line="1612"/>
         <source>Chart Import</source>
         <translation>Diagramm-Import</translation>
@@ -20228,8 +20223,9 @@ Sie sind dabei, alle Diagramme auf die Voreinstellungen zurückzusetzen</transla
         <translation>Diagramme verwalten</translation>
     </message>
     <message>
+        <location filename="../../Gui/MainWindow.cpp" line="603"/>
         <source>&amp;Edit</source>
-        <translation type="vanished">&amp;Bearbeiten</translation>
+        <translation>&amp;Bearbeiten</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="633"/>
@@ -21356,14 +21352,14 @@ Please check your preference settings.</source>
         <translation type="vanished">Messwertgruppen</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3228"/>
-        <location filename="../../Gui/Pages.cpp" line="3242"/>
+        <location filename="../../Gui/Pages.cpp" line="3230"/>
+        <location filename="../../Gui/Pages.cpp" line="3244"/>
         <source>Symbol</source>
         <translation>Symbol</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3229"/>
-        <location filename="../../Gui/Pages.cpp" line="3243"/>
+        <location filename="../../Gui/Pages.cpp" line="3231"/>
+        <location filename="../../Gui/Pages.cpp" line="3245"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
@@ -21372,44 +21368,44 @@ Please check your preference settings.</source>
         <translation type="vanished">Messwertfelder</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3226"/>
+        <location filename="../../Gui/Pages.cpp" line="3228"/>
         <source>Groups</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3244"/>
+        <location filename="../../Gui/Pages.cpp" line="3246"/>
         <source>Metric Units</source>
         <translation>Metrische Einheiten</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3245"/>
+        <location filename="../../Gui/Pages.cpp" line="3247"/>
         <source>Imperial Units</source>
         <translation>Imperiale Einheiten</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3246"/>
+        <location filename="../../Gui/Pages.cpp" line="3248"/>
         <source>Units Factor</source>
         <translation>Einheitenfaktor</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3247"/>
+        <location filename="../../Gui/Pages.cpp" line="3249"/>
         <source>CSV Headers</source>
         <translation>CSV-Kopfzeilen</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3374"/>
-        <location filename="../../Gui/Pages.cpp" line="3487"/>
+        <location filename="../../Gui/Pages.cpp" line="3376"/>
+        <location filename="../../Gui/Pages.cpp" line="3489"/>
         <source>New</source>
         <translation type="unfinished">Neu</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3376"/>
-        <location filename="../../Gui/Pages.cpp" line="3489"/>
+        <location filename="../../Gui/Pages.cpp" line="3378"/>
+        <location filename="../../Gui/Pages.cpp" line="3491"/>
         <source>New (%1)</source>
         <translation type="unfinished">Neu (%1)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3408"/>
+        <location filename="../../Gui/Pages.cpp" line="3410"/>
         <source>Fields in Group &lt;i&gt;%1&lt;/i&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -21430,22 +21426,22 @@ Please check your preference settings.</source>
         <translation type="vanished">Auf Standardwerte zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3257"/>
+        <location filename="../../Gui/Pages.cpp" line="3259"/>
         <source>Saved changes take effect after restart</source>
         <translation>Gespeicherte Änderungen werden erst nach einem Neustart wirksam</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3352"/>
+        <location filename="../../Gui/Pages.cpp" line="3354"/>
         <source>Are you sure you want to remove Measures customizations and reset to default configuration?</source>
         <translation>Möchten Sie die angepassten Messwerte wirklich löschen und auf die Standardkonfiguration zurücksetzen?</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3353"/>
+        <location filename="../../Gui/Pages.cpp" line="3355"/>
         <source>This action takes effect immediately and cannot be reverted</source>
         <translation>Diese Maßnahme wird sofort wirksam und kann nicht rückgängig gemacht werden</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3354"/>
+        <location filename="../../Gui/Pages.cpp" line="3356"/>
         <source>Reset</source>
         <translation>Zurücksetzen</translation>
     </message>
@@ -21656,13 +21652,13 @@ Please check your preference settings.</source>
         <translation>Startdatum</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="888"/>
+        <location filename="../../Gui/AthletePages.cpp" line="893"/>
         <source>MMM d, yyyy - hh:mm:ss</source>
         <translation>ddd, dd.MMM yyyy - hh:mm:ss</translation>
     </message>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="659"/>
-        <location filename="../../Gui/AthletePages.cpp" line="805"/>
+        <location filename="../../Gui/AthletePages.cpp" line="807"/>
         <source>Comment</source>
         <translation>Kommentar</translation>
     </message>
@@ -23442,42 +23438,42 @@ Keine Aktivitäten zum Importieren gefunden.
 <context>
     <name>PaceSchemePage</name>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3149"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3154"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3150"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3155"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3155"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3160"/>
         <source>Add</source>
         <translation>Hinzufügen</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3156"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3161"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3166"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3171"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3171"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3176"/>
         <source>Short</source>
         <translation>Zone</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3172"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3177"/>
         <source>Long</source>
         <translation>Bezeichnung</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3173"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3178"/>
         <source>Percent of CV</source>
         <translation>Prozentsatz der Critical Velocity</translation>
     </message>
@@ -23486,14 +23482,14 @@ Keine Aktivitäten zum Importieren gefunden.
         <translation type="vanished">Maximale Anzahl von 10 Zonen erreicht.</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3215"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3222"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3220"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3227"/>
         <source>New</source>
         <translation>Neu</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3217"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3224"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3222"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3229"/>
         <source>New (%1)</source>
         <translation>Neu (%1)</translation>
     </message>
@@ -23693,27 +23689,27 @@ Keine Aktivitäten zum Importieren gefunden.
 <context>
     <name>PaceZonePage</name>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3077"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3082"/>
         <source>Sport</source>
         <translation>Sport</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3079"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3084"/>
         <source>Run</source>
         <translation>Laufen</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3080"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3085"/>
         <source>Swim</source>
         <translation>Schwimmen</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3121"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3126"/>
         <source>Critical Velocity</source>
         <translation>Critical Velocity</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3122"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3127"/>
         <source>Default</source>
         <translation>Standardeinstellung</translation>
     </message>
@@ -26402,19 +26398,19 @@ on and that its display says, &quot;Host&quot;</source>
     <name>ProcessorPage</name>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2618"/>
-        <location filename="../../Gui/Pages.cpp" line="2780"/>
+        <location filename="../../Gui/Pages.cpp" line="2782"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2618"/>
-        <location filename="../../Gui/Pages.cpp" line="2780"/>
+        <location filename="../../Gui/Pages.cpp" line="2782"/>
         <source>On Import</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2618"/>
-        <location filename="../../Gui/Pages.cpp" line="2780"/>
+        <location filename="../../Gui/Pages.cpp" line="2782"/>
         <source>On Save</source>
         <translation type="unfinished"></translation>
     </message>
@@ -26425,8 +26421,8 @@ on and that its display says, &quot;Host&quot;</source>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2622"/>
-        <location filename="../../Gui/Pages.cpp" line="2772"/>
-        <location filename="../../Gui/Pages.cpp" line="2787"/>
+        <location filename="../../Gui/Pages.cpp" line="2774"/>
+        <location filename="../../Gui/Pages.cpp" line="2789"/>
         <source>Automation</source>
         <translation type="unfinished"></translation>
     </message>
@@ -26441,37 +26437,37 @@ on and that its display says, &quot;Host&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2767"/>
+        <location filename="../../Gui/Pages.cpp" line="2769"/>
         <source>Core Processor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2767"/>
+        <location filename="../../Gui/Pages.cpp" line="2769"/>
         <source>Custom Python Processor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2775"/>
+        <location filename="../../Gui/Pages.cpp" line="2777"/>
         <source>Automated execution only</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2789"/>
+        <location filename="../../Gui/Pages.cpp" line="2791"/>
         <source>Use as Filter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2794"/>
+        <location filename="../../Gui/Pages.cpp" line="2796"/>
         <source>Default Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2795"/>
+        <location filename="../../Gui/Pages.cpp" line="2797"/>
         <source>Description</source>
         <translation type="unfinished">Beschreibung</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2896"/>
+        <location filename="../../Gui/Pages.cpp" line="2898"/>
         <source>Are you sure you want to delete %1?</source>
         <translation type="unfinished">Soll %1 wirklich gelöscht werden?</translation>
     </message>
@@ -30327,42 +30323,42 @@ Möchten Sie fortfahren?
 <context>
     <name>SchemePage</name>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1007"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1012"/>
         <source>Add</source>
         <translation>Hinzufügen</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1008"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1013"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1001"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1006"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1002"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1007"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1018"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1023"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1024"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1029"/>
         <source>Short</source>
         <translation>Zone</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1025"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1030"/>
         <source>Long</source>
         <translation>Bezeichnung</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1026"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1031"/>
         <source>Percent of CP</source>
         <translation>Prozentsatz der Critical Power</translation>
     </message>
@@ -30371,14 +30367,14 @@ Möchten Sie fortfahren?
         <translation type="vanished">Maximale Anzahl von 10 Zonen erreicht.</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1064"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1071"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1069"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1076"/>
         <source>New</source>
         <translation>Neu</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="1066"/>
-        <location filename="../../Gui/AthletePages.cpp" line="1073"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1071"/>
+        <location filename="../../Gui/AthletePages.cpp" line="1078"/>
         <source>New (%1)</source>
         <translation>Neu (%1)</translation>
     </message>
@@ -30551,64 +30547,64 @@ Möchten Sie fortfahren?
 <context>
     <name>SeasonsPage</name>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3816"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3821"/>
         <source>Add</source>
         <translation>Hinzufügen</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3817"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3822"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3818"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3823"/>
         <source>Up</source>
         <translation>Hoch</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3819"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3824"/>
         <source>Down</source>
         <translation>Runter</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3865"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3867"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3958"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3960"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3870"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3872"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3963"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3965"/>
         <source>ddd MMM d, yyyy</source>
         <translation>ddd, d.MMM yyyy</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3804"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3809"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3805"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3810"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3799"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3830"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3804"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3835"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3800"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3831"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3805"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3836"/>
         <source>Type</source>
         <translation>Typ</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3801"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3832"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3806"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3837"/>
         <source>From</source>
         <translation>Von (untere Grenze)</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="3802"/>
-        <location filename="../../Gui/AthletePages.cpp" line="3833"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3807"/>
+        <location filename="../../Gui/AthletePages.cpp" line="3838"/>
         <source>To</source>
         <translation>Bis (obere Grenze)</translation>
     </message>
@@ -36100,17 +36096,17 @@ Sie können die Referenzen in der Bibliothek über die Optionen im Kontektmenu l
 <context>
     <name>ZonePage</name>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="910"/>
+        <location filename="../../Gui/AthletePages.cpp" line="915"/>
         <source>Sport</source>
         <translation>Sport</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="957"/>
+        <location filename="../../Gui/AthletePages.cpp" line="962"/>
         <source>Critical Power</source>
         <translation>Critical Power</translation>
     </message>
     <message>
-        <location filename="../../Gui/AthletePages.cpp" line="958"/>
+        <location filename="../../Gui/AthletePages.cpp" line="963"/>
         <source>Default</source>
         <translation>Standardeinstellung</translation>
     </message>

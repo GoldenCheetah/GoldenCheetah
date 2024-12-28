@@ -600,11 +600,11 @@ MainWindow::MainWindow(const QDir &home)
     optionsMenu->setWhatsThis(optionsMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Tools));
 
 
-    processMenu = menuBar()->addMenu(tr("&Process"));
-    connect(processMenu, SIGNAL(aboutToShow()), this, SLOT(onProcessMenuAboutToShow()));
+    editMenu = menuBar()->addMenu(tr("&Edit"));
+    connect(editMenu, SIGNAL(aboutToShow()), this, SLOT(onEditMenuAboutToShow()));
 
-    HelpWhatsThis *editMenuHelp = new HelpWhatsThis(processMenu);
-    processMenu->setWhatsThis(editMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Edit));
+    HelpWhatsThis *editMenuHelp = new HelpWhatsThis(editMenu);
+    editMenu->setWhatsThis(editMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Edit));
 
     // VIEW MENU
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
@@ -2613,9 +2613,9 @@ MainWindow::ridesAutoImport() {
 
 }
 
-void MainWindow::onProcessMenuAboutToShow()
+void MainWindow::onEditMenuAboutToShow()
 {
-    processMenu->clear();
+    editMenu->clear();
     if (toolMapper != nullptr) {
         delete toolMapper;
     }
@@ -2630,7 +2630,7 @@ void MainWindow::onProcessMenuAboutToShow()
         if (! (*iter)->isAutomatedOnly()) {
             // The localized processor name is shown in menu
             QAction *action = new QAction(QString("%1...").arg((*iter)->name()), this);
-            processMenu->addAction(action);
+            editMenu->addAction(action);
             connect(action, SIGNAL(triggered()), toolMapper, SLOT(map()));
             toolMapper->setMapping(action, (*iter)->id());
         }
