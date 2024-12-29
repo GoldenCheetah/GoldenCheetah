@@ -274,7 +274,7 @@ class MainWindow : public QMainWindow
         // autoload rides from athlete specific directory (preferences)
         void ridesAutoImport();
 
-        void onProcessMenuAboutToShow();
+        void onEditMenuAboutToShow();
 
 #ifdef GC_HAS_CLOUD_DB
         // CloudDB actions
@@ -302,7 +302,7 @@ class MainWindow : public QMainWindow
         QTFullScreen *fullScreen;
 #endif
 
-        QMenu *processMenu;
+        QMenu *editMenu;
 
         QComboBox *perspectiveSelector;
         bool pactive; // when programmatically manipulating selector
