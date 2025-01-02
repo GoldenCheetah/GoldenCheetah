@@ -345,37 +345,37 @@ Sie müssen diesen möglicherweise manuell deaktivieren.</translation>
     <message>
         <location filename="../../Gui/ActionButtonBox.cpp" line="33"/>
         <source>Up</source>
-        <translation type="unfinished">Hoch</translation>
+        <translation>Hoch</translation>
     </message>
     <message>
         <location filename="../../Gui/ActionButtonBox.cpp" line="34"/>
         <source>Down</source>
-        <translation type="unfinished">Runter</translation>
+        <translation>Runter</translation>
     </message>
     <message>
         <location filename="../../Gui/ActionButtonBox.cpp" line="54"/>
         <source>Edit</source>
-        <translation type="unfinished">Bearbeiten</translation>
+        <translation>Bearbeiten</translation>
     </message>
     <message>
         <location filename="../../Gui/ActionButtonBox.cpp" line="70"/>
         <source>+</source>
-        <translation type="unfinished">+</translation>
+        <translation>+</translation>
     </message>
     <message>
         <location filename="../../Gui/ActionButtonBox.cpp" line="71"/>
         <source>-</source>
-        <translation type="unfinished">-</translation>
+        <translation>-</translation>
     </message>
     <message>
         <location filename="../../Gui/ActionButtonBox.cpp" line="73"/>
         <source>Add</source>
-        <translation type="unfinished">Hinzufügen</translation>
+        <translation>Hinzufügen</translation>
     </message>
     <message>
         <location filename="../../Gui/ActionButtonBox.cpp" line="74"/>
         <source>Delete</source>
-        <translation type="unfinished">Löschen</translation>
+        <translation>Löschen</translation>
     </message>
 </context>
 <context>
@@ -7540,7 +7540,7 @@ Dies kann zu Inkonsistenzen zwischen ihren lokalen GoldenCheetah-Aktivitäten un
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="219"/>
         <source>Reset Measures to Defaults</source>
-        <translation type="unfinished"></translation>
+        <translation>Messwerte auf Standardwerte zurücksetzen</translation>
     </message>
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="263"/>
@@ -8999,7 +8999,7 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../FileIO/FixPyScriptsDialog.cpp" line="196"/>
         <source>Name</source>
-        <translation type="unfinished">Name</translation>
+        <translation>Name</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixPyScriptsDialog.cpp" line="221"/>
@@ -10878,7 +10878,7 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2413"/>
         <source>&lt;h3&gt;Manage allowed values&lt;/h3&gt;If the list is empty, any value is accepted. A list containing &lt;tt&gt;*&lt;/tt&gt; as its only entry indicates previous values for the same field will be used to autocomplete input.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;h3&gt;Werte verwalten&lt;/h3&gt; Wenn die Liste leer ist, wird jeder Wert akzeptiert. Sind Werte in der List unten eingetragen werden sie zur Autovervollständigung verwendet.</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2420"/>
@@ -10941,7 +10941,7 @@ then click &quot;Rescan&quot; to check again.</source>
   - &quot;Filter window size&quot; distance on either side of the current interval
   - &quot;Set Rest HRV&quot; if checked on interactive use the computed HRV metrics are set as Rest HRV Measures
 </source>
-        <translation type="unfinished">R-R-Ausreißer filtern (siehe &quot;R-R flag&quot; in HRV-Xdata). Nicht-Ausreißer sind mit &quot;1&quot; gekennzeichnet.
+        <translation>R-R-Ausreißer filtern (siehe &quot;R-R flag&quot; in HRV-Xdata). Nicht-Ausreißer sind mit &quot;1&quot; gekennzeichnet.
   - &quot;R-R-Minimum und -Maximum&quot; schließen Daten außerhalb dieser Bereich aus (Kennzeichen -1). Sie werden auch beim Filtern des Bereichs ausgeschlossen.
   - &quot;Filterbereich&quot; des Durchschnitts innerhalb eines Fensters (Kennzeichen 0)
   - &quot;Filter Fenstergröße&quot; Abstand auf beiden Seiten des aktuellen Intervalls
@@ -10963,22 +10963,22 @@ then click &quot;Rescan&quot; to check again.</source>
         <location filename="../../FileIO/FilterHRV.cpp" line="154"/>
         <location filename="../../FileIO/FilterHRV.cpp" line="161"/>
         <source>ms</source>
-        <translation type="unfinished">ms</translation>
+        <translation>ms</translation>
     </message>
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="174"/>
         <source>#</source>
-        <translation type="unfinished"></translation>
+        <translation>#</translation>
     </message>
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="178"/>
         <source>R-R maximum</source>
-        <translation type="unfinished"></translation>
+        <translation>R-R-Maximum</translation>
     </message>
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="179"/>
         <source>R-R minimum</source>
-        <translation type="unfinished"></translation>
+        <translation>R-R-Minimum</translation>
     </message>
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="180"/>
@@ -10988,7 +10988,7 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="181"/>
         <source>Filter window size</source>
-        <translation type="unfinished"></translation>
+        <translation>Größe des Filter-Fensters</translation>
     </message>
     <message>
         <source>Filter window size (#)</source>
@@ -11113,7 +11113,7 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../FileIO/FixAeroPod.cpp" line="112"/>
         <source>When recording with an iBike AeroPod (in HR mode) the CdA data is sent as HR. This tool will update the activity file to move the values from HR into the XData.CdA series.</source>
-        <translation type="unfinished">In der Aufzeichnung eines iBike AreoPod (im HF-Modus) werden CdA-Daten als Herzfrequenz gespeichert. Dieses Werkzeug aktualisiert die Aktivität und verschiebt die Werte von der Herzfrequenz in die XData.CdA-Datenreihe.</translation>
+        <translation>In der Aufzeichnung eines iBike AreoPod (im HF-Modus) werden CdA-Daten als Herzfrequenz gespeichert. Dieses Werkzeug aktualisiert die Aktivität und verschiebt die Werte von der Herzfrequenz in die XData.CdA-Datenreihe.</translation>
     </message>
 </context>
 <context>
@@ -11125,12 +11125,12 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../FileIO/FixAeroPod.cpp" line="55"/>
         <source>Field Adjustment</source>
-        <translation type="unfinished">Daten verschieben</translation>
+        <translation>Daten verschieben</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixAeroPod.cpp" line="56"/>
         <source>Heartrate to XData.CdA</source>
-        <translation type="unfinished"></translation>
+        <translation>XData.CdA aus Herzfrequenz</translation>
     </message>
 </context>
 <context>
@@ -11147,7 +11147,7 @@ then click &quot;Rescan&quot; to check again.</source>
 This process will populate distance information (and override existing distance information if present.)The cubic splines processing estimates distance across polynomial curve, otherwise this feature will compute geometric arc distance between ride points.
 
 </source>
-        <translation type="unfinished">Ermittle die Distanz anhand der GPS-Koordinaten
+        <translation>Ermittle die Distanz anhand der GPS-Koordinaten
 
 Dieser Vorgang füllt die Entfernungsinformationen auf (und überschreibt die vorhandenen Entfernungsinformationen, falls vorhanden). Die Kubische Splinevariante schätzt die Distanz über eine Polynomkurve, andernfalls berechnet diese Funktion den geometrischen Bogenabstand zwischen den Fahrpunkten.
 
@@ -11189,7 +11189,7 @@ Dieser Vorgang füllt die Entfernungsinformationen auf (und überschreibt die vo
     <message>
         <location filename="../../FileIO/FixDeriveHeadwind.cpp" line="87"/>
         <source>Use weather broadcasted data in FIT file to derive Headwind.</source>
-        <translation type="unfinished">Verwende Wetterdaten aus der FIT-Datei, um den Gegenwind zu ermitteln.</translation>
+        <translation>Verwende Wetterdaten aus der FIT-Datei, um den Gegenwind zu ermitteln.</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDeriveHeadwind.cpp" line="168"/>
@@ -11230,7 +11230,23 @@ Note: when the file already contains wind data, it will be overridden if wind sp
 The activity has to be a Ride with Speed and Altitude.
 
 Warning: the accuracy of power estimation can be too low to be of practical use for power analysis of general outdoor rides using typical GPS data. A power meter is recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ableitung geschätzter Leistungsdaten auf der Grundlage von Geschwindigkeit/Höhe/Gewicht usw.
+
+Der Parameter Fahrradgewicht wird zum Gewicht des Athleten addiert, um die Gesamtmasse zusammenzusetzen; er sollte Kleidung, Schuhe usw. einschließen.
+
+Der CRR-Parameter ist der Rollwiderstandskoeffizient, der von den Reifen und der Oberfläche abhängt.
+
+Der CdA-Parameter ist die effektive Stirnfläche in m^2, er hängt von der Position und der Ausrüstung ab. Falls 0, wird er anhand der anthropometrischen Daten geschätzt.
+
+Windschatten (Faktor) Parameter ist der Multiplikator für die Anpassung an den Luftzug, 1 ist kein Luftzug und 0,7 scheint für den Luftzug in einer Gruppe zulässig
+
+Die Windgeschwindigkeit wird in km/h angegeben.
+Die Einheit der Windrichtung (Ursprung) ist Grad von -179 bis +180 (-90=W, 0=N, 90=E, 180=S)
+Hinweis: Wenn die Datei bereits Winddaten enthält, werden diese überschrieben, wenn die Windgeschwindigkeit angegeben wird.
+
+Die Aktivität muss ein Ride mit Geschwindigkeit und Höhe sein.
+
+Warnung: Die Genauigkeit der Leistungsschätzung kann zu gering sein, um für die Leistungsanalyse von allgemeinen Fahrten im Freien mit typischen GPS-Daten von praktischem Nutzen zu sein. Ein Leistungsmesser wird empfohlen.</translation>
     </message>
 </context>
 <context>
@@ -11242,22 +11258,22 @@ Warning: the accuracy of power estimation can be too low to be of practical use 
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="63"/>
         <source>kg</source>
-        <translation type="unfinished">kg</translation>
+        <translation>kg</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="88"/>
         <source>km/h</source>
-        <translation type="unfinished"></translation>
+        <translation>km/h</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="95"/>
         <source>°</source>
-        <translation type="unfinished"></translation>
+        <translation>°</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="97"/>
         <source>Bike Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Fahrradgewicht</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="98"/>
@@ -11277,12 +11293,12 @@ Warning: the accuracy of power estimation can be too low to be of practical use 
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="101"/>
         <source>Wind Speed</source>
-        <translation type="unfinished">Windgeschwindigkeit</translation>
+        <translation>Windgeschwindigkeit</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="102"/>
         <source>Wind Direction</source>
-        <translation type="unfinished"></translation>
+        <translation>Windrichtung</translation>
     </message>
     <message>
         <source>Wind (kph)</source>
@@ -11339,7 +11355,7 @@ Warnung: Die Genauigkeit der Leistungsschätzung kann zu gering sein, um für di
     <message>
         <location filename="../../FileIO/FixDeriveTorque.cpp" line="106"/>
         <source>Derive torque when power and cadence data is available.</source>
-        <translation type="unfinished">Ermittle Drehmomentwerte sofern Leistungs- und Trittfrequenzdaten vorhanden sind.</translation>
+        <translation>Ermittle Drehmomentwerte sofern Leistungs- und Trittfrequenzdaten vorhanden sind.</translation>
     </message>
 </context>
 <context>
@@ -11362,7 +11378,7 @@ Warnung: Die Genauigkeit der Leistungsschätzung kann zu gering sein, um für di
 Elevation data is provided by Open-Elevation.com public API, consider a donation if you find it useful.
 
 INTERNET CONNECTION REQUIRED.</source>
-        <translation type="unfinished">Korrektur oder Hinzufügen von Höhendaten. Wenn Höhendaten vorhanden sind, werden sie entfernt und überschrieben.
+        <translation>Korrektur oder Hinzufügen von Höhendaten. Wenn Höhendaten vorhanden sind, werden sie entfernt und überschrieben.
 Die Höhendaten werden von der öffentlichen API von Open-Elevation.com zur Verfügung gestellt. Wenn Sie sie nützlich finden, sollten Sie eine Spende in betracht ziehen.
 
 INTERNETVERBINDUNG ERFORDERLICH.</translation>
@@ -11421,7 +11437,7 @@ INTERNETVERBINDUNG ERFORDERLICH.</translation>
     <message>
         <location filename="../../FileIO/FixFreewheeling.cpp" line="85"/>
         <source>ANT+ crank based power meters will send  3 duplicate values for power and cadence when the  rider starts to freewheel. The duplicates should  not be retained. This tool removes the duplicates.</source>
-        <translation type="unfinished">ANT+-kurbelbasierte Leistungsmesser senden 3 doppelte Werte für Leistung und Trittfrequenz wenn der Radfahrer in den Freilauf wechselt. Diese Duplikate sollten nicht in den Daten stehen. Dieses Werkzug entfernt die Duplikate.</translation>
+        <translation>ANT+-kurbelbasierte Leistungsmesser senden 3 doppelte Werte für Leistung und Trittfrequenz wenn der Radfahrer in den Freilauf wechselt. Diese Duplikate sollten nicht in den Daten stehen. Dieses Werkzug entfernt die Duplikate.</translation>
     </message>
 </context>
 <context>
@@ -11459,7 +11475,7 @@ Generally altitude data is noisiest and requires highest degree for
 reasonable smoothness. Route gps data gnerally requires a much
 lighter touch.
 </source>
-        <translation type="unfinished">GPS-Reparatur mit mehreren Durchgängen/ Pass:
+        <translation>GPS-Reparatur mit mehreren Durchgängen/ Pass:
 
 Immer: Beseitigt GPS-Fehler und interpoliert Positionsdaten, wenn das GPS-Gerät keine Daten aufgezeichnet hat oder die aufgezeichneten Daten ungültig sind.
 
@@ -11548,38 +11564,38 @@ Im Allgemeinen sind die Höhendaten am stärksten und erfordern den höchsten Gr
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="312"/>
         <source>Pass 1 Altitude Smoothing Degree</source>
-        <translation type="unfinished"></translation>
+        <translation>Durchgang 1 Höhenglättungsgrad</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="327"/>
         <source>Pass 2 Altitude Smoothing Degree</source>
-        <translation type="unfinished"></translation>
+        <translation>Durchgang 2 Höhenglättungsgrad</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="342"/>
         <source>Altitude Outlier Criteria</source>
-        <translation type="unfinished"></translation>
+        <translation>Kriterien für Höhenausreißer</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="347"/>
         <location filename="../../FileIO/FixGPS.cpp" line="396"/>
         <source>cm</source>
-        <translation type="unfinished">cm</translation>
+        <translation>cm</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="365"/>
         <source>Pass 1 Route Smoothing Degree</source>
-        <translation type="unfinished"></translation>
+        <translation>Durchgang 1 Routenglättungsgrad</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="378"/>
         <source>Pass 2 Route Smoothing Degree</source>
-        <translation type="unfinished"></translation>
+        <translation>Durchgang 2 Routenglättungsgrad</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="391"/>
         <source>Route Outlier criteria</source>
-        <translation type="unfinished"></translation>
+        <translation>Kriterien für Streckenausreißer</translation>
     </message>
     <message>
         <source>Altitude</source>
@@ -11829,7 +11845,7 @@ This function performs this task, taking two parameters;
 tolerance - this defines the minimum size of a recording gap (in seconds) that will be processed. any gap shorter than this will not be affected.
 
 stop - this defines the maximum size of gap (in seconds) that will have a smoothing algorithm applied. Where a gap is shorter than this value it will be filled with values interpolated from the values recorded before and after the gap. If it is longer than this value, it will be filled with zero values.</source>
-        <translation type="unfinished">Einige Geräte können während der Aufzeichnung die Funkverbindung &quot;verlieren&quot;. Die &quot;verlorenen&quot; Werte führen zu sogenannten &quot;Drops&quot; in der Aufzeichnung.
+        <translation>Einige Geräte können während der Aufzeichnung die Funkverbindung &quot;verlieren&quot;. Die &quot;verlorenen&quot; Werte führen zu sogenannten &quot;Drops&quot; in der Aufzeichnung.
 
 Um die maximale und durchschnittliche Leistung korrekt berechnen zu können, ist es sinnvoll diese &quot;Drops&quot; entweder zu glätten oder durch Nullwerte zu ersetzen.
 
@@ -11846,7 +11862,7 @@ Stopp - Dieser Wert definiert die maximale Dauer einer Lücke (in Sekunden), die
         <location filename="../../FileIO/FixGaps.cpp" line="52"/>
         <location filename="../../FileIO/FixGaps.cpp" line="58"/>
         <source>s</source>
-        <translation type="unfinished">s</translation>
+        <translation>s</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGaps.cpp" line="60"/>
@@ -11893,7 +11909,7 @@ Stopp - Dieser Wert definiert die maximale Dauer einer Lücke (in Sekunden), die
 It takes the following parameter:
 
 Absolute Max - this defines an absolute value for heart rates, and will smooth any values above this absolute value that have been identified as being anomalies (i.e. at odds with the data surrounding it).</source>
-        <translation type="unfinished">Gelegentlich zeigen Herzfrequenzsensoren fehlerhaft hohe Werte oder empfangen kein Signal (HF=0). Diese Funktion sucht nach Störspitzen und Nullwerten und ersetzt diese Daten mit interpolierten Werten aus den vorherigen und nachfolgenden Werten.
+        <translation>Gelegentlich zeigen Herzfrequenzsensoren fehlerhaft hohe Werte oder empfangen kein Signal (HF=0). Diese Funktion sucht nach Störspitzen und Nullwerten und ersetzt diese Daten mit interpolierten Werten aus den vorherigen und nachfolgenden Werten.
 
 Der Parameter &quot;Absolutes Maximum&quot; definiert den Maximalwert für Herzfrequenzen, so dass Werte über diesem Wert, die als Störspitzen erkannt wurden, unter Berücksichtigung der Nachfolger- und Vorgängerwerte geglättet werden.</translation>
     </message>
@@ -11903,7 +11919,7 @@ Der Parameter &quot;Absolutes Maximum&quot; definiert den Maximalwert für Herzf
     <message>
         <location filename="../../FileIO/FixHRSpikes.cpp" line="56"/>
         <source>bpm</source>
-        <translation type="unfinished">1/min</translation>
+        <translation>1/min</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixHRSpikes.cpp" line="58"/>
@@ -11940,7 +11956,16 @@ Pool Length (in meters) allows to re-define the field if value is &gt; 0
 Lengths shorter than Min Rest (in seconds) are removed and their duration carried to the next length.
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Manchmal sind Längen, Zeiten oder Distanzen beim Bahnenschwimmen falsch.
+Sie können Bahn für Bahn im Editorreiter &quot;SCHWIMMEN&quot; korrigieren: TYP, DAUER und ZÜGE.
+Dieses Werkzeug berechnet die gesamte Zeit, Distanz und Geschwindigkeit/Schlagfrequenz aus der neuen Bahnlänge.
+Runden werden nachgebaut unter Verwendung von Längenabstandsänderungen als Markierungen.
+
+Die Bahnlänge (in Metern) überschreibt die vorhandenen Bahnlängen, wenn der Wert &gt; 0 ist
+
+Bahnen, die kürzer als die Mindestruhezeit (in Sekunden) sind, werden entfernt und ihre Dauer wird zur nächsten Bahn addiert.
+
+</translation>
     </message>
 </context>
 <context>
@@ -11965,22 +11990,22 @@ Bahnlänge (in Metern) überschreibt die vorhandenen Bahnlängen, wenn der Wert 
     <message>
         <location filename="../../FileIO/FixLapSwim.cpp" line="56"/>
         <source>m</source>
-        <translation type="unfinished">m</translation>
+        <translation>m</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixLapSwim.cpp" line="62"/>
         <source>s</source>
-        <translation type="unfinished">s</translation>
+        <translation>s</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixLapSwim.cpp" line="64"/>
         <source>Pool Length</source>
-        <translation type="unfinished">Bahnlänge</translation>
+        <translation>Bahnlänge</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixLapSwim.cpp" line="65"/>
         <source>Min Rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Min. Erholung</translation>
     </message>
 </context>
 <context>
@@ -11993,7 +12018,7 @@ Bahnlänge (in Metern) überschreibt die vorhandenen Bahnlängen, wenn der Wert 
     <message>
         <location filename="../../FileIO/FixMoxy.cpp" line="106"/>
         <source>When recording from the Moxy or BSX Insight in Speed and cadence mode the SmO2 and tHb data is sent as cadence and speed respectively. This tool will update the activity file to move the values from speed and cadence into the Moxy series.</source>
-        <translation type="unfinished">Aufzeichnungen von Moxy oder BSX Insight im Geschwindigkeits- und Trittfrequenzmodus speichern die SmO2- und tHb-Daten als Geschwindigkeit bzw. Trittfrequenz. Dieser Assistent verschiebt Werte aus den Geschwindigkeits- und Trittfrequenz-Datenfeldern in die Moxy-Datenfelder.</translation>
+        <translation>Aufzeichnungen von Moxy oder BSX Insight im Geschwindigkeits- und Trittfrequenzmodus speichern die SmO2- und tHb-Daten als Geschwindigkeit bzw. Trittfrequenz. Dieser Assistent verschiebt Werte aus den Geschwindigkeits- und Trittfrequenz-Datenfeldern in die Moxy-Datenfelder.</translation>
     </message>
 </context>
 <context>
@@ -12015,7 +12040,7 @@ Bahnlänge (in Metern) überschreibt die vorhandenen Bahnlängen, wenn der Wert 
     <message>
         <location filename="../../FileIO/FixMoxy.cpp" line="51"/>
         <source>&lt;b&gt;Field Adjustment&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Daten verschieben&lt;/b&gt;</translation>
     </message>
     <message>
         <source>When recording from the Moxy or BSX Insight in Speed and cadence mode the SmO2 and tHb data is sent as cadence and speed respectively. This tool will update the activity file to move the values from speed and cadence into the Moxy series.</source>
@@ -12038,7 +12063,7 @@ Percent Adjustment - this defines percentage  to modify values by. Negative valu
 Fix Adjustment - this defines an fix amount  to modify values by. Negative values are supported.
 
 If both parameters are given, first the relative adjustment takes place, then the fix value adjustment is applied on the result.</source>
-        <translation type="unfinished">Anpassung von Leistungswerten ermöglicht eine Erhöhung oder Verminderung der Leistungswerte um einen prozetualen oder fixen Wert. Es werden zwei Parameter verwendet:
+        <translation>Anpassung von Leistungswerten ermöglicht eine Erhöhung oder Verminderung der Leistungswerte um einen prozetualen oder fixen Wert. Es werden zwei Parameter verwendet:
 
 Prozentuale Anpassung - dieser definiert den Prozentsatz mit dem die Werte verändert werden. Negative Prozentsätze sind möglich.
 
@@ -12062,7 +12087,7 @@ Wenn beide Parameter angegeben werden, wird zunächst die prozentuale Anpassung 
     <message>
         <location filename="../../FileIO/FixPower.cpp" line="58"/>
         <source>W</source>
-        <translation type="unfinished">W</translation>
+        <translation>W</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixPower.cpp" line="61"/>
@@ -12095,7 +12120,7 @@ Wenn beide Parameter angegeben werden, wird zunächst die prozentuale Anpassung 
     <message>
         <location filename="../../FileIO/FixPyDataProcessor.cpp" line="54"/>
         <source>Custom Python Data Processor</source>
-        <translation type="unfinished">Benutzerdefinierte Python-Datenverarbeitung</translation>
+        <translation>Benutzerdefinierte Python-Datenverarbeitung</translation>
     </message>
 </context>
 <context>
@@ -12116,7 +12141,7 @@ Wenn beide Parameter angegeben werden, wird zunächst die prozentuale Anpassung 
         <location filename="../../FileIO/FixRunningCadence.cpp" line="84"/>
         <source>Some file report cadence in steps per minutes.
 This tools convert to revolutions or cycles per minute</source>
-        <translation type="unfinished">Einige Aktivitätsdateien beinhalten als Schrittfrequenz als Schritte pro Minute.
+        <translation>Einige Aktivitätsdateien beinhalten als Schrittfrequenz als Schritte pro Minute.
 Dieses Tool halbiert die vorhandenen Werte</translation>
     </message>
 </context>
@@ -12149,7 +12174,7 @@ wind direction (origin) unit is degrees from -179 to +180 (-90=W, 0=N, 90=E, 180
 Note: when the file already contains wind data, it will be overridden if wind speed is set
 
 The activity has to be a Run with Speed and Altitude.</source>
-        <translation type="unfinished">Ableitung von geschätzten Laufleistungsdaten auf der Grundlage von Geschwindigkeit/Höhe/Gewicht usw. unter Verwendung von di Prampero-Koeffizienten
+        <translation>Ableitung von geschätzten Laufleistungsdaten auf der Grundlage von Geschwindigkeit/Höhe/Gewicht usw. unter Verwendung von di Prampero-Koeffizienten
 
 Der Parameter Gewicht der Ausrüstung (kg)(Ausrüstungsgewicht) wird zum Gewicht des Athleten addiert, um die Gesamtmasse zusammenzusetzen; er sollte Bekleidung, Schuhe usw. enthalten.
 
@@ -12207,37 +12232,37 @@ Die Aktivität muss ein Lauf mit Geschwindigkeit und Höhe sein.</translation>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="61"/>
         <source>kg</source>
-        <translation type="unfinished">kg</translation>
+        <translation>kg</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="74"/>
         <source>km/h</source>
-        <translation type="unfinished"></translation>
+        <translation>km/h</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="81"/>
         <source>°</source>
-        <translation type="unfinished"></translation>
+        <translation>°</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="83"/>
         <source>Equipment Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Gewicht der Ausrüstung</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="84"/>
         <source>Draft Mult.</source>
-        <translation type="unfinished"></translation>
+        <translation>Windschatten (Faktor)</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="85"/>
         <source>Wind Speed</source>
-        <translation type="unfinished">Windgeschwindigkeit</translation>
+        <translation>Windgeschwindigkeit</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="86"/>
         <source>Wind Direction</source>
-        <translation type="unfinished"></translation>
+        <translation>Windrichtung</translation>
     </message>
 </context>
 <context>
@@ -12257,7 +12282,7 @@ Fix SmO2 - check to fix anomalies in SmO2 data
 Fix tHb - check to fix anomalies in tHb data 
 Max. tHb - any tHb above is considered an outlier 
 </source>
-        <translation type="unfinished">Gelegentlich fehlen SmO2- (%) und/oder tHb-Werte (%) oder sind hoch (SmO2: 0% oder &gt; 100%/ tHb: 0% oder &gt; max. tHb Paramter).
+        <translation>Gelegentlich fehlen SmO2- (%) und/oder tHb-Werte (%) oder sind hoch (SmO2: 0% oder &gt; 100%/ tHb: 0% oder &gt; max. tHb Paramter).
 
 Diese Funktion sucht nach solchen Ausreißern/Anomalien in den SmO2- und tHb-Daten und ersetzt diese fehlerhaften Werte (abhängig von den Paramatern) mit dem interpolierten Wert aus den 3 Werten vor und nach dem fehlerhaften Wert. Parameter sind: 
 
@@ -12282,7 +12307,7 @@ Max. tHb - jeder tHb Wert oberhalb dieser Grenze wird als Ausreißer behandelt
     <message>
         <location filename="../../FileIO/FixSmO2.cpp" line="56"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixSmO2.cpp" line="60"/>
@@ -12321,7 +12346,7 @@ Max. tHb - jeder tHb Wert oberhalb dieser Grenze wird als Ausreißer behandelt
 This tool replaces the existing speed channel, or creates a new one if not present, based on travelled distance
 
 Moving Average Seconds parameter allows to set the seconds of the MA filter to smooth speed spikes</source>
-        <translation type="unfinished">Einige Geräte liefern Geschwindigkeitswerte, die nicht zur Änderung der Distanz/Position passen. Z. B. wenn Sie einen Laufsensor für die Geschwindigkeit und GPS für die Distanz verwenden.
+        <translation>Einige Geräte liefern Geschwindigkeitswerte, die nicht zur Änderung der Distanz/Position passen. Z. B. wenn Sie einen Laufsensor für die Geschwindigkeit und GPS für die Distanz verwenden.
 Dieses Werkzeug ersetzt die Geschwindigkeitsdaten oder erzeugt neue (falls es noch keine gab) auf Grundlage auf der zurückgelegten Strecke und Zeit.
 
 Der Parameter &apos;Sekunden (Gleitender Durchschnitt)&apos; ermöglicht die Einstellung des Filters mit dem die Geschwindigkeitsausreißer geglättet werden</translation>
@@ -12346,12 +12371,12 @@ Der Parameter &apos;Sekunden (Gleitender Durchschnitt)&apos; ermöglicht die Ein
     <message>
         <location filename="../../FileIO/FixSpeed.cpp" line="53"/>
         <source>s</source>
-        <translation type="unfinished">s</translation>
+        <translation>s</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixSpeed.cpp" line="55"/>
         <source>Moving Average</source>
-        <translation type="unfinished">Gleitender Durchschnitt</translation>
+        <translation>Gleitender Durchschnitt</translation>
     </message>
 </context>
 <context>
@@ -12380,7 +12405,7 @@ Window Size - this defines the number of neighbouring points used to determine a
 Variance (Watts) - Determines the threshold beyond which a data point will be fixed, if the difference between the data point value and the median value exceeds this parameter.
 
 </source>
-        <translation type="unfinished">Leistungsmesser melden gelegentlich falsch hohe Werte für die Leistung. Bei kurbelbasierten Leistungsmessern wie SRM und Quarq wird dies durch eine fehlerhafte Trittfrequenzmessung verursacht, die durch das Auslösen eines Reed-Relais beim Abstoßen verursacht wird.
+        <translation>Leistungsmesser melden gelegentlich falsch hohe Werte für die Leistung. Bei kurbelbasierten Leistungsmessern wie SRM und Quarq wird dies durch eine fehlerhafte Trittfrequenzmessung verursacht, die durch das Auslösen eines Reed-Relais beim Abstoßen verursacht wird.
 
 Diese Funktion bietet zwei Algorithmen, die nach Spikes/Anomalien in den Leistungsdaten suchen und die fehlerhaften Daten ersetzen, indem sie:
 
@@ -12410,12 +12435,12 @@ Abweichung in Watt - Legt den Schwellenwert fest, ab dem ein Datenpunkt reparier
         <location filename="../../FileIO/FixSpikes.cpp" line="59"/>
         <location filename="../../FileIO/FixSpikes.cpp" line="65"/>
         <source>W</source>
-        <translation type="unfinished">W</translation>
+        <translation>W</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixSpikes.cpp" line="72"/>
         <source>Points</source>
-        <translation type="unfinished"></translation>
+        <translation>Punkte</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixSpikes.cpp" line="79"/>
@@ -12481,7 +12506,7 @@ Abweichung in Watt - Legt den Schwellenwert fest, ab dem ein Datenpunkt reparier
         <source>Adjusting torque values allows you to uplift or degrade the torque values when the calibration of your power meter was incorrect. It takes a single parameter:
 
 Torque Adjust - this defines an absolute value in poinds per square inch or newton meters to modify values by. Negative values are supported. (e.g. enter &quot;1.2 nm&quot; or &quot;-0.5 pi&quot;).</source>
-        <translation type="unfinished">Die Korrektur des Drehmoments ermöglicht es die Werte des Leistungsmesssensors bei falscher Kalibrierung zu verringern oder zu erhöhen. Die Korrektur verwendet als Parameter:
+        <translation>Die Korrektur des Drehmoments ermöglicht es die Werte des Leistungsmesssensors bei falscher Kalibrierung zu verringern oder zu erhöhen. Die Korrektur verwendet als Parameter:
 
 Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratinch). Negative Werte werden unterstützt. Geben Sie z. B. &quot;1.2 Nm&quot; oder &quot;-0.5 pi&quot; ein.</translation>
     </message>
@@ -14014,27 +14039,27 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/Pages.cpp" line="133"/>
         <source>s</source>
-        <translation type="unfinished">s</translation>
+        <translation>s</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="149"/>
         <source>m</source>
-        <translation type="unfinished">m</translation>
+        <translation>m</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="234"/>
         <source>Deviate from default location</source>
-        <translation type="unfinished"></translation>
+        <translation>Abweichend vom Standardspeicherort</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="246"/>
         <source>Localization</source>
-        <translation type="unfinished"></translation>
+        <translation>Lokalisierung</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="248"/>
         <source>Unit</source>
-        <translation>Einheiten</translation>
+        <translation>Einheit</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="106"/>
@@ -14132,27 +14157,27 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/Pages.cpp" line="252"/>
         <source>Application Behaviour</source>
-        <translation type="unfinished"></translation>
+        <translation>Anwendungseinstellung</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="259"/>
         <source>Recording and Calculation</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufzeichnung und Berechnungen</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="261"/>
         <source>Smart Recording Threshold</source>
-        <translation type="unfinished"></translation>
+        <translation>Grenzwert Smart Recording</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="262"/>
         <source>Elevation hysteresis</source>
-        <translation type="unfinished"></translation>
+        <translation>Hysterese für Höhenmeter</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="266"/>
         <source>Integration</source>
-        <translation type="unfinished"></translation>
+        <translation>Integration</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="398"/>
@@ -17263,7 +17288,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/Pages.cpp" line="2214"/>
         <source>&lt;h3&gt;Alternative Keywords&lt;/h3&gt;Add additional keyword to have the same color</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;h3&gt;Alternative Schlüsselwörter&lt;/h3&gt;Zusätzliches Schlüsselwort hinzufügen, um die gleiche Farbe zu erhalten</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2229"/>
@@ -19757,12 +19782,12 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/StyledItemDelegates.cpp" line="623"/>
         <source>New</source>
-        <translation type="unfinished">Neu</translation>
+        <translation>Neu</translation>
     </message>
     <message>
         <location filename="../../Gui/StyledItemDelegates.cpp" line="625"/>
         <source>New (%1)</source>
-        <translation type="unfinished">Neu (%1)</translation>
+        <translation>Neu (%1)</translation>
     </message>
 </context>
 <context>
@@ -20228,7 +20253,7 @@ Sie sind dabei, alle Diagramme auf die Voreinstellungen zurückzusetzen</transla
         <translation>&amp;Bearbeiten</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="633"/>
+        <location filename="../../Gui/MainWindow.cpp" line="634"/>
         <source>Activities</source>
         <translation>Aktivitäten</translation>
     </message>
@@ -20532,7 +20557,7 @@ Please check your preference settings.</source>
         <translation>Athletenreiter anzeigen</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="634"/>
+        <location filename="../../Gui/MainWindow.cpp" line="633"/>
         <source>Trends</source>
         <translation>Trends</translation>
     </message>
@@ -20728,27 +20753,27 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../FileIO/FixPyScriptsDialog.cpp" line="13"/>
         <source>Select a Python Fix to manage</source>
-        <translation type="unfinished">Einen zu verwaltenden Python-Fix auswählen</translation>
+        <translation>Einen zu verwaltenden Python-Fix auswählen</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixPyScriptsDialog.cpp" line="20"/>
         <source>New</source>
-        <translation type="unfinished">Neu</translation>
+        <translation>Neu</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixPyScriptsDialog.cpp" line="21"/>
         <source>Edit</source>
-        <translation type="unfinished">Bearbeiten</translation>
+        <translation>Bearbeiten</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixPyScriptsDialog.cpp" line="22"/>
         <source>Delete</source>
-        <translation type="unfinished">Löschen</translation>
+        <translation>Löschen</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixPyScriptsDialog.cpp" line="74"/>
         <source>Are you sure you want to delete %1?</source>
-        <translation type="unfinished">Soll %1 wirklich gelöscht werden?</translation>
+        <translation>Soll %1 wirklich gelöscht werden?</translation>
     </message>
 </context>
 <context>
@@ -21370,7 +21395,7 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3228"/>
         <source>Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Gruppen</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3246"/>
@@ -21396,18 +21421,18 @@ Please check your preference settings.</source>
         <location filename="../../Gui/Pages.cpp" line="3376"/>
         <location filename="../../Gui/Pages.cpp" line="3489"/>
         <source>New</source>
-        <translation type="unfinished">Neu</translation>
+        <translation>Neu</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3378"/>
         <location filename="../../Gui/Pages.cpp" line="3491"/>
         <source>New (%1)</source>
-        <translation type="unfinished">Neu (%1)</translation>
+        <translation>Neu (%1)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3410"/>
         <source>Fields in Group &lt;i&gt;%1&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Felder in der Gruppe &lt;i&gt;%1&lt;/i&gt;</translation>
     </message>
     <message>
         <source>Edit</source>
@@ -22096,7 +22121,7 @@ Vor dem Zusammenführen haben Sie die Möglichkeit Aktivitäten zu importieren o
     <message>
         <location filename="../../Gui/Pages.cpp" line="2162"/>
         <source>Processors &amp;&amp; Automation</source>
-        <translation type="unfinished"></translation>
+        <translation>Prozessoren &amp;&amp; Automatisierung</translation>
     </message>
     <message>
         <source>Processing</source>
@@ -22472,7 +22497,7 @@ Keine Aktivitäten zum Importieren gefunden.
     <message>
         <location filename="../../Gui/NewAthleteWizard.cpp" line="351"/>
         <source>Provide performance-related data about the athlete. If unsure, it is usually fine to start with the defaults.</source>
-        <translation>Geben Sie die Leistungsdaten des Athleten ein. Wenn Sie sich nicht sicher sind, können Sie mit den Standardwerten beginnen.</translation>
+        <translation>Geben Sie die Leistungsdaten des Athleten ein. Sind Sie sich nicht sicher, können Sie mit den Standardwerten beginnen.</translation>
     </message>
     <message>
         <location filename="../../Gui/NewAthleteWizard.cpp" line="357"/>
@@ -22588,7 +22613,7 @@ Keine Aktivitäten zum Importieren gefunden.
     <message>
         <location filename="../../Gui/NewAthleteWizard.cpp" line="214"/>
         <source>Unique name (mandatory)</source>
-        <translation>Eindeutiger Name (Pflichtfeld)</translation>
+        <translation>Eindeutiger Namen eingeben (Pflichtfeld)</translation>
     </message>
     <message>
         <location filename="../../Gui/NewAthleteWizard.cpp" line="225"/>
@@ -22652,7 +22677,7 @@ Keine Aktivitäten zum Importieren gefunden.
     <message>
         <location filename="../../Gui/NewAthleteWizard.cpp" line="261"/>
         <source>Units</source>
-        <translation>Einheiten</translation>
+        <translation>Einheit</translation>
     </message>
     <message>
         <location filename="../../Gui/NewAthleteWizard.cpp" line="262"/>
@@ -26400,19 +26425,19 @@ on and that its display says, &quot;Host&quot;</source>
         <location filename="../../Gui/Pages.cpp" line="2618"/>
         <location filename="../../Gui/Pages.cpp" line="2782"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2618"/>
         <location filename="../../Gui/Pages.cpp" line="2782"/>
         <source>On Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Beim Importieren</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2618"/>
         <location filename="../../Gui/Pages.cpp" line="2782"/>
         <source>On Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Beim Speichern</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2621"/>
@@ -26424,52 +26449,52 @@ on and that its display says, &quot;Host&quot;</source>
         <location filename="../../Gui/Pages.cpp" line="2774"/>
         <location filename="../../Gui/Pages.cpp" line="2789"/>
         <source>Automation</source>
-        <translation type="unfinished"></translation>
+        <translation>Automation</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2644"/>
         <source>Hide Core Processors</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard Prozessoren ausblenden</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2659"/>
         <source>&lt;center&gt;&lt;h1&gt;No Processor selected&lt;/h1&gt;&lt;/center&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;center&gt;&lt;h1&gt;Kein Prozessor ausgewählt&lt;/h1&gt;&lt;/center&gt;</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2769"/>
         <source>Core Processor</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard Prozessor</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2769"/>
         <source>Custom Python Processor</source>
-        <translation type="unfinished"></translation>
+        <translation>Benutzerdefinierter Python-Prozessor</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2777"/>
         <source>Automated execution only</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht in der Menüleiste Bearbeiten anzeigen</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2791"/>
         <source>Use as Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Als Filter verwenden:</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2796"/>
         <source>Default Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Standardeinstellungen</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2797"/>
         <source>Description</source>
-        <translation type="unfinished">Beschreibung</translation>
+        <translation>Beschreibung</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2898"/>
         <source>Are you sure you want to delete %1?</source>
-        <translation type="unfinished">Soll %1 wirklich gelöscht werden?</translation>
+        <translation>Soll %1 wirklich gelöscht werden?</translation>
     </message>
     <message>
         <source>Apply</source>
@@ -30824,98 +30849,98 @@ Möchten Sie fortfahren?
     <message>
         <location filename="../../Gui/Pages.cpp" line="856"/>
         <source>Bicycle Mass Without Wheels</source>
-        <translation type="unfinished"></translation>
+        <translation>Masse vom Fahrrad ohne Räder</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="857"/>
         <source>Front Wheel Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorne Masse vom Rad</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="859"/>
         <source>Front Spoke &amp; Nipple Mass - Each</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorne Masse einer Speiche und eines Nippels</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="860"/>
         <source>Front Rim Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorne Masse von der Felge (g)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="861"/>
         <source>Front Rotor Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorne Masse von der Nabe</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="862"/>
         <source>Front Skewer Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorne Masse vom Schnellspanner</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="863"/>
         <source>Front Tire Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorne Masse vom Reifen</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="864"/>
         <source>Front Tube or Sealant Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorne Masse vom Schlauch oder Dichtmilch</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="865"/>
         <source>Front Rim Outer Radius</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorne Außenradius von der Felge</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="866"/>
         <source>Front Rim Inner Radius</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorne Außenradius von der Felge</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="867"/>
         <location filename="../../Gui/Pages.cpp" line="992"/>
         <source>Rear Wheel Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Hinten Masse vom Rad</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="869"/>
         <source>Rear Spoke &amp; Nipple Mass - Each</source>
-        <translation type="unfinished"></translation>
+        <translation>Hinten Masse einer Speiche und eines Nippels</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="870"/>
         <source>Rear Rim Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Hinten Masse von der Felge</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="871"/>
         <source>Rear Rotor Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Hinten Masse von der Nabe</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="872"/>
         <source>Rear Skewer Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Hinten Masse vom Schnellspanner</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="873"/>
         <source>Rear Tire Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Hinten Masse vom Reifen</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="874"/>
         <source>Rear Tube or Sealant Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Hinten Masse vom Schlauch oder Dichtmilch</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="875"/>
         <source>Rear Rim Outer Radius</source>
-        <translation type="unfinished"></translation>
+        <translation>Hinten Außenradius von der Felge</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="876"/>
         <source>Rear Rim Inner Radius</source>
-        <translation type="unfinished"></translation>
+        <translation>Hinten Innenradius von der Felge</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="877"/>
@@ -30925,7 +30950,7 @@ Möchten Sie fortfahren?
     <message>
         <location filename="../../Gui/Pages.cpp" line="877"/>
         <source>Rear Cassette Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Hinten Masse der Kassette</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="878"/>
@@ -30960,22 +30985,22 @@ Möchten Sie fortfahren?
     <message>
         <location filename="../../Gui/Pages.cpp" line="881"/>
         <source>Frontal Area</source>
-        <translation type="unfinished"></translation>
+        <translation>Frontfläche</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="882"/>
         <source>Temperature</source>
-        <translation type="unfinished">Temperatur</translation>
+        <translation>Temperatur</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="883"/>
         <source>ActualTrainerAltitude</source>
-        <translation type="unfinished"></translation>
+        <translation>Derzeitige Höhe des Trainers</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="980"/>
         <source>Total KEMass</source>
-        <translation type="unfinished"></translation>
+        <translation>Gesamte KEMasse</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="981"/>
@@ -30986,68 +31011,69 @@ Möchten Sie fortfahren?
         <location filename="../../Gui/Pages.cpp" line="993"/>
         <location filename="../../Gui/Pages.cpp" line="995"/>
         <source>%1 g</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 g</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="982"/>
         <source>FrontWheel KEMass</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorderrad KEMasse</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="984"/>
         <source>FrontWheel Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorne Masse vom Rad</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="986"/>
         <source>FrontWheel EquivMass</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorderrad EquipMasse</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="988"/>
         <source>FrontWheel I</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorderrad I</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="989"/>
         <location filename="../../Gui/Pages.cpp" line="997"/>
         <source>%1</source>
-        <translation type="unfinished">%1</translation>
+        <translation>%1</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="990"/>
         <source>Rear Wheel KEMass</source>
-        <translation type="unfinished"></translation>
+        <translation>Hinterrad KEMasse</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="994"/>
         <source>Rear Wheel EquivMass</source>
-        <translation type="unfinished"></translation>
+        <translation>Hinterrrad EquipMasse</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="996"/>
         <source>Rear Wheel I</source>
-        <translation type="unfinished"></translation>
+        <translation>Hinterrrad I</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1017"/>
         <source>The values on this page inform the bicycle physics models for simulating speed in trainer mode. These values are used by smart trainers and also by the speed simulation enabled by the &lt;i&gt;Simulate Speed From Power&lt;/i&gt; option in the &lt;i&gt;Training&lt;/i&gt; &amp;gt; &lt;i&gt;Preferences&lt;/i&gt; tab.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Werte auf dieser Seite informieren die Fahrrad-Physikmodelle zur Simulation der Geschwindigkeit im Trainermodus. Diese Werte werden von Smarttrainern und auch von der Geschwindigkeitssimulation verwendet, die Option wird unter &lt;i&gt;Optionen/Training/Einstellungen --&gt; Geschwindigkeit aus der Leistung simulieren&lt;i&gt; aktiviert.
+Mehr Informationen: GC Wiki - Simulate_the_physics_of_bicycle_ride.</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1026"/>
         <source>Resistance and Drag</source>
-        <translation type="unfinished"></translation>
+        <translation>Widerstand und Luftwiderstand</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1037"/>
         <source>Derived Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>Abgeleitete Statistiken</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1043"/>
         <source>Bike &amp; Wheels</source>
-        <translation type="unfinished"></translation>
+        <translation>Fahrrad &amp; Laufräder</translation>
     </message>
     <message>
         <source>Frontal Area (m^2)</source>
@@ -31212,7 +31238,7 @@ Mehr Informationen: GC Wiki - Simulate_the_physics_of_bicycle_ride.</translation
     <message>
         <location filename="../../FileIO/Snippets.cpp" line="87"/>
         <source>Dump metrics for the ride to Athlete_Home/Snippets</source>
-        <translation type="unfinished">Speichert die Metriken von der Aktivtität in das Athletenverzeichnis/Snippets</translation>
+        <translation>Speichert die Metriken von der Aktivtität in das Athletenverzeichnis/Snippets</translation>
     </message>
 </context>
 <context>
@@ -32358,58 +32384,58 @@ Falls eine neu erstellte Aktivität zeitlich mit einer bereits existierenden zus
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="687"/>
         <source>rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Erholung</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="688"/>
         <source>free</source>
-        <translation type="unfinished"></translation>
+        <translation>frei</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="689"/>
         <source>back</source>
-        <translation type="unfinished"></translation>
+        <translation>rücken</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="690"/>
         <source>breast</source>
-        <translation type="unfinished"></translation>
+        <translation>brust</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="691"/>
         <source>fly</source>
-        <translation type="unfinished"></translation>
+        <translation>Delfin</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="692"/>
         <source>drill</source>
-        <translation type="unfinished"></translation>
+        <translation>kraulen</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="693"/>
         <source>mixed</source>
-        <translation type="unfinished"></translation>
+        <translation>gemischt</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="694"/>
         <source>na</source>
-        <translation type="unfinished"></translation>
+        <translation>ka</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="699"/>
         <source>Swim Stroke</source>
-        <translation type="unfinished"></translation>
+        <translation>Schwimmstil</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="700"/>
         <location filename="../../Metrics/SwimMetrics.cpp" line="701"/>
         <source>Stroke</source>
-        <translation type="unfinished"></translation>
+        <translation>Zug</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="702"/>
         <source>Swim Stroke: 0 - rest, 1 - free, 2 - back, 3 - breast, 4 - fly, 5 - drill, 6 - mixed</source>
-        <translation type="unfinished"></translation>
+        <translation>Schwimmstil: 0 - Erholung, 1 - frei, 2 - rücken, 3 - brust, 4 - Delfin, 5 - kraulen, 6 - gemischt</translation>
     </message>
 </context>
 <context>
@@ -33788,7 +33814,7 @@ F3 drücken, wenn fertig.</translation>
     <message>
         <location filename="../../Gui/StyledItemDelegates.cpp" line="77"/>
         <source>The given value &quot;%1&quot; is not unique</source>
-        <translation type="unfinished"></translation>
+        <translation>Der angegebene Wert „%1“ ist mehrfach vorhanden</translation>
     </message>
 </context>
 <context>
