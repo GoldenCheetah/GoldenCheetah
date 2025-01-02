@@ -65,7 +65,7 @@ DiaryWindow::DiaryWindow(Context *context) :
 
     vlayout->addLayout(controls);
 
-    // monthly view via QCalendarWidget
+    // monthly view
     calendarModel = new GcCalendarModel(this, &fieldDefinitions, context);
     calendarModel->setSourceModel(context->athlete->rideCache->model());
 

@@ -22,7 +22,6 @@
 #include "GoldenCheetah.h"
 
 #include <QtGui>
-#include <QCalendarWidget>
 #include <QStackedWidget>
 
 #include "Context.h"
