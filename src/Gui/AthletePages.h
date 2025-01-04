@@ -24,7 +24,6 @@
 #include <QLineEdit>
 #include <QComboBox>
 #include <QGroupBox>
-#include <QCalendarWidget>
 #include <QPushButton>
 #include <QTreeWidget>
 #include <QTableView>

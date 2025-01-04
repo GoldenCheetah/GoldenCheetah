@@ -606,11 +606,11 @@ MainWindow::MainWindow(const QDir &home)
     optionsMenu->setWhatsThis(optionsMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Tools));
 
 
-    processMenu = menuBar()->addMenu(tr("&Process"));
-    connect(processMenu, SIGNAL(aboutToShow()), this, SLOT(onProcessMenuAboutToShow()));
+    editMenu = menuBar()->addMenu(tr("&Edit"));
+    connect(editMenu, SIGNAL(aboutToShow()), this, SLOT(onEditMenuAboutToShow()));
 
-    HelpWhatsThis *editMenuHelp = new HelpWhatsThis(processMenu);
-    processMenu->setWhatsThis(editMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Edit));
+    HelpWhatsThis *editMenuHelp = new HelpWhatsThis(editMenu);
+    editMenu->setWhatsThis(editMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Edit));
 
     // VIEW MENU
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
@@ -619,25 +619,25 @@ MainWindow::MainWindow(const QDir &home)
 #else
     viewMenu->addAction(tr("Toggle Full Screen"), this, SLOT(toggleFullScreen()));
 #endif
-    showhideViewbar = viewMenu->addAction(tr("Show View Sidebar"), this, SLOT(showViewbar(bool)));
+    showhideViewbar = viewMenu->addAction(tr("Show View Sidebar"), this, SLOT(showViewbar(bool)), QKeySequence("F2"));
     showhideViewbar->setCheckable(true);
     showhideViewbar->setChecked(true);
-    showhideSidebar = viewMenu->addAction(tr("Show Left Sidebar"), this, SLOT(showSidebar(bool)));
+    showhideSidebar = viewMenu->addAction(tr("Show Left Sidebar"), this, SLOT(showSidebar(bool)), QKeySequence("F3"));
     showhideSidebar->setCheckable(true);
     showhideSidebar->setChecked(true);
-    showhideLowbar = viewMenu->addAction(tr("Show Compare Pane"), this, SLOT(showLowbar(bool)));
+    showhideLowbar = viewMenu->addAction(tr("Show Compare Pane"), this, SLOT(showLowbar(bool)), QKeySequence("F4"));
     showhideLowbar->setCheckable(true);
     showhideLowbar->setChecked(false);
-    showhideToolbar = viewMenu->addAction(tr("Show Toolbar"), this, SLOT(showToolbar(bool)));
+    showhideToolbar = viewMenu->addAction(tr("Show Toolbar"), this, SLOT(showToolbar(bool)), QKeySequence("F5"));
     showhideToolbar->setCheckable(true);
     showhideToolbar->setChecked(true);
-    showhideTabbar = viewMenu->addAction(tr("Show Athlete Tabs"), this, SLOT(showTabbar(bool)));
+    showhideTabbar = viewMenu->addAction(tr("Show Athlete Tabs"), this, SLOT(showTabbar(bool)), QKeySequence("F6"));
     showhideTabbar->setCheckable(true);
     showhideTabbar->setChecked(true);
 
     viewMenu->addSeparator();
-    viewMenu->addAction(tr("Activities"), this, SLOT(selectAnalysis()));
     viewMenu->addAction(tr("Trends"), this, SLOT(selectTrends()));
+    viewMenu->addAction(tr("Activities"), this, SLOT(selectAnalysis()));
     viewMenu->addAction(tr("Train"), this, SLOT(selectTrain()));
     viewMenu->addSeparator();
     impPerspective = viewMenu->addAction(tr("Import Perspective..."), this, SLOT(importPerspective()));
@@ -2675,9 +2675,9 @@ MainWindow::ridesAutoImport() {
 
 }
 
-void MainWindow::onProcessMenuAboutToShow()
+void MainWindow::onEditMenuAboutToShow()
 {
-    processMenu->clear();
+    editMenu->clear();
     if (toolMapper != nullptr) {
         delete toolMapper;
     }
@@ -2692,7 +2692,7 @@ void MainWindow::onProcessMenuAboutToShow()
         if (! (*iter)->isAutomatedOnly()) {
             // The localized processor name is shown in menu
             QAction *action = new QAction(QString("%1...").arg((*iter)->name()), this);
-            processMenu->addAction(action);
+            editMenu->addAction(action);
             connect(action, SIGNAL(triggered()), toolMapper, SLOT(map()));
             toolMapper->setMapping(action, (*iter)->id());
         }

@@ -181,7 +181,7 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     notificationText->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     notificationText->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     notificationText->setTextInteractionFlags(Qt::NoTextInteraction);
-    notificationText->setLineWrapMode(QPlainTextEdit::NoWrap);
+    notificationText->setLineWrapMode(QPlainTextEdit::WidgetWidth);
 
     //QCheckBox *hideOnIdle = new QCheckBox(tr("Auto Hide"), this);
     //intensityControlLayout->addWidget(hideOnIdle);
