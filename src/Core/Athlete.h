@@ -57,7 +57,6 @@ class RideAutoImportConfig;
 class RideCache;
 class IntervalCache;
 class Context;
-class ColorEngine;
 class AnalysisSidebar;
 class AthleteTab;
 class Leaf;

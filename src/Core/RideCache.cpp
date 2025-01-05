@@ -225,6 +225,12 @@ RideCache::configChanged(qint32 what)
         }
     }
 
+    if (what & CONFIG_NOTECOLOR) {
+        foreach(RideItem * item, rides()) {
+            item->color = GlobalContext::context()->rideMetadata->getColor(item);
+        }
+    }
+ 
     // if zones or weight has changed refresh metrics
     // will add more as they come
     qint32 want = CONFIG_ATHLETE | CONFIG_ZONES | CONFIG_NOTECOLOR | CONFIG_DISCOVERY | CONFIG_GENERAL | CONFIG_USERMETRICS;
@@ -243,6 +249,8 @@ RideCache::itemChanged()
     // NOTE ONLY CONNECT THIS TO RIDEITEMS !!!
     // BECAUSE IT IS ASSUMED BELOW THE SENDER IS A RIDEITEM
     RideItem *item = static_cast<RideItem*>(QObject::sender());
+
+    item->color = GlobalContext::context()->rideMetadata->getColor(item);
 
     // the model is particularly interested in ANY item that changes
     emit itemChanged(item);
@@ -273,6 +281,9 @@ RideCache::addRide(QString name, bool dosignal, bool select, bool useTempActivit
        last = new RideItem(plannedDirectory.canonicalPath(), name, dt, context, planned);
     else
        last = new RideItem(directory.canonicalPath(), name, dt, context, planned);
+
+    // set the navigator color
+    last->color = GlobalContext::context()->rideMetadata->getColor(last);
 
     connect(last, SIGNAL(rideDataChanged()), this, SLOT(itemChanged()));
     connect(last, SIGNAL(rideMetadataChanged()), this, SLOT(itemChanged()));

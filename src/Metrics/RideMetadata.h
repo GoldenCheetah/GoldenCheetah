@@ -49,9 +49,9 @@ class RideEditor;
 class KeywordDefinition
 {
     public:
-        QString name;       // keyword for autocomplete
-        QColor  color;      // color to highlight with
-        QStringList tokens; // texts to find from notes
+
+        QString filterExpression;   // textual version of the keyword filter
+        QColor color;               // color to highlight if item matches keyword filter
 
         static unsigned long fingerprint(QList<KeywordDefinition>);
 };
@@ -179,8 +179,8 @@ class RideMetadata : public QWidget
 
     public:
         RideMetadata(Context *, bool singlecolumn = false);
-        static void serialize(QString filename, QList<KeywordDefinition>, QList<FieldDefinition>, QString colofield, QList<DefaultDefinition>defaultDefinitions);
-        static void readXML(QString filename, QList<KeywordDefinition>&, QList<FieldDefinition>&, QString &colorfield, QList<DefaultDefinition>&defaultDefinitions);
+        static void serialize(QString filename, QList<KeywordDefinition>, QList<FieldDefinition>, QList<DefaultDefinition>defaultDefinitions);
+        static void readXML(QString filename, QList<KeywordDefinition>&, QList<FieldDefinition>&, QList<DefaultDefinition>&defaultDefinitions);
         QList<KeywordDefinition> getKeywords() { return keywordDefinitions; }
         QList<FieldDefinition> getFields() { return fieldDefinitions; }
         QList<DefaultDefinition> getDefaults() { return defaultDefinitions; }
@@ -189,8 +189,8 @@ class RideMetadata : public QWidget
 
         QStringList sports();
 
-        QString getColorField() const { return colorfield; }
-        void setColorField(QString x) { colorfield = x; }
+        QColor getColor(RideItem* rideItem) const;
+        QColor getReverseColor() const;
 
         void setRideItem(RideItem *x);
         RideItem *rideItem() const;
@@ -234,7 +234,8 @@ class RideMetadata : public QWidget
 
     QVector<FormField*>   formFields;
 
-    QString colorfield;
+    QString colorfield; // support legacy format conversion
+    QColor reverseColor;
 
     RideEditor *editor;
 };
@@ -251,7 +252,6 @@ public:
 
     QList<KeywordDefinition> getKeywords() { return keywordDefinitions; }
     QList<FieldDefinition> getFields() { return fieldDefinitions; }
-    QString getColorField() { return colorfield; }
     QList<DefaultDefinition> getDefaults() { return defaultDefinitions; }
 
 protected:
@@ -260,7 +260,7 @@ protected:
     // ths results are here
     QList<KeywordDefinition> keywordDefinitions;
     QList<FieldDefinition>   fieldDefinitions;
-    QString colorfield;
+    QString colorfield; // legacy field for conversion
     QList<DefaultDefinition>   defaultDefinitions;
 
     // whilst parsing elements are stored here

@@ -916,10 +916,9 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
 
         // params to readXML - we ignore them
         QList<KeywordDefinition> keywordDefinitions;
-        QString colorfield;
         QList<DefaultDefinition> defaultDefinitions;
 
-        RideMetadata::readXML(metaConfig, keywordDefinitions, settings.metafields, colorfield, defaultDefinitions);
+        RideMetadata::readXML(metaConfig, keywordDefinitions, settings.metafields, defaultDefinitions);
 
         SpecialFields sp;
 

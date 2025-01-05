@@ -243,7 +243,7 @@ class DataFilter : public QObject
         const gsl_rng_type *T;
         gsl_rng *r;
 
-        // RideItem always available and supplies th context
+        // RideItem always available and supplies the context
         Result evaluate(RideItem *rideItem, RideFilePoint *p);
         Result evaluate(DateRange dr, QString filter="");
         Result evaluate(Specification spec, DateRange dr);

@@ -32,6 +32,7 @@
 #include "HelpWhatsThis.h"
 #include "Utils.h"
 #include "RideEditor.h"
+#include "DataFilter.h"
 
 #include <QXmlDefaultHandler>
 #include <QtGui>
@@ -319,7 +320,15 @@ RideMetadata::configChanged(qint32)
     if (QFile(filename).exists()) {
 
         // read in existing file
-        readXML(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
+        readXML(filename, keywordDefinitions, fieldDefinitions, defaultDefinitions);
+
+        reverseColor = GColor(CPLOTBACKGROUND);
+        foreach(KeywordDefinition keyword, keywordDefinitions) {
+            if (keyword.filterExpression == "Reverse") {
+                reverseColor = keyword.color;  // to set the foreground when background is set
+                break;
+            }
+        }
 
     } else {
 
@@ -349,10 +358,9 @@ RideMetadata::configChanged(qint32)
             QList<KeywordDefinition> a_keywordDefinitions;
             QList<FieldDefinition>   a_fieldDefinitions;
             QList<DefaultDefinition>   a_defaultDefinitions;
-            QString a_colorfield;
 
             // read in athlete specific
-            readXML(filename, a_keywordDefinitions, a_fieldDefinitions, a_colorfield, a_defaultDefinitions);
+            readXML(filename, a_keywordDefinitions, a_fieldDefinitions, a_defaultDefinitions);
 
             // first one, just use them all
             if (first) {
@@ -361,7 +369,6 @@ RideMetadata::configChanged(qint32)
                 keywordDefinitions = a_keywordDefinitions;
                 fieldDefinitions = a_fieldDefinitions;
                 defaultDefinitions = a_defaultDefinitions;
-                colorfield = a_colorfield;
 
                 first = false;
 
@@ -372,9 +379,9 @@ RideMetadata::configChanged(qint32)
                 // user can always go an edit them in settings anyway
                 foreach(KeywordDefinition x, a_keywordDefinitions) {
 
-                    bool found=false;
+                    bool found = false;
                     foreach(KeywordDefinition e, keywordDefinitions) {
-                        if (e.name == x.name) found=true;
+                        if (e.filterExpression == x.filterExpression) found = true;
                     }
                     if (!found) {
                         keywordDefinitions.append(x);
@@ -408,7 +415,7 @@ RideMetadata::configChanged(qint32)
         // write out global file now, so we don't keep doing this
         // "upgrade" process every time we open an athlete etc
         filename = QDir(gcroot).absolutePath()+"/metadata.xml";
-        serialize(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
+        serialize(filename, keywordDefinitions, fieldDefinitions, defaultDefinitions);
     }
 
     if (context) { // global doesn't have all the widgets etc
@@ -599,6 +606,29 @@ RideMetadata::sports()
     if (!hasBike) sportList.prepend(tr("Bike"));
 
     return sportList;
+}
+
+QColor
+RideMetadata::getColor(RideItem* rideItem) const {
+
+    if (rideItem) {
+
+        static DataFilter keywordfilter(nullptr, nullptr);
+        keywordfilter.context = rideItem->context;
+
+        foreach(KeywordDefinition keyword, keywordDefinitions) {
+            keywordfilter.check(keyword.filterExpression); // set the expression
+            if (keywordfilter.evaluate(rideItem, NULL).number() != 0) {
+                return keyword.color;
+            }
+        }
+    }
+    return QColor(1, 1, 1, 1); // the default color has an alpha of 1, not possible otherwise
+}
+
+QColor
+RideMetadata::getReverseColor() const {
+    return reverseColor;
 }
 
 /*----------------------------------------------------------------------
@@ -1638,9 +1668,8 @@ KeywordDefinition::fingerprint(QList<KeywordDefinition> list)
 
     foreach(KeywordDefinition def, list) {
 
-        ba.append(def.name.toUtf8());
+        ba.append(def.filterExpression.toUtf8());
         ba.append(def.color.name().toUtf8());
-        ba.append(def.tokens.join("").toUtf8());
     }
 
 #if QT_VERSION < 0x060000
@@ -1655,7 +1684,7 @@ KeywordDefinition::fingerprint(QList<KeywordDefinition> list)
  *--------------------------------------------------------------------*/
 
 void
-RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinitions, QList<FieldDefinition>fieldDefinitions, QString colorfield, QList<DefaultDefinition>defaultDefinitions)
+RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinitions, QList<FieldDefinition>fieldDefinitions, QList<DefaultDefinition>defaultDefinitions)
 {
     // open file - truncate contents
     QFile file(filename);
@@ -1676,7 +1705,6 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
     // begin document
     out << "<metadata>\n";
 
-    out << QString("<colorfield>\"%1\"</colorfield>").arg(Utils::xmlprotect(colorfield));
     //
     // First we write out the keywords
     //
@@ -1685,15 +1713,11 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
     foreach (KeywordDefinition keyword, keywordDefinitions) {
         // chart name
         out<<QString("\t\t<keyword>\n");
-        out<<QString("\t\t\t<keywordname>\"%1\"</keywordname>\n").arg(Utils::xmlprotect(keyword.name));
+        out<<QString("\t\t\t<keywordfilter>\"%1\"</keywordfilter>\n").arg(Utils::xmlprotect(keyword.filterExpression));
         out<<QString("\t\t\t<keywordcolor red=\"%1\" green=\"%3\" blue=\"%4\"></keywordcolor>\n")
                         .arg(keyword.color.red())
                         .arg(keyword.color.green())
                         .arg(keyword.color.blue());
-
-        foreach (QString token, keyword.tokens)
-            out<<QString("\t\t\t<keywordtoken>\"%1\"</keywordtoken>\n").arg(Utils::xmlprotect(token));
-
         out<<QString("\t\t</keyword>\n");
     }
     out <<"\t</keywords>\n";
@@ -1742,7 +1766,7 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
 }
 
 void
-RideMetadata::readXML(QString filename, QList<KeywordDefinition>&keywordDefinitions, QList<FieldDefinition>&fieldDefinitions, QString &colorfield, QList<DefaultDefinition> &defaultDefinitions)
+RideMetadata::readXML(QString filename, QList<KeywordDefinition>&keywordDefinitions, QList<FieldDefinition>&fieldDefinitions, QList<DefaultDefinition> &defaultDefinitions)
 {
     QFile metadataFile(filename);
     QXmlInputSource source( &metadataFile );
@@ -1756,11 +1780,7 @@ RideMetadata::readXML(QString filename, QList<KeywordDefinition>&keywordDefiniti
 
     keywordDefinitions = handler.getKeywords();
     fieldDefinitions = handler.getFields();
-    colorfield = handler.getColorField();
     defaultDefinitions = handler.getDefaults();
-
-    // backwards compatible
-    if (colorfield == "") colorfield = "Calendar Text";
 
     // now auto append special fields, in case
     // the user wiped them or we have introduced
@@ -1817,8 +1837,10 @@ bool MetadataXMLParser::endElement( const QString&, const QString&, const QStrin
     //
     // Single Attribute elements
     //
-    if(qName == "keywordname") keyword.name = Utils::unprotect(buffer);
-    else if(qName == "keywordtoken") keyword.tokens << Utils::unprotect(buffer);
+    if (qName == "keywordname") { // convert the legacy keyword name to an expression
+        keyword.filterExpression = colorfield + " = \"" + Utils::unprotect(buffer) + "\"";
+    }
+    else if(qName == "keywordfilter") keyword.filterExpression = Utils::unprotect(buffer);
     else if(qName == "keywordcolor") {
             // the r,g,b values are in red="xx",green="xx" and blue="xx" attributes
             // of this element and captured in startelement below
@@ -1838,7 +1860,7 @@ bool MetadataXMLParser::endElement( const QString&, const QString&, const QStrin
     else if(qName == "defaultfield") adefault.field =  Utils::unprotect(buffer);
     else if(qName == "defaultvalue") adefault.value =  Utils::unprotect(buffer);
     else if(qName == "defaultlinkedfield") adefault.linkedField =  Utils::unprotect(buffer);
-    else if(qName == "defaultlinkedvalue") adefault.linkedValue =  Utils::unprotect(buffer);
+    else if(qName == "defaultlinkedvalue") adefault.linkedValue =  Utils::unprotect(buffer);  
 
     //
     // Complex Elements
@@ -1847,7 +1869,7 @@ bool MetadataXMLParser::endElement( const QString&, const QString&, const QStrin
         keywordDefinitions.append(keyword);
     else if (qName == "field") // <field></field> block
         fieldDefinitions.append(field);
-    else if (qName == "colorfield")
+    else if (qName == "colorfield") // this is now a legacy keyword 
         colorfield = Utils::unprotect(buffer);
     else if (qName == "default") // <default></default> block
         defaultDefinitions.append(adefault);

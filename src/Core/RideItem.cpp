@@ -29,7 +29,7 @@
 #include "HrZones.h"
 #include "PaceZones.h"
 #include "Settings.h"
-#include "Colors.h" // for ColorEngine
+#include "Colors.h" // for standardColor
 #include "AddIntervalDialog.h" // till we fixup ridefilecache to have offsets
 #include "TimeUtils.h" // time_to_string()
 #include "WPrime.h" // for matches
@@ -473,9 +473,6 @@ RideItem::checkStale()
     // if we're marked stale already then just return that !
     if (isstale) return true;
 
-    // just change it .. its as quick to change as it is to check !
-    color = GlobalContext::context()->colorEngine->colorFor(getText(GlobalContext::context()->rideMetadata->getColorField(), ""));
-
     // upgraded metrics
     if (udbversion != UserMetricSchemaVersion || dbversion != DBSchemaVersion) {
 
@@ -602,7 +599,6 @@ RideItem::refresh()
         isSwim = f->isSwim();
         isXtrain = f->isXtrain();
         isAero = f->isAero();
-        color = GlobalContext::context()->colorEngine->colorFor(f->getTag(GlobalContext::context()->rideMetadata->getColorField(), ""));
         present = f->getTag("Data", "");
         samples = f->dataPoints().count() > 0;
 

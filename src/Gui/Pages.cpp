@@ -2146,7 +2146,6 @@ MetadataPage::MetadataPage(Context *context) : context(context)
     // get current config using default file
     keywordDefinitions = GlobalContext::context()->rideMetadata->getKeywords();
     fieldDefinitions = GlobalContext::context()->rideMetadata->getFields();
-    colorfield = GlobalContext::context()->rideMetadata->getColorField();
     defaultDefinitions = GlobalContext::context()->rideMetadata->getDefaults();
 
     // setup maintenance pages using current config
@@ -2169,7 +2168,6 @@ MetadataPage::MetadataPage(Context *context) : context(context)
 
     // save initial values
     b4.keywordFingerprint = KeywordDefinition::fingerprint(keywordDefinitions);
-    b4.colorfield = colorfield;
     b4.fieldFingerprint = FieldDefinition::fingerprint(fieldDefinitions);
 }
 
@@ -2185,14 +2183,14 @@ MetadataPage::saveClicked()
     appsettings->setValue(GC_RIDEBG, keywordsPage->rideBG->isChecked());
 
     // write to metadata.xml
-    RideMetadata::serialize(QDir(gcroot).canonicalPath() + "/metadata.xml", keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
+    RideMetadata::serialize(QDir(gcroot).canonicalPath() + "/metadata.xml", keywordDefinitions, fieldDefinitions, defaultDefinitions);
 
     // save processors config
     processorPage->saveClicked();
 
     qint32 state = 0;
 
-    if (b4.keywordFingerprint != KeywordDefinition::fingerprint(keywordDefinitions) || b4.colorfield != colorfield)
+    if (b4.keywordFingerprint != KeywordDefinition::fingerprint(keywordDefinitions))
         state += CONFIG_NOTECOLOR;
 
     if (b4.fieldFingerprint != FieldDefinition::fingerprint(fieldDefinitions))
@@ -2211,13 +2209,20 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_DataFields_Notes_Keywords));
 
-    relatedDelegate.setTitle(tr("<h3>Alternative Keywords</h3>Add additional keyword to have the same color"));
-
     QHBoxLayout *field = new QHBoxLayout();
-    fieldLabel = new QLabel(tr("Field"),this);
-    fieldChooser = new QComboBox(this);
+    QLabel* fieldLabel = new QLabel(tr("Filter: "),this);
     field->addWidget(fieldLabel);
-    field->addWidget(fieldChooser);
+
+    // keyword filter
+    keywordFilter = new SearchBox(parent->context, this);
+    keywordFilter->setFixedMode(true);
+    keywordFilter->setMode(SearchBox::Filter);
+    field->addWidget(keywordFilter);
+
+    // update button
+    QPushButton* update = new QPushButton(tr("Update"), this);
+    field->addWidget(update);
+
     field->addStretch();
     mainLayout->addLayout(field);
 
@@ -2226,11 +2231,9 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
     field->addWidget(rideBG);
 
     keywords = new QTreeWidget;
-    keywords->headerItem()->setText(0, tr("Keyword"));
-    keywords->headerItem()->setText(1, tr("Color"));
-    keywords->headerItem()->setText(2, tr("Related Notes Words"));
-    keywords->setColumnCount(3);
-    keywords->setItemDelegateForColumn(2, &relatedDelegate);
+    keywords->headerItem()->setText(0, tr("Color"));
+    keywords->headerItem()->setText(1, tr("Keyword Filter"));
+    keywords->setColumnCount(2);
     basicTreeWidgetStyle(keywords);
 
     actionButtons = new ActionButtonBox(ActionButtonBox::UpDownGroup | ActionButtonBox::AddDeleteGroup);
@@ -2238,28 +2241,19 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
     actionButtons->defaultConnect(ActionButtonBox::AddDeleteGroup, keywords);
 
     foreach(KeywordDefinition keyword, keywordDefinitions) {
+
         QTreeWidgetItem *add;
-        ColorButton *colorButton = new ColorButton(this, keyword.name, keyword.color);
+        ColorButton *colorButton = new ColorButton(this, keyword.filterExpression, keyword.color);
         add = new QTreeWidgetItem(keywords->invisibleRootItem());
         add->setFlags(add->flags() | Qt::ItemIsEditable);
 
-        // keyword
-        add->setText(0, keyword.name);
-
         // color button
         add->setTextAlignment(1, Qt::AlignHCenter);
-        keywords->setItemWidget(add, 1, colorButton);
+        keywords->setItemWidget(add, 0, colorButton);
 
-        QString text;
-        for (int i=0; i< keyword.tokens.count(); i++) {
-            if (i != keyword.tokens.count()-1)
-                text += keyword.tokens[i] + ",";
-            else
-                text += keyword.tokens[i];
-        }
-
-        // notes texts
-        add->setText(2, text);
+        // keyword filter
+        QLabel* filter = new QLabel(keyword.filterExpression, this);
+        keywords->setItemWidget(add, 1, filter);
     }
 
     mainLayout->addWidget(keywords);
@@ -2270,42 +2264,32 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
     connect(actionButtons, &ActionButtonBox::downRequested, this, &KeywordsPage::downClicked);
     connect(actionButtons, &ActionButtonBox::addRequested, this, &KeywordsPage::addClicked);
     connect(actionButtons, &ActionButtonBox::deleteRequested, this, &KeywordsPage::deleteClicked);
-    connect(fieldChooser, SIGNAL(currentIndexChanged(int)), this, SLOT(colorfieldChanged()));
+
 
     keywords->setCurrentItem(keywords->invisibleRootItem()->child(0));
+
+    connect(update, SIGNAL(clicked()), this, SLOT(updateClicked()));
+    connect(keywords, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
 }
 
 void
 KeywordsPage::pageSelected()
 {
-    SpecialFields sp;
-    QString prev = "";
+}
 
-    // remember what was selected, if anything?
-    if (fieldChooser->count()) {
-        prev = sp.internalName(fieldChooser->itemText(fieldChooser->currentIndex()));
-        parent->colorfield = prev;
-    } else prev = parent->colorfield;
-    // load in texts from metadata
-    fieldChooser->clear();
+void KeywordsPage::currentItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous) {
+    
+    // update filter with entries text
+    keywordFilter->setText(((QLabel*)keywords->itemWidget(keywords->currentItem(), 1))->text());
 
-    // get the current fields definitions
-    QList<FieldDefinition> fromFieldsPage;
-    parent->fieldsPage->getDefinitions(fromFieldsPage);
-    foreach(FieldDefinition x, fromFieldsPage) {
-        if (x.type < 3) fieldChooser->addItem(sp.displayName(x.name));
-    }
-    fieldChooser->setCurrentIndex(fieldChooser->findText(sp.displayName(prev)));
 }
 
 void
-KeywordsPage::colorfieldChanged()
-{
-    SpecialFields sp;
-    int index = fieldChooser->currentIndex();
-    if (index >=0) parent->colorfield = sp.internalName(fieldChooser->itemText(fieldChooser->currentIndex()));
-}
+KeywordsPage::updateClicked() {
 
+    // update entries text with filter
+    ((QLabel*) keywords->itemWidget(keywords->currentItem(), 1))->setText(keywordFilter->text());
+}
 
 void
 KeywordsPage::upClicked()
@@ -2315,15 +2299,15 @@ KeywordsPage::upClicked()
         if (index == 0) return; // its at the top already
 
         // movin on up!
-        QWidget *button = keywords->itemWidget(keywords->currentItem(),1);
+        QWidget *button = keywords->itemWidget(keywords->currentItem(),0);
+        QWidget* filter = keywords->itemWidget(keywords->currentItem(), 1);
         ColorButton *colorButton = new ColorButton(this, ((ColorButton*)button)->getName(), ((ColorButton*)button)->getColor());
+        QLabel* filterLabel = new QLabel(((QLabel*)filter)->text(), this);
         QTreeWidgetItem* moved = keywords->invisibleRootItem()->takeChild(index);
         keywords->invisibleRootItem()->insertChild(index-1, moved);
-        keywords->setItemWidget(moved, 1, colorButton);
+        keywords->setItemWidget(moved, 0, colorButton);
+        keywords->setItemWidget(moved, 1, filterLabel);
         keywords->setCurrentItem(moved);
-        //LTMSettings save = (*presets)[index];
-        //presets->removeAt(index);
-        //presets->insert(index-1, save);
     }
 }
 
@@ -2335,11 +2319,14 @@ KeywordsPage::downClicked()
         if (index == (keywords->invisibleRootItem()->childCount()-1)) return; // its at the bottom already
 
         // movin on up!
-        QWidget *button = keywords->itemWidget(keywords->currentItem(),1);
+        QWidget *button = keywords->itemWidget(keywords->currentItem(),0);
+        QWidget *filter = keywords->itemWidget(keywords->currentItem(),1);
         ColorButton *colorButton = new ColorButton(this, ((ColorButton*)button)->getName(), ((ColorButton*)button)->getColor());
+        QLabel *filterLabel = new QLabel(((QLabel*)filter)->text(), this);
         QTreeWidgetItem* moved = keywords->invisibleRootItem()->takeChild(index);
         keywords->invisibleRootItem()->insertChild(index+1, moved);
-        keywords->setItemWidget(moved, 1, colorButton);
+        keywords->setItemWidget(moved, 0, colorButton);
+        keywords->setItemWidget(moved, 1, filterLabel);
         keywords->setCurrentItem(moved);
     }
 }
@@ -2349,25 +2336,19 @@ KeywordsPage::addClicked()
 {
     int index = keywords->invisibleRootItem()->indexOfChild(keywords->currentItem());
     if (index < 0) index = 0;
-    QTreeWidgetItem *add;
-    ColorButton *colorButton = new ColorButton(this, tr("New"), QColor(Qt::blue));
-    add = new QTreeWidgetItem;
+
+    QTreeWidgetItem *add = new QTreeWidgetItem();
     keywords->invisibleRootItem()->insertChild(index, add);
     add->setFlags(add->flags() | Qt::ItemIsEditable);
 
-    // keyword
-    QString text = tr("New");
-    for (int i=0; keywords->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
-        text = QString(tr("New (%1)")).arg(i+1);
-    }
-    add->setText(0, text);
-
     // color button
-    add->setTextAlignment(1, Qt::AlignHCenter);
-    keywords->setItemWidget(add, 1, colorButton);
+    add->setTextAlignment(0, Qt::AlignHCenter);
+    ColorButton* colorButton = new ColorButton(this, tr("New"), QColor(Qt::blue));
+    keywords->setItemWidget(add, 0, colorButton);
 
-    // notes texts
-    add->setText(2, "");
+    // keyword
+    QLabel* filter = new QLabel(keywordFilter->text());
+    keywords->setItemWidget(add, 1, filter);
 
     keywords->setCurrentItem(add);
 }
@@ -2390,12 +2371,12 @@ KeywordsPage::getDefinitions(QList<KeywordDefinition> &keywordList)
     keywordList.clear();
 
     for (int idx =0; idx < keywords->invisibleRootItem()->childCount(); idx++) {
-        KeywordDefinition add;
+
         QTreeWidgetItem *item = keywords->invisibleRootItem()->child(idx);
 
-        add.name = item->text(0);
-        add.color = ((ColorButton*)keywords->itemWidget(item, 1))->getColor();
-        add.tokens = item->text(2).split(",", Qt::SkipEmptyParts);
+        KeywordDefinition add;
+        add.color = ((ColorButton*) keywords->itemWidget(item, 0))->getColor();
+        add.filterExpression = ((QLabel*) keywords->itemWidget(item, 1))->text();
 
         keywordList.append(add);
     }

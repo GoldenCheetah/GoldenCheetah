@@ -466,50 +466,6 @@ GCColor::themes()
     return allThemes;
 }
 
-ColorEngine::ColorEngine(GlobalContext *gc) : defaultColor(QColor(Qt::white)), gc(gc)
-{
-    configChanged(CONFIG_NOTECOLOR);
-    connect(gc, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
-}
-
-void ColorEngine::configChanged(qint32)
-{
-    // clear existing
-    workoutCodes.clear();
-
-    // reverse
-    reverseColor = GColor(CPLOTBACKGROUND);
-
-    // setup the keyword/color combinations from config settings
-    foreach (KeywordDefinition keyword, gc->rideMetadata->getKeywords()) {
-        if (keyword.name == "Default")
-            defaultColor = keyword.color; // we actually ignore this now
-        else if (keyword.name == "Reverse")
-            reverseColor = keyword.color;  // to set the foreground when use as background is set
-        else {
-            workoutCodes[keyword.name] = keyword.color;
-
-            // alternative texts in notes
-            foreach (QString token, keyword.tokens) {
-                workoutCodes[token] = keyword.color;
-            }
-        }
-    }
-}
-
-QColor
-ColorEngine::colorFor(QString text)
-{
-    QColor color = QColor(1,1,1,1); // the default color has an alpha of 1, not possible otherwise
-
-    foreach(QString code, workoutCodes.keys()) {
-        if (text.contains(code, Qt::CaseInsensitive)) {
-           color = workoutCodes[code];
-        }
-    }
-    return color;
-}
-
 QString
 GCColor::css(bool ridesummary)
 {

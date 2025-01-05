@@ -47,7 +47,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : GcChartWindow(
     this->mainwindow = mainwindow;
     _groupBy = -1;
     fontHeight = QFontMetrics(QFont()).height();
-    reverseColor = GlobalContext::context()->colorEngine->reverseColor;
+    reverseColor = GlobalContext::context()->rideMetadata->getReverseColor();
     currentItem = NULL;
     hasCalendarText = false;
 
@@ -168,7 +168,7 @@ void
 RideNavigator::configChanged(qint32 state)
 {
     fontHeight = QFontMetrics(QFont()).height();
-    reverseColor = GlobalContext::context()->colorEngine->reverseColor;
+    reverseColor = GlobalContext::context()->rideMetadata->getReverseColor();
     hasCalendarText = GlobalContext::context()->rideMetadata->hasCalendarText();
 
     // hide ride list scroll bar ?

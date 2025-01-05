@@ -236,11 +236,10 @@ GcUpgrade::upgrade(const QDir &home)
 
             QList<KeywordDefinition> keywordDefinitions;
             QList<FieldDefinition>   fieldDefinitions;
-            QString colorfield;
             QList<DefaultDefinition> defaultDefinitions;
 
             // read em in
-            RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
+            RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions, defaultDefinitions);
 
             bool updated=false;
 
@@ -299,8 +298,8 @@ GcUpgrade::upgrade(const QDir &home)
             //
             int defaultIndex = -1, reverseIndex = -1;
             for(int i=0; i<keywordDefinitions.count(); i++) {
-                if (keywordDefinitions[i].name == "Default") defaultIndex = i;
-                if (keywordDefinitions[i].name == "Reverse") reverseIndex = i;
+                if (keywordDefinitions[i].filterExpression == "Default") defaultIndex = i;
+                if (keywordDefinitions[i].filterExpression == "Reverse") reverseIndex = i;
             }
 
             // no more default
@@ -313,14 +312,14 @@ GcUpgrade::upgrade(const QDir &home)
             if (reverseIndex < 0) {
                 updated = true;
                 KeywordDefinition add;
-                add.name = "Reverse";
+                add.filterExpression = "Reverse";
                 add.color = QColor(Qt::black);
                 keywordDefinitions << add;
             }
 
             if (updated) {
                 // write a new updated version
-                RideMetadata::serialize(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
+                RideMetadata::serialize(filename, keywordDefinitions, fieldDefinitions, defaultDefinitions);
             }
         }
 
@@ -422,12 +421,11 @@ GcUpgrade::upgrade(const QDir &home)
         // just add some very basic fields as an example
         QList<KeywordDefinition> keywordDefinitions;
         QList<FieldDefinition>   fieldDefinitions;
-        QString colorfield;
         QList<DefaultDefinition> defaultDefinitions;
 
         // read em in (should be in parent directory of athlete home)
         filename = home.canonicalPath()+"/../metadata.xml";
-        RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
+        RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions, defaultDefinitions);
 
         // just check we haven't already added Interval metadata
         bool hasIntervalMetadata=false;
@@ -450,7 +448,7 @@ GcUpgrade::upgrade(const QDir &home)
             add.name = "Interval Goal";
             fieldDefinitions << add;
 
-            RideMetadata::serialize(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
+            RideMetadata::serialize(filename, keywordDefinitions, fieldDefinitions, defaultDefinitions);
         }
 
         // Migrate Data Processor apply-values to new keys

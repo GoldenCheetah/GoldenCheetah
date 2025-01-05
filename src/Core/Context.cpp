@@ -38,7 +38,6 @@ static QList<Context*> _contexts;
 GlobalContext::GlobalContext()
 {
     rideMetadata = NULL;
-    colorEngine = NULL;
     readConfig(0); // don't reread user metrics just yet
 }
 
@@ -66,7 +65,6 @@ GlobalContext::readConfig(qint32 state)
 {
     if (rideMetadata) {
         delete rideMetadata;
-        delete colorEngine;
     }
 
     // metric / non-metric
@@ -80,7 +78,6 @@ GlobalContext::readConfig(qint32 state)
 
     // redo
     rideMetadata = new RideMetadata(NULL);
-    colorEngine = new ColorEngine(this);
     specialFields = SpecialFields();
 
     if (state & CONFIG_USERMETRICS)  userMetricsConfigChanged();

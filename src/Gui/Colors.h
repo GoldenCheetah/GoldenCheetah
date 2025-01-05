@@ -166,28 +166,6 @@ class GColorDialog : public QDialog
 };
 #endif
 
-// return a color for a ride file
-class GlobalContext;
-class ColorEngine : public QObject
-{
-    Q_OBJECT
-    G_OBJECT
-
-    public:
-        ColorEngine(GlobalContext *);
-
-        QColor colorFor(QString);
-        QColor defaultColor, reverseColor;
-
-    public slots:
-        void configChanged(qint32);
-
-    private:
-        QMap<QString, QColor> workoutCodes;
-        GlobalContext *gc; // bootstrapping
-};
-
-
 // shorthand
 #define GColor(x) GCColor::getColor(x)
 

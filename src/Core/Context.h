@@ -71,7 +71,6 @@ class MainWindow;
 class AthleteTab;
 class NavigationModel;
 class RideMetadata;
-class ColorEngine;
 
 
 class GlobalContext : public QObject
@@ -87,7 +86,6 @@ class GlobalContext : public QObject
         // metadata etc
         RideMetadata *rideMetadata;
         SpecialFields specialFields;
-        ColorEngine *colorEngine;
 
         // metric units
         bool useMetricUnits;

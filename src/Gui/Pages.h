@@ -52,6 +52,7 @@
 #include "TagStore.h"
 #include "ActionButtonBox.h"
 #include "StyledItemDelegates.h"
+#include "SearchBox.h"
 #ifdef GC_WANT_PYTHON
 #include "FixPyScriptsDialog.h"
 #endif
@@ -404,22 +405,20 @@ class KeywordsPage : public QWidget
         QCheckBox *rideBG;
 
     public slots:
+        void updateClicked();
+
         void addClicked();
         void upClicked();
         void downClicked();
         void deleteClicked();
 
+        void currentItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous);
         void pageSelected(); // reset the list of fields when we are selected...
-        void colorfieldChanged();
 
     private:
+        SearchBox* keywordFilter;
         QTreeWidget *keywords;
         ActionButtonBox *actionButtons;
-
-        QLabel *fieldLabel;
-        QComboBox *fieldChooser;
-        ListEditDelegate relatedDelegate;
-
         MetadataPage *parent;
 };
 
@@ -603,13 +602,11 @@ class MetadataPage : public QWidget
         QList<KeywordDefinition> keywordDefinitions;
         QList<FieldDefinition>   fieldDefinitions;
         QList<DefaultDefinition>  defaultDefinitions;
-        QString colorfield;
 
         // initial values
         struct {
             unsigned long fieldFingerprint;
             unsigned long keywordFingerprint;
-            QString colorfield;
         } b4;
 };
 
