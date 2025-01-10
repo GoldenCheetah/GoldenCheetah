@@ -38,7 +38,7 @@
 #include <QMessageBox>
 
 BatchProcessingDialog::BatchProcessingDialog(Context* context) : QDialog(context->mainWindow), context(context),
-processed(0), fails(0), numFilesToProcess(0) {
+processed(0), fails(0), numFilesToProcess(0), metadataCompleter(nullptr) {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("Activity Batch Processing"));
 
@@ -304,6 +304,11 @@ processed(0), fails(0), numFilesToProcess(0) {
     updateNumberSelected();
 }
 
+
+BatchProcessingDialog::~BatchProcessingDialog() {
+    if (metadataCompleter) delete metadataCompleter;
+}
+
 void
 BatchProcessingDialog::updateNumberSelected() {
     status->setText(QString(tr("%1 files selected")).arg(numFilesToProcess));
@@ -518,6 +523,9 @@ BatchProcessingDialog::updateMetadataTypeField() {
                 case FIELD_SHORTTEXT:
                 default: {
                     metadataEditField->setText(tr(""));
+                    if (metadataCompleter) delete metadataCompleter;
+                    metadataCompleter = field.getCompleter(this, context->athlete->rideCache);
+                    metadataEditField->setCompleter(metadataCompleter); // Set or clear the completer
                     return;
                 }
             }

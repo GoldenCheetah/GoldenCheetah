@@ -40,13 +40,14 @@
 #include <QDebug>
 
 // Dialog class to allow batch processing of activities
-class BatchProcessingDialog : public QDialog
+class BatchProcessingDialog final : public QDialog
 {
     Q_OBJECT
         G_OBJECT
 
 public:
     BatchProcessingDialog(Context *context);
+    ~BatchProcessingDialog();
 
 protected:
 
@@ -93,6 +94,7 @@ private:
     QComboBox *fileFormat, *dataProcessorToRun;
     QComboBox *metadataFieldToSet;
     QLineEdit *metadataEditField;
+    QCompleter *metadataCompleter;
 
     QLabel *dirName, *status;
     QCheckBox *overwrite, *all;
