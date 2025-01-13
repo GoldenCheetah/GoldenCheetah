@@ -562,6 +562,7 @@ LibrarySearchDialog::search()
         } else {
 
             QTreeWidgetItem *item = searchPathTable->invisibleRootItem()->child(pathIndex);
+            if (!item) return; // avoid crash
             QString path = item->text(0);
             searcher = new LibrarySearch(path, findMedia->isChecked(), findWorkouts->isChecked(), findVideoSyncs->isChecked());
         }
@@ -574,6 +575,7 @@ LibrarySearchDialog::search()
         mediaCount->setText(QString("%1").arg(videoCountN));
         videosyncCount->setText(QString("%1").arg(videosyncCountN));
         QTreeWidgetItem *item = searchPathTable->invisibleRootItem()->child(pathIndex);
+        if (!item) return; // avoid crash
         QString path = item->text(0);
         searcher = new LibrarySearch(path, findMedia->isChecked(), findWorkouts->isChecked(), findVideoSyncs->isChecked());
     }
