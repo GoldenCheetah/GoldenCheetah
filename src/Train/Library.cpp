@@ -78,8 +78,11 @@ Library::initialise(QDir home)
             xmlReader.parse(source);
             libraries = handler.getLibraries();
 
-        } else {
+        }
 
+        if (libraries.count() == 0) {
+
+            // if we still don't have libraries, create a default one
             Library *one = new Library;
             one->name = "Media Library";
             QString spath = appsettings->value(NULL, GC_WORKOUTDIR).toString();
