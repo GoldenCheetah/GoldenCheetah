@@ -72,6 +72,7 @@ class AthleteTab;
 class NavigationModel;
 class RideMetadata;
 class ColorEngine;
+class ModelFilter;
 
 
 class GlobalContext : public QObject
@@ -185,6 +186,9 @@ class Context : public QObject
         void setFilter(QStringList&f) { filters=f; isfiltered=true; emit filterChanged(); }
         void clearFilter() { filters.clear(); isfiltered=false; emit filterChanged(); }
 
+        void setWorkoutFilters(QList<ModelFilter*> &f) { emit workoutFiltersChanged(f); }
+        void clearWorkoutFilters() { emit workoutFiltersRemoved(); }
+
         // user metrics - cascade
         void notifyUserMetricsChanged() { emit userMetricsChanged(); }
 
@@ -268,6 +272,10 @@ class Context : public QObject
         // global filter changed
         void filterChanged();
         void homeFilterChanged();
+
+        // workout filters
+        void workoutFiltersChanged(QList<ModelFilter*>&);
+        void workoutFiltersRemoved();
 
         void workoutsChanged(); // added or deleted a workout in train view
         void VideoSyncChanged(); // added or deleted a workout in train view

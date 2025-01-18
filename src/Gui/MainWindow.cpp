@@ -92,6 +92,7 @@
 // SEARCH / FILTER
 #include "NamedSearch.h"
 #include "SearchFilterBox.h"
+#include "WorkoutFilterBox.h"
 
 // LTM CHART DRAG/DROP PARSE
 #include "LTMChartParser.h"
@@ -324,7 +325,7 @@ MainWindow::MainWindow(const QDir &home)
     whatsthis->setToolTip(tr("What's This?"));
     connect(whatsthis, SIGNAL(clicked(bool)), this, SLOT(enterWhatsThisMode()));
 
-    // add a search box on far right, but with a little space too
+    // Perspective selector
     perspectiveSelector = new QComboBox(this);
     perspectiveSelector->setStyle(toolStyle);
     perspectiveSelector->setFixedWidth(200 * dpiXFactor);
@@ -333,11 +334,19 @@ MainWindow::MainWindow(const QDir &home)
     HelpWhatsThis *helpPerspectiveSelector = new HelpWhatsThis(perspectiveSelector);
     perspectiveSelector->setWhatsThis(helpPerspectiveSelector->getWhatsThisText(HelpWhatsThis::ToolBar_PerspectiveSelector));
 
+    // Search/Filter box
     searchBox = new SearchFilterBox(this,context,false);
 
     searchBox->setStyle(toolStyle);
     searchBox->setFixedWidth(400 * dpiXFactor);
     searchBox->setFixedHeight(gl_toolheight * dpiYFactor);
+
+    // Workout Filter Box
+    workoutFilterBox = new WorkoutFilterBox(this, context);
+
+    workoutFilterBox->setStyle(toolStyle);
+    workoutFilterBox->setFixedWidth(400 * dpiXFactor);
+    workoutFilterBox->setFixedHeight(gl_toolheight * dpiYFactor);
 
     QWidget *space = new QWidget(this);
     space->setAutoFillBackground(false);
@@ -348,9 +357,6 @@ MainWindow::MainWindow(const QDir &home)
     head->addWidget(forward);
     head->addWidget(perspectiveSelector);
     head->addStretch();
-    head->addWidget(sidelist);
-    head->addWidget(lowbar);
-    head->addWidget(tabtile);
 #ifdef Q_OS_MAC // no menu on mac, so lets have some breathing space
     head->setFixedHeight(searchBox->height() + (20 *dpiXFactor * 2));
 #else
@@ -362,10 +368,14 @@ MainWindow::MainWindow(const QDir &home)
     HelpWhatsThis *helpSearchBox = new HelpWhatsThis(searchBox);
     searchBox->setWhatsThis(helpSearchBox->getWhatsThisText(HelpWhatsThis::SearchFilterBox));
 
+    head->addWidget(searchBox);
+    head->addWidget(workoutFilterBox);
     space = new Spacer(this);
     space->setFixedWidth(5 *dpiYFactor);
     head->addWidget(space);
-    head->addWidget(searchBox);
+    head->addWidget(sidelist);
+    head->addWidget(lowbar);
+    head->addWidget(tabtile);
     space = new Spacer(this);
     space->setFixedWidth(5 *dpiYFactor);
     head->addWidget(space);
@@ -1275,6 +1285,8 @@ MainWindow::selectAthlete()
 {
     viewStack->setCurrentIndex(0);
     perspectiveSelector->hide();
+    searchBox->hide();
+    workoutFilterBox->hide();
 }
 
 void
@@ -1286,6 +1298,8 @@ MainWindow::selectAnalysis()
     sidebar->setItemSelected(3, true);
     currentAthleteTab->selectView(1);
     perspectiveSelector->show();
+    searchBox->show();
+    workoutFilterBox->hide();
     setToolButtons();
 }
 
@@ -1298,6 +1312,8 @@ MainWindow::selectTrain()
     sidebar->setItemSelected(5, true);
     currentAthleteTab->selectView(3);
     perspectiveSelector->show();
+    searchBox->hide();
+    workoutFilterBox->show();
     setToolButtons();
 }
 
@@ -1309,6 +1325,8 @@ MainWindow::selectDiary()
     viewStack->setCurrentIndex(1);
     currentAthleteTab->selectView(2);
     perspectiveSelector->show();
+    searchBox->show();
+    workoutFilterBox->hide();
     setToolButtons();
 }
 
@@ -1321,6 +1339,8 @@ MainWindow::selectTrends()
     sidebar->setItemSelected(2, true);
     currentAthleteTab->selectView(0);
     perspectiveSelector->show();
+    searchBox->show();
+    workoutFilterBox->hide();
     setToolButtons();
 }
 

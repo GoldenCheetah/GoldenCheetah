@@ -147,8 +147,6 @@ class TrainSidebar : public GcWindow
         void videosyncTreeWidgetSelectionChanged();
         void mediaTreeWidgetSelectionChanged();
 
-        void workoutFilterChanged(const QString &text);
-
         void deviceTreeMenuPopup(const QPoint &);
         void deleteDevice();
         void moveDevices(int, int);
@@ -170,6 +168,10 @@ class TrainSidebar : public GcWindow
         void viewChanged(int index);
 
         int  getCalibrationIndex(void);
+
+        // workout filters
+        void workoutFiltersChanged(QList<ModelFilter*>& f) { sortModel->setFilters(f); }
+        void workoutFiltersRemoved() { sortModel->removeFilters(); }
 
     public slots:
         void configChanged(qint32);
@@ -247,8 +249,6 @@ class TrainSidebar : public GcWindow
         MultiFilterProxyModel *sortModel;  // sorting workout list
         QSortFilterProxyModel *vsortModel; // sorting video list
         QSortFilterProxyModel *vssortModel; // sorting videosync list
-
-        QAction *workoutFilterErrorAction;
 
         int lastAppliedIntensity;// remember how we scaled last time
 
