@@ -67,7 +67,7 @@ mv squashfs-root/opt appdir/opt
 rm -rf squashfs-root
 
 # Generate AppImage
-wget --no-verbose "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
+wget --no-verbose "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
 chmod a+x appimagetool-x86_64.AppImage
 ./appimagetool-x86_64.AppImage appdir
 

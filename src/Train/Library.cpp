@@ -78,8 +78,11 @@ Library::initialise(QDir home)
             xmlReader.parse(source);
             libraries = handler.getLibraries();
 
-        } else {
+        }
 
+        if (libraries.count() == 0) {
+
+            // if we still don't have libraries, create a default one
             Library *one = new Library;
             one->name = "Media Library";
             QString spath = appsettings->value(NULL, GC_WORKOUTDIR).toString();
@@ -562,6 +565,7 @@ LibrarySearchDialog::search()
         } else {
 
             QTreeWidgetItem *item = searchPathTable->invisibleRootItem()->child(pathIndex);
+            if (!item) return; // avoid crash
             QString path = item->text(0);
             searcher = new LibrarySearch(path, findMedia->isChecked(), findWorkouts->isChecked(), findVideoSyncs->isChecked());
         }
@@ -574,6 +578,7 @@ LibrarySearchDialog::search()
         mediaCount->setText(QString("%1").arg(videoCountN));
         videosyncCount->setText(QString("%1").arg(videosyncCountN));
         QTreeWidgetItem *item = searchPathTable->invisibleRootItem()->child(pathIndex);
+        if (!item) return; // avoid crash
         QString path = item->text(0);
         searcher = new LibrarySearch(path, findMedia->isChecked(), findWorkouts->isChecked(), findVideoSyncs->isChecked());
     }
