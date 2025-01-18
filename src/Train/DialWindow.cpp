@@ -540,6 +540,10 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 2));
         break;
 
+    case RealtimeData::Temp:
+        valueLabel->setText(QString("%1").arg(value, 0, 'f', 2));
+        break;
+
     default:
         valueLabel->setText(QString("%1").arg(round(displayValue)));
         break;

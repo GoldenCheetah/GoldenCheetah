@@ -147,6 +147,7 @@ class ANTChannel : public QObject {
             CHANNEL_TYPE_CONTROL,
             CHANNEL_TYPE_TACX_VORTEX,
             CHANNEL_TYPE_FITNESS_EQUIPMENT,
+            CHANNEL_TYPE_TEMPE,
             CHANNEL_TYPE_GUARD
         };
         typedef enum channeltype ChannelType;

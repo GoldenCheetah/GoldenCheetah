@@ -809,6 +809,17 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
             }
             break;
 
+            case ANTChannel::CHANNEL_TYPE_TEMPE:
+            {
+                if (data_page == 1){
+                    uint16_t val = message[10] | (message[11]<<8);
+                    if (val != 0x8000)
+                        tempValid = true;
+                    temp = val;
+                }
+            }
+            break;
+
             default:
                 break;
             }
@@ -934,6 +945,8 @@ void ANTMessage::init()
     fpodInstant = false;
     fpodSpeed=fpodCadence=0;
     fpodStrides=0;
+    tempValid = false;
+    temp=0;
 }
 
 ANTMessage ANTMessage::resetSystem()

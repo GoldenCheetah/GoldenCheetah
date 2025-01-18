@@ -207,6 +207,10 @@ class ANTMessage {
         uint8_t  fpodStrides;
         double   fpodSpeed, fpodCadence;
 
+        // tempe
+        bool     tempValid;
+        uint16_t temp;
+        
     private:
         void init();
 };
