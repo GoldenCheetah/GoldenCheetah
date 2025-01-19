@@ -141,32 +141,15 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
     view = new QWebEngineView(this);
     connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
 
-    //view->page()->profile()->setHttpUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393");
-
     // add a download interceptor
     WebDownloadInterceptor *interceptor = new WebDownloadInterceptor;
     view->page()->profile()->setUrlRequestInterceptor(interceptor);
-
-    // cookies and storage
-    view->page()->profile()->setPersistentCookiesPolicy(QWebEngineProfile::ForcePersistentCookies);
-    QString temp = const_cast<AthleteDirectoryStructure*>(context->athlete->directoryStructure())->temp().absolutePath();
-    view->page()->profile()->setCachePath(temp);
-    view->page()->profile()->setPersistentStoragePath(temp);
-
-    // web scheme handler - not needed must compile with QT 5.9 or higher
-    //WebSchemeHandler *handler = new WebSchemeHandler(view);
-    //view->page()->profile()->installUrlSchemeHandler("filesystem:https", handler);
-    //view->page()->profile()->installUrlSchemeHandler("filesystem", handler);
 
     // add some settings
     view->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
     view->settings()->setAttribute(QWebEngineSettings::LocalStorageEnabled, true);
 
-#if QT_VERSION < 0x060000
-    view->setPage(new simpleWebPage());
-#else
-    view->setPage(new QWebEnginePage(new QWebEngineProfile("Default")));
-#endif
+    view->setPage(new QWebEnginePage(context->webEngineProfile));
     view->setContentsMargins(0,0,0,0);
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     view->setAcceptDrops(false);

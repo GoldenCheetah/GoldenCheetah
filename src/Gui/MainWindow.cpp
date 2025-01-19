@@ -27,6 +27,7 @@
 #include <QTabBar>
 #include <QStyleFactory>
 #include <QRect>
+#include <QWebEngineProfile>
 
 // DATA STRUCTURES
 #include "MainWindow.h"
@@ -149,6 +150,9 @@ MainWindow::MainWindow(const QDir &home)
     // bootstrap
     Context *context = new Context(this);
     context->athlete = new Athlete(context, home);
+    QString temp = const_cast<AthleteDirectoryStructure*>(context->athlete->directoryStructure())->temp().absolutePath();
+    context->webEngineProfile->setCachePath(temp);
+    context->webEngineProfile->setPersistentStoragePath(temp);
     currentAthleteTab = new AthleteTab(context);
 
     setWindowIcon(QIcon(":images/gc.png"));

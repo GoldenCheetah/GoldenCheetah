@@ -56,12 +56,6 @@ struct PositionItem {
 };
 
 
-// trick the maps api into ignoring gestures by
-// pretending to be chrome. see: http://developer.qt.nokia.com/forums/viewthread/1643/P15
-class mapWebPage : public QWebEnginePage
-{
-};
-
 class MapWebBridge : public QObject
 {
     Q_OBJECT
