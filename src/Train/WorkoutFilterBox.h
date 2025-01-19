@@ -36,6 +36,7 @@ public:
 
 private slots:
     void workoutFilterChanged(const QString &text);
+    void configChanged(qint32 topic);
 
 private:
     Context *context;

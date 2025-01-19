@@ -23,15 +23,21 @@
 #include <QDebug>
 #include <QStyle>
 
+#include "Colors.h"
+
 WorkoutFilterBox::WorkoutFilterBox(QWidget *parent, Context *context) : FilterEditor(parent), context(context)
 {
-    QIcon workoutFilterErrorIcon = this->style()->standardIcon(QStyle::SP_MessageBoxCritical);
+    QIcon workoutFilterErrorIcon = QPixmap::fromImage(QImage(":images/toolbar/popbutton.png"));
     workoutFilterErrorAction = this->addAction(workoutFilterErrorIcon, FilterEditor::LeadingPosition);
     workoutFilterErrorAction->setVisible(false);
     this->setClearButtonEnabled(true);
     this->setPlaceholderText(tr("Filter..."));
     this->setFilterCommands(workoutFilterCommands());
     connect(this, SIGNAL(textChanged(const QString&)), this, SLOT(workoutFilterChanged(const QString&)));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+
+    // set appearance
+    configChanged(CONFIG_APPEARANCE);
 }
 
 WorkoutFilterBox::~WorkoutFilterBox()
@@ -57,5 +63,34 @@ WorkoutFilterBox::workoutFilterChanged(const QString &text)
         }
     } else {
         context->clearWorkoutFilters();
+    }
+}
+
+void
+WorkoutFilterBox::configChanged(qint32 topic)
+{
+    if (topic & CONFIG_APPEARANCE) {
+        int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
+        QColor color = QPalette().color(QPalette::Highlight);
+
+        setStyleSheet(QString(
+                          "QLineEdit {"
+                          "    background-color: %1;"
+                          "    color: %2;"
+                          "    border-radius: 3px;"
+                          "    border: 1px solid rgba(127,127,127,127);"
+                          "}"
+                          "QLineEdit:focus {"
+#ifdef WIN32
+                          "    border: 1px solid rgba(%3,%4,%5,255);"
+#else
+                          "    border: 2px solid rgba(%3,%4,%5,255);"
+#endif
+                          "}"
+                 ).arg(GColor(CTOOLBAR).name())
+                  .arg(GCColor::invertColor(GColor(CTOOLBAR)).name())
+                  .arg(color.red())
+                  .arg(color.green())
+                  .arg(color.blue()));
     }
 }
