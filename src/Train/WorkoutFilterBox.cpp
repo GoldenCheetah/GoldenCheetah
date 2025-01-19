@@ -33,7 +33,8 @@ WorkoutFilterBox::WorkoutFilterBox(QWidget *parent, Context *context) : FilterEd
     this->setClearButtonEnabled(true);
     this->setPlaceholderText(tr("Filter..."));
     this->setFilterCommands(workoutFilterCommands());
-    connect(this, SIGNAL(textChanged(const QString&)), this, SLOT(workoutFilterChanged(const QString&)));
+    connect(this, SIGNAL(textChanged(const QString&)), this, SLOT(textChanged(const QString&)));
+    connect(this, SIGNAL(editingFinished()), this, SLOT(editingFinished()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // set appearance
@@ -45,7 +46,7 @@ WorkoutFilterBox::~WorkoutFilterBox()
 }
 
 void
-WorkoutFilterBox::workoutFilterChanged(const QString &text)
+WorkoutFilterBox::textChanged(const QString &text)
 {
     workoutFilterErrorAction->setVisible(false);
     bool ok = true;
@@ -55,12 +56,19 @@ WorkoutFilterBox::workoutFilterChanged(const QString &text)
         input.chop(1);
     }
     if (context && input.length() > 0) {
-	auto filters = parseWorkoutFilter(input, ok, msg);
-        context->setWorkoutFilters(filters);
+	filters = parseWorkoutFilter(input, ok, msg);
         if (! ok) {
             workoutFilterErrorAction->setVisible(true);
             workoutFilterErrorAction->setToolTip(tr("ERROR: %1").arg(msg));
         }
+    }
+}
+
+void
+WorkoutFilterBox::editingFinished()
+{
+    if (context && text().trimmed().length() > 0) {
+        context->setWorkoutFilters(filters);
     } else {
         context->clearWorkoutFilters();
     }
@@ -70,7 +78,6 @@ void
 WorkoutFilterBox::configChanged(qint32 topic)
 {
     if (topic & CONFIG_APPEARANCE) {
-        int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
         QColor color = QPalette().color(QPalette::Highlight);
 
         setStyleSheet(QString(

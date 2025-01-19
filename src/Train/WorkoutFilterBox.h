@@ -35,12 +35,14 @@ public:
     virtual ~WorkoutFilterBox();
 
 private slots:
-    void workoutFilterChanged(const QString &text);
+    void textChanged(const QString &text);
+    void editingFinished();
     void configChanged(qint32 topic);
 
 private:
     Context *context;
     QAction *workoutFilterErrorAction;
+    QList<ModelFilter *> filters;
 };
 
 #endif
