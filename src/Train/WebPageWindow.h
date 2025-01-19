@@ -54,9 +54,6 @@ class QWebEngineDownloadItem;
 #else
 class QWebEngineDownloadRequest;
 #endif
-class simpleWebPage : public QWebEnginePage
-{
-};
 
 class WebPageWindow : public GcChartWindow
 {

@@ -30,6 +30,7 @@
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
 #include <QMutex>
+#include <QWebEngineProfile>
 
 // singleton
 static GlobalContext *globalContext = NULL;
@@ -132,6 +133,7 @@ GlobalContext *GlobalContext::context()
 }
 
 bool Context::isValid(Context *p) { return p != NULL &&_contexts.contains(p); }
+
 Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
 {
     ride = NULL;
@@ -147,6 +149,10 @@ Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
     cdbChartListDialog = NULL;
     cdbUserMetricListDialog = NULL;
 #endif
+
+    // WebEngineProfile - cookies and storage
+    webEngineProfile = new QWebEngineProfile("Default", this);
+    webEngineProfile->setPersistentCookiesPolicy(QWebEngineProfile::ForcePersistentCookies);
 
     _contexts.append(this);
 }

@@ -72,6 +72,7 @@ class AthleteTab;
 class NavigationModel;
 class RideMetadata;
 class ColorEngine;
+class QWebEngineProfile;
 
 
 class GlobalContext : public QObject
@@ -160,6 +161,9 @@ class Context : public QObject
         CloudDBChartListDialog *cdbChartListDialog;
         CloudDBUserMetricListDialog *cdbUserMetricListDialog;
 #endif
+
+        // WebEngineProfile for this user
+        QWebEngineProfile* webEngineProfile;
 
     public slots:
 
