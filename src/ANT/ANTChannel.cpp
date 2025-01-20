@@ -1242,6 +1242,13 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
             }
             break;
 
+            case CHANNEL_TYPE_TEMPE:
+            {
+                if (antMessage.tempValid)
+                    parent->setTemp(antMessage.temp/100.0);
+            }
+            break;
+
            default:
              break; // unknown?
            }

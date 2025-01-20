@@ -251,6 +251,7 @@ struct setChannelAtom {
 #define ANT_SPORT_FITNESS_EQUIPMENT_PERIOD 8192
 #define ANT_FAST_QUARQ_PERIOD (8182/16)
 #define ANT_QUARQ_PERIOD (8182*4)
+#define ANT_SPORT_TEMPE_PERIOD 8192
 
 #define ANT_SPORT_HR_TYPE 0x78
 #define ANT_SPORT_POWER_TYPE 11
@@ -265,6 +266,7 @@ struct setChannelAtom {
 #define ANT_FAST_QUARQ_TYPE_WAS 11 // before release 1.8
 #define ANT_FAST_QUARQ_TYPE 0x60
 #define ANT_QUARQ_TYPE 0x60
+#define ANT_SPORT_TEMPE_TYPE 0x19
 
 #define ANT_SPORT_FREQUENCY 57
 #define ANT_FOOTPOD_FREQUENCY 57
@@ -721,6 +723,8 @@ public:
     void setTrainerBrakeFault(bool status) { telemetry.setTrainerBrakeFault(status); }
     void setTrainerReady(bool status) { telemetry.setTrainerReady(status); }
     void setTrainerRunning(bool status) { telemetry.setTrainerRunning(status); }
+
+    void setTemp(double temp);
 
     qint64 getElapsedTime();
 

@@ -521,6 +521,9 @@ double RealtimeData::value(DataSeries series) const
     case FeO2: return feo2;
         break;
 
+    case Temp: return temp;
+        break;
+        
     case None:
     default:
         return 0;
@@ -593,6 +596,7 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << Altitude;
         seriesList << RouteDistance;
         seriesList << DistanceRemaining;
+        seriesList << Temp;
     }
     return seriesList;
 }
@@ -781,6 +785,9 @@ QString RealtimeData::seriesName(DataSeries series)
 
     case FeO2: return tr("Fraction O2 Expired");
         break;
+
+    case Temp: return tr("Temperature");
+        break;
     }
 }
 
@@ -868,3 +875,7 @@ double RealtimeData::getVCO2() const { return vco2; }
 double RealtimeData::getRER() const { return rer; }
 double RealtimeData::getTv() const { return tv; }
 double RealtimeData::getFeO2() const { return feo2; }
+
+void RealtimeData::setTemp(double temp) { this->temp = temp; }
+double RealtimeData::getTemp() const { return temp; }
+

@@ -395,6 +395,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     mode = ErgFileFormat::erg;
     pendingConfigChange = false;
 
+    displayTemp = 0;
     displayWorkoutLap = 0;
     pwrcount = 0;
     cadcount = 0;
@@ -1674,6 +1675,7 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     hrcount = 0;
     spdcount = 0;
     lodcount = 0;
+    displayTemp = 0;
     displayWorkoutLap = 0;
     wbalr = 0;
     wbal = WPRIME;
@@ -1724,6 +1726,7 @@ void TrainSidebar::updateData(RealtimeData &rtData)
     displayLpppb = rtData.getLpppb();
     displayLpppe = rtData.getLpppe();
     displayPosition = rtData.getPosition();
+    displayTemp = rtData.getTemp();
     // Gradient not supported
     return;
 }
@@ -1913,6 +1916,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
                 if (Devices[dev].type == DEV_ANTLOCAL || Devices[dev].type == DEV_NULL) {
                     rtData.setHb(local.getSmO2(), local.gettHb()); //only moxy data from ant and robot devices right now
+                    rtData.setTemp(local.getTemp());
                 }
 
                 if (Devices[dev].type == DEV_NULL || Devices[dev].type == DEV_BT40) {
@@ -2163,6 +2167,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             displayLpppb = rtData.getLpppb();
             displayLpppe = rtData.getLpppe();
             displayPosition = rtData.getPosition();
+            displayTemp = rtData.getTemp();
 
             double weightKG = bicycle.MassKG();
             double vs = computeInstantSpeed(weightKG, rtData.getSlope(), rtData.getAltitude(), rtData.getWatts());
@@ -2309,7 +2314,7 @@ void TrainSidebar::diskUpdate()
 
     recordFileStream    << "," // headwind
                         << "," << slopeStr
-                        << "," // temp
+                        << "," << displayTemp
                         << "," << displayWorkoutLap
                         << "," << displayLRBalance
                         << "," << displayLTE
