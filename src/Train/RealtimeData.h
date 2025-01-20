@@ -55,7 +55,9 @@ public:
                       RightPowerPhaseBegin, RightPowerPhaseEnd,
                       RightPowerPhasePeakBegin, RightPowerPhasePeakEnd,
                       Position, RightPCO, LeftPCO,
-                      Temp };
+                      Temp,
+                      CoreTemp
+                    };
 
     typedef enum dataseries DataSeries;
 
@@ -119,7 +121,7 @@ public:
     void setLatitude(double);
     void setLongitude(double);
     void setAltitude(double);
-
+    void setCoreTemp(double,double);
     const char *getName() const;
 
     // new muscle oxygen stuff
@@ -142,6 +144,7 @@ public:
     double getRER() const;
     double getTv() const;
     double getFeO2() const;
+    double getCoreTemp() const;
 
     double getWatts() const;
     double getAltWatts() const;
@@ -220,6 +223,7 @@ private:
     double vo2, vco2, rf, rmv, tv, feo2;
     RealtimeData::riderPosition position;
     double temp;
+    double skinTemp, coreTemp;
 
     std::chrono::high_resolution_clock::time_point wheelRpmSampleTime;
 

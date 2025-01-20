@@ -191,7 +191,8 @@ RideFile::updateDataTag()
     else flags += '-';
     if (areDataPresent()->headwind) flags += 'W'; // Windspeed
     else flags += '-';
-    if (areDataPresent()->temp) flags += 'E'; // Temperature
+    if (areDataPresent()->temp ||
+        areDataPresent()->tcore) flags += 'E'; // Temperature
     else flags += '-';
     if (areDataPresent()->lrbalance) flags += 'V'; // V for "Vector" aka lr pedal data
     else flags += '-';
@@ -414,7 +415,7 @@ RideFile::seriesName(SeriesType series, bool compat)
         case RideFile::gear: return QString(tr("Gear Ratio"));
         case RideFile::wbal: return QString(tr("W' Consumed"));
         case RideFile::index: return QString(tr("Sample Index"));
-        case RideFile::tcore: return QString("Core Temperature");
+        case RideFile::tcore: return QString(tr("Core Temperature"));
         default: return QString(tr("Unknown"));
         }
     }
@@ -469,6 +470,7 @@ RideFile::colorFor(SeriesType series)
     case RideFile::rcontact: return GColor(CRGCT);
     case RideFile::rcad: return GColor(CRCAD);
     case RideFile::gear: return GColor(CGEAR);
+    case RideFile::tcore: return GColor(CTEMP);
     case RideFile::secs:
     case RideFile::km:
     case RideFile::vam:
@@ -536,6 +538,7 @@ RideFile::unitName(SeriesType series, Context *context)
     case RideFile::rvert: return QString(tr("cm"));
     case RideFile::rcontact: return QString(tr("ms"));
     case RideFile::gear: return QString(tr("ratio"));
+    case RideFile::tcore: return QString(tr("°C"));
     default: return QString(tr("Unknown"));
     }
 }
@@ -2719,6 +2722,14 @@ RideFile::recalculateDerivedSeries(bool force)
             }
         }
 
+        // Pull tcore from XData if it exists
+        series = xdata("TCORE");
+        if (series && series->datapoints.count() > 0)  {
+            setDataPresent(RideFile::tcore, true);
+            int idx=0;
+            p->tcore = xdataValue(p, idx, "TCORE","Core", RideFile::REPEAT);
+        }
+
         // split out O2Hb and HHb when we have SmO2 and tHb
         // O2Hb is oxygenated haemoglobin and HHb is deoxygenated haemoglobin
         if (dataPresent.smo2 && dataPresent.thb) {
@@ -2831,7 +2842,8 @@ RideFile::recalculateDerivedSeries(bool force)
     // in between
 
     // we need HR data for this
-    if (dataPresent.hr) {
+    // don't derive if we already have tcore data
+    if (dataPresent.hr && !dataPresent.tcore) {
 
         // resample the data into 60s samples
         static const int SAMPLERATE=60000; // milliseconds in a minute

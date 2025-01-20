@@ -347,7 +347,8 @@ RideEditor::whatColumns()
          << tr("Vertical Oscillation")
          << tr("Run Cadence")
          << tr("GCT")
-         << tr("Interval");
+         << tr("Interval")
+         << tr("Core Temperature");
 
     return what;
 }
@@ -1009,6 +1010,7 @@ RideEditor::insColumn(QString name)
     if (name == tr("Vertical Oscillation")) series = RideFile::rvert;
     if (name == tr("Run Cadence")) series = RideFile::rcad;
     if (name == tr("GCT")) series = RideFile::rcontact;
+    if (name == tr("Core Temperature")) series = RideFile::tcore;
 
     model->insertColumn(series);
 }
