@@ -520,7 +520,7 @@ struct RideFilePoint
                   double lppb, double rppb, double lppe, double rppe,
                   double lpppb, double rpppb, double lpppe, double rpppe,
                   double smo2, double thb, 
-                  double rvert, double rcad, double rcontact, double(tcore),
+                  double rvert, double rcad, double rcontact, double tcore,
                   int interval) :
 
         secs(secs), cad(cad), hr(hr), km(km), kph(kph), nm(nm), watts(watts), alt(alt), lon(lon), 

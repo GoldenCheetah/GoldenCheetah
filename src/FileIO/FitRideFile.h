@@ -46,6 +46,7 @@ struct FitFileReader : public RideFileReader {
 #define FILE_CREATOR_MSG_NUM    49
 #define HRV_MSG_NUM             78
 #define SEGMENT_MSG_NUM         142
+#define FIELD_DESCRIPTION       206
 
 /* FIT has uint32 as largest integer type. So qint64 is large enough to
  * store all integer types - no matter if they're signed or not */
