@@ -23,7 +23,6 @@
 #include "Units.h"
 #include "LocationInterpolation.h"
 #include <QWebEngineScriptCollection>
-#include <QWebEngineProfile>
 #include <array>
 
 MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidget(parent), m_Name(Name), m_container(parent), m_Source(Source)
@@ -516,7 +515,7 @@ LiveMapWidget::LiveMapWidget(QString Name, QWidget* parent, QString Source, Cont
     m_osmURL = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
     forceSquareRatio = false;
     liveMapView = new QWebEngineView(this);
-    webPage = new QWebEnginePage(liveMapView);
+    webPage = new QWebEnginePage(context->webEngineProfile);
     liveMapView->setPage(webPage);
     routeInitialized = false;
     mapInitialized = false;

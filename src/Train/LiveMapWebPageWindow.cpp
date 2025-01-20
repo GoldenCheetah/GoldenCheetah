@@ -35,9 +35,6 @@
 #include "ErgFile.h"
 #include "LocationInterpolation.h"
 
-//#include <QtWebChannel>
-//#include <QWebEngineProfile>
-
 // overlay helper
 #include "AbstractView.h"
 #include "GcOverlayWidget.h"
@@ -105,7 +102,7 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
 
     // set webview for map
     view = new QWebEngineView(this);
-    webPage = view->page();
+    webPage = new QWebEnginePage(context->webEngineProfile);
     view->setPage(webPage);
 
     view->setContentsMargins(0,10,0,0);
