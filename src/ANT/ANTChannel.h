@@ -147,6 +147,8 @@ class ANTChannel : public QObject {
             CHANNEL_TYPE_CONTROL,
             CHANNEL_TYPE_TACX_VORTEX,
             CHANNEL_TYPE_FITNESS_EQUIPMENT,
+            CHANNEL_TYPE_TEMPE,
+            CHANNEL_TYPE_CORETEMP,
             CHANNEL_TYPE_GUARD
         };
         typedef enum channeltype ChannelType;
@@ -254,6 +256,9 @@ class ANTChannel : public QObject {
         void rrData(uint16_t  rrtime, uint8_t heartrateBeats, uint8_t instantHeartrate);
 
         void posData(uint8_t position);
+
+        // signal for core temp data
+        void tcoreData(float core, float skin, int qual);
 
         // signal for passing remote control commands
         void antRemoteControl(uint16_t command);

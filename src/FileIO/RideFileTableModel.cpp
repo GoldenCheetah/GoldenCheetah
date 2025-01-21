@@ -121,6 +121,10 @@ RideFileTableModel::setHeadings(RideFile::SeriesType series)
             headings_ << tr("Temperature");
             headingsType << RideFile::temp;
         }
+        if (series == RideFile::tcore || ride->areDataPresent()->tcore) {
+            headings_ << tr("Core Temperature");
+            headingsType << RideFile::tcore;
+        }
         if (series == RideFile::lrbalance || ride->areDataPresent()->lrbalance) {
             headings_ << tr("Left/Right Balance");
             headingsType << RideFile::lrbalance;

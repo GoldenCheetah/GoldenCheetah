@@ -34,6 +34,7 @@ RealtimeData::RealtimeData()
     rte = lte = lps = rps = 0.0;
     rppb = rppe = rpppb = rpppe = 0.0;
     lppb = lppe = lpppb = lpppe = 0.0;
+    coreTemp = skinTemp = 0.0;
     latitude = longitude = altitude = 0.0;
     rf = rmv = vo2 = vco2 = tv = feo2 = 0.0;
     routeDistance = distanceRemaining = 0.0;
@@ -168,6 +169,12 @@ void RealtimeData::setLPS(double x)
 void RealtimeData::setRPS(double x)
 {
     this->rps = x;
+}
+
+//Skin temp passed but not used elsewhere
+void RealtimeData::setCoreTemp(double core, double skin) {
+  this->coreTemp = core;
+  this->skinTemp = skin;
 }
 
 const char *
@@ -521,6 +528,12 @@ double RealtimeData::value(DataSeries series) const
     case FeO2: return feo2;
         break;
 
+    case Temp: return temp;
+        break;
+        
+    case CoreTemp: return coreTemp;
+        break;
+
     case None:
     default:
         return 0;
@@ -593,6 +606,8 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << Altitude;
         seriesList << RouteDistance;
         seriesList << DistanceRemaining;
+        seriesList << Temp;
+        seriesList << CoreTemp;
     }
     return seriesList;
 }
@@ -781,6 +796,12 @@ QString RealtimeData::seriesName(DataSeries series)
 
     case FeO2: return tr("Fraction O2 Expired");
         break;
+
+    case Temp: return tr("Temperature");
+        break;
+
+    case CoreTemp: return tr("CoreTemp");
+        break;
     }
 }
 
@@ -868,3 +889,8 @@ double RealtimeData::getVCO2() const { return vco2; }
 double RealtimeData::getRER() const { return rer; }
 double RealtimeData::getTv() const { return tv; }
 double RealtimeData::getFeO2() const { return feo2; }
+
+void RealtimeData::setTemp(double temp) { this->temp = temp; }
+double RealtimeData::getTemp() const { return temp; }
+
+double RealtimeData::getCoreTemp() const { return coreTemp; }

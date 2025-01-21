@@ -72,6 +72,10 @@ const ant_sensor_type_t ANT::ant_sensor_types[] = {
                 ANT_TACX_VORTEX_FREQUENCY, DEFAULT_NETWORK_NUMBER, "Tacx Vortex Smart", 'v', ":images/IconPower.png" },
   { true, ANTChannel::CHANNEL_TYPE_FITNESS_EQUIPMENT, ANT_SPORT_FITNESS_EQUIPMENT_PERIOD, ANT_SPORT_FITNESS_EQUIPMENT_TYPE,
                 ANT_FITNESS_EQUIPMENT_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Fitness Equipment Control (FE-C)", 'f', ":images/IconPower.png" },
+  { true, ANTChannel::CHANNEL_TYPE_TEMPE, ANT_SPORT_TEMPE_PERIOD, ANT_SPORT_TEMPE_TYPE,
+                ANT_SPORT_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Tempe", 't', ":images/IconTemp.png" },
+  { true, ANTChannel::CHANNEL_TYPE_CORETEMP, ANT_SPORT_CORETEMP_PERIOD, ANT_SPORT_CORETEMP_TYPE,
+        ANT_SPORT_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "CoreTemp", 't', ":images/IconCore.png" },
   { false, ANTChannel::CHANNEL_TYPE_GUARD, 0, 0, 0, 0, "", '\0', "" }
 };
 
@@ -157,6 +161,9 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf, QString athlete) : QThre
 
         connect(antChannel[i], SIGNAL(posData(uint8_t)), this, SIGNAL(posData(uint8_t)));
 
+        // Core temp data
+        connect(antChannel[i], SIGNAL(tcoreData(float, float, int)), this, SIGNAL(tcoreData(float, float, int)));
+
         // timer for master channel broadcasts
         connect(antChannel[i], SIGNAL(broadcastTimerStart(int)), this, SLOT(slotStartBroadcastTimer(int)));
         connect(antChannel[i], SIGNAL(broadcastTimerStop(int)), this, SLOT(slotStopBroadcastTimer(int)));
@@ -229,6 +236,16 @@ void ANT::setWheelRpm(float x) {
 void ANT::setHb(double smo2, double thb)
 {
     telemetry.setHb(smo2, thb);
+}
+
+void ANT::setTemp(double temp)
+{
+    telemetry.setTemp(temp);
+}
+
+void ANT::setCoreTemp(double core, double skin)
+{
+    telemetry.setCoreTemp(core, skin);
 }
 
 /*======================================================================

@@ -133,6 +133,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     XDataSeries *ibikeSeries=NULL;
     XDataSeries *xdataSeries=NULL;
     XDataSeries *vo2Series=NULL;
+    XDataSeries *tcoreSeries=NULL;
 
     /* Joule 1.0
     Version,Date/Time,Km,Minutes,RPE,Tags,"Weight, kg","Work, kJ",FTP,"Sample Rate, s",Device Type,Firmware Version,Last Updated,Category 1,Category 2
@@ -1565,6 +1566,67 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         }
     }
 
+    // is there an associated tcore tcr file?
+    QFile tcorefile(file.fileName().replace(".csv",".tcr"));
+    if (tcorefile.open(QFile::ReadOnly))
+    {
+        // create the XDATA series
+        tcoreSeries = new XDataSeries();
+        tcoreSeries->name = "CoreTemp Measurements";
+        tcoreSeries->valuename << "Core" << "Skin" << "Quality";
+        tcoreSeries->unitname << "C" << "C" << "q";
+
+        // attempt to read and add the data
+        lineno=1;
+        QTextStream rs(&tcorefile);
+
+        // loop through lines and truncate etc
+        while (!rs.atEnd()) {
+            // the readLine() method doesn't handle old Macintosh CR line endings
+            // this workaround will load the the entire file if it has CR endings
+            // then split and loop through each line
+            // otherwise, there will be nothing to split and it will read each line as expected.
+            QString linesIn = rs.readLine();
+            QStringList lines = linesIn.split('\r');
+            // workaround for empty lines
+            if(lines.isEmpty()) {
+                lineno++;
+                continue;
+            }
+            for (int li = 0; li < lines.size(); ++li) {
+                QString line = lines[li];
+
+                if (line.length()==0) {
+                    continue;
+                }
+
+                // first line is a header line
+                if (lineno > 1) {
+
+                    // split comma separated secs, hr, msecs
+                    QStringList values = line.split(",", Qt::KeepEmptyParts);
+
+                    // and add
+                    XDataPoint *p = new XDataPoint();
+                    p->secs = values.at(0).toDouble();
+                    p->km = 0;
+                    p->number[0] = values.at(1).toDouble();
+                    p->number[1] = values.at(2).toDouble();
+                    p->number[2] = values.at(3).toInt();
+                    tcoreSeries->datapoints.append(p);
+                }
+
+                // onto next line
+                ++lineno;
+            }
+        }
+        // free handle
+        tcorefile.close();
+        
+        // add if we got any ....
+        if (tcoreSeries->datapoints.count() > 0) rideFile->addXData("TCORE", tcoreSeries);
+    }
+    
 
     // is there an associated rr file?
     //

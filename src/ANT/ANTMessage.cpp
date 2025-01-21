@@ -619,6 +619,25 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                 newsmo2 = 0.1f * double (((message[10] & 0xc0)>>6) + (message[11]<<2));
                 break;
 
+            case ANTChannel::CHANNEL_TYPE_CORETEMP:
+            {
+                switch (data_page)
+                {
+                case 0:
+                    tempQual = (message[6]&0x3);
+                    break;
+                case 1:
+                    uint16_t val=(message[7]+((message[8] & 0xf0)<<4));
+                    if (val>0 && val != 0x800) 
+                        skinTemp = val/20.0;
+                    val=(message[10]+(message[11]<<8));
+                    if (val>0  && val != 0x8000)
+                        coreTemp = val/100.0;
+                    break;
+                }
+                break;
+            }
+
             case ANTChannel::CHANNEL_TYPE_FITNESS_EQUIPMENT:
                 switch (data_page)
                 {
@@ -809,6 +828,17 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
             }
             break;
 
+            case ANTChannel::CHANNEL_TYPE_TEMPE:
+            {
+                if (data_page == 1){
+                    uint16_t val = message[10] | (message[11]<<8);
+                    if (val != 0x8000)
+                        tempValid = true;
+                    temp = val;
+                }
+            }
+            break;
+
             default:
                 break;
             }
@@ -934,6 +964,10 @@ void ANTMessage::init()
     fpodInstant = false;
     fpodSpeed=fpodCadence=0;
     fpodStrides=0;
+    tempValid = false;
+    temp=0;
+    coreTemp = skinTemp = 0.0;
+    tempQual = 0;
 }
 
 ANTMessage ANTMessage::resetSystem()
@@ -1339,3 +1373,6 @@ ANTMessage ANTMessage::controlDeviceAvailability(const uint8_t channel)
                       0x00, 0x00,                           // reserved
                       ANT_CONTROL_DEVICE_SUPPORT_GENERIC);  // support for generic remote controls
 }
+
+
+

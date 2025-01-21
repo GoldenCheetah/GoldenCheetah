@@ -902,7 +902,24 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
            }
            break;
 
-           // Cadence
+        case CHANNEL_TYPE_CORETEMP:
+        {
+            // Quality alternates messages so will need to remember last quality message
+            // only use core temp if data is 'good' or better (just use >0 for now)
+            if ( antMessage.coreTemp > 0 )
+            {
+                value = antMessage.coreTemp;
+                value2 = antMessage.skinTemp;
+
+                // Store in XDATA
+                emit tcoreData(antMessage.coreTemp, antMessage.skinTemp, antMessage.tempQual);
+                // and forward to telemetry
+                parent->setCoreTemp(antMessage.coreTemp, antMessage.skinTemp);
+            }
+        }
+        break;
+
+        // Cadence
            case CHANNEL_TYPE_CADENCE:
            {
                float rpm;
@@ -1239,6 +1256,13 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                     if (antMessage.vortexCadence)
                         parent->setSecondaryCadence(antMessage.vortexCadence);
                 }
+            }
+            break;
+
+            case CHANNEL_TYPE_TEMPE:
+            {
+                if (antMessage.tempValid)
+                    parent->setTemp(antMessage.temp/100.0);
             }
             break;
 

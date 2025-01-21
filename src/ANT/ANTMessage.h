@@ -162,6 +162,8 @@ class ANTMessage {
         bool utcTimeRequired; // moxy
         uint8_t moxyCapabilities; //moxy
         double tHb, oldsmo2, newsmo2; //moxy
+        double coreTemp, skinTemp;
+        uint8_t tempQual;
         uint8_t leftTorqueEffectiveness, rightTorqueEffectiveness; // power - TE&PS
         uint8_t leftOrCombinedPedalSmoothness, rightPedalSmoothness; // power - TE&PS
         // tacx vortex fields - only what we care about now, for more check decoding
@@ -207,6 +209,10 @@ class ANTMessage {
         uint8_t  fpodStrides;
         double   fpodSpeed, fpodCadence;
 
+        // tempe
+        bool     tempValid;
+        uint16_t temp;
+        
     private:
         void init();
 };
