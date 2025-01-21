@@ -26,37 +26,92 @@
 #include <QApplication>
 #include <QScreen>
 
+#include "Colors.h"
+#include "GcUpgrade.h"
+
+#define SHOW_BOX 0 // 1 shows labels background (useful for fitting)
+
 
 SplashScreen::SplashScreen
-(const QString &pixmapPath, const QString &version, int versionX, int versionY)
+()
 : QSplashScreen()
 {
+    const QString textRgb("#000000");
+    int versionX = 48;
+    int versionY = 296;
+    int versionWidth = 243;
+    int versionHeight = 21;
+    int sepOverlap = 2;
+    int msgX = versionX;
+    int msgY = 320;
+    int msgWidth = versionWidth;
+    int msgHeight = 14;
+    const QString pixmapPath(":images/splashscreen.png");
+    const QString version = QString(tr("%1 - build %2")).arg(VERSION_STRING).arg(VERSION_LATEST);
+
+    setAttribute(Qt::WA_TranslucentBackground);
+
     QPixmap pixmap(pixmapPath);
-    QScreen *screen = QApplication::primaryScreen();
-    if (screen->geometry().width() <= 1280) {
-        // Scale pixmap for lower screen resolutions
-        int targetPixmapWidth = 420;
-        if (screen->geometry().width() < 1024) {
-            targetPixmapWidth = 320;
-        }
+    int targetPixmapWidth = -1;
+    if (QApplication::primaryScreen()->geometry().width() <= 1280) {
+        targetPixmapWidth = 280;
+    } else if (dpiXFactor > 1) {
+        targetPixmapWidth = pixmap.rect().width() * dpiXFactor;
+    }
+    if (targetPixmapWidth > 0) {
+        // Scale pixmap for low or high screen resolutions
         int origPixmapWidth = pixmap.rect().width();
         int origPixmapHeight = pixmap.rect().height();
         pixmap = pixmap.scaledToWidth(targetPixmapWidth, Qt::SmoothTransformation);
-        int newPixmapWidth = pixmap.rect().width();
-        int newPixmapHeight = pixmap.rect().height();
-        versionX *= newPixmapWidth / static_cast<double>(origPixmapWidth);
-        versionY *= newPixmapHeight / static_cast<double>(origPixmapHeight);
+        double xFactor = pixmap.rect().width() / static_cast<double>(origPixmapWidth);
+        double yFactor = pixmap.rect().height() / static_cast<double>(origPixmapHeight);
+        versionX *= xFactor;
+        versionY *= yFactor;
+        versionWidth *= xFactor;
+        versionHeight *= yFactor;
+        sepOverlap *= xFactor;
+        msgX *= xFactor;
+        msgY *= yFactor;
+        msgWidth *= xFactor;
+        msgHeight *= yFactor;
     }
-    QPainter painter(&pixmap);
     if (version.size() > 0) {
-        QFont f = font();
-        f.setPointSize(16);
-        painter.setFont(f);
-        QFontMetrics fm(f);
-        QRect versionRect = fm.boundingRect(version);
-        painter.drawText(versionX - versionRect.width(), versionY + versionRect.height(), version);
+        QLabel *versionLabel = new QLabel(this);
+#if SHOW_BOX == 0
+        versionLabel->setAttribute(Qt::WA_TranslucentBackground);
+        versionLabel->setStyleSheet(QString("QLabel { color: %1; }").arg(textRgb));
+#else
+        versionLabel->setStyleSheet("QLabel { color: white; background-color: darkgreen; }");
+#endif
+        QFont f = versionLabel->font();
+        f.setPixelSize(versionHeight * 0.8);
+        f.setBold(true);
+        versionLabel->setFont(f);
+        versionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+        versionLabel->setGeometry(versionX, versionY, versionWidth, versionHeight);
+        versionLabel->setText(version);
+
+        int sepLeft = versionX - sepOverlap;
+        int sepRight = versionX + versionWidth + sepOverlap;
+        int sepY = (versionY + versionHeight + msgY) / 2;
+        QPainter painter(&pixmap);
+        painter.setPen(QColor(textRgb));
+        painter.drawLine(sepLeft, sepY, sepRight, sepY);
     }
     setPixmap(pixmap);
+
+    msgLabel = new QLabel(this);
+#if SHOW_BOX == 0
+    msgLabel->setAttribute(Qt::WA_TranslucentBackground);
+    msgLabel->setStyleSheet(QString("QLabel { color: %1; }").arg(textRgb));
+#else
+    msgLabel->setStyleSheet("QLabel { color: white; background-color: darkred; }");
+#endif
+    QFont f = msgLabel->font();
+    f.setPixelSize(msgHeight * 0.8);
+    msgLabel->setFont(f);
+    msgLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    msgLabel->setGeometry(msgX, msgY, msgWidth, msgHeight);
 
     show();
 }
@@ -72,7 +127,7 @@ void
 SplashScreen::showMessage
 (const QString &msg)
 {
-    QSplashScreen::showMessage(msg);
+    msgLabel->setText(msg);
     QApplication::processEvents();
 }
 
@@ -81,6 +136,6 @@ void
 SplashScreen::clearMessage
 ()
 {
-    QSplashScreen::clearMessage();
+    msgLabel->clear();
     QApplication::processEvents();
 }

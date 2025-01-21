@@ -135,7 +135,7 @@ MainWindow::MainWindow(const QDir &home)
 
     // create a splash to keep user informed on first load
     // first one in middle of display, not middle of window
-    setSplash();
+    splash = new SplashScreen();
 
 #if defined(_MSC_VER) && defined(_WIN64)
     // set dbg/stacktrace directory for Windows to the athlete directory
@@ -734,27 +734,14 @@ MainWindow::MainWindow(const QDir &home)
 #endif
 
     // get rid of splash when currentTab is shown
-    clearSplash();
+    delete splash;
+    splash = nullptr;
 }
 
 
 /*----------------------------------------------------------------------
  * GUI
  *--------------------------------------------------------------------*/
-
-void
-MainWindow::setSplash()
-{
-    QString versionText = QString(tr("%1 - build %2")).arg(VERSION_STRING).arg(VERSION_LATEST);
-    splash = new SplashScreen(":images/splashscreen.png", versionText, 533, 100);
-}
-
-void
-MainWindow::clearSplash()
-{
-    delete splash;
-    splash = nullptr;
-}
 
 void
 MainWindow::toggleSidebar()

@@ -122,8 +122,6 @@ class MainWindow : public QMainWindow
 
         // working with splash screens
         SplashScreen *splash;
-        void setSplash();
-        void clearSplash();
 
     signals:
         void backClicked();
