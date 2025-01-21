@@ -75,7 +75,7 @@ const ant_sensor_type_t ANT::ant_sensor_types[] = {
   { true, ANTChannel::CHANNEL_TYPE_TEMPE, ANT_SPORT_TEMPE_PERIOD, ANT_SPORT_TEMPE_TYPE,
                 ANT_SPORT_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Tempe", 't', ":images/IconTemp.png" },
   { true, ANTChannel::CHANNEL_TYPE_CORETEMP, ANT_SPORT_CORETEMP_PERIOD, ANT_SPORT_CORETEMP_TYPE,
-        ANT_SPORT_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "CoreTemp", 't', ":images/IconCore.png" },
+                ANT_SPORT_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "CoreTemp", 'e', ":images/IconCore.png" },
   { false, ANTChannel::CHANNEL_TYPE_GUARD, 0, 0, 0, 0, "", '\0', "" }
 };
 
