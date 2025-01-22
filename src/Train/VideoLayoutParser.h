@@ -23,6 +23,7 @@
 #ifndef _VideoLayoutParser_h
 #define _VideoLayoutParser_h
 #include "GoldenCheetah.h"
+class Context;
 
 #include <QString>
 #include <QXmlDefaultHandler>
@@ -32,7 +33,7 @@
 class VideoLayoutParser : public QXmlDefaultHandler
 {
 public:
-    VideoLayoutParser(QList<MeterWidget*>* metersWidget, QList<QString>* layoutNames, QWidget* VideoContainer);
+    VideoLayoutParser(QList<MeterWidget*>* metersWidget, QList<QString>* layoutNames, QWidget* VideoContainer, Context* context);
 
     bool startElement( const QString&, const QString&, const QString&, const QXmlAttributes& );
     bool endElement( const QString&, const QString&, const QString& );
@@ -42,6 +43,8 @@ public:
     int  layoutPositionSelected;
 
 private:
+    Context *context;
+
     QList<MeterWidget*>* metersWidget;
     QList<QString>* layoutNames;
     QWidget*    VideoContainer;
