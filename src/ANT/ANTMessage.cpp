@@ -621,12 +621,15 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
 
             case ANTChannel::CHANNEL_TYPE_CORETEMP:
             {
+                static int tmpQual=0;
                 switch (data_page)
                 {
                 case 0:
-                    tempQual = (message[6]&0x3);
+                    // Quality only on intermittent messages so need to remember last quality message
+                    tmpQual = (message[6]&0x3);
                     break;
                 case 1:
+                    tempQual = tmpQual;
                     uint16_t val=(message[7]+((message[8] & 0xf0)<<4));
                     if (val>0 && val != 0x800) 
                         skinTemp = val/20.0;

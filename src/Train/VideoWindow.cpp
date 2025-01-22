@@ -142,7 +142,7 @@ VideoWindow::VideoWindow(Context *context)  :
     }
 #endif
 
-#ifdef GC_VIDEO_QT5
+#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
     // USE QT VIDEO PLAYER
     wd = new QVideoWidget(this);
     wd->show();
@@ -198,7 +198,7 @@ VideoWindow::~VideoWindow()
     vlcDispatch.Drain();
 #endif
 
-#ifdef GC_VIDEO_QT5
+#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
     // QT MEDIA
     delete mp;
     delete wd;
@@ -223,6 +223,10 @@ bool VideoWindow::hasActiveVideo() const
 #endif
 #ifdef GC_VIDEO_QT5
     if (mp->state() != QMediaPlayer::StoppedState)
+        return true;
+#endif
+#ifdef GC_VIDEO_QT6
+    if (mp->playbackState() != QMediaPlayer::StoppedState)
         return true;
 #endif
 
@@ -267,7 +271,7 @@ void VideoWindow::readVideoLayout(int pos, bool useDefault)
         }
         layoutNames.clear();
 
-        VideoLayoutParser handler(&m_metersWidget, &layoutNames, container);
+        VideoLayoutParser handler(&m_metersWidget, &layoutNames, container, context);
         QXmlInputSource source(&file);
         QXmlSimpleReader reader;
         handler.layoutPositionSelected = pos;
@@ -342,7 +346,7 @@ void VideoWindow::startPlayback()
     m_MediaChanged = false;
 #endif
 
-#ifdef GC_VIDEO_QT5
+#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
     // open the media object
     mp->play();
 #endif
@@ -398,7 +402,7 @@ void VideoWindow::startPlayback()
             }
         }
 #endif
-#ifdef GC_VIDEO_QT5
+#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
         // QT doesn't expose media frame rate so make due with duration.
         double videoSyncDuration = currentVideoSyncFile->duration();
         if (videoSyncDuration > 0) {
@@ -455,7 +459,7 @@ void VideoWindow::stopPlayback()
     vlcDispatch.AsyncCall([capture_mp]{ libvlc_media_player_stop(capture_mp); });
 #endif
 
-#ifdef GC_VIDEO_QT5
+#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
     mp->stop();
 #endif
 }
@@ -476,7 +480,7 @@ void VideoWindow::pausePlayback()
     vlcDispatch.AsyncCall([capture_mp]{libvlc_media_player_set_pause(capture_mp, true); });
 #endif
 
-#ifdef GC_VIDEO_QT5
+#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
     mp->pause();
 #endif
 }
@@ -499,7 +503,7 @@ void VideoWindow::resumePlayback()
     }
 #endif
 
-#ifdef GC_VIDEO_QT5
+#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
     mp->play();
 #endif
 
@@ -798,7 +802,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
     }
 #endif
 
-#ifdef GC_VIDEO_QT5
+#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
 //TODO
 //    // seek to ms position in current file
 //    mp->setPosition(ms);
@@ -831,7 +835,7 @@ void VideoWindow::seekPlayback(long ms)
     }
 #endif
 
-#ifdef GC_VIDEO_QT5
+#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
     Q_UNUSED(ms)
 //TODO
 //    // seek to ms position in current file
@@ -891,6 +895,10 @@ void VideoWindow::mediaSelected(QString filename)
     // QT MEDIA
     mc = QMediaContent(QUrl::fromLocalFile(filename));
     mp->setMedia(mc);
+#endif
+#ifdef GC_VIDEO_QT6
+    // QT MEDIA
+    mp->setSource(QUrl::fromLocalFile(filename));
 #endif
     if(context->isRunning) startPlayback();
 }

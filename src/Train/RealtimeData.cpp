@@ -45,6 +45,7 @@ RealtimeData::RealtimeData()
     trainerConfigRequired = false;
     trainerBrakeFault = false;
     memset(spinScan, 0, 24);
+    temp = 0.0;
 }
 
 void RealtimeData::setName(char *name)
@@ -530,7 +531,7 @@ double RealtimeData::value(DataSeries series) const
 
     case Temp: return temp;
         break;
-        
+
     case CoreTemp: return coreTemp;
         break;
 

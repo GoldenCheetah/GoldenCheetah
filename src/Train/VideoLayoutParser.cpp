@@ -23,11 +23,13 @@
 #include <QString>
 #include <QDebug>
 
+#include "Context.h"
+
 #include "VideoLayoutParser.h"
 #include "MeterWidget.h"
 
-VideoLayoutParser::VideoLayoutParser (QList<MeterWidget*>* metersWidget, QList<QString>* layoutNames, QWidget* VideoContainer)
-    : metersWidget(metersWidget), layoutNames(layoutNames), VideoContainer(VideoContainer)
+VideoLayoutParser::VideoLayoutParser (QList<MeterWidget*>* metersWidget, QList<QString>* layoutNames, QWidget* VideoContainer, Context* context)
+    : metersWidget(metersWidget), layoutNames(layoutNames), VideoContainer(VideoContainer), context(context)
 {
     nonameindex = 0;
     skipLayout = false;
@@ -191,7 +193,7 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
         }
         else if (meterType == QString("LiveMap"))
         {
-            meterWidget = new LiveMapWidget(meterName, containerWidget, source);
+            meterWidget = new LiveMapWidget(meterName, containerWidget, source, context);
         }
         else
         {

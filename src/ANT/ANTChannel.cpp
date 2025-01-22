@@ -904,7 +904,6 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
 
         case CHANNEL_TYPE_CORETEMP:
         {
-            // Quality alternates messages so will need to remember last quality message
             // only use core temp if data is 'good' or better (just use >0 for now)
             if ( antMessage.coreTemp > 0 )
             {
