@@ -271,7 +271,7 @@ void VideoWindow::readVideoLayout(int pos, bool useDefault)
         }
         layoutNames.clear();
 
-        VideoLayoutParser handler(&m_metersWidget, &layoutNames, container);
+        VideoLayoutParser handler(&m_metersWidget, &layoutNames, container, context);
         QXmlInputSource source(&file);
         QXmlSimpleReader reader;
         handler.layoutPositionSelected = pos;
