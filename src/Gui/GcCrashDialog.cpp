@@ -286,6 +286,8 @@ QString GcCrashDialog::versionHTML()
             .arg("quicktime")
 #elif defined GC_VIDEO_QT5
             .arg("qt5")
+#elif defined GC_VIDEO_QT6
+            .arg("qt6")
 #elif defined GC_VIDEO_VLC
             .arg("vlc")
 #else
