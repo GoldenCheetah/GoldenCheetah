@@ -121,6 +121,7 @@ class Context : public QObject
         bool showSidebar, showLowbar, showToolbar, showTabbar;
         int style;
         QString searchText;
+        QString workoutFilterText;
         bool scopehighlighted;
 
         // ride item

@@ -351,6 +351,8 @@ MainWindow::MainWindow(const QDir &home)
     workoutFilterBox->setStyle(toolStyle);
     workoutFilterBox->setFixedWidth(400 * dpiXFactor);
     workoutFilterBox->setFixedHeight(gl_toolheight * dpiYFactor);
+    HelpWhatsThis *helpWorkoutFilterBox = new HelpWhatsThis(workoutFilterBox);
+    workoutFilterBox->setWhatsThis(helpWorkoutFilterBox->getWhatsThisText(HelpWhatsThis::ToolBar_WorkoutFilterBox));
 
     QWidget *space = new QWidget(this);
     space->setAutoFillBackground(false);
@@ -1984,6 +1986,9 @@ MainWindow::openAthleteTab(QString name)
     GcUpgrade v3;
     if (!v3.upgradeConfirmedByUser(home)) return;
 
+    // save how we are
+    saveGCState(currentAthleteTab->context);
+
     Context *con= new Context(this);
     con->athlete = NULL;
     emit openingAthlete(name, con);
@@ -2017,6 +2022,9 @@ MainWindow::loadCompleted(QString name, Context *context)
     // show the tabbar if we're gonna open tabs -- but wait till the last second
     // to show it to avoid crappy paint artefacts
     showTabbar(true);
+
+    // clear the workout filter box text
+    workoutFilterBox->clear();
 
     // tell everyone
     currentAthleteTab->context->notifyLoadDone(name, context);
@@ -2277,6 +2285,7 @@ MainWindow::saveGCState(Context *context)
     context->showLowbar = showhideLowbar->isChecked();
     context->showToolbar = showhideToolbar->isChecked();
     context->searchText = searchBox->text();
+    context->workoutFilterText = workoutFilterBox->text();
     context->style = styleAction->isChecked();
 }
 
@@ -2304,6 +2313,8 @@ MainWindow::restoreGCState(Context *context)
     showLowbar(context->showLowbar);
     searchBox->setContext(context);
     searchBox->setText(context->searchText);
+    workoutFilterBox->setContext(context);
+    workoutFilterBox->setText(context->workoutFilterText);
 }
 
 void

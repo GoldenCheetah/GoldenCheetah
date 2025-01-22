@@ -89,6 +89,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("Tool%20Bar_Functions#forward").arg(tr("Navigate forward"));
     case ToolBar_PerspectiveSelector:
         return text.arg("Tool%20Bar_Functions#perspective-selector").arg(tr("Select active perspective for the current view, create new perspectives and manage existing ones"));
+    case ToolBar_WorkoutFilterBox:
+        return text.arg("Tool%20Bar-WorkoutFilterBox").arg(tr("Entry field for Searching and Filtering of workouts"));
     case ToolBar_ToggleSidebar:
         return text.arg("Tool%20Bar_Functions#side-bar").arg(tr("Activate / De-activate the Sidebar - which provides different sub-sections to select data shown in the main view"));
     case ToolBar_ToggleComparePane:

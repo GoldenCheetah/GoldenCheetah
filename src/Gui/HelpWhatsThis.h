@@ -44,6 +44,7 @@ Q_OBJECT
                  ToolBar_Back,
                  ToolBar_Forward,
                  ToolBar_PerspectiveSelector,
+                 ToolBar_WorkoutFilterBox,
                  ToolBar_ToggleSidebar,
                  ToolBar_ToggleComparePane,
                  ToolBar_TabTile,

@@ -33,6 +33,7 @@ class WorkoutFilterBox : public FilterEditor
 public:
     WorkoutFilterBox(QWidget *parent=nullptr, Context *context=nullptr);
     virtual ~WorkoutFilterBox();
+    void setContext(Context *ctx) { context = ctx; }
 
 private slots:
     void textChanged(const QString &text);
