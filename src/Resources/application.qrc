@@ -167,7 +167,7 @@
         <file>images/toolbar/forward_alt.png</file>
         <file>images/toolbar/popbutton.png</file>
         <file>images/toolbar/flipbutton.png</file>
-        <file>images/splashscreen.png</file>
+        <file>images/splashscreen.svg</file>
         <file>images/mac/back.png</file>
         <file>images/mac/forward.png</file>
         <file>images/mac/compose.png</file>

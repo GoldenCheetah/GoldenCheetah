@@ -19,6 +19,7 @@
 #include "SplashScreen.h"
 
 #include <QDebug>
+#include <QSvgRenderer>
 #include <QPixmap>
 #include <QPainter>
 #include <QFont>
@@ -37,6 +38,7 @@ SplashScreen::SplashScreen
 : QSplashScreen()
 {
     const QString textRgb("#000000");
+    int pixmapWidth = 340;
     int versionX = 48;
     int versionY = 296;
     int versionWidth = 243;
@@ -46,35 +48,38 @@ SplashScreen::SplashScreen
     int msgY = 320;
     int msgWidth = versionWidth;
     int msgHeight = 14;
-    const QString pixmapPath(":images/splashscreen.png");
+    const QString svgPath(":images/splashscreen.svg");
     const QString version = QString(tr("%1 - build %2")).arg(VERSION_STRING).arg(VERSION_LATEST);
 
     setAttribute(Qt::WA_TranslucentBackground);
 
-    QPixmap pixmap(pixmapPath);
-    int targetPixmapWidth = -1;
+    QSvgRenderer renderer(svgPath);
+    QSize defaultSize = renderer.defaultSize();
+    double scaleFactor = 1;
+
     if (QApplication::primaryScreen()->geometry().width() <= 1280) {
-        targetPixmapWidth = 280;
+        pixmapWidth = 280;
+        scaleFactor = 280 / 340.0;
     } else if (dpiXFactor > 1) {
-        targetPixmapWidth = pixmap.rect().width() * dpiXFactor;
+        scaleFactor = dpiXFactor;
+        pixmapWidth *= scaleFactor;
     }
-    if (targetPixmapWidth > 0) {
-        // Scale pixmap for low or high screen resolutions
-        int origPixmapWidth = pixmap.rect().width();
-        int origPixmapHeight = pixmap.rect().height();
-        pixmap = pixmap.scaledToWidth(targetPixmapWidth, Qt::SmoothTransformation);
-        double xFactor = pixmap.rect().width() / static_cast<double>(origPixmapWidth);
-        double yFactor = pixmap.rect().height() / static_cast<double>(origPixmapHeight);
-        versionX *= xFactor;
-        versionY *= yFactor;
-        versionWidth *= xFactor;
-        versionHeight *= yFactor;
-        sepOverlap *= xFactor;
-        msgX *= xFactor;
-        msgY *= yFactor;
-        msgWidth *= xFactor;
-        msgHeight *= yFactor;
-    }
+
+    QPixmap pixmap(pixmapWidth, pixmapWidth / double(defaultSize.width()) * defaultSize.height());
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    renderer.render(&painter);
+
+    versionX *= scaleFactor;
+    versionY *= scaleFactor;
+    versionWidth *= scaleFactor;
+    versionHeight *= scaleFactor;
+    sepOverlap *= scaleFactor;
+    msgX *= scaleFactor;
+    msgY *= scaleFactor;
+    msgWidth *= scaleFactor;
+    msgHeight *= scaleFactor;
+
     if (version.size() > 0) {
         QLabel *versionLabel = new QLabel(this);
 #if SHOW_BOX == 0
@@ -94,7 +99,6 @@ SplashScreen::SplashScreen
         int sepLeft = versionX - sepOverlap;
         int sepRight = versionX + versionWidth + sepOverlap;
         int sepY = (versionY + versionHeight + msgY) / 2;
-        QPainter painter(&pixmap);
         painter.setPen(QColor(textRgb));
         painter.drawLine(sepLeft, sepY, sepRight, sepY);
     }
