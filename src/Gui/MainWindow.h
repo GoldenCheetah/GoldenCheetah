@@ -63,6 +63,7 @@ class QtSegmentControl;
 class SaveSingleDialogWidget;
 class ChooseCyclistDialog;
 class SearchFilterBox;
+class WorkoutFilterBox;
 class NewSideBar;
 class AthleteView;
 
@@ -307,6 +308,7 @@ class MainWindow : public QMainWindow
         QComboBox *perspectiveSelector;
         bool pactive; // when programmatically manipulating selector
         SearchFilterBox *searchBox;
+        WorkoutFilterBox *workoutFilterBox;
 
         // Not on Mac so use other types
         QPushButton *sidelist, *lowbar, *tabtile, *whatsthis;

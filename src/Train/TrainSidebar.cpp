@@ -77,8 +77,6 @@
 #include "windows.h"
 #endif
 
-#include "WorkoutFilter.h"
-#include "FilterEditor.h"
 #include "TrainDB.h"
 #include "Library.h"
 
@@ -246,6 +244,10 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     connect(context, SIGNAL(newLap()), this, SLOT(resetLapTimer()));
     connect(context, SIGNAL(viewChanged(int)), this, SLOT(viewChanged(int)));
 
+    // workout filters
+    connect(context, SIGNAL(workoutFiltersChanged(QList<ModelFilter*>&)), this, SLOT(workoutFiltersChanged(QList<ModelFilter*>&)));
+    connect(context, SIGNAL(workoutFiltersRemoved()), this, SLOT(workoutFiltersRemoved()));
+
     // not used but kept in case re-instated in the future
     recordSelector = new QCheckBox(this);
     recordSelector->setText(tr("Save workout data"));
@@ -272,15 +274,6 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     trainSplitter->addWidget(deviceItem);
 
 
-    FilterEditor *workoutFilter = new FilterEditor();
-    QIcon workoutFilterErrorIcon = workoutFilter->style()->standardIcon(QStyle::SP_MessageBoxCritical);
-    workoutFilterErrorAction = workoutFilter->addAction(workoutFilterErrorIcon, FilterEditor::LeadingPosition);
-    workoutFilterErrorAction->setVisible(false);
-    workoutFilter->setClearButtonEnabled(true);
-    workoutFilter->setPlaceholderText(tr("Filter..."));
-    workoutFilter->setFilterCommands(workoutFilterCommands());
-    connect(workoutFilter, SIGNAL(textChanged(const QString&)), this, SLOT(workoutFilterChanged(const QString&)));
-    workoutItem->addWidget(workoutFilter);
     workoutItem->addWidget(workoutTree);
     HelpWhatsThis *helpWorkoutTree = new HelpWhatsThis(workoutTree);
     workoutTree->setWhatsThis(helpWorkoutTree->getWhatsThisText(HelpWhatsThis::SideBarTrainView_Workouts));
@@ -1238,30 +1231,6 @@ TrainSidebar::mediaTreeWidgetSelectionChanged()
         context->notifyMediaSelected(filename);
     }
 }
-
-
-void
-TrainSidebar::workoutFilterChanged
-(const QString &text)
-{
-    workoutFilterErrorAction->setVisible(false);
-    bool ok = true;
-    QString msg;
-    QString input(text.trimmed());
-    while (input.length() > 0 && (input.back().isSpace() || input.back() == ',')) {
-        input.chop(1);
-    }
-    if (input.length() > 0) {
-        sortModel->setFilters(parseWorkoutFilter(input, ok, msg));
-        if (! ok) {
-            workoutFilterErrorAction->setVisible(true);
-            workoutFilterErrorAction->setToolTip(tr("ERROR: %1").arg(msg));
-        }
-    } else {
-        sortModel->removeFilters();
-    }
-}
-
 
 void
 TrainSidebar::videosyncTreeWidgetSelectionChanged()
