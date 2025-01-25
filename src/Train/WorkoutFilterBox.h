@@ -36,14 +36,12 @@ public:
     void setContext(Context *ctx) { context = ctx; }
 
 private slots:
-    void textChanged(const QString &text);
     void editingFinished();
     void configChanged(qint32 topic);
 
 private:
     Context *context;
     QAction *workoutFilterErrorAction;
-    QList<ModelFilter *> filters;
 };
 
 #endif
