@@ -107,7 +107,9 @@ extern "C" {
 #include <QVideoWidget>
 #include <QMediaPlayer>
 #endif
-
+#ifdef GC_VIDEO_QT6
+#include <QAudioOutput>
+#endif
 #ifdef GC_VIDEO_QT5
 #include <QMediaContent>
 #endif
@@ -266,6 +268,8 @@ class VideoWindow : public GcChartWindow
         void mediaSelected(QString filename);
         bool hasActiveVideo() const;
 
+        void ChangedStatus(QMediaPlayer::MediaStatus);
+        
     protected:
 
         void resizeEvent(QResizeEvent *);

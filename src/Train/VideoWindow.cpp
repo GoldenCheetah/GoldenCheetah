@@ -28,6 +28,10 @@
 #include "VideoLayoutParser.h"
 #include "HelpWhatsThis.h"
 
+#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
+#include <QMediaMetaData>
+#endif
+
 class Lock
 {
     QRecursiveMutex& mutex;
@@ -101,9 +105,32 @@ VideoWindow::VideoWindow(Context *context)  :
         libvlc_media_player_set_xwindow (mp, container->winId());
 #endif
 
-#if defined(WIN32) || defined(Q_OS_LINUX)
+    } else {
+        // something went wrong !
+        init = false;
+    }
+#endif
 
-        // Read the video layouts just to list the names for the layout selector
+#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
+    // USE QT VIDEO PLAYER
+    wd = new QVideoWidget(this);
+    wd->show();
+
+    container = wd;
+
+    mp = new QMediaPlayer(this);
+    mp->setVideoOutput(wd);
+
+#if defined(GC_VIDEO_QT6)
+    mp->setAudioOutput(new QAudioOutput);
+#endif
+//    layout->addWidget(wd);
+    layout->addWidget(container);
+#endif
+
+#if defined(WIN32) || defined(Q_OS_LINUX)
+    if (init) {
+    // Read the video layouts just to list the names for the layout selector
         readVideoLayout(-1);
 
         // Create the layout selector form
@@ -134,23 +161,7 @@ VideoWindow::VideoWindow(Context *context)  :
 
         // Instantiate a layout as initial default
         layoutChanged();
-#endif
-    } else {
-
-        // something went wrong !
-        init = false;
     }
-#endif
-
-#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
-    // USE QT VIDEO PLAYER
-    wd = new QVideoWidget(this);
-    wd->show();
-
-    mp = new QMediaPlayer(this);
-    mp->setVideoOutput(wd);
-
-    layout->addWidget(wd);
 #endif
 
     setControls(c);
@@ -348,6 +359,10 @@ void VideoWindow::startPlayback()
 
 #if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
     // open the media object
+    float rate = 1.0f;
+    if (context->currentVideoSyncFile() && context->currentVideoSyncFile()->Points.count() > 1)
+        rate = 0.1f;
+    mp->setPlaybackRate(rate);
     mp->play();
 #endif
 
@@ -403,12 +418,39 @@ void VideoWindow::startPlayback()
         }
 #endif
 #if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
-        // QT doesn't expose media frame rate so make due with duration.
-        double videoSyncDuration = currentVideoSyncFile->duration();
-        if (videoSyncDuration > 0) {
-            double mediaDuration = (double)mp->duration();
-            if (mediaDuration > 0) {
-                videoSyncTimeAdjustFactor = mediaDuration / videoSyncDuration;
+//TODO
+        double videoSyncFrameRate = currentVideoSyncFile->videoFrameRate();
+qDebug()<<"Sync rate " << videoSyncFrameRate;
+        if (videoSyncFrameRate > 0.) {
+            auto md = mp->metaData();
+//get rate from first video video
+            bool ok=false;
+            auto rate = md.value(QMediaMetaData::VideoFrameRate);
+            if (md.isEmpty())
+                qDebug()<<"Empty metadata";
+            auto keys= md.keys();
+            
+            for (int i = 0; i < keys.size(); ++i) {
+            qDebug() <<"key " <<i<<"-"<<
+                QMediaMetaData::metaDataKeyToString(    keys.at(i));
+            }
+            
+            double mediaFrameRate = rate.toReal(&ok);
+qDebug() <<"Video frame rate " <<mediaFrameRate;
+            if (mediaFrameRate > 0.) {
+                videoSyncTimeAdjustFactor = videoSyncFrameRate / mediaFrameRate;
+            }
+            
+            if (!ok) //fallback to duration
+            {
+                // QT doesn't expose media frame rate so make due with duration.
+                double videoSyncDuration = currentVideoSyncFile->duration();
+                if (videoSyncDuration > 0) {
+                    double mediaDuration = (double)mp->duration();
+                    if (mediaDuration > 0) {
+                        videoSyncTimeAdjustFactor = mediaDuration / videoSyncDuration;
+                    }
+                }
             }
         }
 #endif
@@ -449,6 +491,10 @@ void VideoWindow::stopPlayback()
     foreach(MeterWidget * p_meterWidget, m_metersWidget) {
         p_meterWidget->stopPlayback();
         p_meterWidget->hide();
+
+        //TODO?
+//        m_metersWidget.removeAll(p_meterWidget);
+//        p_meterWidget->deleteLater();
     }
 
 #ifdef GC_VIDEO_VLC
@@ -705,7 +751,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
     Q_UNUSED(rtd)
 #endif
 
-#ifdef GC_VIDEO_VLC
+#if defined (GC_VIDEO_VLC) || defined (GC_VIDEO_QT6)
     if (PlaybackState::Playing != state)
         return;
 
@@ -773,8 +819,12 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         float rate;
         float video_time_shift_ms;
 
+#ifdef GC_VIDEO_VLC
         libvlc_media_player_t* capture_mp = this->mp;
         video_time_shift_ms = (rfp.secs * 1000.0 - vlcDispatch.SyncCall<double>([capture_mp]{ return libvlc_media_player_get_time(capture_mp); }));
+#else
+        video_time_shift_ms = (rfp.secs * 1000.0 - mp->position() );
+#endif
         if (rfp.kph == 0.0)
             rate = 1.0;
         else
@@ -784,19 +834,30 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         if (fabs(video_time_shift_ms) > 5000)
         {
             double rfp_secs = rfp.secs;
+#ifdef GC_VIDEO_VLC
             vlcDispatch.AsyncCall([capture_mp, rfp_secs]{ libvlc_media_player_set_time(capture_mp, (libvlc_time_t)(rfp_secs * 1000.0)); });
+#else
+            mp->setPosition(rfp_secs * 1000.0);
+#endif
+
         }
         else {
             // otherwise add "small" empiric corrective parameter to get video back to ghost position:
             rate *= 1.0 + (video_time_shift_ms / 10000.0);
         }
 
+        //pause for a period?
+#ifdef GC_VIDEO_VLC
         vlcDispatch.AsyncCall([capture_mp, rate]{ libvlc_media_player_set_pause(capture_mp, (rate < 0.01)); });
-
+#endif
         // change video rate but only if there is a significant change
         if ((rate != 0.0) && (fabs((rate - currentVideoRate) / rate) > 0.05))
         {
+#ifdef GC_VIDEO_VLC
             vlcDispatch.AsyncCall([capture_mp, rate]{ libvlc_media_player_set_rate(capture_mp, rate); });
+#else
+            mp->setPlaybackRate(rate);
+#endif
             currentVideoRate = rate;
         }
     }
@@ -821,7 +882,8 @@ void VideoWindow::seekPlayback(long ms)
 
 #ifdef GC_VIDEO_VLC
     if (!m) return;
-
+#endif
+    
     // when we selected a videosync file in training mode (rlv...)
     if (context->currentVideoSyncFile())
     {
@@ -829,11 +891,14 @@ void VideoWindow::seekPlayback(long ms)
     }
     else
     {
+#ifdef GC_VIDEO_VLC
         // seek to ms position in current file
         libvlc_media_player_t* capture_mp = this->mp;
         vlcDispatch.AsyncCall([capture_mp, ms]{ libvlc_media_player_set_time(capture_mp, (libvlc_time_t)ms); });
-    }
+#else
+        mp->setPosition(ms);
 #endif
+    }
 
 #if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
     Q_UNUSED(ms)
@@ -898,9 +963,37 @@ void VideoWindow::mediaSelected(QString filename)
 #endif
 #ifdef GC_VIDEO_QT6
     // QT MEDIA
+qDebug()<< "setSource";
     mp->setSource(QUrl::fromLocalFile(filename));
+
+    connect(mp, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(ChangedStatus(QMediaPlayer::MediaStatus)));
+
 #endif
     if(context->isRunning) startPlayback();
+}
+
+void VideoWindow::ChangedStatus(QMediaPlayer::MediaStatus status)
+{
+    qDebug() << "Status changed to: " << status;
+    
+    if (status == QMediaPlayer::LoadedMedia)
+    {
+            auto md = mp->metaData();
+//get rate from first video video
+            bool ok=false;
+            auto rate = md.value(QMediaMetaData::VideoFrameRate);
+            if (md.isEmpty())
+                qDebug()<<"Empty metadata";
+            auto keys= md.keys();
+            
+            for (int i = 0; i < keys.size(); ++i) {
+            qDebug() <<"key " <<i<<"-"<<
+                QMediaMetaData::metaDataKeyToString(    keys.at(i));
+            }
+            
+            double mediaFrameRate = rate.toReal(&ok);
+qDebug() <<"Video frame rate " <<mediaFrameRate;
+    }
 }
 
 MediaHelper::MediaHelper()
@@ -923,7 +1016,6 @@ MediaHelper::MediaHelper()
     supported << ".MXF";
     supported << ".VOB";
     supported << ".WMV";
-
 }
 
 MediaHelper::~MediaHelper()
