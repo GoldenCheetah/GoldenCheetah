@@ -33,7 +33,6 @@ WorkoutFilterBox::WorkoutFilterBox(QWidget *parent, Context *context) : FilterEd
     this->setClearButtonEnabled(true);
     this->setPlaceholderText(tr("Filter..."));
     this->setFilterCommands(workoutFilterCommands());
-    connect(this, SIGNAL(textChanged(const QString&)), this, SLOT(textChanged(const QString&)));
     connect(this, SIGNAL(editingFinished()), this, SLOT(editingFinished()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
@@ -46,31 +45,28 @@ WorkoutFilterBox::~WorkoutFilterBox()
 }
 
 void
-WorkoutFilterBox::textChanged(const QString &text)
+WorkoutFilterBox::editingFinished()
 {
     workoutFilterErrorAction->setVisible(false);
     bool ok = true;
     QString msg;
-    QString input(text.trimmed());
+    QString input(text().trimmed());
     while (input.length() > 0 && (input.back().isSpace() || input.back() == ',')) {
         input.chop(1);
     }
-    if (context && input.length() > 0) {
-	filters = parseWorkoutFilter(input, ok, msg);
-        if (! ok) {
-            workoutFilterErrorAction->setVisible(true);
-            workoutFilterErrorAction->setToolTip(tr("ERROR: %1").arg(msg));
+    if (context) {
+        if (input.length() > 0) {
+            QList<ModelFilter *> filters = parseWorkoutFilter(input, ok, msg);
+            if (ok) {
+                context->setWorkoutFilters(filters);
+            } else {
+                workoutFilterErrorAction->setVisible(true);
+                workoutFilterErrorAction->setToolTip(tr("ERROR: %1").arg(msg));
+                context->clearWorkoutFilters();
+            }
+        } else {
+            context->clearWorkoutFilters();
         }
-    }
-}
-
-void
-WorkoutFilterBox::editingFinished()
-{
-    if (context && text().trimmed().length() > 0) {
-        context->setWorkoutFilters(filters);
-    } else {
-        context->clearWorkoutFilters();
     }
 }
 
