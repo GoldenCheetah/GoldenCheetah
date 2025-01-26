@@ -268,8 +268,6 @@ class VideoWindow : public GcChartWindow
         void mediaSelected(QString filename);
         bool hasActiveVideo() const;
 
-        void ChangedStatus(QMediaPlayer::MediaStatus);
-        
     protected:
 
         void resizeEvent(QResizeEvent *);

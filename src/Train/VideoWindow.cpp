@@ -41,7 +41,7 @@ public:
 };
 
 VideoWindow::VideoWindow(Context *context)  :
-    GcChartWindow(context), context(context), m_MediaChanged(false), layoutSelector(NULL)
+    GcChartWindow(context), context(context), m_MediaChanged(false), layoutSelector(NULL), container(nullptr)
 {
     HelpWhatsThis *helpContents = new HelpWhatsThis(this);
     this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::ChartTrain_VideoPlayer));
@@ -116,15 +116,13 @@ VideoWindow::VideoWindow(Context *context)  :
     wd = new QVideoWidget(this);
     wd->show();
 
-    container = wd;
-
     mp = new QMediaPlayer(this);
     mp->setVideoOutput(wd);
 
 #if defined(GC_VIDEO_QT6)
     mp->setAudioOutput(new QAudioOutput);
 #endif
-//    layout->addWidget(wd);
+    container = wd;
     layout->addWidget(container);
 #endif
 
@@ -207,6 +205,8 @@ VideoWindow::~VideoWindow()
     vlcDispatch.AsyncCall([capture_inst]() {libvlc_release(capture_inst); });
 
     vlcDispatch.Drain();
+    
+    delete container;
 #endif
 
 #if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
@@ -420,23 +420,12 @@ void VideoWindow::startPlayback()
 #if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
 //TODO
         double videoSyncFrameRate = currentVideoSyncFile->videoFrameRate();
-qDebug()<<"Sync rate " << videoSyncFrameRate;
         if (videoSyncFrameRate > 0.) {
             auto md = mp->metaData();
-//get rate from first video video
             bool ok=false;
             auto rate = md.value(QMediaMetaData::VideoFrameRate);
-            if (md.isEmpty())
-                qDebug()<<"Empty metadata";
-            auto keys= md.keys();
-            
-            for (int i = 0; i < keys.size(); ++i) {
-            qDebug() <<"key " <<i<<"-"<<
-                QMediaMetaData::metaDataKeyToString(    keys.at(i));
-            }
             
             double mediaFrameRate = rate.toReal(&ok);
-qDebug() <<"Video frame rate " <<mediaFrameRate;
             if (mediaFrameRate > 0.) {
                 videoSyncTimeAdjustFactor = videoSyncFrameRate / mediaFrameRate;
             }
@@ -491,10 +480,6 @@ void VideoWindow::stopPlayback()
     foreach(MeterWidget * p_meterWidget, m_metersWidget) {
         p_meterWidget->stopPlayback();
         p_meterWidget->hide();
-
-        //TODO?
-//        m_metersWidget.removeAll(p_meterWidget);
-//        p_meterWidget->deleteLater();
     }
 
 #ifdef GC_VIDEO_VLC
@@ -561,7 +546,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
     Lock lock(stateLock);
     if (!hasActiveVideo())
         return;
-
+    
     bool metric = GlobalContext::context()->useMetricUnits;
 
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
@@ -846,9 +831,13 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
             rate *= 1.0 + (video_time_shift_ms / 10000.0);
         }
 
-        //pause for a period?
 #ifdef GC_VIDEO_VLC
         vlcDispatch.AsyncCall([capture_mp, rate]{ libvlc_media_player_set_pause(capture_mp, (rate < 0.01)); });
+#else
+        if (rate < 0.01)
+            mp->pause();
+        else 
+            mp->play();
 #endif
         // change video rate but only if there is a significant change
         if ((rate != 0.0) && (fabs((rate - currentVideoRate) / rate) > 0.05))
@@ -963,37 +952,11 @@ void VideoWindow::mediaSelected(QString filename)
 #endif
 #ifdef GC_VIDEO_QT6
     // QT MEDIA
-qDebug()<< "setSource";
-    mp->setSource(QUrl::fromLocalFile(filename));
-
-    connect(mp, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(ChangedStatus(QMediaPlayer::MediaStatus)));
+    if (filename != "")
+        mp->setSource(QUrl::fromLocalFile(filename));
 
 #endif
     if(context->isRunning) startPlayback();
-}
-
-void VideoWindow::ChangedStatus(QMediaPlayer::MediaStatus status)
-{
-    qDebug() << "Status changed to: " << status;
-    
-    if (status == QMediaPlayer::LoadedMedia)
-    {
-            auto md = mp->metaData();
-//get rate from first video video
-            bool ok=false;
-            auto rate = md.value(QMediaMetaData::VideoFrameRate);
-            if (md.isEmpty())
-                qDebug()<<"Empty metadata";
-            auto keys= md.keys();
-            
-            for (int i = 0; i < keys.size(); ++i) {
-            qDebug() <<"key " <<i<<"-"<<
-                QMediaMetaData::metaDataKeyToString(    keys.at(i));
-            }
-            
-            double mediaFrameRate = rate.toReal(&ok);
-qDebug() <<"Video frame rate " <<mediaFrameRate;
-    }
 }
 
 MediaHelper::MediaHelper()
