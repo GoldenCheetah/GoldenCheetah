@@ -1260,8 +1260,10 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
 
             case CHANNEL_TYPE_TEMPE:
             {
-                if (antMessage.tempValid)
-                    parent->setTemp(antMessage.temp/100.0);
+                if (antMessage.tempValid) {
+                    value = value2 = antMessage.temp/100.0;
+                    parent->setTemp(value);
+                }
             }
             break;
 
