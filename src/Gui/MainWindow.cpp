@@ -626,8 +626,6 @@ MainWindow::MainWindow(const QDir &home)
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
 #ifndef Q_OS_MAC
     viewMenu->addAction(tr("Toggle Full Screen"), this, SLOT(toggleFullScreen()), QKeySequence("F11"));
-#else
-    viewMenu->addAction(tr("Toggle Full Screen"), this, SLOT(toggleFullScreen()));
 #endif
     showhideViewbar = viewMenu->addAction(tr("Show View Sidebar"), this, SLOT(showViewbar(bool)), QKeySequence("F2"));
     showhideViewbar->setCheckable(true);
@@ -1028,14 +1026,7 @@ MainWindow::toggleStyle()
 void
 MainWindow::toggleFullScreen()
 {
-#ifdef Q_OS_MAC
-    QRect screenSize = QGuiApplication::primaryScreen()->availableGeometry();
-    if (screenSize.width() > frameGeometry().width() ||
-        screenSize.height() > frameGeometry().height())
-        showFullScreen();
-    else
-        showNormal();
-#else
+#ifndef Q_OS_MAC
     if (fullScreen) fullScreen->toggle();
     else qDebug()<<"no fullscreen support compiled in.";
 #endif
