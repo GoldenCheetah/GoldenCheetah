@@ -162,13 +162,18 @@ OverviewEquipmentWindow::configChanged(qint32 cfg) {
         // need to update all the nonGCDistances in all the tiles before recalc
         for (ChartSpaceItem* item : space->allItems()) {
 
-            if (item->type == OverviewItemType::EQ_ITEM)
-            {
-                static_cast<EquipmentItem*>(item)->unitsChanged();
+            if (item->type == OverviewItemType::EQ_ITEM) {
+                dynamic_cast<EquipmentItem*>(item)->unitsChanged();
             }
         }
-
         if (reCalcOnVisible_) eqCalc_->recalculateEquipSpace(space->allItems());
+    }
+
+    if (cfg & CONFIG_APPEARANCE) {
+
+        for (ChartSpaceItem* item : space->allItems()) {
+            item->configChanged(CONFIG_APPEARANCE);
+        }
     }
 }
 
