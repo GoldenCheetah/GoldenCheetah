@@ -645,7 +645,7 @@ class SwimPaceFly : public SwimPaceStroke {
         {
             SwimPaceStroke::initialize();
             setName(tr("Swim Pace Fly"));
-            setDescription(tr("Average Swim Pace for freestyle lengths"));
+            setDescription(tr("Average Swim Pace for butterfly lengths"));
         }
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }
