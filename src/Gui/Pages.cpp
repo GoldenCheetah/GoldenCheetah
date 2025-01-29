@@ -140,12 +140,12 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     // Elevation hysterisis  GC_ELEVATION_HYSTERISIS
     QVariant elevationHysteresis = appsettings->value(this, GC_ELEVATION_HYSTERESIS);
     if (elevationHysteresis.isNull() || elevationHysteresis.toFloat() == 0.0)
-       elevationHysteresis.setValue(3.0);  // default is 1 meter
+       elevationHysteresis.setValue(3.0);  // default is 3 meters
 
     hystedit = new QDoubleSpinBox();
     hystedit->setDecimals(1);
     hystedit->setSingleStep(0.1);
-    hystedit->setRange(0, 10);
+    hystedit->setRange(0.1, 10); // minimum value is enforced in metric code
     hystedit->setSuffix(" " + tr("m"));
     hystedit->setValue(elevationHysteresis.toFloat());
 
