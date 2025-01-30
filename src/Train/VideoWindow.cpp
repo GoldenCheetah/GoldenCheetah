@@ -852,7 +852,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
     }
 #endif
 
-#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
+#ifdef GC_VIDEO_QT5
 //TODO
 //    // seek to ms position in current file
 //    mp->setPosition(ms);
@@ -885,16 +885,13 @@ void VideoWindow::seekPlayback(long ms)
         libvlc_media_player_t* capture_mp = this->mp;
         vlcDispatch.AsyncCall([capture_mp, ms]{ libvlc_media_player_set_time(capture_mp, (libvlc_time_t)ms); });
 #else
+#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
         mp->setPosition(ms);
+#else
+        Q_UNUSED(ms)
+#endif
 #endif
     }
-
-#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
-    Q_UNUSED(ms)
-//TODO
-//    // seek to ms position in current file
-//    mp->setPosition(ms);
-#endif
 }
 
 void VideoWindow::mediaSelected(QString filename)
