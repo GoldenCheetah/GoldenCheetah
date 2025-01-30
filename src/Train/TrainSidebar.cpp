@@ -406,7 +406,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     displayPosition = RealtimeData::seated;
     displayRppb = displayRppe = displayRpppb = displayRpppe = 0.0;
     displayLppb = displayLppe = displayLpppb = displayLpppe = 0.0;
-    displayCoreTemp = 0.0;
+    displayCoreTemp = displaySkinTemp = displayHeatStrain = 0.0;
 
     connect(gui_timer, SIGNAL(timeout()), this, SLOT(guiUpdate()));
     connect(disk_timer, SIGNAL(timeout()), this, SLOT(diskUpdate()));
@@ -766,7 +766,7 @@ TrainSidebar::configChanged(qint32 why)
             // connect slot for receiving rrData
             connect(Devices[i].controller, SIGNAL(rrData(uint16_t,uint8_t,uint8_t)), this, SLOT(rrData(uint16_t,uint8_t,uint8_t)));
             connect(Devices[i].controller, SIGNAL(posData(uint8_t)), this, SLOT(posData(uint8_t)));
-            connect(Devices[i].controller, SIGNAL(tcoreData(float,float,int)), this, SLOT(tcoreData(float,float,int)));
+            connect(Devices[i].controller, SIGNAL(tcoreData(float,float,float,int)), this, SLOT(tcoreData(float,float,float,int)));
 #ifdef QT_BLUETOOTH_LIB
         } else if (Devices.at(i).type == DEV_BT40) {
             Devices[i].controller = new BT40Controller(this, &Devices[i]);
@@ -1707,6 +1707,8 @@ void TrainSidebar::updateData(RealtimeData &rtData)
     displayPosition = rtData.getPosition();
     displayTemp = rtData.getTemp();
     displayCoreTemp = rtData.getCoreTemp();
+    displaySkinTemp = rtData.getSkinTemp();
+    displayHeatStrain = rtData.getHeatStrain();
     // Gradient not supported
     return;
 }
@@ -1908,7 +1910,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     rtData.setFeO2(local.getFeO2());
                 }
 
-                rtData.setCoreTemp(local.getCoreTemp(),0);
+                rtData.setCoreTemp(local.getCoreTemp(),local.getSkinTemp(),local.getHeatStrain());
                 // what are we getting from this one?
                 if (dev == bpmTelemetry) rtData.setHr(local.getHr());
                 if (dev == rpmTelemetry) rtData.setCadence(local.getCadence());
@@ -2150,6 +2152,8 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             displayPosition = rtData.getPosition();
             displayTemp = rtData.getTemp();
             displayCoreTemp = rtData.getCoreTemp();
+            displaySkinTemp = rtData.getSkinTemp();
+            displayHeatStrain = rtData.getHeatStrain();
 
             double weightKG = bicycle.MassKG();
             double vs = computeInstantSpeed(weightKG, rtData.getSlope(), rtData.getAltitude(), rtData.getWatts());
@@ -3367,7 +3371,7 @@ void TrainSidebar::posData(uint8_t position)
 }
 
 // Coretemp data received
-void TrainSidebar::tcoreData(float  core, float skin, int qual)
+void TrainSidebar::tcoreData(float  core, float skin, float hsi, int qual)
 {
     if (status&RT_RECORDING && tcoreFile == NULL && recordFile != NULL) {
         QString tcorefile = recordFile->fileName().replace("csv", "tcr");
@@ -3381,7 +3385,7 @@ void TrainSidebar::tcoreData(float  core, float skin, int qual)
 
             // CSV File header
             QTextStream recordFileStream(rrFile);
-            recordFileStream << "secs, core, skin, qual\n";
+            recordFileStream << "secs, core, skin, hsi, qual\n";
         }
     }
 
@@ -3393,7 +3397,7 @@ void TrainSidebar::tcoreData(float  core, float skin, int qual)
         double secs = double(session_elapsed_msec + session_time.elapsed()) / 1000.00;
 
         // output a line
-        recordFileStream << secs << ", " << core << ", " << skin << ", " << qual << "\n";
+        recordFileStream << secs << ", " << core << ", " << skin << ", " << hsi << ", " << qual << "\n";
     }
 }
 

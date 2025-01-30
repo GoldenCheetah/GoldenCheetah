@@ -162,7 +162,7 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf, QString athlete) : QThre
         connect(antChannel[i], SIGNAL(posData(uint8_t)), this, SIGNAL(posData(uint8_t)));
 
         // Core temp data
-        connect(antChannel[i], SIGNAL(tcoreData(float, float, int)), this, SIGNAL(tcoreData(float, float, int)));
+        connect(antChannel[i], SIGNAL(tcoreData(float, float, float, int)), this, SIGNAL(tcoreData(float, float, float, int)));
 
         // timer for master channel broadcasts
         connect(antChannel[i], SIGNAL(broadcastTimerStart(int)), this, SLOT(slotStartBroadcastTimer(int)));
@@ -243,9 +243,9 @@ void ANT::setTemp(double temp)
     telemetry.setTemp(temp);
 }
 
-void ANT::setCoreTemp(double core, double skin)
+void ANT::setCoreTemp(double core, double skin, double strain)
 {
-    telemetry.setCoreTemp(core, skin);
+    telemetry.setCoreTemp(core, skin, strain);
 }
 
 /*======================================================================

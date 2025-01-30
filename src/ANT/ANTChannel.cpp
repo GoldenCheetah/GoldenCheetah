@@ -911,9 +911,9 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 value2 = antMessage.skinTemp;
 
                 // Store in XDATA
-                emit tcoreData(antMessage.coreTemp, antMessage.skinTemp, antMessage.tempQual);
+                emit tcoreData(antMessage.coreTemp, antMessage.skinTemp, antMessage.heatStrain, antMessage.tempQual);
                 // and forward to telemetry
-                parent->setCoreTemp(antMessage.coreTemp, antMessage.skinTemp);
+                parent->setCoreTemp(antMessage.coreTemp, antMessage.skinTemp, antMessage.heatStrain);
             }
         }
         break;

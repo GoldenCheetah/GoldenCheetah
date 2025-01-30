@@ -219,7 +219,7 @@ class TrainSidebar : public GcWindow
         void rrData(uint16_t  rrtime, uint8_t heartrateBeats, uint8_t instantHeartrate);
 
         void posData(uint8_t position);
-        void tcoreData(float  core, float skin, int qual);
+        void tcoreData(float  core, float skin, float hsi, int qual);
 
         // VO2 measurement data to save
         void vo2Data(double rf, double rmv, double vo2, double vco2, double tv, double feo2);
@@ -268,7 +268,7 @@ class TrainSidebar : public GcWindow
         double displayDistance, displayWorkoutDistance;
         double displayLapDistance, displayLapDistanceRemaining;
         double displayLatitude, displayLongitude, displayAltitude; // geolocation
-        double displayCoreTemp;
+        double displayCoreTemp, displaySkinTemp, displayHeatStrain;
         long load;
         double slope;
         int displayWorkoutLap;     // which Lap in the workout are we at?
