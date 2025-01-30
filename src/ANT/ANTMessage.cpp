@@ -636,6 +636,9 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                     val=(message[10]+(message[11]<<8));
                     if (val>0  && val != 0x8000)
                         coreTemp = val/100.0;
+                    uint8_t hsi = message[5]; //Heat strain index
+                    if (hsi != 0xff)
+                        heatStrain = hsi/10.0;
                     break;
                 }
                 break;
@@ -969,7 +972,7 @@ void ANTMessage::init()
     fpodStrides=0;
     tempValid = false;
     temp=0;
-    coreTemp = skinTemp = 0.0;
+    coreTemp = skinTemp = heatStrain = 0.0;
     tempQual = 0;
 }
 

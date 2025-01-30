@@ -35,6 +35,7 @@ RealtimeData::RealtimeData()
     rppb = rppe = rpppb = rpppe = 0.0;
     lppb = lppe = lpppb = lpppe = 0.0;
     coreTemp = skinTemp = 0.0;
+    heatStrain = 0.0;
     latitude = longitude = altitude = 0.0;
     rf = rmv = vo2 = vco2 = tv = feo2 = 0.0;
     routeDistance = distanceRemaining = 0.0;
@@ -173,9 +174,10 @@ void RealtimeData::setRPS(double x)
 }
 
 //Skin temp passed but not used elsewhere
-void RealtimeData::setCoreTemp(double core, double skin) {
+void RealtimeData::setCoreTemp(double core, double skin, double heatStrain) {
   this->coreTemp = core;
   this->skinTemp = skin;
+  this->heatStrain = heatStrain;
 }
 
 const char *
@@ -895,3 +897,5 @@ void RealtimeData::setTemp(double temp) { this->temp = temp; }
 double RealtimeData::getTemp() const { return temp; }
 
 double RealtimeData::getCoreTemp() const { return coreTemp; }
+double RealtimeData::getSkinTemp() const { return skinTemp; }
+double RealtimeData::getHeatStrain() const { return heatStrain; }

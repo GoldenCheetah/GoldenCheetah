@@ -258,7 +258,7 @@ class ANTChannel : public QObject {
         void posData(uint8_t position);
 
         // signal for core temp data
-        void tcoreData(float core, float skin, int qual);
+        void tcoreData(float core, float skin, int qual, float strain);
 
         // signal for passing remote control commands
         void antRemoteControl(uint16_t command);

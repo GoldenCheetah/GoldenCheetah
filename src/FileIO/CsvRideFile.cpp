@@ -1572,9 +1572,9 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     {
         // create the XDATA series
         tcoreSeries = new XDataSeries();
-        tcoreSeries->name = "CoreTemp Measurements";
-        tcoreSeries->valuename << "Core" << "Skin" << "Quality";
-        tcoreSeries->unitname << "C" << "C" << "q";
+        tcoreSeries->name = "TCORE";
+        tcoreSeries->valuename << "Core" << "Skin" << "HSI" << "Quality";
+        tcoreSeries->unitname << "C" << "C" << "%" << "q";
 
         // attempt to read and add the data
         lineno=1;
@@ -1612,7 +1612,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     p->km = 0;
                     p->number[0] = values.at(1).toDouble();
                     p->number[1] = values.at(2).toDouble();
-                    p->number[2] = values.at(3).toInt();
+                    p->number[2] = values.at(3).toDouble();
+                    p->number[3] = values.at(4).toInt();
                     tcoreSeries->datapoints.append(p);
                 }
 

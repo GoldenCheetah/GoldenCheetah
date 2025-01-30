@@ -49,7 +49,7 @@ ANTlocalController::ANTlocalController(TrainSidebar *parent, DeviceConfiguration
     connect(myANTlocal, SIGNAL(rrData(uint16_t, uint8_t, uint8_t)), this, SIGNAL(rrData(uint16_t, uint8_t, uint8_t)));
 
     connect(myANTlocal, SIGNAL(posData(uint8_t)), this, SIGNAL(posData(uint8_t)));
-    connect(myANTlocal, SIGNAL(tcoreData(float, float, int)), this, SIGNAL(tcoreData(float, float, int)));
+    connect(myANTlocal, SIGNAL(tcoreData(float, float, float, int)), this, SIGNAL(tcoreData(float, float, float, int)));
 
     // connect slot receiving ANT remote control commands & translating to native
     connect(myANTlocal, SIGNAL(antRemoteControl(uint16_t)), this, SLOT(antRemoteControl(uint16_t)));
