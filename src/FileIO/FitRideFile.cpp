@@ -5425,7 +5425,7 @@ void write_record_definition(QByteArray *array, const RideFile *ride, QMap<int, 
 void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool withWatts, bool withHr, bool withCad ) {
     QMap<int, int> *local_msg_type_for_record_type = new QMap<int, int>();
 
-    int xdata_cur=0; //cursor into xdata
+    int xdata_cur=0; //cursor into core xdata
     // Record ------
     foreach (const RideFilePoint *point, ride->dataPoints()) {
         int type = 0;
@@ -5486,27 +5486,17 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         }
 
         if (ride->areDataPresent()->tcore) {
-            //Locate XData
-            XDataSeries* xdata_core = ride->xdata("TCORE");
-
             double core = point->tcore;
             double skin = 0.0, hsi = 0.0;
             int    qual = 0;
 
-            if (xdata_core){
-                XDataPoint* xdp = nullptr;
-                //Find xdata nearest current ride point
-                while (xdata_cur <= xdata_core->datapoints.size() &&
-                       (xdp = xdata_core->datapoints[xdata_cur]) &&
-                       xdp->secs < point->secs)
-                    xdata_cur++;
-
-                if (xdp){
-                    core = xdp->number[0];
-                    skin = xdp->number[1];
-                    hsi = xdp->number[2];
-                    qual = xdp->number[3];
-                }
+            //Find XData
+            XDataSeries *series = ride->xdata("TCORE");
+            if (series && series->datapoints.count() > 0)  {
+                core = ride->xdataValue(point, xdata_cur, "TCORE", "Core", RideFile::REPEAT);
+                skin = ride->xdataValue(point, xdata_cur, "TCORE", "Skin", RideFile::REPEAT);
+                hsi = ride->xdataValue(point, xdata_cur, "TCORE", "HSI", RideFile::REPEAT);
+                qual = ride->xdataValue(point, xdata_cur, "TCORE", "Quality", RideFile::REPEAT);
             }
 
             write_float32(ridePoint, core, true);
@@ -5518,6 +5508,7 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         array->append(ridePoint->data(), ridePoint->size());
     }
 
+    delete local_msg_type_for_record_type;
 }
 
 QByteArray
