@@ -60,7 +60,7 @@ OverviewWindow::OverviewWindow(Context *context, int scope, bool blank) : GcChar
     space->setMinimumColumns(minimumColumns());
     main->addWidget(space);
 
-    HelpWhatsThis *help = new HelpWhatsThis(space);
+    help = new HelpWhatsThis(space);
     if (scope & OverviewScope::ANALYSIS) space->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Overview));
     else space->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Chart_Overview));
 
@@ -90,7 +90,7 @@ OverviewWindow::OverviewWindow(Context *context, int scope, bool blank) : GcChar
     connect(space, SIGNAL(itemConfigRequested(ChartSpaceItem*, QPoint)), this, SLOT(configItem(ChartSpaceItem*, QPoint)));
 }
 
-void
+ChartSpaceItem*
 OverviewWindow::addTile()
 {
     ChartSpaceItem *added = NULL; // tell us what you added...
@@ -110,6 +110,7 @@ OverviewWindow::addTile()
         space->updateView();
 
     }
+    return added;
 }
 
 void
@@ -302,6 +303,8 @@ OverviewWindow::getConfiguration() const
                 config += "\"settings\":\"" + QString("%1").arg(Utils::jsonprotect(uc->getConfig())) + "\",";
             }
             break;
+
+        default: getExtraConfiguration(item, config); break;
         }
 
         config += "\"datafilter\":\"" + Utils::jsonprotect(item->datafilter) + "\",";
@@ -317,6 +320,15 @@ OverviewWindow::getConfiguration() const
     config += "  ]\n}\n";
 
     return config;
+}
+
+QString
+OverviewWindow::getChartSource() const
+{
+    QString source;
+    if (scope == OverviewScope::ANALYSIS) source = ":charts/overview-analysis.gchart";
+    if (scope == OverviewScope::TRENDS) source = ":charts/overview-trends.gchart";
+    return source;
 }
 
 void
@@ -345,9 +357,7 @@ defaultsetup:
         //
         // so we open the json doc and extract the config element
         //
-        QString source;
-        if (scope == OverviewScope::ANALYSIS) source = ":charts/overview-analysis.gchart";
-        if (scope == OverviewScope::TRENDS) source = ":charts/overview-trends.gchart";
+        QString source = getChartSource();
 
         QFile file(source);
         if (file.open(QIODevice::ReadOnly)) {
@@ -554,6 +564,8 @@ badconfig:
                 space->addItem(order,column,span,deep, add);
             }
             break;
+
+        default: add = setExtraConfiguration(obj, type, name, datafilter, order, column, span, deep); break;
         }
 
         // color is common- if we actuall added one...
@@ -662,6 +674,7 @@ OverviewConfigDialog::close()
         // update after config changed
         if (item->parent->scope & OverviewScope::ANALYSIS && item->parent->currentRideItem) item->setData(item->parent->currentRideItem);
         if (item->parent->scope & OverviewScope::TRENDS ) item->setDateRange(item->parent->currentDateRange);
+        if (item->parent->scope & OverviewScope::EQUIPMENT) item->setData(nullptr);
 
         item=NULL;
     }

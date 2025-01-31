@@ -33,6 +33,7 @@
 
 #include "ChartSpace.h"
 #include "OverviewItems.h"
+#include "HelpWhatsThis.h"
 
 class OverviewWindow : public GcChartWindow
 {
@@ -58,17 +59,30 @@ class OverviewWindow : public GcChartWindow
         void setMinimumColumns(int x) { if (x>0 && x< 11) {mincolsEdit->setValue(x); space->setMinimumColumns(x); }}
 
         // add a tile to the window
-        void addTile();
+        virtual ChartSpaceItem* addTile();
         void importChart();
         void settings();
 
         // config item requested
-        void configItem(ChartSpaceItem *, QPoint);
+        virtual void configItem(ChartSpaceItem *, QPoint);
+
+        const ChartSpace* getSpace() const { return space; };
+
+    protected:
+
+        virtual QString getChartSource() const;
+        virtual void getExtraConfiguration(ChartSpaceItem* /*item*/, QString& /*config*/) const {}
+        virtual ChartSpaceItem* setExtraConfiguration(QJsonObject& /*obj*/, int /*type*/,
+                                                    QString& /*name*/, QString& /*datafilter*/, int /*order*/,
+                                                    int /*column*/, int /*span*/, int /*deep*/) const
+                                                    { return nullptr; }
+
+        HelpWhatsThis* help;
+        ChartSpace* space;
 
     private:
 
         // gui setup
-        ChartSpace *space;
         bool configured;
         int scope;
         bool blank;

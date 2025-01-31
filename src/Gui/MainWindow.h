@@ -65,7 +65,9 @@ class ChooseCyclistDialog;
 class SearchFilterBox;
 class WorkoutFilterBox;
 class NewSideBar;
+class AbstractView;
 class AthleteView;
+class EquipView;
 
 
 class MainWindow;
@@ -74,6 +76,7 @@ class AthleteLoader;
 class Context;
 class AthleteTab;
 class GGraphicsView;
+class EquipCalculator;
 
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
@@ -95,6 +98,7 @@ class MainWindow : public QMainWindow
         // currently selected tab
         AthleteTab *athleteTab() { return currentAthleteTab; }
         NewSideBar *newSidebar() { return sidebar; }
+        EquipView *equipView() { return equipmentView; }
 
         // tab view keeps this up to date
         QAction *showhideSidebar;
@@ -111,6 +115,7 @@ class MainWindow : public QMainWindow
         friend class ::ChooseCyclistDialog;
         friend class ::AthleteLoader;
         friend class ::GGraphicsView;
+        friend class ::EquipCalculator;
         QMap<QString,AthleteTab*> athletetabs;
         AthleteTab *currentAthleteTab;
         QList<AthleteTab*> tabList;
@@ -123,6 +128,9 @@ class MainWindow : public QMainWindow
 
         // working with splash screens
         SplashScreen *splash;
+
+        AbstractView *getAbstractView(int view);
+        void setViewStack(int newViewStack);
 
     signals:
         void backClicked();
@@ -141,7 +149,6 @@ class MainWindow : public QMainWindow
         void helpView();
         void logBug();
         void support();
-        void actionClicked(int);
 
         void loadProgress(QString folder, double progress);
 
@@ -199,8 +206,8 @@ class MainWindow : public QMainWindow
         void selectDiary();
         void selectAnalysis();
         void selectTrain();
+        void selectEquipment();
 
-        void setChartMenu();
         void setSubChartMenu();
         void setChartMenu(QMenu *);
         void addChart(QAction*);
@@ -296,6 +303,13 @@ class MainWindow : public QMainWindow
         // when loading athlete
         NewSideBar *sidebar;
         AthleteView *athleteView;
+        EquipView *equipmentView;
+
+        bool eqViewbarState;
+        bool eqSidebarState;
+        bool eqLowbarState;
+        bool eqToolbarState;
+        bool eqAthleteTabbarState;
 
 #ifndef Q_OS_MAC
         QTFullScreen *fullScreen;
@@ -336,7 +350,6 @@ class MainWindow : public QMainWindow
         QSignalMapper *deleteMapper;
 
         // chart menus
-        QMenu *chartMenu;
         QMenu *subChartMenu;
 
         // Toolbar state checkables in View menu / context
@@ -345,6 +358,10 @@ class MainWindow : public QMainWindow
         QAction *showhideLowbar;
         QAction *showhideToolbar;
         QAction *showhideTabbar;
+
+        QAction *impPerspective;
+        QAction *expPerspective;
+        QAction *resetCharts;
 
         QAction *shareAction;
         QAction *checkAction;
