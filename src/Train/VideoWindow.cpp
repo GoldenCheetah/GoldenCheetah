@@ -358,13 +358,14 @@ void VideoWindow::startPlayback()
 #endif
 
 #ifdef GC_VIDEO_QT5
+    mp->play();
+#endif
 #ifdef GC_VIDEO_QT6
     // open the media object
     float rate = 1.0f;
     if (context->currentVideoSyncFile() && context->currentVideoSyncFile()->Points.count() > 1)
         rate = 0.1f;
     mp->setPlaybackRate(rate);
-#endif
     mp->play();
 #endif
 
