@@ -379,7 +379,7 @@ class RideFile : public QObject // QObject to emit signals
         XDataSeries *xdata(QString name) const { return xdata_.value(name, NULL); }
         void addXData(QString name, XDataSeries *series);
         QMap<QString,XDataSeries*> &xdata() { return xdata_; }
-        double xdataValue(RideFilePoint *p, int &idx, QString xdata, QString series, RideFile::XDataJoin);
+        double xdataValue(const RideFilePoint *p, int &idx, QString xdata, QString series, RideFile::XDataJoin) const;
 
         // METRIC OVERRIDES
         QMap<QString,QMap<QString,QString> > metricOverrides;
