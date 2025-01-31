@@ -1122,7 +1122,7 @@ QStringList RideFileFactory::listRideFiles(const QDir &dir) const
 }
 
 double
-RideFile::xdataValue(RideFilePoint *p, int &idx, QString sxdata, QString series, RideFile::XDataJoin xjoin)
+RideFile::xdataValue(const RideFilePoint *p, int &idx, QString sxdata, QString series, RideFile::XDataJoin xjoin) const
 {
     double returning = RideFile::NA;
     XDataSeries *s = xdata(sxdata);
