@@ -72,6 +72,7 @@ class SmallPlot : public QwtPlot
         QVector<double> hrArray;
         QVector<double> wattsArray;
         QVector<double> altArray;
+        QVector<double> distanceArray;
         QVector<double> timeArray;
         QVector<QwtPlotCurve*> timeCurves;
         int arrayLength;
