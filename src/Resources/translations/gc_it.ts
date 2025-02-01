@@ -27212,22 +27212,22 @@ Python disabilitato nelle preferenze.</translation>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="734"/>
         <source>Right Power Phase Start</source>
-        <translation type="unfinished">Inizio Fase Potenza destra</translation>
+        <translation>Inizio Fase Potenza destra</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="737"/>
         <source>Right Power Phase End</source>
-        <translation type="unfinished">Fine Fase Potenza destra</translation>
+        <translation>Fine Fase Potenza destra</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="740"/>
         <source>Right Power Phase Peak Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Inizio Fase Picco Potenza destra</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="743"/>
         <source>Right Power Phase Peak End</source>
-        <translation type="unfinished"></translation>
+        <translation>Fine Fase Picco Potenza destra</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="746"/>
@@ -27416,7 +27416,7 @@ Python disabilitato nelle preferenze.</translation>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="418"/>
         <source>Relative Wattage Workout Creator, current CP = </source>
-        <translation type="unfinished"></translation>
+        <translation>Creazione allenamento in wattaggio relativo, corrent CP = </translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="422"/>
@@ -29372,7 +29372,7 @@ Vuoi continuare?</translation>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="103"/>
         <source>Map Grayscale Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtro della mappa dei grigi</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="111"/>
@@ -30737,93 +30737,93 @@ di GoldenCheetah. Procediamo?
     <message>
         <location filename="../../Gui/Pages.cpp" line="857"/>
         <source>Front Wheel Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Massa Ruota Anteriore</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="859"/>
         <source>Front Spoke &amp; Nipple Mass - Each</source>
-        <translation type="unfinished"></translation>
+        <translation>Massa Raggio anteriore e nipple - ognuno</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="860"/>
         <source>Front Rim Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Massa cerchione anteriore</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="861"/>
         <source>Front Rotor Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Massa Mozzo Anteriore</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="862"/>
         <source>Front Skewer Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Massa Sgancio Rapido Anteriore</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="863"/>
         <source>Front Tire Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Massa Copertone Anteriore</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="864"/>
         <source>Front Tube or Sealant Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Massa Camera d&apos;aria o sigillante Anteriore</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="865"/>
         <source>Front Rim Outer Radius</source>
-        <translation type="unfinished"></translation>
+        <translation>Raggio Bordo Esterno Cerchione Anteriore</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="866"/>
         <source>Front Rim Inner Radius</source>
-        <translation type="unfinished"></translation>
+        <translation>Raggio Bordo Interno Cerchione Anteriore</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="867"/>
         <location filename="../../Gui/Pages.cpp" line="992"/>
         <source>Rear Wheel Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Massa Ruota Posteriore</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="869"/>
         <source>Rear Spoke &amp; Nipple Mass - Each</source>
-        <translation type="unfinished"></translation>
+        <translation>Massa Raggio e Nipple Posteriore - Ognuno</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="870"/>
         <source>Rear Rim Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Massa cerchione posteriore</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="871"/>
         <source>Rear Rotor Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Massa Mozzo Posteriore</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="872"/>
         <source>Rear Skewer Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Massa sgancio rapido posteriore</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="873"/>
         <source>Rear Tire Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Massa Copertone Posteriore</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="874"/>
         <source>Rear Tube or Sealant Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Massa Camera d&apos;aria posteriore o sigillante</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="875"/>
         <source>Rear Rim Outer Radius</source>
-        <translation type="unfinished"></translation>
+        <translation>Raggio bordo esterno del cerchione posteriore</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="876"/>
         <source>Rear Rim Inner Radius</source>
-        <translation type="unfinished"></translation>
+        <translation>Raggio bordo interno del cerchione posteriore</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="877"/>
@@ -30833,7 +30833,7 @@ di GoldenCheetah. Procediamo?
     <message>
         <location filename="../../Gui/Pages.cpp" line="877"/>
         <source>Rear Cassette Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Massa pignoni</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="878"/>
@@ -30868,17 +30868,17 @@ di GoldenCheetah. Procediamo?
     <message>
         <location filename="../../Gui/Pages.cpp" line="881"/>
         <source>Frontal Area</source>
-        <translation type="unfinished"></translation>
+        <translation>Area Frontale</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="882"/>
         <source>Temperature</source>
-        <translation type="unfinished">Temperatura</translation>
+        <translation>Temperatura</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="883"/>
         <source>ActualTrainerAltitude</source>
-        <translation type="unfinished"></translation>
+        <translation>Altitudine del trainer</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="980"/>
@@ -30940,22 +30940,22 @@ di GoldenCheetah. Procediamo?
     <message>
         <location filename="../../Gui/Pages.cpp" line="1017"/>
         <source>The values on this page inform the bicycle physics models for simulating speed in trainer mode. These values are used by smart trainers and also by the speed simulation enabled by the &lt;i&gt;Simulate Speed From Power&lt;/i&gt; option in the &lt;i&gt;Training&lt;/i&gt; &amp;gt; &lt;i&gt;Preferences&lt;/i&gt; tab.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">I valori in questa pagina impostano il modello della fisica della bicicletta per simulare la velocita&apos; in modalita&apos; trainer. Questi valori sono usati dagli smart trainer e anche per la simulazione della velocita&apos; quando e&apos; attiva l&apos;opzione &lt;i&gt;Simula Velocita&apos; dalla Potenza&lt;/i&gt; nella tabella delle preferenze di allenamento.</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1026"/>
         <source>Resistance and Drag</source>
-        <translation type="unfinished"></translation>
+        <translation>Resistenza e Resistenza aerodinamica</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1037"/>
         <source>Derived Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>Statistiche Derivate</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1043"/>
         <source>Bike &amp; Wheels</source>
-        <translation type="unfinished"></translation>
+        <translation>Bicilette e Ruote</translation>
     </message>
     <message>
         <source>Frontal Area (m^2)</source>
@@ -31119,7 +31119,7 @@ per la simulazione della velocita&apos; quando e&apos; attiva l&apos;opzione
     <message>
         <location filename="../../FileIO/Snippets.cpp" line="87"/>
         <source>Dump metrics for the ride to Athlete_Home/Snippets</source>
-        <translation type="unfinished">Scarica metriche dell&apos;uscita in bici nella cartella Atleta_Home/Snippets</translation>
+        <translation>Scarica metriche dell&apos;uscita in bici nella cartella Atleta_Home/Snippets</translation>
     </message>
 </context>
 <context>
@@ -31273,7 +31273,7 @@ per la simulazione della velocita&apos; quando e&apos; attiva l&apos;opzione
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="45"/>
         <source>File Format</source>
-        <translation type="unfinished"></translation>
+        <translation>Formato file</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="47"/>
@@ -31288,7 +31288,7 @@ per la simulazione della velocita&apos; quando e&apos; attiva l&apos;opzione
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="51"/>
         <source>Weekday</source>
-        <translation type="unfinished"></translation>
+        <translation>Giorno della settimana</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="53"/>
@@ -31298,7 +31298,7 @@ per la simulazione della velocita&apos; quando e&apos; attiva l&apos;opzione
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="58"/>
         <source>SubSport</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SottoSport</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="60"/>
@@ -31368,7 +31368,7 @@ per la simulazione della velocita&apos; quando e&apos; attiva l&apos;opzione
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="76"/>
         <source>EPOC</source>
-        <translation type="unfinished"></translation>
+        <translation>EPOC</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="77"/>
@@ -31403,12 +31403,12 @@ per la simulazione della velocita&apos; quando e&apos; attiva l&apos;opzione
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="83"/>
         <source>Spike Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tempo di Picco</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="84"/>
         <source>Spikes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Picco</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="35"/>
@@ -32264,58 +32264,59 @@ Se la nuova attività è in conflitto con un&apos;attività pre-esistente (stess
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="687"/>
         <source>rest</source>
-        <translation type="unfinished"></translation>
+        <translation>riposo</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="688"/>
         <source>free</source>
-        <translation type="unfinished"></translation>
+        <translation>libero</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="689"/>
         <source>back</source>
-        <translation type="unfinished"></translation>
+        <translation>dorso</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="690"/>
         <source>breast</source>
-        <translation type="unfinished"></translation>
+        <translation>rana</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="691"/>
         <source>fly</source>
-        <translation type="unfinished"></translation>
+        <translation>farfalla</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="692"/>
         <source>drill</source>
-        <translation type="unfinished"></translation>
+        <translation>Esercizio</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="693"/>
         <source>mixed</source>
-        <translation type="unfinished"></translation>
+        <translation>misto</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="694"/>
         <source>na</source>
-        <translation type="unfinished"></translation>
+        <translation>nd</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="699"/>
         <source>Swim Stroke</source>
-        <translation type="unfinished"></translation>
+        <translation>Colpo di Nuoto</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="700"/>
         <location filename="../../Metrics/SwimMetrics.cpp" line="701"/>
         <source>Stroke</source>
-        <translation type="unfinished"></translation>
+        <translation>Colpo</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="702"/>
         <source>Swim Stroke: 0 - rest, 1 - free, 2 - back, 3 - breast, 4 - fly, 5 - drill, 6 - mixed</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Stile di nuoto: 0 - riposo, 1 - libero, 2 - dorso, 3 - rana, 4 - farfalla, 5 - esercizio, 6 - misto</translatorcomment>
+        <translation>Swim Stroke: 0 - rest, 1 - free, 2 - back, 3 - breast, 4 - fly, 5 - drill, 6 - mixed</translation>
     </message>
 </context>
 <context>
@@ -33387,28 +33388,28 @@ Premi F3 sul Controller quando finito.</translation>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="40"/>
         <source>Query TrainerDay...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ricerca TrainerDay...</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="44"/>
         <source>Search</source>
-        <translation type="unfinished">Cerca</translation>
+        <translation>Cerca</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="55"/>
         <source>Select all</source>
-        <translation type="unfinished">Seleziona tutti</translation>
+        <translation>Seleziona tutti</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="59"/>
         <source>Allow overwriting of existing workouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Abilita sovrascrittura allenamenti esistenti</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="61"/>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="451"/>
         <source>Import selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Importa selezionati</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="85"/>
@@ -33418,42 +33419,42 @@ Premi F3 sul Controller quando finito.</translation>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="120"/>
         <source>TrainerDay workout querying is disabled in this build.</source>
-        <translation type="unfinished"></translation>
+        <translation>La ricerca degli allenamenti TrainerDay è disabilitata in questa versione.</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="156"/>
         <source>Page %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Pagine %1</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="164"/>
         <source>Syntax error in query &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Errore di sintassi nella ricerca &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="449"/>
         <source>Import selected (%1/%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Importa selezionti (%1/%2)</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="524"/>
         <source>successfully imported</source>
-        <translation type="unfinished"></translation>
+        <translation>Importati con successo</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="530"/>
         <source>already imported</source>
-        <translation type="unfinished"></translation>
+        <translation>Già importato</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="536"/>
         <source>import failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Importazione fallita</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayAPIDialog.cpp" line="542"/>
         <source>available in filesystem but not imported</source>
-        <translation type="unfinished"></translation>
+        <translation>disponibile nel filesystemma non importata</translation>
     </message>
 </context>
 <context>
@@ -33491,17 +33492,17 @@ Premi F3 sul Controller quando finito.</translation>
     <message>
         <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="76"/>
         <source>Close</source>
-        <translation type="unfinished">Chiudi</translation>
+        <translation>Chiudi</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="94"/>
         <source>Query workouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Ricerca nei workout</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="95"/>
         <source>Classic download</source>
-        <translation type="unfinished"></translation>
+        <translation>Downoload classico</translation>
     </message>
     <message>
         <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="302"/>
@@ -33696,7 +33697,7 @@ Premi F3 sul Controller quando finito.</translation>
     <message>
         <location filename="../../Gui/StyledItemDelegates.cpp" line="77"/>
         <source>The given value &quot;%1&quot; is not unique</source>
-        <translation type="unfinished"></translation>
+        <translation>Il valore dato &quot;%1&quot; non e&apos; unico</translation>
     </message>
 </context>
 <context>
@@ -35228,13 +35229,13 @@ Si possono rimuovere le referenze quando si gestisce la librearia atraverso le o
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="40"/>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="104"/>
         <source>Ergmode specific settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Impostazioni specifiche per Ergmode</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="46"/>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="105"/>
         <source>Color power zones</source>
-        <translation type="unfinished"></translation>
+        <translation>Colore zone di potenza</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="48"/>
@@ -35242,13 +35243,13 @@ Si possono rimuovere le referenze quando si gestisce la librearia atraverso le o
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="106"/>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="111"/>
         <source>Never</source>
-        <translation type="unfinished"></translation>
+        <translation>Mai</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="49"/>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="107"/>
         <source>Always</source>
-        <translation type="unfinished"></translation>
+        <translation>Sempre</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="50"/>
@@ -35256,13 +35257,13 @@ Si possono rimuovere le referenze quando si gestisce la librearia atraverso le o
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="108"/>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="112"/>
         <source>When stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>Quando fermato</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="54"/>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="110"/>
         <source>Show tooltip</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostra descrizione del comando</translation>
     </message>
 </context>
 <context>
