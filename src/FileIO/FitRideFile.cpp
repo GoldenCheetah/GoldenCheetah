@@ -3044,9 +3044,9 @@ genericnext:
                              native_num = -1;
                              break;
                     case 139: // Core Temp
-                             if (!native_profile && field.deve_idx>-1) { //field comes from dev fields
+                             if (!native_profile && field.deve_idx>-1) {
                                  tcore = deve_value;
-                                 core_index = field.deve_idx;
+                                 core_index = field.deve_idx; //Store which dev field core is in
                              } else {
                                  tcore = value;
                              }
@@ -3064,7 +3064,7 @@ genericnext:
 
                 if (field.deve_idx>-1) {
                     QString key = QString("%1.%2").arg(field.deve_idx).arg(field.num);
-                            FitFieldDefinition deveField = local_deve_fields[key];
+                    FitFieldDefinition deveField = local_deve_fields[key];
 
                     if (!record_deve_fields.contains(key)) {
                         addRecordDeveField(key, deveField, true);
@@ -3292,10 +3292,17 @@ genericnext:
         last_distance = km;
         last_altitude = alt;
 
-        if (core_index != -1) //did we get coretemp dev fields
+        if (core_index != -1 && p_deve) //Developer field index for coretemp
         {
-            //Parse into xdata here since this isn't in a separate record
-            decodeCoreTemp(def, secs, core_index, values);
+            //If we have CoreTemp populate TCORE XData from generic developer fields
+            XDataPoint *p = new XDataPoint();
+            p->secs = secs;
+            p->km = last_distance;
+            p->number[0]=tcore;
+            p->number[1]=getDevelField(p_deve,core_index,10); //Skin
+            p->number[2]=getDevelField(p_deve,core_index,95); //Heat strain
+            p->number[3]=getDevelField(p_deve,core_index,19); //Quality
+            coreXdata->datapoints.append(p);
         }
 
         if (p_deve != NULL) {
@@ -3306,6 +3313,15 @@ genericnext:
             p_extra->secs = secs;
             extraXdata->datapoints.append(p_extra);
         }
+    }
+
+    double getDevelField(XDataPoint* p_deve,int dev_idx, int field)
+    {
+        QString key = QString("%1.%2").arg(dev_idx).arg(field);
+        if (record_deve_fields.contains(key))
+            return p_deve->number[record_deve_fields[key]];
+        else
+            return 0;
     }
 
     void decodeLength(const FitMessage &def, int time_offset,
@@ -3461,46 +3477,6 @@ genericnext:
         p->number[3] = humidity;
 
         weatherXdata->datapoints.append(p);
-    }
-
-    //Parse coretemp dev fields into xdata
-    void decodeCoreTemp(const FitMessage &def, int secs,
-                        int devidx,
-                        const std::vector<FitValue>& values )
-    {
-        int i = 0;
-        double core=0,skin=0,hsi=0.0;
-        int qual=0;
-        foreach(const FitField &field, def.fields) {
-            if (field.deve_idx!=devidx){
-                i++;
-                continue;
-            }
-
-            const FitValue& _values = values[i];
-            const fit_value_t& value = values[i++].v;
-
-            if( _values.type == SingleValue && value == NA_VALUE )
-                continue;
-            switch (field.num) {
-            case 0: //core
-                core = _values.f; break;
-            case 10: //skin
-                skin = _values.f; break;
-            case 19: //quality
-                qual = _values.v; break;
-            case 95: //heat strain
-                hsi = _values.f; break;
-            }
-        }
-        XDataPoint *p = new XDataPoint();
-        p->secs = secs;
-        p->km = last_distance;
-        p->number[0]=core;
-        p->number[1]=skin;
-        p->number[2]=hsi;
-        p->number[3]=qual;
-        coreXdata->datapoints.append(p);
     }
 
     void decodeHr(const FitMessage &def, int time_offset,
@@ -5335,18 +5311,6 @@ void write_dev_fields(QByteArray* array, const RideFile* ride, int local_msg_typ
         write_int8(array, 136); //float
         write_int8(array, 255); // Native num
         write_int8(array, 0); // developer id 0
-
-     /* write_message_definition(array, FIELD_DESCRIPTION, local_msg_type, num_fields);
-        array->append(fields->data(), fields->size());
-        write_int8(array, 0);
-        write_string(array, "core_reserved", 64);
-        write_string(array, "kcal", 16);
-        write_int16(array, 20, true); // record
-        write_int8(array, 20); // Local num (increment counter?)
-        write_int8(array, 131); // sint16
-        write_int8(array, 255); // Native num
-        write_int8(array, 0); // developer id 0
-     */
     }
 }
 
