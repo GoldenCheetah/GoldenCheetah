@@ -22,6 +22,7 @@
 #include "Settings.h"
 #include "Colors.h"
 #include "Units.h"
+#include "Context.h"
 
 #include <qwt_plot_curve.h>
 #include <qwt_plot_canvas.h>
@@ -85,6 +86,8 @@ SmallPlotPicker::trackerText(const QPoint &point) const
     text.append(QString("%1:%2:%3").arg(hours)
                                    .arg(mins, 2, 10, QChar('0'))
                                    .arg(secs, 2, 10, QChar('0')));
+    double dist = plot()->invTransform(QwtAxis::XTop, point.x()) * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM);
+    text.append(QString("\n%1 %2").arg(dist, 0, 'f', 3).arg(GlobalContext::context()->useMetricUnits ? "km" : "mi"));
 
     QwtText tooltip(text);
     QFont stGiles;
@@ -130,6 +133,12 @@ SmallPlot::SmallPlot(QWidget *parent) : QwtPlot(parent), d_mrk(NULL), smooth(30)
     hrCurve->setPen(QPen(GColor(CHEARTRATE)));
     hrCurve->attach(this);
 
+    speedCurve = new QwtPlotCurve("Speed");
+    // speedCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    speedCurve->setYAxis(QwtAxisId(QwtAxis::YLeft,0));
+    speedCurve->setPen(QPen(GColor(CSPEED)));
+    speedCurve->attach(this);
+
     // grid lines on such a small plot look AWFUL
     //grid = new QwtPlotGrid();
     //grid->enableX(false);
@@ -159,10 +168,10 @@ SmallPlot::SmallPlot(QWidget *parent) : QwtPlot(parent), d_mrk(NULL), smooth(30)
 }
 
 struct DataPoint {
-    double time, hr, alt, watts;
+    double time, distance, hr, kph, alt, watts;
     int inter;
-    DataPoint(double t, double h, double w, double a, int i) :
-             time(t), hr(h), alt(a), watts(w), inter(i) {}
+    DataPoint(double t, double d, double h, double s, double w, double a, int i) :
+             time(t), distance(d), hr(h), kph(s), alt(a), watts(w), inter(i) {}
 };
 
 void
@@ -187,20 +196,24 @@ SmallPlot::recalc()
         QVector<double> data;
         wattsCurve->setSamples(data, data);
         hrCurve->setSamples(data, data);
+        speedCurve->setSamples(data, data);
         altCurve->setSamples(data, data);
         return;
     }
 
     double totalWatts = 0.0;
     double totalHr = 0.0;
+    double totalSpeed = 0.0;
     double totalAlt = 0.0;
     QList<DataPoint*> list;
     int i = 0;
 
     QVector<double> smoothWatts(rideTimeSecs + 1);
     QVector<double> smoothHr(rideTimeSecs + 1);
+    QVector<double> smoothSpeed(rideTimeSecs + 1);
     QVector<double> smoothAlt(rideTimeSecs + 1);
     QVector<double> smoothTime(rideTimeSecs + 1);
+    QVector<double> smoothDistance(rideTimeSecs + 1);
 
     QList<double> interList; //Just store the time that it happened.
                              //Intervals are sequential.
@@ -210,14 +223,18 @@ SmallPlot::recalc()
     for (int secs = 0; ((secs < smooth) && (secs < rideTimeSecs)); ++secs) {
         smoothWatts[secs] = 0.0;
         smoothHr[secs]    = 0.0;
+        smoothSpeed[secs] = 0.0;
         smoothAlt[secs]    = 0.0;
     }
+    bool metricUnits = GlobalContext::context()->useMetricUnits;
     for (int secs = smooth; secs <= rideTimeSecs; ++secs) {
         while ((i < arrayLength) && (timeArray[i] <= secs)) {
+            double speed = speedArray[i] * (metricUnits ? 1.0 : MILES_PER_KM);
             DataPoint *dp =
-                new DataPoint(timeArray[i], hrArray[i], wattsArray[i], altArray[i], interArray[i]);
+                new DataPoint(timeArray[i], distanceArray[i], hrArray[i], speed, wattsArray[i], altArray[i], interArray[i]);
             totalWatts += wattsArray[i];
             totalHr    += hrArray[i];
+            totalSpeed += speed;
             totalAlt    += altArray[i];
             list.append(dp);
             //Figure out when and if we have a new interval..
@@ -232,6 +249,7 @@ SmallPlot::recalc()
             list.removeFirst();
             totalWatts -= dp->watts;
             totalHr    -= dp->hr;
+            totalSpeed -= dp->kph;
             totalAlt    -= dp->alt;
             delete dp;
         }
@@ -240,19 +258,25 @@ SmallPlot::recalc()
         if (list.empty()) {
             smoothWatts[secs] = 0.0;
             smoothHr[secs]    = 0.0;
+            smoothSpeed[secs] = 0.0;
             smoothAlt[secs]    = 0.0;
         }
         else {
             smoothWatts[secs]    = totalWatts / list.size();
             smoothHr[secs]       = totalHr / list.size();
+            smoothSpeed[secs]    = totalSpeed / list.size();
             smoothAlt[secs]       = totalAlt / list.size();
         }
         smoothTime[secs]  = secs / 60.0;
+        smoothDistance[secs] = distanceArray[i-1];
     }
     wattsCurve->setSamples(smoothTime.constData(), smoothWatts.constData(), rideTimeSecs + 1);
     hrCurve->setSamples(smoothTime.constData(), smoothHr.constData(), rideTimeSecs + 1);
+    speedCurve->setSamples(smoothTime.constData(), smoothSpeed.constData(), rideTimeSecs + 1);
     altCurve->setSamples(smoothTime.constData(), smoothAlt.constData(), rideTimeSecs + 1);
     setAxisScale(QwtAxis::XBottom, 0.0, smoothTime[rideTimeSecs]);
+    // Add setup for smoothDistance on xTop axis
+    setAxisScale(QwtAxis::XTop, 0.0, smoothDistance[rideTimeSecs]);
 
     setYMax();
     replot();
@@ -273,6 +297,10 @@ SmallPlot::setYMax()
     if (hrCurve->isVisible()) {
         ymax = std::max(ymax, hrCurve->maxYValue());
         ylabel += QString((ylabel == "") ? "" : " / ") + tr("BPM");
+    }
+    if (speedCurve->isVisible()) {
+        ymax = std::max(ymax, speedCurve->maxYValue());
+        ylabel += QString((ylabel == "") ? "" : " / ") + tr("%1").arg(GlobalContext::context()->useMetricUnits ? "kmh" : "mph");
     }
     if (altCurve->isVisible()) {
         size_t size = altCurve->data()->size();
@@ -338,16 +366,20 @@ SmallPlot::setData(RideFile *ride)
 
     wattsArray.resize(ride->dataPoints().size());
     hrArray.resize(ride->dataPoints().size());
+    speedArray.resize(ride->dataPoints().size());
     altArray.resize(ride->dataPoints().size());
+    distanceArray.resize(ride->dataPoints().size());
     timeArray.resize(ride->dataPoints().size());
     interArray.resize(ride->dataPoints().size());
 
     arrayLength = 0;
     foreach (const RideFilePoint *point, ride->dataPoints()) {
         timeArray[arrayLength]  = point->secs;
+        distanceArray[arrayLength] = point->km;
         wattsArray[arrayLength] = std::max(0., point->watts);
         hrArray[arrayLength]    = std::max(0., point->hr);
         altArray[arrayLength]   = std::max(0., point->alt);
+        speedArray[arrayLength] = std::max(0., point->kph);
         interArray[arrayLength] = point->interval;
         ++arrayLength;
     }
@@ -366,6 +398,14 @@ void
 SmallPlot::showHr(int state)
 {
     hrCurve->setVisible(state == Qt::Checked);
+    setYMax();
+    replot();
+}
+
+void
+SmallPlot::showSpeed(int state)
+{
+    speedCurve->setVisible(state == Qt::Checked);
     setYMax();
     replot();
 }
