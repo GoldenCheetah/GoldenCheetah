@@ -181,7 +181,7 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     connect(context, SIGNAL(compareIntervalsChanged()), this, SLOT(compareIntervalsChanged()));
     connect(context, SIGNAL(compareIntervalsChanged()), webBridge, SLOT(compareIntervalsChanged()));
 
-    // just the hr and power as a plot
+    // just hr, speed and power as a plot
     smallPlot = new SmallPlot(this);
     smallPlot->enableTracking();
     connect(smallPlot, SIGNAL(selectedPosX(double)), this, SLOT(showPosition(double)));

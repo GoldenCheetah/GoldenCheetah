@@ -52,6 +52,7 @@ class SmallPlot : public QwtPlot
 
         void showPower(int state);
         void showHr(int state);
+        void showSpeed(int state);
         void setSmoothing(int value);
 
     signals:
@@ -66,11 +67,13 @@ class SmallPlot : public QwtPlot
         QwtPlotGrid *grid;
         QwtPlotCurve *wattsCurve;
         QwtPlotCurve *hrCurve;
+        QwtPlotCurve *speedCurve;
         QwtPlotCurve *altCurve;
 
         QwtPlotMarker* d_mrk;
         QVector<double> hrArray;
         QVector<double> wattsArray;
+        QVector<double> speedArray;
         QVector<double> altArray;
         QVector<double> distanceArray;
         QVector<double> timeArray;
