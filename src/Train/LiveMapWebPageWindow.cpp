@@ -82,10 +82,20 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
     customUrl = new QLineEdit(this);
     customUrl->setFixedWidth(600);
 
+    customZoomLabel = new QLabel(tr("Initial Zoom"));
+    customZoom = new QSpinBox(this);
+    customZoom->setFixedWidth(60);
+    customZoom->setRange(0, 20); // Set the range for zoom levels
+
+
     if (customUrl->text().trimmed().isEmpty()) customUrl->setText("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
     commonLayout->addRow(customUrlLabel, customUrl);
 
     connect(customUrl, SIGNAL(returnPressed()), this, SLOT(userUrl()));
+
+    if (customZoom->text().trimmed().isEmpty()) customZoom->setValue(15);
+    commonLayout->addRow(customZoomLabel, customZoom);
+
 
     applyButton = new QPushButton(application->style()->standardIcon(QStyle::SP_ArrowRight), tr("Apply changes"), this);
     commonLayout->addRow(applyButton);
@@ -145,7 +155,7 @@ void LiveMapWebPageWindow::ergFileSelected(ErgFile* f)
         }
         else
         {
-            QString js = ("<div><script type=\"text/javascript\">initMap (" + startingLat + ", " + startingLon + ",13);</script></div>\n");
+            QString js = ("<div><script type=\"text/javascript\">initMap (" + startingLat + ", " + startingLon + ");</script></div>\n");
             routeLatLngs = "[";
             QString code = "";
 
@@ -230,13 +240,17 @@ void LiveMapWebPageWindow::telemetryUpdate(RealtimeData rtd)
         code = "";
         if (!markerIsVisible)
         {
-            code = QString("centerMap (" + sLat + ", " + sLon + ", " + "15" + ");");
+            if (zoom() != 0) {
+                QString sZoom = QString::number(zoom());
+                code += QString("centerMap (" + sLat + ", " + sLon + ", " + sZoom + ");");
+            }
             code += QString("showMyMarker (" + sLat + ", " + sLon + ");");
             markerIsVisible = true;
         }
         else
         {
-            code += QString("moveMarker (" + sLat + ", " + sLon + ");");
+            (zoom() != 0) ? code += QString("moveMarker (" + sLat + ", " + sLon + ", true);") :
+                code += QString("moveMarker (" + sLat + ", " + sLon + ");");
         }
         view->page()->runJavaScript(code);
     }
@@ -259,14 +273,15 @@ void LiveMapWebPageWindow::createHtml(QString sBaseUrl, QString autoRunJS)
         "<body><div id=\"mapid\"></div>\n"
         "<script type=\"text/javascript\">\n"
         "var mapOptions, mymap, mylayer, mymarker, latlng, myscale, routepolyline\n"
-        "function moveMarker(myLat, myLon) {\n"
-        "    mymap.panTo(new L.LatLng(myLat, myLon));\n"
+        "function moveMarker(myLat, myLon, moveMap) {\n"
+        "    if (moveMap) {\n"
+        "       mymap.panTo(new L.LatLng(myLat, myLon));\n"
+        "    }\n"
         "    mymarker.setLatLng(new L.latLng(myLat, myLon));\n"
         "}\n"
-        "function initMap(myLat, myLon, myZoom) {\n"
+        "function initMap(myLat, myLon) {\n"
         "    mapOptions = {\n"
         "    center: [myLat, myLon],\n"
-        "    zoom : myZoom,\n"
         "    zoomControl : true,\n"
         "    scrollWheelZoom : false,\n"
         "    dragging : false,\n"
