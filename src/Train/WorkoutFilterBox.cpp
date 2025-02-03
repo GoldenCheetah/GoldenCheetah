@@ -77,6 +77,7 @@ WorkoutFilterBox::setText
 void
 WorkoutFilterBox::processInput()
 {
+    bool errorActionWasVisible = workoutFilterErrorAction->isVisible();
     workoutFilterErrorAction->setVisible(false);
     bool ok = true;
     QString msg;
@@ -93,11 +94,13 @@ WorkoutFilterBox::processInput()
                 workoutFilterErrorAction->setVisible(true);
                 workoutFilterErrorAction->setToolTip(tr("ERROR: %1").arg(msg));
                 context->clearWorkoutFilters();
-                repaint();
             }
         } else {
             context->clearWorkoutFilters();
         }
+    }
+    if (errorActionWasVisible != workoutFilterErrorAction->isVisible()) {
+        repaint();
     }
 }
 
