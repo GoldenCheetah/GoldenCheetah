@@ -286,6 +286,7 @@ WorkoutMenuProvider::addTagDialog
 ()
 {
     QDialog dialog;
+    dialog.setWindowTitle(tr("Add Tag to Filter"));
 
     QLineEdit *filterEdit = new QLineEdit();
     filterEdit->setPlaceholderText(tr("Filter Tags..."));
@@ -349,6 +350,7 @@ WorkoutMenuProvider::manageFiltersDialog
 ()
 {
     QDialog dialog;
+    dialog.setWindowTitle(tr("Manage Workout Filters"));
     dialog.resize(800 * dpiXFactor, 600 * dpiYFactor);
 
     NegativeListEditDelegate nameDelegate({ "" });
@@ -418,6 +420,7 @@ WorkoutMenuProvider::addFilterDialog
 ()
 {
     QDialog dialog;
+    dialog.setWindowTitle(tr("Add Workout Filter"));
 
     QLineEdit *nameEdit = new QLineEdit();
     nameEdit->setPlaceholderText(tr("Name of the Filter..."));
