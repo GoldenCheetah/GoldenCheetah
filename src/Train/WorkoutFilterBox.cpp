@@ -28,10 +28,19 @@
 
 WorkoutFilterBox::WorkoutFilterBox(QWidget *parent, Context *context) : FilterEditor(parent), context(context)
 {
+    QIcon workoutFilterClearIcon = QPixmap::fromImage(QImage(":images/toolbar/clear.png"));
+    QAction *workoutFilterClearAction = this->addAction(workoutFilterClearIcon, FilterEditor::TrailingPosition);
+    workoutFilterClearAction->setVisible(! text().isEmpty());
+    connect(this, &FilterEditor::textChanged, this, [=](const QString &text) {
+        workoutFilterClearAction->setVisible(! text.isEmpty());
+    });
+    connect(workoutFilterClearAction, &QAction::triggered, this, [=]() {
+        setText("");
+    });
+
     QIcon workoutFilterErrorIcon = QPixmap::fromImage(QImage(":images/toolbar/popbutton.png"));
     workoutFilterErrorAction = this->addAction(workoutFilterErrorIcon, FilterEditor::LeadingPosition);
     workoutFilterErrorAction->setVisible(false);
-    this->setClearButtonEnabled(true);
     this->setPlaceholderText(tr("Filter..."));
     this->setFilterCommands(workoutFilterCommands());
     this->setMenuProvider(new WorkoutMenuProvider(this, QDir(gcroot).canonicalPath() + "/workoutfilters.xml"));
