@@ -18,6 +18,7 @@
 
 #include "WorkoutFilterBox.h"
 #include "WorkoutFilter.h"
+#include "WorkoutMenuProvider.h"
 
 #include <QString>
 #include <QDebug>
@@ -33,7 +34,8 @@ WorkoutFilterBox::WorkoutFilterBox(QWidget *parent, Context *context) : FilterEd
     this->setClearButtonEnabled(true);
     this->setPlaceholderText(tr("Filter..."));
     this->setFilterCommands(workoutFilterCommands());
-    connect(this, SIGNAL(editingFinished()), this, SLOT(editingFinished()));
+    this->setMenuProvider(new WorkoutMenuProvider(this, QDir(gcroot).canonicalPath() + "/workoutfilters.xml"));
+    connect(this, &FilterEditor::returnPressed, this, &WorkoutFilterBox::processInput);
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // set appearance
@@ -44,8 +46,27 @@ WorkoutFilterBox::~WorkoutFilterBox()
 {
 }
 
+
 void
-WorkoutFilterBox::editingFinished()
+WorkoutFilterBox::clear
+()
+{
+    FilterEditor::clear();
+    processInput();
+}
+
+
+void
+WorkoutFilterBox::setText
+(const QString &text)
+{
+    FilterEditor::setText(text);
+    processInput();
+}
+
+
+void
+WorkoutFilterBox::processInput()
 {
     workoutFilterErrorAction->setVisible(false);
     bool ok = true;
@@ -63,6 +84,7 @@ WorkoutFilterBox::editingFinished()
                 workoutFilterErrorAction->setVisible(true);
                 workoutFilterErrorAction->setToolTip(tr("ERROR: %1").arg(msg));
                 context->clearWorkoutFilters();
+                repaint();
             }
         } else {
             context->clearWorkoutFilters();

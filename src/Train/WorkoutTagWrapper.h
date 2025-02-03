@@ -14,11 +14,11 @@ public:
 
     void setFilepath(const QString &filepath);
 
-    bool hasTag(int id) const;
-    void addTag(int id);
-    void removeTag(int id);
-    void clearTags();
-    QList<int> getTagIds() const;
+    bool hasTag(int id) const override;
+    void addTag(int id) override;
+    void removeTag(int id) override;
+    void clearTags() override;
+    QList<int> getTagIds() const override;
 
 private:
     QString filepath;

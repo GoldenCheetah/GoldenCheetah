@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Joachim Kohlhammer (joachim.kohlhammer@gmx.de)
+ * Copyright (c) 2025, Joachim Kohlhammer <joachim.kohlhammer@gmx.de>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -16,36 +16,17 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _GC_WorkoutFilterBox_h
-#define _GC_WorkoutFilterBox_h
+#ifndef MENUPROVIDER_H
+#define MENUPROVIDER_H
 
-#include <QString>
-#include <QStringList>
-#include <QList>
+#include <QMenu>
 
-#include "FilterEditor.h"
-#include "Context.h"
 
-class WorkoutFilterBox : public FilterEditor
+class MenuProvider
 {
-    Q_OBJECT
-
 public:
-    WorkoutFilterBox(QWidget *parent=nullptr, Context *context=nullptr);
-    virtual ~WorkoutFilterBox();
-    void setContext(Context *ctx) { context = ctx; }
-
-public slots:
-    void clear();
-    void setText(const QString &text);
-
-private slots:
-    void processInput();
-    void configChanged(qint32 topic);
-
-private:
-    Context *context;
-    QAction *workoutFilterErrorAction;
+    virtual ~MenuProvider() {}
+    virtual void addActions(QMenu *menu) const = 0;
 };
 
 #endif

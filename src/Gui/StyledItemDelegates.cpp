@@ -53,6 +53,29 @@ NoEditDelegate::createEditor
 }
 
 
+
+// NegativeListEditDelegate ///////////////////////////////////////////////////////
+
+NegativeListEditDelegate::NegativeListEditDelegate
+(const QStringList &negativeList, QObject *parent)
+: QStyledItemDelegate(parent), negativeList(negativeList)
+{
+}
+
+
+void
+NegativeListEditDelegate::setModelData
+(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+    QString newData = editor->property("text").toString().trimmed();
+    if (newData == index.data().toString() || negativeList.contains(newData)) {
+        return;
+    }
+    model->setData(index, newData, Qt::EditRole);
+}
+
+
+
 // UniqueLabelEditDelegate ////////////////////////////////////////////////////////
 
 UniqueLabelEditDelegate::UniqueLabelEditDelegate
@@ -63,11 +86,19 @@ UniqueLabelEditDelegate::UniqueLabelEditDelegate
 
 
 void
+UniqueLabelEditDelegate::setNegativeList
+(const QStringList &negativeList)
+{
+    this->negativeList = negativeList;
+}
+
+
+void
 UniqueLabelEditDelegate::setModelData
 (QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
     QString newData = editor->property("text").toString().trimmed();
-    if (newData.isEmpty() || newData == index.data().toString()) {
+    if (newData.isEmpty() || newData == index.data().toString() || negativeList.contains(newData)) {
         return;
     }
     int rowCount = model->rowCount();

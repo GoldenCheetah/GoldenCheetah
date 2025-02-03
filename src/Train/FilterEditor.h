@@ -29,6 +29,9 @@
 
 #include <utility>
 
+#include "MainWindow.h"
+#include "MenuProvider.h"
+
 
 class FilterEditorHelper
 {
@@ -54,11 +57,11 @@ class FilterEditor: public QLineEdit
 
 public:
     FilterEditor(QWidget *parent = nullptr);
-    FilterEditor(const QString &contents, QWidget *parent = nullptr);
     virtual ~FilterEditor();
 
     void setFilterCommands(const QStringList &commands);
     QCompleter *completer() const;
+    void setMenuProvider(MenuProvider *menuProvider);
 
 protected:
     void setCompleter(QCompleter *completer);
@@ -67,11 +70,14 @@ protected:
 private slots:
     void insertCompletion(const QString &completion);
     void updateCompleterModel(const QString &text);
+    void openMenu();
 
 private:
     QCompleter *_completer;
     QStringListModel *_completerModel;
     QStringList _origCmds;
+    QAction *_menuAction;
+    MenuProvider *_menuProvider = nullptr;
     FilterEditorHelper feh;
 
     QString wordLeftOfCursor() const;

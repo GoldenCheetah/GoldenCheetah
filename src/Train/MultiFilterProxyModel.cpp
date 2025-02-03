@@ -32,7 +32,7 @@ MultiFilterProxyModel::MultiFilterProxyModel
 MultiFilterProxyModel::~MultiFilterProxyModel
 ()
 {
-    removeFilters(false);
+    removeFilters(true);
 }
 
 
@@ -72,7 +72,7 @@ bool
 MultiFilterProxyModel::filterAcceptsRow
 (int source_row, const QModelIndex &source_parent) const
 {
-    for (auto filter : _filters) {
+    for (auto &filter : _filters) {
         if (filter->modelColumn() < 0 || filter->modelColumn() > sourceModel()->columnCount()) {
             return false;
         }
