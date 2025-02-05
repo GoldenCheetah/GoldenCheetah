@@ -42,6 +42,21 @@ public:
 
 
 
+class NegativeListEditDelegate: public QStyledItemDelegate
+{
+    Q_OBJECT
+
+public:
+    NegativeListEditDelegate(const QStringList &negativeList, QObject *parent = nullptr);
+
+    virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+
+private:
+    QStringList negativeList;
+};
+
+
+
 class UniqueLabelEditDelegate: public QStyledItemDelegate
 {
     Q_OBJECT
@@ -49,7 +64,12 @@ class UniqueLabelEditDelegate: public QStyledItemDelegate
 public:
     UniqueLabelEditDelegate(QObject *parent = nullptr);
 
-    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+    void setNegativeList(const QStringList &negativeList);
+
+    virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+
+private:
+    QStringList negativeList;
 };
 
 

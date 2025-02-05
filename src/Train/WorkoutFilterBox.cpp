@@ -18,6 +18,7 @@
 
 #include "WorkoutFilterBox.h"
 #include "WorkoutFilter.h"
+#include "WorkoutMenuProvider.h"
 
 #include <QString>
 #include <QDebug>
@@ -27,13 +28,23 @@
 
 WorkoutFilterBox::WorkoutFilterBox(QWidget *parent, Context *context) : FilterEditor(parent), context(context)
 {
+    QIcon workoutFilterClearIcon = QPixmap::fromImage(QImage(":images/toolbar/clear.png"));
+    QAction *workoutFilterClearAction = this->addAction(workoutFilterClearIcon, FilterEditor::TrailingPosition);
+    workoutFilterClearAction->setVisible(! text().isEmpty());
+    connect(this, &FilterEditor::textChanged, this, [=](const QString &text) {
+        workoutFilterClearAction->setVisible(! text.isEmpty());
+    });
+    connect(workoutFilterClearAction, &QAction::triggered, this, [=]() {
+        setText("");
+    });
+
     QIcon workoutFilterErrorIcon = QPixmap::fromImage(QImage(":images/toolbar/popbutton.png"));
     workoutFilterErrorAction = this->addAction(workoutFilterErrorIcon, FilterEditor::LeadingPosition);
     workoutFilterErrorAction->setVisible(false);
-    this->setClearButtonEnabled(true);
     this->setPlaceholderText(tr("Filter..."));
     this->setFilterCommands(workoutFilterCommands());
-    connect(this, SIGNAL(editingFinished()), this, SLOT(editingFinished()));
+    this->setMenuProvider(new WorkoutMenuProvider(this, QDir(gcroot).canonicalPath() + "/workoutfilters.xml"));
+    connect(this, &FilterEditor::returnPressed, this, &WorkoutFilterBox::processInput);
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // set appearance
@@ -44,9 +55,29 @@ WorkoutFilterBox::~WorkoutFilterBox()
 {
 }
 
+
 void
-WorkoutFilterBox::editingFinished()
+WorkoutFilterBox::clear
+()
 {
+    FilterEditor::clear();
+    processInput();
+}
+
+
+void
+WorkoutFilterBox::setText
+(const QString &text)
+{
+    FilterEditor::setText(text);
+    processInput();
+}
+
+
+void
+WorkoutFilterBox::processInput()
+{
+    bool errorActionWasVisible = workoutFilterErrorAction->isVisible();
     workoutFilterErrorAction->setVisible(false);
     bool ok = true;
     QString msg;
@@ -67,6 +98,9 @@ WorkoutFilterBox::editingFinished()
         } else {
             context->clearWorkoutFilters();
         }
+    }
+    if (errorActionWasVisible != workoutFilterErrorAction->isVisible()) {
+        repaint();
     }
 }
 

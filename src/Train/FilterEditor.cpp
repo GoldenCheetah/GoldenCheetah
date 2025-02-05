@@ -22,24 +22,27 @@
 #include <QAbstractItemView>
 #include <QScrollBar>
 
+#include "GcSideBarItem.h"
+#include "Colors.h"
+
 
 FilterEditor::FilterEditor
 (QWidget *parent)
 : QLineEdit(parent), _completer(nullptr), _completerModel(nullptr), _origCmds()
 {
-}
-
-
-FilterEditor::FilterEditor
-(const QString &contents, QWidget *parent)
-: QLineEdit(contents, parent), _completer(nullptr), _completerModel(nullptr), _origCmds()
-{
+    QIcon workoutFilterMenuIcon = iconFromPNG(":images/sidebar/extra-2.png");
+    _menuAction = addAction(workoutFilterMenuIcon, FilterEditor::TrailingPosition);
+    connect(_menuAction, &QAction::triggered, this, &FilterEditor::openMenu);
+    _menuAction->setVisible(false);
 }
 
 
 FilterEditor::~FilterEditor
 ()
 {
+    if (_menuProvider != nullptr) {
+        delete _menuProvider;
+    }
 }
 
 
@@ -86,6 +89,15 @@ FilterEditor::completer
 () const
 {
     return _completer;
+}
+
+
+void
+FilterEditor::setMenuProvider
+(MenuProvider *menuProvider)
+{
+    _menuProvider = menuProvider;
+    _menuAction->setVisible(_menuProvider != nullptr);
 }
 
 
@@ -204,6 +216,20 @@ FilterEditor::updateCompleterModel
         }
     }
     _completerModel->setStringList(completerCmds);
+}
+
+
+void
+FilterEditor::openMenu
+()
+{
+    if (_menuProvider == nullptr) {
+        return;
+    }
+    QMenu *menu = new QMenu(this);
+    menu->setAttribute(Qt::WA_DeleteOnClose);
+    _menuProvider->addActions(menu);
+    menu->exec(mapToGlobal(QPoint(width() - 28 * dpiXFactor, height())));
 }
 
 
