@@ -30,7 +30,7 @@ FilterEditor::FilterEditor
 (QWidget *parent)
 : QLineEdit(parent), _completer(nullptr), _completerModel(nullptr), _origCmds()
 {
-    QIcon workoutFilterMenuIcon = iconFromPNG(":images/sidebar/extra.png");
+    QIcon workoutFilterMenuIcon = iconFromPNG(":images/sidebar/extra-2.png");
     _menuAction = addAction(workoutFilterMenuIcon, FilterEditor::TrailingPosition);
     connect(_menuAction, &QAction::triggered, this, &FilterEditor::openMenu);
     _menuAction->setVisible(false);
