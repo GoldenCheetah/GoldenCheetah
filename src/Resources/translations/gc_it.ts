@@ -11323,12 +11323,12 @@ Avvertenza: l&apos;accuratezza della stima della potenza può essere troppo bass
     <message>
         <location filename="../../FileIO/FixDeriveTorque.cpp" line="94"/>
         <source>Add Torque Values</source>
-        <translation>Aggiungi valori coppia torcente</translation>
+        <translation>Aggiungi Valori di Coppia Torcente</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDeriveTorque.cpp" line="106"/>
         <source>Derive torque when power and cadence data is available.</source>
-        <translation type="unfinished">Ottieni i dati di coppia torcente quando i dati di potenza e cadenza sono disponibili.</translation>
+        <translation>Ottieni i dati di coppia torcente quando i dati di potenza e cadenza sono disponibili.</translation>
     </message>
 </context>
 <context>
@@ -20108,7 +20108,7 @@ Si prega di verificare le impostazioni delle preferenze.</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="648"/>
         <source>Tabbed not Tiled</source>
-        <translation>A Pannelli non Impilati</translation>
+        <translation type="unfinished">A Pannelli Non Impilati</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="511"/>
@@ -20248,7 +20248,7 @@ Si prega di verificare le impostazioni delle preferenze.</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="628"/>
         <source>Show Athlete Tabs</source>
-        <translation>Mostra tab Atleta</translation>
+        <translation>Mostra Scheda Atleta</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="633"/>
@@ -20414,7 +20414,7 @@ Si prega di verificare le impostazioni delle preferenze.</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="324"/>
         <source>What&apos;s This?</source>
-        <translation>Questo cos&apos;e&apos;?</translation>
+        <translation type="unfinished">Questo cos&apos;è?</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="395"/>
@@ -20483,7 +20483,7 @@ Si prega di verificare le impostazioni delle preferenze.</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="616"/>
         <source>Show View Sidebar</source>
-        <translation>Mostra barra laterale</translation>
+        <translation>Mostra Barra Laterale</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="637"/>
@@ -26316,13 +26316,13 @@ on and that its display says, &quot;Host&quot;</source>
         <location filename="../../Gui/Pages.cpp" line="2618"/>
         <location filename="../../Gui/Pages.cpp" line="2782"/>
         <source>On Import</source>
-        <translation type="unfinished"></translation>
+        <translation>In Importazione</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2618"/>
         <location filename="../../Gui/Pages.cpp" line="2782"/>
         <source>On Save</source>
-        <translation type="unfinished"></translation>
+        <translation>In Salvataggio</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2621"/>
@@ -26334,17 +26334,17 @@ on and that its display says, &quot;Host&quot;</source>
         <location filename="../../Gui/Pages.cpp" line="2774"/>
         <location filename="../../Gui/Pages.cpp" line="2789"/>
         <source>Automation</source>
-        <translation type="unfinished"></translation>
+        <translation>Automazione</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2644"/>
         <source>Hide Core Processors</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nascondi Processore Core</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2659"/>
         <source>&lt;center&gt;&lt;h1&gt;No Processor selected&lt;/h1&gt;&lt;/center&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;center&gt;&lt;h1&gt;Nessun Processore selezionato&lt;/h1&gt;&lt;/center&gt;</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2769"/>
@@ -26354,32 +26354,32 @@ on and that its display says, &quot;Host&quot;</source>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2769"/>
         <source>Custom Python Processor</source>
-        <translation type="unfinished"></translation>
+        <translation>Processore Python Custom</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2777"/>
         <source>Automated execution only</source>
-        <translation type="unfinished"></translation>
+        <translation>Solo Esecuzione Automatica</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2791"/>
         <source>Use as Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Usa come filtro</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2796"/>
         <source>Default Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Impostazioni Di Default</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2797"/>
         <source>Description</source>
-        <translation type="unfinished">Descrizione</translation>
+        <translation>Descrizione</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2898"/>
         <source>Are you sure you want to delete %1?</source>
-        <translation type="unfinished">Sei sicuro di voler cancellare %1?</translation>
+        <translation>Sei sicuro di voler cancellare %1?</translation>
     </message>
     <message>
         <source>Apply</source>
@@ -30883,7 +30883,7 @@ di GoldenCheetah. Procediamo?
     <message>
         <location filename="../../Gui/Pages.cpp" line="980"/>
         <source>Total KEMass</source>
-        <translation type="unfinished"></translation>
+        <translation>Massa KE totale</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="981"/>
@@ -30899,22 +30899,22 @@ di GoldenCheetah. Procediamo?
     <message>
         <location filename="../../Gui/Pages.cpp" line="982"/>
         <source>FrontWheel KEMass</source>
-        <translation type="unfinished"></translation>
+        <translation>Massa KE Ruota Anteriore</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="984"/>
         <source>FrontWheel Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Massa Ruota Anteriore</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="986"/>
         <source>FrontWheel EquivMass</source>
-        <translation type="unfinished"></translation>
+        <translation>Mass Equiv Ruota Anteriore</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="988"/>
         <source>FrontWheel I</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruota Anteriore I</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="989"/>
@@ -30925,22 +30925,22 @@ di GoldenCheetah. Procediamo?
     <message>
         <location filename="../../Gui/Pages.cpp" line="990"/>
         <source>Rear Wheel KEMass</source>
-        <translation type="unfinished"></translation>
+        <translation>Massa KE Ruota Posteriore</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="994"/>
         <source>Rear Wheel EquivMass</source>
-        <translation type="unfinished"></translation>
+        <translation>Mass Equiv Ruota Posteriore</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="996"/>
         <source>Rear Wheel I</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruota Posteriore I</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1017"/>
         <source>The values on this page inform the bicycle physics models for simulating speed in trainer mode. These values are used by smart trainers and also by the speed simulation enabled by the &lt;i&gt;Simulate Speed From Power&lt;/i&gt; option in the &lt;i&gt;Training&lt;/i&gt; &amp;gt; &lt;i&gt;Preferences&lt;/i&gt; tab.</source>
-        <translation type="unfinished">I valori in questa pagina impostano il modello della fisica della bicicletta per simulare la velocita&apos; in modalita&apos; trainer. Questi valori sono usati dagli smart trainer e anche per la simulazione della velocita&apos; quando e&apos; attiva l&apos;opzione &lt;i&gt;Simula Velocita&apos; dalla Potenza&lt;/i&gt; nella tabella delle preferenze di allenamento.</translation>
+        <translation>I valori in questa pagina impostano il modello della fisica della bicicletta per simulare la velocita&apos; in modalita&apos; trainer. Questi valori sono usati dagli smart trainer e anche per la simulazione della velocita&apos; quando e&apos; attiva l&apos;opzione &lt;i&gt;Simula Velocita&apos; dalla Potenza&lt;/i&gt; nella tabella delle preferenze di allenamento.</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1026"/>
@@ -31328,7 +31328,7 @@ per la simulazione della velocita&apos; quando e&apos; attiva l&apos;opzione
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="65"/>
         <source>Feel</source>
-        <translation type="unfinished"></translation>
+        <translation>Sensazione</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="68"/>
@@ -31403,12 +31403,12 @@ per la simulazione della velocita&apos; quando e&apos; attiva l&apos;opzione
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="83"/>
         <source>Spike Time</source>
-        <translation type="unfinished">Tempo di Picco</translation>
+        <translation>Tempo di Picco</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="84"/>
         <source>Spikes</source>
-        <translation type="unfinished">Picco</translation>
+        <translation>Picco</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="35"/>
