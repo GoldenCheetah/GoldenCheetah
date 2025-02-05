@@ -368,7 +368,7 @@ WorkoutMenuProvider::manageFiltersDialog
 
     ActionButtonBox *actionButtons = new ActionButtonBox(ActionButtonBox::UpDownGroup | ActionButtonBox::AddDeleteGroup);
     QPushButton *execute = actionButtons->addButton(tr("Execute"));
-    QPushButton *obtain = actionButtons->addButton(tr("Obtain"));
+    QPushButton *update = actionButtons->addButton(tr("Update"));
     actionButtons->defaultConnect(ActionButtonBox::UpDownGroup, filterTree);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close);
@@ -383,14 +383,14 @@ WorkoutMenuProvider::manageFiltersDialog
         bool hasItem = filterTree->currentItem() != nullptr;
         actionButtons->setButtonEnabled(ActionButtonBox::Delete, hasItem);
         execute->setEnabled(hasItem);
-        obtain->setEnabled(hasItem && ! editor->text().trimmed().isEmpty());
+        update->setEnabled(hasItem && ! editor->text().trimmed().isEmpty());
     });
     connect(execute, &QPushButton::clicked, this, [=]() {
         if (filterTree->currentItem() != nullptr) {
             editor->setText(filterTree->currentItem()->data(1, Qt::DisplayRole).toString());
         }
     });
-    connect(obtain, &QPushButton::clicked, this, [=]() {
+    connect(update, &QPushButton::clicked, this, [=]() {
         if (filterTree->currentItem() != nullptr && ! editor->text().trimmed().isEmpty()) {
             int index = filterTree->currentItem()->data(2, Qt::DisplayRole).toInt();
             QString name = filterTree->currentItem()->data(0, Qt::DisplayRole).toString();
@@ -403,7 +403,7 @@ WorkoutMenuProvider::manageFiltersDialog
     connect(actionButtons, &ActionButtonBox::addRequested, this, [=]() { manageAdd(filterTree); });
     connect(actionButtons, &ActionButtonBox::deleteRequested, this, [=]() { manageDelete(filterTree->currentItem()); });
     connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::accept);
-    QMetaObject::Connection obtainEnabledConn = connect(editor, &WorkoutFilterBox::textChanged, this, [=](const QString &text) { obtain->setEnabled(! text.trimmed().isEmpty()); });
+    QMetaObject::Connection updateEnabledConn = connect(editor, &WorkoutFilterBox::textChanged, this, [=](const QString &text) { update->setEnabled(! text.trimmed().isEmpty()); });
 
     manageFillItems(filterTree);
 
@@ -411,7 +411,7 @@ WorkoutMenuProvider::manageFiltersDialog
         store.save();
     }
     disconnect(conn);
-    disconnect(obtainEnabledConn);
+    disconnect(updateEnabledConn);
 }
 
 
