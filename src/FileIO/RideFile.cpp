@@ -2722,14 +2722,6 @@ RideFile::recalculateDerivedSeries(bool force)
             }
         }
 
-        // Pull tcore from XData if it exists
-        series = xdata("TCORE");
-        if (series && series->datapoints.count() > 0)  {
-            setDataPresent(RideFile::tcore, true);
-            int idx=0;
-            p->tcore = xdataValue(p, idx, "TCORE","Core", RideFile::REPEAT);
-        }
-
         // split out O2Hb and HHb when we have SmO2 and tHb
         // O2Hb is oxygenated haemoglobin and HHb is deoxygenated haemoglobin
         if (dataPresent.smo2 && dataPresent.thb) {
@@ -2842,7 +2834,7 @@ RideFile::recalculateDerivedSeries(bool force)
     // in between
 
     // we need HR data for this
-    // don't derive if we already have tcore data
+    // but don't derive if we already have tcore data
     if (dataPresent.hr && !dataPresent.tcore) {
 
         // resample the data into 60s samples

@@ -462,7 +462,6 @@ struct FitFileParser
     XDataSeries *deveXdata;
     XDataSeries *extraXdata;
     XDataSeries *hrvXdata;
-    XDataSeries *coreXdata;
     QMap<int, QString> deviceInfos, session_device_info_;
     QList<QString> dataInfos, session_data_info_;
 
@@ -1541,9 +1540,6 @@ struct FitFileParser
             case 116: // Stress
                 return 100.0;
 
-            // case 139: //CORETEMP //do we need to scale here?
-            //     return 0.01;
-
             default:
                 return 1.0;
         }
@@ -1561,7 +1557,8 @@ struct FitFileParser
     void addRecordDeveField(QString key, FitFieldDefinition deveField, bool xdata) {
         QString name = deveField.name.c_str();
 
-        if (deveField.native>-1) {
+        //If field has a native type and doesnt have a name, generate one
+        if (deveField.native>-1 && name.length()==0 ) {
             int i = 0;
             RideFile::SeriesType series = getSeriesForNative(deveField.native);
             QString nativeName = rideFile->symbolForSeries(series);
@@ -1671,12 +1668,6 @@ struct FitFileParser
             rf->addXData("EXTRA", extraXdata);
         else
             delete extraXdata;
-
-        if (!coreXdata->datapoints.empty())
-            rf->addXData("TCORE", coreXdata);
-        else
-            delete coreXdata;
-
     }
 
     RideFile *splitSessions(QList<RideFile*> *rides) {
@@ -2765,7 +2756,6 @@ genericnext:
 
         XDataPoint *p_deve = NULL;
         XDataPoint *p_extra = NULL;
-        int core_index = -1;
 
         fit_value_t lati = NA_VALUE, lngi = NA_VALUE;
         int i = 0;
@@ -3046,7 +3036,8 @@ genericnext:
                     case 139: // Core Temp
                              if (!native_profile && field.deve_idx>-1) {
                                  tcore = deve_value;
-                                 core_index = field.deve_idx; //Store which dev field core is in
+                             //  core_index = field.deve_idx; //Store which dev field core is in
+                                 native_num = -1; //Clear native so added to developer fields
                              } else {
                                  tcore = value;
                              }
@@ -3291,19 +3282,6 @@ genericnext:
         last_time = time;
         last_distance = km;
         last_altitude = alt;
-
-        if (core_index != -1 && p_deve) //Developer field index for coretemp
-        {
-            //If we have CoreTemp populate TCORE XData from generic developer fields
-            XDataPoint *p = new XDataPoint();
-            p->secs = secs;
-            p->km = last_distance;
-            p->number[0]=tcore;
-            p->number[1]=getDevelField(p_deve,core_index,10); //Skin
-            p->number[2]=getDevelField(p_deve,core_index,95); //Heat strain
-            p->number[3]=getDevelField(p_deve,core_index,19); //Quality
-            coreXdata->datapoints.append(p);
-        }
 
         if (p_deve != NULL) {
             p_deve->secs = secs;
@@ -4645,17 +4623,6 @@ genericnext:
         gearsXdata->valuename << "REAR-NUM";
         gearsXdata->unitname << "";
 
-        coreXdata = new XDataSeries();
-        coreXdata->name = "TCORE";
-        coreXdata->valuename << "Core";
-        coreXdata->unitname << "C";
-        coreXdata->valuename << "Skin";
-        coreXdata->unitname << "C";
-        coreXdata->valuename << "HSI";
-        coreXdata->unitname << "%";
-        coreXdata->valuename << "Quality";
-        coreXdata->unitname << "q";
-        
         positionXdata = new XDataSeries();
         positionXdata->name = "POSITION";
         positionXdata->valuename << "POSITION";
@@ -4987,29 +4954,8 @@ void write_file_creator(QByteArray *array) {
 }
 
 void write_session(QByteArray* array, const RideFile* ride, QHash<QString, RideMetricPtr> computed) {
-    QByteArray* fields = new QByteArray();
 
-    write_message_definition(array, FIELD_DESCRIPTION, 0, 7);
-
-    write_field_definition(fields, 3, 64, 0x07); //'core_temperature'
-    write_field_definition(fields, 8, 16, 0x07); //'°C'
-    write_field_definition(fields, 14, 2, 0x84); // 20 - record
-    write_field_definition(fields, 1, 1, 0x02); // uint8 - local id
-    write_field_definition(fields, 2, 1, 0x02); // uint8 - (float32) 136
-    write_field_definition(fields, 15, 1, 0x02); // unit8 - (native#) 139
-    write_field_definition(fields, 0, 1, 0x02); // developer id
-
-    array->append(fields->data(), fields->size());
-    write_int8(array, 0);
-    write_string(array, "CIQ_device_info", 64);
-    write_string(array, "", 16);
-    write_int16(array, 18, true);
-    write_int8(array, 40); // Local num (increment counter?)
-    write_int8(array, 2);
-    write_int8(array, 255); // Native num
-    write_int8(array, 0); // developer id 0
-
-    write_message_definition(array, SESSION_MSG_NUM, 32, 10); // global_msg_num, local_msg_type, num_fields
+    write_message_definition(array, SESSION_MSG_NUM, 0, 10); // global_msg_num, local_msg_type, num_fields
 
     write_field_definition(array, 253, 4, 134); // timestamp (253)
     write_field_definition(array, 254, 2, 132); // message_index (254)
@@ -5021,8 +4967,6 @@ void write_session(QByteArray* array, const RideFile* ride, QHash<QString, RideM
     write_field_definition(array, 7, 4, 134); // total_elapsed_time (7)
     write_field_definition(array, 9, 4, 134); // total_distance (9)
     write_field_definition(array, 28, 1, 0); // trigger (28)
-    write_int8(array, 1);
-    write_field_definition(array, 40, 14, 0); // developer id
 
     // Record ------
     int record_header = 0;
@@ -5069,8 +5013,6 @@ void write_session(QByteArray* array, const RideFile* ride, QHash<QString, RideM
     // 10. trigger
     write_int8(array, 0); // activity end
 
-    uint8_t ciq_id[] = { 127, 19, 55, 95, 253, 25, 0, 0, 1, 2, 0, 0, 0, 0 };
-    array->append((const char*)ciq_id, 14);
 }
 
 void write_lap(QByteArray *array, const RideFile *ride) {
@@ -5240,31 +5182,26 @@ void write_dev_fields(QByteArray* array, const RideFile* ride, int local_msg_typ
     if (ride->areDataPresent()->tcore) {
 
         // Minimal developer header
-        write_message_definition(array, 207, local_msg_type, 5); // global_msg_num, local_msg_type, num_fields
-        write_field_definition(array, 0, 16, 13); // developer id
+        write_message_definition(array, 207, local_msg_type, 3); // global_msg_num, local_msg_type, num_fields
         write_field_definition(array, 1, 16, 13); // application id
-        write_field_definition(array, 2, 2, 132); // manufacturer_id
-        write_field_definition(array, 3, 1, 2); // developer index
-        write_field_definition(array, 4, 4, 6); // app_version
+        write_field_definition(array, 3, 1, 2);   // developer index
+        write_field_definition(array, 4, 4, 6);   // app_version
 
         uint8_t app_id[] = { 105, 87, 254, 104, 131, 254, 78, 214, 134, 19, 65, 63, 112, 98, 75, 181 };
-        uint8_t dev_id[] = { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 };
 
         write_int8(array, 0);
-        array->append((const char*)dev_id, 16);
         array->append((const char*)app_id, 16);
-        write_int16(array, 65535, true); // Invalid
         write_int8(array, 0);
-        write_int32(array, 42, true);
+        write_int32(array, 64, true);
 
         // Store core temerature as a developer field until included in ANT spec
-        write_field_definition(fields, 3, 64, 0x07); //'core_temperature'
-        write_field_definition(fields, 8, 16, 0x07); //'°C'
-        write_field_definition(fields, 14, 2, 0x84); // 20 - record
-        write_field_definition(fields, 1, 1, 0x02); // uint8 - local id
-        write_field_definition(fields, 2, 1, 0x02); // uint8 - (float32) 136
-        write_field_definition(fields, 15, 1, 0x02); // unit8 - (native#) 139
-        write_field_definition(fields, 0, 1, 0x02); // developer id
+        write_field_definition(fields, 3, 64, 0x07); // field name
+        write_field_definition(fields, 8, 16, 0x07); // units
+        write_field_definition(fields, 14, 2, 0x84); // native-msg (20)
+        write_field_definition(fields, 1, 1, 0x02);  // field_definition id
+        write_field_definition(fields, 2, 1, 0x02);  // fit base type
+        write_field_definition(fields, 15, 1, 0x02); // native field#
+        write_field_definition(fields, 0, 1, 0x02);  // developer id
 
         num_fields = 7;
 
@@ -5275,7 +5212,7 @@ void write_dev_fields(QByteArray* array, const RideFile* ride, int local_msg_typ
         write_string(array, "°C", 16);
         write_int16(array, 20, true);
         write_int8(array, 0); // Local num (increment counter?)
-        write_int8(array, 136);
+        write_int8(array, 136);//float32
         write_int8(array, 139); // Native num
         write_int8(array, 0); // developer id 0
 
@@ -5455,12 +5392,12 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
             int    qual = 0;
 
             //Find XData
-            XDataSeries *series = ride->xdata("TCORE");
+            XDataSeries *series = ride->xdata("DEVELOPER");
             if (series && series->datapoints.count() > 0)  {
-                core = ride->xdataValue(point, xdata_cur, "TCORE", "Core", RideFile::REPEAT);
-                skin = ride->xdataValue(point, xdata_cur, "TCORE", "Skin", RideFile::REPEAT);
-                hsi = ride->xdataValue(point, xdata_cur, "TCORE", "HSI", RideFile::REPEAT);
-                qual = ride->xdataValue(point, xdata_cur, "TCORE", "Quality", RideFile::REPEAT);
+                core = ride->xdataValue(point, xdata_cur, "DEVELOPER", "core_temperature", RideFile::REPEAT);
+                skin = ride->xdataValue(point, xdata_cur, "DEVELOPER", "skin_temperature", RideFile::REPEAT);
+                hsi = ride->xdataValue(point, xdata_cur, "DEVELOPER", "heat_strain_index", RideFile::REPEAT);
+                qual = ride->xdataValue(point, xdata_cur, "DEVELOPER", "core_data_quality", RideFile::REPEAT);
             }
 
             write_float32(ridePoint, core, true);

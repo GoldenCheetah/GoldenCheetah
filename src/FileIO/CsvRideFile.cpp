@@ -133,7 +133,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     XDataSeries *ibikeSeries=NULL;
     XDataSeries *xdataSeries=NULL;
     XDataSeries *vo2Series=NULL;
-    XDataSeries *tcoreSeries=NULL;
+    XDataSeries *develSeries=NULL;
 
     /* Joule 1.0
     Version,Date/Time,Km,Minutes,RPE,Tags,"Weight, kg","Work, kJ",FTP,"Sample Rate, s",Device Type,Firmware Version,Last Updated,Category 1,Category 2
@@ -1567,14 +1567,17 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     }
 
     // is there an associated tcore tcr file?
+    // Store coretemp into developer fields
     QFile tcorefile(file.fileName().replace(".csv",".tcr"));
     if (tcorefile.open(QFile::ReadOnly))
     {
-        // create the XDATA series
-        tcoreSeries = new XDataSeries();
-        tcoreSeries->name = "TCORE";
-        tcoreSeries->valuename << "Core" << "Skin" << "HSI" << "Quality";
-        tcoreSeries->unitname << "C" << "C" << "%" << "q";
+        // create the XDATA series        
+        develSeries = new XDataSeries();
+
+        //Add type info. add dev header info.?
+        develSeries->name = "DEVELOPER";
+        develSeries->valuename << "core_temperature" << "skin_temperature" << "heat_strain_index" << "core_data_quality";
+        develSeries->unitname << "C" << "C" << "%" << "q";
 
         // attempt to read and add the data
         lineno=1;
@@ -1614,7 +1617,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     p->number[1] = values.at(2).toDouble();
                     p->number[2] = values.at(3).toDouble();
                     p->number[3] = values.at(4).toInt();
-                    tcoreSeries->datapoints.append(p);
+                    develSeries->datapoints.append(p);
                 }
 
                 // onto next line
@@ -1623,11 +1626,10 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         }
         // free handle
         tcorefile.close();
-        
-        // add if we got any ....
-        if (tcoreSeries->datapoints.count() > 0) rideFile->addXData("TCORE", tcoreSeries);
     }
     
+    if (develSeries->datapoints.count()>0)
+        rideFile->addXData("DEVELOPER", develSeries);
 
     // is there an associated rr file?
     //
