@@ -1041,6 +1041,15 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
         // what data is present - after processor in case 'derived' or adjusted
         result->updateDataTag();
 
+        //If we have a CIQ tag, populate the CIQinfo
+        QString ciq = result->getTag("CIQ","");
+        if (ciq.length())
+        {
+            QList<CIQinfo> infos = CIQinfo::listFromString(ciq);
+            foreach(CIQinfo info, infos){
+                result->addCIQ(info);
+            }
+        }
         //foreach(RideFile::seriestype x, result->arePresent()) qDebug()<<"present="<<x;
 
         // sample code for using XDATA, left here temporarily till we have an
@@ -1103,6 +1112,12 @@ void
 RideFile::addXData(QString name, XDataSeries *series)
 {
     xdata_.insert(name, series);
+}
+
+void
+RideFile::addCIQ(CIQinfo &ciqinfo)
+{
+    ciqinfo_ << ciqinfo;
 }
 
 QStringList RideFileFactory::listRideFiles(const QDir &dir) const
@@ -3568,4 +3583,80 @@ XDataSeries::timeIndex(double secs) const
     if (i == datapoints.end())
         return datapoints.size()-1;
     return i - datapoints.begin();
+}
+
+QString CIQinfo::listToString(const QList<CIQinfo>& ciqList) {
+    QStringList ciqStrings;
+    for (const CIQinfo& ciq : ciqList) {
+        ciqStrings.append("ciq=[" + ciq.toString() + "]");
+    }
+    return ciqStrings.join(",");
+}
+
+QList<CIQinfo> CIQinfo::listFromString(const QString& src) {
+    QList<CIQinfo> ciqList;
+    if (src.isEmpty()) {
+        return ciqList;
+    }
+
+    QStringList parts = src.split(",ciq=[");
+    if (!parts.isEmpty() && parts[0].startsWith("ciq=[")) {
+        parts[0] = parts[0].mid(5);  // Remove "ciq=[" prefix
+    }
+
+    for (QString& part : parts) {
+        if (part.endsWith("]")) {
+            part.chop(1);  // Remove trailing ']'
+        }
+        ciqList.append(CIQinfo(part));
+    }
+
+    return ciqList;
+}
+
+
+QString CIQfield::toString() const {
+    return QString("%1|%2|%3|%4|%5")
+           .arg(name)
+           .arg(nativeid)
+           .arg(id)
+           .arg(type)
+           .arg(unit);
+}
+
+QString CIQinfo::toString() const {
+    QStringList fieldStrings;
+    for (const CIQfield& field : fields) {
+        fieldStrings.append(field.toString());
+    }
+    return QString("%1|%2~%3")
+           .arg(appid)
+           .arg(ver)
+           .arg(fieldStrings.join("~"));
+}
+
+CIQfield::CIQfield(QString src) {
+    QStringList parts = src.split("|");
+
+    if (parts.size() == 5) {
+        name = parts[0];
+        nativeid = parts[1].toInt();
+        id = parts[2].toInt();
+        type = parts[3].toInt();
+        unit = parts[4];
+    }
+}
+
+CIQinfo::CIQinfo(QString src) {
+    QStringList parts = src.split("~");
+
+    QStringList header = parts[0].split("|");
+    if (header.size() == 2) {
+        appid = header[0];
+        ver = header[1].toInt();
+    }
+
+    for (int i = 1; i < parts.size(); ++i) {
+        fields.append(CIQfield(parts[i]));
+    }
 }
