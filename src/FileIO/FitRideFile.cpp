@@ -100,10 +100,16 @@ int typeToFIT(int id)
     switch (id){
     case 1: //sint8
         return 1;
+    case 2: //uint8
+        return 2;
     case 3: //sint16
         return 131;
+    case 4: //uint16
+        return 132;
     case 5: //sint32
         return 133;
+    case 6: //uint32
+        return 134;
     case 8: //float32
         return 136;
     }
@@ -114,14 +120,13 @@ int typeToFIT(int id)
 int typeLength(int id)
 {
     switch (id){
-    case 1:
-        return 1;
-    case 3:
-        return 2;
-    case 5:
-        return 4;
-    case 8:
-        return 4;
+    case 1: return 1;
+    case 2: return 1;
+    case 3: return 2;
+    case 4: return 2;
+    case 5: return 4;
+    case 6: return 4;
+    case 8: return 4;
     }
     return 0;
 }
@@ -4766,7 +4771,6 @@ genericnext:
                     //deve_app.dev_data_id
 
                     foreach(FitFieldDefinition deve_field, deve_app.fields) {
-                        qDebug() <<"type " << deve_field.type;
                         info.fields << CIQfield(deve_field.name.c_str(),
                                                 deve_field.native,
                                                 deve_field.num,
@@ -4833,6 +4837,9 @@ RideFile *FitFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 void write_int8(QByteArray* array, fit_value_t value) {
     array->append(value);
 }
+void write_uint8(QByteArray* array, fit_value_t value) {
+    array->append(value);
+}
 
 void write_int16(QByteArray *array, fit_value_t value,  bool is_big_endian) {
     value = is_big_endian
@@ -4844,10 +4851,32 @@ void write_int16(QByteArray *array, fit_value_t value,  bool is_big_endian) {
     }
 }
 
+void write_uint16(QByteArray *array, fit_value_t value,  bool is_big_endian) {
+    value = is_big_endian
+        ? qFromBigEndian<quint16>( value )
+        : qFromLittleEndian<quint16>( value );
+
+    for (int i=0; i<16; i=i+8) {
+        array->append(value >> i);
+    }
+}
+
 void write_int32(QByteArray *array, fit_value_t value,  bool is_big_endian) {
     value = is_big_endian
         ? qFromBigEndian<qint32>( value )
         : qFromLittleEndian<qint32>( value );
+
+
+
+    for (int i=0; i<32; i=i+8) {
+        array->append(value >> i);
+    }
+}
+
+void write_uint32(QByteArray *array, fit_value_t value,  bool is_big_endian) {
+    value = is_big_endian
+        ? qFromBigEndian<quint32>( value )
+        : qFromLittleEndian<quint32>( value );
 
 
 
@@ -5434,11 +5463,20 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
                     case 1:
                         write_int8(ridePoint, val);
                         break;
+                    case 2:
+                        write_uint8(ridePoint, val);
+                        break;
                     case 3:
                         write_int16(ridePoint, val, true);
                         break;
+                    case 4:
+                        write_uint16(ridePoint, val, true);
+                        break;
                     case 5:
                         write_int32(ridePoint, val, true);
+                        break;
+                    case 6:
+                        write_uint32(ridePoint, val, true);
                         break;
                     case 8:
                         write_float32(ridePoint, val, true);
