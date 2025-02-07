@@ -388,12 +388,12 @@ void ANT::requestFecCalibration(uint8_t type)
 
 void ANT::requestPwrCapabilities1(const uint8_t chan)
 {
-    sendMessage(ANTMessage::requestPwrCapabilities1(chan!=-1?chan:pwrChannel));
+    sendMessage(ANTMessage::requestPwrCapabilities1(chan!=255?chan:pwrChannel));
 }
 
 void ANT::requestPwrCapabilities2(const uint8_t chan)
 {
-    sendMessage(ANTMessage::requestPwrCapabilities2(chan!=-1?chan:pwrChannel));
+    sendMessage(ANTMessage::requestPwrCapabilities2(chan!=255?chan:pwrChannel));
 }
 
 void ANT::enablePwrCapabilities1(const uint8_t chan, const uint8_t capabilitiesMask, const uint8_t capabilitiesSetup)
