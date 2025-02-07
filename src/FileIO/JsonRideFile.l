@@ -150,7 +150,6 @@ void JsonRideFilefree (void * ptr , yyscan_t /*scanner*/)
 \"RCON\"            return RCON;
 \"RVERT\"           return RVERT;
 \"RCAD\"            return RCAD;
-\"TCORE\"           return TCORE;
 [-+]?[0-9]+                     { *yylval = QString::fromUtf8(yytext); return JS_INTEGER; }
 [-+]?[0-9]+e-[0-9]+             { *yylval = QString::fromUtf8(yytext); return JS_FLOAT;   }
 [-+]?[0-9]+\.[-+e0-9]*          { *yylval = QString::fromUtf8(yytext); return JS_FLOAT;   }
