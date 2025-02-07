@@ -1574,7 +1574,6 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         // create the XDATA series        
         develSeries = new XDataSeries();
 
-        //Add type info. add dev header info.?
         develSeries->name = "DEVELOPER";
         develSeries->valuename << "core_temperature" << "skin_temperature" << "heat_strain_index" << "core_data_quality";
         develSeries->unitname << "C" << "C" << "%" << "q";
@@ -1612,11 +1611,11 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     // and add
                     XDataPoint *p = new XDataPoint();
                     p->secs = values.at(0).toDouble();
-                    p->km = 0;
-                    p->number[0] = values.at(1).toDouble();
-                    p->number[1] = values.at(2).toDouble();
-                    p->number[2] = values.at(3).toDouble();
-                    p->number[3] = values.at(4).toInt();
+                    p->km = 0; //why not add km too?
+                    p->number[0] = values.at(1).toDouble(); //core
+                    p->number[1] = values.at(2).toDouble(); //skin
+                    p->number[2] = values.at(3).toDouble(); //qual
+                    p->number[3] = values.at(4).toInt(); //hsi
                     develSeries->datapoints.append(p);
                 }
 
@@ -1626,10 +1625,24 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         }
         // free handle
         tcorefile.close();
+
+        // Now add the developer fields
+        if (develSeries->datapoints.count()>0)
+        {
+            // Since we're creating source data from ANT, add the CIQ developer and field info
+            // perhaps move this into the ANT code.
+            CIQinfo info("6957fe68-83fe-4ed6-8613-413f70624bb5", 64);
+
+            info.fields << CIQfield( "core_temperature", 139, 0, 8,"°C" ); //8 -float32
+            info.fields << CIQfield( "skin_temperature", -1, 10, 8,"°C" );
+            info.fields << CIQfield( "core_data_quality",-1, 19, 3,"Q" );  //3 - sint16
+            info.fields << CIQfield( "heat_strain_index",-1, 95, 8,"a.u." );
+
+            rideFile->addXData("DEVELOPER", develSeries);
+            rideFile->addCIQ(info); //store ciq metadata for fit writer
+        }
     }
     
-    if (develSeries->datapoints.count()>0)
-        rideFile->addXData("DEVELOPER", develSeries);
 
     // is there an associated rr file?
     //
