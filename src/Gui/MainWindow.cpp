@@ -2639,10 +2639,26 @@ void MainWindow::onEditMenuAboutToShow()
     toolMapper = new QSignalMapper(this); // maps each option
     connect(toolMapper, &QSignalMapper::mappedString, this, &MainWindow::manualProcess);
 
+    bool userProcDefined = false;
+    // User defined data processors first
     for (QList<DataProcessor*>::iterator iter = processors.begin(); iter != processors.end(); ++iter) {
-        if (! (*iter)->isAutomatedOnly()) {
+        if (! (*iter)->isAutomatedOnly() && !(*iter)->isCoreProcessor()) {
             // The localized processor name is shown in menu
             QAction *action = new QAction(QString("%1...").arg((*iter)->name()), this);
+            editMenu->addAction(action);
+            connect(action, SIGNAL(triggered()), toolMapper, SLOT(map()));
+            toolMapper->setMapping(action, (*iter)->id());
+            userProcDefined = true;
+        }
+    }
+
+    if (userProcDefined) editMenu->addSeparator();
+
+    // Then core data processors
+    for (QList<DataProcessor*>::iterator iter = processors.begin(); iter != processors.end(); ++iter) {
+        if (!(*iter)->isAutomatedOnly() && (*iter)->isCoreProcessor()) {
+            // The localized processor name is shown in menu
+            QAction* action = new QAction(QString("%1...").arg((*iter)->name()), this);
             editMenu->addAction(action);
             connect(action, SIGNAL(triggered()), toolMapper, SLOT(map()));
             toolMapper->setMapping(action, (*iter)->id());
