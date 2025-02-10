@@ -152,7 +152,6 @@ NavigationModel::action(bool redo, NavigationEvent event)
     case NavigationEvent::VIEW:
     {
         view = redo ? event.after.toInt() : event.before.toInt();
-        tab->selectView(view);
 
         // new side bar uses a different id, which will
         // eventually be refactored to be the only id
@@ -164,7 +163,7 @@ NavigationModel::action(bool redo, NavigationEvent event)
         case 2: id=0; break; // diary
         case 3: id=5; break; // train
         }
-        tab->context->mainWindow->newSidebar()->setItemSelected(id, true);
+        tab->context->mainWindow->sidebarSelected(id);
     }
     break;
 

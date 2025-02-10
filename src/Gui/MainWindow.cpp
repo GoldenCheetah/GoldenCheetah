@@ -1268,6 +1268,8 @@ void
 MainWindow::selectAthlete()
 {
     viewStack->setCurrentIndex(0);
+    back->hide();
+    forward->hide();
     perspectiveSelector->hide();
     searchBox->hide();
     workoutFilterBox->hide();
@@ -1281,6 +1283,8 @@ MainWindow::selectAnalysis()
     viewStack->setCurrentIndex(1);
     sidebar->setItemSelected(3, true);
     currentAthleteTab->selectView(1);
+    back->show();
+    forward->show();
     perspectiveSelector->show();
     searchBox->show();
     workoutFilterBox->hide();
@@ -1295,6 +1299,8 @@ MainWindow::selectTrain()
     viewStack->setCurrentIndex(1);
     sidebar->setItemSelected(5, true);
     currentAthleteTab->selectView(3);
+    back->show();
+    forward->show();
     perspectiveSelector->show();
     searchBox->hide();
     workoutFilterBox->show();
@@ -1308,6 +1314,8 @@ MainWindow::selectDiary()
     //currentTab->diaryView->setPerspectives(perspectiveSelector);
     viewStack->setCurrentIndex(1);
     currentAthleteTab->selectView(2);
+    back->show();
+    forward->show();
     perspectiveSelector->show();
     searchBox->show();
     workoutFilterBox->hide();
@@ -1322,6 +1330,8 @@ MainWindow::selectTrends()
     viewStack->setCurrentIndex(1);
     sidebar->setItemSelected(2, true);
     currentAthleteTab->selectView(0);
+    back->show();
+    forward->show();
     perspectiveSelector->show();
     searchBox->show();
     workoutFilterBox->hide();
