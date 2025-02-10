@@ -2851,7 +2851,6 @@ genericnext:
             }
 
             if (native_num>-1) {
-
                 switch (native_num) {
                     case 253: // TIMESTAMP
                               time = value + qbase_time.toSecsSinceEpoch();
@@ -3072,10 +3071,8 @@ genericnext:
                              native_num = -1;
                              break;
                     case 139: // Core Temp
-                             if (!native_profile && field.deve_idx>-1) {
+                             if (field.deve_idx>-1) {
                                  tcore = deve_value;
-                             //  core_index = field.deve_idx; //Store which dev field core is in
-                                 native_num = -1; //Clear native so added to developer fields
                              } else {
                                  tcore = value;
                              }
@@ -3086,7 +3083,7 @@ genericnext:
                 }
             }
 
-            if (native_num == -1) {
+            if (native_num == -1 || field.deve_idx>-1) {
                 // native, deve_native or deve to record.
 
                 int idx = -1;
@@ -5365,14 +5362,13 @@ void write_record_definition(QByteArray *array, const RideFile *ride, QMap<int, 
         int numfields = write_dev_fields(array, ride, 0); // add custom field definitions
         int dev_idx = 0;
 
-        int base = 0; //basetype 0 for dev fields?
-        write_int8(fields, numfields); // four dev fields
+        write_int8(fields, numfields);
 
         foreach (CIQinfo ciqinfo, ciqlist)
         {
             foreach (CIQfield field, ciqinfo.fields)
             {
-                write_field_definition(fields, field.id, typeLength(field.type), base);
+                write_field_definition(fields, field.id, typeLength(field.type), dev_idx);
             }
 
             dev_idx++;
@@ -5390,7 +5386,7 @@ void write_record_definition(QByteArray *array, const RideFile *ride, QMap<int, 
 void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool withWatts, bool withHr, bool withCad ) {
     QMap<int, int> *local_msg_type_for_record_type = new QMap<int, int>();
 
-    int xdata_cur=0; //cursor into core xdata
+    int xdata_cur=1; //cursor into core xdata
     // Record ------
     foreach (const RideFilePoint *point, ride->dataPoints()) {
         int type = 0;

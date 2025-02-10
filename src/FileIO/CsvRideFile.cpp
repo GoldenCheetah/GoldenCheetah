@@ -1629,16 +1629,15 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         // Now add the developer fields
         if (develSeries->datapoints.count()>0)
         {
-            // Since we're creating source data from ANT, add the CIQ developer and field info
-            // perhaps move this into the ANT code.
-            CIQinfo info("6957fe68-83fe-4ed6-8613-413f70624bb5", 64);
+            rideFile->addXData("DEVELOPER", develSeries);
 
+            // Since we're creating source data as if a device,
+            // add the CIQ developer and field info
+            CIQinfo info("6957fe68-83fe-4ed6-8613-413f70624bb5", 64);
             info.fields << CIQfield( "core_temperature", 139, 0, 8,"°C" ); //8 -float32
             info.fields << CIQfield( "skin_temperature", -1, 10, 8,"°C" );
             info.fields << CIQfield( "core_data_quality",-1, 19, 3,"Q" );  //3 - sint16
             info.fields << CIQfield( "heat_strain_index",-1, 95, 8,"a.u." );
-
-            rideFile->addXData("DEVELOPER", develSeries);
             rideFile->addCIQ(info); //store ciq metadata for fit writer
         }
     }
