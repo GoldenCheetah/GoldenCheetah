@@ -53,7 +53,7 @@ jobs:
     compiler: clang
   - if: commit_message !~ /\[skip linux\]/
     os: linux
-    dist: focal
+    dist: jammy
     compiler: gcc
 
 before_install:

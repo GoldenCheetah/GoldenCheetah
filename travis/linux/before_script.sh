@@ -1,11 +1,12 @@
 #!/bin/bash
 set -ev
-export PATH=/opt/qt515/bin:$PATH
 
 cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
 cp src/gcconfig.pri.in src/gcconfig.pri
 # Define GC version string, only for tagged builds
 if [ -n "$TRAVIS_TAG" ]; then echo DEFINES += GC_VERSION=VERSION_STRING >> src/gcconfig.pri; fi
+# required to use bison version higher than 3.7
+sed -i "s|#\(QMAKE_MOVE = cp.*\)|\1|" src/gcconfig.pri
 # make a release build
 sed -i "s|#\(CONFIG += release.*\)|\1 static|" src/gcconfig.pri
 sed -i "s|^#QMAKE_CXXFLAGS|QMAKE_CXXFLAGS|" src/gcconfig.pri
@@ -31,8 +32,8 @@ sed -i "s|^#CloudDB|CloudDB|" src/gcconfig.pri
 sed -i "s|#\(D2XX_INCLUDE =.*\)|\1 ../D2XX/release|" src/gcconfig.pri
 # SAMPLERATE
 sed -i "s|#\(SAMPLERATE_INSTALL =\).*|\1 /usr|" src/gcconfig.pri
-# SRMIO
-sed -i "s|#\(SRMIO_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
+# SRMIO (disabled due to build errors)
+#sed -i "s|#\(SRMIO_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
 # Python
 echo DEFINES += GC_WANT_PYTHON >> src/gcconfig.pri
 echo PYTHONINCLUDES = -I/usr/include/python3.7 >> src/gcconfig.pri

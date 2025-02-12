@@ -1,7 +1,5 @@
 #!/bin/bash
 set -ev
-export PATH=/opt/qt515/bin:$PATH
-export LD_LIBRARY_PATH=/opt/qt515/lib/x86_64-linux-gnu:/opt/qt515/lib:$LD_LIBRARY_PATH
 
 ### This script should be run from GoldenCheetah src directory after build
 cd src
@@ -48,11 +46,11 @@ cp -r /usr/lib/x86_64-linux-gnu/vlc appdir/lib/vlc
 sudo appdir/lib/vlc/vlc-cache-gen appdir/lib/vlc/plugins
 
 ### Download current version of linuxdeployqt
-wget --no-verbose -c https://github.com/probonopd/linuxdeployqt/releases/download/7/linuxdeployqt-7-x86_64.AppImage
-chmod a+x linuxdeployqt-7-x86_64.AppImage
+wget --no-verbose -c https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
+chmod a+x linuxdeployqt-continuous-x86_64.AppImage
 
 ### Deploy to appdir
-./linuxdeployqt-7-x86_64.AppImage appdir/GoldenCheetah -verbose=2 -bundle-non-qt-libs -exclude-libs=libqsqlmysql,libqsqlpsql,libnss3,libnssutil3,libxcb-dri3.so.0 -unsupported-allow-new-glibc
+./linuxdeployqt-continuous-x86_64.AppImage appdir/GoldenCheetah -verbose=2 -bundle-non-qt-libs -exclude-libs=libqsqlmysql,libqsqlpsql,libnss3,libnssutil3,libxcb-dri3.so.0 -unsupported-allow-new-glibc
 
 # Add Python and core modules
 wget --no-verbose https://github.com/niess/python-appimage/releases/download/python3.7/python3.7.17-cp37-cp37m-manylinux1_x86_64.AppImage
@@ -72,7 +70,7 @@ chmod a+x appimagetool-x86_64.AppImage
 ./appimagetool-x86_64.AppImage appdir
 
 ### Cleanup
-rm linuxdeployqt-7-x86_64.AppImage
+rm linuxdeployqt-continuous-x86_64.AppImage
 rm appimagetool-x86_64.AppImage
 rm -rf appdir
 
