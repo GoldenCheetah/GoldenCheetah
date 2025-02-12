@@ -1014,12 +1014,25 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
                 p->km = p->km - kmOffset;
                 p->secs = p->secs - timeOffset;
             }
-        }
 
-        // drag back intervals
-        foreach(RideFileInterval *i, result->intervals()) {
-            i->start -= timeOffset;
-            i->stop -= timeOffset;
+            // drag back intervals
+            foreach(RideFileInterval *i, result->intervals()) {
+                i->start -= timeOffset;
+                i->stop -= timeOffset;
+            }
+
+            // drag back xdata
+            QMapIterator<QString,XDataSeries*> it(result->xdata());
+            while(it.hasNext()) {
+                it.next();
+                XDataSeries *s = it.value();
+                foreach (XDataPoint *p, s->datapoints) {
+                    if (p->secs>0)
+                        p->secs = p->secs - timeOffset;
+                    if (p->km>0)
+                        p->km = p->km -kmOffset;
+                }
+            }
         }
 
         // calculate derived data series -- after data fixers applied above
@@ -2536,6 +2549,17 @@ RideFile::recalculateDerivedSeries(bool force)
     // last point looked at
     RideFilePoint *lastP = NULL;
 
+    // Hold cursor into xdata to speed up search
+    int coreidx = -1;
+    XDataSeries *devseries = xdata("DEVELOPER");
+    if (devseries && devseries->datapoints.count() > 0)  {
+        if (devseries->valuename.contains("core_temperature"))
+        {
+            setDataPresent(RideFile::tcore, true);
+            coreidx = 0;
+        }
+    }
+
     foreach(RideFilePoint *p, dataPoints_) {
 
         // Delta
@@ -2777,6 +2801,12 @@ RideFile::recalculateDerivedSeries(bool force)
         } else {
             p->clength = 0.0f;
         }
+
+        // Since TCORE isn't stored in json, retrieve it from XDATA
+        // Otherwise, derive it later
+        //
+        if (coreidx>=0)
+            p->tcore = xdataValue(p, coreidx, "DEVELOPER","core_temperature", RideFile::REPEAT);
 
         // last point
         lastP = p;
