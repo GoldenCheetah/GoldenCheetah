@@ -5386,7 +5386,7 @@ void write_record_definition(QByteArray *array, const RideFile *ride, QMap<int, 
 void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool withWatts, bool withHr, bool withCad ) {
     QMap<int, int> *local_msg_type_for_record_type = new QMap<int, int>();
 
-    int xdata_cur=1; //cursor into core xdata
+    int xdata_cur=0; //cursor into core xdata
     // Record ------
     foreach (const RideFilePoint *point, ride->dataPoints()) {
         int type = 0;
