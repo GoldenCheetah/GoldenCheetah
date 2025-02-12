@@ -499,7 +499,6 @@ struct FitFileParser
     XDataSeries *deveXdata;
     XDataSeries *extraXdata;
     XDataSeries *hrvXdata;
-    XDataSeries *fitXdata;
     QMap<int, QString> deviceInfos, session_device_info_;
     QList<QString> dataInfos, session_data_info_;
 
@@ -4663,9 +4662,6 @@ genericnext:
         positionXdata->valuename << "POSITION";
         positionXdata->unitname << "positiontype";
 
-        fitXdata = new XDataSeries();
-        fitXdata->name = "FITMETA";
-
         deveXdata = new XDataSeries();
         deveXdata->name = "DEVELOPER";
 
@@ -4790,8 +4786,6 @@ genericnext:
             }
 
             file.close();
-
-            //Build fitXdata
 
             appendXData(rideFile);
 
