@@ -4771,12 +4771,6 @@ genericnext:
                                                 deve_field.unit.c_str());
                     }
                     rideFile->addCIQ(info);
-                    //add to tag str?
-                    // QString qstr = info.toString();
-                    // QString cur = rideFile->getTag("CIQ","");
-                    // if (cur.length())
-                    //     qstr = cur +"/"+qstr;
-                    // rideFile->setTag("CIQ", qstr);
                 }
                 //add ciq infos as tag
 
