@@ -272,7 +272,12 @@ RideMetadata::setExtraTab()
             } else {
                 // set Text Field to 'Read Only' to still enable scrolling,...
                 GTextEdit* textEdit = dynamic_cast<GTextEdit*> (field->widget);
-                if (textEdit)  textEdit->setReadOnly(true);
+                if (textEdit){
+                    textEdit->setReadOnly(true);
+                    //set tabs to 4 for edit box and dont wrap
+                    textEdit->setLineWrapMode(QTextEdit::NoWrap);
+                    textEdit->setTabStopDistance(4 * textEdit->fontMetrics().horizontalAdvance(' '));
+                }
                 else {
                     QLineEdit* lineEdit = dynamic_cast<QLineEdit*> (field->widget);
                     if (lineEdit) lineEdit->setReadOnly(true);
