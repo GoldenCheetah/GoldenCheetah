@@ -1025,16 +1025,19 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
                 i->stop -= timeOffset;
             }
 
-            // drag back xdata
+            // drag back DEVELOPER xdata
             QMapIterator<QString,XDataSeries*> it(result->xdata());
             while(it.hasNext()) {
                 it.next();
                 XDataSeries *s = it.value();
-                foreach (XDataPoint *p, s->datapoints) {
-                    if (p->secs>0)
-                        p->secs = p->secs - timeOffset;
-                    if (p->km>0)
-                        p->km = p->km -kmOffset;
+                if (s->name == "DEVELOPER")
+                {
+                    foreach (XDataPoint *p, s->datapoints) {
+                        if (p->secs>0)
+                            p->secs = p->secs - timeOffset;
+                        if (p->km>0)
+                            p->km = p->km -kmOffset;
+                    }
                 }
             }
         }
