@@ -3327,15 +3327,6 @@ genericnext:
         }
     }
 
-    double getDevelField(XDataPoint* p_deve,int dev_idx, int field)
-    {
-        QString key = QString("%1.%2").arg(dev_idx).arg(field);
-        if (record_deve_fields.contains(key))
-            return p_deve->number[record_deve_fields[key]];
-        else
-            return 0;
-    }
-
     void decodeLength(const FitMessage &def, int time_offset,
                       const std::vector<FitValue>& values) {
         if (!isLapSwim) {
@@ -4760,8 +4751,7 @@ genericnext:
             if (local_deve_fields_app.count()>0) {
 
                 foreach(FitDeveApp deve_app, local_deve_fields_app) {
-                    CIQinfo info(deve_app.app_id.c_str(), deve_app.app_version); //dev id also?
-                    //deve_app.dev_data_id
+                    CIQinfo info(deve_app.app_id.c_str(), deve_app.dev_data_id, deve_app.app_version);
 
                     foreach(FitFieldDefinition deve_field, deve_app.fields) {
                         info.fields << CIQfield(deve_field.name.c_str(),
@@ -4775,7 +4765,12 @@ genericnext:
                 //add ciq infos as tag
 
                 if (!rideFile->ciqinfo().empty() ) {
-                    rideFile->setTag("CIQ", CIQinfo::listToString( rideFile->ciqinfo()));
+
+                    QString ciqString = CIQinfo::listToJson( rideFile->ciqinfo());
+
+                    QString escaped = QJsonValue(ciqString).toVariant().toString();
+
+                    rideFile->setTag("CIQ", escaped );
                 }
             }
 
@@ -5240,9 +5235,9 @@ int write_dev_fields(QByteArray* array, const RideFile* ride, int local_msg_type
     const QList<CIQinfo> &ciqlist = ride->ciqinfo();
     //Do we have developer field definitions?
     if (!ciqlist.empty()){
-        int dev_idx = 0;
         foreach (CIQinfo ciqinfo, ciqlist)
         {
+            int dev_idx = ciqinfo.devid;
             QByteArray* fields = new QByteArray();
 
             // Minimal developer header
@@ -5284,8 +5279,6 @@ int write_dev_fields(QByteArray* array, const RideFile* ride, int local_msg_type
 
                 num_fields++;
             }
-
-            dev_idx++;
         }
     }
     return num_fields;
@@ -5348,18 +5341,17 @@ void write_record_definition(QByteArray *array, const RideFile *ride, QMap<int, 
     if (!ciqlist.empty()){
         withDev = true;
         int numfields = write_dev_fields(array, ride, 0); // add custom field definitions
-        int dev_idx = 0;
 
         write_int8(fields, numfields);
 
         foreach (CIQinfo ciqinfo, ciqlist)
         {
+            int dev_idx = ciqinfo.devid;
+
             foreach (CIQfield field, ciqinfo.fields)
             {
                 write_field_definition(fields, field.id, typeLength(field.type), dev_idx);
             }
-
-            dev_idx++;
         }
     }
     
@@ -5437,9 +5429,11 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         const QList<CIQinfo> &ciqlist = ride->ciqinfo();
         //Do we have developer field definitions?
         if (!ciqlist.empty()){
-            int dev_idx = 0;
             foreach (CIQinfo ciqinfo, ciqlist)
             {
+                int dev_idx = ciqinfo.devid;
+                static_cast<void>(dev_idx);
+
                 foreach (CIQfield field, ciqinfo.fields)
                 {
                     double val = ride->xdataValue(point, xdata_cur, "DEVELOPER", field.name, RideFile::REPEAT);
@@ -5469,7 +5463,6 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
                         fprintf(stderr,"ERROR TYPE %d CURRENTLY UNSUPPORTED\n",field.type); fflush(stderr);
                     }
                 }
-                dev_idx++;
             }
         }
         array->append(ridePoint->data(), ridePoint->size());

@@ -30,6 +30,10 @@
 #include "Units.h"
 #include "SplineLookup.h"
 
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
+
 #include <QtXml/QtXml>
 #include <algorithm> // for std::lower_bound
 #include <assert.h>
@@ -1056,11 +1060,19 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
 
         //If we have a CIQ tag, populate the CIQinfo
         QString ciq = result->getTag("CIQ","");
-        if (ciq.length())
+        if (!ciq.isEmpty())
         {
-            QList<CIQinfo> infos = CIQinfo::listFromString(ciq);
-            foreach(CIQinfo info, infos){
-                result->addCIQ(info);
+            QJsonDocument doc = QJsonDocument::fromJson(ciq.toUtf8());
+
+            if (!doc.isNull() && (doc.isObject() || doc.isArray()))
+            {
+                ciq = doc.toJson(QJsonDocument::Compact);
+
+                QList<CIQinfo> infos = CIQinfo::listFromJson(ciq);
+                foreach(CIQinfo info, infos)
+                {
+                    result->addCIQ(info);
+                }
             }
         }
         //foreach(RideFile::seriestype x, result->arePresent()) qDebug()<<"present="<<x;
@@ -3615,95 +3627,96 @@ XDataSeries::timeIndex(double secs) const
     return i - datapoints.begin();
 }
 
-const char* CIQ_KEY = "ciq";
-const char* VER_KEY = "ver";
+const char* CIQ_KEY = "application_id";
+const char* CIQ_ID = "developer_data_index";
+const char* VER_KEY = "verison";
 const char* FIELDS_KEY = "fields";
 
-QString CIQinfo::listToString(const QList<CIQinfo>& ciqList)
-{
-    QStringList ciqStrings;
+const char* CIQ_FIELD_NAME="name";
+const char* CIQ_FIELD_NATIVE="native_id";
+const char* CIQ_FIELD_ID="dev_id";
+const char* CIQ_FIELD_TYPE="type";
+const char* CIQ_FIELD_UNIT="unit";
 
+
+QString CIQinfo::listToJson(const QList<CIQinfo>& ciqList)
+{
+    QJsonArray ciqArray;
     foreach (const CIQinfo& ciq, ciqList)
     {
-        ciqStrings.append(ciq.toString());
+        QJsonObject ciqObj;
+
+        ciqObj[QString(CIQ_KEY)] = ciq.appid;
+        ciqObj[QString(CIQ_ID)] = ciq.devid;
+        ciqObj[QString(VER_KEY)] = ciq.ver;
+
+        QJsonArray fieldsArray;
+        foreach (const CIQfield& field, ciq.fields)
+        {
+            QJsonObject fieldObj;
+            fieldObj[CIQ_FIELD_NAME] = field.name;
+            fieldObj[CIQ_FIELD_NATIVE] = field.nativeid;
+            fieldObj[CIQ_FIELD_ID] = field.id;
+            fieldObj[CIQ_FIELD_TYPE] = field.type;
+            fieldObj[CIQ_FIELD_UNIT] = field.unit;
+
+            fieldsArray.append(fieldObj);
+        }
+
+        ciqObj[QString(FIELDS_KEY)] = fieldsArray;
+
+        ciqArray.append(ciqObj);
     }
-    return ciqStrings.join("\n");
+    QJsonDocument jsonDoc(ciqArray);
+
+    //Do we want it nicely formatted or compact?
+    // QString jsonString = jsonDoc.toJson(QJsonDocument::Indented);
+    // jsonString.replace("    ", "\t");
+
+    QString jsonString = jsonDoc.toJson(QJsonDocument::Compact);
+    return jsonString;
 }
 
-QList<CIQinfo> CIQinfo::listFromString(const QString& src)
+QList<CIQinfo> CIQinfo::listFromJson(const QString& src)
 {
     QList<CIQinfo> ciqList;
-    QStringList ciqStrings = src.split("\n", Qt::SkipEmptyParts);
 
-    foreach (const QString& ciqStr, ciqStrings)
+    QJsonDocument doc = QJsonDocument::fromJson(src.toUtf8());
+
+    //Allow for either an array or single item
+    if (doc.isArray())
     {
-        ciqList.append(CIQinfo(ciqStr));
+        QJsonArray ciqArray = doc.array();
+        foreach (const QJsonValue& ciqValue, ciqArray)
+        {
+            QJsonObject ciqObj = ciqValue.toObject();
+            ciqList.append(CIQinfo(ciqObj));
+        }
     }
+    else if (doc.isObject())
+    {
+        ciqList.append(CIQinfo(doc.object()));
+    }
+
     return ciqList;
 }
 
-QString CIQinfo::toString() const
+CIQinfo::CIQinfo(const QJsonObject& obj)
 {
-    QStringList fieldStrings;
+    appid = obj[QString(CIQ_KEY)].toString();
+    ver = obj[QString(VER_KEY)].toInt();
+    devid = obj[QString(CIQ_ID)].toInt();
 
-    foreach (const CIQfield& field, fields)
+    QJsonArray jsonfields = obj[QString(FIELDS_KEY)].toArray();
+    foreach (const QJsonValue& field, jsonfields)
     {
-        fieldStrings.append(field.toString());
-    }
+        QJsonObject fieldObj = field.toObject();
+        CIQfield ciqfield(fieldObj[CIQ_FIELD_NAME].toString(),
+                          fieldObj[CIQ_FIELD_NATIVE].toInt(),
+                          fieldObj[CIQ_FIELD_ID].toInt(),
+                          fieldObj[CIQ_FIELD_TYPE].toInt(),
+                          fieldObj[CIQ_FIELD_UNIT].toString());
 
-    return QString("%1=%2,%3=%4,%5=%6").arg(CIQ_KEY, appid,
-                                            VER_KEY, QString::number(ver),
-                                            FIELDS_KEY, fieldStrings.join("\t"));
-
-}
-
-CIQinfo::CIQinfo(QString src)
-{
-    QStringList parts = src.trimmed().split("," + QString(FIELDS_KEY) + "=");
-
-    if (parts.size() == 2)
-    {
-        QStringList headerParts = parts[0].split(",");
-
-        foreach (const QString& part, headerParts)
-        {
-            if (part.startsWith(QString(CIQ_KEY) + "="))
-            {
-                appid = part.mid(strlen(CIQ_KEY) + 1);
-            }
-            else if (part.startsWith(QString(VER_KEY) + "="))
-            {
-                ver = part.mid(strlen(VER_KEY) + 1).toInt();
-            }
-        }
-
-        QStringList fieldStrings = parts[1].split("\t");
-        foreach (const QString& fieldStr, fieldStrings)
-        {
-            fields.append(CIQfield(fieldStr.trimmed()));
-        }
+        fields.append(ciqfield);
     }
 }
-
-QString CIQfield::toString() const
-{
-    return QString("%1,%2,%3,%4,%5")
-           .arg(name)
-           .arg(nativeid)
-           .arg(id)
-           .arg(type)
-           .arg(unit);
-}
-
-CIQfield::CIQfield(QString src) {
-    QStringList parts = src.split(",");
-    if (parts.size() == 5) {
-        name = parts[0];
-        nativeid = parts[1].toInt();
-        id = parts[2].toInt();
-        type = parts[3].toInt();
-        unit = parts[4];
-    }
-}
-
-

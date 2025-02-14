@@ -94,8 +94,6 @@ struct CIQfield
 {
     CIQfield(QString name, int nativeid, int id, int type, QString unit) :
         name(name), nativeid(nativeid),id(id),type(type),unit(unit) {}
-    CIQfield(QString src);
-    QString toString() const;
 
     QString name;
     int nativeid;
@@ -107,14 +105,14 @@ struct CIQfield
 
 struct CIQinfo
 {
-    CIQinfo(QString appid, int ver) : appid(appid), ver(ver){}
-    CIQinfo(QString src);
-    QString toString() const;
+    CIQinfo(QString appid, int id, int ver) : appid(appid), devid(id), ver(ver){}
+    CIQinfo(const QJsonObject& obj);
 
-    static QString listToString(const QList<CIQinfo>& ciqList);
-    static QList<CIQinfo> listFromString(const QString& src);
+    static QString listToJson(const QList<CIQinfo>& ciqList);
+    static QList<CIQinfo> listFromJson(const QString& src);
 
     QString appid;
+    int devid;
     int ver;
     QList<CIQfield> fields;
 };
