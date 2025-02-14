@@ -85,7 +85,7 @@ SrmDevice::get_tmpname(const QDir &tmpdir, QString &tmpname, QString &err)
     tmp.setAutoRemove(false);
     if (!tmp.open()) {
         err = tr("Failed to create temporary file ")
-            + tmpl + ": " + tmp.error();
+            + tmpl + ": " + QString::number(tmp.error());
         return false;
     }
     tmpname = tmp.fileName(); // after close(), tmp.fileName() is ""

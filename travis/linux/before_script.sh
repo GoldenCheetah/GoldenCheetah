@@ -32,8 +32,8 @@ sed -i "s|^#CloudDB|CloudDB|" src/gcconfig.pri
 sed -i "s|#\(D2XX_INCLUDE =.*\)|\1 ../D2XX/release|" src/gcconfig.pri
 # SAMPLERATE
 sed -i "s|#\(SAMPLERATE_INSTALL =\).*|\1 /usr|" src/gcconfig.pri
-# SRMIO (disabled due to build errors)
-#sed -i "s|#\(SRMIO_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
+# SRMIO
+sed -i "s|#\(SRMIO_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
 # Python
 echo DEFINES += GC_WANT_PYTHON >> src/gcconfig.pri
 echo PYTHONINCLUDES = -I/usr/include/python3.7 >> src/gcconfig.pri
