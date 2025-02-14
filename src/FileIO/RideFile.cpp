@@ -3615,38 +3615,79 @@ XDataSeries::timeIndex(double secs) const
     return i - datapoints.begin();
 }
 
-QString CIQinfo::listToString(const QList<CIQinfo>& ciqList) {
+const char* CIQ_KEY = "ciq";
+const char* VER_KEY = "ver";
+const char* FIELDS_KEY = "fields";
+
+QString CIQinfo::listToString(const QList<CIQinfo>& ciqList)
+{
     QStringList ciqStrings;
-    for (const CIQinfo& ciq : ciqList) {
-        ciqStrings.append("ciq=[" + ciq.toString() + "]");
+
+    foreach (const CIQinfo& ciq, ciqList)
+    {
+        ciqStrings.append(ciq.toString());
     }
-    return ciqStrings.join(",");
+    return ciqStrings.join("\n");
 }
 
-QList<CIQinfo> CIQinfo::listFromString(const QString& src) {
+QList<CIQinfo> CIQinfo::listFromString(const QString& src)
+{
     QList<CIQinfo> ciqList;
-    if (src.isEmpty()) {
-        return ciqList;
-    }
+    QStringList ciqStrings = src.split("\n", Qt::SkipEmptyParts);
 
-    QStringList parts = src.split(",ciq=[");
-    if (!parts.isEmpty() && parts[0].startsWith("ciq=[")) {
-        parts[0] = parts[0].mid(5);  // Remove "ciq=[" prefix
+    foreach (const QString& ciqStr, ciqStrings)
+    {
+        ciqList.append(CIQinfo(ciqStr));
     }
-
-    for (QString& part : parts) {
-        if (part.endsWith("]")) {
-            part.chop(1);  // Remove trailing ']'
-        }
-        ciqList.append(CIQinfo(part));
-    }
-
     return ciqList;
 }
 
+QString CIQinfo::toString() const
+{
+    QStringList fieldStrings;
 
-QString CIQfield::toString() const {
-    return QString("%1|%2|%3|%4|%5")
+    foreach (const CIQfield& field, fields)
+    {
+        fieldStrings.append(field.toString());
+    }
+
+    return QString("%1=%2,%3=%4,%5=%6").arg(CIQ_KEY, appid,
+                                            VER_KEY, QString::number(ver),
+                                            FIELDS_KEY, fieldStrings.join("\t"));
+
+}
+
+CIQinfo::CIQinfo(QString src)
+{
+    QStringList parts = src.trimmed().split("," + QString(FIELDS_KEY) + "=");
+
+    if (parts.size() == 2)
+    {
+        QStringList headerParts = parts[0].split(",");
+
+        foreach (const QString& part, headerParts)
+        {
+            if (part.startsWith(QString(CIQ_KEY) + "="))
+            {
+                appid = part.mid(strlen(CIQ_KEY) + 1);
+            }
+            else if (part.startsWith(QString(VER_KEY) + "="))
+            {
+                ver = part.mid(strlen(VER_KEY) + 1).toInt();
+            }
+        }
+
+        QStringList fieldStrings = parts[1].split("\t");
+        foreach (const QString& fieldStr, fieldStrings)
+        {
+            fields.append(CIQfield(fieldStr.trimmed()));
+        }
+    }
+}
+
+QString CIQfield::toString() const
+{
+    return QString("%1,%2,%3,%4,%5")
            .arg(name)
            .arg(nativeid)
            .arg(id)
@@ -3654,20 +3695,8 @@ QString CIQfield::toString() const {
            .arg(unit);
 }
 
-QString CIQinfo::toString() const {
-    QStringList fieldStrings;
-    for (const CIQfield& field : fields) {
-        fieldStrings.append(field.toString());
-    }
-    return QString("%1|%2~%3")
-           .arg(appid)
-           .arg(ver)
-           .arg(fieldStrings.join("~"));
-}
-
 CIQfield::CIQfield(QString src) {
-    QStringList parts = src.split("|");
-
+    QStringList parts = src.split(",");
     if (parts.size() == 5) {
         name = parts[0];
         nativeid = parts[1].toInt();
@@ -3677,16 +3706,4 @@ CIQfield::CIQfield(QString src) {
     }
 }
 
-CIQinfo::CIQinfo(QString src) {
-    QStringList parts = src.split("~");
 
-    QStringList header = parts[0].split("|");
-    if (header.size() == 2) {
-        appid = header[0];
-        ver = header[1].toInt();
-    }
-
-    for (int i = 1; i < parts.size(); ++i) {
-        fields.append(CIQfield(parts[i]));
-    }
-}
