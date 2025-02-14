@@ -3670,10 +3670,10 @@ QString CIQinfo::listToJson(const QList<CIQinfo>& ciqList)
     QJsonDocument jsonDoc(ciqArray);
 
     //Do we want it nicely formatted or compact?
-    // QString jsonString = jsonDoc.toJson(QJsonDocument::Indented);
-    // jsonString.replace("    ", "\t");
+    QString jsonString = jsonDoc.toJson(QJsonDocument::Indented);
+    jsonString.replace("    ", "\t");
 
-    QString jsonString = jsonDoc.toJson(QJsonDocument::Compact);
+    //QString jsonString = jsonDoc.toJson(QJsonDocument::Compact);
     return jsonString;
 }
 
