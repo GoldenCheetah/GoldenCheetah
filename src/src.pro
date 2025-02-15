@@ -704,7 +704,7 @@ HEADERS += Train/AddDeviceWizard.h Train/CalibrationData.h Train/ComputrainerCon
            Train/VideoSyncFileBase.h Train/ErgFileBase.h \
            Train/ModelFilter.h Train/MultiFilterProxyModel.h Train/WorkoutFilter.h Train/FilterEditor.h \
            Train/WorkoutFilterBox.h Train/TagBar.h Train/Taggable.h Train/TagStore.h Train/TagWidget.h \
-           Train/TrainerDayAPIQuery.h Train/TrainerDayAPIDialog.h
+           Train/TrainerDayAPIQuery.h Train/TrainerDayAPIDialog.h Train/ElevationChartWindow.h
 
 HEADERS += Train/TrainBottom.h Train/TrainDB.h Train/TrainSidebar.h \
            Train/VideoLayoutParser.h Train/VideoSyncFile.h Train/WorkoutPlotWindow.h Train/WebPageWindow.h \
@@ -817,7 +817,7 @@ SOURCES += Train/AddDeviceWizard.cpp Train/CalibrationData.cpp Train/Computraine
            Train/VideoSyncFileBase.cpp Train/ErgFileBase.cpp \
            Train/ModelFilter.cpp Train/MultiFilterProxyModel.cpp Train/WorkoutFilter.cpp Train/FilterEditor.cpp \
            Train/WorkoutFilterBox.cpp Train/TagBar.cpp Train/TagWidget.cpp \
-           Train/TrainerDayAPIQuery.cpp Train/TrainerDayAPIDialog.cpp
+           Train/TrainerDayAPIQuery.cpp Train/TrainerDayAPIDialog.cpp Train/ElevationChartWindow.cpp
 
 SOURCES += Train/TrainBottom.cpp Train/TrainDB.cpp Train/TrainSidebar.cpp \
            Train/VideoLayoutParser.cpp Train/VideoSyncFile.cpp Train/WorkoutPlotWindow.cpp Train/WebPageWindow.cpp \
