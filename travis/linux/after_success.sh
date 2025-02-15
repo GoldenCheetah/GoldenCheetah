@@ -66,6 +66,8 @@ rm -rf squashfs-root
 
 # Generate AppImage
 wget --no-verbose "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
+# Fix RPATH on QtWebEngineProcess
+patchelf --set-rpath '$ORIGIN/../lib' appdir/libexec/QtWebEngineProcess
 chmod a+x appimagetool-x86_64.AppImage
 ./appimagetool-x86_64.AppImage appdir
 

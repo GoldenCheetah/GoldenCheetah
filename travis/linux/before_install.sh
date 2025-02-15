@@ -1,10 +1,6 @@
 #!/bin/bash
 set -ev
 
-# Install fuse2, required to run older AppImages
-sudo add-apt-repository -y universe
-sudo apt install libfuse2
-
 # Install qt5.15
 sudo apt-get update -qq
 sudo apt-get install -qq qtbase5-dev qt5-qmake qtbase5-dev-tools qttools5-dev
@@ -64,5 +60,9 @@ sudo apt-get -qq install libgsl-dev
 wget --no-verbose https://github.com/tcnksm/ghr/releases/download/v0.16.2/ghr_v0.16.2_linux_amd64.tar.gz
 tar xf ghr_v0.16.2_linux_amd64.tar.gz
 mv ghr_v0.16.2_linux_amd64 ghr
+
+# Install fuse2 required to run older AppImages, and patchelf to fix QtWebEngineProcess
+sudo add-apt-repository -y universe
+sudo apt install libfuse2 patchelf
 
 exit
