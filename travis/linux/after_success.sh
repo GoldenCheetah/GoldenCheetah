@@ -16,15 +16,6 @@ mkdir -p appdir
 # Executable
 cp GoldenCheetah appdir
 
-# AppRun file
-cat >appdir/AppRun <<EOF
-#!/bin/bash
-HERE="\$(dirname "\$(readlink -f "\${0}")")"
-export QTWEBENGINE_DISABLE_SANDBOX=1
-exec "\${HERE}/GoldenCheetah" "\$@"
-EOF
-chmod a+x appdir/AppRun
-
 # Desktop file
 cat >appdir/GoldenCheetah.desktop <<EOF
 [Desktop Entry]
