@@ -39,6 +39,7 @@
 #include <qwt_plot_canvas.h>
 #include <qwt_scale_draw.h>
 #include <qwt_symbol.h>
+#include <algorithm>
 
 #define PI M_PI
 
@@ -299,8 +300,8 @@ void ScatterPlot::setData (ScatterSettings *settings)
     cranklength = appsettings->cvalue(context->athlete->cyclist, GC_CRANKLENGTH, 175.00).toDouble() / 1000.0;
 
     // how many curves do we need ?
-    if (xseries == MODEL_LRBALANCE || xseries == MODEL_TE || xseries == MODEL_PS ||
-        yseries == MODEL_LRBALANCE || yseries == MODEL_TE || yseries == MODEL_PS) {
+    if (xseries == MODEL_TE || xseries == MODEL_PS ||
+        yseries == MODEL_TE || yseries == MODEL_PS) {
 
         // left and right side needed for each ride/interval
         curves = 2;
@@ -569,9 +570,9 @@ void ScatterPlot::setData (ScatterSettings *settings)
     setAxisTitle(QwtAxis::XBottom, describeType(settings->x, true, GlobalContext::context()->useMetricUnits));
 
     // axis scale
-    if (settings->y == MODEL_AEPF) setAxisScale(QwtAxis::YLeft, 0, 600);
+    if (settings->y == MODEL_AEPF) setAxisScale(QwtAxis::YLeft, 0, std::min(maxY, 2500.0));
     else setAxisScale(QwtAxis::YLeft, minY, maxY);
-    if (settings->x == MODEL_CPV) setAxisScale(QwtAxis::XBottom, 0, 3);
+    if (settings->x == MODEL_CPV) setAxisScale(QwtAxis::XBottom, 0, std::max(maxX, 3.0));
     else setAxisScale(QwtAxis::XBottom, minX, maxX);
 
     // gear
