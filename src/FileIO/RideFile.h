@@ -92,13 +92,13 @@ struct RideFileDataPresent
 //Mappings for QIC/ANT fields info
 struct CIQfield
 {
-    CIQfield(QString name, int nativeid, int id, int type, QString unit) :
+    CIQfield(QString name, int nativeid, int id, QString type, QString unit) :
         name(name), nativeid(nativeid),id(id),type(type),unit(unit) {}
 
     QString name;
     int nativeid;
     int id;
-    int type;
+    QString type;
     QString unit;
 
 };

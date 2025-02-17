@@ -95,8 +95,9 @@ QList<FitFieldDefinition> FITstandardfields;
 QStringList GenericDecodeList;
 
 //Convert metadata typeids to fit ids
-int typeToFIT(int id)
+int typeToFIT(QString type)
 {
+    int id = FITbasetypes.indexOf(type);
     switch (id){
     case 1: //sint8
         return 1;
@@ -117,8 +118,9 @@ int typeToFIT(int id)
 }
 
 //Convert metadata typeids to fit lengths
-int typeLength(int id)
+int typeLength(QString type)
 {
+    int id = FITbasetypes.indexOf(type);
     switch (id){
     case 1: return 1;
     case 2: return 1;
@@ -4751,13 +4753,15 @@ genericnext:
             if (local_deve_fields_app.count()>0) {
 
                 foreach(FitDeveApp deve_app, local_deve_fields_app) {
-                    CIQinfo info(deve_app.app_id.c_str(), deve_app.dev_data_id, deve_app.app_version);
+                    CIQinfo info(deve_app.app_id.c_str(),
+                                 deve_app.dev_data_id,
+                                 deve_app.app_version);
 
                     foreach(FitFieldDefinition deve_field, deve_app.fields) {
                         info.fields << CIQfield(deve_field.name.c_str(),
                                                 deve_field.native,
                                                 deve_field.num,
-                                                deve_field.type,
+                                                FITbasetypes[deve_field.type],
                                                 deve_field.unit.c_str());
                     }
                     rideFile->addCIQ(info);
@@ -5434,10 +5438,11 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
                 int dev_idx = ciqinfo.devid;
                 static_cast<void>(dev_idx);
 
-                foreach (CIQfield field, ciqinfo.fields)
+                foreach (CIQfield ciqfield, ciqinfo.fields)
                 {
-                    double val = ride->xdataValue(point, xdata_cur, "DEVELOPER", field.name, RideFile::REPEAT);
-                    switch (field.type){ //limited set supported
+                    double val = ride->xdataValue(point, xdata_cur, "DEVELOPER", ciqfield.name, RideFile::REPEAT);
+                    int id = FITbasetypes.indexOf(ciqfield.type);
+                    switch (id){ //limited set supported
                     case 1:
                         write_int8(ridePoint, val);
                         break;
@@ -5460,7 +5465,7 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
                         write_float32(ridePoint, val, true);
                         break;
                     default:
-                        fprintf(stderr,"ERROR TYPE %d CURRENTLY UNSUPPORTED\n",field.type); fflush(stderr);
+                        fprintf(stderr,"ERROR TYPE % CURRENTLY UNSUPPORTED\n",ciqfield.type); fflush(stderr);
                     }
                 }
             }

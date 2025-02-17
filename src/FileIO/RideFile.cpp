@@ -3717,7 +3717,7 @@ CIQinfo::CIQinfo(const QJsonObject& obj)
         CIQfield ciqfield(fieldObj[CIQ_FIELD_NAME].toString(),
                           fieldObj[CIQ_FIELD_NATIVE].toInt(),
                           fieldObj[CIQ_FIELD_ID].toInt(),
-                          fieldObj[CIQ_FIELD_TYPE].toInt(),
+                          fieldObj[CIQ_FIELD_TYPE].toString(),
                           fieldObj[CIQ_FIELD_UNIT].toString());
 
         fields.append(ciqfield);

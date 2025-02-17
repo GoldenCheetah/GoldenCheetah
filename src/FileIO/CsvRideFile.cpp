@@ -1634,10 +1634,10 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
             // Since we're creating source data as if a device,
             // add the one CIQ developer and field info
             CIQinfo info("6957fe68-83fe-4ed6-8613-413f70624bb5", 0, 64);
-            info.fields << CIQfield( "core_temperature", 139, 0, 8,"°C" ); //8 -float32
-            info.fields << CIQfield( "skin_temperature", -1, 10, 8,"°C" );
-            info.fields << CIQfield( "core_data_quality",-1, 19, 3,"Q" );  //3 - sint16
-            info.fields << CIQfield( "heat_strain_index",-1, 95, 8,"a.u." );
+            info.fields << CIQfield( "core_temperature", 139, 0, "float32","°C" );
+            info.fields << CIQfield( "skin_temperature", -1, 10, "float32","°C" );
+            info.fields << CIQfield( "core_data_quality",-1, 19, "sint16","Q" );
+            info.fields << CIQfield( "heat_strain_index",-1, 95, "float32","a.u." );
             rideFile->addCIQ(info); //store ciq metadata for fit writer
         }
     }
