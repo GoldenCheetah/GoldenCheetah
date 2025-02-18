@@ -59,6 +59,7 @@ class LiveMapWebPageWindow : public GcChartWindow
 
     // properties can be saved/restored/set by the layout manager
     Q_PROPERTY(QString url READ url WRITE setUrl USER true)
+    Q_PROPERTY(int zoom READ zoom WRITE setZoom USER true)
 
     public:
         LiveMapWebPageWindow(Context *);
@@ -72,6 +73,8 @@ class LiveMapWebPageWindow : public GcChartWindow
         // set/get properties
         QString url() const { return customUrl->text(); }
         void setUrl(QString x) { customUrl->setText(x); }
+        int zoom() const { return customZoom->value(); }
+        void setZoom(int x) { customZoom->setValue(x); }
 
     public slots:
         void configChanged(qint32);
@@ -96,7 +99,7 @@ class LiveMapWebPageWindow : public GcChartWindow
         QLineEdit* rCustomUrl;
         QLineEdit* customLat;
         QLineEdit* customLon;
-        QLineEdit* customZoom;
+        QSpinBox* customZoom;
         QPushButton* rButton;
         QPushButton* applyButton;
 
