@@ -82,11 +82,19 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
     customUrl = new QLineEdit(this);
     customUrl->setFixedWidth(600);
 
+    customZoomLabel = new QLabel(tr("Initial Zoom"));
+    customZoom = new QSpinBox(this);
+    customZoom->setFixedWidth(60);
+    customZoom->setRange(0, 20); // Set the range for zoom levels
+
     if (customUrl->text().trimmed().isEmpty()) customUrl->setText("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
     commonLayout->addRow(customUrlLabel, customUrl);
 
     connect(customUrl, SIGNAL(returnPressed()), this, SLOT(userUrl()));
 
+    if (customZoom->text().trimmed().isEmpty()) customZoom->setValue(15);
+    commonLayout->addRow(customZoomLabel, customZoom);
+    
     applyButton = new QPushButton(application->style()->standardIcon(QStyle::SP_ArrowRight), tr("Apply changes"), this);
     commonLayout->addRow(applyButton);
 
@@ -145,7 +153,8 @@ void LiveMapWebPageWindow::ergFileSelected(ErgFile* f)
         }
         else
         {
-            QString js = ("<div><script type=\"text/javascript\">initMap (" + startingLat + ", " + startingLon + ",13);</script></div>\n");
+            QString sZoom = QString::number(zoom());
+            QString js = ("<div><script type=\"text/javascript\">initMap (" + startingLat + ", " + startingLon + ", " + sZoom + ");</script></div>\n");
             routeLatLngs = "[";
             QString code = "";
 
@@ -230,7 +239,8 @@ void LiveMapWebPageWindow::telemetryUpdate(RealtimeData rtd)
         code = "";
         if (!markerIsVisible)
         {
-            code = QString("centerMap (" + sLat + ", " + sLon + ", " + "15" + ");");
+            QString sZoom = QString::number(zoom());
+            code += QString("centerMap (" + sLat + ", " + sLon + ", " + sZoom + ");");
             code += QString("showMyMarker (" + sLat + ", " + sLon + ");");
             markerIsVisible = true;
         }
