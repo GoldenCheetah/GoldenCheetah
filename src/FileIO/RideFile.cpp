@@ -3635,12 +3635,14 @@ const char* CIQ_ID = "developer_data_index";
 const char* VER_KEY = "verison";
 const char* FIELDS_KEY = "fields";
 
+const char* CIQ_FIELD_MESSAGE="message";
 const char* CIQ_FIELD_NAME="name";
 const char* CIQ_FIELD_NATIVE="native_id";
 const char* CIQ_FIELD_ID="dev_id";
 const char* CIQ_FIELD_TYPE="type";
 const char* CIQ_FIELD_UNIT="unit";
-
+const char* CIQ_FIELD_SCALE="scale";
+const char* CIQ_FIELD_OFFSET="offset";
 
 QString CIQinfo::listToJson(const QList<CIQinfo>& ciqList)
 {
@@ -3657,11 +3659,14 @@ QString CIQinfo::listToJson(const QList<CIQinfo>& ciqList)
         foreach (const CIQfield& field, ciq.fields)
         {
             QJsonObject fieldObj;
+            fieldObj[CIQ_FIELD_MESSAGE] = field.message;
             fieldObj[CIQ_FIELD_NAME] = field.name;
             fieldObj[CIQ_FIELD_NATIVE] = field.nativeid;
             fieldObj[CIQ_FIELD_ID] = field.id;
             fieldObj[CIQ_FIELD_TYPE] = field.type;
             fieldObj[CIQ_FIELD_UNIT] = field.unit;
+            fieldObj[CIQ_FIELD_SCALE] = field.scale;
+            fieldObj[CIQ_FIELD_OFFSET] = field.offset;
 
             fieldsArray.append(fieldObj);
         }
@@ -3714,11 +3719,14 @@ CIQinfo::CIQinfo(const QJsonObject& obj)
     foreach (const QJsonValue& field, jsonfields)
     {
         QJsonObject fieldObj = field.toObject();
-        CIQfield ciqfield(fieldObj[CIQ_FIELD_NAME].toString(),
+        CIQfield ciqfield(fieldObj[CIQ_FIELD_MESSAGE].toString(),
+                          fieldObj[CIQ_FIELD_NAME].toString(),
                           fieldObj[CIQ_FIELD_NATIVE].toInt(),
                           fieldObj[CIQ_FIELD_ID].toInt(),
                           fieldObj[CIQ_FIELD_TYPE].toString(),
-                          fieldObj[CIQ_FIELD_UNIT].toString());
+                          fieldObj[CIQ_FIELD_UNIT].toString(),
+                          fieldObj[CIQ_FIELD_SCALE].toInt(),
+                          fieldObj[CIQ_FIELD_OFFSET].toInt());
 
         fields.append(ciqfield);
     }

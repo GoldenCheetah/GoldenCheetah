@@ -1627,18 +1627,17 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         tcorefile.close();
 
         // Now add the developer fields
-        if (develSeries->datapoints.count()>0)
-        {
+        if (develSeries->datapoints.count() > 0) {
             rideFile->addXData("DEVELOPER", develSeries);
 
             // Since we're creating source data as if a device,
             // add the one CIQ developer and field info
             CIQinfo info("6957fe68-83fe-4ed6-8613-413f70624bb5", 0, 64);
-            info.fields << CIQfield( "core_temperature", 139, 0, "float32","°C" );
-            info.fields << CIQfield( "skin_temperature", -1, 10, "float32","°C" );
-            info.fields << CIQfield( "core_data_quality",-1, 19, "sint16","Q" );
-            info.fields << CIQfield( "heat_strain_index",-1, 95, "float32","a.u." );
-            rideFile->addCIQ(info); //store ciq metadata for fit writer
+            info.fields << CIQfield("record","core_temperature", 139, 0, "float32", "°C", -1, -1);
+            info.fields << CIQfield("record","skin_temperature", -1, 10, "float32", "°C", -1, -1);
+            info.fields << CIQfield("record","core_data_quality", -1, 19, "sint16", "Q", -1, -1);
+            info.fields << CIQfield("record","heat_strain_index", -1, 95, "float32", "a.u.", -1, -1);
+            rideFile->addCIQ(info); // store ciq metadata for fit writer
         }
     }
     

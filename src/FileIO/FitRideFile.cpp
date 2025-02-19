@@ -3955,6 +3955,7 @@ genericnext:
                         break;
             }
         }
+        fieldDef.message = fitMessageDesc(native_mesg_num,true).toStdString();
 
         if (FIT_DEBUG && FIT_DEBUG_LEVEL>0) {
             // always show these regardless of debug level
@@ -3974,8 +3975,8 @@ genericnext:
         // add or replace with new definition
         local_deve_fields.insert((key), fieldDef);
 
-
-        if (native_mesg_num == RECORD_MSG_NUM && fieldDef.native > -1 && !record_deve_native_fields.values().contains(fieldDef.native)) {
+        if ((native_mesg_num == RECORD_MSG_NUM) && fieldDef.native > -1 &&
+            !record_deve_native_fields.values().contains(fieldDef.native)) {
             record_deve_native_fields.insert(key, fieldDef.native);
 
             /*RideFile::SeriesType series = getSeriesForNative(fieldDef.native);
@@ -4758,11 +4759,14 @@ genericnext:
                                  deve_app.app_version);
 
                     foreach(FitFieldDefinition deve_field, deve_app.fields) {
-                        info.fields << CIQfield(deve_field.name.c_str(),
+                        info.fields << CIQfield(deve_field.message.c_str(), //always record atm
+                                                deve_field.name.c_str(),
                                                 deve_field.native,
                                                 deve_field.num,
                                                 FITbasetypes[deve_field.type],
-                                                deve_field.unit.c_str());
+                                                deve_field.unit.c_str(),
+                                                deve_field.scale,
+                                                deve_field.offset);
                     }
                     rideFile->addCIQ(info);
                 }
@@ -5266,20 +5270,23 @@ int write_dev_fields(QByteArray* array, const RideFile* ride, int local_msg_type
             write_field_definition(fields, 1, 1, 0x02);  // field_definition id
             write_field_definition(fields, 2, 1, 0x02);  // fit base type
             write_field_definition(fields, 15, 1, 0x02); // native field#
-            write_field_definition(fields, 0, 1, 0x02);  // developer id
+            write_field_definition(fields, 0, 1, 0x02);  // developer id            
+            write_field_definition(fields, 6, 1, 0x02); // scale - uint
+            write_field_definition(fields, 7, 1, 0x01); // offset - sint
 
-            foreach (CIQfield field, ciqinfo.fields)
-            {
-                write_message_definition(array, FIELD_DESCRIPTION, local_msg_type, 7);
+            foreach (CIQfield field, ciqinfo.fields) {
+                write_message_definition(array, FIELD_DESCRIPTION, local_msg_type, 9);
                 array->append(fields->data(), fields->size());
                 write_int8(array, 0);
                 write_string(array, field.name.toStdString().c_str(), 64);
                 write_string(array, field.unit.toStdString().c_str(), 16);
-                write_int16(array, 20, true);
-                write_int8(array, field.id);      // Local num
-                write_int8(array, typeToFIT(field.type));    // type
-                write_int8(array, field.nativeid);// Native num
-                write_int8(array, dev_idx);       // developer id
+                write_int16(array, 20, true);                             // record type
+                write_int8(array, field.id);                              // Local num
+                write_int8(array, typeToFIT(field.type));                 // type
+                write_int8(array, field.nativeid);                        // Native num
+                write_int8(array, dev_idx);                               // developer id
+                write_uint8(array, (field.scale < 0) ? 255 : field.scale);  // Scale
+                write_int8(array, (field.offset < 0) ? 127 : field.offset); // Offset
 
                 num_fields++;
             }
