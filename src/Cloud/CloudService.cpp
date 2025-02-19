@@ -236,8 +236,8 @@ RideFile *
 CloudService::uncompressRide(QByteArray *data, QString name, QStringList &errors)
 {
     // make sure its named as we expect
-    if ((downloadCompression== zip && !name.endsWith(".json.zip")) ||
-        (downloadCompression== gzip && !name.endsWith(".json.gz"))) {
+    if ((downloadCompression== zip && !name.endsWith(".zip")) ||
+        (downloadCompression== gzip && !name.endsWith(".gz"))) {
         errors << tr("expected compressed activity file.");
         return NULL;
     }

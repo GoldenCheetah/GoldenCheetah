@@ -378,6 +378,7 @@
 //Dropbox oauth keys
 #define GC_DROPBOX_TOKEN                "<athlete-private>dropbox/token"
 #define GC_DROPBOX_FOLDER               "<athlete-private>dropbox/folder"
+#define GC_DROPBOX_FORMAT               "<athlete-private>dropbox/format"
 
 //Withings
 #define GC_WITHINGS_TOKEN               "<athlete-private>withings_token"

@@ -31,6 +31,7 @@ Dropbox::Dropbox(Context *context) : CloudService(context), context(context), ro
     // config
     settings.insert(OAuthToken, GC_DROPBOX_TOKEN);
     settings.insert(Folder, GC_DROPBOX_FOLDER);
+    settings.insert(Combo1, QString("%1::Format::JSON::FIT::TCX::PWX::CSV").arg(GC_DROPBOX_FORMAT));
 }
 
 Dropbox::~Dropbox() {
@@ -41,6 +42,14 @@ Dropbox::~Dropbox() {
 bool
 Dropbox::open(QStringList &errors)
 {
+    // User selected file format, defaults to JSON
+    const QString format =  getSetting(GC_DROPBOX_FORMAT, "JSON").toString();
+    if (format == "JSON") filetype = uploadType::JSON;
+    else if (format == "FIT") filetype = uploadType::FIT;
+    else if (format == "TCX") filetype = uploadType::TCX;
+    else if (format == "PWX") filetype = uploadType::PWX;
+    else if (format == "CSV") filetype = uploadType::CSV;
+
     // do we have a token
     QString token = getSetting(GC_DROPBOX_TOKEN, "").toString();
     if (token == "") {
