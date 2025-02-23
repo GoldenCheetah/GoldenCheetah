@@ -5,6 +5,7 @@
 #include "Context.h"
 #include "Colors.h"
 #include "HelpWhatsThis.h"
+#include <Array>
 
 
 namespace elevationChart {
