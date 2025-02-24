@@ -18,6 +18,7 @@
  */
 
 #include "ChartSettings.h"
+#include "Colors.h"
 #include <QVBoxLayout>
 
 ChartSettings::ChartSettings(QWidget *parent, QWidget *contents) : QDialog(parent)
@@ -31,8 +32,11 @@ ChartSettings::ChartSettings(QWidget *parent, QWidget *contents) : QDialog(paren
   // Create the main layout box.
   QVBoxLayout *mainVBox = new QVBoxLayout(this);
 
-  // Set up the instructions field.
+  // Set up the instructions field, limiting heigth
+  // to avoid issues on lower resolution displays
   mainVBox->addWidget(contents);
+  contents->setMaximumWidth(640*dpiXFactor);
+  contents->setMaximumHeight(640*dpiYFactor);
 
   // "Done" button.
   QHBoxLayout *buttonHBox = new QHBoxLayout;
