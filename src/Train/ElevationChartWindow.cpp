@@ -5,7 +5,7 @@
 #include "Context.h"
 #include "Colors.h"
 #include "HelpWhatsThis.h"
-#include <Array>
+#include <array>
 
 
 namespace elevationChart {
@@ -280,6 +280,7 @@ ElevationChartWindow::ElevationChartWindow(Context *context) :
     connect(context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
     connect(context, SIGNAL(ergFileSelected(ErgFile*)), this, SLOT(ergFileSelected(ErgFile*)));
 
+    ergFileSelected(context->currentErgFile());
 }
 
 
