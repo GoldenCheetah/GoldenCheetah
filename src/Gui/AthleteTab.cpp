@@ -93,8 +93,6 @@ AthleteTab::AthleteTab(Context *context) : QWidget(context->mainWindow), context
 
     // the dialog box for the chart settings
     chartSettings = new ChartSettings(this, masterControls);
-    chartSettings->setMaximumWidth(650);
-    chartSettings->setMaximumHeight(600);
     chartSettings->hide();
 
     // navigation model after main items as it uses the observer
