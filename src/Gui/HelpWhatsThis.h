@@ -155,6 +155,7 @@ Q_OBJECT
                  ChartTrain_VideoPlayer,
                  ChartTrain_WorkoutEditor,
                  ChartTrain_LiveMap,
+                 ChartTrain_Elevation,
 
                  SideBarTrendsView_DateRanges,
                  SideBarTrendsView_Events,
