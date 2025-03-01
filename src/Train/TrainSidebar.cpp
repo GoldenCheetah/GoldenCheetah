@@ -2083,7 +2083,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     if (fPlayAudio) {
                         lapAudioThisLap = false;
 #if QT_VERSION >= 0x060000
-                        QSoundEffect effect;
+                        static QSoundEffect effect;
                         effect.setSource(QUrl::fromLocalFile(":audio/lap.wav"));
                         effect.play();
 #else
