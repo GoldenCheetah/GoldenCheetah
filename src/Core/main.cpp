@@ -586,22 +586,22 @@ main(int argc, char *argv[])
         qSetMessagePattern(debugFormat);
         QLoggingCategory::setFilterRules(debugRules.replace(";", "\n")); // accept ; as separator like QT_LOGGING_RULES
 
-        // install QT Translator to enable QT Dialogs translation
-        // we may have restarted JUST to get this!
-        QTranslator qtTranslator;
-        qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-        application->installTranslator(&qtTranslator);
-
         // Language setting (default to system locale)
         QVariant lang = appsettings->value(NULL, GC_LANG, QLocale::system().name());
+
+        // install QT Translator to enable QT Dialogs translation
+        QTranslator qtTranslator;
+        if (!qtTranslator.load("qt_" + lang.toString(), QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
+            qDebug()<<"Failed to load Qt translator for "<<lang.toString();
+        application->installTranslator(&qtTranslator);
 
         // Load specific translation, try from GCROOT otherwise from binary
         QTranslator gcTranslator;
         QString translation_file = "/gc_" + lang.toString() + ".qm";
         if (gcTranslator.load(gcroot + translation_file))
             qDebug() << "Loaded translation from"+gcroot+translation_file;
-        else
-            gcTranslator.load(":translations" + translation_file);
+        else if (!gcTranslator.load(":translations" + translation_file))
+            qDebug()<<"Failed to load GC translator for "<<lang.toString();
         application->installTranslator(&gcTranslator);
 
         // Now the translator is installed, set default colors with translated names
