@@ -3,7 +3,7 @@ set -ev
 
 # Install qt5.15
 sudo apt-get update -qq
-sudo apt-get install -qq qtbase5-dev qt5-qmake qtbase5-dev-tools qttools5-dev
+sudo apt-get install -qq qtbase5-dev qt5-qmake qtbase5-dev-tools qttools5-dev qttranslations5-l10n
 sudo apt-get install -qq qtmultimedia5-dev qtconnectivity5-dev qtwebengine5-dev qtpositioning5-dev
 sudo apt-get install -qq libqt5charts5-dev libqt5serialport5-dev libqt5webchannel5-dev libqt5svg5-dev libqt5opengl5-dev
 qmake --version
