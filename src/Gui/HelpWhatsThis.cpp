@@ -290,6 +290,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("ChartTypes_Train#workout-editor").arg(tr("Edition and diplay of ergometer type workout files"));
     case ChartTrain_LiveMap:
         return text.arg("ChartTypes_Train#live-map").arg(tr("Real time display of the route of simulation workouts in an Open Street Map"));
+    case ChartTrain_Elevation:
+        return text.arg("ChartTypes_Train#elevation").arg(tr("Show elevation profile of instant position"));
 
     // Sidebars
     case SideBarTrendsView_DateRanges:
