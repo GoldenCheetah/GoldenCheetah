@@ -964,14 +964,14 @@ ScatterPlot::resample(QVector<double> &xval, QVector<double> &yval, int &count, 
 bool
 ScatterPlot::skipValues(double xv, double yv, ScatterSettings *settings) {
 
-    // skip zeroes? - special logic for Model Gear, since there value between 0.01 and 1 happen and are relevant
-    if ((settings->x != MODEL_GEAR && settings->y != MODEL_GEAR)
+    // skip zeroes? - special logic for Model Gear/CPV, since there value between 0.01 and 1 happen and are relevant
+    if ((settings->x != MODEL_GEAR && settings->y != MODEL_GEAR && settings->x != MODEL_CPV && settings->y != MODEL_CPV)
          && settings->ignore && (int(xv) == 0 || int(yv) == 0)) return true;
 
-    // Model Gear
-    if ((settings->x == MODEL_GEAR)
+    // Model Gear/CPV
+    if ((settings->x == MODEL_GEAR || settings->x == MODEL_CPV)
          && settings->ignore && (xv == 0.0f || int(yv) == 0)) return true;
-    if ((settings->y == MODEL_GEAR)
+    if ((settings->y == MODEL_GEAR || settings->y == MODEL_GEAR)
          && settings->ignore && (int(xv) == 0 || yv == 0.0f)) return true;
 
     // Temp 0 values are relevant
