@@ -303,7 +303,7 @@ void
 ElevationChartWindow::telemetryUpdate(const RealtimeData &rtData)
 {
     // If it is not visible, it saves time
-    if (isHidden())
+    if (!isVisible())
         return;
     m_rtData = rtData;
     bubbleWidget->setRealtimeData(&m_rtData);
