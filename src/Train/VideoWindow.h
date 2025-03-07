@@ -107,7 +107,9 @@ extern "C" {
 #include <QVideoWidget>
 #include <QMediaPlayer>
 #endif
-
+#ifdef GC_VIDEO_QT6
+#include <QAudioOutput>
+#endif
 #ifdef GC_VIDEO_QT5
 #include <QMediaContent>
 #endif
