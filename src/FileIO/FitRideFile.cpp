@@ -20,7 +20,6 @@
 
 #include "FitRideFile.h"
 #include "Settings.h"
-#include "Units.h"
 #include "RideItem.h"
 #include "Specification.h"
 #include "DataProcessor.h"
@@ -94,6 +93,45 @@ QList<FITmessage> FITmessages;
 QList<FitFieldDefinition> FITstandardfields;
 
 QStringList GenericDecodeList;
+
+//Convert metadata typeids to fit ids
+int typeToFIT(QString type)
+{
+    int id = FITbasetypes.indexOf(type);
+    switch (id){
+    case 1: //sint8
+        return 1;
+    case 2: //uint8
+        return 2;
+    case 3: //sint16
+        return 131;
+    case 4: //uint16
+        return 132;
+    case 5: //sint32
+        return 133;
+    case 6: //uint32
+        return 134;
+    case 8: //float32
+        return 136;
+    }
+    return -1;
+}
+
+//Convert metadata typeids to fit lengths
+int typeLength(QString type)
+{
+    int id = FITbasetypes.indexOf(type);
+    switch (id){
+    case 1: return 1;
+    case 2: return 1;
+    case 3: return 2;
+    case 4: return 2;
+    case 5: return 4;
+    case 6: return 4;
+    case 8: return 4;
+    }
+    return 0;
+}
 
 // load the FITmetadata file, called the first time a FIT file
 // is parsed, so may not ever be called by the user
@@ -1499,8 +1537,8 @@ struct FitFileParser
             case 138: // Stamina
                 return "STAMINA";
 
-        case 139: // CoreTemp
-            return "CORETEMP";
+            case 139: // CoreTemp
+                return "CORETEMP";
 
             case 140: // Gap
                 return "GAP";
@@ -1541,9 +1579,6 @@ struct FitFileParser
             case 116: // Stress
                 return 100.0;
 
-            // case 139: //CORETEMP //do we need to scale here?
-            //     return 0.01;
-
             default:
                 return 1.0;
         }
@@ -1561,7 +1596,8 @@ struct FitFileParser
     void addRecordDeveField(QString key, FitFieldDefinition deveField, bool xdata) {
         QString name = deveField.name.c_str();
 
-        if (deveField.native>-1) {
+        //If field has a native type and doesnt have a name, generate one
+        if (deveField.native>-1 && name.length()==0 ) {
             int i = 0;
             RideFile::SeriesType series = getSeriesForNative(deveField.native);
             QString nativeName = rideFile->symbolForSeries(series);
@@ -2816,7 +2852,6 @@ genericnext:
             }
 
             if (native_num>-1) {
-
                 switch (native_num) {
                     case 253: // TIMESTAMP
                               time = value + qbase_time.toSecsSinceEpoch();
@@ -3036,23 +3071,27 @@ genericnext:
                     case 133: // Pulse Ox
                              native_num = -1;
                              break;
-                case 139: // Core Temp
-                    tcore = value;
-                    break;
+                    case 139: // Core Temp
+                             if (field.deve_idx>-1) {
+                                 tcore = deve_value;
+                             } else {
+                                 tcore = value;
+                             }
+                             break;
                     default:
                             unknown_record_fields.insert(native_num);
                             native_num = -1;
                 }
             }
 
-            if (native_num == -1) {
+            if (native_num == -1 || field.deve_idx>-1) {
                 // native, deve_native or deve to record.
 
                 int idx = -1;
 
                 if (field.deve_idx>-1) {
                     QString key = QString("%1.%2").arg(field.deve_idx).arg(field.num);
-                            FitFieldDefinition deveField = local_deve_fields[key];
+                    FitFieldDefinition deveField = local_deve_fields[key];
 
                     if (!record_deve_fields.contains(key)) {
                         addRecordDeveField(key, deveField, true);
@@ -3916,6 +3955,7 @@ genericnext:
                         break;
             }
         }
+        fieldDef.message = fitMessageDesc(native_mesg_num,true).toStdString();
 
         if (FIT_DEBUG && FIT_DEBUG_LEVEL>0) {
             // always show these regardless of debug level
@@ -3935,8 +3975,8 @@ genericnext:
         // add or replace with new definition
         local_deve_fields.insert((key), fieldDef);
 
-
-        if (native_mesg_num == RECORD_MSG_NUM && fieldDef.native > -1 && !record_deve_native_fields.values().contains(fieldDef.native)) {
+        if ((native_mesg_num == RECORD_MSG_NUM) && fieldDef.native > -1 &&
+            !record_deve_native_fields.values().contains(fieldDef.native)) {
             record_deve_native_fields.insert(key, fieldDef.native);
 
             /*RideFile::SeriesType series = getSeriesForNative(fieldDef.native);
@@ -4712,25 +4752,34 @@ genericnext:
 
             // CIQINFO
             if (local_deve_fields_app.count()>0) {
-                QString ciqInfo = "[";
-                int i=0;
-                foreach(FitDeveApp deve_app, local_deve_fields_app) {
-                    ciqInfo += QString("{\n\t\"application_id\": %1,\n\t\"developer_data_index\": %2,\n\t").arg(deve_app.app_id.c_str() ).arg(deve_app.dev_data_id);
-                    ciqInfo += QString("\"fields\": [\n\t\t");
-                    int j=0;
-                    foreach(FitFieldDefinition deve_field, deve_app.fields) {
-                        ciqInfo += QString("{\n\t\t\"dev_id\": %1,\n\t\t\"name\": \"%2\"}").arg(deve_field.dev_id).arg(deve_field.name.c_str());
-                        if (++j<deve_app.fields.count())
-                            ciqInfo += ",\n\t\t";
-                    }
-                    ciqInfo += QString("\n\t]\n}");
-                    if (++i<local_deve_fields_app.count())
-                        ciqInfo += ",\n";
-                }
-                ciqInfo += "]";
 
-                //if (ciqInfo.length()>2)
-                //    rideFile->setTag("CIQ", ciqInfo);
+                foreach(FitDeveApp deve_app, local_deve_fields_app) {
+                    CIQinfo info(deve_app.app_id.c_str(),
+                                 deve_app.dev_data_id,
+                                 deve_app.app_version);
+
+                    foreach(FitFieldDefinition deve_field, deve_app.fields) {
+                        info.fields << CIQfield(deve_field.message.c_str(), //always record atm
+                                                deve_field.name.c_str(),
+                                                deve_field.native,
+                                                deve_field.num,
+                                                FITbasetypes[deve_field.type],
+                                                deve_field.unit.c_str(),
+                                                deve_field.scale,
+                                                deve_field.offset);
+                    }
+                    rideFile->addCIQ(info);
+                }
+                //add ciq infos as tag
+
+                if (!rideFile->ciqinfo().empty() ) {
+
+                    QString ciqString = CIQinfo::listToJson( rideFile->ciqinfo());
+
+                    QString escaped = QJsonValue(ciqString).toVariant().toString();
+
+                    rideFile->setTag("CIQ", escaped );
+                }
             }
 
             file.close();
@@ -4776,6 +4825,9 @@ RideFile *FitFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 void write_int8(QByteArray* array, fit_value_t value) {
     array->append(value);
 }
+void write_uint8(QByteArray* array, fit_value_t value) {
+    array->append(value);
+}
 
 void write_int16(QByteArray *array, fit_value_t value,  bool is_big_endian) {
     value = is_big_endian
@@ -4787,10 +4839,32 @@ void write_int16(QByteArray *array, fit_value_t value,  bool is_big_endian) {
     }
 }
 
+void write_uint16(QByteArray *array, fit_value_t value,  bool is_big_endian) {
+    value = is_big_endian
+        ? qFromBigEndian<quint16>( value )
+        : qFromLittleEndian<quint16>( value );
+
+    for (int i=0; i<16; i=i+8) {
+        array->append(value >> i);
+    }
+}
+
 void write_int32(QByteArray *array, fit_value_t value,  bool is_big_endian) {
     value = is_big_endian
         ? qFromBigEndian<qint32>( value )
         : qFromLittleEndian<qint32>( value );
+
+
+
+    for (int i=0; i<32; i=i+8) {
+        array->append(value >> i);
+    }
+}
+
+void write_uint32(QByteArray *array, fit_value_t value,  bool is_big_endian) {
+    value = is_big_endian
+        ? qFromBigEndian<quint32>( value )
+        : qFromLittleEndian<quint32>( value );
 
 
 
@@ -4942,29 +5016,8 @@ void write_file_creator(QByteArray *array) {
 }
 
 void write_session(QByteArray* array, const RideFile* ride, QHash<QString, RideMetricPtr> computed) {
-    QByteArray* fields = new QByteArray();
 
-    write_message_definition(array, FIELD_DESCRIPTION, 0, 7);
-
-    write_field_definition(fields, 3, 64, 0x07); //'core_temperature'
-    write_field_definition(fields, 8, 16, 0x07); //'°C'
-    write_field_definition(fields, 14, 2, 0x84); // 20 - record
-    write_field_definition(fields, 1, 1, 0x02); // uint8 - local id
-    write_field_definition(fields, 2, 1, 0x02); // uint8 - (float32) 136
-    write_field_definition(fields, 15, 1, 0x02); // unit8 - (native#) 139
-    write_field_definition(fields, 0, 1, 0x02); // developer id
-
-    array->append(fields->data(), fields->size());
-    write_int8(array, 0);
-    write_string(array, "CIQ_device_info", 64);
-    write_string(array, "", 16);
-    write_int16(array, 18, true);
-    write_int8(array, 40); // Local num (increment counter?)
-    write_int8(array, 2);
-    write_int8(array, 255); // Native num
-    write_int8(array, 0); // developer id 0
-
-    write_message_definition(array, SESSION_MSG_NUM, 32, 10); // global_msg_num, local_msg_type, num_fields
+    write_message_definition(array, SESSION_MSG_NUM, 0, 10); // global_msg_num, local_msg_type, num_fields
 
     write_field_definition(array, 253, 4, 134); // timestamp (253)
     write_field_definition(array, 254, 2, 132); // message_index (254)
@@ -4976,8 +5029,6 @@ void write_session(QByteArray* array, const RideFile* ride, QHash<QString, RideM
     write_field_definition(array, 7, 4, 134); // total_elapsed_time (7)
     write_field_definition(array, 9, 4, 134); // total_distance (9)
     write_field_definition(array, 28, 1, 0); // trigger (28)
-    write_int8(array, 1);
-    write_field_definition(array, 40, 14, 0); // developer id
 
     // Record ------
     int record_header = 0;
@@ -5024,8 +5075,6 @@ void write_session(QByteArray* array, const RideFile* ride, QHash<QString, RideM
     // 10. trigger
     write_int8(array, 0); // activity end
 
-    uint8_t ciq_id[] = { 127, 19, 55, 95, 253, 25, 0, 0, 1, 2, 0, 0, 0, 0 };
-    array->append((const char*)ciq_id, 14);
 }
 
 void write_lap(QByteArray *array, const RideFile *ride) {
@@ -5187,86 +5236,63 @@ void write_activity(QByteArray *array, const RideFile *ride, QHash<QString,RideM
 
 // Add developer field definitions
 
-void write_dev_fields(QByteArray* array, const RideFile* ride, int local_msg_type)
+int write_dev_fields(QByteArray* array, const RideFile* ride, int local_msg_type)
 {
     int num_fields = 0;
-    QByteArray* fields = new QByteArray();
 
-    if (ride->areDataPresent()->tcore) {
+    const QList<CIQinfo> &ciqlist = ride->ciqinfo();
+    //Do we have developer field definitions?
+    if (!ciqlist.empty()){
+        foreach (CIQinfo ciqinfo, ciqlist)
+        {
+            int dev_idx = ciqinfo.devid;
+            QByteArray* fields = new QByteArray();
 
-        // Minimal developer header
-        write_message_definition(array, 207, local_msg_type, 5); // global_msg_num, local_msg_type, num_fields
-        write_field_definition(array, 0, 16, 13); // developer id
-        write_field_definition(array, 1, 16, 13); // application id
-        write_field_definition(array, 2, 2, 132); // manufacturer_id
-        write_field_definition(array, 3, 1, 2); // developer index
-        write_field_definition(array, 4, 4, 6); // app_version
+            // Minimal developer header
+            write_message_definition(array, 207, local_msg_type, 3); // global_msg_num, local_msg_type, num_fields
+            write_field_definition(array, 1, 16, 13); // application id
+            write_field_definition(array, 3, 1, 2);   // developer index
+            write_field_definition(array, 4, 4, 6);   // app_version
 
-        uint8_t app_id[] = { 105, 87, 254, 104, 131, 254, 78, 214, 134, 19, 65, 63, 112, 98, 75, 181 };
-        uint8_t dev_id[] = { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 };
+            QString tmpid(ciqinfo.appid);
+            tmpid.remove('-');//why bother adding the hyphens?
+            QByteArray byteArray = QByteArray::fromHex(tmpid.toUtf8());
 
-        write_int8(array, 0);
-        array->append((const char*)dev_id, 16);
-        array->append((const char*)app_id, 16);
-        write_int16(array, 65535, true); // Invalid
-        write_int8(array, 0);
-        write_int32(array, 42, true);
+            write_int8(array, 0);
+            array->append((const char*)byteArray.data(), 16);
+            write_int8(array, dev_idx);
+            write_int32(array, ciqinfo.ver, true);
 
-        // Store core temerature as a developer field until included in ANT spec
-        write_field_definition(fields, 3, 64, 0x07); //'core_temperature'
-        write_field_definition(fields, 8, 16, 0x07); //'°C'
-        write_field_definition(fields, 14, 2, 0x84); // 20 - record
-        write_field_definition(fields, 1, 1, 0x02); // uint8 - local id
-        write_field_definition(fields, 2, 1, 0x02); // uint8 - (float32) 136
-        write_field_definition(fields, 15, 1, 0x02); // unit8 - (native#) 139
-        write_field_definition(fields, 0, 1, 0x02); // developer id
+            //Add field definitions
+            write_field_definition(fields, 3, 64, 0x07); // field name
+            write_field_definition(fields, 8, 16, 0x07); // units
+            write_field_definition(fields, 14, 2, 0x84); // native-msg (20)
+            write_field_definition(fields, 1, 1, 0x02);  // field_definition id
+            write_field_definition(fields, 2, 1, 0x02);  // fit base type
+            write_field_definition(fields, 15, 1, 0x02); // native field#
+            write_field_definition(fields, 0, 1, 0x02);  // developer id            
+            write_field_definition(fields, 6, 1, 0x02); // scale - uint
+            write_field_definition(fields, 7, 1, 0x01); // offset - sint
 
-        num_fields = 7;
+            foreach (CIQfield field, ciqinfo.fields) {
+                write_message_definition(array, FIELD_DESCRIPTION, local_msg_type, 9);
+                array->append(fields->data(), fields->size());
+                write_int8(array, 0);
+                write_string(array, field.name.toStdString().c_str(), 64);
+                write_string(array, field.unit.toStdString().c_str(), 16);
+                write_int16(array, 20, true);                             // record type
+                write_int8(array, field.id);                              // Local num
+                write_int8(array, typeToFIT(field.type));                 // type
+                write_int8(array, field.nativeid);                        // Native num
+                write_int8(array, dev_idx);                               // developer id
+                write_uint8(array, (field.scale < 0) ? 255 : field.scale);  // Scale
+                write_int8(array, (field.offset < 0) ? 127 : field.offset); // Offset
 
-        write_message_definition(array, FIELD_DESCRIPTION, local_msg_type, num_fields);
-        array->append(fields->data(), fields->size());
-        write_int8(array, 0);
-        write_string(array, "core_temperature", 64);
-        write_string(array, "°C", 16);
-        write_int16(array, 20, true);
-        write_int8(array, /*8*/ 0); // Local num (increment counter?)
-        write_int8(array, 136);
-        write_int8(array, 139); // Native num
-        write_int8(array, 0); // developer id 0
-
-        write_message_definition(array, FIELD_DESCRIPTION, local_msg_type, num_fields);
-        array->append(fields->data(), fields->size());
-        write_int8(array, 0);
-        write_string(array, "skin_temperature", 64);
-        write_string(array, "°C", 16);
-        write_int16(array, 20, true); // record
-        write_int8(array, 10); // Local num (increment counter?)
-        write_int8(array, 136);
-        write_int8(array, 255); // Native num
-        write_int8(array, 0); // developer id 0
-
-        write_message_definition(array, FIELD_DESCRIPTION, local_msg_type, num_fields);
-        array->append(fields->data(), fields->size());
-        write_int8(array, 0);
-        write_string(array, "core_data_quality", 64);
-        write_string(array, "Q", 16);
-        write_int16(array, 20, true); // record
-        write_int8(array, 19); // Local num (increment counter?)
-        write_int8(array, 131);
-        write_int8(array, 255); // Native num
-        write_int8(array, 0); // developer id 0
-
-        write_message_definition(array, FIELD_DESCRIPTION, local_msg_type, num_fields);
-        array->append(fields->data(), fields->size());
-        write_int8(array, 0);
-        write_string(array, "core_reserved", 64);
-        write_string(array, "kcal", 16);
-        write_int16(array, 20, true); // record
-        write_int8(array, 20); // Local num (increment counter?)
-        write_int8(array, 131);
-        write_int8(array, 255); // Native num
-        write_int8(array, 0); // developer id 0
+                num_fields++;
+            }
+        }
     }
+    return num_fields;
 }
 
 void write_record_definition(QByteArray *array, const RideFile *ride, QMap<int, int> *local_msg_type_for_record_type, bool withAlt, bool withWatts, bool withHr, bool withCad, int type) {
@@ -5318,16 +5344,28 @@ void write_record_definition(QByteArray *array, const RideFile *ride, QMap<int, 
 
     int local_msg_type = local_msg_type_for_record_type->values().count()+1;
 
-    bool withDev = false;
     // Do we need our developer fields adding?
-    if (ride->areDataPresent()->tcore) {
+    bool withDev = false;
+    const QList<CIQinfo> &ciqlist = ride->ciqinfo();
+
+    //Do we have developer field definitions?
+    if (!ciqlist.empty()){
         withDev = true;
-        write_dev_fields(array, ride, 0); // add custom field definitions
+        int numfields = write_dev_fields(array, ride, 0); // add custom field definitions
 
-        write_int8(fields, 1); // one dev field
-        write_field_definition(fields, /*8*/ 0, 4, 0); // tcore
+        write_int8(fields, numfields);
+
+        foreach (CIQinfo ciqinfo, ciqlist)
+        {
+            int dev_idx = ciqinfo.devid;
+
+            foreach (CIQfield field, ciqinfo.fields)
+            {
+                write_field_definition(fields, field.id, typeLength(field.type), dev_idx);
+            }
+        }
     }
-
+    
     // Add developer field flag to header
     write_message_definition(array, RECORD_MSG_NUM, local_msg_type | (withDev ? 32 : 0), num_fields); // global_msg_num, local_msg_type, num_fields
 
@@ -5339,6 +5377,7 @@ void write_record_definition(QByteArray *array, const RideFile *ride, QMap<int, 
 void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool withWatts, bool withHr, bool withCad ) {
     QMap<int, int> *local_msg_type_for_record_type = new QMap<int, int>();
 
+    int xdata_cur=0; //cursor into core xdata
     // Record ------
     foreach (const RideFilePoint *point, ride->dataPoints()) {
         int type = 0;
@@ -5397,13 +5436,51 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
             // write right power contribution
             write_int8(ridePoint, 0x80 + (100-point->lrbalance));
         }
-        if (ride->areDataPresent()->tcore) {
-            write_float32(ridePoint, point->tcore, true);
-        }
 
+        const QList<CIQinfo> &ciqlist = ride->ciqinfo();
+        //Do we have developer field definitions?
+        if (!ciqlist.empty()){
+            foreach (CIQinfo ciqinfo, ciqlist)
+            {
+                int dev_idx = ciqinfo.devid;
+                static_cast<void>(dev_idx);
+
+                foreach (CIQfield ciqfield, ciqinfo.fields)
+                {
+                    double val = ride->xdataValue(point, xdata_cur, "DEVELOPER", ciqfield.name, RideFile::REPEAT);
+                    int id = FITbasetypes.indexOf(ciqfield.type);
+                    switch (id){ //limited set supported
+                    case 1:
+                        write_int8(ridePoint, val);
+                        break;
+                    case 2:
+                        write_uint8(ridePoint, val);
+                        break;
+                    case 3:
+                        write_int16(ridePoint, val, true);
+                        break;
+                    case 4:
+                        write_uint16(ridePoint, val, true);
+                        break;
+                    case 5:
+                        write_int32(ridePoint, val, true);
+                        break;
+                    case 6:
+                        write_uint32(ridePoint, val, true);
+                        break;
+                    case 8:
+                        write_float32(ridePoint, val, true);
+                        break;
+                    default:
+                        fprintf(stderr,"ERROR TYPE % CURRENTLY UNSUPPORTED\n",ciqfield.type); fflush(stderr);
+                    }
+                }
+            }
+        }
         array->append(ridePoint->data(), ridePoint->size());
     }
 
+    delete local_msg_type_for_record_type;
 }
 
 QByteArray
@@ -5471,8 +5548,5 @@ FitFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file
     file.close();
     return(true);
 }
-
-
-
 
 
