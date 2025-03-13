@@ -89,7 +89,7 @@
 #endif
 
 TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(context),
-    bicycle(context), stopping(false)
+    bicycle(context)
 {
     // Athlete
     FTP=285; // default to 285 if zones are not set
@@ -1231,9 +1231,7 @@ TrainSidebar::mediaTreeWidgetSelectionChanged()
     QModelIndex current = mediaTree->currentIndex();
     QModelIndex target = vsortModel->mapToSource(current);
     QString filename = videoModel->data(videoModel->index(target.row(), TdbVideoModelIdx::filepath), Qt::DisplayRole).toString();
-    // Called also when stopping, but in such case, we do not care about selection/deselection
-    // of video: we do not have to change its selection at all
-    if (filename == context->videoFilename && !stopping) {
+    if (filename == context->videoFilename) {
         mediafile = "";
         context->notifyMediaSelected(""); // CTRL+Click to clear selection
     } else {
@@ -1399,6 +1397,9 @@ void TrainSidebar::Start()       // when start button is pressed
             foreach(int dev, activeDevices) Devices[dev].controller->setMode(RT_MODE_SPIN);
         }
 
+        // tell the world
+        context->notifyStart();
+
         // we're away!
         setStatusFlags(RT_RUNNING);
 
@@ -1527,7 +1528,6 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
 void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
 {
     if ((status&RT_RUNNING) == 0) return;
-    stopping = true;
 
     // re-enable the screen saver on Windows
 #ifdef WIN32
@@ -1679,8 +1679,6 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     guiUpdate();
 
     emit setNotification(tr("Stopped.."), 2);
-
-    stopping = false;
 
     return;
 }
