@@ -517,10 +517,10 @@ CloudDBHeader::getAllCachedHeader(QList<CommonAPIHeaderV1> *objectHeader, CloudD
 
         // wait for reply (synchronously) and process error codes as necessary
         if (!CloudDBCommon::replyReceivedAndOk(reply)) { 
-		    delete retrievedHeader;
-			delete newHeader;
-            return false;
-		};
+            delete retrievedHeader;
+            delete newHeader;
+            return true; // Allow the user to use cached data when CloudDB is not available
+        };
 
         QByteArray result = reply->readAll();
         retrievedHeader->clear();
