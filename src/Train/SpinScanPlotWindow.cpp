@@ -149,6 +149,8 @@ SpinScanPlotWindow::telemetryUpdate(RealtimeData rtData)
     memcpy(history[current++], rtData.spinScan, 24);
     if (current==16) current=0;
 
-    plPlot->replot();                // redraw
-    rtPlot->replot();                // redraw
+    if (isVisible()) {
+        plPlot->replot();                // redraw
+        rtPlot->replot();                // redraw
+    }
 }

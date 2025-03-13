@@ -565,6 +565,9 @@ void VideoWindow::resumePlayback()
 
 void VideoWindow::telemetryUpdate(RealtimeData rtd)
 {
+    if (!isVisible())
+        return;
+
     Lock lock(stateLock);
     if (!hasActiveVideo())
         return;

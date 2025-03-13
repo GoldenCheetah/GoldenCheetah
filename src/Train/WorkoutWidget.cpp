@@ -114,6 +114,12 @@ WorkoutWidget::WorkoutWidget(WorkoutWindow *parent, Context *context) :
     configChanged(CONFIG_APPEARANCE);
 }
 
+void WorkoutWidget::update()
+{
+    if (isVisible())
+        QWidget::update();
+}
+
 void
 WorkoutWidget::updateErgFile(ErgFile *f)
 {
@@ -188,7 +194,8 @@ WorkoutWidget::stop()
 void
 WorkoutWidget::setNow(long x)
 {
-    ensureVisible(x/1000);
+    if (isVisible())
+        ensureVisible(x/1000);
 }
 
 void
@@ -311,6 +318,8 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
 {
     // process as normal if not one of ours
     if (obj != this) return false;
+    if (!isVisible())
+        return false;
 
     // is a repaint going to be needed?
     bool updateNeeded=false;
