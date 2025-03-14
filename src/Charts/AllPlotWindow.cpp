@@ -22,6 +22,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "AbstractView.h"
+#include "ActionButtonBox.h"
 #include "AllPlotInterval.h"
 #include "AllPlotWindow.h"
 #include "AllPlot.h"
@@ -141,42 +142,16 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     connect(customTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(doubleClicked(int, int)));
 
     // custom buttons
-    editCustomButton = new QPushButton(tr("Edit"));
-    connect(editCustomButton, SIGNAL(clicked()), this, SLOT(editUserData()));
+    ActionButtonBox *customActionButtons = new ActionButtonBox(ActionButtonBox::UpDownGroup | ActionButtonBox::EditGroup | ActionButtonBox::AddDeleteGroup);
 
-    addCustomButton = new QPushButton("+");
-    connect(addCustomButton, SIGNAL(clicked()), this, SLOT(addUserData()));
+    customActionButtons->defaultConnect(customTable);
+    connect(customActionButtons, &ActionButtonBox::upRequested, this, &AllPlotWindow::moveUserDataUp);
+    connect(customActionButtons, &ActionButtonBox::downRequested, this, &AllPlotWindow::moveUserDataDown);
+    connect(customActionButtons, &ActionButtonBox::editRequested, this, &AllPlotWindow::editUserData);
+    connect(customActionButtons, &ActionButtonBox::addRequested, this, &AllPlotWindow::addUserData);
+    connect(customActionButtons, &ActionButtonBox::deleteRequested, this, &AllPlotWindow::deleteUserData);
 
-    deleteCustomButton = new QPushButton("-");
-    connect(deleteCustomButton, SIGNAL(clicked()), this, SLOT(deleteUserData()));
-
-#ifndef Q_OS_MAC
-    upCustomButton = new QToolButton(this);
-    downCustomButton = new QToolButton(this);
-    upCustomButton->setArrowType(Qt::UpArrow);
-    downCustomButton->setArrowType(Qt::DownArrow);
-    upCustomButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    downCustomButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    addCustomButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    deleteCustomButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    upCustomButton = new QPushButton(tr("Up"));
-    downCustomButton = new QPushButton(tr("Down"));
-#endif
-    connect(upCustomButton, SIGNAL(clicked()), this, SLOT(moveUserDataUp()));
-    connect(downCustomButton, SIGNAL(clicked()), this, SLOT(moveUserDataDown()));
-
-
-    QHBoxLayout *customButtons = new QHBoxLayout;
-    customButtons->setSpacing(2 *dpiXFactor);
-    customButtons->addWidget(upCustomButton);
-    customButtons->addWidget(downCustomButton);
-    customButtons->addStretch();
-    customButtons->addWidget(editCustomButton);
-    customButtons->addStretch();
-    customButtons->addWidget(addCustomButton);
-    customButtons->addWidget(deleteCustomButton);
-    customLayout->addLayout(customButtons);
+    customLayout->addWidget(customActionButtons);
 
     // Main layout
     //QGridLayout *mainLayout = new QGridLayout();

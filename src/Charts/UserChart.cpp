@@ -20,6 +20,7 @@
 
 #include "Colors.h"
 #include "AbstractView.h"
+#include "ActionButtonBox.h"
 #include "RideFileCommand.h"
 #include "Utils.h"
 #include "AthleteTab.h"
@@ -867,42 +868,15 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     connect(seriesTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(seriesClicked(int, int)));
 
     // custom buttons
-    editSeriesButton = new QPushButton(tr("Edit"));
-    connect(editSeriesButton, SIGNAL(clicked()), this, SLOT(editSeries()));
+    ActionButtonBox *seriesActionButtons = new ActionButtonBox(ActionButtonBox::UpDownGroup | ActionButtonBox::EditGroup | ActionButtonBox::AddDeleteGroup);
+    seriesActionButtons->defaultConnect(seriesTable);
+    connect(seriesActionButtons, &ActionButtonBox::editRequested, this, &UserChartSettings::editSeries);
+    connect(seriesActionButtons, &ActionButtonBox::addRequested, this, &UserChartSettings::addSeries);
+    connect(seriesActionButtons, &ActionButtonBox::deleteRequested, this, &UserChartSettings::deleteSeries);
+    connect(seriesActionButtons, &ActionButtonBox::upRequested, this, &UserChartSettings::moveSeriesUp);
+    connect(seriesActionButtons, &ActionButtonBox::downRequested, this, &UserChartSettings::moveSeriesDown);
 
-    addSeriesButton = new QPushButton("+");
-    connect(addSeriesButton, SIGNAL(clicked()), this, SLOT(addSeries()));
-
-    deleteSeriesButton = new QPushButton("-");
-    connect(deleteSeriesButton, SIGNAL(clicked()), this, SLOT(deleteSeries()));
-
-#ifndef Q_OS_MAC
-    upSeriesButton = new QToolButton(this);
-    downSeriesButton = new QToolButton(this);
-    upSeriesButton->setArrowType(Qt::UpArrow);
-    downSeriesButton->setArrowType(Qt::DownArrow);
-    upSeriesButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    downSeriesButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    addSeriesButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    deleteSeriesButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    upSeriesButton = new QPushButton(tr("Up"));
-    downSeriesButton = new QPushButton(tr("Down"));
-#endif
-    connect(upSeriesButton, SIGNAL(clicked()), this, SLOT(moveSeriesUp()));
-    connect(downSeriesButton, SIGNAL(clicked()), this, SLOT(moveSeriesDown()));
-
-
-    QHBoxLayout *seriesButtons = new QHBoxLayout;
-    seriesButtons->setSpacing(2 *dpiXFactor);
-    seriesButtons->addWidget(upSeriesButton);
-    seriesButtons->addWidget(downSeriesButton);
-    seriesButtons->addStretch();
-    seriesButtons->addWidget(editSeriesButton);
-    seriesButtons->addStretch();
-    seriesButtons->addWidget(addSeriesButton);
-    seriesButtons->addWidget(deleteSeriesButton);
-    seriesLayout->addLayout(seriesButtons);
+    seriesLayout->addWidget(seriesActionButtons);
 
     // Axes tab
     // axis tab
@@ -929,31 +903,15 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     connect(axisTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(axisClicked(int, int)));
 
     // custom buttons
-    editAxisButton = new QPushButton(tr("Edit"));
-    connect(editAxisButton, SIGNAL(clicked()), this, SLOT(editAxis()));
+    ActionButtonBox *axisActionButtons = new ActionButtonBox(ActionButtonBox::EditGroup);
+    axisActionButtons->defaultConnect(axisTable);
+    connect(axisActionButtons, &ActionButtonBox::editRequested, this, &UserChartSettings::editAxis);
 
     // we don't allow axes to be created, since they are
     // implied by the data series that we add
     // this might change in the future
 
-    //addAxisButton = new QPushButton("+");
-    //connect(addAxisButton, SIGNAL(clicked()), this, SLOT(addAxis()));
-
-    //deleteAxisButton = new QPushButton("-");
-    //connect(deleteAxisButton, SIGNAL(clicked()), this, SLOT(deleteAxis()));
-
-    //addAxisButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    //deleteAxisButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-
-
-    QHBoxLayout *axisButtons = new QHBoxLayout;
-    axisButtons->setSpacing(2 *dpiXFactor);
-    axisButtons->addStretch();
-    axisButtons->addWidget(editAxisButton);
-    axisButtons->addStretch();
-    //axisButtons->addWidget(addAxisButton);
-    //axisButtons->addWidget(deleteAxisButton);
-    axisLayout->addLayout(axisButtons);
+    axisLayout->addWidget(axisActionButtons);
 
     // watch for chartinfo edits (the series/axis stuff is managed by separate dialogs)
     connect(title, SIGNAL(textChanged(QString)), this, SLOT(updateChartInfo()));

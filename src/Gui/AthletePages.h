@@ -80,7 +80,6 @@ class MeasuresPage : public QWidget
         NoEditDelegate origSourceDelegate;
 
         QTreeWidget *measuresTree;
-        QPushButton *addButton, *deleteButton;
 
         void fillItemFromMeasures(int rnum, QTreeWidgetItem *item) const;
 
@@ -219,7 +218,6 @@ class CredentialsPage : public QScrollArea
 
         Context *context;
         QTreeWidget *accounts;
-        QPushButton *addButton, *editButton, *deleteButton;
 
 };
 
@@ -239,12 +237,10 @@ class SchemePage : public QWidget
     private slots:
         void addClicked();
         void deleteClicked();
-        void updateButtons();
 
     private:
         Zones *zones;
         QTreeWidget *scheme;
-        QPushButton *addButton, *deleteButton;
         SpinBoxEditDelegate zoneFromDelegate;
 };
 
@@ -310,7 +306,6 @@ class CPPage : public QWidget
 #endif
 
         void review();
-        void updateButtons();
 
     private:
         bool active;
@@ -330,9 +325,8 @@ class CPPage : public QWidget
         SchemePage *schemePage;
         TreeWidget6 *ranges;
         QTreeWidget *zones;
-        QPushButton *addButton, *deleteButton;
         QPushButton *reviewButton;
-        QPushButton *addZoneButton, *deleteZoneButton, *defaultButton;
+        QPushButton *defaultButton;
         QPushButton *newZoneRequired;
 
         bool getValuesFor(const QDate &date, bool allowDefaults, int &cp, int &aetp, int &ftp, int &wprime, int &pmax, int &estOffset, bool &defaults, QDate *startDate = nullptr) const;
@@ -402,12 +396,10 @@ class HrSchemePage : public QWidget
     private slots:
         void addClicked();
         void deleteClicked();
-        void updateButtons();
 
     private:
         HrZones *hrZones;
         QTreeWidget *scheme;
-        QPushButton *addButton, *deleteButton;
 
         SpinBoxEditDelegate ltDelegate;
         DoubleSpinBoxEditDelegate trimpkDelegate;
@@ -430,7 +422,6 @@ class LTPage : public QWidget
         void addZoneClicked();
         void deleteZoneClicked();
         void zonesChanged();
-        void updateButtons();
 
     private:
         bool active;
@@ -449,8 +440,7 @@ class LTPage : public QWidget
         HrSchemePage *schemePage;
         QTreeWidget *ranges;
         QTreeWidget *zones;
-        QPushButton *addButton, *deleteButton;
-        QPushButton *addZoneButton, *deleteZoneButton, *defaultButton;
+        QPushButton *defaultButton;
 };
 
 class HrZonePage : public QWidget
@@ -497,12 +487,10 @@ class PaceSchemePage : public QWidget
     private slots:
         void addClicked();
         void deleteClicked();
-        void updateButtons();
 
     private:
         PaceZones* paceZones;
         QTreeWidget *scheme;
-        QPushButton *addButton, *deleteButton;
         SpinBoxEditDelegate fromDelegate;
 };
 
@@ -528,7 +516,6 @@ class CVPage : public QWidget
         void addZoneClicked();
         void deleteZoneClicked();
         void zonesChanged();
-        void updateButtons();
 
     private:
         bool active;
@@ -543,8 +530,7 @@ class CVPage : public QWidget
         PaceSchemePage *schemePage;
         QTreeWidget *ranges;
         QTreeWidget *zones;
-        QPushButton *addButton, *deleteButton;
-        QPushButton *addZoneButton, *deleteZoneButton, *defaultButton;
+        QPushButton *defaultButton;
         QLabel *per;
 };
 
@@ -648,14 +634,6 @@ class AutoImportPage : public QWidget
         QTreeWidget *fields;
         ComboBoxDelegate ruleDelegate;
         DirectoryPathDelegate dirDelegate;
-
-#ifndef Q_OS_MAC
-        QToolButton *upButton, *downButton;
-#else
-        QPushButton *upButton, *downButton;
-#endif
-        QPushButton *addButton, *renameButton, *deleteButton, *browseButton;
-
 };
 
 #endif

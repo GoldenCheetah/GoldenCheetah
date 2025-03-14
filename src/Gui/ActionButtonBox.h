@@ -24,8 +24,7 @@
 #include <QToolButton>
 #endif
 #include <QHBoxLayout>
-#include <QTreeWidget>
-#include <QListWidget>
+#include <QAbstractItemView>
 
 
 class ActionButtonBox : public QWidget {
@@ -53,29 +52,31 @@ class ActionButtonBox : public QWidget {
             Right = 1
         };
 
-	ActionButtonBox(StandardButtonGroups standardButtonGroups, QWidget *parent = nullptr);
+        ActionButtonBox(StandardButtonGroups standardButtonGroups, QWidget *parent = nullptr);
 
         QAbstractButton *which(StandardButton which) const;
 
-	void setButtonHidden(StandardButton standardButton, bool hidden);
-	void setButtonEnabled(StandardButton standardButton, bool enabled);
+        void setButtonHidden(StandardButton standardButton, bool hidden);
+        void setButtonEnabled(StandardButton standardButton, bool enabled);
 
-	QPushButton *addButton(const QString &text, ActionPosition pos = ActionPosition::Left);
-	void addWidget(QWidget *widget);
-	void addStretch(ActionPosition pos = ActionPosition::Left);
+        QPushButton *addButton(const QString &text, ActionPosition pos = ActionPosition::Left);
+        void addWidget(QWidget *widget);
+        void addStretch(ActionPosition pos = ActionPosition::Left);
 
-        void defaultConnect(StandardButtonGroup group, QTreeWidget *tree);
-        void defaultConnect(StandardButtonGroup group, QListWidget *list);
+        void defaultConnect(QAbstractItemView *view);
+        void defaultConnect(StandardButtonGroup group, QAbstractItemView *view);
+
+        void setMaxViewItems(int maxItems);
 
     signals:
-	void upRequested();
-	void downRequested();
-	void addRequested();
-	void deleteRequested();
-	void editRequested();
+        void upRequested();
+        void downRequested();
+        void addRequested();
+        void deleteRequested();
+        void editRequested();
 
     private:
-	QHBoxLayout *layout;
+        QHBoxLayout *layout;
 #ifdef Q_OS_MAC
         QPushButton *up = nullptr;
         QPushButton *down = nullptr;
@@ -83,16 +84,16 @@ class ActionButtonBox : public QWidget {
         QToolButton *up = nullptr;
         QToolButton *down = nullptr;
 #endif
-	QPushButton *add = nullptr;
-	QPushButton *del = nullptr;
-	QPushButton *edit = nullptr;
+        QPushButton *add = nullptr;
+        QPushButton *del = nullptr;
+        QPushButton *edit = nullptr;
 
-	int leftOffset = 0;
-	int rightOffset = 0;
+        int maxViewItems = std::numeric_limits<int>::max();
 
-        void updateButtonState(StandardButtonGroup group, QTreeWidget *tree);
-        void updateButtonState(StandardButtonGroup group, QListWidget *list);
-        void defaultConnectInit(StandardButtonGroup group);
+        int leftOffset = 0;
+        int rightOffset = 0;
+
+        void updateButtonState(StandardButtonGroup group, QAbstractItemView *view);
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(ActionButtonBox::StandardButtonGroups)
