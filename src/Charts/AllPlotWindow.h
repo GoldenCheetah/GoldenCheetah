@@ -370,12 +370,6 @@ class AllPlotWindow : public GcChartWindow
         // User data tab
         QWidget *custom;
         QTableWidget *customTable;
-        QPushButton *editCustomButton, *addCustomButton, *deleteCustomButton;
-#ifndef Q_OS_MAC
-        QToolButton *upCustomButton, *downCustomButton;
-#else
-        QPushButton *upCustomButton, *downCustomButton;
-#endif
         void refreshCustomTable(int indexSelectedItem = -1); // refreshes the table from LTMSettings
 
     private:

@@ -153,16 +153,9 @@ class UserChartSettings : public QWidget {
 
         // series tab
         QTableWidget *seriesTable;
-        QPushButton *editSeriesButton, *addSeriesButton, *deleteSeriesButton;
-#ifndef Q_OS_MAC
-        QToolButton *upSeriesButton, *downSeriesButton;
-#else
-        QPushButton *upSeriesButton, *downSeriesButton;
-#endif
 
         // axes tab
         QTableWidget *axisTable;
-        QPushButton *editAxisButton, *addAxisButton, *deleteAxisButton;
 
     public slots:
 

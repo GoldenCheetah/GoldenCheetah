@@ -18,6 +18,7 @@
 
 #include "LTMTool.h"
 #include "MainWindow.h"
+#include "ActionButtonBox.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "Settings.h"
@@ -265,42 +266,15 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     connect(customTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(doubleClicked(int, int)));
 
     // custom buttons
-    editCustomButton = new QPushButton(tr("Edit"));
-    connect(editCustomButton, SIGNAL(clicked()), this, SLOT(editMetric()));
+    customActionButtons = new ActionButtonBox(ActionButtonBox::UpDownGroup | ActionButtonBox::EditGroup | ActionButtonBox::AddDeleteGroup);
+    customActionButtons->defaultConnect(customTable);
+    connect(customActionButtons, &ActionButtonBox::editRequested, this, &LTMTool::editMetric);
+    connect(customActionButtons, &ActionButtonBox::addRequested, this, &LTMTool::addMetric);
+    connect(customActionButtons, &ActionButtonBox::deleteRequested, this, &LTMTool::deleteMetric);
+    connect(customActionButtons, &ActionButtonBox::upRequested, this, &LTMTool::moveMetricUp);
+    connect(customActionButtons, &ActionButtonBox::downRequested, this, &LTMTool::moveMetricDown);
 
-    addCustomButton = new QPushButton("+");
-    connect(addCustomButton, SIGNAL(clicked()), this, SLOT(addMetric()));
-
-    deleteCustomButton = new QPushButton("-");
-    connect(deleteCustomButton, SIGNAL(clicked()), this, SLOT(deleteMetric()));
-
-#ifndef Q_OS_MAC
-    upCustomButton = new QToolButton(this);
-    downCustomButton = new QToolButton(this);
-    upCustomButton->setArrowType(Qt::UpArrow);
-    downCustomButton->setArrowType(Qt::DownArrow);
-    upCustomButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    downCustomButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    addCustomButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    deleteCustomButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    upCustomButton = new QPushButton(tr("Up"));
-    downCustomButton = new QPushButton(tr("Down"));
-#endif
-    connect(upCustomButton, SIGNAL(clicked()), this, SLOT(moveMetricUp()));
-    connect(downCustomButton, SIGNAL(clicked()), this, SLOT(moveMetricDown()));
-
-
-    QHBoxLayout *customButtons = new QHBoxLayout;
-    customButtons->setSpacing(2 *dpiXFactor);
-    customButtons->addWidget(upCustomButton);
-    customButtons->addWidget(downCustomButton);
-    customButtons->addStretch();
-    customButtons->addWidget(editCustomButton);
-    customButtons->addStretch();
-    customButtons->addWidget(addCustomButton);
-    customButtons->addWidget(deleteCustomButton);
-    customLayout->addLayout(customButtons);
+    customLayout->addWidget(customActionButtons);
 
     //----------------------------------------------------------------------------------------------------------
     // setup the Tabs
@@ -1245,12 +1219,7 @@ LTMTool::hideBasic()
 void
 LTMTool::usePresetChanged()
 {
-    customTable->setEnabled(!usePreset->isChecked());
-    editCustomButton->setEnabled(!usePreset->isChecked());
-    addCustomButton->setEnabled(!usePreset->isChecked());
-    deleteCustomButton->setEnabled(!usePreset->isChecked());
-    upCustomButton->setEnabled(!usePreset->isChecked());
-    downCustomButton->setEnabled(!usePreset->isChecked());
+    customActionButtons->setEnabled(!usePreset->isChecked());
 
     // yuck .. this doesn't work nicely !
     //basic->setHidden(usePreset->isChecked());

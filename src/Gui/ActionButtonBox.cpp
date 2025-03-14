@@ -73,7 +73,9 @@ ActionButtonBox::ActionButtonBox
         add->setText(tr("Add"));
         del->setText(tr("Delete"));
 #else
+        add->setStyleSheet("QPushButton { padding: 0px; }");
         add->setFixedSize(20 * dpiXFactor, 20 * dpiYFactor);
+        del->setStyleSheet("QPushButton { padding: 0px; }");
         del->setFixedSize(20 * dpiXFactor, 20 * dpiYFactor);
 #endif
         layout->addItem(new QSpacerItem(5 * dpiXFactor, 0));
@@ -169,111 +171,68 @@ ActionButtonBox::addStretch
 
 void
 ActionButtonBox::defaultConnect
-(StandardButtonGroup group, QTreeWidget *tree)
+(QAbstractItemView *view)
 {
-    defaultConnectInit(group);
-    connect(tree, &QTreeWidget::currentItemChanged, [=]() {
-            updateButtonState(group, tree);
-        });
-    // Also listen for rowsRemoved as currentItemChanged fires to early (count of tree not yet reduced)
-    connect(tree->model(), &QAbstractItemModel::rowsRemoved, [=]() {
-            updateButtonState(group, tree);
-        });
+    if (up != nullptr && down != nullptr) {
+        defaultConnect(UpDownGroup, view);
+    }
+    if (add != nullptr && del != nullptr) {
+        defaultConnect(AddDeleteGroup, view);
+    }
+    if (edit != nullptr) {
+        defaultConnect(EditGroup, view);
+    }
 }
 
 
 void
 ActionButtonBox::defaultConnect
-(StandardButtonGroup group, QListWidget *list)
+(StandardButtonGroup group, QAbstractItemView *view)
 {
-    defaultConnectInit(group);
-    connect(list, &QListWidget::currentItemChanged, [=]()
-        {
-            updateButtonState(group, list);
-        }
-    );
-    // Also listen for rowsRemoved as currentItemChanged fires to early (count of list not yet reduced)
-    connect(list->model(), &QAbstractItemModel::rowsRemoved, [=]()
-        {
-            updateButtonState(group, list);
-        }
-    );
+    connect(view->selectionModel(), &QItemSelectionModel::currentChanged, [=]() {
+        updateButtonState(group, view);
+    });
+    // Also listen for rowsRemoved as currentItemChanged fires to early (count of tree not yet reduced)
+    connect(view->model(), &QAbstractItemModel::rowsRemoved, [=]() {
+        updateButtonState(group, view);
+    });
+    connect(view->model(), &QAbstractItemModel::rowsInserted, [=]() {
+        updateButtonState(group, view);
+    });
+    updateButtonState(group, view);
+}
+
+
+void
+ActionButtonBox::setMaxViewItems
+(int maxItems)
+{
+    maxViewItems = maxItems;
 }
 
 
 void
 ActionButtonBox::updateButtonState
-(StandardButtonGroup group, QTreeWidget *tree)
+(StandardButtonGroup group, QAbstractItemView *view)
 {
-    QTreeWidgetItem *item = tree->currentItem();
+    QModelIndex index = view->selectionModel()->currentIndex();
     switch (group) {
     case UpDownGroup:
         if (up != nullptr && down != nullptr) {
-            up->setEnabled(item != nullptr && tree->currentIndex().row() > 0);
-            down->setEnabled(item != nullptr && tree->currentIndex().row() < tree->invisibleRootItem()->childCount() - 1);
+            up->setEnabled(index.isValid() && index.row() > 0);
+            down->setEnabled(index.isValid() && index.row() < index.model()->rowCount() - 1);
         }
         break;
     case AddDeleteGroup:
         if (add != nullptr && del != nullptr) {
-            add->setEnabled(true);
-            del->setEnabled(item != nullptr);
+            add->setEnabled(view->model()->rowCount() < maxViewItems);
+            del->setEnabled(index.isValid());
         }
         break;
     case EditGroup:
         if (edit != nullptr) {
-            edit->setEnabled(item != nullptr);
+            edit->setEnabled(index.isValid());
         }
-        break;
-    default:
-        break;
-    }
-}
-
-
-void
-ActionButtonBox::updateButtonState
-(StandardButtonGroup group, QListWidget *list)
-{
-    QListWidgetItem *item = list->currentItem();
-    switch (group) {
-    case UpDownGroup:
-        if (up != nullptr && down != nullptr) {
-            up->setEnabled(item != nullptr && list->row(item) > 0);
-            down->setEnabled(item != nullptr && list->row(item) < list->count() - 1);
-        }
-        break;
-    case AddDeleteGroup:
-        if (add != nullptr && del != nullptr) {
-            add->setEnabled(true);
-            del->setEnabled(item != nullptr);
-        }
-        break;
-    case EditGroup:
-        if (edit != nullptr) {
-            edit->setEnabled(item != nullptr);
-        }
-        break;
-    default:
-        break;
-    }
-}
-
-
-void
-ActionButtonBox::defaultConnectInit
-(StandardButtonGroup group)
-{
-    switch (group) {
-    case UpDownGroup:
-        up->setEnabled(false);
-        down->setEnabled(false);
-        break;
-    case AddDeleteGroup:
-        add->setEnabled(true);
-        del->setEnabled(false);
-        break;
-    case EditGroup:
-        edit->setEnabled(false);
         break;
     default:
         break;

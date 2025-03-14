@@ -26,6 +26,7 @@
 #include "PDModel.h"
 
 #include "SearchFilterBox.h"
+#include "ActionButtonBox.h"
 
 #include <QDir>
 #include <QFileDialog>
@@ -140,12 +141,7 @@ class LTMTool : public QWidget
 
         // custom tab:
         QTableWidget *customTable;
-        QPushButton *editCustomButton, *addCustomButton, *deleteCustomButton;
-#ifndef Q_OS_MAC
-        QToolButton *upCustomButton, *downCustomButton;
-#else
-        QPushButton *upCustomButton, *downCustomButton;
-#endif
+        ActionButtonBox *customActionButtons;
         void refreshCustomTable(int indexSelectedItem = -1); // refreshes the table from LTMSettings
 };
 
