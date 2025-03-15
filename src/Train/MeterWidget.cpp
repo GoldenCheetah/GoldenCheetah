@@ -808,6 +808,10 @@ void ElevationZoomedMeterWidget::updateRidePointsQ(int tDist) {
 
 void ElevationZoomedMeterWidget::scalePointsToPlot() {
 
+    // In the weird situation where a video is selected but workout is not GPS based
+    if (plotQ.empty())
+        return;
+
     double pixelX = -1;
     double pixelY = -1;
     m_zoomedElevationPolygon.clear();
