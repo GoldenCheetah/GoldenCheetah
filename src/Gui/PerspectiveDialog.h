@@ -100,10 +100,6 @@ class PerspectiveDialog : public QDialog
         PerspectiveTableWidget *perspectiveTable;
         ChartTableWidget *chartTable;
 
-        QPushButton *editButton;
-        QPushButton *exportPerspective, *importPerspective;
-        QPushButton *addPerspective, *removePerspective;
-        QToolButton *upPerspective, *downPerspective;
         QLabel *instructions;
 
         QPushButton *closeButton;

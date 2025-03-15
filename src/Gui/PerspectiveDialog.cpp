@@ -18,6 +18,7 @@
 
 #include "PerspectiveDialog.h"
 #include "AbstractView.h"
+#include "ActionButtonBox.h"
 #include "Perspective.h"
 
 #include <QFormLayout>
@@ -72,27 +73,10 @@ PerspectiveDialog::PerspectiveDialog(QWidget *parent, AbstractView *tabView) : Q
     chartTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     chartTable->setDragEnabled(true);
 
-    upPerspective = new QToolButton(this);
-    upPerspective->setArrowType(Qt::UpArrow);
-    downPerspective = new QToolButton(this);
-    downPerspective->setArrowType(Qt::DownArrow);
-    upPerspective->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    downPerspective->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-
-    editButton = new QPushButton(tr("Edit"), this);
-    importPerspective = new QPushButton(tr("Import"), this);
-    exportPerspective = new QPushButton(tr("Export"), this);
-
-    addPerspective = new QPushButton("+", this);
-    removePerspective = new QPushButton("-", this);
-
-#ifdef Q_OS_MAC
-    addPerspective->setText(tr("Add"));
-    removePerspective->setText(tr("Delete"));
-#else
-    addPerspective->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    removePerspective->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#endif
+    ActionButtonBox *actionButtons = new ActionButtonBox(ActionButtonBox::UpDownGroup | ActionButtonBox::EditGroup | ActionButtonBox::AddDeleteGroup);
+    QPushButton *exportPerspective = actionButtons->addButton(tr("Export"), ActionButtonBox::Right);
+    QPushButton *importPerspective = actionButtons->addButton(tr("Import"), ActionButtonBox::Right);
+    actionButtons->setMinViewItems(1);
 
     // not so obvious perhaps
     instructions = new QLabel(tr("Drag charts to move to a perspective"));
@@ -100,19 +84,7 @@ PerspectiveDialog::PerspectiveDialog(QWidget *parent, AbstractView *tabView) : Q
     // lay it out
     mainLayout->addWidget(xlabel);
     mainLayout->addWidget(perspectiveTable);
-    QHBoxLayout *xb = new QHBoxLayout();
-    xb->addWidget(upPerspective);
-    xb->addWidget(downPerspective);
-    xb->addStretch();
-    xb->addWidget(editButton);
-    xb->addStretch();
-    xb->addWidget(importPerspective);
-    xb->addWidget(exportPerspective);
-    xb->addStretch();
-    xb->addWidget(addPerspective);
-    xb->addWidget(removePerspective);
-    mainLayout->addLayout(xb);
-
+    mainLayout->addWidget(actionButtons);
     mainLayout->addWidget(xslabel);
     mainLayout->addWidget(chartTable);
     QHBoxLayout *xs = new QHBoxLayout();
@@ -124,14 +96,14 @@ PerspectiveDialog::PerspectiveDialog(QWidget *parent, AbstractView *tabView) : Q
     connect(perspectiveTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(perspectiveNameChanged(QTableWidgetItem*))); // user edit
     connect(perspectiveTable, SIGNAL(itemDoubleClicked(QTableWidgetItem*)), this, SLOT(editPerspectiveClicked())); // Double click -> edit
 
-    connect(editButton, SIGNAL(clicked(bool)), this, SLOT(editPerspectiveClicked()));
-    connect(importPerspective, SIGNAL(clicked(bool)), this, SLOT(importPerspectiveClicked()));
-    connect(exportPerspective, SIGNAL(clicked(bool)), this, SLOT(exportPerspectiveClicked()));
-
-    connect(removePerspective, SIGNAL(clicked(bool)), this, SLOT(removePerspectiveClicked()));
-    connect(addPerspective, SIGNAL(clicked(bool)), this, SLOT(addPerspectiveClicked()));
-    connect(upPerspective, SIGNAL(clicked(bool)), this, SLOT(upPerspectiveClicked()));
-    connect(downPerspective, SIGNAL(clicked(bool)), this, SLOT(downPerspectiveClicked()));
+    actionButtons->defaultConnect(perspectiveTable);
+    connect(actionButtons, &ActionButtonBox::editRequested, this, &PerspectiveDialog::editPerspectiveClicked);
+    connect(actionButtons, &ActionButtonBox::addRequested, this, &PerspectiveDialog::addPerspectiveClicked);
+    connect(actionButtons, &ActionButtonBox::deleteRequested, this, &PerspectiveDialog::removePerspectiveClicked);
+    connect(actionButtons, &ActionButtonBox::upRequested, this, &PerspectiveDialog::upPerspectiveClicked);
+    connect(actionButtons, &ActionButtonBox::downRequested, this, &PerspectiveDialog::downPerspectiveClicked);
+    connect(importPerspective, &QPushButton::clicked, this, &PerspectiveDialog::importPerspectiveClicked);
+    connect(exportPerspective, &QPushButton::clicked, this, &PerspectiveDialog::exportPerspectiveClicked);
 
     // set table
     setTables();
@@ -165,9 +137,6 @@ void PerspectiveDialog::setTables()
 
     }
 
-    // enable/disable remove button if we have > 1 perspectives
-    // it must not be possible to remove the last perspective
-    removePerspective->setEnabled(perspectiverow > 1);
     active = false;
 
     // set to first row
@@ -299,7 +268,7 @@ void
 PerspectiveDialog::importPerspectiveClicked()
 {
     // import a new perspective from a file
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Select Perspective file to export"), "", tr("GoldenCheetah Perspective Files (*.gchartset)"));
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Select Perspective file to import"), "", tr("GoldenCheetah Perspective Files (*.gchartset)"));
     if (fileName.isEmpty()) {
         QMessageBox::critical(this, tr("Import Perspective"), tr("No perspective file selected!"));
     } else {

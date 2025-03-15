@@ -40,8 +40,8 @@ ActionButtonBox::ActionButtonBox
         down->setArrowType(Qt::DownArrow);
         down->setFixedSize(20 * dpiXFactor, 20 * dpiYFactor);
 #endif
-        layout->addWidget(up, 0, Qt::AlignHCenter | Qt::AlignTop);
-        layout->addWidget(down, 0, Qt::AlignHCenter | Qt::AlignTop);
+        layout->addWidget(up, 0);
+        layout->addWidget(down, 0);
 
         layout->addItem(new QSpacerItem(5 * dpiXFactor, 0));
         leftOffset = 3;
@@ -79,8 +79,8 @@ ActionButtonBox::ActionButtonBox
         del->setFixedSize(20 * dpiXFactor, 20 * dpiYFactor);
 #endif
         layout->addItem(new QSpacerItem(5 * dpiXFactor, 0));
-        layout->addWidget(add, 0, Qt::AlignHCenter | Qt::AlignTop);
-        layout->addWidget(del, 0, Qt::AlignHCenter | Qt::AlignTop);
+        layout->addWidget(add, 0);
+        layout->addWidget(del, 0);
         rightOffset += 3;
 
         connect(add, &QPushButton::clicked, this, &ActionButtonBox::addRequested);
@@ -204,6 +204,14 @@ ActionButtonBox::defaultConnect
 
 
 void
+ActionButtonBox::setMinViewItems
+(int minItems)
+{
+    minViewItems = minItems;
+}
+
+
+void
 ActionButtonBox::setMaxViewItems
 (int maxItems)
 {
@@ -226,7 +234,7 @@ ActionButtonBox::updateButtonState
     case AddDeleteGroup:
         if (add != nullptr && del != nullptr) {
             add->setEnabled(view->model()->rowCount() < maxViewItems);
-            del->setEnabled(index.isValid());
+            del->setEnabled(index.isValid() && view->model()->rowCount() > minViewItems);
         }
         break;
     case EditGroup:

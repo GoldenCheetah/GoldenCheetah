@@ -19,6 +19,7 @@
 #ifndef _Library_h
 #define _Library_h
 #include "GoldenCheetah.h"
+#include "ActionButtonBox.h"
 
 #include <QDir>
 #include <QLabel>
@@ -101,8 +102,7 @@ class LibrarySearchDialog : public QDialog
         QCheckBox *findWorkouts,
                   *findVideoSyncs,
                   *findMedia;
-        QPushButton *addPath,
-                    *removePath;
+        ActionButtonBox *actionButtons;
         QPushButton *removeRef;
         QTreeWidget *searchPathTable;
         QTreeWidget *refTable;
