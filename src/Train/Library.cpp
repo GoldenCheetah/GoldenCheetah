@@ -340,13 +340,11 @@ LibrarySearchDialog::LibrarySearchDialog(Context *context) : context(context)
     findMedia->setChecked(true);
     findVideoSyncs = new QCheckBox(tr("VideoSync files (.rlv, .tts etc)"), this);
     findVideoSyncs->setChecked(true);
-    addPath = new QPushButton("+", this);
-    removePath = new QPushButton("-", this);
+    actionButtons = new ActionButtonBox(ActionButtonBox::AddDeleteGroup);
     removeRef = new QPushButton("-", this);
 #ifndef Q_OS_MAC
-    addPath->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    removePath->setFixedSize(20*dpiXFactor,20*dpiYFactor);
     removeRef->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    removeRef->setStyleSheet("QPushButton { padding: 0px; }");
 #endif
 
     searchPathTable = new QTreeWidget(this);
@@ -418,15 +416,10 @@ LibrarySearchDialog::LibrarySearchDialog(Context *context) : context(context)
     mainLayout->addWidget(findMedia, Qt::AlignCenter);
     mainLayout->addWidget(findVideoSyncs, Qt::AlignCenter);
 
-    QHBoxLayout *editButtons = new QHBoxLayout;
     QVBoxLayout *tableLayout = new QVBoxLayout;
-    editButtons->addWidget(addPath);
-    editButtons->addWidget(removePath);
-    editButtons->addStretch();
-    editButtons->setSpacing(2 *dpiXFactor);
     tableLayout->setSpacing(2 *dpiXFactor);
     tableLayout->addWidget(searchPathTable);
-    tableLayout->addLayout(editButtons);
+    tableLayout->addWidget(actionButtons);
     QHBoxLayout *editButtons2 = new QHBoxLayout;
     editButtons2->addWidget(removeRef);
     editButtons2->addStretch();
@@ -459,8 +452,10 @@ LibrarySearchDialog::LibrarySearchDialog(Context *context) : context(context)
 
     setSearching(false);
 
-    connect(addPath, SIGNAL(clicked()), this, SLOT(addDirectory()));
-    connect(removePath, SIGNAL(clicked()), this, SLOT(removeDirectory()));
+    actionButtons->defaultConnect(searchPathTable);
+    connect(actionButtons, &ActionButtonBox::addRequested, this, &LibrarySearchDialog::addDirectory);
+    connect(actionButtons, &ActionButtonBox::deleteRequested, this, &LibrarySearchDialog::removeDirectory);
+
     connect(removeRef, SIGNAL(clicked()), this, SLOT(removeReference()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancel()));
     connect(searchButton, SIGNAL(clicked()), this, SLOT(search()));
@@ -474,8 +469,7 @@ LibrarySearchDialog::setWidgets()
         searchButton->hide();
         cancelButton->setText(tr("Abort Search"));
         searchPathTable->hide();
-        addPath->hide();
-        removePath->hide();
+        actionButtons->setVisible(false);
         removeRef->hide();
         refTable->hide();
 
@@ -493,8 +487,7 @@ LibrarySearchDialog::setWidgets()
         searchButton->show();
         cancelButton->setText(tr("Cancel"));
         searchPathTable->show();
-        addPath->show();
-        removePath->show();
+        actionButtons->setVisible(true);
         removeRef->show();
         refTable->show();
 

@@ -66,6 +66,7 @@ class ActionButtonBox : public QWidget {
         void defaultConnect(QAbstractItemView *view);
         void defaultConnect(StandardButtonGroup group, QAbstractItemView *view);
 
+        void setMinViewItems(int minItems);
         void setMaxViewItems(int maxItems);
 
     signals:
@@ -88,6 +89,7 @@ class ActionButtonBox : public QWidget {
         QPushButton *del = nullptr;
         QPushButton *edit = nullptr;
 
+        int minViewItems = 0;
         int maxViewItems = std::numeric_limits<int>::max();
 
         int leftOffset = 0;
