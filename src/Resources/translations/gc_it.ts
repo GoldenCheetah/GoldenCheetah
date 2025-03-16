@@ -3392,7 +3392,7 @@ Clicca Successivo per Continuare
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="805"/>
         <source>Athlete Bodyfat Percent</source>
-        <translation>Percentuale Grasso corporeo atleta</translation>
+        <translation type="unfinished">Percentuale Grasso corporeo atleta</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="807"/>
@@ -20108,7 +20108,7 @@ Si prega di verificare le impostazioni delle preferenze.</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="648"/>
         <source>Tabbed not Tiled</source>
-        <translation type="unfinished">A Pannelli Non Impilati</translation>
+        <translation>A Pannelli Non Impilati</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="511"/>
@@ -20414,7 +20414,7 @@ Si prega di verificare le impostazioni delle preferenze.</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="324"/>
         <source>What&apos;s This?</source>
-        <translation type="unfinished">Questo cos&apos;è?</translation>
+        <translation>Questo cos&apos;è?</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="395"/>
@@ -20652,27 +20652,27 @@ Si prega di verificare le impostazioni delle preferenze.</translation>
     <message>
         <location filename="../../FileIO/FixPyScriptsDialog.cpp" line="13"/>
         <source>Select a Python Fix to manage</source>
-        <translation type="unfinished">Seleziona un Fix Python da gestire</translation>
+        <translation>Seleziona un Fix Python da gestire</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixPyScriptsDialog.cpp" line="20"/>
         <source>New</source>
-        <translation type="unfinished">Nuovo</translation>
+        <translation>Nuovo</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixPyScriptsDialog.cpp" line="21"/>
         <source>Edit</source>
-        <translation type="unfinished">Modifica</translation>
+        <translation>Modifica</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixPyScriptsDialog.cpp" line="22"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Elimina</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixPyScriptsDialog.cpp" line="74"/>
         <source>Are you sure you want to delete %1?</source>
-        <translation type="unfinished">Sei sicuro di voler cancellare %1?</translation>
+        <translation>Sei sicuro di voler cancellare %1?</translation>
     </message>
 </context>
 <context>
@@ -21293,7 +21293,7 @@ Si prega di verificare le impostazioni delle preferenze.</translation>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3228"/>
         <source>Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Gruppi</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3246"/>
@@ -21330,7 +21330,7 @@ Si prega di verificare le impostazioni delle preferenze.</translation>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3410"/>
         <source>Fields in Group &lt;i&gt;%1&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Campi in Gruppo -&lt;i&gt;%1&lt;/i&gt;</translation>
     </message>
     <message>
         <source>Edit</source>
@@ -21986,17 +21986,17 @@ Potrai importare o scaricare i dati prima di unire i dati e di aggiustare manual
     <message>
         <location filename="../../Gui/MetadataDialog.cpp" line="32"/>
         <source>Metadata Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Editore dei Metadati</translation>
     </message>
     <message>
         <location filename="../../Gui/MetadataDialog.cpp" line="130"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Cancella</translation>
     </message>
     <message>
         <location filename="../../Gui/MetadataDialog.cpp" line="131"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
 </context>
 <context>
@@ -22019,7 +22019,7 @@ Potrai importare o scaricare i dati prima di unire i dati e di aggiustare manual
     <message>
         <location filename="../../Gui/Pages.cpp" line="2162"/>
         <source>Processors &amp;&amp; Automation</source>
-        <translation type="unfinished"></translation>
+        <translation>Processore &amp;&amp; Automazione</translation>
     </message>
     <message>
         <source>Processing</source>
@@ -22803,12 +22803,12 @@ Nessuna uscita in bici trovata da importare.
     <message>
         <location filename="../../Cloud/Nolio.h" line="38"/>
         <source>Nolio</source>
-        <translation type="unfinished"></translation>
+        <translation>Nolio</translation>
     </message>
     <message>
         <location filename="../../Cloud/Nolio.h" line="39"/>
         <source>Sync with your favorite training partner.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sincronizza col tuo partner di allenamento preferito</translation>
     </message>
 </context>
 <context>
@@ -23001,7 +23001,7 @@ Nessuna uscita in bici trovata da importare.
     <message>
         <location filename="../../Charts/Overview.cpp" line="576"/>
         <source>Tile Settings</source>
-        <translation type="unfinished">Impostazioni Elemento</translation>
+        <translation>Impostazioni Elemento</translation>
     </message>
     <message>
         <location filename="../../Charts/Overview.cpp" line="599"/>
@@ -23045,42 +23045,42 @@ Nessuna uscita in bici trovata da importare.
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3774"/>
         <source>User defined</source>
-        <translation type="unfinished"></translation>
+        <translation>Definito dall&apos;utilizzatore</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3775"/>
         <source>Totals</source>
-        <translation type="unfinished">Totali</translation>
+        <translation>Totali</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3776"/>
         <source>Averages</source>
-        <translation type="unfinished">Medie</translation>
+        <translation>Medie</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3777"/>
         <source>Maximums</source>
-        <translation type="unfinished">Massimi</translation>
+        <translation>Massimi</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3778"/>
         <source>Metrics</source>
-        <translation type="unfinished">Misure</translation>
+        <translation>Misure</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3779"/>
         <source>Zones</source>
-        <translation type="unfinished">Zone</translation>
+        <translation>Zone</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3781"/>
         <source>Intervals</source>
-        <translation type="unfinished">Intervalli</translation>
+        <translation>Intervalli</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3783"/>
         <source>Activities</source>
-        <translation type="unfinished">Attività</translation>
+        <translation>Attività</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3786"/>
@@ -23155,12 +23155,12 @@ Nessuna uscita in bici trovata da importare.
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3970"/>
         <source>Background</source>
-        <translation type="unfinished">Colore Sfondo</translation>
+        <translation>Colore Sfondo</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3972"/>
         <source>Color</source>
-        <translation type="unfinished">Colore</translation>
+        <translation>Colore</translation>
     </message>
 </context>
 <context>
@@ -26339,7 +26339,7 @@ on and that its display says, &quot;Host&quot;</source>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2644"/>
         <source>Hide Core Processors</source>
-        <translation type="unfinished">Nascondi Processore Core</translation>
+        <translation>Nascondi Processore Centrale</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2659"/>
@@ -26349,7 +26349,7 @@ on and that its display says, &quot;Host&quot;</source>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2769"/>
         <source>Core Processor</source>
-        <translation type="unfinished"></translation>
+        <translation>Processore Centrale</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2769"/>
@@ -31985,7 +31985,7 @@ Se la nuova attività è in conflitto con un&apos;attività pre-esistente (stess
     <message>
         <location filename="../../Cloud/Strava.h" line="35"/>
         <source>Sync with the social network for cyclists and runners.</source>
-        <translation>Sincronizza col il social network per ciclisti e corridori.</translation>
+        <translation>Sincronizza col social network per ciclisti e corridori.</translation>
     </message>
 </context>
 <context>
