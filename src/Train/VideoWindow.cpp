@@ -126,7 +126,7 @@ VideoWindow::VideoWindow(Context *context)  :
     layout->addWidget(container);
 #endif
 
-#if defined(WIN32) || defined(Q_OS_LINUX)
+#if defined(GC_VIDEO_QT6) || defined (GC_VIDEO_VLC) && (defined(WIN32) || defined(Q_OS_LINUX))
     if (init) {
     // Read the video layouts just to list the names for the layout selector
         readVideoLayout(-1);
