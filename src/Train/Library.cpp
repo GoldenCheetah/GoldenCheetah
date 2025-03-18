@@ -31,11 +31,7 @@
 #include <QFileInfo>
 
 // helpers
-#if defined(GC_VIDEO_AV) || defined(GC_VIDEO_QUICKTIME)
-#include "QtMacVideoWindow.h"
-#else
 #include "VideoWindow.h"
-#endif
 
 #include "ErgFile.h"
 #include "VideoSyncFile.h"

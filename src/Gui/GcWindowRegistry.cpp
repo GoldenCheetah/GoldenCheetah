@@ -29,11 +29,7 @@
 #endif
 #include "HistogramWindow.h"
 #include "LTMWindow.h"
-#if defined(GC_VIDEO_AV) || defined(GC_VIDEO_QUICKTIME)
-#include "QtMacVideoWindow.h"
-#else
 #include "VideoWindow.h"
-#endif
 #include "PfPvWindow.h"
 #include "HrPwWindow.h"
 #include "RideEditor.h"

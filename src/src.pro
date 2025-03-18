@@ -148,33 +148,12 @@ macx {
     # on mac we use native buttons and video, but have native fullscreen support
     LIBS    += -lobjc -framework IOKit -framework AppKit
 
-    # on mac we use QTKit or AV Foundation
-    contains(DEFINES, "GC_VIDEO_AV") {
-
-        # explicitly wants AV Foundation
-        LIBS += -framework AVFoundation
-        HEADERS +=  Gui/QtMacVideoWindow.h
-        OBJECTIVE_SOURCES += Gui/QtMacVideoWindow.mm
-
-    } else {
-
-        !contains(DEFINES, "GC_VIDEO_QUICKTIME") {
-
-            # GC_VIDEO_QT5 will enable Qt5 video support,
-            # GC_VIDEO_VLC will enable VLC video support,
-            # otherwise we have a blank videowindow, it will do nothing
-            HEADERS += Train/VideoWindow.h
-            SOURCES += Train/VideoWindow.cpp
-
-        } else {
-
-            # default is to use QuickTime for now
-            LIBS += -framework QTKit
-            HEADERS +=  Gui/QtMacVideoWindow.h
-            OBJECTIVE_SOURCES += Gui/QtMacVideoWindow.mm
-
-        }
-    }
+    # GC_VIDEO_QT5 will enable Qt5 video support,
+    # GC_VIDEO_QT6 will enable Qt6 video support,
+    # GC_VIDEO_VLC will enable VLC video support,
+    # otherwise we have a blank videowindow, it will do nothing
+    HEADERS += Train/VideoWindow.h
+    SOURCES += Train/VideoWindow.cpp
 
 } else {
 

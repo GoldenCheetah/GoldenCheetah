@@ -37,11 +37,7 @@
 #define COMPILER_VERSION QString("%1").arg(_MSC_VER)
 #endif
 
-#if defined(GC_VIDEO_AV) || defined(GC_VIDEO_QUICKTIME)
-#include "QtMacVideoWindow.h"
-#else
 #include "VideoWindow.h"
-#endif
 
 #ifdef GC_HAVE_ICAL
 #include "ICalendar.h"
@@ -282,9 +278,7 @@ QString GcCrashDialog::versionHTML()
             .arg(usbxpress)
             .arg(libusb)
             .arg(vlc)
-#if defined GC_VIDEO_QUICKTIME
-            .arg("quicktime")
-#elif defined GC_VIDEO_QT5
+#if defined GC_VIDEO_QT5
             .arg("qt5")
 #elif defined GC_VIDEO_QT6
             .arg("qt6")

@@ -27,9 +27,9 @@
 //
 // Options are, GC_VIDEO_xxxx where xxxx is one of:
 // GC_VIDEO_VLC
-// GC_VIDEO_QUICKTIME
 // GC_VIDEO_NONE
 // GC_VIDEO_QT5
+// GC_VIDEO_QT6
 //
 // If the user hasn't set one of the above then we determine
 // which one should apply !
@@ -39,9 +39,9 @@
 //----------------------------------------------------------------------
 #ifdef Q_OS_MAC
 
-// if we aint chosen one or the other then use quicktime
-#if !defined GC_VIDEO_QUICKTIME && !defined GC_VIDEO_NONE && !defined GC_VIDEO_QT5 && !defined GC_VIDEO_QT6 && !defined GC_VIDEO_VLC
-#define GC_VIDEO_QUICKTIME
+// if we aint chosen one or the other then use none
+#if !defined GC_VIDEO_NONE && !defined GC_VIDEO_QT5 && !defined GC_VIDEO_QT6 && !defined GC_VIDEO_VLC
+#define GC_VIDEO_NONE
 #endif
 
 // but qt5 and vlc are not experimental options !
@@ -69,17 +69,17 @@
 #endif
 #endif
 
-// if we aint chosen one or the other then use QT5
+// if we aint chosen one then use none
 #if !defined GC_VIDEO_NONE && !defined GC_VIDEO_QT5 && !defined GC_VIDEO_QT6 && !defined GC_VIDEO_VLC
-#define GC_VIDEO_QT5
-#endif
-
-// now check for stupid settings
-#if defined GC_VIDEO_QUICKTIME
-#error "QuickTime is only supported on Mac OS X"
+#define GC_VIDEO_NONE
 #endif
 
 #endif // Q_OS_LINUX || Q_OS_WIN
+
+// now check for stupid settings
+#if defined GC_VIDEO_QT6 && QT_VERSION < 0x060000
+#error "Qt6 Video is not supported on Qt5"
+#endif
 
 //----------------------------------------------------------------------
 // Now options are set lets pull in the headers we need then
