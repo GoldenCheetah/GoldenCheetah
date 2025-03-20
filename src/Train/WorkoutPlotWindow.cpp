@@ -93,7 +93,8 @@ WorkoutPlotWindow::ergFileSelected(ErgFile *f)
 void
 WorkoutPlotWindow::setNow(long now)
 {
-    ergPlot->setNow(now);
+    if (isVisible())
+        ergPlot->setNow(now);
 }
 
 void

@@ -270,6 +270,9 @@ class VideoWindow : public GcChartWindow
 
     protected:
 
+        void showEvent(QShowEvent *event) override;
+        void hideEvent(QHideEvent *event) override;
+
         void resizeEvent(QResizeEvent *);
 
         // media data
