@@ -55,7 +55,7 @@ VideoWindow::VideoWindow(Context *context)  :
     videoSyncDistanceAdjustFactor = 1.;
     videoSyncTimeAdjustFactor = 1.;
 
-    curPosition = 1; 
+    curPosition = 1;
 
     state = PlaybackState::None;
 
