@@ -312,8 +312,6 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
 {
     // process as normal if not one of ours
     if (obj != this) return false;
-    if (!isVisible())
-        return false;
 
     // is a repaint going to be needed?
     bool updateNeeded=false;
