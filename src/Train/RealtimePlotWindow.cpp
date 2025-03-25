@@ -259,7 +259,8 @@ RealtimePlotWindow::telemetryUpdate(RealtimeData rtData)
         rtPlot->o2hbData->addData(rtData.value(RealtimeData::O2Hb));
         rtPlot->hhbData->addData(rtData.value(RealtimeData::HHb));
     }
-    rtPlot->replot();                // redraw
+    if (isVisible())
+        rtPlot->replot();                // redraw
 }
 
 void

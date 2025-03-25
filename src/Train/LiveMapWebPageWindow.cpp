@@ -231,6 +231,9 @@ void LiveMapWebPageWindow::configChanged(qint32)
 // Update position on the map when telemetry changes.
 void LiveMapWebPageWindow::telemetryUpdate(RealtimeData rtd)
 {
+    if (!isVisible())
+        return;
+
     QString code = "";
     geolocation geoloc(rtd.getLatitude(), rtd.getLongitude(), rtd.getAltitude());
     if (geoloc.IsReasonableGeoLocation()) {

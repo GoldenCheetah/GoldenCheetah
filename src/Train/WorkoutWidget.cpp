@@ -188,7 +188,8 @@ WorkoutWidget::stop()
 void
 WorkoutWidget::setNow(long x)
 {
-    ensureVisible(x/1000);
+    if (isVisible())
+        ensureVisible(x/1000);
 }
 
 void

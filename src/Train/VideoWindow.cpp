@@ -303,7 +303,8 @@ void VideoWindow::showMeters()
         p_meterWidget->AdjustSizePos();
         p_meterWidget->update();
         p_meterWidget->raise();
-        p_meterWidget->show();
+        if (isVisible())
+            p_meterWidget->show();
         p_meterWidget->startPlayback(context);
     }
     prevPosition = mapToGlobal(pos());
@@ -318,6 +319,24 @@ void VideoWindow::resizeEvent(QResizeEvent * )
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
         p_meterWidget->AdjustSizePos();
     prevPosition = mapToGlobal(pos());
+}
+
+void VideoWindow::showEvent(QShowEvent *event)
+{
+    GcChartWindow::showEvent(event);
+    if (init  && (state == PlaybackState::Playing || state == PlaybackState::Paused)) {
+        foreach(MeterWidget* p_meterWidget , m_metersWidget)
+            p_meterWidget->show();
+    }
+}
+
+void VideoWindow::hideEvent(QHideEvent *event)
+{
+    GcChartWindow::hideEvent(event);
+    if (init) {
+        foreach(MeterWidget* p_meterWidget , m_metersWidget)
+            p_meterWidget->hide();
+    }
 }
 
 VideoSyncFilePoint VideoWindow::VideoSyncPointAdjust(const VideoSyncFilePoint& vsfp) const
@@ -546,6 +565,9 @@ void VideoWindow::resumePlayback()
 
 void VideoWindow::telemetryUpdate(RealtimeData rtd)
 {
+    if (!isVisible())
+        return;
+
     Lock lock(stateLock);
     if (!hasActiveVideo())
         return;
