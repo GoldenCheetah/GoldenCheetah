@@ -171,6 +171,8 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
     connect(view->page()->profile(), SIGNAL(downloadRequested(QWebEngineDownloadRequest*)), this, SLOT(downloadRequested(QWebEngineDownloadRequest*)));
 #endif
     connect(view->page(), SIGNAL(linkHovered(QString)), this, SLOT(linkHovered(QString)));
+
+    forceReplot();
 }
 
 WebPageWindow::~WebPageWindow()
