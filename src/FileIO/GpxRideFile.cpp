@@ -32,7 +32,7 @@ RideFile *GpxFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 {
     (void) errors;
     RideFile *rideFile = new RideFile();
-    rideFile->setRecIntSecs(1.0);
+    rideFile->setRecIntSecs(GPX_SAMPLE_INTERVAL);
     //rideFile->setDeviceType("GPS Exchange Format");
     rideFile->setFileFormat("GPS Exchange Format (gpx)");
 

@@ -29,6 +29,8 @@
 #include <QXmlDefaultHandler>
 #include "Settings.h"
 
+#define GPX_SAMPLE_INTERVAL (1.0)
+
 class GpxParser : public QXmlDefaultHandler
 {
 public:
@@ -53,6 +55,7 @@ private:
     QDateTime   time;
     double      distance;
     double      lastLat, lastLon;
+    double      lastSpeed;
 
     double      alt;
     double      lat;
@@ -61,6 +64,7 @@ private:
     double      temp;
     double      cad;
     double      watts;
+    double      speed;
 
     // set to false after the first time element is seen (not in metadata)
     bool firstTime;
