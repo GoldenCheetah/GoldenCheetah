@@ -46,6 +46,7 @@ GpxParser::GpxParser (RideFile* rideFile)
     lon = 0;
     lat = 0;
     hr = 0;
+    speed = std::numeric_limits<double>::infinity();
     temp = RideFile::NA;
     firstTime = true;
     metadata = false;
@@ -86,6 +87,9 @@ bool GpxParser::startElement( const QString&, const QString&,
         {
             lon = lastLon;
         }
+
+        // clear last speed value
+        speed = std::numeric_limits<double>::infinity();
     }
     return true;
 }
@@ -143,6 +147,11 @@ bool
     {
         watts = buffer.toDouble();
     }
+    else if (qName == "gpxtpx:speed" || qName == "ns3:speed" || qName == "speed")
+    {
+        // gpx speed is in meters/s.  Convert to kph.
+        speed = buffer.toDouble() * (60.0 * 60.0) / 1000.0;
+    }
 
 
     else if (qName == "trkpt")
@@ -156,42 +165,91 @@ bool
             last_time = time;
             lastLon = lon;
             lastLat = lat;
+            lastSpeed = speed;
 	    // first point
             rideFile->appendPoint(secs, cad, hr, 0, 0, 0, watts, alt, lon, lat, 0, 0.0, temp, 0.0, 
                                   0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                   0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0);
             return true;
         }
-        // we need to figure out the distance by using the lon,lat
-        // using the haversine formula
-        double r = 6371;
-        double dlat = toRadians(lat -lastLat);  // convert to radians
-
-        double dlon = toRadians(lon - lastLon);
-        double a = sin(dlat /2) * sin(dlat/2) + cos(toRadians(lat)) * cos(toRadians(lastLat)) * sin(dlon/2) * sin(dlon /2);
-        //double c = 2*asin(sqrt(fabs(a)));  // Alternate definition.
-        double c = 4*atan2(sqrt(a),1+sqrt(1-fabs(a)));
-        double delta_d = r * c;
-        if(lastLat != 0)
-            distance += delta_d;
 
         // compute the elapsed time and distance traveled since the
         // last recorded trackpoint
         // use msec in case there are msec in QDateTime
         double delta_t_ms = last_time.msecsTo(time);
-        if (delta_d<0)
-        {
-            delta_d=0;
-        }
 
-        // compute speed for this trackpoint by dividing the distance
-        // traveled by the elapsed time. The elapsed time will be 0.0
-        // for the first trackpoint -- so set speed to 0.0 instead of
-        // dividing by zero.
-        double speed = 0.0;
-        if (delta_t_ms > 0.0)
+        if (!std::isinf(speed))
         {
-            speed= 1000.0 * delta_d / delta_t_ms * 3600.0;
+            // If speed is specified in the extensions, use it to calculate
+            // distance traveled.  Note that gaps in speed data could be either
+            // of two cases:
+            //
+            // 1) missing samples during movement -- interpolation appropriate
+            // 2) paused collection while stopped -- zeroization appropriate
+            //
+            // There is no guaranteed way to differentiate between the two, so
+            // here we use the Garmin Smart Recording threshold to switch from
+            // (1) to (2).
+
+            // speed adjusted for time gaps
+            double speed_avg;
+
+            // if Garmin Smart Recording is enabled and time elapsed is less
+            // than the configured limit, use simple linear interpolation of the
+            // speed.
+            if (isGarminSmartRecording.toBool() &&
+                delta_t_ms < GarminHWM.toInt() * 1000.0) {
+                if (std::isinf(lastSpeed)) {
+                    speed_avg = speed;
+                }
+                else {
+                    speed_avg = (lastSpeed + speed) / 2.0;
+                }
+            }
+            // otherwise, for deltas greater than two sampling periods, scale
+            // the speed by the elapsed time.  This is equivalent to treating
+            // speed as 0m/s for all but the first second, or "zeroing the gap".
+            else {
+                if (delta_t_ms >= (2 * GPX_SAMPLE_INTERVAL * 1000.0)) {
+                    speed_avg = speed / (delta_t_ms / 1000.0);
+                }
+                else {
+                    speed_avg = speed;
+                }
+            }
+
+            // now calculate the distance traveled for this time and speed
+            double delta_d = speed_avg * delta_t_ms / (60.0 * 60.0) / 1000.0; // speed in kph
+            distance += delta_d; // distance in km
+        }
+        else
+        {
+            // we need to figure out the distance by using the lon,lat
+            // using the haversine formula
+            double r = 6371;
+            double dlat = toRadians(lat -lastLat);  // convert to radians
+
+            double dlon = toRadians(lon - lastLon);
+            double a = sin(dlat /2) * sin(dlat/2) + cos(toRadians(lat)) * cos(toRadians(lastLat)) * sin(dlon/2) * sin(dlon /2);
+            //double c = 2*asin(sqrt(fabs(a)));  // Alternate definition.
+            double c = 4*atan2(sqrt(a),1+sqrt(1-fabs(a)));
+            double delta_d = r * c;
+            if(lastLat != 0)
+                distance += delta_d;
+
+            if (delta_d<0)
+            {
+                delta_d=0;
+            }
+
+            // compute speed for this trackpoint by dividing the distance
+            // traveled by the elapsed time. The elapsed time will be 0.0
+            // for the first trackpoint -- so set speed to 0.0 instead of
+            // dividing by zero.
+            if (delta_t_ms > 0.0)
+            {
+                speed= 1000.0 * delta_d / delta_t_ms * 3600.0;
+            }
         }
 
         // Record trackpoint
@@ -260,6 +318,7 @@ bool
         last_time = time;
         lastLon = lon;
         lastLat = lat;
+        lastSpeed = speed;
     }
 
     return true;
