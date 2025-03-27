@@ -5472,7 +5472,7 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
                         write_float32(ridePoint, val, true);
                         break;
                     default:
-                        fprintf(stderr,"ERROR TYPE % CURRENTLY UNSUPPORTED\n",ciqfield.type); fflush(stderr);
+                        fprintf(stderr,"ERROR TYPE % CURRENTLY UNSUPPORTED\n",ciqfield.type.toStdString().c_str()); fflush(stderr);
                     }
                 }
             }
