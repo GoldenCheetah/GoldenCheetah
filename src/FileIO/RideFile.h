@@ -89,6 +89,36 @@ struct RideFileDataPresent
 
 };
 
+// Mappings for QIC/ANT fields info
+struct CIQfield {
+    CIQfield(QString message, QString name, int nativeid, int id, QString type, QString unit, int scale, int offset)
+        : message(message), name(name), nativeid(nativeid), id(id), scale(scale), offset(offset), type(type), unit(unit) {}
+
+    QString message;
+    QString name;
+    int     nativeid;
+    int     id;
+    int     scale;
+    int     offset;
+    QString type;
+    QString unit;
+//  int     size;
+};
+
+struct CIQinfo
+{
+    CIQinfo(QString appid, int id, int ver) : appid(appid), devid(id), ver(ver){}
+    CIQinfo(const QJsonObject& obj);
+
+    static QString listToJson(const QList<CIQinfo>& ciqList);
+    static QList<CIQinfo> listFromJson(const QString& src);
+
+    QString appid;
+    int devid;
+    int ver;
+    QList<CIQfield> fields;
+};
+
 class RideFileInterval
 {
     Q_DECLARE_TR_FUNCTIONS(RideFileInterval);
@@ -379,7 +409,9 @@ class RideFile : public QObject // QObject to emit signals
         XDataSeries *xdata(QString name) const { return xdata_.value(name, NULL); }
         void addXData(QString name, XDataSeries *series);
         QMap<QString,XDataSeries*> &xdata() { return xdata_; }
-        double xdataValue(RideFilePoint *p, int &idx, QString xdata, QString series, RideFile::XDataJoin);
+        double xdataValue(const RideFilePoint *p, int &idx, QString xdata, QString series, RideFile::XDataJoin) const;
+        void addCIQ(CIQinfo &ciqinfo);
+        const QList<CIQinfo>& ciqinfo() const { return ciqinfo_; }
 
         // METRIC OVERRIDES
         QMap<QString,QMap<QString,QString> > metricOverrides;
@@ -423,6 +455,7 @@ class RideFile : public QObject // QObject to emit signals
 
         // xdata series
         QMap<QString, XDataSeries*> xdata_;
+        QList<CIQinfo> ciqinfo_; //ciq metadata
 
         void clearIntervals();
         void fillInIntervals();

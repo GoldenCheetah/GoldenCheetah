@@ -133,7 +133,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     XDataSeries *ibikeSeries=NULL;
     XDataSeries *xdataSeries=NULL;
     XDataSeries *vo2Series=NULL;
-    XDataSeries *tcoreSeries=NULL;
+    XDataSeries *develSeries=NULL;
 
     /* Joule 1.0
     Version,Date/Time,Km,Minutes,RPE,Tags,"Weight, kg","Work, kJ",FTP,"Sample Rate, s",Device Type,Firmware Version,Last Updated,Category 1,Category 2
@@ -1567,14 +1567,16 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     }
 
     // is there an associated tcore tcr file?
+    // Store coretemp into developer fields
     QFile tcorefile(file.fileName().replace(".csv",".tcr"));
     if (tcorefile.open(QFile::ReadOnly))
     {
-        // create the XDATA series
-        tcoreSeries = new XDataSeries();
-        tcoreSeries->name = "TCORE";
-        tcoreSeries->valuename << "Core" << "Skin" << "HSI" << "Quality";
-        tcoreSeries->unitname << "C" << "C" << "%" << "q";
+        // create the XDATA series        
+        develSeries = new XDataSeries();
+
+        develSeries->name = "DEVELOPER";
+        develSeries->valuename << "core_temperature" << "skin_temperature" << "heat_strain_index" << "core_data_quality";
+        develSeries->unitname << "C" << "C" << "%" << "q";
 
         // attempt to read and add the data
         lineno=1;
@@ -1609,12 +1611,12 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     // and add
                     XDataPoint *p = new XDataPoint();
                     p->secs = values.at(0).toDouble();
-                    p->km = 0;
-                    p->number[0] = values.at(1).toDouble();
-                    p->number[1] = values.at(2).toDouble();
-                    p->number[2] = values.at(3).toDouble();
-                    p->number[3] = values.at(4).toInt();
-                    tcoreSeries->datapoints.append(p);
+                    p->km = 0; //why not add km too?
+                    p->number[0] = values.at(1).toDouble(); //core
+                    p->number[1] = values.at(2).toDouble(); //skin
+                    p->number[2] = values.at(3).toDouble(); //qual
+                    p->number[3] = values.at(4).toInt(); //hsi
+                    develSeries->datapoints.append(p);
                 }
 
                 // onto next line
@@ -1623,9 +1625,20 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         }
         // free handle
         tcorefile.close();
-        
-        // add if we got any ....
-        if (tcoreSeries->datapoints.count() > 0) rideFile->addXData("TCORE", tcoreSeries);
+
+        // Now add the developer fields
+        if (develSeries->datapoints.count() > 0) {
+            rideFile->addXData("DEVELOPER", develSeries);
+
+            // Since we're creating source data as if a device,
+            // add the one CIQ developer and field info
+            CIQinfo info("6957fe68-83fe-4ed6-8613-413f70624bb5", 0, 64);
+            info.fields << CIQfield("record","core_temperature", 139, 0, "float32", "°C", -1, -1);
+            info.fields << CIQfield("record","skin_temperature", -1, 10, "float32", "°C", -1, -1);
+            info.fields << CIQfield("record","core_data_quality", -1, 19, "sint16", "Q", -1, -1);
+            info.fields << CIQfield("record","heat_strain_index", -1, 95, "float32", "a.u.", -1, -1);
+            rideFile->addCIQ(info); // store ciq metadata for fit writer
+        }
     }
     
 

@@ -30,6 +30,10 @@
 #include "Units.h"
 #include "SplineLookup.h"
 
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
+
 #include <QtXml/QtXml>
 #include <algorithm> // for std::lower_bound
 #include <assert.h>
@@ -1014,12 +1018,28 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
                 p->km = p->km - kmOffset;
                 p->secs = p->secs - timeOffset;
             }
-        }
 
-        // drag back intervals
-        foreach(RideFileInterval *i, result->intervals()) {
-            i->start -= timeOffset;
-            i->stop -= timeOffset;
+            // drag back intervals
+            foreach(RideFileInterval *i, result->intervals()) {
+                i->start -= timeOffset;
+                i->stop -= timeOffset;
+            }
+
+            // drag back DEVELOPER xdata
+            QMapIterator<QString,XDataSeries*> it(result->xdata());
+            while(it.hasNext()) {
+                it.next();
+                XDataSeries *s = it.value();
+                if (s->name == "DEVELOPER")
+                {
+                    foreach (XDataPoint *p, s->datapoints) {
+                        if (p->secs>0)
+                            p->secs = p->secs - timeOffset;
+                        if (p->km>0)
+                            p->km = p->km -kmOffset;
+                    }
+                }
+            }
         }
 
         // calculate derived data series -- after data fixers applied above
@@ -1041,6 +1061,23 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
         // what data is present - after processor in case 'derived' or adjusted
         result->updateDataTag();
 
+        //If we have a CIQ tag, populate the CIQinfo
+        QString ciq = result->getTag("CIQ","");
+        if (!ciq.isEmpty())
+        {
+            QJsonDocument doc = QJsonDocument::fromJson(ciq.toUtf8());
+
+            if (!doc.isNull() && (doc.isObject() || doc.isArray()))
+            {
+                ciq = doc.toJson(QJsonDocument::Compact);
+
+                QList<CIQinfo> infos = CIQinfo::listFromJson(ciq);
+                foreach(CIQinfo info, infos)
+                {
+                    result->addCIQ(info);
+                }
+            }
+        }
         //foreach(RideFile::seriestype x, result->arePresent()) qDebug()<<"present="<<x;
 
         // sample code for using XDATA, left here temporarily till we have an
@@ -1105,6 +1142,12 @@ RideFile::addXData(QString name, XDataSeries *series)
     xdata_.insert(name, series);
 }
 
+void
+RideFile::addCIQ(CIQinfo &ciqinfo)
+{
+    ciqinfo_ << ciqinfo;
+}
+
 QStringList RideFileFactory::listRideFiles(const QDir &dir) const
 {
     QStringList filters;
@@ -1122,7 +1165,7 @@ QStringList RideFileFactory::listRideFiles(const QDir &dir) const
 }
 
 double
-RideFile::xdataValue(RideFilePoint *p, int &idx, QString sxdata, QString series, RideFile::XDataJoin xjoin)
+RideFile::xdataValue(const RideFilePoint *p, int &idx, QString sxdata, QString series, RideFile::XDataJoin xjoin) const
 {
     double returning = RideFile::NA;
     XDataSeries *s = xdata(sxdata);
@@ -2521,6 +2564,17 @@ RideFile::recalculateDerivedSeries(bool force)
     // last point looked at
     RideFilePoint *lastP = NULL;
 
+    // Hold cursor into xdata to speed up search
+    int coreidx = -1;
+    XDataSeries *devseries = xdata("DEVELOPER");
+    if (devseries && devseries->datapoints.count() > 0)  {
+        if (devseries->valuename.contains("core_temperature"))
+        {
+            setDataPresent(RideFile::tcore, true);
+            coreidx = 0;
+        }
+    }
+
     foreach(RideFilePoint *p, dataPoints_) {
 
         // Delta
@@ -2722,14 +2776,6 @@ RideFile::recalculateDerivedSeries(bool force)
             }
         }
 
-        // Pull tcore from XData if it exists
-        series = xdata("TCORE");
-        if (series && series->datapoints.count() > 0)  {
-            setDataPresent(RideFile::tcore, true);
-            int idx=0;
-            p->tcore = xdataValue(p, idx, "TCORE","Core", RideFile::REPEAT);
-        }
-
         // split out O2Hb and HHb when we have SmO2 and tHb
         // O2Hb is oxygenated haemoglobin and HHb is deoxygenated haemoglobin
         if (dataPresent.smo2 && dataPresent.thb) {
@@ -2770,6 +2816,12 @@ RideFile::recalculateDerivedSeries(bool force)
         } else {
             p->clength = 0.0f;
         }
+
+        // Since TCORE isn't stored in json, retrieve it from XDATA
+        // Otherwise, derive it later
+        //
+        if (coreidx>=0)
+            p->tcore = xdataValue(p, coreidx, "DEVELOPER","core_temperature", RideFile::REPEAT);
 
         // last point
         lastP = p;
@@ -2842,7 +2894,7 @@ RideFile::recalculateDerivedSeries(bool force)
     // in between
 
     // we need HR data for this
-    // don't derive if we already have tcore data
+    // but don't derive if we already have tcore data
     if (dataPresent.hr && !dataPresent.tcore) {
 
         // resample the data into 60s samples
@@ -3576,4 +3628,106 @@ XDataSeries::timeIndex(double secs) const
     if (i == datapoints.end())
         return datapoints.size()-1;
     return i - datapoints.begin();
+}
+
+const char* CIQ_KEY = "application_id";
+const char* CIQ_ID = "developer_data_index";
+const char* VER_KEY = "verison";
+const char* FIELDS_KEY = "fields";
+
+const char* CIQ_FIELD_MESSAGE="message";
+const char* CIQ_FIELD_NAME="name";
+const char* CIQ_FIELD_NATIVE="native_id";
+const char* CIQ_FIELD_ID="dev_id";
+const char* CIQ_FIELD_TYPE="type";
+const char* CIQ_FIELD_UNIT="unit";
+const char* CIQ_FIELD_SCALE="scale";
+const char* CIQ_FIELD_OFFSET="offset";
+
+QString CIQinfo::listToJson(const QList<CIQinfo>& ciqList)
+{
+    QJsonArray ciqArray;
+    foreach (const CIQinfo& ciq, ciqList)
+    {
+        QJsonObject ciqObj;
+
+        ciqObj[QString(CIQ_KEY)] = ciq.appid;
+        ciqObj[QString(CIQ_ID)] = ciq.devid;
+        ciqObj[QString(VER_KEY)] = ciq.ver;
+
+        QJsonArray fieldsArray;
+        foreach (const CIQfield& field, ciq.fields)
+        {
+            QJsonObject fieldObj;
+            fieldObj[CIQ_FIELD_MESSAGE] = field.message;
+            fieldObj[CIQ_FIELD_NAME] = field.name;
+            fieldObj[CIQ_FIELD_NATIVE] = field.nativeid;
+            fieldObj[CIQ_FIELD_ID] = field.id;
+            fieldObj[CIQ_FIELD_TYPE] = field.type;
+            fieldObj[CIQ_FIELD_UNIT] = field.unit;
+            fieldObj[CIQ_FIELD_SCALE] = field.scale;
+            fieldObj[CIQ_FIELD_OFFSET] = field.offset;
+
+            fieldsArray.append(fieldObj);
+        }
+
+        ciqObj[QString(FIELDS_KEY)] = fieldsArray;
+
+        ciqArray.append(ciqObj);
+    }
+    QJsonDocument jsonDoc(ciqArray);
+
+    //Do we want it nicely formatted or compact?
+    QString jsonString = jsonDoc.toJson(QJsonDocument::Indented);
+    jsonString.replace("    ", "\t");
+
+    //QString jsonString = jsonDoc.toJson(QJsonDocument::Compact);
+    return jsonString;
+}
+
+QList<CIQinfo> CIQinfo::listFromJson(const QString& src)
+{
+    QList<CIQinfo> ciqList;
+
+    QJsonDocument doc = QJsonDocument::fromJson(src.toUtf8());
+
+    //Allow for either an array or single item
+    if (doc.isArray())
+    {
+        QJsonArray ciqArray = doc.array();
+        foreach (const QJsonValue& ciqValue, ciqArray)
+        {
+            QJsonObject ciqObj = ciqValue.toObject();
+            ciqList.append(CIQinfo(ciqObj));
+        }
+    }
+    else if (doc.isObject())
+    {
+        ciqList.append(CIQinfo(doc.object()));
+    }
+
+    return ciqList;
+}
+
+CIQinfo::CIQinfo(const QJsonObject& obj)
+{
+    appid = obj[QString(CIQ_KEY)].toString();
+    ver = obj[QString(VER_KEY)].toInt();
+    devid = obj[QString(CIQ_ID)].toInt();
+
+    QJsonArray jsonfields = obj[QString(FIELDS_KEY)].toArray();
+    foreach (const QJsonValue& field, jsonfields)
+    {
+        QJsonObject fieldObj = field.toObject();
+        CIQfield ciqfield(fieldObj[CIQ_FIELD_MESSAGE].toString(),
+                          fieldObj[CIQ_FIELD_NAME].toString(),
+                          fieldObj[CIQ_FIELD_NATIVE].toInt(),
+                          fieldObj[CIQ_FIELD_ID].toInt(),
+                          fieldObj[CIQ_FIELD_TYPE].toString(),
+                          fieldObj[CIQ_FIELD_UNIT].toString(),
+                          fieldObj[CIQ_FIELD_SCALE].toInt(),
+                          fieldObj[CIQ_FIELD_OFFSET].toInt());
+
+        fields.append(ciqfield);
+    }
 }
