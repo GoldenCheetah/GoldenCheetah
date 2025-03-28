@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="es">
+<TS version="2.1" language="es_ES">
 <context>
     <name>AAvgPower</name>
     <message>
@@ -10274,17 +10274,17 @@ le sugerirá los posibles nombres
     <message>
         <location filename="../../Train/ElevationChartWindow.cpp" line="221"/>
         <source>Profile Distance (m)</source>
-        <translation type="unfinished"></translation>
+        <translation>Distancia del perfil</translation>
     </message>
     <message>
         <location filename="../../Train/ElevationChartWindow.cpp" line="229"/>
         <source>Seconds for delta slope</source>
-        <translation type="unfinished"></translation>
+        <translation>Segundos para el delta de pendiente</translation>
     </message>
     <message>
         <location filename="../../Train/ElevationChartWindow.cpp" line="237"/>
         <source>Elevation window size (%) relative to current altitude</source>
-        <translation type="unfinished"></translation>
+        <translation>Tamaño de la la ventana de elevación (%) relativa a la altitud actual</translation>
     </message>
 </context>
 <context>
@@ -13818,7 +13818,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="111"/>
         <source>Elevation Chart</source>
-        <translation type="unfinished"></translation>
+        <translation>Gráfico de elevación</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="112"/>
@@ -14751,7 +14751,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="93"/>
         <source>Entry field for Searching and Filtering of workouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Búsqueda y filtrado de entrenamientos</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="97"/>
@@ -15042,7 +15042,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="294"/>
         <source>Show elevation profile of instant position</source>
-        <translation type="unfinished"></translation>
+        <translation>Muestra el perfil de elevación alrededor de la posición actual</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="298"/>
@@ -19683,7 +19683,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/LiveMapWebPageWindow.cpp" line="85"/>
         <source>Initial Zoom</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom inicial</translation>
     </message>
     <message>
         <location filename="../../Train/LiveMapWebPageWindow.cpp" line="98"/>
@@ -25837,7 +25837,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Gui/PerspectiveDialog.cpp" line="271"/>
         <source>Select Perspective file to import</source>
-        <translation type="unfinished"></translation>
+        <translation>Elegir archivo de perspectiva para importar</translation>
     </message>
     <message>
         <location filename="../../Gui/PerspectiveDialog.cpp" line="273"/>
@@ -27300,12 +27300,12 @@ Python deshabilitado en preferencias.</translation>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="803"/>
         <source>Temperature</source>
-        <translation type="unfinished">Temperatura</translation>
+        <translation>Temperatura</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="806"/>
         <source>CoreTemp</source>
-        <translation type="unfinished"></translation>
+        <translation>Temperatura corporal</translation>
     </message>
 </context>
 <context>
@@ -27924,7 +27924,7 @@ Python deshabilitado en preferencias.</translation>
         <location filename="../../Charts/RideEditor.cpp" line="351"/>
         <location filename="../../Charts/RideEditor.cpp" line="1013"/>
         <source>Core Temperature</source>
-        <translation type="unfinished">Temperatura corporal</translation>
+        <translation>Temperatura corporal</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="1564"/>
@@ -28351,7 +28351,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="418"/>
         <source>Core Temperature</source>
-        <translation type="unfinished">Temperatura corporal</translation>
+        <translation>Temperatura corporal</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="419"/>
@@ -28743,7 +28743,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../FileIO/RideFileTableModel.cpp" line="125"/>
         <source>Core Temperature</source>
-        <translation type="unfinished">Temperatura corporal</translation>
+        <translation>Temperatura corporal</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFileTableModel.cpp" line="129"/>
@@ -31504,7 +31504,7 @@ preferencias de entrenamiento.</translation>
     <message>
         <location filename="../../Gui/SplashScreen.cpp" line="52"/>
         <source>%1 - build %2</source>
-        <translation type="unfinished">%1 - compilación %2</translation>
+        <translation>%1 - compilación %2</translation>
     </message>
 </context>
 <context>
@@ -32251,7 +32251,7 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="648"/>
         <source>Average Swim Pace for butterfly lengths</source>
-        <translation type="unfinished"></translation>
+        <translation>Ritmo medio de nado considerando solo largos en estilo mariposa</translation>
     </message>
     <message>
         <source>Average Swim Pace for freestyle lengths</source>
@@ -35223,12 +35223,12 @@ Aguante la respiración durante 5 segundos.</translation>
     <message>
         <location filename="../../Train/WorkoutFilterBox.cpp" line="44"/>
         <source>Filter...</source>
-        <translation type="unfinished">Filtrar...</translation>
+        <translation>Filtrar...</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutFilterBox.cpp" line="95"/>
         <source>ERROR: %1</source>
-        <translation type="unfinished">ERROR: %1</translation>
+        <translation>ERROR: %1</translation>
     </message>
 </context>
 <context>
@@ -35273,82 +35273,82 @@ Puede eliminar las referencias cuando administra la biblioteca usando el menú d
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="271"/>
         <source>Select Tags</source>
-        <translation type="unfinished"></translation>
+        <translation>Elegir etiquetas</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="274"/>
         <source>Manage Filters</source>
-        <translation type="unfinished">Administrar filtros</translation>
+        <translation>Administrar filtros</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="275"/>
         <source>Add Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Agregar filtro</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="289"/>
         <source>Add Tag to Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Agregar etiqueta al filtro</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="292"/>
         <source>Filter Tags...</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrar etiquetas...</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="310"/>
         <source>Match all selected tags</source>
-        <translation type="unfinished"></translation>
+        <translation>Coincidir con todas las etiquetas seleccionadas</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="353"/>
         <source>Manage Workout Filters</source>
-        <translation type="unfinished"></translation>
+        <translation>Administrar filtros de entrenamientos</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="360"/>
         <source>Name</source>
-        <translation type="unfinished">Nombre</translation>
+        <translation>Nombre</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="361"/>
         <source>Filter</source>
-        <translation type="unfinished">Filtro</translation>
+        <translation>Filtro</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="362"/>
         <source>_index</source>
-        <translation type="unfinished"></translation>
+        <translation>_índice</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="370"/>
         <source>Execute</source>
-        <translation type="unfinished">Ejecutar</translation>
+        <translation>Ejecutar</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="371"/>
         <source>Update</source>
-        <translation type="unfinished"></translation>
+        <translation>Actualizar</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="423"/>
         <source>Add Workout Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Agregar filtro de entrenamiento</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="426"/>
         <source>Name of the Filter...</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre del filtro...</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="467"/>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuevo</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="469"/>
         <source>New (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuevo (%1)</translation>
     </message>
 </context>
 <context>
