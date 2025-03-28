@@ -12007,7 +12007,7 @@ La lunghezza della piscina (in metri) permette di ridefinire il campo se il valo
     <message>
         <location filename="../../FileIO/FixLapSwim.cpp" line="65"/>
         <source>Min Rest</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Riposo Min</translation>
     </message>
 </context>
 <context>
@@ -12042,7 +12042,7 @@ La lunghezza della piscina (in metri) permette di ridefinire il campo se il valo
     <message>
         <location filename="../../FileIO/FixMoxy.cpp" line="51"/>
         <source>&lt;b&gt;Field Adjustment&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Aggiustamento Campo&lt;b&gt;</translation>
     </message>
     <message>
         <source>When recording from the Moxy or BSX Insight in Speed and cadence mode the SmO2 and tHb data is sent as cadence and speed respectively. This tool will update the activity file to move the values from speed and cadence into the Moxy series.</source>
@@ -12122,7 +12122,7 @@ Se sono forniti entrambi i valori, viene considerato prima l&apos;aggiustamento 
     <message>
         <location filename="../../FileIO/FixPyDataProcessor.cpp" line="54"/>
         <source>Custom Python Data Processor</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Processore Data Python Personalizzato</translation>
     </message>
 </context>
 <context>
@@ -12247,7 +12247,7 @@ L&apos;attivita&apos; deve essere una Corsa con Velocita&apos; e Altitudine.</tr
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="84"/>
         <source>Draft Mult.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scia Molt.</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="85"/>
@@ -12917,7 +12917,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Colors.cpp" line="222"/>
         <source>Overview Tile Background</source>
-        <translation type="unfinished"></translation>
+        <translation>Panoramica Sfondo Riquadro</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="229"/>
@@ -12932,22 +12932,22 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Colors.cpp" line="231"/>
         <source>Overview Tile Background Alternate</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Panoramica Sfondo Riquadro Alternato</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="232"/>
         <source>Overview Tile Background Vibrant</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Panoramica Sfondo Riquadro Vivace</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="233"/>
         <source>Map Route Line</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Linea Mappa Rotta</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="234"/>
         <source>Stress Ramp Rate</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rampa Stress Ritmo</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="221"/>
@@ -13428,7 +13428,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/GcCrashDialog.cpp" line="251"/>
         <source>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;%3&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VIDEO&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SAMPLERATE&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SSL&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;R&lt;/td&gt;&lt;td&gt;%16&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;Python&lt;/td&gt;&lt;td&gt;%18&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LMFIT&lt;/td&gt;&lt;td&gt;7.0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;GSL&lt;/td&gt;&lt;td&gt;%19&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;%3&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VIDEO&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;FREQUENZA DI CAMPIONAMENTO&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SSL&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;R&lt;/td&gt;&lt;td&gt;%16&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;Python&lt;/td&gt;&lt;td&gt;%18&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LMFIT&lt;/td&gt;&lt;td&gt;7.0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;GSL&lt;/td&gt;&lt;td&gt;%19&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</translation>
     </message>
     <message>
         <location filename="../../Gui/GcCrashDialog.cpp" line="456"/>
@@ -13557,7 +13557,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="390"/>
         <source>We are about to upgrade your data and layouts to v3.6, please note Ride Summary chart was deprecated, and to use v3.5 again you will need to restore a backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Stiamo per aggiornare i tuoi dati e layout alla versione 3.6, per favore fate attenzione che il grafico del Sommario dell&apos;allenamento è stato deprecato, e per usare ancora la versione 3.5 si dovrà ripristinare un backup</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="554"/>
@@ -13898,7 +13898,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="111"/>
         <source>Elevation Chart</source>
-        <translation type="unfinished"></translation>
+        <translation>Grafico di Ascesas</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="112"/>
@@ -14031,7 +14031,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Pages.cpp" line="234"/>
         <source>Deviate from default location</source>
-        <translation type="unfinished"></translation>
+        <translation>Deviazione dalla posizione di default</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="246"/>
@@ -14749,7 +14749,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="93"/>
         <source>Entry field for Searching and Filtering of workouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Campo di inserimento per Cercare e Filtrare gli allenamenti</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="97"/>
@@ -15041,7 +15041,7 @@ In modalità Allenamento, visualizza/nasconde la Regolazione Intensità e il Pan
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="294"/>
         <source>Show elevation profile of instant position</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mostra il profile di ascesa della posizione istantanea</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="298"/>
@@ -15136,17 +15136,17 @@ In modalità Allenamento, visualizza/nasconde la Regolazione Intensità e il Pan
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="376"/>
         <source>Metrics shown in &apos;Intervals&apos; and &apos;Summary&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Parametri mostrati come &apos;Intervalli&apos; e &apos;Sommario&apos;</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="378"/>
         <source>User/Custom Metrics</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramtri Utente/Personalizzati</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="380"/>
         <source>Create or Edit a User Metric</source>
-        <translation type="unfinished"></translation>
+        <translation>Crea o modifica un parametro utente</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="382"/>
@@ -16843,67 +16843,67 @@ In modalità Allenamento, visualizza/nasconde la Regolazione Intensità e il Pan
     <message>
         <location filename="../../Train/InfoWidget.cpp" line="125"/>
         <source>Never</source>
-        <translation type="unfinished">Mai</translation>
+        <translation>Mai</translation>
     </message>
     <message>
         <location filename="../../Train/InfoWidget.cpp" line="132"/>
         <source>today</source>
-        <translation type="unfinished"></translation>
+        <translation>oggi</translation>
     </message>
     <message>
         <location filename="../../Train/InfoWidget.cpp" line="134"/>
         <source>yesterday</source>
-        <translation type="unfinished"></translation>
+        <translation>ieri</translation>
     </message>
     <message>
         <location filename="../../Train/InfoWidget.cpp" line="136"/>
         <source>%1 days ago</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 gioni fa</translation>
     </message>
     <message>
         <location filename="../../Train/InfoWidget.cpp" line="138"/>
         <source>%1 weeks ago</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 settimane fa</translation>
     </message>
     <message>
         <location filename="../../Train/InfoWidget.cpp" line="140"/>
         <source>%1 months ago</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 mesi fa</translation>
     </message>
     <message>
         <location filename="../../Train/InfoWidget.cpp" line="142"/>
         <source>1 year ago</source>
-        <translation type="unfinished"></translation>
+        <translation>1 anno fa</translation>
     </message>
     <message>
         <location filename="../../Train/InfoWidget.cpp" line="144"/>
         <source>%1 years ago</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 anni fa</translation>
     </message>
     <message>
         <location filename="../../Train/InfoWidget.cpp" line="149"/>
         <source>Last Run: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ultima corsa: %1</translation>
     </message>
     <message>
         <location filename="../../Train/InfoWidget.cpp" line="193"/>
         <source>Distance</source>
-        <translation type="unfinished">Distanza</translation>
+        <translation>Distanza</translation>
     </message>
     <message>
         <location filename="../../Train/InfoWidget.cpp" line="196"/>
         <source>Elevation Gain</source>
-        <translation type="unfinished">Ascesa</translation>
+        <translation>Ascesa</translation>
     </message>
     <message>
         <location filename="../../Train/InfoWidget.cpp" line="201"/>
         <source>Min Elevation</source>
-        <translation type="unfinished"></translation>
+        <translation>Ascesa minima</translation>
     </message>
     <message>
         <location filename="../../Train/InfoWidget.cpp" line="204"/>
         <source>Max Elevation</source>
-        <translation type="unfinished"></translation>
+        <translation>Ascesa massima</translation>
     </message>
 </context>
 <context>
@@ -17184,7 +17184,7 @@ In modalità Allenamento, visualizza/nasconde la Regolazione Intensità e il Pan
     <message>
         <location filename="../../Gui/Pages.cpp" line="2214"/>
         <source>&lt;h3&gt;Alternative Keywords&lt;/h3&gt;Add additional keyword to have the same color</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;h3&gt;Parola chiave alternativa&lt;/h3&gt;Aggiungi una parola chiave addizionale per avere lo stesso colore</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2229"/>
@@ -18558,22 +18558,22 @@ In modalità Allenamento, visualizza/nasconde la Regolazione Intensità e il Pan
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="271"/>
         <source>RMSE 2.9 for 22 tests.</source>
-        <translation type="unfinished"></translation>
+        <translation>RMSE 2.9 per 22 test.</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="490"/>
         <source>%1 watts on %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 watts su %2</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="491"/>
         <source>%1 on %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 su %2</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="497"/>
         <source>RMSE %1 for %2 tests.</source>
-        <translation type="unfinished"></translation>
+        <translation>RMSE %1 per %2 test.</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="1319"/>
@@ -19015,7 +19015,7 @@ In modalità Allenamento, visualizza/nasconde la Regolazione Intensità e il Pan
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2128"/>
         <source>%s expects a string name (the tab name in the raw data view)</source>
-        <translation type="unfinished"></translation>
+        <translation>%s si aspetta una stringa come nome (il nome della scheda nella vista dei dati raw)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2135"/>
@@ -19536,22 +19536,22 @@ In modalità Allenamento, visualizza/nasconde la Regolazione Intensità e il Pan
     <message>
         <location filename="../../Train/Library.cpp" line="199"/>
         <source>%1 cannot be written to videoSync library %2. Check library path, permissions and free space</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 non può essere scritto nella libreria videoSync %2. Controlla il percosso della libreria, i permessi e lo spazio libero</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="203"/>
         <source>%1 cannot be written to videoSync library %2, check permissions and free space</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 non può essere scritto nella libreria videoSync %2, controlla i permessi e lo spazio libero</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="249"/>
         <source>%1 cannot be written to workout library %2. Check library path, permissions and free space</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 non può essere scritto nella libreria degli allenamenti %2. Controlla il percosso della libreria, i permessi e lo spazio libero</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="253"/>
         <source>%1 cannot be written to workout library %2, check permissions and free space</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 non può essere scritto nella libreria degli allenamenti %2, controlla i permessi e lo spazio libero</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="239"/>
@@ -19681,7 +19681,7 @@ In modalità Allenamento, visualizza/nasconde la Regolazione Intensità e il Pan
     <message>
         <location filename="../../Train/LiveMapWebPageWindow.cpp" line="85"/>
         <source>Initial Zoom</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom iniziale</translation>
     </message>
     <message>
         <location filename="../../Train/LiveMapWebPageWindow.cpp" line="98"/>
@@ -25814,7 +25814,7 @@ Vuoi continuare?</translation>
     <message>
         <location filename="../../Gui/PerspectiveDialog.cpp" line="271"/>
         <source>Select Perspective file to import</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleziona file di prospettiva per l&apos;importazione</translation>
     </message>
     <message>
         <location filename="../../Gui/PerspectiveDialog.cpp" line="273"/>
@@ -27901,7 +27901,7 @@ Python disabilitato nelle preferenze.</translation>
         <location filename="../../Charts/RideEditor.cpp" line="351"/>
         <location filename="../../Charts/RideEditor.cpp" line="1013"/>
         <source>Core Temperature</source>
-        <translation type="unfinished">Temperatura di base</translation>
+        <translation>Temperatura di base</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="759"/>
@@ -28333,7 +28333,7 @@ Vuoi continuare?</translation>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="418"/>
         <source>Core Temperature</source>
-        <translation type="unfinished">Temperatura di base</translation>
+        <translation>Temperatura di base</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="419"/>
@@ -28720,7 +28720,7 @@ Vuoi continuare?</translation>
     <message>
         <location filename="../../FileIO/RideFileTableModel.cpp" line="125"/>
         <source>Core Temperature</source>
-        <translation type="unfinished">Temperatura di base</translation>
+        <translation>Temperatura di base</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFileTableModel.cpp" line="129"/>
@@ -29334,7 +29334,7 @@ Vuoi continuare?</translation>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="84"/>
         <source>Hide Out &amp; Back Route Opacity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nascondi l&apos;opacità della rotta andata e ritorno</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="85"/>
@@ -31301,7 +31301,7 @@ per la simulazione della velocita&apos; quando e&apos; attiva l&apos;opzione
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="58"/>
         <source>SubSport</source>
-        <translation type="unfinished">SottoSport</translation>
+        <translation>SottoSport</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="60"/>
@@ -31477,7 +31477,7 @@ per la simulazione della velocita&apos; quando e&apos; attiva l&apos;opzione
     <message>
         <location filename="../../Gui/SplashScreen.cpp" line="52"/>
         <source>%1 - build %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 - versione %2</translation>
     </message>
 </context>
 <context>
@@ -32223,7 +32223,7 @@ Se la nuova attività è in conflitto con un&apos;attività pre-esistente (stess
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="648"/>
         <source>Average Swim Pace for butterfly lengths</source>
-        <translation type="unfinished"></translation>
+        <translation>Ritmo di nuoto medio per la lunghezza delle bracciate stile farfalla</translation>
     </message>
     <message>
         <source>Average Swim Pace for freestyle lengths</source>
@@ -35192,12 +35192,12 @@ Premi F3 sul Controller quando finito.</translation>
     <message>
         <location filename="../../Train/WorkoutFilterBox.cpp" line="44"/>
         <source>Filter...</source>
-        <translation type="unfinished">Filtro...</translation>
+        <translation>Filtro...</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutFilterBox.cpp" line="95"/>
         <source>ERROR: %1</source>
-        <translation type="unfinished">ERRORE: %1</translation>
+        <translation>ERRORE: %1</translation>
     </message>
 </context>
 <context>
@@ -35242,37 +35242,37 @@ Si possono rimuovere le referenze quando si gestisce la librearia atraverso le o
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="271"/>
         <source>Select Tags</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona Tag</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="274"/>
         <source>Manage Filters</source>
-        <translation type="unfinished">Gestisci filtri</translation>
+        <translation>Gestisci filtri</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="275"/>
         <source>Add Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiungi Filtro</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="289"/>
         <source>Add Tag to Filter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aggiungi tag al filtro</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="292"/>
         <source>Filter Tags...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Filtra i tag...</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="310"/>
         <source>Match all selected tags</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Combina tutti i tag selezionati</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="353"/>
         <source>Manage Workout Filters</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Gestisci filtri di allenamento</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="360"/>
@@ -35287,12 +35287,12 @@ Si possono rimuovere le referenze quando si gestisce la librearia atraverso le o
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="362"/>
         <source>_index</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">_indice</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="370"/>
         <source>Execute</source>
-        <translation type="unfinished">Esegue</translation>
+        <translation type="unfinished">Esegui</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="371"/>
@@ -35302,12 +35302,12 @@ Si possono rimuovere le referenze quando si gestisce la librearia atraverso le o
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="423"/>
         <source>Add Workout Filter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aggiungi filtro di allenamento</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="426"/>
         <source>Name of the Filter...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nome del filtro...</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="467"/>
