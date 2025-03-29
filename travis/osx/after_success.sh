@@ -54,7 +54,7 @@ python3.7 -m pip install travis-wait-improved
 /Library/Frameworks/Python.framework/Versions/3.7/bin/travis-wait-improved --timeout 30m /usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -fs=hfs+ -dmg
 
 echo "Renaming dmg file to branch and build number ready for deploy"
-export FINAL_NAME=GoldenCheetah_v3.7-DEV_x64.dmg
+export FINAL_NAME=GoldenCheetah_v3.7_x64.dmg
 mv GoldenCheetah.dmg $FINAL_NAME
 ls -l $FINAL_NAME
 
