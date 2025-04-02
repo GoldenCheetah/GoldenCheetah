@@ -5,7 +5,7 @@
                                      Mark Liversedge
                                      Ale Martinez
 
-                                        Mar 2024
+                                        Mar 2025
                                       Version 3.7
 
 A walkthrough of building GoldenCheetah from scratch on Mac OSX. This was performed
@@ -92,10 +92,10 @@ build a release you need to checkout the code at the tag for the release.
 
 A list of releases can be found at: https://github.com/GoldenCheetah/GoldenCheetah/tags
 
-$ git checkout V3.6
+$ git checkout V3.7
 $ ls
 
-The following walkthrough is based on latest master, if you want to build v3.6 please
+The following walkthrough is based on latest master, if you want to build v3.7 please
 see the travis scripts in the repository.
 
 1.5 Install HomeBrew
@@ -118,7 +118,7 @@ $ qmake --version
 1.6 Install GSL and Bison
 -------------------------
 
-GSL is a mandatory dependency from v3.6, you can install using HomeBrew:
+GSL is a mandatory dependency from v3.7, you can install using HomeBrew:
 
 $ brew install gsl
 
@@ -206,7 +206,12 @@ technical skills we do not provide a walkthrough for building them all but
 instead provide the configure settings and any special considerations that
 should be taken into account.
 
-See Travis scripts in the repository for the changes you need to make:
-- travis/osx/before_install.sh
-- travis/osx/before_script.sh
+See src/gcconfig.pri.in for instructions and the now deprecated Travis CI scripts
+in the repository for examples the changes you need to make:
+- deprecated/osx/before_install.sh
+- deprecated/osx/before_script.sh
 and then rebuild.
+
+If you plan to use Cloud Services, you need to obtain the proper API keys for
+the service, a detailed example can be found in GoldenCheetah Developers Guide
+https://github.com/GoldenCheetah/GoldenCheetah/wiki/Strava-configuration
