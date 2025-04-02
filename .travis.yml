@@ -47,10 +47,6 @@ env:
 
 jobs:
   include:
-  - if: commit_message !~ /\[skip osx\]/
-    os: osx
-    osx_image: xcode14.2
-    compiler: clang
   - if: commit_message !~ /\[skip linux\]/
     os: linux
     dist: jammy
@@ -64,9 +60,6 @@ before_script:
 
 script:
 - travis/$TRAVIS_OS_NAME/script.sh
-
-before_cache:
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew cleanup; fi
 
 after_success:
 - travis/$TRAVIS_OS_NAME/after_success.sh
