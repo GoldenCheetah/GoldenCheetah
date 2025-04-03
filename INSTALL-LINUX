@@ -6,10 +6,10 @@
                                      John Ehrlinger
                                      Ale Martinez
 
-                                        Jul 2022
-                                      Version 3.6
+                                        Mar 2025
+                                      Version 3.7
 
-A walkthrough of building GoldenCheetah from scratch on Ubuntu linux 18.04
+A walkthrough of building GoldenCheetah from scratch on Ubuntu linux 22.04
 This walkthrough should be largely the same for any Debian derivative Linux
 distro, and very similar for others using their correspoing package manager.
 
@@ -27,7 +27,7 @@ CONTENTS
    - FTDI D2XX
    - SRMIO
    - liboauth
-   - libvlc  - Video playback in training mode
+   - Qt6 Video  - Video playback in training mode
    - libical - Diary window and CalDAV support (external calendar integration)
    - libusb  - If you want support for using USB2 sticks in Train View
    - R       - If you want R charts
@@ -46,11 +46,11 @@ login and open a terminal to get a shell prompt
 Install Qt
 ----------
 Download and install the Qt SDK from http://qt-project.org/
-You can use a browser to download and run the interactive installer, be sure to
-select version 5.15.2 or higher Qt 5 version, including at least the following modules:
+You can use a browser to download and run the interactive installer and select
+a Qt version, in this case we used Qt 6.8.3, including at least the following modules:
 - Desktop gcc 64-bit
-- Qt Charts
-- Qt WebEngine
+- Additional Libraries
+- Qt WebEngine under Extensions
 Once this step is completed add the bin directory to PATH and test qmake is ok:
 $ qmake --version
 
@@ -78,6 +78,16 @@ $ mkdir -p ~/Projects
 $ cd ~/Projects
 $ git clone git://github.com/GoldenCheetah/GoldenCheetah.git
 $ cd GoldenCheetah
+
+Selecte the version to build
+----------------------------
+If you are wanting to build a particular release you need to checkout the release.
+To build a release you need to checkout the code at the tag for the release.
+
+A list of releases can be found at: https://github.com/GoldenCheetah/GoldenCheetah/tags
+
+$ git checkout V3.7
+$ ls
 
 Configure MANDATORY DEPENDENCIES
 --------------------------------
@@ -222,22 +232,14 @@ $ make
 
 You should now have diary functions.
 
-LIBVLC - Video playback in Realtime
------------------------------------
-
-You will need libvlc 3.0.8 or higher for better performance:
-
-sudo add-apt-repository ppa:jonathonf/vlc-3
-sudo add-apt-repository ppa:jonathonf/ffmpeg-4
-sudo apt-get update
-sudo apt-get install vlc libvlc-dev libvlccore-dev
+Qt6 Video - Video playback in Realtime
+--------------------------------------
 
 $ cd ~/Projects/GoldenCheetah/src
 $ vi gcconfig.pri
 
-Comment out VLC_INSTALL and it should read:
-
-VLC_INSTALL = /usr
+Uncomment the line
+#DEFINES += GC_VIDEO_QT6
 
 $ make clean
 $ qmake
@@ -309,3 +311,7 @@ PYTHONLIBS = -L/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu -lpython3.7m
 $ make clean
 $ qmake
 $ make
+
+If you plan to use Cloud Services, you need to obtain the proper API keys for
+the service, a detailed example can be found in GoldenCheetah Developers Guide
+https://github.com/GoldenCheetah/GoldenCheetah/wiki/Strava-configuration
