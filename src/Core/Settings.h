@@ -39,12 +39,7 @@
 //Cycling Analytics / see also Athlete parameter
 #define GC_CYCLINGANALYTICS_CLIENT_ID    "1504958" // app id
 
-//Withings oauth keys
-#ifndef GC_WITHINGS_CONSUMER_KEY
-#define GC_WITHINGS_CONSUMER_KEY    "292875b6883b87e27cefd2555d1cb872b2282f02fee25b4906871314934" //< consumer key
-#endif
-
-//Nokia
+// Withings/Nokia
 #ifndef GC_NOKIA_CLIENT_ID
 #define GC_NOKIA_CLIENT_ID    "eaa338e1f64bcdb8579d21550df661c84d1d28e2053c5d0ede4600c1ebc8b6cd"
 #endif
