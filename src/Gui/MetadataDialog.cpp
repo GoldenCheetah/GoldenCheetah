@@ -201,11 +201,19 @@ MetadataDialog::okClicked()
 
     // Update special field
     if ((field_.name == "Device") && (rideF->deviceType() != text)) {
+
+        // Update the device value in the ride file.
         rideF->setDeviceType(text);
+
+        // rideFile is now dirty!
+        rideI->setDirty(true);
+
+        // refresh as state has changed
+        rideI->notifyRideMetadataChanged();
 
     } else if (rideF->getTag(field_.name, "") != text) {
  
-        // Update the metadata value in the tile and ride file.
+        // Update the metadata value in the ride file.
         rideF->setTag(field_.name, text);
 
         // rideFile is now dirty!
