@@ -123,11 +123,6 @@ AthleteTab::~AthleteTab()
 void
 AthleteTab::close()
 {
-    analysisView->saveState();
-    homeView->saveState();
-    trainView->saveState();
-    diaryView->saveState();
-
     analysisView->close();
     homeView->close();
     trainView->close();
