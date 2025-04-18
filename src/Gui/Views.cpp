@@ -62,7 +62,6 @@ AnalysisView::~AnalysisView()
 {
     appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "analysis", _sidebar);
     delete analSidebar;
-    //delete hw; tabview deletes after save state
 }
 
 void
@@ -150,7 +149,6 @@ DiaryView::~DiaryView()
 {
     appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "diary", _sidebar);
     delete diarySidebar;
-    //delete hw; tabview deletes after save state
 }
 
 void
@@ -204,7 +202,6 @@ TrendsView::~TrendsView()
 {
     appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "trend", _sidebar);
     delete sidebar;
-    //delete hw; tabview deletes after save state
 }
 
 void
@@ -318,7 +315,6 @@ TrainView::~TrainView()
 {
     appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "train", _sidebar);
     delete trainTool;
-    //delete hw; tabview deletes after save state
 }
 
 void
