@@ -217,10 +217,10 @@ technical skills we do not provide a walkthrough for building them all but
 instead provide the configure settings and any special considerations that
 should be taken into account.
 
-See src/gcconfig.pri.in for instructions and the now deprecated Travis CI scripts
-in the repository for examples the changes you need to make:
-- deprecated/osx/before_install.sh
-- deprecated/osx/before_script.sh
+See src/gcconfig.pri.in for instructions and the AppVeyor CI scripts
+in the repository for examples about the changes you need to make:
+- appveyor/macos/install.sh
+- appveyor/macos/before_build.sh
 and then rebuild.
 
 If you plan to use Cloud Services, you need to obtain the proper API keys for

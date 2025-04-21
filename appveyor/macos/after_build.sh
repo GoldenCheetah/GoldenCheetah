@@ -1,9 +1,6 @@
 #!/bin/bash
 set -ev
 cd src
-echo "Checking GoldenCheetah.app can execute"
-GoldenCheetah.app/Contents/MacOS/GoldenCheetah --version 2>GCversionMacOS.txt
-cat GCversionMacOS.txt
 
 echo "About to create dmg file and fix up"
 mkdir GoldenCheetah.app/Contents/Frameworks
@@ -32,7 +29,7 @@ rm -r GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/lib/py
 cp -R ../site-packages GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/lib/python3.7
 
 # Initial deployment using macdeployqt
-/usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -executable=GoldenCheetah.app/Contents/MacOS/GoldenCheetah
+macdeployqt GoldenCheetah.app -verbose=2 -executable=GoldenCheetah.app/Contents/MacOS/GoldenCheetah
 
 # Fix QtWebEngineProcess due to bug in macdployqt from homebrew
 if [ ! -f GoldenCheetah.app/Contents/Frameworks/QtWebEngineCore.framework/Helpers/QtWebEngineProcess.app/Contents/MacOS/QtWebEngineProcess ]; then
@@ -50,31 +47,9 @@ done
 popd
 
 # Final deployment to generate dmg (may take longer than 10' without output)
-python3.7 -m pip install travis-wait-improved
-/Library/Frameworks/Python.framework/Versions/3.7/bin/travis-wait-improved --timeout 30m /usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -fs=hfs+ -dmg
+macdeployqt GoldenCheetah.app -verbose=2 -fs=hfs+ -dmg
 
 echo "Renaming dmg file to branch and build number ready for deploy"
-export FINAL_NAME=GoldenCheetah_v3.7_x64.dmg
-mv GoldenCheetah.dmg $FINAL_NAME
-ls -l $FINAL_NAME
+mv GoldenCheetah.dmg ../GoldenCheetah_v3.7_x64.dmg
 
-# Add last commit message and SHA256 to txt file
-git log -1 >> GCversionMacOS.txt
-echo "SHA256 hash of $FINAL_NAME:" >> GCversionMacOS.txt
-shasum -a 256 $FINAL_NAME | cut -f 1 -d ' ' >> GCversionMacOS.txt
-cat GCversionMacOS.txt
-
-echo "Uploading for user tests"
-### upload for testing
-if [[ $TRAVIS_PULL_REQUEST == "false" && $TRAVIS_COMMIT_MESSAGE == *"[publish binaries]"* ]]; then
-mkdir out
-mv $FINAL_NAME out
-mv GCversionMacOS.txt out
-ghr -n "Snapshot Builds" -replace snapshot out
-else
-curl --max-time 300 -F "file=@$FINAL_NAME" https://temp.sh/upload
-fi
-
-echo "Make sure we are back in the Travis build directory"
-cd $TRAVIS_BUILD_DIR
 exit

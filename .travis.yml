@@ -9,12 +9,9 @@ language: cpp
 
 cache:
   directories:
-  - $HOME/Library/Caches/Homebrew
   - qwt
   - D2XX
-  - site-packages
   - VLC
-  - src/GoldenCheetah.app
 
 env:
   global:

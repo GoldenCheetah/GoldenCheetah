@@ -2,11 +2,10 @@
 set -ev
 
 date
-# Don't update to use included Qt version
+# Don't update or cleanup
 export HOMEBREW_NO_AUTO_UPDATE=1
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
-brew install qt5
 brew install bison@2.7
 brew install gsl
 brew install libical
@@ -32,6 +31,7 @@ cd ..
 
 # D2XX - refresh cache if folder is empty
 if [ -z "$(ls -A D2XX)" ]; then
+    mkdir -p D2XX
     curl -O https://ftdichip.com/wp-content/uploads/2021/05/D2XX1.4.24.zip
     unzip D2XX1.4.24.zip
     hdiutil mount D2XX1.4.24.dmg
@@ -43,6 +43,7 @@ sudo cp D2XX/libftd2xx.1.4.24.dylib /usr/local/lib
 
 # VLC
 if [[ -z "$(ls -A VLC)" ]]; then
+    mkdir -p VLC
     curl -O http://download.videolan.org/pub/videolan/vlc/3.0.8/macosx/vlc-3.0.8.dmg
     hdiutil mount vlc-3.0.8.dmg
     cp -R "/Volumes/VLC media player/VLC.app/Contents/MacOS/include" VLC/include
@@ -52,7 +53,26 @@ if [[ -z "$(ls -A VLC)" ]]; then
 fi
 sudo cp VLC/lib/libvlc*.dylib /usr/local/lib
 
-# GHR to updload binaries to GitHub releases
-brew install ghr
+# Python 3.7.8
+curl -O https://www.python.org/ftp/python/3.7.9/python-3.7.9-macosx10.9.pkg
+sudo installer -pkg python-3.7.9-macosx10.9.pkg -target /
+
+python3.7 --version
+python3.7-config --prefix
+
+# Python mandatory packages - refresh cache if folder is empty
+if [ -z "$(ls -A site-packages)" ]; then
+    mkdir -p site-packages
+    python3.7 -m pip install -q -r src/Python/requirements.txt -t site-packages
+fi
+
+# Python SIP
+curl -k -L -O https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.tar.gz
+tar xf sip-4.19.8.tar.gz
+cd sip-4.19.8
+python3.7 configure.py
+make -j4
+sudo make install
+cd ..
 
 exit
