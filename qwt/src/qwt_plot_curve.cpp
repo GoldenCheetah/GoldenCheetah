@@ -902,6 +902,8 @@ void QwtPlotCurve::fillCurve( QPainter* painter,
     if ( polygon.count() <= 2 ) // a line can't be filled
         return;
 
+    double avg=(yMap.invTransform(polygon[0].y())+yMap.invTransform(polygon[1].y())) / 2.00;
+
     QBrush brush = m_data->brush;
     if ( !brush.color().isValid() )
         brush.setColor( m_data->pen.color() );
@@ -916,6 +918,27 @@ void QwtPlotCurve::fillCurve( QPainter* painter,
 
     painter->setPen( Qt::NoPen );
     painter->setBrush( brush );
+
+    // if we have zones we need to process the polygon point by point...
+    if (m_data->zones.count()>0 && polygon.count() == 4) {
+
+        // we need to set color based upon zone
+        double alpha = m_data->brush.color().alphaF();
+        QColor color = m_data->brush.color();
+
+        if (avg < 1) color=Qt::black;
+        else {
+            for(int i=0; i<m_data->zones.count(); i++) {
+                if (avg < m_data->zones[i].lim) {
+                    color = m_data->zones[i].color;
+                    color.setAlphaF(alpha);
+                    break;
+                }
+            }
+        }
+        brush.setColor(color);
+        painter->setBrush(brush);
+    }
 
     QwtPainter::drawPolygon( painter, polygon );
 
