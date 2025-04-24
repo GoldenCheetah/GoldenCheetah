@@ -269,7 +269,7 @@ deploy:
       secure: 807DE/9vib/Kjz5Tah/Zc6zkoigLEWRzASw/DUWjLwZ5d8HHomXqWQ7iln4VtOqL
     release: snapshot
     description: 'Snapshot Builds'
-    artifact: GCinstaller, GCversionWindows
+    artifact: GCinstallerWindows, GCversionWindows, GCmacOSpackage, GCversionMacOS
     draft: false
     prerelease: true
     force_update: true
