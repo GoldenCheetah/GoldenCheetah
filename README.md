@@ -38,9 +38,9 @@ INSTALL-LINUX   For building on Linux
 
 INSTALL-MAC     For building on Apple MacOS
 
-macOS and Linux: [![Build Status](https://app.travis-ci.com/GoldenCheetah/GoldenCheetah.svg?branch=master)](https://app.travis-ci.com/GoldenCheetah/GoldenCheetah)
+Linux: [![Build Status](https://app.travis-ci.com/GoldenCheetah/GoldenCheetah.svg?branch=master)](https://app.travis-ci.com/GoldenCheetah/GoldenCheetah)
 
-Windows: [![Build status](https://ci.appveyor.com/api/projects/status/i6dwn4m8oyu52ihi?svg=true)](https://ci.appveyor.com/project/Joern-R/goldencheetah-knhd8)
+Windows and macOS: [![Build status](https://ci.appveyor.com/api/projects/status/i6dwn4m8oyu52ihi?svg=true)](https://ci.appveyor.com/project/Joern-R/goldencheetah-knhd8)
 
 Official release builds, snapshots and development builds are all available from http://www.goldencheetah.org
 
@@ -48,3 +48,6 @@ Official release builds, snapshots and development builds are all available from
 
 If you are looking for the NOTIO fork of GoldenCheetah it can be found here: https://github.com/notio-technologies/GCNotio
 
+## Feedback
+
+If you have questions or would like to give feedback, we have a Users Forum: https://groups.google.com/g/golden-cheetah-users
