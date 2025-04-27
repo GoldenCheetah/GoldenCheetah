@@ -58,9 +58,9 @@ init:
 - cmd: set PATH=%PATH%;C:\"Program Files (x86)"\NSIS
 
 # macOS
-# Setup QT 5.15
-- sh: export QTDIR=$HOME/Qt/5.15.2/clang_64
-- sh: export PATH=$HOME/Qt/5.15.2/clang_64/bin:$PATH
+# Setup QT 6.5
+- sh: export QTDIR=$HOME/Qt/6.5/macos
+- sh: export PATH=$HOME/Qt/6.5/macos/bin:$PATH
 - sh: qmake --version
 # Setup Xcode 14.2
 - sh: sudo xcode-select -s /Applications/Xcode-14.2.0.app
@@ -72,9 +72,8 @@ cache:
 - C:\R
 - C:\Python -> src\Python\requirements.txt
 - c:\tools\vcpkg\installed\
-- qwt -> qwt/qwtconfig.pri.in
+- qwt -> qwt/qwtconfig.pri.in, appveyor.yml
 - D2XX
-- VLC
 - site-packages
 
 install:

@@ -54,10 +54,9 @@ sed -i "" "s|#\(HTPATH = ../httpserver.*\)|\1 |" src/gcconfig.pri
 # Robot
 sed -i "" "s|#\(DEFINES += GC_WANT_ROBOT.*\)|\1 |" src/gcconfig.pri
 
-# VLC & VIDEO
-sed -i "" "s|#\(VLC_INSTALL =.*\)|\1 ../VLC|" src/gcconfig.pri
+# Qt6 VIDEO
 sed -i "" "s|\(DEFINES += GC_VIDEO_NONE.*\)|#\1 |" src/gcconfig.pri
-sed -i "" "s|#\(DEFINES += GC_VIDEO_VLC.*\)|\1 |" src/gcconfig.pri
+sed -i "" "s|#\(DEFINES += GC_VIDEO_QT6.*\)|\1 |" src/gcconfig.pri
 
 # Enable R embedding
 sed -i "" "s|#\(DEFINES += GC_WANT_R.*\)|\1 |" src/gcconfig.pri

@@ -41,18 +41,6 @@ if [ -z "$(ls -A D2XX)" ]; then
 fi
 sudo cp D2XX/libftd2xx.1.4.24.dylib /usr/local/lib
 
-# VLC
-if [[ -z "$(ls -A VLC)" ]]; then
-    mkdir -p VLC
-    curl -O http://download.videolan.org/pub/videolan/vlc/3.0.8/macosx/vlc-3.0.8.dmg
-    hdiutil mount vlc-3.0.8.dmg
-    cp -R "/Volumes/VLC media player/VLC.app/Contents/MacOS/include" VLC/include
-    cp -R "/Volumes/VLC media player/VLC.app/Contents/MacOS/lib" VLC/lib
-    cp -R "/Volumes/VLC media player/VLC.app/Contents/MacOS/plugins" VLC/plugins
-    rm -f VLC/plugins/plugins.dat
-fi
-sudo cp VLC/lib/libvlc*.dylib /usr/local/lib
-
 # Python 3.7.8
 curl -O https://www.python.org/ftp/python/3.7.9/python-3.7.9-macosx10.9.pkg
 sudo installer -pkg python-3.7.9-macosx10.9.pkg -target /
