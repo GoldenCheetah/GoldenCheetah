@@ -23,6 +23,7 @@
 #include "CommPort.h"
 
 #ifdef Q_OS_WIN32 // for HANDLE
+#define NOMINMAX // prevents windows.h defining max & min macros
 #include <windows.h>
 #include <winbase.h>
 #endif

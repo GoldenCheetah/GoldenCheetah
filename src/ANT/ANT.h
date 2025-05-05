@@ -64,6 +64,7 @@
 #include <stdint.h> //uint8_t
 
 #ifdef WIN32
+#define NOMINMAX // prevents windows.h defining max & min macros
 #include <windows.h>
 #include <winbase.h>
 #include "USBXpress.h" // for Garmin USB1 sticks

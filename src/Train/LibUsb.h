@@ -23,6 +23,7 @@
 #if defined GC_HAVE_LIBUSB
 
 #ifdef WIN32
+#define NOMINMAX // prevents windows.h defining max & min macros
 #include <windows.h>
 #endif
 

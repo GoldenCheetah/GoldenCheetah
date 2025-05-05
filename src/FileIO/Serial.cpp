@@ -21,6 +21,7 @@
 #ifdef Q_OS_WIN32
 
 // WIN32 includes
+#define NOMINMAX // prevents windows.h defining max & min macros
 #include <windows.h>
 #include <winbase.h>
 #else

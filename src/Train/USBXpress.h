@@ -21,6 +21,7 @@
 
 #if defined WIN32 
 
+#define NOMINMAX // prevents windows.h defining max & min macros
 #include <windows.h>
 
 #ifdef GC_HAVE_USBXPRESS

@@ -41,6 +41,7 @@
 #include "RealtimeController.h"
 
 #ifdef WIN32
+#define NOMINMAX // prevents windows.h defining max & min macros
 #include <windows.h>
 #include <winbase.h>
 #else

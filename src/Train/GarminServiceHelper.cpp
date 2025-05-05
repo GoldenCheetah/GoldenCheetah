@@ -20,6 +20,7 @@
 #if defined(_MSC_VER)
 
 #pragma comment(lib, "advapi32.lib")
+#define NOMINMAX // prevents windows.h defining max & min macros
 #include <windows.h>
 
 class WindowsServiceHandle

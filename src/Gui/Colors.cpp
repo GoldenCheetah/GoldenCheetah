@@ -26,6 +26,7 @@
 #include "Settings.h"
 
 #ifdef Q_OS_WIN
+#define NOMINMAX // prevents windows.h defining max & min macros
 #include <windows.h>
 #ifdef GC_HAVE_DWM
 #include "dwmapi.h"

@@ -28,6 +28,7 @@
 #include <string>
 #include <sstream>
 
+#define NOMINMAX // prevents windows.h defining max & min macros
 #include <windows.h>
 #include <dbghelp.h>
 #pragma comment(lib, "dbghelp.lib")
