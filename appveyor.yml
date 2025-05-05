@@ -1,3 +1,7 @@
+# Warning: if you change this file qwt cache will be invalidated,
+# so it will be refreshed and the build terminated to store it.
+# RE-BUILD COMMIT is necessary to continue the build process.
+
 version: ci.{build}
 clone_depth: 1
 skip_tags: true
@@ -85,6 +89,7 @@ cache:
 - C:\Python -> src\Python\requirements.txt
 - c:\tools\vcpkg\installed\
 - qwt -> qwt/qwtconfig.pri.in, appveyor.yml
+- srmio -> appveyor.yml
 - D2XX
 - site-packages
 
@@ -203,12 +208,12 @@ build_script:
 
 # Windows
 - cmd: qmake.exe build.pro -r -spec win32-msvc
-- cmd: if not exist qwt\lib\qwt.lib jom -j1 sub-qwt
+- cmd: if not exist qwt\lib\qwt.lib jom -j1 sub-qwt & echo Re-build commit to continue & exit /b 1
 - cmd: jom -j4 sub-src
 
 # Linux / macOS
 - sh: qmake build.pro -r QMAKE_CXXFLAGS_WARN_ON+="-Wno-unused-private-field -Wno-c++11-narrowing -Wno-deprecated-declarations -Wno-deprecated-register -Wno-nullability-completeness -Wno-sign-compare -Wno-inconsistent-missing-override" QMAKE_CFLAGS_WARN_ON+="-Wno-deprecated-declarations -Wno-sign-compare"
-- sh: if test ! -f qwt/lib/libqwt.a; then make sub-qwt; fi
+- sh: if test ! -f qwt/lib/libqwt.a; then make sub-qwt; echo Re-build commit to continue; false; fi
 - sh: make -j4 sub-src
 
 after_build:

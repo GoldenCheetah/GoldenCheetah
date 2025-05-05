@@ -26,11 +26,15 @@ if [ -z "$(ls -A D2XX)" ]; then
 fi
 
 # SRMIO
-git clone https://github.com/rclasen/srmio.git
+if [ -z "$(ls -A srmio)" ]; then
+    git clone https://github.com/rclasen/srmio.git
+    cd srmio
+    sh genautomake.sh
+    ./configure --disable-shared --enable-static
+    make --silent -j2
+    cd ..
+fi
 cd srmio
-sh genautomake.sh
-./configure --disable-shared --enable-static
-make --silent -j3
 sudo make install
 cd ..
 

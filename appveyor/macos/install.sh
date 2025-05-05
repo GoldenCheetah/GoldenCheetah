@@ -20,12 +20,15 @@ sudo installer -pkg R-4.1.1.pkg -target /
 R --version
 
 # SRMIO
-curl -L -O https://github.com/rclasen/srmio/archive/v0.1.1git1.tar.gz
-tar xf v0.1.1git1.tar.gz
-cd srmio-0.1.1git1
-sh genautomake.sh
-./configure --disable-shared --enable-static
-make -j3 --silent
+if [ -z "$(ls -A srmio)" ]; then
+    git clone https://github.com/rclasen/srmio.git
+    cd srmio
+    sh genautomake.sh
+    ./configure --disable-shared --enable-static
+    make -j2 --silent
+    cd ..
+fi
+cd srmio
 sudo make install
 cd ..
 
