@@ -84,7 +84,7 @@ init:
 cache:
 - gc-ci-libs.zip -> appveyor.yml
 - jom_1_1_3.zip
-- sip-4.19.8.zip
+- sip-4.19.8 -> appveyor.yml
 - C:\R
 - C:\Python -> src\Python\requirements.txt
 - c:\tools\vcpkg\installed\
@@ -136,14 +136,17 @@ install:
     }
 
 # Get SIP and and install on Python
-- cmd: c:\python37-x64\python --version
-- cmd: if not exist sip-4.19.8.zip appveyor DownloadFile "https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.zip"
-- cmd: 7z x sip-4.19.8.zip
-- cmd: cd sip-4.19.8
-- cmd: c:\python37-x64\python configure.py
-- cmd: jom -j4
-- cmd: nmake install
-- cmd: cd ..
+- ps: >-
+    if ($isWindows -And -not (Test-Path 'sip-4.19.8')) {
+      Start-FileDownload "https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.zip"
+        7z x sip-4.19.8.zip
+        cd sip-4.19.8
+        c:\python37-x64\python --version
+        c:\python37-x64\python configure.py
+        jom -j2
+        cd ..
+    }
+- cmd: cd sip-4.19.8 & nmake install & cd ..
 
 # Add Python (avoiding collision between GC Context.h and Python context.h)
 - cmd: echo DEFINES+=GC_WANT_PYTHON >> src\gcconfig.pri

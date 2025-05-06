@@ -46,11 +46,15 @@ sudo add-apt-repository -y ppa:deadsnakes/ppa
 sudo apt-get update -qq
 sudo apt-get install -qq python3.7-dev python3.7-distutils
 python3.7 --version
-wget --no-verbose https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.tar.gz
-tar xf sip-4.19.8.tar.gz
+if [ -z "$(ls -A sip-4.19.8)" ]; then
+    wget --no-verbose https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.tar.gz
+    tar xf sip-4.19.8.tar.gz
+    cd sip-4.19.8
+    python3.7 configure.py --incdir=/usr/include/python3.7
+    make -j2
+    cd ..
+fi
 cd sip-4.19.8
-python3.7 configure.py --incdir=/usr/include/python3.7
-make
 sudo make install
 cd ..
 

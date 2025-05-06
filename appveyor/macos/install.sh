@@ -58,11 +58,15 @@ if [ -z "$(ls -A site-packages)" ]; then
 fi
 
 # Python SIP
-curl -k -L -O https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.tar.gz
-tar xf sip-4.19.8.tar.gz
+if [ -z "$(ls -A sip-4.19.8)" ]; then
+    curl -k -L -O https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.tar.gz
+    tar xf sip-4.19.8.tar.gz
+    cd sip-4.19.8
+    python3.7 configure.py
+    make -j2
+    cd ..
+fi
 cd sip-4.19.8
-python3.7 configure.py
-make -j4
 sudo make install
 cd ..
 
