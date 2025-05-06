@@ -824,31 +824,6 @@ MainWindow::showToolbar(bool want)
 }
 
 void
-MainWindow::setChartMenu()
-{
-    unsigned int mask=0;
-
-    // called when chart menu about to be shown
-    // setup to only show charts that are relevant
-    // to this view
-    switch(currentAthleteTab->currentView()) {
-        case 0 : mask = VIEW_TRENDS; break;
-        default:
-        case 1 : mask = VIEW_ANALYSIS; break;
-        case 2 : mask = VIEW_DIARY; break;
-        case 3 : mask = VIEW_TRAIN; break;
-    }
-
-    chartMenu->clear();
-    if (!mask) return;
-
-    for(int i=0; GcWindows[i].relevance; i++) {
-        if (GcWindows[i].relevance & mask)
-            chartMenu->addAction(GcWindows[i].name);
-    }
-}
-
-void
 MainWindow::setSubChartMenu()
 {
     setChartMenu(subChartMenu);
@@ -2592,25 +2567,6 @@ MainWindow::downloadMeasures(QAction *action)
     MeasuresDownload dialog(currentAthleteTab->context, measures->getGroup(group));
     dialog.exec();
 }
-
-void
-MainWindow::actionClicked(int index)
-{
-    switch(index) {
-
-    default:
-    case 0: currentAthleteTab->addIntervals();
-            break;
-
-    case 1 : splitRide();
-            break;
-
-    case 2 : deleteRide();
-            break;
-
-    }
-}
-
 
 void
 MainWindow::loadProgress
