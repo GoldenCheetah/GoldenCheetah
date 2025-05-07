@@ -28,7 +28,8 @@
 #include "TrainBottom.h"
 #include "Specification.h"
 
-AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_ANALYSIS)
+AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) :
+        AbstractView(context, VIEW_ANALYSIS, "analysis", "Compare Activities and Intervals")
 {
     analSidebar = new AnalysisSidebar(context);
     BlankStateAnalysisPage *b = new BlankStateAnalysisPage(context);
@@ -126,7 +127,8 @@ AnalysisView::isBlank()
     else return true;
 }
 
-DiaryView::DiaryView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_DIARY)
+DiaryView::DiaryView(Context *context, QStackedWidget *controls) :
+        AbstractView(context, VIEW_DIARY, "diary", "Compare Activities and Intervals")
 {
     diarySidebar = new DiarySidebar(context);
     BlankStateDiaryPage *b = new BlankStateDiaryPage(context);
@@ -176,7 +178,8 @@ DiaryView::isBlank()
     else return true;
 }
 
-TrendsView::TrendsView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_TRENDS)
+TrendsView::TrendsView(Context *context, QStackedWidget *controls) :
+        AbstractView(context, VIEW_TRENDS, "home", "Compare Date Ranges")
 {
     sidebar = new LTMSidebar(context);
     BlankStateHomePage *b = new BlankStateHomePage(context);
@@ -282,7 +285,8 @@ TrendsView::justSelected()
     }
 }
 
-TrainView::TrainView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_TRAIN)
+TrainView::TrainView(Context *context, QStackedWidget *controls) :
+        AbstractView(context, VIEW_TRAIN, "train", "Intensity Adjustments and Workout Control")
 {
     trainTool = new TrainSidebar(context);
     trainTool->setTrainView(this);
