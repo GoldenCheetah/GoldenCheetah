@@ -50,8 +50,8 @@ environment:
 init:
 
 # Windows
-# Setup QT 5.15 - 64Bit
-- cmd: set QTDIR=C:\Qt\5.15\msvc2019_64
+# Setup QT 6.5 - 64Bit
+- cmd: set QTDIR=C:\Qt\6.5\msvc2019_64
 - cmd: set PATH=%QTDIR%\bin;%PATH%
 - cmd: qmake --version
 # Setup MSVC - VS 2019
@@ -63,15 +63,15 @@ init:
 - sh: >-
     if $CI_LINUX; then
       export OS_NAME=linux
-      # Setup QT 5.15
-      export QTDIR=$HOME/Qt/5.15/gcc_64
-      export PATH=$HOME/Qt/5.15/gcc_64/bin:$PATH
+      # Setup QT 6.5
+      export QTDIR=$HOME/Qt/6.5/gcc_64
+      export PATH=$QTDIR/bin:$PATH
       qmake --version
     else
       export OS_NAME=macos
       # Setup QT 6.5
       export QTDIR=$HOME/Qt/6.5/macos
-      export PATH=$HOME/Qt/6.5/macos/bin:$PATH
+      export PATH=$QTDIR/bin:$PATH
       qmake --version
       # Setup Xcode 14.2
       sudo xcode-select -s /Applications/Xcode-14.2.0.app
@@ -101,6 +101,13 @@ install:
 # Get config
 - cmd: copy qwt\qwtconfig.pri.in qwt\qwtconfig.pri
 - cmd: copy c:\libs\gcconfig64-Release.appveyor.pri src\gcconfig.pri
+
+# Use Qt6 Video instead of VLC on Windows
+- ps: >-
+    if ($isWindows) {
+      (Get-Content src\gcconfig.pri) -replace 'GC_VIDEO_VLC', 'GC_VIDEO_QT6' | Set-Content src\gcconfig.pri
+      (Get-Content src\gcconfig.pri) -replace 'VLC_', '#VLC_' | Set-Content src\gcconfig.pri
+    }
 
 # Get jom
 - cmd: if not exist jom_1_1_3.zip appveyor DownloadFile "https://download.qt.io/official_releases/jom/jom_1_1_3.zip"
@@ -175,6 +182,9 @@ before_build:
 # Avoid macro redefinition warnings
 - cmd: echo DEFINES+=_MATH_DEFINES_DEFINED >> src\gcconfig.pri
 
+# Avoid conflict with min/max macros defined in Windows.h
+- echo DEFINES+=NOMINMAX >> src\gcconfig.pri
+
 # Linux / macOS
 - sh: bash appveyor/$OS_NAME/before_build.sh
 # Define GC version string, only for tagged builds
@@ -207,13 +217,13 @@ build_script:
 
 # Windows
 - cmd: qmake.exe build.pro -r -spec win32-msvc
-- cmd: if not exist qwt\lib\qwt.lib jom -j1 sub-qwt
-- cmd: jom -j4 sub-src
+- cmd: if not exist qwt\lib\qwt.lib jom -j1 sub-qwt & echo Re-build commit to continue & exit /b 1
+- cmd: jom -j2 sub-src
 
 # Linux / macOS
 - sh: qmake build.pro -r QMAKE_CXXFLAGS_WARN_ON+="-Wno-unused-private-field -Wno-c++11-narrowing -Wno-deprecated-declarations -Wno-deprecated-register -Wno-nullability-completeness -Wno-sign-compare -Wno-inconsistent-missing-override" QMAKE_CFLAGS_WARN_ON+="-Wno-deprecated-declarations -Wno-sign-compare"
-- sh: if test ! -f qwt/lib/libqwt.a; then make sub-qwt; fi
-- sh: make -j4 sub-src
+- sh: if test ! -f qwt/lib/libqwt.a; then make sub-qwt; echo Re-build commit to continue; false; fi
+- sh: make -j2 sub-src
 
 after_build:
 
@@ -228,8 +238,6 @@ after_build:
 - cmd: windeployqt --release GoldenCheetah.exe
 - cmd: copy c:\libs\10_Precompiled_DLL\usbexpress_3.5.1\USBXpress\USBXpress_API\Host\x64\SiUSBXp.dll
 - cmd: copy c:\libs\10_Precompiled_DLL\libsamplerate64\lib\libsamplerate-0.dll
-- cmd: copy c:\libs\10_Precompiled_DLL\VLC\win64\lib\libvlc*.dll
-- cmd: xcopy /s /i /e /q c:\libs\10_Precompiled_DLL\VLC\win64\plugins plugins
 - cmd: copy c:\OpenSSL-v111-Win64\bin\lib*.dll
 - cmd: copy c:\OpenSSL-v111-Win64\license.txt "OpenSSL License.txt"
 - cmd: xcopy /s /i /e /q C:\Python .
@@ -244,10 +252,10 @@ after_build:
 - cmd: copy ..\Resources\win32\gc.ico
 
 # Installer script
-- cmd: copy ..\Resources\win32\GC3.7-Master-W64-QT5.nsi
+- cmd: copy ..\Resources\win32\GC3.7-Master-W64-QT6.nsi
 
 # Build the installer
-- cmd: makensis GC3.7-Master-W64-QT5.nsi
+- cmd: makensis GC3.7-Master-W64-QT6.nsi
 - cmd: move GoldenCheetah_v3.7_64bit_Windows.exe ..\..\GoldenCheetah_v3.7_x64.exe
 - cmd: cd ..\..
 
