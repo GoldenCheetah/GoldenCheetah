@@ -1538,7 +1538,7 @@ struct FitFileParser
                 return "STAMINA";
 
             case 139: // CoreTemp
-                return "CORETEMP";
+                return "TCORE";
 
             case 140: // Gap
                 return "GAP";
@@ -1577,6 +1577,7 @@ struct FitFileParser
 
             case 108: // RESPIRATIONRATE
             case 116: // Stress
+            case 139: // CoreTemp
                 return 100.0;
 
             default:
@@ -3076,6 +3077,7 @@ genericnext:
                                  tcore = deve_value;
                              } else {
                                  tcore = value;
+                                 native_num = -1;
                              }
                              break;
                     default:
