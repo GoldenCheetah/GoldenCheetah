@@ -65,13 +65,13 @@ init:
       export OS_NAME=linux
       # Setup QT 5.15
       export QTDIR=$HOME/Qt/5.15/gcc_64
-      export PATH=$HOME/Qt/5.15/gcc_64/bin:$PATH
+      export PATH=$QTDIR/bin:$PATH
       qmake --version
     else
       export OS_NAME=macos
       # Setup QT 6.5
       export QTDIR=$HOME/Qt/6.5/macos
-      export PATH=$HOME/Qt/6.5/macos/bin:$PATH
+      export PATH=$QTDIR/bin:$PATH
       qmake --version
       # Setup Xcode 14.2
       sudo xcode-select -s /Applications/Xcode-14.2.0.app
