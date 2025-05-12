@@ -158,7 +158,7 @@ ChartTreeView::ChartTreeView(Context *context) : context(context)
 void
 ChartTreeView::dropEvent(QDropEvent* event)
 {
-    QTreeWidgetItem* target = (QTreeWidgetItem *)itemAt(event->pos());
+    QTreeWidgetItem* target = (QTreeWidgetItem *)itemAt(event->position().toPoint());
     int idxTo = indexFromItem(target).row();
 
     // when dragging to past the last one, we get -1, so lets

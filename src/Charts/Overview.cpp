@@ -402,13 +402,13 @@ badconfig:
 
         QVector<int> widths;
         QJsonArray w = root["widths"].toArray();
-        foreach(const QJsonValue width, w) widths << width.toInt();
+        for(const QJsonValue &width : w) widths << width.toInt();
         space->setColumnWidths(widths);
     }
 
     // cards
     QJsonArray CHARTS = root["CHARTS"].toArray();
-    foreach(const QJsonValue val, CHARTS) {
+    for(const QJsonValue &val : CHARTS) {
 
         // convert so we can inspect
         QJsonObject obj = val.toObject();

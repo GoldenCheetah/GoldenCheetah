@@ -522,20 +522,20 @@ MainWindow::MainWindow(const QDir &home)
 
     // ACTIVITY MENU
     QMenu *rideMenu = menuBar()->addMenu(tr("A&ctivity"));
-    rideMenu->addAction(tr("&Download from device..."), this, SLOT(downloadRide()), QKeySequence("Ctrl+D"));
-    rideMenu->addAction(tr("&Import from file..."), this, SLOT (importFile()), QKeySequence("Ctrl+I"));
-    rideMenu->addAction(tr("&Manual entry..."), this, SLOT(manualRide()), QKeySequence("Ctrl+M"));
+    rideMenu->addAction(tr("&Download from device..."), QKeySequence("Ctrl+D"), this, SLOT(downloadRide()));
+    rideMenu->addAction(tr("&Import from file..."), QKeySequence("Ctrl+I"), this, SLOT (importFile()));
+    rideMenu->addAction(tr("&Manual entry..."), QKeySequence("Ctrl+M"), this, SLOT(manualRide()));
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("&Export..."), this, SLOT(exportRide()), QKeySequence("Ctrl+E"));
-    rideMenu->addAction(tr("&Batch Processing..."), this, SLOT(batchProcessing()), QKeySequence("Ctrl+B"));
+    rideMenu->addAction(tr("&Export..."), QKeySequence("Ctrl+E"), this, SLOT(exportRide()));
+    rideMenu->addAction(tr("&Batch Processing..."), QKeySequence("Ctrl+B"), this, SLOT(batchProcessing()));
 
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("&Save activity"), this, SLOT(saveRide()), QKeySequence("Ctrl+S"));
+    rideMenu->addAction(tr("&Save activity"), QKeySequence("Ctrl+S"), this, SLOT(saveRide()));
     rideMenu->addAction(tr("D&elete activity..."), this, SLOT(deleteRide()));
     rideMenu->addAction(tr("Split &activity..."), this, SLOT(splitRide()));
     rideMenu->addAction(tr("Combine activities..."), this, SLOT(mergeRide()));
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("Find intervals..."), this, SLOT(addIntervals()), QKeySequence(""));
+    rideMenu->addAction(tr("Find intervals..."), QKeySequence(""), this, SLOT(addIntervals()));
 
     HelpWhatsThis *helpRideMenu = new HelpWhatsThis(rideMenu);
     rideMenu->setWhatsThis(helpRideMenu->getWhatsThisText(HelpWhatsThis::MenuBar_Activity));
@@ -625,21 +625,21 @@ MainWindow::MainWindow(const QDir &home)
     // VIEW MENU
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
 #ifndef Q_OS_MAC
-    viewMenu->addAction(tr("Toggle Full Screen"), this, SLOT(toggleFullScreen()), QKeySequence("F11"));
+    viewMenu->addAction(tr("Toggle Full Screen"), QKeySequence("F11"), this, SLOT(toggleFullScreen()));
 #endif
-    showhideViewbar = viewMenu->addAction(tr("Show View Sidebar"), this, SLOT(showViewbar(bool)), QKeySequence("F2"));
+    showhideViewbar = viewMenu->addAction(tr("Show View Sidebar"), QKeySequence("F2"), this, SLOT(showViewbar(bool)));
     showhideViewbar->setCheckable(true);
     showhideViewbar->setChecked(true);
-    showhideSidebar = viewMenu->addAction(tr("Show Left Sidebar"), this, SLOT(showSidebar(bool)), QKeySequence("F3"));
+    showhideSidebar = viewMenu->addAction(tr("Show Left Sidebar"), QKeySequence("F3"), this, SLOT(showSidebar(bool)));
     showhideSidebar->setCheckable(true);
     showhideSidebar->setChecked(true);
-    showhideLowbar = viewMenu->addAction(tr("Show Compare Pane"), this, SLOT(showLowbar(bool)), QKeySequence("F4"));
+    showhideLowbar = viewMenu->addAction(tr("Show Compare Pane"), QKeySequence("F4"), this, SLOT(showLowbar(bool)));
     showhideLowbar->setCheckable(true);
     showhideLowbar->setChecked(false);
-    showhideToolbar = viewMenu->addAction(tr("Show Toolbar"), this, SLOT(showToolbar(bool)), QKeySequence("F5"));
+    showhideToolbar = viewMenu->addAction(tr("Show Toolbar"), QKeySequence("F5"), this, SLOT(showToolbar(bool)));
     showhideToolbar->setCheckable(true);
     showhideToolbar->setChecked(true);
-    showhideTabbar = viewMenu->addAction(tr("Show Athlete Tabs"), this, SLOT(showTabbar(bool)), QKeySequence("F6"));
+    showhideTabbar = viewMenu->addAction(tr("Show Athlete Tabs"), QKeySequence("F6"), this, SLOT(showTabbar(bool)));
     showhideTabbar->setCheckable(true);
     showhideTabbar->setChecked(true);
 
@@ -2147,7 +2147,7 @@ MainWindow::setOpenTabMenu()
 
     // add create new option
     openTabMenu->addSeparator();
-    openTabMenu->addAction(tr("&New Athlete..."), this, SLOT(newCyclistTab()), QKeySequence("Ctrl+N"));
+    openTabMenu->addAction(tr("&New Athlete..."), QKeySequence("Ctrl+N"), this, SLOT(newCyclistTab()));
 }
 
 void

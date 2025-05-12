@@ -1111,7 +1111,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     if ((m=rideNavigator->columnMetrics.value(columnName, NULL)) != NULL) {
 
         // get double from model, special case QTime to avoid default .000 msecs
-        if ((QMetaType::Type)index.model()->data(index, Qt::DisplayRole).type() == QMetaType::QTime)
+        if (index.model()->data(index, Qt::DisplayRole).metaType().id() == QMetaType::QTime)
             value = index.model()->data(index, Qt::DisplayRole).toTime().toString("hh:mm:ss");
         else
             value = index.model()->data(index, Qt::DisplayRole).toString();
@@ -1396,7 +1396,7 @@ bool RideNavigatorSortProxyModel::lessThan(const QModelIndex &left,
     QVariant leftData = sourceModel()->data(left);
     QVariant rightData = sourceModel()->data(right);
 
-    if (leftData.type() == QVariant::DateTime) {
+    if (leftData.metaType().id() == QMetaType::QDateTime) {
         return leftData.toDateTime() < rightData.toDateTime();
     }
     QString leftString = leftData.toString();

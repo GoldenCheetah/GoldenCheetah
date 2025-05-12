@@ -973,7 +973,7 @@ Strava::prepareResponse(QByteArray* data)
                 QJsonArray laps = each["laps"].toArray();
 
                 double last_lap = 0.0;
-                foreach (QJsonValue value, laps) {
+                for (const QJsonValue &value : laps) {
                     QJsonObject lap = value.toObject();
 
                     double start = starttime.secsTo(QDateTime::fromString(lap["start_date_local"].toString(), Qt::ISODate));

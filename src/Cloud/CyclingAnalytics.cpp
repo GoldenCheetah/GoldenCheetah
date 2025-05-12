@@ -132,7 +132,7 @@ CyclingAnalytics::readdir(QString path, QStringList &errors, QDateTime, QDateTim
     QTimer::singleShot(30000,&loop, SLOT(quit())); // timeout after 30 seconds
 
     // if successful, lets unpack
-    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    //int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     printd("fetch response: %d: %s\n", reply->error(), reply->errorString().toStdString().c_str());
 
     if (reply->error() == 0) {
@@ -246,7 +246,7 @@ CyclingAnalytics::readdir(QString path, QStringList &errors, QDateTime, QDateTim
 
 
     // all good ?
-    printd("returning count(%d), errors(%s)\n", returning.count(), errors.join(",").toStdString().c_str());
+    printd("returning count(%lld), errors(%s)\n", returning.count(), errors.join(",").toStdString().c_str());
     return returning;
 }
 
@@ -402,7 +402,6 @@ CyclingAnalytics::readFileCompleted()
             add.secs = index;
 
             // move through tracks if they're waiting for this point
-            bool updated=false;
             for(int t=0; t<data.count(); t++) {
 
                // hr, distance et al

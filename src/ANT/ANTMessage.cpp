@@ -375,7 +375,7 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
             {
 
                 // page no is first 7 bits, page change toggle is bit 8
-                bool page_toggle = data_page&128;
+                // bool page_toggle = data_page&128;
                 data_page &= 127;
 
                 // Heartrate is fairly simple. Although
@@ -577,8 +577,8 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
 
                 case POWER_MANUFACTURER_ID:
                 {
-                    uint16_t manuf_id = (message[8] + (static_cast<uint16_t>(message[9])<<8));
-                    uint16_t product_id = (message[10] + (static_cast<uint16_t>(message[11])<<8));
+                    // uint16_t manuf_id = (message[8] + (static_cast<uint16_t>(message[9])<<8));
+                    // uint16_t product_id = (message[10] + (static_cast<uint16_t>(message[11])<<8));
                     // qDebug()<<channel<<"Received power sensor info: Manufacturer id:" << manuf_id << ", Product id:" << product_id;
                     break;
                 }

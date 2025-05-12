@@ -346,7 +346,7 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
                         }
                         svalp = sval;
                         temp = sval;
-                        sprintf(GRAPHDATA[i], "%8ld", svalp);
+                        snprintf(GRAPHDATA[i], 32, "%8ld", svalp);
                         break;
                     case '^' : /* Slope */
                         if (get_bit(thelot, bit-1)) { /* is negative */
@@ -375,13 +375,13 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
                     case 'T' : /* Torque */
                         if (imperialflag && WKO_GRAPHS[i]=='S') val = long((double)val * KMTOMI);
                         valp=val;
-                        sprintf(GRAPHDATA[i], "%6ld.%1ld", valp/10, valp%10);
+                        snprintf(GRAPHDATA[i], 32, "%6ld.%1ld", valp/10, valp%10);
                         nm = val; nm /=10;
                         break;
                     case 'S' : /* Speed */
                         if (imperialflag && WKO_GRAPHS[i]=='S') val = long((double)val * KMTOMI);
                         valp=val;
-                        sprintf(GRAPHDATA[i], "%6ld.%1ld", valp/10, valp%10);
+                        snprintf(GRAPHDATA[i], 32, "%6ld.%1ld", valp/10, valp%10);
                         kph = val; kph/= 10;
 
                         // distance is not available so we need to calculate it
@@ -402,7 +402,7 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
                             xf = modf(distance,&xi);
                             f = floor(xf*1000+0.5)/1000.0;
 
-                            sprintf(GRAPHDATA[i], "%g", xi+f);
+                            snprintf(GRAPHDATA[i], 32, "%g", xi+f);
                             km = xi+f;
                         }
                         break;
@@ -425,7 +425,7 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
                         xf = modf(distance,&xi);
                         f = floor(xf*1000+0.5)/1000.0;
 
-                        sprintf(GRAPHDATA[i], "%g", xi+f);
+                        snprintf(GRAPHDATA[i], 32, "%g", xi+f);
                         km = xi+f;
 
 
@@ -452,29 +452,29 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
                             llat=round(lat); llon=round(lon);
                             if (llat == 180 && llon == 180) lat=lon=0;
 
-                            sprintf(slon, "%-3.9g", lon);
-                            sprintf(slat, "%-3.9g", lat);
+                            snprintf(slon, 20, "%-3.9g", lon);
+                            snprintf(slat, 20, "%-3.9g", lat);
 
-                            sprintf(GRAPHDATA[i], "%13s %13s", slat,slon);
+                            snprintf(GRAPHDATA[i], 32, "%13s %13s", slat,slon);
 
                         }
                         break;
                     case 'P' :
                         watts = val;
                         valp=val;
-                        sprintf(GRAPHDATA[i], "%8lu", valp); // just output as numeric
+                        snprintf(GRAPHDATA[i], 32, "%8lu", valp); // just output as numeric
                         break;
 
                     case 'H' :
                         hr = val;
                         valp=val;
-                        sprintf(GRAPHDATA[i], "%8lu", valp); // just output as numeric
+                        snprintf(GRAPHDATA[i], 32, "%8lu", valp); // just output as numeric
                         break;
 
                     case 'C' :
                         cad = val;
 			            valp = val;
-                        sprintf(GRAPHDATA[i], "%8lu", valp); // just output as numeric
+                        snprintf(GRAPHDATA[i], 32, "%8lu", valp); // just output as numeric
                         break;
                     }
                 }

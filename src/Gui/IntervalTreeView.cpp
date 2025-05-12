@@ -73,7 +73,7 @@ IntervalTreeView::dragEnterEvent(QDragEnterEvent* event)
 void
 IntervalTreeView::dropEvent(QDropEvent* event)
 {
-    QTreeWidgetItem* target = (QTreeWidgetItem *)itemAt(event->pos());
+    QTreeWidgetItem* target = (QTreeWidgetItem *)itemAt(event->position().toPoint());
     QTreeWidgetItem* parent = target->parent();
 
     QList<IntervalItem*> intervals =  context->rideItem()->intervals();

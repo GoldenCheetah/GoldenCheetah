@@ -309,8 +309,6 @@ ElevationChartWindow::telemetryUpdate(const RealtimeData &rtData)
     bubbleWidget->setRealtimeData(&m_rtData);
 
     int npoints = 30;
-    int pointsAfter = 25;
-    int pointsBefore = npoints - pointsAfter;
 
     QQueue<QPointF> &plotQ = slopeWidget->getPlotQ();
     plotQ.clear();
