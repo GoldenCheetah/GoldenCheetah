@@ -1,3 +1,7 @@
+%top{
+  #include <stdint.h>
+}
+
 %{
 /*
  * Copyright (c) 2023 Joachim Kohlhammer (joachim.kohlhammer@gmx.de)

@@ -1,3 +1,7 @@
+%top{
+  #include <stdint.h>
+}
+
 %{
 /*
  * Copyright (c) 2010 Mark Liversedge (liversedge@gmail.com)
