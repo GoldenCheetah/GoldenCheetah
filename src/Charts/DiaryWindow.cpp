@@ -27,7 +27,7 @@
 #include "HelpWhatsThis.h"
 
 DiaryWindow::DiaryWindow(Context *context) :
-    GcChartWindow(context), context(context), active(false)
+    GcChartWindow(context), ride(nullptr), context(context), active(false)
 {
     setControls(NULL);
 
@@ -142,11 +142,12 @@ DiaryWindow::setDefaultView(int view)
 void
 DiaryWindow::rideSelected()
 {
-    if (active) {
+    // ignore if already active or the selected activity has not changed
+    if (active || ride == myRideItem) {
         return;
     }
 
-    RideItem *ride = myRideItem;
+    ride = myRideItem;
 
     // ignore if not active or null ride
     if (!ride) {

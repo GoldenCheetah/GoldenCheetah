@@ -61,6 +61,7 @@ class DiaryWindow : public GcChartWindow
 
     protected:
         Context *context;
+        RideItem *ride;
 
         QDateEdit *title;
         QPushButton *prev, *next;
