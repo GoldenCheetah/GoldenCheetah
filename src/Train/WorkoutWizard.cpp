@@ -812,6 +812,12 @@ WorkoutWizard::WorkoutWizard(Context *context) :QWizard(context->mainWindow)
     setPage(WW_ImportPage, new ImportPage());
     this->setStartId(WW_WorkoutTypePage);
 
+#ifdef Q_OS_MAC
+    setWizardStyle(QWizard::MacStyle);
+#else
+    setWizardStyle(QWizard::ModernStyle);
+#endif
+    setWindowTitle(tr("Workout Wizard"));
 }
 // called at the end of the wizard...
 void WorkoutWizard::accept()
