@@ -72,22 +72,22 @@ then echo "AppImage not generated, check the errors"; exit 1
 fi
 
 echo "Renaming AppImage file to branch and build number ready for deploy"
-export FINAL_NAME=GoldenCheetah_v3.7_x64.AppImage
+export FINAL_NAME=GoldenCheetah_v3.7_x64Old.AppImage
 mv GoldenCheetah*.AppImage $FINAL_NAME
 ls -l $FINAL_NAME
 
 ### Minimum Test
-./$FINAL_NAME --version 2>GCversionLinux.txt
-git log -1 >> GCversionLinux.txt
-echo "SHA256 hash of $FINAL_NAME:" >> GCversionLinux.txt
-shasum -a 256 $FINAL_NAME | cut -f 1 -d ' '  >> GCversionLinux.txt
-cat GCversionLinux.txt
+./$FINAL_NAME --version 2>GCversionLinuxOld.txt
+git log -1 >> GCversionLinuxOld.txt
+echo "SHA256 hash of $FINAL_NAME:" >> GCversionLinuxOld.txt
+shasum -a 256 $FINAL_NAME | cut -f 1 -d ' '  >> GCversionLinuxOld.txt
+cat GCversionLinuxOld.txt
 
 ### upload for testing
 if [[ $TRAVIS_PULL_REQUEST == "false" && $TRAVIS_COMMIT_MESSAGE == *"[publish binaries]"* ]]; then
 mkdir out
 mv $FINAL_NAME out
-mv GCversionLinux.txt out
+mv GCversionLinuxOld.txt out
 ${TRAVIS_BUILD_DIR}/ghr/ghr -n "Snapshot Builds" -replace snapshot out
 else
 curl --max-time 300 -F "file=@$FINAL_NAME" https://temp.sh/upload
