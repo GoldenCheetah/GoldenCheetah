@@ -52,6 +52,7 @@ double
 SplineLookup::valueY
 (double x) const
 {
+    if (splinePolygon.size() == 0) return x;
     const int i = lookupIndex(x);
     if (splinePolynomials.size() > 0) {
         const double deltaX = x - splinePolygon[i].x();
