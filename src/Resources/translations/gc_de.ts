@@ -11820,7 +11820,7 @@ Im Allgemeinen sind die Höhendaten am stärksten und erfordern den höchsten Gr
     <message>
         <location filename="../../FileIO/FixGaps.cpp" line="103"/>
         <source>Fix Gaps in Recording</source>
-        <translation>Lücken in Aufzeichung korrigieren</translation>
+        <translation>Lücken in Aufzeichnung korrigieren</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGaps.cpp" line="115"/>
@@ -14850,7 +14850,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="168"/>
         <source>Fix Gaps in Recording</source>
-        <translation>Korrigiert Lücken in der Aufzeichung</translation>
+        <translation>Korrigiert Lücken in der Aufzeichnung</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="170"/>
