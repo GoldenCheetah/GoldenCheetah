@@ -141,7 +141,6 @@ class MainWindow : public QMainWindow
         void helpView();
         void logBug();
         void support();
-        void actionClicked(int);
 
         void loadProgress(QString folder, double progress);
 
@@ -200,7 +199,6 @@ class MainWindow : public QMainWindow
         void selectAnalysis();
         void selectTrain();
 
-        void setChartMenu();
         void setSubChartMenu();
         void setChartMenu(QMenu *);
         void addChart(QAction*);
