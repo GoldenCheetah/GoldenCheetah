@@ -495,6 +495,9 @@ class FieldsPage : public QWidget
         void renameClicked();
         void deleteClicked();
 
+    protected slots:
+        void handleItemChanged(QTreeWidgetItem* item, int column);
+
     private:
         QTreeWidget *fields;
         ActionButtonBox *actionButtons;
@@ -502,6 +505,8 @@ class FieldsPage : public QWidget
         UniqueLabelEditDelegate fieldDelegate;
         ComboBoxDelegate fieldTypeDelegate;
         ListEditDelegate valueDelegate;
+        SpecialFields specialFields;
+        SpecialTabs specialTabs;
 };
 
 class ProcessorPage : public QWidget

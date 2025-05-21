@@ -101,26 +101,26 @@ SpecialFields::SpecialFields()
 }
 
 bool
-SpecialFields::isSpecial(QString &name) const
+SpecialFields::isSpecial(const QString &internalName) const
 {
-    return specialset.contains(name);
+    return specialset.contains(internalName);
 }
 
 bool
-SpecialFields::isUser(QString &name) const
+SpecialFields::isUser(const QString &internalName) const
 {
-    return !isSpecial(name) && !isMetric(name);
+    return !isSpecial(internalName) && !isMetric(internalName);
 }
 
 bool
-SpecialFields::isMetric(QString &name) const
+SpecialFields::isMetric(const QString &internalName) const
 {
-    if (metricSymbol(name) != "") return true;
+    if (metricSymbol(internalName) != "") return true;
     else return false;
 }
 
 QString
-SpecialFields::makeTechName(QString name) const
+SpecialFields::makeTechName(const QString &name) const
 {
     // strip spaces and only keep alpha values - everything else
     // becomes an underscore
@@ -129,7 +129,7 @@ SpecialFields::makeTechName(QString name) const
 }
 
 QString
-SpecialFields::metricSymbol(QString name) const
+SpecialFields::metricSymbol(const QString& name) const
 {
     // return technical name for metric long name
     const RideMetric *metric = metricmap.value(name, NULL);
@@ -138,21 +138,21 @@ SpecialFields::metricSymbol(QString name) const
 }
 
 const RideMetric *
-SpecialFields::rideMetric(QString&name) const
+SpecialFields::rideMetric(const QString &name) const
 {
     return metricmap.value(name, NULL);
 }
 
 QString
-SpecialFields::displayName(QString &name) const
+SpecialFields::displayName(const QString &internalName) const
 {
     // return localized name for display
-    if (namesmap.contains(name)) return namesmap.value(name);
-    else return(name);
+    if (namesmap.contains(internalName)) return namesmap.value(internalName);
+    else return(internalName);
 }
 
 QString
-SpecialFields::internalName(QString displayName) const
+SpecialFields::internalName(const QString &displayName) const
 {
     // return internal name for storage
     QMapIterator<QString, QString> i(namesmap);
@@ -176,7 +176,7 @@ SpecialTabs::SpecialTabs()
 }
 
 QString
-SpecialTabs::displayName(QString &internalName) const
+SpecialTabs::displayName(const QString &internalName) const
 {
     // return localized name for display
     if (namesmap.contains(internalName)) return namesmap.value(internalName);
@@ -184,7 +184,7 @@ SpecialTabs::displayName(QString &internalName) const
 }
 
 QString
-SpecialTabs::internalName(QString displayName) const
+SpecialTabs::internalName(const QString &displayName) const
 {
     // return internal name for storage
     QMapIterator<QString, QString> i(namesmap);
