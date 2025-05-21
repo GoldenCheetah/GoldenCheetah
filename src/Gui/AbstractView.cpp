@@ -33,8 +33,8 @@
 #include "GcUpgrade.h"
 #include "LTMWindow.h"
 
-AbstractView::AbstractView(Context *context, int type) : 
-    QWidget(context->tab), context(context), type(type),
+AbstractView::AbstractView(Context *context, int type, const QString& view, const QString& heading) :
+    QWidget(context->tab), context(context), type(type), view(view),
     _sidebar(true), _tiled(false), _selected(false), lastHeight(130*dpiYFactor), sidewidth(0),
     active(false), bottomRequested(false), bottomHideOnIdle(false), perspectiveactive(false),
     stack(NULL), splitter(NULL), mainSplitter(NULL), 
@@ -66,10 +66,6 @@ AbstractView::AbstractView(Context *context, int type) :
     splitter->setContentsMargins(0, 0, 0, 0); // attempting to follow some UI guides
     splitter->setOpaqueResize(true); // redraw when released, snappier UI
     stack->insertWidget(0, splitter); // splitter always at index 0
-
-    QString heading = tr("Compare Activities and Intervals");
-    if (type == VIEW_TRENDS) heading = tr("Compare Date Ranges");
-    else if (type == VIEW_TRAIN) heading = tr("Intensity Adjustments and Workout Control");
 
     mainSplitter = new ViewSplitter(Qt::Vertical, heading, this);
     mainSplitter->setHandleWidth(23 *dpiXFactor);
@@ -269,16 +265,8 @@ AbstractView::saveState()
     // we do not save all the other Qt properties since
     // we're not interested in them
     // NOTE: currently we support QString, int, double and bool types - beware custom types!!
-
-    QString view = "none";
-    switch(type) {
-    case VIEW_ANALYSIS: view = "analysis"; break;
-    case VIEW_TRAIN: view = "train"; break;
-    case VIEW_DIARY: view = "diary"; break;
-    case VIEW_TRENDS: view = "home"; break;
-    }
-
     QString filename = context->athlete->home->config().canonicalPath() + "/" + view + "-perspectives.xml";
+
     QFile file(filename);
     if (!file.open(QFile::WriteOnly)) {
         QMessageBox msgBox;
@@ -310,16 +298,9 @@ AbstractView::saveState()
 void
 AbstractView::restoreState(bool useDefault)
 {
-    QString view = "none";
-    switch(type) {
-    case VIEW_ANALYSIS: view = "analysis"; break;
-    case VIEW_TRAIN: view = "train"; break;
-    case VIEW_DIARY: view = "diary"; break;
-    case VIEW_TRENDS: view = "home"; break;
-    }
-
     // restore window state
     QString filename = context->athlete->home->config().canonicalPath() + "/" + view + "-perspectives.xml";
+
     QFileInfo finfo(filename);
 
     QString content = "";
