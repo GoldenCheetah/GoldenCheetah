@@ -2521,13 +2521,6 @@ FieldsPage::downClicked()
 }
 
 void
-FieldsPage::renameClicked()
-{
-    // which one is selected?
-    if (fields->currentItem()) fields->editItem(fields->currentItem(), 0);
-}
-
-void
 FieldsPage::addClicked()
 {
     int index = fields->invisibleRootItem()->indexOfChild(fields->currentItem());

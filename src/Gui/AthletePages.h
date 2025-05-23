@@ -588,7 +588,6 @@ class SeasonsPage : public QWidget
         void addClicked();
         void upClicked();
         void downClicked();
-        void renameClicked();
         void deleteClicked();
         void clearEdit();
         qint32 saveClicked();
