@@ -2406,14 +2406,15 @@ KeywordsPage::getDefinitions(QList<KeywordDefinition> &keywordList)
 //
 
 // Defines the order of the columns
-#define FIELDSPAGE_COL_CATEGORY 0
+#define FIELDSPAGE_COL_SCREEN_TAB 0
 #define FIELDSPAGE_COL_FIELD 1
 #define FIELDSPAGE_COL_TYPE 2
-#define FIELDSPAGE_COL_VALUES 3
-#define FIELDSPAGE_COL_SCREEN_TAB 4
+#define FIELDSPAGE_COL_CATEGORY 3
+#define FIELDSPAGE_COL_VALUES 4
 #define FIELDSPAGE_COL_SUMMARY 5
 #define FIELDSPAGE_COL_INTERVAL 6
-#define FIELDSPAGE_NUM_COLS 7
+#define FIELDSPAGE_COL_EXPRESSION 7
+#define FIELDSPAGE_NUM_COLS 8
 
 FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition> fieldDefinitions) : QWidget(parent)
 {
@@ -2425,16 +2426,17 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition> fieldDefinitions)
                               "If the list is empty, any value is accepted. A list containing "
                               "<tt>*</tt> as its only entry indicates previous values for the "
                               "same field will be used to autocomplete input."));
-    valueDelegate.setDisplayLength(60, 2);
+    valueDelegate.setDisplayLength(15, 2);
 
     fields = new QTreeWidget;
-    fields->headerItem()->setText(FIELDSPAGE_COL_CATEGORY, tr("Category"));
     fields->headerItem()->setText(FIELDSPAGE_COL_SCREEN_TAB, tr("Screen Tab"));
     fields->headerItem()->setText(FIELDSPAGE_COL_FIELD, tr("Field"));
     fields->headerItem()->setText(FIELDSPAGE_COL_TYPE, tr("Type"));
+    fields->headerItem()->setText(FIELDSPAGE_COL_CATEGORY, tr("Cat"));
     fields->headerItem()->setText(FIELDSPAGE_COL_VALUES, tr("Values"));
     fields->headerItem()->setText(FIELDSPAGE_COL_SUMMARY, tr("Summary"));
     fields->headerItem()->setText(FIELDSPAGE_COL_INTERVAL, tr("Interval"));
+    fields->headerItem()->setText(FIELDSPAGE_COL_EXPRESSION, tr("Interval Expression"));
     fields->setColumnCount(FIELDSPAGE_NUM_COLS);
     fieldTypeDelegate.addItems( {
         tr("Text"),
@@ -2465,18 +2467,17 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition> fieldDefinitions)
 
         QTreeWidgetItem *add = new QTreeWidgetItem(fields->invisibleRootItem());
         add->setFlags(add->flags() | Qt::ItemIsEditable);
-        QString category = specialFields.isSpecial(field.name) ? "Special" : specialFields.isMetric(field.name) ? "Metric" : "User";
-        add->setText(FIELDSPAGE_COL_CATEGORY, category); // field category
         add->setText(FIELDSPAGE_COL_SCREEN_TAB, specialTabs.displayName(field.tab)); // tab name
         add->setText(FIELDSPAGE_COL_FIELD, specialFields.displayName(field.name)); // field name
         add->setData(FIELDSPAGE_COL_TYPE, Qt::DisplayRole, field.type); // field type
         add->setText(FIELDSPAGE_COL_VALUES, field.values.join(",")); // values
         fields->setItemWidget(add, FIELDSPAGE_COL_SUMMARY, checkBox);
         fields->setItemWidget(add, FIELDSPAGE_COL_INTERVAL, checkBoxInt);
-    }
+        add->setText(FIELDSPAGE_COL_EXPRESSION, field.expression);
 
-    fields->header()->setStretchLastSection(false);
-    fields->header()->setSectionResizeMode(FIELDSPAGE_COL_VALUES, QHeaderView::Stretch);
+        // Ensure columns are consistent with their field type
+        handleItemChanged(add, FIELDSPAGE_COL_FIELD);
+    }
 
     mainLayout->addWidget(fields);
     mainLayout->addWidget(actionButtons);
@@ -2494,15 +2495,14 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition> fieldDefinitions)
 void
 FieldsPage::handleItemChanged(QTreeWidgetItem* item, int column) {
 
-    if (column == FIELDSPAGE_COL_CATEGORY || column == FIELDSPAGE_COL_FIELD || column == FIELDSPAGE_COL_TYPE) {
-       
+    if (column != FIELDSPAGE_COL_SCREEN_TAB) {
+
         QString internalFieldName = specialFields.internalName(item->text(FIELDSPAGE_COL_FIELD));
 
+        // Ensure columns are consistent for the field
         if (specialFields.isSpecial(internalFieldName)) {
 
-            item->setText(FIELDSPAGE_COL_CATEGORY, "Special");
-
-            // Find the correct type for the field
+            // Find the correct type for the special field
             foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
 
                 if (field.name == internalFieldName) {
@@ -2510,14 +2510,26 @@ FieldsPage::handleItemChanged(QTreeWidgetItem* item, int column) {
                     item->setData(FIELDSPAGE_COL_TYPE, Qt::DisplayRole, field.type);
                 }
             }
-        }
-        else if (specialFields.isMetric(internalFieldName)) {
 
-            item->setText(FIELDSPAGE_COL_CATEGORY, "Metric");
-            item->setData(FIELDSPAGE_COL_TYPE, Qt::DisplayRole, 4); // All metrics have Double type.
-        }
-        else {
-            item->setText(FIELDSPAGE_COL_CATEGORY, "User");
+            item->setText(FIELDSPAGE_COL_CATEGORY, "Spc");
+            item->setText(FIELDSPAGE_COL_VALUES, "");
+            dynamic_cast<QCheckBox*>(fields->itemWidget(item, FIELDSPAGE_COL_INTERVAL))->setChecked(false);
+            dynamic_cast<QCheckBox*>(fields->itemWidget(item, FIELDSPAGE_COL_INTERVAL))->setCheckable(false);
+            item->setText(FIELDSPAGE_COL_EXPRESSION, "");
+
+        } else {
+
+            dynamic_cast<QCheckBox*>(fields->itemWidget(item, FIELDSPAGE_COL_INTERVAL))->setCheckable(true);
+
+            if (specialFields.isMetric(internalFieldName)) {
+
+                item->setData(FIELDSPAGE_COL_TYPE, Qt::DisplayRole, 4); // All metrics have Double type.
+                item->setText(FIELDSPAGE_COL_CATEGORY, "Met");
+                item->setText(FIELDSPAGE_COL_VALUES, "");
+
+            } else {
+                item->setText(FIELDSPAGE_COL_CATEGORY, "Usr");
+            }
         }
     }
 }
@@ -2629,11 +2641,11 @@ FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
 
         add.tab = specialTabs.internalName(item->text(FIELDSPAGE_COL_SCREEN_TAB));
         add.name = specialFields.internalName(item->text(FIELDSPAGE_COL_FIELD));
-        // handleItemChanged() ensures the field type is correct.
         add.type = item->data(FIELDSPAGE_COL_TYPE, Qt::DisplayRole).toInt(); 
         add.values = item->text(FIELDSPAGE_COL_VALUES).split(QRegularExpression("(, *|,)"), Qt::KeepEmptyParts);
-        add.diary = ((QCheckBox*)fields->itemWidget(item, FIELDSPAGE_COL_SUMMARY))->isChecked();
-        add.interval = ((QCheckBox*)fields->itemWidget(item, FIELDSPAGE_COL_INTERVAL))->isChecked();
+        add.diary = dynamic_cast<QCheckBox*>(fields->itemWidget(item, FIELDSPAGE_COL_SUMMARY))->isChecked();
+        add.interval = dynamic_cast<QCheckBox*>(fields->itemWidget(item, FIELDSPAGE_COL_INTERVAL))->isChecked();
+        add.expression = item->text(FIELDSPAGE_COL_EXPRESSION);
 
         fieldList.append(add);
     }

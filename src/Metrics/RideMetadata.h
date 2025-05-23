@@ -67,14 +67,15 @@ class FieldDefinition
         bool interval; // this is interval specific metadata
 
         QStringList values; // autocomplete 'defaults'
+        QString expression; // expression to evaluate, if true field is available
 
         static unsigned long fingerprint(QList<FieldDefinition>);
         QCompleter *getCompleter(QObject *parent, RideCache *rideCache);
         QString calendarText(QString value);
 
-        FieldDefinition() : tab(""), name(""), type(0), diary(false), interval(false), values() {}
-        FieldDefinition(QString tab, QString name, int type, bool diary, bool interval, QStringList values)
-                        : tab(tab), name(name), type(type), diary(diary), interval(interval), values(values) {}
+        FieldDefinition() : tab(""), name(""), type(0), diary(false), interval(false), values(), expression("") {}
+        FieldDefinition(QString tab, QString name, int type, bool diary, bool interval, QStringList values, QString expression)
+                        : tab(tab), name(name), type(type), diary(diary), interval(interval), values(values), expression(expression) {}
 };
 
 class Form;

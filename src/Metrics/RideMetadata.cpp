@@ -249,7 +249,7 @@ RideMetadata::setExtraTab()
             else if (tags.value().length() < 30) type = FIELD_SHORTTEXT;
             else type = FIELD_TEXT;
 
-            extraDefs.append(FieldDefinition("Extra", tags.key(), type, false, false, QStringList()));
+            extraDefs.append(FieldDefinition("Extra", tags.key(), type, false, false, QStringList(), ""));
             extraForm->addField(extraDefs[extraDefs.count()-1]);
         }
     }
@@ -1717,6 +1717,7 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
         out<<QString("\t\t\t<fieldvalues>\"%1\"</fieldvalues>\n").arg(Utils::xmlprotect(field.values.join(",")));
         out<<QString("\t\t\t<fielddiary>%1</fielddiary>\n").arg(field.diary ? 1 : 0);
         out<<QString("\t\t\t<fieldinterval>%1</fieldinterval>\n").arg(field.interval ? 1 : 0);
+        out<<QString("\t\t\t<fieldexpression>\"%1\"</fieldexpression>\n").arg(Utils::xmlprotect(field.expression));
         out<<QString("\t\t</field>\n");
     }
     out <<"\t</fields>\n";
@@ -1830,6 +1831,7 @@ bool MetadataXMLParser::endElement( const QString&, const QString&, const QStrin
     }
     else if(qName == "fieldtab") field.tab = Utils::unprotect(buffer);
     else if(qName == "fieldname") field.name =  Utils::unprotect(buffer);
+    else if(qName == "fieldexpression") field.expression =  Utils::unprotect(buffer);
     else if(qName == "fieldtype") {
         field.type = buffer.trimmed().toInt();
         if (field.tab != "" && field.type < 3 && field.name != "Filename" &&
