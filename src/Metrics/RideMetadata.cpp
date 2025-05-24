@@ -1622,10 +1622,12 @@ FieldDefinition::calendarText(QString value)
     if (value.isEmpty() || diary != true) return QString();
 
     switch (type) {
+        case FIELD_TIME:
+            return QString("%1: %2\n").arg(name).arg(QTime(0, 0, 0).addSecs(value.toInt()).toString());
+        case FIELD_DATE:
+            return QString("%1: %2\n").arg(name).arg(QDate(1900, 01, 01).addDays(value.toInt()).toString("dd MMM yyyy"));
         case FIELD_INTEGER:
         case FIELD_DOUBLE:
-        case FIELD_DATE:
-        case FIELD_TIME:
         case FIELD_CHECKBOX:
             return QString("%1: %2\n").arg(name).arg(value);
         case FIELD_TEXT:
