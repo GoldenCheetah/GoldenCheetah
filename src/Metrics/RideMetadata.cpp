@@ -1230,7 +1230,7 @@ FormField::editFinished()
                             }
                         }
                         break;
-    case FIELD_DATE : text = ((QDateEdit*)widget)->date().toString("dd.MM.yyyy"); break;
+    case FIELD_DATE : text = ((QDateEdit*)widget)->date().toString("dd/MM/yyyy"); break;
     case FIELD_TIME : text = ((QTimeEdit*)widget)->time().toString("hh:mm:ss.zzz"); break;
     }
 
@@ -1462,7 +1462,7 @@ FormField::metadataChanged()
         // Handle "Special" fields
         if (definition.name == "Device") value = ourRideItem->ride()->deviceType();
         else if (definition.name == "Recording Interval") value = QString("%1").arg(ourRideItem->ride()->recIntSecs());
-        else if (definition.name == "Start Date") value = ourRideItem->ride()->startTime().date().toString("dd.MM.yyyy");
+        else if (definition.name == "Start Date") value = ourRideItem->ride()->startTime().date().toString("dd/MM/yyyy");
         else if (definition.name == "Start Time") value = ourRideItem->ride()->startTime().time().toString("hh:mm:ss.zzz");
         else if (definition.name == "Identifier") value = ourRideItem->ride()->id();
         else {
@@ -1623,9 +1623,13 @@ FieldDefinition::calendarText(QString value)
 
     switch (type) {
         case FIELD_TIME:
+        if (name == "Start Time") {
             return QString("%1: %2\n").arg(name).arg(QTime(0, 0, 0).addSecs(value.toInt()).toString());
+        }
         case FIELD_DATE:
-            return QString("%1: %2\n").arg(name).arg(QDate(1900, 01, 01).addDays(value.toInt()).toString("dd MMM yyyy"));
+        if (name == "Start Date") {
+            return QString("%1: %2\n").arg(name).arg(QDate(1900, 01, 01).addDays(value.toInt()).toString("dd/MM/yyyy"));
+        }
         case FIELD_INTEGER:
         case FIELD_DOUBLE:
         case FIELD_CHECKBOX:
