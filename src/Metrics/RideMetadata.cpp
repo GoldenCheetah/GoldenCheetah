@@ -1624,7 +1624,7 @@ FieldDefinition::calendarText(QString value)
     switch (type) {
         case FIELD_TIME:
         if (name == "Start Time") {
-            return QString("%1: %2\n").arg(name).arg(QTime(0, 0, 0).addSecs(value.toInt()).toString());
+            return QString("%1: %2\n").arg(name).arg(QTime(0, 0, 0).addSecs(value.toInt()).toString("hh:mm:ss.zzz"));
         }
         case FIELD_DATE:
         if (name == "Start Date") {
