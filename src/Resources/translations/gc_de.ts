@@ -2876,7 +2876,7 @@ Gerät gefunden.
     <message>
         <location filename="../../Gui/Views.cpp" line="32"/>
         <source>Compare Activities and Intervals</source>
-        <translation type="unfinished">Aktivitäten und Intervalle vergleichen</translation>
+        <translation>Aktivitäten und Intervalle vergleichen</translation>
     </message>
 </context>
 <context>
@@ -8639,7 +8639,7 @@ Möchten Sie die Änderung durchführen und GoldenCheetah neu starten?</translat
     <message>
         <location filename="../../Gui/Views.cpp" line="130"/>
         <source>Compare Activities and Intervals</source>
-        <translation type="unfinished">Aktivitäten und Intervalle vergleichen</translation>
+        <translation>Aktivitäten und Intervalle vergleichen</translation>
     </message>
 </context>
 <context>
@@ -12755,7 +12755,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
         <location filename="../../Gui/Colors.cpp" line="228"/>
         <location filename="../../Gui/Colors.cpp" line="234"/>
         <source>Data</source>
-        <translation>Datum</translation>
+        <translation>Daten</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="132"/>
@@ -13318,7 +13318,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/ColorButton.cpp" line="132"/>
         <source>Data</source>
-        <translation>Datum</translation>
+        <translation>Daten</translation>
     </message>
     <message>
         <location filename="../../Gui/ColorButton.cpp" line="149"/>
@@ -13886,7 +13886,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="84"/>
         <source>Data</source>
-        <translation>Datum</translation>
+        <translation>Daten</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="88"/>
@@ -31398,7 +31398,7 @@ Mehr Informationen: GC Wiki - Simulate_the_physics_of_bicycle_ride.</translation
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="43"/>
         <source>Data</source>
-        <translation>Datum</translation>
+        <translation>Daten</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="45"/>
@@ -33535,7 +33535,7 @@ F3 drücken, wenn fertig.</translation>
     <message>
         <location filename="../../Gui/Views.cpp" line="286"/>
         <source>Intensity Adjustments and Workout Control</source>
-        <translation type="unfinished">Intensitätsanpassung und Workout-Kontrolle</translation>
+        <translation>Intensitätsanpassung und Workout-Kontrolle</translation>
     </message>
 </context>
 <context>
@@ -33844,7 +33844,7 @@ F3 drücken, wenn fertig.</translation>
     <message>
         <location filename="../../Gui/Views.cpp" line="180"/>
         <source>Compare Date Ranges</source>
-        <translation type="unfinished">Zeiträume vergleichen</translation>
+        <translation>Zeiträume vergleichen</translation>
     </message>
 </context>
 <context>
@@ -35771,7 +35771,7 @@ Sie können die Referenzen in der Bibliothek über die Optionen im Kontektmenu l
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="820"/>
         <source>Workout Wizard</source>
-        <translation type="unfinished">Workout-Assistent</translation>
+        <translation>Workout-Assistent</translation>
     </message>
 </context>
 <context>
