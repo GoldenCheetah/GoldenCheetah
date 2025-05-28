@@ -23,7 +23,7 @@
 #include "IntervalItem.h"
 #include "RideCache.h"
 
-FreeSearch::FreeSearch(QObject *parent, Context *context) : QObject(parent), context(context)
+FreeSearch::FreeSearch()
 {
     // nothing to do, all the data we need is in the ridecache
 }
@@ -76,7 +76,7 @@ static QStringList searchSplit(QString string)
     return returning;
 }
 
-QList<QString> FreeSearch::search(QString query)
+QList<QString> FreeSearch::search(Context* context, QString query)
 {
     filenames.clear();
 

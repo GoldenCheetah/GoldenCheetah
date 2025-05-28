@@ -890,9 +890,9 @@ LTMSidebar::filterTreeWidgetSelectionChanged()
 
             case NamedSearch::search :
                 {
-                    // use clucence
-                    FreeSearch s(this, context);
-                    results = s.search(ns.text);
+                    // use RideCache
+                    FreeSearch s;
+                    results = s.search(context, ns.text);
                 }
 
             }

@@ -38,11 +38,11 @@ SearchFilterBox::SearchFilterBox(QWidget *parent, Context *context, bool nochoos
     searchbox->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
     contents->addWidget(searchbox);
 
-    freeSearch = new FreeSearch(this, context);
+    freeSearch = new FreeSearch();
     datafilter = new DataFilter(this,context);
 
     // text searching
-    connect(searchbox, SIGNAL(submitQuery(QString)), freeSearch, SLOT(search(QString)));
+    connect(searchbox, SIGNAL(submitQuery(Context*,QString)), freeSearch, SLOT(search(Context*,QString)));
     connect(freeSearch, SIGNAL(results(QStringList)), this, SIGNAL(searchResults(QStringList)));
     connect(searchbox, SIGNAL(clearQuery()), this, SIGNAL(searchClear()));
 
@@ -96,8 +96,8 @@ SearchFilterBox::matches(Context *context, QString filter)
 
     if (mode == SearchBox::Search) {
 
-        FreeSearch fs(NULL, context);
-        returning = fs.search(spec);
+        FreeSearch fs;
+        returning = fs.search(context, spec);
     }
 
     return returning;
