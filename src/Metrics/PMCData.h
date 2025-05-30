@@ -132,6 +132,8 @@ class PMCData : public QObject {
         QVector<double> expected_lts_, expected_sts_, expected_sb_, expected_rr_;
 
         bool isstale; // needs refreshing
+
+        void calculateMetrics(int days, const QVector<double> &stress, QVector<double> &lts, QVector<double> &sts, QVector<double> &sb, QVector<double> &rr) const;
 };
 
 #endif // _GC_StressCalculator_h
