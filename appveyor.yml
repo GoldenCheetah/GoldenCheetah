@@ -1,6 +1,10 @@
 version: ci.{build}
 clone_depth: 1
 skip_tags: true
+branches:
+  only:
+    - master
+
 image:
   - Visual Studio 2019
   - macos-monterey
