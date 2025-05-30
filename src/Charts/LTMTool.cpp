@@ -1039,6 +1039,51 @@ QList<MetricDetail> LTMTool::providePMmetrics() {
     cogganExpectedTSB.uunits = "TSB";
     metrics.append(cogganExpectedTSB);
 
+    MetricDetail cogganPlannedCTL;
+    cogganPlannedCTL.type = METRIC_PM;
+    cogganPlannedCTL.symbol = "planned_coggan_ctl";
+    cogganPlannedCTL.metric = NULL; // not a factory metric
+    cogganPlannedCTL.penColor = QColor(Qt::blue);
+    cogganPlannedCTL.curveStyle = QwtPlotCurve::Dots;
+    cogganPlannedCTL.symbolStyle = QwtSymbol::NoSymbol;
+    cogganPlannedCTL.smooth = false;
+    cogganPlannedCTL.trendtype = 0;
+    cogganPlannedCTL.topN = 1;
+    cogganPlannedCTL.uname = cogganPlannedCTL.name = tr("Coggan Planned Chronic Training Load");
+    cogganPlannedCTL.units = "CTL";
+    cogganPlannedCTL.uunits = "CTL";
+    metrics.append(cogganPlannedCTL);
+
+    MetricDetail cogganPlannedATL;
+    cogganPlannedATL.type = METRIC_PM;
+    cogganPlannedATL.symbol = "planned_coggan_atl";
+    cogganPlannedATL.metric = NULL; // not a factory metric
+    cogganPlannedATL.penColor = QColor(Qt::magenta);
+    cogganPlannedATL.curveStyle = QwtPlotCurve::Dots;
+    cogganPlannedATL.symbolStyle = QwtSymbol::NoSymbol;
+    cogganPlannedATL.smooth = false;
+    cogganPlannedATL.trendtype = 0;
+    cogganPlannedATL.topN = 1;
+    cogganPlannedATL.uname = cogganPlannedATL.name = tr("Coggan Planned Acute Training Load");
+    cogganPlannedATL.units = "ATL";
+    cogganPlannedATL.uunits = "ATL";
+    metrics.append(cogganPlannedATL);
+
+    MetricDetail cogganPlannedTSB;
+    cogganPlannedTSB.type = METRIC_PM;
+    cogganPlannedTSB.symbol = "planned_coggan_tsb";
+    cogganPlannedTSB.metric = NULL; // not a factory metric
+    cogganPlannedTSB.penColor = QColor(Qt::yellow);
+    cogganPlannedTSB.curveStyle = QwtPlotCurve::Dots;
+    cogganPlannedTSB.symbolStyle = QwtSymbol::NoSymbol;
+    cogganPlannedTSB.smooth = false;
+    cogganPlannedTSB.trendtype = 0;
+    cogganPlannedTSB.topN = 1;
+    cogganPlannedTSB.uname = cogganPlannedTSB.name = tr("Coggan Planned Training Stress Balance");
+    cogganPlannedTSB.units = "TSB";
+    cogganPlannedTSB.uunits = "TSB";
+    metrics.append(cogganPlannedTSB);
+
     // TRIMP LTS
     MetricDetail trimpLTS;
     trimpLTS.type = METRIC_PM;
