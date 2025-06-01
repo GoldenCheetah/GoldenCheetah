@@ -38,7 +38,7 @@ class SpecialFields
 
         QString makeTechName(QString) const;        // return a SQL friendly name
         QString metricSymbol(QString) const;        // return symbol for user friendly name
-        const RideMetric *rideMetric(QString&) const; // retuen metric ptr for user friendly name
+        const RideMetric *rideMetric(const QString&) const; // return metric ptr for user friendly name
         QString displayName(QString &) const;         // return display (localized) name for name
         QString internalName(QString) const;          // return internal (english) Name for display
 

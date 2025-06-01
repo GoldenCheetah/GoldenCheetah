@@ -138,7 +138,7 @@ SpecialFields::metricSymbol(QString name) const
 }
 
 const RideMetric *
-SpecialFields::rideMetric(QString&name) const
+SpecialFields::rideMetric(const QString &name) const
 {
     return metricmap.value(name, NULL);
 }
