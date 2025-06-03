@@ -64,3 +64,6 @@ doc/contrib/WASP Packet Protocol.pdf
 
 # Qt testlib
 target_wrapper.sh
+
+# IDEs
+**/.vs/
