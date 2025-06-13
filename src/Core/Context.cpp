@@ -124,6 +124,9 @@ GlobalContext::userMetricsConfigChanged()
     foreach(UserMetricSettings m, _userMetrics) {
         RideMetricFactory::instance().addMetric(UserMetric(_contexts.at(0), m));
     }
+
+    // refresh SpecialFields to include updated user metrics
+    specialFields = SpecialFields();
 }
 
 GlobalContext *GlobalContext::context()
