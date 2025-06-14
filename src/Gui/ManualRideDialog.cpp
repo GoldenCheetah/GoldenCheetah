@@ -18,6 +18,9 @@
  */
 
 #include "ManualRideDialog.h"
+
+#include <QMessageBox>
+
 #include "Context.h"
 #include "Colors.h"
 #include "Athlete.h"
@@ -32,559 +35,730 @@
 #include "Units.h"
 #include "HelpWhatsThis.h"
 
-//
-// Get the estimate factors
-//
-void 
-ManualRideDialog::deriveFactors()
+#define MANDATORY " *"
+
+////////////////////////////////////////////////////////////////////////////////
+// ManualActivityWizard
+
+ManualActivityWizard::ManualActivityWizard
+(Context *context, QWidget *parent)
+: QWizard(parent), context(context)
 {
-    // we already calculated for that day range
-    if (days->value() == daysago) return;
-    else daysago = days->value();
-
-    // working variables
-    timeKJ = distanceKJ = timeTSS = distanceTSS = timeBS = distanceBS = timeDP = distanceDP = 0.0;
-
-    // do we have any rides?
-    if (context->athlete->rideCache->rides().count()) {
-
-        // last 'n' days calculation
-        double seconds, distance, bs, dp, tss, kj;
-        seconds = distance = tss = kj = bs = dp = 0;
-        int rides = 0;
-
-        // fall back to 'all time' calculation
-        double totalseconds, totaldistance, totalbs, totaldp, totaltss, totalkj;
-        totalseconds = totaldistance = totaltss = totalkj = totalbs = totaldp = 0;
-
-        // iterate over the ride cache
-        foreach (RideItem *ride, context->athlete->rideCache->rides()) {
-
-            // skip those with no time or distance values (not comparing doubles)
-            if (ride->getForSymbol("time_riding") == 0 || ride->getForSymbol("total_distance") == 0) continue;
-
-            // how many days ago was it?
-            int days =  ride->dateTime.daysTo(QDateTime::currentDateTime());
-
-            // only use rides in last 'n' days
-            if (days >= 0 && days < daysago) {
-
-                bs += ride->getForSymbol("skiba_bike_score");
-                seconds += ride->getForSymbol("time_riding");
-                distance += ride->getForSymbol("total_distance");
-                dp += ride->getForSymbol("daniels_points");
-                tss += ride->getForSymbol("coggan_tss");
-                kj += ride->getForSymbol("total_work");
-
-                rides++;
-            } 
-            totalbs += ride->getForSymbol("skiba_bike_score");
-            totalseconds += ride->getForSymbol("time_riding");
-            totaldistance += ride->getForSymbol("total_distance");
-            totaldp += ride->getForSymbol("daniels_points");
-            totaltss += ride->getForSymbol("coggan_tss");
-            totalkj += ride->getForSymbol("total_work");
-
-        }
-
-        // total values, not just last 'n' days -- but avoid divide by zero
-        if (totalseconds && totaldistance) {
-            if (!GlobalContext::context()->useMetricUnits) totaldistance *= MILES_PER_KM;
-            timeBS = (totalbs * 3600) / totalseconds;  // BS per hour
-            distanceBS = totalbs / totaldistance;  // BS per mile or km
-            timeDP = (totaldp * 3600) / totalseconds;  // DP per hour
-            distanceDP = totaldp / totaldistance;  // DP per mile or km
-            timeTSS = (totaltss * 3600) / totalseconds;  // DP per hour
-            distanceTSS = totaltss / totaldistance;  // DP per mile or km
-            timeKJ = (totalkj * 3600) / totalseconds;  // DP per hour
-            distanceKJ = totalkj / totaldistance;  // DP per mile or km
-        }
-
-        // don't use defaults if we have rides in last 'n' days
-        if (rides) {
-            if (!GlobalContext::context()->useMetricUnits) distance *= MILES_PER_KM;
-            timeBS = (bs * 3600) / seconds;  // BS per hour
-            distanceBS = bs / distance;  // BS per mile or km
-            timeDP = (dp * 3600) / seconds;  // DP per hour
-            distanceDP = dp / distance;  // DP per mile or km
-            timeTSS = (tss * 3600) / seconds;  // DP per hour
-            distanceTSS = tss / distance;  // DP per mile or km
-            timeKJ = (kj * 3600) / seconds;  // DP per hour
-            distanceKJ = kj / distance;  // DP per mile or km
-        }
-    }
-}
-
-ManualRideDialog::ManualRideDialog(Context *context) : context(context)
-{
-    setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("Manual Entry"));
-    HelpWhatsThis *help = new HelpWhatsThis(this);
-    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Activity_Manual));
+    setMinimumSize(800 * dpiXFactor, 650 * dpiYFactor);
+    setModal(true);
+
 #ifdef Q_OS_MAC
-    setMinimumSize(610,415);
+    setWizardStyle(QWizard::MacStyle);
 #else
-    setMinimumSize(615 *dpiXFactor,360 *dpiYFactor);
+    setWizardStyle(QWizard::ModernStyle);
 #endif
 
-    // we haven't derived factors yet
-    daysago = -1;
+    setPage(PageBasics, new ManualActivityPageBasics(context));
+    setPage(PageSpecifics, new ManualActivityPageSpecifics(context));
 
-    // we haven't lapsEditor yet
-    lapsEditor = NULL;
+    setStartId(PageBasics);
+}
 
-    //
-    // Create the GUI widgets
-    //
 
-    // BASIC DATA
+void
+ManualActivityWizard::done
+(int result)
+{
+    int finalResult = result;
+    if (result == QDialog::Accepted) {
+        appsettings->setValue(GC_BIKESCOREDAYS, field("estimationDays").toInt());
+        int eb = field("estimateBy").toInt();
+        appsettings->setValue(GC_BIKESCOREMODE, eb == 0 ? "time" : (eb == 1 ? "dist" : "manual"));
 
-    // ride start date and start time
-    QLabel *dateLabel = new QLabel(tr("Date:"), this);
-    dateEdit = new QDateEdit(this);
-    dateEdit->setDate(QDate::currentDate());
+        RideFile rideFile;
+
+        QDateTime rideDateTime = QDateTime(field("activityDate").toDate(), field("activityTime").toTime());
+        rideFile.setStartTime(rideDateTime);
+        rideFile.setRecIntSecs(0.00);
+        rideFile.setDeviceType("Manual");
+        rideFile.setFileFormat("GoldenCheetah Json");
+
+        QString sport = field("sport").toString().trimmed();
+        rideFile.setTag("Sport", sport);
+        if (field("subSport").toString().trimmed().size() > 0) {
+            rideFile.setTag("SubSport", field("subSport").toString().trimmed());
+        }
+        if (field("workoutCode").toString().trimmed().size() > 0) {
+            rideFile.setTag("Workout Code", field("workoutCode").toString().trimmed());
+        }
+
+        if ((sport == "Run" || sport == "Swim") && field("paceIntervals").toBool()) {
+            QList<RideFilePoint*> points = field("laps").value<QList<RideFilePoint*>>();
+            // get samples from Laps Editor, if available
+            if (points.count() > 0) {
+                rideFile.setRecIntSecs(1.00);
+                for (RideFilePoint *point : points) {
+                    rideFile.appendPoint(*point);
+                }
+                rideFile.fillInIntervals();
+            }
+        } else {
+            double distance = field("realDistance").toDouble();
+            if (distance > 0) {
+                QMap<QString,QString> values;
+                values.insert("value", QString("%1").arg(distance));
+                rideFile.metricOverrides.insert("total_distance", values);
+            }
+
+            double seconds = field("realDuration").toDouble();
+            if (seconds > 0) {
+                QMap<QString,QString> values;
+                values.insert("value", QString("%1").arg(seconds));
+                rideFile.metricOverrides.insert("workout_time", values);
+                rideFile.metricOverrides.insert("time_riding", values);
+            }
+        }
+        if (field("averageHr").toInt() > 0) {
+            QMap<QString,QString> values;
+            values.insert("value", QString("%1").arg(field("averageHr").toInt()));
+            rideFile.metricOverrides.insert("average_hr", values);
+        }
+        if (field("averageCadence").toInt() > 0) {
+            QMap<QString,QString> values;
+            values.insert("value", QString("%1").arg(field("averageCadence").toInt()));
+            rideFile.metricOverrides.insert("average_cad", values);
+        }
+        if (field("averagePower").toInt() > 0) {
+            QMap<QString,QString> values;
+            values.insert("value", QString("%1").arg(field("averagePower").toInt()));
+            rideFile.metricOverrides.insert("average_power", values);
+        }
+
+        if (field("work").toInt() > 0) {
+            QMap<QString,QString> values;
+            values.insert("value", QString("%1").arg(field("work").toInt()));
+            rideFile.metricOverrides.insert("total_work", values);
+        }
+        if (field("bikeStress").toInt() > 0 && sport == "Bike") {
+            QMap<QString,QString> values;
+            values.insert("value", QString("%1").arg(field("bikeStress").toInt()));
+            rideFile.metricOverrides.insert("coggan_tss", values);
+        }
+        if (field("bikeScore").toInt() > 0 && sport == "Bike") {
+            QMap<QString,QString> values;
+            values.insert("value", QString("%1").arg(field("bikeScore").toInt()));
+            rideFile.metricOverrides.insert("skiba_bike_score", values);
+        }
+        if (field("swimScore").toInt() > 0 && sport == "Swim") {
+            QMap<QString,QString> values;
+            values.insert("value", QString("%1").arg(field("swimScore").toInt()));
+            rideFile.metricOverrides.insert("swimscore", values);
+        }
+        if (field("triScore").toInt() > 0) {
+            QMap<QString,QString> values;
+            values.insert("value", QString("%1").arg(field("triScore").toInt()));
+            rideFile.metricOverrides.insert("triscore", values);
+        }
+
+        // process linked defaults
+        GlobalContext::context()->rideMetadata->setLinkedDefaults(&rideFile);
+
+        // what should the filename be?
+        QChar zero = QLatin1Char('0');
+        QString basename = QString("%1_%2_%3_%4_%5_%6")
+                                  .arg(rideDateTime.date().year(), 4, 10, zero)
+                                  .arg(rideDateTime.date().month(), 2, 10, zero)
+                                  .arg(rideDateTime.date().day(), 2, 10, zero)
+                                  .arg(rideDateTime.time().hour(), 2, 10, zero)
+                                  .arg(rideDateTime.time().minute(), 2, 10, zero)
+                                  .arg(rideDateTime.time().second(), 2, 10, zero);
+        QString filename = context->athlete->home->activities().canonicalPath() + "/" + basename + ".json";
+        QFile out(filename);
+        if (RideFileFactory::instance().writeRideFile(context, &rideFile, out, "json")) {
+            // refresh metric db etc
+            context->athlete->addRide(basename + ".json", true);
+        } else {
+            // rather than dance around renaming existing rides, this time we will let the user
+            // work it out -- they may actually want to keep an existing ride, so we shouldn't
+            // rename it silently.
+            QMessageBox oops(QMessageBox::Critical, tr("Unable to save"),
+                             tr("There is already an activity with the same start time or you do not have permissions to save a file."));
+            oops.exec();
+            finalResult = QDialog::Rejected;
+        }
+    }
+
+    QWizard::done(finalResult);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// ManualActivityPageBasics
+
+ManualActivityPageBasics::ManualActivityPageBasics
+(Context *context, QWidget *parent)
+: QWizardPage(parent), context(context)
+{
+    bool useMetricUnits = GlobalContext::context()->useMetricUnits;
+    bool metricSwimPace = appsettings->value(this, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
+
+    QDateEdit *dateEdit = new QDateEdit();
+    dateEdit->setMaximumDate(QDate::currentDate());
+    dateEdit->setMinimumDate(QDate(2000, 1, 1));
     dateEdit->setCalendarPopup(true);
 
-    QLabel *timeLabel = new QLabel(tr("Start time:"), this);
-    timeEdit = new QTimeEdit(this);
+    QTimeEdit *timeEdit = new QTimeEdit();
     timeEdit->setDisplayFormat("hh:mm:ss");
-    timeEdit->setTime(QTime::currentTime().addSecs(-4 * 3600)); // 4 hours ago by default
 
-    // Lap information
-    QLabel *lapsLabel = new QLabel(tr("Pace intervals:"), this);
-    lapsButton = new QPushButton(tr("&Laps Editor"), this);
-    lapsButton->setEnabled(false); // it is enables when sport is selected
+    QLineEdit *sportEdit = new QLineEdit();
 
-    // ride duration
-    QLabel *durationLabel = new QLabel(tr("Duration:"), this);
-    duration = new QTimeEdit(this);
-    duration->setDisplayFormat("hh:mm:ss");
+    QLineEdit *subSportEdit = new QLineEdit();
 
-    // ride distance
-    QString distanceString = QString(tr("Distance (%1):")).arg(GlobalContext::context()->useMetricUnits ? "km" : "miles");
-    QLabel *distanceLabel = new QLabel(distanceString, this);
-    distance = new QDoubleSpinBox(this);
-    distance->setSingleStep(1.0);
-    distance->setDecimals(2);
-    distance->setMinimum(0);
-    distance->setMaximum(999);
+    QLineEdit *workoutCodeEdit = new QLineEdit();
 
-    QLabel *wcodeLabel = new QLabel(tr("Workout Code:"), this);
-    wcode = new QLineEdit(this);
-    QLabel *sportLabel = new QLabel(tr("Sport:"), this);
-    sport = new QLineEdit(this);
-    QLabel *notesLabel = new QLabel(tr("Notes:"), this);
-    notes = new QTextEdit(this);
-    notes->setAcceptRichText(false);
+    QSpinBox *averageHrEdit = new QSpinBox();
+    averageHrEdit->setMinimum(0);
+    averageHrEdit->setMaximum(250);
+    averageHrEdit->setSuffix(" " + tr("bpm"));
 
-    // Set completer for Sport and Workout Code fields
+    averagePowerLabel = new QLabel("Average Power");
+
+    averagePowerEdit = new QSpinBox();
+    averagePowerEdit->setMinimum(0);
+    averagePowerEdit->setMaximum(2000);
+    averagePowerEdit->setSuffix(" " + tr("W"));
+
+    paceIntervals = new QCheckBox(tr("Pace intervals"));
+
+    lapsEditor = new LapsEditorWidget();
+
+    averageCadenceLabel = new QLabel(tr("Average Cadence"));
+
+    averageCadenceEdit = new QSpinBox();
+    averageCadenceEdit->setMinimum(0);
+    averageCadenceEdit->setMaximum(500);
+    averageCadenceEdit->setSuffix(" " + tr("rpm"));
+
+    distanceLabel = new QLabel(tr("Distance"));
+
+    distanceEdit = new QDoubleSpinBox();
+    distanceEdit->setMinimum(0);
+    distanceEdit->setMaximum(999);
+    distanceEdit->setDecimals(2);
+    distanceEdit->setSuffix(" " + (useMetricUnits ? tr("km") : tr("mi")));
+
+    swimDistanceLabel = new QLabel(tr("Swim Distance"));
+
+    swimDistanceEdit = new QSpinBox();
+    swimDistanceEdit->setMinimum(0);
+    swimDistanceEdit->setMaximum(100000);
+    swimDistanceEdit->setSuffix(" " + (metricSwimPace ? tr("m") : tr("yd")));
+
+    durationLabel = new QLabel(tr("Duration"));
+
+    durationEdit = new QTimeEdit();
+    durationEdit->setDisplayFormat("hh:mm:ss");
+
+    // Set completer for Sport, SubSport and Workout Code fields
     RideMetadata *rideMetadata = GlobalContext::context()->rideMetadata;
     if (rideMetadata) {
         foreach (FieldDefinition field, rideMetadata->getFields()) {
-            if (field.name == "Sport")
-                sport->setCompleter(field.getCompleter(this, context->athlete->rideCache));
-            else if (field.name == "Workout Code")
-                wcode->setCompleter(field.getCompleter(this, context->athlete->rideCache));
+            if (field.name == "Sport") {
+                sportEdit->setCompleter(field.getCompleter(this, context->athlete->rideCache));
+            } else if (field.name == "SubSport") {
+                subSportEdit->setCompleter(field.getCompleter(this, context->athlete->rideCache));
+            } else if (field.name == "Workout Code") {
+                workoutCodeEdit->setCompleter(field.getCompleter(this, context->athlete->rideCache));
+            }
         }
     }
 
-    // METRICS
+    connect(sportEdit, &QLineEdit::editingFinished, this, &ManualActivityPageBasics::updateVisibility);
+    connect(paceIntervals, &QCheckBox::toggled, this, &ManualActivityPageBasics::updateVisibility);
 
-    // average heartrate
-    QLabel *avgBPMLabel = new QLabel(tr("Average HR:"), this);
-    avgBPM = new QDoubleSpinBox(this);
-    avgBPM->setSingleStep(1.0);
-    avgBPM->setDecimals(0);
-    avgBPM->setMinimum(0);
-    avgBPM->setMaximum(250);
+    registerField("activityDate*", dateEdit);
+    registerField("activityTime", timeEdit);
+    registerField("sport*", sportEdit);
+    registerField("subSport", subSportEdit);
+    registerField("workoutCode", workoutCodeEdit);
+    registerField("averageHr", averageHrEdit);
+    registerField("averagePower", averagePowerEdit);
+    registerField("paceIntervals", paceIntervals);
+    registerField("laps", lapsEditor, "dataPoints", SIGNAL(editingFinished()));
+    registerField("averageCadence", averageCadenceEdit);
+    registerField("distance", distanceEdit, "value", SIGNAL(valueChanged(double)));
+    registerField("swimDistance", swimDistanceEdit);
+    registerField("duration", durationEdit);
 
-    // average power
-    QLabel *avgWattsLabel = new QLabel(tr("Average Watts:"), this);
-    avgWatts = new QDoubleSpinBox(this);
-    avgWatts->setSingleStep(1.0);
-    avgWatts->setDecimals(0);
-    avgWatts->setMinimum(0);
-    avgWatts->setMaximum(2500);
+    QFormLayout *form = newQFormLayout();
+    form->addRow(tr("Date") + MANDATORY, dateEdit);
+    form->addRow(tr("Time") + MANDATORY, timeEdit);
+    form->addRow(tr("Sport") + MANDATORY, sportEdit);
+    form->addRow(tr("Sub Sport"), subSportEdit);
+    form->addRow(tr("Workout Code"), workoutCodeEdit);
+    form->addRow(tr("Average Heartrate"), averageHrEdit);
+    form->addRow(averagePowerLabel, averagePowerEdit);
+    form->addRow(averageCadenceLabel, averageCadenceEdit);
+    form->addRow("", paceIntervals);
+    form->addRow(distanceLabel, distanceEdit);
+    form->addRow(swimDistanceLabel, swimDistanceEdit);
+    form->addRow(durationLabel, durationEdit);
+    form->addRow(lapsEditor);
 
-    // average cadence
-    QLabel *avgRPMLabel = new QLabel(tr("Average Cadence:"), this);
-    avgRPM = new QDoubleSpinBox(this);
-    avgRPM->setSingleStep(1.0);
-    avgRPM->setDecimals(0);
-    avgRPM->setMinimum(0);
-    avgRPM->setMaximum(250);
+    QWidget *scrollWidget = new QWidget();
+    QVBoxLayout *scrollLayout = new QVBoxLayout(scrollWidget);
+    scrollLayout->addWidget(centerLayoutInWidget(form, false));
+    scrollLayout->addWidget(lapsEditor);
+    QScrollArea *scrollArea = new QScrollArea();
+    scrollArea->setFrameShape(QFrame::NoFrame);
+    scrollArea->setWidget(scrollWidget);
+    scrollArea->setWidgetResizable(true);
 
-    // average speed
-    QLabel *avgKPHLabel = new QLabel(tr("Average Speed:"), this);
-    avgKPH = new QDoubleSpinBox(this);
-    avgKPH->setSingleStep(1.0);
-    avgKPH->setDecimals(1);
-    avgKPH->setMinimum(0);
-    avgKPH->setMaximum(100);
+    QVBoxLayout *all = new QVBoxLayout();
+    all->addWidget(scrollArea);
+    setLayout(all);
 
-    // how to estimate stress
-    QLabel *modeLabel = new QLabel(tr("Estimate Stress by:"), this);
-    byDuration = new QRadioButton(tr("Duration"));
-    byDistance = new QRadioButton(tr("Distance"));
-    byManual = new QRadioButton(tr("Manually"));
-
-    days = new QDoubleSpinBox(this);
-    days->setSingleStep(1.0);
-    days->setDecimals(0);
-    days->setMinimum(0);
-    days->setMaximum(999);
-    days->setValue(appsettings->value(this, GC_BIKESCOREDAYS, "30").toInt());
-    QLabel *dayLabel = new QLabel(tr("Estimate Stress days:"), this);
-
-    // Restore from last time
-    QVariant BSmode = appsettings->value(this, GC_BIKESCOREMODE); // remember from before
-    if (BSmode.toString() == "time") byDuration->setChecked(true);
-    else if (BSmode.toString() == "dist") byDistance->setChecked(true);
-    else byManual->setChecked(true);
-
-    // Derived metrics
-    QLabel *BSLabel = new QLabel("BikeScore (TM): ", this);
-    BS = new QDoubleSpinBox(this);
-    BS->setSingleStep(1.0);
-    BS->setDecimals(0);
-    BS->setMinimum(0);
-    BS->setMaximum(999);
-    
-    QLabel *DPLabel = new QLabel(tr("Daniel Points: "), this);
-    DP = new QDoubleSpinBox(this);
-    DP->setSingleStep(1.0);
-    DP->setDecimals(0);
-    DP->setMinimum(0);
-    DP->setMaximum(999);
-
-    QLabel *TSSLabel = new QLabel(tr("BikeStress: "), this);
-    BikeStress = new QDoubleSpinBox(this);
-    BikeStress->setSingleStep(1.0);
-    BikeStress->setDecimals(0);
-    BikeStress->setMinimum(0);
-    BikeStress->setMaximum(999);
-
-    QLabel *KJLabel = new QLabel(tr("Work (KJ):"), this);
-    KJ = new QDoubleSpinBox(this);
-    KJ->setSingleStep(1.0);
-    KJ->setDecimals(0);
-    KJ->setMinimum(0);
-    KJ->setMaximum(9999);
-
-    // buttons
-    okButton = new QPushButton(tr("&OK"), this);
-    cancelButton = new QPushButton(tr("&Cancel"), this);
-
-    // save by default -- we don't overwrite and
-    // the user will expect enter to save file
-    okButton->setDefault(true);
-    cancelButton->setDefault(false);
-    lapsButton->setDefault(false);
-
-    //
-    // LAY OUT THE GUI
-    //
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    QHBoxLayout *squeeze = new QHBoxLayout;
-    mainLayout->addLayout(squeeze);
-    QGridLayout *basicLayout = new QGridLayout;
-    squeeze->addLayout(basicLayout);
-    QGridLayout *notesLayout = new QGridLayout;
-    squeeze->addLayout(notesLayout);
-
-    notesLayout->addWidget(wcodeLabel, 0,0, Qt::AlignLeft);
-    notesLayout->addWidget(wcode, 0,1, Qt::AlignLeft);
-    notesLayout->addWidget(sportLabel, 1,0, Qt::AlignLeft);
-    notesLayout->addWidget(sport, 1,1, Qt::AlignLeft);
-    notesLayout->addWidget(notesLabel, 2,0, Qt::AlignTop|Qt::AlignLeft);
-    notesLayout->addWidget(notes, 2,1, Qt::AlignLeft);
-
-    basicLayout->addWidget(dateLabel, 0,0,Qt::AlignLeft);
-    basicLayout->addWidget(dateEdit, 0,1,Qt::AlignLeft);
-    basicLayout->addWidget(timeLabel, 1,0,Qt::AlignLeft);
-    basicLayout->addWidget(timeEdit, 1,1,Qt::AlignLeft);
-    basicLayout->addWidget(lapsLabel, 2,0,Qt::AlignLeft);
-    basicLayout->addWidget(lapsButton, 2,1, Qt::AlignLeft);
-    basicLayout->addWidget(durationLabel, 3,0,Qt::AlignLeft);
-    basicLayout->addWidget(duration, 3,1, Qt::AlignLeft);
-    basicLayout->addWidget(distanceLabel, 4,0, Qt::AlignLeft);
-    basicLayout->addWidget(distance, 4,1, Qt::AlignLeft);
-
-    QGroupBox *metricBox = new QGroupBox(tr("Metrics"),this);
-    QGridLayout *metricLayout = new QGridLayout;
-    metricBox->setLayout(metricLayout);
-    mainLayout->addWidget(metricBox);
-
-    metricLayout->addWidget(avgBPMLabel, 0,0,Qt::AlignLeft);
-    metricLayout->addWidget(avgBPM, 0,1,Qt::AlignLeft);
-    metricLayout->addWidget(avgWattsLabel, 1,0,Qt::AlignLeft);
-    metricLayout->addWidget(avgWatts, 1,1,Qt::AlignLeft);
-    metricLayout->addWidget(avgRPMLabel, 2,0,Qt::AlignLeft);
-    metricLayout->addWidget(avgRPM, 2,1,Qt::AlignLeft);
-    metricLayout->addWidget(avgKPHLabel, 3,0,Qt::AlignLeft);
-    metricLayout->addWidget(avgKPH, 3,1,Qt::AlignLeft);
-
-    QHBoxLayout *estimateby = new QHBoxLayout;
-    estimateby->addWidget(modeLabel);
-    estimateby->addWidget(byDuration);
-    estimateby->addWidget(byDistance);
-    estimateby->addWidget(byManual);
-    metricLayout->addLayout(estimateby, 0,2,1,-1,Qt::AlignLeft);
-
-
-    QHBoxLayout *daysLayout = new QHBoxLayout;
-    daysLayout->addWidget(dayLabel);
-    daysLayout->addWidget(days);
-    metricLayout->addLayout(daysLayout, 1,2,1,-1,Qt::AlignLeft);
-
-    metricLayout->addWidget(TSSLabel, 2,2, Qt::AlignLeft);
-    metricLayout->addWidget(BikeStress, 2,3, Qt::AlignLeft);
-    metricLayout->addWidget(KJLabel, 2,4, Qt::AlignLeft);
-    metricLayout->addWidget(KJ, 2,5, Qt::AlignLeft);
-    metricLayout->addWidget(BSLabel, 3,2, Qt::AlignLeft);
-    metricLayout->addWidget(BS, 3,3, Qt::AlignLeft);
-    metricLayout->addWidget(DPLabel, 3,4, Qt::AlignLeft);
-    metricLayout->addWidget(DP, 3,5, Qt::AlignLeft);
-
-    QHBoxLayout *buttons = new QHBoxLayout;
-    mainLayout->addLayout(buttons);
-    buttons->addStretch();
-    buttons->addWidget(okButton);
-    buttons->addWidget(cancelButton);
-
-    // sport is used to enable/disable and to configure LapsEditor
-    connect(sport, SIGNAL(textChanged(QString)), this, SLOT(sportChanged(QString)));
-
-    // if any of the fields used to determine estimation are changed then
-    // lets re-calculate and apply
-    connect(distance, SIGNAL(valueChanged(double)), this, SLOT(estimate()));
-    connect(duration, SIGNAL(timeChanged(QTime)), this, SLOT(estimate()));
-    connect(byDistance, SIGNAL(toggled(bool)), this, SLOT(estimate()));
-    connect(byDuration, SIGNAL(toggled(bool)), this, SLOT(estimate()));
-    connect(byManual, SIGNAL(toggled(bool)), this, SLOT(estimate()));
-    connect(days, SIGNAL(valueChanged(double)), this, SLOT(estimate()));
-
-    // dialog buttons
-    connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
-    connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
-    connect(lapsButton, SIGNAL(clicked()), this, SLOT(lapsClicked()));
-
-    // initialise estimates / widgets enabled
-    estimate();
+    updateVisibility();
 }
 
-ManualRideDialog::~ManualRideDialog() {
-    delete lapsEditor;
-}
 
 void
-ManualRideDialog::estimate()
+ManualActivityPageBasics::initializePage
+()
 {
-    if (byManual->isChecked()) {
-        BS->setEnabled(true);
-        DP->setEnabled(true);
-        BikeStress->setEnabled(true);
-        KJ->setEnabled(true);
+    setField("activityDate", QDate::currentDate());
+    setField("activityTime", QDateTime::currentDateTime().addSecs(-4 * 3600)); // 4 hours ago by default
+}
 
-        return; // no calculation - manually entered by user
+
+int
+ManualActivityPageBasics::nextId
+() const
+{
+    return ManualActivityWizard::PageSpecifics;
+}
+
+
+void
+ManualActivityPageBasics::updateVisibility
+()
+{
+    bool useMetricUnits = GlobalContext::context()->useMetricUnits;
+    bool showAveragePower = true;
+    bool showAverageCadence = true;
+    bool showDistance = true;
+    bool showSwimDistance = false;
+    bool showDuration = true;
+    bool showLapsEditor = false;
+    bool showPaceIntervals = false;
+    QString sport = field("sport").toString().trimmed();
+
+    if (sport == "") {
+        // Hide all conditional fields
+        showAveragePower = false;
+        showAverageCadence = false;
+        showDistance = false;
+        showSwimDistance = false;
+        showDuration = false;
+        showLapsEditor = false;
+        showPaceIntervals = false;
+    } else if (sport == "Bike") {
+        // Stick to defaults
+    } else if (sport == "Run") {
+        useMetricUnits = appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
+        showPaceIntervals = true;
+        showLapsEditor = paceIntervals->isChecked();
+        showDistance = ! showLapsEditor;
+        showDuration = ! showLapsEditor;
+        lapsEditor->setSwim(false);
+    } else if (sport == "Swim") {
+        showAveragePower = false;
+        showDistance = false;
+        showPaceIntervals = true;
+        showLapsEditor = paceIntervals->isChecked();
+        showSwimDistance = ! showLapsEditor;
+        showDuration = ! showLapsEditor;
+        lapsEditor->setSwim(true);
+    } else if (sport == "Row") {
+        // Stick to defaults
+    } else if (sport == "Ski") {
+        showAveragePower = false;
+        showAverageCadence = false;
+    } else if (sport == "Gym") {
+        showAveragePower = false;
+        showAverageCadence = false;
+        showDistance = false;
+        showSwimDistance = false;
     } else {
-
-        BS->setEnabled(false);
-        DP->setEnabled(false);
-        BikeStress->setEnabled(false);
-        KJ->setEnabled(false);
+        // Stick to defaults
     }
 
-    deriveFactors(); // if days changed..
+    paceIntervals->setVisible(showPaceIntervals);
+    lapsEditor->setVisible(showLapsEditor);
 
-    if (byDuration->isChecked()) {
-        // by time
-        QTime time = duration->time();
-        double hours = (time.hour()) + (time.minute() / 60.00) + (time.second() / 3600.00);
+    averageCadenceLabel->setVisible(showAverageCadence);
+    averageCadenceEdit->setVisible(showAverageCadence);
+    averagePowerLabel->setVisible(showAveragePower);
+    averagePowerEdit->setVisible(showAveragePower);
+    distanceLabel->setVisible(showDistance);
+    distanceEdit->setVisible(showDistance);
+    distanceEdit->setSuffix(" " + (useMetricUnits ? tr("km") : tr("mi")));
+    swimDistanceLabel->setVisible(showSwimDistance);
+    swimDistanceEdit->setVisible(showSwimDistance);
+    durationLabel->setVisible(showDuration);
+    durationEdit->setVisible(showDuration);
+}
 
-        BS->setValue(hours * timeBS);
-        DP->setValue(hours * timeDP);
-        BikeStress->setValue(hours * timeTSS);
-        KJ->setValue(hours * timeKJ);
 
+////////////////////////////////////////////////////////////////////////////////
+// ManualActivityPageSpecifics
+
+ManualActivityPageSpecifics::ManualActivityPageSpecifics
+(Context *context, QWidget *parent)
+: QWizardPage(parent), context(context)
+{
+    setFinalPage(true);
+
+    estimateBy = new QComboBox();
+    estimateBy->addItem(tr("Duration"));
+    estimateBy->addItem(tr("Distance"));
+    estimateBy->addItem(tr("Manually"));
+    QString bsMode = appsettings->value(this, GC_BIKESCOREMODE).toString();
+    if (bsMode == "time") {
+        estimateBy->setCurrentIndex(0);
+    } else if (bsMode == "dist") {
+        estimateBy->setCurrentIndex(1);
     } else {
-        // by distance
-        double dist = distance->value();
-
-        BS->setValue(dist * distanceBS);
-        DP->setValue(dist * distanceDP);
-        BikeStress->setValue(dist * distanceTSS);
-        KJ->setValue(dist * distanceKJ);
-    }
-}
-
-void
-ManualRideDialog::cancelClicked()
-{
-    reject();
-}
-
-void
-ManualRideDialog::okClicked()
-{
-    // remember parameters
-    appsettings->setValue(GC_BIKESCOREDAYS, days->value());
-    appsettings->setValue(GC_BIKESCOREMODE,
-        byDistance->isChecked() ? "dist" :  
-       (byDuration->isChecked() ? "time" : "manual"));
-
-    // create a new ridefile
-    RideFile *rideFile = new RideFile();
-
-    // set the first class variables
-    QDateTime rideDateTime = QDateTime(dateEdit->date(), timeEdit->time());
-    rideFile->setStartTime(rideDateTime);
-    rideFile->setRecIntSecs(0.00);
-    rideFile->setDeviceType("Manual");
-    rideFile->setFileFormat("GoldenCheetah Json");
-
-    // get samples from Laps Editor, if available
-    if (lapsEditor && lapsEditor->dataPoints().count() > 0) {
-        rideFile->setRecIntSecs(1.00);
-        foreach(RideFilePoint *point, lapsEditor->dataPoints())
-            rideFile->appendPoint(*point);
-        rideFile->fillInIntervals();
+        estimateBy->setCurrentIndex(2);
     }
 
-    // basic data
-    if (distance->value()) {
-        QMap<QString,QString> override;
-        if (!GlobalContext::context()->useMetricUnits) {
-            override.insert("value", QString("%1").arg(distance->value() * KM_PER_MILE));
-        }else{
-            override.insert("value", QString("%1").arg(distance->value()));
+    estimationDayEdit = new QSpinBox();
+    estimationDayEdit->setSingleStep(1);
+    estimationDayEdit->setMinimum(1);
+    estimationDayEdit->setMaximum(999);
+    estimationDayEdit->setValue(appsettings->value(this, GC_BIKESCOREDAYS, "30").toInt());
+
+    workEdit = new QSpinBox();
+    workEdit->setSuffix(" " + tr("kJ"));
+    workEdit->setSingleStep(1);
+    workEdit->setMinimum(0);
+    workEdit->setMaximum(9999);
+
+    bikeStressLabel = new QLabel(tr("BikeStress"));
+
+    bikeStressEdit = new QSpinBox();
+    bikeStressEdit->setSingleStep(1);
+    bikeStressEdit->setMinimum(0);
+    bikeStressEdit->setMaximum(999);
+
+    bikeScoreLabel = new QLabel(tr("BikeScore") + "<sup>TM</sup>");
+
+    bikeScoreEdit = new QSpinBox();
+    bikeScoreEdit->setSingleStep(1);
+    bikeScoreEdit->setMinimum(0);
+    bikeScoreEdit->setMaximum(999);
+
+    swimScoreLabel = new QLabel(tr("SwimScore") + "<sup>TM</sup>");
+
+    swimScoreEdit = new QSpinBox();
+    swimScoreEdit->setSingleStep(1);
+    swimScoreEdit->setMinimum(0);
+    swimScoreEdit->setMaximum(999);
+
+    triScoreLabel = new QLabel(tr("TriScore") + "<sup>TM</sup");
+
+    triScoreEdit = new QSpinBox();
+    triScoreEdit->setSingleStep(1);
+    triScoreEdit->setMinimum(0);
+    triScoreEdit->setMaximum(999);
+
+    QDoubleSpinBox *realDuration = new QDoubleSpinBox();
+    realDuration->setMinimum(0);
+    realDuration->setMaximum(100000);
+    realDuration->setVisible(false);
+
+    QDoubleSpinBox *realDistance = new QDoubleSpinBox();
+    realDistance->setMinimum(0);
+    realDistance->setMaximum(10000);
+    realDistance->setVisible(false);
+
+#if QT_VERSION >= 0x060000
+    connect(estimateBy, &QComboBox::currentIndexChanged, this, &ManualActivityPageSpecifics::updateVisibility);
+    connect(estimateBy, &QComboBox::currentIndexChanged, this, &ManualActivityPageSpecifics::updateEstimates);
+    connect(estimationDayEdit, &QSpinBox::valueChanged, this, &ManualActivityPageSpecifics::updateEstimates);
+#else
+    connect(estimateBy, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ManualActivityPageSpecifics::updateVisibility);
+    connect(estimateBy, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ManualActivityPageSpecifics::updateEstimates);
+    connect(estimationDayEdit, QOverload<int>::of(&QSpinBox::valueChanged), this, &ManualActivityPageSpecifics::updateEstimates);
+#endif
+
+    registerField("estimateBy", estimateBy);
+    registerField("estimationDays", estimationDayEdit);
+    registerField("work", workEdit);
+    registerField("bikeStress", bikeStressEdit);
+    registerField("bikeScore", bikeScoreEdit);
+    registerField("swimScore", swimScoreEdit);
+    registerField("triScore", triScoreEdit);
+    registerField("realDuration", realDuration, "value", SIGNAL(valueChanged(double)));
+    registerField("realDistance", realDistance, "value", SIGNAL(valueChanged(double)));
+
+    QFormLayout *form = newQFormLayout();
+    form->addRow(tr("Estimate by"), estimateBy);
+    form->addRow(tr("Estimate Stress Days"), estimationDayEdit);
+    form->addRow(tr("Work"), workEdit);
+    form->addRow(bikeStressLabel, bikeStressEdit);
+    form->addRow(bikeScoreLabel, bikeScoreEdit);
+    form->addRow(swimScoreLabel, swimScoreEdit);
+    form->addRow(triScoreLabel, triScoreEdit);
+    form->addRow(realDuration);
+    form->addRow(realDistance);
+
+    setLayout(centerLayout(form));
+}
+
+
+void
+ManualActivityPageSpecifics::cleanupPage
+()
+{
+    // Overriden to prevent "estimate by" and "Estimate Stress days" from being reset when going back
+}
+
+
+void
+ManualActivityPageSpecifics::initializePage
+()
+{
+    updateVisibility();
+    updateEstimates();
+}
+
+
+int
+ManualActivityPageSpecifics::nextId
+() const
+{
+    return ManualActivityWizard::Finalize;
+}
+
+
+void
+ManualActivityPageSpecifics::updateVisibility
+()
+{
+    bool manual = estimateBy->currentIndex() == 2;
+
+    bool showBikeStress = false;
+    bool showBikeScore = false;
+    bool showSwimScore = false;
+    bool showTriScore = true;
+    QString sport = field("sport").toString().trimmed();
+    if (sport == "Bike") {
+        showBikeStress = true;
+        showBikeScore = true;
+    } else if (sport == "Run") {
+        // Use defaults
+    } else if (sport == "Swim") {
+        showSwimScore = true;
+    } else if (sport == "Row") {
+        // Use defaults
+    } else if (sport == "Ski") {
+        // Use defaults
+    } else if (sport == "Gym") {
+        // Use defaults
+    }
+
+    workEdit->setEnabled(manual);
+    bikeStressEdit->setEnabled(manual);
+    bikeScoreEdit->setEnabled(manual);
+    swimScoreEdit->setEnabled(manual);
+    triScoreEdit->setEnabled(manual);
+
+    estimationDayEdit->setEnabled(! manual);
+    bikeStressLabel->setVisible(showBikeStress);
+    bikeStressEdit->setVisible(showBikeStress);
+    bikeScoreLabel->setVisible(showBikeScore);
+    bikeScoreEdit->setVisible(showBikeScore);
+    swimScoreLabel->setVisible(showSwimScore);
+    swimScoreEdit->setVisible(showSwimScore);
+    triScoreLabel->setVisible(showTriScore);
+    triScoreEdit->setVisible(showTriScore);
+}
+
+
+void
+ManualActivityPageSpecifics::updateEstimates
+()
+{
+    std::pair<double, double> durationDistance = getDurationDistance();
+    double actDuration = durationDistance.first;
+    double actDistance = durationDistance.second;
+    setField("realDuration", actDuration);
+    setField("realDistance", actDistance);
+
+    int estimateBy = field("estimateBy").toInt();
+    if (estimateBy == 2) { // manual
+        return;
+    }
+    int estimationDays = field("estimationDays").toInt();
+    double timeWork = 0.0;
+    double distanceWork = 0.0;
+    double timeBikeStress = 0.0;
+    double distanceBikeStress = 0.0;
+    double timeBikeScore = 0.0;
+    double distanceBikeScore = 0.0;
+    double timeSwimScore = 0.0;
+    double distanceSwimScore = 0.0;
+    double timeTriScore = 0.0;
+    double distanceTriScore = 0.0;
+
+    QString sport = field("sport").toString().trimmed();
+
+    double metricFactor = 1.0;
+    if (   (sport == "Run" && ! appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool())
+        || (sport == "Swim" && ! appsettings->value(this, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool())
+        || (sport != "Run" && sport != "Swim" && ! GlobalContext::context()->useMetricUnits)) {
+        metricFactor = MILES_PER_KM;
+    }
+
+    // do we have any rides?
+    if (context->athlete->rideCache->rides().count()) {
+        // last 'n' days calculation
+        double seconds = 0.0;
+        double distance = 0.0;
+        double work = 0.0;
+        double bikeStress = 0.0;
+        double bikeScore = 0.0;
+        double swimScore = 0.0;
+        double triScore = 0.0;
+        int rides = 0;
+
+        // fall back to 'all time' calculation
+        double totalSeconds = 0.0;
+        double totalDistance = 0.0;
+        double totalWork = 0.0;
+        double totalBikeStress = 0.0;
+        double totalBikeScore = 0.0;
+        double totalSwimScore = 0.0;
+        double totalTriScore = 0.0;
+
+        // iterate over the ride cache
+        for (RideItem *ride : context->athlete->rideCache->rides()) {
+            if (ride->planned || ride->sport.trimmed() != sport) {
+                continue;
+            }
+
+            // skip those with no time or distance values (not comparing doubles)
+            if (ride->getForSymbol("time_riding") == 0 || ride->getForSymbol("total_distance") == 0) {
+                continue;
+            }
+
+            // how many days ago was it?
+            int daysAgo = ride->dateTime.daysTo(QDateTime::currentDateTime());
+
+            // only use rides in last 'n' days
+            if (daysAgo >= 0 && daysAgo < estimationDays) {
+                seconds += ride->getForSymbol("time_riding");
+                distance += ride->getForSymbol("total_distance");
+                work += ride->getForSymbol("total_work");
+                bikeStress += ride->getForSymbol("coggan_tss");
+                bikeScore += ride->getForSymbol("skiba_bike_score");
+                swimScore += ride->getForSymbol("swimscore");
+                triScore += ride->getForSymbol("triscore");
+
+                rides++;
+            }
+            totalSeconds += ride->getForSymbol("time_riding");
+            totalDistance += ride->getForSymbol("total_distance");
+            totalWork += ride->getForSymbol("total_work");
+            totalBikeStress += ride->getForSymbol("coggan_tss");
+            totalBikeScore += ride->getForSymbol("skiba_bike_score");
+            totalSwimScore += ride->getForSymbol("swimscore");
+            totalTriScore += ride->getForSymbol("triscore");
         }
-        rideFile->metricOverrides.insert("total_distance", override);
+
+        // total values, not just last 'n' days -- but avoid divide by zero
+        totalDistance *= metricFactor;
+
+        timeWork = (totalWork * 3600) / totalSeconds;
+        timeBikeStress = (totalBikeStress * 3600) / totalSeconds;
+        timeBikeScore = (totalBikeScore * 3600) / totalSeconds;
+        timeSwimScore = (totalSwimScore * 3600) / totalSeconds;
+        timeTriScore = (totalTriScore * 3600) / totalSeconds;
+        distanceWork = totalWork / totalDistance;
+        distanceBikeStress = totalBikeStress / totalDistance;
+        distanceBikeScore = totalBikeScore / totalDistance;
+        distanceSwimScore = totalSwimScore / totalDistance;
+        distanceTriScore = totalTriScore / totalDistance;
+
+        // don't use defaults if we have rides in last 'n' days
+        if (rides) {
+            if (seconds) {
+                distance *= metricFactor;
+                timeWork = (work * 3600) / seconds;
+                timeBikeStress = (bikeStress * 3600) / seconds;
+                timeBikeScore = (bikeScore * 3600) / seconds;
+                timeSwimScore = (swimScore * 3600) / seconds;
+                timeTriScore = (triScore * 3600) / seconds;
+            }
+            if (distance) {
+                distanceWork = work / distance;
+                distanceBikeStress = bikeStress / distance;
+                distanceBikeScore = bikeScore / distance;
+                distanceSwimScore = swimScore / distance;
+                distanceTriScore = triScore / distance;
+            }
+        }
     }
 
-    QTime time = duration->time();
-    double seconds = (time.hour() * 3600) + (time.minute() * 60.00) + (time.second());
-    if (seconds) {
-        QMap<QString,QString> override;
-        override.insert("value", QString("%1").arg(seconds));
-        rideFile->metricOverrides.insert("workout_time", override);
-        // Override time_riding to duration
-        // only if we don't have better information
-        if (!lapsEditor || lapsEditor->dataPoints().count() == 0)
-            rideFile->metricOverrides.insert("time_riding", override);
-    }
-
-    // basic metadata
-    rideFile->setTag("Sport", sport->text());
-    rideFile->setTag("Workout Code", wcode->text());
-    rideFile->setTag("Notes", notes->document()->toPlainText());
-
-    // average metrics
-    if (avgBPM->value()) {
-        QMap<QString,QString> override;
-        override.insert("value", QString("%1").arg(avgBPM->value()));
-        rideFile->metricOverrides.insert("average_hr", override);
-    }
-    if (avgRPM->value()) {
-        QMap<QString,QString> override;
-        override.insert("value", QString("%1").arg(avgRPM->value()));
-        rideFile->metricOverrides.insert("average_cad", override);
-    }
-    if (avgKPH->value()) {
-        QMap<QString,QString> override;
-        // Avg Speed is shown according to units preferences
-        double kph = (GlobalContext::context()->useMetricUnits ? 1.0 : KM_PER_MILE) * avgKPH->value();
-        override.insert("value", QString("%1").arg(kph));
-        rideFile->metricOverrides.insert("average_speed", override);
-    }
-    if (avgWatts->value()) {
-        QMap<QString,QString> override;
-        override.insert("value", QString("%1").arg(avgWatts->value()));
-        rideFile->metricOverrides.insert("average_power", override);
-    }
-
-    // stress metrics
-    if (BS->value()) {
-        QMap<QString,QString> override;
-        override.insert("value", QString("%1").arg(BS->value()));
-        rideFile->metricOverrides.insert("skiba_bike_score", override);
-    }
-    if (DP->value()) {
-        QMap<QString,QString> override;
-        override.insert("value", QString("%1").arg(DP->value()));
-        rideFile->metricOverrides.insert("daniels_points", override);
-    }
-    if (BikeStress->value()) {
-        QMap<QString,QString> override;
-        override.insert("value", QString("%1").arg(BikeStress->value()));
-        rideFile->metricOverrides.insert("coggan_tss", override);
-    }
-    if (KJ->value()) {
-        QMap<QString,QString> override;
-        override.insert("value", QString("%1").arg(KJ->value()));
-        rideFile->metricOverrides.insert("total_work", override);
-    }
-
-    // process linked defaults
-    GlobalContext::context()->rideMetadata->setLinkedDefaults(rideFile);
-
-    // what should the filename be?
-    QChar zero = QLatin1Char ('0');
-    QString basename = QString ("%1_%2_%3_%4_%5_%6")
-                           .arg (rideDateTime.date().year(), 4, 10, zero)
-                           .arg (rideDateTime.date().month(), 2, 10, zero)
-                           .arg (rideDateTime.date().day(), 2, 10, zero)
-                           .arg (rideDateTime.time().hour(), 2, 10, zero)
-                           .arg (rideDateTime.time().minute(), 2, 10, zero)
-                           .arg (rideDateTime.time().second(), 2, 10, zero);
-
-    QString filename = context->athlete->home->activities().canonicalPath() + "/" + basename + ".json";
-
-    QFile out(filename);
-    bool success = RideFileFactory::instance().writeRideFile(context, rideFile, out, "json");
-    delete rideFile;
-
-    if (success) {
-
-        // refresh metric db etc
-        context->athlete->addRide(basename + ".json", true);
-        accept();
-
-    } else {
-
-        // rather than dance around renaming existing rides, this time we will let the user
-        // work it out -- they may actually want to keep an existing ride, so we shouldn't
-        // rename it silently.
-        QMessageBox oops(QMessageBox::Critical, tr("Unable to save"),
-                         tr("There is already an activity with the same start time or you do not have permissions to save a file."));
-        oops.exec();
+    if (estimateBy == 0) { // by time
+        setField("work", actDuration * timeWork / 3600.0);
+        setField("bikeStress", actDuration * timeBikeStress / 3600.0);
+        setField("bikeScore", actDuration * timeBikeScore / 3600.0);
+        setField("swimScore", actDuration * timeSwimScore / 3600.0);
+        setField("triScore", actDuration * timeTriScore / 3600.0);
+    } else if (estimateBy == 1) { // by distance
+        setField("work", actDistance * distanceWork);
+        setField("bikeStress", actDistance * distanceBikeStress);
+        setField("bikeScore", actDistance * distanceBikeScore);
+        setField("swimScore", actDistance * distanceSwimScore);
+        setField("triScore", actDistance * distanceTriScore);
     }
 }
 
-void
-ManualRideDialog::sportChanged(const QString& text)
-{
-    // remove previous Laps Editor and create a new one according to sport
-    // only for swimming and running.
-    delete lapsEditor;
-    if (text == "Swim" || text == tr("Swim")) {
-        lapsEditor = new LapsEditor(true);
-        lapsButton->setEnabled(true);
-    } else if (text == "Run" || text == tr("Run")) {
-        lapsEditor = new LapsEditor(false);
-        lapsButton->setEnabled(true);
-    } else {
-        lapsEditor = NULL;
-        lapsButton->setEnabled(false);
-    }
-}
 
-void
-ManualRideDialog::lapsClicked()
+std::pair<double, double>
+ManualActivityPageSpecifics::getDurationDistance
+() const
 {
-    if (lapsEditor && lapsEditor->exec() && lapsEditor->dataPoints().count() > 0) {
-        // update duration and distance
-        duration->setTime(QTime(0, 0, 0).addSecs(lapsEditor->dataPoints().count()));
-        distance->setValue(lapsEditor->dataPoints()[lapsEditor->dataPoints().count()-1]->km / (GlobalContext::context()->useMetricUnits ? 1.0 : KM_PER_MILE));
+    double durationSeconds = 0;
+    double distanceKm = 0;
+    bool useLaps = field("paceIntervals").toBool();
+    if (useLaps) {
+        QList<RideFilePoint*> rideFilePoints = field("laps").value<QList<RideFilePoint*>>();
+        if (! rideFilePoints.isEmpty()) {
+            RideFilePoint *rfp = rideFilePoints.last();
+            durationSeconds = rfp->secs;
+            distanceKm = rfp->km;
+        }
+    } else {
+        QTime durationField = field("duration").toTime();
+        durationSeconds = durationField.hour() * 3600 + durationField.minute() * 60.0 + durationField.second();
+
+        QString sport = field("sport").toString().trimmed();
+        bool useMetricUnits = GlobalContext::context()->useMetricUnits;
+        if (sport == "Run") {
+            useMetricUnits = appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
+        } else if (sport == "Swim") {
+            useMetricUnits = appsettings->value(this, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
+        }
+        if (sport == "Swim") {
+            distanceKm = field("swimDistance").toInt() / 1000.0;
+            if (! useMetricUnits) {
+                distanceKm *= METERS_PER_YARD;
+            }
+        } else {
+            distanceKm = field("distance").toDouble();
+            if (! useMetricUnits) {
+                distanceKm /= MILES_PER_KM;
+            }
+        }
     }
+    return std::make_pair(durationSeconds, distanceKm);
 }

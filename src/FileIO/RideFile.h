@@ -215,7 +215,7 @@ class RideFile : public QObject // QObject to emit signals
         friend class TcxFileReader;
         friend struct PwxFileReader;
         friend struct JsonFileReader;
-        friend class ManualRideDialog;
+        friend class ManualActivityWizard;
         friend class PolarFileReader;
         friend class Strava;
         friend class ErgFile; // access to intervals

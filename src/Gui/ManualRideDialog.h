@@ -23,74 +23,101 @@
 #include "LapsEditor.h"
 
 #include <QtGui>
-#include <QLineEdit>
-#include <QTextEdit>
-#include <QDialog>
-#include <QGroupBox>
 #include <QLabel>
-#include <QMessageBox>
+#include <QComboBox>
+#include <QCheckBox>
+#include <QWizard>
+#include <QWizardPage>
+
+#include "StyledItemDelegates.h"
 
 class Context;
 
-class ManualRideDialog : public QDialog
+
+class ManualActivityWizard : public QWizard
 {
     Q_OBJECT
-    G_OBJECT
 
     public:
-        ManualRideDialog(Context *context);
-        ~ManualRideDialog();
+        enum {
+            Finalize = -1,
+            PageBasics,
+            PageSpecifics
+        };
 
-    private slots:
-        void okClicked();
-        void cancelClicked();
+        ManualActivityWizard(Context *context, QWidget *parent = nullptr);
 
-        void estimate();          // estimate BikeStress et al when method/duration/distance changes
-        void deriveFactors();        // calculate factors to use for estimate
-
-        void sportChanged(const QString& text); // enable/disable lapsButton
-        void lapsClicked(); // starts laps editor
+    protected:
+        virtual void done(int result) override;
 
     private:
-
         Context *context;
-        QVector<unsigned char> records;
-        QString filename, filepath;
-        int daysago; // remember last deriveFactors value
+};
 
-        // factors for estimator
-        double timeBS, distanceBS,  // Bikescore (use same for BikeStress)
-               timeDP, distanceDP,  // Daniel Points
-               timeTSS, distanceTSS,  // Coggan BikeStress
-               timeKJ, distanceKJ;  // Work
 
-        LapsEditor *lapsEditor; // Laps Editor Dialog
+class ManualActivityPageBasics : public QWizardPage
+{
+    Q_OBJECT
 
-        QPushButton *okButton, *cancelButton, *lapsButton;
+    public:
+        ManualActivityPageBasics(Context *context, QWidget *parent = nullptr);
 
-        QDateEdit *dateEdit;  // start date
-        QTimeEdit *timeEdit;  // start time
+        virtual void initializePage() override;
+        virtual int nextId() const override;
 
-        QDoubleSpinBox *days; // how many days to estimate?
+    private slots:
+        void updateVisibility();
 
-        QLineEdit *wcode;     // workout code
-        QLineEdit *sport;     // sport
-        QTextEdit *notes;     // capture some notes at least
+    private:
+        Context *context;
 
-        QTimeEdit *duration;  // ride duration as a time edit
-        QDoubleSpinBox *distance, // ride distance
-                       *avgBPM,   // heartrate
-                       *avgKPH,   // speed
-                       *avgRPM,   // cadence
-                       *avgWatts; // power
+        QLabel *distanceLabel;
+        QDoubleSpinBox *distanceEdit;
+        QLabel *swimDistanceLabel;
+        QSpinBox *swimDistanceEdit;
+        QLabel *durationLabel;
+        QTimeEdit *durationEdit;
+        QCheckBox *paceIntervals;
+        LapsEditorWidget *lapsEditor;
+        QLabel *averageCadenceLabel;
+        QSpinBox *averageCadenceEdit;
+        QLabel *averagePowerLabel;
+        QSpinBox *averagePowerEdit;
+};
 
-        QRadioButton *byDistance, *byDuration, *byManual;
 
-        QDoubleSpinBox *BS,       // skiba
-                       *DP,       // rhea
-                       *BikeStress,      // coggan
-                       *KJ;       // work
+class ManualActivityPageSpecifics : public QWizardPage
+{
+    Q_OBJECT
 
+    public:
+        ManualActivityPageSpecifics(Context *context, QWidget *parent = nullptr);
+
+        virtual void cleanupPage() override;
+        virtual void initializePage() override;
+        virtual int nextId() const override;
+
+    private slots:
+        void updateVisibility();
+        void updateEstimates();
+
+    private:
+        Context *context;
+
+        std::pair<double, double> getDurationDistance() const;
+
+    private:
+        QComboBox *estimateBy;
+        QSpinBox *estimationDayEdit;
+        QSpinBox *workEdit;
+        QLabel *bikeStressLabel;
+        QSpinBox *bikeStressEdit;
+        QLabel *bikeScoreLabel;
+        QSpinBox *bikeScoreEdit;
+        QLabel *swimScoreLabel;
+        QSpinBox *swimScoreEdit;
+        QLabel *triScoreLabel;
+        QSpinBox *triScoreEdit;
 };
 
 #endif // _GC_ManualRideDialog_h
