@@ -20,6 +20,7 @@
 #include "ManualRideDialog.h"
 
 #include <QMessageBox>
+#include <QSvgRenderer>
 
 #include "Context.h"
 #include "Colors.h"
@@ -36,6 +37,35 @@
 #include "HelpWhatsThis.h"
 
 #define MANDATORY " *"
+#define ICON_COLOR QColor("#F79130")
+#ifdef Q_OS_MAC
+#define ICON_SIZE 250
+#define ICON_TYPE QWizard::BackgroundPixmap
+#else
+#define ICON_SIZE 120
+#define ICON_TYPE QWizard::LogoPixmap
+#endif
+
+
+QPixmap
+svgAsColoredPixmap
+(const QString &file, const QSize &size, const QColor &color)
+{
+    QSvgRenderer renderer(file);
+    QPixmap pixmap(size.width(), size.height());
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    renderer.render(&painter);
+    painter.end();
+
+    QPainter recolorPainter(&pixmap);
+    recolorPainter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+    recolorPainter.fillRect(pixmap.rect(), color);
+    recolorPainter.end();
+
+    return pixmap;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // ManualActivityWizard
@@ -53,6 +83,7 @@ ManualActivityWizard::ManualActivityWizard
 #else
     setWizardStyle(QWizard::ModernStyle);
 #endif
+    setPixmap(ICON_TYPE, svgAsColoredPixmap(":images/material/summit.svg", QSize(ICON_SIZE * dpiXFactor, ICON_SIZE * dpiYFactor), ICON_COLOR));
 
     setPage(PageBasics, new ManualActivityPageBasics(context));
     setPage(PageSpecifics, new ManualActivityPageSpecifics(context));
@@ -195,6 +226,9 @@ ManualActivityPageBasics::ManualActivityPageBasics
 (Context *context, QWidget *parent)
 : QWizardPage(parent), context(context)
 {
+    setTitle(tr("General Information"));
+    setSubTitle(tr("Some fields will appear only when relevant to the selected sport. Whenever possible, uploading a recording of your activity is preferred over creating it manually."));
+
     bool useMetricUnits = GlobalContext::context()->useMetricUnits;
     bool metricSwimPace = appsettings->value(this, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
 
@@ -270,6 +304,10 @@ ManualActivityPageBasics::ManualActivityPageBasics
     }
 
     connect(sportEdit, &QLineEdit::editingFinished, this, &ManualActivityPageBasics::updateVisibility);
+    connect(sportEdit, &QLineEdit::editingFinished, this, &ManualActivityPageBasics::sportsChanged);
+    connect(paceIntervals, &QCheckBox::toggled, this, &ManualActivityPageBasics::updateVisibility);
+
+    registerField("activityDate*", dateEdit);
     connect(paceIntervals, &QCheckBox::toggled, this, &ManualActivityPageBasics::updateVisibility);
 
     registerField("activityDate*", dateEdit);
@@ -406,6 +444,31 @@ ManualActivityPageBasics::updateVisibility
 }
 
 
+void
+ManualActivityPageBasics::sportsChanged
+()
+{
+    QString path(":images/material/summit.svg");
+    QString sport = field("sport").toString().trimmed();
+    if (sport == "Bike") {
+        path = ":images/material/bike.svg";
+    } else if (sport == "Run") {
+        path = ":images/material/run.svg";
+    } else if (sport == "Swim") {
+        path = ":images/material/swim.svg";
+    } else if (sport == "Row") {
+        path = ":images/material/rowing.svg";
+    } else if (sport == "Ski") {
+        path = ":images/material/ski.svg";
+    } else if (sport == "Gym") {
+        path = ":images/material/weight-lifter.svg";
+    } else if (! sport.isEmpty()) {
+        path = ":images/material/torch.svg";
+    }
+    wizard()->setPixmap(ICON_TYPE, svgAsColoredPixmap(path, QSize(ICON_SIZE * dpiXFactor, ICON_SIZE * dpiYFactor), ICON_COLOR));
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // ManualActivityPageSpecifics
 
@@ -413,6 +476,8 @@ ManualActivityPageSpecifics::ManualActivityPageSpecifics
 (Context *context, QWidget *parent)
 : QWizardPage(parent), context(context)
 {
+    setTitle(tr("Stress Information"));
+    setSubTitle(tr("Stress values can be estimated or entered manually. Estimates are based on recent activities of the same sport, or your full history if none are found."));
     setFinalPage(true);
 
     estimateBy = new QComboBox();

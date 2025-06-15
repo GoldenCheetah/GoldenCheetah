@@ -34,6 +34,9 @@
 class Context;
 
 
+extern QPixmap svgAsColoredPixmap(const QString &file, const QSize &size, const QColor &color);
+
+
 class ManualActivityWizard : public QWizard
 {
     Q_OBJECT
@@ -67,6 +70,7 @@ class ManualActivityPageBasics : public QWizardPage
 
     private slots:
         void updateVisibility();
+        void sportsChanged();
 
     private:
         Context *context;
