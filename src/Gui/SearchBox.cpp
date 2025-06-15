@@ -313,7 +313,7 @@ void SearchBox::searchSubmit()
     // return hit / key pressed
     if (text() != "") {
         filtered = true;
-        mode == Search ? submitQuery(text()) : submitFilter(context, text());
+        mode == Search ? submitQuery(context, text()) : submitFilter(context, text());
     }
 }
 
