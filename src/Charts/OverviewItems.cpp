@@ -823,13 +823,6 @@ MetricOverviewItem::MetricOverviewItem(ChartSpace *parent, QString name, QString
     this->type = OverviewItemType::METRIC;
     this->symbol = symbol;
 
-    RideMetricFactory &factory = RideMetricFactory::instance();
-    this->metric = const_cast<RideMetric*>(factory.rideMetric(symbol));
-    if (metric) units = metric->units(GlobalContext::context()->useMetricUnits);
-
-    // display the edit icon
-    setShowEdit(true);
-
     // prepare the gold, silver and bronze medal
     gold = colouredPixmapFromPNG(":/images/medal.png", QColor(249,166,2)).scaledToWidth(ROWHEIGHT*2);
     silver = colouredPixmapFromPNG(":/images/medal.png", QColor(192,192,192)).scaledToWidth(ROWHEIGHT*2);
@@ -853,20 +846,30 @@ MetricOverviewItem::~MetricOverviewItem()
 void
 MetricOverviewItem::configChanged(qint32) {
 
+    RideMetricFactory& factory = RideMetricFactory::instance();
+    metric = factory.rideMetric(symbol);
+
+    // Only display the override option for metrics that exist.
+    setShowEdit(metric != nullptr);
+    units = (metric) ? metric->units(GlobalContext::context()->useMetricUnits) : "";
+
     // Update the value and override status
-    value = rideItem ? rideItem->getStringForSymbol(symbol, GlobalContext::context()->useMetricUnits) : "";
-    overridden = rideItem ? (rideItem->ride()->metricOverrides.contains(symbol)) : false;
+    if (rideItem) {
+        value = rideItem->getStringForSymbol(symbol, GlobalContext::context()->useMetricUnits);
+        overridden = rideItem->ride() ? (rideItem->ride()->metricOverrides.contains(symbol)) : false;
+    }
 }
 
 void MetricOverviewItem::displayTileEditMenu(const QPoint& pos) {
 
     RideMetricFactory& factory = RideMetricFactory::instance();
-    const RideMetric* rideM = factory.rideMetric(symbol);
+    metric = factory.rideMetric(symbol);
 
-    if (rideM && rideItem) {
+    // Only display the Metric Override Dialog for metrics that exist.
+    if (metric && rideItem) {
 
         double editValue = rideItem->getForSymbol(symbol, GlobalContext::context()->useMetricUnits);
-        MetricOverrideDialog* metricOverrideDialog = new MetricOverrideDialog(parent->context, rideM->internalName(), editValue, pos);
+        MetricOverrideDialog* metricOverrideDialog = new MetricOverrideDialog(parent->context, metric->internalName(), editValue, pos);
         connect(metricOverrideDialog, SIGNAL(finished(int)), this, SLOT(updateTile(int)));
         metricOverrideDialog->show(); // configured for delete on close
     }
@@ -3346,15 +3349,16 @@ MetricOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem 
     if (geometry().height() > (ROWHEIGHT*6)) mid=((ROWHEIGHT*1.5f) + (ROWHEIGHT*3) / 2.0f) - (addy/2);
 
     // we align centre and mid
+    bool prevItalic = parent->bigfont.italic();
+    parent->bigfont.setItalic(overridden);
     QFontMetrics fm(parent->bigfont);
-    QString displayedValue = overridden ? QString("=") + value : value;
-    QRectF rect = QFontMetrics(parent->bigfont, parent->device()).boundingRect(displayedValue);
+    QRectF rect = QFontMetrics(parent->bigfont, parent->device()).boundingRect(value);
 
     painter->setPen(GColor(CPLOTMARKER));
     painter->setFont(parent->bigfont);
-
     painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
-                              mid + (fm.ascent() / 3.0f)), displayedValue); // divided by 3 to account for "gap" at top of font
+                              mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
+    parent->bigfont.setItalic(prevItalic);
 
     // now units
     if (units != "" && addy > 0) {
@@ -3389,7 +3393,7 @@ MetricOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem 
 
     // regardless we always show up/down/same
     QPointF bl = QPointF((geometry().width() - rect.width()) / 2.0f, mid + (fm.ascent() / 3.0f));
-    QRectF trect = fm.tightBoundingRect(displayedValue);
+    QRectF trect = fm.tightBoundingRect(value);
     QRectF trirect(bl.x() + trect.width() + ROWHEIGHT,
                    bl.y() - trect.height(), trect.height()*0.66f, trect.height());
 
