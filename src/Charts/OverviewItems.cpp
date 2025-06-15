@@ -853,19 +853,23 @@ MetricOverviewItem::~MetricOverviewItem()
 void
 MetricOverviewItem::configChanged(qint32) {
 
-    // Update the value
+    // Update the value and override status
     value = rideItem ? rideItem->getStringForSymbol(symbol, GlobalContext::context()->useMetricUnits) : "";
+    overridden = rideItem ? (rideItem->ride()->metricOverrides.contains(symbol)) : false;
 }
 
 void MetricOverviewItem::displayTileEditMenu(const QPoint& pos) {
 
     RideMetricFactory& factory = RideMetricFactory::instance();
-    QString internalName = factory.rideMetric(symbol)->internalName();
-    double editValue = rideItem ? rideItem->getForSymbol(symbol, GlobalContext::context()->useMetricUnits) : 0.0;
+    const RideMetric* rideM = factory.rideMetric(symbol);
 
-    MetricOverrideDialog* metricOverrideDialog = new MetricOverrideDialog(parent->context, internalName, editValue, pos);
-    connect(metricOverrideDialog, SIGNAL(finished(int)), this, SLOT(updateTile(int)));
-    metricOverrideDialog->show(); // configured for delete on close
+    if (rideM && rideItem) {
+
+        double editValue = rideItem->getForSymbol(symbol, GlobalContext::context()->useMetricUnits);
+        MetricOverrideDialog* metricOverrideDialog = new MetricOverrideDialog(parent->context, rideM->internalName(), editValue, pos);
+        connect(metricOverrideDialog, SIGNAL(finished(int)), this, SLOT(updateTile(int)));
+        metricOverrideDialog->show(); // configured for delete on close
+    }
 }
 
 void MetricOverviewItem::updateTile(int ret) {
