@@ -29,11 +29,18 @@ MetricOverrideDialog::MetricOverrideDialog(Context* context, const QString& fiel
     QDialog(context->mainWindow), context_(context), fieldName_(fieldName), pos_(pos)
 {
     setAttribute(Qt::WA_DeleteOnClose);
+
+    const RideMetric* metric = GlobalContext::context()->specialFields.rideMetric(fieldName_);
+
+    // Metric Override Dialog should only be created for metrics that exist, if not exit.
+    if (metric == nullptr) { done(QDialog::Rejected); return; }
+
     setWindowTitle(tr("Metric Override Editor"));
 
-    QString units = GlobalContext::context()->specialFields.rideMetric(fieldName_)->units(GlobalContext::context()->useMetricUnits);
+    bool useMetricUnits = GlobalContext::context()->useMetricUnits;
+    QString units = metric->units(useMetricUnits);
 
-    if (GlobalContext::context()->specialFields.rideMetric(fieldName_)->isDate()) {
+    if (metric->isDate()) {
         dlgMetricType_ = DialogMetricType::DATE;
     } else if (units == "seconds" || units == tr("seconds")) {
         dlgMetricType_ = DialogMetricType::SECS_TIME;
@@ -47,9 +54,7 @@ MetricOverrideDialog::MetricOverrideDialog(Context* context, const QString& fiel
     units = (dlgMetricType_ == DialogMetricType::DOUBLE) ? QString(" (%1)").arg(units) : "";
 
     // we need to show what units we use for weight...
-    if (fieldName_ == "Weight") {
-        units = GlobalContext::context()->useMetricUnits ? tr(" (kg)") : tr(" (lbs)");
-    }
+    if (fieldName_ == "Weight") { units = useMetricUnits ? tr(" (kg)") : tr(" (lbs)"); }
 
     metricLabel_ = new QLabel(QString("%1%2").arg(GlobalContext::context()->specialFields.displayName(fieldName_)).arg(units));
 
