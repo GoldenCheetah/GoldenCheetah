@@ -40,27 +40,31 @@
 #define ICON_COLOR QColor("#F79130")
 #ifdef Q_OS_MAC
 #define ICON_SIZE 250
+#define ICON_MARGIN 0
 #define ICON_TYPE QWizard::BackgroundPixmap
 #else
-#define ICON_SIZE 120
+#define ICON_SIZE 125
+#define ICON_MARGIN 5
 #define ICON_TYPE QWizard::LogoPixmap
 #endif
 
 
 QPixmap
 svgAsColoredPixmap
-(const QString &file, const QSize &size, const QColor &color)
+(const QString &file, const QSize &size, int margin, const QColor &color)
 {
     QSvgRenderer renderer(file);
     QPixmap pixmap(size.width(), size.height());
     pixmap.fill(Qt::transparent);
+
+    QRectF renderRect(margin, margin, size.width() - 2 * margin, size.height() - 2 * margin);
     QPainter painter(&pixmap);
-    renderer.render(&painter);
+    renderer.render(&painter, renderRect);
     painter.end();
 
     QPainter recolorPainter(&pixmap);
     recolorPainter.setCompositionMode(QPainter::CompositionMode_SourceIn);
-    recolorPainter.fillRect(pixmap.rect(), color);
+    recolorPainter.fillRect(renderRect, color);
     recolorPainter.end();
 
     return pixmap;
@@ -83,7 +87,7 @@ ManualActivityWizard::ManualActivityWizard
 #else
     setWizardStyle(QWizard::ModernStyle);
 #endif
-    setPixmap(ICON_TYPE, svgAsColoredPixmap(":images/material/summit.svg", QSize(ICON_SIZE * dpiXFactor, ICON_SIZE * dpiYFactor), ICON_COLOR));
+    setPixmap(ICON_TYPE, svgAsColoredPixmap(":images/material/summit.svg", QSize(ICON_SIZE * dpiXFactor, ICON_SIZE * dpiYFactor), ICON_MARGIN * dpiXFactor, ICON_COLOR));
 
     setPage(PageBasics, new ManualActivityPageBasics(context));
     setPage(PageSpecifics, new ManualActivityPageSpecifics(context));
@@ -465,7 +469,7 @@ ManualActivityPageBasics::sportsChanged
     } else if (! sport.isEmpty()) {
         path = ":images/material/torch.svg";
     }
-    wizard()->setPixmap(ICON_TYPE, svgAsColoredPixmap(path, QSize(ICON_SIZE * dpiXFactor, ICON_SIZE * dpiYFactor), ICON_COLOR));
+    wizard()->setPixmap(ICON_TYPE, svgAsColoredPixmap(path, QSize(ICON_SIZE * dpiXFactor, ICON_SIZE * dpiYFactor), ICON_MARGIN * dpiXFactor, ICON_COLOR));
 }
 
 
