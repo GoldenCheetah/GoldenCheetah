@@ -19,6 +19,7 @@
 
 #include "RideDB.h"
 #include "RideFileCache.h"
+#include "SpecialFields.h"
 #include "Settings.h"
 #ifdef GC_WANT_HTTP
 #include "APIWebService.h"
@@ -921,7 +922,7 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
 
         RideMetadata::readXML(metaConfig, keywordDefinitions, settings.metafields, colorfield, defaultDefinitions);
 
-        SpecialFields sp;
+        SpecialFields& sp = SpecialFields::getInstance();
 
         // what is being asked for ?
         if (metadata.toUpper() == "ALL") {

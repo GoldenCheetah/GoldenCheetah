@@ -742,7 +742,7 @@ LTMSidebar::setAutoFilterMenu()
     autoFilterState.clear();
 
     // Convert field names for Internal to Display (to work with the translated values)
-    SpecialFields sp;
+    SpecialFields& sp = SpecialFields::getInstance();
     foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
 
         if (field.tab != "" && (field.type == 0 || field.type == 2)) { // we only do text or shorttext fields
@@ -813,7 +813,7 @@ LTMSidebar::autoFilterChanged()
             tree->setWhatsThis(helpFilterTree->getWhatsThisText(HelpWhatsThis::SideBarTrendsView_Filter));
 
             // Convert field names for Internal to Display (to work with the translated values)
-            SpecialFields sp;
+            SpecialFields& sp = SpecialFields::getInstance();
             // update the values available in the tree
             foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
                 if (sp.displayName(field.name) == action->text()) {
@@ -976,7 +976,7 @@ LTMSidebar::autoFilterRefresh()
         qDeleteAll(tree->invisibleRootItem()->takeChildren());
 
         // translate fields back from Display Name to internal Name !
-        SpecialFields sp;
+        SpecialFields& sp = SpecialFields::getInstance();
 
         // what is the field?
         QString fieldname = sp.internalName(item->splitterHandle->title());
@@ -1007,7 +1007,7 @@ LTMSidebar::autoFilterSelectionChanged()
     isautofilter = false;
 
     // Convert field names from Display to Internal (to work with translations)
-    SpecialFields sp;
+    SpecialFields& sp = SpecialFields::getInstance();
 
     // are any auto filters applied?
     for (int i=1; i<filterSplitter->count(); i++) {

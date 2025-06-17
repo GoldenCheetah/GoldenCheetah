@@ -25,6 +25,7 @@
 #include "GcSideBarItem.h"
 #include "AnalysisSidebar.h"
 #include "DataFilter.h"
+#include "SpecialFields.h"
 #include <QToolButton>
 #include <QInputDialog>
 
@@ -128,7 +129,6 @@ SearchBox::configChanged(qint32)
     // get suitably formated list
     QList<QString> list;
     QString last;
-    SpecialFields sp;
 
     // start with just a list of functions
     list = DataFilter::builtins(context);
@@ -180,6 +180,8 @@ SearchBox::configChanged(qint32)
     // get sorted list
     QStringList names = context->rideNavigator->logicalHeadings;
     std::sort(names.begin(), names.end(), insensitiveLessThan);
+
+    SpecialFields& sp = SpecialFields::getInstance();
 
     foreach(QString name, names) {
 
@@ -417,8 +419,7 @@ SearchBox::dropEvent(QDropEvent *event)
     if (name.startsWith("BikeScore")) name = QString("BikeScore");
 
     //  Always use the "internalNames" in Filter expressions
-    SpecialFields sp;
-    name = sp.internalName(name);
+    name = SpecialFields::getInstance().internalName(name);
 
     // we do very little to the name, just space to _ and lower case it for now...
     name.replace(' ', '_');

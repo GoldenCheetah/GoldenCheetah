@@ -40,6 +40,7 @@
 #include "WPrime.h" // for LR when copying CP chart filtering mechanism
 #include "FastKmeans.h" // for kmeans(...)
 #include "Season.h" // for events(...)
+#include "SpecialFields.h"
 
 #ifdef GC_HAVE_SAMPLERATE
 // we have libsamplerate
@@ -3394,14 +3395,16 @@ void DataFilter::configChanged(qint32)
         rt.lookupType.insert(name.replace(" ","_"), true);
     }
 
+    SpecialFields& sp = SpecialFields::getInstance();
+
     // now add the ride metadata fields -- should be the same generally
     foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
             QString underscored = field.name;
-            if (!GlobalContext::context()->specialFields.isMetric(underscored)) {
+            if (!sp.isMetric(underscored)) {
 
                 // translate to internal name if name has non Latin1 characters
-                underscored = GlobalContext::context()->specialFields.internalName(underscored);
-                field.name = GlobalContext::context()->specialFields.internalName((field.name));
+                underscored = sp.internalName(underscored);
+                field.name = sp.internalName((field.name));
 
                 rt.lookupMap.insert(underscored.replace(" ","_"), field.name);
                 rt.lookupType.insert(underscored.replace(" ","_"), (field.type > 2)); // true if is number

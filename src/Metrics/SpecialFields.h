@@ -28,28 +28,33 @@ class SpecialFields
     Q_DECLARE_TR_FUNCTIONS(SpecialFields)
 
     public:
-        SpecialFields();
 
-        enum FieldType { User, Special, Metric };
-        FieldType fieldType(QString &) const;         // what type is it?
-        bool isUser(QString&) const;                  // is this a real user defined field?
-        bool isSpecial(QString&) const;               // is this a special field name?
-        bool isMetric(QString&) const;                // is this a metric override?
+        // Singleton pattern
+        static SpecialFields& getInstance() {
+            static SpecialFields instance;
+            return instance;
+        }
+        SpecialFields(SpecialFields const&) = delete;
+        void operator=(SpecialFields const&) = delete;
 
-        QString makeTechName(QString) const;        // return a SQL friendly name
-        QString metricSymbol(QString) const;        // return symbol for user friendly name
+        void reloadFields();
+
+        bool isUser(const QString&) const;                  // is this a real user defined field?
+        bool isSpecial(const QString&) const;               // is this a special field name?
+        bool isMetric(const QString&) const;                // is this a metric override?
+
+        QString makeTechName(const QString&) const;         // return a SQL friendly name
+        QString metricSymbol(const QString&) const;         // return symbol for user friendly name
         const RideMetric *rideMetric(const QString&) const; // return metric ptr for user friendly name
-        QString displayName(QString &) const;         // return display (localized) name for name
-        QString internalName(QString) const;          // return internal (english) Name for display
-
-        // the config pane uses the model
-        QStringListModel *model() { return model_; }
+        QString displayName(const QString&) const;          // return display (localized) name for name
+        QString internalName(const QString&) const;         // return internal (english) Name for display
 
     private:
+        SpecialFields();
+
         QMap<QString, QString> namesmap; // Map Internal (english) name to external (Localized) name
         QSet<QString> specialset; // Internal names of special fields
         QMap<QString, const RideMetric *> metricmap;
-        QStringListModel *model_;
 };
 
 class SpecialTabs
@@ -57,11 +62,20 @@ class SpecialTabs
     Q_DECLARE_TR_FUNCTIONS(SpecialTabs)
 
     public:
-        SpecialTabs();
-        QString displayName(QString &) const;       // return display (localized)
-        QString internalName(QString) const;        // return internal (english)
+        // Singleton pattern
+        static SpecialTabs& getInstance() {
+            static SpecialTabs instance;
+            return instance;
+        }
+        SpecialTabs(SpecialTabs const&) = delete;
+        void operator=(SpecialTabs const&) = delete;
+
+        QString displayName(const QString&) const;       // return display (localized)
+        QString internalName(const QString&) const;      // return internal (english)
 
     private:
+        SpecialTabs();
+
         QMap<QString, QString> namesmap; // Map Internal (english) name to external (Localized) name
 };
 

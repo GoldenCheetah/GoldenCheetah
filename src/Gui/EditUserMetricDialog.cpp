@@ -28,6 +28,7 @@
 #include "Zones.h"
 #include "HrZones.h"
 #include "RideMetric.h"
+#include "SpecialFields.h"
 #include "HelpWhatsThis.h"
 
 #include <QFont>
@@ -112,7 +113,6 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
     // get suitably formated list XXX XXX ffs, refactor this into FormulEdit !!! XXX XXX
     QList<QString> list;
     QString last;
-    SpecialFields sp;
 
     // get sorted list
     QStringList names = context->rideNavigator->logicalHeadings;
@@ -165,6 +165,8 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
     list << "best(wpk, 3600)";
 
     std::sort(names.begin(), names.end(), insensitiveLessThan);
+
+    SpecialFields& sp = SpecialFields::getInstance();
 
     foreach(QString name, names) {
 

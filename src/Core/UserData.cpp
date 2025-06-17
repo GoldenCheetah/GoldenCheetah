@@ -21,6 +21,7 @@
 #include "RideNavigator.h"
 #include "AthleteTab.h"
 #include "HelpWhatsThis.h"
+#include "SpecialFields.h"
 #include "Utils.h"
 
 #include <QTextEdit> // for parsing trademark symbols (!)
@@ -109,7 +110,6 @@ EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     // should be done in formula completer !
     QList<QString> list;
     QString last;
-    SpecialFields sp;
 
     // get sorted list
     QStringList names = context->rideNavigator->logicalHeadings;
@@ -164,6 +164,8 @@ EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     list << "NA";
 
     std::sort(names.begin(), names.end(), insensitiveLessThan);
+
+    SpecialFields& sp = SpecialFields::getInstance();
 
     foreach(QString name, names) {
 

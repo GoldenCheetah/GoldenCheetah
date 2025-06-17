@@ -255,7 +255,7 @@ TreeMapWindow::refresh()
         settings.specification.setDateRange(dr);
 
         // and the fields to use
-        SpecialFields sp;
+        SpecialFields& sp = SpecialFields::getInstance();;
         settings.field1 = sp.internalName(field1->currentText());
         settings.field2 = sp.internalName(field2->currentText());
 
@@ -327,7 +327,7 @@ void
 TreeMapWindow::addTextFields(QComboBox *combo)
 {
     combo->addItem(tr("None")); // if "None" is changed to not being first any more, adjust public methods f1,f2,setf1,setf2
-    SpecialFields sp;
+    SpecialFields& sp = SpecialFields::getInstance();;
     foreach (FieldDefinition x, fieldDefinitions) {
         if (x.type < 4) combo->addItem(sp.displayName(x.name));
     }

@@ -212,8 +212,9 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
        metrics.append(m);
     }
 
+    SpecialFields& sp = SpecialFields::getInstance();
+
     // metadata metrics
-    SpecialFields sp;
     foreach (FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
         if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
             MetricDetail metametric;
@@ -1866,7 +1867,6 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     // get suitably formated list
     QList<QString> list;
     QString last;
-    SpecialFields sp;
 
     // get sorted list
     QStringList names = context->rideNavigator->logicalHeadings;
@@ -1919,6 +1919,8 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     list << "best(wpk, 3600)";
 
     std::sort(names.begin(), names.end(), insensitiveLessThan);
+
+    SpecialFields& sp = SpecialFields::getInstance();
 
     foreach(QString name, names) {
 
