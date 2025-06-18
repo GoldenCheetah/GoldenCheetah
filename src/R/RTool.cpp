@@ -39,6 +39,7 @@
 #include "PaceZones.h"
 #include "GenericChart.h"
 #include "Perspective.h"
+#include "SpecialFields.h"
 
 #ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wcast-function-type" // shut gcc up
@@ -968,7 +969,7 @@ RTool::dfForRideItem(const RideItem *ri)
         // count active fields
         foreach(FieldDefinition def, GlobalContext::context()->rideMetadata->getFields()) {
             if (def.name != "" && def.tab != "" &&
-                !GlobalContext::context()->specialFields.isMetric(def.name))
+                !SpecialFields::getInstance().isMetric(def.name))
                 meta++;
         }
     }
@@ -1043,7 +1044,7 @@ RTool::dfForRideItem(const RideItem *ri)
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = SpecialFields::getInstance().internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
@@ -1069,7 +1070,7 @@ RTool::dfForRideItem(const RideItem *ri)
 
         // don't add incomplete meta definitions or metric override fields
         if (field.name == "" || field.tab == "" ||
-            GlobalContext::context()->specialFields.isMetric(field.name)) continue;
+            SpecialFields::getInstance().isMetric(field.name)) continue;
 
         // Create a string vector
         SEXP m;
@@ -1138,7 +1139,7 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
         // count active fields
         foreach(FieldDefinition def, GlobalContext::context()->rideMetadata->getFields()) {
             if (def.name != "" && def.tab != "" &&
-                !GlobalContext::context()->specialFields.isMetric(def.name))
+                !SpecialFields::getInstance().isMetric(def.name))
                 meta++;
         }
     }
@@ -1258,7 +1259,7 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = SpecialFields::getInstance().internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
@@ -1292,7 +1293,7 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
 
         // don't add incomplete meta definitions or metric override fields
         if (field.name == "" || field.tab == "" ||
-            GlobalContext::context()->specialFields.isMetric(field.name)) continue;
+            SpecialFields::getInstance().isMetric(field.name)) continue;
 
         // Create a string vector
         SEXP m;
@@ -1514,7 +1515,7 @@ RTool::dfForDateRangeIntervals(DateRange range, QStringList types)
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = SpecialFields::getInstance().internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
@@ -1952,7 +1953,7 @@ RTool::activityIntervals(SEXP pTypes, SEXP datetime)
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = SpecialFields::getInstance().internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
@@ -3352,7 +3353,7 @@ RTool::pmc(SEXP pAll, SEXP pMetric)
         const RideMetricFactory &factory = RideMetricFactory::instance();
         for (int i=0; i<factory.metricCount(); i++) {
             QString symbol = factory.metricName(i);
-            QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
+            QString name = SpecialFields::getInstance().internalName(factory.rideMetric(symbol)->name());
             name.replace(" ","_");
 
             if (name == metric) {

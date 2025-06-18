@@ -26,6 +26,7 @@
 #include "RideNavigatorProxy.h"
 #include "SearchFilterBox.h"
 #include "AbstractView.h"
+#include "SpecialFields.h"
 #include "HelpWhatsThis.h"
 
 #include <QtGui>
@@ -281,7 +282,7 @@ RideNavigator::resetView()
     }
 
     // add metadata fields...
-    SpecialFields sp; // all the special fields are in here...
+    SpecialFields& sp = SpecialFields::getInstance(); // all the special fields are in here...
     foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
         if (!sp.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
             nameMap.insert(QString("%1").arg(sp.makeTechName(field.name)), sp.displayName(field.name));

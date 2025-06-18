@@ -25,6 +25,7 @@
 #include "NavigationModel.h"
 #include "UserMetricSettings.h"
 #include "UserMetricParser.h"
+#include "SpecialFields.h"
 #include "DataFilter.h"
 
 #include <QXmlInputSource>
@@ -82,7 +83,7 @@ GlobalContext::readConfig(qint32 state)
     // redo
     rideMetadata = new RideMetadata(NULL);
     colorEngine = new ColorEngine(this);
-    specialFields = SpecialFields();
+    SpecialFields::getInstance().reloadFields();
 
     if (state & CONFIG_USERMETRICS)  userMetricsConfigChanged();
 
@@ -126,7 +127,7 @@ GlobalContext::userMetricsConfigChanged()
     }
 
     // refresh SpecialFields to include updated user metrics
-    specialFields = SpecialFields();
+    SpecialFields::getInstance().reloadFields();
 }
 
 GlobalContext *GlobalContext::context()

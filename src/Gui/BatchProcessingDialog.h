@@ -81,8 +81,6 @@ private:
     Context *context;
     bool aborted;
 
-    SpecialFields specialFields;
-
     int processed, fails, numFilesToProcess;
     batchRadioBType outputMode;
 

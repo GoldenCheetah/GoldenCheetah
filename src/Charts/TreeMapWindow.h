@@ -74,8 +74,7 @@ class TreeMapWindow : public GcChartWindow
             if (field1->currentIndex() == 0) {
                return "None"; // dont' translate
             } else {
-               SpecialFields sp;
-               return ( sp.internalName(field1->currentText()));
+               return (SpecialFields::getInstance().internalName(field1->currentText()));
             }
         }
 
@@ -84,23 +83,20 @@ class TreeMapWindow : public GcChartWindow
             if (field2->currentIndex() == 0) {
                return "None"; // dont' translate
             } else {
-               SpecialFields sp;
-               return ( sp.internalName(field2->currentText()));
+               return (SpecialFields::getInstance().internalName(field2->currentText()));
             }
         }
 
         void setf1(QString x)
         {   // consider translation on Screen, but Store only in EN
-            SpecialFields sp;
             if (x == "None") field1->setCurrentIndex(0); // "None" is the first item in Combo Box
-            else field1->setCurrentIndex(field1->findText(sp.displayName(x)));
+            else field1->setCurrentIndex(field1->findText(SpecialFields::getInstance().displayName(x)));
         }
 
         void setf2(QString x)
         {   // consider translation on Screen, but Store only in EN
-            SpecialFields sp;
             if (x == "None") field2->setCurrentIndex(0); // // "None" is the first item in Combo Box
-            else field2->setCurrentIndex(field2->findText(sp.displayName(x)));
+            else field2->setCurrentIndex(field2->findText(SpecialFields::getInstance().displayName(x)));
         }
 
         int useSelected() { return dateSetting->mode(); }

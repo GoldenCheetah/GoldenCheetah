@@ -21,6 +21,7 @@
 #include "Context.h"
 #include "RideCache.h"
 #include "RideMetric.h"
+#include "SpecialFields.h"
 
 #include <QFormLayout>
 #include <QDebug>
@@ -30,7 +31,7 @@ MetricOverrideDialog::MetricOverrideDialog(Context* context, const QString& fiel
 {
     setAttribute(Qt::WA_DeleteOnClose);
 
-    const RideMetric* metric = GlobalContext::context()->specialFields.rideMetric(fieldName_);
+    const RideMetric* metric = SpecialFields::getInstance().rideMetric(fieldName_);
 
     // Metric Override Dialog should only be created for metrics that exist, if not exit.
     if (metric == nullptr) { done(QDialog::Rejected); return; }
@@ -56,7 +57,7 @@ MetricOverrideDialog::MetricOverrideDialog(Context* context, const QString& fiel
     // we need to show what units we use for weight...
     if (fieldName_ == "Weight") { units = useMetricUnits ? tr(" (kg)") : tr(" (lbs)"); }
 
-    metricLabel_ = new QLabel(QString("%1%2").arg(GlobalContext::context()->specialFields.displayName(fieldName_)).arg(units));
+    metricLabel_ = new QLabel(QString("%1%2").arg(SpecialFields::getInstance().displayName(fieldName_)).arg(units));
 
     switch (dlgMetricType_) {
         case DialogMetricType::DATE: {
@@ -164,8 +165,8 @@ MetricOverrideDialog::setClicked()
 
             // convert from imperial to metric if needed
             if (!GlobalContext::context()->useMetricUnits) {
-                double value = text.toDouble() * (1 / GlobalContext::context()->specialFields.rideMetric(fieldName_)->conversion());
-                value -= GlobalContext::context()->specialFields.rideMetric(fieldName_)->conversionSum();
+                double value = text.toDouble() * (1 / SpecialFields::getInstance().rideMetric(fieldName_)->conversion());
+                value -= SpecialFields::getInstance().rideMetric(fieldName_)->conversionSum();
                 text = QString("%1").arg(value);
             }
         } break;
@@ -179,7 +180,7 @@ MetricOverrideDialog::setClicked()
     override.insert("value", text);
 
     // check for compatability metrics
-    QString symbol = GlobalContext::context()->specialFields.metricSymbol(fieldName_);
+    QString symbol = SpecialFields::getInstance().metricSymbol(fieldName_);
     if (fieldName_ == "TSS") symbol = "coggan_tss";
     if (fieldName_ == "NP") symbol = "coggan_np";
     if (fieldName_ == "IF") symbol = "coggan_if";
@@ -202,7 +203,7 @@ MetricOverrideDialog::setClicked()
 void
 MetricOverrideDialog::clearClicked() {
 
-    QString symbol = GlobalContext::context()->specialFields.metricSymbol(fieldName_);
+    QString symbol = SpecialFields::getInstance().metricSymbol(fieldName_);
     if (fieldName_ == "TSS") symbol = "coggan_tss";
     if (fieldName_ == "NP") symbol = "coggan_np";
     if (fieldName_ == "IF") symbol = "coggan_if";

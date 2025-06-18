@@ -2278,7 +2278,7 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
 void
 KeywordsPage::pageSelected()
 {
-    SpecialFields sp;
+    SpecialFields& sp = SpecialFields::getInstance();
     QString prev = "";
 
     // remember what was selected, if anything?
@@ -2301,9 +2301,8 @@ KeywordsPage::pageSelected()
 void
 KeywordsPage::colorfieldChanged()
 {
-    SpecialFields sp;
     int index = fieldChooser->currentIndex();
-    if (index >=0) parent->colorfield = sp.internalName(fieldChooser->itemText(fieldChooser->currentIndex()));
+    if (index >=0) parent->colorfield = SpecialFields::getInstance().internalName(fieldChooser->itemText(fieldChooser->currentIndex()));
 }
 
 
@@ -2445,8 +2444,8 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     actionButtons->defaultConnect(ActionButtonBox::UpDownGroup, fields);
     actionButtons->defaultConnect(ActionButtonBox::AddDeleteGroup, fields);
 
-    SpecialFields specials;
-    SpecialTabs specialTabs;
+    SpecialFields& specials = SpecialFields::getInstance();
+    SpecialTabs& specialTabs = SpecialTabs::getInstance();
     foreach(FieldDefinition field, fieldDefinitions) {
         QCheckBox *checkBox = new QCheckBox("", this);
         checkBox->setChecked(field.diary);
@@ -2569,8 +2568,8 @@ FieldsPage::deleteClicked()
 void
 FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
 {
-    SpecialFields sp;
-    SpecialTabs st;
+    SpecialFields& sp = SpecialFields::getInstance();
+    SpecialTabs& st = SpecialTabs::getInstance();
     QStringList checkdups;
 
     // clear current just in case
@@ -3044,7 +3043,7 @@ DefaultsPage::DefaultsPage
     actionButtons->defaultConnect(ActionButtonBox::UpDownGroup, defaults);
     actionButtons->defaultConnect(ActionButtonBox::AddDeleteGroup, defaults);
 
-    SpecialFields specials;
+    SpecialFields& specials = SpecialFields::getInstance();
     foreach(DefaultDefinition adefault, defaultDefinitions) {
         QTreeWidgetItem *add;
 
@@ -3133,7 +3132,7 @@ DefaultsPage::deleteClicked()
 void
 DefaultsPage::getDefinitions(QList<DefaultDefinition> &defaultList)
 {
-    SpecialFields sp;
+    SpecialFields& sp = SpecialFields::getInstance();
 
     // clear current just in case
     defaultList.clear();
@@ -3158,7 +3157,7 @@ DefaultsPage::eventFilter
 (QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::Show && ! event->spontaneous()) {
-        SpecialFields sp;
+        SpecialFields& sp = SpecialFields::getInstance();
         QList<FieldDefinition> fromFieldsPage;
         parent->fieldsPage->getDefinitions(fromFieldsPage);
         QStringList fieldNames;

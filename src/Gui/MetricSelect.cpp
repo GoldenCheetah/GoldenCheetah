@@ -18,6 +18,7 @@
 
 #include "MetricSelect.h"
 #include "RideFileCache.h"
+#include "SpecialFields.h"
 
 MetricSelect::MetricSelect(QWidget *parent, Context *context, int scope)
     : QLineEdit(parent), context(context), scope(scope), _metric(NULL)
@@ -39,13 +40,15 @@ MetricSelect::MetricSelect(QWidget *parent, Context *context, int scope)
     // add meta if we're selecting this
     if (scope & Meta) {
 
+        SpecialFields& sp = SpecialFields::getInstance();
+
         // now add the ride metadata fields -- should be the same generally
         foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
             QString text = field.name;
-            if (!GlobalContext::context()->specialFields.isMetric(text)) {
+            if (!sp.isMetric(text)) {
 
                 // translate to internal name if name has non Latin1 characters
-                text = GlobalContext::context()->specialFields.internalName(text);
+                text = sp.internalName(text);
                 text = text.replace(" ","_");
                 metaMap.insert(text, field.name);
             }

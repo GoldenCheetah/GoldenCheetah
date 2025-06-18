@@ -29,6 +29,7 @@
 
 #include "PMCData.h"
 #include "RideMetadata.h"
+#include "SpecialFields.h"
 
 #include "DataFilter.h"
 #include "Utils.h"
@@ -952,7 +953,7 @@ MetaOverviewItem::MetaOverviewItem(ChartSpace *parent, QString name, QString sym
 void
 MetaOverviewItem::configChanged(qint32)
 {
-    SpecialFields specialFields;
+    SpecialFields& sp = SpecialFields::getInstance();
 
     //  Get the field type
     fieldtype = -1;
@@ -963,7 +964,7 @@ MetaOverviewItem::configChanged(qint32)
             // display the edit icon for relevant metadata fields
             setShowEdit((p.name != "Interval Goal") && // cannot specify which interval
                         (p.name != "Interval Notes") && // cannot specify which interval
-                        specialFields.isUser(p.name)); // user mutable metadata fields
+                        sp.isUser(p.name)); // user mutable metadata fields
             break;
          }
     }
@@ -3915,7 +3916,6 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), it
         //
         QList<QString> list;
         QString last;
-        SpecialFields sp;
 
         // get sorted list
         QStringList names = item->parent->context->rideNavigator->logicalHeadings;
@@ -3968,6 +3968,8 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), it
         list << "best(wpk, 3600)";
 
         std::sort(names.begin(), names.end(), insensitiveLessThan);
+
+        SpecialFields& sp = SpecialFields::getInstance();
 
         foreach(QString name, names) {
 
