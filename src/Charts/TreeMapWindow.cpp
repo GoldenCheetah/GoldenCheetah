@@ -29,6 +29,7 @@
 #include "HelpWhatsThis.h"
 #include "GoldenCheetah.h"
 #include "Perspective.h"
+#include "SpecialFields.h"
 
 #include <QtGui>
 #include <QString>
