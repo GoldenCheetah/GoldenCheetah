@@ -39,6 +39,7 @@
 #include "PaceZones.h"
 #include "GenericChart.h"
 #include "Perspective.h"
+#include "SpecialFields.h"
 
 #ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wcast-function-type" // shut gcc up
