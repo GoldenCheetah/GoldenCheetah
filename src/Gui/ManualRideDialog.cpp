@@ -255,7 +255,7 @@ ManualActivityPageBasics::ManualActivityPageBasics
     averageHrEdit->setMaximum(250);
     averageHrEdit->setSuffix(" " + tr("bpm"));
 
-    averagePowerLabel = new QLabel("Average Power");
+    averagePowerLabel = new QLabel(tr("Average Power"));
 
     averagePowerEdit = new QSpinBox();
     averagePowerEdit->setMinimum(0);
