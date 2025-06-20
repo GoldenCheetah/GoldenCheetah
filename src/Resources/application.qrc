@@ -220,6 +220,14 @@
         <file>images/services/polarflow.png</file>
         <file>images/services/sporttracks.png</file>
         <file>images/services/nolio.png</file>
+        <file>images/material/summit.svg</file>
+        <file>images/material/bike.svg</file>
+        <file>images/material/run.svg</file>
+        <file>images/material/swim.svg</file>
+        <file>images/material/rowing.svg</file>
+        <file>images/material/ski.svg</file>
+        <file>images/material/weight-lifter.svg</file>
+        <file>images/material/torch.svg</file>
         <file>python/library.py</file>
         <file>images/devices/imagic.png</file>
         <file>data/powerprofile.csv</file>

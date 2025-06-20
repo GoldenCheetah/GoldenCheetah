@@ -1672,7 +1672,8 @@ MainWindow::downloadRide()
 void
 MainWindow::manualRide()
 {
-    (new ManualRideDialog(currentAthleteTab->context))->show();
+    ManualActivityWizard wizard(currentAthleteTab->context);
+    wizard.exec();
 }
 
 void
