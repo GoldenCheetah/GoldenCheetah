@@ -34,9 +34,6 @@
 class Context;
 
 
-extern QPixmap svgAsColoredPixmap(const QString &file, const QSize &size, int margin, const QColor &color);
-
-
 class ManualActivityWizard : public QWizard
 {
     Q_OBJECT

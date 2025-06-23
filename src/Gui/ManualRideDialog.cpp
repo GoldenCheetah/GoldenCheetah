@@ -20,7 +20,6 @@
 #include "ManualRideDialog.h"
 
 #include <QMessageBox>
-#include <QSvgRenderer>
 
 #include "Context.h"
 #include "Colors.h"
@@ -49,28 +48,6 @@
 #endif
 
 
-QPixmap
-svgAsColoredPixmap
-(const QString &file, const QSize &size, int margin, const QColor &color)
-{
-    QSvgRenderer renderer(file);
-    QPixmap pixmap(size.width(), size.height());
-    pixmap.fill(Qt::transparent);
-
-    QRectF renderRect(margin, margin, size.width() - 2 * margin, size.height() - 2 * margin);
-    QPainter painter(&pixmap);
-    renderer.render(&painter, renderRect);
-    painter.end();
-
-    QPainter recolorPainter(&pixmap);
-    recolorPainter.setCompositionMode(QPainter::CompositionMode_SourceIn);
-    recolorPainter.fillRect(renderRect, color);
-    recolorPainter.end();
-
-    return pixmap;
-}
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // ManualActivityWizard
 
@@ -87,7 +64,7 @@ ManualActivityWizard::ManualActivityWizard
 #else
     setWizardStyle(QWizard::ModernStyle);
 #endif
-    setPixmap(ICON_TYPE, svgAsColoredPixmap(":images/material/summit.svg", QSize(ICON_SIZE * dpiXFactor, ICON_SIZE * dpiYFactor), ICON_MARGIN * dpiXFactor, ICON_COLOR));
+    setPixmap(ICON_TYPE, svgAsColouredPixmap(":images/material/summit.svg", QSize(ICON_SIZE * dpiXFactor, ICON_SIZE * dpiYFactor), ICON_MARGIN * dpiXFactor, ICON_COLOR));
 
     setPage(PageBasics, new ManualActivityPageBasics(context));
     setPage(PageSpecifics, new ManualActivityPageSpecifics(context));
@@ -121,6 +98,12 @@ ManualActivityWizard::done
         }
         if (field("workoutCode").toString().trimmed().size() > 0) {
             rideFile.setTag("Workout Code", field("workoutCode").toString().trimmed());
+        }
+        if (field("notes").toString().trimmed().size() > 0) {
+            rideFile.setTag("Notes", field("notes").toString().trimmed());
+        }
+        if (field("rpe").toInt() > 0) {
+            rideFile.setTag("RPE", QString::number(field("rpe").toInt()));
         }
 
         if ((sport == "Run" || sport == "Swim") && field("paceIntervals").toBool()) {
@@ -235,20 +218,37 @@ ManualActivityPageBasics::ManualActivityPageBasics
 
     bool useMetricUnits = GlobalContext::context()->useMetricUnits;
     bool metricSwimPace = appsettings->value(this, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
+    QLocale locale;
 
     QDateEdit *dateEdit = new QDateEdit();
+    dateEdit->setDisplayFormat(locale.dateFormat(QLocale::ShortFormat));
     dateEdit->setMaximumDate(QDate::currentDate());
     dateEdit->setMinimumDate(QDate(2000, 1, 1));
     dateEdit->setCalendarPopup(true);
 
     QTimeEdit *timeEdit = new QTimeEdit();
-    timeEdit->setDisplayFormat("hh:mm:ss");
+    dateEdit->setDisplayFormat(locale.timeFormat(QLocale::ShortFormat));
 
     QLineEdit *sportEdit = new QLineEdit();
 
     QLineEdit *subSportEdit = new QLineEdit();
 
     QLineEdit *workoutCodeEdit = new QLineEdit();
+
+    QComboBox *rpeEdit = new QComboBox();
+    rpeEdit->addItem("0 - " + tr("Rest"));
+    rpeEdit->addItem("1 - " + tr("Very, very easy"));
+    rpeEdit->addItem("2 - " + tr("Easy"));
+    rpeEdit->addItem("3 - " + tr("Moderate"));
+    rpeEdit->addItem("4 - " + tr("Somewhat hard"));
+    rpeEdit->addItem("5 - " + tr("Hard"));
+    rpeEdit->addItem("6 - " + tr("Hard+"));
+    rpeEdit->addItem("7 - " + tr("Very hard"));
+    rpeEdit->addItem("8 - " + tr("Very hard+"));
+    rpeEdit->addItem("9 - " + tr("Very hard++"));
+    rpeEdit->addItem("10 - " + tr("Maximum"));
+
+    QTextEdit *notesEdit = new QTextEdit();
 
     QSpinBox *averageHrEdit = new QSpinBox();
     averageHrEdit->setMinimum(0);
@@ -312,13 +312,12 @@ ManualActivityPageBasics::ManualActivityPageBasics
     connect(paceIntervals, &QCheckBox::toggled, this, &ManualActivityPageBasics::updateVisibility);
 
     registerField("activityDate*", dateEdit);
-    connect(paceIntervals, &QCheckBox::toggled, this, &ManualActivityPageBasics::updateVisibility);
-
-    registerField("activityDate*", dateEdit);
     registerField("activityTime", timeEdit);
     registerField("sport*", sportEdit);
     registerField("subSport", subSportEdit);
     registerField("workoutCode", workoutCodeEdit);
+    registerField("rpe", rpeEdit);
+    registerField("notes", notesEdit, "plainText", SIGNAL(textChanged()));
     registerField("averageHr", averageHrEdit);
     registerField("averagePower", averagePowerEdit);
     registerField("paceIntervals", paceIntervals);
@@ -334,6 +333,8 @@ ManualActivityPageBasics::ManualActivityPageBasics
     form->addRow(tr("Sport") + MANDATORY, sportEdit);
     form->addRow(tr("Sub Sport"), subSportEdit);
     form->addRow(tr("Workout Code"), workoutCodeEdit);
+    form->addRow(tr("RPE"), rpeEdit);
+    form->addRow(tr("Notes"), notesEdit);
     form->addRow(tr("Average Heartrate"), averageHrEdit);
     form->addRow(averagePowerLabel, averagePowerEdit);
     form->addRow(averageCadenceLabel, averageCadenceEdit);
@@ -469,7 +470,7 @@ ManualActivityPageBasics::sportsChanged
     } else if (! sport.isEmpty()) {
         path = ":images/material/torch.svg";
     }
-    wizard()->setPixmap(ICON_TYPE, svgAsColoredPixmap(path, QSize(ICON_SIZE * dpiXFactor, ICON_SIZE * dpiYFactor), ICON_MARGIN * dpiXFactor, ICON_COLOR));
+    wizard()->setPixmap(ICON_TYPE, svgAsColouredPixmap(path, QSize(ICON_SIZE * dpiXFactor, ICON_SIZE * dpiYFactor), ICON_MARGIN * dpiXFactor, ICON_COLOR));
 }
 
 
