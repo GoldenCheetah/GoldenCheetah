@@ -17,7 +17,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "ManualRideDialog.h"
+#include "ManualActivityWizard.h"
 
 #include <QMessageBox>
 

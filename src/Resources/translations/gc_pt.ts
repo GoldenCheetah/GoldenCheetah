@@ -19823,109 +19823,109 @@ Please check your preference settings.</source>
 <context>
     <name>ManualActivityPageBasics</name>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="233"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="233"/>
         <source>General Information</source>
         <translation type="unfinished">Informações gerais</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="234"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="234"/>
         <source>Some fields will appear only when relevant to the selected sport. Whenever possible, uploading a recording of your activity is preferred over creating it manually.</source>
         <translation type="unfinished">Alguns campos só serão apresentados quando forem relevantes para o desporto selecionado. Sempre que possível, é preferível carregar uma gravação da sua atividade a criá-la manualmente.</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="256"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="256"/>
         <source>bpm</source>
         <translation type="unfinished">bpm</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="258"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="258"/>
         <source>Average Power</source>
         <translation type="unfinished">Potência média</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="263"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="263"/>
         <source>W</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="265"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="265"/>
         <source>Pace intervals</source>
         <translation type="unfinished">Intervalos de ritmo</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="269"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="269"/>
         <source>Average Cadence</source>
         <translation type="unfinished">Cadência Média</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="274"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="274"/>
         <source>rpm</source>
         <translation type="unfinished">rpm</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="276"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="276"/>
         <source>Distance</source>
         <translation type="unfinished">Distância</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="282"/>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="443"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="282"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="443"/>
         <source>km</source>
         <translation type="unfinished">km</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="282"/>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="443"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="282"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="443"/>
         <source>mi</source>
         <translation type="unfinished">milhas</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="284"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="284"/>
         <source>Swim Distance</source>
         <translation type="unfinished">Distância de natação</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="289"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="289"/>
         <source>m</source>
         <translation type="unfinished">m</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="289"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="289"/>
         <source>yd</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="291"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="291"/>
         <source>Duration</source>
         <translation type="unfinished">Duração</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="332"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="332"/>
         <source>Date</source>
         <translation type="unfinished">Data</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="333"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="333"/>
         <source>Time</source>
         <translation type="unfinished">Tempo</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="334"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="334"/>
         <source>Sport</source>
         <translation type="unfinished">Desporto</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="335"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="335"/>
         <source>Sub Sport</source>
         <translation type="unfinished">Subdesporto</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="336"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="336"/>
         <source>Workout Code</source>
         <translation type="unfinished">Código do treino</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="337"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="337"/>
         <source>Average Heartrate</source>
         <translation type="unfinished">Frequência Cardíaca Média</translation>
     </message>
@@ -19933,67 +19933,67 @@ Please check your preference settings.</source>
 <context>
     <name>ManualActivityPageSpecifics</name>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="483"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="483"/>
         <source>Stress Information</source>
         <translation type="unfinished">Informações sobre o stress</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="484"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="484"/>
         <source>Stress values can be estimated or entered manually. Estimates are based on recent activities of the same sport, or your full history if none are found.</source>
         <translation type="unfinished">Os valores de stress podem ser estimados ou introduzidos manualmente. As estimativas baseiam-se em actividades recentes do mesmo desporto ou no seu historial completo, se não for encontrado nenhum.</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="488"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="488"/>
         <source>Duration</source>
         <translation type="unfinished">Duração</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="489"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="489"/>
         <source>Distance</source>
         <translation type="unfinished">Distância</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="490"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="490"/>
         <source>Manually</source>
         <translation type="unfinished">Manualmente</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="507"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="507"/>
         <source>kJ</source>
         <translation type="unfinished">kJ</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="512"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="512"/>
         <source>BikeStress</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="519"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="519"/>
         <source>BikeScore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="526"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="526"/>
         <source>SwimScore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="533"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="533"/>
         <source>TriScore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="571"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="571"/>
         <source>Estimate by</source>
         <translation type="unfinished">Estimativa por</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="572"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="572"/>
         <source>Estimate Stress Days</source>
         <translation type="unfinished">Estimativa de dias de stress</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="573"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="573"/>
         <source>Work</source>
         <translation type="unfinished">Trabalho</translation>
     </message>
@@ -20001,17 +20001,17 @@ Please check your preference settings.</source>
 <context>
     <name>ManualActivityWizard</name>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="81"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="81"/>
         <source>Manual Entry</source>
         <translation type="unfinished">Entrada manual</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="215"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="215"/>
         <source>Unable to save</source>
         <translation type="unfinished">Não é possível guardar</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="216"/>
+        <location filename="../../Gui/ManualActivityWizard.cpp" line="216"/>
         <source>There is already an activity with the same start time or you do not have permissions to save a file.</source>
         <translation type="unfinished">Já existe uma atividade com a mesma hora de início ou não tem permissões para guardar um ficheiro.</translation>
     </message>

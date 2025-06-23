@@ -17,8 +17,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _GC_ManualRideDialog_h
-#define _GC_ManualRideDialog_h 1
+#ifndef _GC_ManualActivityWizard_h
+#define _GC_ManualActivityWizard_h 1
 #include "GoldenCheetah.h"
 #include "LapsEditor.h"
 
@@ -121,5 +121,5 @@ class ManualActivityPageSpecifics : public QWizardPage
         QSpinBox *triScoreEdit;
 };
 
-#endif // _GC_ManualRideDialog_h
+#endif // _GC_ManualActivityWizard_h
 

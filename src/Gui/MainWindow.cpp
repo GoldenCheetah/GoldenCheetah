@@ -57,7 +57,7 @@
 #include "ConfigDialog.h"
 #include "AthleteConfigDialog.h"
 #include "DownloadRideDialog.h"
-#include "ManualRideDialog.h"
+#include "ManualActivityWizard.h"
 #include "RideImportWizard.h"
 #include "EstimateCPDialog.h"
 #include "SolveCPDialog.h"
