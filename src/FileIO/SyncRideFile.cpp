@@ -90,18 +90,19 @@ struct SyncFileReaderState
     }
 
 
-    QString
-    cEscape(char *buf, int len)
-    {
-        char *result = new char[4 * len + 1];
-        char *tmp = result;
+    static QString
+    cEscape(const char* buf, int len) {
+
+        QString result;
+        result.reserve(4 * len + 1);
+
         for (int i = 0; i < len; ++i) {
             if (buf[i] == '"')
-                tmp += sprintf(tmp, "\\\"");
+                result += "\\\"";
             else if (isprint(buf[i]))
-                *(tmp++) = buf[i];
+                result += buf[i];
             else
-                tmp += sprintf(tmp, "\\x%02x", 0xff & (unsigned) buf[i]);
+                result += QString::asprintf("\\x%02x", 0xff & (unsigned)buf[i]);
         }
         return result;
     }
