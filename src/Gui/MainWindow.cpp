@@ -57,7 +57,7 @@
 #include "ConfigDialog.h"
 #include "AthleteConfigDialog.h"
 #include "DownloadRideDialog.h"
-#include "ManualRideDialog.h"
+#include "ManualActivityWizard.h"
 #include "RideImportWizard.h"
 #include "EstimateCPDialog.h"
 #include "SolveCPDialog.h"
@@ -1672,7 +1672,8 @@ MainWindow::downloadRide()
 void
 MainWindow::manualRide()
 {
-    (new ManualRideDialog(currentAthleteTab->context))->show();
+    ManualActivityWizard wizard(currentAthleteTab->context);
+    wizard.exec();
 }
 
 void
