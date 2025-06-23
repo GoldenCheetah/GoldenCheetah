@@ -33,6 +33,8 @@
 // A selection of distinct colours, user can adjust also
 extern QIcon colouredIconFromPNG(QString filename, QColor color);
 extern QPixmap colouredPixmapFromPNG(QString filename, QColor color);
+extern QPixmap svgAsColouredPixmap(const QString &file, const QSize &size, int margin, const QColor &color);
+
 
 // dialog scaling
 extern double dpiXFactor, dpiYFactor;

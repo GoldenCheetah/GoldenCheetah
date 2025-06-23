@@ -1635,6 +1635,13 @@ struct FitFileParser
                 dataInfos.append(the_info);
                 session_data_info_.append(the_info);
             }
+        } else {
+            int i = 0;
+            do {
+                i++;
+                name = deveField.name.c_str() + (i>1?QString("-%1").arg(i):"");
+            }
+            while (deveXdata->valuename.contains(name));
         }
 
         if (xdata) {
@@ -5474,7 +5481,7 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
                         write_float32(ridePoint, val, true);
                         break;
                     default:
-                        fprintf(stderr,"ERROR TYPE % CURRENTLY UNSUPPORTED\n",ciqfield.type.toStdString().c_str()); fflush(stderr);
+                        fprintf(stderr,"ERROR TYPE %s CURRENTLY UNSUPPORTED\n",ciqfield.type.toStdString().c_str()); fflush(stderr);
                     }
                 }
             }

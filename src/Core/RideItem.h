@@ -151,7 +151,7 @@ class RideItem : public QObject
         QDateTime dateTime;
         QString present;
         QColor color;
-        bool planned;
+        bool planned = false;
         QString sport;
         bool isBike,isRun,isSwim,isXtrain,isAero;
         bool samples; // has samples data

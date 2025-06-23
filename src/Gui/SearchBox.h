@@ -97,7 +97,7 @@ private slots:
 
 signals:
     // text search mode
-    void submitQuery(QString);
+    void submitQuery(Context*,QString);
     void clearQuery();
 
     // db filter mode

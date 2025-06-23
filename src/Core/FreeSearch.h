@@ -34,7 +34,7 @@ class FreeSearch : public QObject
     Q_OBJECT
 
 public:
-    FreeSearch(QObject *parent, Context *context);
+    FreeSearch();
     ~FreeSearch();
 
 protected:
@@ -42,15 +42,12 @@ protected:
 public slots:
 
     // search metadata texts in ridecache
-    QList<QString> search(QString query);
+    QList<QString> search(Context* context, QString query);
 
 signals:
     void results(QStringList);
 
 private:
-    Context *context;
-    QDir dir;
-
     // Query results
     QStringList filenames;
 };

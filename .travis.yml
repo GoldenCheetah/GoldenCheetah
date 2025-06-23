@@ -3,7 +3,6 @@ if: commit_message =~ /\[publish binaries\]/
 branches:
   only:
   - master
-  - /^[vV]\d+\.\d+(\.\d+)?(-\S*)?$/
 
 language: cpp
 

@@ -24,111 +24,101 @@
 #include "HelpWhatsThis.h"
 #include "Context.h"
 
-#include <QHeaderView>
 
-// QTableWidgetItem to accept only non-negative integers
-class QTableWidgetItemUInt : public QTableWidgetItem {
-    public:
-    void setData (int role, const QVariant & value) {
-        QTableWidgetItem::setData(role, value.toUInt());
-    }
-};
 
-// QTableWidgetItem to accept only non-negative doubles
-class QTableWidgetItemUDouble : public QTableWidgetItem {
-    public:
-    void setData (int role, const QVariant & value) {
-        QTableWidgetItem::setData(role, value.toDouble() > 0.0 ? value.toDouble() : 0.0);
-    }
-};
-
-LapsEditor::LapsEditor(bool isSwim) : isSwim(isSwim)
+LapsEditorWidget::LapsEditorWidget
+(QWidget *parent)
+: QWidget(parent)
 {
-    setWindowTitle(tr("Laps Editor"));
-    HelpWhatsThis *help = new HelpWhatsThis(this);
-    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Activity_Manual_LapsEditor));
-#ifdef Q_OS_MAC
-    setFixedSize(625,415);
-#else
-    setFixedSize(630 *dpiXFactor,420 *dpiYFactor);
-#endif
+    qRegisterMetaType<QList<RideFilePoint*>>("QList<RideFilePoint*>");
 
-    //
-    // Create the GUI widgets
-    //
+    repDelegate.setRange(1, 100);
 
-    // Laps table
-    const int nCols = 7;
-    const int nRows = 100;
-    tableWidget = new QTableWidget(nRows, nCols, this);
-    QStringList hLabels;
-    tableWidget->setColumnWidth(0,  48);
-    for (int j = 1; j < nCols; j++) tableWidget->setColumnWidth(j, 88*dpiXFactor);
-    hLabels<<tr("reps")<<tr("work dist")<< tr("work min")<<tr("work sec")<<tr("rest dist")<<tr("rest min")<<tr("rest sec");
-    tableWidget->setHorizontalHeaderLabels(hLabels);
-    tableWidget->verticalHeader()->setVisible(false);
-    for (int i = 0; i < nRows; i++) {
-        QTableWidgetItemUInt *item = new QTableWidgetItemUInt();
-        item->setTextAlignment(Qt::AlignRight);
-        item->setData(Qt::EditRole, 1);
-        tableWidget->setItem(i, 0, item);
-        for (int j = 1; j < nCols; j++) {
-            QTableWidgetItem *item;
-            if (!isSwim && (j == 1 || j == 4))
-                item = new QTableWidgetItemUDouble();
-            else
-                item = new QTableWidgetItemUInt();
-            item->setTextAlignment(Qt::AlignRight);
-            item->setData(Qt::EditRole, 0);
-            tableWidget->setItem(i, j, item);
-        }
-    }
+    woDistDelegate.setRange(0, 100);
+    woDistDelegate.setDecimals(2);
+    woDistDelegate.setShowSuffixOnEdit(true);
+    woDistDelegate.setShowSuffixOnDisplay(true);
 
-    // buttons
-    okButton = new QPushButton(tr("&OK"), this);
-    cancelButton = new QPushButton(tr("&Cancel"), this);
+    woDurDelegate.setFormat("mm:ss");
 
-    // save by default -- we don't overwrite and
-    // the user will expect enter to save laps
-    okButton->setDefault(true);
-    cancelButton->setDefault(false);
+    reDistDelegate.setRange(0, 100);
+    reDistDelegate.setDecimals(2);
+    reDistDelegate.setShowSuffixOnEdit(true);
+    reDistDelegate.setShowSuffixOnDisplay(true);
 
-    //
-    // LAY OUT THE GUI
-    //
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    QHBoxLayout *table = new QHBoxLayout;
-    mainLayout->addLayout(table);
-    table->addWidget(tableWidget);
+    reDurDelegate.setFormat("mm:ss");
 
-    QHBoxLayout *buttons = new QHBoxLayout;
-    mainLayout->addLayout(buttons);
-    buttons->addStretch();
-    buttons->addWidget(okButton);
-    buttons->addWidget(cancelButton);
+    setSwim(false);
 
-    // dialog buttons
-    connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
-    connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+    tree = new QTreeWidget();
+    tree->headerItem()->setText(0, tr("Repetitions"));
+    tree->headerItem()->setText(1, tr("Work Distance"));
+    tree->headerItem()->setText(2, tr("Work Duration"));
+    tree->headerItem()->setText(3, tr("Rest Distance"));
+    tree->headerItem()->setText(4, tr("Rest Duration"));
+    tree->setColumnCount(5);
+    tree->setItemDelegateForColumn(0, &repDelegate);
+    tree->setItemDelegateForColumn(1, &woDistDelegate);
+    tree->setItemDelegateForColumn(2, &woDurDelegate);
+    tree->setItemDelegateForColumn(3, &reDistDelegate);
+    tree->setItemDelegateForColumn(4, &reDurDelegate);
+    basicTreeWidgetStyle(tree);
+
+    ActionButtonBox *actionButtons = new ActionButtonBox(ActionButtonBox::AddDeleteGroup);
+
+    QVBoxLayout *layout = new QVBoxLayout();
+    layout->addWidget(tree);
+    layout->addWidget(actionButtons);
+
+    actionButtons->defaultConnect(tree);
+    connect(actionButtons, &ActionButtonBox::addRequested, this, &LapsEditorWidget::addClicked);
+    connect(actionButtons, &ActionButtonBox::deleteRequested, this, &LapsEditorWidget::deleteClicked);
+    connect(&repDelegate, &QStyledItemDelegate::closeEditor, this, &LapsEditorWidget::editingFinished);
+    connect(&woDistDelegate, &QStyledItemDelegate::closeEditor, this, &LapsEditorWidget::editingFinished);
+    connect(&woDurDelegate, &QStyledItemDelegate::closeEditor, this, &LapsEditorWidget::editingFinished);
+    connect(&reDistDelegate, &QStyledItemDelegate::closeEditor, this, &LapsEditorWidget::editingFinished);
+    connect(&reDurDelegate, &QStyledItemDelegate::closeEditor, this, &LapsEditorWidget::editingFinished);
+
+    setLayout(layout);
 }
 
-LapsEditor::~LapsEditor() {
-    foreach(RideFilePoint *point, dataPoints_)
+
+LapsEditorWidget::~LapsEditorWidget
+()
+{
+    for (RideFilePoint *point : dataPoints_) {
         delete point;
+    }
 }
 
+
 void
-LapsEditor::cancelClicked()
+LapsEditorWidget::setSwim
+(bool swim)
 {
-    reject();
+    isSwim = swim;
+
+    if (isSwim) {
+        bool metricPace = appsettings->value(this, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
+        woDistDelegate.setSuffix(metricPace ? tr("m") : tr("yd"));
+        reDistDelegate.setSuffix(metricPace ? tr("m") : tr("yd"));
+    } else {
+        bool metricPace = appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
+        woDistDelegate.setSuffix(metricPace ? tr("km") : tr("mi"));
+        reDistDelegate.setSuffix(metricPace ? tr("km") : tr("mi"));
+    }
+    emit editingFinished();
 }
 
-void
-LapsEditor::okClicked()
+
+const QList<RideFilePoint*>&
+LapsEditorWidget::dataPoints
+()
 {
     // Remove point from previous activation
-    foreach(RideFilePoint *point, dataPoints_)
+    for (RideFilePoint *point : dataPoints_) {
         delete point;
+    }
     dataPoints_.clear();
 
     // Select metric units setting according to sport
@@ -140,16 +130,21 @@ LapsEditor::okClicked()
     int secs = 0;
     double km = 0.0;
     int interval = 1;
-    for (int i = 0; i < tableWidget->rowCount(); i++) {
-        int laps = tableWidget->item(i, 0)->data(Qt::EditRole).toInt();
+    for (int i = 0; i < tree->invisibleRootItem()->childCount(); i++) {
+        QTreeWidgetItem *rowItem = tree->invisibleRootItem()->child(i);
+        int laps = rowItem->data(0, Qt::EditRole).toInt();
         for (int lap = 1; lap <= laps; lap++) {
             for (int j = 0; j < 2; j++) {
-                double lap_dist = tableWidget->item(i, 3*j+1)->data(Qt::EditRole).toDouble() * distance_factor;
-                int lap_secs = 60*tableWidget->item(i, 3*j+2)->data(Qt::EditRole).toInt() + tableWidget->item(i, 3*j+3)->data(Qt::EditRole).toInt();
-                double kph = (lap_secs > 0) ? 3.6*lap_dist/lap_secs : 0.0;
+                double lap_dist = rowItem->data(2 * j + 1, Qt::EditRole).toDouble() * distance_factor;
+                QTime dur = rowItem->data(2 * j + 2, Qt::EditRole).toTime();
+                if (! dur.isValid()) {
+                    continue;
+                }
+                int lap_secs = dur.minute() * 60 + dur.second();
+                double kph = (lap_secs > 0) ? 3.6 * lap_dist/lap_secs : 0.0;
                 for (int s = 0; s < lap_secs; s++) {
                     secs++;
-                    km += kph/3600.0;
+                    km += kph / 3600.0;
                     dataPoints_.append(new RideFilePoint(secs, 0.0, 0.0, km, kph,                                     0.0, 0.0, 0.0, 0.0, 0.0,
                                                          0.0, 0.0,
                                                          RideFile::NA, RideFile::NA,
@@ -166,5 +161,32 @@ LapsEditor::okClicked()
             }
         }
     }
-    accept();
+    return dataPoints_;
+}
+
+
+void
+LapsEditorWidget::addClicked
+()
+{
+    int index = tree->invisibleRootItem()->childCount();
+    QTreeWidgetItem *add = new QTreeWidgetItem();
+    add->setFlags(add->flags() | Qt::ItemIsEditable);
+    tree->invisibleRootItem()->insertChild(index, add);
+    add->setData(0, Qt::DisplayRole, 1);
+
+    emit editingFinished();
+}
+
+
+void
+LapsEditorWidget::deleteClicked
+()
+{
+    if (tree->currentItem()) {
+        int index = tree->invisibleRootItem()->indexOfChild(tree->currentItem());
+        delete tree->invisibleRootItem()->takeChild(index);
+
+        emit editingFinished();
+    }
 }

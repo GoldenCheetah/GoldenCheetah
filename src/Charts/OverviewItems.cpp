@@ -823,10 +823,6 @@ MetricOverviewItem::MetricOverviewItem(ChartSpace *parent, QString name, QString
     this->type = OverviewItemType::METRIC;
     this->symbol = symbol;
 
-    RideMetricFactory &factory = RideMetricFactory::instance();
-    this->metric = const_cast<RideMetric*>(factory.rideMetric(symbol));
-    if (metric) units = metric->units(GlobalContext::context()->useMetricUnits);
-
     // prepare the gold, silver and bronze medal
     gold = colouredPixmapFromPNG(":/images/medal.png", QColor(249,166,2)).scaledToWidth(ROWHEIGHT*2);
     silver = colouredPixmapFromPNG(":/images/medal.png", QColor(192,192,192)).scaledToWidth(ROWHEIGHT*2);
@@ -838,11 +834,63 @@ MetricOverviewItem::MetricOverviewItem(ChartSpace *parent, QString name, QString
 
     configwidget = new OverviewItemConfig(this);
     configwidget->hide();
+
+    configChanged(0);
 }
 
 MetricOverviewItem::~MetricOverviewItem()
 {
     delete sparkline;
+}
+
+void
+MetricOverviewItem::configChanged(qint32) {
+
+    RideMetricFactory& factory = RideMetricFactory::instance();
+    metric = factory.rideMetric(symbol);
+
+    // Only display the override option for metrics that exist.
+    setShowEdit(metric != nullptr);
+    units = (metric) ? metric->units(GlobalContext::context()->useMetricUnits) : "";
+
+    // Update the value and override status
+    if (rideItem) {
+        value = rideItem->getStringForSymbol(symbol, GlobalContext::context()->useMetricUnits);
+        overridden = rideItem->ride() ? (rideItem->ride()->metricOverrides.contains(symbol)) : false;
+    }
+}
+
+void MetricOverviewItem::displayTileEditMenu(const QPoint& pos) {
+
+    RideMetricFactory& factory = RideMetricFactory::instance();
+    metric = factory.rideMetric(symbol);
+
+    // Only display the Metric Override Dialog for metrics that exist.
+    if (metric && rideItem) {
+
+        double editValue = rideItem->getForSymbol(symbol, GlobalContext::context()->useMetricUnits);
+        MetricOverrideDialog* metricOverrideDialog = new MetricOverrideDialog(parent->context, metric->internalName(), editValue, pos);
+        connect(metricOverrideDialog, SIGNAL(finished(int)), this, SLOT(updateTile(int)));
+        metricOverrideDialog->show(); // configured for delete on close
+    }
+}
+
+void MetricOverviewItem::updateTile(int ret) {
+
+    // Ensure tile contents are updated
+    if (rideItem && (ret == QDialog::Accepted)) {
+        setData(rideItem);
+        update();
+    }
+}
+
+void MetricOverviewItem::metadataChanged() {
+
+    // Ensure when metadata is edited in the details tab it is updated on the tile.
+    if (rideItem) {
+        setData(rideItem);
+        update();
+    }
 }
 
 TopNOverviewItem::TopNOverviewItem(ChartSpace *parent, QString name, QString symbol) : ChartSpaceItem(parent, name)
@@ -921,7 +969,7 @@ MetaOverviewItem::configChanged(qint32)
     }
 
     // Update the value
-    if (rideItem) value = rideItem->getText(symbol, "");
+    value = rideItem ? rideItem->getText(symbol, "") : "";
 
     // sparkline if are we numeric?
     if (fieldtype == FIELD_INTEGER || fieldtype == FIELD_DOUBLE) {
@@ -945,13 +993,13 @@ void MetaOverviewItem::updateTile(int ret)
 {
     // Ensure tile contents are updated
     if (ret == QDialog::Accepted) {
-        if (rideItem) value = rideItem->getText(symbol, "");
+        value = rideItem ? rideItem->getText(symbol, "") : "";
         update();
     }
 }
 
-void MetaOverviewItem::metadataChanged() {
-
+void MetaOverviewItem::metadataChanged()
+{
     // Ensure when metadata is edited in the details tab it
     // is updated on the tile.
     if (rideItem) {
@@ -1439,7 +1487,14 @@ RPEOverviewItem::setData(RideItem *item)
 void
 MetricOverviewItem::setData(RideItem *item)
 {
+    if (rideItem) disconnect(rideItem, SIGNAL(rideMetadataChanged()), this, SLOT(metadataChanged()));
+    if (item) connect(item, SIGNAL(rideMetadataChanged()), this, SLOT(metadataChanged()));
+
+    rideItem = item;
+
     if (item == NULL || item->ride() == NULL) return;
+
+    overridden = (rideItem->ride()->metricOverrides.contains(symbol));
 
     // get last 30 days, if they exist
     QList<QPointF> points;
@@ -3294,6 +3349,8 @@ MetricOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem 
     if (geometry().height() > (ROWHEIGHT*6)) mid=((ROWHEIGHT*1.5f) + (ROWHEIGHT*3) / 2.0f) - (addy/2);
 
     // we align centre and mid
+    bool prevItalic = parent->bigfont.italic();
+    parent->bigfont.setItalic(overridden);
     QFontMetrics fm(parent->bigfont);
     QRectF rect = QFontMetrics(parent->bigfont, parent->device()).boundingRect(value);
 
@@ -3301,8 +3358,7 @@ MetricOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem 
     painter->setFont(parent->bigfont);
     painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
                               mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
-    painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
-                              mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
+    parent->bigfont.setItalic(prevItalic);
 
     // now units
     if (units != "" && addy > 0) {
