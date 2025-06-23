@@ -236,17 +236,20 @@ ManualActivityPageBasics::ManualActivityPageBasics
     QLineEdit *workoutCodeEdit = new QLineEdit();
 
     QComboBox *rpeEdit = new QComboBox();
-    rpeEdit->addItem("0 - " + tr("Rest"));
-    rpeEdit->addItem("1 - " + tr("Very, very easy"));
-    rpeEdit->addItem("2 - " + tr("Easy"));
-    rpeEdit->addItem("3 - " + tr("Moderate"));
-    rpeEdit->addItem("4 - " + tr("Somewhat hard"));
-    rpeEdit->addItem("5 - " + tr("Hard"));
-    rpeEdit->addItem("6 - " + tr("Hard+"));
-    rpeEdit->addItem("7 - " + tr("Very hard"));
-    rpeEdit->addItem("8 - " + tr("Very hard+"));
-    rpeEdit->addItem("9 - " + tr("Very hard++"));
-    rpeEdit->addItem("10 - " + tr("Maximum"));
+    rpeEdit->addItem("0 - " + tr("Rest"), QColor(Qt::lightGray));
+    rpeEdit->addItem("1 - " + tr("Very, very easy"), QColor(Qt::lightGray));
+    rpeEdit->addItem("2 - " + tr("Easy"), QColor(Qt::darkGreen));
+    rpeEdit->addItem("3 - " + tr("Moderate"), QColor(Qt::darkGreen));
+    rpeEdit->addItem("4 - " + tr("Somewhat hard"), QColor(Qt::darkGreen));
+    rpeEdit->addItem("5 - " + tr("Hard"), QColor(Qt::darkYellow));
+    rpeEdit->addItem("6 - " + tr("Hard+"), QColor(Qt::darkYellow));
+    rpeEdit->addItem("7 - " + tr("Very hard"), QColor(Qt::darkYellow));
+    rpeEdit->addItem("8 - " + tr("Very hard+"), QColor(Qt::darkRed));
+    rpeEdit->addItem("9 - " + tr("Very hard++"), QColor(Qt::darkRed));
+    rpeEdit->addItem("10 - " + tr("Maximum"), QColor(Qt::red));
+
+    ColorDelegate *rpeDelegate = new ColorDelegate();
+    rpeEdit->setItemDelegate(rpeDelegate);
 
     QTextEdit *notesEdit = new QTextEdit();
 
