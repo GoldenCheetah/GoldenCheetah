@@ -253,7 +253,7 @@ PerspectiveDialog::exportPerspectiveClicked()
 
     // export the current perspective to a file
     QString suffix;
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Export Persepctive"),
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export Perspective"),
                        QDir::homePath()+"/"+ typedesc + " " + current->title() + ".gchartset",
                        ("*.gchartset;;"), &suffix, QFileDialog::DontUseNativeDialog); // native dialog hangs when threads in use (!)
 

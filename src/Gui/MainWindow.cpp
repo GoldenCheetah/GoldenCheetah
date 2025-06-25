@@ -57,7 +57,7 @@
 #include "ConfigDialog.h"
 #include "AthleteConfigDialog.h"
 #include "DownloadRideDialog.h"
-#include "ManualRideDialog.h"
+#include "ManualActivityWizard.h"
 #include "RideImportWizard.h"
 #include "EstimateCPDialog.h"
 #include "SolveCPDialog.h"
@@ -923,7 +923,7 @@ MainWindow::importPerspective()
     }
 
     // import a new perspective from a file
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Select Perspective file to export"), "", tr("GoldenCheetah Perspective Files (*.gchartset)"));
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Select Perspective file to import"), "", tr("GoldenCheetah Perspective Files (*.gchartset)"));
     if (fileName.isEmpty()) {
         QMessageBox::critical(this, tr("Import Perspective"), tr("No perspective file selected!"));
     } else {
@@ -1672,7 +1672,8 @@ MainWindow::downloadRide()
 void
 MainWindow::manualRide()
 {
-    (new ManualRideDialog(currentAthleteTab->context))->show();
+    ManualActivityWizard wizard(currentAthleteTab->context);
+    wizard.exec();
 }
 
 void

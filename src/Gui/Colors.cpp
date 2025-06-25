@@ -23,6 +23,7 @@
 #include <QObject>
 #include <QByteArray>
 #include <QDir>
+#include <QSvgRenderer>
 #include "Settings.h"
 
 #ifdef Q_OS_WIN
@@ -1116,6 +1117,28 @@ QPixmap colouredPixmapFromPNG(QString filename, QColor color)
 QIcon colouredIconFromPNG(QString filename, QColor color)
 {
     return QIcon(colouredPixmapFromPNG(filename, color));
+}
+
+
+QPixmap
+svgAsColouredPixmap
+(const QString &file, const QSize &size, int margin, const QColor &color)
+{
+    QSvgRenderer renderer(file);
+    QPixmap pixmap(size.width(), size.height());
+    pixmap.fill(Qt::transparent);
+
+    QRectF renderRect(margin, margin, size.width() - 2 * margin, size.height() - 2 * margin);
+    QPainter painter(&pixmap);
+    renderer.render(&painter, renderRect);
+    painter.end();
+
+    QPainter recolorPainter(&pixmap);
+    recolorPainter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+    recolorPainter.fillRect(renderRect, color);
+    recolorPainter.end();
+
+    return pixmap;
 }
 
 

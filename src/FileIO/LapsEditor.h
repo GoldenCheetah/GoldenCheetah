@@ -22,34 +22,43 @@
 #include "RideFile.h"
 
 #include <QtGui>
-#include <QLineEdit>
-#include <QDialog>
-#include <QLabel>
-#include <QMessageBox>
-#include <QTableWidget>
+#include <QTreeWidget>
 
-class LapsEditor : public QDialog
+#include "StyledItemDelegates.h"
+
+
+Q_DECLARE_METATYPE(QList<RideFilePoint*>)
+
+class LapsEditorWidget : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
+    Q_PROPERTY(QList<RideFilePoint*> dataPoints READ dataPoints NOTIFY editingFinished)
 
     public:
-        LapsEditor(bool isSwim);
-        ~LapsEditor();
-        const QVector<RideFilePoint*> &dataPoints() const { return dataPoints_; }
+        LapsEditorWidget(QWidget *parent = nullptr);
+        ~LapsEditorWidget();
 
-    private slots:
-        void okClicked();
-        void cancelClicked();
+        void setSwim(bool swim);
+
+        const QList<RideFilePoint*> &dataPoints();
+
+    signals:
+        void editingFinished();
 
     private:
+        void addClicked();
+        void deleteClicked();
 
-        bool isSwim; // Swimming indicator, used for distance units selection
-        QVector<RideFilePoint*> dataPoints_; // samples generated from laps
+    private:
+        bool isSwim = false; // Swimming indicator, used for distance units selection
+        QList<RideFilePoint*> dataPoints_; // samples generated from laps
+        SpinBoxEditDelegate repDelegate;
+        DoubleSpinBoxEditDelegate woDistDelegate;
+        TimeEditDelegate woDurDelegate;
+        DoubleSpinBoxEditDelegate reDistDelegate;
+        TimeEditDelegate reDurDelegate;
 
-        QPushButton *okButton, *cancelButton;
-
-        QTableWidget *tableWidget;
+        QTreeWidget *tree;
 };
 
 #endif // _GC_LapsEditor_h

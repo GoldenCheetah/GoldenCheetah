@@ -32,6 +32,17 @@
 #include "ActionButtonBox.h"
 
 
+class ColorDelegate: public QStyledItemDelegate
+{
+    Q_OBJECT
+
+public:
+    ColorDelegate(QObject *parent = nullptr);
+
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+};
+
+
 class NoEditDelegate: public QStyledItemDelegate
 {
 public:
