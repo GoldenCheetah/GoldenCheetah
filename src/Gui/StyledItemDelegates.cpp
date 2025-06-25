@@ -33,6 +33,40 @@
 #include "Colors.h"
 
 
+// ColorDelegate //////////////////////////////////////////////////////////////////
+
+ColorDelegate::ColorDelegate
+(QObject *parent)
+: QStyledItemDelegate(parent)
+{
+}
+
+
+void
+ColorDelegate::paint
+(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    painter->save();
+    QColor textColor;
+    QVariant colorVariant = index.data(Qt::UserRole);
+    if (colorVariant.canConvert<QColor>()) {
+        textColor = colorVariant.value<QColor>();
+    }
+    QColor backgroundColor = option.palette.base().color();
+    if (option.state & QStyle::State_Selected) {
+        backgroundColor = option.palette.highlight().color();
+        textColor = option.palette.highlightedText().color();
+    } else if (! backgroundColor.isValid()) {
+        textColor = option.palette.text().color();
+    }
+    painter->fillRect(option.rect, backgroundColor);
+    QString text = index.data(Qt::DisplayRole).toString();
+    painter->setPen(textColor);
+    painter->drawText(option.rect.adjusted(4, 0, -4, 0), Qt::AlignVCenter | Qt::AlignLeft, text);
+    painter->restore();
+}
+
+
 // NoEditDelegate /////////////////////////////////////////////////////////////////
 
 NoEditDelegate::NoEditDelegate
