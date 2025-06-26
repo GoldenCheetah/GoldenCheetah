@@ -3681,13 +3681,6 @@ SeasonsPage::downClicked()
 }
 
 void
-SeasonsPage::renameClicked()
-{
-    // which one is selected?
-    if (seasons->currentItem()) seasons->editItem(seasons->currentItem(), 0);
-}
-
-void
 SeasonsPage::addClicked()
 {
     if (nameEdit->text() == "") return; // just ignore it

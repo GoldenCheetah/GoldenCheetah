@@ -492,7 +492,6 @@ class FieldsPage : public QWidget
         void addClicked();
         void upClicked();
         void downClicked();
-        void renameClicked();
         void deleteClicked();
 
     private:
