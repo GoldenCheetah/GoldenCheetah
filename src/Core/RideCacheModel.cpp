@@ -22,6 +22,7 @@
 #include "RideCache.h"
 #include "AthleteTab.h"
 #include "AbstractView.h"
+#include "SpecialFields.h"
 
 #include "RideCacheModel.h"
 
@@ -224,7 +225,7 @@ RideCacheModel::configChanged(qint32)
 
                     // is a metadata
                     int i= section -5 - factory->metricCount();
-                    headings_<< QString("%1").arg(GlobalContext::context()->specialFields.makeTechName(metadata[i].name));
+                    headings_<< QString("%1").arg(SpecialFields::getInstance().makeTechName(metadata[i].name));
                 }
             }
             break;

@@ -41,6 +41,7 @@
 #include "RideMetric.h"
 #include "UserMetricSettings.h"
 #include "UserMetricParser.h"
+#include "SpecialFields.h"
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
 
@@ -99,7 +100,7 @@ RideCache::RideCache(Context *context) : context(context)
         }
 
         // reset special fields to take into account user metrics
-        GlobalContext::context()->specialFields = SpecialFields();
+        SpecialFields::getInstance().reloadFields();
     }
 
     // set the list

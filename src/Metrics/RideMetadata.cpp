@@ -455,6 +455,8 @@ RideMetadata::configChanged(qint32)
         // remove editor if it exists
         if (tabs->count() > 0) tabs->removeTab(tabs->count()-1);
 
+        SpecialTabs& specialTabs = SpecialTabs::getInstance();
+
         // create forms and populate with fields
         for(int i=0; i<fieldDefinitions.count(); i++) {
 
@@ -573,8 +575,8 @@ RideMetadata::calendarText(RideItem *rideItem)
         QString fieldName = (field.name == "Weight") ? "Athlete Weight" :
                                                        field.name;
         QString value;
-        if (GlobalContext::context()->specialFields.isMetric(fieldName)) {
-            value = rideItem->getStringForSymbol(GlobalContext::context()->specialFields.rideMetric(fieldName)->symbol(), GlobalContext::context()->useMetricUnits);
+        if (SpecialFields::getInstance().isMetric(fieldName)) {
+            value = rideItem->getStringForSymbol(SpecialFields::getInstance().rideMetric(fieldName)->symbol(), GlobalContext::context()->useMetricUnits);
         } else {
             value = rideItem->getText(fieldName, "");
         }
@@ -772,7 +774,7 @@ Form::arrange()
 
         here->addWidget(fields[i]->label, y, 0, labelalignment);
 
-        if (GlobalContext::context()->specialFields.isMetric(fields[i]->definition.name)) {
+        if (SpecialFields::getInstance().isMetric(fields[i]->definition.name)) {
             QHBoxLayout *override = new QHBoxLayout;
             overrides.append(override);
 
@@ -900,9 +902,9 @@ FormField::FormField(Form *form, FieldDefinition field, RideMetadata *meta) : fo
     isTime = false;
     warn = false;
 
-    if (GlobalContext::context()->specialFields.isMetric(field.name)) {
+    if (SpecialFields::getInstance().isMetric(field.name)) {
         field.type = FIELD_DOUBLE; // whatever they say, we want a double!
-        units = GlobalContext::context()->specialFields.rideMetric(field.name)->units(GlobalContext::context()->useMetricUnits);
+        units = SpecialFields::getInstance().rideMetric(field.name)->units(GlobalContext::context()->useMetricUnits);
         // remove "seconds", since the field will be a QTimeEdit field
         if (units == "seconds" || units == tr("seconds")) units = "";
         // layout units name for screen
@@ -914,7 +916,7 @@ FormField::FormField(Form *form, FieldDefinition field, RideMetadata *meta) : fo
         units = GlobalContext::context()->useMetricUnits ? tr(" (kg)") : tr (" (lbs)");
     }
 
-    label = new QLabel(QString("%1%2").arg(GlobalContext::context()->specialFields.displayName(field.name)).arg(units), this);
+    label = new QLabel(QString("%1%2").arg(SpecialFields::getInstance().displayName(field.name)).arg(units), this);
     label->setPalette(meta->palette);
     //label->setFont(font);
     //label->setFixedHeight(18);
@@ -967,11 +969,11 @@ FormField::FormField(Form *form, FieldDefinition field, RideMetadata *meta) : fo
         ((QDoubleSpinBox*)widget)->setButtonSymbols(QAbstractSpinBox::NoButtons);
         ((QDoubleSpinBox*)widget)->setMinimum(-9999999.99);
         ((QDoubleSpinBox*)widget)->setMaximum(9999999.99);
-        if (GlobalContext::context()->specialFields.isMetric(field.name)) {
+        if (SpecialFields::getInstance().isMetric(field.name)) {
 
             enabled = new QCheckBox(this);
             connect(enabled, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
-            units = GlobalContext::context()->specialFields.rideMetric(field.name)->units(GlobalContext::context()->useMetricUnits);
+            units = SpecialFields::getInstance().rideMetric(field.name)->units(GlobalContext::context()->useMetricUnits);
 
             if (units == "seconds" || units == tr("seconds")) {
                 // we need to use a TimeEdit instead
@@ -1123,12 +1125,12 @@ FormField::metadataFlush()
         ourRideItem->setStartTime(update);
 
     } else if (definition.name != "Summary") {
-        if (GlobalContext::context()->specialFields.isMetric(definition.name) && enabled->isChecked()) {
+        if (SpecialFields::getInstance().isMetric(definition.name) && enabled->isChecked()) {
 
             // convert from imperial to metric if needed
             if (!GlobalContext::context()->useMetricUnits) {
-                double value = text.toDouble() * (1/ GlobalContext::context()->specialFields.rideMetric(definition.name)->conversion());
-                value -= GlobalContext::context()->specialFields.rideMetric(definition.name)->conversionSum();
+                double value = text.toDouble() * (1/ SpecialFields::getInstance().rideMetric(definition.name)->conversion());
+                value -= SpecialFields::getInstance().rideMetric(definition.name)->conversionSum();
                 text = QString("%1").arg(value);
             }
 
@@ -1137,7 +1139,7 @@ FormField::metadataFlush()
             override.insert("value", text);
 
             // check for compatability metrics
-            QString symbol = GlobalContext::context()->specialFields.metricSymbol(definition.name);
+            QString symbol = SpecialFields::getInstance().metricSymbol(definition.name);
             if (definition.name == "TSS") symbol = "coggan_tss";
             if (definition.name == "NP") symbol = "coggan_np";
             if (definition.name == "IF") symbol = "coggan_if";
@@ -1291,17 +1293,17 @@ FormField::editFinished()
         }
 
     } else if (definition.name != "Summary") {
-        if (GlobalContext::context()->specialFields.isMetric(definition.name) && enabled->isChecked()) {
+        if (SpecialFields::getInstance().isMetric(definition.name) && enabled->isChecked()) {
 
             // convert from imperial to metric if needed
             if (!GlobalContext::context()->useMetricUnits) {
-                double value = text.toDouble() * (1/ GlobalContext::context()->specialFields.rideMetric(definition.name)->conversion());
-                value -= GlobalContext::context()->specialFields.rideMetric(definition.name)->conversionSum();
+                double value = text.toDouble() * (1/ SpecialFields::getInstance().rideMetric(definition.name)->conversion());
+                value -= SpecialFields::getInstance().rideMetric(definition.name)->conversionSum();
                 text = QString("%1").arg(value);
             }
 
             QMap<QString, QString> empty;
-            QMap<QString,QString> current = ourRideItem->ride()->metricOverrides.value(GlobalContext::context()->specialFields.metricSymbol(definition.name), empty);
+            QMap<QString,QString> current = ourRideItem->ride()->metricOverrides.value(SpecialFields::getInstance().metricSymbol(definition.name), empty);
             QString currentvalue = current.value("value", "");
 
             if (currentvalue != text) {
@@ -1309,7 +1311,7 @@ FormField::editFinished()
                 changed = true;
                 QMap<QString,QString> override;
                 override.insert("value", text);
-                ourRideItem->ride()->metricOverrides.insert(GlobalContext::context()->specialFields.metricSymbol(definition.name), override);
+                ourRideItem->ride()->metricOverrides.insert(SpecialFields::getInstance().metricSymbol(definition.name), override);
             }
 
         } else {
@@ -1415,7 +1417,7 @@ FormField::stateChanged(int state)
     // remove from overrides if neccessary
     if (ourRideItem && ourRideItem->ride()) {
 
-        QString symbol = GlobalContext::context()->specialFields.metricSymbol(definition.name);
+        QString symbol = SpecialFields::getInstance().metricSymbol(definition.name);
         if (definition.name == "TSS") symbol = "coggan_tss";
         if (definition.name == "NP") symbol = "coggan_np";
         if (definition.name == "IF") symbol = "coggan_if";
@@ -1466,9 +1468,9 @@ FormField::metadataChanged()
         else if (definition.name == "Start Time") value = ourRideItem->ride()->startTime().time().toString("hh:mm:ss.zzz");
         else if (definition.name == "Identifier") value = ourRideItem->ride()->id();
         else {
-            if (GlobalContext::context()->specialFields.isMetric(definition.name)) {
+            if (SpecialFields::getInstance().isMetric(definition.name)) {
 
-                QString symbol = GlobalContext::context()->specialFields.metricSymbol(definition.name);
+                QString symbol = SpecialFields::getInstance().metricSymbol(definition.name);
                 if (definition.name == "TSS") symbol = "coggan_tss";
                 if (definition.name == "NP") symbol = "coggan_np";
                 if (definition.name == "IF") symbol = "coggan_if";
@@ -1483,11 +1485,11 @@ FormField::metadataChanged()
                     value = override.value("value");
 
                     // does it need conversion from metric?
-                    if (GlobalContext::context()->specialFields.rideMetric(definition.name)->conversion() != 1.0) {
+                    if (SpecialFields::getInstance().rideMetric(definition.name)->conversion() != 1.0) {
                         // do we want imperial?
                         if (!GlobalContext::context()->useMetricUnits) {
-                            double newvalue = value.toDouble() * GlobalContext::context()->specialFields.rideMetric(definition.name)->conversion();
-                            newvalue -= GlobalContext::context()->specialFields.rideMetric(definition.name)->conversionSum();
+                            double newvalue = value.toDouble() * SpecialFields::getInstance().rideMetric(definition.name)->conversion();
+                            newvalue -= SpecialFields::getInstance().rideMetric(definition.name)->conversionSum();
                             value = QString("%1").arg(newvalue);
                         }
                     }

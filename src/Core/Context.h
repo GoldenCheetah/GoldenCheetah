@@ -21,7 +21,6 @@
 
 #include "TimeUtils.h" // for class DateRange
 #include "RealtimeData.h" // for class RealtimeData
-#include "SpecialFields.h" // for class RealtimeData
 #include "CompareInterval.h" // what intervals are being compared?
 #include "CompareDateRange.h" // what intervals are being compared?
 #include "RideFile.h"
@@ -88,7 +87,6 @@ class GlobalContext : public QObject
 
         // metadata etc
         RideMetadata *rideMetadata;
-        SpecialFields specialFields;
         ColorEngine *colorEngine;
 
         // metric units

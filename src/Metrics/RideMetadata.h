@@ -21,7 +21,6 @@
 #include "GoldenCheetah.h"
 
 #include "Context.h"
-#include "SpecialFields.h"
 
 #include <QWidget>
 #include <QLabel>
@@ -201,7 +200,6 @@ class RideMetadata : public QWidget
         bool singlecolumn;
 
         Context *context;
-        SpecialTabs specialTabs;
 
         QPalette palette; // to be applied to all widgets
 

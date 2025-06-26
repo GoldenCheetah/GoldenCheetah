@@ -51,6 +51,7 @@ class EditUserDataDialog;
 class EditUserMetricDialog;
 class EditUserSeriesDialog;
 class OverviewItemConfig;
+class RideMetric;
 
 //
 // The RideNavigator

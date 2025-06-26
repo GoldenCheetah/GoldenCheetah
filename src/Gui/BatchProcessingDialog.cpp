@@ -28,6 +28,7 @@
 #include "CsvRideFile.h"
 #include "DataProcessor.h"
 #include "RideMetadata.h"
+#include "SpecialFields.h"
 
 #ifdef GC_WANT_PYTHON
 #include "FixPyScriptsDialog.h"
@@ -206,14 +207,15 @@ processed(0), fails(0), numFilesToProcess(0), metadataCompleter(nullptr) {
     metadataEditField = new QLineEdit(this);
 
     // Now add the ride metadata fields to the comboBox
+    SpecialFields &sp = SpecialFields::getInstance();
     foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
 
         // display the edit icon for relevant metadata fields
         if ((field.name != "Interval Goal") && // cannot specify which interval
             (field.name != "Interval Notes") && // cannot specify which interval
-            specialFields.isUser(field.name)) { // user mutable metadata fields
+            sp.isUser(field.name)) { // user mutable metadata fields
 
-            metadataFieldToSet->addItem(specialFields.displayName(field.name));
+            metadataFieldToSet->addItem(sp.displayName(field.name));
         }
     }
 
@@ -771,7 +773,7 @@ BatchProcessingDialog::bpFailureType
 BatchProcessingDialog::setMetadataForActivities() {
 
     // Convert from metdata diosplay name to internal name
-    QString metadataFieldName(specialFields.internalName(metadataFieldToSet->currentText()));
+    QString metadataFieldName(SpecialFields::getInstance().internalName(metadataFieldToSet->currentText()));
     QString metadataValue(metadataEditField->text());
 
 

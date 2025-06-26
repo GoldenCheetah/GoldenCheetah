@@ -17,6 +17,7 @@
 #include "PaceZones.h"
 #include "DataProcessor.h"
 #include "Perspective.h"
+#include "SpecialFields.h"
 
 #include "Bindings.h"
 
@@ -982,7 +983,7 @@ Bindings::activityMetrics(RideItem* item) const
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = SpecialFields::getInstance().internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
@@ -1006,7 +1007,7 @@ Bindings::activityMetrics(RideItem* item) const
 
         // don't add incomplete meta definitions or metric override fields
         if (field.name == "" || field.tab == "" ||
-            GlobalContext::context()->specialFields.isMetric(field.name)) continue;
+            SpecialFields::getInstance().isMetric(field.name)) continue;
 
         // add to the dict
         PyDict_SetItemString_Steal(dict, field.name.replace(" ","_").toUtf8().constData(), PyUnicode_FromString(item->getText(field.name, "").toUtf8().constData()));
@@ -1186,7 +1187,7 @@ Bindings::seasonMetrics(bool all, DateRange range, QString filter) const
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = SpecialFields::getInstance().internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
@@ -1212,7 +1213,7 @@ Bindings::seasonMetrics(bool all, DateRange range, QString filter) const
 
         // don't add incomplete meta definitions or metric override fields
         if (field.name == "" || field.tab == "" ||
-            GlobalContext::context()->specialFields.isMetric(field.name)) continue;
+            SpecialFields::getInstance().isMetric(field.name)) continue;
 
         // Create a string list
         PyObject* metalist = PyList_New(rides);
@@ -1392,7 +1393,7 @@ Bindings::seasonIntervals(DateRange range, QString type) const
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = SpecialFields::getInstance().internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
@@ -1510,7 +1511,7 @@ Bindings::activityIntervals(QString type, PyObject* activity) const
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = SpecialFields::getInstance().internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
@@ -1698,9 +1699,9 @@ Bindings::setTag(QString name, QString value, PyObject *activity) const
     if (f == nullptr) return false;
 
     name = name.replace("_"," ");
-    if (GlobalContext::context()->specialFields.isMetric(name)) {
+    if (SpecialFields::getInstance().isMetric(name)) {
 
-        QString symbol = GlobalContext::context()->specialFields.metricSymbol(name);
+        QString symbol = SpecialFields::getInstance().metricSymbol(name);
         // lets set the override
         QMap<QString,QString> override;
         override  = f->metricOverrides.value(symbol);
@@ -1747,9 +1748,9 @@ Bindings::delTag(QString name, PyObject *activity) const
     if (m == nullptr) m = context->rideItem();
 
     name = name.replace("_"," ");
-    if (GlobalContext::context()->specialFields.isMetric(name)) {
+    if (SpecialFields::getInstance().isMetric(name)) {
 
-        if (f->metricOverrides.remove(GlobalContext::context()->specialFields.metricSymbol(name))) {
+        if (f->metricOverrides.remove(SpecialFields::getInstance().metricSymbol(name))) {
 
             // Notify changes if activity is already in rideCache
             if (m && m->dateTime == f->startTime()) {
@@ -1789,8 +1790,8 @@ Bindings::hasTag(QString name, PyObject *activity) const
     if (f == nullptr) return false;
 
     name = name.replace("_"," ");
-    if (GlobalContext::context()->specialFields.isMetric(name)) {
-        return f->metricOverrides.contains(GlobalContext::context()->specialFields.metricSymbol(name));
+    if (SpecialFields::getInstance().isMetric(name)) {
+        return f->metricOverrides.contains(SpecialFields::getInstance().metricSymbol(name));
     } else {
         return f->tags().contains(name);
     }
@@ -1806,8 +1807,8 @@ Bindings::getTag(QString name, PyObject *activity) const
     if (f == nullptr) return QString();
 
     name = name.replace("_"," ");
-    if (GlobalContext::context()->specialFields.isMetric(name)) {
-        return f->metricOverrides[GlobalContext::context()->specialFields.metricSymbol(name)]["value"];
+    if (SpecialFields::getInstance().isMetric(name)) {
+        return f->metricOverrides[SpecialFields::getInstance().metricSymbol(name)]["value"];
     } else {
         return f->getTag(name, "");
     }
@@ -1854,7 +1855,7 @@ Bindings::metrics(QString metric, bool all, QString filter) const
 
         QString symbol = factory.metricName(i);
         const RideMetric *m = factory.rideMetric(symbol);
-        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = SpecialFields::getInstance().internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
@@ -2107,7 +2108,7 @@ Bindings::seasonPmc(bool all, QString metric) const
         const RideMetricFactory &factory = RideMetricFactory::instance();
         for (int i=0; i<factory.metricCount(); i++) {
             QString symbol = factory.metricName(i);
-            QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
+            QString name = SpecialFields::getInstance().internalName(factory.rideMetric(symbol)->name());
             name.replace(" ","_");
 
             if (name == metric) {

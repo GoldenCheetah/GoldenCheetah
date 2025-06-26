@@ -34,6 +34,7 @@
 #include "TimeUtils.h"
 #include "HelpWhatsThis.h"
 #include "RideItem.h"
+#include "SpecialFields.h"
 
 #include <limits>
 #include <QScrollArea>
@@ -1389,7 +1390,6 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
 
     QList<QString> list;
     QString last;
-    SpecialFields sp;
 
     // get sorted list
     QStringList names = context->rideNavigator->logicalHeadings;
@@ -1442,6 +1442,8 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     list << "best(wpk, 3600)";
 
     std::sort(names.begin(), names.end(), insensitiveLessThan);
+
+    SpecialFields& sp = SpecialFields::getInstance();
 
     foreach(QString name, names) {
 
