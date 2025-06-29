@@ -65,6 +65,7 @@ class HrZonePage;
 class PaceZonePage;
 class MetadataPage;
 class KeywordsPage;
+class SummaryFieldsPage;
 class FieldsPage;
 class Colors;
 class AboutRiderPage;
@@ -423,6 +424,34 @@ class KeywordsPage : public QWidget
         MetadataPage *parent;
 };
 
+class SummaryFieldsPage : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        SummaryFieldsPage(MetadataPage* parent, QList<SummaryKeywordDefinition>);
+        void getDefinitions(QList<SummaryKeywordDefinition>&);
+
+    public slots:
+        void addClicked();
+        void upClicked();
+        void downClicked();
+        void deleteClicked();
+
+        void pageSelected(); // reset the list of fields when we are selected...
+        void summaryfieldChanged();
+
+    private:
+        QTreeWidget* keywords;
+        ActionButtonBox* actionButtons;
+
+        QLabel* fieldLabel;
+        QComboBox* fieldChooser;
+        ListEditDelegate relatedDelegate;
+
+        MetadataPage* parent;
+};
+
 class ColorsPage : public QWidget
 {
     Q_OBJECT
@@ -577,6 +606,7 @@ class MetadataPage : public QWidget
     G_OBJECT
 
     friend class ::KeywordsPage;
+    friend class ::SummaryFieldsPage;
     friend class ::DefaultsPage;
 
     public:
@@ -594,21 +624,26 @@ class MetadataPage : public QWidget
 
         QTabWidget *tabs;
         KeywordsPage *keywordsPage;
+        SummaryFieldsPage *summaryFieldsPage;
         FieldsPage *fieldsPage;
         DefaultsPage *defaultsPage;
         ProcessorPage *processorPage;
 
         // local versions for modification
         QList<KeywordDefinition> keywordDefinitions;
+        QList<SummaryKeywordDefinition> summaryKeywordDefinitions;
         QList<FieldDefinition>   fieldDefinitions;
         QList<DefaultDefinition>  defaultDefinitions;
         QString colorfield;
+        QString summaryfield;
 
         // initial values
         struct {
             unsigned long fieldFingerprint;
             unsigned long keywordFingerprint;
+            unsigned long summaryKeywordFingerprint;
             QString colorfield;
+            QString summaryfield;
         } b4;
 };
 

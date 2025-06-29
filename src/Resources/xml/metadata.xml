@@ -1,5 +1,6 @@
 <metadata>
-<colorfield>"Workout Code"</colorfield>	<keywords>
+<colorfield>"Workout Code"</colorfield>
+    <keywords>
 		<keyword>
 			<keywordname>"Reverse"</keywordname>
 			<keywordcolor red="70" green="70" blue="70"></keywordcolor>
@@ -17,6 +18,14 @@
 			<keywordcolor red="0" green="0" blue="255"></keywordcolor>
 		</keyword>
 	</keywords>
+    <summaryfield>"Sport"</summaryfield>
+    <sumkeywords>
+        <sumkeyword>
+            <sumkeywordname>"*"</sumkeywordname>
+            <sumfield>"Distance"</sumfield>
+            <sumfield>"Time Moving"</sumfield>
+        </sumkeyword>
+    </sumkeywords>
 	<fields>
 		<field>
 			<fieldtab>"Workout"</fieldtab>

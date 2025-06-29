@@ -170,6 +170,7 @@ class TreeMapWindow : public GcChartWindow
         bool useToToday;
         DateRange custom; // custom date range supplied
         QList<KeywordDefinition> keywordDefinitions;
+        QList<SummaryKeywordDefinition> summaryKeywordDefinitions;
         QList<FieldDefinition>   fieldDefinitions;
         QList<DefaultDefinition>   defaultDefinitions;
 

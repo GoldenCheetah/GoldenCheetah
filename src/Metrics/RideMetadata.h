@@ -55,6 +55,14 @@ class KeywordDefinition
         static unsigned long fingerprint(QList<KeywordDefinition>);
 };
 
+class SummaryKeywordDefinition {
+    public:
+        QString name;       // keyword for autocomplete
+        QStringList summaryFields;
+
+        static unsigned long fingerprint(QList<SummaryKeywordDefinition>);
+};
+
 class FieldDefinition
 {
     public:
@@ -62,7 +70,6 @@ class FieldDefinition
         QString tab,
                 name;
         int type;
-        bool diary; // show in summary on diary page...
         bool interval; // this is interval specific metadata
 
         QStringList values; // autocomplete 'defaults'
@@ -70,11 +77,10 @@ class FieldDefinition
 
         static unsigned long fingerprint(QList<FieldDefinition>);
         QCompleter *getCompleter(QObject *parent, RideCache *rideCache);
-        QString calendarText(QString value);
 
-        FieldDefinition() : tab(""), name(""), type(0), diary(false), interval(false), values(), expression("") {}
-        FieldDefinition(QString tab, QString name, int type, bool diary, bool interval, QStringList values, QString expression)
-                        : tab(tab), name(name), type(type), diary(diary), interval(interval), values(values), expression(expression) {}
+        FieldDefinition() : tab(""), name(""), type(0), interval(false), values(), expression("") {}
+        FieldDefinition(QString tab, QString name, int type, bool interval, QStringList values, QString expression)
+                        : tab(tab), name(name), type(type), interval(interval), values(values), expression(expression) {}
 };
 
 class Form;
@@ -178,11 +184,16 @@ class RideMetadata : public QWidget
 
     public:
         RideMetadata(Context *, bool singlecolumn = false);
-        static void serialize(QString filename, QList<KeywordDefinition>, QList<FieldDefinition>, QString colofield, QList<DefaultDefinition>defaultDefinitions);
-        static void readXML(QString filename, QList<KeywordDefinition>&, QList<FieldDefinition>&, QString &colorfield, QList<DefaultDefinition>&defaultDefinitions);
-        QList<KeywordDefinition> getKeywords() { return keywordDefinitions; }
-        QList<FieldDefinition> getFields() { return fieldDefinitions; }
-        QList<DefaultDefinition> getDefaults() { return defaultDefinitions; }
+        static void serialize(const QString& filename, const QList<KeywordDefinition>&, const QList<SummaryKeywordDefinition>&,
+                              const QList<FieldDefinition>&, const QString& colorfield, const QString& summaryfield, const QList<DefaultDefinition>&);
+        static void readXML(const QString& filename, QList<KeywordDefinition>&, QList<SummaryKeywordDefinition>&,
+                            QList<FieldDefinition>&, QString &colorfield, QString &summaryfield, QList<DefaultDefinition>&);
+
+        const QList<KeywordDefinition>& getKeywords() { return keywordDefinitions; }
+        const QList<SummaryKeywordDefinition>& getSummaryKeywords() { return summaryKeywordDefinitions; }
+        const QList<FieldDefinition>& getFields() { return fieldDefinitions; }
+        const QList<DefaultDefinition>& getDefaults() { return defaultDefinitions; }
+
         bool hasCalendarText();
         QString calendarText(RideItem *rideItem);
 
@@ -191,11 +202,14 @@ class RideMetadata : public QWidget
         QString getColorField() const { return colorfield; }
         void setColorField(QString x) { colorfield = x; }
 
+        QString getSummaryField() const { return summaryfield; }
+        void setSummaryField(QString x) { summaryfield = x; }
+
         void setRideItem(RideItem *x);
         RideItem *rideItem() const;
 
         void addFormField(FormField *f);
-        QVector<FormField*> getFormFields();
+        const QVector<FormField*>& getFormFields() { return formFields; };
 
         bool singlecolumn;
 
@@ -227,12 +241,14 @@ class RideMetadata : public QWidget
 
     QStringList keywordList; // for completer
     QList<KeywordDefinition> keywordDefinitions;
+    QList<SummaryKeywordDefinition> summaryKeywordDefinitions;
     QList<FieldDefinition>   fieldDefinitions;
     QList<DefaultDefinition>   defaultDefinitions;
 
     QVector<FormField*>   formFields;
 
     QString colorfield;
+    QString summaryfield;
 
     RideEditor *editor;
 };
@@ -247,25 +263,33 @@ public:
     bool startElement( const QString&, const QString&, const QString &name, const QXmlAttributes &attrs );
     bool characters( const QString& str );
 
-    QList<KeywordDefinition> getKeywords() { return keywordDefinitions; }
-    QList<FieldDefinition> getFields() { return fieldDefinitions; }
-    QString getColorField() { return colorfield; }
-    QList<DefaultDefinition> getDefaults() { return defaultDefinitions; }
+    const QList<KeywordDefinition>& getKeywords() const { return keywordDefinitions; }
+    const QList<SummaryKeywordDefinition>& getSummaryKeywords() const { return summaryKeywordDefinitions; }
+    const QList<FieldDefinition>& getFields() const { return fieldDefinitions; }
+    const QString& getColorField() const { return colorfield; }
+    const QString& getSummaryField() const { return summaryfield; }
+    const QList<DefaultDefinition>& getDefaults() const { return defaultDefinitions; }
 
 protected:
     QString buffer;
 
-    // ths results are here
+    // the results are here
     QList<KeywordDefinition> keywordDefinitions;
+    QList<SummaryKeywordDefinition> summaryKeywordDefinitions;
     QList<FieldDefinition>   fieldDefinitions;
     QString colorfield;
+    QString summaryfield;
     QList<DefaultDefinition>   defaultDefinitions;
 
     // whilst parsing elements are stored here
     KeywordDefinition keyword;
+    SummaryKeywordDefinition summaryKeyword;
     FieldDefinition   field;
     DefaultDefinition   adefault;
     int red, green, blue;
+
+private:
+    void summaryFieldUpgrade(bool diarySet);
 };
 
 // version of qtextedit with signal when lost focus

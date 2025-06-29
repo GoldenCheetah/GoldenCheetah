@@ -249,7 +249,7 @@ RideMetadata::setExtraTab()
             else if (tags.value().length() < 30) type = FIELD_SHORTTEXT;
             else type = FIELD_TEXT;
 
-            extraDefs.append(FieldDefinition("Extra", tags.key(), type, false, false, QStringList(), ""));
+            extraDefs.append(FieldDefinition("Extra", tags.key(), type, false, QStringList(), ""));
             extraForm->addField(extraDefs[extraDefs.count()-1]);
         }
     }
@@ -324,7 +324,7 @@ RideMetadata::configChanged(qint32)
     if (QFile(filename).exists()) {
 
         // read in existing file
-        readXML(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
+        readXML(filename, keywordDefinitions, summaryKeywordDefinitions, fieldDefinitions, colorfield, summaryfield, defaultDefinitions);
 
     } else {
 
@@ -352,21 +352,25 @@ RideMetadata::configChanged(qint32)
 
             // athlete specific configuration
             QList<KeywordDefinition> a_keywordDefinitions;
+            QList<SummaryKeywordDefinition> a_summaryKeywordDefinitions;
             QList<FieldDefinition>   a_fieldDefinitions;
             QList<DefaultDefinition>   a_defaultDefinitions;
             QString a_colorfield;
+            QString a_summaryfield;
 
             // read in athlete specific
-            readXML(filename, a_keywordDefinitions, a_fieldDefinitions, a_colorfield, a_defaultDefinitions);
+            readXML(filename, a_keywordDefinitions, a_summaryKeywordDefinitions, a_fieldDefinitions, a_colorfield, a_summaryfield, a_defaultDefinitions);
 
             // first one, just use them all
             if (first) {
 
                 // just adopt all the config for the first athlete found
                 keywordDefinitions = a_keywordDefinitions;
+                summaryKeywordDefinitions = a_summaryKeywordDefinitions;
                 fieldDefinitions = a_fieldDefinitions;
                 defaultDefinitions = a_defaultDefinitions;
                 colorfield = a_colorfield;
+                summaryfield = a_summaryfield;
 
                 first = false;
 
@@ -383,6 +387,17 @@ RideMetadata::configChanged(qint32)
                     }
                     if (!found) {
                         keywordDefinitions.append(x);
+                    }
+                }
+
+                foreach(SummaryKeywordDefinition x, a_summaryKeywordDefinitions) {
+
+                    bool found = false;
+                    foreach(SummaryKeywordDefinition e, summaryKeywordDefinitions) {
+                        if (e.name == x.name) found = true;
+                    }
+                    if (!found) {
+                        summaryKeywordDefinitions.append(x);
                     }
                 }
 
@@ -413,7 +428,7 @@ RideMetadata::configChanged(qint32)
         // write out global file now, so we don't keep doing this
         // "upgrade" process every time we open an athlete etc
         filename = QDir(gcroot).absolutePath()+"/metadata.xml";
-        serialize(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
+        serialize(filename, keywordDefinitions, summaryKeywordDefinitions, fieldDefinitions, colorfield, summaryfield, defaultDefinitions);
     }
 
     if (context) { // global doesn't have all the widgets etc
@@ -549,19 +564,10 @@ RideMetadata::addFormField(FormField *f)
     formFields.append(f);
 }
 
-QVector<FormField *> RideMetadata::getFormFields()
-{
-    return formFields;
-}
-
-// Are there fields enabled for CalendarText?
 bool
 RideMetadata::hasCalendarText()
 {
-    foreach (FieldDefinition field, getFields()) {
-        if (field.diary) return true;
-    }
-    return false;
+    return !summaryKeywordDefinitions.isEmpty();
 }
 
 // Construct the summary text used on the calendar
@@ -569,20 +575,58 @@ QString
 RideMetadata::calendarText(RideItem *rideItem)
 {
     QString calendarText;
+    QString summaryField(rideItem->getText(getSummaryField(), ""));
 
-    foreach (FieldDefinition field, getFields()) {
-        // "Weight" field is replace by "Athlete Weight" metric
-        QString fieldName = (field.name == "Weight") ? "Athlete Weight" :
-                                                       field.name;
-        QString value;
-        if (SpecialFields::getInstance().isMetric(fieldName)) {
-            value = rideItem->getStringForSymbol(SpecialFields::getInstance().rideMetric(fieldName)->symbol(), GlobalContext::context()->useMetricUnits);
-        } else {
-            value = rideItem->getText(fieldName, "");
+    SpecialFields& sp = SpecialFields::getInstance();
+    for(const SummaryKeywordDefinition& keyword : getSummaryKeywords()) {
+
+        if ((keyword.name == "*") || (keyword.name == summaryField)) {
+
+            for (const QString& fieldName : keyword.summaryFields) {
+
+                QString value;
+                int fieldType = -1;
+
+                // "Weight" field is replaced by "Athlete Weight" metric
+                QString internalfieldName = (fieldName == "Weight") ? "Athlete Weight" : (sp.internalName(fieldName));
+
+                if (sp.isMetric(internalfieldName)) {
+                    fieldType = FIELD_DOUBLE;
+                    value = rideItem->getStringForSymbol(sp.metricSymbol(internalfieldName), GlobalContext::context()->useMetricUnits);
+                } else { // its metadata
+
+                    foreach(FieldDefinition p, GlobalContext::context()->rideMetadata->getFields()) {
+                        if (p.name == fieldName) {
+                            fieldType = p.type;
+                            value = rideItem->getText(internalfieldName, "");
+                            break;
+                        }
+                    }
+                }
+
+                switch (fieldType) {
+                case FIELD_TIME: {
+                        calendarText += QString("%1: %2\n").arg(fieldName).arg(QTime(0, 0, 0).addSecs(value.toInt()).toString("hh:mm:ss"));
+                    } break;
+                case FIELD_DATE: {
+                        calendarText += QString("%1: %2\n").arg(fieldName).arg(QDate(1900, 01, 01).addDays(value.toInt()).toString("dd/MM/yyyy"));
+                    } break;
+                case FIELD_INTEGER:
+                case FIELD_DOUBLE:
+                case FIELD_CHECKBOX: {
+                        calendarText += QString("%1: %2\n").arg(fieldName).arg(value);
+                    } break;
+                // Text fields don't require the field name for their content to be understood.
+                case FIELD_TEXT:
+                case FIELD_TEXTBOX:
+                case FIELD_SHORTTEXT:
+                default:
+                    calendarText += QString("%1\n").arg(value);
+                }
+            }
+            break; // only process the first match
         }
-        calendarText += field.calendarText(value);
     }
-
     return calendarText;
 }
 
@@ -1581,8 +1625,25 @@ FieldDefinition::fingerprint(QList<FieldDefinition> list)
         ba.append(def.tab.toUtf8());
         ba.append(def.name.toUtf8());
         ba.append(def.type);
-        ba.append(def.diary);
         ba.append(def.values.join("").toUtf8());
+    }
+
+#if QT_VERSION < 0x060000
+    return qChecksum(ba, ba.length());
+#else
+    return qChecksum(ba);
+#endif
+}
+
+unsigned long
+SummaryKeywordDefinition::fingerprint(QList<SummaryKeywordDefinition> list)
+{
+    QByteArray ba;
+
+    foreach(SummaryKeywordDefinition def, list) {
+
+        ba.append(def.name.toUtf8());
+        ba.append(def.summaryFields.join("").toUtf8());
     }
 
 #if QT_VERSION < 0x060000
@@ -1618,32 +1679,6 @@ FieldDefinition::getCompleter(QObject *parent, RideCache* rideCache)
     return completer;
 }
 
-QString
-FieldDefinition::calendarText(QString value)
-{
-    if (value.isEmpty() || diary != true) return QString();
-
-    switch (type) {
-        case FIELD_TIME:
-        if (name == "Start Time") {
-            return QString("%1: %2\n").arg(name).arg(QTime(0, 0, 0).addSecs(value.toInt()).toString("hh:mm:ss.zzz"));
-        }
-        case FIELD_DATE:
-        if (name == "Start Date") {
-            return QString("%1: %2\n").arg(name).arg(QDate(1900, 01, 01).addDays(value.toInt()).toString("dd/MM/yyyy"));
-        }
-        case FIELD_INTEGER:
-        case FIELD_DOUBLE:
-        case FIELD_CHECKBOX:
-            return QString("%1: %2\n").arg(name).arg(value);
-        case FIELD_TEXT:
-        case FIELD_TEXTBOX:
-        case FIELD_SHORTTEXT:
-        default:
-            return QString("%1\n").arg(value);
-    }
-}
-
 unsigned long
 KeywordDefinition::fingerprint(QList<KeywordDefinition> list)
 {
@@ -1668,7 +1703,9 @@ KeywordDefinition::fingerprint(QList<KeywordDefinition> list)
  *--------------------------------------------------------------------*/
 
 void
-RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinitions, QList<FieldDefinition>fieldDefinitions, QString colorfield, QList<DefaultDefinition>defaultDefinitions)
+RideMetadata::serialize(const QString& filename, const QList<KeywordDefinition>& keywordDefinitions,
+                        const QList<SummaryKeywordDefinition>& summaryKeywordDefinitions, const QList<FieldDefinition>& fieldDefinitions,
+                        const QString& colorfield, const QString& summaryfield, const QList<DefaultDefinition>& defaultDefinitions)
 {
     // open file - truncate contents
     QFile file(filename);
@@ -1689,11 +1726,12 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
     // begin document
     out << "<metadata>\n";
 
-    out << QString("<colorfield>\"%1\"</colorfield>").arg(Utils::xmlprotect(colorfield));
     //
-    // First we write out the keywords
+    // First we write out the color keywords
     //
     out << "\t<keywords>\n";
+    out << QString("\t\t<colorfield>\"%1\"</colorfield>\n").arg(Utils::xmlprotect(colorfield));
+
     // write out to file
     foreach (KeywordDefinition keyword, keywordDefinitions) {
         // chart name
@@ -1712,6 +1750,25 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
     out <<"\t</keywords>\n";
 
     //
+    // Next write out the summary keywords
+    //
+    out << "\t<summarykeywords>\n";
+    out << QString("\t\t<summaryfield>\"%1\"</summaryfield>\n").arg(Utils::xmlprotect(summaryfield));
+
+    // write out to file
+    foreach(SummaryKeywordDefinition summaryKeyword, summaryKeywordDefinitions) {
+        // chart name
+        out << QString("\t\t<sumkeyword>\n");
+        out << QString("\t\t\t<sumkeywordname>\"%1\"</sumkeywordname>\n").arg(Utils::xmlprotect(summaryKeyword.name));
+
+        foreach(QString summaryField, summaryKeyword.summaryFields)
+            out << QString("\t\t\t<sumfield>\"%1\"</sumfield>\n").arg(Utils::xmlprotect(summaryField));
+
+        out << QString("\t\t</sumkeyword>\n");
+    }
+    out << "\t</summarykeywords>\n";
+
+    //
     // we write out the field definitions
     //
     out << "\t<fields>\n";
@@ -1723,7 +1780,6 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
         out<<QString("\t\t\t<fieldname>\"%1\"</fieldname>\n").arg(Utils::xmlprotect(field.name));
         out<<QString("\t\t\t<fieldtype>%1</fieldtype>\n").arg(field.type);
         out<<QString("\t\t\t<fieldvalues>\"%1\"</fieldvalues>\n").arg(Utils::xmlprotect(field.values.join(",")));
-        out<<QString("\t\t\t<fielddiary>%1</fielddiary>\n").arg(field.diary ? 1 : 0);
         out<<QString("\t\t\t<fieldinterval>%1</fieldinterval>\n").arg(field.interval ? 1 : 0);
         out<<QString("\t\t\t<fieldexpression>\"%1\"</fieldexpression>\n").arg(Utils::xmlprotect(field.expression));
         out<<QString("\t\t</field>\n");
@@ -1755,7 +1811,10 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
 }
 
 void
-RideMetadata::readXML(QString filename, QList<KeywordDefinition>&keywordDefinitions, QList<FieldDefinition>&fieldDefinitions, QString &colorfield, QList<DefaultDefinition> &defaultDefinitions)
+RideMetadata::readXML(const QString& filename, QList<KeywordDefinition>&keywordDefinitions,
+                      QList<SummaryKeywordDefinition>& summaryKeywordDefinitions,
+                      QList<FieldDefinition>&fieldDefinitions,
+                      QString &colorfield, QString &summaryfield, QList<DefaultDefinition> &defaultDefinitions)
 {
     QFile metadataFile(filename);
     QXmlInputSource source( &metadataFile );
@@ -1768,8 +1827,10 @@ RideMetadata::readXML(QString filename, QList<KeywordDefinition>&keywordDefiniti
     xmlReader.parse( source );
 
     keywordDefinitions = handler.getKeywords();
+    summaryKeywordDefinitions = handler.getSummaryKeywords();
     fieldDefinitions = handler.getFields();
     colorfield = handler.getColorField();
+    summaryfield = handler.getSummaryField();
     defaultDefinitions = handler.getDefaults();
 
     // backwards compatible
@@ -1806,8 +1867,7 @@ RideMetadata::readXML(QString filename, QList<KeywordDefinition>&keywordDefiniti
     if (!hasCalendarText) {
         FieldDefinition add;
         add.name = "Calendar Text";
-        add.type = 1;
-        add.diary = false;
+        add.type = FIELD_TEXTBOX;
         add.tab = "";
 
         fieldDefinitions.append(add);
@@ -1815,8 +1875,7 @@ RideMetadata::readXML(QString filename, QList<KeywordDefinition>&keywordDefiniti
     if (!hasData) {
         FieldDefinition add;
         add.name = "Data";
-        add.type = 2;
-        add.diary = false;
+        add.type = FIELD_SHORTTEXT;
         add.tab = "";
 
         fieldDefinitions.append(add);
@@ -1831,23 +1890,21 @@ bool MetadataXMLParser::endElement( const QString&, const QString&, const QStrin
     // Single Attribute elements
     //
     if(qName == "keywordname") keyword.name = Utils::unprotect(buffer);
+    else if(qName == "sumkeywordname") summaryKeyword.name = Utils::unprotect(buffer);
     else if(qName == "keywordtoken") keyword.tokens << Utils::unprotect(buffer);
+    else if(qName == "sumfield") summaryKeyword.summaryFields << Utils::unprotect(buffer);
     else if(qName == "keywordcolor") {
             // the r,g,b values are in red="xx",green="xx" and blue="xx" attributes
             // of this element and captured in startelement below
-            keyword.color = QColor(red,green,blue);
+            keyword.color = QColor(red, green, blue);
     }
     else if(qName == "fieldtab") field.tab = Utils::unprotect(buffer);
     else if(qName == "fieldname") field.name =  Utils::unprotect(buffer);
     else if(qName == "fieldexpression") field.expression =  Utils::unprotect(buffer);
-    else if(qName == "fieldtype") {
-        field.type = buffer.trimmed().toInt();
-        if (field.tab != "" && field.type < 3 && field.name != "Filename" &&
-            field.name != "Change History") field.diary = true; // default!
-    } else if(qName == "fieldvalues") {
-        field.values = Utils::unprotect(buffer).split(",", Qt::SkipEmptyParts);
-    } else if (qName == "fielddiary") field.diary = (buffer.trimmed().toInt() != 0);
-    else if (qName == "fieldinterval") field.interval = (buffer.trimmed().toInt() != 0);
+    else if(qName == "fieldtype") field.type = buffer.trimmed().toInt();
+    else if(qName == "fieldvalues") field.values = Utils::unprotect(buffer).split(",", Qt::SkipEmptyParts);
+    else if(qName == "fielddiary") summaryFieldUpgrade(buffer.trimmed().toInt() != 0); // upgrade
+    else if(qName == "fieldinterval") field.interval = (buffer.trimmed().toInt() != 0);
     else if(qName == "defaultfield") adefault.field =  Utils::unprotect(buffer);
     else if(qName == "defaultvalue") adefault.value =  Utils::unprotect(buffer);
     else if(qName == "defaultlinkedfield") adefault.linkedField =  Utils::unprotect(buffer);
@@ -1858,14 +1915,47 @@ bool MetadataXMLParser::endElement( const QString&, const QString&, const QStrin
     //
     else if(qName == "keyword") // <keyword></keyword> block
         keywordDefinitions.append(keyword);
+    else if (qName == "sumkeyword") // <sumkeyword></sumkeyword> block
+        summaryKeywordDefinitions.append(summaryKeyword);
     else if (qName == "field") // <field></field> block
         fieldDefinitions.append(field);
     else if (qName == "colorfield")
         colorfield = Utils::unprotect(buffer);
+    else if (qName == "summaryfield")
+        summaryfield = Utils::unprotect(buffer);
     else if (qName == "default") // <default></default> block
         defaultDefinitions.append(adefault);
 
     return true;
+}
+
+void MetadataXMLParser::summaryFieldUpgrade(bool diarySet) {
+
+    if (diarySet) {
+
+        bool found(false);
+
+        // Move the diary field name to a single wildcard summary keyword entry
+        // this functionally equivalent to the exisiting diary configuration.
+        for (SummaryKeywordDefinition& sumKeyword : summaryKeywordDefinitions) {
+
+            if (sumKeyword.name == "*") {
+                sumKeyword.summaryFields.append(field.name);
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+
+            // Create an initial wildcard entry to hold the diary field
+            summaryfield = "Sport"; // provide a default
+            SummaryKeywordDefinition sumKeyword;
+            sumKeyword.name = "*";
+            sumKeyword.summaryFields.append(field.name);
+            summaryKeywordDefinitions.append(sumKeyword);
+        }
+    }
 }
 
 bool MetadataXMLParser::startElement( const QString&, const QString&, const QString &name, const QXmlAttributes &attrs )
@@ -1879,6 +1969,8 @@ bool MetadataXMLParser::startElement( const QString&, const QString&, const QStr
         field = FieldDefinition();
     else if (name == "keyword")
         keyword = KeywordDefinition();
+    else if (name == "sumkeyword")
+        summaryKeyword = SummaryKeywordDefinition();
     else if (name == "keywordcolor") {
 
         // red="x" green="x" blue="x" attributes for pen/brush color
