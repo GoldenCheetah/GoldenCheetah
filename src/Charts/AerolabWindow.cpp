@@ -184,7 +184,7 @@ AerolabWindow::AerolabWindow(Context *context) :
 
   // Elevation offset:
   QHBoxLayout *eoffsetLayout = new QHBoxLayout;
-  eoffsetLabel = new QLabel(tr("Eoffset (m)"), this);
+  eoffsetLabel = new QLabel(this);
   eoffsetLabel->setFixedWidth(labelWidth2);
   eoffsetLineEdit = new QLineEdit();
   eoffsetLineEdit->setFixedWidth(70 * dpiXFactor);
@@ -318,6 +318,8 @@ AerolabWindow::zoomChanged()
 void
 AerolabWindow::configChanged(qint32)
 {
+  eoffsetLabel->setText(GlobalContext::context()->useMetricUnits ? tr("Eoffset (m)") : tr("Eoffset (ft)"));
+
   allZoomer->setRubberBandPen(GColor(CPLOTSELECT));
   setProperty("color", GColor(CPLOTBACKGROUND));
 
