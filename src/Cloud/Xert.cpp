@@ -267,8 +267,8 @@ QString
 Xert::getRideName(RideFile *ride)
 {
     QString name = "";
-    // is "Name" set?
-    if (!ride->getTag("Name", "").isEmpty()) {
+    // is "Objective" set?
+    if (!ride->getTag("Objective", "").isEmpty()) {
         name = ride->getTag("Name", "");
     } else {
         // is "Route" set?
@@ -373,7 +373,7 @@ Xert::readyRead()
     buffers.value(reply)->append(reply->readAll());
 }
 
-// SportTracks workouts are delivered back as JSON, the original is lost
+// Xert workouts are delivered back as JSON, the original is lost
 // so we need to parse the response and turn it into a JSON file to
 // import. The description of the format is here:
 // https://sporttracks.mobi/api/doc/data-structures
@@ -412,7 +412,7 @@ Xert::readFileCompleted()
         }
 
         // location => route
-        if (!ride["name"].isNull()) ret->setTag("Objectives", ride["name"].toString());
+        if (!ride["name"].isNull()) ret->setTag("Objective", ride["name"].toString());
         if (!ride["notes"].isNull()) ret->setTag("Notes", ride["description"].toString());
 
         // SAMPLES DATA
