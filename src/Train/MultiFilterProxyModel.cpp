@@ -26,6 +26,8 @@ MultiFilterProxyModel::MultiFilterProxyModel
 (QObject *parent)
 : QSortFilterProxyModel(parent), _filters()
 {
+    _collator.setCaseSensitivity(Qt::CaseInsensitive);
+    _collator.setNumericMode(true);
 }
 
 
@@ -81,4 +83,14 @@ MultiFilterProxyModel::filterAcceptsRow
         }
     }
     return true;
+}
+
+
+bool
+MultiFilterProxyModel::lessThan
+(const QModelIndex &left, const QModelIndex &right) const
+{
+    QString leftText = left.data().toString();
+    QString rightText = right.data().toString();
+    return _collator.compare(leftText, rightText) < 0;
 }

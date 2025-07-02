@@ -21,6 +21,7 @@
 
 
 #include <QSortFilterProxyModel>
+#include <QCollator>
 #include <QList>
 
 #include "ModelFilter.h"
@@ -40,9 +41,11 @@ public:
 
 protected:
     virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
 
 private:
     QList<ModelFilter*> _filters;
+    QCollator _collator;
 };
 
 #endif // MultiFilterProxyModel_H
