@@ -33,20 +33,22 @@
 
 
 InfoWidget::InfoWidget
-(QList<QColor> powerZoneColors, QList<QString> powerZoneNames, QWidget *parent)
+(QList<QColor> powerZoneColors, QList<QString> powerZoneNames, bool showRating, bool showTags, QWidget *parent)
 : QFrame(parent)
 {
     QGridLayout *l = new QGridLayout(this);
     int row = 0;
 
-    ratingWidget = new RatingWidget();
-    ratingWidget->setAlignment(Qt::AlignHCenter);
-    connect(ratingWidget, SIGNAL(rated(int)), this, SLOT(rated(int)));
-    QFont ratingFont = ratingWidget->font();
-    ratingFont.setPointSizeF(ratingFont.pointSizeF() * 1.5);
-    ratingWidget->setFont(ratingFont);
-    l->addWidget(ratingWidget, row, 0, 1, -1);
-    ++row;
+    if (showRating) {
+        ratingWidget = new RatingWidget();
+        ratingWidget->setAlignment(Qt::AlignHCenter);
+        connect(ratingWidget, SIGNAL(rated(int)), this, SLOT(rated(int)));
+        QFont ratingFont = ratingWidget->font();
+        ratingFont.setPointSizeF(ratingFont.pointSizeF() * 1.5);
+        ratingWidget->setFont(ratingFont);
+        l->addWidget(ratingWidget, row, 0, 1, -1);
+        ++row;
+    }
 
     ErgOverview *eo = new ErgOverview();
     connect(this, SIGNAL(relayErgFileSelected(ErgFileBase*)), eo, SLOT(setContent(ErgFileBase*)));
@@ -74,10 +76,12 @@ InfoWidget::InfoWidget
     l->addWidget(powerZonesWidget, row, 0, 1, -1);
     ++row;
 
-    tagBar = new TagBar(trainDB, GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)), this);
-    connect(trainDB, SIGNAL(tagsChanged(int, int, int)), tagBar, SLOT(tagStoreChanged(int, int, int)));
-    l->addWidget(tagBar, row, 0, 1, -1);
-    ++row;
+    if (showTags) {
+        tagBar = new TagBar(trainDB, GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)), this);
+        connect(trainDB, SIGNAL(tagsChanged(int, int, int)), tagBar, SLOT(tagStoreChanged(int, int, int)));
+        l->addWidget(tagBar, row, 0, 1, -1);
+        ++row;
+    }
 
     descriptionLabel = new QLabel();
     descriptionLabel->setWordWrap(true);
@@ -109,12 +113,16 @@ void
 InfoWidget::changeEvent
 (QEvent *event)
 {
-    if (event->type() == QEvent::FontChange) {
-        QFont ratingFont = font();
-        ratingFont.setPointSizeF(ratingFont.pointSizeF() * 1.5);
-        ratingWidget->setFont(ratingFont);
+    if (ratingWidget != nullptr) {
+        if (event->type() == QEvent::FontChange) {
+            QFont ratingFont = font();
+            ratingFont.setPointSizeF(ratingFont.pointSizeF() * 1.5);
+            ratingWidget->setFont(ratingFont);
+        }
     }
-    tagBar->setColor(GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)));
+    if (tagBar != nullptr) {
+        tagBar->setColor(GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)));
+    }
 }
 
 
@@ -147,7 +155,9 @@ InfoWidget::setContent
     }
     when = QString("<b>%1</b>").arg(when);
     lastRunLabel->setText(tr("Last Run: %1").arg(when));
-    ratingWidget->setRating(rating);
+    if (ratingWidget != nullptr) {
+        ratingWidget->setRating(rating);
+    }
 
     if (filepath == ergFileBase.filename()) {
         // Stop if the workout is only reselected
@@ -158,10 +168,12 @@ InfoWidget::setContent
 
     // Common fields
     workoutTagWrapper.setFilepath(ergFileBase.filename());
-    if (! ergFileBase.filename().isEmpty()) {
-        tagBar->setTaggable(&workoutTagWrapper);
-    } else {
-        tagBar->setTaggable(nullptr);
+    if (tagBar != nullptr) {
+        if (! ergFileBase.filename().isEmpty()) {
+            tagBar->setTaggable(&workoutTagWrapper);
+        } else {
+            tagBar->setTaggable(nullptr);
+        }
     }
 
     if (! ergFileBase.description().isEmpty()) {

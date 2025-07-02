@@ -45,10 +45,12 @@ WorkoutFilterBox::WorkoutFilterBox(QWidget *parent, Context *context) : FilterEd
     this->setFilterCommands(workoutFilterCommands());
     this->setMenuProvider(new WorkoutMenuProvider(this, QDir(gcroot).canonicalPath() + "/workoutfilters.xml"));
     connect(this, &FilterEditor::returnPressed, this, &WorkoutFilterBox::processInput);
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    if (context != nullptr) {
+        connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
-    // set appearance
-    configChanged(CONFIG_APPEARANCE);
+        // set appearance
+        configChanged(CONFIG_APPEARANCE);
+    }
 }
 
 WorkoutFilterBox::~WorkoutFilterBox()
@@ -85,18 +87,28 @@ WorkoutFilterBox::processInput()
     while (input.length() > 0 && (input.back().isSpace() || input.back() == ',')) {
         input.chop(1);
     }
-    if (context) {
-        if (input.length() > 0) {
-            QList<ModelFilter *> filters = parseWorkoutFilter(input, ok, msg);
-            if (ok) {
+    bool clear = false;
+    if (input.length() > 0) {
+        QList<ModelFilter *> filters = parseWorkoutFilter(input, ok, msg);
+        if (ok) {
+            if (context != nullptr) {
                 context->setWorkoutFilters(filters);
             } else {
-                workoutFilterErrorAction->setVisible(true);
-                workoutFilterErrorAction->setToolTip(tr("ERROR: %1").arg(msg));
-                context->clearWorkoutFilters();
+                emit workoutFiltersChanged(filters);
             }
         } else {
+            workoutFilterErrorAction->setVisible(true);
+            workoutFilterErrorAction->setToolTip(tr("ERROR: %1").arg(msg));
+            clear = true;
+        }
+    } else {
+        clear = true;
+    }
+    if (clear) {
+        if (context != nullptr) {
             context->clearWorkoutFilters();
+        } else {
+            emit workoutFiltersRemoved();
         }
     }
     if (errorActionWasVisible != workoutFilterErrorAction->isVisible()) {

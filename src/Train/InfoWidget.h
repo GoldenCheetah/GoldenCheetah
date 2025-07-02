@@ -40,7 +40,7 @@ class InfoWidget : public QFrame
     Q_OBJECT
 
     public:
-        InfoWidget(QList<QColor> powerZoneColors, QList<QString> powerZoneNames, QWidget *parent = nullptr);
+        InfoWidget(QList<QColor> powerZoneColors, QList<QString> powerZoneNames, bool showRating = true, bool showTags = true, QWidget *parent = nullptr);
         ~InfoWidget();
 
         void setContent(const ErgFileBase &ergFileBase, int rating, qlonglong lastRun);
@@ -59,13 +59,13 @@ class InfoWidget : public QFrame
         virtual void changeEvent(QEvent *event);
 
     private:
-        RatingWidget *ratingWidget;
+        RatingWidget *ratingWidget = nullptr;
         PowerInfoWidget *powerInfoWidget;
         QLabel *slpLabel;
         PowerZonesWidget *powerZonesWidget;
         QLabel *descriptionLabel;
         QLabel *lastRunLabel;
-        TagBar *tagBar;
+        TagBar *tagBar = nullptr;
         QString filepath;
         WorkoutTagWrapper workoutTagWrapper;
 
