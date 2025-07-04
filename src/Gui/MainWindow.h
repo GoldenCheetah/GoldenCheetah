@@ -253,6 +253,7 @@ class MainWindow : public QMainWindow
         void saveAllFilesSilent(Context *);
         void downloadRide();
         void manualRide();
+        void planActivity();
         void exportRide();
         void batchProcessing();
         void generateHeatMap();

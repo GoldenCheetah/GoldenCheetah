@@ -39,6 +39,10 @@ public slots:
     void clear();
     void setText(const QString &text);
 
+signals:
+    void workoutFiltersChanged(QList<ModelFilter*> &f); // only emitted if no context given
+    void workoutFiltersRemoved(); // only emitted if no context given
+
 private slots:
     void processInput();
     void configChanged(qint32 topic);

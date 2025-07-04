@@ -1121,7 +1121,7 @@ QIcon colouredIconFromPNG(QString filename, QColor color)
 
 
 QPixmap
-svgAsColouredPixmap
+svgAsColoredPixmap
 (const QString &file, const QSize &size, int margin, const QColor &color)
 {
     QSvgRenderer renderer(file);
