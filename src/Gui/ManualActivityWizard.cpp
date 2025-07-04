@@ -113,9 +113,9 @@ ManualActivityWizard::done
         field2TagString(rideFile, "sport", "Sport");
         field2TagString(rideFile, "subSport", "SubSport");
         field2TagString(rideFile, "workoutCode", "Workout Code");
-        field2TagString(rideFile, "notes", "Notes");
-        field2TagString(rideFile, "objective", "Objective");
         field2TagInt(rideFile, "rpe", "RPE");
+        field2TagString(rideFile, "objective", "Objective");
+        field2TagString(rideFile, "notes", "Notes");
         field2TagString(rideFile, "woFilename", "WorkoutFilename");
         field2TagString(rideFile, "woTitle", "Route");
 
@@ -301,7 +301,7 @@ ManualActivityPageBasics::ManualActivityPageBasics
     }
 
     QLabel *objectiveLabel = new QLabel(tr("Objective"));
-    QTextEdit *objectiveEdit = new QTextEdit();
+    QLineEdit *objectiveEdit = new QLineEdit();
 
     // Set completer for Sport, SubSport and Workout Code fields
     RideMetadata *rideMetadata = GlobalContext::context()->rideMetadata;
@@ -323,8 +323,6 @@ ManualActivityPageBasics::ManualActivityPageBasics
     workoutCodeEdit->setVisible(! plan);
     rpeLabel->setVisible(! plan);
     rpeEdit->setVisible(! plan);
-    notesLabel->setVisible(! plan);
-    notesEdit->setVisible(! plan);
     woTypeLabel->setVisible(plan);
     woTypeEdit->setVisible(plan);
     objectiveLabel->setVisible(plan);
@@ -341,9 +339,9 @@ ManualActivityPageBasics::ManualActivityPageBasics
     registerField("subSport", subSportEdit);
     registerField("workoutCode", workoutCodeEdit);
     registerField("rpe", rpeEdit);
+    registerField("objective", objectiveEdit);
     registerField("notes", notesEdit, "plainText", SIGNAL(textChanged()));
     registerField("woType", woTypeEdit);
-    registerField("objective", objectiveEdit, "plainText", SIGNAL(textChanged()));
 
     QFormLayout *form = newQFormLayout();
     form->addRow(tr("Date") + MANDATORY, dateEdit);
@@ -354,8 +352,8 @@ ManualActivityPageBasics::ManualActivityPageBasics
     form->addRow(subSportLabel, subSportEdit);
     form->addRow(workoutCodeLabel, workoutCodeEdit);
     form->addRow(rpeLabel, rpeEdit);
-    form->addRow(notesLabel, notesEdit);
     form->addRow(objectiveLabel, objectiveEdit);
+    form->addRow(notesLabel, notesEdit);
 
     QWidget *scrollWidget = new QWidget();
     QVBoxLayout *scrollLayout = new QVBoxLayout(scrollWidget);
@@ -1364,8 +1362,6 @@ ManualActivityPageSummary::initializePage
     addRowString(tr("SubSport"), "subSport");
     addRowString(tr("Workout Code"), "workoutCode");
     addRowString(tr("Workout Title"), "woTitle");
-    addRowString(tr("Notes"), "notes");
-    addRowString(tr("Objective"), "objective");
     if (! plan) {
         switch (field("rpe").toInt()) {
         case 0:
@@ -1405,6 +1401,8 @@ ManualActivityPageSummary::initializePage
             break;
         }
     }
+    addRowString(tr("Objective"), "objective");
+    addRowString(tr("Notes"), "notes");
     bool hasActMetricsSection = false;
     QLabel *actMetricsHL = new QLabel(HLO + tr("Activity Metrics") + HLC);
     form->addRow(actMetricsHL);
