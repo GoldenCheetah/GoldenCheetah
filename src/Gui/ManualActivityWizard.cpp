@@ -279,6 +279,8 @@ ManualActivityPageBasics::ManualActivityPageBasics
 
     QLabel *notesLabel = new QLabel(tr("Notes"));
     QTextEdit *notesEdit = new QTextEdit();
+    // rich text hangs 'fontd' for some users
+    notesEdit->setAcceptRichText(false);
 
     QLabel *woTypeLabel = new QLabel(tr("Type") + MANDATORY);
     QComboBox *woTypeEdit = new QComboBox();
