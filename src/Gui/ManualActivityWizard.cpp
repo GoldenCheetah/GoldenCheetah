@@ -23,6 +23,8 @@
 #include <QtGui>
 #include <QMessageBox>
 #include <QSplitter>
+#include <QStyleFactory>
+#include <QScrollBar>
 
 #include <string.h>
 #include <errno.h>
@@ -482,7 +484,7 @@ ManualActivityPageWorkout::ManualActivityPageWorkout
     workoutTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
 #ifdef Q_OS_WIN
-    xde = QStyleFactory::create(OS_STYLE);
+    QStyle *xde = QStyleFactory::create(OS_STYLE);
     workoutTree->verticalScrollBar()->setStyle(xde);
 #endif
 
