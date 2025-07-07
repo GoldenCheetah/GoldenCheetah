@@ -302,8 +302,9 @@ deploy:
   - provider: GitHub
     auth_token:
       secure: 807DE/9vib/Kjz5Tah/Zc6zkoigLEWRzASw/DUWjLwZ5d8HHomXqWQ7iln4VtOqL
-    release: snapshot
-    description: 'Snapshot Builds'
+    tag: snapshot
+    release: 'Snapshot Builds'
+    description: ''
     artifact: GCwindowsInstaller, GCversionWindows, GCmacOSpackage, GCversionMacOS, GClinuxAppImage, GCversionLinux
     draft: false
     prerelease: true
