@@ -2090,7 +2090,7 @@ Bindings::rideFileCacheMeanmax(RideFileCache* cache) const
 }
 
 PyObject*
-Bindings::seasonPmc(bool all, QString metric) const
+Bindings::seasonPmc(bool all, QString metric, QString type) const
 {
     Context *context = python->contexts.value(threadid()).context;
 
@@ -2150,11 +2150,25 @@ Bindings::seasonPmc(bool all, QString metric) const
             // just copy
             for(unsigned int k=0; k<size; k++) {
 
-                PyList_SET_ITEM(stress, k, PyFloat_FromDouble(pmcData.stress()[k]));
-                PyList_SET_ITEM(lts, k, PyFloat_FromDouble(pmcData.lts()[k]));
-                PyList_SET_ITEM(sts, k, PyFloat_FromDouble(pmcData.sts()[k]));
-                PyList_SET_ITEM(sb, k, PyFloat_FromDouble(pmcData.sb()[k]));
-                PyList_SET_ITEM(rr, k, PyFloat_FromDouble(pmcData.rr()[k]));
+                if (type == "Planned") {
+                    PyList_SET_ITEM(stress, k, PyFloat_FromDouble(pmcData.plannedStress()[k]));
+                    PyList_SET_ITEM(lts, k, PyFloat_FromDouble(pmcData.plannedLts()[k]));
+                    PyList_SET_ITEM(sts, k, PyFloat_FromDouble(pmcData.plannedSts()[k]));
+                    PyList_SET_ITEM(sb, k, PyFloat_FromDouble(pmcData.plannedSb()[k]));
+                    PyList_SET_ITEM(rr, k, PyFloat_FromDouble(pmcData.plannedRr()[k]));
+                } else if (type == "Expected") {
+                    PyList_SET_ITEM(stress, k, PyFloat_FromDouble(pmcData.expectedStress()[k]));
+                    PyList_SET_ITEM(lts, k, PyFloat_FromDouble(pmcData.expectedLts()[k]));
+                    PyList_SET_ITEM(sts, k, PyFloat_FromDouble(pmcData.expectedSts()[k]));
+                    PyList_SET_ITEM(sb, k, PyFloat_FromDouble(pmcData.expectedSb()[k]));
+                    PyList_SET_ITEM(rr, k, PyFloat_FromDouble(pmcData.expectedRr()[k]));
+                } else {
+                    PyList_SET_ITEM(stress, k, PyFloat_FromDouble(pmcData.stress()[k]));
+                    PyList_SET_ITEM(lts, k, PyFloat_FromDouble(pmcData.lts()[k]));
+                    PyList_SET_ITEM(sts, k, PyFloat_FromDouble(pmcData.sts()[k]));
+                    PyList_SET_ITEM(sb, k, PyFloat_FromDouble(pmcData.sb()[k]));
+                    PyList_SET_ITEM(rr, k, PyFloat_FromDouble(pmcData.rr()[k]));
+                }
             }
 
         } else {
@@ -2165,11 +2179,25 @@ Bindings::seasonPmc(bool all, QString metric) const
                 // day today
                 if (start.addDays(k) >= range.from && start.addDays(k) <= range.to) {
 
-                    PyList_SET_ITEM(stress, index, PyFloat_FromDouble(pmcData.stress()[k]));
-                    PyList_SET_ITEM(lts, index, PyFloat_FromDouble(pmcData.lts()[k]));
-                    PyList_SET_ITEM(sts, index, PyFloat_FromDouble(pmcData.sts()[k]));
-                    PyList_SET_ITEM(sb, index, PyFloat_FromDouble(pmcData.sb()[k]));
-                    PyList_SET_ITEM(rr, index, PyFloat_FromDouble(pmcData.rr()[k]));
+                    if (type == "Planned") {
+                        PyList_SET_ITEM(stress, index, PyFloat_FromDouble(pmcData.plannedStress()[k]));
+                        PyList_SET_ITEM(lts, index, PyFloat_FromDouble(pmcData.plannedLts()[k]));
+                        PyList_SET_ITEM(sts, index, PyFloat_FromDouble(pmcData.plannedSts()[k]));
+                        PyList_SET_ITEM(sb, index, PyFloat_FromDouble(pmcData.plannedSb()[k]));
+                        PyList_SET_ITEM(rr, index, PyFloat_FromDouble(pmcData.plannedRr()[k]));
+                    } else if (type == "Expected") {
+                        PyList_SET_ITEM(stress, index, PyFloat_FromDouble(pmcData.expectedStress()[k]));
+                        PyList_SET_ITEM(lts, index, PyFloat_FromDouble(pmcData.expectedLts()[k]));
+                        PyList_SET_ITEM(sts, index, PyFloat_FromDouble(pmcData.expectedSts()[k]));
+                        PyList_SET_ITEM(sb, index, PyFloat_FromDouble(pmcData.expectedSb()[k]));
+                        PyList_SET_ITEM(rr, index, PyFloat_FromDouble(pmcData.expectedRr()[k]));
+                    } else {
+                        PyList_SET_ITEM(stress, index, PyFloat_FromDouble(pmcData.stress()[k]));
+                        PyList_SET_ITEM(lts, index, PyFloat_FromDouble(pmcData.lts()[k]));
+                        PyList_SET_ITEM(sts, index, PyFloat_FromDouble(pmcData.sts()[k]));
+                        PyList_SET_ITEM(sb, index, PyFloat_FromDouble(pmcData.sb()[k]));
+                        PyList_SET_ITEM(rr, index, PyFloat_FromDouble(pmcData.rr()[k]));
+                    }
                     index++;
                 }
             }

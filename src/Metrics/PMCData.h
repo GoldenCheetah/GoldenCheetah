@@ -68,6 +68,18 @@ class PMCData : public QObject {
         QVector<double> &sb() { return sb_; }
         QVector<double> &rr() { return rr_; }
 
+        QVector<double> &plannedStress() { return planned_stress_; }
+        QVector<double> &plannedLts() { return planned_lts_; }
+        QVector<double> &plannedSts() { return planned_sts_; }
+        QVector<double> &plannedSb() { return planned_sb_; }
+        QVector<double> &plannedRr() { return planned_rr_; }
+
+        QVector<double> &expectedStress() { return expected_stress_; }
+        QVector<double> &expectedLts() { return expected_lts_; }
+        QVector<double> &expectedSts() { return expected_sts_; }
+        QVector<double> &expectedSb() { return expected_sb_; }
+        QVector<double> &expectedRr() { return expected_rr_; }
+
         // index into the arrays
         int indexOf(QDate) ;
 
@@ -129,7 +141,7 @@ class PMCData : public QObject {
         int days_;
         QVector<double> stress_, lts_, sts_, sb_, rr_;
         QVector<double> planned_stress_, planned_lts_, planned_sts_, planned_sb_, planned_rr_;
-        QVector<double> expected_lts_, expected_sts_, expected_sb_, expected_rr_;
+        QVector<double> expected_stress_, expected_lts_, expected_sts_, expected_sb_, expected_rr_;
 
         bool isstale; // needs refreshing
 

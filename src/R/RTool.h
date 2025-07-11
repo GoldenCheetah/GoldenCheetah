@@ -70,7 +70,7 @@ class RTool {
         static SEXP seasonIntervals(SEXP type, SEXP compare);
         static SEXP seasonMeanmax(SEXP all, SEXP filter, SEXP compare);
         static SEXP seasonPeaks(SEXP all, SEXP filter, SEXP compare, SEXP series, SEXP duration);
-        static SEXP pmc(SEXP all, SEXP metric);
+        static SEXP pmc(SEXP all, SEXP metric, SEXP type);
         static SEXP measures(SEXP all, SEXP group);
 
         // charts

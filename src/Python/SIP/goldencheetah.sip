@@ -369,7 +369,7 @@ public:
     PyObject* activityMetrics(bool compare=false) /TransferBack/;
     PyObject* seasonMetrics(bool all=false, QString filter=QString(), bool compare=false) /TransferBack/;
     PythonDataSeries *metrics(QString metric, bool all=false, QString filter=QString()) /TransferBack/;
-    PyObject* seasonPmc(bool all=false, QString metric=QString("BikeStress")) /TransferBack/;
+    PyObject* seasonPmc(bool all=false, QString metric=QString("BikeStress"), QString type=QString("Actual")) /TransferBack/;
     PyObject* seasonMeasures(bool all=false, QString group=QString("Body")) /TransferBack/;
 
     // working with meanmax data

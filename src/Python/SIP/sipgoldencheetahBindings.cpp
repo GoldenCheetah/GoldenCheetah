@@ -678,19 +678,24 @@ static PyObject *meth_Bindings_seasonPmc(PyObject *sipSelf, PyObject *sipArgs, P
          ::QString a1def = QString("BikeStress");
          ::QString* a1 = &a1def;
         int a1State = 0;
+         ::QString a2def = QString("Actual");
+         ::QString* a2 = &a2def;
+        int a2State = 0;
          ::Bindings *sipCpp;
 
         static const char *sipKwdList[] = {
             sipName_all,
             sipName_metric,
+            sipName_type,
         };
 
-        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|bJ1", &sipSelf, sipType_Bindings, &sipCpp, &a0, sipType_QString,&a1, &a1State))
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|bJ1J1", &sipSelf, sipType_Bindings, &sipCpp, &a0, sipType_QString,&a1, &a1State, sipType_QString,&a2, &a2State))
         {
             PyObject * sipRes;
 
-            sipRes = sipCpp->seasonPmc(a0,*a1);
+            sipRes = sipCpp->seasonPmc(a0,*a1,*a2);
             sipReleaseType(a1,sipType_QString,a1State);
+            sipReleaseType(a2,sipType_QString,a2State);
 
             return sipRes;
         }

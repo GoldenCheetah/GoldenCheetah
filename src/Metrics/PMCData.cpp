@@ -165,7 +165,6 @@ void PMCData::refresh()
     // back to null date if not set, just to get round date arithmetic
     if (start_ == QDate(9999,12,31)) start_ = QDate();
 
-    QVector<double> expected_stress;
     // We got a valid range ?
     if (start_ != QDate() && end_ != QDate() && start_ < end_) {
 
@@ -183,7 +182,7 @@ void PMCData::refresh()
         planned_sb_.resize(days_+1); // for SB tomorrow!
         planned_rr_.resize(days_);
 
-        expected_stress.resize(days_);
+        expected_stress_.resize(days_);
         expected_lts_.resize(days_);
         expected_sts_.resize(days_);
         expected_sb_.resize(days_+1); // for SB tomorrow!
@@ -221,7 +220,6 @@ void PMCData::refresh()
     //
     // STEP TWO What are the seedings and ride values
     //
-    bool sbToday = appsettings->cvalue(context->athlete->cyclist, GC_SB_TODAY).toInt();
     const double lte = (double)exp(-1.0/ltsDays_);
     const double ste = (double)exp(-1.0/stsDays_);
 
@@ -238,7 +236,7 @@ void PMCData::refresh()
     planned_sb_.fill(0);
     planned_rr_.fill(0);
 
-    expected_stress.fill(0);
+    expected_stress_.fill(0);
     expected_lts_.fill(0);
     expected_sts_.fill(0);
     expected_sb_.fill(0);
@@ -294,11 +292,11 @@ void PMCData::refresh()
                     }
                 } else if (start_.addDays(offset).daysTo(QDate::currentDate()) < 0) {
                     if (item->planned) {
-                        expected_stress[offset] += value;
+                        expected_stress_[offset] += value;
                     }
                 } else {
                     if (! item->planned) {
-                        expected_stress[offset] += value;
+                        expected_stress_[offset] += value;
                     }
                 }
             }
@@ -306,14 +304,14 @@ void PMCData::refresh()
     }
     if (todayOffset > -1) {
         // Special case today: Use actual stress if available, otherwise planned
-        expected_stress[todayOffset] = (todayActualStress > 0) ? todayActualStress : todayPlannedStress;
+        expected_stress_[todayOffset] = (todayActualStress > 0) ? todayActualStress : todayPlannedStress;
     }
 
     delete df;
 
     calculateMetrics(days_, stress_, lts_, sts_, sb_, rr_);
     calculateMetrics(days_, planned_stress_, planned_lts_, planned_sts_, planned_sb_, planned_rr_);
-    calculateMetrics(days_, expected_stress, expected_lts_, expected_sts_, expected_sb_, expected_rr_);
+    calculateMetrics(days_, expected_stress_, expected_lts_, expected_sts_, expected_sb_, expected_rr_);
 
     //qDebug()<<"refresh PMC in="<<timer.elapsed()<<"ms";
 

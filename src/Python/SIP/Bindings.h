@@ -98,7 +98,7 @@ class Bindings {
         PyObject* activityMetrics(bool compare=false) const;
         PyObject* seasonMetrics(bool all=false, QString filter=QString(), bool compare=false) const;
         PythonDataSeries *metrics(QString metric, bool all=false, QString filter=QString()) const;
-        PyObject* seasonPmc(bool all=false, QString metric=QString("BikeStress")) const;
+        PyObject* seasonPmc(bool all=false, QString metric=QString("BikeStress"), QString type=QString("Actual")) const;
         PyObject* seasonMeasures(bool all=false, QString group=QString("Body")) const;
 
         // working with meanmax data
