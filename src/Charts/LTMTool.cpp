@@ -1950,6 +1950,14 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     stressTypeSelect->addItem(tr("Long Term Stress  (LTS/CTL)"), STRESS_LTS);
     stressTypeSelect->addItem(tr("Stress Balance    (SB/TSB)"),  STRESS_SB);
     stressTypeSelect->addItem(tr("Stress Ramp Rate  (RR)"),      STRESS_RR);
+    stressTypeSelect->addItem(tr("Planned Short Term Stress (Planned STS/ATL)"), STRESS_PLANNED_STS);
+    stressTypeSelect->addItem(tr("Planned Long Term Stress  (Planned LTS/CTL)"), STRESS_PLANNED_LTS);
+    stressTypeSelect->addItem(tr("Planned Stress Balance    (Planned SB/TSB)"),  STRESS_PLANNED_SB);
+    stressTypeSelect->addItem(tr("Planned Stress Ramp Rate  (Planned RR)"),      STRESS_PLANNED_RR);
+    stressTypeSelect->addItem(tr("Expected Short Term Stress (Expected STS/ATL)"), STRESS_EXPECTED_STS);
+    stressTypeSelect->addItem(tr("Expected Long Term Stress  (Expected LTS/CTL)"), STRESS_EXPECTED_LTS);
+    stressTypeSelect->addItem(tr("Expected Stress Balance    (Expected SB/TSB)"),  STRESS_EXPECTED_SB);
+    stressTypeSelect->addItem(tr("Expected Stress Ramp Rate  (Expected RR)"),      STRESS_EXPECTED_RR);
     stressTypeSelect->setCurrentIndex(metricDetail->stressType);
 
     stressWidget = new QWidget(this);
