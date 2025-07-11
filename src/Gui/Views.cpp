@@ -126,6 +126,56 @@ AnalysisView::isBlank()
     else return true;
 }
 
+void
+AnalysisView::notifyViewStateRestored() {
+
+    // lets select the first ride
+    QDateTime now = QDateTime::currentDateTime();
+    for (int i = context->athlete->rideCache->rides().count(); i > 0; --i) {
+        if (context->athlete->rideCache->rides()[i - 1]->dateTime <= now) {
+            context->athlete->selectRideFile(context->athlete->rideCache->rides()[i - 1]->fileName);
+            break;
+        }
+    }
+
+    // otherwise just the latest
+    if (context->currentRideItem() == NULL && context->athlete->rideCache->rides().count() != 0) {
+        context->athlete->selectRideFile(context->athlete->rideCache->rides().last()->fileName);
+    }
+}
+
+void
+AnalysisView::notifyViewSidebarChanged() {
+
+    // if user moved us then tell ride navigator
+    // all a bit of a hack to stop the column widths from
+    // being adjusted as the splitter gets resized and reset
+    if (context->mainWindow->init && context->tab->init && active == false && context->rideNavigator->geometry().width() != 100) {
+        context->rideNavigator->setWidth(context->rideNavigator->geometry().width());
+    }
+}
+
+void
+AnalysisView::setViewSpecificPerspective() {
+
+    // Setting the ride for analysis view also sets the perspective.
+    RideItem* ride = (RideItem*)context->currentRideItem();
+    if (ride != NULL) setRide(ride);
+}
+
+void
+AnalysisView::notifyViewSplitterMoved() {
+
+    // if user moved us then tell ride navigator if
+    // all a bit of a hack to stop the column widths from
+    // being adjusted as the splitter gets resized and reset
+
+    if (active == false && context->rideNavigator->geometry().width() != 100) {
+        context->rideNavigator->setWidth(context->rideNavigator->geometry().width());
+    }
+}
+
+
 DiaryView::DiaryView(Context *context, QStackedWidget *controls) :
         AbstractView(context, VIEW_DIARY, "diary", tr("Compare Activities and Intervals"))
 {
@@ -341,3 +391,9 @@ TrainView::onSelectionChanged()
         setBottomRequested(true);
     }
 }
+
+void
+TrainView::notifyViewPerspectiveAdded(Perspective* page) {
+    page->styleChanged(2);
+}
+
