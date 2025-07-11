@@ -193,7 +193,7 @@ static struct {
                       // because the returned vector is at 1s resolution the data is interpolated using linear interpolation
                       // and resampled to 1s samples.
 
-    { "pmc", 2 },  // pmc(symbol, stress|lts|sts|sb|rr|date) - get a vector of PMC series for the metric in symbol for the current date range.
+    { "pmc", 0 },  // pmc(symbol, stress|lts|sts|sb|rr|date [,actual|planned|expected) - get a vector of PMC series for the metric in symbol for the current date range.
 
     { "sapply", 2 }, // sapply(vector, expr) - returns a vector where expr has been applied to every element. x and i
                      // are both available in the expr for element value and index position.
@@ -547,7 +547,7 @@ DataFilter::builtins(Context *context)
         } else if (i == 59) {
 
             // pmc
-            returning << "pmc(metric, stress|lts|sts|sb|rr|date)";
+            returning << "pmc(metric, stress|lts|sts|sb|rr|date [,actual|planned|expected])";
 
         } else if (i == 60) {
 
@@ -1780,6 +1780,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
             QRegExp constValidSymbols("^(e|pi)$", Qt::CaseInsensitive); // just do basics for now
             QRegExp dateRangeValidSymbols("^(start|stop)$", Qt::CaseInsensitive); // date range
             QRegExp pmcValidSymbols("^(stress|lts|sts|sb|rr|date)$", Qt::CaseInsensitive);
+            QRegExp pmcValidTypes("^(actual|planned|expected)$", Qt::CaseInsensitive);
             QRegExp smoothAlgos("^(sma|ewma)$", Qt::CaseInsensitive);
             QRegExp annotateTypes("^(label|lr|hline|vline|voronoi)$", Qt::CaseInsensitive);
             QRegExp curveData("^(x|y|z|d|t)$", Qt::CaseInsensitive);
@@ -2786,7 +2787,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     if (leaf->fparms.count() < 2 || leaf->fparms[1]->type != Leaf::Symbol) {
 
                        leaf->inerror = true;
-                       DataFiltererrors << QString(tr("pmc(metric, stress|lts|sts|sb|rr|date), need to specify a metric and series."));
+                       DataFiltererrors << QString(tr("pmc(metric, stress|lts|sts|sb|rr|date [,actual|planned|expected}), need to specify a metric and series."));
 
                     } else {
 
@@ -2797,6 +2798,14 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         if (!pmcValidSymbols.exactMatch(symbol)) {
                             leaf->inerror = true;
                             DataFiltererrors << QString(tr("invalid PMC series '%1'").arg(symbol));
+                        }
+
+                        if (leaf->fparms.count() == 3) {
+                            QString type=*(leaf->fparms[2]->lvalue.n);
+                            if (!pmcValidTypes.exactMatch(type)) {
+                                leaf->inerror = true;
+                                DataFiltererrors << QString(tr("invalid PMC type '%1'").arg(type));
+                            }
                         }
                     }
 
@@ -6492,6 +6501,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             if (d.from==QDate() || d.to==QDate()) return Result(0);
 
             QString series = *(leaf->fparms[1]->lvalue.n);
+            QString type = (leaf->fparms.count() == 3) ?  *(leaf->fparms[2]->lvalue.n) : "actual";
             QDateTime earliest(QDate(1900,01,01),QTime(0,0,0));
             PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df); // use default days
             Result returning(0);
@@ -6504,11 +6514,25 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                     // lets copy into our array
                     if (series == "date") value = earliest.daysTo(QDateTime(date, QTime(0,0,0)));
-                    if (series == "lts") value = pmcData->lts()[si];
-                    if (series == "stress") value = pmcData->stress()[si];
-                    if (series == "sts") value = pmcData->sts()[si];
-                    if (series == "rr") value = pmcData->rr()[si];
-                    if (series == "sb") value = pmcData->sb()[si];
+                    if (QString::compare(type, "planned", Qt::CaseInsensitive) == 0) {
+                        if (series == "lts") value = pmcData->plannedLts()[si];
+                        if (series == "stress") value = pmcData->plannedStress()[si];
+                        if (series == "sts") value = pmcData->plannedSts()[si];
+                        if (series == "rr") value = pmcData->plannedRr()[si];
+                        if (series == "sb") value = pmcData->plannedSb()[si];
+		    } else if (QString::compare(type, "expected", Qt::CaseInsensitive) == 0) {
+                        if (series == "lts") value = pmcData->expectedLts()[si];
+                        if (series == "stress") value = pmcData->expectedStress()[si];
+                        if (series == "sts") value = pmcData->expectedSts()[si];
+                        if (series == "rr") value = pmcData->expectedRr()[si];
+                        if (series == "sb") value = pmcData->expectedSb()[si];
+                    } else {
+                        if (series == "lts") value = pmcData->lts()[si];
+                        if (series == "stress") value = pmcData->stress()[si];
+                        if (series == "sts") value = pmcData->sts()[si];
+                        if (series == "rr") value = pmcData->rr()[si];
+                        if (series == "sb") value = pmcData->sb()[si];
+                    }
 
                     returning.asNumeric() << value;
                     returning.number() += value;
