@@ -29,6 +29,10 @@ NullController::NullController(TrainSidebar *parent,
   : RealtimeController(parent, dc), parent(parent), load(100),
     bicycle(NULL)
 {
+  //set values before start as heat 
+  this->core = 37.5;
+  this->skin = 37.0;
+  this->heatStrain = 2.0;  
 }
 
 int NullController::start() {
@@ -74,6 +78,26 @@ void NullController::getRealtimeData(RealtimeData &rtData) {
     rtData.setCadence(85 + ((rand()%10)-5));
     rtData.setHr(145 + ((rand()%3)-2));
     rtData.setHb(35 + ((rand()%30)), 11 + (double(rand()%100) * 0.01f));
+
+    rtData.setCoreTemp(this->core, this->skin, this->heatStrain);
+
+    //randomize robot temp for testing
+    this->core += ((rand()%4) - 2) /10.0;
+    if(this->core < 37)
+      this->core = 37.5;
+    if(this->core > 40)
+      this->core = 39.5;
+    this->skin += ((rand()%4) - 2) /10.0;
+    if(this->skin < 37)
+      this->skin = 37.5;
+    if(this->skin > 40)
+      this->skin = 39.5;
+    this->heatStrain += ((rand()%2) - 1) /10.0;
+    if(this->heatStrain < 1)
+      this->heatStrain = 1.5;
+    if(this->heatStrain > 5)
+      this->heatStrain = 4.5;
+
     processRealtimeData(rtData); // for testing virtual power etc
 
     // generate an R-R data signal based upon 60bpm +/- 2bpm

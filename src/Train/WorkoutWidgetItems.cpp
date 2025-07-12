@@ -370,6 +370,19 @@ WWTelemetry::paint(QPainter *painter)
     // only when recording
     if (!workoutWidget()->recording()) return;
 
+    if (workoutWidget()->shouldPlotSkinTemp())
+    {
+        paintSampleList(painter, GColor(CSKINTEMP), workoutWidget()->stemp, WorkoutWidget::SKINTEMP);
+    }
+    if (workoutWidget()->shouldPlotCoreTemp())
+    {
+        paintSampleList(painter, GColor(CCORETEMP), workoutWidget()->ctemp, WorkoutWidget::CORETEMP);
+    }
+    if (workoutWidget()->shouldPlotHSI())
+    {
+        paintSampleList(painter, GColor(CHEATSTRAIN), workoutWidget()->hsi, WorkoutWidget::HSI);
+    }
+
     // Draw POWER
     if (workoutWidget()->shouldPlotPwr())
     {

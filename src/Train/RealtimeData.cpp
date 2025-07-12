@@ -175,9 +175,9 @@ void RealtimeData::setRPS(double x)
 
 //Skin temp passed but not used elsewhere
 void RealtimeData::setCoreTemp(double core, double skin, double heatStrain) {
-  this->coreTemp = core;
-  this->skinTemp = skin;
-  this->heatStrain = heatStrain;
+    this->coreTemp = core;
+    this->skinTemp = skin;
+    this->heatStrain = heatStrain;
 }
 
 const char *
@@ -536,6 +536,10 @@ double RealtimeData::value(DataSeries series) const
 
     case CoreTemp: return coreTemp;
         break;
+    case SkinTemp: return skinTemp;
+        break;
+    case HeatStrain: return heatStrain;
+        break;
 
     case None:
     default:
@@ -611,6 +615,9 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << DistanceRemaining;
         seriesList << Temp;
         seriesList << CoreTemp;
+        seriesList << SkinTemp;
+        seriesList << HeatStrain;
+        seriesList << HeatLoad;
     }
     return seriesList;
 }
@@ -803,7 +810,13 @@ QString RealtimeData::seriesName(DataSeries series)
     case Temp: return tr("Temperature");
         break;
 
-    case CoreTemp: return tr("CoreTemp");
+    case CoreTemp: return tr("Core Temp");
+        break;
+    case SkinTemp: return tr("Skin Temp");
+        break;
+    case HeatStrain: return tr("Heat Strain");
+        break;
+    case HeatLoad: return tr("Estimated Heat Load");
         break;
     }
 }

@@ -52,6 +52,9 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     plotVo2CB = new QCheckBox();
     plotVentilationCB = new QCheckBox();
     plotSpeedCB = new QCheckBox();
+    plotCoreTempCB = new QCheckBox();
+    plotSkinTempCB = new QCheckBox();
+    plotHSICB = new QCheckBox();
 
     plotHrSB = new QSpinBox(); plotHrSB->setMinimum(1);
     plotPwrSB = new QSpinBox(); plotPwrSB->setMinimum(1);
@@ -111,8 +114,15 @@ WorkoutWindow::WorkoutWindow(Context *context) :
 
     gridLayout->addWidget(new QLabel(tr("Show WBal")),row,0);
     gridLayout->addWidget(plotWbalCB,row++,1);
-    gridLayout->addItem(new QSpacerItem(1,1,QSizePolicy::Preferred,QSizePolicy::Expanding),row,0);
 
+    gridLayout->addWidget(new QLabel(tr("Show Core Temp")),row,0);
+    gridLayout->addWidget(plotCoreTempCB,row++,1);
+    gridLayout->addWidget(new QLabel(tr("Show Skin Temp")),row,0);
+    gridLayout->addWidget(plotSkinTempCB,row++,1);
+    gridLayout->addWidget(new QLabel(tr("Show Heat Strain Index")),row,0);
+    gridLayout->addWidget(plotHSICB,row++,1);
+
+    gridLayout->addItem(new QSpacerItem(1,1,QSizePolicy::Preferred,QSizePolicy::Expanding),row,0);
 
     setControls(settingsWidget);
     ergFile = NULL;
@@ -702,6 +712,18 @@ void WorkoutWindow::setShouldPlotVentilation(bool value)
 void WorkoutWindow::setShouldPlotSpeed(bool value)
 {
     plotSpeedCB->setChecked(value);
+}
+void WorkoutWindow::setShouldPlotCoreTemp(bool value)
+{
+    plotCoreTempCB->setChecked(value);
+}
+void WorkoutWindow::setShouldPlotSkinTemp(bool value)
+{
+    plotSkinTempCB->setChecked(value);
+}
+void WorkoutWindow::setShouldPlotHSI(bool value)
+{
+    plotHSICB->setChecked(value);
 }
 
 int WorkoutWindow::hrPlotAvgLength()

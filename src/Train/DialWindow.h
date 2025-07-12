@@ -129,6 +129,13 @@ class DialWindow : public GcChartWindow
         // used by XPower algorithm
         double rsum, ewma;
 
+        //heat load estimate (don't reset in resetValues, but preserve between sessions, and reset when local date changes)
+        //note: each athelete has it's own set of DialWindows if more than one athlete is loaded at the same time
+        double heatLoad;
+        qint64 heatLoadMSec;
+        QDateTime heatLoadLocalDate;
+        bool isRunning = false;
+
         void resetValues() {
 
             rolling.fill(0.00);
