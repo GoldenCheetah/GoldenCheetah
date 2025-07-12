@@ -137,6 +137,9 @@ class WorkoutWidget : public QWidget
         QList<int> vo2; // 1s samples [ml/min]
         QList<int> ventilation; // 1s samples [l/min]
         QList<double> hrAvg, pwrAvg, cadenceAvg, vo2Avg, ventilationAvg, speedAvg; // averages
+		QList<double> ctemp;
+		QList<double> stemp;
+		QList<double> hsi;
 
         // interaction state;
         // none - initial state
@@ -146,7 +149,7 @@ class WorkoutWidget : public QWidget
         // create - clicked to create
         enum { none, create, drag, dragblock, rect } state;
 
-        enum wwseriestype { CADENCE, HEARTRATE, POWER, SPEED, WBAL, VO2, VENTILATION };
+        enum wwseriestype { CADENCE, HEARTRATE, POWER, SPEED, WBAL, VO2, VENTILATION, CORETEMP, SKINTEMP, HSI };
         typedef enum wwseriestype WwSeriesType;
 
         // adding items and points
@@ -310,6 +313,9 @@ class WorkoutWidget : public QWidget
         bool shouldPlotVo2();
         bool shouldPlotVentilation();
         bool shouldPlotSpeed();
+        bool shouldPlotCoreTemp();
+        bool shouldPlotSkinTemp();
+        bool shouldPlotHSI();
 
         int hrPlotAvgLength();
         int pwrPlotAvgLength();
@@ -416,6 +422,9 @@ class WorkoutWidget : public QWidget
         double speedMax;
         int vo2Max;
         int ventilationMax;
+		double ctempMax;
+		double stempMax;
+		double hsiMax;
 
         // resampling when recording
         double wbalSum;
@@ -425,6 +434,9 @@ class WorkoutWidget : public QWidget
         double hrSum;
         double vo2Sum;
         double ventilationSum;
+        double ctempSum; 
+        double stempSum;
+        double hsiSum; 
         int count;
 };
 
