@@ -43,6 +43,17 @@ static double MAXZOOM = 3.0f;
 static double MINZOOM = 0.2f;
 static double ZOOMSTEP = 0.1f;
 
+
+// Offset the body temperatures otherwise changes get lost in the graphs
+static double CTEMP_BASE = 36.5;
+static double CTEMP_DEFAULT_MAX = 38.0;
+static double STEMP_BASE = 32.0;
+static double STEMP_DEFAULT_MAX = 38.0;
+static double HRPWR_DEFAULT_MAX = 40;
+static double HRPWR_MAX_LIMIT = 60;
+static double CTEMP_MAX_LIMIT = 39.5;
+
+
 void WorkoutWidget::adjustLayout()
 {
     // adjust all the settings based upon current size
@@ -90,6 +101,11 @@ WorkoutWidget::WorkoutWidget(WorkoutWindow *parent, Context *context) :
     minVX_=0;
     maxVX_=maxWX_=3600;
     maxY_=400;
+
+    //starting point for body temperature graphs
+    ctempMax = CTEMP_DEFAULT_MAX - CTEMP_BASE;
+    stempMax = STEMP_DEFAULT_MAX - STEMP_BASE;
+    hsiMax = 5.0;
 
     // when plotting telemetry these are maxY for those series
     cadenceMax = 200; // make it line up between power and hr
@@ -163,7 +179,9 @@ WorkoutWidget::start()
     vo2Avg.clear();
     ventilation.clear();
     ventilationAvg.clear();
-
+    ctemp.clear(); 
+    stemp.clear(); 
+    hsi.clear(); 
     // and resampling data
     count = wbalSum = wattsSum = hrSum = speedSum = cadenceSum = vo2Sum = ventilationSum = 0;
 
@@ -206,6 +224,10 @@ WorkoutWidget::telemetryUpdate(RealtimeData rt)
     vo2Sum += rt.getVO2();
     ventilationSum += rt.getRMV();
 
+    ctempSum += rt.getCoreTemp();
+    stempSum += rt.getSkinTemp();
+    hsiSum += rt.getHeatStrain();
+
     count++;
 
     // did we get 5 samples (5hz refresh rate) ?
@@ -226,8 +248,18 @@ WorkoutWidget::telemetryUpdate(RealtimeData rt)
         ventilation << ve;
         sampleTimes << context->getNow();
 
+        double ct = (ctempSum/5.0f) - CTEMP_BASE;
+        if(ct < 0) ct = 0; //core temp less than 37 we can ignore
+		ctemp << ct;
+        double st = (stempSum/5.0f) - STEMP_BASE;
+        if(st < 0) st = 0; //skin temp below 32 is quite possible, but we can ignore it
+		stemp << st;
+        double hi = hsiSum/5.0f;
+		hsi << hi;
+
         // clear for next time
         count = wbalSum = wattsSum = hrSum = speedSum = cadenceSum = vo2Sum = ventilationSum = 0;
+        ctempSum = stempSum = hsiSum  = 0;
 
         // do we need to increase maxes?
         if (c > cadenceMax) cadenceMax=c;
@@ -236,6 +268,14 @@ WorkoutWidget::telemetryUpdate(RealtimeData rt)
         if (v > vo2Max) vo2Max=v;
         if (ve > ventilationMax) ventilationMax=ve;
 
+        //ct already has base subtracted
+        double ct_headroom = ct * 1.05;
+        if(ct_headroom > ctempMax && ct_headroom < (CTEMP_MAX_LIMIT - CTEMP_BASE)) ctempMax = ct_headroom;
+        double st_headroom = st * 1.05;
+        if(st_headroom > stempMax) stempMax = st_headroom;
+        double hi_headroom = hi * 1.05;
+        if(hi_headroom > hsiMax) hsiMax = hi_headroom;
+        
         // Do we need to increase plot x-axis max? (add 15 min at a time)
         if (cadence.size() > maxVX_) setMaxVX(maxVX_ + 900);
 
@@ -2554,7 +2594,16 @@ WorkoutWidget::transform(double seconds, double watts, WwSeriesType s)
         yratio = double(c.height()) / double(ventilationMax);
         }
         break;
-
+    //scale the hight of the line for core temp , which has base subtracted
+    case CORETEMP: 
+        yratio = double(c.height()) / double(ctempMax);
+        break;
+    case SKINTEMP:
+        yratio = double(c.height()) / double(stempMax);
+        break;
+    case HSI:
+        yratio = double(c.height()) / double(hsiMax);
+        break;
     }
     return QPoint(c.x() - (minVX() * xratio) + (seconds * xratio), c.bottomLeft().y() - (watts * yratio));
 }
@@ -3051,7 +3100,21 @@ WorkoutWidget::shouldPlotSpeed()
 {
     return parent->shouldPlotSpeed();
 }
-
+bool
+WorkoutWidget::shouldPlotCoreTemp()
+{
+    return parent->shouldPlotCoreTemp();
+}
+bool
+WorkoutWidget::shouldPlotSkinTemp()
+{
+    return parent->shouldPlotSkinTemp();
+}
+bool
+WorkoutWidget::shouldPlotHSI()
+{
+    return parent->shouldPlotHSI();
+}
 int
 WorkoutWidget::hrPlotAvgLength()
 {

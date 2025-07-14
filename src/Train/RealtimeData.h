@@ -56,7 +56,7 @@ public:
                       RightPowerPhasePeakBegin, RightPowerPhasePeakEnd,
                       Position, RightPCO, LeftPCO,
                       Temp,
-                      CoreTemp, SkinTemp, HeatStrain
+                      CoreTemp, SkinTemp, HeatStrain, HeatLoad
                     };
 
     typedef enum dataseries DataSeries;
