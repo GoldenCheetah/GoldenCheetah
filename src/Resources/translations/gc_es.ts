@@ -2873,7 +2873,7 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Gui/Views.cpp" line="32"/>
         <source>Compare Activities and Intervals</source>
-        <translation type="unfinished">Comparar actividades e intervalos</translation>
+        <translation>Comparar actividades e intervalos</translation>
     </message>
 </context>
 <context>
@@ -8631,7 +8631,7 @@ Los datos actuales no estarán más disponibles y es necesario reiniciar GoldenC
     <message>
         <location filename="../../Gui/Views.cpp" line="130"/>
         <source>Compare Activities and Intervals</source>
-        <translation type="unfinished">Comparar actividades e intervalos</translation>
+        <translation>Comparar actividades e intervalos</translation>
     </message>
 </context>
 <context>
@@ -18242,17 +18242,17 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1052"/>
         <source>Coggan Planned Chronic Training Load</source>
-        <translation type="unfinished"></translation>
+        <translation>Carga crónica de trabajo planificada (Coggan)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1067"/>
         <source>Coggan Planned Acute Training Load</source>
-        <translation type="unfinished"></translation>
+        <translation>Carga aguda de trabajo planificada (Coggan)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1082"/>
         <source>Coggan Planned Training Stress Balance</source>
-        <translation type="unfinished"></translation>
+        <translation>Balance de estrés planificado (Coggan)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1098"/>
@@ -18849,51 +18849,51 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../FileIO/LapsEditor.cpp" line="54"/>
         <source>Repetitions</source>
-        <translation type="unfinished">Repeticiones</translation>
+        <translation>Repeticiones</translation>
     </message>
     <message>
         <location filename="../../FileIO/LapsEditor.cpp" line="55"/>
         <source>Work Distance</source>
-        <translation type="unfinished">Distancia de trabajo</translation>
+        <translation>Distancia de trabajo</translation>
     </message>
     <message>
         <location filename="../../FileIO/LapsEditor.cpp" line="56"/>
         <source>Work Duration</source>
-        <translation type="unfinished">Duración de trabajo</translation>
+        <translation>Duración de trabajo</translation>
     </message>
     <message>
         <location filename="../../FileIO/LapsEditor.cpp" line="57"/>
         <source>Rest Distance</source>
-        <translation type="unfinished">Distancia de recuperación</translation>
+        <translation>Distancia de recuperación</translation>
     </message>
     <message>
         <location filename="../../FileIO/LapsEditor.cpp" line="58"/>
         <source>Rest Duration</source>
-        <translation type="unfinished">Duración de recuperación</translation>
+        <translation>Duración de recuperación</translation>
     </message>
     <message>
         <location filename="../../FileIO/LapsEditor.cpp" line="103"/>
         <location filename="../../FileIO/LapsEditor.cpp" line="104"/>
         <source>m</source>
-        <translation type="unfinished">m</translation>
+        <translation>m</translation>
     </message>
     <message>
         <location filename="../../FileIO/LapsEditor.cpp" line="103"/>
         <location filename="../../FileIO/LapsEditor.cpp" line="104"/>
         <source>yd</source>
-        <translation type="unfinished">yd</translation>
+        <translation>yd</translation>
     </message>
     <message>
         <location filename="../../FileIO/LapsEditor.cpp" line="107"/>
         <location filename="../../FileIO/LapsEditor.cpp" line="108"/>
         <source>km</source>
-        <translation type="unfinished">km</translation>
+        <translation>km</translation>
     </message>
     <message>
         <location filename="../../FileIO/LapsEditor.cpp" line="107"/>
         <location filename="../../FileIO/LapsEditor.cpp" line="108"/>
         <source>mi</source>
-        <translation type="unfinished">mi</translation>
+        <translation>mi</translation>
     </message>
 </context>
 <context>
@@ -20743,109 +20743,109 @@ Por favor, verifique la configuración de preferencias.</translation>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="233"/>
         <source>General Information</source>
-        <translation type="unfinished">Información general</translation>
+        <translation>Información general</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="234"/>
         <source>Some fields will appear only when relevant to the selected sport. Whenever possible, uploading a recording of your activity is preferred over creating it manually.</source>
-        <translation type="unfinished">Algunos campos sólo aparecerán cuando sean relevantes para el deporte seleccionado. Siempre que sea posible, es preferible cargar una grabación de tu actividad que crearla manualmente.</translation>
+        <translation>Algunos campos sólo aparecerán cuando sean relevantes para el deporte seleccionado. Siempre que sea posible, es preferible cargar una grabación de tu actividad que crearla manualmente.</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="256"/>
         <source>bpm</source>
-        <translation type="unfinished">ppm</translation>
+        <translation>ppm</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="258"/>
         <source>Average Power</source>
-        <translation type="unfinished">Potencia media</translation>
+        <translation>Potencia media</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="263"/>
         <source>W</source>
-        <translation type="unfinished">W</translation>
+        <translation>W</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="265"/>
         <source>Pace intervals</source>
-        <translation type="unfinished">Intervalos de ritmo</translation>
+        <translation>Intervalos de ritmo</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="269"/>
         <source>Average Cadence</source>
-        <translation type="unfinished">Cadencia media</translation>
+        <translation>Cadencia media</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="274"/>
         <source>rpm</source>
-        <translation type="unfinished">rpm</translation>
+        <translation>rpm</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="276"/>
         <source>Distance</source>
-        <translation type="unfinished">Distancia</translation>
+        <translation>Distancia</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="282"/>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="443"/>
         <source>km</source>
-        <translation type="unfinished">km</translation>
+        <translation>km</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="282"/>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="443"/>
         <source>mi</source>
-        <translation type="unfinished">mi</translation>
+        <translation>mi</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="284"/>
         <source>Swim Distance</source>
-        <translation type="unfinished">Distancia de natación</translation>
+        <translation>Distancia de natación</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="289"/>
         <source>m</source>
-        <translation type="unfinished">m</translation>
+        <translation>m</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="289"/>
         <source>yd</source>
-        <translation type="unfinished">yd</translation>
+        <translation>yd</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="291"/>
         <source>Duration</source>
-        <translation type="unfinished">Duración</translation>
+        <translation>Duración</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="332"/>
         <source>Date</source>
-        <translation type="unfinished">Fecha</translation>
+        <translation>Fecha</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="333"/>
         <source>Time</source>
-        <translation type="unfinished">Hora</translation>
+        <translation>Hora</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="334"/>
         <source>Sport</source>
-        <translation type="unfinished">Deporte</translation>
+        <translation>Deporte</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="335"/>
         <source>Sub Sport</source>
-        <translation type="unfinished">Especialidad</translation>
+        <translation>Especialidad</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="336"/>
         <source>Workout Code</source>
-        <translation type="unfinished">Código</translation>
+        <translation>Código</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="337"/>
         <source>Average Heartrate</source>
-        <translation type="unfinished">Fec. cardíaca media</translation>
+        <translation>Fec. cardíaca media</translation>
     </message>
 </context>
 <context>
@@ -20853,67 +20853,67 @@ Por favor, verifique la configuración de preferencias.</translation>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="483"/>
         <source>Stress Information</source>
-        <translation type="unfinished">Información sobre el estrés</translation>
+        <translation>Información sobre el estrés</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="484"/>
         <source>Stress values can be estimated or entered manually. Estimates are based on recent activities of the same sport, or your full history if none are found.</source>
-        <translation type="unfinished">Los valores de esfuerzo pueden estimarse o introducirse manualmente. Las estimaciones se basan en actividades recientes del mismo deporte, o en tu historial completo si no se encuentra ninguna.</translation>
+        <translation>Los valores de esfuerzo pueden estimarse o introducirse manualmente. Las estimaciones se basan en actividades recientes del mismo deporte, o en tu historial completo si no se encuentra ninguna.</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="488"/>
         <source>Duration</source>
-        <translation type="unfinished">Duración</translation>
+        <translation>Duración</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="489"/>
         <source>Distance</source>
-        <translation type="unfinished">Distancia</translation>
+        <translation>Distancia</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="490"/>
         <source>Manually</source>
-        <translation type="unfinished">Manualmente</translation>
+        <translation>Manualmente</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="507"/>
         <source>kJ</source>
-        <translation type="unfinished">kJ</translation>
+        <translation>kJ</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="512"/>
         <source>BikeStress</source>
-        <translation type="unfinished">BikeStress</translation>
+        <translation>BikeStress</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="519"/>
         <source>BikeScore</source>
-        <translation type="unfinished">BikeScore</translation>
+        <translation>BikeScore</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="526"/>
         <source>SwimScore</source>
-        <translation type="unfinished"></translation>
+        <translation>SwimScore</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="533"/>
         <source>TriScore</source>
-        <translation type="unfinished"></translation>
+        <translation>TriScore</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="571"/>
         <source>Estimate by</source>
-        <translation type="unfinished">Estimación por</translation>
+        <translation>Estimación por</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="572"/>
         <source>Estimate Stress Days</source>
-        <translation type="unfinished">Días estimados de estrés</translation>
+        <translation>Días estimados de estrés</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="573"/>
         <source>Work</source>
-        <translation type="unfinished">Trabajo</translation>
+        <translation>Trabajo</translation>
     </message>
 </context>
 <context>
@@ -20921,17 +20921,17 @@ Por favor, verifique la configuración de preferencias.</translation>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="81"/>
         <source>Manual Entry</source>
-        <translation type="unfinished">Ingreso manual de actividad</translation>
+        <translation>Ingreso manual de actividad</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="215"/>
         <source>Unable to save</source>
-        <translation type="unfinished">Imposible guardar</translation>
+        <translation>Imposible guardar</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="216"/>
         <source>There is already an activity with the same start time or you do not have permissions to save a file.</source>
-        <translation type="unfinished">Ya existe una actividad con la misma fecha y hora o no tiene permisos para guardar un archivo.</translation>
+        <translation>Ya existe una actividad con la misma fecha y hora o no tiene permisos para guardar un archivo.</translation>
     </message>
 </context>
 <context>
@@ -33668,7 +33668,7 @@ Presionar F3 en el controlador al finalizar.</translation>
     <message>
         <location filename="../../Gui/Views.cpp" line="286"/>
         <source>Intensity Adjustments and Workout Control</source>
-        <translation type="unfinished">Ajuste de intensidad y control del entrenamiento</translation>
+        <translation>Ajuste de intensidad y control del entrenamiento</translation>
     </message>
 </context>
 <context>
@@ -33978,7 +33978,7 @@ Presionar F3 en el controlador al finalizar.</translation>
     <message>
         <location filename="../../Gui/Views.cpp" line="180"/>
         <source>Compare Date Ranges</source>
-        <translation type="unfinished">Comparar rangos de fechas</translation>
+        <translation>Comparar rangos de fechas</translation>
     </message>
 </context>
 <context>
@@ -35905,7 +35905,7 @@ Puede eliminar las referencias cuando administra la biblioteca usando el menú d
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="820"/>
         <source>Workout Wizard</source>
-        <translation type="unfinished">Asistente de entrenamientos</translation>
+        <translation>Asistente de entrenamientos</translation>
     </message>
 </context>
 <context>
