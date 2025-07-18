@@ -68,7 +68,7 @@ private:
     int calendarText;
     int colorColumn;
     int fileIndex;
-    int isRunIndex;
+    int plannedIndex;
     int tempIndex;
     int dateColumn;
 
@@ -110,15 +110,15 @@ public:
         calendarText = -1;
         colorColumn = -1;
         fileIndex = -1;
-        isRunIndex = -1;
+        plannedIndex = -1;
         tempIndex = -1;
         for(int i=0; i<model->columnCount(); i++) {
 
             if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "average_temp") {
                 tempIndex = i;
             }
-            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "isRun") {
-                isRunIndex = i;
+            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "planned") {
+                plannedIndex = i;
             }
             if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "filename" ||
                 model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == tr("File")) {
@@ -342,17 +342,17 @@ public:
 
             } else if (role == (Qt::UserRole+2)) { // isRUN ?
 
-                if (isRunIndex != -1 && proxyIndex.internalPointer()) {
+                if (plannedIndex != -1 && proxyIndex.internalPointer()) {
 
-                    bool isRun = false;
+                    bool planned = false;
 
                     // hideous code, sorry
                     int groupNo = ((QModelIndex*)proxyIndex.internalPointer())->row();
                     if (groupNo < 0 || groupNo >= groups.count() || proxyIndex.column() == 0)
                         returning = false;
-                    else isRun = sourceModel()->data(sourceModel()->index(groupToSourceRow.value(groups[groupNo])->at(proxyIndex.row()), isRunIndex)).toBool();
+                    else planned = sourceModel()->data(sourceModel()->index(groupToSourceRow.value(groups[groupNo])->at(proxyIndex.row()), plannedIndex)).toBool();
 
-                    returning = isRun;
+                    returning = planned;
                 } else {
                     returning = false;
                 }
