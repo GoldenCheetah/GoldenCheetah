@@ -867,6 +867,7 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
                 // isRun isa special, we may add more later (e.g. date)
                 if (!sym.compare("Date", Qt::CaseInsensitive) ||
                     !sym.compare("Time", Qt::CaseInsensitive) ||
+                    !sym.compare("Planned", Qt::CaseInsensitive) ||
                     !sym.compare("banister", Qt::CaseInsensitive) ||
                     !sym.compare("best", Qt::CaseInsensitive) ||
                     !sym.compare("tiz", Qt::CaseInsensitive) ||
@@ -1628,6 +1629,7 @@ bool Leaf::isNumber(DataFilterRuntime *df, Leaf *leaf)
             if (symbol == "x" || symbol == "i") return true;
             else if (!symbol.compare("Date", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("Time", Qt::CaseInsensitive)) return true;
+            else if (!symbol.compare("Planned", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("Today", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("Current", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("RECINTSECS", Qt::CaseInsensitive)) return true;
@@ -1726,6 +1728,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                 // isRun isa special, we may add more later (e.g. date)
                 if (symbol.compare("Date", Qt::CaseInsensitive) &&
                     symbol.compare("Time", Qt::CaseInsensitive) &&
+                    symbol.compare("Planned", Qt::CaseInsensitive) &&
                     symbol.compare("x", Qt::CaseInsensitive) && // used by which and [lexpr]
                     symbol.compare("i", Qt::CaseInsensitive) && // used by which and [lexpr]
                     symbol.compare("Today", Qt::CaseInsensitive) &&
@@ -2925,6 +2928,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                             //  some specials are not allowed
                             if (!symbol.compare("Date", Qt::CaseInsensitive) ||
                                 !symbol.compare("Time", Qt::CaseInsensitive) ||
+                                !symbol.compare("Planned", Qt::CaseInsensitive) ||
                                 !symbol.compare("x", Qt::CaseInsensitive) || // used by which
                                 !symbol.compare("i", Qt::CaseInsensitive) || // used by which
                                 !symbol.compare("Today", Qt::CaseInsensitive) ||
@@ -7776,6 +7780,11 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         } else if (!symbol.compare("Time", Qt::CaseInsensitive)) {
 
             lhsdouble = QTime(0,0,0).secsTo(m->dateTime.time());
+            lhsisNumber = true;
+
+        } else if (!symbol.compare("Planned", Qt::CaseInsensitive)) {
+
+            lhsdouble = m->planned;
             lhsisNumber = true;
 
         } else if (isCoggan(symbol)) {

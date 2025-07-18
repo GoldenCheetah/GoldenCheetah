@@ -90,6 +90,12 @@ NamedSearches::read()
     if (list.isEmpty()) {
         NamedSearch namedSearch;
         namedSearch.type = NamedSearch::filter;
+        namedSearch.name = tr("Planned");
+        namedSearch.text = "Planned";
+        list.append(namedSearch);
+        namedSearch.name = tr("Actual");
+        namedSearch.text = "!Planned";
+        list.append(namedSearch);
         namedSearch.name = tr("Swim");
         namedSearch.text = "isSwim";
         list.append(namedSearch);
