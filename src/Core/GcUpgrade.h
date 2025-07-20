@@ -123,7 +123,7 @@
 #define VERSION34_BUILD   3955 // released
 #define VERSION35_BUILD   3990 // released
 #define VERSION36_BUILD   5000 // released 5/8/23
-#define VERSION37_BUILD   5005 // released 28/3/25 - latest snapshot 7/7/25
+#define VERSION37_BUILD   5005 // released 28/3/25 - latest snapshot 20/7/25
 
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG
