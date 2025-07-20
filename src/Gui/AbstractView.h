@@ -230,7 +230,7 @@ public:
 protected:
     double fh() { QFontMetrics fm(baseFont); return fm.height(); }
     double spacer() { return (2 * dpiYFactor); }
-    QSplitterHandle *createHandle() {
+    QSplitterHandle *createHandle() override {
         if (this->tabView)
         {
             if (this->tabView->viewType() == VIEW_TRAIN)

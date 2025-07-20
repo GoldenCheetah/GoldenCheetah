@@ -220,7 +220,7 @@ public:
     bool operator< (GcWindow right) const { return geometry().x() < right.geometry().x(); }
 
     // we paint a heading if there is space in the top margin
-    void paintEvent (QPaintEvent * event);
+    void paintEvent (QPaintEvent * event) override;
 
     // mouse actions -- resizing and dragging tiles
     //bool eventFilter(QObject *object, QEvent *e);

@@ -252,14 +252,14 @@ class MetricOverviewItem : public ChartSpaceItem
         MetricOverviewItem(ChartSpace *parent, QString name, QString symbol);
         ~MetricOverviewItem();
 
-        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
-        void itemGeometryChanged();
-        void setData(RideItem *item);
-        void setDateRange(DateRange);
+        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override;
+        void itemGeometryChanged() override;
+        void setData(RideItem *item) override;
+        void setDateRange(DateRange) override;
 
         virtual void displayTileEditMenu(const QPoint& pos) override;
 
-        QWidget *config() { return configwidget; }
+        QWidget *config() override { return configwidget; }
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent) { return new MetricOverviewItem(parent, "PowerIndex", "power_index"); }
