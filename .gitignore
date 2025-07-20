@@ -45,6 +45,9 @@ doc/doxygen/html
 # qt creator builds
 build-src*
 
+# It contains cache and index files for Clangd, the language server that Qt Creator uses to provide advanced C++ code editing features
+.qtc_clangd/
+
 qwt/src/debug/
 qwt/src/release/
 src/Makefile.Debug
