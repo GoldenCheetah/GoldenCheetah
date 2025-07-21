@@ -112,12 +112,12 @@ class Perspective : public GcWindow
         void tabSelected(int id, bool forride);
         void tabMoved(int from, int to);
         void tabMenu(int index, int x);
-        virtual void dragEnterEvent(QDragEnterEvent *);
-        virtual void dropEvent(QDropEvent *);
-        void resizeEvent(QResizeEvent *);
+        virtual void dragEnterEvent(QDragEnterEvent *) override;
+        virtual void dropEvent(QDropEvent *) override;
+        void resizeEvent(QResizeEvent *) override;
         void resize();
-        void showEvent(QShowEvent *);
-        bool eventFilter(QObject *object, QEvent *e);
+        void showEvent(QShowEvent *) override;
+        bool eventFilter(QObject *object, QEvent *e) override;
 
         // My widget signals and events
         void styleChanged(int, bool force=false);
