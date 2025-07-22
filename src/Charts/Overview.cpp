@@ -570,7 +570,7 @@ badconfig:
 //
 // Config dialog that pops up when you click on the config button
 //
-OverviewConfigDialog::OverviewConfigDialog(ChartSpaceItem*item, QPoint pos) : QDialog(NULL), item(item), pos(pos)
+OverviewConfigDialog::OverviewConfigDialog(ChartSpaceItem*item, QPoint pos) : QDialog(NULL), pos(pos), item(item)
 {
     if (item->type == OverviewItemType::USERCHART) setWindowTitle(tr("Chart Settings"));
     else setWindowTitle(tr("Tile Settings"));
