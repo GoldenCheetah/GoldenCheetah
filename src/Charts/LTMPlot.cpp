@@ -3476,8 +3476,6 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
 
     for (QDate date=settings->start.date(); date <= settings->end.date(); date = date.addDays(1)) {
         bool plotData = true;
-        // past ?
-        bool past = date.daysTo(QDate::currentDate())>0;
 
         // day we are on
         int currentDay = groupForDate(date, settings->groupBy);
@@ -3512,23 +3510,15 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
             break;
         case STRESS_EXPECTED_LTS:
             value = pmcData->expectedLts(date);
-            if (past)
-                plotData = false;
             break;
         case STRESS_EXPECTED_STS:
             value = pmcData->expectedSts(date);
-            if (past)
-                plotData = false;
             break;
         case STRESS_EXPECTED_SB:
             value = pmcData->expectedSb(date);
-            if (past)
-                plotData = false;
             break;
         case STRESS_EXPECTED_RR:
             value = pmcData->expectedRr(date);
-            if (past)
-                plotData = false;
             break;
         default:
             value = 0;
