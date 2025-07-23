@@ -445,7 +445,7 @@ DataFilter::builtins(Context *context)
     QStringList returning;
 
     // add special functions
-    returning <<"isRide"<<"isSwim"<<"isXtrain"; // isRun is included in RideNavigator
+    returning <<"isRun"<<"isRide"<<"isSwim"<<"isXtrain";
 
     for(int i=0; DataFilterFunctions[i].parameters != -1; i++) {
 
