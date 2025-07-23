@@ -3475,8 +3475,6 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
 
 
     for (QDate date=settings->start.date(); date <= settings->end.date(); date = date.addDays(1)) {
-        bool plotData = true;
-
         // day we are on
         int currentDay = groupForDate(date, settings->groupBy);
 
@@ -3525,7 +3523,7 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
             break;
         }
         
-        if (plotData && (value || wantZero)) {
+        if (value || wantZero) {
             unsigned long seconds = 1;
             if (currentDay > lastDay) {
                 if (lastDay && wantZero) {
