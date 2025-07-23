@@ -115,11 +115,11 @@ static struct {
     { "min", 0 },
     { "count", 0 },
 
-    // PMC functions
-    { "lts", 1 },
-    { "sts", 1 },
-    { "sb", 1 },
-    { "rr", 1 },
+    // PMC functions: name(expr [,actual|planned|expected])
+    { "lts", 0 },
+    { "sts", 0 },
+    { "sb", 0 },
+    { "rr", 0 },
 
     // estimate
     { "estimate", 2 }, // estimate(model, (cp|ftp|w'|pmax|x))
@@ -449,7 +449,10 @@ DataFilter::builtins(Context *context)
 
     for(int i=0; DataFilterFunctions[i].parameters != -1; i++) {
 
-        if (i == 30 || i == 95) { // special case 'estimate' and 'estimates' we describe it
+        if (i >= 26 && i <= 29) { // pmc functions: lts/sts/sb/rr
+            returning <<QString("%1(expr [,actual|planned|estimated])").arg(DataFilterFunctions[i].name);
+
+        } else if (i == 30 || i == 95) { // special case 'estimate' and 'estimates' we describe it
 
             if (i==30) { foreach(QString model, pdmodels(context)) returning << "estimate(" + model + ", cp|ftp|w'|pmax|x)"; }
             if (i==95) { foreach(QString model, pdmodels(context)) returning << "estimates(" + model + ", cp|ftp|w'|pmax|x|date)"; }
@@ -2805,6 +2808,27 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                         if (leaf->fparms.count() == 3) {
                             QString type=*(leaf->fparms[2]->lvalue.n);
+                            if (!pmcValidTypes.exactMatch(type)) {
+                                leaf->inerror = true;
+                                DataFiltererrors << QString(tr("invalid PMC type '%1'").arg(type));
+                            }
+                        }
+                    }
+
+                } else if (leaf->function == "lts" || leaf->function == "sts" || leaf->function == "sb" || leaf->function == "rr") {
+
+                    if (leaf->fparms.count() < 1 || (leaf->fparms.count() >= 2 && leaf->fparms[1]->type != Leaf::Symbol)) {
+
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("pmc(metric, stress|lts|sts|sb|rr|date [,actual|planned|expected}), need to specify a metric and series."));
+
+                    } else {
+
+                        // expression good?
+                        validateFilter(context, df, leaf->fparms[0]);
+
+                        if (leaf->fparms.count() >= 2) {
+                            QString type=*(leaf->fparms[1]->lvalue.n);
                             if (!pmcValidTypes.exactMatch(type)) {
                                 leaf->inerror = true;
                                 DataFiltererrors << QString(tr("invalid PMC type '%1'").arg(type));
@@ -7004,7 +7028,13 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     if (m == NULL) return Result(0); // no ride then no context
 
                     PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df);
-                    return Result(pmcData->lts(m->dateTime.date()));
+                    QString type = (leaf->fparms.count() >= 2) ?  *(leaf->fparms[1]->lvalue.n) : "actual";
+                    if (QString::compare(type, "planned", Qt::CaseInsensitive) == 0)
+                        return Result(pmcData->plannedLts(m->dateTime.date()));
+                    else if (QString::compare(type, "expected", Qt::CaseInsensitive) == 0)
+                        return Result(pmcData->expectedLts(m->dateTime.date()));
+                    else
+                        return Result(pmcData->lts(m->dateTime.date()));
                   }
                   break;
 
@@ -7013,7 +7043,13 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     if (m == NULL) return Result(0); // no ride then no context
 
                     PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df);
-                    return Result(pmcData->sts(m->dateTime.date()));
+                    QString type = (leaf->fparms.count() >= 2) ?  *(leaf->fparms[1]->lvalue.n) : "actual";
+                    if (QString::compare(type, "planned", Qt::CaseInsensitive) == 0)
+                        return Result(pmcData->plannedSts(m->dateTime.date()));
+                    else if (QString::compare(type, "expected", Qt::CaseInsensitive) == 0)
+                        return Result(pmcData->expectedSts(m->dateTime.date()));
+                    else
+                        return Result(pmcData->sts(m->dateTime.date()));
                   }
                   break;
 
@@ -7022,7 +7058,13 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     if (m == NULL) return Result(0); // no ride then no context
 
                     PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df);
-                    return Result(pmcData->sb(m->dateTime.date()));
+                    QString type = (leaf->fparms.count() >= 2) ?  *(leaf->fparms[1]->lvalue.n) : "actual";
+                    if (QString::compare(type, "planned", Qt::CaseInsensitive) == 0)
+                        return Result(pmcData->plannedSb(m->dateTime.date()));
+                    else if (QString::compare(type, "expected", Qt::CaseInsensitive) == 0)
+                        return Result(pmcData->expectedSb(m->dateTime.date()));
+                    else
+                        return Result(pmcData->sb(m->dateTime.date()));
                   }
                   break;
 
@@ -7031,7 +7073,13 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     if (m == NULL) return Result(0); // no ride then no context
 
                     PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df);
-                    return Result(pmcData->rr(m->dateTime.date()));
+                    QString type = (leaf->fparms.count() >= 2) ?  *(leaf->fparms[1]->lvalue.n) : "actual";
+                    if (QString::compare(type, "planned", Qt::CaseInsensitive) == 0)
+                        return Result(pmcData->plannedRr(m->dateTime.date()));
+                    else if (QString::compare(type, "expected", Qt::CaseInsensitive) == 0)
+                        return Result(pmcData->expectedRr(m->dateTime.date()));
+                    else
+                        return Result(pmcData->rr(m->dateTime.date()));
                   }
                   break;
 
