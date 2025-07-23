@@ -34,15 +34,11 @@ LapsEditorWidget::LapsEditorWidget
 
     repDelegate.setRange(1, 100);
 
-    woDistDelegate.setRange(0, 100);
-    woDistDelegate.setDecimals(2);
     woDistDelegate.setShowSuffixOnEdit(true);
     woDistDelegate.setShowSuffixOnDisplay(true);
 
     woDurDelegate.setFormat("mm:ss");
 
-    reDistDelegate.setRange(0, 100);
-    reDistDelegate.setDecimals(2);
     reDistDelegate.setShowSuffixOnEdit(true);
     reDistDelegate.setShowSuffixOnDisplay(true);
 
@@ -100,11 +96,19 @@ LapsEditorWidget::setSwim
 
     if (isSwim) {
         bool metricPace = appsettings->value(this, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
+        woDistDelegate.setRange(0, 10000);
+        woDistDelegate.setDecimals(0);
         woDistDelegate.setSuffix(metricPace ? tr("m") : tr("yd"));
+        reDistDelegate.setRange(0, 10000);
+        reDistDelegate.setDecimals(0);
         reDistDelegate.setSuffix(metricPace ? tr("m") : tr("yd"));
     } else {
         bool metricPace = appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
+        woDistDelegate.setRange(0, 100);
+        woDistDelegate.setDecimals(3);
         woDistDelegate.setSuffix(metricPace ? tr("km") : tr("mi"));
+        reDistDelegate.setRange(0, 100);
+        reDistDelegate.setDecimals(3);
         reDistDelegate.setSuffix(metricPace ? tr("km") : tr("mi"));
     }
     emit editingFinished();
