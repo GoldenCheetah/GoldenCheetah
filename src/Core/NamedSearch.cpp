@@ -244,9 +244,9 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, Context *context) : QDialo
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowModality(Qt::NonModal);
 #ifdef Q_OS_MAC
-    setFixedSize(350,400);
+    setMinimumSize(350*dpiXFactor,400*dpiYFactor);
 #else
-    setFixedSize(450*dpiXFactor,400*dpiYFactor);
+    setMinimumSize(450*dpiXFactor,400*dpiYFactor);
 #endif
 
     QVBoxLayout *layout = new QVBoxLayout(this);
