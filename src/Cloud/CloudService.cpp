@@ -1121,7 +1121,7 @@ CloudServiceSyncDialog::refreshClicked()
     for(int i=0; uploadEnabled && i<context->athlete->rideCache->rides().count(); i++) {
 
         RideItem *ride = context->athlete->rideCache->rides().at(i);
-        if (!specification.pass(ride)) continue;
+        if (!specification.pass(ride) || ride->planned) continue;
 
         QTreeWidgetItem *add;
 
