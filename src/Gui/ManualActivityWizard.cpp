@@ -1102,6 +1102,12 @@ void
 ManualActivityPageMetrics::updateEstimates
 ()
 {
+    std::pair<double, double> durationDistance = getDurationDistance();
+    double actDuration = durationDistance.first;
+    double actDistance = durationDistance.second;
+    setField("realDuration", actDuration);
+    setField("realDistance", actDistance);
+
     QString sport = RideFile::sportTag(field("sport").toString().trimmed());
     if (   plan
         && field("woType").toInt() == 0
@@ -1221,11 +1227,6 @@ ManualActivityPageMetrics::updateEstimates
         }
     }
 
-    std::pair<double, double> durationDistance = getDurationDistance();
-    double actDuration = durationDistance.first;
-    double actDistance = durationDistance.second;
-    setField("realDuration", actDuration);
-    setField("realDistance", actDistance);
     if (estimateBy == 0) { // by time
         setField("work", actDuration * timeWork / 3600.0);
         setField("bikeStress", actDuration * timeBikeStress / 3600.0);
