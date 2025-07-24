@@ -97,7 +97,7 @@ ManualActivityWizard::done
 {
     int finalResult = result;
     if (result == QDialog::Accepted) {
-        QString sport = field("sport").toString().trimmed();
+        QString sport = RideFile::sportTag(field("sport").toString().trimmed());
         appsettings->setValue(GC_BIKESCOREDAYS, field("estimationDays").toInt());
         int eb = field("estimateBy").toInt();
         appsettings->setValue(GC_BIKESCOREMODE, eb == 0 ? "time" : (eb == 1 ? "dist" : "manual"));
@@ -230,8 +230,6 @@ ManualActivityPageBasics::ManualActivityPageBasics
         setSubTitle(tr("Log your activity by entering the basic details of the session. Once finished, you can add your performance metrics on the next page."));
     }
 
-    bool useMetricUnits = GlobalContext::context()->useMetricUnits;
-    bool metricSwimPace = appsettings->value(this, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
     QLocale locale;
 
     QDateEdit *dateEdit = new QDateEdit();
@@ -418,7 +416,7 @@ ManualActivityPageBasics::sportsChanged
 ()
 {
     QString path(":images/material/summit.svg");
-    QString sport = field("sport").toString().trimmed();
+    QString sport = RideFile::sportTag(field("sport").toString().trimmed());
     if (sport == "Bike") {
         path = ":images/material/bike.svg";
     } else if (sport == "Run") {
@@ -976,7 +974,7 @@ ManualActivityPageMetrics::updateVisibility
 ()
 {
     bool workoutPlan = plan && field("woType").toInt() == 0;
-    QString sport = field("sport").toString().trimmed();
+    QString sport = RideFile::sportTag(field("sport").toString().trimmed());
     bool useMetricUnits = GlobalContext::context()->useMetricUnits;
     bool showAveragePower = true;
     bool showAverageCadence = true;
@@ -1104,7 +1102,7 @@ void
 ManualActivityPageMetrics::updateEstimates
 ()
 {
-    QString sport = field("sport").toString().trimmed();
+    QString sport = RideFile::sportTag(field("sport").toString().trimmed());
     if (   plan
         && field("woType").toInt() == 0
         && field("woFileType").toString().trimmed() == "erg") { // no estimation if planning a ergmode workout
@@ -1262,7 +1260,7 @@ ManualActivityPageMetrics::getDurationDistance
         QTime durationField = field("duration").toTime();
         durationSeconds = durationField.hour() * 3600 + durationField.minute() * 60.0 + durationField.second();
 
-        QString sport = field("sport").toString().trimmed();
+        QString sport = RideFile::sportTag(field("sport").toString().trimmed());
         bool useMetricUnits = GlobalContext::context()->useMetricUnits;
         if (sport == "Run") {
             useMetricUnits = appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
@@ -1339,7 +1337,7 @@ void
 ManualActivityPageSummary::initializePage
 ()
 {
-    QString sport = field("sport").toString().trimmed();
+    QString sport = RideFile::sportTag(field("sport").toString().trimmed());
     bool useMetricUnits = true;
     double metricFactorKM = 1.0;
     double metricFactorM = 1.0;
