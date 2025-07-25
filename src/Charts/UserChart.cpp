@@ -1344,10 +1344,6 @@ UserChartSettings::refreshAxesTab()
     //if (selected) seriesTable->setCurrentItem(selected);
 }
 
-static bool insensitiveLessThan(const QString &a, const QString &b)
-{
-    return a.toLower() < b.toLower();
-}
 //
 // Data series settings
 //
@@ -1388,82 +1384,9 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
 
     cf->addRow(tr("Series Name"), zz);
 
-    QList<QString> list;
-    QString last;
-
-    // get sorted list
-    QStringList names = context->rideNavigator->logicalHeadings;
-
-    // start with just a list of functions
-    list = DataFilter::builtins(context);
-
-    // ridefile data series symbols
-    list += RideFile::symbols();
-
-    // add special functions (older code needs fixing !)
-    list << "config(cranklength)";
-    list << "config(cp)";
-    list << "config(aetp)";
-    list << "config(ftp)";
-    list << "config(w')";
-    list << "config(pmax)";
-    list << "config(cv)";
-    list << "config(aetv)";
-    list << "config(sex)";
-    list << "config(dob)";
-    list << "config(height)";
-    list << "config(weight)";
-    list << "config(lthr)";
-    list << "config(aethr)";
-    list << "config(maxhr)";
-    list << "config(rhr)";
-    list << "config(units)";
-    list << "const(e)";
-    list << "const(pi)";
-    list << "daterange(start)";
-    list << "daterange(stop)";
-    list << "ctl";
-    list << "tsb";
-    list << "atl";
-    list << "sb(BikeStress)";
-    list << "lts(BikeStress)";
-    list << "sts(BikeStress)";
-    list << "rr(BikeStress)";
-    list << "tiz(power, 1)";
-    list << "tiz(hr, 1)";
-    list << "best(power, 3600)";
-    list << "best(hr, 3600)";
-    list << "best(cadence, 3600)";
-    list << "best(speed, 3600)";
-    list << "best(torque, 3600)";
-    list << "best(isopower, 3600)";
-    list << "best(xpower, 3600)";
-    list << "best(vam, 3600)";
-    list << "best(wpk, 3600)";
-
-    std::sort(names.begin(), names.end(), insensitiveLessThan);
-
-    SpecialFields& sp = SpecialFields::getInstance();
-
-    foreach(QString name, names) {
-
-        // handle dups
-        if (last == name) continue;
-        last = name;
-
-        // Handle bikescore tm
-        if (name.startsWith("BikeScore")) name = QString("BikeScore");
-
-        //  Always use the "internalNames" in Filter expressions
-        name = sp.internalName(name);
-
-        // we do very little to the name, just space to _ and lower case it for now...
-        name.replace(' ', '_');
-        list << name;
-    }
     program = new DataFilterEdit(this, context);
     program->setMinimumHeight(250 * dpiXFactor); // give me some space!
-    DataFilterCompleter *completer = new DataFilterCompleter(list, this);
+    DataFilterCompleter *completer = new DataFilterCompleter(DataFilter::completerList(context, !rangemode), this);
     program->setCompleter(completer);
     pl->addWidget(program);
     errors = new QLabel(this);

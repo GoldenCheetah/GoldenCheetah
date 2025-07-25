@@ -439,14 +439,97 @@ static Qt::PenStyle linestyle(QString name)
     return Qt::NoPen; // not known
 }
 
+static bool insensitiveLessThan(const QString &a, const QString &b)
+{
+    return a.toLower() < b.toLower();
+}
+
+QStringList
+DataFilter::completerList(Context *context, bool withSymbols)
+{
+    QList<QString> list;
+    QString last;
+
+    // start with just a list of functions
+    list = builtins(context);
+
+    // add ridefile data series and symbols for use in activities contexts
+    if (withSymbols) {
+        list += RideFile::symbols();
+        list << "RECINTSECS";
+        list << "NA";
+    }
+
+    // get sorted list of metrics and metadata fields
+    QStringList names = context->rideNavigator->logicalHeadings;
+
+    std::sort(names.begin(), names.end(), insensitiveLessThan);
+
+    SpecialFields& sp = SpecialFields::getInstance();
+
+    // add them replacing blanks by underscores and avoiding duplicates
+    foreach(QString name, names) {
+
+        // handle dups
+        if (last == name || name.contains("_") || name == "*") continue;
+        last = name;
+
+        // Handle bikescore tm
+        if (name.startsWith("BikeScore")) name = QString("BikeScore");
+
+        //  Always use the "internalNames" in Filter expressions
+        name = sp.internalName(name);
+
+        // we do very little to the name, just space to _ and lower case it for now...
+        name.replace(' ', '_');
+        list << name;
+    }
+
+    return list;
+}
+
 QStringList
 DataFilter::builtins(Context *context)
 {
     QStringList returning;
 
-    // add special functions
+    // add special/old functions
     returning <<"isRun"<<"isRide"<<"isSwim"<<"isXtrain";
+    returning << "ctl" << "tsb" << "atl";
+    returning << "config(cranklength)";
+    returning << "config(cp)";
+    returning << "config(aetp)";
+    returning << "config(ftp)";
+    returning << "config(w')";
+    returning << "config(pmax)";
+    returning << "config(cv)";
+    returning << "config(aetv)";
+    returning << "config(sex)";
+    returning << "config(dob)";
+    returning << "config(height)";
+    returning << "config(weight)";
+    returning << "config(lthr)";
+    returning << "config(aethr)";
+    returning << "config(maxhr)";
+    returning << "config(rhr)";
+    returning << "config(units)";
+    returning << "const(e)";
+    returning << "const(pi)";
+    returning << "daterange(start)";
+    returning << "daterange(stop)";
+    returning << "tiz(power, 1)";
+    returning << "tiz(hr, 1)";
+    returning << "best(power, 3600)";
+    returning << "best(hr, 3600)";
+    returning << "best(cadence, 3600)";
+    returning << "best(speed, 3600)";
+    returning << "best(torque, 3600)";
+    returning << "best(isopower, 3600)";
+    returning << "best(xpower, 3600)";
+    returning << "best(vam, 3600)";
+    returning << "best(wpk, 3600)";
 
+    // add new functions
     for(int i=0; DataFilterFunctions[i].parameters != -1; i++) {
 
         if (i >= 26 && i <= 29) { // pmc functions: lts/sts/sb/rr

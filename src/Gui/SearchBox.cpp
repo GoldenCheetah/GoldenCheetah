@@ -96,11 +96,6 @@ SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
     configChanged(CONFIG_APPEARANCE | CONFIG_FIELDS);
 }
 
-static bool insensitiveLessThan(const QString &a, const QString &b)
-{
-    return (QString::compare(a,b,Qt::CaseInsensitive)<0);
-}
-
 void
 SearchBox::configChanged(qint32)
 {
@@ -126,85 +121,8 @@ SearchBox::configChanged(qint32)
               .arg(color.red()).arg(color.green()).arg(color.blue())
               .arg(clearButton->sizeHint().width() + frameWidth + 12));
 
-    // get suitably formated list
-    QList<QString> list;
-    QString last;
-
-    // start with just a list of functions
-    list = DataFilter::builtins(context);
-
-    // add special functions (older code needs fixing !)
-    list << "config(cranklength)";
-    list << "config(cp)";
-    list << "config(aetp)";
-    list << "config(ftp)";
-    list << "config(w')";
-    list << "config(pmax)";
-    list << "config(cv)";
-    list << "config(aetv)";
-    list << "config(sex)";
-    list << "config(dob)";
-    list << "config(height)";
-    list << "config(weight)";
-    list << "config(lthr)";
-    list << "config(aethr)";
-    list << "config(maxhr)";
-    list << "config(rhr)";
-    list << "config(units)";
-    list << "const(e)";
-    list << "const(pi)";
-    list << "daterange(start)";
-    list << "daterange(stop)";
-    list << "ctl";
-    list << "tsb";
-    list << "atl";
-    list << "sb(BikeStress)";
-    list << "lts(BikeStress)";
-    list << "sts(BikeStress)";
-    list << "rr(BikeStress)";
-    list << "tiz(power, 1)";
-    list << "tiz(hr, 1)";
-    list << "best(power, 3600)";
-    list << "best(hr, 3600)";
-    list << "best(cadence, 3600)";
-    list << "best(speed, 3600)";
-    list << "best(torque, 3600)";
-    list << "best(isopower, 3600)";
-    list << "best(xpower, 3600)";
-    list << "best(vam, 3600)";
-    list << "best(wpk, 3600)";
-    //list<<"RECINTSECS" is NOT added since its really only
-    //valid to use it when working on ride samples
-    list << "NA";
-
-    // get sorted list
-    QStringList names = context->rideNavigator->logicalHeadings;
-    std::sort(names.begin(), names.end(), insensitiveLessThan);
-
-    SpecialFields& sp = SpecialFields::getInstance();
-
-    foreach(QString name, names) {
-
-        // handle dups
-        if (last == name) continue;
-        last = name;
-
-        // Handle bikescore tm
-        if (name.startsWith("BikeScore")) name = QString("BikeScore");
-
-        //  Always use the "internalNames" in Filter expressions
-        name = sp.internalName(name);
-
-        // we do very little to the name, just space to _ and lower case it for now...
-        name.replace(' ', '_');
-        list << name;
-    }
-
-    // sort the list
-    std::sort(list.begin(), list.end(), insensitiveLessThan);
-
-    // set new list
-    completer->setList(list);
+    // set new completer list
+    completer->setList(DataFilter::completerList(context, false));
 }
 
 void

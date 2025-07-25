@@ -250,6 +250,7 @@ class DataFilter : public QObject
         QStringList getErrors() { return errors; };
         void colorSyntax(QTextDocument *content, int pos);
 
+        static QStringList completerList(Context *, bool); // return list of names for auto-completers
         static QStringList builtins(Context *); // return list of functions supported
 
         int refcount; // used by user metrics
