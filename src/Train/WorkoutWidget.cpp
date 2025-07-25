@@ -179,11 +179,12 @@ WorkoutWidget::start()
     vo2Avg.clear();
     ventilation.clear();
     ventilationAvg.clear();
-    ctemp.clear(); 
-    stemp.clear(); 
-    hsi.clear(); 
+    ctemp.clear();
+    stemp.clear();
+    hsi.clear();
     // and resampling data
     count = wbalSum = wattsSum = hrSum = speedSum = cadenceSum = vo2Sum = ventilationSum = 0;
+    ctempSum = stempSum = hsiSum = 0;
 
     // set initial
     cadenceMax = 200;
@@ -275,7 +276,7 @@ WorkoutWidget::telemetryUpdate(RealtimeData rt)
         if(st_headroom > stempMax) stempMax = st_headroom;
         double hi_headroom = hi * 1.05;
         if(hi_headroom > hsiMax) hsiMax = hi_headroom;
-        
+
         // Do we need to increase plot x-axis max? (add 15 min at a time)
         if (cadence.size() > maxVX_) setMaxVX(maxVX_ + 900);
 
@@ -2595,7 +2596,7 @@ WorkoutWidget::transform(double seconds, double watts, WwSeriesType s)
         }
         break;
     //scale the hight of the line for core temp , which has base subtracted
-    case CORETEMP: 
+    case CORETEMP:
         yratio = double(c.height()) / double(ctempMax);
         break;
     case SKINTEMP:

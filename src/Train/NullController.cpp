@@ -24,15 +24,28 @@
 #include "RealtimeData.h"
 #include "PhysicsUtility.h"
 
+#define CORE_START 37.5
+#define CORE_UPPER_LIMIT 40.0
+#define CORE_LOWER_LIMIT 35.0
+
+#define SKIN_START 35.0
+#define SKIN_UPPER_LIMIT 40.0
+#define SKIN_LOWER_LIMIT 30.0
+
+#define HSI_START 2.0
+#define HSI_UPPER_LIMIT 5.0
+#define HSI_LOWER_LIMIT 0
+
+
 NullController::NullController(TrainSidebar *parent,
                                DeviceConfiguration *dc)
   : RealtimeController(parent, dc), parent(parent), load(100),
     bicycle(NULL)
 {
-  //set values before start as heat 
-  this->core = 37.5;
-  this->skin = 37.0;
-  this->heatStrain = 2.0;  
+  //set values before start as heat
+  core = 37.5;
+  skin = 37.0;
+  heatStrain = 2.0;
 }
 
 int NullController::start() {
@@ -79,24 +92,24 @@ void NullController::getRealtimeData(RealtimeData &rtData) {
     rtData.setHr(145 + ((rand()%3)-2));
     rtData.setHb(35 + ((rand()%30)), 11 + (double(rand()%100) * 0.01f));
 
-    rtData.setCoreTemp(this->core, this->skin, this->heatStrain);
+    rtData.setCoreTemp(core, skin, heatStrain);
 
     //randomize robot temp for testing
-    this->core += ((rand()%4) - 2) /10.0;
-    if(this->core < 37)
-      this->core = 37.5;
-    if(this->core > 40)
-      this->core = 39.5;
-    this->skin += ((rand()%4) - 2) /10.0;
-    if(this->skin < 37)
-      this->skin = 37.5;
-    if(this->skin > 40)
-      this->skin = 39.5;
-    this->heatStrain += ((rand()%2) - 1) /10.0;
-    if(this->heatStrain < 1)
-      this->heatStrain = 1.5;
-    if(this->heatStrain > 5)
-      this->heatStrain = 4.5;
+    core += ((rand()%5) - 2) /10.0;
+    if(core < CORE_LOWER_LIMIT)
+      core = CORE_START;
+    if(core > CORE_UPPER_LIMIT)
+      core = CORE_START;
+    skin += ((rand()%5) - 2) /10.0;
+    if(skin < SKIN_LOWER_LIMIT)
+      skin = SKIN_START;
+    if(skin > SKIN_UPPER_LIMIT)
+      skin = SKIN_START;
+    heatStrain += ((rand()%3) - 1) /10.0;
+    if(heatStrain < HSI_LOWER_LIMIT)
+      heatStrain = HSI_START;
+    if(heatStrain > HSI_UPPER_LIMIT)
+      heatStrain = HSI_START;
 
     processRealtimeData(rtData); // for testing virtual power etc
 

@@ -114,10 +114,10 @@ DialWindow::DialWindow(Context *context) :
 
 
     //do this on init, but not in resetValues as we want to preserve the heat load across sessions, resetting if local midnight passes while not running
-    this->heatLoadMSec = 0;
-    this->heatLoad = 0;
-    this->heatLoadLocalDate = QDateTime::currentDateTime();
-    this->isRunning = false;
+    heatLoadMSec = 0;
+    heatLoad = 0;
+    heatLoadLocalDate = QDateTime::currentDateTime();
+    isRunning = false;
 }
 
 void
@@ -131,14 +131,14 @@ void
 DialWindow::start()
 {
     resetValues();
-    this->isRunning = true;
+    isRunning = true;
 }
 
 void
 DialWindow::stop()
 {
     resetValues();
-    this->isRunning = false;
+    isRunning = false;
 }
 
 void
@@ -578,35 +578,35 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
             QDateTime currentTime = QDateTime::currentDateTimeUtc();
             qint64 msecEpoc = currentTime.toMSecsSinceEpoch();
 
-            //qDebug()<<"reset check time isRunning" << this->isRunning << "at" << QDateTime::currentDateTime() << "heatLoadLocalDate" << this->heatLoadLocalDate << "DOY" << this->heatLoadLocalDate.date().dayOfYear();
-            if(!this->isRunning && this->heatLoadLocalDate.date().dayOfYear() != QDateTime::currentDateTime().date().dayOfYear())
+            //qDebug()<<"reset check time isRunning" << isRunning << "at" << QDateTime::currentDateTime() << "heatLoadLocalDate" << heatLoadLocalDate << "DOY" << heatLoadLocalDate.date().dayOfYear();
+            if(!isRunning && heatLoadLocalDate.date().dayOfYear() != QDateTime::currentDateTime().date().dayOfYear())
             {
-                qDebug()<<"resetting heat load at " << QDateTime::currentDateTime() << "heatLoadLocalDate" << this->heatLoadLocalDate;
-                this->heatLoadMSec = 0;
-                this->heatLoad = 0;
-                this->heatLoadLocalDate = QDateTime::currentDateTime();
+                qDebug()<<"resetting heat load at " << QDateTime::currentDateTime() << "heatLoadLocalDate" << heatLoadLocalDate;
+                heatLoadMSec = 0;
+                heatLoad = 0;
+                heatLoadLocalDate = QDateTime::currentDateTime();
             }
 
-            if(this->heatLoadMSec != 0 && heatStrain > HEATLOAD_OFFSET) //don't try to calculate a negative effective heat strain
+            if(heatLoadMSec != 0 && heatStrain > HEATLOAD_OFFSET) //don't try to calculate a negative effective heat strain
             {
                 //(HSI-AOC_Off)^AOC_EXP*TIME/AOC_Mult
 
-                qint64 deltaMSec = msecEpoc - this->heatLoadMSec;
+                qint64 deltaMSec = msecEpoc - heatLoadMSec;
                 double deltamin = deltaMSec / (1000.0 * 60.0); //msec to minutes
 
                 double newLoad = pow(heatStrain-HEATLOAD_OFFSET, HEATLOAD_EXP) * deltamin / HEATLOAD_MULT;
 
                 if(newLoad > 0)
-                    this->heatLoad += newLoad;
+                    heatLoad += newLoad;
 
-                //qDebug()<<"newLoad is "<< newLoad << "a" << a << "b" << b << "heatStrain" << heatStrain << "c" << c << "deltamin" << deltamin << "heatLoad" << this->heatLoad;
+                //qDebug()<<"newLoad is "<< newLoad << "a" << a << "b" << b << "heatStrain" << heatStrain << "c" << c << "deltamin" << deltamin << "heatLoad" << heatLoad;
 
-                if(this->heatLoad >= 10.0)
-                    this->heatLoad = 10.0;
+                if(heatLoad >= 10.0)
+                    heatLoad = 10.0;
             }
-            this->heatLoadMSec = msecEpoc;
+            heatLoadMSec = msecEpoc;
 
-            valueLabel->setText(QString("%1").arg(this->heatLoad, 0, 'f', 3)); //HACK, three DP for extra details
+            valueLabel->setText(QString("%1").arg(heatLoad, 0, 'f', 3)); //HACK, three DP for extra details
         }
         break;
 
