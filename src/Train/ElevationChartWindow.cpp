@@ -81,7 +81,7 @@ CONSTEXPR RangeColorMapper<RangeColorCriteria, 5> s_gradientToColorMapper{
 
 void BubbleWidget::paintEvent(QPaintEvent *event)
 {
-    if (!m_rtData || !m_ergFileAdapter)
+    if (!m_rtData || !m_ergFileAdapter || !m_ergFileAdapter->hasGradient())
         return;
 
     QWidget::paintEvent(event);
@@ -303,14 +303,12 @@ void
 ElevationChartWindow::telemetryUpdate(const RealtimeData &rtData)
 {
     // If it is not visible, it saves time
-    if (!isVisible())
+    if (!isVisible() || !m_ergFileAdapter.hasGradient())
         return;
     m_rtData = rtData;
     bubbleWidget->setRealtimeData(&m_rtData);
 
     int npoints = 30;
-    int pointsAfter = 25;
-    int pointsBefore = npoints - pointsAfter;
 
     QQueue<QPointF> &plotQ = slopeWidget->getPlotQ();
     plotQ.clear();
