@@ -23,6 +23,12 @@
 #include "RideFile.h"
 #include "HelpWhatsThis.h"
 
+
+#define HEATLOAD_OFFSET 0.9596
+#define  HEATLOAD_MULT 35.92
+#define  HEATLOAD_EXP 1.324
+
+
 DialWindow::DialWindow(Context *context) :
     GcChartWindow(context), context(context), average(1), isNewLap(false)
 {
@@ -105,6 +111,13 @@ DialWindow::DialWindow(Context *context) :
 
     // set to zero
     resetValues();
+
+
+    //do this on init, but not in resetValues as we want to preserve the heat load across sessions, resetting if local midnight passes while not running
+    heatLoadMSec = 0;
+    heatLoad = 0;
+    heatLoadLocalDate = QDateTime::currentDateTime();
+    isRunning = false;
 }
 
 void
@@ -118,12 +131,14 @@ void
 DialWindow::start()
 {
     resetValues();
+    isRunning = true;
 }
 
 void
 DialWindow::stop()
 {
     resetValues();
+    isRunning = false;
 }
 
 void
@@ -548,6 +563,52 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
     case RealtimeData::CoreTemp:
         valueLabel->setText(QString("%1").arg(displayValue, 0, 'f', 2));
         break;
+    //Skin temp, heat strain, and heat load are from CORE sensor
+    case RealtimeData::SkinTemp:
+        valueLabel->setText(QString("%1").arg(displayValue, 0, 'f', 2));
+        break;
+
+    case RealtimeData::HeatStrain:
+        valueLabel->setText(QString("%1").arg(displayValue, 0, 'f', 1));
+        break;
+
+    case RealtimeData::HeatLoad:
+        {
+            double heatStrain = rtData.getHeatStrain();
+            QDateTime currentTime = QDateTime::currentDateTimeUtc();
+            qint64 msecEpoc = currentTime.toMSecsSinceEpoch();
+
+            //qDebug()<<"reset check time isRunning" << isRunning << "at" << QDateTime::currentDateTime() << "heatLoadLocalDate" << heatLoadLocalDate << "DOY" << heatLoadLocalDate.date().dayOfYear();
+            if(!isRunning && heatLoadLocalDate.date().dayOfYear() != QDateTime::currentDateTime().date().dayOfYear())
+            {
+                qDebug()<<"resetting heat load at " << QDateTime::currentDateTime() << "heatLoadLocalDate" << heatLoadLocalDate;
+                heatLoadMSec = 0;
+                heatLoad = 0;
+                heatLoadLocalDate = QDateTime::currentDateTime();
+            }
+
+            if(heatLoadMSec != 0 && heatStrain > HEATLOAD_OFFSET) //don't try to calculate a negative effective heat strain
+            {
+                //(HSI-AOC_Off)^AOC_EXP*TIME/AOC_Mult
+
+                qint64 deltaMSec = msecEpoc - heatLoadMSec;
+                double deltamin = deltaMSec / (1000.0 * 60.0); //msec to minutes
+
+                double newLoad = pow(heatStrain-HEATLOAD_OFFSET, HEATLOAD_EXP) * deltamin / HEATLOAD_MULT;
+
+                if(newLoad > 0)
+                    heatLoad += newLoad;
+
+                //qDebug()<<"newLoad is "<< newLoad << "a" << a << "b" << b << "heatStrain" << heatStrain << "c" << c << "deltamin" << deltamin << "heatLoad" << heatLoad;
+
+                if(heatLoad >= 10.0)
+                    heatLoad = 10.0;
+            }
+            heatLoadMSec = msecEpoc;
+
+            valueLabel->setText(QString("%1").arg(heatLoad, 0, 'f', 3)); //HACK, three DP for extra details
+        }
+        break;
 
     default:
         valueLabel->setText(QString("%1").arg(round(displayValue)));
@@ -593,7 +654,7 @@ void DialWindow::seriesChanged()
     case RealtimeData::FeO2:
         foreground = GColor(CFEO2);
         break;
-            
+
     case RealtimeData::Distance:
     case RealtimeData::RouteDistance:
     case RealtimeData::DistanceRemaining:
@@ -626,10 +687,10 @@ void DialWindow::seriesChanged()
         foreground = GColor(CTIDALVOLUME);
         break;
 
-    case RealtimeData::Slope:  
+    case RealtimeData::Slope:
         foreground = GColor(CSLOPE);
         break;
-            
+
     case RealtimeData::Load:
         foreground = GColor(CLOAD);
         break;
@@ -655,7 +716,6 @@ void DialWindow::seriesChanged()
     case RealtimeData::VirtualSpeed:
     case RealtimeData::AvgSpeed:
     case RealtimeData::AvgSpeedLap:
-    case RealtimeData::CoreTemp:
             foreground = GColor(CSPEED);
             break;
 
@@ -718,6 +778,19 @@ void DialWindow::seriesChanged()
 
     case RealtimeData::Altitude:
            foreground = GColor(CALTITUDE);
+           break;
+
+    case RealtimeData::CoreTemp:
+           foreground = GColor(CCORETEMP);
+           break;
+    case RealtimeData::SkinTemp:
+           foreground = GColor(CSKINTEMP);
+           break;
+    case RealtimeData::HeatStrain:
+           foreground = GColor(CHEATSTRAIN);
+           break;
+    case RealtimeData::HeatLoad:
+           foreground = GColor(CHEATLOAD);
            break;
     }
 

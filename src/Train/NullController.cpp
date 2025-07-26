@@ -24,11 +24,28 @@
 #include "RealtimeData.h"
 #include "PhysicsUtility.h"
 
+#define CORE_START 37.5
+#define CORE_UPPER_LIMIT 40.0
+#define CORE_LOWER_LIMIT 35.0
+
+#define SKIN_START 35.0
+#define SKIN_UPPER_LIMIT 40.0
+#define SKIN_LOWER_LIMIT 30.0
+
+#define HSI_START 2.0
+#define HSI_UPPER_LIMIT 5.0
+#define HSI_LOWER_LIMIT 0
+
+
 NullController::NullController(TrainSidebar *parent,
                                DeviceConfiguration *dc)
   : RealtimeController(parent, dc), parent(parent), load(100),
     bicycle(NULL)
 {
+  //set values before start as heat
+  core = 37.5;
+  skin = 37.0;
+  heatStrain = 2.0;
 }
 
 int NullController::start() {
@@ -74,6 +91,26 @@ void NullController::getRealtimeData(RealtimeData &rtData) {
     rtData.setCadence(85 + ((rand()%10)-5));
     rtData.setHr(145 + ((rand()%3)-2));
     rtData.setHb(35 + ((rand()%30)), 11 + (double(rand()%100) * 0.01f));
+
+    rtData.setCoreTemp(core, skin, heatStrain);
+
+    //randomize robot temp for testing
+    core += ((rand()%5) - 2) /10.0;
+    if(core < CORE_LOWER_LIMIT)
+      core = CORE_START;
+    if(core > CORE_UPPER_LIMIT)
+      core = CORE_START;
+    skin += ((rand()%5) - 2) /10.0;
+    if(skin < SKIN_LOWER_LIMIT)
+      skin = SKIN_START;
+    if(skin > SKIN_UPPER_LIMIT)
+      skin = SKIN_START;
+    heatStrain += ((rand()%3) - 1) /10.0;
+    if(heatStrain < HSI_LOWER_LIMIT)
+      heatStrain = HSI_START;
+    if(heatStrain > HSI_UPPER_LIMIT)
+      heatStrain = HSI_START;
+
     processRealtimeData(rtData); // for testing virtual power etc
 
     // generate an R-R data signal based upon 60bpm +/- 2bpm

@@ -70,6 +70,10 @@ class WorkoutWindow : public GcChartWindow
     Q_PROPERTY(bool plotVentilation READ shouldPlotVentilation WRITE setShouldPlotVentilation USER true)
     Q_PROPERTY(bool plotSpeed READ shouldPlotSpeed WRITE setShouldPlotSpeed USER true)
 
+    Q_PROPERTY(bool plotCoreTemp READ shouldPlotCoreTemp WRITE setShouldPlotCoreTemp USER true)
+    Q_PROPERTY(bool plotSkinTemp READ shouldPlotSkinTemp WRITE setShouldPlotSkinTemp USER true)
+    Q_PROPERTY(bool plotHSI READ shouldPlotHSI WRITE setShouldPlotHSI USER true)
+    
     Q_PROPERTY(int hrPlotAvgLength READ hrPlotAvgLength WRITE setPlotHrAvgLength USER true)
     Q_PROPERTY(int pwrPlotAvgLength READ pwrPlotAvgLength WRITE setPlotPwrAvgLength USER true)
     Q_PROPERTY(int cadencePlotAvgLength READ cadencePlotAvgLength WRITE setPlotCadenceAvgLength USER true)
@@ -158,6 +162,10 @@ class WorkoutWindow : public GcChartWindow
         void setShouldPlotVentilation(bool);
         void setShouldPlotSpeed(bool);
 
+        void setShouldPlotCoreTemp(bool);
+        void setShouldPlotSkinTemp(bool);
+        void setShouldPlotHSI(bool);
+
         void setPlotHrAvgLength(int);
         void setPlotPwrAvgLength(int);
         void setPlotCadenceAvgLength(int);
@@ -173,7 +181,9 @@ class WorkoutWindow : public GcChartWindow
         bool shouldPlotVo2() { return plotVo2CB->checkState() != Qt::Unchecked;}
         bool shouldPlotVentilation() { return plotVentilationCB->checkState() != Qt::Unchecked;}
         bool shouldPlotSpeed() { return plotSpeedCB->checkState() != Qt::Unchecked;}
-
+        bool shouldPlotCoreTemp() { return plotCoreTempCB->checkState() != Qt::Unchecked;}
+        bool shouldPlotSkinTemp() { return plotSkinTempCB->checkState() != Qt::Unchecked;}
+        bool shouldPlotHSI() { return plotHSICB->checkState() != Qt::Unchecked;}
         int hrPlotAvgLength();
         int pwrPlotAvgLength();
         int cadencePlotAvgLength();
@@ -192,6 +202,7 @@ class WorkoutWindow : public GcChartWindow
         WorkoutWidget *workout; // will become editor.
         QScrollBar *scroll;     // for controlling the position
         QCheckBox *plotHrCB, *plotPwrCB, *plotCadenceCB, *plotWbalCB, *plotVo2CB, *plotVentilationCB, *plotSpeedCB;
+        QCheckBox *plotCoreTempCB, *plotSkinTempCB, *plotHSICB;
         QSpinBox *plotHrSB, *plotPwrSB, *plotCadenceSB, *plotVo2SB, *plotVentilationSB, *plotSpeedSB;
 
         WWPowerScale *powerscale;

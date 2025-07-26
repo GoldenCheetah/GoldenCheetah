@@ -71,7 +71,8 @@ class NullController : public RealtimeController
 
         double load;
         int beats,count; // send an R-R signal every 4th call
-
+        double core, skin, heatStrain;
+        
         Bicycle bicycle;
 };
 

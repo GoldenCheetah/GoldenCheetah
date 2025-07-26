@@ -233,6 +233,9 @@ void GCColor::setupColors()
         { tr("Gui"), tr("Overview Tile Background Vibrant"), "CCARDBACKGROUND3", QColor(52,52,52) },
         { tr("Gui"), tr("Map Route Line"), "MAPROUTELINE", Qt::red },
         { tr("Data"), tr("Stress Ramp Rate"), "COLORRR", Qt::green },
+        { tr("Data"), tr("Skin Temp"), "CSKINTEMP", Qt::cyan },
+        { tr("Data"), tr("Heat Strain"), "CHEATSTRAIN", Qt::green },
+        { tr("Data"), tr("Heat Load"), "CHEATLOAD", Qt::red },
         { "", "", "", QColor(0,0,0) },
     };
 
@@ -357,6 +360,9 @@ void GCColor::setupColors()
     LightDefaultColorList[107].color = QColor(238,248,255); // 107:Tile Vibrant
     LightDefaultColorList[108].color = QColor(255, 0, 0); // 105:MapRouteLine
     LightDefaultColorList[109].color = QColor(0,102,0); // 109:Stress Ramp Rate
+    LightDefaultColorList[110].color = Qt::cyan; //CSKINTEMP
+    LightDefaultColorList[111].color = Qt::green; //CHEATSTRAIN
+    LightDefaultColorList[112].color = Qt::red; //CHEATLOAD
 }
 
 // returns a luminance for a color from 0 (dark) to 255 (very light) 127 is a half way house gray
@@ -365,7 +371,7 @@ double GCColor::luminance(QColor color)
     QColor cRGB = color.convertTo(QColor::Rgb);
 
     // based upon http://en.wikipedia.org/wiki/Luminance_(relative)
-    return (0.2126f * double(cRGB.red()))  + 
+    return (0.2126f * double(cRGB.red()))  +
            (0.7152f * double(cRGB.green())) +
            (0.0722f * double(cRGB.blue()));
 }
@@ -550,7 +556,7 @@ GCColor::css(bool ridesummary)
                                .arg(200 * dpiXFactor)
                                .arg(100 * dpiXFactor);
 }
-QPalette 
+QPalette
 GCColor::palette()
 {
     // make it to order, to reflect current config
@@ -621,7 +627,7 @@ GCColor::linearGradient(int size, bool, bool)
     returning.setColorAt(1.0, color);
 
 
-    return returning; 
+    return returning;
 }
 
 void
@@ -1054,7 +1060,7 @@ QColor GCColor::getThemeColor(const ColorTheme& theme, int colorIdx)
 }
 
 void
-GCColor::applyTheme(int index) 
+GCColor::applyTheme(int index)
 {
     // now get the theme selected
     ColorTheme theme = GCColor::themes().themes[index];
@@ -1089,7 +1095,7 @@ ColorLabel::paintEvent(QPaintEvent *)
     QRectF allF(0,0,width(),height());
     QRect all(0,0,width(),height());
 
-    const double x = width() / 5; 
+    const double x = width() / 5;
     const double y = height();
 
     // now do all the color blocks
