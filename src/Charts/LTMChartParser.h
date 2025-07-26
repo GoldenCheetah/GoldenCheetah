@@ -72,10 +72,8 @@ class ChartTreeView : public QTreeWidget
         void itemMoved(QTreeWidgetItem* item, int previous, int actual);
 
     protected:
-        void dropEvent(QDropEvent* event);
+        void dropEvent(QDropEvent* event) override;
         Context *context;
-
-
 };
 
 #endif
