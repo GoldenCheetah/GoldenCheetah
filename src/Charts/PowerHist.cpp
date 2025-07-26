@@ -63,9 +63,9 @@ PowerHist::PowerHist(Context *context, bool rangemode) :
     dt(1),
     absolutetime(true),
     cache(NULL),
-    LASTcache(nullptr),
     source(Ride),
-    LASTsource(Ride)
+    LASTsource(Ride),
+    LASTcache(nullptr)
 {
     binw = appsettings->value(this, GC_HIST_BIN_WIDTH, 5).toInt();
     if (appsettings->value(this, GC_SHADEZONES, true).toBool() == true)
