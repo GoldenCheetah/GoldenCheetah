@@ -183,6 +183,14 @@ class AbstractView : public QWidget
 
         bool loaded;
 
+        // Support view specific behaviour
+        virtual void notifyViewStateRestored() {}
+        virtual void notifyViewPerspectiveAdded(Perspective* page);
+        virtual void notifyViewSidebarChanged() {}
+        virtual void setViewSpecificPerspective() {};
+        virtual void notifyViewSplitterMoved() {};
+        virtual QString getPathToPerspectiveFile();
+
     private slots:
         void onIdle();
         void onActive();

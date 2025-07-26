@@ -47,6 +47,13 @@ class AnalysisView : public AbstractView
         bool isBlank() override;
         void compareChanged(bool);
 
+    protected:
+
+        void notifyViewStateRestored() override;
+        void notifyViewSidebarChanged() override;
+        void setViewSpecificPerspective() override;
+        void notifyViewSplitterMoved() override;
+
 };
 
 class DiarySidebar;
@@ -84,6 +91,10 @@ class TrainView : public AbstractView
 
         bool isBlank() override;
         void onSelectionChanged();
+
+    protected:
+
+        void notifyViewPerspectiveAdded(Perspective* page) override;
 
     private:
 
