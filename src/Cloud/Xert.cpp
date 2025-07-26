@@ -199,12 +199,11 @@ Xert::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
     connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
     loop.exec();
 
-    // if successful, lets unpack
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     printd("fetch response: %d: %s\n", reply->error(), reply->errorString().toStdString().c_str());
 
+    // if successful, lets unpack
     if (reply->error() == 0) {
-
         // get the data
         QByteArray r = reply->readAll();
 
@@ -308,10 +307,10 @@ Xert::readActivityDetail(QString path, bool withSessionData)
     connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
     loop.exec();
 
-    // if successful, lets unpack
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     printd("fetch response: %d: %s\n", reply->error(), reply->errorString().toStdString().c_str());
 
+    // if successful, lets unpack
     if (reply->error() == 0) {
 
         // get the data

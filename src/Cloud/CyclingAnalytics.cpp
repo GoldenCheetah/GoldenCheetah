@@ -131,10 +131,10 @@ CyclingAnalytics::readdir(QString path, QStringList &errors, QDateTime, QDateTim
     loop.exec();
     QTimer::singleShot(30000,&loop, SLOT(quit())); // timeout after 30 seconds
 
-    // if successful, lets unpack
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     printd("fetch response: %d: %s\n", reply->error(), reply->errorString().toStdString().c_str());
 
+    // if successful, lets unpack
     if (reply->error() == 0) {
 
         // get the data
