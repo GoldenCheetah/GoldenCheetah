@@ -770,8 +770,6 @@ Strava:: fixSmartRecording(RideFile* ret)
 
     // OK, so there are probably some gaps, lets post process them
     RideFilePoint *last = NULL;
-    int dropouts = 0;
-    double dropouttime = 0.0;
 
     for (int position = 0; position < ret->dataPoints().count(); position++) {
         RideFilePoint *point = ret->dataPoints()[position];
@@ -785,11 +783,6 @@ Strava:: fixSmartRecording(RideFile* ret)
 
             // moved for less than GarminHWM seconds ... interpolate
             if (!stationary && gap >= 1 && gap <= GarminHWM.toInt()) {
-
-                // what's needed?
-                dropouts++;
-                dropouttime += gap;
-
                 int count = gap/ret->recIntSecs();
                 double hrdelta = (point->hr - last->hr) / (double) count;
                 double pwrdelta = (point->watts - last->watts) / (double) count;
