@@ -258,7 +258,7 @@ Xert::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
     }
 
     // all good ?
-    printd("returning count(%d), errors(%s)\n", returning.count(), errors.join(",").toStdString().c_str());
+    printd("returning count(%lld), errors(%s)\n", returning.count(), errors.join(",").toStdString().c_str());
     return returning;
 }
 

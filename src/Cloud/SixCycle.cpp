@@ -258,7 +258,7 @@ SixCycle::readdir(QString path, QStringList &errors, QDateTime from, QDateTime t
         // results ?
         QJsonArray results = document.array();
 
-        printd("items found: %d\n", results.size());
+        printd("items found: %lld\n", results.size());
 
         // lets look at that then
         for(int i=0; i<results.size(); i++) {
