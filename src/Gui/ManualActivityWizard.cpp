@@ -63,8 +63,9 @@ static QString activityFilename(const QDateTime &dt, bool plan, Context *context
 ////////////////////////////////////////////////////////////////////////////////
 // ManualActivityWizard
 
+
 ManualActivityWizard::ManualActivityWizard
-(Context *context, bool plan, QWidget *parent)
+(Context *context, bool plan, const QDateTime &when, QWidget *parent)
 : QWizard(parent), context(context), plan(plan)
 {
     if (plan) {
@@ -82,7 +83,7 @@ ManualActivityWizard::ManualActivityWizard
 #endif
     setPixmap(ICON_TYPE, svgAsColoredPixmap(":images/material/summit.svg", QSize(ICON_SIZE * dpiXFactor, ICON_SIZE * dpiYFactor), ICON_MARGIN * dpiXFactor, ICON_COLOR));
 
-    setPage(PageBasics, new ManualActivityPageBasics(context, plan));
+    setPage(PageBasics, new ManualActivityPageBasics(context, plan, when));
     setPage(PageWorkout, new ManualActivityPageWorkout(context));
     setPage(PageMetrics, new ManualActivityPageMetrics(context, plan));
     setPage(PageSummary, new ManualActivityPageSummary(plan));
@@ -220,8 +221,8 @@ ManualActivityWizard::field2TagInt
 // ManualActivityPageBasics
 
 ManualActivityPageBasics::ManualActivityPageBasics
-(Context *context, bool plan, QWidget *parent)
-: QWizardPage(parent), context(context), plan(plan)
+(Context *context, bool plan, const QDateTime &when, QWidget *parent)
+: QWizardPage(parent), context(context), plan(plan), when(when)
 {
     setTitle(tr("General Information"));
     if (plan) {
@@ -373,11 +374,16 @@ void
 ManualActivityPageBasics::initializePage
 ()
 {
-    setField("activityDate", QDate::currentDate());
-    if (plan) {
-        setField("activityTime", QTime(16, 0, 0)); // Planned: 16:00 by default
+    if (when.isValid()) {
+        setField("activityDate", when);
+        setField("activityTime", when.time());
     } else {
-        setField("activityTime", QTime::currentTime().addSecs(-4 * 3600)); // Completed: 4 hours ago by default
+        setField("activityDate", QDateTime::currentDateTime());
+        if (plan) {
+            setField("activityTime", QTime(16, 0, 0)); // Planned: 16:00 by default
+        } else {
+            setField("activityTime", QTime::currentTime().addSecs(-4 * 3600)); // Completed: 4 hours ago by default
+        }
     }
     if (plan) {
         setField("woType", 0);

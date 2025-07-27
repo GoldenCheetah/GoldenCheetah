@@ -34,6 +34,7 @@
 extern QIcon colouredIconFromPNG(QString filename, QColor color);
 extern QPixmap colouredPixmapFromPNG(QString filename, QColor color);
 extern QPixmap svgAsColoredPixmap(const QString &file, const QSize &size, int margin, const QColor &color);
+extern QPixmap svgOnBackground(const QString& file, const QSize &size, int margin, const QColor &bg, int radius = 10);
 
 // dialog scaling
 extern double dpiXFactor, dpiYFactor;
@@ -137,6 +138,7 @@ class GCColor : public QObject
         static double luminance(QColor color); // return the relative luminance
         static QColor invertColor(QColor); // return the contrasting color
         static QColor alternateColor(QColor); // return the alternate background
+        static QColor inactiveColor(QColor baseColor, double factor = 0.2); // return a dimmed variant
         static QColor selectedColor(QColor); // return the on select background color
         static QColor htmlCode(QColor x) { return x.name(); } // return the alternate background
         static Themes &themes();
@@ -186,6 +188,13 @@ class ColorEngine : public QObject
     private:
         QMap<QString, QColor> workoutCodes;
         GlobalContext *gc; // bootstrapping
+};
+
+class PaletteApplier {
+    public:
+        static void setPaletteRecursively(QWidget *widget, const QPalette &palette, bool forceOnCustom = false);
+        static void setPaletteOnList(const QList<QWidget*> &widgets, const QPalette &palette);
+        static void setPaletteByType(QWidget *root, const QPalette &palette, const QString &typeName);
 };
 
 
