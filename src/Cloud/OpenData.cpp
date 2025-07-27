@@ -278,7 +278,7 @@ OpenData::run()
     postingdata = zip.readAll();
     zip.close();
 
-    printd("Compressed to %s, size %d\n", zipFile.fileName().toStdString().c_str(), postingdata.size());
+    printd("Compressed to %s, size %lld\n", zipFile.fileName().toStdString().c_str(), postingdata.size());
 
     // ----------------------------------------------------------------
     // STEP FOUR: Sending data to server
