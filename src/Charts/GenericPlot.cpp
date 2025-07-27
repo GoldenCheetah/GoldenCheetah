@@ -303,9 +303,10 @@ GenericPlot::setSeriesVisible(QString name, bool visible)
 void
 GenericPlot::pieHover(QPieSlice *slice, bool state)
 {
-    if (havelegend.count() == 0) return;
-    if (state == true)  legend->setValue(GPointF(0, round(slice->percentage()*1000)/10, -1), havelegend.first());
-    else legend->unhover(havelegend.first());
+    foreach (QString l, havelegend) {
+        if (state)  legend->setValue(GPointF(0, l.endsWith(" %") ? round(slice->percentage()*1000)/10 : slice->value(), -1), l);
+        else legend->unhover(l);
+    }
 }
 
 // handle hover on barset
@@ -881,6 +882,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
                 slice->setLabelVisible();
                 slice->setLabelBrush(QBrush(GColor(CPLOTMARKER)));
                 slice->setPen(Qt::NoPen);
+                slice->setLabelFont(labelsfont);
                 if (i <colors.size()) slice->setBrush(QColor(colors.at(i)));
                 else slice->setBrush(Qt::red);
                 i++;
