@@ -4838,13 +4838,11 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     } else {
 
         // when transition is -1 we are rescaling the axes first
-        int index=0;
         foreach(BPointF point, oldpoints) {
 
             if (point.x < minx || point.x > maxx ||
                 point.y < miny || point.y > maxy ||
                 !std::isfinite(point.z) || std::isnan(point.z)) {
-                index++;
                 continue;
             }
 
@@ -4863,8 +4861,6 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 
             double radius = sqrt(size/3.1415927f);
             painter->drawEllipse(center, radius, radius);
-
-            index++;
         }
 
     }
@@ -5176,7 +5172,6 @@ Routeline::setData(RideItem *item)
     int div = item->ride()->dataPoints().count() / ROUTEPOINTS;
     int count=0;
     height = geom.width() * aspectratio;
-    int lines=0;
     foreach(RideFilePoint *p, item->ride()->dataPoints()){
 
         // ignore zero values and out of bounds
@@ -5201,7 +5196,6 @@ Routeline::setData(RideItem *item)
             path.lineTo((geom.width() / (xdiff / (p->lon - minlon))),
                         (height-(height / (ydiff / (mercator_projection(p->lat) - minlat)))));
             count=div;
-            lines++;
 
         }
     }

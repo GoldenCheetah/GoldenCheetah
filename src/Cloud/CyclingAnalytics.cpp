@@ -402,7 +402,6 @@ CyclingAnalytics::readFileCompleted()
             add.secs = index;
 
             // move through tracks if they're waiting for this point
-            bool updated=false;
             for(int t=0; t<data.count(); t++) {
 
                // hr, distance et al

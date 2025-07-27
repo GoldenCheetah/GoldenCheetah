@@ -798,7 +798,6 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
        if (frameIntervals()==false && num_intervals) mainCurvesSetVisible(false);
        QVector<std::set<std::pair<double, double> > > dataSetInterval(num_intervals);
 
-       long tot_cad = 0;
        long tot_cad_points = 0;
 
         foreach(const RideFilePoint *p1, ride->dataPoints()) {
@@ -829,7 +828,6 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
                         }
                     }
                 }
-                tot_cad += p1->cad;
                 tot_cad_points++;
             }
         }
@@ -1333,7 +1331,6 @@ PfPvPlot::showCompareIntervals()
     recalcCompare();
 
     QVector<std::set<std::pair<double, double> > > dataSetInterval(num_intervals);
-    long tot_cad = 0;
     long tot_cad_points = 0;
 
     // prepare aggregates
@@ -1360,7 +1357,6 @@ PfPvPlot::showCompareIntervals()
 #else
                         dataSetInterval[high].insert(std::MAKEPAIR<double, double>(aepf, cpv));
 #endif
-                    tot_cad += p1->cad;
                     tot_cad_points++;
                 }
             }
