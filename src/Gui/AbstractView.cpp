@@ -33,8 +33,8 @@
 #include "GcUpgrade.h"
 #include "LTMWindow.h"
 
-AbstractView::AbstractView(Context *context, int type, const QString& view, const QString& heading) :
-    QWidget(context->tab), context(context), type(type), view(view),
+AbstractView::AbstractView(Context *context, int type, const QString& view, const QString& viewCfgPath, const QString& heading) :
+    QWidget(context->tab), context(context), type(type), view(view), viewCfgPath(viewCfgPath),
     _sidebar(true), _tiled(false), _selected(false), lastHeight(130*dpiYFactor), sidewidth(0),
     active(false), bottomRequested(false), bottomHideOnIdle(false), perspectiveactive(false),
     stack(NULL), splitter(NULL), mainSplitter(NULL), 
@@ -253,12 +253,6 @@ AbstractView::configChanged(qint32)
     if (sidebar_)  sidebar_->setStyleSheet(ourStyleSheet());
 }
 
-QString
-AbstractView::getPathToPerspectiveFile()
-{
-    return context->athlete->home->config().canonicalPath();
-}
-
 void
 AbstractView::saveState()
 {
@@ -270,7 +264,7 @@ AbstractView::saveState()
     // we do not save all the other Qt properties since
     // we're not interested in them
     // NOTE: currently we support QString, int, double and bool types - beware custom types!!
-    QString filename = getPathToPerspectiveFile() + "/" + view + "-perspectives.xml";
+    QString filename = viewCfgPath + "/" + view + "-perspectives.xml";
 
     QFile file(filename);
     if (!file.open(QFile::WriteOnly)) {
@@ -304,7 +298,7 @@ void
 AbstractView::restoreState(bool useDefault)
 {
     // restore window state
-    QString filename = getPathToPerspectiveFile() + "/" + view + "-perspectives.xml";
+    QString filename = viewCfgPath + "/" + view + "-perspectives.xml";
 
     QFileInfo finfo(filename);
 
