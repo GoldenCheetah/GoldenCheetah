@@ -211,7 +211,7 @@ PlanningCalendarWindow::getActivities
 
         QString route = rideItem->getText("Route", "").trimmed();
         QString workoutCode = rideItem->getText("Workout Code", "").trimmed();
-        QString sport = rideItem->getText("Sport", "").trimmed();
+        QString sport = rideItem->sport;
         CalendarEntry activity;
         if (! route.isEmpty()) {
             activity.name = route;
@@ -284,31 +284,35 @@ PlanningCalendarWindow::getPhasesEvents
             }
         }
     }
-    for (const SeasonEvent &event : season.events) {
-        if (   (   (   firstDay.isValid()
-                    && event.date >= firstDay)
-                || ! firstDay.isValid())
-            && (   (   lastDay.isValid()
-                    && event.date <= lastDay)
-                || ! lastDay.isValid())) {
-            CalendarEntry entry;
-            entry.name = event.name;
-            if (event.priority == 0 || event.priority == 1) {
-                entry.iconFile = ":images/material/podium.svg";
-            } else if (event.priority == 2) {
-                entry.iconFile = ":images/material/podium-gold.svg";
-            } else if (event.priority == 3) {
-                entry.iconFile = ":images/material/podium-silver.svg";
-            } else {
-                entry.iconFile = ":images/material/podium-bronze.svg";
+    QList<Season> tmpSeasons = context->athlete->seasons->seasons;
+    std::sort(tmpSeasons.begin(),tmpSeasons.end(),Season::LessThanForStarts);
+    for (const Season s : tmpSeasons) {
+        for (const SeasonEvent &event : s.events) {
+            if (   (   (   firstDay.isValid()
+                        && event.date >= firstDay)
+                    || ! firstDay.isValid())
+                && (   (   lastDay.isValid()
+                        && event.date <= lastDay)
+                    || ! lastDay.isValid())) {
+                CalendarEntry entry;
+                entry.name = event.name;
+                if (event.priority == 0 || event.priority == 1) {
+                    entry.iconFile = ":images/material/podium.svg";
+                } else if (event.priority == 2) {
+                    entry.iconFile = ":images/material/podium-gold.svg";
+                } else if (event.priority == 3) {
+                    entry.iconFile = ":images/material/podium-silver.svg";
+                } else {
+                    entry.iconFile = ":images/material/podium-bronze.svg";
+                }
+                entry.color = Qt::yellow;
+                entry.reference = event.id;
+                entry.start = QTime(0, 0, 0);
+                entry.durationSecs = 0;
+                entry.type = ENTRY_TYPE_EVENT;
+                entry.isRelocatable = false;
+                phasesEvents[event.date] << entry;
             }
-            entry.color = Qt::yellow;
-            entry.reference = event.id;
-            entry.start = QTime(0, 0, 0);
-            entry.durationSecs = 0;
-            entry.type = ENTRY_TYPE_EVENT;
-            entry.isRelocatable = false;
-            phasesEvents[event.date] << entry;
         }
     }
 
