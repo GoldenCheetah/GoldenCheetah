@@ -14,6 +14,7 @@
 #endif
 
 #include "CalendarItemDelegates.h"
+#include "Colors.h"
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -446,6 +447,10 @@ CalendarMonthTable::mouseMoveEvent
     QAbstractItemDelegate *abstractDelegate = itemDelegateForIndex(pressedIndex);
     CalendarDayDelegate *delegate = static_cast<CalendarDayDelegate*>(abstractDelegate);
     int entryIdx = delegate->hitTestEntry(pressedIndex, pressedPos);
+
+    CalendarEntry calEntry = pressedIndex.data(Qt::UserRole + 1).value<CalendarDay>().entries[entryIdx];
+    QPixmap pixmap = svgAsColoredPixmap(calEntry.iconFile, QSize(40 * dpiXFactor, 40 * dpiYFactor), 0, calEntry.color);
+    drag->setPixmap(pixmap);
 
     QList<int> entryCoords = { pressedIndex.row(), pressedIndex.column(), entryIdx };
     QString entryStr = QString::fromStdString(std::accumulate(entryCoords.begin(),
