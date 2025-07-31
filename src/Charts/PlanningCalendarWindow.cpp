@@ -32,20 +32,26 @@ PlanningCalendarWindow::PlanningCalendarWindow(Context *context)
 : GcChartWindow(context), context(context)
 {
     QWidget *controlsWidget = new QWidget();
-    weekStartCombo = new QComboBox();
-    weekStartCombo->addItem(tr("Sunday"));
-    weekStartCombo->addItem(tr("Monday"));
+    QLocale locale;
+    firstDayOfWeekCombo = new QComboBox();
+    for (int i = Qt::Monday; i <= Qt::Sunday; ++i) {
+        firstDayOfWeekCombo->addItem(locale.dayName(i, QLocale::LongFormat));
+    }
+    firstDayOfWeekCombo->setCurrentIndex(locale.firstDayOfWeek() - 1);
+    summaryMonthCheck = new QCheckBox(tr("Show weekly summary on month view"));
+    summaryMonthCheck->setChecked(true);
     QFormLayout *controlsLayout = newQFormLayout(controlsWidget);
-    controlsLayout->addRow(tr("Week starts on"), weekStartCombo);
+    controlsLayout->addRow(tr("First day of week"), firstDayOfWeekCombo);
+    controlsLayout->addRow("", summaryMonthCheck);
     setControls(controlsWidget);
-
-#if QT_VERSION >= 0x060000
-    connect(weekStartCombo, &QComboBox::currentIndexChanged, this, &PlanningCalendarWindow::setWeekStartsOn);
+#if QT_VERSION < 0x060000
+    connect(firstDayOfWeekCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int idx) { setFirstDayOfWeek(idx + 1); });
 #else
-    connect(weekStartCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PlanningCalendarWindow::setWeekStartsOn);
+    connect(firstDayOfWeekCombo, &QComboBox::currentIndexChanged, [=](int idx) { setFirstDayOfWeek(idx + 1); });
 #endif
+    connect(summaryMonthCheck, &QCheckBox::toggled, this, &PlanningCalendarWindow::setSummaryVisibleMonth);
 
-    calendar = new Calendar(QDate::currentDate());
+    calendar = new Calendar(QDate::currentDate(), static_cast<Qt::DayOfWeek>(getFirstDayOfWeek()));
 
     QVBoxLayout *mainLayout = new QVBoxLayout();
     setChartLayout(mainLayout);
@@ -133,18 +139,36 @@ PlanningCalendarWindow::PlanningCalendarWindow(Context *context)
 
 
 int
-PlanningCalendarWindow::getWeekStartsOn
+PlanningCalendarWindow::getFirstDayOfWeek
 () const
 {
-    return weekStartsOn;
+    return firstDayOfWeekCombo->currentIndex() + 1;
+}
+
+
+bool
+PlanningCalendarWindow::isSummaryVisibleMonth
+() const
+{
+    return summaryMonthCheck->isChecked();
 }
 
 
 void
-PlanningCalendarWindow::setWeekStartsOn
-(int wso)
+PlanningCalendarWindow::setFirstDayOfWeek
+(int fdw)
 {
-    weekStartsOn = wso;
+    firstDayOfWeekCombo->setCurrentIndex(std::min(static_cast<int>(Qt::Sunday), std::max(static_cast<int>(Qt::Monday), fdw)) - 1);
+    calendar->setFirstDayOfWeek(static_cast<Qt::DayOfWeek>(fdw));
+}
+
+
+void
+PlanningCalendarWindow::setSummaryVisibleMonth
+(bool svm)
+{
+    summaryMonthCheck->setChecked(svm);
+    calendar->setSummaryMonthVisible(svm);
 }
 
 
@@ -286,7 +310,7 @@ PlanningCalendarWindow::getPhasesEvents
     }
     QList<Season> tmpSeasons = context->athlete->seasons->seasons;
     std::sort(tmpSeasons.begin(),tmpSeasons.end(),Season::LessThanForStarts);
-    for (const Season s : tmpSeasons) {
+    for (const Season &s : tmpSeasons) {
         for (const SeasonEvent &event : s.events) {
             if (   (   (   firstDay.isValid()
                         && event.date >= firstDay)

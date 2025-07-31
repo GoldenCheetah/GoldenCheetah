@@ -20,32 +20,28 @@
 // CalendarMonthTable
 
 CalendarMonthTable::CalendarMonthTable
-(bool weekStartsOnMonday, QWidget *parent)
-: CalendarMonthTable(QDate::currentDate(), weekStartsOnMonday, parent)
+(Qt::DayOfWeek firstDayOfWeek, QWidget *parent)
+: CalendarMonthTable(QDate::currentDate(), firstDayOfWeek, parent)
 {
 }
 
 
 CalendarMonthTable::CalendarMonthTable
-(const QDate &dateInMonth, bool weekStartsOnMonday, QWidget *parent)
-: QTableWidget(parent), weekStartsOnMonday(weekStartsOnMonday)
+(const QDate &dateInMonth, Qt::DayOfWeek firstDayOfWeek, QWidget *parent)
+: QTableWidget(parent)
 {
     dragTimer.setSingleShot(true);
     setAcceptDrops(true);
     setColumnCount(8);
     setFrameShape(QFrame::NoFrame);
-    QStringList headers = weekStartsOnMonday
-        ? QStringList{ "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Σ" }
-        : QStringList{ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Σ" };
-    setHorizontalHeaderLabels(headers);
-    verticalHeader()->setVisible(false);
     setItemDelegateForColumn(7, new CalendarSummaryDelegate(this));
     for (int i = 0; i < 7; ++i) {
         setItemDelegateForColumn(i, new CalendarDayDelegate(this));
     }
+
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, &CalendarMonthTable::customContextMenuRequested, this, &CalendarMonthTable::showContextMenu);
-
+    setFirstDayOfWeek(firstDayOfWeek);
     setMonth(dateInMonth);
 }
 
@@ -78,7 +74,7 @@ CalendarMonthTable::setMonth
     clearContents();
 
     int startDayOfWeek = firstOfMonth.dayOfWeek();
-    int offset = weekStartsOnMonday ? (startDayOfWeek - 1) : (startDayOfWeek % 7);
+    int offset = (startDayOfWeek - firstDayOfWeek + 7) % 7;
     startDate = firstOfMonth.addDays(-offset);
     int daysInMonth = dateInMonth.daysInMonth();
     int totalDisplayedDays = offset + daysInMonth;
@@ -89,11 +85,9 @@ CalendarMonthTable::setMonth
     for (int i = 0; i < totalRows * 7; ++i) {
         QDate date = startDate.addDays(i);
         int row = i / 7;
-        int col = weekStartsOnMonday ? (date.dayOfWeek() - 1) : (date.dayOfWeek() % 7);
-
+        int col = (date.dayOfWeek() - firstDayOfWeek + 7) % 7;
         QTableWidgetItem *item = new QTableWidgetItem();
         item->setData(Qt::UserRole, date);
-
         bool isDimmed = ! dr.pass(date);
         CalendarDay day;
         day.date = date;
@@ -179,7 +173,7 @@ CalendarMonthTable::fillEntries
     for (int i = 0; i < rowCount() * 7; ++i) {
         QDate date = startDate.addDays(i);
         int row = i / 7;
-        int col = weekStartsOnMonday ? (date.dayOfWeek() - 1) : (date.dayOfWeek() % 7);
+        int col = (date.dayOfWeek() - firstDayOfWeek + 7) % 7;
         QTableWidgetItem *item = this->item(row, col);
         CalendarDay day = item->data(Qt::UserRole + 1).value<CalendarDay>();
         if (activityEntries.contains(date)) {
@@ -283,6 +277,26 @@ CalendarMonthTable::limitDateRange
         setMonth(dr.to);
     } else {
         setMonth(dr.from);
+    }
+}
+
+
+void
+CalendarMonthTable::setFirstDayOfWeek
+(Qt::DayOfWeek firstDayOfWeek)
+{
+    clear();
+    QLocale locale;
+    QStringList headers;
+    this->firstDayOfWeek = firstDayOfWeek;
+    for (int i = Qt::Monday - 1; i < Qt::Sunday; ++i) {
+        headers << locale.dayName((i + firstDayOfWeek - 1) % 7 + 1, QLocale::ShortFormat);
+    }
+    headers << tr("Summary");
+    setHorizontalHeaderLabels(headers);
+    verticalHeader()->setVisible(false);
+    if (firstOfMonth.isValid()) {
+        setMonth(firstOfMonth, true);
     }
 }
 
@@ -659,20 +673,20 @@ CalendarMonthTable::findEntry
 
 
 Calendar::Calendar
-(bool weekStartsOnMonday, QWidget *parent)
-: Calendar(QDate::currentDate(), weekStartsOnMonday, parent)
+(Qt::DayOfWeek firstDayOfWeek, QWidget *parent)
+: Calendar(QDate::currentDate(), firstDayOfWeek, parent)
 {
 }
 
 
 Calendar::Calendar
-(const QDate &dateInMonth, bool weekStartsOnMonday, QWidget *parent)
+(const QDate &dateInMonth, Qt::DayOfWeek firstDayOfWeek, QWidget *parent)
 : QWidget(parent)
 {
     qRegisterMetaType<CalendarDay>("CalendarDay");
     qRegisterMetaType<CalendarWeeklySummary>("CalendarWeeklySummary");
 
-    monthTable = new CalendarMonthTable(dateInMonth, weekStartsOnMonday);
+    monthTable = new CalendarMonthTable(dateInMonth, firstDayOfWeek);
 
     prevYButton = new QPushButton("<<");
     prevYButton->setFlat(true);
@@ -850,6 +864,22 @@ Calendar::activateDateRange
     monthTable->limitDateRange(dr, allowKeepMonth);
     setNavButtonState();
     emit dateRangeActivated(dr.name);
+}
+
+
+void
+Calendar::setFirstDayOfWeek
+(Qt::DayOfWeek firstDayOfWeek)
+{
+    monthTable->setFirstDayOfWeek(firstDayOfWeek);
+}
+
+
+void
+Calendar::setSummaryMonthVisible
+(bool visible)
+{
+    monthTable->setColumnHidden(7, ! visible);
 }
 
 

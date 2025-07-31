@@ -19,8 +19,8 @@ class CalendarMonthTable : public QTableWidget {
     Q_OBJECT
 
 public:
-    explicit CalendarMonthTable(bool weekStartsOnMonday = true, QWidget *parent = nullptr);
-    explicit CalendarMonthTable(const QDate &dateInMonth, bool weekStartsOnMonday = true, QWidget *parent = nullptr);
+    explicit CalendarMonthTable(Qt::DayOfWeek firstDayOfWeek = Qt::Monday, QWidget *parent = nullptr);
+    explicit CalendarMonthTable(const QDate &dateInMonth, Qt::DayOfWeek firstDayOfWeek = Qt::Monday, QWidget *parent = nullptr);
 
     bool selectDay(const QDate &day);
     bool setMonth(const QDate &dateInMonth, bool allowKeepMonth = false);
@@ -35,6 +35,7 @@ public:
     QDate lastVisibleDay() const;
     QDate selectedDate() const;
     void limitDateRange(const DateRange &dr, bool allowKeepMonth = false);
+    void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
 
 signals:
     void dayClicked(const CalendarDay &day);
@@ -76,7 +77,7 @@ private slots:
 private:
     int findEntry(const QModelIndex &index, const QPoint &pos) const;
 
-    bool weekStartsOnMonday = true;
+    Qt::DayOfWeek firstDayOfWeek = Qt::Monday;
     QDate firstOfMonth;
     QDate startDate; // first visible date
     QDate endDate; // last visible date
@@ -93,8 +94,8 @@ class Calendar : public QWidget {
     Q_OBJECT
 
 public:
-    explicit Calendar(bool weekStartsOnMonday = true, QWidget *parent = nullptr);
-    explicit Calendar(const QDate &dateInMonth, bool weekStartsOnMonday = true, QWidget *parent = nullptr);
+    explicit Calendar(Qt::DayOfWeek firstDayOfWeek = Qt::Monday, QWidget *parent = nullptr);
+    explicit Calendar(const QDate &dateInMonth, Qt::DayOfWeek firstDayOfWeek = Qt::Monday, QWidget *parent = nullptr);
 
     void setMonth(const QDate &dateInMonth, bool allowKeepMonth = false);
     void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries);
@@ -105,6 +106,8 @@ public:
 
 public slots:
     void activateDateRange(const DateRange &dr, bool allowKeepMonth = false);
+    void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
+    void setSummaryMonthVisible(bool visible);
 
 signals:
     void dayClicked(const QDate &date);

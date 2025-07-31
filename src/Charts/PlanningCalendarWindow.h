@@ -22,6 +22,7 @@
 #include "GoldenCheetah.h"
 
 #include <QtGui>
+#include <QCheckBox>
 #include <QHash>
 #include <QList>
 #include <QDate>
@@ -36,25 +37,28 @@ class PlanningCalendarWindow : public GcChartWindow
 {
     Q_OBJECT
 
-    Q_PROPERTY(int weekStartsOn READ getWeekStartsOn WRITE setWeekStartsOn USER true)
+    Q_PROPERTY(int firstDayOfWeek READ getFirstDayOfWeek WRITE setFirstDayOfWeek USER true)
+    Q_PROPERTY(bool summaryVisibleMonth READ isSummaryVisibleMonth WRITE setSummaryVisibleMonth USER true)
 
     public:
         PlanningCalendarWindow(Context *context);
 
-        int getWeekStartsOn() const;
+        int getFirstDayOfWeek() const;
+        bool isSummaryVisibleMonth() const;
 
         bool isFiltered() const;
 
     public slots:
-        void setWeekStartsOn(int wso);
+        void setFirstDayOfWeek(int fdw);
+        void setSummaryVisibleMonth(bool svm);
         void configChanged(qint32);
 
     private:
         Context *context;
-        int weekStartsOn = 1; // 0: Sunday, 1: Monday
         bool first = true;
 
-        QComboBox *weekStartCombo;
+        QComboBox *firstDayOfWeekCombo;
+        QCheckBox *summaryMonthCheck;
         Calendar *calendar;
 
         QHash<QDate, QList<CalendarEntry>> getActivities(const QDate &firstDay, const QDate &lastDay) const;

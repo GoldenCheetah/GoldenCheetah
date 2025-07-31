@@ -81,7 +81,7 @@ CalendarDayDelegate::paint
                   lineHeight);
 
     if (isToday) {
-        QRect dayHLRect(opt.rect.x() + 1 , opt.rect.y() + 1, dayRect.width() - 1, dayRect.height() + topMargin - 1);
+        QRect dayHLRect(opt.rect.x() + 1, dayRect.y(), dayRect.width() - 1, dayRect.height());
         painter->save();
         painter->setPen(opt.palette.color(calendarDay.isDimmed ? QPalette::Disabled : QPalette::Active, QPalette::Base)),
         painter->setBrush(opt.palette.color(calendarDay.isDimmed ? QPalette::Disabled : QPalette::Active, QPalette::Highlight)),
@@ -134,11 +134,13 @@ CalendarDayDelegate::paint
     int entryStartY = dayRect.y() + dayRect.height() + lineSpacing;
     for (int i = 0; i < std::min(maxLines, static_cast<int>(calendarDay.entries.size())); ++i) {
         CalendarEntry calEntry = calendarDay.entries[i];
-
-        entryFont.setWeight(calEntry.isRelocatable ? QFont::ExtraLight : QFont::Normal);
         painter->setFont(entryFont);
-
-        QPixmap pixmap = svgOnBackground(calEntry.iconFile, pixmapSize, lineSpacing, calEntry.color, radius);
+        QPixmap pixmap;
+        if (calEntry.type == ENTRY_TYPE_PLANNED_ACTIVITY) {
+            pixmap = svgAsColoredPixmap(calEntry.iconFile, pixmapSize, lineSpacing, calEntry.color);
+        } else {
+            pixmap = svgOnBackground(calEntry.iconFile, pixmapSize, lineSpacing, calEntry.color, radius);
+        }
 
         QRect entryRect(opt.rect.x() + leftMargin,
                         entryStartY + i * (entryHeight + lineSpacing),
