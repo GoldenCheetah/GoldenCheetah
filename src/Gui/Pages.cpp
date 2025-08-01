@@ -2145,31 +2145,38 @@ MetadataPage::MetadataPage(Context *context) : context(context)
 
     // get current config using default file
     keywordDefinitions = GlobalContext::context()->rideMetadata->getKeywords();
+    summaryKeywordDefinitions = GlobalContext::context()->rideMetadata->getSummaryKeywords();
     fieldDefinitions = GlobalContext::context()->rideMetadata->getFields();
     colorfield = GlobalContext::context()->rideMetadata->getColorField();
+    summaryfield = GlobalContext::context()->rideMetadata->getSummaryField();
     defaultDefinitions = GlobalContext::context()->rideMetadata->getDefaults();
 
     // setup maintenance pages using current config
     fieldsPage = new FieldsPage(this, fieldDefinitions);
     keywordsPage = new KeywordsPage(this, keywordDefinitions);
+    summaryFieldsPage = new SummaryFieldsPage(this, summaryKeywordDefinitions);
     defaultsPage = new DefaultsPage(this, defaultDefinitions);
     processorPage = new ProcessorPage(context);
 
     tabs = new QTabWidget(this);
     tabs->addTab(fieldsPage, tr("Fields"));
     tabs->addTab(keywordsPage, tr("Colour Keywords"));
+    tabs->addTab(summaryFieldsPage, tr("Summary Fields"));
     tabs->addTab(defaultsPage, tr("Defaults"));
     tabs->addTab(processorPage, tr("Processors && Automation"));
 
     // refresh the keywords combo when change tabs .. will do more often than
     // needed but better that than less often than needed
     connect (tabs, SIGNAL(currentChanged(int)), keywordsPage, SLOT(pageSelected()));
+    connect(tabs, SIGNAL(currentChanged(int)), summaryFieldsPage, SLOT(pageSelected()));
 
     layout->addWidget(tabs);
 
     // save initial values
     b4.keywordFingerprint = KeywordDefinition::fingerprint(keywordDefinitions);
+    b4.summaryKeywordFingerprint = SummaryKeywordDefinition::fingerprint(summaryKeywordDefinitions);
     b4.colorfield = colorfield;
+    b4.summaryfield = summaryfield;
     b4.fieldFingerprint = FieldDefinition::fingerprint(fieldDefinitions);
 }
 
@@ -2179,13 +2186,14 @@ MetadataPage::saveClicked()
     // get current state
     fieldsPage->getDefinitions(fieldDefinitions);
     keywordsPage->getDefinitions(keywordDefinitions);
+    summaryFieldsPage->getDefinitions(summaryKeywordDefinitions);
     defaultsPage->getDefinitions(defaultDefinitions);
 
     // save settings
     appsettings->setValue(GC_RIDEBG, keywordsPage->rideBG->isChecked());
 
     // write to metadata.xml
-    RideMetadata::serialize(QDir(gcroot).canonicalPath() + "/metadata.xml", keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
+    RideMetadata::serialize(QDir(gcroot).canonicalPath() + "/metadata.xml", keywordDefinitions, summaryKeywordDefinitions, fieldDefinitions, colorfield, summaryfield, defaultDefinitions);
 
     // save processors config
     processorPage->saveClicked();
@@ -2194,6 +2202,9 @@ MetadataPage::saveClicked()
 
     if (b4.keywordFingerprint != KeywordDefinition::fingerprint(keywordDefinitions) || b4.colorfield != colorfield)
         state += CONFIG_NOTECOLOR;
+
+    if (b4.summaryKeywordFingerprint != SummaryKeywordDefinition::fingerprint(summaryKeywordDefinitions) || b4.summaryfield != summaryfield)
+        state += CONFIG_NOTECOLOR; // Summary keyword changes are just GUI presentation changes, this ensures the ride navigator is redrawn
 
     if (b4.fieldFingerprint != FieldDefinition::fingerprint(fieldDefinitions))
         state += CONFIG_FIELDS;
@@ -2401,8 +2412,192 @@ KeywordsPage::getDefinitions(QList<KeywordDefinition> &keywordList)
 }
 
 //
+// Summary fields page
+//
+
+// Defines the order of the columns
+#define SUM_FIELDS_COL_KEYWORD 0
+#define SUM_FIELDS_COL_VALUES 1
+#define SUM_FIELDS_NUM_COLS 2
+
+SummaryFieldsPage::SummaryFieldsPage(MetadataPage* parent, QList<SummaryKeywordDefinition> summaryKeywordDefinitions) : QWidget(parent), parent(parent)
+{
+    QVBoxLayout* mainLayout = new QVBoxLayout(this);
+    HelpWhatsThis* help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_DataFields_Notes_Keywords));
+
+    relatedDelegate.setTitle(tr("<h3>Summary Fields</h3>Add additional field to display in summary"));
+
+    QHBoxLayout* field = new QHBoxLayout();
+    fieldLabel = new QLabel(tr("Field"), this);
+    fieldChooser = new QComboBox(this);
+    field->addWidget(fieldLabel);
+    field->addWidget(fieldChooser);
+    field->addStretch();
+    mainLayout->addLayout(field);
+
+    keywords = new QTreeWidget;
+    keywords->headerItem()->setText(SUM_FIELDS_COL_KEYWORD, tr("Keyword"));
+    keywords->headerItem()->setText(SUM_FIELDS_COL_VALUES, tr("Summary Fields"));
+    keywords->setColumnCount(SUM_FIELDS_NUM_COLS);
+    keywords->setItemDelegateForColumn(SUM_FIELDS_COL_VALUES, &relatedDelegate);
+    basicTreeWidgetStyle(keywords);
+
+    actionButtons = new ActionButtonBox(ActionButtonBox::UpDownGroup | ActionButtonBox::AddDeleteGroup);
+    actionButtons->defaultConnect(ActionButtonBox::UpDownGroup, keywords);
+    actionButtons->defaultConnect(ActionButtonBox::AddDeleteGroup, keywords);
+
+    for(const SummaryKeywordDefinition& keyword : summaryKeywordDefinitions) {
+
+        QTreeWidgetItem* add = new QTreeWidgetItem(keywords->invisibleRootItem());
+        add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+        // keyword
+        add->setText(SUM_FIELDS_COL_KEYWORD, keyword.name);
+
+        QString text;
+        for (int i = 0; i < keyword.summaryFields.count(); i++) {
+            if (i != keyword.summaryFields.count() - 1)
+                text += keyword.summaryFields[i] + ",";
+            else
+                text += keyword.summaryFields[i];
+        }
+
+        add->setText(SUM_FIELDS_COL_VALUES, text);
+    }
+
+    mainLayout->addWidget(keywords);
+    mainLayout->addWidget(actionButtons);
+
+    // connect up slots
+    connect(actionButtons, &ActionButtonBox::upRequested, this, &SummaryFieldsPage::upClicked);
+    connect(actionButtons, &ActionButtonBox::downRequested, this, &SummaryFieldsPage::downClicked);
+    connect(actionButtons, &ActionButtonBox::addRequested, this, &SummaryFieldsPage::addClicked);
+    connect(actionButtons, &ActionButtonBox::deleteRequested, this, &SummaryFieldsPage::deleteClicked);
+    connect(fieldChooser, SIGNAL(currentIndexChanged(int)), this, SLOT(summaryfieldChanged()));
+
+    keywords->setCurrentItem(keywords->invisibleRootItem()->child(0));
+}
+
+void
+SummaryFieldsPage::pageSelected()
+{
+    SpecialFields& sp = SpecialFields::getInstance();
+    QString prev = "";
+
+    // remember what was selected, if anything?
+    if (fieldChooser->count()) {
+        prev = sp.internalName(fieldChooser->itemText(fieldChooser->currentIndex()));
+        parent->summaryfield = prev;
+    } else prev = parent->summaryfield;
+    // load in texts from metadata
+    fieldChooser->clear();
+
+    // get the current fields definitions
+    QList<FieldDefinition> fromFieldsPage;
+    parent->fieldsPage->getDefinitions(fromFieldsPage);
+    foreach(FieldDefinition x, fromFieldsPage) {
+        if (x.type < 3) fieldChooser->addItem(sp.displayName(x.name));
+    }
+    fieldChooser->setCurrentIndex(fieldChooser->findText(sp.displayName(prev)));
+}
+
+void
+SummaryFieldsPage::summaryfieldChanged() {
+    int index = fieldChooser->currentIndex();
+    if (index >= 0) parent->summaryfield = SpecialFields::getInstance().internalName(fieldChooser->itemText(fieldChooser->currentIndex()));
+}
+
+void
+SummaryFieldsPage::upClicked() {
+    if (keywords->currentItem()) {
+        int index = keywords->invisibleRootItem()->indexOfChild(keywords->currentItem());
+        if (index == 0) return; // its at the top already
+
+        // movin on up!
+        QTreeWidgetItem* moved = keywords->invisibleRootItem()->takeChild(index);
+        keywords->invisibleRootItem()->insertChild(index - 1, moved);
+        keywords->setCurrentItem(moved);
+    }
+}
+
+void
+SummaryFieldsPage::downClicked() {
+    if (keywords->currentItem()) {
+        int index = keywords->invisibleRootItem()->indexOfChild(keywords->currentItem());
+        if (index == (keywords->invisibleRootItem()->childCount() - 1)) return; // its at the bottom already
+
+        // movin on up!
+        QTreeWidgetItem* moved = keywords->invisibleRootItem()->takeChild(index);
+        keywords->invisibleRootItem()->insertChild(index + 1, moved);
+        keywords->setCurrentItem(moved);
+    }
+}
+
+void
+SummaryFieldsPage::addClicked() {
+    int index = keywords->invisibleRootItem()->indexOfChild(keywords->currentItem());
+    if (index < 0) index = 0;
+    QTreeWidgetItem* add;
+    add = new QTreeWidgetItem;
+    keywords->invisibleRootItem()->insertChild(index, add);
+    add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+    // keyword
+    QString text = tr("New");
+    for (int i = 0; keywords->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
+        text = QString(tr("New (%1)")).arg(i + 1);
+    }
+    add->setText(SUM_FIELDS_COL_KEYWORD, text);
+    add->setText(SUM_FIELDS_COL_VALUES, "");
+
+    keywords->setCurrentItem(add);
+}
+
+void
+SummaryFieldsPage::deleteClicked() {
+    if (keywords->currentItem()) {
+        int index = keywords->invisibleRootItem()->indexOfChild(keywords->currentItem());
+
+        // zap!
+        delete keywords->invisibleRootItem()->takeChild(index);
+    }
+}
+
+void
+SummaryFieldsPage::getDefinitions(QList<SummaryKeywordDefinition>& summaryKeywordList) {
+
+    // clear current just in case
+    summaryKeywordList.clear();
+
+    for (int idx = 0; idx < keywords->invisibleRootItem()->childCount(); idx++) {
+
+        QTreeWidgetItem* item = keywords->invisibleRootItem()->child(idx);
+
+        SummaryKeywordDefinition add;
+        add.name = item->text(SUM_FIELDS_COL_KEYWORD);
+        add.summaryFields = item->text(SUM_FIELDS_COL_VALUES).split(",", Qt::SkipEmptyParts);
+
+        // Ensure the Calendar text field used by the summary is not added!
+        add.summaryFields.removeAll("Calendar Text");
+
+        summaryKeywordList.append(add);
+    }
+}
+
+//
 // Ride metadata page
 //
+
+// Defines the order of the columns
+#define FIELDSPAGE_COL_SCREEN_TAB 0
+#define FIELDSPAGE_COL_FIELD 1
+#define FIELDSPAGE_COL_TYPE 2
+#define FIELDSPAGE_COL_VALUES 3
+#define FIELDSPAGE_COL_INTERVAL 4
+#define FIELDSPAGE_COL_EXPRESSION 5
+#define FIELDSPAGE_NUM_COLS 6
+
 FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) : QWidget(parent)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -2416,14 +2611,13 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     valueDelegate.setDisplayLength(15, 2);
 
     fields = new QTreeWidget;
-    fields->headerItem()->setText(0, tr("Screen Tab"));
-    fields->headerItem()->setText(1, tr("Field"));
-    fields->headerItem()->setText(2, tr("Type"));
-    fields->headerItem()->setText(3, tr("Values"));
-    fields->headerItem()->setText(4, tr("Summary"));
-    fields->headerItem()->setText(5, tr("Interval"));
-    fields->headerItem()->setText(6, tr("Expression"));
-    fields->setColumnCount(7);
+    fields->headerItem()->setText(FIELDSPAGE_COL_SCREEN_TAB, tr("Screen Tab"));
+    fields->headerItem()->setText(FIELDSPAGE_COL_FIELD, tr("Field"));
+    fields->headerItem()->setText(FIELDSPAGE_COL_TYPE, tr("Type"));
+    fields->headerItem()->setText(FIELDSPAGE_COL_VALUES, tr("Values"));
+    fields->headerItem()->setText(FIELDSPAGE_COL_INTERVAL, tr("Interval"));
+    fields->headerItem()->setText(FIELDSPAGE_COL_EXPRESSION, tr("Expression"));
+    fields->setColumnCount(FIELDSPAGE_NUM_COLS);
     fieldTypeDelegate.addItems( {
         tr("Text"),
         tr("Textbox"),
@@ -2434,10 +2628,10 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
         tr("Time"),
         tr("Checkbox")
     } );
-    fields->setItemDelegateForColumn(0, &tabDelegate);
-    fields->setItemDelegateForColumn(1, &fieldDelegate);
-    fields->setItemDelegateForColumn(2, &fieldTypeDelegate);
-    fields->setItemDelegateForColumn(3, &valueDelegate);
+    fields->setItemDelegateForColumn(FIELDSPAGE_COL_SCREEN_TAB, &tabDelegate);
+    fields->setItemDelegateForColumn(FIELDSPAGE_COL_FIELD, &fieldDelegate);
+    fields->setItemDelegateForColumn(FIELDSPAGE_COL_TYPE, &fieldTypeDelegate);
+    fields->setItemDelegateForColumn(FIELDSPAGE_COL_VALUES, &valueDelegate);
     basicTreeWidgetStyle(fields);
 
     actionButtons = new ActionButtonBox(ActionButtonBox::UpDownGroup | ActionButtonBox::AddDeleteGroup);
@@ -2447,21 +2641,21 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     SpecialFields& specials = SpecialFields::getInstance();
     SpecialTabs& specialTabs = SpecialTabs::getInstance();
     foreach(FieldDefinition field, fieldDefinitions) {
-        QCheckBox *checkBox = new QCheckBox("", this);
-        checkBox->setChecked(field.diary);
+
+        // Hide the internal system metadata, Data is already read-only on Extra tab.
+        if ((field.name == "Calendar Text") || (field.name == "Data")) continue;
 
         QCheckBox *checkBoxInt = new QCheckBox("", this);
         checkBoxInt->setChecked(field.interval);
 
         QTreeWidgetItem *add = new QTreeWidgetItem(fields->invisibleRootItem());
         add->setFlags(add->flags() | Qt::ItemIsEditable);
-        add->setText(0, specialTabs.displayName(field.tab)); // tab name
-        add->setText(1, specials.displayName(field.name)); // field name
-        add->setData(2, Qt::DisplayRole, field.type);
-        add->setText(3, field.values.join(",")); // values
-        fields->setItemWidget(add, 4, checkBox);
-        fields->setItemWidget(add, 5, checkBoxInt);
-        add->setText(6, field.expression); // expression
+        add->setText(FIELDSPAGE_COL_SCREEN_TAB, specialTabs.displayName(field.tab)); // tab name
+        add->setText(FIELDSPAGE_COL_FIELD, specials.displayName(field.name)); // field name
+        add->setData(FIELDSPAGE_COL_TYPE, Qt::DisplayRole, field.type); // field data type
+        add->setText(FIELDSPAGE_COL_VALUES, field.values.join(",")); // values
+        fields->setItemWidget(add, FIELDSPAGE_COL_INTERVAL, checkBoxInt);
+        add->setText(FIELDSPAGE_COL_EXPRESSION, field.expression); // expression
     }
 
     mainLayout->addWidget(fields);
@@ -2484,16 +2678,12 @@ FieldsPage::upClicked()
         if (index == 0) return; // its at the top already
 
         // movin on up!
-        QWidget *check = fields->itemWidget(fields->currentItem(),4);
-        QWidget *checkInt = fields->itemWidget(fields->currentItem(),5);
-        QCheckBox *checkBox = new QCheckBox("", this);
-        checkBox->setChecked(((QCheckBox*)check)->isChecked());
+        QWidget *checkInt = fields->itemWidget(fields->currentItem(), FIELDSPAGE_COL_INTERVAL);
         QCheckBox *checkBoxInt = new QCheckBox("", this);
         checkBoxInt->setChecked(((QCheckBox*)checkInt)->isChecked());
         QTreeWidgetItem* moved = fields->invisibleRootItem()->takeChild(index);
         fields->invisibleRootItem()->insertChild(index-1, moved);
-        fields->setItemWidget(moved, 4, checkBox);
-        fields->setItemWidget(moved, 5, checkBoxInt);
+        fields->setItemWidget(moved, FIELDSPAGE_COL_INTERVAL, checkBoxInt);
         fields->setCurrentItem(moved);
     }
 }
@@ -2505,16 +2695,12 @@ FieldsPage::downClicked()
         int index = fields->invisibleRootItem()->indexOfChild(fields->currentItem());
         if (index == (fields->invisibleRootItem()->childCount()-1)) return; // its at the bottom already
 
-        QWidget *check = fields->itemWidget(fields->currentItem(),4);
-        QWidget *checkInt = fields->itemWidget(fields->currentItem(),5);
-        QCheckBox *checkBox = new QCheckBox("", this);
-        checkBox->setChecked(((QCheckBox*)check)->isChecked());
+        QWidget *checkInt = fields->itemWidget(fields->currentItem(), FIELDSPAGE_COL_INTERVAL);
         QCheckBox *checkBoxInt = new QCheckBox("", this);
         checkBoxInt->setChecked(((QCheckBox*)checkInt)->isChecked());
         QTreeWidgetItem* moved = fields->invisibleRootItem()->takeChild(index);
         fields->invisibleRootItem()->insertChild(index+1, moved);
-        fields->setItemWidget(moved, 4, checkBox);
-        fields->setItemWidget(moved, 5, checkBoxInt);
+        fields->setItemWidget(moved, FIELDSPAGE_COL_INTERVAL, checkBoxInt);
         fields->setCurrentItem(moved);
     }
 }
@@ -2525,7 +2711,6 @@ FieldsPage::addClicked()
     int index = fields->invisibleRootItem()->indexOfChild(fields->currentItem());
     if (index < 0) index = 0;
     QTreeWidgetItem *add;
-    QCheckBox *checkBox = new QCheckBox("", this);
     QCheckBox *checkBoxInt = new QCheckBox("", this);
 
     add = new QTreeWidgetItem;
@@ -2537,11 +2722,10 @@ FieldsPage::addClicked()
     for (int i=0; fields->findItems(text, Qt::MatchExactly, 1).count() > 0; i++) {
         text = QString(tr("New (%1)")).arg(i+1);
     }
-    add->setText(1, text);
+    add->setText(FIELDSPAGE_COL_FIELD, text);
 
     // type button
-    fields->setItemWidget(add, 4, checkBox);
-    fields->setItemWidget(add, 5, checkBoxInt);
+    fields->setItemWidget(add, FIELDSPAGE_COL_INTERVAL, checkBoxInt);
 
     fields->setCurrentItem(add);
 }
@@ -2556,7 +2740,6 @@ FieldsPage::deleteClicked()
         delete fields->invisibleRootItem()->takeChild(index);
     }
 }
-
 
 void
 FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
@@ -2574,20 +2757,19 @@ FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
         QTreeWidgetItem *item = fields->invisibleRootItem()->child(idx);
 
         // silently ignore duplicates
-        if (checkdups.contains(item->text(1))) continue;
-        else checkdups << item->text(1);
+        if (checkdups.contains(item->text(FIELDSPAGE_COL_FIELD))) continue;
+        else checkdups << item->text(FIELDSPAGE_COL_FIELD);
 
-        add.tab = st.internalName(item->text(0));
-        add.name = sp.internalName(item->text(1));
-        add.values = item->text(3).split(QRegularExpression("(, *|,)"), Qt::KeepEmptyParts);
-        add.diary = ((QCheckBox*)fields->itemWidget(item, 4))->isChecked();
-        add.interval = ((QCheckBox*)fields->itemWidget(item, 5))->isChecked();
-        add.expression = item->text(6);
+        add.tab = st.internalName(item->text(FIELDSPAGE_COL_SCREEN_TAB));
+        add.name = sp.internalName(item->text(FIELDSPAGE_COL_FIELD));
+        add.values = item->text(FIELDSPAGE_COL_VALUES).split(QRegularExpression("(, *|,)"), Qt::KeepEmptyParts);
+        add.interval = ((QCheckBox*)fields->itemWidget(item, FIELDSPAGE_COL_INTERVAL))->isChecked();
+        add.expression = item->text(FIELDSPAGE_COL_EXPRESSION);
 
         if (sp.isMetric(add.name))
             add.type = 4;
         else
-            add.type = item->data(2, Qt::DisplayRole).toInt();
+            add.type = item->data(FIELDSPAGE_COL_TYPE, Qt::DisplayRole).toInt();
 
         fieldList.append(add);
     }

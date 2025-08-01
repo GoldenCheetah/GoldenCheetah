@@ -66,9 +66,9 @@ TreeMapWindow::TreeMapWindow(Context *context) :
 
     // read metadata.xml
     QString filename = QDir(gcroot).canonicalPath()+"/metadata.xml";
-    QString colorfield;
+    QString colorfield, summaryfield;
     if (!QFile(filename).exists()) filename = ":/xml/metadata.xml";
-    RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
+    RideMetadata::readXML(filename, keywordDefinitions, summaryKeywordDefinitions, fieldDefinitions, colorfield, summaryfield, defaultDefinitions);
 
     //title = new QLabel(this);
     //QFont font;
