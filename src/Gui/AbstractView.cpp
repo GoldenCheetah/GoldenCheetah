@@ -33,15 +33,15 @@
 #include "GcUpgrade.h"
 #include "LTMWindow.h"
 
-AbstractView::AbstractView(Context *context, int type, const QString& view, const QString& viewCfgPath, const QString& heading) :
-    QWidget(context->tab), context(context), type(type), view(view), viewCfgPath(viewCfgPath),
+AbstractView::AbstractView(Context *context, int type, const QString& view, const QString& heading) :
+    QWidget(context->tab), context(context), type(type), view(view),
     _sidebar(true), _tiled(false), _selected(false), lastHeight(130*dpiYFactor), sidewidth(0),
     active(false), bottomRequested(false), bottomHideOnIdle(false), perspectiveactive(false),
     stack(NULL), splitter(NULL), mainSplitter(NULL), 
     sidebar_(NULL), bottom_(NULL), perspective_(NULL), blank_(NULL),
     loaded(false)
 {
-
+    viewCfgPath = context->athlete->home->config().canonicalPath();
     defaultAppearance= GSettings::defaultAppearanceSettings();
 
     // setup the basic widget
