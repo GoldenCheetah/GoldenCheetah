@@ -54,7 +54,7 @@ class ManualActivityWizard : public QWizard
             PageBusyRejection
         };
 
-        ManualActivityWizard(Context *context, bool plan = false, QWidget *parent = nullptr);
+        ManualActivityWizard(Context *context, bool plan = false, const QDateTime &when = QDateTime(), QWidget *parent = nullptr);
 
     protected:
         virtual void done(int result) override;
@@ -75,7 +75,7 @@ class ManualActivityPageBasics : public QWizardPage
     Q_OBJECT
 
     public:
-        ManualActivityPageBasics(Context *context, bool plan = false, QWidget *parent = nullptr);
+        ManualActivityPageBasics(Context *context, bool plan = false, const QDateTime &when = QDateTime(), QWidget *parent = nullptr);
 
         virtual void initializePage() override;
         virtual int nextId() const override;
@@ -88,6 +88,7 @@ class ManualActivityPageBasics : public QWizardPage
     private:
         Context *context;
         bool plan = false;
+        QDateTime when;
         QLabel *duplicateActivityLabel;
 };
 

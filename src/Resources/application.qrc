@@ -228,6 +228,13 @@
         <file>images/material/ski.svg</file>
         <file>images/material/weight-lifter.svg</file>
         <file>images/material/torch.svg</file>
+        <file>images/material/calendar-blank.svg</file>
+        <file>images/material/plus.svg</file>
+        <file>images/material/podium.svg</file>
+        <file>images/material/podium-gold.svg</file>
+        <file>images/material/podium-silver.svg</file>
+        <file>images/material/podium-bronze.svg</file>
+        <file>images/material/arrow-left-right.svg</file>
         <file>python/library.py</file>
         <file>images/devices/imagic.png</file>
         <file>data/powerprofile.csv</file>
