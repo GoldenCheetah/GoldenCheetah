@@ -38,7 +38,6 @@ class NavigatorCellDelegate;
 class GroupByModel;
 class SearchFilter;
 class SearchFilterBox;
-class DiaryWindow;
 class DiarySidebar;
 class QSortFilterProxyModel;
 class RideNavigatorSortProxyModel;
@@ -73,7 +72,6 @@ class RideNavigator : public GcChartWindow
 
     friend class ::NavigatorCellDelegate;
     friend class ::GroupByModel;
-    friend class ::DiaryWindow;
     friend class ::DiarySidebar;
     friend class ::GcMiniCalendar;
     friend class ::DataFilter;

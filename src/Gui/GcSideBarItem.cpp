@@ -17,7 +17,6 @@
  */
 
 #include "GcSideBarItem.h"
-#include "DiaryWindow.h"
 #include "DiarySidebar.h"
 
 // fixed width stuff, easier to set globally

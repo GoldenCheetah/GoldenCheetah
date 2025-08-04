@@ -17,7 +17,6 @@
  */
 
 #include "ChartBar.h"
-#include "DiaryWindow.h"
 #include "DiarySidebar.h"
 #include "Context.h"
 

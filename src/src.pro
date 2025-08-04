@@ -345,8 +345,8 @@ contains(DEFINES, "GC_WANT_R") {
     LIBS        += $${ICAL_LIBS}
 
     # add caldav and diary functions
-    HEADERS     += Core/ICalendar.h Charts/DiaryWindow.h Cloud/CalDAV.h Cloud/CalDAVCloud.h
-    SOURCES     += Core/ICalendar.cpp Charts/DiaryWindow.cpp Cloud/CalDAV.cpp Cloud/CalDAVCloud.cpp
+    HEADERS     += Core/ICalendar.h Cloud/CalDAV.h Cloud/CalDAVCloud.h
+    SOURCES     += Core/ICalendar.cpp Cloud/CalDAV.cpp Cloud/CalDAVCloud.cpp
 }
 
 
