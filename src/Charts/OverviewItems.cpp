@@ -850,8 +850,10 @@ MetricOverviewItem::configChanged(qint32) {
     RideMetricFactory& factory = RideMetricFactory::instance();
     metric = factory.rideMetric(symbol);
 
-    // Only display the override option for metrics that exist.
-    setShowEdit(metric != nullptr);
+    // Only display the override option for metrics that exist, and those related to specific activities.
+    // It doesn't make sense to overide metrics related to multiple activities, date ranges and/or filters.
+    setShowEdit((metric != nullptr) && (parent->scope == OverviewScope::ANALYSIS));
+
     units = (metric) ? metric->units(GlobalContext::context()->useMetricUnits) : "";
 
     // Update the value and override status
