@@ -81,7 +81,6 @@
 // GUI Widgets
 #include "AthleteTab.h"
 #include "GcToolBar.h"
-#include "NewSideBar.h"
 #include "HelpWindow.h"
 #include "Perspective.h"
 #include "PerspectiveDialog.h"
@@ -115,6 +114,12 @@
 #include "WindowsCrashHandler.cpp"
 #endif
 
+// The order of the GcViewStackIdx values below must match the viewStack widget's tab order, see the MainWindow's constructor below.
+namespace GcViewStackIdx {
+// use constexpr instead of enum class to prevent unecessary casting
+constexpr int SELECT_ATHLETE_VIEW = 0;
+constexpr int ATHLETE_TAB_STACK = 1;
+};
 
 // We keep track of all theopen mainwindows
 QList<MainWindow *> mainwindows;
@@ -207,34 +212,34 @@ MainWindow::MainWindow(const QDir &home)
     HelpWhatsThis *helpNewSideBar = new HelpWhatsThis(sidebar);
     sidebar->setWhatsThis(helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar));
 
-    sidebar->addItem(QImage(":sidebar/athlete.png"), tr("athletes"), 0, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Athletes));
-    sidebar->setItemEnabled(1, false);
+    // The ids of the sidebar buttons below are defined in NewSideBar.h
+    sidebar->addItem(QImage(":sidebar/athlete.png"), tr("athletes"), GcSideBarBtnId::SELECT_ATHLETE_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Athletes));
 
-    sidebar->addItem(QImage(":sidebar/plan.png"), tr("plan"), 1), tr("Feature not implemented yet");
-    sidebar->setItemEnabled(1, false);
+    sidebar->addItem(QImage(":sidebar/plan.png"), tr("plan"), GcSideBarBtnId::PLAN_BTN, tr("Feature not implemented yet"));
+    sidebar->setItemEnabled(GcSideBarBtnId::PLAN_BTN, false);
 
-    sidebar->addItem(QImage(":sidebar/trends.png"), tr("trends"), 2, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Trends));
-    sidebar->addItem(QImage(":sidebar/assess.png"), tr("activities"), 3, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Rides));
-    sidebar->setItemSelected(3, true);
+    sidebar->addItem(QImage(":sidebar/trends.png"), tr("trends"), GcSideBarBtnId::TRENDS_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Trends));
 
-    sidebar->addItem(QImage(":sidebar/reflect.png"), tr("reflect"), 4), tr("Feature not implemented yet");
-    sidebar->setItemEnabled(4, false);
+    sidebar->addItem(QImage(":sidebar/assess.png"), tr("activities"), GcSideBarBtnId::ACTIVITIES_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Rides));
 
-    sidebar->addItem(QImage(":sidebar/train.png"), tr("train"), 5, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Train));
+    sidebar->addItem(QImage(":sidebar/reflect.png"), tr("reflect"), GcSideBarBtnId::REFLECT_BTN, tr("Feature not implemented yet"));
+    sidebar->setItemEnabled(GcSideBarBtnId::REFLECT_BTN, false);
+
+    sidebar->addItem(QImage(":sidebar/train.png"), tr("train"), GcSideBarBtnId::TRAIN_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Train));
 
     sidebar->addStretch();
-    sidebar->addItem(QImage(":sidebar/apps.png"), tr("apps"), 6, tr("Feature not implemented yet"));
-    sidebar->setItemEnabled(6, false);
+    sidebar->addItem(QImage(":sidebar/apps.png"), tr("apps"), GcSideBarBtnId::APPS_BTN, tr("Feature not implemented yet"));
+    sidebar->setItemEnabled(GcSideBarBtnId::APPS_BTN, false);
     sidebar->addStretch();
 
     // we can click on the quick icons, but they aren't selectable views
-    sidebar->addItem(QImage(":sidebar/sync.png"), tr("sync"), 7, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Sync));
-    sidebar->setItemSelectable(7, false);
-    sidebar->addItem(QImage(":sidebar/prefs.png"), tr("options"), 8, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Options));
-    sidebar->setItemSelectable(8, false);
+    sidebar->addItem(QImage(":sidebar/sync.png"), tr("sync"), GcSideBarBtnId::SYNC_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Sync));
+    sidebar->setItemSelectable(GcSideBarBtnId::SYNC_BTN, false);
+    sidebar->addItem(QImage(":sidebar/prefs.png"), tr("options"), GcSideBarBtnId::OPTIONS_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Options));
+    sidebar->setItemSelectable(GcSideBarBtnId::OPTIONS_BTN, false);
 
-    connect(sidebar, SIGNAL(itemClicked(int)), this, SLOT(sidebarClicked(int)));
-    connect(sidebar, SIGNAL(itemSelected(int)), this, SLOT(sidebarSelected(int)));
+    connect(sidebar, SIGNAL(itemClicked(GcSideBarBtnId)), this, SLOT(sidebarClicked(GcSideBarBtnId)));
+    connect(sidebar, SIGNAL(itemSelected(GcSideBarBtnId)), this, SLOT(sidebarSelected(GcSideBarBtnId)));
 
     /*----------------------------------------------------------------------
      * What's this Context Help
@@ -416,6 +421,7 @@ MainWindow::MainWindow(const QDir &home)
     tabbar->setDocumentMode(true);
 #endif
 
+    // Note: The order of the viewStack tabs below, must match the GcViewStackIdx definitions above.
     athleteView = new AthleteView(context);
     viewStack = new QStackedWidget(this);
     viewStack->addWidget(athleteView);
@@ -1217,37 +1223,43 @@ MainWindow::support()
 }
 
 void
-MainWindow::sidebarClicked(int id)
+MainWindow::sidebarClicked(GcSideBarBtnId id)
 {
-    // sync quick link
-    if (id == 7) checkCloud();
-
-    // prefs
-    if (id == 8) showOptions();
-
+    switch (id) {
+    case GcSideBarBtnId::SYNC_BTN: checkCloud(); break; // sync quick link
+    case GcSideBarBtnId::OPTIONS_BTN: showOptions(); break; // prefs
+    }
 }
 
 void
-MainWindow::sidebarSelected(int id)
+MainWindow::sidebarSelected(GcSideBarBtnId id)
 {
     switch (id) {
-    case 0: selectAthlete(); break;
-    case 1: // plan not written yet
-            break;
-    case 2: selectTrends(); break;
-    case 3: selectAnalysis(); break;
-    case 4: // reflect not written yet
-            break;
-    case 5: selectTrain(); break;
-    case 6: // apps not written yet
-            break;
+    case GcSideBarBtnId::SELECT_ATHLETE_BTN: selectAthlete(); break;
+    case GcSideBarBtnId::PLAN_BTN: break; // plan not written yet
+    case GcSideBarBtnId::TRENDS_BTN: selectTrends(); break;
+    case GcSideBarBtnId::ACTIVITIES_BTN: selectAnalysis(); break;
+    case GcSideBarBtnId::REFLECT_BTN: break; // reflect not written yet
+    case GcSideBarBtnId::TRAIN_BTN: selectTrain(); break;
+    case GcSideBarBtnId::APPS_BTN: break;// apps not written yet
+    }
+}
+
+void
+MainWindow::setView(int view)
+{
+    switch (view) {
+    case 0: selectTrends(); break; // trends
+    case 1: selectAnalysis(); break; // analysis
+    case 2: selectDiary(); break; // diary
+    case 3: selectTrain(); break; // train
     }
 }
 
 void
 MainWindow::selectAthlete()
 {
-    viewStack->setCurrentIndex(0);
+    viewStack->setCurrentIndex(GcViewStackIdx::SELECT_ATHLETE_VIEW);
     back->hide();
     forward->hide();
     perspectiveSelector->hide();
@@ -1260,8 +1272,8 @@ MainWindow::selectAnalysis()
 {
     resetPerspective(1);
     //currentTab->analysisView->setPerspectives(perspectiveSelector);
-    viewStack->setCurrentIndex(1);
-    sidebar->setItemSelected(3, true);
+    viewStack->setCurrentIndex(GcViewStackIdx::ATHLETE_TAB_STACK);
+    sidebar->setItemSelected(GcSideBarBtnId::ACTIVITIES_BTN, true);
     currentAthleteTab->selectView(1);
     back->show();
     forward->show();
@@ -1276,8 +1288,8 @@ MainWindow::selectTrain()
 {
     resetPerspective(3);
     //currentTab->trainView->setPerspectives(perspectiveSelector);
-    viewStack->setCurrentIndex(1);
-    sidebar->setItemSelected(5, true);
+    viewStack->setCurrentIndex(GcViewStackIdx::ATHLETE_TAB_STACK);
+    sidebar->setItemSelected(GcSideBarBtnId::TRAIN_BTN, true);
     currentAthleteTab->selectView(3);
     back->show();
     forward->show();
@@ -1292,7 +1304,7 @@ MainWindow::selectDiary()
 {
     resetPerspective(2);
     //currentTab->diaryView->setPerspectives(perspectiveSelector);
-    viewStack->setCurrentIndex(1);
+    viewStack->setCurrentIndex(GcViewStackIdx::ATHLETE_TAB_STACK);
     currentAthleteTab->selectView(2);
     back->show();
     forward->show();
@@ -1307,8 +1319,8 @@ MainWindow::selectTrends()
 {
     resetPerspective(0);
     //currentTab->homeView->setPerspectives(perspectiveSelector);
-    viewStack->setCurrentIndex(1);
-    sidebar->setItemSelected(2, true);
+    viewStack->setCurrentIndex(GcViewStackIdx::ATHLETE_TAB_STACK);
+    sidebar->setItemSelected(GcSideBarBtnId::TRENDS_BTN, true);
     currentAthleteTab->selectView(0);
     back->show();
     forward->show();
@@ -2269,18 +2281,18 @@ MainWindow::saveGCState(Context *context)
 void
 MainWindow::restoreGCState(Context *context)
 {
-    if (viewStack->currentIndex() != 0) {
+    if (viewStack->currentIndex() != GcViewStackIdx::SELECT_ATHLETE_VIEW) {
 
         // not on athlete view...
         resetPerspective(currentAthleteTab->currentView()); // will lazy load, hence doing it first
 
         // restore window state from the supplied context
             switch(currentAthleteTab->currentView()) {
-            case 0: sidebar->setItemSelected(2,true); break;
-            case 1: sidebar->setItemSelected(3,true); break;
+            case 0: sidebar->setItemSelected(GcSideBarBtnId::TRENDS_BTN,true); break;
+            case 1: sidebar->setItemSelected(GcSideBarBtnId::ACTIVITIES_BTN,true); break;
             case 2: break; // diary not an icon
-            case 3: sidebar->setItemSelected(5, true); break;
-            default: sidebar->setItemSelected(0, true); break;
+            case 3: sidebar->setItemSelected(GcSideBarBtnId::TRAIN_BTN, true); break;
+            default: sidebar->setItemSelected(GcSideBarBtnId::SELECT_ATHLETE_BTN, true); break;
         }
     }
 

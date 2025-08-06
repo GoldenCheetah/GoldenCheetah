@@ -1,6 +1,40 @@
+/*
+ * Copyright (c) 2020 Mark Liversedge <liversedge@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+#ifndef _GC_NewSideBar_h
+#define _GC_NewSideBar_h 1
+
 #include <QWidget>
 #include <QMap>
 #include <QVBoxLayout>
+
+enum class GcSideBarBtnId : int {
+    NO_BUTTON_SET = -1,
+    SELECT_ATHLETE_BTN = 0,
+    PLAN_BTN = 1,
+    TRENDS_BTN = 2,
+    ACTIVITIES_BTN = 3,
+    REFLECT_BTN = 4,
+    TRAIN_BTN = 5,
+    APPS_BTN = 6,
+    SYNC_BTN = 7,
+    OPTIONS_BTN = 8
+};
 
 class Context;
 class NewSideBarItem;
@@ -8,6 +42,7 @@ class NewSideBar : public QWidget
 {
 
     Q_OBJECT
+    Q_ENUM(GcSideBarBtnId)
 
     friend class ::NewSideBarItem;
 
@@ -16,32 +51,31 @@ class NewSideBar : public QWidget
 
     public slots:
 
-        // managing items - the id can be assigned or will get a default
-        //                  it returns the id used
-        int addItem(QImage icon, QString name, int id=-1, QString whatsThisText="");
+        // managing items - addItem returns the id of the button added, or NO_BUTTON_SET.
+        GcSideBarBtnId addItem(QImage icon, const QString& name, GcSideBarBtnId id, const QString& whatsThisText);
 
         // leave a gap- we have main icons, gap, apps, gap, sync, prefs
         void addStretch();
 
         // is it shown, is it usable?
-        void setItemVisible(int id, bool);
-        void setItemEnabled(int id, bool);
+        void setItemVisible(GcSideBarBtnId id, bool);
+        void setItemEnabled(GcSideBarBtnId id, bool);
 
         // can we select it, select it by program?
-        void setItemSelectable(int id, bool);
-        void setItemSelected(int id, bool);
+        void setItemSelectable(GcSideBarBtnId id, bool);
+        void setItemSelected(GcSideBarBtnId id, bool);
 
         // config changed
         void configChanged(qint32);
 
         // called by children
-        void clicked(int id);
-        void selected(int id);
+        void clicked(GcSideBarBtnId id);
+        void selected(GcSideBarBtnId id);
 
     signals:
 
-        void itemSelected(int id);
-        void itemClicked(int id);
+        void itemSelected(GcSideBarBtnId id);
+        void itemClicked(GcSideBarBtnId id);
 
     protected:
         Context *context;
@@ -49,9 +83,9 @@ class NewSideBar : public QWidget
     private:
 
         QWidget *top, *middle, *bottom; // bars at top and the bottom
-        QMap<int,NewSideBarItem*> items;
+        QMap<GcSideBarBtnId,NewSideBarItem*> items;
 
-        int lastid; // when autoallocating
+        GcSideBarBtnId lastid; // when autoallocating
         QVBoxLayout *layout;
 };
 
@@ -62,7 +96,7 @@ class NewSideBarItem : public QWidget
 
     public:
 
-        NewSideBarItem(NewSideBar *sidebar, int id, QImage icon, QString name);
+        NewSideBarItem(NewSideBar *sidebar, GcSideBarBtnId id, QImage icon, QString name);
 
         void setSelectable(bool);
         void setEnabled(bool);
@@ -87,7 +121,7 @@ class NewSideBarItem : public QWidget
     private:
 
         NewSideBar *sidebar; // for emitting signals
-        int id;
+        GcSideBarBtnId id;
 
         // pre-rendered/calculated icons and colors
         QImage icon;
@@ -103,3 +137,5 @@ class NewSideBarItem : public QWidget
         bool enabled;
         bool clicked;
 };
+
+#endif // _GC_NewSideBar_h

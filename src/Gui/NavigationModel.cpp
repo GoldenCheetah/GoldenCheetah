@@ -153,17 +153,7 @@ NavigationModel::action(bool redo, NavigationEvent event)
     {
         view = redo ? event.after.toInt() : event.before.toInt();
 
-        // new side bar uses a different id, which will
-        // eventually be refactored to be the only id
-        // but for now we need to map this
-        int id=0;
-        switch(view) {
-        case 0: id=2; break; // trends
-        case 1: id=3; break; // analysis
-        case 2: id=0; break; // diary
-        case 3: id=5; break; // train
-        }
-        tab->context->mainWindow->sidebarSelected(id);
+        tab->context->mainWindow->setView(view);
     }
     break;
 

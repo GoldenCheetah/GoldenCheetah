@@ -20,6 +20,7 @@
 #ifndef _GC_MainWindow_h
 #define _GC_MainWindow_h 1
 #include "GoldenCheetah.h"
+#include "NewSideBar.h"
 
 #include <QDir>
 #include <QSqlDatabase>
@@ -175,8 +176,9 @@ class MainWindow : public QMainWindow
         void switchAthleteTab(int index); // for switching between one tab and another
 
         // sidebar selecting views and actions
-        void sidebarClicked(int id);
-        void sidebarSelected(int id);
+        void sidebarClicked(GcSideBarBtnId id);
+        void sidebarSelected(GcSideBarBtnId id);
+        void setView(int view);
 
         // Athlete Backup
         void setBackupAthleteMenu();
