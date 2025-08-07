@@ -391,6 +391,16 @@ QColor GCColor::alternateColor(QColor bgColor)
         return QColor(Qt::lightGray);
 }
 
+QColor GCColor::inactiveColor(QColor baseColor, double factor)
+{
+    QColor gray = baseColor.lightness() < 128 ? QColor(128, 128, 128) : QColor(200, 200, 200);
+    return QColor::fromRgbF(
+        baseColor.redF() * (1 - factor) + gray.redF() * factor,
+        baseColor.greenF() * (1 - factor) + gray.greenF() * factor,
+        baseColor.blueF()* (1 - factor) + gray.blueF()* factor
+    );
+}
+
 QColor GCColor::selectedColor(QColor bgColor)
 {
      // if foreground is white then we're "dark" if it's
@@ -1080,6 +1090,48 @@ GCColor::applyTheme(int index)
 
 }
 
+
+//
+// PaletteApplier - Helper to force a palette update on all children - use if palette propagation doesn't work
+//
+
+void
+PaletteApplier::setPaletteRecursively
+(QWidget *widget, const QPalette &palette, bool forceOnCustom)
+{
+    widget->setPalette(palette);
+    for (QWidget *child : widget->findChildren<QWidget*>()) {
+        bool hasCustomPalette = child->testAttribute(Qt::WA_SetPalette);
+        if (! hasCustomPalette || forceOnCustom) {
+            child->setPalette(palette);
+        }
+    }
+}
+
+
+void
+PaletteApplier::setPaletteOnList
+(const QList<QWidget*> &widgets, const QPalette &palette)
+{
+    for (QWidget *widget : widgets) {
+        widget->setPalette(palette);
+    }
+}
+
+
+void
+PaletteApplier::setPaletteByType
+(QWidget *root, const QPalette &palette, const QString &typeName)
+{
+    QList<QWidget*> widgets = root->findChildren<QWidget*>();
+    for (QWidget *widget : widgets) {
+        if (widget->metaObject()->className() == typeName) {
+            widget->setPalette(palette);
+        }
+    }
+}
+
+
 //
 // ColorLabel - just paints a swatch of the first 5 colors
 //
@@ -1143,6 +1195,30 @@ svgAsColoredPixmap
     recolorPainter.setCompositionMode(QPainter::CompositionMode_SourceIn);
     recolorPainter.fillRect(renderRect, color);
     recolorPainter.end();
+
+    return pixmap;
+}
+
+
+QPixmap
+svgOnBackground
+(const QString& file, const QSize &size, int margin, const QColor &bg, int radius)
+{
+    QColor fg(GCColor::invertColor(bg));
+    QPixmap svgPixmap = svgAsColoredPixmap(file, size, margin, fg);
+
+    QPixmap pixmap(svgPixmap.size());
+    pixmap.fill(Qt::transparent);
+
+    QPainterPath path;
+    path.addRoundedRect(QRectF(0, 0, size.width(), size.height()), radius, radius);
+
+    QPainter painter(&pixmap);
+    painter.setClipPath(path);
+    painter.fillRect(pixmap.rect(), bg);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+    painter.drawPixmap(0, 0, svgPixmap);
+    painter.end();
 
     return pixmap;
 }

@@ -405,10 +405,16 @@ LTMSidebar::dateRangeTreeWidgetSelectionChanged()
     }
 
     // Let the view know its changed....
-    if (phase) emit dateRangeChanged(DateRange(phase->getStart(), phase->getEnd(), dateRange->getName() + "/" + phase->getName()));
-    else if (dateRange) emit dateRangeChanged(DateRange(dateRange->getStart(), dateRange->getEnd(), dateRange->getName()));
-    else emit dateRangeChanged(DateRange());
-
+    if (phase) {
+        emit dateRangeChanged(DateRange(phase->getStart(), phase->getEnd(), dateRange->getName() + "/" + phase->getName()));
+        context->notifySeasonChanged(phase);
+    } else if (dateRange) {
+        emit dateRangeChanged(DateRange(dateRange->getStart(), dateRange->getEnd(), dateRange->getName()));
+        context->notifySeasonChanged(dateRange);
+    } else {
+        emit dateRangeChanged(DateRange());
+        context->notifySeasonChanged(nullptr);
+    }
 }
 
 /*----------------------------------------------------------------------
