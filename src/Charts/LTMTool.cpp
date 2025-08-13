@@ -216,7 +216,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
 
     // metadata metrics
     foreach (FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
-        if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
+        if (!sp.isMetric(field.name) && (field.type == GcFieldType::FIELD_INTEGER || field.type == GcFieldType::FIELD_DOUBLE)) {
             MetricDetail metametric;
             metametric.type = METRIC_META;
             QString underscored = field.name;

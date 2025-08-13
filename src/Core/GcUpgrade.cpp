@@ -272,7 +272,7 @@ GcUpgrade::upgrade(const QDir &home)
                 FieldDefinition add;
                 add.tab = pos >= 0 ? fieldDefinitions[pos].tab : tr("Metric");
                 add.diary = false;
-                add.type = 4; // double
+                add.type = GcFieldType::FIELD_DOUBLE;
 
                 // now set pos to non-negative if needed
                 if (pos < 0) pos = 1;
@@ -443,7 +443,7 @@ GcUpgrade::upgrade(const QDir &home)
             FieldDefinition add;
             add.name = "Interval Notes";
             add.tab = "Interval";
-            add.type = FIELD_TEXTBOX;
+            add.type = GcFieldType::FIELD_TEXTBOX;
             add.interval = 1;
             fieldDefinitions << add;
 
