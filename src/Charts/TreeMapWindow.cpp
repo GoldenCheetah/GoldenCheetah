@@ -328,9 +328,18 @@ void
 TreeMapWindow::addTextFields(QComboBox *combo)
 {
     combo->addItem(tr("None")); // if "None" is changed to not being first any more, adjust public methods f1,f2,setf1,setf2
-    SpecialFields& sp = SpecialFields::getInstance();;
+    SpecialFields& sp = SpecialFields::getInstance();
     foreach (FieldDefinition x, fieldDefinitions) {
-        if (x.type < 4) combo->addItem(sp.displayName(x.name));
+        switch (x.type) {
+            case GcFieldType::FIELD_TEXT:
+            case GcFieldType::FIELD_TEXTBOX:
+            case GcFieldType::FIELD_SHORTTEXT:
+            case GcFieldType::FIELD_INTEGER:
+                combo->addItem(sp.displayName(x.name));
+                break;
+            default:
+                break;
+        }
     }
 }
 

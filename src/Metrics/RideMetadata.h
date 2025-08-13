@@ -32,14 +32,17 @@
 #include <QMessageBox>
 
 // field types
-#define FIELD_TEXT      0
-#define FIELD_TEXTBOX   1
-#define FIELD_SHORTTEXT 2
-#define FIELD_INTEGER   3
-#define FIELD_DOUBLE    4
-#define FIELD_DATE      5
-#define FIELD_TIME      6
-#define FIELD_CHECKBOX  7
+enum class GcFieldType : int {
+    NO_FIELD_SET = -1,
+    FIELD_TEXT = 0,
+    FIELD_TEXTBOX = 1,
+    FIELD_SHORTTEXT = 2,
+    FIELD_INTEGER = 3,
+    FIELD_DOUBLE = 4,
+    FIELD_DATE = 5,
+    FIELD_TIME = 6,
+    FIELD_CHECKBOX = 7
+};
 
 class RideMetadata;
 class RideFileInterval;
@@ -61,19 +64,22 @@ class FieldDefinition
 
         QString tab,
                 name;
-        int type;
+        GcFieldType type;
         bool diary; // show in summary on diary page...
         bool interval; // this is interval specific metadata
 
         QStringList values; // autocomplete 'defaults'
         QString expression; // expression to evaluate, if true field is available
 
+        bool isTextField() const { return type == GcFieldType::FIELD_TEXT || type == GcFieldType::FIELD_TEXTBOX || type == GcFieldType::FIELD_SHORTTEXT; }
+        bool isNumericField() const { return !isTextField() && type != GcFieldType::NO_FIELD_SET; }
+
         static unsigned long fingerprint(QList<FieldDefinition>);
         QCompleter *getCompleter(QObject *parent, RideCache *rideCache);
         QString calendarText(QString value);
 
-        FieldDefinition() : tab(""), name(""), type(0), diary(false), interval(false), values(), expression("") {}
-        FieldDefinition(QString tab, QString name, int type, bool diary, bool interval, QStringList values, QString expression)
+        FieldDefinition() : tab(""), name(""), type(GcFieldType::NO_FIELD_SET), diary(false), interval(false), values(), expression("") {}
+        FieldDefinition(QString tab, QString name, GcFieldType type, bool diary, bool interval, QStringList values, QString expression)
                         : tab(tab), name(name), type(type), diary(diary), interval(interval), values(values), expression(expression) {}
 };
 

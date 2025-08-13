@@ -244,10 +244,10 @@ RideMetadata::setExtraTab()
         //              Otherwise make it a text
         //
         if (!configured) {
-            int type;
-            if (tags.value().contains("\n")) type = FIELD_TEXTBOX;
-            else if (tags.value().length() < 30) type = FIELD_SHORTTEXT;
-            else type = FIELD_TEXT;
+            GcFieldType type;
+            if (tags.value().contains("\n")) type = GcFieldType::FIELD_TEXTBOX;
+            else if (tags.value().length() < 30) type = GcFieldType::FIELD_SHORTTEXT;
+            else type = GcFieldType::FIELD_TEXT;
 
             extraDefs.append(FieldDefinition("Extra", tags.key(), type, false, false, QStringList(), ""));
             extraForm->addField(extraDefs[extraDefs.count()-1]);
@@ -736,7 +736,7 @@ Form::arrange()
 
     // special case -- a textbox and its the only field on the tab needs no label
     //                 this is how the "Notes" tab is created
-    if (fields.count() == 1 && fields[0]->definition.type == FIELD_TEXTBOX) {
+    if (fields.count() == 1 && fields[0]->definition.type == GcFieldType::FIELD_TEXTBOX) {
         hlayout->addWidget(fields[0]->widget, 0, Qt::Alignment());
         ((GTextEdit*)(fields[0]->widget))->setFrameStyle(QFrame::NoFrame);
         ((GTextEdit*)(fields[0]->widget))->viewport()->setAutoFillBackground(false);
@@ -771,7 +771,8 @@ Form::arrange()
         Qt::Alignment labelalignment = Qt::AlignLeft|Qt::AlignTop;
         Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignTop;
 
-        if (fields[i]->definition.type < FIELD_SHORTTEXT) alignment = Qt::Alignment(); // text types
+        if ((fields[i]->definition.type == GcFieldType::FIELD_TEXT) ||
+            (fields[i]->definition.type == GcFieldType::FIELD_TEXTBOX)) alignment = Qt::Alignment(); // text types
 
         here->addWidget(fields[i]->label, y, 0, labelalignment);
 
@@ -784,7 +785,7 @@ Form::arrange()
             override->addWidget(fields[i]->widget);
             here->addLayout(override, y, 1, alignment);
 
-        //} else  if (fields[i]->definition.type == FIELD_TEXTBOX) {
+        //} else  if (fields[i]->definition.type == GcFieldType::FIELD_TEXTBOX) {
         //    here->addWidget(fields[i]->widget, ++y, 0, 2, 2, alignment);
         //    y++;
         } else {
@@ -904,7 +905,7 @@ FormField::FormField(Form *form, FieldDefinition field, RideMetadata *meta) : fo
     warn = false;
 
     if (SpecialFields::getInstance().isMetric(field.name)) {
-        field.type = FIELD_DOUBLE; // whatever they say, we want a double!
+        field.type = GcFieldType::FIELD_DOUBLE; // whatever they say, we want a double!
         units = SpecialFields::getInstance().rideMetric(field.name)->units(GlobalContext::context()->useMetricUnits);
         // remove "seconds", since the field will be a QTimeEdit field
         if (units == "seconds" || units == tr("seconds")) units = "";
@@ -913,7 +914,7 @@ FormField::FormField(Form *form, FieldDefinition field, RideMetadata *meta) : fo
     }
 
     // we need to show what units we use for weight...
-    if (field.name == "Weight" && field.type == FIELD_DOUBLE) {
+    if (field.name == "Weight" && field.type == GcFieldType::FIELD_DOUBLE) {
         units = GlobalContext::context()->useMetricUnits ? tr(" (kg)") : tr (" (lbs)");
     }
 
@@ -925,8 +926,8 @@ FormField::FormField(Form *form, FieldDefinition field, RideMetadata *meta) : fo
     completer = NULL; // by default we don't have one
     switch(field.type) {
 
-    case FIELD_TEXT : // text
-    case FIELD_SHORTTEXT : // shorttext
+    case GcFieldType::FIELD_TEXT : // text
+    case GcFieldType::FIELD_SHORTTEXT : // shorttext
 
         completer = field.getCompleter(this, meta->context->athlete->rideCache);
         widget = new QLineEdit(this);
@@ -937,7 +938,7 @@ FormField::FormField(Form *form, FieldDefinition field, RideMetadata *meta) : fo
         connect (widget, SIGNAL(editingFinished()), this, SLOT(editFinished()));
         break;
 
-    case FIELD_TEXTBOX : // textbox
+    case GcFieldType::FIELD_TEXTBOX : // textbox
         widget = new GTextEdit(this);
 
         // use special style sheet ..
@@ -955,7 +956,7 @@ FormField::FormField(Form *form, FieldDefinition field, RideMetadata *meta) : fo
        }
         break;
 
-    case FIELD_INTEGER : // integer
+    case GcFieldType::FIELD_INTEGER : // integer
         widget = new QSpinBox(this);
         ((QSpinBox*)widget)->setMinimum(-9999999);
         ((QSpinBox*)widget)->setMaximum(9999999);
@@ -964,7 +965,7 @@ FormField::FormField(Form *form, FieldDefinition field, RideMetadata *meta) : fo
         connect (widget, SIGNAL(editingFinished()), this, SLOT(editFinished()));
         break;
 
-    case FIELD_DOUBLE : // double
+    case GcFieldType::FIELD_DOUBLE : // double
         widget = new QDoubleSpinBox(this);
         //widget->setFixedHeight(18);
         ((QDoubleSpinBox*)widget)->setButtonSymbols(QAbstractSpinBox::NoButtons);
@@ -992,7 +993,7 @@ FormField::FormField(Form *form, FieldDefinition field, RideMetadata *meta) : fo
         connect (widget, SIGNAL(editingFinished()), this, SLOT(editFinished()));
         break;
 
-    case FIELD_DATE : // date
+    case GcFieldType::FIELD_DATE : // date
         widget = new QDateEdit(this);
         ((QDateEdit*)widget)->setButtonSymbols(QAbstractSpinBox::NoButtons);
         ((QDateEdit*)widget)->setDisplayFormat("dd/MM/yyyy");
@@ -1001,7 +1002,7 @@ FormField::FormField(Form *form, FieldDefinition field, RideMetadata *meta) : fo
         connect (widget, SIGNAL(editingFinished()), this, SLOT(editFinished()));
         break;
 
-    case FIELD_TIME : // time
+    case GcFieldType::FIELD_TIME : // time
         widget = new QTimeEdit(this);
         ((QTimeEdit*)widget)->setButtonSymbols(QAbstractSpinBox::NoButtons);
         //widget->setFixedHeight(18);
@@ -1010,7 +1011,7 @@ FormField::FormField(Form *form, FieldDefinition field, RideMetadata *meta) : fo
         connect (widget, SIGNAL(editingFinished()), this, SLOT(editFinished()));
         break;
 
-    case FIELD_CHECKBOX : // check
+    case GcFieldType::FIELD_CHECKBOX : // check
         widget = new QCheckBox(this);
         //widget->setFixedHeight(18);
         connect(widget, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
@@ -1072,18 +1073,18 @@ FormField::metadataFlush()
 
     // get the current value into a string
     switch (definition.type) {
-    case FIELD_TEXT :
-    case FIELD_SHORTTEXT :
+    case GcFieldType::FIELD_TEXT :
+    case GcFieldType::FIELD_SHORTTEXT :
              text = ((QLineEdit*)widget)->text();
              break;
-    case FIELD_TEXTBOX :
+    case GcFieldType::FIELD_TEXTBOX :
         {
             text = ((GTextEdit*)widget)->document()->toPlainText();
             break;
         }
 
-    case FIELD_INTEGER : text = QString("%1").arg(((QSpinBox*)widget)->value()); break;
-    case FIELD_DOUBLE :
+    case GcFieldType::FIELD_INTEGER : text = QString("%1").arg(((QSpinBox*)widget)->value()); break;
+    case GcFieldType::FIELD_DOUBLE :
         {
             if (!isTime) text = QString("%1").arg(((QDoubleSpinBox*)widget)->value());
             else {
@@ -1091,11 +1092,11 @@ FormField::metadataFlush()
             }
         }
         break;
-    case FIELD_CHECKBOX :
+    case GcFieldType::FIELD_CHECKBOX :
         text = ((QCheckBox *)widget)->isChecked() ? "1" : "0";
         break;
-    case FIELD_DATE : text = ((QDateEdit*)widget)->date().toString("dd/MM/yyyy"); break;
-    case FIELD_TIME : text = ((QTimeEdit*)widget)->time().toString("hh:mm:ss.zzz"); break;
+    case GcFieldType::FIELD_DATE : text = ((QDateEdit*)widget)->date().toString("dd/MM/yyyy"); break;
+    case GcFieldType::FIELD_TIME : text = ((QTimeEdit*)widget)->time().toString("hh:mm:ss.zzz"); break;
     }
 
     // Update special field
@@ -1150,7 +1151,7 @@ FormField::metadataFlush()
 
             // we need to convert from display value to
             // stored value for the Weight field:
-            if (definition.type == FIELD_DOUBLE && definition.name == "Weight" && GlobalContext::context()->useMetricUnits == false) {
+            if (definition.type == GcFieldType::FIELD_DOUBLE && definition.name == "Weight" && GlobalContext::context()->useMetricUnits == false) {
                 double kg = text.toDouble() / LB_PER_KG;
                 text = QString("%1").arg(kg);
             }
@@ -1172,7 +1173,7 @@ FormField::focusOut(QFocusEvent *)
     if (ourRideItem && ourRideItem->ride()) {
 
         // watch to see if we actually have changed ?
-        if (definition.type == FIELD_TEXTBOX && definition.name != "Change History") {
+        if (definition.type == GcFieldType::FIELD_TEXTBOX && definition.name != "Change History") {
 
             // what did we used to be ?
             QString value = definition.interval ? form->interval->getTag(definition.name, "")
@@ -1194,7 +1195,7 @@ FormField::editFinished()
     bool changed = false;
 
     if (active || ourRideItem == NULL ||
-        (edited == false && definition.type != FIELD_TEXTBOX) ||
+        (edited == false && definition.type != GcFieldType::FIELD_TEXTBOX) ||
         ourRideItem == NULL) return;
 
     // get values from the widgets
@@ -1202,8 +1203,8 @@ FormField::editFinished()
 
     // get the current value into a string
     switch (definition.type) {
-    case FIELD_TEXT :
-    case FIELD_SHORTTEXT :
+    case GcFieldType::FIELD_TEXT :
+    case GcFieldType::FIELD_SHORTTEXT :
              text = ((QLineEdit*)widget)->text();
 
              // we specified a value list and ignored it...
@@ -1219,22 +1220,22 @@ FormField::editFinished()
                   }
              }
              break;
-    case FIELD_TEXTBOX :
+    case GcFieldType::FIELD_TEXTBOX :
         {
             text = ((GTextEdit*)widget)->document()->toPlainText();
             break;
         }
 
-    case FIELD_INTEGER : text = QString("%1").arg(((QSpinBox*)widget)->value()); break;
-    case FIELD_DOUBLE : {
+    case GcFieldType::FIELD_INTEGER : text = QString("%1").arg(((QSpinBox*)widget)->value()); break;
+    case GcFieldType::FIELD_DOUBLE : {
                             if (!isTime) text = QString("%1").arg(((QDoubleSpinBox*)widget)->value());
                             else {
                                 text = QString("%1").arg(QTime(0,0,0,0).secsTo(((QTimeEdit*)widget)->time()));
                             }
                         }
                         break;
-    case FIELD_DATE : text = ((QDateEdit*)widget)->date().toString("dd/MM/yyyy"); break;
-    case FIELD_TIME : text = ((QTimeEdit*)widget)->time().toString("hh:mm:ss.zzz"); break;
+    case GcFieldType::FIELD_DATE : text = ((QDateEdit*)widget)->date().toString("dd/MM/yyyy"); break;
+    case GcFieldType::FIELD_TIME : text = ((QTimeEdit*)widget)->time().toString("hh:mm:ss.zzz"); break;
     }
 
     meta->active = active = true;
@@ -1319,7 +1320,7 @@ FormField::editFinished()
 
             // we need to convert from display value to
             // stored value for the Weight field:
-            if (definition.type == FIELD_DOUBLE && definition.name == "Weight" && GlobalContext::context()->useMetricUnits == false) {
+            if (definition.type == GcFieldType::FIELD_DOUBLE && definition.name == "Weight" && GlobalContext::context()->useMetricUnits == false) {
                 double kg = text.toDouble() / LB_PER_KG;
                 text = QString("%1").arg(kg);
             }
@@ -1405,7 +1406,7 @@ FormField::stateChanged(int state)
     if (definition.interval && form->interval == NULL) return;
 
     // are we a checkbox -- do the simple stuff
-    if (definition.type == FIELD_CHECKBOX) {
+    if (definition.type == GcFieldType::FIELD_CHECKBOX) {
         if (definition.interval) form->interval->setTag(definition.name, ((QCheckBox *)widget)->isChecked() ? "1" : "0");
         else ourRideItem->ride()->setTag(definition.name, ((QCheckBox *)widget)->isChecked() ? "1" : "0");
         ourRideItem->setDirty(true);
@@ -1515,21 +1516,21 @@ FormField::metadataChanged()
 
     if (!enabled) { // not a ride metric 
         switch (definition.type) {
-        case FIELD_TEXT : // text
-        case FIELD_SHORTTEXT : // shorttext
+        case GcFieldType::FIELD_TEXT : // text
+        case GcFieldType::FIELD_SHORTTEXT : // shorttext
                 ((QLineEdit*)widget)->setText(value);
             break;
 
-        case FIELD_TEXTBOX : // textbox
+        case GcFieldType::FIELD_TEXTBOX : // textbox
             if (definition.name != "Summary")
                 ((GTextEdit*)widget)->setText(value);
             break;
 
-        case FIELD_INTEGER : // integer
+        case GcFieldType::FIELD_INTEGER : // integer
             ((QSpinBox*)widget)->setValue(value.toInt());
             break;
 
-        case FIELD_DOUBLE : // double
+        case GcFieldType::FIELD_DOUBLE : // double
             if (isTime) ((QTimeEdit*)widget)->setTime(QTime(0,0,0,0).addSecs(value.toDouble()));
             else {
                 if (definition.name == "Weight" && GlobalContext::context()->useMetricUnits == false) {
@@ -1540,7 +1541,7 @@ FormField::metadataChanged()
             }
             break;
 
-        case FIELD_DATE: { // date
+        case GcFieldType::FIELD_DATE: { // date
             if (value == "") ((QDateEdit*)widget)->setDate(QDate(2000, 1, 1));
             else {
                 QDate date(/* year*/value.mid(6, 4).toInt(),
@@ -1551,7 +1552,7 @@ FormField::metadataChanged()
             }
             break;
 
-        case FIELD_TIME: { // time
+        case GcFieldType::FIELD_TIME: { // time
             if (value == "") ((QTimeEdit*)widget)->setTime(QTime(0,0,0)); else {
                 QTime time(/* hours*/ value.mid(0, 2).toInt(),
                            /* minutes */ value.mid(3, 2).toInt(),
@@ -1562,7 +1563,7 @@ FormField::metadataChanged()
             }
             break;
 
-        case FIELD_CHECKBOX : // checkbox
+        case GcFieldType::FIELD_CHECKBOX : // checkbox
             {
             ((QCheckBox*)widget)->setChecked((value == "1") ? true : false);
             }
@@ -1581,7 +1582,7 @@ FieldDefinition::fingerprint(QList<FieldDefinition> list)
 
         ba.append(def.tab.toUtf8());
         ba.append(def.name.toUtf8());
-        ba.append(def.type);
+        ba.append(static_cast<int>(def.type));
         ba.append(def.diary);
         ba.append(def.values.join("").toUtf8());
     }
@@ -1625,21 +1626,21 @@ FieldDefinition::calendarText(QString value)
     if (value.isEmpty() || diary != true) return QString();
 
     switch (type) {
-        case FIELD_TIME:
+        case GcFieldType::FIELD_TIME:
         if (name == "Start Time") {
             return QString("%1: %2\n").arg(name).arg(QTime(0, 0, 0).addSecs(value.toInt()).toString("hh:mm:ss.zzz"));
         }
-        case FIELD_DATE:
+        case GcFieldType::FIELD_DATE:
         if (name == "Start Date") {
             return QString("%1: %2\n").arg(name).arg(QDate(1900, 01, 01).addDays(value.toInt()).toString("dd/MM/yyyy"));
         }
-        case FIELD_INTEGER:
-        case FIELD_DOUBLE:
-        case FIELD_CHECKBOX:
+        case GcFieldType::FIELD_INTEGER:
+        case GcFieldType::FIELD_DOUBLE:
+        case GcFieldType::FIELD_CHECKBOX:
             return QString("%1: %2\n").arg(name).arg(value);
-        case FIELD_TEXT:
-        case FIELD_TEXTBOX:
-        case FIELD_SHORTTEXT:
+        case GcFieldType::FIELD_TEXT:
+        case GcFieldType::FIELD_TEXTBOX:
+        case GcFieldType::FIELD_SHORTTEXT:
         default:
             return QString("%1\n").arg(value);
     }
@@ -1722,7 +1723,7 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
         out<<QString("\t\t<field>\n");
         out<<QString("\t\t\t<fieldtab>\"%1\"</fieldtab>\n").arg(Utils::xmlprotect(field.tab));
         out<<QString("\t\t\t<fieldname>\"%1\"</fieldname>\n").arg(Utils::xmlprotect(field.name));
-        out<<QString("\t\t\t<fieldtype>%1</fieldtype>\n").arg(field.type);
+        out<<QString("\t\t\t<fieldtype>%1</fieldtype>\n").arg(static_cast<int>(field.type));
         out<<QString("\t\t\t<fieldvalues>\"%1\"</fieldvalues>\n").arg(Utils::xmlprotect(field.values.join(",")));
         out<<QString("\t\t\t<fielddiary>%1</fielddiary>\n").arg(field.diary ? 1 : 0);
         out<<QString("\t\t\t<fieldinterval>%1</fieldinterval>\n").arg(field.interval ? 1 : 0);
@@ -1797,17 +1798,17 @@ RideMetadata::readXML(QString filename, QList<KeywordDefinition>&keywordDefiniti
         if (fieldDefinitions[i].name == "Time Riding" && fieldDefinitions[i].tab == "Metric") fieldDefinitions[i].name = "Time Moving";
 
         // set type to correct value if a 1st class variable
-        if (fieldDefinitions[i].name == "Device") fieldDefinitions[i].type = FIELD_SHORTTEXT;
-        else if (fieldDefinitions[i].name == "Recording Interval") fieldDefinitions[i].type = FIELD_DOUBLE;
-        else if (fieldDefinitions[i].name == "Start Date") fieldDefinitions[i].type = FIELD_DATE;
-        else if (fieldDefinitions[i].name == "Start Time") fieldDefinitions[i].type = FIELD_TIME;
-        else if (fieldDefinitions[i].name == "Identifier") fieldDefinitions[i].type = FIELD_SHORTTEXT;
+        if (fieldDefinitions[i].name == "Device") fieldDefinitions[i].type = GcFieldType::FIELD_SHORTTEXT;
+        else if (fieldDefinitions[i].name == "Recording Interval") fieldDefinitions[i].type = GcFieldType::FIELD_DOUBLE;
+        else if (fieldDefinitions[i].name == "Start Date") fieldDefinitions[i].type = GcFieldType::FIELD_DATE;
+        else if (fieldDefinitions[i].name == "Start Time") fieldDefinitions[i].type = GcFieldType::FIELD_TIME;
+        else if (fieldDefinitions[i].name == "Identifier") fieldDefinitions[i].type = GcFieldType::FIELD_SHORTTEXT;
     }
 
     if (!hasCalendarText) {
         FieldDefinition add;
         add.name = "Calendar Text";
-        add.type = 1;
+        add.type = GcFieldType::FIELD_TEXTBOX;
         add.diary = false;
         add.tab = "";
 
@@ -1816,7 +1817,7 @@ RideMetadata::readXML(QString filename, QList<KeywordDefinition>&keywordDefiniti
     if (!hasData) {
         FieldDefinition add;
         add.name = "Data";
-        add.type = 2;
+        add.type = GcFieldType::FIELD_SHORTTEXT;
         add.diary = false;
         add.tab = "";
 
@@ -1842,8 +1843,8 @@ bool MetadataXMLParser::endElement( const QString&, const QString&, const QStrin
     else if(qName == "fieldname") field.name =  Utils::unprotect(buffer);
     else if(qName == "fieldexpression") field.expression =  Utils::unprotect(buffer);
     else if(qName == "fieldtype") {
-        field.type = buffer.trimmed().toInt();
-        if (field.tab != "" && field.type < 3 && field.name != "Filename" &&
+        field.type = static_cast<GcFieldType>(buffer.trimmed().toInt());
+        if (field.tab != "" && field.isTextField() && field.name != "Filename" &&
             field.name != "Change History") field.diary = true; // default!
     } else if(qName == "fieldvalues") {
         field.values = Utils::unprotect(buffer).split(",", Qt::SkipEmptyParts);

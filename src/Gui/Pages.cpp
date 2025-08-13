@@ -2293,7 +2293,9 @@ KeywordsPage::pageSelected()
     QList<FieldDefinition> fromFieldsPage;
     parent->fieldsPage->getDefinitions(fromFieldsPage);
     foreach(FieldDefinition x, fromFieldsPage) {
-        if (x.type < 3) fieldChooser->addItem(sp.displayName(x.name));
+        if (x.isTextField()) {
+            fieldChooser->addItem(sp.displayName(x.name));
+        }
     }
     fieldChooser->setCurrentIndex(fieldChooser->findText(sp.displayName(prev)));
 }
@@ -2457,7 +2459,7 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
         add->setFlags(add->flags() | Qt::ItemIsEditable);
         add->setText(0, specialTabs.displayName(field.tab)); // tab name
         add->setText(1, specials.displayName(field.name)); // field name
-        add->setData(2, Qt::DisplayRole, field.type);
+        add->setData(2, Qt::DisplayRole, static_cast<int>(field.type));
         add->setText(3, field.values.join(",")); // values
         fields->setItemWidget(add, 4, checkBox);
         fields->setItemWidget(add, 5, checkBoxInt);
@@ -2585,9 +2587,9 @@ FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
         add.expression = item->text(6);
 
         if (sp.isMetric(add.name))
-            add.type = 4;
+            add.type = GcFieldType::FIELD_DOUBLE;
         else
-            add.type = item->data(2, Qt::DisplayRole).toInt();
+            add.type = static_cast<GcFieldType>(item->data(2, Qt::DisplayRole).toInt());
 
         fieldList.append(add);
     }

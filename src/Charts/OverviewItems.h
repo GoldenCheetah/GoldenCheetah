@@ -383,7 +383,7 @@ class MetaOverviewItem : public ChartSpaceItem
         void configChanged(qint32) override;
 
         QString symbol;
-        int fieldtype;
+        GcFieldType fieldtype;
 
         // for numeric metadata items
         bool up, showrange;

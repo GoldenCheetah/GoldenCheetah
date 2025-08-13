@@ -43,8 +43,8 @@ MetadataDialog::MetadataDialog(Context* context, const QString& fieldName, const
 
     switch (field_.type) {
 
-    case FIELD_TEXT: // text
-    case FIELD_SHORTTEXT: { // shorttext
+    case GcFieldType::FIELD_TEXT: // text
+    case GcFieldType::FIELD_SHORTTEXT: { // shorttext
         metaEdit_ = new QLineEdit(this);
         completer_ = field_.getCompleter(this, context_->athlete->rideCache);
         if (completer_) ((QLineEdit*)metaEdit_)->setCompleter(completer_);
@@ -52,7 +52,7 @@ MetadataDialog::MetadataDialog(Context* context, const QString& fieldName, const
         ((QLineEdit*)metaEdit_)->setText(value);
         } break;
 
-    case FIELD_TEXTBOX: { // textbox
+    case GcFieldType::FIELD_TEXTBOX: { // textbox
         metaEdit_ = new GTextEdit(this);
         // use special style sheet ..
         ((GTextEdit*)metaEdit_)->setObjectName("metadata");
@@ -63,7 +63,7 @@ MetadataDialog::MetadataDialog(Context* context, const QString& fieldName, const
         ((GTextEdit*)metaEdit_)->setText(value);
         } break;
 
-    case FIELD_INTEGER: { // integer
+    case GcFieldType::FIELD_INTEGER: { // integer
         metaEdit_ = new QSpinBox(this);
         ((QSpinBox*)metaEdit_)->setMinimum(-9999999);
         ((QSpinBox*)metaEdit_)->setMaximum(9999999);
@@ -72,7 +72,7 @@ MetadataDialog::MetadataDialog(Context* context, const QString& fieldName, const
         ((QSpinBox*)metaEdit_)->setValue(value.toInt());
         } break;
 
-    case FIELD_DOUBLE: { // double
+    case GcFieldType::FIELD_DOUBLE: { // double
         metaEdit_ = new QDoubleSpinBox(this);
         ((QDoubleSpinBox*)metaEdit_)->setButtonSymbols(QAbstractSpinBox::NoButtons);
         ((QDoubleSpinBox*)metaEdit_)->setMinimum(-9999999.99);
@@ -81,7 +81,7 @@ MetadataDialog::MetadataDialog(Context* context, const QString& fieldName, const
         ((QDoubleSpinBox*)metaEdit_)->setValue(value.toDouble());
         } break;
 
-    case FIELD_DATE: { // date
+    case GcFieldType::FIELD_DATE: { // date
         metaEdit_ = new QDateEdit(this);
         ((QDateEdit*)metaEdit_)->setButtonSymbols(QAbstractSpinBox::NoButtons);
         ((QDateEdit*)metaEdit_)->setDisplayFormat("dd/MM/yyyy");
@@ -96,7 +96,7 @@ MetadataDialog::MetadataDialog(Context* context, const QString& fieldName, const
             ((QDateEdit*)metaEdit_)->setDate(date);
         } } break;
 
-    case FIELD_TIME: { // time
+    case GcFieldType::FIELD_TIME: { // time
         metaEdit_ = new QTimeEdit(this);
         ((QTimeEdit*)metaEdit_)->setButtonSymbols(QAbstractSpinBox::NoButtons);
         ((QTimeEdit*)metaEdit_)->setDisplayFormat("hh:mm:ss");
@@ -110,10 +110,12 @@ MetadataDialog::MetadataDialog(Context* context, const QString& fieldName, const
             ((QTimeEdit*)metaEdit_)->setTime(time);
         } } break;
 
-    case FIELD_CHECKBOX: { // check
+    case GcFieldType::FIELD_CHECKBOX: { // check
         metaEdit_ = new QCheckBox(this);
         ((QCheckBox*)metaEdit_)->setChecked((value == "1") ? true : false);
         } break;
+    default:
+        qDebug() << "Metadata field type not set"; break;
     }
 
     // Metadata
@@ -175,22 +177,24 @@ MetadataDialog::okClicked()
 
     // get the current value into a string
     switch (field_.type) {
-    case FIELD_TEXT:
-    case FIELD_SHORTTEXT: text = ((QLineEdit*)metaEdit_)->text(); break;
-    case FIELD_TEXTBOX: text = ((GTextEdit*)metaEdit_)->document()->toPlainText(); break;
-    case FIELD_INTEGER: text = QString("%1").arg(((QSpinBox*)metaEdit_)->value()); break;
-    case FIELD_DOUBLE: text = QString("%1").arg(((QDoubleSpinBox*)metaEdit_)->value()); break;
-    case FIELD_CHECKBOX: text = ((QCheckBox*)metaEdit_)->isChecked() ? "1" : "0"; break;
-    case FIELD_DATE:
+    case GcFieldType::FIELD_TEXT:
+    case GcFieldType::FIELD_SHORTTEXT: text = ((QLineEdit*)metaEdit_)->text(); break;
+    case GcFieldType::FIELD_TEXTBOX: text = ((GTextEdit*)metaEdit_)->document()->toPlainText(); break;
+    case GcFieldType::FIELD_INTEGER: text = QString("%1").arg(((QSpinBox*)metaEdit_)->value()); break;
+    case GcFieldType::FIELD_DOUBLE: text = QString("%1").arg(((QDoubleSpinBox*)metaEdit_)->value()); break;
+    case GcFieldType::FIELD_CHECKBOX: text = ((QCheckBox*)metaEdit_)->isChecked() ? "1" : "0"; break;
+    case GcFieldType::FIELD_DATE:
         if (((QDateEdit*)metaEdit_)->date().isValid()) {
             text = ((QDateEdit*)metaEdit_)->date().toString("dd/MM/yyyy");
         }
         break;
-    case FIELD_TIME:
+    case GcFieldType::FIELD_TIME:
         if (((QTimeEdit*)metaEdit_)->time().isValid()) {
             text = ((QTimeEdit*)metaEdit_)->time().toString("hh:mm:ss"); break;
         }
         break;
+    default:
+        qDebug() << "Metadata field type not set"; break;
     }
 
     RideItem* rideI = context_->rideItem();

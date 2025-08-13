@@ -3527,7 +3527,7 @@ void DataFilter::configChanged(qint32)
                 field.name = sp.internalName((field.name));
 
                 rt.lookupMap.insert(underscored.replace(" ","_"), field.name);
-                rt.lookupType.insert(underscored.replace(" ","_"), (field.type > 2)); // true if is number
+                rt.lookupType.insert(underscored.replace(" ","_"), (field.isNumericField())); // true if is number
             }
     }
 

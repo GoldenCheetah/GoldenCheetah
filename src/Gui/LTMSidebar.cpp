@@ -745,7 +745,7 @@ LTMSidebar::setAutoFilterMenu()
     SpecialFields& sp = SpecialFields::getInstance();
     foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
 
-        if (field.tab != "" && (field.type == 0 || field.type == 2)) { // we only do text or shorttext fields
+        if (field.tab != "" && (field.type == GcFieldType::FIELD_TEXT || field.type == GcFieldType::FIELD_SHORTTEXT)) { // we only do text or shorttext fields
 
             QAction *action = new QAction(sp.displayName(field.name), this);
             action->setCheckable(true);
