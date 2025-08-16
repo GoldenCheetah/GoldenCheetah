@@ -2557,15 +2557,8 @@ IntervalOverviewItem::setData(RideItem *item, bool animate)
 
 
     // set scale
-#if 0 // not clear why this is here or what it is supposed to do
-      // but it results in items being filtered out.
-    double ydiff = (maxy-miny) / 10.0f;
-    if (miny >= 0 && ydiff > miny) miny = ydiff;
-    double xdiff = (maxx-minx) / 10.0f;
-    if (minx >= 0 && xdiff > minx) minx = xdiff;
-#endif
-    maxx=round(maxx); minx=round(minx);
-    maxy=round(maxy); miny=round(miny);
+    maxx=ceil(maxx); minx=floor(minx);
+    maxy=ceil(maxy); miny=floor(miny);
 
     // set range before points to filter
     bubble->setPoints(points, minx,maxx,miny,maxy, animate);
@@ -4632,8 +4625,8 @@ BubbleViz::setPoints(QList<BPointF> p, double minx, double maxx, double miny, do
     this->points.clear();
     foreach(BPointF point, p) {
 
-        if (point.x < minx || point.x > maxx || !std::isfinite(point.x) || std::isnan(point.x) || point.x == 0 ||
-            point.y < miny || point.y > maxy || !std::isfinite(point.y) || std::isnan(point.y) || point.y == 0 ||
+        if (point.x < minx || point.x > maxx || !std::isfinite(point.x) || std::isnan(point.x) ||
+            point.y < miny || point.y > maxy || !std::isfinite(point.y) || std::isnan(point.y) ||
             point.z == 0 || !std::isfinite(point.z) || std::isnan(point.z)) continue;
 
         this->points << point;
