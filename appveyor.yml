@@ -67,8 +67,9 @@ init:
 - sh: >-
     if $CI_LINUX; then
       export OS_NAME=linux
-      # Setup QT 5.15
-      export QTDIR=$HOME/Qt/5.15/gcc_64
+      # Setup QT 6.8
+      export QTDIR=$HOME/Qt/6.8
+      export LD_LIBRARY_PATH=$QTDIR:$LD_LIBRARY_PATH
       export PATH=$QTDIR/bin:$PATH
       qmake --version
     else

@@ -28,11 +28,6 @@ EOF
 # Icon
 cp Resources/images/gc.png appdir/
 
-### Add vlc 3
-mkdir appdir/lib
-cp -r /usr/lib/x86_64-linux-gnu/vlc appdir/lib/vlc
-sudo appdir/lib/vlc/vlc-cache-gen appdir/lib/vlc/plugins
-
 ### Download current version of linuxdeployqt
 wget --no-verbose -c https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
 chmod a+x linuxdeployqt-continuous-x86_64.AppImage
