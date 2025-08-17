@@ -46,8 +46,8 @@ extern YYSTYPE yylval;
 [0-9]+m              { yytext[strlen(yytext) - 1] = '\0'; WorkoutFilterlval.numValue = atoi(yytext) * 30; return DAYS; }
 [0-9]+y              { yytext[strlen(yytext) - 1] = '\0'; WorkoutFilterlval.numValue = atoi(yytext) * 365; return DAYS; }
 [0-9]+:[0-6][0-9]    { int minutes = atoi(yytext + strlen(yytext) - 2); yytext[strlen(yytext) - 2] = '\0'; WorkoutFilterlval.numValue = atoi(yytext) * 60 + minutes; return TIME; }
-[0-9]+\.[0-9]+       { WorkoutFilterlval.floatValue = QString(yytext).toFloat(); return FLOAT; }
-[0-9]+               { WorkoutFilterlval.numValue = atoi(yytext); return NUMBER; }
+[0-9]+\.[0-9]+       { WorkoutFilterlval.floatValue = QString(yytext).toFloat(); return WF_FLOAT; }
+[0-9]+               { WorkoutFilterlval.numValue = atoi(yytext); return WF_NUMBER; }
 
 [ \t]                ;   /* ignore white space */
 
@@ -73,8 +73,8 @@ extern YYSTYPE yylval;
 [Gg][Rr][Aa][Dd][Ee]                               { return GRADE; }
 [Ff][Ii][Ll][Ee]                                   { return FILEPATH; }
 [zZ]([1-9]|10)                                     { yytext += 1; WorkoutFilterlval.numValue = atoi(yytext); return ZONE; }
-\"[^\"]+\"                                         { yytext[strlen(yytext) - 1] = '\0'; WorkoutFilterlval.word = yytext + 1; return WORD; }
-[^ ,.]+                                            { WorkoutFilterlval.word = yytext; return WORD; }
+\"[^\"]+\"                                         { yytext[strlen(yytext) - 1] = '\0'; WorkoutFilterlval.word = yytext + 1; return WF_WORD; }
+[^ ,.]+                                            { WorkoutFilterlval.word = yytext; return WF_WORD; }
 .                                                  { return yytext[0]; }
 
 %%
