@@ -362,6 +362,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
 #endif //GC_VIDEO_NONE
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(selectWorkout(QString)), this, SLOT(selectWorkout(QString)));
+    connect(context, SIGNAL(selectWorkout(int)), this, SLOT(selectWorkout(int)));
     connect(trainDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
 
     connect(workoutTree->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(workoutTreeWidgetSelectionChanged()));
@@ -3261,6 +3262,12 @@ TrainSidebar::selectWorkout(QString fullpath)
             break;
         }
     }
+}
+
+void
+TrainSidebar::selectWorkout(int idx)
+{
+    workoutTree->setCurrentIndex(workoutTree->model()->index(idx, TdbWorkoutModelIdx::filepath));
 }
 
 // got a remote control command

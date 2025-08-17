@@ -63,9 +63,9 @@ extern QString workoutModelErrorMsg;
 %token SEPARATOR
 %token <floatValue> FLOAT
 %token <numValue> NUMBER ZONE PERCENT DAYS TIME MINPOWER MAXPOWER AVGPOWER ISOPOWER POWER LASTRUN CREATED DISTANCE ELEVATION GRADE
-%token <word> WORD
+%token <word> WORD FILEPATH
 
-%type <filter> zone dominantzone duration stress intensity vi xpower ri bikescore svi rating minpower maxpower avgpower isopower lastrun created distance elevation grade
+%type <filter> zone dominantzone duration stress intensity vi xpower ri bikescore svi rating minpower maxpower avgpower isopower lastrun created distance elevation grade filepath
 %type <filterPair> power
 %type <wordList> word words
 %type <floatValue> mixedNumValue
@@ -98,6 +98,7 @@ statement:  dominantzone  { workoutModelFilters << $1; }
     |       distance      { workoutModelFilters << $1; }
     |       elevation     { workoutModelFilters << $1; }
     |       grade         { workoutModelFilters << $1; }
+    |       filepath      { workoutModelFilters << $1; }
     |       words         { workoutModelFilters << new ModelStringContainsFilter(TdbWorkoutModelIdx::fulltext, *$1); }
     ;
 
@@ -234,6 +235,9 @@ grade: GRADE PERCENT                      { $$ = new ModelNumberEqualFilter(TdbW
     |  GRADE PERCENT RANGESYMBOL PERCENT  { $$ = new ModelNumberRangeFilter(TdbWorkoutModelIdx::avgGrade, $2, $4); }
     |  GRADE RANGESYMBOL PERCENT          { $$ = new ModelNumberRangeFilter(TdbWorkoutModelIdx::avgGrade, 0, $3); }
     |  GRADE PERCENT RANGESYMBOL          { $$ = new ModelNumberRangeFilter(TdbWorkoutModelIdx::avgGrade, $2); }
+    ;
+
+filepath: FILEPATH word { $$ = new ModelStringContainsFilter(TdbWorkoutModelIdx::filepath, *$2); }
     ;
 
 words: word words  { *$1 << *$2; delete $2; $$ = $1; }

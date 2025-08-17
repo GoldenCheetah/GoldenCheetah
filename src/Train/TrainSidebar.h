@@ -161,6 +161,7 @@ class TrainSidebar : public GcWindow
         void selectVideo(QString fullpath);
         void selectVideoSync(QString fullpath);
         void selectWorkout(QString fullpath);
+        void selectWorkout(int idx);
 
         void removeInvalidVideoSync();
         void removeInvalidWorkout();

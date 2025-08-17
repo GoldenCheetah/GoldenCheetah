@@ -84,3 +84,62 @@ workoutFilterCommands
     filterCommands.sort(Qt::CaseInsensitive);
     return filterCommands;
 }
+
+
+extern QString
+buildWorkoutFilter
+(RideItem * const rideItem)
+{
+    QString filter;
+    QString filename = rideItem->getText("WorkoutFilename", "").trimmed();
+    if (! filename.isEmpty()) {
+        filter = QString("file \"%1\"").arg(filename);
+    } else {
+        QHash<QString, int> ergMetrics;
+        ergMetrics["duration"] = rideItem->getForSymbol("workout_time");
+        ergMetrics["avgpower"] = rideItem->getForSymbol("average_pwer");
+        ergMetrics["stress"] = rideItem->getForSymbol("coggan_tss");
+        ergMetrics["isopower"] = rideItem->getForSymbol("coggan_np");
+        ergMetrics["bikescore"] = rideItem->getForSymbol("skiba_bike_score");
+        ergMetrics["xpower"] = rideItem->getForSymbol("skiba_xpower");
+        QHash<QString, int> slpMetrics;
+        slpMetrics["distance"] = rideItem->getForSymbol("total_distance");
+        slpMetrics["elevation"] = rideItem->getForSymbol("elevation_gain");
+        for (const QString &key : ergMetrics.keys()) {
+            if (ergMetrics[key] == 0) {
+                ergMetrics.remove(key);
+            }
+        }
+        for (const QString &key : slpMetrics.keys()) {
+            if (slpMetrics[key] == 0) {
+                slpMetrics.remove(key);
+            }
+        }
+
+        if (! filename.isEmpty()) {
+        } else if (ergMetrics.count() > 0) {
+            bool first = true;
+            for (const QString &key : ergMetrics.keys()) {
+                if (! first) {
+                    filter += ", ";
+                }
+                if (key == "duration") {
+                    filter += QString("%1 %2:%3").arg(key).arg(ergMetrics[key] / 3600).arg(ergMetrics[key] % 3600 / 60, 2, 10, QChar('0'));
+                } else {
+                    filter += QString("%1 %2").arg(key).arg(ergMetrics[key]);
+                }
+                first = false;
+            }
+        } else if (slpMetrics.count() > 0) {
+            bool first = true;
+            for (const QString &key : slpMetrics.keys()) {
+                if (! first) {
+                    filter += ", ";
+                }
+                filter += QString("%1 %2").arg(key).arg(slpMetrics[key]);
+                first = false;
+            }
+        }
+    }
+    return filter;
+}
