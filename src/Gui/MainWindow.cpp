@@ -2380,6 +2380,19 @@ MainWindow::importWorkout()
         Library::importFiles(currentAthleteTab->context, fileNamesCopy);
     }
 }
+
+void
+MainWindow::clearWorkoutFilterBox()
+{
+    workoutFilterBox->clear();
+}
+
+void
+MainWindow::fillinWorkoutFilterBox(const QString &filterText)
+{
+    workoutFilterBox->setText(filterText);
+}
+
 /*----------------------------------------------------------------------
  * TrainerDay
  *--------------------------------------------------------------------*/

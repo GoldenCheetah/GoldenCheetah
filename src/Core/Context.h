@@ -207,6 +207,7 @@ class Context : public QObject
         void notifyMediaSelected( QString x) { videoFilename = x; mediaSelected(x); }
         void notifySelectVideo(QString x) { selectMedia(x); }
         void notifySelectWorkout(QString x) { selectWorkout(x); }
+        void notifySelectWorkout(int idx ) { selectWorkout(idx); }
         void notifySelectVideoSync(QString x) { selectVideoSync(x); }
         void notifySetNow(long x) { now = x; setNow(x); }
         long getNow() { return now; }
@@ -330,6 +331,7 @@ class Context : public QObject
         void videoSyncFileSelected(VideoSyncFile *);
         void mediaSelected(QString);
         void selectWorkout(QString); // ask traintool to select this
+        void selectWorkout(int idx); // ask traintool to select this
         void selectMedia(QString); // ask traintool to select this
         void selectVideoSync(QString); // ask traintool to select this
         void setNow(long);

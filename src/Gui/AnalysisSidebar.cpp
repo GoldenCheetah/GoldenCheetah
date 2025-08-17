@@ -39,6 +39,9 @@
 // the ride cache
 #include "RideCache.h"
 
+// Show in Train Mode
+#include "WorkoutFilter.h"
+
 AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow), context(context)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -408,6 +411,20 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
         QAction *actFindBest = new QAction(tr("Find Intervals..."), intervalItem);
         connect(actFindBest, SIGNAL(triggered(void)), this, SLOT(addIntervals(void)));
         menu.addAction(actFindBest);
+
+        if (rideItem->planned && rideItem->sport == "Bike") {
+            QString filter = buildWorkoutFilter(rideItem);
+            if (! filter.isEmpty()) {
+                QAction *actStartWorkout = new QAction(tr("Show in Train Mode..."), rideNavigator);
+                connect(actStartWorkout, &QAction::triggered, [=]() {
+                    context->mainWindow->fillinWorkoutFilterBox(filter);
+                    context->mainWindow->selectTrain();
+                    context->notifySelectWorkout(0);
+                });
+                menu.addAction(actStartWorkout);
+            }
+        }
+
         menu.addSeparator();
 
         // ride navigator stuff
@@ -1064,5 +1081,3 @@ AnalysisSidebar::backInterval()
 
 #endif
 }
-
-
