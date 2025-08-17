@@ -81,7 +81,7 @@ ManualActivityWizard::ManualActivityWizard
 #else
     setWizardStyle(QWizard::ModernStyle);
 #endif
-    setPixmap(ICON_TYPE, svgAsColoredPixmap(":images/material/summit.svg", QSize(ICON_SIZE * dpiXFactor, ICON_SIZE * dpiYFactor), ICON_MARGIN * dpiXFactor, ICON_COLOR));
+    setPixmap(ICON_TYPE, svgAsColoredPixmap(":images/breeze/games-highscores.svg", QSize(ICON_SIZE * dpiXFactor, ICON_SIZE * dpiYFactor), ICON_MARGIN * dpiXFactor, ICON_COLOR));
 
     setPage(PageBasics, new ManualActivityPageBasics(context, plan, when));
     setPage(PageWorkout, new ManualActivityPageWorkout(context));
@@ -421,7 +421,7 @@ void
 ManualActivityPageBasics::sportsChanged
 ()
 {
-    QString path(":images/material/summit.svg");
+    QString path(":images/breeze/games-highscores.svg");
     QString sport = RideFile::sportTag(field("sport").toString().trimmed());
     if (sport == "Bike") {
         path = ":images/material/bike.svg";
@@ -435,8 +435,6 @@ ManualActivityPageBasics::sportsChanged
         path = ":images/material/ski.svg";
     } else if (sport == "Gym") {
         path = ":images/material/weight-lifter.svg";
-    } else if (! sport.isEmpty()) {
-        path = ":images/material/torch.svg";
     }
     wizard()->setPixmap(ICON_TYPE, svgAsColoredPixmap(path, QSize(ICON_SIZE * dpiXFactor, ICON_SIZE * dpiYFactor), ICON_MARGIN * dpiXFactor, ICON_COLOR));
 }

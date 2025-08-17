@@ -27,6 +27,7 @@
 #include <QList>
 #include <QDate>
 
+#include "MetricSelect.h"
 #include "Context.h"
 #include "Season.h"
 #include "Calendar.h"
@@ -39,6 +40,10 @@ class PlanningCalendarWindow : public GcChartWindow
 
     Q_PROPERTY(int firstDayOfWeek READ getFirstDayOfWeek WRITE setFirstDayOfWeek USER true)
     Q_PROPERTY(bool summaryVisibleMonth READ isSummaryVisibleMonth WRITE setSummaryVisibleMonth USER true)
+    Q_PROPERTY(QString primaryMainField READ getPrimaryMainField WRITE setPrimaryMainField USER true)
+    Q_PROPERTY(QString primaryFallbackField READ getPrimaryFallbackField WRITE setPrimaryFallbackField USER true)
+    Q_PROPERTY(QString secondaryMetric READ getSecondaryMetric WRITE setSecondaryMetric USER true)
+    Q_PROPERTY(QString summaryMetrics READ getSummaryMetrics WRITE setSummaryMetrics USER true)
 
     public:
         PlanningCalendarWindow(Context *context);
@@ -48,9 +53,20 @@ class PlanningCalendarWindow : public GcChartWindow
 
         bool isFiltered() const;
 
+        QString getPrimaryMainField() const;
+        QString getPrimaryFallbackField() const;
+        QString getSecondaryMetric() const;
+        QString getSummaryMetrics() const;
+        QStringList getSummaryMetricsList() const;
+
     public slots:
         void setFirstDayOfWeek(int fdw);
         void setSummaryVisibleMonth(bool svm);
+        void setPrimaryMainField(const QString &name);
+        void setPrimaryFallbackField(const QString &name);
+        void setSecondaryMetric(const QString &name);
+        void setSummaryMetrics(const QString &summaryMetrics);
+        void setSummaryMetrics(const QStringList &summaryMetrics);
         void configChanged(qint32);
 
     private:
@@ -59,14 +75,22 @@ class PlanningCalendarWindow : public GcChartWindow
 
         QComboBox *firstDayOfWeekCombo;
         QCheckBox *summaryMonthCheck;
+        QComboBox *primaryMainCombo;
+        QComboBox *primaryFallbackCombo;
+        QComboBox *secondaryCombo;
+        MultiMetricSelector *multiMetricSelector;
         Calendar *calendar;
 
+        void mkControls();
+        void updatePrimaryConfigCombos();
+        void updateSecondaryConfigCombo();
         QHash<QDate, QList<CalendarEntry>> getActivities(const QDate &firstDay, const QDate &lastDay) const;
+        QList<CalendarSummary> getWeeklySummaries(const QDate &firstDay, const QDate &lastDay) const;
         QHash<QDate, QList<CalendarEntry>> getPhasesEvents(const Season &season, const QDate &firstDay, const QDate &lastDay) const;
 
     private slots:
         void updateActivities();
-        void updateActivitiesIfVisible(RideItem *rideItem);
+        void updateActivitiesIfInRange(RideItem *rideItem);
         void updateSeason(Season const *season, bool allowKeepMonth = false);
         bool movePlannedActivity(RideItem *rideItem, const QDate &destDay, bool force = false);
 };

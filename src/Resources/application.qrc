@@ -124,6 +124,18 @@
         <file>xml/home-perspectives.xml</file>
         <file>ini/measures.ini</file>
         <file>html/ltm-summary.html</file>
+        <file>images/breeze/games-highscores.svg</file>
+        <file>images/breeze/network-mobile-0.svg</file>
+        <file>images/breeze/network-mobile-20.svg</file>
+        <file>images/breeze/network-mobile-40.svg</file>
+        <file>images/breeze/network-mobile-60.svg</file>
+        <file>images/breeze/network-mobile-80.svg</file>
+        <file>images/breeze/network-mobile-100.svg</file>
+        <file>images/breeze/task-process-0.svg</file>
+        <file>images/breeze/task-process-1.svg</file>
+        <file>images/breeze/task-process-2.svg</file>
+        <file>images/breeze/task-process-3.svg</file>
+        <file>images/breeze/task-process-4.svg</file>
         <file>images/breeze/light/unknown.svg</file>
         <file>images/breeze/light/offline.svg</file>
         <file>images/breeze/light/online.svg</file>
@@ -138,6 +150,10 @@
         <file>images/breeze/light/up.svg</file>
         <file>images/breeze/light/down.svg</file>
         <file>images/breeze/light/cal.svg</file>
+        <file>images/breeze/light/go-next-skip.svg</file>
+        <file>images/breeze/light/go-next.svg</file>
+        <file>images/breeze/light/go-previous-skip.svg</file>
+        <file>images/breeze/light/go-previous.svg</file>
         <file>images/breeze/dark/unknown.svg</file>
         <file>images/breeze/dark/offline.svg</file>
         <file>images/breeze/dark/online.svg</file>
@@ -152,6 +168,10 @@
         <file>images/breeze/dark/up.svg</file>
         <file>images/breeze/dark/down.svg</file>
         <file>images/breeze/dark/cal.svg</file>
+        <file>images/breeze/dark/go-next-skip.svg</file>
+        <file>images/breeze/dark/go-next.svg</file>
+        <file>images/breeze/dark/go-previous-skip.svg</file>
+        <file>images/breeze/dark/go-previous.svg</file>
         <file>images/toolbar/close-icon.png</file>
         <file>images/toolbar/save.png</file>
         <file>images/toolbar/saveas.png</file>
@@ -220,21 +240,12 @@
         <file>images/services/polarflow.png</file>
         <file>images/services/sporttracks.png</file>
         <file>images/services/nolio.png</file>
-        <file>images/material/summit.svg</file>
         <file>images/material/bike.svg</file>
         <file>images/material/run.svg</file>
         <file>images/material/swim.svg</file>
         <file>images/material/rowing.svg</file>
         <file>images/material/ski.svg</file>
         <file>images/material/weight-lifter.svg</file>
-        <file>images/material/torch.svg</file>
-        <file>images/material/calendar-blank.svg</file>
-        <file>images/material/plus.svg</file>
-        <file>images/material/podium.svg</file>
-        <file>images/material/podium-gold.svg</file>
-        <file>images/material/podium-silver.svg</file>
-        <file>images/material/podium-bronze.svg</file>
-        <file>images/material/arrow-left-right.svg</file>
         <file>python/library.py</file>
         <file>images/devices/imagic.png</file>
         <file>data/powerprofile.csv</file>

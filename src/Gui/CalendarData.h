@@ -25,7 +25,9 @@ struct CalendarPhase {
 };
 
 struct CalendarEntry {
-    QString name;
+    QString primary;
+    QString secondary;
+    QString secondaryMetric;
     QString iconFile;
     QColor color;
     QString reference;
@@ -44,14 +46,12 @@ struct CalendarDay {
     QList<CalendarEntry> headlineEntries = QList<CalendarEntry>();
 };
 
-struct CalendarWeeklySummary {
-    QDate firstDayOfWeek;
-    QList<CalendarEntry> entries;
-    QHash<int, int> entriesByType;
+struct CalendarSummary {
+    QList<std::pair<QString, QString>> keyValues;
 };
 
 Q_DECLARE_METATYPE(CalendarEntry)
 Q_DECLARE_METATYPE(CalendarDay)
-Q_DECLARE_METATYPE(CalendarWeeklySummary)
+Q_DECLARE_METATYPE(CalendarSummary)
 
 #endif

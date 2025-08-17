@@ -28,6 +28,9 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     bool helpEvent(QHelpEvent *event, QAbstractItemView *view, const QStyleOptionViewItem &option, const QModelIndex &index) override;
+
+private:
+    mutable QHash<QModelIndex, bool> indexHasToolTip;
 };
 
 #endif

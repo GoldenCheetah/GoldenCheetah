@@ -15,6 +15,7 @@
 
 #include "CalendarItemDelegates.h"
 #include "Colors.h"
+#include "Settings.h"
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -117,10 +118,7 @@ bool
 CalendarMonthTable::addMonths
 (int months)
 {
-    if (canAddMonths(months)) {
-        return setMonth(firstOfMonth.addMonths(months));
-    }
-    return false;
+    return setMonth(fitDate(firstOfMonth.addMonths(months)));
 }
 
 
@@ -128,10 +126,28 @@ bool
 CalendarMonthTable::addYears
 (int years)
 {
-    if (canAddYears(years)) {
-        return setMonth(firstOfMonth.addYears(years));
+    return setMonth(fitDate(firstOfMonth.addYears(years)));
+}
+
+
+QDate
+CalendarMonthTable::fitDate
+(const QDate &date) const
+{
+    QDate newDate(date);
+    QDate today = QDate::currentDate();
+    if (   newDate.year() == today.year()
+        && newDate.month() == today.month()
+        && isInDateRange(today)) {
+        newDate = today;
+    } else if (! isInDateRange(newDate)) {
+        if (newDate < dr.to) {
+            newDate = QDate(newDate.year(), newDate.month(), newDate.daysInMonth());
+        } else {
+            newDate = QDate(newDate.year(), newDate.month(), 1);
+        }
     }
-    return false;
+    return isInDateRange(newDate) ? newDate : QDate();
 }
 
 
@@ -163,13 +179,13 @@ bool
 CalendarMonthTable::isInDateRange
 (const QDate &date) const
 {
-    return dr.pass(date);
+    return date.isValid() && dr.pass(date);
 }
 
 
 void
 CalendarMonthTable::fillEntries
-(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries)
+(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries)
 {
     for (int i = 0; i < rowCount() * 7; ++i) {
         QDate date = startDate.addDays(i);
@@ -190,27 +206,9 @@ CalendarMonthTable::fillEntries
         item->setData(Qt::UserRole + 1, QVariant::fromValue(day));
     }
 
-    // Summary column
-    for (int row = 0; row < rowCount(); ++row) {
-        CalendarWeeklySummary summary;
-        summary.entriesByType.clear();
-        for (int col = 0; col < 7; ++col) {
-            QTableWidgetItem *cell = item(row, col);
-            if (! cell) {
-                continue;
-            }
-            CalendarDay day = cell->data(Qt::UserRole + 1).value<CalendarDay>();
-            if (col == 0) {
-                summary.firstDayOfWeek = day.date;
-            }
-            for (CalendarEntry calEntry : day.entries) {
-                summary.entriesByType[calEntry.type] = summary.entriesByType.value(calEntry.type, 0) + 1;
-                summary.entries << calEntry;
-            }
-        }
-
+    for (int row = 0; row < rowCount() && row < summaries.count(); ++row) {
         QTableWidgetItem *summaryItem = new QTableWidgetItem();
-        summaryItem->setData(Qt::UserRole, QVariant::fromValue(summary));
+        summaryItem->setData(Qt::UserRole, QVariant::fromValue(summaries[row]));
         summaryItem->setFlags(Qt::ItemIsEnabled);
         setItem(row, 7, summaryItem);
     }
@@ -261,15 +259,12 @@ CalendarMonthTable::limitDateRange
         return;
     }
     this->dr = dr;
-    QDate selectedDate = firstOfMonth;
-    QTableWidgetItem *item = currentItem();
-    if (item != nullptr) {
-        selectedDate = item->data(Qt::UserRole).toDate();
-    }
-    if (isInDateRange(selectedDate)) {
-        setMonth(selectedDate, allowKeepMonth);
+    if (currentItem() != nullptr && isInDateRange(currentItem()->data(Qt::UserRole).toDate())) {
+        setMonth(currentItem()->data(Qt::UserRole).toDate());
     } else if (isInDateRange(QDate::currentDate())) {
         setMonth(QDate::currentDate());
+    } else if (isInDateRange(firstOfMonth)) {
+        setMonth(firstOfMonth, allowKeepMonth);
     } else if (dr.to.isValid() && dr.to < QDate::currentDate()) {
         setMonth(dr.to);
     } else if (dr.from.isValid() && dr.from > QDate::currentDate()) {
@@ -286,6 +281,12 @@ void
 CalendarMonthTable::setFirstDayOfWeek
 (Qt::DayOfWeek firstDayOfWeek)
 {
+    QDate selectedDate;
+    if (currentItem() != nullptr && isInDateRange(currentItem()->data(Qt::UserRole).toDate())) {
+        selectedDate = currentItem()->data(Qt::UserRole).toDate();
+    } else {
+        selectedDate = fitDate(firstOfMonth);
+    }
     clear();
     QLocale locale;
     QStringList headers;
@@ -296,8 +297,8 @@ CalendarMonthTable::setFirstDayOfWeek
     headers << tr("Summary");
     setHorizontalHeaderLabels(headers);
     verticalHeader()->setVisible(false);
-    if (firstOfMonth.isValid()) {
-        setMonth(firstOfMonth, true);
+    if (selectedDate.isValid()) {
+        setMonth(selectedDate, true);
     }
 }
 
@@ -612,7 +613,7 @@ CalendarMonthTable::showContextMenu
             });
             break;
         case ENTRY_TYPE_OTHER:
-            contextMenu.addAction(calEntry.name);
+            contextMenu.addAction(calEntry.primary);
         default:
             break;
         }
@@ -689,20 +690,24 @@ Calendar::Calendar
 : QWidget(parent)
 {
     qRegisterMetaType<CalendarDay>("CalendarDay");
-    qRegisterMetaType<CalendarWeeklySummary>("CalendarWeeklySummary");
+    qRegisterMetaType<CalendarSummary>("CalendarSummary");
 
     monthTable = new CalendarMonthTable(dateInMonth, firstDayOfWeek);
 
-    prevYButton = new QPushButton("<<");
+    prevYButton = new QPushButton();
     prevYButton->setFlat(true);
-    prevMButton = new QPushButton("<");
+    prevMButton = new QPushButton();
     prevMButton->setFlat(true);
-    nextMButton = new QPushButton(">");
+    nextMButton = new QPushButton();
     nextMButton->setFlat(true);
-    nextYButton = new QPushButton(">>");
+    nextYButton = new QPushButton();
     nextYButton->setFlat(true);
-    dateLabel = new QLabel();
     todayButton = new QPushButton("Today");
+    //todayButton->setFlat(true);
+    dateLabel = new QLabel();
+    dateLabel->setAlignment(Qt::AlignRight);
+
+    applyNavIcons();
 
     connect(monthTable, &CalendarMonthTable::dayClicked, [=](const CalendarDay &day) {
         qDebug() << __func__ << "dayClicked:" << day.date;
@@ -711,13 +716,13 @@ Calendar::Calendar
         qDebug() << __func__ << "moreClicked:" << day.date;
     });
     connect(monthTable, &CalendarMonthTable::entryClicked, [=](const CalendarDay &day, int entryIdx) {
-        qDebug() << __func__ << "entryClicked:" << day.date << day.entries[entryIdx].name;
+        qDebug() << __func__ << "entryClicked:" << day.date << day.entries[entryIdx].primary;
     });
     connect(monthTable, &CalendarMonthTable::dayRightClicked, [=](const CalendarDay &day) {
         qDebug() << __func__ << "dayRightClicked:" << day.date;
     });
     connect(monthTable, &CalendarMonthTable::entryRightClicked, [=](const CalendarDay &day, int entryIdx) {
-        qDebug() << __func__ << "entryRightClicked:" << day.date << day.entries[entryIdx].name;
+        qDebug() << __func__ << "entryRightClicked:" << day.date << day.entries[entryIdx].primary;
     });
     connect(monthTable, &CalendarMonthTable::dayDblClicked, [=](const CalendarDay &day) {
         qDebug() << __func__ << "dayDblClicked:" << day.date;
@@ -746,41 +751,39 @@ Calendar::Calendar
     connect(monthTable, &CalendarMonthTable::delRestday, this, &Calendar::delRestday);
     connect(monthTable, &CalendarMonthTable::monthChanged, [=](const QDate &month, const QDate &firstVisible, const QDate &lastVisible) {
         setNavButtonState();
-        dateLabel->setText(QString("<h2>%1</h2>").arg(monthTable->firstOfCurrentMonth().toString("MMMM yyyy")));
+        QLocale locale;
+        dateLabel->setText(locale.toString(monthTable->firstOfCurrentMonth(), ("MMMM yyyy")));
         emit monthChanged(month, firstVisible, lastVisible);
     });
     connect(prevYButton, &QPushButton::clicked, [=]() {
-        QDate lom(monthTable->firstOfCurrentMonth().year(), monthTable->firstOfCurrentMonth().month(), monthTable->firstOfCurrentMonth().daysInMonth());
-        setMonth(lom.addYears(-1));
+        monthTable->addYears(-1);
     });
     connect(prevMButton, &QPushButton::clicked, [=]() {
-        QDate lom(monthTable->firstOfCurrentMonth().year(), monthTable->firstOfCurrentMonth().month(), monthTable->firstOfCurrentMonth().daysInMonth());
-        setMonth(lom.addMonths(-1));
+        monthTable->addMonths(-1);
     });
     connect(nextMButton, &QPushButton::clicked, [=]() {
-        setMonth(monthTable->firstOfCurrentMonth().addMonths(1));
+        monthTable->addMonths(1);
     });
     connect(nextYButton, &QPushButton::clicked, [=]() {
-        setMonth(monthTable->firstOfCurrentMonth().addYears(1));
+        monthTable->addYears(1);
     });
     connect(todayButton, &QPushButton::clicked, [=]() {
         setMonth(QDate::currentDate());
     });
 
     QHBoxLayout *navLayout = new QHBoxLayout();
+    navLayout->setSpacing(0);
     navLayout->addWidget(prevYButton);
     navLayout->addWidget(prevMButton);
     navLayout->addWidget(nextMButton);
     navLayout->addWidget(nextYButton);
+    navLayout->addWidget(todayButton);
+    navLayout->addSpacing(24 * dpiXFactor);
     navLayout->addWidget(dateLabel);
     navLayout->addStretch();
 
-    QHBoxLayout *subnavLayout = new QHBoxLayout();
-    subnavLayout->addWidget(todayButton);
-
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addLayout(navLayout);
-    mainLayout->addLayout(subnavLayout);
     mainLayout->addWidget(monthTable);
 
     setMonth(dateInMonth);
@@ -799,7 +802,7 @@ Calendar::setMonth
 
 void
 Calendar::fillEntries
-(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries)
+(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries)
 {
     QHash<QDate, QList<CalendarEntry>> activities = activityEntries;
     QDate firstVisible = monthTable->firstVisibleDay();
@@ -808,7 +811,7 @@ Calendar::fillEntries
         if (dayIt.key() >= firstVisible && dayIt.key() <= lastVisible) {
             std::sort(dayIt.value().begin(), dayIt.value().end(), [](const CalendarEntry &a, const CalendarEntry &b) {
                 if (a.start == b.start) {
-                    return a.name < b.name;
+                    return a.primary < b.primary;
                 } else {
                     return a.start < b.start;
                 }
@@ -816,7 +819,7 @@ Calendar::fillEntries
         }
     }
     this->headlineEntries = headlineEntries;
-    monthTable->fillEntries(activities, headlineEntries);
+    monthTable->fillEntries(activities, summaries, headlineEntries);
 }
 
 
@@ -860,7 +863,7 @@ Calendar::activateDateRange
     for (auto dayIt = headlineEntries.begin(); dayIt != headlineEntries.end(); ++dayIt) {
         std::sort(dayIt.value().begin(), dayIt.value().end(), [](const CalendarEntry &a, const CalendarEntry &b) {
             if (a.start == b.start) {
-                return a.name < b.name;
+                return a.primary < b.primary;
             } else {
                 return a.start < b.start;
             }
@@ -898,4 +901,40 @@ Calendar::setNavButtonState
     nextMButton->setEnabled(monthTable->isInDateRange(monthTable->firstOfCurrentMonth().addMonths(1)));
     nextYButton->setEnabled(monthTable->isInDateRange(monthTable->firstOfCurrentMonth().addYears(1)));
     todayButton->setEnabled(monthTable->isInDateRange(QDate::currentDate()));
+}
+
+
+void
+Calendar::applyNavIcons
+()
+{
+    double scale = appsettings->value(this, GC_FONT_SCALE, 1.0).toDouble();
+    QFont font;
+    font.setPointSize(font.pointSizeF() * scale * 1.3);
+    font.setWeight(QFont::Bold);
+    dateLabel->setFont(font);
+
+    int size = font.pointSize() * 1.5;
+    QSize iconSize(size * dpiXFactor, size * dpiYFactor);
+    QString buttonStyle = QString("padding: %1px;").arg(size / 6 * dpiXFactor);
+    prevYButton->setStyleSheet(buttonStyle);
+    prevYButton->setIcon(QIcon(QString(":images/breeze/%1/go-previous-skip.svg").arg(isDark() ? "dark" : "light")));
+    prevYButton->setIconSize(iconSize);
+    prevMButton->setStyleSheet(buttonStyle);
+    prevMButton->setIcon(QIcon(QString(":images/breeze/%1/go-previous.svg").arg(isDark() ? "dark" : "light")));
+    prevMButton->setIconSize(iconSize);
+    nextMButton->setStyleSheet(buttonStyle);
+    nextMButton->setIcon(QIcon(QString(":images/breeze/%1/go-next.svg").arg(isDark() ? "dark" : "light")));
+    nextMButton->setIconSize(iconSize);
+    nextYButton->setStyleSheet(buttonStyle);
+    nextYButton->setIcon(QIcon(QString(":images/breeze/%1/go-next-skip.svg").arg(isDark() ? "dark" : "light")));
+    nextYButton->setIconSize(iconSize);
+}
+
+
+bool
+Calendar::isDark
+() const
+{
+    return palette().color(QPalette::Active, QPalette::Window).lightness() < 127;
 }

@@ -26,10 +26,11 @@ public:
     bool setMonth(const QDate &dateInMonth, bool allowKeepMonth = false);
     bool addMonths(int months);
     bool addYears(int years);
+    QDate fitDate(const QDate &date) const;
     bool canAddMonths(int months) const;
     bool canAddYears(int years) const;
     bool isInDateRange(const QDate &date) const;
-    void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries);
+    void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries);
     QDate firstOfCurrentMonth() const;
     QDate firstVisibleDay() const;
     QDate lastVisibleDay() const;
@@ -98,7 +99,7 @@ public:
     explicit Calendar(const QDate &dateInMonth, Qt::DayOfWeek firstDayOfWeek = Qt::Monday, QWidget *parent = nullptr);
 
     void setMonth(const QDate &dateInMonth, bool allowKeepMonth = false);
-    void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries);
+    void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries);
     QDate firstOfCurrentMonth() const;
     QDate firstVisibleDay() const;
     QDate lastVisibleDay() const;
@@ -108,6 +109,7 @@ public slots:
     void activateDateRange(const DateRange &dr, bool allowKeepMonth = false);
     void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
     void setSummaryMonthVisible(bool visible);
+    void applyNavIcons();
 
 signals:
     void dayClicked(const QDate &date);
@@ -132,6 +134,7 @@ private:
     QHash<QDate, QList<CalendarEntry>> headlineEntries;
 
     void setNavButtonState();
+    bool isDark() const;
 };
 
 #endif
