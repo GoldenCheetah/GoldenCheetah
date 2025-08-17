@@ -318,8 +318,6 @@ ManualActivityPageBasics::ManualActivityPageBasics
         }
     }
 
-    subSportLabel->setVisible(! plan);
-    subSportEdit->setVisible(! plan);
     workoutCodeLabel->setVisible(! plan);
     workoutCodeEdit->setVisible(! plan);
     rpeLabel->setVisible(! plan);
