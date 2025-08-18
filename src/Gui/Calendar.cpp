@@ -597,7 +597,7 @@ CalendarMonthTable::showContextMenu
         CalendarEntry calEntry = day.entries[entryIdx];
         switch (calEntry.type) {
         case ENTRY_TYPE_ACTIVITY:
-            contextMenu.addAction("View activity", this, [=]() {
+            contextMenu.addAction("View activity...", this, [=]() {
                 emit viewActivity(calEntry);
             });
             contextMenu.addAction("Delete activity", this, [=]() {
@@ -605,7 +605,12 @@ CalendarMonthTable::showContextMenu
             });
             break;
         case ENTRY_TYPE_PLANNED_ACTIVITY:
-            contextMenu.addAction("View planned activity", this, [=]() {
+            if (calEntry.hasTrainMode) {
+                contextMenu.addAction("Show in Train Mode...", this, [=]() {
+                    emit showInTrainMode(calEntry);
+                });
+            }
+            contextMenu.addAction("View planned activity...", this, [=]() {
                 emit viewActivity(calEntry);
             });
             contextMenu.addAction("Delete planned activity", this, [=]() {
@@ -613,13 +618,12 @@ CalendarMonthTable::showContextMenu
             });
             break;
         case ENTRY_TYPE_OTHER:
-            contextMenu.addAction(calEntry.primary);
         default:
             break;
         }
     } else {
         if (day.date <= QDate::currentDate()) {
-            contextMenu.addAction("Add activity", this, [=]() {
+            contextMenu.addAction("Add activity...", this, [=]() {
                 QTime time = QTime::currentTime();
                 if (day.date == QDate::currentDate()) {
                     time = time.addSecs(std::max(-4 * 3600, time.secsTo(QTime(0, 0))));
@@ -628,7 +632,7 @@ CalendarMonthTable::showContextMenu
             });
         }
         if (day.date >= QDate::currentDate()) {
-            contextMenu.addAction("Add planned activity", this, [=]() {
+            contextMenu.addAction("Add planned activity...", this, [=]() {
                 QTime time = QTime::currentTime();
                 if (day.date == QDate::currentDate()) {
                     time = time.addSecs(std::min(4 * 3600, time.secsTo(QTime(23, 59, 59))));
@@ -703,7 +707,6 @@ Calendar::Calendar
     nextYButton = new QPushButton();
     nextYButton->setFlat(true);
     todayButton = new QPushButton("Today");
-    //todayButton->setFlat(true);
     dateLabel = new QLabel();
     dateLabel->setAlignment(Qt::AlignRight);
 
@@ -743,6 +746,7 @@ Calendar::Calendar
     connect(monthTable, &CalendarMonthTable::summaryDblClicked, [=](QModelIndex index) {
         qDebug() << __func__ << "summaryDblClicked:" << index.data(Qt::UserRole);
     });
+    connect(monthTable, &CalendarMonthTable::showInTrainMode, this, &Calendar::showInTrainMode);
     connect(monthTable, &CalendarMonthTable::viewActivity, this, &Calendar::viewActivity);
     connect(monthTable, &CalendarMonthTable::addActivity, this, &Calendar::addActivity);
     connect(monthTable, &CalendarMonthTable::delActivity, this, &Calendar::delActivity);

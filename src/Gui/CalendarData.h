@@ -35,6 +35,7 @@ struct CalendarEntry {
     int durationSecs = 0;
     int type = 0;
     bool isRelocatable = false;
+    bool hasTrainMode = false;
     QDate spanStart = QDate();
     QDate spanEnd = QDate();
 };

@@ -52,6 +52,7 @@ signals:
     void summaryDblClicked(const QModelIndex &index);
     void summaryRightClicked(const QModelIndex &index);
     void monthChanged(const QDate &month, const QDate &firstVisible, const QDate &lastVisible);
+    void showInTrainMode(const CalendarEntry &activity);
     void viewActivity(const CalendarEntry &activity);
     void addActivity(bool plan, const QDate &day, const QTime &time);
     void delActivity(const CalendarEntry &activity);
@@ -116,6 +117,7 @@ signals:
     void summaryClicked(const QDate &date);
     void monthChanged(const QDate &month, const QDate &firstVisible, const QDate &lastVisible);
     void dateRangeActivated(const QString &name);
+    void showInTrainMode(const CalendarEntry &activity);
     void viewActivity(const CalendarEntry &activity);
     void addActivity(bool plan, const QDate &day, const QTime &time);
     void delActivity(const CalendarEntry &activity);

@@ -28,6 +28,7 @@
 #include "RideMetadata.h"
 #include "Colors.h"
 #include "ManualActivityWizard.h"
+#include "WorkoutFilter.h"
 
 #define HLO "<h4>"
 #define HLC "</h4>"
@@ -58,6 +59,19 @@ PlanningCalendarWindow::PlanningCalendarWindow(Context *context)
     connect(context, &Context::rideAdded, this, &PlanningCalendarWindow::updateActivitiesIfInRange);
     connect(context, &Context::rideDeleted, this, &PlanningCalendarWindow::updateActivitiesIfInRange);
     connect(context, &Context::configChanged, this, &PlanningCalendarWindow::configChanged);
+    connect(calendar, &Calendar::showInTrainMode, [=](CalendarEntry activity) {
+        for (RideItem *rideItem : context->athlete->rideCache->rides()) {
+            if (rideItem != nullptr && rideItem->fileName == activity.reference) {
+                QString filter = buildWorkoutFilter(rideItem);
+                if (! filter.isEmpty()) {
+                    context->mainWindow->fillinWorkoutFilterBox(filter);
+                    context->mainWindow->selectTrain();
+                    context->notifySelectWorkout(0);
+                }
+                break;
+            }
+        }
+    });
     connect(calendar, &Calendar::viewActivity, [=](CalendarEntry activity) {
         for (RideItem *rideItem : context->athlete->rideCache->rides()) {
             if (rideItem != nullptr && rideItem->fileName == activity.reference) {
@@ -490,6 +504,7 @@ PlanningCalendarWindow::getActivities
         activity.durationSecs = rideItem->getForSymbol("workout_time", GlobalContext::context()->useMetricUnits);
         activity.type = rideItem->planned ? ENTRY_TYPE_PLANNED_ACTIVITY : ENTRY_TYPE_ACTIVITY;
         activity.isRelocatable = rideItem->planned;
+        activity.hasTrainMode = rideItem->planned && sport == "Bike" && ! buildWorkoutFilter(rideItem).isEmpty();
         activities[rideItem->dateTime.date()] << activity;
     }
     return activities;
