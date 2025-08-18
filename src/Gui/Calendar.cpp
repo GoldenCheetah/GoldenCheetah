@@ -712,40 +712,10 @@ Calendar::Calendar
 
     applyNavIcons();
 
-    connect(monthTable, &CalendarMonthTable::dayClicked, [=](const CalendarDay &day) {
-        qDebug() << __func__ << "dayClicked:" << day.date;
-    });
-    connect(monthTable, &CalendarMonthTable::moreClicked, [=](const CalendarDay &day) {
-        qDebug() << __func__ << "moreClicked:" << day.date;
-    });
-    connect(monthTable, &CalendarMonthTable::entryClicked, [=](const CalendarDay &day, int entryIdx) {
-        qDebug() << __func__ << "entryClicked:" << day.date << day.entries[entryIdx].primary;
-    });
-    connect(monthTable, &CalendarMonthTable::dayRightClicked, [=](const CalendarDay &day) {
-        qDebug() << __func__ << "dayRightClicked:" << day.date;
-    });
-    connect(monthTable, &CalendarMonthTable::entryRightClicked, [=](const CalendarDay &day, int entryIdx) {
-        qDebug() << __func__ << "entryRightClicked:" << day.date << day.entries[entryIdx].primary;
-    });
-    connect(monthTable, &CalendarMonthTable::dayDblClicked, [=](const CalendarDay &day) {
-        qDebug() << __func__ << "dayDblClicked:" << day.date;
-    });
-    connect(monthTable, &CalendarMonthTable::moreDblClicked, [=](const CalendarDay &day) {
-        qDebug() << __func__ << "moreDblClicked:" << day.date;
-    });
     connect(monthTable, &CalendarMonthTable::entryDblClicked, [=](const CalendarDay &day, int entryIdx) {
         viewActivity(day.entries[entryIdx]);
     });
 
-    connect(monthTable, &CalendarMonthTable::summaryClicked, [=](QModelIndex index) {
-        qDebug() << __func__ << "summaryClicked:" << index.data(Qt::UserRole);
-    });
-    connect(monthTable, &CalendarMonthTable::summaryRightClicked, [=](QModelIndex index) {
-        qDebug() << __func__ << "summaryRightClicked:" << index.data(Qt::UserRole);
-    });
-    connect(monthTable, &CalendarMonthTable::summaryDblClicked, [=](QModelIndex index) {
-        qDebug() << __func__ << "summaryDblClicked:" << index.data(Qt::UserRole);
-    });
     connect(monthTable, &CalendarMonthTable::showInTrainMode, this, &Calendar::showInTrainMode);
     connect(monthTable, &CalendarMonthTable::viewActivity, this, &Calendar::viewActivity);
     connect(monthTable, &CalendarMonthTable::addActivity, this, &Calendar::addActivity);
