@@ -24,6 +24,7 @@
 #include "CompareInterval.h" // what intervals are being compared?
 #include "CompareDateRange.h" // what intervals are being compared?
 #include "RideFile.h"
+#include "Season.h"
 
 #ifdef GC_HAS_CLOUD_DB
 #include "CloudDBChart.h"
@@ -126,6 +127,7 @@ class Context : public QObject
         RideItem *rideItem() const { return ride; }
         const RideItem *currentRideItem() { return ride; }
         DateRange currentDateRange() { return dr_; }
+        Season const *currentSeason() { return season; }
 
         // current selections and widgetry
         MainWindow * const mainWindow;
@@ -134,6 +136,7 @@ class Context : public QObject
         Athlete *athlete;
         RideItem *ride;  // the currently selected ride
         DateRange dr_;
+        Season const *season = nullptr;
         ErgFile *workout; // the currently selected workout file
         VideoSyncFile *videosync; // the currently selected videosync file
         QString videoFilename;
@@ -224,6 +227,12 @@ class Context : public QObject
         void notifyWorkoutsChanged() { emit workoutsChanged(); }
         void notifyVideoSyncChanged() { emit VideoSyncChanged(); }
 
+        void notifySeasonChanged(Season const *season) {
+            bool changed = this->season != season;
+            this->season = season;
+            emit seasonSelected(season, changed);
+        }
+
         void notifyRideSelected(RideItem*x) { ride=x; rideSelected(x); }
         void notifyRideAdded(RideItem *x) { ride=x; rideAdded(x); }
         void notifyRideDeleted(RideItem *x) { ride=x; rideDeleted(x); }
@@ -306,6 +315,8 @@ class Context : public QObject
 
         void dateRangeSelected(DateRange);
         void rideSelected(RideItem*);
+
+        void seasonSelected(Season const *season, bool changed);
 
         // we added/deleted/changed an item
         void rideAdded(RideItem *);

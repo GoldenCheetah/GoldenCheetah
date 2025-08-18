@@ -77,7 +77,8 @@ enum gcwinid {
         LiveMapWebPageWindow = 48,
         OverviewAnalysisBlank=49,
         OverviewTrendsBlank=50,
-        ElevationChart=51
+        ElevationChart=51,
+        Calendar=52
 };
 };
 typedef enum GcWindowTypes::gcwinid GcWinID;

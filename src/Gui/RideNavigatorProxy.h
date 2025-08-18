@@ -81,6 +81,20 @@ private:
     QVector<int> sourceRowToGroupRow;
     QList<rankx> rankedRows;
 
+    int countResetInProgress = 0;
+
+    void myBeginResetModel() {
+        if (countResetInProgress++ == 0) {
+            beginResetModel();
+        }
+    }
+
+    void myEndResetModel() {
+        if (--countResetInProgress == 0) {
+            endResetModel();
+        }
+    }
+
     void clearGroups() {
         // Wipe current
         QMapIterator<QString, QVector<int>*> i(groupToSourceRow);
@@ -511,7 +525,7 @@ public:
     void setGroups() {
 
         // let the views know we're doing this
-        beginResetModel();
+        myBeginResetModel();
 
         // wipe whatever is there first
         clearGroups();
@@ -579,7 +593,7 @@ public:
         }
 
         // all done. let the views know everything changed
-        endResetModel();
+        myEndResetModel();
     }
 
 public slots:
@@ -587,13 +601,13 @@ public slots:
     void sourceModelChanged() {
 
         // notify everyone we're changing
-        beginResetModel();
+        myBeginResetModel();
 
         clearGroups();
         setGroupBy(groupBy+2); // accommodate virtual columns
         setIndexes();
 
-        endResetModel();// we're clean
+        myEndResetModel();// we're clean
 
         // lets expand column 0 for the groupBy heading
         for (int i=0; i < groupCount(); i++)
