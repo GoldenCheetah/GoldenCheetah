@@ -41,7 +41,7 @@ AbstractView::AbstractView(Context *context, int type, const QString& view, cons
     sidebar_(NULL), bottom_(NULL), perspective_(NULL), blank_(NULL),
     loaded(false)
 {
-
+    viewCfgPath = context->athlete->home->config().canonicalPath();
     defaultAppearance= GSettings::defaultAppearanceSettings();
 
     // setup the basic widget
@@ -253,12 +253,6 @@ AbstractView::configChanged(qint32)
     if (sidebar_)  sidebar_->setStyleSheet(ourStyleSheet());
 }
 
-QString
-AbstractView::getPathToPerspectiveFile()
-{
-    return context->athlete->home->config().canonicalPath();
-}
-
 void
 AbstractView::saveState()
 {
@@ -270,7 +264,7 @@ AbstractView::saveState()
     // we do not save all the other Qt properties since
     // we're not interested in them
     // NOTE: currently we support QString, int, double and bool types - beware custom types!!
-    QString filename = getPathToPerspectiveFile() + "/" + view + "-perspectives.xml";
+    QString filename = viewCfgPath + "/" + view + "-perspectives.xml";
 
     QFile file(filename);
     if (!file.open(QFile::WriteOnly)) {
@@ -304,7 +298,7 @@ void
 AbstractView::restoreState(bool useDefault)
 {
     // restore window state
-    QString filename = getPathToPerspectiveFile() + "/" + view + "-perspectives.xml";
+    QString filename = viewCfgPath + "/" + view + "-perspectives.xml";
 
     QFileInfo finfo(filename);
 

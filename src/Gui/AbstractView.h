@@ -153,6 +153,7 @@ class AbstractView : public QWidget
                         // we don't care what values are pass through to the GcWindowRegistry to decide
                         // what charts are relevant for this view.
         const QString view; // type of view:  "train", "analysis", "diary", "home"
+        QString viewCfgPath; // directory path to the view's configuration
 
         // properties
         bool _filtered;
@@ -189,7 +190,6 @@ class AbstractView : public QWidget
         virtual void notifyViewSidebarChanged() {}
         virtual void setViewSpecificPerspective() {};
         virtual void notifyViewSplitterMoved() {};
-        virtual QString getPathToPerspectiveFile();
 
     private slots:
         void onIdle();

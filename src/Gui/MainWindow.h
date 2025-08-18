@@ -237,6 +237,8 @@ class MainWindow : public QMainWindow
         void manageLibrary();
         void showWorkoutWizard();
         void importWorkout();
+        void clearWorkoutFilterBox();
+        void fillinWorkoutFilterBox(const QString &filterText);
 
         // Measures
         void setMeasuresMenu();

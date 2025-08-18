@@ -850,8 +850,10 @@ MetricOverviewItem::configChanged(qint32) {
     RideMetricFactory& factory = RideMetricFactory::instance();
     metric = factory.rideMetric(symbol);
 
-    // Only display the override option for metrics that exist.
-    setShowEdit(metric != nullptr);
+    // Only display the override option for metrics that exist, and those related to specific activities.
+    // It doesn't make sense to overide metrics related to multiple activities, date ranges and/or filters.
+    setShowEdit((metric != nullptr) && (parent->scope == OverviewScope::ANALYSIS));
+
     units = (metric) ? metric->units(GlobalContext::context()->useMetricUnits) : "";
 
     // Update the value and override status
@@ -2555,15 +2557,8 @@ IntervalOverviewItem::setData(RideItem *item, bool animate)
 
 
     // set scale
-#if 0 // not clear why this is here or what it is supposed to do
-      // but it results in items being filtered out.
-    double ydiff = (maxy-miny) / 10.0f;
-    if (miny >= 0 && ydiff > miny) miny = ydiff;
-    double xdiff = (maxx-minx) / 10.0f;
-    if (minx >= 0 && xdiff > minx) minx = xdiff;
-#endif
-    maxx=round(maxx); minx=round(minx);
-    maxy=round(maxy); miny=round(miny);
+    maxx=ceil(maxx); minx=floor(minx);
+    maxy=ceil(maxy); miny=floor(miny);
 
     // set range before points to filter
     bubble->setPoints(points, minx,maxx,miny,maxy, animate);
@@ -4630,8 +4625,8 @@ BubbleViz::setPoints(QList<BPointF> p, double minx, double maxx, double miny, do
     this->points.clear();
     foreach(BPointF point, p) {
 
-        if (point.x < minx || point.x > maxx || !std::isfinite(point.x) || std::isnan(point.x) || point.x == 0 ||
-            point.y < miny || point.y > maxy || !std::isfinite(point.y) || std::isnan(point.y) || point.y == 0 ||
+        if (point.x < minx || point.x > maxx || !std::isfinite(point.x) || std::isnan(point.x) ||
+            point.y < miny || point.y > maxy || !std::isfinite(point.y) || std::isnan(point.y) ||
             point.z == 0 || !std::isfinite(point.z) || std::isnan(point.z)) continue;
 
         this->points << point;
@@ -4838,13 +4833,11 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     } else {
 
         // when transition is -1 we are rescaling the axes first
-        int index=0;
         foreach(BPointF point, oldpoints) {
 
             if (point.x < minx || point.x > maxx ||
                 point.y < miny || point.y > maxy ||
                 !std::isfinite(point.z) || std::isnan(point.z)) {
-                index++;
                 continue;
             }
 
@@ -4863,8 +4856,6 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 
             double radius = sqrt(size/3.1415927f);
             painter->drawEllipse(center, radius, radius);
-
-            index++;
         }
 
     }
@@ -5176,7 +5167,6 @@ Routeline::setData(RideItem *item)
     int div = item->ride()->dataPoints().count() / ROUTEPOINTS;
     int count=0;
     height = geom.width() * aspectratio;
-    int lines=0;
     foreach(RideFilePoint *p, item->ride()->dataPoints()){
 
         // ignore zero values and out of bounds
@@ -5201,7 +5191,6 @@ Routeline::setData(RideItem *item)
             path.lineTo((geom.width() / (xdiff / (p->lon - minlon))),
                         (height-(height / (ydiff / (mercator_projection(p->lat) - minlat)))));
             count=div;
-            lines++;
 
         }
     }

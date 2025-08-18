@@ -24,10 +24,11 @@
 #include <QList>
 
 #include "ModelFilter.h"
+#include "RideItem.h"
 
 
 extern QList<ModelFilter*> parseWorkoutFilter(QString text, bool &ok, QString &msg);
 extern QStringList workoutFilterCommands(int numZones = 7);
-
+extern QString buildWorkoutFilter(RideItem * const rideItem);
 
 #endif

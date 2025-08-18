@@ -576,7 +576,8 @@ RideMetadata::calendarText(RideItem *rideItem)
                                                        field.name;
         QString value;
         if (SpecialFields::getInstance().isMetric(fieldName)) {
-            value = rideItem->getStringForSymbol(SpecialFields::getInstance().rideMetric(fieldName)->symbol(), GlobalContext::context()->useMetricUnits);
+            if (SpecialFields::getInstance().rideMetric(fieldName)->isRelevantForRide(rideItem))
+                value = rideItem->getStringForSymbol(SpecialFields::getInstance().rideMetric(fieldName)->symbol(), GlobalContext::context()->useMetricUnits);
         } else {
             value = rideItem->getText(fieldName, "");
         }

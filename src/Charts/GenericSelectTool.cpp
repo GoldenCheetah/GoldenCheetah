@@ -504,7 +504,7 @@ GenericSelectTool::released(QPointF pos)
             if (yseries) {
 
                 // convert value to series value
-                QPointF v = host->qchart->mapToValue(pos,yseries);
+                // QPointF v = host->qchart->mapToValue(pos,yseries);
 
                 // add to chart
                 // not implemented yet, need to decide how they persist, will do in 3.7
