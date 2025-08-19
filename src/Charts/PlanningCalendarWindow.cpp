@@ -389,9 +389,7 @@ PlanningCalendarWindow::updatePrimaryConfigCombos
     primaryFallbackCombo->clear();
     QList<FieldDefinition> fieldsDefs = GlobalContext::context()->rideMetadata->getFields();
     for (const FieldDefinition &fieldDef : fieldsDefs) {
-        if (   fieldDef.type == GcFieldType::FIELD_TEXT
-            || fieldDef.type == GcFieldType::FIELD_TEXTBOX
-            || fieldDef.type == GcFieldType::FIELD_SHORTTEXT) {
+        if (fieldDef.isTextField()) {
             primaryMainCombo->addItem(fieldDef.name);
             primaryFallbackCombo->addItem(fieldDef.name);
         }
