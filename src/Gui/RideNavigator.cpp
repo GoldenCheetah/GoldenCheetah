@@ -284,7 +284,7 @@ RideNavigator::resetView()
     // add metadata fields...
     SpecialFields& sp = SpecialFields::getInstance(); // all the special fields are in here...
     foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
-        if (!sp.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
+        if (!sp.isMetric(field.name) && (field.type != GcFieldType::FIELD_DATE && field.type != GcFieldType::FIELD_TIME)) {
             nameMap.insert(QString("%1").arg(sp.makeTechName(field.name)), sp.displayName(field.name));
             internalNameMap.insert(field.name, sp.displayName(field.name));
         }
