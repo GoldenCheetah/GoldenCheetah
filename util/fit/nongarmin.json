@@ -40,6 +40,7 @@
 { "manu":70, "prod":51, "name":"SIGMA ROX 2.0" },
 { "manu":70, "prod":52, "name":"SIGMA ROX 4.0" },
 { "manu":70, "prod":54, "name":"SIGMA ROX 12.1 EVO" },
+{ "manu":70, "prod":69, "name":"SIGMA ROX 4.0 SE" },
 { "manu":76, "prod":-1, "name":"Moxy Monitor" },
 { "manu":83, "prod":3, "name":"Scosche Rythm+" },
 { "manu":89, "prod":2800, "name":"Tacx Neo" },
