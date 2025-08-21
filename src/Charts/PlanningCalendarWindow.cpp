@@ -631,10 +631,15 @@ PlanningCalendarWindow::updateActivities
 ()
 {
     Season const *season = context->currentSeason();
-    QHash<QDate, QList<CalendarEntry>> activities = getActivities(calendar->firstVisibleDay(), calendar->lastVisibleDay());
-    QList<CalendarSummary> summaries = getWeeklySummaries(calendar->firstVisibleDay(), calendar->lastVisibleDay());
-    QHash<QDate, QList<CalendarEntry>> phasesEvents = getPhasesEvents(*season, calendar->firstVisibleDay(), calendar->lastVisibleDay());
-    calendar->fillEntries(activities, summaries, phasesEvents);
+
+    // PLAN_VIEW_TODO - added this protection as undo'ing actions after chaning the timeframe in the trends view
+    // caused the context->currentSeason() to return nullptr.
+    if (season != nullptr) { 
+        QHash<QDate, QList<CalendarEntry>> activities = getActivities(calendar->firstVisibleDay(), calendar->lastVisibleDay());
+        QList<CalendarSummary> summaries = getWeeklySummaries(calendar->firstVisibleDay(), calendar->lastVisibleDay());
+        QHash<QDate, QList<CalendarEntry>> phasesEvents = getPhasesEvents(*season, calendar->firstVisibleDay(), calendar->lastVisibleDay());
+        calendar->fillEntries(activities, summaries, phasesEvents);
+    }
 }
 
 

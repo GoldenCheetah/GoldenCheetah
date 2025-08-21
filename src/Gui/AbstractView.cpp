@@ -353,7 +353,7 @@ AbstractView::restoreState(bool useDefault)
         // except when useDefault is requested
         if (!finfo.exists() && !useDefault) {
             filename = context->athlete->home->config().canonicalPath() + "/" + view + "-layout.xml";
-            legacy = true;
+
             QFile file(filename);
             if (file.open(QIODevice::ReadOnly)) {
                 content = file.readAll();
@@ -362,6 +362,9 @@ AbstractView::restoreState(bool useDefault)
             if (content != "") {
                 // whilst this happens don't show user
                 setUpdatesEnabled(false);
+
+                // Legacy perspective name only applies to -layout.xml files
+                legacy = true;
 
                 // setup the handler
                 QXmlInputSource source;
@@ -412,10 +415,14 @@ AbstractView::restoreState(bool useDefault)
 
         setUpdatesEnabled(true);
     }
-    if (legacy && restored.count() >= 1) restored[0]->title_ = "Legacy";
 
-    // MUST have at least one
-    if (restored.count() == 0)  restored << new Perspective(context, "empty", type);
+    if (restored.count()) {
+        // if we have restored the perspectives from legacy format -layout.xml files
+        if (legacy) restored[0]->title_ = "Legacy";
+
+    } else { // MUST have at least one perspective
+        restored << new Perspective(context, "Empty", type);
+    }
 
     // initialise them
     foreach(Perspective *page, restored) appendPerspective(page);

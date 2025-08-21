@@ -119,7 +119,7 @@
         <file>xml/metadata.xml</file>
         <file>xml/train-perspectives.xml</file>
         <file>xml/video-layout.xml</file>
-        <file>xml/diary-perspectives.xml</file>
+        <file>xml/plan-perspectives.xml</file>
         <file>xml/analysis-perspectives.xml</file>
         <file>xml/home-perspectives.xml</file>
         <file>ini/measures.ini</file>
@@ -208,7 +208,7 @@
         <file>images/mac/right.png</file>
         <file>images/analysis.png</file>
         <file>images/home.png</file>
-        <file>images/diary.png</file>
+        <file>images/plan.png</file>
         <file>images/train.png</file>
         <file>images/sidebar/bookmark.png</file>
         <file>images/sidebar/charts.png</file>

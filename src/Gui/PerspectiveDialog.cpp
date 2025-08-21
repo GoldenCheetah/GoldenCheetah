@@ -247,7 +247,7 @@ PerspectiveDialog::exportPerspectiveClicked()
     switch (tabView->type) {
     case VIEW_TRENDS: typedesc="Trends"; break;
     case VIEW_ANALYSIS: typedesc="Analysis"; break;
-    case VIEW_DIARY: typedesc="Diary"; break;
+    case VIEW_PLAN: typedesc="Plan"; break;
     case VIEW_TRAIN: typedesc="Train"; break;
     }
 

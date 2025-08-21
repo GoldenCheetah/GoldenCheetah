@@ -104,14 +104,14 @@ class AthleteTab: public QWidget
         AnalysisView *analysisView;
         TrendsView *homeView;
         TrainView *trainView;
-        DiaryView *diaryView;
+        PlanView *planView;
 
         // Chart Settings Dialog
         ChartSettings *chartSettings;
         QStackedWidget *masterControls,
                        *analysisControls,
                        *trainControls,
-                       *diaryControls,
+                       *planControls,
                        *homeControls,
                        *intervalControls;
 

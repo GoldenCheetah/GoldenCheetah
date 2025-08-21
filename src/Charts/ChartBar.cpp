@@ -17,7 +17,7 @@
  */
 
 #include "ChartBar.h"
-#include "DiarySidebar.h"
+#include "PlanSidebar.h"
 #include "Context.h"
 
 #include <QFontMetrics>

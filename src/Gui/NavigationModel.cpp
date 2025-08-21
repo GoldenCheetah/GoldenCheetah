@@ -156,7 +156,7 @@ NavigationModel::action(bool redo, NavigationEvent event)
         switch (view) {
         case 0:  tab->context->mainWindow->selectTrends(); break;
         case 1:  tab->context->mainWindow->selectAnalysis(); break;
-        case 2:  tab->context->mainWindow->selectDiary(); break;
+        case 2:  tab->context->mainWindow->selectPlan(); break;
         case 3:  tab->context->mainWindow->selectTrain(); break;
         }
     }

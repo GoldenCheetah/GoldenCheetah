@@ -23,7 +23,7 @@
 #include "Context.h"
 #include "GcSideBarItem.h"
 #include "RideNavigator.h"
-#include "DiarySidebar.h" // for GcMultiCalendar
+#include "PlanSidebar.h" // for GcMultiCalendar
 #include "RideItem.h"
 #include "IntervalTreeView.h"
 #include "IntervalSummaryWindow.h"
