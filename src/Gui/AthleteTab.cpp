@@ -211,7 +211,7 @@ AthleteTab::rideSelected(RideItem*)
         // as important to be aware that perspectives are loaded
         // when the view is selected by the user and no earlier
         if (analysisView->page() != NULL) {
-            context->mainWindow->newSidebar()->setItemSelected(3, true);
+            context->mainWindow->newSidebar()->setItemSelected(GcSideBarBtnId::ACTIVITIES_BTN, true);
             selectView(1);
         }
     }

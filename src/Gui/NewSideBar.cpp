@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2020 Mark Liversedge <liversedge@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #include "Context.h"
 #include "NewSideBar.h"
 #include "Colors.h"
@@ -11,7 +29,7 @@ NewSideBar::NewSideBar(Context *context, QWidget *parent) : QWidget(parent), con
 {
     setFixedWidth(gl_itemwidth *dpiXFactor);
     setAutoFillBackground(true);
-    lastid=0;
+    lastid=GcSideBarBtnId::NO_BUTTON_SET;
 
     QVBoxLayout *mainlayout = new QVBoxLayout(this);
     mainlayout->setSpacing(0);
@@ -35,18 +53,18 @@ NewSideBar::NewSideBar(Context *context, QWidget *parent) : QWidget(parent), con
 }
 
 void
-NewSideBar::clicked(int id)
+NewSideBar::clicked(GcSideBarBtnId id)
 {
     // un selectable item was clicked (e.g. symc or settings)
     emit itemClicked(id);
 }
 
 void
-NewSideBar::selected(int id)
+NewSideBar::selected(GcSideBarBtnId id)
 {
     // we selected one, so need to set it selected
     // and deselect everyone else
-    QMapIterator<int,NewSideBarItem*>i(items);
+    QMapIterator<GcSideBarBtnId,NewSideBarItem*>i(items);
     while(i.hasNext()) {
         i.next();
         if (i.key() == id) i.value()->setSelected(true);
@@ -56,16 +74,15 @@ NewSideBar::selected(int id)
     emit itemSelected(id);
 }
 
-int
-NewSideBar::addItem(QImage icon, QString name, int id, QString whatsThisText)
+GcSideBarBtnId
+NewSideBar::addItem(QImage icon, const QString& name, GcSideBarBtnId id, const QString& whatsThisText)
 {
-    // allocated an id
-    if (id == -1) id=lastid++;
-
-    NewSideBarItem *add = new NewSideBarItem(this, id, icon, name);
-    if (!whatsThisText.isEmpty()) add->setWhatsThis(whatsThisText);
-    layout->addWidget(add);
-    items.insert(id, add);
+    if (id != GcSideBarBtnId::NO_BUTTON_SET) {
+        NewSideBarItem *add = new NewSideBarItem(this, id, icon, name);
+        if (!whatsThisText.isEmpty()) add->setWhatsThis(whatsThisText);
+        layout->addWidget(add);
+        items.insert(id, add);
+    }
 
     return id;
 }
@@ -80,14 +97,14 @@ NewSideBar::addStretch()
 
 // is it shown, is it usable?
 void
-NewSideBar::setItemVisible(int id, bool x)
+NewSideBar::setItemVisible(GcSideBarBtnId id, bool x)
 {
     NewSideBarItem *item = items.value(id, NULL);
     if (item) item->setVisible(x);
 }
 
 void
-NewSideBar::setItemEnabled(int id, bool x)
+NewSideBar::setItemEnabled(GcSideBarBtnId id, bool x)
 {
     NewSideBarItem *item = items.value(id, NULL);
     if (item) item->setEnabled(x);
@@ -95,14 +112,14 @@ NewSideBar::setItemEnabled(int id, bool x)
 
 // can we select it, select it by program?
 void
-NewSideBar::setItemSelectable(int id, bool x)
+NewSideBar::setItemSelectable(GcSideBarBtnId id, bool x)
 {
     NewSideBarItem *item = items.value(id, NULL);
     if (item) item->setSelectable(x);
 }
 
 void
-NewSideBar::setItemSelected(int id, bool x)
+NewSideBar::setItemSelected(GcSideBarBtnId id, bool x)
 {
     NewSideBarItem *item = items.value(id, NULL);
     if (item) item->setSelected(x);
@@ -131,7 +148,7 @@ NewSideBar::configChanged(qint32)
     middle->setStyleSheet(style);
 }
 
-NewSideBarItem::NewSideBarItem(NewSideBar *sidebar, int id, QImage icon, QString name) : QWidget(sidebar), sidebar(sidebar), id(id), icon(icon), name(name)
+NewSideBarItem::NewSideBarItem(NewSideBar *sidebar, GcSideBarBtnId id, QImage icon, QString name) : QWidget(sidebar), sidebar(sidebar), id(id), icon(icon), name(name)
 {
     clicked = selected = false;
     selectable = enabled = true;
