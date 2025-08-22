@@ -178,7 +178,6 @@ class MainWindow : public QMainWindow
         // sidebar selecting views and actions
         void sidebarClicked(GcSideBarBtnId id);
         void sidebarSelected(GcSideBarBtnId id);
-        void setView(int view);
 
         // Athlete Backup
         void setBackupAthleteMenu();

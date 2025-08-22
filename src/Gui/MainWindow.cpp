@@ -1246,17 +1246,6 @@ MainWindow::sidebarSelected(GcSideBarBtnId id)
 }
 
 void
-MainWindow::setView(int view)
-{
-    switch (view) {
-    case 0: selectTrends(); break; // trends
-    case 1: selectAnalysis(); break; // analysis
-    case 2: selectDiary(); break; // diary
-    case 3: selectTrain(); break; // train
-    }
-}
-
-void
 MainWindow::selectAthlete()
 {
     viewStack->setCurrentIndex(GcViewStackIdx::SELECT_ATHLETE_VIEW);

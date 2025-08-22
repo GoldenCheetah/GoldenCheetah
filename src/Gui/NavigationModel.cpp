@@ -153,7 +153,12 @@ NavigationModel::action(bool redo, NavigationEvent event)
     {
         view = redo ? event.after.toInt() : event.before.toInt();
 
-        tab->context->mainWindow->setView(view);
+        switch (view) {
+        case 0:  tab->context->mainWindow->selectTrends(); break;
+        case 1:  tab->context->mainWindow->selectAnalysis(); break;
+        case 2:  tab->context->mainWindow->selectDiary(); break;
+        case 3:  tab->context->mainWindow->selectTrain(); break;
+        }
     }
     break;
 
