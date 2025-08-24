@@ -88,12 +88,15 @@ PlanningCalendarWindow::PlanningCalendarWindow(Context *context)
         context->tab->setNoSwitch(false);
     });
     connect(calendar, &Calendar::delActivity, [=](CalendarEntry activity) {
-        context->tab->setNoSwitch(true);
-        context->athlete->rideCache->removeRide(activity.reference);
-        context->tab->setNoSwitch(false);
+        QMessageBox::StandardButton res = QMessageBox::question(this, tr("Delete Activity"), tr("Are you sure you want to delete %1?").arg(activity.reference));
+        if (res == QMessageBox::Yes) {
+            context->tab->setNoSwitch(true);
+            context->athlete->rideCache->removeRide(activity.reference);
+            context->tab->setNoSwitch(false);
 
-        // Context::rideDeleted is not always emitted, therefore forcing the update
-        updateActivities();
+            // Context::rideDeleted is not always emitted, therefore forcing the update
+            updateActivities();
+        }
     });
     connect(calendar, &Calendar::moveActivity, [=](CalendarEntry activity, const QDate &srcDay, const QDate &destDay) {
         Q_UNUSED(srcDay)
