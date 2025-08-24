@@ -19,7 +19,7 @@
 #include "Views.h"
 #include "RideCache.h"
 #include "AnalysisSidebar.h"
-#include "DiarySidebar.h"
+#include "PlanSidebar.h"
 #include "TrainSidebar.h"
 #include "LTMSidebar.h"
 #include "BlankState.h"
@@ -176,13 +176,13 @@ AnalysisView::notifyViewSplitterMoved() {
 }
 
 
-DiaryView::DiaryView(Context *context, QStackedWidget *controls) :
-        AbstractView(context, VIEW_DIARY, "diary", tr("Compare Activities and Intervals"))
+PlanView::PlanView(Context *context, QStackedWidget *controls) :
+        AbstractView(context, VIEW_PLAN, "plan", tr("Plan future activities"))
 {
-    diarySidebar = new DiarySidebar(context);
-    BlankStateDiaryPage *b = new BlankStateDiaryPage(context);
+    planSidebar = new PlanSidebar(context);
+    BlankStatePlanPage *b = new BlankStatePlanPage(context);
 
-    setSidebar(diarySidebar);
+    setSidebar(planSidebar);
 
     // each perspective has a stack of controls
     cstack = new QStackedWidget(this);
@@ -193,34 +193,37 @@ DiaryView::DiaryView(Context *context, QStackedWidget *controls) :
     setPages(pstack);
     setBlank(b);
 
-    setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "diary", false).toBool());
-    connect(diarySidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
+    setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "plan", false).toBool());
+    connect(planSidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
 }
 
-DiaryView::~DiaryView()
+PlanView::~PlanView()
 {
-    appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "diary", _sidebar);
-    delete diarySidebar;
+    appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "plan", _sidebar);
+    delete planSidebar;
 }
 
 void
-DiaryView::setRide(RideItem*ride)
+PlanView::setRide(RideItem*ride)
 {
     if (loaded) {
-        static_cast<DiarySidebar*>(sidebar())->setRide(ride);
+        static_cast<PlanSidebar*>(sidebar())->setRide(ride);
         page()->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
     }
 }
 
 void
-DiaryView::dateRangeChanged(DateRange dr)
+PlanView::dateRangeChanged(DateRange dr)
 {
-    //context->notifyDateRangeChanged(dr); // diary view deprecated and not part of navigation model
+    // PLAN_VIEW_TODO - Not sure if all of these are required? Maybe the PlanView and TrendsView will have independent
+    //  date ranges?
+    // emit dateChanged(dr);
+    context->notifyDateRangeChanged(dr);
     if (loaded) page()->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
 }
 
 bool
-DiaryView::isBlank()
+PlanView::isBlank()
 {
     if (context->athlete->rideCache->rides().count() > 0) return false;
     else return true;

@@ -215,8 +215,7 @@ MainWindow::MainWindow(const QDir &home)
     // The ids of the sidebar buttons below are defined in NewSideBar.h
     sidebar->addItem(QImage(":sidebar/athlete.png"), tr("athletes"), GcSideBarBtnId::SELECT_ATHLETE_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Athletes));
 
-    sidebar->addItem(QImage(":sidebar/plan.png"), tr("plan"), GcSideBarBtnId::PLAN_BTN, tr("Feature not implemented yet"));
-    sidebar->setItemEnabled(GcSideBarBtnId::PLAN_BTN, false);
+    sidebar->addItem(QImage(":sidebar/plan.png"), tr("plan"), GcSideBarBtnId::PLAN_BTN, tr("Feature is work in progress"));
 
     sidebar->addItem(QImage(":sidebar/trends.png"), tr("trends"), GcSideBarBtnId::TRENDS_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Trends));
 
@@ -655,6 +654,7 @@ MainWindow::MainWindow(const QDir &home)
     showhideTabbar->setChecked(true);
 
     viewMenu->addSeparator();
+    viewMenu->addAction(tr("Plan"), this, SLOT(selectPlan()));
     viewMenu->addAction(tr("Trends"), this, SLOT(selectTrends()));
     viewMenu->addAction(tr("Activities"), this, SLOT(selectAnalysis()));
     viewMenu->addAction(tr("Train"), this, SLOT(selectTrain()));
@@ -851,7 +851,7 @@ MainWindow::setChartMenu(QMenu *menu)
         case 0 : mask = VIEW_TRENDS; break;
         default:
         case 1 : mask = VIEW_ANALYSIS; break;
-        case 2 : mask = VIEW_DIARY; break;
+        case 2 : mask = VIEW_PLAN; break;
         case 3 : mask = VIEW_TRAIN; break;
     }
 
@@ -903,7 +903,7 @@ MainWindow::exportPerspective()
     switch (view) {
     case 0:  current = currentAthleteTab->homeView; typedesc = "Trends"; break;
     case 1:  current = currentAthleteTab->analysisView; typedesc = "Analysis"; break;
-    case 2:  current = currentAthleteTab->diaryView; typedesc = "Diary"; break;
+    case 2:  current = currentAthleteTab->planView; typedesc = "Plan"; break;
     case 3:  current = currentAthleteTab->trainView; typedesc = "Train"; break;
     }
 
@@ -929,7 +929,7 @@ MainWindow::importPerspective()
     switch (view) {
     case 0:  current = currentAthleteTab->homeView; break;
     case 1:  current = currentAthleteTab->analysisView; break;
-    case 2:  current = currentAthleteTab->diaryView; break;
+    case 2:  current = currentAthleteTab->planView; break;
     case 3:  current = currentAthleteTab->trainView; break;
     }
 
@@ -1236,7 +1236,7 @@ MainWindow::sidebarSelected(GcSideBarBtnId id)
 {
     switch (id) {
     case GcSideBarBtnId::SELECT_ATHLETE_BTN: selectAthlete(); break;
-    case GcSideBarBtnId::PLAN_BTN: break; // plan not written yet
+    case GcSideBarBtnId::PLAN_BTN: selectPlan(); break;
     case GcSideBarBtnId::TRENDS_BTN: selectTrends(); break;
     case GcSideBarBtnId::ACTIVITIES_BTN: selectAnalysis(); break;
     case GcSideBarBtnId::REFLECT_BTN: break; // reflect not written yet
@@ -1260,7 +1260,6 @@ void
 MainWindow::selectAnalysis()
 {
     resetPerspective(1);
-    //currentTab->analysisView->setPerspectives(perspectiveSelector);
     viewStack->setCurrentIndex(GcViewStackIdx::ATHLETE_TAB_STACK);
     sidebar->setItemSelected(GcSideBarBtnId::ACTIVITIES_BTN, true);
     currentAthleteTab->selectView(1);
@@ -1276,7 +1275,6 @@ void
 MainWindow::selectTrain()
 {
     resetPerspective(3);
-    //currentTab->trainView->setPerspectives(perspectiveSelector);
     viewStack->setCurrentIndex(GcViewStackIdx::ATHLETE_TAB_STACK);
     sidebar->setItemSelected(GcSideBarBtnId::TRAIN_BTN, true);
     currentAthleteTab->selectView(3);
@@ -1289,11 +1287,11 @@ MainWindow::selectTrain()
 }
 
 void
-MainWindow::selectDiary()
+MainWindow::selectPlan()
 {
     resetPerspective(2);
-    //currentTab->diaryView->setPerspectives(perspectiveSelector);
     viewStack->setCurrentIndex(GcViewStackIdx::ATHLETE_TAB_STACK);
+    sidebar->setItemSelected(GcSideBarBtnId::PLAN_BTN, true);
     currentAthleteTab->selectView(2);
     back->show();
     forward->show();
@@ -1307,7 +1305,6 @@ void
 MainWindow::selectTrends()
 {
     resetPerspective(0);
-    //currentTab->homeView->setPerspectives(perspectiveSelector);
     viewStack->setCurrentIndex(GcViewStackIdx::ATHLETE_TAB_STACK);
     sidebar->setItemSelected(GcSideBarBtnId::TRENDS_BTN, true);
     currentAthleteTab->selectView(0);
@@ -1340,34 +1337,6 @@ MainWindow::setToolButtons()
     //if (styleSelector->isSegmentSelected(select) == false)
         //styleSelector->setSegmentSelected(select, true);
 
-    int index = currentAthleteTab->currentView();
-
-    //XXX WTAF! The index used is fucked up XXX
-    //          hack around this and then come back
-    //          and look at this as a separate fixup
-#ifdef GC_HAVE_ICAL
-    switch (index) {
-    case 0: // home no change
-    case 3: // train no change
-    default:
-        break;
-    case 1:
-        index = 2; // analysis
-        break;
-    case 2:
-        index = 1; // diary
-        break;
-    }
-#else
-    switch (index) {
-    case 0: // home no change
-    case 1:
-    default:
-        break;
-    case 3:
-        index = 2; // train
-    }
-#endif
 #ifdef Q_OS_MAC // bizarre issue with searchbox focus on tab voew change
     searchBox->clearFocus();
 #endif
@@ -1400,7 +1369,7 @@ MainWindow::resetPerspective(int view, bool force)
 
     case 0:  current = currentAthleteTab->homeView; break;
     case 1:  current = currentAthleteTab->analysisView; break;
-    case 2:  current = currentAthleteTab->diaryView; break;
+    case 2:  current = currentAthleteTab->planView; break;
     case 3:  current = currentAthleteTab->trainView; break;
     }
 
@@ -1422,7 +1391,7 @@ MainWindow::perspectiveSelected(int index)
     switch (view) {
     case 0:  current = currentAthleteTab->homeView; break;
     case 1:  current = currentAthleteTab->analysisView; break;
-    case 2:  current = currentAthleteTab->diaryView; break;
+    case 2:  current = currentAthleteTab->planView; break;
     case 3:  current = currentAthleteTab->trainView; break;
     }
 
@@ -1492,7 +1461,7 @@ MainWindow::perspectivesChanged()
     switch (view) {
     case 0:  current = currentAthleteTab->homeView; break;
     case 1:  current = currentAthleteTab->analysisView; break;
-    case 2:  current = currentAthleteTab->diaryView; break;
+    case 2:  current = currentAthleteTab->planView; break;
     case 3:  current = currentAthleteTab->trainView; break;
     }
 
@@ -2279,7 +2248,7 @@ MainWindow::restoreGCState(Context *context)
             switch(currentAthleteTab->currentView()) {
             case 0: sidebar->setItemSelected(GcSideBarBtnId::TRENDS_BTN,true); break;
             case 1: sidebar->setItemSelected(GcSideBarBtnId::ACTIVITIES_BTN,true); break;
-            case 2: break; // diary not an icon
+            case 2: sidebar->setItemSelected(GcSideBarBtnId::PLAN_BTN,true); break;
             case 3: sidebar->setItemSelected(GcSideBarBtnId::TRAIN_BTN, true); break;
             default: sidebar->setItemSelected(GcSideBarBtnId::SELECT_ATHLETE_BTN, true); break;
         }
