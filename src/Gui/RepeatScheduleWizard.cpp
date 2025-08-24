@@ -274,7 +274,7 @@ RepeatSchedulePageActivities::initializePage
     QDate endDate = field("endDate").toDate();
     QLocale locale;
     numSelected = 0;
-    for (RideItem const * const rideItem : context->athlete->rideCache->rides()) {
+    for (RideItem *rideItem : context->athlete->rideCache->rides()) {
         if (   rideItem == nullptr
             || ! rideItem->planned
             || rideItem->dateTime.date() < startDate
