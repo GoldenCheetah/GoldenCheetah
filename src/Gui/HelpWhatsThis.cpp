@@ -71,6 +71,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
          return text.arg("ScopeBar_Views").arg(tr("Quick access to main Views and common actions"));
     case ScopeBar_Athletes:
          return text.arg("ScopeBar_Views#athletes").arg(tr("Athletes Status and Configuration"));
+    case ScopeBar_Plan:
+         return text.arg("ScopeBar_Views#plan").arg(tr("Plan future activities, analyse completed activities against planned"));
     case ScopeBar_Trends:
          return text.arg("ScopeBar_Views#trends").arg(tr("Analysis of a number of activities (e.g. a date range ) like PMC, long term metrics view, ... and data summaries"));
     case ScopeBar_Rides:

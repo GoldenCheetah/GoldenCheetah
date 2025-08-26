@@ -215,7 +215,7 @@ MainWindow::MainWindow(const QDir &home)
     // The ids of the sidebar buttons below are defined in NewSideBar.h
     sidebar->addItem(QImage(":sidebar/athlete.png"), tr("athletes"), GcSideBarBtnId::SELECT_ATHLETE_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Athletes));
 
-    sidebar->addItem(QImage(":sidebar/plan.png"), tr("plan"), GcSideBarBtnId::PLAN_BTN, tr("Feature is work in progress"));
+    sidebar->addItem(QImage(":sidebar/plan.png"), tr("plan"), GcSideBarBtnId::PLAN_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Plan));
 
     sidebar->addItem(QImage(":sidebar/trends.png"), tr("trends"), GcSideBarBtnId::TRENDS_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Trends));
 

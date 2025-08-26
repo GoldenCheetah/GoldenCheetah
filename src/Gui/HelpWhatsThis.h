@@ -35,6 +35,7 @@ Q_OBJECT
 
                  ScopeBar,
                  ScopeBar_Athletes,
+                 ScopeBar_Plan,
                  ScopeBar_Trends,
                  ScopeBar_Rides,
                  ScopeBar_Train,

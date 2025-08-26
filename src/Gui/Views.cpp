@@ -215,8 +215,6 @@ PlanView::setRide(RideItem*ride)
 void
 PlanView::dateRangeChanged(DateRange dr)
 {
-    // PLAN_VIEW_TODO - Not sure if all of these are required? Maybe the PlanView and TrendsView will have independent
-    //  date ranges?
     // emit dateChanged(dr);
     context->notifyDateRangeChanged(dr);
     if (loaded) page()->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
