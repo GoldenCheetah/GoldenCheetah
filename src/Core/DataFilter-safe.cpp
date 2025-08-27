@@ -4961,10 +4961,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             if (m == NULL) return Result(0.0); // no ride then no context
 
             QString fieldName = eval(df, leaf->fparms[0],x, it, m, p, c, s, d).string();
+            SpecialFields &sp = SpecialFields::getInstance();
 
             if (d.from==QDate() && d.to==QDate()) { // ride only
 
-                SpecialFields &sp = SpecialFields::getInstance();
                 if (!sp.isUser(fieldName)) return Result(0.0); // not a user metadata field
 
                 foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
@@ -4975,13 +4975,52 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                         foreach(QString completerVal, field.values) {
 
-                            if (metadataValue == completerVal) return Result(1.0); // "true"
+                            if (metadataValue == completerVal) return Result(1.0); // return "true"
                         }
-                        break; // matched the field names
                     }
                 }
+                return Result(0.0);
+
+            } else {
+
+                // vector for a date range
+                FilterSet fs;
+                fs.addFilter(m->context->isfiltered, m->context->filters);
+                fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
+                Specification spec;
+                spec.setFilterSet(fs);
+                spec.setDateRange(d); // date range
+
+                QVector<double> vector;
+                foreach(RideItem *ride, m->context->athlete->rideCache->rides()) {
+
+                    // relies upon the daterange being passed to eval...
+                    // relies upon the daterange being passed to eval...
+                    // user metadata field
+                    if (!s.pass(ride) || !spec.pass(ride) || (!sp.isUser(fieldName))) {
+                        vector << 0.0;
+                    } else {
+
+                        foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
+
+                            if (field.name == fieldName) {
+
+                                QString metadataValue = m->getText(field.name, "");
+
+                                foreach(QString completerVal, field.values) {
+
+                                    if (metadataValue == completerVal) {
+                                        vector << 1.0; // true
+                                        break; // matched the completer value
+                                    }
+                                }
+                                break; // found the field
+                            }
+                        }
+                    }
+                }
+                return Result(vector);
             }
-            return Result(0.0);
         }
 
         // normalize values to between 0 and 1
