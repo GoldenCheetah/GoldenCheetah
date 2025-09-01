@@ -2482,7 +2482,6 @@ IconsPage::IconsPage
 
     connect(importButton, &QPushButton::clicked, [=]() {
         QString zipFile = QFileDialog::getOpenFileName(this, tr("Import Icons"), "", tr("Zip Files (*.zip)"));
-        qDebug() << __PRETTY_FUNCTION__ << "Selected" << zipFile;
         if (zipFile.isEmpty() || ! IconManager::instance().importBundle(zipFile)) {
             QMessageBox::warning(nullptr, tr("Icons Bundle"), tr("Bundle file %1 cannot be imported.").arg(zipFile));
         } else {
