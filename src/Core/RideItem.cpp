@@ -814,7 +814,7 @@ RideItem::getStdVarianceForSymbol(QString name)
 
 // access the metadata
 QString
-RideItem::getText(QString name, QString fallback) const
+RideItem::getText(const QString& name, const QString& fallback) const
 {
     // Start Date and Time are special cases, defined as metadata fields but stored in a different way
     if (name == "Start Date") return QString::number(QDate(1900,01,01).daysTo(dateTime.date()));
@@ -823,11 +823,30 @@ RideItem::getText(QString name, QString fallback) const
 }
 
 bool
-RideItem::hasText(QString name) const
+RideItem::hasText(const QString& name) const
 {
     if (name == "Start Date") return true;
     if (name == "Start Time") return true;
     return metadata_.contains(name);
+}
+
+bool
+RideItem::isCompleterValue(const QString& name) const
+{
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
+
+        if (field.name == name) {
+
+            QString value = getText(field.name, "");
+
+            foreach(QString completerVal, field.values) {
+
+                if (value == completerVal) return true;
+            }
+            return false;
+        }
+    }
+    return false;
 }
 
 QString

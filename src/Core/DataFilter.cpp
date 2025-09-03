@@ -4964,22 +4964,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             if (d.from==QDate() && d.to==QDate()) { // ride only
 
-                SpecialFields &sp = SpecialFields::getInstance();
-                if (!sp.isUser(fieldName)) return Result(0.0); // not a user metadata field
-
-                foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
-
-                    if (field.name == fieldName) {
-
-                        QString metadataValue = m->getText(field.name, "");
-
-                        foreach(QString completerVal, field.values) {
-
-                            if (metadataValue == completerVal) return Result(1.0); // "true"
-                        }
-                        break; // matched the field names
-                    }
-                }
+                if (m->isCompleterValue(fieldName)) return Result(1.0); // true;
             }
             return Result(0.0);
         }
