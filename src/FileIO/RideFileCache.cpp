@@ -2344,7 +2344,6 @@ RideFileCache::getAllBestsFor(Context *context, QList<MetricDetail> metrics, Spe
 QVector<double>
 RideFileCache::getAllBestsFor(Context *context, RideFile::SeriesType series, int duration, Specification specification)
 {
-    QDate earliest(GC_EPOCH);
     QVector<double> results;
 
     // get a list of rides & iterate over them
@@ -2375,7 +2374,7 @@ RideFileCache::getAllBestsFor(Context *context, RideFile::SeriesType series, int
 
         if (series == RideFile::none) {
 
-            double date= earliest.daysTo(ride->dateTime.date());
+            double date= GC_EPOCH.daysTo(ride->dateTime.date());
             results << date;
 
         } else {

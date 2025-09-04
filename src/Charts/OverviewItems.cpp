@@ -1723,8 +1723,7 @@ MetricOverviewItem::setDateRange(DateRange dr)
     QList<QPointF> points;
 
     // how many days
-    QDate earliest(GC_EPOCH);
-    sparkline->setDays(earliest.daysTo(dr.to) - earliest.daysTo(dr.from));
+    sparkline->setDays(GC_EPOCH.daysTo(dr.to) - GC_EPOCH.daysTo(dr.from));
 
     double min=0, max=0;
     double sum=0;
@@ -1744,7 +1743,7 @@ MetricOverviewItem::setDateRange(DateRange dr)
             v = sum;
         }
 
-        points << QPointF(earliest.daysTo(item->dateTime.date()) - earliest.daysTo(dr.from), v);
+        points << QPointF(GC_EPOCH.daysTo(item->dateTime.date()) - GC_EPOCH.daysTo(dr.from), v);
 
         if (v < min) min=v;
         if (first || v > max) max=v;

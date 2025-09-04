@@ -3796,21 +3796,20 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             Result returning;
 
-            QDate earliest(GC_EPOCH);
             bool wantdate = leaf->function == "datestring";
             Result r=eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
 
             if (r.isVector()) {
                 QVector<QString> list;
                 foreach(double n, r.asNumeric()) {
-                    if (wantdate) list << earliest.addDays(n).toString("dd MMM yyyy");
+                    if (wantdate) list << GC_EPOCH.addDays(n).toString("dd MMM yyyy");
                     else list << time_to_string(n);
                 }
                 returning = Result(list);
             } else {
 
                 float n = r.number();
-                if (wantdate) returning = Result(earliest.addDays(n).toString("dd MMM yyyy"));
+                if (wantdate) returning = Result(GC_EPOCH.addDays(n).toString("dd MMM yyyy"));
                 else returning = Result(time_to_string(n));
             }
             return returning;
@@ -3953,8 +3952,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 Result to =eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
 
                 // so work out the date range
-                QDate earliest(GC_EPOCH);
-                DateRange ourdaterange(earliest.addDays(from.number()), earliest.addDays(to.number()));
+                DateRange ourdaterange(GC_EPOCH.addDays(from.number()), GC_EPOCH.addDays(to.number()));
 
                 // return the expression, evaluated using our daterange
                 return eval(df, leaf->fparms[2],x, it, m, p, c, s, ourdaterange);
@@ -5039,7 +5037,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             leaf->function == "aggmetrics" || leaf->function == "aggmetricstrings") {
 
             bool wantstrings = (leaf->function.endsWith("strings"));
-            QDate earliest(GC_EPOCH);
             bool wantdate=false;
             bool wanttime=false;
             QString symbol = *(leaf->fparms[0]->lvalue.n);
@@ -5073,10 +5070,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                 // start to stop
                 Result b = eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
-                QDate start = earliest.addDays(b.number());
+                QDate start = GC_EPOCH.addDays(b.number());
 
                 Result e = eval(df, leaf->fparms[2],x, it, m, p, c, s, d);
-                QDate stop = earliest.addDays(e.number());
+                QDate stop = GC_EPOCH.addDays(e.number());
 
                 spec.setDateRange(DateRange(start,stop));
 
@@ -5084,7 +5081,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                 // start to today
                 Result b = eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
-                QDate start = earliest.addDays(b.number());
+                QDate start = GC_EPOCH.addDays(b.number());
                 QDate stop = QDate::currentDate();
 
                 spec.setDateRange(DateRange(start,stop));
@@ -5182,7 +5179,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             bool currentride = false;
             bool wantstrings = (leaf->function == "intervalstrings");
-            QDate earliest(GC_EPOCH);
             QString symbol = *(leaf->fparms[0]->lvalue.n);
 
             // find the metric
@@ -5208,10 +5204,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                 // start to stop
                 Result b = eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
-                QDate start = earliest.addDays(b.number());
+                QDate start = GC_EPOCH.addDays(b.number());
 
                 Result e = eval(df, leaf->fparms[2],x, it, m, p, c, s, d);
-                QDate stop = earliest.addDays(e.number());
+                QDate stop = GC_EPOCH.addDays(e.number());
 
                 spec.setDateRange(DateRange(start,stop));
 
@@ -5219,7 +5215,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                 // start to today
                 Result b = eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
-                QDate start = earliest.addDays(b.number());
+                QDate start = GC_EPOCH.addDays(b.number());
                 QDate stop = QDate::currentDate();
 
                 spec.setDateRange(DateRange(start,stop));
@@ -5342,7 +5338,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         if (leaf->function == "measures") {
 
             Result returning(0);
-            QDate earliest(GC_EPOCH);
             bool wantdate=false;
 
             if (m == NULL) return Result(0); // no ride then no context
@@ -5375,7 +5370,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                 if (!spec.pass(date)) continue;
                 double value;
-                if (wantdate) value = earliest.daysTo(date);
+                if (wantdate) value = GC_EPOCH.daysTo(date);
                 else value = m->context->athlete->measures->getFieldValue(group,date,field);
 
                 returning.number() += value;
@@ -5390,7 +5385,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             if (m == NULL) return Result(0); // no ride then no context
 
             // work out what the date range is...
-            QDate earliest(GC_EPOCH);
             Result returning(0);
             int duration = 0;
             int po = 0;
@@ -5415,10 +5409,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                 // start to stop
                 Result b = eval(df, leaf->fparms[1+po],x, it, m, p, c, s, d);
-                QDate start = earliest.addDays(b.number());
+                QDate start = GC_EPOCH.addDays(b.number());
 
                 Result e = eval(df, leaf->fparms[2+po],x, it, m, p, c, s, d);
-                QDate stop = earliest.addDays(e.number());
+                QDate stop = GC_EPOCH.addDays(e.number());
 
                 spec.setDateRange(DateRange(start,stop));
 
@@ -5426,7 +5420,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                 // start to today
                 Result b = eval(df, leaf->fparms[1+po],x, it, m, p, c, s, d);
-                QDate start = earliest.addDays(b.number());
+                QDate start = GC_EPOCH.addDays(b.number());
                 QDate stop = QDate::currentDate();
 
                 spec.setDateRange(DateRange(start,stop));
@@ -5471,15 +5465,14 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                     // default date range
                     QDate from=d.from, to=d.to;
-                    QDate earliest(GC_EPOCH);
 
                     if (leaf->fparms.count() == 3) {
                         // get the date range
                         Result start =  eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
                         Result stop =  eval(df, leaf->fparms[2],x, it, m, p, c, s, d);
 
-                        from = earliest.addDays(start.number());
-                        to = earliest.addDays(stop.number());
+                        from = GC_EPOCH.addDays(start.number());
+                        to = GC_EPOCH.addDays(stop.number());
                     }
 
                     // use a season meanmax
@@ -6699,7 +6692,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         if (leaf->function == "week") {
 
             // convert number or vector of dates to weeks since GC_EPOCH
-            QDate earliest(GC_EPOCH);
             Result returning(0);
 
             if (leaf->fparms.count() != 1) return returning;
@@ -6707,12 +6699,12 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
             if (v.asNumeric().count()) {
                 for(int i=0; i<v.asNumeric().count(); i++) {
-                    double value = std::floor(earliest.daysTo(earliest.addDays(v.asNumeric()[i])) / 7.0);
+                    double value = std::floor(GC_EPOCH.daysTo(GC_EPOCH.addDays(v.asNumeric()[i])) / 7.0);
                     returning.number() += value; // for sum
                     returning.asNumeric() << value;
                 }
             } else {
-                returning.number() = std::floor(earliest.daysTo(earliest.addDays(v.number())) / 7.0);
+                returning.number() = std::floor(GC_EPOCH.daysTo(GC_EPOCH.addDays(v.number())) / 7.0);
             }
 
             return returning;
@@ -6721,7 +6713,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         if (leaf->function == "weekdate") {
 
             // convert number or vector of dates to weeks since GC_EPOCH
-            QDate earliest(GC_EPOCH);
             Result returning(0);
 
             if (leaf->fparms.count() != 1) return returning;
@@ -6729,12 +6720,12 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
             if (v.asNumeric().count()) {
                 for(int i=0; i<v.asNumeric().count(); i++) {
-                    double value = std::floor(earliest.daysTo(earliest.addDays(v.asNumeric()[i]* 7.0)));
+                    double value = std::floor(GC_EPOCH.daysTo(GC_EPOCH.addDays(v.asNumeric()[i]* 7.0)));
                     returning.number() += value; // for sum
                     returning.asNumeric() << value;
                 }
             } else {
-                returning.number() = std::floor(earliest.daysTo(earliest.addDays(v. number()* 7.0)));
+                returning.number() = std::floor(GC_EPOCH.daysTo(GC_EPOCH.addDays(v. number()* 7.0)));
             }
 
             return returning;
@@ -6742,7 +6733,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         if (leaf->function == "month") {
 
             // convert number or vector of dates to weeks since GC_EPOCH
-            QDate earliest(GC_EPOCH);
             Result returning(0);
 
             if (leaf->fparms.count() != 1) return returning;
@@ -6750,12 +6740,12 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
             if (v.asNumeric().count()) {
                 for(int i=0; i<v.asNumeric().count(); i++) {
-                    double value = std::floor(monthsTo(earliest, earliest.addDays(v.asNumeric()[i])));
+                    double value = std::floor(monthsTo(GC_EPOCH, GC_EPOCH.addDays(v.asNumeric()[i])));
                     returning.number() += value; // for sum
                     returning.asNumeric() << value;
                 }
             } else {
-                returning.number() = std::floor(monthsTo(earliest, earliest.addDays(v.number())));
+                returning.number() = std::floor(monthsTo(GC_EPOCH, GC_EPOCH.addDays(v.number())));
             }
 
             return returning;
@@ -6764,7 +6754,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         if (leaf->function == "monthdate") {
 
             // convert number or vector of dates to weeks since GC_EPOCH
-            QDate earliest(GC_EPOCH);
             Result returning(0);
 
             if (leaf->fparms.count() != 1) return returning;
@@ -6772,14 +6761,14 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
             if (v.asNumeric().count()) {
                 for(int i=0; i<v.asNumeric().count(); i++) {
-                    QDate dd = earliest.addMonths(v.asNumeric()[i]);
-                    double value = earliest.daysTo(QDate(dd.year(), dd.month(), 1));
+                    QDate dd = GC_EPOCH.addMonths(v.asNumeric()[i]);
+                    double value = GC_EPOCH.daysTo(QDate(dd.year(), dd.month(), 1));
                     returning.number() += value; // for sum
                     returning.asNumeric() << value;
                 }
             } else {
-                QDate dd = earliest.addMonths(v.number());
-                returning.number() = earliest.daysTo(QDate(dd.year(), dd.month(), 1));
+                QDate dd = GC_EPOCH.addMonths(v.number());
+                returning.number() = GC_EPOCH.daysTo(QDate(dd.year(), dd.month(), 1));
             }
 
             return returning;
@@ -7242,9 +7231,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                                 // overlaps, but truncate the dates we return
                                 int dfrom, dto;
-                                QDate earliest(GC_EPOCH);
-                                dfrom = earliest.daysTo(pde.from < d.from ? d.from : pde.from);
-                                dto = earliest.daysTo(pde.to > d.to ? d.to : pde.to);
+                                dfrom = GC_EPOCH.daysTo(pde.from < d.from ? d.from : pde.from);
+                                dto = GC_EPOCH.daysTo(pde.to > d.to ? d.to : pde.to);
 
                                 double v1, v2;
 

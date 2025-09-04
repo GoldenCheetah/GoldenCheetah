@@ -427,15 +427,13 @@ UserChart::groupBy(int groupby, int aggregateby, QVector<double> &xseries, QVect
 
     QVector<double> newx, newy;
 
-    QDate epoch(GC_EPOCH);
-
     for(int i=0; i<xseries.count() && i <yseries.count(); i++) {
 
         // value
         double value = yseries[i];
 
         // date
-        QDate date = epoch.addDays(xseries[i]);
+        QDate date = GC_EPOCH.addDays(xseries[i]);
         long group=groupForDate(groupby, date);
 
         // first entry needs to set group
@@ -445,7 +443,7 @@ UserChart::groupBy(int groupby, int aggregateby, QVector<double> &xseries, QVect
         // assumes in date order, we could sort first (?)
         if (group != lastgroup && groupcount > 0) {
 
-            newx << epoch.daysTo(dateForGroup(groupby, lastgroup));
+            newx << GC_EPOCH.daysTo(dateForGroup(groupby, lastgroup));
             newy << aggregate;
 
             if (fillzero) {
@@ -453,7 +451,7 @@ UserChart::groupBy(int groupby, int aggregateby, QVector<double> &xseries, QVect
                 // we fill gaps with zero for some chart types
                 // notably category based charts e.g. bar chart
                 for(int j=lastgroup+1; j<group;j++) {
-                    newx << epoch.daysTo(dateForGroup(groupby, j));
+                    newx << GC_EPOCH.daysTo(dateForGroup(groupby, j));
                     newy << 0;
                 }
             }
@@ -492,7 +490,7 @@ UserChart::groupBy(int groupby, int aggregateby, QVector<double> &xseries, QVect
     if (groupcount >0) {
 
         // pick up on last one
-        newx << epoch.daysTo(dateForGroup(groupby, lastgroup));
+        newx << GC_EPOCH.daysTo(dateForGroup(groupby, lastgroup));
         newy << aggregate;
     }
 
