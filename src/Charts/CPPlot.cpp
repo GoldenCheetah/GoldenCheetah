@@ -159,8 +159,8 @@ CPPlot::setDateRange(const QDate &start, const QDate &end, bool stale)
 {
 
     // wipe out current - calculate will reinstate
-    QDate istart = (start == QDate()) ? QDate(1900, 1, 1) : start;
-    QDate iend = (end == QDate()) ? QDate(3000, 12, 31) : end;
+    QDate istart = (start == QDate()) ? GC_EPOCH : start;
+    QDate iend = (end == QDate()) ? GC_YR_3000_EPOCH : end;
 
     // check they actually changed, to avoid ridefilecache aggregation
     // which is an expensive function

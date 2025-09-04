@@ -1282,7 +1282,6 @@ DataOverviewItem::sort(int column, Qt::SortOrder order)
 
     } else {
 
-        const QDate epoch(1970,1,1);
         QVector<double> in;
         for(int i= rows * column; i<values.count() && i< rows * (column+1) ; i++) {
 
@@ -1313,7 +1312,7 @@ DataOverviewItem::sort(int column, Qt::SortOrder order)
                     attempt = QDate::fromString(val, format);
                     if (attempt.isValid()) break;
                 }
-                in <<  epoch.daysTo(attempt);
+                in <<  GC_UNIX_EPOCH.daysTo(attempt);
 
             } else in << 0; // nope, don't understand
         }
@@ -1724,7 +1723,7 @@ MetricOverviewItem::setDateRange(DateRange dr)
     QList<QPointF> points;
 
     // how many days
-    QDate earliest(1900,01,01);
+    QDate earliest(GC_EPOCH);
     sparkline->setDays(earliest.daysTo(dr.to) - earliest.daysTo(dr.from));
 
     double min=0, max=0;
@@ -3595,7 +3594,7 @@ MetaOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
 
             QString displayValue(value);
             if ((fieldtype == GcFieldType::FIELD_DATE) && (symbol == "Start Date")) {
-                displayValue = (QDate(1900, 1, 1).addDays(value.toInt())).toString("dd/MM/yyyy");
+                displayValue = (GC_EPOCH.addDays(value.toInt())).toString("dd/MM/yyyy");
 
             } else if ((fieldtype == GcFieldType::FIELD_TIME) && (symbol == "Start Time")) {
                 displayValue = (QTime(0, 0).addSecs(value.toInt())).toString("hh:mm:ss");

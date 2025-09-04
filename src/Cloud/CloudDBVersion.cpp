@@ -51,7 +51,7 @@ void
 CloudDBVersionClient::informUserAboutLatestVersions() {
 
     // update check is done only once every xx days - to save DB read quota
-    QDate lastUpdateCheck = (appsettings->value(NULL, GC_LAST_VERSION_CHECK_DATE, QDate(1990, 1, 1)).toDate());
+    QDate lastUpdateCheck = (appsettings->value(NULL, GC_LAST_VERSION_CHECK_DATE, GC_VERSION_CHK_EPOCH).toDate());
     if (lastUpdateCheck.addDays(CloudDBVersionClient::CloudDBVersion_Days_Delay) > QDate::currentDate()) return;
 
     // consider any updates done since the last start and consider only newer versions

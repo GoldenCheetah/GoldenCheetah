@@ -63,7 +63,7 @@ MetricOverrideDialog::MetricOverrideDialog(Context* context, const QString& fiel
         case DialogMetricType::DATE: {
             metricEdit_ = new QDateEdit(this);
             dynamic_cast<QDateEdit*>(metricEdit_)->setDisplayFormat("dd MMM yyyy"); // same format as metric tile
-            dynamic_cast<QDateEdit*>(metricEdit_)->setDate(QDate(1900,1,1).addDays(value));
+            dynamic_cast<QDateEdit*>(metricEdit_)->setDate(GC_EPOCH.addDays(value));
         } break;
 
         case DialogMetricType::SECS_TIME: {
@@ -152,7 +152,7 @@ MetricOverrideDialog::setClicked()
     QString text;
     switch (dlgMetricType_) {
         case DialogMetricType::DATE: {
-            text = QString("%1").arg(QDate(1900, 01, 01).daysTo(dynamic_cast<QDateEdit*>(metricEdit_)->date()));
+            text = QString("%1").arg(GC_EPOCH.daysTo(dynamic_cast<QDateEdit*>(metricEdit_)->date()));
         } break;
         case DialogMetricType::SECS_TIME: {
             text = QString("%1").arg(QTime(0, 0, 0, 0).secsTo(dynamic_cast<QTimeEdit*>(metricEdit_)->time()));

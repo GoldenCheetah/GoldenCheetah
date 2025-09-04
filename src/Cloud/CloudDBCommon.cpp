@@ -496,7 +496,7 @@ CloudDBHeader::getAllCachedHeader(QList<CommonAPIHeaderV1> *objectHeader, CloudD
         selectAfter = objectHeader->at(0).LastChanged.addSecs(1); // DB has Microseconds - we not - so round up to next full second
     } else {
         // we do not have charts before 2000 :-)
-        selectAfter = QDateTime(QDate(2000,01,01).startOfDay());
+        selectAfter = QDateTime(GC_MIN_EDIT_DATE.startOfDay());
     }
 
     // now get the missing headers (in bulks of xxx - since GAE is not nicely handling high single call volumes)

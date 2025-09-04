@@ -201,7 +201,7 @@ APIWebService::writeRideLine(RideItem &item, HttpRequest *request, HttpResponse 
 
     // honour the since parameter
     QString sincep(request->getParameter("since"));
-    QDate since(1900,01,01);
+    QDate since(GC_EPOCH);
     if (sincep != "") since = QDate::fromString(sincep,"yyyy/MM/dd");
 
     // before parameter
@@ -459,7 +459,7 @@ APIWebService::listMMP(QString athlete, QStringList paths, HttpRequest &request,
 
         // honour the since parameter
         QString sincep(request.getParameter("since"));
-        QDate since(1900,01,01);
+        QDate since(GC_EPOCH);
         if (sincep != "") since = QDate::fromString(sincep,"yyyy/MM/dd");
 
         // before parameter
@@ -675,7 +675,7 @@ APIWebService::listMeasures(QString athlete, QStringList paths, HttpRequest &req
 
     // honour the since parameter
     QString sincep(request.getParameter("since"));
-    QDate since(1900,01,01);
+    QDate since(GC_EPOCH);
     if (sincep != "") since = QDate::fromString(sincep,"yyyy/MM/dd");
     QDate date = measuresGroup->getStartDate();
     if (since > date) date = since;

@@ -1542,7 +1542,7 @@ FormField::metadataChanged()
             break;
 
         case GcFieldType::FIELD_DATE: { // date
-            if (value == "") ((QDateEdit*)widget)->setDate(QDate(2000, 1, 1));
+            if (value == "") ((QDateEdit*)widget)->setDate(GC_MIN_EDIT_DATE);
             else {
                 QDate date(/* year*/value.mid(6, 4).toInt(),
                            /* month */value.mid(3, 2).toInt(),
@@ -1632,7 +1632,7 @@ FieldDefinition::calendarText(QString value)
         }
         case GcFieldType::FIELD_DATE:
         if (name == "Start Date") {
-            return QString("%1: %2\n").arg(name).arg(QDate(1900, 01, 01).addDays(value.toInt()).toString("dd/MM/yyyy"));
+            return QString("%1: %2\n").arg(name).arg(GC_EPOCH.addDays(value.toInt()).toString("dd/MM/yyyy"));
         }
         case GcFieldType::FIELD_INTEGER:
         case GcFieldType::FIELD_DOUBLE:

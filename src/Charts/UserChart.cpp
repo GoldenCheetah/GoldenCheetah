@@ -271,8 +271,8 @@ UserChart::refresh()
             series.labels.clear();
             foreach (GenericAxisInfo axis, axisinfo) {
                 if (series.xname == axis.name) {
-                    // DATERANGE values are days from 01-01-1900
-                    QDateTime earliest(QDate(1900,01,01), QTime(0,0,0), Qt::LocalTime);
+                    // DATERANGE values are days from GC_EPOCH
+                    QDateTime earliest(GC_EPOCH, QTime(0,0,0), Qt::LocalTime);
                     switch (axis.type) {
                         case GenericAxisInfo::TIME:
                             for(int i=0; i<ucd->x.asNumeric().count(); i++) series.labels << time_to_string(ucd->x.asNumeric()[i], true);
@@ -323,8 +323,8 @@ UserChart::refresh()
         // find the first series for this axis and set the categories
         // to the x series values.
         if ((chartinfo.type == GC_CHART_BAR || chartinfo.type == GC_CHART_STACK || chartinfo.type == GC_CHART_PERCENT) && axis.orientation == Qt::Horizontal) {
-            // DATERANGE values are days from 01-01-1900
-            QDateTime earliest(QDate(1900,01,01), QTime(0,0,0), Qt::LocalTime);
+            // DATERANGE values are days from GC_EPOCH
+            QDateTime earliest(GC_EPOCH, QTime(0,0,0), Qt::LocalTime);
 
             // find the first series for axis.name
             foreach(GenericSeriesInfo s, seriesinfo) {
@@ -413,10 +413,10 @@ UserChart::refresh()
 }
 
 
-// dates are always days since 1900,1,1 at this point as they
+// dates are always days since GC_EPOCH at this point as they
 // were returned by the datafilter. later on (notably after the
 // genericchart has intervened) they are converted to MSsincetheEpoch
-// but at this point, we have days since Jan 1 1900
+// but at this point, we have days since GC_EPOCH
 void
 UserChart::groupBy(int groupby, int aggregateby, QVector<double> &xseries, QVector<double> &yseries, bool fillzero)
 {
@@ -427,7 +427,7 @@ UserChart::groupBy(int groupby, int aggregateby, QVector<double> &xseries, QVect
 
     QVector<double> newx, newy;
 
-    QDate epoch(1900,1,1);
+    QDate epoch(GC_EPOCH);
 
     for(int i=0; i<xseries.count() && i <yseries.count(); i++) {
 

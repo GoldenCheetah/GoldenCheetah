@@ -817,7 +817,7 @@ QString
 RideItem::getText(QString name, QString fallback) const
 {
     // Start Date and Time are special cases, defined as metadata fields but stored in a different way
-    if (name == "Start Date") return QString::number(QDate(1900,01,01).daysTo(dateTime.date()));
+    if (name == "Start Date") return QString::number(GC_EPOCH.daysTo(dateTime.date()));
     if (name == "Start Time") return QString::number(QTime(0,0,0).secsTo(dateTime.time()));
     return metadata_.value(name, fallback);
 }

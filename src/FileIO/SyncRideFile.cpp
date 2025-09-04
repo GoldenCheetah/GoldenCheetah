@@ -185,7 +185,7 @@ struct SyncFileReaderState
                 int month = read_bytes(1, &bytes_read, &sum); // Section start time month
                 int year = read_bsd_byte(&bytes_read, &sum); // Section start time year
 
-                QDateTime t = QDateTime(QDate(2000+year,month,day), QTime(hour,min,sec));
+                QDateTime t = QDateTime(QDate(GC_RIDE_FILE_YEAR+year,month,day), QTime(hour,min,sec));
 
                 if (secs == 0.0) { // || rideFile->startTime().toSecsSinceEpoch()<0
                     rideFile->setStartTime(t);

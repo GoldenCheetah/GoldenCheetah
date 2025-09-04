@@ -1037,7 +1037,7 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
 
         // honour the since parameter
         QString sincep(request.getParameter("since"));
-        QDate since(1900,01,01);
+        QDate since(GC_EPOCH);
         if (sincep != "") since = QDate::fromString(sincep,"yyyy/MM/dd");
 
         // before parameter

@@ -248,9 +248,9 @@ static struct {
                        // is the class of measures e.g. "Hrv" or "Body", and field is the field
                        // name you want to retrieve e.g. "WeightKg" for "Body" and "RMSSD" for "Hrv"
 
-    { "week", 1 },      // some date arithmetic functions, week and month convert a date (days since 01/01/1970
-    { "month", 1 },     // to the week or month since 01/01/1970, and in reverse weekdate and monthdate
-    { "weekdate", 1 },  // convert the week or month number to a date (days since 01/01/1970).
+    { "week", 1 },      // some date arithmetic functions, week and month convert a date (days since GC_UNIX_EPOCH
+    { "month", 1 },     // to the week or month since GC_UNIX_EPOCH, and in reverse weekdate and monthdate
+    { "weekdate", 1 },  // convert the week or month number to a date (days since GC_UNIX_EPOCH).
     { "monthdate", 1 },
 
     { "aggregate", 3 }, // aggregate(v, by, mean|sum|max|min|count) - returns an aggregate of vector
@@ -603,7 +603,7 @@ DataFilter::builtins(Context *context)
 
         } else if (i == 53) {
 
-            // get a vector of activity metrics - date is integer days since 1900
+            // get a vector of activity metrics - date is integer days since GC_EPOCH
             returning << "metrics(symbol|date [,start [,stop]])";
 
         } else if (i == 54) {
@@ -1699,7 +1699,7 @@ bool Leaf::isNumber(DataFilterRuntime *df, Leaf *leaf)
         {
             // strings that evaluate as a date
             // will be returned as a number of days
-            // since 1900!
+            // since GC_EPOCH!
             QString string = *(leaf->lvalue.s);
             if (QDate::fromString(string, "yyyy/MM/dd").isValid())
                 return true;
@@ -3796,7 +3796,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             Result returning;
 
-            QDate earliest(1900,01,01);
+            QDate earliest(GC_EPOCH);
             bool wantdate = leaf->function == "datestring";
             Result r=eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
 
@@ -3942,8 +3942,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             if (leaf->fparms.count() == 1) {
 
                 QString symbol =  *(leaf->fparms[0]->lvalue.s);
-                if (symbol == "start") return Result(QDate(1900,01,01).daysTo(m->context->currentDateRange().from));
-                else if (symbol == "stop") return Result(QDate(1900,01,01).daysTo(m->context->currentDateRange().to));
+                if (symbol == "start") return Result(GC_EPOCH.daysTo(m->context->currentDateRange().from));
+                else if (symbol == "stop") return Result(GC_EPOCH.daysTo(m->context->currentDateRange().to));
 
                 return Result(0);
 
@@ -3953,7 +3953,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 Result to =eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
 
                 // so work out the date range
-                QDate earliest(1900,01,01);
+                QDate earliest(GC_EPOCH);
                 DateRange ourdaterange(earliest.addDays(from.number()), earliest.addDays(to.number()));
 
                 // return the expression, evaluated using our daterange
@@ -4038,7 +4038,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             //
             // DOB and SEX
             //
-            double DOB = QDate(1900,1,1).daysTo(appsettings->cvalue(m->context->athlete->cyclist, GC_DOB).toDate());
+            double DOB = GC_EPOCH.daysTo(appsettings->cvalue(m->context->athlete->cyclist, GC_DOB).toDate());
             QString SEX = appsettings->cvalue(m->context->athlete->cyclist, GC_SEX).toInt() ? "Female" : "Male";
 
             if (symbol == "cp") {
@@ -5039,7 +5039,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             leaf->function == "aggmetrics" || leaf->function == "aggmetricstrings") {
 
             bool wantstrings = (leaf->function.endsWith("strings"));
-            QDate earliest(1900,01,01);
+            QDate earliest(GC_EPOCH);
             bool wantdate=false;
             bool wanttime=false;
             QString symbol = *(leaf->fparms[0]->lvalue.n);
@@ -5116,7 +5116,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 double value=0;
                 QString asstring;
                 if(wantdate) {
-                    value= QDate(1900,01,01).daysTo(ride->dateTime.date());
+                    value= GC_EPOCH.daysTo(ride->dateTime.date());
                     if (wantstrings) asstring = ride->dateTime.date().toString("dd MMM yyyy");
                 } else if (wanttime) {
                     value= QTime(0,0,0).secsTo(ride->dateTime.time());
@@ -5182,7 +5182,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             bool currentride = false;
             bool wantstrings = (leaf->function == "intervalstrings");
-            QDate earliest(1900,01,01);
+            QDate earliest(GC_EPOCH);
             QString symbol = *(leaf->fparms[0]->lvalue.n);
 
             // find the metric
@@ -5247,7 +5247,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     double value=0;
                     QString asstring;
                     if(symbol == "date") {
-                        value= QDate(1900,01,01).daysTo(ride->dateTime.date());
+                        value= GC_EPOCH.daysTo(ride->dateTime.date());
                         if (wantstrings) asstring = ride->dateTime.date().toString("dd MMM yyyy");
                     } else if(symbol == "time") {
                         value= QTime(0,0,0).secsTo(ride->dateTime.time().addSecs(ii->start));
@@ -5321,7 +5321,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 foreach (SeasonEvent event, s.events) {
                     if (event.date >= d.from && event.date <= d.to) {
                         if (symbol == "date") {
-                            int value = QDate(1900,01,01).daysTo(event.date);
+                            int value = GC_EPOCH.daysTo(event.date);
                             returning.number() += value;
                             returning.asNumeric().append(value);
 			} if (symbol == "name") {
@@ -5342,7 +5342,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         if (leaf->function == "measures") {
 
             Result returning(0);
-            QDate earliest(1900,01,01);
+            QDate earliest(GC_EPOCH);
             bool wantdate=false;
 
             if (m == NULL) return Result(0); // no ride then no context
@@ -5390,7 +5390,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             if (m == NULL) return Result(0); // no ride then no context
 
             // work out what the date range is...
-            QDate earliest(1900,01,01);
+            QDate earliest(GC_EPOCH);
             Result returning(0);
             int duration = 0;
             int po = 0;
@@ -5471,7 +5471,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                     // default date range
                     QDate from=d.from, to=d.to;
-                    QDate earliest(1900,01,01);
+                    QDate earliest(GC_EPOCH);
 
                     if (leaf->fparms.count() == 3) {
                         // get the date range
@@ -6613,7 +6613,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             QString series = *(leaf->fparms[1]->lvalue.n);
             QString type = (leaf->fparms.count() == 3) ?  *(leaf->fparms[2]->lvalue.n) : "actual";
-            QDateTime earliest(QDate(1900,01,01),QTime(0,0,0));
+            QDateTime earliest(GC_EPOCH,QTime(0,0,0));
             PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df); // use default days
             Result returning(0);
             int  si=0;
@@ -6668,7 +6668,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             QString perf_metric = df->lookupMap.value(second->signature(), "");
             QString value = third->signature();
             Banister *banister = m->context->athlete->getBanisterFor(metric, perf_metric, 0,0);
-            QDateTime earliest(QDate(1900,01,01),QTime(0,0,0));
+            QDateTime earliest(GC_EPOCH,QTime(0,0,0));
 
             // prepare result
             Result returning(0);
@@ -6698,8 +6698,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         // date handling functions
         if (leaf->function == "week") {
 
-            // convert number or vector of dates to weeks since 1900
-            QDate earliest(1900,01,01);
+            // convert number or vector of dates to weeks since GC_EPOCH
+            QDate earliest(GC_EPOCH);
             Result returning(0);
 
             if (leaf->fparms.count() != 1) return returning;
@@ -6720,8 +6720,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         if (leaf->function == "weekdate") {
 
-            // convert number or vector of dates to weeks since 1900
-            QDate earliest(1900,01,01);
+            // convert number or vector of dates to weeks since GC_EPOCH
+            QDate earliest(GC_EPOCH);
             Result returning(0);
 
             if (leaf->fparms.count() != 1) return returning;
@@ -6741,8 +6741,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         }
         if (leaf->function == "month") {
 
-            // convert number or vector of dates to weeks since 1900
-            QDate earliest(1900,01,01);
+            // convert number or vector of dates to weeks since GC_EPOCH
+            QDate earliest(GC_EPOCH);
             Result returning(0);
 
             if (leaf->fparms.count() != 1) return returning;
@@ -6763,8 +6763,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         if (leaf->function == "monthdate") {
 
-            // convert number or vector of dates to weeks since 1900
-            QDate earliest(1900,01,01);
+            // convert number or vector of dates to weeks since GC_EPOCH
+            QDate earliest(GC_EPOCH);
             Result returning(0);
 
             if (leaf->fparms.count() != 1) return returning;
@@ -7242,7 +7242,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                                 // overlaps, but truncate the dates we return
                                 int dfrom, dto;
-                                QDate earliest(1900,01,01);
+                                QDate earliest(GC_EPOCH);
                                 dfrom = earliest.daysTo(pde.from < d.from ? d.from : pde.from);
                                 dto = earliest.daysTo(pde.to > d.to ? d.to : pde.to);
 
@@ -7651,7 +7651,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                     Result days = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
                     if (!days.isNumber) return Result(0); // invalid date
-                    QDate date = QDate(1900,01,01).addDays(days.number());
+                    QDate date = GC_EPOCH.addDays(days.number());
                     if (!date.isValid()) return Result(0); // invalid date
 
                     if (leaf->fparms[1]->type != String) return Result(0);
@@ -7892,7 +7892,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         } else if (!symbol.compare("Current", Qt::CaseInsensitive)) {
 
             if (m->context->currentRideItem())
-                lhsdouble = QDate(1900,01,01).
+                lhsdouble = GC_EPOCH.
                 daysTo(m->context->currentRideItem()->dateTime.date());
             else
                 lhsdouble = 0;
@@ -7900,12 +7900,12 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         } else if (!symbol.compare("Today", Qt::CaseInsensitive)) {
 
-            lhsdouble = QDate(1900,01,01).daysTo(QDate::currentDate());
+            lhsdouble = GC_EPOCH.daysTo(QDate::currentDate());
             lhsisNumber = true;
 
         } else if (!symbol.compare("Date", Qt::CaseInsensitive)) {
 
-            lhsdouble = QDate(1900,01,01).daysTo(m->dateTime.date());
+            lhsdouble = GC_EPOCH.daysTo(m->dateTime.date());
             lhsisNumber = true;
 
         } else if (!symbol.compare("Time", Qt::CaseInsensitive)) {
@@ -7969,7 +7969,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         // dates are returned as numbers
         QDate date = QDate::fromString(string, "yyyy/MM/dd");
-        if (date.isValid()) return Result(QDate(1900,01,01).daysTo(date));
+        if (date.isValid()) return Result(GC_EPOCH.daysTo(date));
         else return Result(string);
     }
     break;

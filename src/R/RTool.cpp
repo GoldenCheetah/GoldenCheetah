@@ -464,8 +464,7 @@ RTool::athlete()
 
     // DOB
     PROTECT(item=Rf_allocVector(INTSXP, 1));
-    QDate d1970(1970,01,01);
-    INTEGER(item)[0] = d1970.daysTo(appsettings->cvalue(rtool->context->athlete->cyclist, GC_DOB).toDate());
+    INTEGER(item)[0] = GC_UNIX_EPOCH.daysTo(appsettings->cvalue(rtool->context->athlete->cyclist, GC_DOB).toDate());
     SEXP dclas;
     PROTECT(dclas=Rf_allocVector(STRSXP, 1));
     SET_STRING_ELT(dclas, 0, Rf_mkChar("Date"));
@@ -507,7 +506,7 @@ RTool::athlete()
 // one entry per sport per date for hr/power/pace
 class gcZoneConfig {
     public:
-    gcZoneConfig(QString sport) : sport(sport), date(QDate(01,01,01)), cp(0), wprime(0), pmax(0), aetp(0), ftp(0),lthr(0),aethr(0),rhr(0),hrmax(0),cv(0),aetv(0) {}
+    gcZoneConfig(QString sport) : sport(sport), date(GC_EARLY_DATE), cp(0), wprime(0), pmax(0), aetp(0), ftp(0),lthr(0),aethr(0),rhr(0),hrmax(0),cv(0),aetv(0) {}
     bool operator<(gcZoneConfig rhs) const { return date < rhs.date; }
     QString sport;
     QDate date;
@@ -531,12 +530,11 @@ RTool::zones(SEXP pDate, SEXP pSport)
     QList<gcZoneConfig> config;
 
     // for a specific date?
-    QDate d1970(1970,01,01);
     PROTECT(pDate=Rf_coerceVector(pDate,INTSXP));
     if (INTEGER(pDate)[0] != 0) {
 
         // get settings for...
-        QDate forDate=d1970.addDays(INTEGER(pDate)[0]);
+        QDate forDate=GC_UNIX_EPOCH.addDays(INTEGER(pDate)[0]);
 
         // Look for the range in Power, HR and Pace zones for each sport
         foreach (QString sp, GlobalContext::context()->rideMetadata->sports()) {
@@ -689,7 +687,7 @@ RTool::zones(SEXP pDate, SEXP pSport)
                 // new date so save what we have collected
                 if (x.date > last.date) {
 
-                    if (last.date > QDate(01,01,01))  compressed << last;
+                    if (last.date > GC_EARLY_DATE)  compressed << last;
                     last.date = x.date;
                 }
 
@@ -714,7 +712,7 @@ RTool::zones(SEXP pDate, SEXP pSport)
             }
         }
 
-        if (last.date > QDate(01,01,01)) compressed << last;
+        if (last.date > GC_EARLY_DATE) compressed << last;
     }
 
     // now use the new compressed ones
@@ -760,7 +758,7 @@ RTool::zones(SEXP pDate, SEXP pSport)
     foreach(gcZoneConfig x, config) {
 
         // update the arrays
-        INTEGER(date)[index] = d1970.daysTo(x.date);
+        INTEGER(date)[index] = GC_UNIX_EPOCH.daysTo(x.date);
         SET_STRING_ELT(sport, index, Rf_mkChar(x.sport.toLatin1().constData()));
         SET_STRING_ELT(rownames, index, Rf_mkChar(QString("%1").arg(index+1).toLatin1().constData()));
         INTEGER(cp)[index] = x.cp;
@@ -999,8 +997,7 @@ RTool::dfForRideItem(const RideItem *ri)
     // DATE
     SEXP date;
     PROTECT(date=Rf_allocVector(INTSXP, rides));
-    QDate d1970(1970,01,01);
-    INTEGER(date)[0] = d1970.daysTo(item->dateTime.date());
+    INTEGER(date)[0] = GC_UNIX_EPOCH.daysTo(item->dateTime.date());
 
     SEXP dclas;
     PROTECT(dclas=Rf_allocVector(STRSXP, 1));
@@ -1203,11 +1200,10 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
     PROTECT(date=Rf_allocVector(INTSXP, rides));
 
     int k=0;
-    QDate d1970(1970,01,01);
     foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
         if (!specification.pass(ride)) continue;
         if (all || range.pass(ride->dateTime.date()))
-            INTEGER(date)[k++] = d1970.daysTo(ride->dateTime.date());
+            INTEGER(date)[k++] = GC_UNIX_EPOCH.daysTo(ride->dateTime.date());
     }
 
     SEXP dclas;
@@ -1418,13 +1414,12 @@ RTool::dfForDateRangeIntervals(DateRange range, QStringList types)
     PROTECT(date=Rf_allocVector(INTSXP, intervals));
 
     int k=0;
-    QDate d1970(1970,01,01);
     foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
         if (!specification.pass(ride)) continue;
         if (range.pass(ride->dateTime.date())) {
             foreach(IntervalItem *item, ride->intervals())
                 if (types.isEmpty() || types.contains(RideFileInterval::typeDescription(item->type)))
-                    INTEGER(date)[k++] = d1970.daysTo(ride->dateTime.date());
+                    INTEGER(date)[k++] = GC_UNIX_EPOCH.daysTo(ride->dateTime.date());
         }
     }
 
@@ -1655,12 +1650,11 @@ RTool::season(SEXP pAll, SEXP pCompare)
     PROTECT(rownames = Rf_allocVector(STRSXP, worklist.count()));
 
     int index=0;
-    QDate d1970(1970,1,1);
 
     foreach(DateRange p, worklist){
 
-        INTEGER(start) [index] = d1970.daysTo(p.from);
-        INTEGER(end) [index] = d1970.daysTo(p.to);
+        INTEGER(start) [index] = GC_UNIX_EPOCH.daysTo(p.from);
+        INTEGER(end) [index] = GC_UNIX_EPOCH.daysTo(p.to);
         SET_STRING_ELT(name, index, Rf_mkChar(p.name.toLatin1().constData()));
         SET_STRING_ELT(color, index, Rf_mkChar(p.color.name().toLatin1().constData()));
         QString rownumber=QString("%1").arg(index+1);
@@ -2549,7 +2543,7 @@ SEXP
 RTool::dfForDateRangeMeanmax(bool all, DateRange range, SEXP filter)
 {
     // construct the date range and then get a ridefilecache
-    if (all) range = DateRange(QDate(1900,01,01), QDate(2100,01,01));
+    if (all) range = DateRange(GC_EPOCH, GC_YR_2100_EPOCH);
 
     // did call contain any filters?
     QStringList filelist;
@@ -2656,8 +2650,6 @@ RTool::dfForRideFileCache(RideFileCache *cache)
         // if is power add the dates
         if(series == RideFile::watts) {
 
-            QDate d1970(1970,01,01);
-
             // dates
             QVector<QDate> dates = cache->meanMaxDates(series);
             SEXP vector;
@@ -2670,7 +2662,7 @@ RTool::dfForRideFileCache(RideFileCache *cache)
             // will have different sizes e.g. when a daterange
             // since longest ride with e.g. power may be different
             // to longest ride with heartrate
-            for(int j=0; j<values.count(); j++) INTEGER(vector)[j] = d1970.daysTo(dates[j]);
+            for(int j=0; j<values.count(); j++) INTEGER(vector)[j] = GC_UNIX_EPOCH.daysTo(dates[j]);
 
             // add to the list
             SET_VECTOR_ELT(ans, next, vector);
@@ -3370,11 +3362,9 @@ RTool::pmc(SEXP pAll, SEXP pMetric, SEXP pType)
         PMCData pmcData(rtool->context, Specification(), metric);
 
         // how many entries ?
-        QDate d1970(1970,01,01);
-
-        // not unsigned coz date could be configured < 1970 (!)
-        int from =d1970.daysTo(range.from);
-        int to =d1970.daysTo(range.to);
+        // not unsigned coz date could be configured < GC_UNIX_EPOCH (!)
+        int from =GC_UNIX_EPOCH.daysTo(range.from);
+        int to =GC_UNIX_EPOCH.daysTo(range.to);
         unsigned int size = all ? pmcData.days() : (to - from + 1);
 
         // returning a dataframe with
@@ -3396,7 +3386,7 @@ RTool::pmc(SEXP pAll, SEXP pMetric, SEXP pType)
         // DATE - 1 a day from start
         SEXP date;
         PROTECT(date=Rf_allocVector(INTSXP, size));
-        unsigned int start = d1970.daysTo(all ? pmcData.start() : range.from);
+        unsigned int start = GC_UNIX_EPOCH.daysTo(all ? pmcData.start() : range.from);
         for(unsigned int k=0; k<size; k++) INTEGER(date)[k] = start + k;
 
         SEXP dclas;
@@ -3442,7 +3432,7 @@ RTool::pmc(SEXP pAll, SEXP pMetric, SEXP pType)
 
         } else {
 
-            int day = d1970.daysTo(pmcData.start());
+            int day = GC_UNIX_EPOCH.daysTo(pmcData.start());
             for(int k=0; k < pmcData.days(); k++) {
 
                 // day today
@@ -3532,11 +3522,9 @@ RTool::measures(SEXP pAll, SEXP pGroup)
         }
 
         // how many entries ?
-        QDate d1970(1970,01,01);
-
-        // not unsigned coz date could be configured < 1970 (!)
-        int from =d1970.daysTo(range.from);
-        int to =d1970.daysTo(range.to);
+        // not unsigned coz date could be configured < GC_UNIX_EPOCH (!)
+        int from =GC_UNIX_EPOCH.daysTo(range.from);
+        int to =GC_UNIX_EPOCH.daysTo(range.to);
         unsigned int size = to - from + 1;
 
         // returning a dataframe with
@@ -3556,7 +3544,7 @@ RTool::measures(SEXP pAll, SEXP pGroup)
         // DATE - 1 a day from start
         SEXP date;
         PROTECT(date=Rf_allocVector(INTSXP, size));
-        unsigned int start = d1970.daysTo(range.from);
+        unsigned int start = GC_UNIX_EPOCH.daysTo(range.from);
         for(unsigned int k=0; k<size; k++) INTEGER(date)[k] = start + k;
 
         SEXP dclas;
@@ -3581,7 +3569,7 @@ RTool::measures(SEXP pAll, SEXP pGroup)
             if (day >= from && day <= to) {
 
                 for (int fieldIdx=0; fieldIdx<fields.count(); fieldIdx++)
-                    REAL(fields[fieldIdx])[index] = rtool->context->athlete->measures->getFieldValue(groupIdx, d1970.addDays(day), fieldIdx);
+                    REAL(fields[fieldIdx])[index] = rtool->context->athlete->measures->getFieldValue(groupIdx, GC_UNIX_EPOCH.addDays(day), fieldIdx);
                 index++;
             }
             day++;

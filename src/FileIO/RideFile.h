@@ -59,6 +59,8 @@ class Context;      // for context; cyclist, homedir
 // suffixes to the RideFileReader objects capable of converting those files
 // into RideFile objects.
 
+static const int GC_RIDE_FILE_YEAR{2000};
+
 extern const QChar deltaChar;
 
 struct RideFileDataPresent
