@@ -46,9 +46,14 @@ PerspectiveDialog::PerspectiveDialog(QWidget *parent, AbstractView *tabView) : Q
 #ifdef Q_OS_MAX
     xdataTable->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
-    perspectiveTable->setColumnCount(1);
+    perspectiveTable->setColumnCount(2);
+    QStringList headers = (QStringList() << tr(" Name ") << tr("Switch Expression"));
+    perspectiveTable->setHorizontalHeaderLabels(headers);
+    QFont font = perspectiveTable->horizontalHeaderItem(0)->font();
+    font.setBold(false);
+    perspectiveTable->horizontalHeaderItem(0)->setFont(font);
+    perspectiveTable->horizontalHeaderItem(1)->setFont(font);
     perspectiveTable->horizontalHeader()->setStretchLastSection(true);
-    perspectiveTable->horizontalHeader()->hide();
     perspectiveTable->setSortingEnabled(false);
     perspectiveTable->verticalHeader()->hide();
     perspectiveTable->setShowGrid(false);
@@ -119,7 +124,7 @@ void PerspectiveDialog::setTables()
 {
     active = true;
 
-    perspectiveTable->clear();
+    perspectiveTable->clearContents();
     perspectiveTable->setRowCount(tabView->perspectives_.count());
 
     // add a row for each perspective
@@ -132,8 +137,15 @@ void PerspectiveDialog::setTables()
 
         // and the perspective we represent, so we can avoid dropping on ourselves
         add->setData(Qt::UserRole, QVariant::fromValue(static_cast<void*>(perspective)));
+        perspectiveTable->setItem(perspectiverow, 0, add);
 
-        perspectiveTable->setItem(perspectiverow++, 0, add);
+        // and the perspective's rule (for information)
+        QTableWidgetItem *rule = new QTableWidgetItem(perspective->expression(), 0);
+        rule->setFlags(add->flags() | Qt::ItemIsDropEnabled);
+
+        // and the perspective we represent, so we can avoid dropping on ourselves
+        rule->setData(Qt::UserRole, QVariant::fromValue(static_cast<void*>(perspective)));
+        perspectiveTable->setItem(perspectiverow++, 1, rule);
 
     }
 
@@ -362,6 +374,9 @@ PerspectiveTableWidget::dragMoveEvent(QDragMoveEvent *event)
 {
     QPoint pos = mapFromGlobal(QCursor::pos());
 
+    // allow for the height of the perspective table header
+    pos.setY(pos.y() - horizontalHeader()->height());
+
     QTableWidgetItem *hover = itemAt(pos);
     if (hover) {
         QTableWidget::dragMoveEvent(event);
@@ -391,6 +406,9 @@ PerspectiveTableWidget::dropEvent(QDropEvent *event)
 
     // to where?
     QPoint pos = mapFromGlobal(QCursor::pos());
+
+    // allow for the height of the perspective table header
+    pos.setY(pos.y() - horizontalHeader()->height());
 
     QTableWidgetItem *hover = itemAt(pos);
     if (hover) {
