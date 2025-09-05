@@ -28,6 +28,7 @@
 #include "RideMetadata.h"
 #include "Colors.h"
 #include "ManualActivityWizard.h"
+#include "RepeatScheduleWizard.h"
 #include "WorkoutFilter.h"
 #include "IconManager.h"
 
@@ -86,6 +87,15 @@ PlanningCalendarWindow::PlanningCalendarWindow(Context *context)
         context->tab->setNoSwitch(true);
         ManualActivityWizard wizard(context, plan, QDateTime(day, time));
         wizard.exec();
+        context->tab->setNoSwitch(false);
+    });
+    connect(calendar, &Calendar::repeatSchedule, [=](const QDate &day) {
+        context->tab->setNoSwitch(true);
+        RepeatScheduleWizard wizard(context, day);
+        if (wizard.exec() == QDialog::Accepted) {
+            // Context::rideDeleted is not always emitted, therefore forcing the update
+            updateActivities();
+        }
         context->tab->setNoSwitch(false);
     });
     connect(calendar, &Calendar::delActivity, [=](CalendarEntry activity) {

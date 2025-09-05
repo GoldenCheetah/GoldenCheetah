@@ -1900,7 +1900,7 @@ CustomMetricsPage::addClicked()
     here.conversionSum = 0.00;
     here.program = R"({
     # only calculate for rides containing power
-    relevant { Data contains P; }
+    relevant { Data contains "P"; }
 
     # initialise aggregating variables
     # does nothing, update as needed

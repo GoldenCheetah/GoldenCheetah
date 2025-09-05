@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2025 Joachim Kohlhammer (joachim.kohlhammer@gmx.de)
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #include "Calendar.h"
 
 #include <QHeaderView>
@@ -639,6 +657,9 @@ CalendarMonthTable::showContextMenu
                 }
                 emit addActivity(true, day.date, time);
             });
+            contextMenu.addAction("Repeat schedule...", this, [=]() {
+                emit repeatSchedule(day.date);
+            });
             bool hasPlannedActivity = false;
             for (const CalendarEntry &calEntry : day.entries) {
                 if (calEntry.type == ENTRY_TYPE_PLANNED_ACTIVITY) {
@@ -719,6 +740,7 @@ Calendar::Calendar
     connect(monthTable, &CalendarMonthTable::showInTrainMode, this, &Calendar::showInTrainMode);
     connect(monthTable, &CalendarMonthTable::viewActivity, this, &Calendar::viewActivity);
     connect(monthTable, &CalendarMonthTable::addActivity, this, &Calendar::addActivity);
+    connect(monthTable, &CalendarMonthTable::repeatSchedule, this, &Calendar::repeatSchedule);
     connect(monthTable, &CalendarMonthTable::delActivity, this, &Calendar::delActivity);
     connect(monthTable, &CalendarMonthTable::entryMoved, this, &Calendar::moveActivity);
     connect(monthTable, &CalendarMonthTable::insertRestday, this, &Calendar::insertRestday);
