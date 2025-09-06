@@ -399,7 +399,7 @@ static struct {
     { "xdataunits", 1 },  // returns a string vector of all the units in an xdata e.g. xdataunits("SESSION");
     { "xdatavalues", 1 }, // returns a vector of doubles of all vales in an xdata suitable for display in an overview tile
 
-    { "completerval", 1 }, // get the metadata value for current ride and check its one of the autocomplete 'defaults'
+    { "completervalues", 1 }, // get the metadata completer values for the specified field name
 
     // add new ones above this line
     { "", -1 }
@@ -4954,19 +4954,21 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             return returning;
         }
 
-        if (leaf->function == "completerval") {
+        if (leaf->function == "completervalues") {
 
-            // get the metadata value for current ride and check its one of the autocomplete 'defaults'
-
+            // get the metadata completer values for the specified field name
+            Result returning("");
             if (m == NULL) return Result(0.0); // no ride then no context
 
             QString fieldName = eval(df, leaf->fparms[0],x, it, m, p, c, s, d).string();
 
             if (d.from==QDate() && d.to==QDate()) { // ride only
 
-                if (m->isCompleterValue(fieldName)) return Result(1.0); // true;
+                foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
+                    if (field.name == fieldName) return returning.asString() << field.values;
+                }
             }
-            return Result(0.0);
+            return returning;
         }
 
         // normalize values to between 0 and 1

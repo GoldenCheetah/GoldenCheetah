@@ -142,9 +142,8 @@ class RideItem : public QObject
         int importImages(QStringList files);
 
         // access the metadata
-        QString getText(const QString& name, const QString& fallback) const;
-        bool hasText(const QString& name) const;
-        bool isCompleterValue(const QString& name) const;
+        QString getText(QString name, QString fallback) const;
+        bool hasText(QString name) const;
 
         // get at the first class data
         QString path;
