@@ -30,6 +30,7 @@
 #include "ManualActivityWizard.h"
 #include "RepeatScheduleWizard.h"
 #include "WorkoutFilter.h"
+#include "IconManager.h"
 
 #define HLO "<h4>"
 #define HLC "</h4>"
@@ -490,21 +491,7 @@ PlanningCalendarWindow::getActivities
             activity.secondaryMetric = "";
         }
 
-        if (sport == "Bike") {
-            activity.iconFile = ":images/material/bike.svg";
-        } else if (sport == "Run") {
-            activity.iconFile = ":images/material/run.svg";
-        } else if (sport == "Swim") {
-            activity.iconFile = ":images/material/swim.svg";
-        } else if (sport == "Row") {
-            activity.iconFile = ":images/material/rowing.svg";
-        } else if (sport == "Ski") {
-            activity.iconFile = ":images/material/ski.svg";
-        } else if (sport == "Gym") {
-            activity.iconFile = ":images/material/weight-lifter.svg";
-        } else {
-            activity.iconFile = ":images/breeze/games-highscores.svg";
-        }
+        activity.iconFile = IconManager::instance().getFilepath(rideItem);
         if (rideItem->color.alpha() < 255 || rideItem->planned) {
             activity.color = QColor("#F79130");
         } else {

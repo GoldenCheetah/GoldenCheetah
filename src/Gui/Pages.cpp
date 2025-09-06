@@ -42,6 +42,7 @@
 #include "LocalFileStore.h"
 #include "Secrets.h"
 #include "Utils.h"
+#include "IconManager.h"
 #ifdef GC_WANT_PYTHON
 #include "PythonEmbed.h"
 #include "FixPySettings.h"
@@ -2152,12 +2153,14 @@ MetadataPage::MetadataPage(Context *context) : context(context)
     // setup maintenance pages using current config
     fieldsPage = new FieldsPage(this, fieldDefinitions);
     keywordsPage = new KeywordsPage(this, keywordDefinitions);
+    iconsPage = new IconsPage(fieldDefinitions, this);
     defaultsPage = new DefaultsPage(this, defaultDefinitions);
     processorPage = new ProcessorPage(context);
 
     tabs = new QTabWidget(this);
     tabs->addTab(fieldsPage, tr("Fields"));
     tabs->addTab(keywordsPage, tr("Colour Keywords"));
+    tabs->addTab(iconsPage, tr("Icons"));
     tabs->addTab(defaultsPage, tr("Defaults"));
     tabs->addTab(processorPage, tr("Processors && Automation"));
 
@@ -2197,6 +2200,8 @@ MetadataPage::saveClicked()
 
     if (b4.fieldFingerprint != FieldDefinition::fingerprint(fieldDefinitions))
         state += CONFIG_FIELDS;
+
+    state |= iconsPage->saveClicked();
 
     return state;
 }
@@ -2401,6 +2406,513 @@ KeywordsPage::getDefinitions(QList<KeywordDefinition> &keywordList)
         keywordList.append(add);
     }
 }
+
+
+//
+// Icons page
+//
+
+#define ICONSPAGE_L_W 64 * dpiXFactor
+#define ICONSPAGE_L_H 64 * dpiXFactor
+#define ICONSPAGE_L QSize(ICONSPAGE_L_W, ICONSPAGE_L_H)
+#define ICONSPAGE_L_SPACE QSize(80 * dpiXFactor, 80 * dpiYFactor)
+#define ICONSPAGE_S_W 48 * dpiXFactor
+#define ICONSPAGE_S_H 48 * dpiXFactor
+#define ICONSPAGE_S QSize(ICONSPAGE_S_W, ICONSPAGE_S_H)
+#define ICONSPAGE_MARGIN 2 * dpiXFactor
+
+IconsPage::IconsPage
+(const QList<FieldDefinition> &fieldDefinitions, QWidget *parent)
+: QWidget(parent), fieldDefinitions(fieldDefinitions)
+{
+    QPalette palette;
+
+    sportTree = new QTreeWidget();
+    sportTree->setColumnCount(3);
+    basicTreeWidgetStyle(sportTree);
+    sportTree->setHeaderLabels({ tr("Field"), tr("Value"), tr("Icon") });
+    sportTree->setIconSize(ICONSPAGE_S);
+    sportTree->setAcceptDrops(true);
+    sportTree->installEventFilter(this);
+    sportTree->viewport()->installEventFilter(this);
+    initSportTree();
+
+    iconList = new QListWidget();
+    iconList->setViewMode(QListView::IconMode);
+    iconList->setIconSize(ICONSPAGE_L);
+    iconList->setGridSize(ICONSPAGE_L_SPACE);
+    iconList->setResizeMode(QListView::Adjust);
+    iconList->setWrapping(true);
+    iconList->setFlow(QListView::LeftToRight);
+    iconList->setSpacing(10 * dpiXFactor);
+    iconList->setMovement(QListView::Static);
+    iconList->setUniformItemSizes(true);
+    iconList->setSelectionMode(QAbstractItemView::SingleSelection);
+    iconList->setDragEnabled(false);
+    iconList->setAcceptDrops(true);
+    iconList->installEventFilter(this);
+    iconList->viewport()->installEventFilter(this);
+    updateIconList();
+
+    QPixmap trashPixmap = svgAsColoredPixmap(":images/breeze/trash-empty.svg", ICONSPAGE_L, ICONSPAGE_MARGIN, palette.color(QPalette::WindowText));
+    QPixmap trashPixmapActive = svgAsColoredPixmap(":images/breeze/trash-empty.svg", ICONSPAGE_L, ICONSPAGE_MARGIN, QColor("#F79130"));
+    trashIcon.addPixmap(trashPixmap, QIcon::Normal);
+    trashIcon.addPixmap(trashPixmapActive, QIcon::Active);
+
+    trash = new QLabel();
+    trash->setAcceptDrops(true);
+    trash->setPixmap(trashIcon.pixmap(ICONSPAGE_L, QIcon::Normal));
+    trash->installEventFilter(this);
+    QPushButton *importButton = new QPushButton(tr("Import"));
+    QPushButton *exportButton = new QPushButton(tr("Export"));
+
+    QHBoxLayout *contentLayout = new QHBoxLayout();
+    contentLayout->addWidget(sportTree);
+    contentLayout->addWidget(iconList);
+
+    QHBoxLayout *actionLayout = new QHBoxLayout();
+    actionLayout->addWidget(trash);
+    actionLayout->addStretch();
+    actionLayout->addWidget(importButton);
+    actionLayout->addWidget(exportButton);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->addLayout(contentLayout);
+    mainLayout->addLayout(actionLayout);
+
+    connect(importButton, &QPushButton::clicked, [=]() {
+        QString zipFile = QFileDialog::getOpenFileName(this, tr("Import Icons"), "", tr("Zip Files (*.zip)"));
+        if (zipFile.isEmpty() || ! IconManager::instance().importBundle(zipFile)) {
+            QMessageBox::warning(nullptr, tr("Icons Bundle"), tr("Bundle file %1 cannot be imported.").arg(zipFile));
+        } else {
+            initSportTree();
+            updateIconList();
+        }
+    });
+    connect(exportButton, &QPushButton::clicked, [=]() {
+        QString zipFile = QFileDialog::getSaveFileName(this, tr("Export Icons"), "", tr("Zip Files (*.zip)"));
+        if (zipFile.isEmpty() || ! IconManager::instance().exportBundle(zipFile)) {
+            QMessageBox::warning(nullptr, tr("Icons Bundle"), tr("Bundle file %1 cannot be created.").arg(zipFile));
+        }
+    });
+}
+
+
+qint32
+IconsPage::saveClicked
+()
+{
+    bool changed = false;
+
+    int rowCount = sportTree->topLevelItemCount();
+    for (int i = 0; i < rowCount; ++i) {
+        QTreeWidgetItem *item = sportTree->topLevelItem(i);
+        if (! item) {
+            continue;
+        }
+        QString originalIcon = item->data(0, Qt::UserRole + 1).toString();
+        QString newIcon = item->data(0, Qt::UserRole + 2).toString();
+        if (originalIcon != newIcon) {
+            QString type = item->data(0, Qt::UserRole).toString();
+            QString key = item->data(1, Qt::DisplayRole).toString();
+            IconManager::instance().assignIcon(type, key, newIcon);
+        }
+    }
+
+    if (changed) {
+        return CONFIG_APPEARANCE;
+    } else {
+        return 0;
+    }
+}
+
+
+bool
+IconsPage::eventFilter
+(QObject *watched, QEvent *event)
+{
+    bool handled = false;
+    if (watched == trash) {
+        handled = eventFilterTrash(event);
+    } else if (watched == sportTree) {
+        handled = eventFilterSportTree(event);
+    } else if (watched == sportTree->viewport()) {
+        handled = eventFilterSportTreeViewport(event);
+    } else if (watched == iconList) {
+        handled = eventFilterIconList(event);
+    } else if (watched == iconList->viewport()) {
+        handled = eventFilterIconListViewport(event);
+    }
+    return handled ? true : QObject::eventFilter(watched, event);
+}
+
+
+bool
+IconsPage::eventFilterTrash
+(QEvent *event)
+{
+    if (   event->type() == QEvent::DragEnter
+        || event->type() == QEvent::Drop) {
+        QDropEvent *dropEvent = static_cast<QDropEvent*>(event);
+        if (   dropEvent->mimeData()->hasFormat("application/x-gc-icon")
+            && (dropEvent->possibleActions() & Qt::MoveAction)
+            && (   dropEvent->source() == sportTree
+                || dropEvent->source() == iconList)) {
+            dropEvent->setDropAction(Qt::MoveAction);
+            dropEvent->accept();
+            trash->setPixmap(trashIcon.pixmap(ICONSPAGE_L, event->type() == QEvent::Drop ? QIcon::Normal : QIcon::Active));
+            return true;
+        }
+    } else if (event->type() == QEvent::DragLeave) {
+        trash->setPixmap(trashIcon.pixmap(ICONSPAGE_L, QIcon::Normal));
+        return true;
+    }
+    return false;
+}
+
+
+bool
+IconsPage::eventFilterSportTree
+(QEvent *event)
+{
+    if (event->type() == QEvent::DragEnter) {
+        QDragEnterEvent *dragEnterEvent = static_cast<QDragEnterEvent*>(event);
+        if (   dragEnterEvent->mimeData()->hasFormat("application/x-gc-icon")
+            && (dragEnterEvent->possibleActions() & Qt::LinkAction)
+            && dragEnterEvent->source() == iconList) {
+            sportTree->setStyleSheet("QTreeWidget { border: 2px solid #F79130; border-radius: 8px; }");
+            dragEnterEvent->setDropAction(Qt::LinkAction);
+            dragEnterEvent->accept();
+            return true;
+        }
+    } else if (event->type() == QEvent::DragMove) {
+        QDragMoveEvent *dragMoveEvent = static_cast<QDragMoveEvent*>(event);
+        if (   dragMoveEvent->mimeData()->hasFormat("application/x-gc-icon")
+            && (dragMoveEvent->possibleActions() & Qt::LinkAction)
+            && dragMoveEvent->source() == iconList) {
+            QPoint globalCursor = QCursor::pos();
+            QPoint pos = sportTree->viewport()->mapFromGlobal(globalCursor);
+            QTreeWidgetItem* targetItem = sportTree->itemAt(pos);
+            if (targetItem) {
+                sportTree->setCurrentItem(targetItem);
+                dragMoveEvent->setDropAction(Qt::LinkAction);
+                dragMoveEvent->accept();
+            } else {
+                dragMoveEvent->ignore();
+            }
+            return true;
+        }
+    } else if (event->type() == QEvent::DragLeave) {
+        sportTree->setStyleSheet("");
+        return true;
+    } else if (event->type() == QEvent::Drop) {
+        QDropEvent *dropEvent = static_cast<QDropEvent*>(event);
+        if (   dropEvent->mimeData()->hasFormat("application/x-gc-icon")
+            && (dropEvent->possibleActions() & Qt::LinkAction)
+            && dropEvent->source() == iconList) {
+            QByteArray iconBytes = dropEvent->mimeData()->data("application/x-gc-icon");
+            QString iconFile = QString::fromUtf8(iconBytes);
+            QPoint globalCursor = QCursor::pos();
+            QPoint pos = sportTree->viewport()->mapFromGlobal(globalCursor);
+            QTreeWidgetItem* targetItem = sportTree->itemAt(pos);
+            if (targetItem) {
+                QPalette palette;
+                QElapsedTimer timer;
+                timer.start();
+                QPixmap pixmap = svgAsColoredPixmap(IconManager::instance().toFilepath(iconFile), QSize(1000, 1000), 0, palette.color(QPalette::Text));
+                qint64 elapsed = timer.elapsed();
+                if (   elapsed < 50
+                    || QMessageBox::question(this, tr("Complex Icon"), tr("The selected icon %1 appears to be complex and could impact performance. Are you sure you want to use this icon?").arg(iconFile)) == QMessageBox::Yes) {
+                    QPixmap pixmap = svgAsColoredPixmap(IconManager::instance().toFilepath(iconFile), ICONSPAGE_S, ICONSPAGE_MARGIN, palette.color(QPalette::Text));
+                    targetItem->setData(0, Qt::UserRole + 2, iconFile);
+                    targetItem->setIcon(2, QIcon(pixmap));
+                    dropEvent->setDropAction(Qt::LinkAction);
+                    dropEvent->accept();
+                } else {
+                    dropEvent->ignore();
+                }
+            }
+        }
+        sportTree->setStyleSheet("");
+        return true;
+    }
+    return false;
+}
+
+
+bool
+IconsPage::eventFilterSportTreeViewport
+(QEvent *event)
+{
+    if (event->type() == QEvent::MouseButtonPress) {
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+        if (mouseEvent->button() == Qt::LeftButton) {
+#if QT_VERSION >= 0x060000
+            QTreeWidgetItem *item = sportTree->itemAt(mouseEvent->position().toPoint());
+#else
+            QTreeWidgetItem *item = sportTree->itemAt(mouseEvent->pos());
+#endif
+            if (item && ! item->data(0, Qt::UserRole + 2).toString().isEmpty()) {
+#if QT_VERSION >= 0x060000
+                sportTreeDragStartPos = mouseEvent->position().toPoint();
+#else
+                sportTreeDragStartPos = mouseEvent->pos();
+#endif
+                sportTreeDragWatch = true;
+            } else {
+                sportTreeDragWatch = false;
+            }
+        }
+        return true;
+    } else if (event->type() == QEvent::MouseMove) {
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+        if (   ! (mouseEvent->buttons() & Qt::LeftButton)
+            || ! sportTreeDragWatch
+#if QT_VERSION >= 0x060000
+            || (mouseEvent->position().toPoint() - sportTreeDragStartPos).manhattanLength() < QApplication::startDragDistance()) {
+#else
+            || (mouseEvent->pos() - sportTreeDragStartPos).manhattanLength() < QApplication::startDragDistance()) {
+#endif
+            return true;
+        }
+        sportTreeDragWatch = false;
+#if QT_VERSION >= 0x060000
+        QTreeWidgetItem *item = sportTree->itemAt(mouseEvent->position().toPoint());
+#else
+        QTreeWidgetItem *item = sportTree->itemAt(mouseEvent->pos());
+#endif
+        if (! item) {
+            return true;
+        }
+
+        QByteArray entryBytes = item->data(0, Qt::UserRole).toString().toUtf8();
+        QMimeData *mimeData = new QMimeData();
+        mimeData->setData("application/x-gc-icon", entryBytes);
+
+        QDrag *drag = new QDrag(sportTree);
+        drag->setMimeData(mimeData);
+        drag->setPixmap(item->icon(2).pixmap(ICONSPAGE_S));
+        drag->setHotSpot(QPoint(ICONSPAGE_S_W / 2, ICONSPAGE_S_H / 2));
+        Qt::DropAction dropAction = drag->exec(Qt::MoveAction);
+        if (dropAction == Qt::MoveAction) {
+            QPixmap pixmap(ICONSPAGE_S);
+            pixmap.fill(Qt::transparent);
+            QIcon icon(pixmap);
+            item->setData(0, Qt::UserRole + 2, "");
+            item->setIcon(2, icon);
+        }
+        return true;
+    }
+    return false;
+}
+
+
+bool
+IconsPage::eventFilterIconList
+(QEvent *event)
+{
+    if (event->type() == QEvent::DragEnter) {
+        QDragEnterEvent *dragEnterEvent = static_cast<QDragEnterEvent*>(event);
+        if (   dragEnterEvent->mimeData()->hasFormat("application/x-gc-icon")
+            && (dragEnterEvent->possibleActions() & Qt::MoveAction)
+            && dragEnterEvent->source() == sportTree) {
+            dragEnterEvent->setDropAction(Qt::MoveAction);
+            dragEnterEvent->accept();
+        } else if (   dragEnterEvent->mimeData()->hasUrls()
+                   && (dragEnterEvent->possibleActions() & Qt::CopyAction)) {
+            const QList<QUrl> urls = dragEnterEvent->mimeData()->urls();
+            int svgs = 0;
+            for (const QUrl &url : urls) {
+                QString path = url.toLocalFile();
+                if (path.endsWith(".svg")) {
+                    ++svgs;
+                }
+            }
+            if (svgs > 0) {
+                dragEnterEvent->setDropAction(Qt::CopyAction);
+                dragEnterEvent->accept();
+            }
+        }
+        if (dragEnterEvent->isAccepted()) {
+            iconList->setStyleSheet("QListWidget { border: 2px solid #F79130; border-radius: 8px; }");
+        }
+        return true;
+    } else if (event->type() == QEvent::DragLeave) {
+        iconList->setStyleSheet("");
+        return true;
+    } else if (event->type() == QEvent::Drop) {
+        QDropEvent *dropEvent = static_cast<QDropEvent*>(event);
+        if (   dropEvent->mimeData()->hasFormat("application/x-gc-icon")
+            && (dropEvent->possibleActions() & Qt::MoveAction)
+            && dropEvent->source() == sportTree) {
+            dropEvent->setDropAction(Qt::MoveAction);
+            dropEvent->accept();
+        } else if (   dropEvent->mimeData()->hasUrls()
+                   && (dropEvent->possibleActions() & Qt::CopyAction)) {
+            const QList<QUrl> urls = dropEvent->mimeData()->urls();
+            int added = 0;
+            for (const QUrl &url : urls) {
+                QString path = url.toLocalFile();
+                if (IconManager::instance().addIconFile(path)) {
+                    ++added;
+                }
+            }
+            if (added > 0) {
+                dropEvent->setDropAction(Qt::CopyAction);
+                dropEvent->accept();
+                updateIconList();
+            }
+        }
+        iconList->setStyleSheet("");
+        return true;
+    }
+    return false;
+}
+
+
+bool
+IconsPage::eventFilterIconListViewport
+(QEvent *event)
+{
+    if (event->type() == QEvent::Paint) {
+        if (iconList->count() == 0) {
+            QPaintEvent *paintEvent = static_cast<QPaintEvent*>(event);
+            QPainter painter(iconList->viewport());
+            QPalette palette;
+            QColor pixmapColor = palette.color(QPalette::Disabled, QPalette::Text);
+            if (palette.color(QPalette::Base).lightness() < 127) {
+                pixmapColor = pixmapColor.darker(135);
+            } else {
+                pixmapColor = pixmapColor.lighter(135);
+            }
+            QPixmap pixmap = svgAsColoredPixmap(":/images/breeze/edit-image-face-add.svg", QSize(256 * dpiXFactor, 256 * dpiYFactor), 0, pixmapColor);
+            painter.drawPixmap((paintEvent->rect().width() - pixmap.width()) / 2, (paintEvent->rect().height() - pixmap.height()) / 2, pixmap);
+            painter.drawText(paintEvent->rect(), Qt::AlignCenter | Qt::TextWordWrap, tr("No icons available.\nDrag and drop .svg files here to add icons."));
+            return true;
+        }
+        return false;
+    } else if (event->type() == QEvent::MouseButtonPress) {
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+        if (mouseEvent->button() == Qt::LeftButton) {
+#if QT_VERSION >= 0x060000
+            QListWidgetItem *item = iconList->itemAt(mouseEvent->position().toPoint());
+#else
+            QListWidgetItem *item = iconList->itemAt(mouseEvent->pos());
+#endif
+            if (item) {
+#if QT_VERSION >= 0x060000
+                iconListDragStartPos = mouseEvent->position().toPoint();
+#else
+                iconListDragStartPos = mouseEvent->pos();
+#endif
+                iconListDragWatch = true;
+            } else {
+                iconListDragWatch = false;
+            }
+        }
+        return true;
+    } else if (event->type() == QEvent::MouseMove) {
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+        if (   ! (mouseEvent->buttons() & Qt::LeftButton)
+            || ! iconListDragWatch
+#if QT_VERSION >= 0x060000
+            || (mouseEvent->position().toPoint() - iconListDragStartPos).manhattanLength() < QApplication::startDragDistance()) {
+#else
+            || (mouseEvent->pos() - iconListDragStartPos).manhattanLength() < QApplication::startDragDistance()) {
+#endif
+            return true;
+        }
+        iconListDragWatch = false;
+#if QT_VERSION >= 0x060000
+        QListWidgetItem *item = iconList->itemAt(mouseEvent->position().toPoint());
+#else
+        QListWidgetItem *item = iconList->itemAt(mouseEvent->pos());
+#endif
+        if (! item) {
+            return true;
+        }
+
+        QString iconFile = item->data(Qt::UserRole).toString();
+        QMimeData *mimeData = new QMimeData();
+        mimeData->setData("application/x-gc-icon", iconFile.toUtf8());
+
+        QDrag *drag = new QDrag(iconList);
+        drag->setMimeData(mimeData);
+        drag->setPixmap(item->icon().pixmap(ICONSPAGE_L));
+        drag->setHotSpot(QPoint(ICONSPAGE_L_W / 2, ICONSPAGE_L_H / 2));
+        Qt::DropAction dropAction = drag->exec(Qt::MoveAction | Qt::LinkAction);
+        if (dropAction == Qt::MoveAction) {
+            if (IconManager::instance().deleteIconFile(iconFile)) {
+                updateIconList();
+                int rowCount = sportTree->topLevelItemCount();
+                for (int i = 0; i < rowCount; ++i) {
+                    QTreeWidgetItem *item = sportTree->topLevelItem(i);
+                    if (item && item->data(0, Qt::UserRole + 2).toString() == iconFile) {
+                        QPixmap pixmap(ICONSPAGE_S);
+                        pixmap.fill(Qt::transparent);
+                        item->setData(0, Qt::UserRole + 2, "");
+                        item->setIcon(2, QIcon(pixmap));
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
+
+void
+IconsPage::initSportTree
+()
+{
+    sportTree->clear();
+    QPalette palette;
+    SpecialFields &specials = SpecialFields::getInstance();
+    for (QString field : { "Sport", "SubSport" }) {
+        for (const FieldDefinition &fieldDefinition : fieldDefinitions) {
+            if (fieldDefinition.name == field) {
+                for (const QString &fieldValue : fieldDefinition.values) {
+                    QIcon icon;
+                    QString assignedFile = IconManager::instance().assignedIcon(fieldDefinition.name, fieldValue);
+                    if (! assignedFile.isEmpty()) {
+                        QPixmap pixmap = svgAsColoredPixmap(IconManager::instance().toFilepath(assignedFile), ICONSPAGE_S, ICONSPAGE_MARGIN, palette.color(QPalette::Text));
+                        icon.addPixmap(pixmap);
+                    } else {
+                        QPixmap pixmap(ICONSPAGE_S);
+                        pixmap.fill(Qt::transparent);
+                        icon.addPixmap(pixmap);
+                    }
+                    QTreeWidgetItem *item = new QTreeWidgetItem();
+                    item->setData(0, Qt::DisplayRole, specials.displayName(fieldDefinition.name));
+                    item->setData(0, Qt::UserRole, fieldDefinition.name);
+                    item->setData(0, Qt::UserRole + 1, assignedFile);
+                    item->setData(0, Qt::UserRole + 2, assignedFile);
+                    item->setData(1, Qt::DisplayRole, fieldValue);
+                    item->setIcon(2, icon);
+                    sportTree->addTopLevelItem(item);
+                }
+            }
+        }
+    }
+}
+
+
+void
+IconsPage::updateIconList
+()
+{
+    iconList->clear();
+    QPalette palette;
+    QStringList icons = IconManager::instance().listIconFiles();
+    for (QString icon : icons) {
+        QPixmap pixmap = svgAsColoredPixmap(IconManager::instance().toFilepath(icon), ICONSPAGE_L, ICONSPAGE_MARGIN, palette.color(QPalette::Text));
+        QListWidgetItem *item = new QListWidgetItem(QIcon(pixmap), "");
+        item->setData(Qt::UserRole, icon);
+        iconList->addItem(item);
+    }
+}
+
 
 //
 // Ride metadata page
