@@ -4965,7 +4965,12 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             if (d.from==QDate() && d.to==QDate()) { // ride only
 
                 foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
-                    if (field.name == fieldName) return returning.asString() << field.values;
+                    if (field.name == fieldName) {
+                        foreach(QString completerVal, field.values) {
+                            returning.asString() << completerVal;
+                        }
+                        return returning;
+                    }
                 }
             }
             return returning;
