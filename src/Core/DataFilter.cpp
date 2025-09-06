@@ -4962,15 +4962,12 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             QString fieldName = eval(df, leaf->fparms[0],x, it, m, p, c, s, d).string();
 
-            if (d.from==QDate() && d.to==QDate()) { // ride only
-
-                foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
-                    if (field.name == fieldName) {
-                        foreach(QString completerVal, field.values) {
-                            returning.asString() << completerVal;
-                        }
-                        return returning;
+            foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
+                if (field.name == fieldName) {
+                    foreach(QString completerVal, field.values) {
+                        returning.asString() << completerVal;
                     }
+                    return returning;
                 }
             }
             return returning;
