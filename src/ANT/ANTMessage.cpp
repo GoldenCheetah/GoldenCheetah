@@ -815,7 +815,7 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                         // SDM main format - strides loop at 255 should be x2
                         fpodInstant=false;
                         fpodStrides = message[10];
-                        fpodSpeed = 0;
+                        fpodSpeed = double(message[8]&0x0f) + (double(message[9]/256.00f));
                         fpodCadence = 0;
                     }
                     break;
