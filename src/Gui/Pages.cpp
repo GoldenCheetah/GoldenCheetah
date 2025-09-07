@@ -2752,8 +2752,7 @@ IconsPage::eventFilterIconList
             const QList<QUrl> urls = dropEvent->mimeData()->urls();
             int added = 0;
             for (const QUrl &url : urls) {
-                QString path = url.toLocalFile();
-                if (IconManager::instance().addIconFile(path)) {
+                if (IconManager::instance().addIconFile(QFile(url.toLocalFile()))) {
                     ++added;
                 }
             }
