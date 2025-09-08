@@ -1881,6 +1881,8 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
             double distanceTick = 0;
 
+            // If any of the active devices is a footpod, simulated speed will not be used, as it is a treadmill
+            bool deviceIsFootpod = false;
             // fetch the right data from each device...
             foreach(int dev, activeDevices) {
 
@@ -1953,12 +1955,15 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     rtData.setTrainerConfigRequired(local.getTrainerConfigRequired());
                     rtData.setTrainerBrakeFault(local.getTrainerBrakeFault());
                 }
+                if (Devices[dev].type == DEV_ANTLOCAL && Devices[dev].deviceProfile.contains("o")) {
+                    deviceIsFootpod = true;
+                }
             }
 
             // If simulated speed is *not* checked then you get speed reported by
             // trainer which in ergo mode will be dictated by your gear and cadence,
             // and in slope mode is whatever the trainer happens to implement.
-            if (useSimulatedSpeed) {
+            if (useSimulatedSpeed && !deviceIsFootpod) {
                 BicycleSimState newState(rtData);
                 SpeedDistance ret = bicycle.SampleSpeed(newState);
 
