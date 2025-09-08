@@ -46,8 +46,18 @@ PerspectiveDialog::PerspectiveDialog(QWidget *parent, AbstractView *tabView) : Q
 #ifdef Q_OS_MAX
     xdataTable->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
+
+    QString typedesc;
+    switch (tabView->type) {
+    case VIEW_DIARY:
+    case VIEW_TRENDS: typedesc=tr("Activities filter"); break;
+    case VIEW_ANALYSIS: typedesc=tr("Switch expression"); break;
+    case VIEW_TRAIN: typedesc=tr("Switch for"); break;
+    default: qDebug() << "Unknown view type in PerspectiveDialog:" << tabView->type; break;
+    }
+
     perspectiveTable->setColumnCount(2);
-    QStringList headers = (QStringList() << tr(" Name ") << tr("Switch Expression"));
+    QStringList headers = (QStringList() << tr(" Name ") << typedesc);
     perspectiveTable->setHorizontalHeaderLabels(headers);
     QFont font = perspectiveTable->horizontalHeaderItem(0)->font();
     font.setBold(false);
@@ -139,14 +149,31 @@ void PerspectiveDialog::setTables()
         add->setData(Qt::UserRole, QVariant::fromValue(static_cast<void*>(perspective)));
         perspectiveTable->setItem(perspectiverow, 0, add);
 
+        QString description;
+        switch (tabView->type) {
+        case VIEW_TRENDS:
+        case VIEW_ANALYSIS:
+        case VIEW_DIARY: description = perspective->expression(); break;
+        case VIEW_TRAIN: {
+            switch (perspective->trainswitch) {
+            case Perspective::None: description=tr("Don't switch"); break;
+            case Perspective::Erg: description=tr("Erg Workout"); break;
+            case Perspective::Slope: description=tr("Slope Workout"); break;
+            case Perspective::Video: description=tr("Video Workout"); break;
+            case Perspective::Map: description=tr("Map Workout"); break;
+            default: qDebug() << "Unknown train switch value in PerspectiveDialog:" << perspective->trainswitch; break;
+        } break;
+        default: qDebug() << "Unknown view type in PerspectiveDialog:" << tabView->type; break;
+        }
+        }
+
         // and the perspective's rule (for information)
-        QTableWidgetItem *rule = new QTableWidgetItem(perspective->expression(), 0);
-        rule->setFlags(add->flags() | Qt::ItemIsDropEnabled);
+        QTableWidgetItem *perspectiveInfo = new QTableWidgetItem(description, 0);
+        perspectiveInfo->setFlags(add->flags() | Qt::ItemIsDropEnabled);
 
         // and the perspective we represent, so we can avoid dropping on ourselves
-        rule->setData(Qt::UserRole, QVariant::fromValue(static_cast<void*>(perspective)));
-        perspectiveTable->setItem(perspectiverow++, 1, rule);
-
+        perspectiveInfo->setData(Qt::UserRole, QVariant::fromValue(static_cast<void*>(perspective)));
+        perspectiveTable->setItem(perspectiverow++, 1, perspectiveInfo);
     }
 
     active = false;
@@ -240,8 +267,16 @@ PerspectiveDialog::addPerspectiveClicked()
 
          // add...
         Perspective *newone =tabView->addPerspective(name);
-        newone->setExpression(expression);
-        emit perspectivesChanged();
+
+        switch (tabView->type) {
+        case VIEW_TRENDS:
+        case VIEW_ANALYSIS:
+        case VIEW_DIARY: newone->setExpression(expression); break;
+        case VIEW_TRAIN: newone->setTrainSwitch(trainswitch); break;
+        default: qDebug() << "Unknown view type in PerspectiveDialog:" << tabView->type; break;
+        }
+
+    emit perspectivesChanged();
 
         setTables();
     }
@@ -261,6 +296,7 @@ PerspectiveDialog::exportPerspectiveClicked()
     case VIEW_ANALYSIS: typedesc="Analysis"; break;
     case VIEW_DIARY: typedesc="Diary"; break;
     case VIEW_TRAIN: typedesc="Train"; break;
+    default: qDebug() << "Unknown view type in PerspectiveDialog:" << tabView->type; break;
     }
 
     // export the current perspective to a file
