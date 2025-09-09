@@ -1207,7 +1207,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                     if (fpCount==4) {
 
                         // default or get config
-                        double STRIDELENGTH=115; // 1.15m seems to be a common L2 pace stride length (?)
+                        double STRIDELENGTH= 0.0;
                         if (parent->devConf) STRIDELENGTH=parent->devConf->stridelength;
 
                         // convert to meters
@@ -1221,8 +1221,11 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                         parent->setCadence(fpStrides * (60/(fpMS/1000.00f)));
 
                         // running speed is strides x 2 (for left and right) multiplied
-                        // by the user defined stride length, which is typicall ~78cm
-                        parent->setSpeed((fpStrides*2*STRIDELENGTH) / (fpMS/1000.00f) * 3.6f);
+                        // by the user defined stride length
+                        if (STRIDELENGTH > 0.0)
+                            parent->setSpeed((fpStrides*2*STRIDELENGTH) / (fpMS/1000.00f) * 3.6f);
+                        else
+                            parent->setSpeed(antMessage.fpodSpeed * 3.6f);
 
                         // reset counters
                         fpCount=0;
