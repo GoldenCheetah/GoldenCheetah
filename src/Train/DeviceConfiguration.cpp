@@ -36,7 +36,7 @@ DeviceConfiguration::DeviceConfiguration()
     type=0;
     wheelSize=2100;
     postProcess=0;
-    stridelength=80;
+    stridelength=0;
     controller = NULL;
     virtualPowerDefinitionString = "";
 }
@@ -109,7 +109,6 @@ DeviceConfigurations::readConfig()
             configStr = QString("%1%2").arg(GC_DEV_STRIDE).arg(i+1);
             configVal = appsettings->value(NULL, configStr);
             Entry.stridelength = configVal.toInt();
-            if (Entry.stridelength == 0) Entry.stridelength = 78; // default to 78cm
 
             configStr = QString("%1%2").arg(GC_DEV_PROF).arg(i+1);
             configVal = appsettings->value(NULL, configStr);
