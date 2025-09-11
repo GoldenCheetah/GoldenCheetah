@@ -29,6 +29,27 @@
 #include <QDoubleSpinBox>
 #include <QComboBox>
 
+// the following time constants are widely used within GC:
+
+static const QDate GC_EARLY_DATE(01,01,01); // Not sure why this is so early, could be replaced with GC_EPOCH
+
+static const int GC_EPOCH_YEAR{1900};
+static const QDate GC_EPOCH(1900,01,01);
+static const QDate GC_UNIX_EPOCH(1970, 1, 1);
+static const QDate GC_VERSION_CHK_EPOCH(1990, 1, 1);
+
+// these will probably get updated at some future point
+static const QDate GC_MIN_EDIT_DATE(2000,01,01); // default minimum value for time editing fields
+static const QDate GC_MAX_EDIT_DATE(2030,01,01); // default maximum value for time editing fields
+
+// probably only need one far distant future time ??
+static const QDate GC_YR_2099_EPOCH(2099, 31, 12);
+static const QDate GC_YR_2100_EPOCH(2100,01,01);
+static const QDate GC_YR_2999_EPOCH(2999,12,31);
+static const QDate GC_YR_3000_EPOCH(3000, 12, 31);
+static const QDate GC_INFINITY(9999,12,31);
+
+
 QString interval_to_str(double secs);  // output like 1h 2m 3s
 double str_to_interval(QString s);     // convert 1h 2m 3s -> 3123.0 , e.g.
 QString time_to_string(double secs, bool forceMinutes=false);   // output like 1:02:03

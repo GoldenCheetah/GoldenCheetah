@@ -54,7 +54,7 @@ RideFile *SrdFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
         // first class variables
         //
         result->setRecIntSecs(w->recording_interval);
-        result->setStartTime(QDateTime(QDate(w->date.tm_year+1900, w->date.tm_mon+1, w->date.tm_mday),
+        result->setStartTime(QDateTime(QDate(w->date.tm_year+GC_EPOCH_YEAR, w->date.tm_mon+1, w->date.tm_mday),
                                        QTime(w->date.tm_hour, w->date.tm_min, w->date.tm_sec, 0))); // (tm) S710_Date w->date
 
         switch (w->type) {

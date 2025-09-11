@@ -50,7 +50,7 @@ class RideDate : public RideMetric {
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-        setValue (QDate(1900,01,01).daysTo(item->dateTime.date()));
+        setValue (GC_EPOCH.daysTo(item->dateTime.date()));
     }
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }

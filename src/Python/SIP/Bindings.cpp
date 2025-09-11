@@ -177,7 +177,7 @@ PyObject* Bindings::athlete() const
 // one entry per sport per date for hr/power/pace
 class gcZoneConfig {
     public:
-    gcZoneConfig(QString sport) : sport(sport), date(QDate(01,01,01)), cp(0), wprime(0), pmax(0), aetp(0), ftp(0),lthr(0),aethr(0),rhr(0),hrmax(0),cv(0),aetv(0) {}
+    gcZoneConfig(QString sport) : sport(sport), date(GC_EARLY_DATE), cp(0), wprime(0), pmax(0), aetp(0), ftp(0),lthr(0),aethr(0),rhr(0),hrmax(0),cv(0),aetv(0) {}
     bool operator<(gcZoneConfig rhs) const { return date < rhs.date; }
     QString sport;
     QDate date;
@@ -348,7 +348,7 @@ Bindings::athleteZones(PyObject* date, QString sport) const
                 // new date so save what we have collected
                 if (x.date > last.date) {
 
-                    if (last.date > QDate(01,01,01))  compressed << last;
+                    if (last.date > GC_EARLY_DATE)  compressed << last;
                     last.date = x.date;
                 }
 
@@ -373,7 +373,7 @@ Bindings::athleteZones(PyObject* date, QString sport) const
             }
         }
 
-        if (last.date > QDate(01,01,01)) compressed << last;
+        if (last.date > GC_EARLY_DATE) compressed << last;
     }
 
     // now use the new compressed ones
@@ -2001,7 +2001,7 @@ Bindings::seasonMeanmax(bool all, DateRange range, QString filter) const
     if (context == NULL) return NULL;
 
     // construct the date range and then get a ridefilecache
-    if (all) range = DateRange(QDate(1900,01,01), QDate(2100,01,01));
+    if (all) range = DateRange(GC_EPOCH, GC_YR_2100_EPOCH);
 
     // did call contain any filters?
     QStringList filelist;

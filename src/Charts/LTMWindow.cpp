@@ -60,7 +60,7 @@ LTMWindow::LTMWindow(Context *context) :
             GcChartWindow(context), context(context), dirty(true), stackDirty(true), compareDirty(true), firstshow(true)
 {
     useToToday = useCustom = false;
-    plotted = DateRange(QDate(01,01,01), QDate(01,01,01));
+    plotted = DateRange(GC_EARLY_DATE, GC_EARLY_DATE);
     lastRefresh = QTime::currentTime().addSecs(-10);
 
     // the plot
@@ -1240,8 +1240,8 @@ void
 LTMWindow::pointClicked(QwtPlotCurve*curve, int index)
 {
     // initialize date and time to senseful boundaries
-    QDate start = QDate(1900,1,1);
-    QDate end   = QDate(2999,12,31);
+    QDate start(GC_EPOCH);
+    QDate end(GC_YR_2999_EPOCH);
     QTime time = QTime(0, 0, 0, 0);
 
     // now fill the correct values for context

@@ -271,8 +271,8 @@ UserChart::refresh()
             series.labels.clear();
             foreach (GenericAxisInfo axis, axisinfo) {
                 if (series.xname == axis.name) {
-                    // DATERANGE values are days from 01-01-1900
-                    QDateTime earliest(QDate(1900,01,01), QTime(0,0,0), Qt::LocalTime);
+                    // DATERANGE values are days from GC_EPOCH
+                    QDateTime earliest(GC_EPOCH, QTime(0,0,0), Qt::LocalTime);
                     switch (axis.type) {
                         case GenericAxisInfo::TIME:
                             for(int i=0; i<ucd->x.asNumeric().count(); i++) series.labels << time_to_string(ucd->x.asNumeric()[i], true);
@@ -323,8 +323,8 @@ UserChart::refresh()
         // find the first series for this axis and set the categories
         // to the x series values.
         if ((chartinfo.type == GC_CHART_BAR || chartinfo.type == GC_CHART_STACK || chartinfo.type == GC_CHART_PERCENT) && axis.orientation == Qt::Horizontal) {
-            // DATERANGE values are days from 01-01-1900
-            QDateTime earliest(QDate(1900,01,01), QTime(0,0,0), Qt::LocalTime);
+            // DATERANGE values are days from GC_EPOCH
+            QDateTime earliest(GC_EPOCH, QTime(0,0,0), Qt::LocalTime);
 
             // find the first series for axis.name
             foreach(GenericSeriesInfo s, seriesinfo) {
@@ -413,10 +413,10 @@ UserChart::refresh()
 }
 
 
-// dates are always days since 1900,1,1 at this point as they
+// dates are always days since GC_EPOCH at this point as they
 // were returned by the datafilter. later on (notably after the
 // genericchart has intervened) they are converted to MSsincetheEpoch
-// but at this point, we have days since Jan 1 1900
+// but at this point, we have days since GC_EPOCH
 void
 UserChart::groupBy(int groupby, int aggregateby, QVector<double> &xseries, QVector<double> &yseries, bool fillzero)
 {
@@ -427,15 +427,13 @@ UserChart::groupBy(int groupby, int aggregateby, QVector<double> &xseries, QVect
 
     QVector<double> newx, newy;
 
-    QDate epoch(1900,1,1);
-
     for(int i=0; i<xseries.count() && i <yseries.count(); i++) {
 
         // value
         double value = yseries[i];
 
         // date
-        QDate date = epoch.addDays(xseries[i]);
+        QDate date = GC_EPOCH.addDays(xseries[i]);
         long group=groupForDate(groupby, date);
 
         // first entry needs to set group
@@ -445,7 +443,7 @@ UserChart::groupBy(int groupby, int aggregateby, QVector<double> &xseries, QVect
         // assumes in date order, we could sort first (?)
         if (group != lastgroup && groupcount > 0) {
 
-            newx << epoch.daysTo(dateForGroup(groupby, lastgroup));
+            newx << GC_EPOCH.daysTo(dateForGroup(groupby, lastgroup));
             newy << aggregate;
 
             if (fillzero) {
@@ -453,7 +451,7 @@ UserChart::groupBy(int groupby, int aggregateby, QVector<double> &xseries, QVect
                 // we fill gaps with zero for some chart types
                 // notably category based charts e.g. bar chart
                 for(int j=lastgroup+1; j<group;j++) {
-                    newx << epoch.daysTo(dateForGroup(groupby, j));
+                    newx << GC_EPOCH.daysTo(dateForGroup(groupby, j));
                     newy << 0;
                 }
             }
@@ -492,7 +490,7 @@ UserChart::groupBy(int groupby, int aggregateby, QVector<double> &xseries, QVect
     if (groupcount >0) {
 
         // pick up on last one
-        newx << epoch.daysTo(dateForGroup(groupby, lastgroup));
+        newx << GC_EPOCH.daysTo(dateForGroup(groupby, lastgroup));
         newy << aggregate;
     }
 

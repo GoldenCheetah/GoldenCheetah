@@ -153,7 +153,7 @@ void PMCData::refresh()
     }
 
     // what is earliest date we got ? (substract 1 day to include first ride)
-    start_ = QDate(9999,12,31);
+    start_ = GC_INFINITY;
     if (seed != QDate() && seed < start_) start_ = seed;
     if (first != QDate() && first < start_) start_ = first.addDays(-1);
 
@@ -163,7 +163,7 @@ void PMCData::refresh()
     else if (seed != QDate()) end_ = seed.addDays(365);
 
     // back to null date if not set, just to get round date arithmetic
-    if (start_ == QDate(9999,12,31)) start_ = QDate();
+    if (start_ == GC_INFINITY) start_ = QDate();
 
     // We got a valid range ?
     if (start_ != QDate() && end_ != QDate() && start_ < end_) {

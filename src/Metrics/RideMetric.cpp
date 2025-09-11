@@ -162,7 +162,7 @@
 // 152 20  May 2019 Ale Martinez       Fixed Time in Zone Percentages to aggregate properly
 // 153  8  Dec 2019 Mark Liversedge    Regenerate after v3.5 RC2/RC2X re-issue
 // 154 18  Apr 2020 Mark Liversedge    Added PeakPowerIndex (only for full rides)
-// 155 27  Jun 2020 Mark Liversedge    Added Ride Date as days since 1900,01,01
+// 155 27  Jun 2020 Mark Liversedge    Added Ride Date as days since 1900,01,01 (aka GC_EPOCH)
 // 156 18  Mar 2021 Ale Martinez       Added Time and % in Zones I, II and III
 // 157 27  May 2021 Ale Martinez       Added Pace Row
 // 158 28  Feb 2024 Ale Martinez       Enabled Pace for Walking
@@ -320,7 +320,7 @@ RideMetric::getForSymbol(QString symbol, const QHash<QString,RideMetric*> *p)
 QString 
 RideMetric::toString(bool useMetricUnits) const
 {
-    if (isDate()) { QDate date(1900,01,01); date = date.addDays(this->value(useMetricUnits)); return date.toString("dd MMM yy"); }
+    if (isDate()) { QDate date(GC_EPOCH); date = date.addDays(this->value(useMetricUnits)); return date.toString("dd MMM yy"); }
     if (isTime()) return time_to_string(value(useMetricUnits));
     return QString("%1").arg(value(useMetricUnits), 0, 'f', this->precision());
 }
@@ -328,7 +328,7 @@ RideMetric::toString(bool useMetricUnits) const
 QString
 RideMetric::toString(double v) const
 {
-    if (isDate()) { QDate date(1900,01,01); date = date.addDays(v); return date.toString("dd MMM yy"); }
+    if (isDate()) { QDate date(GC_EPOCH); date = date.addDays(v); return date.toString("dd MMM yy"); }
     if (isTime()) return time_to_string(v);
     return QString("%1").arg(v, 0, 'f', this->precision());
 }

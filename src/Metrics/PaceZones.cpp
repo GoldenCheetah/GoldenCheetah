@@ -33,10 +33,8 @@
 #include <float.h>
 
 
-// the infinity endpoints are indicated with extreme date ranges
-// but not zero dates so we can edit and compare them
-static const QDate date_zero(1900, 01, 01);
-static const QDate date_infinity(9999,12,31);
+// the infinity endpoints (GC_EPOCH & GC_INFINITY) are indicated with
+// extreme date ranges but not zero dates so we can edit and compare them
 
 // initialize default static zone parameters
 void PaceZones::initializeZoneParameters()
@@ -177,7 +175,7 @@ bool PaceZones::read(QFile &file)
     // the current range in the file
     // PaceZoneRange *range = NULL;
     bool in_range = false;
-    QDate begin = date_zero, end = date_infinity;
+    QDate begin = GC_EPOCH, end = GC_INFINITY;
     double cv=0;
     double aet=0;
     QList<PaceZoneInfo> zoneInfos;
@@ -252,7 +250,7 @@ bool PaceZones::read(QFile &file)
                 // process the beginning date
                 if (rangerx[r].cap(1) == "BEGIN") {
 
-                    begin = date_zero; 
+                    begin = GC_EPOCH; 
 
                 } else {
 
@@ -264,7 +262,7 @@ bool PaceZones::read(QFile &file)
                 // process an end date, if any, else it is null
                 if (rangerx[r].cap(5) == "END") {
 
-                    end = date_infinity; 
+                    end = GC_INFINITY; 
 
                 } else if (rangerx[r].cap(6).toInt() || rangerx[r].cap(7).toInt() || rangerx[r].cap(8).toInt()) {
 
@@ -443,7 +441,7 @@ next_line: {}
             ranges[nr].end =
                 (nr < ranges.size() - 1) ?
                 ranges[nr + 1].begin :
-                date_infinity;
+                GC_INFINITY;
 
         } else if ((nr < ranges.size() - 1) && (ranges[nr + 1].begin != ranges[nr].end)) {
 
@@ -459,7 +457,7 @@ next_line: {}
 
             append_to_warning(tr("Extending final range %1 to infinite "
                                  "to include present date.\n").arg(nr + 1));
-            ranges[nr].end = date_infinity;
+            ranges[nr].end = GC_INFINITY;
         }
 
         if (ranges[nr].cv <= 0) {
@@ -881,7 +879,7 @@ int PaceZones::addZoneRange(QDate _start, double _cv, double _aet)
     for(rnum=0; rnum < ranges.count(); rnum++) if (ranges[rnum].begin > _start) break;
 
     // at the end ?
-    if (rnum == ranges.count()) ranges.append(PaceZoneRange(_start, date_infinity, _cv, _aet)); 
+    if (rnum == ranges.count()) ranges.append(PaceZoneRange(_start, GC_INFINITY, _cv, _aet)); 
     else ranges.insert(rnum, PaceZoneRange(_start, ranges[rnum].begin, _cv, _aet));
 
     // modify previous end date
@@ -898,7 +896,7 @@ int PaceZones::addZoneRange(QDate _start, double _cv, double _aet)
 
 void PaceZones::addZoneRange()
 {
-    ranges.append(PaceZoneRange(date_zero, date_infinity));
+    ranges.append(PaceZoneRange(GC_EPOCH, GC_INFINITY));
 }
 
 void PaceZones::setEndDate(int rnum, QDate endDate)

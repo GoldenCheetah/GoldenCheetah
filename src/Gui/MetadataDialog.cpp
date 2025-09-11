@@ -88,7 +88,7 @@ MetadataDialog::MetadataDialog(Context* context, const QString& fieldName, const
         ((QDateEdit*)metaEdit_)->setCalendarPopup(true);
         ((QDateEdit*)metaEdit_)->setMinimumWidth(130);
         if (value == "") {
-            ((QDateEdit*)metaEdit_)->setDate(QDate(2000,1,1));
+            ((QDateEdit*)metaEdit_)->setDate(GC_MIN_EDIT_DATE);
         } else {
             QDate date(/* year*/value.mid(6, 4).toInt(),
                        /* month */value.mid(3, 2).toInt(),

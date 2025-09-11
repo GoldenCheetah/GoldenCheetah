@@ -111,7 +111,7 @@ struct Bin2FileReaderState
         int month = bcd2Int(read_bytes(1, bytes_read, sum));
         int year = bcd2Int(read_bytes(1, bytes_read, sum));
 
-        return QDateTime(QDate(2000+year,month,day), QTime(hour,min,sec));
+        return QDateTime(QDate(GC_RIDE_FILE_YEAR+year,month,day), QTime(hour,min,sec));
     }
 
     QDateTime read_RTC_mark(double *secs, int *bytes_read = NULL, int *sum = NULL)

@@ -85,7 +85,7 @@ OpenData::check(Context *context)
     granted = appsettings->cvalue(context->athlete->cyclist, GC_OPENDATA_GRANTED, "X").toString();
     int version = appsettings->cvalue(context->athlete->cyclist, GC_OPENDATA_LASTPOSTVERSION, 0).toInt();
 
-    QDate lastpost = appsettings->cvalue(context->athlete->cyclist, GC_OPENDATA_LASTPOSTED, QDate(1970,01,01)).toDate();
+    QDate lastpost = appsettings->cvalue(context->athlete->cyclist, GC_OPENDATA_LASTPOSTED, GC_UNIX_EPOCH).toDate();
     if (granted == "Y" && (version < OpenDataVersion || lastpost.daysTo(QDate::currentDate()) > 365)) {
         // might be time, but lets just check we have new workouts
         int newworkouts = context->athlete->rideCache->count() -

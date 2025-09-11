@@ -28,10 +28,8 @@
 #include <cmath>
 
 
-// the infinity endpoints are indicated with extreme date ranges
-// but not zero dates so we can edit and compare them
-static const QDate date_zero(1900, 01, 01);
-static const QDate date_infinity(9999,12,31);
+// the infinity endpoints ( GC_EPOCH & GC_INFINITY) are indicated with
+// extreme date ranges but not zero dates so we can edit and compare them
 
 // initialize default static zone parameters
 void HrZones::initializeZoneParameters()
@@ -150,7 +148,7 @@ bool HrZones::read(QFile &file)
     // the current range in the file
     // ZoneRange *range = NULL;
     bool in_range = false;
-    QDate begin = date_zero, end = date_infinity;
+    QDate begin = GC_EPOCH, end = GC_INFINITY;
     int lt = 0;
     int aet = 0;
     int restHr = 0;
@@ -231,7 +229,7 @@ bool HrZones::read(QFile &file)
 
                 // process the beginning date
                 if (rangerx[r].cap(1) == "BEGIN")
-                    begin = date_zero;
+                    begin = GC_EPOCH;
                 else {
                     begin = QDate(rangerx[r].cap(2).toInt(),
                     rangerx[r].cap(3).toInt(),
@@ -239,7 +237,7 @@ bool HrZones::read(QFile &file)
                 }
 
                 // process an end date, if any, else it is null
-                if (rangerx[r].cap(5) == "END") end = date_infinity;
+                if (rangerx[r].cap(5) == "END") end = GC_INFINITY;
                 else if (rangerx[r].cap(6).toInt() || rangerx[r].cap(7).toInt() || rangerx[r].cap(8).toInt()) {
 
                     end = QDate(rangerx[r].cap(6).toInt(),
@@ -377,7 +375,7 @@ bool HrZones::read(QFile &file)
         // clean up gaps or overlaps in zone ranges
         if (ranges[nr].end.isNull()) {
 
-            ranges[nr].end = (nr < ranges.size() - 1) ?  ranges[nr + 1].begin : date_infinity;
+            ranges[nr].end = (nr < ranges.size() - 1) ?  ranges[nr + 1].begin : GC_INFINITY;
 
          } else if ((nr < ranges.size() - 1) && (ranges[nr + 1].begin != ranges[nr].end)) {
 
@@ -388,7 +386,7 @@ bool HrZones::read(QFile &file)
 
 
             append_to_warning(tr("Extending final range %1 to infinite to include present date.\n").arg(nr + 1));
-            ranges[nr].end = date_infinity;
+            ranges[nr].end = GC_INFINITY;
         }
 
         if (ranges[nr].lt <= 0) {
@@ -762,7 +760,7 @@ int HrZones::addHrZoneRange(QDate _start, int _lt, int _aet, int _restHr, int _m
     for(rnum=0; rnum < ranges.count(); rnum++) if (ranges[rnum].begin > _start) break;
 
     // at the end ?
-    if (rnum == ranges.count()) ranges.append(HrZoneRange(_start, date_infinity, _lt, _aet, _restHr, _maxHr));
+    if (rnum == ranges.count()) ranges.append(HrZoneRange(_start, GC_INFINITY, _lt, _aet, _restHr, _maxHr));
     else ranges.insert(rnum, HrZoneRange(_start, ranges[rnum].begin, _lt, _aet, _restHr, _maxHr));
 
     // modify previous end date
@@ -779,7 +777,7 @@ int HrZones::addHrZoneRange(QDate _start, int _lt, int _aet, int _restHr, int _m
 
 void HrZones::addHrZoneRange()
 {
-    ranges.append(HrZoneRange(date_zero, date_infinity));
+    ranges.append(HrZoneRange(GC_EPOCH, GC_INFINITY));
 }
 
 void HrZones::setEndDate(int rnum, QDate endDate)
