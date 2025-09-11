@@ -631,10 +631,13 @@ PlanningCalendarWindow::updateActivities
 ()
 {
     Season const *season = context->currentSeason();
-    QHash<QDate, QList<CalendarEntry>> activities = getActivities(calendar->firstVisibleDay(), calendar->lastVisibleDay());
-    QList<CalendarSummary> summaries = getWeeklySummaries(calendar->firstVisibleDay(), calendar->lastVisibleDay());
-    QHash<QDate, QList<CalendarEntry>> phasesEvents = getPhasesEvents(*season, calendar->firstVisibleDay(), calendar->lastVisibleDay());
-    calendar->fillEntries(activities, summaries, phasesEvents);
+
+    if (season) { 
+        QHash<QDate, QList<CalendarEntry>> activities = getActivities(calendar->firstVisibleDay(), calendar->lastVisibleDay());
+        QList<CalendarSummary> summaries = getWeeklySummaries(calendar->firstVisibleDay(), calendar->lastVisibleDay());
+        QHash<QDate, QList<CalendarEntry>> phasesEvents = getPhasesEvents(*season, calendar->firstVisibleDay(), calendar->lastVisibleDay());
+        calendar->fillEntries(activities, summaries, phasesEvents);
+    }
 }
 
 

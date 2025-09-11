@@ -17,7 +17,7 @@
  */
 
 #include "GcSideBarItem.h"
-#include "DiarySidebar.h"
+#include "PlanSidebar.h"
 
 // fixed width stuff, easier to set globally
 // since progating across widgets we don't create
