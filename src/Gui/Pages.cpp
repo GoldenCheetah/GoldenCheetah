@@ -2463,6 +2463,7 @@ IconsPage::IconsPage
     trash->setAcceptDrops(true);
     trash->setPixmap(trashIcon.pixmap(ICONSPAGE_L, QIcon::Normal));
     trash->installEventFilter(this);
+    QPushButton *downloadButton = new QPushButton(tr("Download Default"));
     QPushButton *importButton = new QPushButton(tr("Import"));
     QPushButton *exportButton = new QPushButton(tr("Export"));
 
@@ -2473,6 +2474,7 @@ IconsPage::IconsPage
     QHBoxLayout *actionLayout = new QHBoxLayout();
     actionLayout->addWidget(trash);
     actionLayout->addStretch();
+    actionLayout->addWidget(downloadButton);
     actionLayout->addWidget(importButton);
     actionLayout->addWidget(exportButton);
 
@@ -2480,19 +2482,28 @@ IconsPage::IconsPage
     mainLayout->addLayout(contentLayout);
     mainLayout->addLayout(actionLayout);
 
-    connect(importButton, &QPushButton::clicked, [=]() {
-        QString zipFile = QFileDialog::getOpenFileName(this, tr("Import Icons"), "", tr("Zip Files (*.zip)"));
-        if (zipFile.isEmpty() || ! IconManager::instance().importBundle(zipFile)) {
-            QMessageBox::warning(nullptr, tr("Icons Bundle"), tr("Bundle file %1 cannot be imported.").arg(zipFile));
-        } else {
+    connect(downloadButton, &QPushButton::clicked, [=]() {
+        QUrl url("https://github.com/GoldenCheetah/GoldenCheetah/releases/download/snapshot/icons.zip");
+        if (IconManager::instance().importBundle(url)) {
             initSportTree();
             updateIconList();
+        } else {
+            QMessageBox::warning(nullptr, tr("Icon Bundle"), tr("Bundle file %1 cannot be imported.").arg(url.toString()));
+        }
+    });
+    connect(importButton, &QPushButton::clicked, [=]() {
+        QString zipFile = QFileDialog::getOpenFileName(this, tr("Import Icons"), "", tr("Zip Files (*.zip)"));
+        if (! zipFile.isEmpty() && IconManager::instance().importBundle(zipFile)) {
+            initSportTree();
+            updateIconList();
+        } else {
+            QMessageBox::warning(nullptr, tr("Icon Bundle"), tr("Bundle file %1 cannot be imported.").arg(zipFile));
         }
     });
     connect(exportButton, &QPushButton::clicked, [=]() {
         QString zipFile = QFileDialog::getSaveFileName(this, tr("Export Icons"), "", tr("Zip Files (*.zip)"));
         if (zipFile.isEmpty() || ! IconManager::instance().exportBundle(zipFile)) {
-            QMessageBox::warning(nullptr, tr("Icons Bundle"), tr("Bundle file %1 cannot be created.").arg(zipFile));
+            QMessageBox::warning(nullptr, tr("Icon Bundle"), tr("Bundle file %1 cannot be created.").arg(zipFile));
         }
     });
 }
@@ -2894,6 +2905,9 @@ IconsPage::initSportTree
             }
         }
     }
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    sportTree->viewport()->update();
+#endif
 }
 
 
