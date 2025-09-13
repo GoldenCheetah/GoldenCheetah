@@ -70,7 +70,7 @@ private:
     bool loadMapping();
     void writeGroup(QJsonObject &rootObj, const QString &field, const QHash<QString, QString> &data) const;
     QHash<QString, QString> readGroup(const QJsonObject &rootObj, const QString &field);
-    QByteArray downloadUrl(const QUrl &url, int timeoutMs = 15000, int maxRedirects = 5);
+    QByteArray downloadUrl(const QUrl &url, int timeoutMs = 15000);
 };
 
 #endif

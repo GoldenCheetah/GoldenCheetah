@@ -336,72 +336,23 @@ IconManager::readGroup
 
 QByteArray
 IconManager::downloadUrl
-(const QUrl &url, int timeoutMs, int maxRedirects)
+(const QUrl &url, int timeoutMs)
 {
     QNetworkAccessManager manager;
-
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    QUrl currentUrl = url;
-
-    for (int i = 0; i < maxRedirects; ++i) {
-        QNetworkRequest request(currentUrl);
-        QNetworkReply *reply = manager.get(request);
-
-        QTimer timeoutTimer;
-        timeoutTimer.setSingleShot(true);
-        QEventLoop loop;
-
-        QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-        QObject::connect(&timeoutTimer, &QTimer::timeout, [&]() {
-            reply->abort();
-            loop.quit();
-        });
-
-        timeoutTimer.start(timeoutMs);
-        loop.exec();
-        timeoutTimer.stop();
-
-        if (reply->error() != QNetworkReply::NoError) {
-            delete reply;
-            return {};
-        }
-
-        QVariant redirectAttr = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
-        if (redirectAttr.isValid()) {
-            QUrl redirectedUrl = redirectAttr.toUrl();
-            if (redirectedUrl.isRelative()) {
-                redirectedUrl = currentUrl.resolved(redirectedUrl);
-            }
-
-            currentUrl = redirectedUrl;
-            delete reply;
-            continue;
-        }
-
-        QByteArray data = reply->readAll();
-        delete reply;
-        return data;
-    }
-
-    return {};
-#else
-    Q_UNUSED(maxRedirects)
     QNetworkRequest request(url);
-#if QT_VERSION < QT_VERSION_CHECK(6, 6, 0)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
 #endif
-    QNetworkReply* reply = manager.get(request);
+    QNetworkReply *reply = manager.get(request);
 
     QTimer timeoutTimer;
     timeoutTimer.setSingleShot(true);
     QEventLoop loop;
-
     QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
     QObject::connect(&timeoutTimer, &QTimer::timeout, [&]() {
         reply->abort();
         loop.quit();
     });
-
     timeoutTimer.start(timeoutMs);
     loop.exec();
     timeoutTimer.stop();
@@ -414,5 +365,4 @@ IconManager::downloadUrl
     QByteArray data = reply->readAll();
     delete reply;
     return data;
-#endif
 }
