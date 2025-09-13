@@ -2483,7 +2483,7 @@ IconsPage::IconsPage
     mainLayout->addLayout(actionLayout);
 
     connect(downloadButton, &QPushButton::clicked, [=]() {
-        QUrl url("https://github.com/GoldenCheetah/GoldenCheetah/releases/download/snapshot/icons.zip");
+        QUrl url(QString("%1/icons.zip").arg(VERSION_CONFIG_PREFIX));
         if (IconManager::instance().importBundle(url)) {
             initSportTree();
             updateIconList();
