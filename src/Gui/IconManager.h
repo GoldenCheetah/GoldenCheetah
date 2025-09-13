@@ -51,6 +51,8 @@ public:
 
     bool exportBundle(const QString &filepath);
     bool importBundle(const QString &filepath);
+    bool importBundle(const QUrl &url);
+    bool importBundle(QIODevice *device);
 
     bool saveConfig() const;
 
@@ -68,6 +70,7 @@ private:
     bool loadMapping();
     void writeGroup(QJsonObject &rootObj, const QString &field, const QHash<QString, QString> &data) const;
     QHash<QString, QString> readGroup(const QJsonObject &rootObj, const QString &field);
+    QByteArray downloadUrl(const QUrl &url, int timeoutMs = 15000);
 };
 
 #endif

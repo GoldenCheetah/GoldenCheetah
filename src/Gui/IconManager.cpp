@@ -19,6 +19,8 @@
 #include "IconManager.h"
 
 #include <QSvgRenderer>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 #include "../qzip/zipwriter.h"
 #include "../qzip/zipreader.h"
@@ -205,11 +207,28 @@ IconManager::importBundle
 (const QString &filename)
 {
     QFile zipFile(filename);
-    if (! zipFile.open(QIODevice::ReadOnly)) {
-        return false;
-    }
-    zipFile.close();
-    ZipReader reader(zipFile.fileName());
+    return importBundle(&zipFile);
+}
+
+
+bool
+IconManager::importBundle
+(const QUrl &url)
+{
+    QByteArray zipData = downloadUrl(url);
+    QBuffer buffer;
+    buffer.setData(zipData);
+    buffer.open(QIODevice::ReadOnly);
+
+    return importBundle(&buffer);
+}
+
+
+bool
+IconManager::importBundle
+(QIODevice *device)
+{
+    ZipReader reader(device);
     for (ZipReader::FileInfo info : reader.fileInfoList()) {
         if (info.isFile) {
             QByteArray data = reader.fileData(info.filePath);
@@ -312,4 +331,38 @@ IconManager::readGroup
         }
     }
     return result;
+}
+
+
+QByteArray
+IconManager::downloadUrl
+(const QUrl &url, int timeoutMs)
+{
+    QNetworkAccessManager manager;
+    QNetworkRequest request(url);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
+#endif
+    QNetworkReply *reply = manager.get(request);
+
+    QTimer timeoutTimer;
+    timeoutTimer.setSingleShot(true);
+    QEventLoop loop;
+    QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    QObject::connect(&timeoutTimer, &QTimer::timeout, [&]() {
+        reply->abort();
+        loop.quit();
+    });
+    timeoutTimer.start(timeoutMs);
+    loop.exec();
+    timeoutTimer.stop();
+
+    if (reply->error() != QNetworkReply::NoError) {
+        delete reply;
+        return {};
+    }
+
+    QByteArray data = reply->readAll();
+    delete reply;
+    return data;
 }

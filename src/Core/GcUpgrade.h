@@ -134,7 +134,7 @@
 //#define GC_VERSION VERSION_STRING // To force version string on non-tagged ci builds
 
 // default config for this release cycle
-#define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/3.7"
+#define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/3.8"
 
 class GcUpgradeLogDialog : public QDialog
 {
