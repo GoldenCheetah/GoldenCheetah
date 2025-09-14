@@ -423,6 +423,40 @@ class KeywordsPage : public QWidget
         MetadataPage *parent;
 };
 
+class IconsPage : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        IconsPage(const QList<FieldDefinition> &fieldDefinitions, QWidget *parent = nullptr);
+        qint32 saveClicked();
+
+    public slots:
+
+    protected:
+        bool eventFilter(QObject *watched, QEvent *event) override;
+
+    private:
+        QList<FieldDefinition> fieldDefinitions;
+        QTreeWidget *sportTree;
+        QListWidget *iconList;
+        QLabel *trash;
+        QIcon trashIcon;
+        QPoint sportTreeDragStartPos;
+        bool sportTreeDragWatch = false;
+        QPoint iconListDragStartPos;
+        bool iconListDragWatch = false;
+
+        bool eventFilterTrash(QEvent *event);
+        bool eventFilterSportTree(QEvent *event);
+        bool eventFilterSportTreeViewport(QEvent *event);
+        bool eventFilterIconList(QEvent *event);
+        bool eventFilterIconListViewport(QEvent *event);
+
+        void initSportTree();
+        void updateIconList();
+};
+
 class ColorsPage : public QWidget
 {
     Q_OBJECT
@@ -594,6 +628,7 @@ class MetadataPage : public QWidget
 
         QTabWidget *tabs;
         KeywordsPage *keywordsPage;
+        IconsPage *iconsPage;
         FieldsPage *fieldsPage;
         DefaultsPage *defaultsPage;
         ProcessorPage *processorPage;

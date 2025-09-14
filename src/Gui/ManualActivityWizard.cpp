@@ -40,6 +40,7 @@
 #include "RideMetadata.h"
 #include "Units.h"
 #include "HelpWhatsThis.h"
+#include "IconManager.h"
 
 #define MANDATORY " *"
 #define TRADEMARK "<sup>TM</sup>"
@@ -81,7 +82,7 @@ ManualActivityWizard::ManualActivityWizard
 #else
     setWizardStyle(QWizard::ModernStyle);
 #endif
-    setPixmap(ICON_TYPE, svgAsColoredPixmap(":images/breeze/games-highscores.svg", QSize(ICON_SIZE * dpiXFactor, ICON_SIZE * dpiYFactor), ICON_MARGIN * dpiXFactor, ICON_COLOR));
+    setPixmap(ICON_TYPE, svgAsColoredPixmap(IconManager::instance().getDefault(), QSize(ICON_SIZE * dpiXFactor, ICON_SIZE * dpiYFactor), ICON_MARGIN * dpiXFactor, ICON_COLOR));
 
     setPage(PageBasics, new ManualActivityPageBasics(context, plan, when));
     setPage(PageWorkout, new ManualActivityPageWorkout(context));
@@ -331,6 +332,7 @@ ManualActivityPageBasics::ManualActivityPageBasics
     connect(timeEdit, &QTimeEdit::timeChanged, this, &ManualActivityPageBasics::checkDateTime);
     connect(sportEdit, &QLineEdit::editingFinished, this, &ManualActivityPageBasics::sportsChanged);
     connect(sportEdit, &QLineEdit::textChanged, this, [this]() { emit completeChanged(); });
+    connect(subSportEdit, &QLineEdit::editingFinished, this, &ManualActivityPageBasics::sportsChanged);
 
     registerField("activityDate", dateEdit);
     registerField("activityTime", timeEdit, "time", SIGNAL(timeChanged(QTime)));
@@ -419,21 +421,9 @@ void
 ManualActivityPageBasics::sportsChanged
 ()
 {
-    QString path(":images/breeze/games-highscores.svg");
     QString sport = RideFile::sportTag(field("sport").toString().trimmed());
-    if (sport == "Bike") {
-        path = ":images/material/bike.svg";
-    } else if (sport == "Run") {
-        path = ":images/material/run.svg";
-    } else if (sport == "Swim") {
-        path = ":images/material/swim.svg";
-    } else if (sport == "Row") {
-        path = ":images/material/rowing.svg";
-    } else if (sport == "Ski") {
-        path = ":images/material/ski.svg";
-    } else if (sport == "Gym") {
-        path = ":images/material/weight-lifter.svg";
-    }
+    QString subSport = field("subSport").toString().trimmed();
+    QString path = IconManager::instance().getFilepath(sport, subSport);
     wizard()->setPixmap(ICON_TYPE, svgAsColoredPixmap(path, QSize(ICON_SIZE * dpiXFactor, ICON_SIZE * dpiYFactor), ICON_MARGIN * dpiXFactor, ICON_COLOR));
 }
 

@@ -179,7 +179,7 @@ SeasonParser::readSeasons
 {
     QList<Season> seasons;
     if (! file->open(QFile::ReadOnly | QFile::Text)) {
-        qCritical() << "Cannot read file" << file->fileName() << "-" << file->errorString();
+        qDebug() << "Cannot read file" << file->fileName() << "-" << file->errorString();
         return seasons;
     }
     QXmlStreamReader reader(file);

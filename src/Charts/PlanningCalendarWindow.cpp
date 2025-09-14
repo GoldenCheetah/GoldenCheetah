@@ -28,7 +28,9 @@
 #include "RideMetadata.h"
 #include "Colors.h"
 #include "ManualActivityWizard.h"
+#include "RepeatScheduleWizard.h"
 #include "WorkoutFilter.h"
+#include "IconManager.h"
 
 #define HLO "<h4>"
 #define HLC "</h4>"
@@ -87,13 +89,25 @@ PlanningCalendarWindow::PlanningCalendarWindow(Context *context)
         wizard.exec();
         context->tab->setNoSwitch(false);
     });
-    connect(calendar, &Calendar::delActivity, [=](CalendarEntry activity) {
+    connect(calendar, &Calendar::repeatSchedule, [=](const QDate &day) {
         context->tab->setNoSwitch(true);
-        context->athlete->rideCache->removeRide(activity.reference);
+        RepeatScheduleWizard wizard(context, day);
+        if (wizard.exec() == QDialog::Accepted) {
+            // Context::rideDeleted is not always emitted, therefore forcing the update
+            updateActivities();
+        }
         context->tab->setNoSwitch(false);
+    });
+    connect(calendar, &Calendar::delActivity, [=](CalendarEntry activity) {
+        QMessageBox::StandardButton res = QMessageBox::question(this, tr("Delete Activity"), tr("Are you sure you want to delete %1?").arg(activity.reference));
+        if (res == QMessageBox::Yes) {
+            context->tab->setNoSwitch(true);
+            context->athlete->rideCache->removeRide(activity.reference);
+            context->tab->setNoSwitch(false);
 
-        // Context::rideDeleted is not always emitted, therefore forcing the update
-        updateActivities();
+            // Context::rideDeleted is not always emitted, therefore forcing the update
+            updateActivities();
+        }
     });
     connect(calendar, &Calendar::moveActivity, [=](CalendarEntry activity, const QDate &srcDay, const QDate &destDay) {
         Q_UNUSED(srcDay)
@@ -477,21 +491,7 @@ PlanningCalendarWindow::getActivities
             activity.secondaryMetric = "";
         }
 
-        if (sport == "Bike") {
-            activity.iconFile = ":images/material/bike.svg";
-        } else if (sport == "Run") {
-            activity.iconFile = ":images/material/run.svg";
-        } else if (sport == "Swim") {
-            activity.iconFile = ":images/material/swim.svg";
-        } else if (sport == "Row") {
-            activity.iconFile = ":images/material/rowing.svg";
-        } else if (sport == "Ski") {
-            activity.iconFile = ":images/material/ski.svg";
-        } else if (sport == "Gym") {
-            activity.iconFile = ":images/material/weight-lifter.svg";
-        } else {
-            activity.iconFile = ":images/breeze/games-highscores.svg";
-        }
+        activity.iconFile = IconManager::instance().getFilepath(rideItem);
         if (rideItem->color.alpha() < 255 || rideItem->planned) {
             activity.color = QColor("#F79130");
         } else {
@@ -631,13 +631,12 @@ PlanningCalendarWindow::updateActivities
 ()
 {
     Season const *season = context->currentSeason();
+    if (!season) return; // avoid crash if no season selected
 
-    if (season) { 
-        QHash<QDate, QList<CalendarEntry>> activities = getActivities(calendar->firstVisibleDay(), calendar->lastVisibleDay());
-        QList<CalendarSummary> summaries = getWeeklySummaries(calendar->firstVisibleDay(), calendar->lastVisibleDay());
-        QHash<QDate, QList<CalendarEntry>> phasesEvents = getPhasesEvents(*season, calendar->firstVisibleDay(), calendar->lastVisibleDay());
-        calendar->fillEntries(activities, summaries, phasesEvents);
-    }
+    QHash<QDate, QList<CalendarEntry>> activities = getActivities(calendar->firstVisibleDay(), calendar->lastVisibleDay());
+    QList<CalendarSummary> summaries = getWeeklySummaries(calendar->firstVisibleDay(), calendar->lastVisibleDay());
+    QHash<QDate, QList<CalendarEntry>> phasesEvents = getPhasesEvents(*season, calendar->firstVisibleDay(), calendar->lastVisibleDay());
+    calendar->fillEntries(activities, summaries, phasesEvents);
 }
 
 
