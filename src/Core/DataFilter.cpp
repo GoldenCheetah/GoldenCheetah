@@ -3584,8 +3584,8 @@ static int monthsTo(QDate from, QDate to)
 
 Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, RideItem *m, RideFilePoint *p, const QHash<QString,RideMetric*> *c, const  Specification &s, const DateRange &d)
 {
-    // if error state all bets are off
-    //if (inerror) return Result(0);
+    // Avoid crash on NULL leaf
+    if (!leaf) return Result(0);
 
     switch(leaf->type) {
 
