@@ -6,7 +6,7 @@ branches:
     - master
 
 image:
-  - Visual Studio 2019
+  - Previous Visual Studio 2019
   - macos-monterey
   - Ubuntu2204
 
