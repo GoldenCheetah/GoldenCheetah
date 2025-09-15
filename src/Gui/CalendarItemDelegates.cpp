@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2025 Joachim Kohlhammer (joachim.kohlhammer@gmx.de)
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #include "CalendarItemDelegates.h"
 
 #include <QDate>
@@ -11,6 +29,561 @@
 
 #include "CalendarData.h"
 #include "Colors.h"
+
+
+//////////////////////////////////////////////////////////////////////////////
+// TimeScaleData
+
+TimeScaleData::TimeScaleData
+()
+{
+}
+
+void
+TimeScaleData::setFirstMinute
+(int minute)
+{
+    _firstMinute = minute;
+}
+
+
+int
+TimeScaleData::firstMinute
+() const
+{
+    return _firstMinute;
+}
+
+
+void
+TimeScaleData::setLastMinute
+(int minute)
+{
+    _lastMinute = minute;
+}
+
+
+int
+TimeScaleData::lastMinute
+() const
+{
+    return _lastMinute;
+}
+
+
+void
+TimeScaleData::setStepSize
+(int step)
+{
+    _stepSize = step;
+}
+
+
+int
+TimeScaleData::stepSize
+() const
+{
+    return _stepSize;
+}
+
+
+double
+TimeScaleData::pixelsPerMinute
+(int availableHeight) const
+{
+    int totalMinutes = _lastMinute - _firstMinute;
+    if (totalMinutes <= 0) {
+        return 0.0;
+    }
+    return static_cast<double>(availableHeight) / totalMinutes;
+}
+
+
+double
+TimeScaleData::pixelsPerMinute
+(const QRect& rect) const
+{
+    return pixelsPerMinute(rect.height());
+}
+
+
+int
+TimeScaleData::minuteToY
+(int minute, int rectTop, int rectHeight) const
+{
+    if (minute < _firstMinute) {
+        return rectTop;
+    }
+    if (minute > _lastMinute) {
+        return rectTop + rectHeight;
+    }
+
+    int totalMinutes = _lastMinute - _firstMinute;
+    double pixelsPerMinute = static_cast<double>(rectHeight) / totalMinutes;
+    return std::min(rectHeight, rectTop + static_cast<int>((minute - _firstMinute) * pixelsPerMinute));
+}
+
+
+int
+TimeScaleData::minuteToY
+(int minute, const QRect &rect) const
+{
+    return minuteToY(minute, rect.top(), rect.height());
+}
+
+
+int
+TimeScaleData::minuteToY
+(const QTime &time, const QRect& rect) const
+{
+    return minuteToY(time.hour() * 60 + time.minute(), rect.top(), rect.height());
+}
+
+
+QTime
+TimeScaleData::timeFromY
+(int y, const QRect &rect, int snap) const
+{
+    int s = std::max(1, snap);
+    int minute = trunc((_firstMinute + y / pixelsPerMinute(rect)) / s) * s;
+    return QTime(0, 0).addSecs(60 * minute);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// CalendarDayViewDayDelegate
+
+ColumnDelegatingItemDelegate::ColumnDelegatingItemDelegate
+(QList<QStyledItemDelegate*> delegates, QObject *parent)
+: QStyledItemDelegate(parent), delegates(delegates)
+{
+}
+
+
+QStyledItemDelegate*
+ColumnDelegatingItemDelegate::getDelegate
+(int idx) const
+{
+    return delegates.value(idx, nullptr);
+}
+
+
+QWidget*
+ColumnDelegatingItemDelegate::createEditor
+(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QStyledItemDelegate *delegate = delegates.value(index.column(), nullptr);
+    if (delegate != nullptr) {
+        return delegate->createEditor(parent, option, index);
+    } else {
+        return QStyledItemDelegate::createEditor(parent, option, index);
+    }
+}
+
+
+void
+ColumnDelegatingItemDelegate::paint
+(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QStyledItemDelegate *delegate = delegates.value(index.column(), nullptr);
+    if (delegate != nullptr) {
+        delegate->paint(painter, option, index);
+    } else {
+        QStyledItemDelegate::paint(painter, option, index);
+    }
+}
+
+
+bool
+ColumnDelegatingItemDelegate::helpEvent
+(QHelpEvent *event, QAbstractItemView *view, const QStyleOptionViewItem &option, const QModelIndex &index)
+{
+    QStyledItemDelegate *delegate = delegates.value(index.column(), nullptr);
+    if (delegate != nullptr) {
+        return delegate->helpEvent(event, view, option, index);
+    } else {
+        return QStyledItemDelegate::helpEvent(event, view, option, index);
+    }
+}
+
+
+void
+ColumnDelegatingItemDelegate::setEditorData
+(QWidget *editor, const QModelIndex &index) const
+{
+    QStyledItemDelegate *delegate = delegates.value(index.column(), nullptr);
+    if (delegate != nullptr) {
+        return delegate->setEditorData(editor, index);
+    } else {
+        return QStyledItemDelegate::setEditorData(editor, index);
+    }
+}
+
+
+void
+ColumnDelegatingItemDelegate::setModelData
+(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+    QStyledItemDelegate *delegate = delegates.value(index.column(), nullptr);
+    if (delegate != nullptr) {
+        delegate->setModelData(editor, model, index);
+    } else {
+        QStyledItemDelegate::setModelData(editor, model, index);
+    }
+}
+
+
+QSize
+ColumnDelegatingItemDelegate::sizeHint
+(const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QStyledItemDelegate *delegate = delegates.value(index.column(), nullptr);
+    if (delegate != nullptr) {
+        return delegate->sizeHint(option, index);
+    } else {
+        return QStyledItemDelegate::sizeHint(option, index);
+    }
+}
+
+
+void
+ColumnDelegatingItemDelegate::updateEditorGeometry
+(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QStyledItemDelegate *delegate = delegates.value(index.column(), nullptr);
+    if (delegate != nullptr) {
+        delegate->updateEditorGeometry(editor, option, index);
+    } else {
+        QStyledItemDelegate::updateEditorGeometry(editor, option, index);
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// CalendarDayViewDayDelegate
+
+CalendarDayViewDayDelegate::CalendarDayViewDayDelegate
+(TimeScaleData const * const timeScaleData, QObject *parent)
+: QStyledItemDelegate(parent), timeScaleData(timeScaleData)
+{
+}
+
+
+void
+CalendarDayViewDayDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    if (index.row() != 0) {
+        QStyledItemDelegate::paint(painter, option, index);
+        return;
+    }
+
+    painter->save();
+    painter->setRenderHint(QPainter::Antialiasing, true);
+
+    QStyleOptionViewItem opt = option;
+    initStyleOption(&opt, index);
+
+    bool ok;
+    int pressedEntryIdx = index.data(Qt::UserRole + 2).toInt(&ok);
+    if (! ok) {
+        pressedEntryIdx = -2;
+    }
+    QDate date = index.data(Qt::UserRole).toDate();
+    CalendarDay calendarDay = index.data(Qt::UserRole + 1).value<CalendarDay>();
+    QList<CalendarEntryLayout> layout = index.data(Qt::UserRole + 3).value<QList<CalendarEntryLayout>>();
+#if QT_VERSION < 0x060000
+    entryRects[index].clear();
+    for (int i = 0; i < layout.count(); ++i) {
+        entryRects[index] << QRect();
+    }
+#else
+    entryRects[index].resize(layout.count());
+#endif
+    bool isToday = (date == QDate::currentDate());
+
+    // Horizontal Lines
+    painter->save();
+    QPen linePen(Qt::lightGray, 1, Qt::DotLine);
+    painter->setPen(linePen);
+    for (int minute = timeScaleData->firstMinute(); minute <= timeScaleData->lastMinute(); minute += timeScaleData->stepSize()) {
+        int y = timeScaleData->minuteToY(minute, option.rect);
+        painter->drawLine(option.rect.left(), y, option.rect.right(), y);
+    }
+    painter->restore();
+
+    // Activities
+    const int columnSpacing = 10 * dpiXFactor;
+    const int lineSpacing = 2 * dpiYFactor;
+    const int iconSpacing = 2 * dpiXFactor;
+    const int radius = 4 * dpiXFactor;
+    const int horPadding = 4 * dpiXFactor;
+    QFont entryFont = painter->font();
+    entryFont.setPointSize(entryFont.pointSize() * 0.95);
+    QFontMetrics entryFM(entryFont);
+    int lineHeight = entryFM.height();
+    painter->setFont(entryFont);
+
+    int rectLeft = option.rect.left() + columnSpacing;
+    int rectWidth = option.rect.width() - 2 * columnSpacing;
+    for (const CalendarEntryLayout &l : layout) {
+        if (calendarDay.entries.count() < l.entryIdx) {
+            continue;
+        }
+        bool pressed = (l.entryIdx == pressedEntryIdx);
+        const CalendarEntry &entry = calendarDay.entries[l.entryIdx];
+        int startMinute = entry.start.hour() * 60 + entry.start.minute();
+        int endMinute = startMinute + entry.durationSecs / 60;
+        int columnWidth = (rectWidth - (l.columnCount - 1) * columnSpacing) / std::max(1, l.columnCount);
+        int left = rectLeft + l.columnIndex * (columnWidth + columnSpacing);
+        int top = timeScaleData->minuteToY(startMinute, option.rect);
+        int bottom = timeScaleData->minuteToY(endMinute, option.rect);
+        int height = std::max(1, bottom - top);
+        int numLines = (height + lineSpacing) / (lineHeight + lineSpacing);
+
+        painter->save();
+        QRect entryRect(left, top, columnWidth, height);
+        entryRects[index][l.entryIdx] = entryRect;
+        QColor entryBG = option.palette.base().color();
+        QColor entryFrame = entry.color;
+        if (pressed) {
+            entryBG = option.palette.highlight().color();
+            entryFrame = entryBG;
+        } else if (entry.type == ENTRY_TYPE_ACTIVITY) {
+            QColor overlayBG = entry.color;
+            overlayBG = entry.color;
+            if (GCColor::isPaletteDark(option.palette)) {
+                overlayBG.setAlpha(150);
+            } else {
+                overlayBG.setAlpha(60);
+            }
+            entryBG = GCColor::blendedColor(overlayBG, entryBG);
+            entryFrame = entryBG;
+        }
+        painter->save();
+        painter->setPen(entryFrame);
+        painter->setBrush(entryBG);
+        painter->drawRoundedRect(entryRect, radius, radius);
+        painter->restore();
+
+        int iconWidth = 0;
+        if (height >= lineHeight && columnWidth >= lineHeight) {
+            QColor pixmapColor(entry.color);
+            int headlineOffset = 0;
+            if (height >= 2 * lineHeight + lineSpacing && columnWidth >= 2 * lineHeight + lineSpacing) {
+                iconWidth = 2 * lineHeight + lineSpacing;
+            } else {
+                iconWidth = lineHeight;
+            }
+            QSize pixmapSize(iconWidth, iconWidth);
+            QPixmap pixmap;
+            if (entry.type == ENTRY_TYPE_PLANNED_ACTIVITY) {
+                if (pressed) {
+                    pixmapColor = GCColor::invertColor(entryBG);
+                }
+                pixmap = svgAsColoredPixmap(entry.iconFile, pixmapSize, lineSpacing, pixmapColor);
+            } else {
+                pixmap = svgOnBackground(entry.iconFile, pixmapSize, lineSpacing, pixmapColor, radius);
+            }
+            painter->drawPixmap(left, top, pixmap);
+        }
+        if (numLines > 0) {
+            painter->save();
+            QRect textRect(left + iconWidth + horPadding, top, columnWidth - iconWidth - 2 * horPadding, lineHeight);
+            painter->setPen(GCColor::invertColor(entryBG));
+            painter->drawText(textRect, Qt::AlignLeft | Qt::AlignTop, entry.primary);
+            --numLines;
+            if (numLines > 0) {
+                textRect.translate(0, lineHeight + lineSpacing);
+                painter->drawText(textRect, Qt::AlignLeft | Qt::AlignTop, entry.secondary + " (" + entry.secondaryMetric + ")");
+            }
+            painter->restore();
+        }
+        painter->restore();
+    }
+
+    painter->restore();
+}
+
+
+bool
+CalendarDayViewDayDelegate::helpEvent
+(QHelpEvent *event, QAbstractItemView *view, const QStyleOptionViewItem &option, const QModelIndex &index)
+{
+    if (! event || ! view) {
+        return false;
+    }
+
+    CalendarDay day = index.data(Qt::UserRole + 1).value<CalendarDay>();
+    int entryIdx = hitTestEntry(index, event->pos());
+    if (entryIdx >= 0 && entryIdx < day.entries.size()) {
+        CalendarEntry calEntry = day.entries[entryIdx];
+        QString tooltip = "<center><b>" + calEntry.primary + "</b>";
+        tooltip += "<br/>";
+        switch (calEntry.type) {
+        case ENTRY_TYPE_ACTIVITY:
+            tooltip += "[completed]";
+            break;
+        case ENTRY_TYPE_PLANNED_ACTIVITY:
+            tooltip += "[planned]";
+            break;
+        case ENTRY_TYPE_OTHER:
+        default:
+            tooltip += "[other]";
+            break;
+        }
+        tooltip += "<br/>";
+        if (! calEntry.secondary.isEmpty()) {
+            tooltip += calEntry.secondaryMetric + ": " + calEntry.secondary;
+            tooltip += "<br/>";
+        }
+        if (calEntry.start.isValid()) {
+            tooltip += calEntry.start.toString();
+            if (calEntry.durationSecs > 0) {
+                tooltip += " - " + calEntry.start.addSecs(calEntry.durationSecs).toString();
+            }
+        }
+        tooltip += "</center>";
+        QToolTip::showText(event->globalPos(), tooltip, view);
+        return true;
+    }
+
+    return QStyledItemDelegate::helpEvent(event, view, option, index);
+}
+
+
+int
+CalendarDayViewDayDelegate::hitTestEntry
+(const QModelIndex &index, const QPoint &pos) const
+{
+    if (! entryRects.contains(index)) {
+        return -1;
+    }
+    const QList<QRect> &rects = entryRects[index];
+    for (int i = 0; i < rects.size(); ++i) {
+        if (rects[i].contains(pos)) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// CalendarTimeScaleDelegate
+
+CalendarTimeScaleDelegate::CalendarTimeScaleDelegate
+(TimeScaleData *timeScaleData, QObject *parent)
+: QStyledItemDelegate(parent), timeScaleData(timeScaleData)
+{
+}
+
+
+void
+CalendarTimeScaleDelegate::paint
+(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    if (index.row() != 0) {
+        QStyledItemDelegate::paint(painter, option, index);
+        return;
+    }
+
+    const int totalRangeMinutes = timeScaleData->lastMinute() - timeScaleData->firstMinute();
+    const int cellHeight = option.rect.height();
+    const double pixelsPerMinute = static_cast<double>(cellHeight) / totalRangeMinutes;
+
+    painter->save();
+    painter->setRenderHint(QPainter::Antialiasing, true);
+    QPen linePen(Qt::lightGray, 1, Qt::DotLine);
+    QPen textPen(Qt::darkGray);
+    painter->setPen(textPen);
+
+    QFont font = painter->font();
+    font.setPointSizeF(font.pointSizeF() * 0.9);
+    painter->setFont(font);
+    QFontMetrics fm(font);
+
+    int labelHeight = fm.height();
+    int minPixelSpacing = labelHeight + 4;
+    int calculatedMinInterval = std::ceil(minPixelSpacing / pixelsPerMinute);
+    int effectiveInterval = selectNiceInterval(calculatedMinInterval);
+    timeScaleData->setStepSize(effectiveInterval);
+
+    int previousYBottom = -labelHeight;
+
+    for (int minute = timeScaleData->firstMinute(); minute <= timeScaleData->lastMinute(); minute += timeScaleData->stepSize()) {
+        int y = timeScaleData->minuteToY(minute, option.rect);
+        QString timeLabel = QTime(0, 0).addSecs(minute * 60).toString("hh:mm");
+
+        QRect textRect;
+        if (minute == timeScaleData->firstMinute()) {
+            textRect = QRect(option.rect.left() + 4, y, option.rect.width() - 8, labelHeight);
+        } else if (minute + effectiveInterval > timeScaleData->lastMinute()) {
+            int bottomY = option.rect.bottom();
+            textRect = QRect(option.rect.left() + 4, bottomY - labelHeight, option.rect.width() - 8, labelHeight);
+            y = bottomY;
+        } else {
+            textRect = QRect(option.rect.left() + 4, y - labelHeight / 2, option.rect.width() - 8, labelHeight);
+        }
+
+        if (textRect.top() < previousYBottom + 2) {
+            continue;
+        }
+
+        painter->setPen(linePen);
+        painter->drawLine(textRect.right(), y, option.rect.right(), y);
+
+        painter->setPen(textPen);
+        painter->drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, timeLabel);
+
+        previousYBottom = textRect.bottom();
+    }
+    int blockY = -1;
+    QModelIndex scaleIndex = index.sibling(0, 0);
+    BlockIndicator blockIndicator = static_cast<BlockIndicator>(scaleIndex.data(Qt::UserRole + 1).toInt());
+    if (blockIndicator == BlockIndicator::AllBlock) {
+        blockY = option.rect.height();
+    } else if (blockIndicator == BlockIndicator::BlockBeforeNow) {
+        blockY = timeScaleData->minuteToY(QTime::currentTime(), option.rect);
+    }
+    if (blockY >= 0) {
+        QRect rect = option.rect;
+        rect.setHeight(blockY);
+        QColor blockColor = option.palette.color(QPalette::Disabled, QPalette::Base);
+        blockColor.setAlpha(180);
+        painter->fillRect(rect, blockColor);
+    }
+    int currentY = scaleIndex.data(Qt::UserRole).toInt();
+    if (currentY > blockY) {
+        painter->save();
+        painter->setPen(textPen);
+        painter->drawLine(option.rect.left(), currentY, option.rect.width(), currentY);
+        painter->restore();
+    }
+
+    painter->restore();
+}
+
+
+QSize
+CalendarTimeScaleDelegate::sizeHint
+(const QStyleOptionViewItem& option, const QModelIndex& index) const
+{
+    return QStyledItemDelegate::sizeHint(option, index);
+}
+
+
+int
+CalendarTimeScaleDelegate::selectNiceInterval
+(int minInterval) const
+{
+    const QList<int> allowed = { 60, 120, 180, 240, 360, 720 };
+    for (int interval : allowed) {
+        if (interval >= minInterval) {
+            return interval;
+        }
+    }
+    return 1440;
+}
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -61,13 +634,13 @@ CalendarDayDelegate::paint
 
     painter->fillRect(opt.rect, bgColor);
 
-    int leftMargin = 4;
-    int rightMargin = 4;
-    int topMargin = 2;
-    int bottomMargin = 4;
-    int lineSpacing = 2;
-    int iconSpacing = 2;
-    int radius = 4;
+    const int leftMargin = 4 * dpiXFactor;
+    const int rightMargin = 4 * dpiXFactor;
+    const int topMargin = 2 * dpiYFactor;
+    const int bottomMargin = 4 * dpiYFactor;
+    const int lineSpacing = 2 * dpiYFactor;
+    const int iconSpacing = 2 * dpiXFactor;
+    const int radius = 4 * dpiXFactor;
 
     // Day number / Headline
     painter->save();
@@ -336,8 +909,8 @@ CalendarDayDelegate::hitTestMore
 // CalendarSummaryDelegate
 
 CalendarSummaryDelegate::CalendarSummaryDelegate
-(QObject *parent)
-: QStyledItemDelegate(parent)
+(int horMargin, QObject *parent)
+: QStyledItemDelegate(parent), horMargin(horMargin)
 {
 }
 
@@ -357,9 +930,6 @@ CalendarSummaryDelegate::paint
     keyFont.setWeight(QFont::DemiBold);
     const QFontMetrics valueFontMetrics(valueFont);
     const QFontMetrics keyFontMetrics(keyFont);
-    const int lineSpacing = 2;
-    const int horMargin = 4;
-    const int vertMargin = 4;
     const int lineHeight = keyFontMetrics.height();
     const int cellWidth = option.rect.width();
     const int cellHeight = option.rect.height();
@@ -437,4 +1007,18 @@ CalendarSummaryDelegate::helpEvent
     tooltip += "</table>";
     QToolTip::showText(event->globalPos(), tooltip, view);
     return true;
+}
+
+
+QSize
+CalendarSummaryDelegate::sizeHint
+(const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    const CalendarSummary summary = index.data(Qt::UserRole).value<CalendarSummary>();
+    QFont font;
+    font.setWeight(QFont::DemiBold);
+    const QFontMetrics fontMetrics(font);
+    const int lineHeight = fontMetrics.height();
+
+    return QSize(10, vertMargin + (lineHeight + lineSpacing) * summary.keyValues.count() - lineSpacing);
 }

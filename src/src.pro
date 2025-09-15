@@ -764,7 +764,7 @@ SOURCES += Gui/AboutDialog.cpp Gui/AddIntervalDialog.cpp Gui/AnalysisSidebar.cpp
            Gui/AddTileWizard.cpp Gui/NavigationModel.cpp Gui/AthleteView.cpp Gui/AthleteConfigDialog.cpp Gui/AthletePages.cpp Gui/Perspective.cpp \
            Gui/PerspectiveDialog.cpp Gui/SplashScreen.cpp Gui/StyledItemDelegates.cpp Gui/MetadataDialog.cpp Gui/ActionButtonBox.cpp \
            Gui/MetricOverrideDialog.cpp Gui/RepeatScheduleWizard.cpp \
-           Gui/Calendar.cpp Gui/CalendarItemDelegates.cpp \
+           Gui/Calendar.cpp Gui/CalendarData.cpp Gui/CalendarItemDelegates.cpp \
            Gui/IconManager.cpp
 
 ## Models and Metrics
