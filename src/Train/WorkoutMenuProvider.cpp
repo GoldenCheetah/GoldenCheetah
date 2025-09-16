@@ -109,7 +109,7 @@ WorkoutFilterStore::load
     workoutFilters.clear();
     QFile file(fileName);
     if (! file.open(QFile::ReadOnly | QFile::Text)) {
-        qCritical() << "Cannot open file" << fileName << "for reading -" << file.errorString();
+        qDebug() << "Cannot open file" << fileName << "for reading -" << file.errorString();
         return;
     }
     QXmlStreamReader reader(&file);

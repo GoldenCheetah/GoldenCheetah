@@ -16,7 +16,6 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-
 #include "PlanningCalendarWindow.h"
 
 #include <QComboBox>
@@ -28,7 +27,9 @@
 #include "RideMetadata.h"
 #include "Colors.h"
 #include "ManualActivityWizard.h"
+#include "RepeatScheduleWizard.h"
 #include "WorkoutFilter.h"
+#include "IconManager.h"
 
 #define HLO "<h4>"
 #define HLC "</h4>"
@@ -87,21 +88,33 @@ PlanningCalendarWindow::PlanningCalendarWindow(Context *context)
         wizard.exec();
         context->tab->setNoSwitch(false);
     });
-    connect(calendar, &Calendar::delActivity, [=](CalendarEntry activity) {
+    connect(calendar, &Calendar::repeatSchedule, [=](const QDate &day) {
         context->tab->setNoSwitch(true);
-        context->athlete->rideCache->removeRide(activity.reference);
+        RepeatScheduleWizard wizard(context, day);
+        if (wizard.exec() == QDialog::Accepted) {
+            // Context::rideDeleted is not always emitted, therefore forcing the update
+            updateActivities();
+        }
         context->tab->setNoSwitch(false);
-
-        // Context::rideDeleted is not always emitted, therefore forcing the update
-        updateActivities();
     });
-    connect(calendar, &Calendar::moveActivity, [=](CalendarEntry activity, const QDate &srcDay, const QDate &destDay) {
+    connect(calendar, &Calendar::delActivity, [=](CalendarEntry activity) {
+        QMessageBox::StandardButton res = QMessageBox::question(this, tr("Delete Activity"), tr("Are you sure you want to delete %1?").arg(activity.reference));
+        if (res == QMessageBox::Yes) {
+            context->tab->setNoSwitch(true);
+            context->athlete->rideCache->removeRide(activity.reference);
+            context->tab->setNoSwitch(false);
+
+            // Context::rideDeleted is not always emitted, therefore forcing the update
+            updateActivities();
+        }
+    });
+    connect(calendar, &Calendar::moveActivity, [=](CalendarEntry activity, const QDate &srcDay, const QDate &destDay, const QTime &destTime) {
         Q_UNUSED(srcDay)
 
         QApplication::setOverrideCursor(Qt::WaitCursor);
         for (RideItem *rideItem : context->athlete->rideCache->rides()) {
             if (rideItem != nullptr && rideItem->fileName == activity.reference) {
-                movePlannedActivity(rideItem, destDay);
+                movePlannedActivity(rideItem, destDay, destTime);
                 break;
             }
         }
@@ -133,9 +146,13 @@ PlanningCalendarWindow::PlanningCalendarWindow(Context *context)
         }
         QApplication::restoreOverrideCursor();
     });
+    connect(calendar, &Calendar::dayChanged, this, &PlanningCalendarWindow::updateActivities);
     connect(calendar, &Calendar::monthChanged, this, &PlanningCalendarWindow::updateActivities);
+    connect(calendar, &Calendar::viewChanged, this, &PlanningCalendarWindow::updateActivities);
 
-    configChanged(CONFIG_APPEARANCE);
+    QTimer::singleShot(0, this, [this]() {
+        configChanged(CONFIG_APPEARANCE);
+    });
 }
 
 
@@ -262,7 +279,8 @@ PlanningCalendarWindow::setSummaryMetrics
 
 
 void
-PlanningCalendarWindow::configChanged(qint32 what)
+PlanningCalendarWindow::configChanged
+(qint32 what)
 {
     bool refreshActivities = false;
     if (   (what & CONFIG_FIELDS)
@@ -285,9 +303,20 @@ PlanningCalendarWindow::configChanged(qint32 what)
 
         QPalette palette;
 
+        palette.setColor(QPalette::Normal, QPalette::Window, activeBg);
+        palette.setColor(QPalette::Normal, QPalette::WindowText, activeText);
+        palette.setColor(QPalette::Normal, QPalette::Base, activeBg);
+        palette.setColor(QPalette::Normal, QPalette::AlternateBase, alternateBg);
+        palette.setColor(QPalette::Normal, QPalette::Text, activeText);
+        palette.setColor(QPalette::Normal, QPalette::Highlight, activeHl);
+        palette.setColor(QPalette::Normal, QPalette::HighlightedText, activeHlText);
+        palette.setColor(QPalette::Normal, QPalette::Button, activeBg);
+        palette.setColor(QPalette::Normal, QPalette::ButtonText, activeText);
+
         palette.setColor(QPalette::Active, QPalette::Window, activeBg);
         palette.setColor(QPalette::Active, QPalette::WindowText, activeText);
         palette.setColor(QPalette::Active, QPalette::Base, activeBg);
+        palette.setColor(QPalette::Active, QPalette::AlternateBase, alternateBg);
         palette.setColor(QPalette::Active, QPalette::Text, activeText);
         palette.setColor(QPalette::Active, QPalette::Highlight, activeHl);
         palette.setColor(QPalette::Active, QPalette::HighlightedText, activeHlText);
@@ -297,11 +326,22 @@ PlanningCalendarWindow::configChanged(qint32 what)
         palette.setColor(QPalette::Disabled, QPalette::Window, alternateBg);
         palette.setColor(QPalette::Disabled, QPalette::WindowText, alternateText);
         palette.setColor(QPalette::Disabled, QPalette::Base, alternateBg);
+        palette.setColor(QPalette::Disabled, QPalette::AlternateBase, alternateBg);
         palette.setColor(QPalette::Disabled, QPalette::Text, alternateText);
         palette.setColor(QPalette::Disabled, QPalette::Highlight, activeHl);
         palette.setColor(QPalette::Disabled, QPalette::HighlightedText, activeHlText);
         palette.setColor(QPalette::Disabled, QPalette::Button, alternateBg);
         palette.setColor(QPalette::Disabled, QPalette::ButtonText, alternateText);
+
+        palette.setColor(QPalette::Inactive, QPalette::Window, activeBg);
+        palette.setColor(QPalette::Inactive, QPalette::WindowText, activeText);
+        palette.setColor(QPalette::Inactive, QPalette::Base, activeBg);
+        palette.setColor(QPalette::Inactive, QPalette::AlternateBase, alternateBg);
+        palette.setColor(QPalette::Inactive, QPalette::Text, activeText);
+        palette.setColor(QPalette::Inactive, QPalette::Highlight, activeHl);
+        palette.setColor(QPalette::Inactive, QPalette::HighlightedText, activeHlText);
+        palette.setColor(QPalette::Inactive, QPalette::Button, activeBg);
+        palette.setColor(QPalette::Inactive, QPalette::ButtonText, activeText);
 
         PaletteApplier::setPaletteRecursively(this, palette, true);
 
@@ -477,21 +517,7 @@ PlanningCalendarWindow::getActivities
             activity.secondaryMetric = "";
         }
 
-        if (sport == "Bike") {
-            activity.iconFile = ":images/material/bike.svg";
-        } else if (sport == "Run") {
-            activity.iconFile = ":images/material/run.svg";
-        } else if (sport == "Swim") {
-            activity.iconFile = ":images/material/swim.svg";
-        } else if (sport == "Row") {
-            activity.iconFile = ":images/material/rowing.svg";
-        } else if (sport == "Ski") {
-            activity.iconFile = ":images/material/ski.svg";
-        } else if (sport == "Gym") {
-            activity.iconFile = ":images/material/weight-lifter.svg";
-        } else {
-            activity.iconFile = ":images/breeze/games-highscores.svg";
-        }
+        activity.iconFile = IconManager::instance().getFilepath(rideItem);
         if (rideItem->color.alpha() < 255 || rideItem->planned) {
             activity.color = QColor("#F79130");
         } else {
@@ -505,27 +531,36 @@ PlanningCalendarWindow::getActivities
         activity.hasTrainMode = rideItem->planned && sport == "Bike" && ! buildWorkoutFilter(rideItem).isEmpty();
         activities[rideItem->dateTime.date()] << activity;
     }
+    for (auto dayIt = activities.begin(); dayIt != activities.end(); ++dayIt) {
+        std::sort(dayIt.value().begin(), dayIt.value().end(), [](const CalendarEntry &a, const CalendarEntry &b) {
+            if (a.start == b.start) {
+                return a.primary < b.primary;
+            } else {
+                return a.start < b.start;
+            }
+        });
+    }
     return activities;
 }
 
 
 QList<CalendarSummary>
-PlanningCalendarWindow::getWeeklySummaries
-(const QDate &firstDay, const QDate &lastDay) const
+PlanningCalendarWindow::getSummaries
+(const QDate &firstDay, const QDate &lastDay, int timeBucketSize) const
 {
     QStringList symbols = getSummaryMetricsList();
     QList<CalendarSummary> summaries;
-    int numWeeks = firstDay.daysTo(lastDay) / 7 + 1;
+    int numTimeBuckets = firstDay.daysTo(lastDay) / timeBucketSize + 1;
     bool useMetricUnits = GlobalContext::context()->useMetricUnits;
 
     const RideMetricFactory &factory = RideMetricFactory::instance();
     FilterSet filterSet(context->isfiltered, context->filters);
     Specification spec;
     spec.setFilterSet(filterSet);
-    for (int week = 0; week < numWeeks; ++week) {
-        QDate firstDayOfWeek = firstDay.addDays(week * 7);
-        QDate lastDayOfWeek = firstDayOfWeek.addDays(6);
-        spec.setDateRange(DateRange(firstDayOfWeek, lastDayOfWeek));
+    for (int timeBucket = 0; timeBucket < numTimeBuckets; ++timeBucket) {
+        QDate firstDayOfTimeBucket = firstDay.addDays(timeBucket * timeBucketSize);
+        QDate lastDayOfTimeBucket = firstDayOfTimeBucket.addDays(timeBucketSize - 1);
+        spec.setDateRange(DateRange(firstDayOfTimeBucket, lastDayOfTimeBucket));
         CalendarSummary summary;
         summary.keyValues.clear();
         for (const QString &symbol : symbols) {
@@ -588,7 +623,7 @@ PlanningCalendarWindow::getPhasesEvents
         }
     }
     QList<Season> tmpSeasons = context->athlete->seasons->seasons;
-    std::sort(tmpSeasons.begin(),tmpSeasons.end(),Season::LessThanForStarts);
+    std::sort(tmpSeasons.begin(), tmpSeasons.end(), Season::LessThanForStarts);
     for (const Season &s : tmpSeasons) {
         for (const SeasonEvent &event : s.events) {
             if (   (   (   firstDay.isValid()
@@ -631,9 +666,17 @@ PlanningCalendarWindow::updateActivities
 ()
 {
     Season const *season = context->currentSeason();
+    if (!season) return; // avoid crash if no season selected
+
+    QList<CalendarSummary> summaries;
     QHash<QDate, QList<CalendarEntry>> activities = getActivities(calendar->firstVisibleDay(), calendar->lastVisibleDay());
-    QList<CalendarSummary> summaries = getWeeklySummaries(calendar->firstVisibleDay(), calendar->lastVisibleDay());
     QHash<QDate, QList<CalendarEntry>> phasesEvents = getPhasesEvents(*season, calendar->firstVisibleDay(), calendar->lastVisibleDay());
+    if (calendar->currentView() == CalendarView::Day) {
+        QDate dayViewDate = calendar->selectedDate();
+        summaries = getSummaries(dayViewDate, dayViewDate, 1);
+    } else {
+        summaries = getSummaries(calendar->firstVisibleDay(), calendar->lastVisibleDay(), 7);
+    }
     calendar->fillEntries(activities, summaries, phasesEvents);
 }
 
@@ -642,9 +685,15 @@ void
 PlanningCalendarWindow::updateActivitiesIfInRange
 (RideItem *rideItem)
 {
-    if (   rideItem->dateTime.date() >= calendar->firstVisibleDay()
-        && rideItem->dateTime.date() <= calendar->lastVisibleDay()) {
-        updateActivities();
+    if (calendar->currentView() == CalendarView::Day) {
+        if (rideItem->dateTime.date() == calendar->selectedDate()) {
+            updateActivities();
+        }
+    } else {
+        if (   rideItem->dateTime.date() >= calendar->firstVisibleDay()
+            && rideItem->dateTime.date() <= calendar->lastVisibleDay()) {
+            updateActivities();
+        }
     }
 }
 
@@ -665,12 +714,12 @@ PlanningCalendarWindow::updateSeason
 
 bool
 PlanningCalendarWindow::movePlannedActivity
-(RideItem *rideItem, const QDate &destDay, bool force)
+(RideItem *rideItem, const QDate &destDay, const QTime &destTime)
 {
     bool ret = false;
     RideFile *rideFile = rideItem->ride();
 
-    QDateTime rideDateTime(destDay, rideFile->startTime().time());
+    QDateTime rideDateTime(destDay, destTime);
     rideFile->setStartTime(rideDateTime);
     QString basename = rideDateTime.toString("yyyy_MM_dd_HH_mm_ss");
 
@@ -681,8 +730,7 @@ PlanningCalendarWindow::movePlannedActivity
         filename = context->athlete->home->activities().canonicalPath() + "/" + basename + ".json";
     }
     QFile out(filename);
-    if (   (   force
-            || (! force && ! out.exists()))
+    if (   ! out.exists()
         && RideFileFactory::instance().writeRideFile(context, rideFile, out, "json")) {
         context->tab->setNoSwitch(true);
         context->athlete->rideCache->removeRide(rideItem->fileName);

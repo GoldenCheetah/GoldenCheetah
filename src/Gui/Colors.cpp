@@ -24,6 +24,7 @@
 #include <QByteArray>
 #include <QDir>
 #include <QSvgRenderer>
+#include <cmath>
 #include "Settings.h"
 
 #ifdef Q_OS_WIN
@@ -415,6 +416,25 @@ QColor GCColor::selectedColor(QColor bgColor)
      if (isblack) bg_select = QColor(30, 30, 30);
 
      return bg_select;
+}
+
+QColor GCColor::blendedColor(const QColor &fg, const QColor &bg)
+{
+    double alpha = fg.alphaF();
+    int r = static_cast<int>(std::round(fg.red() * alpha + bg.red() * (1.0 - alpha)));
+    int g = static_cast<int>(std::round(fg.green() * alpha + bg.green() * (1.0 - alpha)));
+    int b = static_cast<int>(std::round(fg.blue() * alpha + bg.blue() * (1.0 - alpha)));
+    return QColor(r, g, b);
+}
+
+bool GCColor::isDark(const QColor &color)
+{
+    return color.lightness() < 127;
+}
+
+bool GCColor::isPaletteDark(const QPalette &palette)
+{
+    return isDark(palette.color(QPalette::Active, QPalette::Base));
 }
 
 const Colors * GCColor::colorSet()
