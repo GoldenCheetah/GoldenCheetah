@@ -123,7 +123,7 @@
 #define VERSION34_BUILD   3955 // released
 #define VERSION35_BUILD   3990 // released
 #define VERSION36_BUILD   5000 // released 5/8/23
-#define VERSION37_BUILD   5005 // released 28/3/25 - latest snapshot 21/8/25
+#define VERSION37_BUILD   5005 // released 28/3/25 - latest snapshot 10/9/25
 
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG
@@ -134,7 +134,7 @@
 //#define GC_VERSION VERSION_STRING // To force version string on non-tagged ci builds
 
 // default config for this release cycle
-#define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/3.7"
+#define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/3.8"
 
 class GcUpgradeLogDialog : public QDialog
 {

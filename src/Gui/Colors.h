@@ -140,6 +140,9 @@ class GCColor : public QObject
         static QColor alternateColor(QColor); // return the alternate background
         static QColor inactiveColor(QColor baseColor, double factor = 0.2); // return a dimmed variant
         static QColor selectedColor(QColor); // return the on select background color
+        static QColor blendedColor(const QColor &fg, const QColor &bg); // return a color with alpha blended on a background
+        static bool isDark(const QColor &color);
+        static bool isPaletteDark(const QPalette &palette);
         static QColor htmlCode(QColor x) { return x.name(); } // return the alternate background
         static Themes &themes();
         static void applyTheme(int index);
