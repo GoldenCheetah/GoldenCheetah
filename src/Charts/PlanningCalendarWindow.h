@@ -85,14 +85,14 @@ class PlanningCalendarWindow : public GcChartWindow
         void updatePrimaryConfigCombos();
         void updateSecondaryConfigCombo();
         QHash<QDate, QList<CalendarEntry>> getActivities(const QDate &firstDay, const QDate &lastDay) const;
-        QList<CalendarSummary> getWeeklySummaries(const QDate &firstDay, const QDate &lastDay) const;
+        QList<CalendarSummary> getSummaries(const QDate &firstDay, const QDate &lastDay, int timeBucketSize = 7) const;
         QHash<QDate, QList<CalendarEntry>> getPhasesEvents(const Season &season, const QDate &firstDay, const QDate &lastDay) const;
 
     private slots:
         void updateActivities();
         void updateActivitiesIfInRange(RideItem *rideItem);
         void updateSeason(Season const *season, bool allowKeepMonth = false);
-        bool movePlannedActivity(RideItem *rideItem, const QDate &destDay, bool force = false);
+        bool movePlannedActivity(RideItem *rideItem, const QDate &destDay, const QTime &destTime = QTime());
 };
 
 #endif

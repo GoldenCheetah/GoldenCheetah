@@ -72,7 +72,7 @@ ManualActivityWizard::ManualActivityWizard
     if (plan) {
         setWindowTitle(tr("Add a Planned Activity"));
     } else {
-        setWindowTitle(tr("Create a Completed Activity"));
+        setWindowTitle(tr("Add a Completed Activity"));
     }
     setMinimumSize(800 * dpiXFactor, 650 * dpiYFactor);
     setModal(true);
