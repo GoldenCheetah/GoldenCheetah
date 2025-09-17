@@ -94,7 +94,7 @@ QString time_to_string_minutes(double secs)
     return result;
 }
 
-double str_to_interval(QString s)
+double str_to_interval(const QString& s)
 {
     QRegExp rx("(\\d+\\s*h)?\\s*(\\d{1,2}\\s*m)?\\s*(\\d{1,2})(\\.\\d+)?\\s*s");
     rx.indexIn(s);
@@ -133,7 +133,7 @@ QString interval_to_str(double secs)
     return result;
 }
 
-QDateTime convertToLocalTime(QString timestamp)
+QDateTime convertToLocalTime(const QString& timestamp)
 {
     //check if the last character is Z designating the timezone to be UTC
     //otherwise assume the timestamp is already in local time and simply convert it
@@ -168,7 +168,7 @@ QDateTime convertToLocalTime(QString timestamp)
     return QDateTime::fromString(timestamp);
 }
 
-DateRange::DateRange(QDate from, QDate to, QString name, QColor color) : QObject()
+DateRange::DateRange(const QDate& from, const QDate& to, const QString& name, const QColor& color) : QObject()
 {
     this->from=from;
     this->to=to;

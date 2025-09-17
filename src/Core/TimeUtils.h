@@ -30,35 +30,26 @@
 #include <QComboBox>
 
 // the following time constants are widely used within GC:
-
-static const QDate GC_EARLY_DATE(01,01,01); // Not sure why this is so early, could be replaced with GC_EPOCH
-
 static const int GC_EPOCH_YEAR{1900};
 static const QDate GC_EPOCH(1900,01,01);
 static const QDate GC_UNIX_EPOCH(1970, 1, 1);
 static const QDate GC_VERSION_CHK_EPOCH(1990, 1, 1);
+static const QDate GC_INFINITY(9999,12,31); // maximum value for Python datetime module
 
-// these will probably get updated at some future point
+// these will probably need to be reviewed and updated at some future point
 static const QDate GC_MIN_EDIT_DATE(2000,01,01); // default minimum value for time editing fields
 static const QDate GC_MAX_EDIT_DATE(2030,01,01); // default maximum value for time editing fields
 
-// probably only need one far distant future time ??
-static const QDate GC_YR_2099_EPOCH(2099, 31, 12);
-static const QDate GC_YR_2100_EPOCH(2100,01,01);
-static const QDate GC_YR_2999_EPOCH(2999,12,31);
-static const QDate GC_YR_3000_EPOCH(3000, 12, 31);
-static const QDate GC_INFINITY(9999,12,31);
-
 
 QString interval_to_str(double secs);  // output like 1h 2m 3s
-double str_to_interval(QString s);     // convert 1h 2m 3s -> 3123.0 , e.g.
+double str_to_interval(const QString& s);     // convert 1h 2m 3s -> 3123.0 , e.g.
 QString time_to_string(double secs, bool forceMinutes=false);   // output like 1:02:03
 QString time_to_string_for_sorting(double secs);   // output always xx:yy:zz
 QString time_to_string_minutes(double secs); // output always hh:mm - seconds are cut-off
 
 /* takes a string containing an ISO 8601 timestamp and converts it to local time
 */
-QDateTime convertToLocalTime(QString timestamp);
+QDateTime convertToLocalTime(const QString& timestamp);
 
 class DateRange : QObject
 {
@@ -66,7 +57,7 @@ class DateRange : QObject
 
     public:
         DateRange(const DateRange& other);
-        DateRange(QDate from = QDate(), QDate to = QDate(), QString name ="", QColor=QColor(127,127,127));
+        DateRange(const QDate& from = QDate(), const QDate& to = QDate(), const QString& name ="", const QColor& color =QColor(127,127,127));
         DateRange& operator=(const DateRange &);
         bool operator!=(const DateRange&other) const {
             if (other.from != from || other.to != to || other.name != name) return true;
@@ -83,7 +74,7 @@ class DateRange : QObject
         QUuid id;
 
         // does this date fall in the range selection ?
-        bool pass(QDate date) const {
+        bool pass(const QDate& date) const {
             if (from == QDate() && to == QDate()) return true;
             if (from == QDate() && date <= to) return true;
             if (to == QDate() && date >= from) return true;
@@ -124,13 +115,13 @@ class DateSettingsEdit : public QWidget
         int mode();
 
         // betweem from and to
-        void setFromDate(QDate x) { fromDateEdit->setDate(x); }
+        void setFromDate(const QDate& x) { fromDateEdit->setDate(x); }
         QDate fromDate() { return fromDateEdit->date(); }
-        void setToDate(QDate x) { toDateEdit->setDate(x); }
+        void setToDate(const QDate& x) { toDateEdit->setDate(x); }
         QDate toDate() { return toDateEdit->date(); }
 
         // start date till today
-        void setStartDate(QDate x) { startDateEdit->setDate(x); }
+        void setStartDate(const QDate& x) { startDateEdit->setDate(x); }
         QDate startDate() { return startDateEdit->date(); }
 
         // last n of days/weeks/months/years

@@ -238,7 +238,7 @@ ManualActivityPageBasics::ManualActivityPageBasics
     dateEdit->setDisplayFormat(locale.dateFormat(QLocale::ShortFormat));
     if (plan) {
         dateEdit->setMinimumDate(QDate::currentDate());
-        dateEdit->setMaximumDate(GC_YR_2099_EPOCH);
+        dateEdit->setMaximumDate(GC_INFINITY);
     } else {
         dateEdit->setMinimumDate(GC_MIN_EDIT_DATE);
         dateEdit->setMaximumDate(QDate::currentDate());

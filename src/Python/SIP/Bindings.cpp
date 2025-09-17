@@ -177,7 +177,7 @@ PyObject* Bindings::athlete() const
 // one entry per sport per date for hr/power/pace
 class gcZoneConfig {
     public:
-    gcZoneConfig(QString sport) : sport(sport), date(GC_EARLY_DATE), cp(0), wprime(0), pmax(0), aetp(0), ftp(0),lthr(0),aethr(0),rhr(0),hrmax(0),cv(0),aetv(0) {}
+    gcZoneConfig(QString sport) : sport(sport), date(GC_EPOCH), cp(0), wprime(0), pmax(0), aetp(0), ftp(0),lthr(0),aethr(0),rhr(0),hrmax(0),cv(0),aetv(0) {}
     bool operator<(gcZoneConfig rhs) const { return date < rhs.date; }
     QString sport;
     QDate date;
@@ -348,7 +348,7 @@ Bindings::athleteZones(PyObject* date, QString sport) const
                 // new date so save what we have collected
                 if (x.date > last.date) {
 
-                    if (last.date > GC_EARLY_DATE)  compressed << last;
+                    if (last.date > GC_EPOCH)  compressed << last;
                     last.date = x.date;
                 }
 
@@ -373,7 +373,7 @@ Bindings::athleteZones(PyObject* date, QString sport) const
             }
         }
 
-        if (last.date > GC_EARLY_DATE) compressed << last;
+        if (last.date > GC_EPOCH) compressed << last;
     }
 
     // now use the new compressed ones
@@ -489,7 +489,7 @@ Bindings::activities(QString filter) const
         FilterSet fs;
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
-        if (python->perspective) fs.addFilter(python->perspective->isFiltered(), python->perspective->filterlist(DateRange(QDate(1,1,1970),QDate(31,12,3000))));
+        if (python->perspective) fs.addFilter(python->perspective->isFiltered(), python->perspective->filterlist(DateRange(GC_UNIX_EPOCH,GC_INFINITY)));
 
         // did call contain any filters?
         if (filter != "") {
@@ -1110,7 +1110,7 @@ Bindings::seasonMetrics(bool all, DateRange range, QString filter) const
     FilterSet fs;
     fs.addFilter(context->isfiltered, context->filters);
     fs.addFilter(context->ishomefiltered, context->homeFilters);
-    if (python->perspective) fs.addFilter(python->perspective->isFiltered(), python->perspective->filterlist(DateRange(QDate(1,1,1970),QDate(31,12,3000))));
+    if (python->perspective) fs.addFilter(python->perspective->isFiltered(), python->perspective->filterlist(DateRange(GC_UNIX_EPOCH,GC_INFINITY)));
 
     // did call contain a filter?
     if (filter != "") {
@@ -1308,7 +1308,7 @@ Bindings::seasonIntervals(DateRange range, QString type) const
     FilterSet fs;
     fs.addFilter(context->isfiltered, context->filters);
     fs.addFilter(context->ishomefiltered, context->homeFilters);
-    if (python->perspective) fs.addFilter(python->perspective->isFiltered(), python->perspective->filterlist(DateRange(QDate(1,1,1970),QDate(31,12,3000))));
+    if (python->perspective) fs.addFilter(python->perspective->isFiltered(), python->perspective->filterlist(DateRange(GC_UNIX_EPOCH,GC_INFINITY)));
     specification.setFilterSet(fs);
 
     // we need to count intervals that are in range...
@@ -1829,7 +1829,7 @@ Bindings::metrics(QString metric, bool all, QString filter) const
     FilterSet fs;
     fs.addFilter(context->isfiltered, context->filters);
     fs.addFilter(context->ishomefiltered, context->homeFilters);
-    if (python->perspective) fs.addFilter(python->perspective->isFiltered(), python->perspective->filterlist(DateRange(QDate(1,1,1970),QDate(31,12,3000))));
+    if (python->perspective) fs.addFilter(python->perspective->isFiltered(), python->perspective->filterlist(DateRange(GC_UNIX_EPOCH,GC_INFINITY)));
 
     // did call contain a filter?
     if (filter != "") {
@@ -2001,14 +2001,14 @@ Bindings::seasonMeanmax(bool all, DateRange range, QString filter) const
     if (context == NULL) return NULL;
 
     // construct the date range and then get a ridefilecache
-    if (all) range = DateRange(GC_EPOCH, GC_YR_2100_EPOCH);
+    if (all) range = DateRange(GC_EPOCH, GC_INFINITY);
 
     // did call contain any filters?
     QStringList filelist;
     bool filt=false;
 
     if (python->perspective) {
-        filelist = python->perspective->filterlist(DateRange(QDate(1,1,1970),QDate(31,12,3000)));
+        filelist = python->perspective->filterlist(DateRange(GC_UNIX_EPOCH,GC_INFINITY));
         filt = python->perspective->isFiltered();
     }
 
@@ -2460,7 +2460,7 @@ Bindings::seasonPeaks(bool all, DateRange range, QString filter, QList<RideFile:
     FilterSet fs;
     fs.addFilter(context->isfiltered, context->filters);
     fs.addFilter(context->ishomefiltered, context->homeFilters);
-    if (python->perspective) fs.addFilter(python->perspective->isFiltered(), python->perspective->filterlist(DateRange(QDate(1,1,1970),QDate(31,12,3000))));
+    if (python->perspective) fs.addFilter(python->perspective->isFiltered(), python->perspective->filterlist(DateRange(GC_UNIX_EPOCH,GC_INFINITY)));
     specification.setFilterSet(fs);
 
     // did call contain any filters?

@@ -506,7 +506,7 @@ RTool::athlete()
 // one entry per sport per date for hr/power/pace
 class gcZoneConfig {
     public:
-    gcZoneConfig(QString sport) : sport(sport), date(GC_EARLY_DATE), cp(0), wprime(0), pmax(0), aetp(0), ftp(0),lthr(0),aethr(0),rhr(0),hrmax(0),cv(0),aetv(0) {}
+    gcZoneConfig(QString sport) : sport(sport), date(GC_EPOCH), cp(0), wprime(0), pmax(0), aetp(0), ftp(0),lthr(0),aethr(0),rhr(0),hrmax(0),cv(0),aetv(0) {}
     bool operator<(gcZoneConfig rhs) const { return date < rhs.date; }
     QString sport;
     QDate date;
@@ -687,7 +687,7 @@ RTool::zones(SEXP pDate, SEXP pSport)
                 // new date so save what we have collected
                 if (x.date > last.date) {
 
-                    if (last.date > GC_EARLY_DATE)  compressed << last;
+                    if (last.date > GC_EPOCH)  compressed << last;
                     last.date = x.date;
                 }
 
@@ -712,7 +712,7 @@ RTool::zones(SEXP pDate, SEXP pSport)
             }
         }
 
-        if (last.date > GC_EARLY_DATE) compressed << last;
+        if (last.date > GC_EPOCH) compressed << last;
     }
 
     // now use the new compressed ones
@@ -2543,7 +2543,7 @@ SEXP
 RTool::dfForDateRangeMeanmax(bool all, DateRange range, SEXP filter)
 {
     // construct the date range and then get a ridefilecache
-    if (all) range = DateRange(GC_EPOCH, GC_YR_2100_EPOCH);
+    if (all) range = DateRange(GC_EPOCH, GC_INFINITY);
 
     // did call contain any filters?
     QStringList filelist;
