@@ -218,7 +218,7 @@ NewAthletePageUser::NewAthletePageUser
 
     dob = new QDateEdit();
     dob->setCalendarPopup(true);
-    dob->setDisplayFormat(locale.dateFormat(QLocale::ShortFormat));
+    dob->setDisplayFormat(locale.dateFormat(QLocale::LongFormat));
     registerField("user.dob", dob);
 
     sex = new QComboBox();

@@ -46,9 +46,24 @@ PerspectiveDialog::PerspectiveDialog(QWidget *parent, AbstractView *tabView) : Q
 #ifdef Q_OS_MAX
     xdataTable->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
-    perspectiveTable->setColumnCount(1);
+
+    QString typedesc;
+    switch (tabView->type) {
+    case VIEW_DIARY:
+    case VIEW_TRENDS: typedesc=tr("Activities filter"); break;
+    case VIEW_ANALYSIS: typedesc=tr("Switch expression"); break;
+    case VIEW_TRAIN: typedesc=tr("Switch for"); break;
+    default: qDebug() << "Unknown view type in PerspectiveDialog:" << tabView->type; break;
+    }
+
+    perspectiveTable->setColumnCount(2);
+    QStringList headers = (QStringList() << tr(" Name ") << typedesc);
+    perspectiveTable->setHorizontalHeaderLabels(headers);
+    QFont font = perspectiveTable->horizontalHeaderItem(0)->font();
+    font.setBold(false);
+    perspectiveTable->horizontalHeaderItem(0)->setFont(font);
+    perspectiveTable->horizontalHeaderItem(1)->setFont(font);
     perspectiveTable->horizontalHeader()->setStretchLastSection(true);
-    perspectiveTable->horizontalHeader()->hide();
     perspectiveTable->setSortingEnabled(false);
     perspectiveTable->verticalHeader()->hide();
     perspectiveTable->setShowGrid(false);
@@ -119,7 +134,7 @@ void PerspectiveDialog::setTables()
 {
     active = true;
 
-    perspectiveTable->clear();
+    perspectiveTable->clearContents();
     perspectiveTable->setRowCount(tabView->perspectives_.count());
 
     // add a row for each perspective
@@ -132,9 +147,33 @@ void PerspectiveDialog::setTables()
 
         // and the perspective we represent, so we can avoid dropping on ourselves
         add->setData(Qt::UserRole, QVariant::fromValue(static_cast<void*>(perspective)));
+        perspectiveTable->setItem(perspectiverow, 0, add);
 
-        perspectiveTable->setItem(perspectiverow++, 0, add);
+        QString description;
+        switch (tabView->type) {
+        case VIEW_TRENDS:
+        case VIEW_ANALYSIS:
+        case VIEW_DIARY: description = perspective->expression(); break;
+        case VIEW_TRAIN: {
+            switch (perspective->trainswitch) {
+            case Perspective::None: description=tr("Don't switch"); break;
+            case Perspective::Erg: description=tr("Erg Workout"); break;
+            case Perspective::Slope: description=tr("Slope Workout"); break;
+            case Perspective::Video: description=tr("Video Workout"); break;
+            case Perspective::Map: description=tr("Map Workout"); break;
+            default: qDebug() << "Unknown train switch value in PerspectiveDialog:" << perspective->trainswitch; break;
+        } break;
+        default: qDebug() << "Unknown view type in PerspectiveDialog:" << tabView->type; break;
+        }
+        }
 
+        // and the perspective's rule (for information)
+        QTableWidgetItem *perspectiveInfo = new QTableWidgetItem(description, 0);
+        perspectiveInfo->setFlags(add->flags() | Qt::ItemIsDropEnabled);
+
+        // and the perspective we represent, so we can avoid dropping on ourselves
+        perspectiveInfo->setData(Qt::UserRole, QVariant::fromValue(static_cast<void*>(perspective)));
+        perspectiveTable->setItem(perspectiverow++, 1, perspectiveInfo);
     }
 
     active = false;
@@ -228,8 +267,16 @@ PerspectiveDialog::addPerspectiveClicked()
 
          // add...
         Perspective *newone =tabView->addPerspective(name);
-        newone->setExpression(expression);
-        emit perspectivesChanged();
+
+        switch (tabView->type) {
+        case VIEW_TRENDS:
+        case VIEW_ANALYSIS:
+        case VIEW_DIARY: newone->setExpression(expression); break;
+        case VIEW_TRAIN: newone->setTrainSwitch(trainswitch); break;
+        default: qDebug() << "Unknown view type in PerspectiveDialog:" << tabView->type; break;
+        }
+
+    emit perspectivesChanged();
 
         setTables();
     }
@@ -249,6 +296,7 @@ PerspectiveDialog::exportPerspectiveClicked()
     case VIEW_ANALYSIS: typedesc="Analysis"; break;
     case VIEW_PLAN: typedesc="Plan"; break;
     case VIEW_TRAIN: typedesc="Train"; break;
+    default: qDebug() << "Unknown view type in PerspectiveDialog:" << tabView->type; break;
     }
 
     // export the current perspective to a file
@@ -362,6 +410,9 @@ PerspectiveTableWidget::dragMoveEvent(QDragMoveEvent *event)
 {
     QPoint pos = mapFromGlobal(QCursor::pos());
 
+    // allow for the height of the perspective table header
+    pos.setY(pos.y() - horizontalHeader()->height());
+
     QTableWidgetItem *hover = itemAt(pos);
     if (hover) {
         QTableWidget::dragMoveEvent(event);
@@ -391,6 +442,9 @@ PerspectiveTableWidget::dropEvent(QDropEvent *event)
 
     // to where?
     QPoint pos = mapFromGlobal(QCursor::pos());
+
+    // allow for the height of the perspective table header
+    pos.setY(pos.y() - horizontalHeader()->height());
 
     QTableWidgetItem *hover = itemAt(pos);
     if (hover) {
