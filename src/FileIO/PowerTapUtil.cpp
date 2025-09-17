@@ -49,7 +49,7 @@ PowerTapUtil::unpack_time(unsigned char *buf, struct tm *time, bool bVer81)
 {
     (void) bVer81; // unused
     memset(time, 0, sizeof(*time));
-    time->tm_year = 2000 + buf[1] - GC_EPOCH_YEAR;
+    time->tm_year = 2000 + buf[1] - GC_EPOCH.year();
     time->tm_mon = buf[2] - 1;
     time->tm_mday = buf[3] & 0x1f;
     time->tm_hour = buf[4] & 0x1f;

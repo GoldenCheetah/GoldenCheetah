@@ -798,7 +798,7 @@ void PaceZones::write(QDir home)
 #if USE_SHORT_POWER_ZONES_FORMAT
 
         // note: BEGIN is not needed anymore
-        //       since it becomes Jan 01 1900
+        //       since it becomes Jan 01 1900 (aka GC_EPOCH)
         strzones += QString("%1: CV=%2").arg(getStartDate(i).toString("yyyy/MM/dd")).arg(cv);
         strzones += QString("\n");
 

@@ -3448,7 +3448,7 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
         if (!SearchFilterBox::isNull(metricDetail.datafilter))
             allDates.addMatches(SearchFilterBox::matches(context, metricDetail.datafilter));
 
-        allDates.setDateRange(DateRange(QDate(),QDate()));
+        allDates.setDateRange(DateRange());
         localPMC = new PMCData(context, allDates, scoreType);
     }
 

@@ -703,7 +703,7 @@ PlanningCalendarWindow::updateSeason
 (Season const *season, bool allowKeepMonth)
 {
     if (season == nullptr) {
-        DateRange dr(QDate(), QDate(), "");
+        DateRange dr;
         calendar->activateDateRange(dr, allowKeepMonth);
     } else {
         DateRange dr(DateRange(season->getStart(), season->getEnd(), season->getName()));

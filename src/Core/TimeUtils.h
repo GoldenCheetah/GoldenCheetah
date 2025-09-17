@@ -30,7 +30,6 @@
 #include <QComboBox>
 
 // the following time constants are widely used within GC:
-static const int GC_EPOCH_YEAR{1900};
 static const QDate GC_EPOCH(1900,01,01);
 static const QDate GC_UNIX_EPOCH(1970, 1, 1);
 static const QDate GC_VERSION_CHK_EPOCH(1990, 1, 1);

@@ -712,7 +712,7 @@ void HrZones::write(QDir home)
         // note this explicitly sets the first and last ranges such that all time is spanned
 
         // note: BEGIN is not needed anymore
-        //       since it becomes Jan 01 1900
+        //       since it becomes Jan 01 1900 (aka GC_EPOCH)
         strzones += QString("%1: LT=%2, RestHr=%3, MaxHr=%4, AeT=%5").arg(getStartDate(i).toString("yyyy/MM/dd")).arg(lt).arg(restHr).arg(maxHr).arg(aet);
         strzones += QString("\n");
 
