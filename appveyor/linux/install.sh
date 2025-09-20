@@ -3,7 +3,7 @@ set -ev
 
 sudo apt-get update -qq
 sudo apt-get install -qq flex libpulse-dev
-sudo apt-get install -qq libglu1-mesa-dev
+sudo apt-get install -qq libglu1-mesa-dev libxcb-cursor-dev
 sudo apt-get install -qq libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
 sudo apt-get install -qq libsamplerate0-dev
 sudo apt-get install -qq libical-dev
