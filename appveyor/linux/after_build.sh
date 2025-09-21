@@ -47,10 +47,13 @@ mv squashfs-root/usr appdir/usr
 mv squashfs-root/opt appdir/opt
 rm -rf squashfs-root
 
+# Fix RPATH on QtWebEngineProcess and copy missing resources
+patchelf --set-rpath '$ORIGIN/../lib' appdir/libexec/QtWebEngineProcess
+cp -r `qmake -v|awk '/Qt/ { print $6 "/../resources" }' -` appdir
+
 # Generate AppImage
 wget --no-verbose "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
 # Fix RPATH on QtWebEngineProcess
-patchelf --set-rpath '$ORIGIN/../lib' appdir/libexec/QtWebEngineProcess
 chmod a+x appimagetool-x86_64.AppImage
 ./appimagetool-x86_64.AppImage appdir
 
