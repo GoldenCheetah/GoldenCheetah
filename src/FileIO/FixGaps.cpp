@@ -262,7 +262,7 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="
                 }
 
             // stationary or greater than stop seconds... fill with zeroes
-            } else if (stationary || gap > stop) {
+            } else if (stationary && gap >= tolerance || gap > stop) {
 
                 dropouts++;
                 dropouttime += gap;
