@@ -6,7 +6,7 @@ branches:
     - master
 
 image:
-  - Previous Visual Studio 2019
+  - Visual Studio 2019
   - macos-monterey
   - Ubuntu2204
 
@@ -54,14 +54,19 @@ environment:
 init:
 
 # Windows
-# Setup QT 5.15 - 64Bit
-- cmd: set QTDIR=C:\Qt\5.15\msvc2019_64
+# Setup QT 6.8 - 64Bit
+- cmd: set QTDIR=C:\Qt\6.8\msvc2022_64
 - cmd: set PATH=%QTDIR%\bin;%PATH%
 - cmd: qmake --version
 # Setup MSVC - VS 2019
 - cmd: call c:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\VC\Auxiliary\Build\vcvarsall.bat amd64
 # Setup NSIS
 - cmd: set PATH=%PATH%;C:\"Program Files (x86)"\NSIS
+# install Python 3.7
+- cmd: appveyor DownloadFile "https://www.python.org/ftp/python/3.7.9/python-3.7.9-amd64.exe"
+- cmd: python-3.7.9-amd64.exe /quiet InstallAllUsers=1 PrependPath=1 TargetDir="C:\Python37-x64"
+- cmd: c:\python37-x64\python --version
+- cmd: del python-3.7.9-amd64.exe
 
 # Linux / macOS
 - sh: >-
@@ -105,7 +110,7 @@ install:
 
 # Get config
 - cmd: copy qwt\qwtconfig.pri.in qwt\qwtconfig.pri
-- cmd: copy c:\libs\gcconfig64-Release.appveyor.pri src\gcconfig.pri
+- cmd: copy c:\libs\gcconfig64Qt6-Release.appveyor.pri src\gcconfig.pri
 
 # Get jom
 - cmd: if not exist jom_1_1_3.zip appveyor DownloadFile "https://download.qt.io/official_releases/jom/jom_1_1_3.zip"
@@ -180,6 +185,10 @@ before_build:
 # Avoid macro redefinition warnings
 - cmd: echo DEFINES+=_MATH_DEFINES_DEFINED >> src\gcconfig.pri
 
+# Avoid conflicts between Windows.h min/max macros and limits.h
+- cmd: echo DEFINES+=NOMINMAX >> src\gcconfig.pri
+
+
 # Linux / macOS
 - sh: bash appveyor/$OS_NAME/before_build.sh
 # Define GC version string, only for tagged builds
@@ -212,7 +221,7 @@ build_script:
 
 # Windows
 - cmd: qmake.exe build.pro -r -spec win32-msvc
-- cmd: if not exist qwt\lib\qwt.lib jom -j1 sub-qwt
+- cmd: if not exist qwt\lib\qwt.lib jom -j1 sub-qwt & exit /b 1
 - cmd: jom -j4 sub-src
 
 # Linux / macOS
@@ -233,8 +242,6 @@ after_build:
 - cmd: windeployqt --release GoldenCheetah.exe
 - cmd: copy c:\libs\10_Precompiled_DLL\usbexpress_3.5.1\USBXpress\USBXpress_API\Host\x64\SiUSBXp.dll
 - cmd: copy c:\libs\10_Precompiled_DLL\libsamplerate64\lib\libsamplerate-0.dll
-- cmd: copy c:\libs\10_Precompiled_DLL\VLC\win64\lib\libvlc*.dll
-- cmd: xcopy /s /i /e /q c:\libs\10_Precompiled_DLL\VLC\win64\plugins plugins
 - cmd: copy c:\OpenSSL-v111-Win64\bin\lib*.dll
 - cmd: copy c:\OpenSSL-v111-Win64\license.txt "OpenSSL License.txt"
 - cmd: xcopy /s /i /e /q C:\Python .
@@ -249,10 +256,10 @@ after_build:
 - cmd: copy ..\Resources\win32\gc.ico
 
 # Installer script
-- cmd: copy ..\Resources\win32\GC3.7-Master-W64-QT5.nsi
+- cmd: copy ..\Resources\win32\GC3.7-Master-W64-QT6.nsi
 
 # Build the installer
-- cmd: makensis GC3.7-Master-W64-QT5.nsi
+- cmd: makensis GC3.7-Master-W64-QT6.nsi
 - cmd: move GoldenCheetah_v3.7_64bit_Windows.exe ..\..\GoldenCheetah_v3.7_x64.exe
 - cmd: cd ..\..
 
