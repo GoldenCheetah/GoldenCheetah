@@ -34,6 +34,7 @@
 #include "CalendarItemDelegates.h"
 #include "CalendarData.h"
 #include "TimeUtils.h"
+#include "Measures.h"
 
 
 class CalendarOverview : public QCalendarWidget {
@@ -196,12 +197,47 @@ enum class CalendarView {
 };
 
 
+class CalendarDayView : public QWidget {
+    Q_OBJECT
+
+public:
+    explicit CalendarDayView(const QDate &dateInMonth, Qt::DayOfWeek firstDayOfWeek = Qt::Monday, Measures * const athleteMeasures = nullptr, QWidget *parent = nullptr);
+
+    bool setDay(const QDate &date);
+    void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
+    void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries);
+    void limitDateRange(const DateRange &dr);
+    QDate firstVisibleDay() const;
+    QDate lastVisibleDay() const;
+    QDate selectedDate() const;
+    void updateMeasures();
+
+signals:
+    void showInTrainMode(const CalendarEntry &activity);
+    void viewActivity(const CalendarEntry &activity);
+    void addActivity(bool plan, const QDate &day, const QTime &time);
+    void delActivity(const CalendarEntry &activity);
+    void entryMoved(const CalendarEntry &activity, const QDate &srcDay, const QDate &destDay, const QTime &destTime);
+    void dayChanged(const QDate &date);
+
+private:
+    Measures * const athleteMeasures;
+    CalendarOverview *dayDateSelector;
+    QLabel *dayPhaseLabel;
+    QLabel *dayEventLabel;
+    QTabWidget *measureTabs;
+    CalendarDayTable *dayTable;
+
+    bool measureDialog(const QDateTime &when, MeasuresGroup * const measuresGroup, bool update);
+    void updateMeasures(const QDate &date);
+};
+
+
 class Calendar : public QWidget {
     Q_OBJECT
 
 public:
-    explicit Calendar(Qt::DayOfWeek firstDayOfWeek = Qt::Monday, QWidget *parent = nullptr);
-    explicit Calendar(const QDate &dateInMonth, Qt::DayOfWeek firstDayOfWeek = Qt::Monday, QWidget *parent = nullptr);
+    explicit Calendar(const QDate &dateInMonth, Qt::DayOfWeek firstDayOfWeek = Qt::Monday, Measures * const athleteMeasures = nullptr, QWidget *parent = nullptr);
 
     void setDate(const QDate &dateInMonth, bool allowKeepMonth = false);
     void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries);
@@ -224,6 +260,7 @@ public slots:
     void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
     void setSummaryMonthVisible(bool visible);
     void applyNavIcons();
+    void updateMeasures();
 
 signals:
     void viewChanged(CalendarView newView, CalendarView oldView);
@@ -251,13 +288,9 @@ private:
     QAction *dayAction;
     QAction *monthAction;
     QLabel *dateLabel;
-    QStackedWidget *tableStack;
-    QWidget *dayCalendar;
-    CalendarOverview *dayDateSelector;
-    QLabel *dayPhaseLabel;
-    QLabel *dayEventLabel;
-    CalendarDayTable *dayTable;
-    CalendarMonthTable *monthTable;
+    QStackedWidget *viewStack;
+    CalendarDayView *dayView;
+    CalendarMonthTable *monthView;
     DateRange dateRange;
 
     void setNavButtonState();

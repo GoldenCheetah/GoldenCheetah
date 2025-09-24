@@ -40,7 +40,7 @@ PlanningCalendarWindow::PlanningCalendarWindow(Context *context)
 {
     mkControls();
 
-    calendar = new Calendar(QDate::currentDate(), static_cast<Qt::DayOfWeek>(getFirstDayOfWeek()));
+    calendar = new Calendar(QDate::currentDate(), static_cast<Qt::DayOfWeek>(getFirstDayOfWeek()), context->athlete->measures);
 
     QVBoxLayout *mainLayout = new QVBoxLayout();
     setChartLayout(mainLayout);
@@ -288,6 +288,9 @@ PlanningCalendarWindow::configChanged
         updatePrimaryConfigCombos();
         updateSecondaryConfigCombo();
         multiMetricSelector->updateMetrics();
+    }
+    if (what & CONFIG_ATHLETE) {
+        calendar->updateMeasures();
     }
     if (what & CONFIG_APPEARANCE) {
         // change colors to reflect preferences
