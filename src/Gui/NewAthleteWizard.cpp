@@ -99,10 +99,10 @@ NewAthleteWizard::done
                 appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/analysis/hide/1"), true);
                 appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/analysis/hide/2"), false);
                 appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/analysis/hide/3"), true);
-                appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/diary/hide"), true);
-                appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/diary/hide/0"), false);
-                appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/diary/hide/1"), false);
-                appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/diary/hide/2"), true);
+                appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/plan/hide"), true);
+                appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/plan/hide/0"), false);
+                appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/plan/hide/1"), false);
+                appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/plan/hide/2"), true);
                 appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/train/hide"), true);
                 appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/train/hide/0"), false);
                 appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/train/hide/1"), false);
