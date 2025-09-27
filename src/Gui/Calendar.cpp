@@ -1427,6 +1427,7 @@ CalendarDayView::updateMeasures
     if (measureTabs->count() > currentIndex) {
         measureTabs->setCurrentIndex(currentIndex);
     }
+    PaletteApplier::setPaletteRecursively(measureTabs, this->palette(), true);
 }
 
 
