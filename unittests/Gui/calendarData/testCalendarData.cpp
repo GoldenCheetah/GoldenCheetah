@@ -14,11 +14,11 @@ private slots:
         QSKIP("Skipping test with Qt5");
 #else
         QList<CalendarEntry> entries = {
-            { "", "", "", "", Qt::red, "", QTime(9, 0), 3600 },
-            { "", "", "", "", Qt::red, "", QTime(9, 30), 3600 },
-            { "", "", "", "", Qt::red, "", QTime(10, 30), 1800 },
-            { "", "", "", "", Qt::red, "", QTime(11, 0), 1800 },
-            { "", "", "", "", Qt::red, "", QTime(11, 15), 3600 },
+            { "", "", "", "", "", Qt::red, "", QTime(9, 0), 3600 },
+            { "", "", "", "", "", Qt::red, "", QTime(9, 30), 3600 },
+            { "", "", "", "", "", Qt::red, "", QTime(10, 30), 1800 },
+            { "", "", "", "", "", Qt::red, "", QTime(11, 0), 1800 },
+            { "", "", "", "", "", Qt::red, "", QTime(11, 15), 3600 },
         };
         CalendarEntryLayouter layouter;
         QList<CalendarEntryLayout> layout = layouter.layout(entries);

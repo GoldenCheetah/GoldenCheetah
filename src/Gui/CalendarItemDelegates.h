@@ -89,6 +89,7 @@ public:
 private:
     TimeScaleData const * const timeScaleData;
     mutable QHash<QModelIndex, QList<QRect>> entryRects;
+    void drawWrappingText(QPainter &painter, const QRect &rect, const QString &text) const;
 };
 
 
