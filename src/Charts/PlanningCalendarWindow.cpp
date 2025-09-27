@@ -130,7 +130,7 @@ PlanningCalendarWindow::PlanningCalendarWindow(Context *context)
         }
         for (int i = plannedRides.size() - 1; i >= 0; --i) {
             QDate destDay = plannedRides[i]->dateTime.date().addDays(1);
-            movePlannedActivity(plannedRides[i], destDay);
+            movePlannedActivity(plannedRides[i], destDay, plannedRides[i]->dateTime.time());
         }
         updateActivities();
         QApplication::restoreOverrideCursor();
@@ -141,7 +141,7 @@ PlanningCalendarWindow::PlanningCalendarWindow(Context *context)
         for (RideItem *rideItem : context->athlete->rideCache->rides()) {
             if (rideItem != nullptr && rideItem->planned && rideItem->dateTime.date() >= day) {
                 QDate destDay = rideItem->dateTime.date().addDays(-1);
-                movePlannedActivity(rideItem, destDay);
+                movePlannedActivity(rideItem, destDay, rideItem->dateTime.time());
             }
         }
         QApplication::restoreOverrideCursor();
