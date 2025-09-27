@@ -43,6 +43,7 @@ class PlanningCalendarWindow : public GcChartWindow
     Q_PROPERTY(QString primaryMainField READ getPrimaryMainField WRITE setPrimaryMainField USER true)
     Q_PROPERTY(QString primaryFallbackField READ getPrimaryFallbackField WRITE setPrimaryFallbackField USER true)
     Q_PROPERTY(QString secondaryMetric READ getSecondaryMetric WRITE setSecondaryMetric USER true)
+    Q_PROPERTY(QString tertiaryField READ getTertiaryField WRITE setTertiaryField USER true)
     Q_PROPERTY(QString summaryMetrics READ getSummaryMetrics WRITE setSummaryMetrics USER true)
 
     public:
@@ -56,6 +57,7 @@ class PlanningCalendarWindow : public GcChartWindow
         QString getPrimaryMainField() const;
         QString getPrimaryFallbackField() const;
         QString getSecondaryMetric() const;
+        QString getTertiaryField() const;
         QString getSummaryMetrics() const;
         QStringList getSummaryMetricsList() const;
 
@@ -65,6 +67,7 @@ class PlanningCalendarWindow : public GcChartWindow
         void setPrimaryMainField(const QString &name);
         void setPrimaryFallbackField(const QString &name);
         void setSecondaryMetric(const QString &name);
+        void setTertiaryField(const QString &name);
         void setSummaryMetrics(const QString &summaryMetrics);
         void setSummaryMetrics(const QStringList &summaryMetrics);
         void configChanged(qint32);
@@ -78,12 +81,14 @@ class PlanningCalendarWindow : public GcChartWindow
         QComboBox *primaryMainCombo;
         QComboBox *primaryFallbackCombo;
         QComboBox *secondaryCombo;
+        QComboBox *tertiaryCombo;
         MultiMetricSelector *multiMetricSelector;
         Calendar *calendar;
 
         void mkControls();
         void updatePrimaryConfigCombos();
         void updateSecondaryConfigCombo();
+        void updateTertiaryConfigCombo();
         QHash<QDate, QList<CalendarEntry>> getActivities(const QDate &firstDay, const QDate &lastDay) const;
         QList<CalendarSummary> getSummaries(const QDate &firstDay, const QDate &lastDay, int timeBucketSize = 7) const;
         QHash<QDate, QList<CalendarEntry>> getPhasesEvents(const Season &season, const QDate &firstDay, const QDate &lastDay) const;

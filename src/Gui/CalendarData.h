@@ -39,6 +39,7 @@ struct CalendarEntry {
     QString primary;
     QString secondary;
     QString secondaryMetric;
+    QString tertiary;
     QString iconFile;
     QColor color;
     QString reference;
