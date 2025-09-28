@@ -151,7 +151,7 @@ TimeScaleData::timeFromY
 
 
 //////////////////////////////////////////////////////////////////////////////
-// CalendarDayViewDayDelegate
+// ColumnDelegatingItemDelegate
 
 ColumnDelegatingItemDelegate::ColumnDelegatingItemDelegate
 (QList<QStyledItemDelegate*> delegates, QObject *parent)
@@ -312,15 +312,15 @@ CalendarDayViewDayDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     painter->restore();
 
     // Activities
-    const int columnSpacing = 10 * dpiXFactor;
-    const int lineSpacing = 2 * dpiYFactor;
-    const int iconSpacing = 2 * dpiXFactor;
-    const int radius = 4 * dpiXFactor;
-    const int horPadding = 4 * dpiXFactor;
     QFont entryFont = painter->font();
     entryFont.setPointSize(entryFont.pointSize() * 0.95);
     QFontMetrics entryFM(entryFont);
-    int lineHeight = entryFM.height();
+    const int columnSpacing = 10 * dpiXFactor;
+    const int horPadding = 4 * dpiXFactor;
+    const int radius = 4 * dpiXFactor;
+    const int iconSpacing = 2 * dpiXFactor;
+    const int priSecSpacing = 2 * dpiXFactor;
+    const int lineHeight = entryFM.height();
     painter->setFont(entryFont);
 
     int rectLeft = option.rect.left() + columnSpacing;
@@ -338,7 +338,7 @@ CalendarDayViewDayDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         int top = timeScaleData->minuteToY(startMinute, option.rect);
         int bottom = timeScaleData->minuteToY(endMinute, option.rect);
         int height = std::max(1, bottom - top);
-        int numLines = (height + lineSpacing) / (lineHeight + lineSpacing);
+        int numLines = (height + priSecSpacing) / (lineHeight + priSecSpacing);
 
         painter->save();
         QRect entryRect(left, top, columnWidth, height);
@@ -369,8 +369,8 @@ CalendarDayViewDayDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         if (height >= lineHeight && columnWidth >= lineHeight) {
             QColor pixmapColor(entry.color);
             int headlineOffset = 0;
-            if (height >= 2 * lineHeight + lineSpacing && columnWidth >= 2 * lineHeight + lineSpacing) {
-                iconWidth = 2 * lineHeight + lineSpacing;
+            if (height >= 2 * lineHeight + priSecSpacing && columnWidth >= 2 * lineHeight + priSecSpacing) {
+                iconWidth = 2 * lineHeight + priSecSpacing;
             } else {
                 iconWidth = lineHeight;
             }
@@ -380,9 +380,9 @@ CalendarDayViewDayDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
                 if (pressed) {
                     pixmapColor = GCColor::invertColor(entryBG);
                 }
-                pixmap = svgAsColoredPixmap(entry.iconFile, pixmapSize, lineSpacing, pixmapColor);
+                pixmap = svgAsColoredPixmap(entry.iconFile, pixmapSize, iconSpacing, pixmapColor);
             } else {
-                pixmap = svgOnBackground(entry.iconFile, pixmapSize, lineSpacing, pixmapColor, radius);
+                pixmap = svgOnBackground(entry.iconFile, pixmapSize, iconSpacing, pixmapColor, radius);
             }
             painter->drawPixmap(left, top, pixmap);
         }
@@ -391,10 +391,25 @@ CalendarDayViewDayDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             QRect textRect(left + iconWidth + horPadding, top, columnWidth - iconWidth - 2 * horPadding, lineHeight);
             painter->setPen(GCColor::invertColor(entryBG));
             painter->drawText(textRect, Qt::AlignLeft | Qt::AlignTop, entry.primary);
-            --numLines;
-            if (numLines > 0) {
-                textRect.translate(0, lineHeight + lineSpacing);
-                painter->drawText(textRect, Qt::AlignLeft | Qt::AlignTop, entry.secondary + " (" + entry.secondaryMetric + ")");
+            if (--numLines > 0 && ! entry.secondary.isEmpty()) {
+                textRect.translate(0, lineHeight + priSecSpacing);
+                if (! entry.secondaryMetric.isEmpty()) {
+                    painter->drawText(textRect, Qt::AlignLeft | Qt::AlignTop, entry.secondary + " (" + entry.secondaryMetric + ")");
+                } else {
+                    painter->drawText(textRect, Qt::AlignLeft | Qt::AlignTop, entry.secondary);
+                }
+            }
+            if (--numLines > 0 && ! entry.tertiary.isEmpty()) {
+                QRect tertiaryRect(left + horPadding,
+                                   top + iconWidth + priSecSpacing,
+                                   columnWidth - 2 * horPadding,
+                                   entryRect.height() - iconWidth - 2 * priSecSpacing);
+                QFont tertiaryFont = painter->font();
+                tertiaryFont.setWeight(QFont::Light);
+                painter->save();
+                painter->setFont(tertiaryFont);
+                drawWrappingText(*painter, tertiaryRect, entry.tertiary);
+                painter->restore();
             }
             painter->restore();
         }
@@ -465,6 +480,82 @@ CalendarDayViewDayDelegate::hitTestEntry
         }
     }
     return -1;
+}
+
+
+void
+CalendarDayViewDayDelegate::drawWrappingText
+(QPainter &painter, const QRect &rect, const QString &text) const
+{
+    painter.save();
+    const QFont font = painter.font();
+    QFontMetrics fm(font);
+    const int maxWidth = rect.width();
+    const qreal maxY = rect.bottom() + 0.5;
+    qreal y = rect.top();
+    const QStringList paragraphs = text.split('\n');
+    QList<QPair<QPoint, QString>> linesToDraw;
+    QString lastLineText;
+    QPoint lastLinePos;
+    bool stopDrawing = false;
+    bool moreTextFollowing = false;
+    for (int p = 0; p < paragraphs.size() && ! stopDrawing; ++p) {
+        const QString &para = paragraphs[p];
+        QTextLayout layout(para, font);
+        layout.beginLayout();
+        while (! stopDrawing) {
+            QTextLine line = layout.createLine();
+            if (! line.isValid()) {
+                break;
+            }
+            line.setLineWidth(maxWidth);
+            const qreal ascent = line.ascent();
+            const qreal descent = line.descent();
+            const qreal lineHeight = ascent + descent;
+            const qreal lineBottom = y + lineHeight;
+            if (lineBottom > maxY) {
+                stopDrawing = true;
+                moreTextFollowing = true;
+                break;
+            }
+            const QString lineText = para.mid(line.textStart(), line.textLength());
+            if (line.naturalTextWidth() > maxWidth) {
+                linesToDraw.clear();
+                stopDrawing = true;
+                break;
+            }
+            QPoint pos(rect.left(), std::round(y + ascent));
+            linesToDraw.append({ pos, lineText });
+            lastLineText = lineText;
+            lastLinePos = pos;
+            y += lineHeight;
+        }
+        layout.endLayout();
+        if (stopDrawing) {
+            break;
+        }
+        if (p < paragraphs.size() - 1) {
+            qreal nextLineHeight = fm.ascent() + fm.descent();
+            if (y + nextLineHeight > maxY) {
+                stopDrawing = true;
+                moreTextFollowing = true;
+                break;
+            }
+        }
+    }
+    if (stopDrawing && ! linesToDraw.isEmpty() && moreTextFollowing) {
+        QString textToElide = lastLineText;
+        const QString ellipsis = QStringLiteral("…");
+        while (! textToElide.isEmpty() && fm.horizontalAdvance(textToElide + ellipsis) > maxWidth - 1) {
+            textToElide.chop(1);
+        }
+        textToElide += ellipsis;
+        linesToDraw.last() = { lastLinePos, textToElide };
+    }
+    for (const auto &line : linesToDraw) {
+        painter.drawText(line.first, line.second);
+    }
+    painter.restore();
 }
 
 
@@ -1014,6 +1105,8 @@ QSize
 CalendarSummaryDelegate::sizeHint
 (const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    Q_UNUSED(option)
+
     const CalendarSummary summary = index.data(Qt::UserRole).value<CalendarSummary>();
     QFont font;
     font.setWeight(QFont::DemiBold);
