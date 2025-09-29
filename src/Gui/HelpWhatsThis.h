@@ -35,6 +35,7 @@ Q_OBJECT
 
                  ScopeBar,
                  ScopeBar_Athletes,
+                 ScopeBar_Plan,
                  ScopeBar_Trends,
                  ScopeBar_Rides,
                  ScopeBar_Train,
@@ -165,8 +166,8 @@ Q_OBJECT
                  SideBarRidesView_Calendar,
                  SideBarRidesView_Rides,
                  SideBarRidesView_Intervals,
-                 SideBarDiaryView_Calendar,
-                 SideBarDiaryView_Summary,
+                 SideBarPlanView_Calendar,
+                 SideBarPlanView_Summary,
                  SideBarTrainView_Devices,
                  SideBarTrainView_Workouts,
                  SideBarTrainView_Media,

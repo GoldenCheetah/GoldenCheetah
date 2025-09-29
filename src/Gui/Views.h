@@ -56,15 +56,15 @@ class AnalysisView : public AbstractView
 
 };
 
-class DiarySidebar;
-class DiaryView : public AbstractView
+class PlanSidebar;
+class PlanView : public AbstractView
 {
     Q_OBJECT
 
     public:
 
-        DiaryView(Context *context, QStackedWidget *controls);
-        ~DiaryView();
+        PlanView(Context *context, QStackedWidget *controls);
+        ~PlanView();
         void setRide(RideItem*ride) override;
 
     public slots:
@@ -73,7 +73,7 @@ class DiaryView : public AbstractView
         void dateRangeChanged(DateRange);
 
     private:
-        DiarySidebar *diarySidebar;
+        PlanSidebar *planSidebar;
 
 };
 
