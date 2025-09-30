@@ -566,9 +566,14 @@ CalendarTimeScaleDelegate::paint
 
 QSize
 CalendarTimeScaleDelegate::sizeHint
-(const QStyleOptionViewItem& option, const QModelIndex& index) const
+(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    return QStyledItemDelegate::sizeHint(option, index);
+    Q_UNUSED(index)
+
+    QFont font = option.font;
+    font.setPointSizeF(font.pointSizeF() * 0.9);
+    QFontMetrics fm(font);
+    return QSize(fm.horizontalAdvance("00:00") + 10 * dpiXFactor, option.rect.height());
 }
 
 
@@ -920,7 +925,7 @@ CalendarSummaryDelegate::paint
 (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     bool hasToolTip = false;
-    const QColor bgColor = GCColor::inactiveColor(option.palette.color(QPalette::Active, QPalette::Base));
+    const QColor bgColor = option.palette.color(QPalette::Active, QPalette::AlternateBase);
     const QColor fgColor = option.palette.color(QPalette::Active, QPalette::Text);
     const CalendarSummary summary = index.data(Qt::UserRole).value<CalendarSummary>();
     QFont valueFont(painter->font());
