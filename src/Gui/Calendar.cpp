@@ -1217,6 +1217,7 @@ CalendarDayView::CalendarDayView
 : QWidget(parent), athleteMeasures(athleteMeasures)
 {
     dayDateSelector = new CalendarOverview();
+    dayDateSelector->setFixedHeight(std::max(static_cast<int>(280 * dpiYFactor), dayDateSelector->sizeHint().height()));
 
     dayPhaseLabel = new QLabel(tr("No Phase"));
     dayPhaseLabel->setWordWrap(true);
