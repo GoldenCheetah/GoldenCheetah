@@ -296,49 +296,51 @@ PlanningCalendarWindow::configChanged
         // change colors to reflect preferences
         setProperty("color", GColor(CPLOTBACKGROUND));
 
-        QColor activeBg = GColor(CPLOTBACKGROUND);
-        QColor activeText = GCColor::invertColor(activeBg);
+        QColor activeBase = GColor(CPLOTBACKGROUND);
+        QColor activeWindow = activeBase;
+        QColor activeText = GCColor::invertColor(activeBase);
         QColor activeHl = GColor(CCALCURRENT);
         QColor activeHlText = GCColor::invertColor(activeHl);
-        QColor alternateBg = GCColor::inactiveColor(activeBg, 0.2);
-        QColor alternateText = GCColor::inactiveColor(activeText, 1.5);
-        QColor buttonBg = activeBg;
+        QColor alternateBg = GCColor::inactiveColor(activeBase, 0.2);
+        QColor inactiveText = GCColor::inactiveColor(activeText, 1.5);
+        QColor activeButtonBg = activeBase;
         QColor disabledButtonBg = alternateBg;
-        if (buttonBg.lightness() < 10) {
-            buttonBg = alternateBg;
-            disabledButtonBg = GCColor::inactiveColor(buttonBg, 0.3);
+        if (activeBase.lightness() < 20) {
+            activeWindow = GCColor::inactiveColor(activeWindow, 0.2);
+            activeButtonBg = alternateBg;
+            disabledButtonBg = GCColor::inactiveColor(activeButtonBg, 0.3);
         }
 
         QPalette palette;
-        palette.setColor(QPalette::Active, QPalette::Window, activeBg);
+        palette.setColor(QPalette::Active, QPalette::Window, activeWindow);
         palette.setColor(QPalette::Active, QPalette::WindowText, activeText);
-        palette.setColor(QPalette::Active, QPalette::Base, activeBg);
+        palette.setColor(QPalette::Active, QPalette::Base, activeBase);
         palette.setColor(QPalette::Active, QPalette::AlternateBase, alternateBg);
         palette.setColor(QPalette::Active, QPalette::Text, activeText);
         palette.setColor(QPalette::Active, QPalette::Highlight, activeHl);
         palette.setColor(QPalette::Active, QPalette::HighlightedText, activeHlText);
-        palette.setColor(QPalette::Active, QPalette::Button, buttonBg);
+        palette.setColor(QPalette::Active, QPalette::Button, activeButtonBg);
         palette.setColor(QPalette::Active, QPalette::ButtonText, activeText);
 
-        palette.setColor(QPalette::Inactive, QPalette::Window, activeBg);
+        palette.setColor(QPalette::Inactive, QPalette::Window, activeWindow);
         palette.setColor(QPalette::Inactive, QPalette::WindowText, activeText);
-        palette.setColor(QPalette::Inactive, QPalette::Base, activeBg);
+        palette.setColor(QPalette::Inactive, QPalette::Base, activeBase);
         palette.setColor(QPalette::Inactive, QPalette::AlternateBase, alternateBg);
         palette.setColor(QPalette::Inactive, QPalette::Text, activeText);
         palette.setColor(QPalette::Inactive, QPalette::Highlight, activeHl);
         palette.setColor(QPalette::Inactive, QPalette::HighlightedText, activeHlText);
-        palette.setColor(QPalette::Inactive, QPalette::Button, buttonBg);
+        palette.setColor(QPalette::Inactive, QPalette::Button, activeButtonBg);
         palette.setColor(QPalette::Inactive, QPalette::ButtonText, activeText);
 
         palette.setColor(QPalette::Disabled, QPalette::Window, alternateBg);
-        palette.setColor(QPalette::Disabled, QPalette::WindowText, alternateText);
+        palette.setColor(QPalette::Disabled, QPalette::WindowText, inactiveText);
         palette.setColor(QPalette::Disabled, QPalette::Base, alternateBg);
         palette.setColor(QPalette::Disabled, QPalette::AlternateBase, alternateBg);
-        palette.setColor(QPalette::Disabled, QPalette::Text, alternateText);
+        palette.setColor(QPalette::Disabled, QPalette::Text, inactiveText);
         palette.setColor(QPalette::Disabled, QPalette::Highlight, activeHl);
         palette.setColor(QPalette::Disabled, QPalette::HighlightedText, activeHlText);
         palette.setColor(QPalette::Disabled, QPalette::Button, disabledButtonBg);
-        palette.setColor(QPalette::Disabled, QPalette::ButtonText, alternateText);
+        palette.setColor(QPalette::Disabled, QPalette::ButtonText, inactiveText);
 
         PaletteApplier::setPaletteRecursively(this, palette, true);
         calendar->applyNavIcons();
