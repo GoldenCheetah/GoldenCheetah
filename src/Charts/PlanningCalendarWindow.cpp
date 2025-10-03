@@ -59,6 +59,7 @@ PlanningCalendarWindow::PlanningCalendarWindow(Context *context)
     connect(context, &Context::homeFilterChanged, this, &PlanningCalendarWindow::updateActivities);
     connect(context, &Context::rideAdded, this, &PlanningCalendarWindow::updateActivitiesIfInRange);
     connect(context, &Context::rideDeleted, this, &PlanningCalendarWindow::updateActivitiesIfInRange);
+    connect(context, &Context::rideChanged, this, &PlanningCalendarWindow::updateActivitiesIfInRange);
     connect(context, &Context::configChanged, this, &PlanningCalendarWindow::configChanged);
     connect(calendar, &Calendar::showInTrainMode, [=](CalendarEntry activity) {
         for (RideItem *rideItem : context->athlete->rideCache->rides()) {
@@ -130,7 +131,7 @@ PlanningCalendarWindow::PlanningCalendarWindow(Context *context)
         }
         for (int i = plannedRides.size() - 1; i >= 0; --i) {
             QDate destDay = plannedRides[i]->dateTime.date().addDays(1);
-            movePlannedActivity(plannedRides[i], destDay);
+            movePlannedActivity(plannedRides[i], destDay, plannedRides[i]->dateTime.time());
         }
         updateActivities();
         QApplication::restoreOverrideCursor();
@@ -141,7 +142,7 @@ PlanningCalendarWindow::PlanningCalendarWindow(Context *context)
         for (RideItem *rideItem : context->athlete->rideCache->rides()) {
             if (rideItem != nullptr && rideItem->planned && rideItem->dateTime.date() >= day) {
                 QDate destDay = rideItem->dateTime.date().addDays(-1);
-                movePlannedActivity(rideItem, destDay);
+                movePlannedActivity(rideItem, destDay, rideItem->dateTime.time());
             }
         }
         QApplication::restoreOverrideCursor();
@@ -235,6 +236,22 @@ PlanningCalendarWindow::getSecondaryMetric
 () const
 {
     return secondaryCombo->currentData(Qt::UserRole).toString();
+}
+
+
+QString
+PlanningCalendarWindow::getTertiaryField
+() const
+{
+    return tertiaryCombo->currentText();
+}
+
+
+void
+PlanningCalendarWindow::setTertiaryField
+(const QString &name)
+{
+    tertiaryCombo->setCurrentText(name);
 }
 
 
@@ -369,14 +386,17 @@ PlanningCalendarWindow::mkControls
     primaryMainCombo = new QComboBox();
     primaryFallbackCombo = new QComboBox();
     secondaryCombo = new QComboBox();
+    tertiaryCombo = new QComboBox();
     updatePrimaryConfigCombos();
     updateSecondaryConfigCombo();
+    updateTertiaryConfigCombo();
     primaryMainCombo->setCurrentText("Route");
     primaryFallbackCombo->setCurrentText("Workout Code");
     int secondaryIndex = secondaryCombo->findData("workout_time");
     if (secondaryIndex >= 0) {
         secondaryCombo->setCurrentIndex(secondaryIndex);
     }
+    tertiaryCombo->setCurrentText("Notes");
     QStringList summaryMetrics { "ride_count", "total_distance", "coggan_tss", "workout_time" };
     multiMetricSelector = new MultiMetricSelector(tr("Available Metrics"), tr("Selected Metrics"), summaryMetrics);
 
@@ -387,6 +407,7 @@ PlanningCalendarWindow::mkControls
     formLayout->addRow(tr("Field for Primary Line"), primaryMainCombo);
     formLayout->addRow(tr("Fallback Field for Primary Line"), primaryFallbackCombo);
     formLayout->addRow(tr("Metric for Secondary Line"), secondaryCombo);
+    formLayout->addRow(tr("Field for Tertiary Line (day view only)"), tertiaryCombo);
     formLayout->addRow(new QLabel(HLO + tr("Summary") + HLC));
 
     QWidget *controlsWidget = new QWidget();
@@ -401,11 +422,13 @@ PlanningCalendarWindow::mkControls
     connect(primaryMainCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PlanningCalendarWindow::updateActivities);
     connect(primaryFallbackCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PlanningCalendarWindow::updateActivities);
     connect(secondaryCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PlanningCalendarWindow::updateActivities);
+    connect(tertiaryCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PlanningCalendarWindow::updateActivities);
 #else
     connect(firstDayOfWeekCombo, &QComboBox::currentIndexChanged, [=](int idx) { setFirstDayOfWeek(idx + 1); });
     connect(primaryMainCombo, &QComboBox::currentIndexChanged, this, &PlanningCalendarWindow::updateActivities);
     connect(primaryFallbackCombo, &QComboBox::currentIndexChanged, this, &PlanningCalendarWindow::updateActivities);
     connect(secondaryCombo, &QComboBox::currentIndexChanged, this, &PlanningCalendarWindow::updateActivities);
+    connect(tertiaryCombo, &QComboBox::currentIndexChanged, this, &PlanningCalendarWindow::updateActivities);
 #endif
     connect(summaryMonthCheck, &QCheckBox::toggled, this, &PlanningCalendarWindow::setSummaryVisibleMonth);
     connect(multiMetricSelector, &MultiMetricSelector::selectedChanged, this, &PlanningCalendarWindow::updateActivities);
@@ -458,6 +481,26 @@ PlanningCalendarWindow::updateSecondaryConfigCombo
 
     secondaryCombo->blockSignals(false);
     setSecondaryMetric(symbol);
+}
+
+
+void
+PlanningCalendarWindow::updateTertiaryConfigCombo
+()
+{
+    QString field = getTertiaryField();
+
+    tertiaryCombo->blockSignals(true);
+    tertiaryCombo->clear();
+    QList<FieldDefinition> fieldsDefs = GlobalContext::context()->rideMetadata->getFields();
+    for (const FieldDefinition &fieldDef : fieldsDefs) {
+        if (fieldDef.isTextField()) {
+            tertiaryCombo->addItem(fieldDef.name);
+        }
+    }
+
+    tertiaryCombo->blockSignals(false);
+    setTertiaryField(field);
 }
 
 
@@ -514,6 +557,11 @@ PlanningCalendarWindow::getActivities
             activity.secondary = "";
             activity.secondaryMetric = "";
         }
+        activity.tertiary = rideItem->getText(getTertiaryField(), "").trimmed();
+        activity.primary = Utils::unprotect(activity.primary);
+        activity.secondary = Utils::unprotect(activity.secondary);
+        activity.secondaryMetric = Utils::unprotect(activity.secondaryMetric);
+        activity.tertiary = Utils::unprotect(activity.tertiary);
 
         activity.iconFile = IconManager::instance().getFilepath(rideItem);
         if (rideItem->color.alpha() < 255 || rideItem->planned) {
