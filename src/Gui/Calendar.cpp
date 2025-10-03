@@ -202,7 +202,7 @@ CalendarDayTable::setDay
     item->setData(Qt::UserRole, date);
     CalendarDay day;
     day.date = date;
-    day.isDimmed = false;
+    day.isDimmed = DayDimLevel::None;
     item->setData(Qt::UserRole + 1, QVariant::fromValue(day));
     setItem(0, 1, item);
     setSelectionMode(QAbstractItemView::NoSelection);
@@ -699,7 +699,12 @@ CalendarMonthTable::setMonth
         int col = (date.dayOfWeek() - firstDayOfWeek + 7) % 7;
         QTableWidgetItem *item = new QTableWidgetItem();
         item->setData(Qt::UserRole, date);
-        bool isDimmed = ! dr.pass(date);
+        DayDimLevel isDimmed = DayDimLevel::None;
+        if (! dr.pass(date)) {
+            isDimmed = DayDimLevel::Full;
+        } else if (date.month() != dateInMonth.month()) {
+            isDimmed = DayDimLevel::Partial;
+        }
         CalendarDay day;
         day.date = date;
         day.isDimmed = isDimmed;

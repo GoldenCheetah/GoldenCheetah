@@ -309,6 +309,7 @@ PlanningCalendarWindow::configChanged
             activeWindow = GCColor::inactiveColor(activeWindow, 0.2);
             activeButtonBg = alternateBg;
             disabledButtonBg = GCColor::inactiveColor(activeButtonBg, 0.3);
+            inactiveText = GCColor::inactiveColor(activeText, 2.5);
         }
 
         QPalette palette;
