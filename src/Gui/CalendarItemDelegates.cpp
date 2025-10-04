@@ -657,9 +657,14 @@ CalendarTimeScaleDelegate::paint
 
 QSize
 CalendarTimeScaleDelegate::sizeHint
-(const QStyleOptionViewItem& option, const QModelIndex& index) const
+(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    return QStyledItemDelegate::sizeHint(option, index);
+    Q_UNUSED(index)
+
+    QFont font = option.font;
+    font.setPointSizeF(font.pointSizeF() * 0.9);
+    QFontMetrics fm(font);
+    return QSize(fm.horizontalAdvance("00:00") + 10 * dpiXFactor, option.rect.height());
 }
 
 
@@ -715,8 +720,8 @@ CalendarDayDelegate::paint
     }
 
     if (pressedEntryIdx < 0 && opt.state & QStyle::State_Selected) {
-        bgColor = opt.palette.color(calendarDay.isDimmed ? QPalette::Disabled : QPalette::Active, QPalette::Highlight);
-    } else if (calendarDay.isDimmed) {
+        bgColor = opt.palette.color(calendarDay.isDimmed == DayDimLevel::Full ? QPalette::Disabled : QPalette::Active, QPalette::Highlight);
+    } else if (calendarDay.isDimmed == DayDimLevel::Full) {
         bgColor = opt.palette.color(QPalette::Disabled, QPalette::Base);
     } else {
         bgColor = opt.palette.base().color();
@@ -749,16 +754,16 @@ CalendarDayDelegate::paint
         dayRect.setX(opt.rect.x() + 1);
         dayRect.setWidth(dayRect.width() - 1);
         painter->save();
-        painter->setPen(opt.palette.color(calendarDay.isDimmed ? QPalette::Disabled : QPalette::Active, QPalette::Base)),
-        painter->setBrush(opt.palette.color(calendarDay.isDimmed ? QPalette::Disabled : QPalette::Active, QPalette::Highlight)),
+        painter->setPen(opt.palette.color(calendarDay.isDimmed == DayDimLevel::Full ? QPalette::Disabled : QPalette::Active, QPalette::Base)),
+        painter->setBrush(opt.palette.color(calendarDay.isDimmed == DayDimLevel::Full ? QPalette::Disabled : QPalette::Active, QPalette::Highlight)),
         painter->drawRoundedRect(dayRect, 2 * radius, 2 * radius);
         painter->restore();
-        dayColor = opt.palette.color(calendarDay.isDimmed ? QPalette::Disabled : QPalette::Active, QPalette::HighlightedText);
+        dayColor = opt.palette.color((calendarDay.isDimmed == DayDimLevel::Full || calendarDay.isDimmed == DayDimLevel::Partial) ? QPalette::Disabled : QPalette::Active, QPalette::HighlightedText);
         alignFlags = Qt::AlignHCenter | Qt::AlignTop;
     } else if (pressedEntryIdx < 0 && opt.state & QStyle::State_Selected) {
-        dayColor = opt.palette.color(calendarDay.isDimmed ? QPalette::Disabled : QPalette::Active, QPalette::HighlightedText);
+        dayColor = opt.palette.color((calendarDay.isDimmed == DayDimLevel::Full || calendarDay.isDimmed == DayDimLevel::Partial) ? QPalette::Disabled : QPalette::Active, QPalette::HighlightedText);
     } else {
-        dayColor = opt.palette.color(calendarDay.isDimmed ? QPalette::Disabled : QPalette::Active, QPalette::Text);
+        dayColor = opt.palette.color((calendarDay.isDimmed == DayDimLevel::Full || calendarDay.isDimmed == DayDimLevel::Partial) ? QPalette::Disabled : QPalette::Active, QPalette::Text);
     }
 
     painter->setFont(dayFont);
@@ -1011,7 +1016,7 @@ CalendarSummaryDelegate::paint
 (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     bool hasToolTip = false;
-    const QColor bgColor = GCColor::inactiveColor(option.palette.color(QPalette::Active, QPalette::Base));
+    const QColor bgColor = option.palette.color(QPalette::Active, QPalette::AlternateBase);
     const QColor fgColor = option.palette.color(QPalette::Active, QPalette::Text);
     const CalendarSummary summary = index.data(Qt::UserRole).value<CalendarSummary>();
     QFont valueFont(painter->font());

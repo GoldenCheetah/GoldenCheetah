@@ -21,6 +21,7 @@
 #include <QHeaderView>
 #include <QHBoxLayout>
 #include <QTextEdit>
+#include <QScrollArea>
 #include <QEvent>
 #include <QMouseEvent>
 #include <QMenu>
@@ -201,7 +202,7 @@ CalendarDayTable::setDay
     item->setData(Qt::UserRole, date);
     CalendarDay day;
     day.date = date;
-    day.isDimmed = false;
+    day.isDimmed = DayDimLevel::None;
     item->setData(Qt::UserRole + 1, QVariant::fromValue(day));
     setItem(0, 1, item);
     setSelectionMode(QAbstractItemView::NoSelection);
@@ -698,7 +699,12 @@ CalendarMonthTable::setMonth
         int col = (date.dayOfWeek() - firstDayOfWeek + 7) % 7;
         QTableWidgetItem *item = new QTableWidgetItem();
         item->setData(Qt::UserRole, date);
-        bool isDimmed = ! dr.pass(date);
+        DayDimLevel isDimmed = DayDimLevel::None;
+        if (! dr.pass(date)) {
+            isDimmed = DayDimLevel::Full;
+        } else if (date.month() != dateInMonth.month()) {
+            isDimmed = DayDimLevel::Partial;
+        }
         CalendarDay day;
         day.date = date;
         day.isDimmed = isDimmed;
@@ -1216,6 +1222,7 @@ CalendarDayView::CalendarDayView
 : QWidget(parent), athleteMeasures(athleteMeasures)
 {
     dayDateSelector = new CalendarOverview();
+    dayDateSelector->setFixedHeight(std::max(static_cast<int>(280 * dpiYFactor), dayDateSelector->sizeHint().height()));
 
     dayPhaseLabel = new QLabel(tr("No Phase"));
     dayPhaseLabel->setWordWrap(true);
@@ -1229,12 +1236,13 @@ CalendarDayView::CalendarDayView
     leftPaneLayout->addWidget(dayPhaseLabel);
     leftPaneLayout->addWidget(dayEventLabel);
     leftPaneLayout->addWidget(measureTabs, 1);
+    dayLeftPane->setFixedWidth(dayDateSelector->sizeHint().width() + leftPaneLayout->contentsMargins().left() + leftPaneLayout->contentsMargins().right());
 
     dayTable = new CalendarDayTable(dateInMonth);
 
     QHBoxLayout *dayLayout = new QHBoxLayout(this);
-    dayLayout->addWidget(dayLeftPane, 1);
-    dayLayout->addWidget(dayTable, 3);
+    dayLayout->addWidget(dayLeftPane);
+    dayLayout->addWidget(dayTable);
 
     connect(dayDateSelector, &QCalendarWidget::selectionChanged, [=]() {
         if (dayTable->selectedDate() != dayDateSelector->selectedDate()) {
@@ -1375,21 +1383,30 @@ CalendarDayView::updateMeasures
                     form->addRow(measuresGroup->getFieldNames()[i], new QLabel(measureText));
                 }
             }
-            QTextEdit *commentField = new QTextEdit();
-            commentField->setAcceptRichText(false);
-            commentField->setReadOnly(true);
-            commentField->setText(measure.comment);
-            form->addRow(tr("Comment"), commentField);
+            if (! measure.comment.isEmpty()) {
+                QTextEdit *commentField = new QTextEdit();
+                commentField->setAcceptRichText(false);
+                commentField->setReadOnly(true);
+                commentField->setText(measure.comment);
+                commentField->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+                form->addRow(commentField);
+            }
             QLocale locale;
             QString validText = locale.toString(measure.when, QLocale::ShortFormat);
             int validDays = measure.when.date().daysTo(date);
             if (validDays > 1) {
-                validText.append(tr(" (%1 days earlier)").arg(validDays));
+                validText.append(tr("\n(%1 days earlier)").arg(validDays));
             } else if (validDays > 0) {
-                validText.append(tr(" (%1 day earlier)").arg(validDays));
+                validText.append(tr("\n(%1 day earlier)").arg(validDays));
             }
             form->addRow(tr("Valid since"), new QLabel(validText));
-            measureLayout->addLayout(form);
+            QWidget *scrollWidget = new QWidget();
+            scrollWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+            scrollWidget->setLayout(form);
+            QScrollArea *scrollArea = new QScrollArea();
+            scrollArea->setWidget(scrollWidget);
+            scrollArea->setWidgetResizable(true);
+            measureLayout->addWidget(scrollArea);
             if (validDays == 0) {
                 buttonType = 1;
             }
@@ -1427,6 +1444,7 @@ CalendarDayView::updateMeasures
     if (measureTabs->count() > currentIndex) {
         measureTabs->setCurrentIndex(currentIndex);
     }
+    PaletteApplier::setPaletteRecursively(measureTabs, this->palette(), true);
 }
 
 
@@ -1544,6 +1562,7 @@ Calendar::Calendar
     dayAction = toolbar->addAction(tr("Day"));
     dayAction->setCheckable(true);
     dayAction->setActionGroup(viewGroup);
+
     connect(dayAction, &QAction::triggered, [=]() { setView(CalendarView::Day); });
 
     monthAction = toolbar->addAction(tr("Month"));

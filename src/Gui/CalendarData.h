@@ -58,9 +58,15 @@ struct CalendarEntryLayout {
     int columnCount;
 };
 
+enum class DayDimLevel {
+    None,
+    Full,
+    Partial
+};
+
 struct CalendarDay {
     QDate date;
-    bool isDimmed;
+    DayDimLevel isDimmed;
     QList<CalendarEntry> entries = QList<CalendarEntry>();
     QList<CalendarEntry> headlineEntries = QList<CalendarEntry>();
 };
