@@ -73,6 +73,10 @@ ZwoParser::startElement(const QString &, const QString &, const QString &qName, 
         int from = int(100.0 * PowerLow);
         int to = int(100.0 * PowerHigh);
 
+        if (qName == "Cooldown" && from < to) {
+            std::swap(from, to);
+        }
+
         // some kind of old kludge, should be flat, but isn't always
         if (qName == "SteadyState") {
             int ap = (from+to) / 2;
