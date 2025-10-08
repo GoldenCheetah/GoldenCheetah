@@ -105,7 +105,7 @@ Perspective::Perspective(Context *context, QString title, int type) :
 
     switch(this->type_) {
     case VIEW_ANALYSIS: view="analysis"; break;
-    case VIEW_DIARY: view="diary"; break;
+    case VIEW_PLAN: view="plan"; break;
     case VIEW_TRENDS: view="home"; break;
     case VIEW_TRAIN: view="train"; break;
     }
@@ -1773,15 +1773,13 @@ ImportChartDialog::ImportChartDialog(Context *context, QList<QMap<QString,QStrin
         // convert to user name for view from here, since
         // they won't recognise the names used internally
         // as they need to be translated too
-        if (view == "diary") view = tr("Diary");
+        if (view == "plan") view = tr("Plan");
         if (view == "home") view = tr("Trends");
         if (view == "analysis") view = tr("Activities");
         if (view == "train") view = tr("Train");
 
         QTableWidgetItem *t;
 #ifndef GC_HAVE_ICAL
-        // diary not available!
-        if (view == tr("Diary"))  view = tr("Trends");
         // View
         t = new QTableWidgetItem;
         t->setText(view);
@@ -1789,14 +1787,14 @@ ImportChartDialog::ImportChartDialog(Context *context, QList<QMap<QString,QStrin
         table->setItem(i, 1, t);
 
 #else
-        // we should be able to select trend/diary
-        if (view == tr("Diary") || view == tr("Trends")) {
+        // we should be able to select trend/plan
+        if (view == tr("Plan") || view == tr("Trends")) {
 
             QComboBox *com = new QComboBox(this);
-            com->addItem(tr("Diary"));
+            com->addItem(tr("Plan"));
             com->addItem(tr("Trends"));
             table->setCellWidget(i,1,com);
-            if (view == tr("Diary")) com->setCurrentIndex(0);
+            if (view == tr("Plan")) com->setCurrentIndex(0);
             else com->setCurrentIndex(1);
 
         } else {
@@ -1848,7 +1846,7 @@ ImportChartDialog::importClicked()
             if (com) {
                 switch(com->currentIndex()) {
 
-                    case 0 : view = tr("Diary"); break;
+                    case 0 : view = tr("Plan"); break;
 
                     default:
                     case 1 : view = tr("Trends"); break;
@@ -1860,7 +1858,7 @@ ImportChartDialog::importClicked()
             int x=0;
             if (view == tr("Trends"))      { x=0; context->mainWindow->selectTrends(); }
             if (view == tr("Activities"))  { x=1; context->mainWindow->selectAnalysis(); }
-            if (view == tr("Diary"))       { x=2; context->mainWindow->selectDiary(); }
+            if (view == tr("Plan"))        { x=2; context->mainWindow->selectPlan(); }
             if (view == tr("Train"))       { x=3; context->mainWindow->selectTrain(); }
 
             // add to the currently selected tab and select if only adding one chart

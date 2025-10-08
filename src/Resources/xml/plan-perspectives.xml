@@ -1,0 +1,18 @@
+<layouts>
+    <layout name="General" style="0" type="4" expression="" trainswitch="0">
+        <chart id="52" name="" title="Planning Calendar" >
+            <property name="title" type="QString" value="Planning Calendar" />
+            <property name="subtitle" type="QString" value="" />
+            <property name="widthFactor" type="double" value="2" />
+            <property name="heightFactor" type="double" value="2" />
+            <property name="style" type="int" value="0" />
+            <property name="resizable" type="bool" value="0" />
+            <property name="firstDayOfWeek" type="int" value="1" />
+            <property name="summaryVisibleMonth" type="bool" value="1" />
+            <property name="primaryMainField" type="QString" value="Workout Code" />
+            <property name="primaryFallbackField" type="QString" value="Workout Code" />
+            <property name="secondaryMetric" type="QString" value="workout_time" />
+            <property name="summaryMetrics" type="QString" value="ride_count,total_distance,coggan_tss,workout_time" />
+        </chart>
+    </layout>
+</layouts>
