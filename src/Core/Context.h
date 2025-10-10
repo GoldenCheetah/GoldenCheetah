@@ -222,6 +222,9 @@ class Context : public QObject
         void notifySeek(long x) { emit seek(x); }
         void notifyIntensityChanged(int intensity) { emit intensityChanged(intensity); };
 
+        void notifySetNotification(const QString &msg, int timeout) { emit setNotification(msg, timeout); };
+        void notifyClearNotification() { emit clearNotification(); };
+
         // date range selection
         void notifyDateRangeChanged(DateRange x) { dr_=x; emit dateRangeSelected(x); }
         void notifyWorkoutsChanged() { emit workoutsChanged(); }
@@ -353,6 +356,9 @@ class Context : public QObject
         void pause();
         void stop();
         void intensityChanged(int intensity);
+
+        void setNotification(const QString &msg, int timeout);
+        void clearNotification();
 
         // R messages
         void rMessage(QString);

@@ -21,9 +21,6 @@
 #include "Context.h"
 #include "HelpWhatsThis.h"
 
-#include <QFormLayout>
-#include <QGroupBox>
-
 
 WorkoutPlotWindow::WorkoutPlotWindow(Context *context) :
     GcChartWindow(context), context(context)
@@ -31,35 +28,35 @@ WorkoutPlotWindow::WorkoutPlotWindow(Context *context) :
     HelpWhatsThis *helpContents = new HelpWhatsThis(this);
     this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::ChartTrain_Workout));
 
-    // Chart settings
-    QWidget *settingsWidget = new QWidget(this);
-    settingsWidget->setContentsMargins(0, 0, 0, 0);
+    ctrlsShowNotification = new QCheckBox();
+    connect(ctrlsShowNotification, &QCheckBox::toggled, this, &WorkoutPlotWindow::setShowNotifications);
 
-    QVBoxLayout *commonLayout = new QVBoxLayout(settingsWidget);
+    ctrlsCommonLabel = new QLabel();
+    ctrlsErgmodeLabel = new QLabel();
 
-    ctrlsGroupBox = new QGroupBox(tr("Ergmode specific settings"));
-    commonLayout->addWidget(ctrlsGroupBox);
-    commonLayout->addStretch();
-
-    QFormLayout *ergmodeLayout = new QFormLayout(ctrlsGroupBox);
-
-    ctrlsSituationLabel = new QLabel(tr("Color power zones"));
+    ctrlsSituationLabel = new QLabel();
     ctrlsSituation = new QComboBox();
-    ctrlsSituation->addItem(tr("Never"));
-    ctrlsSituation->addItem(tr("Always"));
-    ctrlsSituation->addItem(tr("When stopped"));
+    ctrlsSituation->addItem("");
+    ctrlsSituation->addItem("");
+    ctrlsSituation->addItem("");
     connect(ctrlsSituation, SIGNAL(currentIndexChanged(int)), this, SLOT(setShowColorZones(int)));
-    ergmodeLayout->addRow(ctrlsSituationLabel, ctrlsSituation);
 
-    ctrlsShowTooltipLabel = new QLabel(tr("Show tooltip"));
+    ctrlsShowTooltipLabel = new QLabel();
     ctrlsShowTooltip = new QComboBox();
-    ctrlsShowTooltip->addItem(tr("Never"));
-    ctrlsShowTooltip->addItem(tr("When stopped"));
+    ctrlsShowTooltip->addItem("");
+    ctrlsShowTooltip->addItem("");
     connect(ctrlsShowTooltip, SIGNAL(currentIndexChanged(int)), this, SLOT(setShowTooltip(int)));
-    ergmodeLayout->addRow(ctrlsShowTooltipLabel, ctrlsShowTooltip);
+
+    QFormLayout *settingsLayout = newQFormLayout();
+    settingsLayout->addRow(ctrlsCommonLabel);
+    settingsLayout->addRow("", ctrlsShowNotification);
+    settingsLayout->addItem(new QSpacerItem(0, 15 * dpiYFactor));
+    settingsLayout->addRow(ctrlsErgmodeLabel);
+    settingsLayout->addRow(ctrlsSituationLabel, ctrlsSituation);
+    settingsLayout->addRow(ctrlsShowTooltipLabel, ctrlsShowTooltip);
 
     setContentsMargins(0,0,0,0);
-    setControls(settingsWidget);
+    setControls(centerLayoutInWidget(settingsLayout, false));
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 
     QVBoxLayout *layout = new QVBoxLayout;
@@ -69,11 +66,36 @@ WorkoutPlotWindow::WorkoutPlotWindow(Context *context) :
     ergPlot = new ErgFilePlot(context);
     layout->addWidget(ergPlot);
 
+    QTimer *notificationTimer = new QTimer(this);
+
     connect(context, SIGNAL(setNow(long)), this, SLOT(setNow(long)));
     connect(context, SIGNAL(ergFileSelected(ErgFile*)), this, SLOT(ergFileSelected(ErgFile*)));
     connect(context, SIGNAL(telemetryUpdate(RealtimeData)), ergPlot, SLOT(performancePlot(RealtimeData)));
     connect(context, SIGNAL(start()), ergPlot, SLOT(start()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+
+    connect(notificationTimer, &QTimer::timeout, this, [=]() {
+        setProperty("subtitle", title);
+    });
+    connect(context, &Context::setNotification, this, [=](QString notification, int timeout) {
+        if (! showNotifications()) {
+            return;
+        }
+        if (timeout > 0) {
+            notificationTimer->setInterval(timeout * 1000);
+            notificationTimer->setSingleShot(true);
+            notificationTimer->start();
+        } else {
+            notificationTimer->stop();
+        }
+
+        setProperty("subtitle", notification);
+    });
+    connect(context, &Context::clearNotification, this, [=]() {
+        setProperty("subtitle", title);
+    });
+
+    configChanged(0);
 
     // Initil setup based on currently selected workout
     ergFileSelected(context->currentErgFile());
@@ -83,8 +105,9 @@ void
 WorkoutPlotWindow::ergFileSelected(ErgFile *f)
 {
     // rename window to workout name
-    if (f && f->name() != "") setProperty("subtitle", f->name());
-    else setProperty("subtitle", "");
+    if (f && f->name() != "") title = f->name();
+    else title = "";
+    setProperty("subtitle", title);
 
     ergPlot->setData(f);
     ergPlot->replot();
@@ -102,7 +125,11 @@ WorkoutPlotWindow::configChanged(qint32)
 {
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 
-    ctrlsGroupBox->setTitle(tr("Ergmode specific settings"));
+    ctrlsCommonLabel->setText("<b>" + tr("Common settings") + "</b>");
+
+    ctrlsShowNotification->setText(tr("Show notifications and textcues in title"));
+
+    ctrlsErgmodeLabel->setText("<b>" + tr("Ergmode specific settings") + "</b>");
     ctrlsSituationLabel->setText(tr("Color power zones"));
     ctrlsSituation->setItemText(0, tr("Never"));
     ctrlsSituation->setItemText(1, tr("Always"));
@@ -113,6 +140,25 @@ WorkoutPlotWindow::configChanged(qint32)
     ctrlsShowTooltip->setItemText(1, tr("When stopped"));
 
     repaint();
+}
+
+
+bool
+WorkoutPlotWindow::showNotifications
+() const
+{
+    return ctrlsShowNotification->isChecked();
+}
+
+
+void
+WorkoutPlotWindow::setShowNotifications
+(bool show)
+{
+    if (! show) {
+        setProperty("subtitle", title);
+    }
+    ctrlsShowNotification->setChecked(show);
 }
 
 

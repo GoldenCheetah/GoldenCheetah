@@ -138,8 +138,6 @@ class TrainSidebar : public GcWindow
         void pause();
         void stop();
         void statusChanged(int status);
-        void setNotification(QString msg, int timeout);
-        void clearNotification(void);
 
     private slots:
         void deviceTreeWidgetSelectionChanged();
