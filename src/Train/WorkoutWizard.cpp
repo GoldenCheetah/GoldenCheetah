@@ -97,7 +97,7 @@ WorkoutEditorBase::WorkoutEditorBase(QStringList &colms, QWidget *parent) :QFram
     row2Layout->addWidget(addButton);
     QPushButton *insertButton = new QPushButton();
     insertButton->setText(tr("Insert"));
-    insertButton->setToolTip(tr("Add a Lap below the highlighted row"));
+    insertButton->setToolTip(tr("Add a Row above the highlighted row"));
     connect(insertButton,SIGNAL(clicked()),this,SLOT(insertButtonClicked()));
     row2Layout->addWidget(insertButton);
     QPushButton *lapButton = new QPushButton();
