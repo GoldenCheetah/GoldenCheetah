@@ -28,6 +28,8 @@
 #include "TrainBottom.h"
 #include "Specification.h"
 
+#include <utility>
+
 AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) :
         AbstractView(context, VIEW_ANALYSIS, "analysis", tr("Compare Activities and Intervals"))
 {
@@ -77,28 +79,41 @@ AnalysisView::setRide(RideItem *ride)
     // then lets go find one to switch to..
     if (context->mainWindow->athleteTab()->currentView() == 1 && page()->relevant(ride) != true) {
 
-        // lets find one to switch to
-        Perspective *found=page();
-        foreach(Perspective *p, perspectives_){
-            if (p->relevant(ride)) {
-                found =p;
-                break;
-            }
-        }
-
-        // none of them want to be selected, so we can stay on the current one
-        // so long as it doesn't have an expression that failed...
-        if (found == page() && page()->expression() != "")
-            found = perspectives_[0];
+        // lets find a perspective to switch to
+        std::pair<int, Perspective*> found = findRidesPerspective(ride);
 
         // if we need to switch, i.e. not already on it
-        if (found != page())  {
-            context->mainWindow->switchPerspective(perspectives_.indexOf(found));
+        if (found.second != page())  {
+            context->mainWindow->switchPerspective(found.first);
         }
     }
 
     // tell the perspective we have selected a ride
     page()->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
+}
+
+std::pair<int, Perspective*>
+AnalysisView::findRidesPerspective(RideItem* ride)
+{
+    std::pair<int, Perspective*> found = std::make_pair(perspectives_.indexOf(page()), page());
+
+    // lets find one to switch to
+    foreach(Perspective *p, perspectives_){
+        if (p->relevant(ride)) {
+            found.first = perspectives_.indexOf(p);
+            found.second = p;
+            break;
+        }
+    }
+
+    // none of them want to be selected, so we can stay on the current one
+    // so long as it doesn't have an expression that failed...
+    if (found.second == page() && page()->expression() != "") {
+        found.first = 0;
+        found.second = perspectives_.first();
+    }
+
+    return found;
 }
 
 void
@@ -155,12 +170,12 @@ AnalysisView::notifyViewSidebarChanged() {
     }
 }
 
-void
-AnalysisView::setViewSpecificPerspective() {
+int
+AnalysisView::getViewSpecificPerspective() {
 
     // Setting the ride for analysis view also sets the perspective.
     RideItem* ride = (RideItem*)context->currentRideItem();
-    if (ride != NULL) setRide(ride);
+    return findRidesPerspective(ride).first;
 }
 
 void

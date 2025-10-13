@@ -51,9 +51,12 @@ class AnalysisView : public AbstractView
 
         void notifyViewStateRestored() override;
         void notifyViewSidebarChanged() override;
-        void setViewSpecificPerspective() override;
+        int getViewSpecificPerspective() override;
         void notifyViewSplitterMoved() override;
 
+    private:
+
+        std::pair<int, Perspective*> findRidesPerspective(RideItem* ride);
 };
 
 class DiarySidebar;

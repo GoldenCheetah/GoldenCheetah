@@ -188,8 +188,8 @@ class AbstractView : public QWidget
         virtual void notifyViewStateRestored() {}
         virtual void notifyViewPerspectiveAdded(Perspective* page);
         virtual void notifyViewSidebarChanged() {}
-        virtual void setViewSpecificPerspective() {};
-        virtual void notifyViewSplitterMoved() {};
+        virtual int getViewSpecificPerspective() { return 0; }
+        virtual void notifyViewSplitterMoved() {}
 
     private slots:
         void onIdle();
