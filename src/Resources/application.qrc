@@ -153,9 +153,7 @@
         <file>images/breeze/light/up.svg</file>
         <file>images/breeze/light/down.svg</file>
         <file>images/breeze/light/cal.svg</file>
-        <file>images/breeze/light/go-next-skip.svg</file>
         <file>images/breeze/light/go-next.svg</file>
-        <file>images/breeze/light/go-previous-skip.svg</file>
         <file>images/breeze/light/go-previous.svg</file>
         <file>images/breeze/dark/unknown.svg</file>
         <file>images/breeze/dark/offline.svg</file>
@@ -171,9 +169,7 @@
         <file>images/breeze/dark/up.svg</file>
         <file>images/breeze/dark/down.svg</file>
         <file>images/breeze/dark/cal.svg</file>
-        <file>images/breeze/dark/go-next-skip.svg</file>
         <file>images/breeze/dark/go-next.svg</file>
-        <file>images/breeze/dark/go-previous-skip.svg</file>
         <file>images/breeze/dark/go-previous.svg</file>
         <file>images/toolbar/close-icon.png</file>
         <file>images/toolbar/save.png</file>
