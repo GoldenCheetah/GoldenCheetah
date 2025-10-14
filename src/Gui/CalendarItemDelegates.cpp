@@ -30,6 +30,79 @@
 #include "CalendarData.h"
 #include "Colors.h"
 
+static bool toolTipHeadlineEntry(const QPoint &pos, QAbstractItemView *view, const CalendarDay &day, int idx);
+static bool toolTipDayEntry(const QPoint &pos, QAbstractItemView *view, const CalendarDay &day, int idx);
+static bool toolTipMore(const QPoint &pos, QAbstractItemView *view, const CalendarDay &day);
+static QRect paintHeadline(QPainter *painter, const QStyleOptionViewItem &opt, const QModelIndex &index, HitTester &headlineTester, const QString &dateFormat, int pressedEntryIdx, int leftMargin, int rightMargin, int topMargin, int lineSpacing, int radius);
+
+
+//////////////////////////////////////////////////////////////////////////////
+// TimeScaleData
+
+HitTester::HitTester
+()
+{
+}
+
+void
+HitTester::clear
+(const QModelIndex &index)
+{
+    rects[index].clear();
+}
+
+
+void
+HitTester::resize
+(const QModelIndex &index, qsizetype size)
+{
+#if QT_VERSION < 0x060000
+    rects[index].clear();
+    for (int i = 0; i < size; ++i) {
+        rects[index] << QRect();
+    }
+#else
+    rects[index].resize(size);
+#endif
+}
+
+
+void
+HitTester::append
+(const QModelIndex &index, const QRect &rect)
+{
+    rects[index].append(rect);
+}
+
+
+bool
+HitTester::set
+(const QModelIndex &index, qsizetype i, const QRect &rect)
+{
+    bool ret = rects[index].count() > i;
+    if (ret) {
+        rects[index][i] = rect;
+    }
+    return ret;
+}
+
+
+int
+HitTester::hitTest
+(const QModelIndex &index, const QPoint &pos) const
+{
+    if (! rects.contains(index)) {
+        return -1;
+    }
+    const QList<QRect> &indexRects = rects[index];
+    for (int i = 0; i < indexRects.size(); ++i) {
+        if (indexRects[i].contains(pos)) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 
 //////////////////////////////////////////////////////////////////////////////
 // TimeScaleData
@@ -108,7 +181,7 @@ TimeScaleData::pixelsPerMinute
 
 
 int
-TimeScaleData::minuteToY
+TimeScaleData::minuteToYInTable
 (int minute, int rectTop, int rectHeight) const
 {
     if (minute < _firstMinute) {
@@ -120,32 +193,32 @@ TimeScaleData::minuteToY
 
     int totalMinutes = _lastMinute - _firstMinute;
     double pixelsPerMinute = static_cast<double>(rectHeight) / totalMinutes;
-    return std::min(rectHeight, rectTop + static_cast<int>((minute - _firstMinute) * pixelsPerMinute));
+    return rectTop + std::min(rectHeight, static_cast<int>((minute - _firstMinute) * pixelsPerMinute));
 }
 
 
 int
-TimeScaleData::minuteToY
+TimeScaleData::minuteToYInTable
 (int minute, const QRect &rect) const
 {
-    return minuteToY(minute, rect.top(), rect.height());
+    return minuteToYInTable(minute, rect.top(), rect.height());
 }
 
 
 int
-TimeScaleData::minuteToY
+TimeScaleData::minuteToYInTable
 (const QTime &time, const QRect& rect) const
 {
-    return minuteToY(time.hour() * 60 + time.minute(), rect.top(), rect.height());
+    return minuteToYInTable(time.hour() * 60 + time.minute(), rect.top(), rect.height());
 }
 
 
 QTime
-TimeScaleData::timeFromY
+TimeScaleData::timeFromYInTable
 (int y, const QRect &rect, int snap) const
 {
     int s = std::max(1, snap);
-    int minute = trunc((_firstMinute + y / pixelsPerMinute(rect)) / s) * s;
+    int minute = trunc((_firstMinute + (y - rect.top()) / pixelsPerMinute(rect)) / s) * s;
     return QTime(0, 0).addSecs(60 * minute);
 }
 
@@ -201,9 +274,8 @@ ColumnDelegatingItemDelegate::helpEvent
     QStyledItemDelegate *delegate = delegates.value(index.column(), nullptr);
     if (delegate != nullptr) {
         return delegate->helpEvent(event, view, option, index);
-    } else {
-        return QStyledItemDelegate::helpEvent(event, view, option, index);
     }
+    return QStyledItemDelegate::helpEvent(event, view, option, index);
 }
 
 
@@ -260,9 +332,9 @@ ColumnDelegatingItemDelegate::updateEditorGeometry
 
 
 //////////////////////////////////////////////////////////////////////////////
-// CalendarDayViewDayDelegate
+// CalendarDetailedDayDelegate
 
-CalendarDayViewDayDelegate::CalendarDayViewDayDelegate
+CalendarDetailedDayDelegate::CalendarDetailedDayDelegate
 (TimeScaleData const * const timeScaleData, QObject *parent)
 : QStyledItemDelegate(parent), timeScaleData(timeScaleData)
 {
@@ -270,13 +342,8 @@ CalendarDayViewDayDelegate::CalendarDayViewDayDelegate
 
 
 void
-CalendarDayViewDayDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+CalendarDetailedDayDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if (index.row() != 0) {
-        QStyledItemDelegate::paint(painter, option, index);
-        return;
-    }
-
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing, true);
 
@@ -288,25 +355,25 @@ CalendarDayViewDayDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     if (! ok) {
         pressedEntryIdx = -2;
     }
-    QDate date = index.data(Qt::UserRole).toDate();
     CalendarDay calendarDay = index.data(Qt::UserRole + 1).value<CalendarDay>();
     QList<CalendarEntryLayout> layout = index.data(Qt::UserRole + 3).value<QList<CalendarEntryLayout>>();
-#if QT_VERSION < 0x060000
-    entryRects[index].clear();
-    for (int i = 0; i < layout.count(); ++i) {
-        entryRects[index] << QRect();
+    entryTester.resize(index, layout.count());
+
+    // Background
+    QColor bgColor;
+    if (calendarDay.isDimmed == DayDimLevel::Full) {
+        bgColor = opt.palette.color(QPalette::Disabled, QPalette::Base);
+    } else {
+        bgColor = opt.palette.base().color();
     }
-#else
-    entryRects[index].resize(layout.count());
-#endif
-    bool isToday = (date == QDate::currentDate());
+    painter->fillRect(opt.rect, bgColor);
 
     // Horizontal Lines
     painter->save();
     QPen linePen(Qt::lightGray, 1, Qt::DotLine);
     painter->setPen(linePen);
     for (int minute = timeScaleData->firstMinute(); minute <= timeScaleData->lastMinute(); minute += timeScaleData->stepSize()) {
-        int y = timeScaleData->minuteToY(minute, option.rect);
+        int y = timeScaleData->minuteToYInTable(minute, option.rect);
         painter->drawLine(option.rect.left(), y, option.rect.right(), y);
     }
     painter->restore();
@@ -335,15 +402,15 @@ CalendarDayViewDayDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         int endMinute = startMinute + entry.durationSecs / 60;
         int columnWidth = (rectWidth - (l.columnCount - 1) * columnSpacing) / std::max(1, l.columnCount);
         int left = rectLeft + l.columnIndex * (columnWidth + columnSpacing);
-        int top = timeScaleData->minuteToY(startMinute, option.rect);
-        int bottom = timeScaleData->minuteToY(endMinute, option.rect);
+        int top = timeScaleData->minuteToYInTable(startMinute, option.rect);
+        int bottom = timeScaleData->minuteToYInTable(endMinute, option.rect);
         int height = std::max(1, bottom - top);
         int numLines = (height + priSecSpacing) / (lineHeight + priSecSpacing);
 
         painter->save();
         QRect entryRect(left, top, columnWidth, height);
-        entryRects[index][l.entryIdx] = entryRect;
-        QColor entryBG = option.palette.base().color();
+        entryTester.set(index, l.entryIdx, entryRect);
+        QColor entryBG = bgColor;
         QColor entryFrame = entry.color;
         if (pressed) {
             entryBG = option.palette.highlight().color();
@@ -421,70 +488,22 @@ CalendarDayViewDayDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
 
 bool
-CalendarDayViewDayDelegate::helpEvent
+CalendarDetailedDayDelegate::helpEvent
 (QHelpEvent *event, QAbstractItemView *view, const QStyleOptionViewItem &option, const QModelIndex &index)
 {
     if (! event || ! view) {
         return false;
     }
-
     CalendarDay day = index.data(Qt::UserRole + 1).value<CalendarDay>();
-    int entryIdx = hitTestEntry(index, event->pos());
-    if (entryIdx >= 0 && entryIdx < day.entries.size()) {
-        CalendarEntry calEntry = day.entries[entryIdx];
-        QString tooltip = "<center><b>" + calEntry.primary + "</b>";
-        tooltip += "<br/>";
-        switch (calEntry.type) {
-        case ENTRY_TYPE_ACTIVITY:
-            tooltip += "[completed]";
-            break;
-        case ENTRY_TYPE_PLANNED_ACTIVITY:
-            tooltip += "[planned]";
-            break;
-        case ENTRY_TYPE_OTHER:
-        default:
-            tooltip += "[other]";
-            break;
-        }
-        tooltip += "<br/>";
-        if (! calEntry.secondary.isEmpty()) {
-            tooltip += calEntry.secondaryMetric + ": " + calEntry.secondary;
-            tooltip += "<br/>";
-        }
-        if (calEntry.start.isValid()) {
-            tooltip += calEntry.start.toString();
-            if (calEntry.durationSecs > 0) {
-                tooltip += " - " + calEntry.start.addSecs(calEntry.durationSecs).toString();
-            }
-        }
-        tooltip += "</center>";
-        QToolTip::showText(event->globalPos(), tooltip, view);
+    if (toolTipDayEntry(event->globalPos(), view, day, entryTester.hitTest(index, event->pos()))) {
         return true;
     }
-
     return QStyledItemDelegate::helpEvent(event, view, option, index);
 }
 
 
-int
-CalendarDayViewDayDelegate::hitTestEntry
-(const QModelIndex &index, const QPoint &pos) const
-{
-    if (! entryRects.contains(index)) {
-        return -1;
-    }
-    const QList<QRect> &rects = entryRects[index];
-    for (int i = 0; i < rects.size(); ++i) {
-        if (rects[i].contains(pos)) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-
 void
-CalendarDayViewDayDelegate::drawWrappingText
+CalendarDetailedDayDelegate::drawWrappingText
 (QPainter &painter, const QRect &rect, const QString &text) const
 {
     painter.save();
@@ -560,6 +579,69 @@ CalendarDayViewDayDelegate::drawWrappingText
 
 
 //////////////////////////////////////////////////////////////////////////////
+// CalendarHeadlineDelegate
+
+CalendarHeadlineDelegate::CalendarHeadlineDelegate
+(QObject *parent)
+: QStyledItemDelegate(parent)
+{
+}
+
+
+void
+CalendarHeadlineDelegate::paint
+(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    painter->save();
+    painter->setRenderHints(painter->renderHints() | QPainter::Antialiasing | QPainter::TextAntialiasing);
+    headlineTester.clear(index);
+
+    QStyleOptionViewItem opt = option;
+    initStyleOption(&opt, index);
+
+    const int leftMargin = 4 * dpiXFactor;
+    const int rightMargin = 4 * dpiXFactor;
+    const int topMargin = 2 * dpiYFactor;
+    const int bottomMargin = 4 * dpiYFactor;
+    const int lineSpacing = 2 * dpiYFactor;
+    const int iconSpacing = 2 * dpiXFactor;
+    const int radius = 4 * dpiXFactor;
+
+    // Headline: Date, Phases and Events
+    QRect dayRect = paintHeadline(painter, opt, index, headlineTester, tr("ddd, dd.MM."), -1, leftMargin, rightMargin, topMargin, lineSpacing, radius);
+    heightHint = dayRect.height();
+
+    painter->restore();
+}
+
+
+bool
+CalendarHeadlineDelegate::helpEvent
+(QHelpEvent *event, QAbstractItemView *view, const QStyleOptionViewItem &option, const QModelIndex &index)
+{
+    if (! event || ! view) {
+        return false;
+    }
+    CalendarDay day = index.data(Qt::UserRole + 1).value<CalendarDay>();
+    if (toolTipHeadlineEntry(event->globalPos(), view, day, headlineTester.hitTest(index, event->pos()))) {
+        return true;
+    }
+    return QStyledItemDelegate::helpEvent(event, view, option, index);
+}
+
+
+QSize
+CalendarHeadlineDelegate::sizeHint
+(const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    Q_UNUSED(option)
+    Q_UNUSED(index)
+
+    return QSize(0, heightHint);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
 // CalendarTimeScaleDelegate
 
 CalendarTimeScaleDelegate::CalendarTimeScaleDelegate
@@ -573,11 +655,6 @@ void
 CalendarTimeScaleDelegate::paint
 (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if (index.row() != 0) {
-        QStyledItemDelegate::paint(painter, option, index);
-        return;
-    }
-
     const int totalRangeMinutes = timeScaleData->lastMinute() - timeScaleData->firstMinute();
     const int cellHeight = option.rect.height();
     const double pixelsPerMinute = static_cast<double>(cellHeight) / totalRangeMinutes;
@@ -598,11 +675,9 @@ CalendarTimeScaleDelegate::paint
     int calculatedMinInterval = std::ceil(minPixelSpacing / pixelsPerMinute);
     int effectiveInterval = selectNiceInterval(calculatedMinInterval);
     timeScaleData->setStepSize(effectiveInterval);
-
     int previousYBottom = -labelHeight;
-
     for (int minute = timeScaleData->firstMinute(); minute <= timeScaleData->lastMinute(); minute += timeScaleData->stepSize()) {
-        int y = timeScaleData->minuteToY(minute, option.rect);
+        int y = timeScaleData->minuteToYInTable(minute, option.rect);
         QString timeLabel = QTime(0, 0).addSecs(minute * 60).toString("hh:mm");
 
         QRect textRect;
@@ -615,7 +690,6 @@ CalendarTimeScaleDelegate::paint
         } else {
             textRect = QRect(option.rect.left() + 4, y - labelHeight / 2, option.rect.width() - 8, labelHeight);
         }
-
         if (textRect.top() < previousYBottom + 2) {
             continue;
         }
@@ -629,12 +703,12 @@ CalendarTimeScaleDelegate::paint
         previousYBottom = textRect.bottom();
     }
     int blockY = -1;
-    QModelIndex scaleIndex = index.sibling(0, 0);
+    QModelIndex scaleIndex = index.siblingAtColumn(0);
     BlockIndicator blockIndicator = static_cast<BlockIndicator>(scaleIndex.data(Qt::UserRole + 1).toInt());
     if (blockIndicator == BlockIndicator::AllBlock) {
         blockY = option.rect.height();
     } else if (blockIndicator == BlockIndicator::BlockBeforeNow) {
-        blockY = timeScaleData->minuteToY(QTime::currentTime(), option.rect);
+        blockY = timeScaleData->minuteToYInTable(QTime::currentTime(), option.rect) - option.rect.top();
     }
     if (blockY >= 0) {
         QRect rect = option.rect;
@@ -644,7 +718,7 @@ CalendarTimeScaleDelegate::paint
         painter->fillRect(rect, blockColor);
     }
     int currentY = scaleIndex.data(Qt::UserRole).toInt();
-    if (currentY > blockY) {
+    if (currentY - option.rect.y() > blockY) {
         painter->save();
         painter->setPen(textPen);
         painter->drawLine(option.rect.left(), currentY, option.rect.width(), currentY);
@@ -683,9 +757,9 @@ CalendarTimeScaleDelegate::selectNiceInterval
 
 
 //////////////////////////////////////////////////////////////////////////////
-// CalendarDayDelegate
+// CalendarCompactDayDelegate
 
-CalendarDayDelegate::CalendarDayDelegate
+CalendarCompactDayDelegate::CalendarCompactDayDelegate
 (QObject *parent)
 : QStyledItemDelegate(parent)
 {
@@ -693,21 +767,19 @@ CalendarDayDelegate::CalendarDayDelegate
 
 
 void
-CalendarDayDelegate::paint
+CalendarCompactDayDelegate::paint
 (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     painter->save();
     painter->setRenderHints(painter->renderHints() | QPainter::Antialiasing | QPainter::TextAntialiasing);
-    entryRects[index].clear();
-    headlineEntryRects[index].clear();
+    entryTester.clear(index);
+    headlineTester.clear(index);
+    moreTester.clear(index);
 
     QStyleOptionViewItem opt = option;
     initStyleOption(&opt, index);
 
-    QDate date = index.data(Qt::UserRole).toDate();
     CalendarDay calendarDay = index.data(Qt::UserRole + 1).value<CalendarDay>();
-    bool isToday = (date == QDate::currentDate());
-
     QColor bgColor;
     QColor selColor = opt.palette.highlight().color();
     QColor dayColor;
@@ -738,57 +810,14 @@ CalendarDayDelegate::paint
     const int iconSpacing = 2 * dpiXFactor;
     const int radius = 4 * dpiXFactor;
 
-    // Day number / Headline
-    painter->save();
-    QFont dayFont = painter->font();
-    QFontMetrics dayFM(dayFont);
-    dayFont.setWeight(QFont::Bold);
-    int lineHeight = dayFM.height();
-    QRect dayRect(opt.rect.x() + leftMargin,
-                  opt.rect.y() + topMargin,
-                  std::max(dayFM.horizontalAdvance(QString::number(date.day())) + leftMargin, lineHeight) + leftMargin,
-                  lineHeight);
-
-    int alignFlags = Qt::AlignLeft | Qt::AlignTop;
-    if (isToday) {
-        dayRect.setX(opt.rect.x() + 1);
-        dayRect.setWidth(dayRect.width() - 1);
-        painter->save();
-        painter->setPen(opt.palette.color(calendarDay.isDimmed == DayDimLevel::Full ? QPalette::Disabled : QPalette::Active, QPalette::Base)),
-        painter->setBrush(opt.palette.color(calendarDay.isDimmed == DayDimLevel::Full ? QPalette::Disabled : QPalette::Active, QPalette::Highlight)),
-        painter->drawRoundedRect(dayRect, 2 * radius, 2 * radius);
-        painter->restore();
-        dayColor = opt.palette.color((calendarDay.isDimmed == DayDimLevel::Full || calendarDay.isDimmed == DayDimLevel::Partial) ? QPalette::Disabled : QPalette::Active, QPalette::HighlightedText);
-        alignFlags = Qt::AlignHCenter | Qt::AlignTop;
-    } else if (pressedEntryIdx < 0 && opt.state & QStyle::State_Selected) {
-        dayColor = opt.palette.color((calendarDay.isDimmed == DayDimLevel::Full || calendarDay.isDimmed == DayDimLevel::Partial) ? QPalette::Disabled : QPalette::Active, QPalette::HighlightedText);
-    } else {
-        dayColor = opt.palette.color((calendarDay.isDimmed == DayDimLevel::Full || calendarDay.isDimmed == DayDimLevel::Partial) ? QPalette::Disabled : QPalette::Active, QPalette::Text);
-    }
-
-    painter->setFont(dayFont);
-    painter->setPen(dayColor);
-    painter->drawText(dayRect, alignFlags, QString::number(date.day()));
-    painter->restore();
-
-    for (int i = 0; i < calendarDay.headlineEntries.size(); ++i) {
-        CalendarEntry calEntry = calendarDay.headlineEntries[i];
-        int x = opt.rect.x() + opt.rect.width() - rightMargin - i * (lineHeight + lineSpacing) - lineHeight;
-        if (x < dayRect.x() + dayRect.width() + lineSpacing) {
-            break;
-        }
-        QPixmap pixmap = svgOnBackground(calEntry.iconFile, QSize(lineHeight, lineHeight), 0, calEntry.color, radius);
-        QRect headlineEntryRect(x, opt.rect.y() + topMargin, lineHeight, lineHeight);
-        painter->drawPixmap(x, opt.rect.y() + topMargin, pixmap);
-        headlineEntryRects[index].append(headlineEntryRect);
-    }
+    // Headline: Date, Phases and Events
+    QRect dayRect = paintHeadline(painter, opt, index, headlineTester, tr("dd"), pressedEntryIdx, leftMargin, rightMargin, topMargin, lineSpacing, radius);
 
     // Entries
     QFont entryFont = painter->font();
-    dayFont.setWeight(QFont::Normal);
     entryFont.setPointSize(entryFont.pointSize() * 0.95);
     QFontMetrics entryFM(entryFont);
-    lineHeight = entryFM.height();
+    int lineHeight = entryFM.height();
     QSize pixmapSize(2 * lineHeight + lineSpacing, 2 * lineHeight + lineSpacing);
     int entryHeight = pixmapSize.height();
     int entrySpace = opt.rect.height() - dayRect.height() - topMargin - bottomMargin;
@@ -847,7 +876,7 @@ CalendarDayDelegate::paint
         }
         painter->restore();
 
-        entryRects[index].append(entryRect);
+        entryTester.append(index, entryRect);
     }
     int overflow = static_cast<int>(calendarDay.entries.size()) - maxLines;
     if (overflow > 0) {
@@ -871,9 +900,7 @@ CalendarDayDelegate::paint
         painter->setFont(overflowFont);
         painter->drawText(overflowRect, Qt::AlignCenter, overflowStr);
         painter->restore();
-        moreRects[index] = overflowRect;
-    } else {
-        moreRects[index] = QRect();
+        moreTester.append(index, overflowRect);
     }
 
     painter->restore();
@@ -881,123 +908,19 @@ CalendarDayDelegate::paint
 
 
 bool
-CalendarDayDelegate::helpEvent
+CalendarCompactDayDelegate::helpEvent
 (QHelpEvent *event, QAbstractItemView *view, const QStyleOptionViewItem &option, const QModelIndex &index)
 {
     if (! event || ! view) {
         return false;
     }
-
     CalendarDay day = index.data(Qt::UserRole + 1).value<CalendarDay>();
-    int entryIdx;
-    bool hoverMore = hitTestMore(index, event->pos());
-    if (! hoverMore && (entryIdx = hitTestEntry(index, event->pos())) >= 0 && entryIdx < day.entries.size()) {
-        CalendarEntry calEntry = day.entries[entryIdx];
-        QString tooltip = "<center><b>" + calEntry.primary + "</b>";
-        tooltip += "<br/>";
-        switch (calEntry.type) {
-        case ENTRY_TYPE_ACTIVITY:
-            tooltip += "[completed]";
-            break;
-        case ENTRY_TYPE_PLANNED_ACTIVITY:
-            tooltip += "[planned]";
-            break;
-        case ENTRY_TYPE_OTHER:
-        default:
-            tooltip += "[other]";
-            break;
-        }
-        tooltip += "<br/>";
-        if (! calEntry.secondary.isEmpty()) {
-            tooltip += calEntry.secondaryMetric + ": " + calEntry.secondary;
-            tooltip += "<br/>";
-        }
-        if (calEntry.start.isValid()) {
-            tooltip += calEntry.start.toString();
-            if (calEntry.durationSecs > 0) {
-                tooltip += " - " + calEntry.start.addSecs(calEntry.durationSecs).toString();
-            }
-        }
-        tooltip += "</center>";
-        QToolTip::showText(event->globalPos(), tooltip, view);
+    if (   (moreTester.hitTest(index, event->pos()) != -1 && toolTipMore(event->globalPos(), view, day))
+        || (toolTipDayEntry(event->globalPos(), view, day, entryTester.hitTest(index, event->pos())))
+        || (toolTipHeadlineEntry(event->globalPos(), view, day, headlineTester.hitTest(index, event->pos())))) {
         return true;
-    } else if (! hoverMore && (entryIdx = hitTestHeadlineEntry(index, event->pos())) >= 0 && entryIdx < day.headlineEntries.size()) {
-        CalendarEntry headlineEntry = day.headlineEntries[entryIdx];
-        QString tooltip = "<center><b>" + headlineEntry.primary + "</b></center>";
-        tooltip += "<center>";
-        switch (headlineEntry.type) {
-        case ENTRY_TYPE_PHASE:
-            tooltip += "[phase]";
-            break;
-        case ENTRY_TYPE_EVENT:
-        default:
-            tooltip += "[event]";
-            break;
-        }
-        tooltip += "</center>";
-        if (headlineEntry.spanStart.isValid() && headlineEntry.spanEnd.isValid() && headlineEntry.spanStart < headlineEntry.spanEnd) {
-            QLocale locale;
-            tooltip += QString("<center>%1 - %2</center>")
-                              .arg(locale.toString(headlineEntry.spanStart, QLocale::ShortFormat))
-                              .arg(locale.toString(headlineEntry.spanEnd, QLocale::ShortFormat));
-        }
-        QToolTip::showText(event->globalPos(), tooltip, view);
-        return true;
-    } else {
-        QStringList entries;
-        for (CalendarEntry entry : day.entries) {
-            entries << entry.primary;
-        }
-        if (! entries.isEmpty()) {
-            QString tooltip = entries.join("\n");
-            QToolTip::showText(event->globalPos(), tooltip, view);
-            return true;
-        }
     }
-
     return QStyledItemDelegate::helpEvent(event, view, option, index);
-}
-
-
-int
-CalendarDayDelegate::hitTestEntry
-(const QModelIndex &index, const QPoint &pos) const
-{
-    if (! entryRects.contains(index)) {
-        return -1;
-    }
-    const QList<QRect> &rects = entryRects[index];
-    for (int i = 0; i < rects.size(); ++i) {
-        if (rects[i].contains(pos)) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-
-int
-CalendarDayDelegate::hitTestHeadlineEntry
-(const QModelIndex &index, const QPoint &pos) const
-{
-    if (! headlineEntryRects.contains(index)) {
-        return -1;
-    }
-    const QList<QRect> &rects = headlineEntryRects[index];
-    for (int i = 0; i < rects.size(); ++i) {
-        if (rects[i].contains(pos)) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-
-bool
-CalendarDayDelegate::hitTestMore
-(const QModelIndex &index, const QPoint &pos) const
-{
-    return moreRects.contains(index) && moreRects[index].contains(pos);
 }
 
 
@@ -1119,4 +1042,152 @@ CalendarSummaryDelegate::sizeHint
     const int lineHeight = fontMetrics.height();
 
     return QSize(10, vertMargin + (lineHeight + lineSpacing) * summary.keyValues.count() - lineSpacing);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// Local helpers
+
+static bool
+toolTipHeadlineEntry
+(const QPoint &pos, QAbstractItemView *view, const CalendarDay &day, int idx)
+{
+    if (idx >= 0 && idx < day.headlineEntries.size()) {
+        CalendarEntry headlineEntry = day.headlineEntries[idx];
+        QString tooltip = "<center><b>" + headlineEntry.primary + "</b></center>";
+        tooltip += "<center>";
+        switch (headlineEntry.type) {
+        case ENTRY_TYPE_PHASE:
+            tooltip += "[phase]";
+            break;
+        case ENTRY_TYPE_EVENT:
+        default:
+            tooltip += "[event]";
+            break;
+        }
+        tooltip += "</center>";
+        if (headlineEntry.spanStart.isValid() && headlineEntry.spanEnd.isValid() && headlineEntry.spanStart < headlineEntry.spanEnd) {
+            QLocale locale;
+            tooltip += QString("<center>%1 - %2</center>")
+                              .arg(locale.toString(headlineEntry.spanStart, QLocale::ShortFormat))
+                              .arg(locale.toString(headlineEntry.spanEnd, QLocale::ShortFormat));
+        }
+        QToolTip::showText(pos, tooltip, view);
+        return true;
+    }
+    return false;
+}
+
+
+static bool
+toolTipDayEntry(const QPoint &pos, QAbstractItemView *view, const CalendarDay &day, int idx)
+{
+    if (idx >= 0 && idx < day.entries.size()) {
+        CalendarEntry calEntry = day.entries[idx];
+        QString tooltip = "<center><b>" + calEntry.primary + "</b>";
+        tooltip += "<br/>";
+        switch (calEntry.type) {
+        case ENTRY_TYPE_ACTIVITY:
+            tooltip += "[completed]";
+            break;
+        case ENTRY_TYPE_PLANNED_ACTIVITY:
+            tooltip += "[planned]";
+            break;
+        case ENTRY_TYPE_OTHER:
+        default:
+            tooltip += "[other]";
+            break;
+        }
+        tooltip += "<br/>";
+        if (! calEntry.secondary.isEmpty()) {
+            tooltip += calEntry.secondaryMetric + ": " + calEntry.secondary;
+            tooltip += "<br/>";
+        }
+        if (calEntry.start.isValid()) {
+            tooltip += calEntry.start.toString();
+            if (calEntry.durationSecs > 0) {
+                tooltip += " - " + calEntry.start.addSecs(calEntry.durationSecs).toString();
+            }
+        }
+        tooltip += "</center>";
+        QToolTip::showText(pos, tooltip, view);
+        return true;
+    }
+    return false;
+}
+
+
+static bool
+toolTipMore
+(const QPoint &pos, QAbstractItemView *view, const CalendarDay &day)
+{
+    QStringList entries;
+    for (CalendarEntry entry : day.entries) {
+        entries << entry.primary;
+    }
+    if (! entries.isEmpty()) {
+        QString tooltip = entries.join("\n");
+        QToolTip::showText(pos, tooltip, view);
+        return true;
+    }
+    return false;
+}
+
+
+static QRect
+paintHeadline
+(QPainter *painter, const QStyleOptionViewItem &opt, const QModelIndex &index, HitTester &headlineTester, const QString &dateFormat, int pressedEntryIdx, int leftMargin, int rightMargin, int topMargin, int lineSpacing, int radius)
+{
+    CalendarDay calendarDay = index.data(Qt::UserRole + 1).value<CalendarDay>();
+    QColor dayColor;
+    bool isToday = (calendarDay.date == QDate::currentDate());
+    QLocale locale;
+    QString dateText = locale.toString(calendarDay.date, dateFormat);
+
+    // Day number / Headline
+    painter->save();
+    QFont dayFont = painter->font();
+    QFontMetrics dayFM(dayFont);
+    dayFont.setWeight(QFont::Bold);
+    int lineHeight = dayFM.height();
+    QRect dayRect(opt.rect.x() + leftMargin,
+                  opt.rect.y() + topMargin,
+                  std::max(dayFM.horizontalAdvance(dateText) + leftMargin, lineHeight) + leftMargin,
+                  lineHeight);
+
+    int alignFlags = Qt::AlignLeft | Qt::AlignTop;
+    if (isToday) {
+        dayRect.setX(opt.rect.x() + 1);
+        dayRect.setWidth(dayRect.width() - 1);
+        painter->save();
+        painter->setPen(opt.palette.color(calendarDay.isDimmed == DayDimLevel::Full ? QPalette::Disabled : QPalette::Active, QPalette::Base)),
+        painter->setBrush(opt.palette.color(calendarDay.isDimmed == DayDimLevel::Full ? QPalette::Disabled : QPalette::Active, QPalette::Highlight)),
+        painter->drawRoundedRect(dayRect, 2 * radius, 2 * radius);
+        painter->restore();
+        dayColor = opt.palette.color((calendarDay.isDimmed == DayDimLevel::Full || calendarDay.isDimmed == DayDimLevel::Partial) ? QPalette::Disabled : QPalette::Active, QPalette::HighlightedText);
+        alignFlags = Qt::AlignHCenter | Qt::AlignTop;
+    } else if (pressedEntryIdx < 0 && opt.state & QStyle::State_Selected) {
+        dayColor = opt.palette.color((calendarDay.isDimmed == DayDimLevel::Full || calendarDay.isDimmed == DayDimLevel::Partial) ? QPalette::Disabled : QPalette::Active, QPalette::HighlightedText);
+    } else {
+        dayColor = opt.palette.color((calendarDay.isDimmed == DayDimLevel::Full || calendarDay.isDimmed == DayDimLevel::Partial) ? QPalette::Disabled : QPalette::Active, QPalette::Text);
+    }
+
+    painter->setFont(dayFont);
+    painter->setPen(dayColor);
+    painter->drawText(dayRect, alignFlags, dateText);
+    painter->restore();
+
+    for (int i = 0; i < calendarDay.headlineEntries.size(); ++i) {
+        CalendarEntry calEntry = calendarDay.headlineEntries[i];
+        int x = opt.rect.x() + opt.rect.width() - rightMargin - i * (lineHeight + lineSpacing) - lineHeight;
+        if (x < dayRect.x() + dayRect.width() + lineSpacing) {
+            break;
+        }
+        QPixmap pixmap = svgOnBackground(calEntry.iconFile, QSize(lineHeight, lineHeight), 0, calEntry.color, radius);
+        QRect headlineEntryRect(x, opt.rect.y() + topMargin, lineHeight, lineHeight);
+        painter->drawPixmap(x, opt.rect.y() + topMargin, pixmap);
+        headlineTester.append(index, headlineEntryRect);
+    }
+
+    return dayRect;
 }

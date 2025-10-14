@@ -407,7 +407,7 @@ PlanningCalendarWindow::mkControls
     formLayout->addRow(tr("Field for Primary Line"), primaryMainCombo);
     formLayout->addRow(tr("Fallback Field for Primary Line"), primaryFallbackCombo);
     formLayout->addRow(tr("Metric for Secondary Line"), secondaryCombo);
-    formLayout->addRow(tr("Field for Tertiary Line (day view only)"), tertiaryCombo);
+    formLayout->addRow(tr("Field for Tertiary Line (day and week view)"), tertiaryCombo);
     formLayout->addRow(new QLabel(HLO + tr("Summary") + HLC));
 
     QWidget *controlsWidget = new QWidget();
@@ -718,8 +718,10 @@ PlanningCalendarWindow::updateActivities
     QHash<QDate, QList<CalendarEntry>> activities = getActivities(calendar->firstVisibleDay(), calendar->lastVisibleDay());
     QHash<QDate, QList<CalendarEntry>> phasesEvents = getPhasesEvents(*season, calendar->firstVisibleDay(), calendar->lastVisibleDay());
     if (calendar->currentView() == CalendarView::Day) {
-        QDate dayViewDate = calendar->selectedDate();
-        summaries = getSummaries(dayViewDate, dayViewDate, 1);
+        QDate selectedDate = calendar->selectedDate();
+        summaries = getSummaries(selectedDate, selectedDate, 1);
+    } else if (calendar->currentView() == CalendarView::Week) {
+        summaries = getSummaries(calendar->firstVisibleDay(), calendar->lastVisibleDay(), 1);
     } else {
         summaries = getSummaries(calendar->firstVisibleDay(), calendar->lastVisibleDay(), 7);
     }

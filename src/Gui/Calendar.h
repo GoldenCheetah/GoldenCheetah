@@ -24,6 +24,7 @@
 #include <QTableWidget>
 #include <QCalendarWidget>
 #include <QPushButton>
+#include <QMenu>
 #include <QLabel>
 #include <QComboBox>
 #include <QDate>
@@ -63,17 +64,28 @@ private:
 };
 
 
+enum class CalendarDayTableType {
+    Day,
+    Week
+};
+
+
 class CalendarDayTable : public QTableWidget {
     Q_OBJECT
 
 public:
-    explicit CalendarDayTable(const QDate &date, QWidget *parent = nullptr);
+    explicit CalendarDayTable(const QDate &date, CalendarDayTableType type = CalendarDayTableType::Day, Qt::DayOfWeek firstDayOfWeek = Qt::Monday, QWidget *parent = nullptr);
 
     bool setDay(const QDate &date);
+    QDate firstVisibleDay() const;
+    QDate firstVisibleDay(const QDate &date) const;
+    QDate lastVisibleDay() const;
+    QDate lastVisibleDay(const QDate &date) const;
     QDate selectedDate() const;
     bool isInDateRange(const QDate &date) const;
-    void fillEntries(const QList<CalendarEntry> &activityEntries, const CalendarSummary &summary, const QList<CalendarEntry> &headlineEntries);
+    void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries);
     void limitDateRange(const DateRange &dr);
+    void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
 
 signals:
     void dayClicked(const CalendarDay &day, const QTime &time);
@@ -105,8 +117,10 @@ private slots:
     void showContextMenu(const QPoint &pos);
 
 private:
+    Qt::DayOfWeek firstDayOfWeek = Qt::Monday;
     QDate date;
     DateRange dr;
+    CalendarDayTableType type;
 
     QTimer dragTimer;
     QPoint pressedPos;
@@ -193,7 +207,8 @@ private:
 
 enum class CalendarView {
     Day = 0,
-    Month = 1
+    Week = 1,
+    Month = 2
 };
 
 
@@ -201,7 +216,7 @@ class CalendarDayView : public QWidget {
     Q_OBJECT
 
 public:
-    explicit CalendarDayView(const QDate &dateInMonth, Qt::DayOfWeek firstDayOfWeek = Qt::Monday, Measures * const athleteMeasures = nullptr, QWidget *parent = nullptr);
+    explicit CalendarDayView(const QDate &date, Measures * const athleteMeasures = nullptr, QWidget *parent = nullptr);
 
     bool setDay(const QDate &date);
     void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
@@ -223,13 +238,40 @@ signals:
 private:
     Measures * const athleteMeasures;
     CalendarOverview *dayDateSelector;
-    QLabel *dayPhaseLabel;
-    QLabel *dayEventLabel;
     QTabWidget *measureTabs;
     CalendarDayTable *dayTable;
 
     bool measureDialog(const QDateTime &when, MeasuresGroup * const measuresGroup, bool update);
     void updateMeasures(const QDate &date);
+};
+
+
+class CalendarWeekView : public QWidget {
+    Q_OBJECT
+
+public:
+    explicit CalendarWeekView(const QDate &date, QWidget *parent = nullptr);
+
+    bool setDay(const QDate &date);
+    void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
+    void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries);
+    void limitDateRange(const DateRange &dr);
+    QDate firstVisibleDay() const;
+    QDate firstVisibleDay(const QDate &date) const;
+    QDate lastVisibleDay() const;
+    QDate lastVisibleDay(const QDate &date) const;
+    QDate selectedDate() const;
+
+signals:
+    void showInTrainMode(const CalendarEntry &activity);
+    void viewActivity(const CalendarEntry &activity);
+    void addActivity(bool plan, const QDate &day, const QTime &time);
+    void delActivity(const CalendarEntry &activity);
+    void entryMoved(const CalendarEntry &activity, const QDate &srcDay, const QDate &destDay, const QTime &destTime);
+    void dayChanged(const QDate &date);
+
+private:
+    CalendarDayTable *weekTable;
 };
 
 
@@ -247,12 +289,11 @@ public:
     QDate selectedDate() const;
     CalendarView currentView() const;
 
-    bool addMonths(int months);
-    bool addYears(int years);
-    QDate fitDate(const QDate &date, bool preferToday = true) const;
-    bool canAddMonths(int months) const;
-    bool canAddYears(int years) const;
+    bool goNext(int amount);
+    QDate fitToMonth(const QDate &date, bool preferToday = true) const;
+    bool canGoNext(int amount) const;
     bool isInDateRange(const QDate &date) const;
+    int weekNumber(const QDate &date) const;
 
 public slots:
     void setView(CalendarView view);
@@ -280,20 +321,26 @@ signals:
     void delRestday(const QDate &day);
 
 private:
-    QAction *prevYAction;
-    QAction *prevMAction;
-    QAction *nextMAction;
-    QAction *nextYAction;
+    QAction *prevAction;
+    QAction *nextAction;
     QAction *todayAction;
     QAction *dayAction;
+    QAction *weekAction;
     QAction *monthAction;
-    QLabel *dateLabel;
+    QPushButton *dateNavigator;
+    QMenu *dateMenu;
     QStackedWidget *viewStack;
     CalendarDayView *dayView;
+    CalendarWeekView *weekView;
     CalendarMonthTable *monthView;
     DateRange dateRange;
+    Qt::DayOfWeek firstDayOfWeek = Qt::Monday;
 
     void setNavButtonState();
+    void updateDateLabel();
+
+private slots:
+    void populateDateMenu();
 };
 
 #endif

@@ -22,6 +22,21 @@
 #include <QStyledItemDelegate>
 
 
+class HitTester {
+public:
+    explicit HitTester();
+
+    void clear(const QModelIndex &index);
+    void resize(const QModelIndex &index, qsizetype size);
+    void append(const QModelIndex &index, const QRect &rect);
+    bool set(const QModelIndex &index, qsizetype i, const QRect &rect);
+    int hitTest(const QModelIndex &index, const QPoint &pos) const;
+
+private:
+    QHash<QModelIndex, QList<QRect>> rects;
+};
+
+
 enum class BlockIndicator {
     NoBlock = 0,
     AllBlock = 1,
@@ -45,11 +60,11 @@ public:
     double pixelsPerMinute(int availableHeight) const;
     double pixelsPerMinute(const QRect& rect) const;
 
-    int minuteToY(int minute, int rectTop, int rectHeight) const;
-    int minuteToY(int minute, const QRect& rect) const;
-    int minuteToY(const QTime &time, const QRect& rect) const;
+    int minuteToYInTable(int minute, int rectTop, int rectHeight) const;
+    int minuteToYInTable(int minute, const QRect& rect) const;
+    int minuteToYInTable(const QTime &time, const QRect& rect) const;
 
-    QTime timeFromY(int y, const QRect &rect, int snap = 15) const;
+    QTime timeFromYInTable(int y, const QRect &rect, int snap = 15) const;
 
 private:
     int _firstMinute = 8 * 60;
@@ -77,19 +92,33 @@ private:
 };
 
 
-class CalendarDayViewDayDelegate : public QStyledItemDelegate {
+class CalendarDetailedDayDelegate : public QStyledItemDelegate {
 public:
-    explicit CalendarDayViewDayDelegate(TimeScaleData const * const timeScaleData, QObject *parent = nullptr);
+    explicit CalendarDetailedDayDelegate(TimeScaleData const * const timeScaleData, QObject *parent = nullptr);
 
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     bool helpEvent(QHelpEvent *event, QAbstractItemView *view, const QStyleOptionViewItem &option, const QModelIndex &index) override;
 
-    int hitTestEntry(const QModelIndex &index, const QPoint &pos) const;
+    mutable HitTester entryTester;
 
 private:
     TimeScaleData const * const timeScaleData;
-    mutable QHash<QModelIndex, QList<QRect>> entryRects;
     void drawWrappingText(QPainter &painter, const QRect &rect, const QString &text) const;
+};
+
+
+class CalendarHeadlineDelegate : public QStyledItemDelegate {
+public:
+    explicit CalendarHeadlineDelegate(QObject *parent = nullptr);
+
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    bool helpEvent(QHelpEvent *event, QAbstractItemView *view, const QStyleOptionViewItem &option, const QModelIndex &index) override;
+    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+
+    mutable HitTester headlineTester;
+
+private:
+    mutable int heightHint = 0;
 };
 
 
@@ -107,21 +136,16 @@ private:
 };
 
 
-class CalendarDayDelegate : public QStyledItemDelegate {
+class CalendarCompactDayDelegate : public QStyledItemDelegate {
 public:
-    explicit CalendarDayDelegate(QObject *parent = nullptr);
+    explicit CalendarCompactDayDelegate(QObject *parent = nullptr);
 
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     bool helpEvent(QHelpEvent *event, QAbstractItemView *view, const QStyleOptionViewItem &option, const QModelIndex &index) override;
 
-    int hitTestEntry(const QModelIndex &index, const QPoint &pos) const;
-    int hitTestHeadlineEntry(const QModelIndex &index, const QPoint &pos) const;
-    bool hitTestMore(const QModelIndex &index, const QPoint &pos) const;
-
-private:
-    mutable QHash<QModelIndex, QList<QRect>> entryRects;
-    mutable QHash<QModelIndex, QList<QRect>> headlineEntryRects;
-    mutable QHash<QModelIndex, QRect> moreRects;
+    mutable HitTester headlineTester;
+    mutable HitTester entryTester;
+    mutable HitTester moreTester;
 };
 
 
