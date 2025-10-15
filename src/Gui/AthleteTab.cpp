@@ -187,6 +187,8 @@ AthleteTab::selectView(int index)
 void
 AthleteTab::rideSelected(RideItem*)
 {
+    emit rideItemSelected(context->ride);
+
     // if we selected a ride we should be on the analysis
     // view-- this is new with the overview and click thru
     // coming in other charts but when navigation model is
@@ -205,8 +207,6 @@ AthleteTab::rideSelected(RideItem*)
             selectView(1);
         }
     }
-
-    emit rideItemSelected(context->ride);
 
     // update the ride property on all widgets
     // to let them know they need to replot new

@@ -57,10 +57,8 @@ public:
     NavigationModel(AthleteTab *tab);
     ~NavigationModel();
 
-    // keep a track of the rides we've looked
-    // at recently-- might want to quick link
-    // to these in the future ...
-    QVector<RideItem*> recent;
+    // list of rides we've looked at recently
+    const QVector<RideItem*>& recentRides() const { return recent; }
 
 public slots:
 
@@ -70,7 +68,6 @@ public slots:
 
     void back();
     void forward();
-    void action(bool redo, NavigationEvent); // redo/undo the event
 
 private:
 
@@ -91,4 +88,15 @@ private:
     void addToStack(NavigationEvent&); // truncates stack if needed
     int stackpointer;
     QVector<NavigationEvent> stack;
+
+    // action the stack changes
+    void action(bool redo, NavigationEvent); // redo/undo the event
+
+    // keep a track of the rides we've looked
+    // at recently-- might want to quick link
+    // to these in the future ...
+    QVector<RideItem*> recent;
+
+    // when all else fails...
+    void debugStack(const QString& caller);
 };

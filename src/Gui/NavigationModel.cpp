@@ -25,6 +25,7 @@
 #include "NewSideBar.h"
 #include "MainWindow.h"
 
+// #define STACK_DBG
 
 NavigationModel::NavigationModel(AthleteTab *tab) : tab(tab), block(false), viewinit(false), drinit(false), iteminit(false)
 {
@@ -90,6 +91,9 @@ NavigationModel::rideChanged(RideItem *x)
 
         item = x;
     }
+#ifdef STACK_DBG
+    debugStack("after rideChanged()");
+#endif
 }
 
 void
@@ -113,6 +117,9 @@ NavigationModel::dateChanged(DateRange x)
 
         dr = x;
     }
+#ifdef STACK_DBG
+    debugStack("after dateChanged()");
+#endif
 }
 
 void
@@ -136,6 +143,9 @@ NavigationModel::viewChanged(int x)
 
         view = x;
     }
+#ifdef STACK_DBG
+    debugStack("after viewChanged()");
+#endif
 }
 
 void
@@ -202,6 +212,9 @@ NavigationModel::back()
             if (stackpointer > 0 && stack[stackpointer].type == NavigationEvent::VIEW &&    // switch view
                                     stack[stackpointer].after.toInt() == 1 &&               // switch to analysis
                                     stack[stackpointer-1].type == NavigationEvent::RIDE) {  // ride selected before
+#ifdef STACK_DBG
+                qDebug() << "back - ride select followed by view change to analysis, reverse both";
+#endif
                 action(false, stack[stackpointer]);
                 stackpointer--;
             }
@@ -211,6 +224,9 @@ NavigationModel::back()
             stackpointer--;
         }
     }
+#ifdef STACK_DBG
+    debugStack("after back()");
+#endif
 }
 
 void
@@ -226,6 +242,9 @@ NavigationModel::forward()
                 stack[stackpointer+2].type == NavigationEvent::VIEW &&   // switch view
                 stack[stackpointer+2].after.toInt() == 1) {              // switch to analysis
 
+#ifdef STACK_DBG
+                qDebug() << "forward - ride select followed by view change to analysis";
+#endif
                 stackpointer++;
                 action(false, stack[stackpointer]);
             }
@@ -234,5 +253,37 @@ NavigationModel::forward()
             stackpointer++;
             action(true, stack[stackpointer]);
         }
+    }
+#ifdef STACK_DBG
+    debugStack("after forward()");
+#endif
+}
+
+void
+NavigationModel::debugStack(const QString& caller)
+{
+    int index = 0;
+    qDebug() << qUtf8Printable(caller);
+    qDebug() << "stack debug:  size:" << stack.size() << ", pointer:" << stackpointer;
+
+    for (const auto& event : stack) {
+
+        QString arrow = (index == stackpointer) ? "--> " : "    ";
+
+        switch(event.type) {
+        case NavigationEvent::VIEW: {
+            qDebug() << qUtf8Printable(arrow) << "idx:" << index << " VIEW: before:" << event.before.toInt() << ", after:" << event.after.toInt();
+        } break;
+        case NavigationEvent::RIDE: {
+            qDebug() << qUtf8Printable(arrow) << "idx:" << index << " RIDE: before:" << event.before.value<RideItem*>() << ", after:" << event.after.value<RideItem*>();
+        } break;
+        case NavigationEvent::DATERANGE: {
+            qDebug() << qUtf8Printable(arrow) << "idx:" << index << " DATE: before:" << event.before.value<DateRange>().name << ", after:" << event.after.value<DateRange>().name;
+        } break;
+        default: {
+            qDebug() << "Event type " << event.type << " error!!";
+        } break;
+        }
+        ++index;
     }
 }
