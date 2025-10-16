@@ -38,7 +38,12 @@ class PlanningCalendarWindow : public GcChartWindow
 {
     Q_OBJECT
 
+    Q_PROPERTY(int defaultView READ getDefaultView WRITE setDefaultView USER true)
     Q_PROPERTY(int firstDayOfWeek READ getFirstDayOfWeek WRITE setFirstDayOfWeek USER true)
+    Q_PROPERTY(int startHour READ getStartHour WRITE setStartHour USER true)
+    Q_PROPERTY(int endHour READ getEndHour WRITE setEndHour USER true)
+    Q_PROPERTY(bool summaryVisibleDay READ isSummaryVisibleDay WRITE setSummaryVisibleDay USER true)
+    Q_PROPERTY(bool summaryVisibleWeek READ isSummaryVisibleWeek WRITE setSummaryVisibleWeek USER true)
     Q_PROPERTY(bool summaryVisibleMonth READ isSummaryVisibleMonth WRITE setSummaryVisibleMonth USER true)
     Q_PROPERTY(QString primaryMainField READ getPrimaryMainField WRITE setPrimaryMainField USER true)
     Q_PROPERTY(QString primaryFallbackField READ getPrimaryFallbackField WRITE setPrimaryFallbackField USER true)
@@ -49,7 +54,12 @@ class PlanningCalendarWindow : public GcChartWindow
     public:
         PlanningCalendarWindow(Context *context);
 
+        int getDefaultView() const;
         int getFirstDayOfWeek() const;
+        int getStartHour() const;
+        int getEndHour() const;
+        bool isSummaryVisibleDay() const;
+        bool isSummaryVisibleWeek() const;
         bool isSummaryVisibleMonth() const;
 
         bool isFiltered() const;
@@ -62,7 +72,12 @@ class PlanningCalendarWindow : public GcChartWindow
         QStringList getSummaryMetricsList() const;
 
     public slots:
+        void setDefaultView(int view);
         void setFirstDayOfWeek(int fdw);
+        void setStartHour(int hour);
+        void setEndHour(int hour);
+        void setSummaryVisibleDay(bool visible);
+        void setSummaryVisibleWeek(bool visible);
         void setSummaryVisibleMonth(bool svm);
         void setPrimaryMainField(const QString &name);
         void setPrimaryFallbackField(const QString &name);
@@ -76,14 +91,19 @@ class PlanningCalendarWindow : public GcChartWindow
         Context *context;
         bool first = true;
 
+        QComboBox *defaultViewCombo;
         QComboBox *firstDayOfWeekCombo;
+        QSpinBox *startHourSpin;
+        QSpinBox *endHourSpin;
+        QCheckBox *summaryDayCheck;
+        QCheckBox *summaryWeekCheck;
         QCheckBox *summaryMonthCheck;
         QComboBox *primaryMainCombo;
         QComboBox *primaryFallbackCombo;
         QComboBox *secondaryCombo;
         QComboBox *tertiaryCombo;
         MultiMetricSelector *multiMetricSelector;
-        Calendar *calendar;
+        Calendar *calendar = nullptr;
 
         void mkControls();
         void updatePrimaryConfigCombos();

@@ -86,6 +86,8 @@ public:
     void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries);
     void limitDateRange(const DateRange &dr);
     void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
+    void setStartHour(int hour);
+    void setEndHour(int hour);
 
 signals:
     void dayClicked(const CalendarDay &day, const QTime &time);
@@ -121,6 +123,8 @@ private:
     QDate date;
     DateRange dr;
     CalendarDayTableType type;
+    int defaultStartHour = 8;
+    int defaultEndHour = 21;
 
     QTimer dragTimer;
     QPoint pressedPos;
@@ -220,6 +224,9 @@ public:
 
     bool setDay(const QDate &date);
     void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
+    void setStartHour(int hour);
+    void setEndHour(int hour);
+    void setSummaryVisible(bool visible);
     void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries);
     void limitDateRange(const DateRange &dr);
     QDate firstVisibleDay() const;
@@ -254,6 +261,9 @@ public:
 
     bool setDay(const QDate &date);
     void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
+    void setStartHour(int hour);
+    void setEndHour(int hour);
+    void setSummaryVisible(bool visible);
     void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries);
     void limitDateRange(const DateRange &dr);
     QDate firstVisibleDay() const;
@@ -299,6 +309,10 @@ public slots:
     void setView(CalendarView view);
     void activateDateRange(const DateRange &dr, bool allowKeepMonth = false);
     void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
+    void setStartHour(int hour);
+    void setEndHour(int hour);
+    void setSummaryDayVisible(bool visible);
+    void setSummaryWeekVisible(bool visible);
     void setSummaryMonthVisible(bool visible);
     void applyNavIcons();
     void updateMeasures();
