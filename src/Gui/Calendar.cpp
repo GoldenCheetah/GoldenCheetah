@@ -317,10 +317,8 @@ void
 CalendarDayTable::fillEntries
 (const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries)
 {
-    Q_UNUSED(headlineEntries)
-
-    int startHour = 8;
-    int endHour = 21;
+    int startHour = defaultStartHour;
+    int endHour = defaultEndHour;
     int numDays = type == CalendarDayTableType::Day ? 1 : 7;
     for (int i = 0; i < numDays; ++i) {
         QTableWidgetItem *headlineItem = this->item(0, i + 1);
@@ -396,6 +394,22 @@ CalendarDayTable::setFirstDayOfWeek
     if (type == CalendarDayTableType::Week) {
         setDay(selectedDate());
     }
+}
+
+
+void
+CalendarDayTable::setStartHour
+(int hour)
+{
+    defaultStartHour = hour;
+}
+
+
+void
+CalendarDayTable::setEndHour
+(int hour)
+{
+    defaultEndHour = hour;
 }
 
 
@@ -1424,6 +1438,30 @@ CalendarDayView::setFirstDayOfWeek
 
 
 void
+CalendarDayView::setStartHour
+(int hour)
+{
+    dayTable->setStartHour(hour);
+}
+
+
+void
+CalendarDayView::setEndHour
+(int hour)
+{
+    dayTable->setEndHour(hour);
+}
+
+
+void
+CalendarDayView::setSummaryVisible
+(bool visible)
+{
+    dayTable->setRowHidden(2, ! visible);
+}
+
+
+void
 CalendarDayView::fillEntries
 (const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries)
 {
@@ -1680,6 +1718,30 @@ CalendarWeekView::setFirstDayOfWeek
 (Qt::DayOfWeek firstDayOfWeek)
 {
     weekTable->setFirstDayOfWeek(firstDayOfWeek);
+}
+
+
+void
+CalendarWeekView::setStartHour
+(int hour)
+{
+    weekTable->setStartHour(hour);
+}
+
+
+void
+CalendarWeekView::setEndHour
+(int hour)
+{
+    weekTable->setEndHour(hour);
+}
+
+
+void
+CalendarWeekView::setSummaryVisible
+(bool visible)
+{
+    weekTable->setRowHidden(2, ! visible);
 }
 
 
@@ -2074,6 +2136,40 @@ Calendar::setFirstDayOfWeek
     } else if (currentView() == CalendarView::Month) {
         setDate(fitToMonth(currentDate, false), true);
     }
+}
+
+
+void
+Calendar::setStartHour
+(int hour)
+{
+    weekView->setStartHour(hour);
+    dayView->setStartHour(hour);
+}
+
+
+void
+Calendar::setEndHour
+(int hour)
+{
+    weekView->setEndHour(hour);
+    dayView->setEndHour(hour);
+}
+
+
+void
+Calendar::setSummaryDayVisible
+(bool visible)
+{
+    dayView->setSummaryVisible(visible);
+}
+
+
+void
+Calendar::setSummaryWeekVisible
+(bool visible)
+{
+    weekView->setSummaryVisible(visible);
 }
 
 
