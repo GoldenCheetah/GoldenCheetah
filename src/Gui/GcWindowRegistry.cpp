@@ -66,13 +66,13 @@ GcWindowRegistry::initialize()
 {
   static GcWindowRegistry GcWindowsInit[36] = {
     // name                     GcWinID
-    { VIEW_TRENDS|VIEW_DIARY, tr("Season Overview"),GcWindowTypes::OverviewTrends },
-    { VIEW_TRENDS|VIEW_DIARY, tr("Blank Overview "),GcWindowTypes::OverviewTrendsBlank },
-    { VIEW_TRENDS|VIEW_DIARY, tr("User Chart"),GcWindowTypes::UserTrends },
-    { VIEW_TRENDS|VIEW_DIARY, tr("Trends"),GcWindowTypes::LTM },
-    { VIEW_TRENDS|VIEW_DIARY, tr("TreeMap"),GcWindowTypes::TreeMap },
+    { VIEW_TRENDS|VIEW_PLAN, tr("Season Overview"),GcWindowTypes::OverviewTrends },
+    { VIEW_TRENDS|VIEW_PLAN, tr("Blank Overview "),GcWindowTypes::OverviewTrendsBlank },
+    { VIEW_TRENDS|VIEW_PLAN, tr("User Chart"),GcWindowTypes::UserTrends },
+    { VIEW_TRENDS|VIEW_PLAN, tr("Trends"),GcWindowTypes::LTM },
+    { VIEW_TRENDS|VIEW_PLAN, tr("TreeMap"),GcWindowTypes::TreeMap },
     //{ VIEW_TRENDS, tr("Weekly Summary"),GcWindowTypes::WeeklySummary },// DEPRECATED
-    { VIEW_TRENDS|VIEW_DIARY,  tr("Power Duration "),GcWindowTypes::CriticalPowerSummary },
+    { VIEW_TRENDS|VIEW_PLAN,  tr("Power Duration "),GcWindowTypes::CriticalPowerSummary },
     //{ VIEW_TRENDS,  tr("Training Plan"),GcWindowTypes::SeasonPlan },
     //{ VIEW_TRENDS|VIEW_DIARY,  tr("Performance Manager"),GcWindowTypes::PerformanceManager },
     { VIEW_ANALYSIS, tr("Activity Overview"),GcWindowTypes::Overview },
@@ -85,7 +85,7 @@ GcWindowRegistry::initialize()
     { VIEW_ANALYSIS, tr("Performance"),GcWindowTypes::AllPlot },
     { VIEW_ANALYSIS, tr("Power Duration"),GcWindowTypes::CriticalPower },
     { VIEW_ANALYSIS, tr("Histogram"),GcWindowTypes::Histogram },
-    { VIEW_TRENDS|VIEW_DIARY, tr("Distribution"),GcWindowTypes::Distribution },
+    { VIEW_TRENDS|VIEW_PLAN, tr("Distribution"),GcWindowTypes::Distribution },
     { VIEW_ANALYSIS, tr("Pedal Force vs Velocity"),GcWindowTypes::PfPv },
     { VIEW_ANALYSIS, tr("Heartrate vs Power"),GcWindowTypes::HrPw },
     { VIEW_ANALYSIS, tr("Map"),GcWindowTypes::RideMapWindow },
@@ -97,7 +97,7 @@ GcWindowRegistry::initialize()
     { VIEW_ANALYSIS, tr("Scatter"),GcWindowTypes::Scatter },
     { VIEW_ANALYSIS, tr("Aerolab"),GcWindowTypes::Aerolab },
     //{ VIEW_TRENDS|VIEW_DIARY, tr("Calendar"),GcWindowTypes::Diary },
-    { VIEW_TRENDS|VIEW_DIARY, tr("Navigator"), GcWindowTypes::ActivityNavigator },
+    { VIEW_TRENDS|VIEW_PLAN, tr("Navigator"), GcWindowTypes::ActivityNavigator },
     //{ VIEW_DIARY|VIEW_TRENDS, tr("Summary "), GcWindowTypes::DateRangeSummary }, // DEPRECATED IN V3.6
     { VIEW_TRAIN, tr("Telemetry"),GcWindowTypes::DialWindow },
     { VIEW_TRAIN, tr("Workout"),GcWindowTypes::WorkoutPlot },
@@ -108,7 +108,7 @@ GcWindowRegistry::initialize()
     { VIEW_TRAIN, tr("Live Map"),GcWindowTypes::LiveMapWebPageWindow },
     { VIEW_TRAIN, tr("Elevation Chart"),GcWindowTypes::ElevationChart },
     { VIEW_ANALYSIS|VIEW_TRENDS|VIEW_TRAIN, tr("Web page"),GcWindowTypes::WebPageWindow },
-    { VIEW_TRENDS, tr("Planning Calendar"),GcWindowTypes::Calendar },
+    { VIEW_TRENDS|VIEW_PLAN, tr("Planning Calendar"),GcWindowTypes::Calendar },
     { 0, "", GcWindowTypes::None }};
   // initialize the global registry
   GcWindows = GcWindowsInit;
