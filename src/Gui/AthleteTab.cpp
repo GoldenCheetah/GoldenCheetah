@@ -169,7 +169,12 @@ AthleteTab::view(int index)
 void
 AthleteTab::selectView(int index)
 {
-    if (views->currentIndex() == index) return; // not changing
+    // ensure an initial viewChanged() event occurs for the navigation model, otherwise if the
+    // startup view is trends (value zero) the guard rejects the selection as views->currentIndex() is zero
+    static bool notifyStartupView = true;
+    if (!notifyStartupView && views->currentIndex() == index) return; // not changing
+
+    notifyStartupView = false;
 
     emit viewChanged(index);
 

@@ -243,6 +243,13 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 
     connect(athleteBrowseButton, SIGNAL(clicked()), this, SLOT(browseAthleteDir()));
 
+    startupView = new QComboBox();
+    startupView->addItem(tr("Trends"));
+    startupView->addItem(tr("Analysis"));
+    startupView->addItem(tr("Plan"));
+    startupView->addItem(tr("Train"));
+    startupView->setCurrentIndex(appsettings->value(NULL, GC_STARTUP_VIEW, "1").toInt());
+
     QFormLayout *form = newQFormLayout();
     form->addRow(new QLabel(HLO + tr("Localization") + HLC));
     form->addRow(tr("Language"), langCombo);
@@ -252,6 +259,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     form->addItem(new QSpacerItem(0, 15 * dpiYFactor));
     form->addRow(new QLabel(HLO + tr("Application Behaviour") + HLC));
     form->addRow(tr("Athlete Library"), athleteDirectoryLayout);
+    form->addRow(tr("Startup View"), startupView);
     form->addRow("", warnOnExit);
     form->addRow("", openLastAthlete);
     form->addRow("", opendata);
@@ -304,6 +312,11 @@ GeneralPage::saveClicked()
         "en", "fr", "ja", "pt-br", "it", "de", "ru", "cs", "es", "pt", "zh-cn", "zh-tw", "nl", "sv"
     };
     appsettings->setValue(GC_LANG, langs[langCombo->currentIndex()]);
+
+    // map diary startup view to trends (temporarily until plan view available)
+    int startView = (startupView->currentIndex() != 2) ? startupView->currentIndex() : 0;
+    // save startup view
+    appsettings->setValue(GC_STARTUP_VIEW, startView);
 
     // Garmin and cranks
     appsettings->setValue(GC_GARMIN_HWMARK, garminHWMarkedit->value());
