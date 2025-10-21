@@ -18,7 +18,6 @@
 
 #include "Context.h"
 #include "Athlete.h"
-#include "AthleteTab.h"
 #include "MainWindow.h"
 
 #include "ArchiveFile.h"
@@ -984,10 +983,8 @@ RideImportWizard::abortClicked()
     if (label == tr("Finish")) {
        // phew. our work is done. -- lets force an update stats...
        hide();
-
-       // only inform the user the work is done, when in stealth mode and
-       // they are on the analysis view, otherwise it's an annoying popup.
-       if (autoImportStealth && (context->tab->currentView() == 1)) {
+       if (autoImportStealth) {
+           // inform the user that the work is done
            QMessageBox::information(NULL, tr("Auto Import"), tr("Automatic import from defined directories is completed."));
        }
        done(0);
