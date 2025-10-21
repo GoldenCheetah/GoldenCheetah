@@ -339,16 +339,16 @@ DirectoryPathWidget::DirectoryPathWidget
 {
     lineEdit = new QLineEdit();
 
-    openButton = new QPushButton(tr("Browse"));
+    browseButton = new QPushButton(tr("Browse"));
 
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
     layout->addWidget(lineEdit, 1);
-    layout->addWidget(openButton, 0);
+    layout->addWidget(browseButton, 0);
 
-    connect(openButton, SIGNAL(clicked()), this, SLOT(openDialog()));
-    connect(lineEdit, SIGNAL(editingFinished()), this, SLOT(lineEditFinished()));
+    connect(browseButton, &QPushButton::clicked, this, &DirectoryPathWidget::handleBrowseClicked);
+    connect(lineEdit, &QLineEdit::editingFinished, this, &DirectoryPathWidget::lineEditFinished);
 }
 
 
@@ -377,31 +377,37 @@ DirectoryPathWidget::setPlaceholderText
 
 
 void
-DirectoryPathWidget::openDialog
+DirectoryPathWidget::handleBrowseClicked
 ()
 {
-    QFileDialog fileDialog(lineEdit->window());
+    if (receivers(SIGNAL(dialogRequested(QString))) > 0) {
+        emit dialogRequested(getPath());
+        return;
+    }
+    QFileDialog dialog(lineEdit->window());
     QStringList selectedDirs;
-    fileDialog.setFileMode(QFileDialog::Directory);
-    fileDialog.setOptions(  QFileDialog::ShowDirsOnly
-                          | QFileDialog::DontResolveSymlinks);
+    dialog.setFileMode(QFileDialog::Directory);
+    dialog.setOptions(  QFileDialog::ShowDirsOnly
+                      | QFileDialog::DontResolveSymlinks);
+#if 0
 #if defined Q_OS_MACOS
     // Avoid crash when using native FileDialog on MacOS from a QStyledItemDelegate (see #4719)
     fileDialog.setOptions(  fileDialog.options()
                           | QFileDialog::DontUseNativeDialog);
 #endif
+#endif
     QString path = lineEdit->text();
     if (path.isEmpty()) {
         path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
     }
-    fileDialog.setDirectory(path);
-    if (fileDialog.exec()) {
-        selectedDirs = fileDialog.selectedFiles();
-    }
-    if (selectedDirs.count() > 0) {
-        QString dir = selectedDirs.at(0);
-        if (dir != "") {
-            lineEdit->setText(dir);
+    dialog.setDirectory(path);
+    if (dialog.exec() == QDialog::Accepted) {
+        QStringList selectedDirs = dialog.selectedFiles();
+        if (! selectedDirs.isEmpty()) {
+            QString selectedDir = selectedDirs.at(0);
+            if (! selectedDir.isEmpty()) {
+                setPath(selectedDir);
+            }
         }
     }
     emit editingFinished();
@@ -418,7 +424,7 @@ DirectoryPathWidget::lineEditFinished
     }
     lineEditAlreadyFinished = true;
 
-    if (! openButton->hasFocus()) {
+    if (! browseButton->hasFocus()) {
         emit editingFinished();
     }
 }
@@ -438,11 +444,50 @@ DirectoryPathDelegate::createEditor
 (QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     Q_UNUSED(option)
-    Q_UNUSED(index)
 
     DirectoryPathWidget *editor = new DirectoryPathWidget(parent);
     editor->setPlaceholderText(placeholderText);
-    connect(editor, SIGNAL(editingFinished()), this, SLOT(commitAndCloseEditor()));
+
+    connect(editor, &DirectoryPathWidget::dialogRequested, editor, [this, editor, index]() {
+        QString currentPath = editor->getPath();
+        QString initialDir = currentPath.isEmpty()
+            ? QStandardPaths::writableLocation(QStandardPaths::HomeLocation)
+            : currentPath;
+
+        QFileDialog dialog(editor);
+        dialog.setOptions(  QFileDialog::ShowDirsOnly
+                          | QFileDialog::DontResolveSymlinks);
+#if 0
+#if defined Q_OS_MACOS
+        // Avoid crash when using native FileDialog on MacOS from a QStyledItemDelegate (see #4719)
+        dialog.setOptions(  fileDialog.options()
+                          | QFileDialog::DontUseNativeDialog);
+#endif
+#endif
+        dialog.setDirectory(initialDir);
+
+        if (dialog.exec() == QDialog::Accepted) {
+            QStringList selectedDirs = dialog.selectedFiles();
+            if (! selectedDirs.isEmpty()) {
+                QString selectedDir = selectedDirs.at(0);
+                QTimer::singleShot(0, editor, [editor, selectedDir]() {
+                    if (! selectedDir.isEmpty()) {
+                        editor->setPath(selectedDir);
+                    }
+                });
+            }
+            QTimer::singleShot(0, this, [this, editor]() {
+                DirectoryPathDelegate *delegate = const_cast<DirectoryPathDelegate*>(this);
+                emit delegate->commitData(editor);
+                emit delegate->closeEditor(editor);
+            });
+        } else {
+            QTimer::singleShot(0, this, [this, editor]() {
+                DirectoryPathDelegate *delegate = const_cast<DirectoryPathDelegate*>(this);
+                emit delegate->closeEditor(editor);
+            });
+        }
+    });
 
     return editor;
 }
@@ -452,8 +497,9 @@ void
 DirectoryPathDelegate::setEditorData
 (QWidget *editor, const QModelIndex &index) const
 {
-    DirectoryPathWidget *filepath = static_cast<DirectoryPathWidget*>(editor);
-    filepath->setPath(index.data(Qt::DisplayRole).toString());
+    if (DirectoryPathWidget *pathEditor = qobject_cast<DirectoryPathWidget*>(editor)) {
+        pathEditor->setPath(index.data(Qt::EditRole).toString());
+    }
 }
 
 
@@ -461,8 +507,9 @@ void
 DirectoryPathDelegate::setModelData
 (QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-    DirectoryPathWidget *filepath = static_cast<DirectoryPathWidget*>(editor);
-    model->setData(index, filepath->getPath(), Qt::DisplayRole);
+    if (DirectoryPathWidget *pathEditor = qobject_cast<DirectoryPathWidget*>(editor)) {
+        model->setData(index, pathEditor->getPath(), Qt::EditRole);
+    }
 }
 
 
@@ -521,17 +568,6 @@ DirectoryPathDelegate::setPlaceholderText
 {
     this->placeholderText = placeholderText;
 }
-
-
-void
-DirectoryPathDelegate::commitAndCloseEditor
-()
-{
-    QWidget *editor = qobject_cast<QWidget*>(sender());
-    emit commitData(editor);
-    emit closeEditor(editor);
-}
-
 
 
 // ListEditWidget //////////////////////////////////////////////////////////////////////
