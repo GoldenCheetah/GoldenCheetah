@@ -129,18 +129,24 @@ AnalysisView::isBlank()
 void
 AnalysisView::notifyViewStateRestored() {
 
-    // lets select the first ride
-    QDateTime now = QDateTime::currentDateTime();
-    for (int i = context->athlete->rideCache->rides().count(); i > 0; --i) {
-        if (context->athlete->rideCache->rides()[i - 1]->dateTime <= now) {
-            context->athlete->selectRideFile(context->athlete->rideCache->rides()[i - 1]->fileName);
-            break;
-        }
-    }
+    // set the ride only when analysis is the startup view and no ride has been set.
+    // otherwise when trends is the startup view and a ride is clicked thru, this part
+    // of the analysis loading process overwrites the click thru selection. 
+    if (context->ride == nullptr) {
 
-    // otherwise just the latest
-    if (context->currentRideItem() == NULL && context->athlete->rideCache->rides().count() != 0) {
-        context->athlete->selectRideFile(context->athlete->rideCache->rides().last()->fileName);
+        // lets select the first ride
+        QDateTime now = QDateTime::currentDateTime();
+        for (int i = context->athlete->rideCache->rides().count(); i > 0; --i) {
+            if (context->athlete->rideCache->rides()[i - 1]->dateTime <= now) {
+                context->athlete->selectRideFile(context->athlete->rideCache->rides()[i - 1]->fileName);
+                return;
+            }
+        }
+
+        // otherwise just select the latest ride
+        if (context->athlete->rideCache->rides().count() != 0) {
+            context->athlete->selectRideFile(context->athlete->rideCache->rides().last()->fileName);
+        }
     }
 }
 
