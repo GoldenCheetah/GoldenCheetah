@@ -151,12 +151,25 @@ ChartSpace::removeItem(ChartSpaceItem *item)
     }
 }
 
+void
+ChartSpace::showEvent(QShowEvent*)
+{
+    // ride item changed
+    foreach(ChartSpaceItem *ChartSpaceItem, items) ChartSpaceItem->setData(currentRideItem);
+
+    // update
+    updateView();
+
+    stale=false;
+}
+
 // when a ride is selected we need to notify all the ChartSpaceItems
 void
 ChartSpace::rideSelected(RideItem *item)
 {
     // don't plot when we're not visible, unless we have nothing plotted yet
     if (!isVisible() && currentRideItem != NULL && item != NULL) {
+        currentRideItem = item; // don't forget the ride might have changed!
         stale=true;
         return;
     }

@@ -696,6 +696,8 @@ GcChartWindow::GcChartWindow(Context *context) : GcWindow(context), context(cont
     _blank = new QWidget(this);
     _blank->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+    _windowBlank = false;
+    _searchFilterBlanking = SFWinBlankingType::NO_BLANKING;
     _layout->addWidget(_blank);
     _layout->addWidget(_mainWidget);
     _layout->setCurrentWidget(_mainWidget);
@@ -750,20 +752,23 @@ GcChartWindow::GcChartWindow(Context *context) : GcWindow(context), context(cont
     blankImg->setIcon(QPixmap(":/images/gc-blank.png"));
     blankImg->setIconSize(QSize(200,200)); //512
 
-    QLabel *blankLabel = new QLabel(tr("No data available"));
-    blankLabel->setAlignment(Qt::AlignCenter);
+    _blankLabel = new QLabel(tr("No data available"));
+    _blankLabel->setAlignment(Qt::AlignCenter);
     QFont font;
     font.setPointSize(font.pointSize() + 4);
     font.setWeight(QFont::Bold);
-    blankLabel->setFont(font);
+    _blankLabel->setFont(font);
 
     _defaultBlankLayout->addStretch();
     _defaultBlankLayout->addWidget(blankImg);
-    _defaultBlankLayout->addWidget(blankLabel);
+    _defaultBlankLayout->addWidget(_blankLabel);
     _defaultBlankLayout->addStretch();
     _blank->setLayout(_defaultBlankLayout);
 
     overlayWidget = NULL;
+
+    connect(context, &Context::filterChanged, [&](void) { this->updateSearchFilterBlanking(); } );
+    connect(context, &Context::rideSelected, [&](RideItem*) { this->updateSearchFilterBlanking(); } );
 }
 
 void
@@ -798,13 +803,6 @@ GcChartWindow:: setRevealLayout(QLayout *layout)
     _revealLayout = layout;
     _revealControls->setLayout(_revealLayout);
     _revealControls->hide();
-}
-
-void
-GcChartWindow:: setBlankLayout(QLayout *layout)
-{
-    _blankLayout = layout;
-    _blank->setLayout(layout);
 }
 
 void
@@ -843,7 +841,52 @@ GcChartWindow::setControls(QWidget *x)
 void
 GcChartWindow:: setIsBlank(bool value)
 {
-    _layout->setCurrentWidget(value?_blank:_mainWidget);
+    _windowBlank = value;
+    updateWindowBlanking();
+}
+
+void
+GcChartWindow::updateSearchFilterBlanking()
+{
+    _searchFilterBlanking = SFWinBlankingType::NO_BLANKING;
+
+    // the ride navigator display is unaffected by the search/filter blanking 
+    if (context->isfiltered && (type() != GcWindowTypes::ActivityNavigator)) {
+        if (context->filters.empty()) {
+            // if a search/filter has no results, then blank the chart's contents
+            _searchFilterBlanking = SFWinBlankingType::NO_RESULTS;
+        } else if ((!context->filters.contains(context->currentRideItem()->fileName)) && GcWindowRegistry::isIdRelevantForType(type(), VIEW_ANALYSIS, true)) {
+            // the search/filter has results, but the current selected ride is not in the results, so need to blank
+            // any chart dependent on the current selected ride, to avoid the display of inconsistent chart info.
+            _searchFilterBlanking = SFWinBlankingType::ACTIVITY_NOT_IN_RESULTS; 
+        }
+    }
+    updateWindowBlanking();
+}
+
+void
+GcChartWindow::updateWindowBlanking()
+{
+    // search/filter blanking overrides any chart requested blanking
+    switch (_searchFilterBlanking) {
+    case SFWinBlankingType::NO_RESULTS: {
+        _blankLabel->setText(tr("No results from search/filter"));
+        _layout->setCurrentWidget(_blank);
+    } break;
+    case SFWinBlankingType::ACTIVITY_NOT_IN_RESULTS: {
+        _blankLabel->setText(tr("The selected activity is not in the search/filter results\n\nSelect a new activity OR cancel the search/filter"));
+        _layout->setCurrentWidget(_blank);
+    } break;
+    default: {
+        // apply any chart requested chart blanking
+        if (_windowBlank) {
+            _blankLabel->setText(tr("No data available"));
+            _layout->setCurrentWidget(_blank);
+        } else {
+            _layout->setCurrentWidget(_mainWidget);
+        }
+    } break;
+    }
 }
 
 void
