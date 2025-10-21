@@ -380,10 +380,16 @@ void
 DirectoryPathWidget::openDialog
 ()
 {
-    QFileDialog fileDialog(this);
+    QFileDialog fileDialog(lineEdit->window());
     QStringList selectedDirs;
     fileDialog.setFileMode(QFileDialog::Directory);
-    fileDialog.setOptions(QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    fileDialog.setOptions(  QFileDialog::ShowDirsOnly
+                          | QFileDialog::DontResolveSymlinks);
+#if defined Q_OS_MACOS
+    // Avoid crash when using native FileDialog on MacOS from a QStyledItemDelegate (see #4719)
+    fileDialog.setOptions(  fileDialog.options()
+                          | QFileDialog::DontUseNativeDialog);
+#endif
     QString path = lineEdit->text();
     if (path.isEmpty()) {
         path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
@@ -534,7 +540,7 @@ ListEditWidget::ListEditWidget
 (QWidget *parent)
 : QWidget(parent)
 {
-    dialog = new QDialog(this);
+    dialog = new QDialog(parent);
     dialog->setModal(true);
 
     title = new QLabel();
