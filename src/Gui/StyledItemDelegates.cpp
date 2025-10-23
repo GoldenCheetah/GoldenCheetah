@@ -389,12 +389,10 @@ DirectoryPathWidget::handleBrowseClicked
     dialog.setFileMode(QFileDialog::Directory);
     dialog.setOptions(  QFileDialog::ShowDirsOnly
                       | QFileDialog::DontResolveSymlinks);
-#if 0
 #if defined Q_OS_MACOS
     // Avoid crash when using native FileDialog on MacOS from a QStyledItemDelegate (see #4719)
     fileDialog.setOptions(  fileDialog.options()
                           | QFileDialog::DontUseNativeDialog);
-#endif
 #endif
     QString path = lineEdit->text();
     if (path.isEmpty()) {
@@ -457,12 +455,10 @@ DirectoryPathDelegate::createEditor
         QFileDialog dialog(editor);
         dialog.setOptions(  QFileDialog::ShowDirsOnly
                           | QFileDialog::DontResolveSymlinks);
-#if 0
 #if defined Q_OS_MACOS
         // Avoid crash when using native FileDialog on MacOS from a QStyledItemDelegate (see #4719)
         dialog.setOptions(  fileDialog.options()
                           | QFileDialog::DontUseNativeDialog);
-#endif
 #endif
         dialog.setDirectory(initialDir);
 
