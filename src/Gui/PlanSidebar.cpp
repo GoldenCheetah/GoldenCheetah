@@ -16,7 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "DiarySidebar.h"
+#include "PlanSidebar.h"
 
 #include "Context.h"
 #include "Athlete.h"
@@ -31,9 +31,9 @@
 #include "HelpWhatsThis.h"
 
 //********************************************************************************
-// CALENDAR SIDEBAR (DiarySidebar)
+// PLANNING SIDEBAR (PlanSidebar)
 //********************************************************************************
-DiarySidebar::DiarySidebar(Context *context) : context(context)
+PlanSidebar::PlanSidebar(Context *context) : context(context)
 {
     setContentsMargins(0,0,0,0);
     setAutoFillBackground(true);
@@ -63,10 +63,10 @@ DiarySidebar::DiarySidebar(Context *context) : context(context)
     calendarItem->addWidget(calWidget);
 
     HelpWhatsThis *helpCalendarItem = new HelpWhatsThis(calendarItem);
-    calendarItem->setWhatsThis(helpCalendarItem->getWhatsThisText(HelpWhatsThis::SideBarDiaryView_Calendar));
+    calendarItem->setWhatsThis(helpCalendarItem->getWhatsThisText(HelpWhatsThis::SideBarPlanView_Calendar));
 
     splitter->addWidget(calendarItem);
-    splitter->prepare(context->athlete->cyclist, "diary");
+    splitter->prepare(context->athlete->cyclist, "plan");
 
     multiCalendar = new GcMultiCalendar(context);
     layout->addWidget(multiCalendar);
@@ -83,7 +83,7 @@ DiarySidebar::DiarySidebar(Context *context) : context(context)
 }
 
 void
-DiarySidebar::configChanged(qint32)
+PlanSidebar::configChanged(qint32)
 {
     // apply
     multiCalendar->refresh();
@@ -96,7 +96,7 @@ DiarySidebar::configChanged(qint32)
 }
 
 void
-DiarySidebar::refresh()
+PlanSidebar::refresh()
 {
     if (!isHidden()) {
         multiCalendar->refresh();
@@ -106,7 +106,7 @@ DiarySidebar::refresh()
 }
 
 void
-DiarySidebar::setRide(RideItem *ride)
+PlanSidebar::setRide(RideItem *ride)
 {
     _ride = ride;
 
@@ -639,7 +639,7 @@ GcMiniCalendar::setDate(int _month, int _year)
 }
 
 void
-DiarySidebar::setDateRange()
+PlanSidebar::setDateRange()
 {
     QDate when;
     if (_ride && _ride->ride()) when = _ride->dateTime.date();

@@ -196,7 +196,7 @@ class MainWindow : public QMainWindow
 
         void selectAthlete();
         void selectTrends();
-        void selectDiary();
+        void selectPlan();
         void selectAnalysis();
         void selectTrain();
 
