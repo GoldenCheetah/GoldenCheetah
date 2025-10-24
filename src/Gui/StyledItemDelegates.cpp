@@ -391,8 +391,8 @@ DirectoryPathWidget::handleBrowseClicked
                       | QFileDialog::DontResolveSymlinks);
 #if defined Q_OS_MACOS
     // Avoid crash when using native FileDialog on MacOS from a QStyledItemDelegate (see #4719)
-    fileDialog.setOptions(  fileDialog.options()
-                          | QFileDialog::DontUseNativeDialog);
+    dialog.setOptions(  dialog.options()
+                      | QFileDialog::DontUseNativeDialog);
 #endif
     QString path = lineEdit->text();
     if (path.isEmpty()) {
@@ -457,7 +457,7 @@ DirectoryPathDelegate::createEditor
                           | QFileDialog::DontResolveSymlinks);
 #if defined Q_OS_MACOS
         // Avoid crash when using native FileDialog on MacOS from a QStyledItemDelegate (see #4719)
-        dialog.setOptions(  fileDialog.options()
+        dialog.setOptions(  dialog.options()
                           | QFileDialog::DontUseNativeDialog);
 #endif
         dialog.setDirectory(initialDir);
