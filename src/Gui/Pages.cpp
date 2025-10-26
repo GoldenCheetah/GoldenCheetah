@@ -246,9 +246,12 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     startupView = new QComboBox();
     startupView->addItem(tr("Trends"));
     startupView->addItem(tr("Analysis"));
-    startupView->addItem(tr("Plan"));
     startupView->addItem(tr("Train"));
-    startupView->setCurrentIndex(appsettings->value(NULL, GC_STARTUP_VIEW, "1").toInt());
+
+    // map view indexes to combo box values, given that plan/diary is not available
+    int startView = appsettings->value(NULL, GC_STARTUP_VIEW, "1").toInt();
+    if (startView == 3) startView = 2;
+    startupView->setCurrentIndex(startView);
 
     QFormLayout *form = newQFormLayout();
     form->addRow(new QLabel(HLO + tr("Localization") + HLC));
@@ -313,9 +316,9 @@ GeneralPage::saveClicked()
     };
     appsettings->setValue(GC_LANG, langs[langCombo->currentIndex()]);
 
-    // map diary startup view to trends (temporarily until plan view available)
-    int startView = (startupView->currentIndex() != 2) ? startupView->currentIndex() : 0;
-    // save startup view
+    // map combo box values to view indexes, given that plan/diary is not available
+    int startView = startupView->currentIndex();
+    if (startView == 2) startView = 3;
     appsettings->setValue(GC_STARTUP_VIEW, startView);
 
     // Garmin and cranks
