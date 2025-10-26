@@ -402,6 +402,40 @@ void
 DirectoryPathWidget::openFileDialog
 ()
 {
+#ifdef Q_OS_MACOS
+    // On macOS, use a pointer-based modal dialog in delegate mode.
+    // The key is using nullptr as parent to avoid lifecycle conflicts between
+    // the delegate editor and the dialog, while keeping the dialog modal.
+    if (delegateMode) {
+        QFileDialog *dialog = new QFileDialog(nullptr);  // No parent to avoid lifecycle issues
+        dialog->setFileMode(QFileDialog::Directory);
+        dialog->setOptions(  QFileDialog::ShowDirsOnly
+                           | QFileDialog::DontResolveSymlinks);
+        dialog->setWindowModality(Qt::ApplicationModal);
+        QString path = lineEdit->text();
+        if (path.isEmpty()) {
+            path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
+        }
+        dialog->setDirectory(path);
+        // Execute modally - this works because there's no parent widget
+        bool accepted = false;
+        if (dialog->exec() == QDialog::Accepted) {
+            const QStringList selectedDirs = dialog->selectedFiles();
+            if (! selectedDirs.isEmpty()) {
+                QString selectedDir = selectedDirs.first();
+                if (! selectedDir.isEmpty()) {
+                    setPath(selectedDir);
+                    accepted = true;
+                }
+            }
+        }
+        emit editingFinished(accepted);
+        delete dialog;
+        return;
+    }
+#endif
+
+    // Standard modal dialog approach for non-delegate mode or non-macOS
     QFileDialog dialog(window());
     dialog.setFileMode(QFileDialog::Directory);
     dialog.setOptions(  QFileDialog::ShowDirsOnly
