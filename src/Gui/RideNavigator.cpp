@@ -327,7 +327,7 @@ RideNavigator::resetView()
     // initialise to whatever groupBy we want to start with
     tableView->sortByColumn(sortByIndex(), static_cast<Qt::SortOrder>(sortByOrder()));;
 
-    //tableView->setColumnHidden(0, true);
+    tableView->setColumnHidden(0, true);
     tableView->setColumnWidth(0,0);
 
     // set the column widths
@@ -487,13 +487,14 @@ RideNavigator::eventFilter(QObject *object, QEvent *e)
             break;
         }
 
-        case QEvent::WindowActivate:
+        case QEvent::LayoutRequest:
         {
             active=true;
             // set the column widths
             int columnnumber=0;
             foreach(QString size, _widths.split("|", Qt::SkipEmptyParts)) {
                 tableView->setColumnWidth(columnnumber, size.toInt());
+                columnnumber++;
             }
             active=false;
             setWidth(geometry().width()); // calculate width...
@@ -606,8 +607,8 @@ RideNavigator::calcColumnsChanged(bool resized, int logicalIndex, int oldSize, i
     setColumnWidth(geometry().width(), resized, logicalIndex, oldSize, newSize); // calculate width...
 
     // get column widths
-    QString widths;
-    for (int i=0; i<tableView->header()->count(); i++) {
+    QString widths("0|");
+    for (int i=1; i<tableView->header()->count(); i++) {
         int index = tableView->header()->logicalIndex(i);
         if (tableView->header()->isSectionHidden(index) != true) {
            widths += QString("%1|").arg(tableView->columnWidth(index));
