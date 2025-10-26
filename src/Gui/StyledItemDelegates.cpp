@@ -377,38 +377,52 @@ DirectoryPathWidget::setPlaceholderText
 
 
 void
+DirectoryPathWidget::setDelegateMode
+(bool delegateMode)
+{
+    this->delegateMode = delegateMode;
+}
+
+
+void
 DirectoryPathWidget::handleBrowseClicked
 ()
 {
-    if (receivers(SIGNAL(dialogRequested(QString))) > 0) {
-        emit dialogRequested(getPath());
-        return;
+    if (delegateMode) {
+        QTimer::singleShot(0, this, [=]() {
+            openFileDialog();
+        });
+    } else {
+        openFileDialog();
     }
-    QFileDialog dialog(lineEdit->window());
-    QStringList selectedDirs;
+}
+
+
+void
+DirectoryPathWidget::openFileDialog
+()
+{
+    QFileDialog dialog(window());
     dialog.setFileMode(QFileDialog::Directory);
     dialog.setOptions(  QFileDialog::ShowDirsOnly
                       | QFileDialog::DontResolveSymlinks);
-#if defined Q_OS_MACOS
-    // Avoid crash when using native FileDialog on MacOS from a QStyledItemDelegate (see #4719)
-    dialog.setOptions(  dialog.options()
-                      | QFileDialog::DontUseNativeDialog);
-#endif
     QString path = lineEdit->text();
     if (path.isEmpty()) {
         path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
     }
     dialog.setDirectory(path);
+    bool accepted = false;
     if (dialog.exec() == QDialog::Accepted) {
-        QStringList selectedDirs = dialog.selectedFiles();
+        const QStringList selectedDirs = dialog.selectedFiles();
         if (! selectedDirs.isEmpty()) {
-            QString selectedDir = selectedDirs.at(0);
+            QString selectedDir = selectedDirs.first();
             if (! selectedDir.isEmpty()) {
                 setPath(selectedDir);
+                accepted = true;
             }
         }
     }
-    emit editingFinished();
+    emit editingFinished(accepted);
 }
 
 
@@ -423,7 +437,7 @@ DirectoryPathWidget::lineEditFinished
     lineEditAlreadyFinished = true;
 
     if (! browseButton->hasFocus()) {
-        emit editingFinished();
+        emit editingFinished(true);
     }
 }
 
@@ -444,45 +458,15 @@ DirectoryPathDelegate::createEditor
     Q_UNUSED(option)
 
     DirectoryPathWidget *editor = new DirectoryPathWidget(parent);
+    editor->setDelegateMode(true);
     editor->setPlaceholderText(placeholderText);
 
-    connect(editor, &DirectoryPathWidget::dialogRequested, editor, [this, editor, index]() {
-        QString currentPath = editor->getPath();
-        QString initialDir = currentPath.isEmpty()
-            ? QStandardPaths::writableLocation(QStandardPaths::HomeLocation)
-            : currentPath;
-
-        QFileDialog dialog(editor);
-        dialog.setOptions(  QFileDialog::ShowDirsOnly
-                          | QFileDialog::DontResolveSymlinks);
-#if defined Q_OS_MACOS
-        // Avoid crash when using native FileDialog on MacOS from a QStyledItemDelegate (see #4719)
-        dialog.setOptions(  dialog.options()
-                          | QFileDialog::DontUseNativeDialog);
-#endif
-        dialog.setDirectory(initialDir);
-
-        if (dialog.exec() == QDialog::Accepted) {
-            QStringList selectedDirs = dialog.selectedFiles();
-            if (! selectedDirs.isEmpty()) {
-                QString selectedDir = selectedDirs.at(0);
-                QTimer::singleShot(0, editor, [editor, selectedDir]() {
-                    if (! selectedDir.isEmpty()) {
-                        editor->setPath(selectedDir);
-                    }
-                });
-            }
-            QTimer::singleShot(0, this, [this, editor]() {
-                DirectoryPathDelegate *delegate = const_cast<DirectoryPathDelegate*>(this);
-                emit delegate->commitData(editor);
-                emit delegate->closeEditor(editor);
-            });
-        } else {
-            QTimer::singleShot(0, this, [this, editor]() {
-                DirectoryPathDelegate *delegate = const_cast<DirectoryPathDelegate*>(this);
-                emit delegate->closeEditor(editor);
-            });
+    DirectoryPathDelegate *delegate = const_cast<DirectoryPathDelegate*>(this);
+    connect(editor, &DirectoryPathWidget::editingFinished, delegate, [delegate, editor](bool accepted) {
+        if (accepted) {
+            emit delegate->commitData(editor);
         }
+        emit delegate->closeEditor(editor);
     });
 
     return editor;

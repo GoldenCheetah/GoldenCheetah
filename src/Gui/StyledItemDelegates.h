@@ -147,21 +147,23 @@ public:
 
     QString getPath() const;
     void setPlaceholderText(const QString &placeholder);
+    void setDelegateMode(bool delegateMode);
 
 public slots:
     void setPath(const QString &path);
 
 signals:
-    void dialogRequested(const QString &currentPath);
-    void editingFinished();
+    void editingFinished(bool accepted);
 
 private:
+    bool delegateMode = false;
     QPushButton *browseButton;
     QLineEdit *lineEdit;
     bool lineEditAlreadyFinished = false;
 
 private slots:
     void handleBrowseClicked();
+    void openFileDialog();
     void lineEditFinished();
 };
 
