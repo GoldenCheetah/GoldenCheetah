@@ -402,13 +402,15 @@ void
 DirectoryPathWidget::openFileDialog
 ()
 {
+#define Q_OS_MACOS 1
 #ifdef Q_OS_MACOS
-    // On macOS, use a modal dialog with deferred widget access in delegate mode.
-    // We use QTimer::singleShot to defer accessing widget members until after
-    // event loop processing, which prevents crashes if the delegate is destroyed
-    // during dialog.exec(). Qt automatically cancels the timer if 'this' is destroyed.
+    // On macOS, use a modal dialog with deferred signal emission in delegate mode.
+    // We immediately update the widget data, but defer the editingFinished signal
+    // to allow the event loop to process, preventing crashes if the delegate
+    // tries to destroy the editor during signal handling.
     if (delegateMode) {
-        QFileDialog *dialog = new QFileDialog(window());
+        QWidget *topLevel = window();
+        QFileDialog *dialog = new QFileDialog(topLevel);
         dialog->setFileMode(QFileDialog::Directory);
         dialog->setOptions(  QFileDialog::ShowDirsOnly
                            | QFileDialog::DontResolveSymlinks);
@@ -429,18 +431,15 @@ DirectoryPathWidget::openFileDialog
             }
         }
         delete dialog;
-        // Defer widget access until after event processing
-        // Qt will not execute the lambda if 'this' has been destroyed
+        // Update the widget data IMMEDIATELY so the delegate can read it
         if (accepted) {
-            QTimer::singleShot(0, this, [this, selectedPath]() {
-                setPath(selectedPath);
-                emit editingFinished(true);
-            });
-        } else {
-            QTimer::singleShot(0, this, [this]() {
-                emit editingFinished(false);
-            });
+            setPath(selectedPath);
         }
+        // Defer only the signal emission to prevent crashes during delegate cleanup
+        // Qt will not execute the lambda if 'this' has been destroyed
+        QTimer::singleShot(0, this, [this, accepted]() {
+            emit editingFinished(accepted);
+        });
         return;
     }
 #endif
