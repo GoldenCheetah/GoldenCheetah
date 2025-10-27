@@ -6,9 +6,9 @@ branches:
     - master
 
 image:
-  - Previous Visual Studio 2019
+  # - Previous Visual Studio 2019
   - macos-monterey
-  - Ubuntu2204
+  # - Ubuntu2204
 
 environment:
   APPVEYOR_SAVE_CACHE_ON_ERROR: true

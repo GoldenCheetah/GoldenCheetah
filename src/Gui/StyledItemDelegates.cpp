@@ -403,34 +403,44 @@ DirectoryPathWidget::openFileDialog
 ()
 {
 #ifdef Q_OS_MACOS
-    // On macOS, use a pointer-based modal dialog in delegate mode.
-    // The key is using nullptr as parent to avoid lifecycle conflicts between
-    // the delegate editor and the dialog, while keeping the dialog modal.
+    // On macOS, use a modal dialog with deferred widget access in delegate mode.
+    // We use QTimer::singleShot to defer accessing widget members until after
+    // event loop processing, which prevents crashes if the delegate is destroyed
+    // during dialog.exec(). Qt automatically cancels the timer if 'this' is destroyed.
     if (delegateMode) {
-        QFileDialog *dialog = new QFileDialog(nullptr);  // No parent to avoid lifecycle issues
+        QFileDialog *dialog = new QFileDialog(window());
         dialog->setFileMode(QFileDialog::Directory);
         dialog->setOptions(  QFileDialog::ShowDirsOnly
                            | QFileDialog::DontResolveSymlinks);
-        dialog->setWindowModality(Qt::ApplicationModal);
+        dialog->setWindowModality(Qt::WindowModal);
         QString path = lineEdit->text();
         if (path.isEmpty()) {
             path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
         }
         dialog->setDirectory(path);
-        // Execute modally - this works because there's no parent widget
+        // Execute modally and store result in local variables
+        QString selectedPath;
         bool accepted = false;
         if (dialog->exec() == QDialog::Accepted) {
             const QStringList selectedDirs = dialog->selectedFiles();
             if (! selectedDirs.isEmpty()) {
-                QString selectedDir = selectedDirs.first();
-                if (! selectedDir.isEmpty()) {
-                    setPath(selectedDir);
-                    accepted = true;
-                }
+                selectedPath = selectedDirs.first();
+                accepted = ! selectedPath.isEmpty();
             }
         }
-        emit editingFinished(accepted);
         delete dialog;
+        // Defer widget access until after event processing
+        // Qt will not execute the lambda if 'this' has been destroyed
+        if (accepted) {
+            QTimer::singleShot(0, this, [this, selectedPath]() {
+                setPath(selectedPath);
+                emit editingFinished(true);
+            });
+        } else {
+            QTimer::singleShot(0, this, [this]() {
+                emit editingFinished(false);
+            });
+        }
         return;
     }
 #endif
@@ -490,6 +500,7 @@ DirectoryPathDelegate::createEditor
 (QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     Q_UNUSED(option)
+    Q_UNUSED(index)
 
     DirectoryPathWidget *editor = new DirectoryPathWidget(parent);
     editor->setDelegateMode(true);
