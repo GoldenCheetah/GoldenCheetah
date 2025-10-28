@@ -402,44 +402,35 @@ void
 DirectoryPathWidget::openFileDialog
 ()
 {
-#define Q_OS_MACOS 1
 #ifdef Q_OS_MACOS
-    // On macOS, use a modal dialog with deferred signal emission in delegate mode.
-    // We immediately update the widget data, but defer the editingFinished signal
-    // to allow the event loop to process, preventing crashes if the delegate
-    // tries to destroy the editor during signal handling.
+    // On macOS in delegate mode, use Qt's cross-platform dialog for maximum safety.
+    // DontUseNativeDialog ensures consistent behavior and prevents delegate lifecycle issues.
     if (delegateMode) {
-        QWidget *topLevel = window();
-        QFileDialog *dialog = new QFileDialog(topLevel);
-        dialog->setFileMode(QFileDialog::Directory);
-        dialog->setOptions(  QFileDialog::ShowDirsOnly
-                           | QFileDialog::DontResolveSymlinks);
-        dialog->setWindowModality(Qt::WindowModal);
+        QFileDialog dialog(window());
+        dialog.setFileMode(QFileDialog::Directory);
+        dialog.setOptions(  QFileDialog::ShowDirsOnly
+                          | QFileDialog::DontResolveSymlinks
+                          | QFileDialog::DontUseNativeDialog);  // Use Qt dialog for safety
         QString path = lineEdit->text();
         if (path.isEmpty()) {
             path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
         }
-        dialog->setDirectory(path);
-        // Execute modally and store result in local variables
+        dialog.setDirectory(path);
+        // Store result in local variables (independent of widget lifecycle)
         QString selectedPath;
         bool accepted = false;
-        if (dialog->exec() == QDialog::Accepted) {
-            const QStringList selectedDirs = dialog->selectedFiles();
+        if (dialog.exec() == QDialog::Accepted) {
+            const QStringList selectedDirs = dialog.selectedFiles();
             if (! selectedDirs.isEmpty()) {
                 selectedPath = selectedDirs.first();
                 accepted = ! selectedPath.isEmpty();
             }
         }
-        delete dialog;
-        // Update the widget data IMMEDIATELY so the delegate can read it
-        if (accepted) {
-            setPath(selectedPath);
+        if (accepted && !selectedPath.isEmpty()) {
+            setPath(selectedPath);  // Safe because native dialog prevents delegate destruction
         }
-        // Defer only the signal emission to prevent crashes during delegate cleanup
-        // Qt will not execute the lambda if 'this' has been destroyed
-        QTimer::singleShot(0, this, [this, accepted]() {
-            emit editingFinished(accepted);
-        });
+        QCoreApplication::processEvents();
+        emit editingFinished(accepted);
         return;
     }
 #endif
