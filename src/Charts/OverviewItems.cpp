@@ -3803,8 +3803,22 @@ void DonutOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsI
 OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), item(item), block(false)
 {
     QVBoxLayout *main = new QVBoxLayout(this);
-    QFormLayout *layout = new QFormLayout();
-    main->addLayout(layout);
+    main->setAlignment(Qt::AlignTop);
+
+    QScrollArea *scrollArea = new QScrollArea();
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setAlignment(Qt::AlignTop);
+    scrollArea->setFrameShape(QFrame::NoFrame);
+
+    QWidget *scrollContent = new QWidget(scrollArea);
+    scrollContent->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+
+    QFormLayout *layout = new QFormLayout(scrollContent);
+
+    scrollContent->setLayout(layout);
+    scrollArea->setWidget(scrollContent);
+
+    main->addWidget(scrollArea);
 
     if (item->type != OverviewItemType::KPI && item->type != OverviewItemType::DATATABLE) main->addStretch();
 
@@ -3899,7 +3913,6 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), it
         connect(double2, SIGNAL(valueChanged(double)), this, SLOT(dataChanged()));
     }
 
-
     if (item->type == OverviewItemType::KPI || item->type == OverviewItemType::DATATABLE) {
 
         // program editor
@@ -3920,9 +3933,8 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), it
 
         connect(editor, SIGNAL(syntaxErrors(QStringList&)), this, SLOT(setErrors(QStringList&)));
         connect(editor, SIGNAL(textChanged()), this, SLOT(dataChanged()));
-
+        scrollArea->setFrameShape(QFrame::StyledPanel);
     }
-
 
     if (item->type == OverviewItemType::KPI) {
         // istime
