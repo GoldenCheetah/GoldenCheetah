@@ -762,24 +762,33 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     HelpWhatsThis *helpConfig = new HelpWhatsThis(this);
     this->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::Chart_User));
 
-    setMinimumHeight(500*dpiYFactor);
-    setMinimumWidth(450*dpiXFactor);
+    setMinimumWidth(500 *dpiXFactor);
+    setMinimumHeight(300 *dpiYFactor);
 
     layout = new QVBoxLayout(this);
     tabs = new QTabWidget(this);
-    layout->addWidget(tabs);
+    // scrollarea->setWidget(buttons);
 
     // Chart tab
-    QWidget *cs= new QWidget(this);
-    tabs->addTab(cs, tr("Chart"));
+    QWidget *cs= new QWidget();
+    // tabs->addTab(cs, tr("Chart"));
+
+    layout->addWidget(tabs);
 
     QVBoxLayout *vf = new QVBoxLayout(cs);
     QFormLayout *cf = new QFormLayout();
     vf->addLayout(cf);
-    vf->addStretch();
+
+    QScrollArea *scrollArea = new QScrollArea;
+    scrollArea->setWidget(cs);
+    scrollArea->setWidgetResizable(true);
+    tabs->addTab(scrollArea, tr("Chart"));
+    scrollArea->setAlignment(Qt::AlignTop);  // ensures content starts at top
+    cs->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
 
     // laying out the chart tab
-    cf->addRow("  ", (QWidget*)NULL);
+    // cf->addRow("  ", (QWidget*)NULL);
     title = new QLineEdit(this);
     cf->addRow(tr("Sub-title"), title);
     description = new QTextEdit(this);
