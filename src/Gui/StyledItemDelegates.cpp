@@ -403,20 +403,19 @@ DirectoryPathWidget::openFileDialog
 ()
 {
 #ifdef Q_OS_MACOS
-    // On macOS in delegate mode, use Qt's cross-platform dialog for maximum safety.
-    // DontUseNativeDialog ensures consistent behavior and prevents delegate lifecycle issues.
+    // On macOS, the window manager aggressively destroys delegate editors after
+    // modal dialogs close. We must defer ALL widget member access until the
+    // event loop stabilizes, using QTimer to ensure the widget still exists.
     if (delegateMode) {
         QFileDialog dialog(window());
         dialog.setFileMode(QFileDialog::Directory);
         dialog.setOptions(  QFileDialog::ShowDirsOnly
-                          | QFileDialog::DontResolveSymlinks
-                          | QFileDialog::DontUseNativeDialog);  // Use Qt dialog for safety
+                          | QFileDialog::DontResolveSymlinks);
         QString path = lineEdit->text();
         if (path.isEmpty()) {
             path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
         }
         dialog.setDirectory(path);
-        // Store result in local variables (independent of widget lifecycle)
         QString selectedPath;
         bool accepted = false;
         if (dialog.exec() == QDialog::Accepted) {
@@ -426,11 +425,18 @@ DirectoryPathWidget::openFileDialog
                 accepted = ! selectedPath.isEmpty();
             }
         }
-        if (accepted && !selectedPath.isEmpty()) {
-            setPath(selectedPath);  // Safe because native dialog prevents delegate destruction
-        }
-        QCoreApplication::processEvents();
-        emit editingFinished(accepted);
+        // DO NOT access widget members here! macOS may have already destroyed it.
+        // Instead, use QTimer with QPointer to safely defer the update.
+        QPointer<DirectoryPathWidget> self(this);
+        QTimer::singleShot(0, this, [self, selectedPath, accepted]() {
+            if (! self) {
+                return; // Widget was destroyed - nothing to do
+            }
+            if (accepted && ! selectedPath.isEmpty()) {
+                self->setPath(selectedPath);
+            }
+            emit self->editingFinished(accepted);
+        });
         return;
     }
 #endif
