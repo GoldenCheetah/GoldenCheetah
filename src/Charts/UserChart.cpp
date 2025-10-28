@@ -767,11 +767,9 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
 
     layout = new QVBoxLayout(this);
     tabs = new QTabWidget(this);
-    // scrollarea->setWidget(buttons);
 
     // Chart tab
     QWidget *cs= new QWidget();
-    // tabs->addTab(cs, tr("Chart"));
 
     layout->addWidget(tabs);
 
