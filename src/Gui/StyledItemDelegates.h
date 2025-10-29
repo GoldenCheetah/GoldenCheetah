@@ -191,8 +191,12 @@ private:
     int maxWidth = -1;
     QString placeholderText;
 #ifdef Q_OS_MACOS
+    void closeEditorForWidget(QWidget *editor);
     void openFileDialogForEditor(QWidget *editor, const QModelIndex &index) const;
 #endif
+
+private slots:
+    void onEditingFinished(bool accepted);
 };
 
 

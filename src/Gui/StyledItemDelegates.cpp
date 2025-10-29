@@ -480,12 +480,7 @@ DirectoryPathDelegate::createEditor
         delegate->openFileDialogForEditor(editor, index);
     });
 #endif
-    connect(editor, &DirectoryPathWidget::editingFinished, delegate, [delegate, editor](bool accepted) {
-        if (accepted) {
-            emit delegate->commitData(editor);
-        }
-        emit delegate->closeEditor(editor);
-    });
+    connect(editor, &DirectoryPathWidget::editingFinished, delegate, &DirectoryPathDelegate::onEditingFinished);
 
     return editor;
 }
@@ -568,40 +563,60 @@ DirectoryPathDelegate::setPlaceholderText
 }
 
 
+void
+DirectoryPathDelegate::onEditingFinished
+(bool accepted)
+{
+    DirectoryPathWidget *editor = qobject_cast<DirectoryPathWidget*>(sender());
+    if (editor) {
+        if (accepted) {
+            emit commitData(editor);
+        }
+        emit closeEditor(editor);
+    }
+}
+
+
 #ifdef Q_OS_MACOS
+void
+DirectoryPathDelegate::closeEditorForWidget
+(QWidget *editor)
+{
+    if (editor) {
+        emit closeEditor(editor, QAbstractItemDelegate::NoHint);
+    }
+}
+
+
 void
 DirectoryPathDelegate::openFileDialogForEditor
 (QWidget *editor, const QModelIndex &index) const
 {
-    DirectoryPathWidget *pathEditor = qobject_cast<DirectoryPathWidget*>(editor);
-    if (! pathEditor) {
-        return;
-    }
-
-    QFileDialog dialog(editor->window());
+    QPointer<QWidget> pathEditor(editor);
+    QFileDialog dialog(pathEditor.data());
     dialog.setFileMode(QFileDialog::Directory);
-    dialog.setOptions(  QFileDialog::ShowDirsOnly
-                      | QFileDialog::DontResolveSymlinks);
-
-    QString path = pathEditor->getPath();
-    if (path.isEmpty()) {
-        path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
-    }
-    dialog.setDirectory(path);
+    dialog.setOption(QFileDialog::ShowDirsOnly, true);
+    dialog.setOption(QFileDialog::DontUseNativeDialog, true);
 
     if (dialog.exec() == QDialog::Accepted) {
-        const QStringList selectedDirs = dialog.selectedFiles();
-        if (! selectedDirs.isEmpty()) {
-            const QString selectedDir = selectedDirs.first();
-            if (! selectedDir.isEmpty()) {
-                // Write data directly to the model, as the editor might be destroyed.
-                QAbstractItemModel *model = const_cast<QAbstractItemModel*>(index.model());
-                model->setData(index, selectedDir, Qt::EditRole);
-            }
+        // Check if the editor widget still exists before using it
+        if (!pathEditor.isNull()) {
+            QString selectedDir = dialog.selectedFiles().first();
+            // Write directly to the model - this persists the data
+            QAbstractItemModel *model = const_cast<QAbstractItemModel*>(index.model());
+            model->setData(index, selectedDir, Qt::EditRole);
         }
     }
-    // Always close the editor after handling the dialog.
-    emit const_cast<DirectoryPathDelegate*>(this)->closeEditor(pathEditor);
+
+    // The editor might have been destroyed during dialog.exec().
+    // Schedule the closeEditor call to happen safely in the event loop.
+    if (!pathEditor.isNull()) {
+        QTimer::singleShot(0, const_cast<DirectoryPathDelegate*>(this), [this, pathEditor]() {
+            if (!pathEditor.isNull()) {
+                const_cast<DirectoryPathDelegate*>(this)->closeEditorForWidget(pathEditor.data());
+            }
+        });
+    }
 }
 #endif
 
