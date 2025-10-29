@@ -154,6 +154,9 @@ public slots:
 
 signals:
     void editingFinished(bool accepted);
+#ifdef Q_OS_MACOS
+    void browseRequested();
+#endif
 
 private:
     bool delegateMode = false;
@@ -187,6 +190,9 @@ public:
 private:
     int maxWidth = -1;
     QString placeholderText;
+#ifdef Q_OS_MACOS
+    void openFileDialogForEditor(QWidget *editor, const QModelIndex &index) const;
+#endif
 };
 
 

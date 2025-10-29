@@ -403,41 +403,12 @@ DirectoryPathWidget::openFileDialog
 ()
 {
 #ifdef Q_OS_MACOS
-    // On macOS, the window manager aggressively destroys delegate editors after
-    // modal dialogs close. We must defer ALL widget member access until the
-    // event loop stabilizes, using QTimer to ensure the widget still exists.
+    // On macOS in delegate mode, emit a signal and let the delegate handle the dialog.
+    // This avoids widget lifecycle issues where the editor is destroyed during
+    // QFileDialog::exec().
     if (delegateMode) {
-        QFileDialog dialog(window());
-        dialog.setFileMode(QFileDialog::Directory);
-        dialog.setOptions(  QFileDialog::ShowDirsOnly
-                          | QFileDialog::DontResolveSymlinks);
-        QString path = lineEdit->text();
-        if (path.isEmpty()) {
-            path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
-        }
-        dialog.setDirectory(path);
-        QString selectedPath;
-        bool accepted = false;
-        if (dialog.exec() == QDialog::Accepted) {
-            const QStringList selectedDirs = dialog.selectedFiles();
-            if (! selectedDirs.isEmpty()) {
-                selectedPath = selectedDirs.first();
-                accepted = ! selectedPath.isEmpty();
-            }
-        }
-        // DO NOT access widget members here! macOS may have already destroyed it.
-        // Instead, use QTimer with QPointer to safely defer the update.
-        QPointer<DirectoryPathWidget> self(this);
-        QTimer::singleShot(0, this, [self, selectedPath, accepted]() {
-            if (! self) {
-                return; // Widget was destroyed - nothing to do
-            }
-            if (accepted && ! selectedPath.isEmpty()) {
-                self->setPath(selectedPath);
-            }
-            emit self->editingFinished(accepted);
-        });
-        return;
+        emit browseRequested();
+        return; // The delegate must take over.
     }
 #endif
 
@@ -503,6 +474,12 @@ DirectoryPathDelegate::createEditor
     editor->setPlaceholderText(placeholderText);
 
     DirectoryPathDelegate *delegate = const_cast<DirectoryPathDelegate*>(this);
+#ifdef Q_OS_MACOS
+    // On macOS, the delegate handles the dialog to prevent lifecycle crashes.
+    connect(editor, &DirectoryPathWidget::browseRequested, delegate, [delegate, editor, index]() {
+        delegate->openFileDialogForEditor(editor, index);
+    });
+#endif
     connect(editor, &DirectoryPathWidget::editingFinished, delegate, [delegate, editor](bool accepted) {
         if (accepted) {
             emit delegate->commitData(editor);
@@ -589,6 +566,44 @@ DirectoryPathDelegate::setPlaceholderText
 {
     this->placeholderText = placeholderText;
 }
+
+
+#ifdef Q_OS_MACOS
+void
+DirectoryPathDelegate::openFileDialogForEditor
+(QWidget *editor, const QModelIndex &index) const
+{
+    DirectoryPathWidget *pathEditor = qobject_cast<DirectoryPathWidget*>(editor);
+    if (! pathEditor) {
+        return;
+    }
+
+    QFileDialog dialog(editor->window());
+    dialog.setFileMode(QFileDialog::Directory);
+    dialog.setOptions(  QFileDialog::ShowDirsOnly
+                      | QFileDialog::DontResolveSymlinks);
+
+    QString path = pathEditor->getPath();
+    if (path.isEmpty()) {
+        path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
+    }
+    dialog.setDirectory(path);
+
+    if (dialog.exec() == QDialog::Accepted) {
+        const QStringList selectedDirs = dialog.selectedFiles();
+        if (! selectedDirs.isEmpty()) {
+            const QString selectedDir = selectedDirs.first();
+            if (! selectedDir.isEmpty()) {
+                // Write data directly to the model, as the editor might be destroyed.
+                QAbstractItemModel *model = const_cast<QAbstractItemModel*>(index.model());
+                model->setData(index, selectedDir, Qt::EditRole);
+            }
+        }
+    }
+    // Always close the editor after handling the dialog.
+    emit const_cast<DirectoryPathDelegate*>(this)->closeEditor(pathEditor);
+}
+#endif
 
 
 // ListEditWidget //////////////////////////////////////////////////////////////////////
