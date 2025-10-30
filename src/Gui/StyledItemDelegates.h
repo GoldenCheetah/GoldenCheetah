@@ -145,20 +145,28 @@ class DirectoryPathWidget: public QWidget
 public:
     DirectoryPathWidget(QWidget *parent = nullptr);
 
-    void setPath(const QString &path);
     QString getPath() const;
     void setPlaceholderText(const QString &placeholder);
+    void setDelegateMode(bool delegateMode);
+
+public slots:
+    void setPath(const QString &path);
 
 signals:
-    void editingFinished();
+    void editingFinished(bool accepted);
+#ifdef Q_OS_MACOS
+    void browseRequested();
+#endif
 
 private:
-    QPushButton *openButton;
+    bool delegateMode = false;
+    QPushButton *browseButton;
     QLineEdit *lineEdit;
     bool lineEditAlreadyFinished = false;
 
 private slots:
-    void openDialog();
+    void handleBrowseClicked();
+    void openFileDialog();
     void lineEditFinished();
 };
 
@@ -179,12 +187,16 @@ public:
     void setMaxWidth(int maxWidth);
     void setPlaceholderText(const QString &placeholderText);
 
-private slots:
-    void commitAndCloseEditor();
-
 private:
     int maxWidth = -1;
     QString placeholderText;
+#ifdef Q_OS_MACOS
+    void closeEditorForWidget(QWidget *editor);
+    void openFileDialogForEditor(QWidget *editor, const QModelIndex &index) const;
+#endif
+
+private slots:
+    void onEditingFinished(bool accepted);
 };
 
 
