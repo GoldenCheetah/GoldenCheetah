@@ -707,7 +707,15 @@ MainWindow::MainWindow(const QDir &home)
     //connect(this, SIGNAL(rideClean()), this, SLOT(enableSaveButton()));
 
     saveGCState(currentAthleteTab->context); // set to whatever we started with
-    selectAnalysis();
+
+    // switch to the startup view, default is analysis.
+    switch (appsettings->value(NULL, GC_STARTUP_VIEW, "1").toInt()) {
+        case 0: selectTrends(); break;
+        case 1: selectAnalysis(); break;
+        case 2: selectDiary(); break;
+        case 3: selectTrain(); break;
+        default: selectAnalysis(); qDebug() << "Unknown startup view"; break;
+    }
 
     //grab focus
     currentAthleteTab->setFocus();

@@ -227,7 +227,7 @@ NavigationModel::forward()
                 stack[stackpointer+2].after.toInt() == 1) {              // switch to analysis
 
                 stackpointer++;
-                action(false, stack[stackpointer]);
+                action(true, stack[stackpointer]);
             }
 
             // redo
@@ -235,4 +235,5 @@ NavigationModel::forward()
             action(true, stack[stackpointer]);
         }
     }
+
 }

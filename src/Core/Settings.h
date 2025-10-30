@@ -164,6 +164,7 @@
 #define GC_TELEMETRY_UPDATE_COUNTER     "<global-general>telemetryUpdateCounter"
 #define GC_LAST_VERSION_CHECKED         "<global-general>lastVersionChecked"
 #define GC_LAST_VERSION_CHECK_DATE      "<global-general>lastVersionCheckDate"
+#define GC_STARTUP_VIEW                 "<global-general>startupView"
 
 
 

@@ -51,9 +51,12 @@ class AnalysisView : public AbstractView
 
         void notifyViewStateRestored() override;
         void notifyViewSidebarChanged() override;
-        void setViewSpecificPerspective() override;
+        int getViewSpecificPerspective() override;
         void notifyViewSplitterMoved() override;
 
+    private:
+
+        int findRidesPerspective(RideItem* ride);
 };
 
 class DiarySidebar;
@@ -128,6 +131,9 @@ class TrendsView : public AbstractView
         void justSelected();
         void dateRangeChanged(DateRange);
         void compareChanged(bool);
+
+    protected:
+        void notifyViewStateRestored() override;
 };
 
 #endif // _GC_Views_h
