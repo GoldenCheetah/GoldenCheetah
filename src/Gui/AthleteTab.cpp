@@ -171,10 +171,9 @@ AthleteTab::selectView(int index)
 {
     // ensure an initial viewChanged() event occurs for the navigation model, otherwise if the
     // startup view is trends (value zero) the guard rejects the selection as views->currentIndex() is zero
-    static bool notifyStartupView = true;
-    if (!notifyStartupView && views->currentIndex() == index) return; // not changing
-
-    notifyStartupView = false;
+    static bool startupView = true;
+    if (!startupView && views->currentIndex() == index) return; // not changing
+    startupView = false;
 
     emit viewChanged(index);
 

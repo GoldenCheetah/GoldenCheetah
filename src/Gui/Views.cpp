@@ -77,28 +77,35 @@ AnalysisView::setRide(RideItem *ride)
     // then lets go find one to switch to..
     if (context->mainWindow->athleteTab()->currentView() == 1 && page()->relevant(ride) != true) {
 
-        // lets find one to switch to
-        Perspective *found=page();
-        foreach(Perspective *p, perspectives_){
-            if (p->relevant(ride)) {
-                found =p;
-                break;
-            }
-        }
-
-        // none of them want to be selected, so we can stay on the current one
-        // so long as it doesn't have an expression that failed...
-        if (found == page() && page()->expression() != "")
-            found = perspectives_[0];
+        // lets find a perspective to switch to
+        int ridePerspectiveIdx = findRidesPerspective(ride);
 
         // if we need to switch, i.e. not already on it
-        if (found != page())  {
-            context->mainWindow->switchPerspective(perspectives_.indexOf(found));
+        if (ridePerspectiveIdx != perspectives_.indexOf(page()))  {
+            context->mainWindow->switchPerspective(ridePerspectiveIdx);
         }
     }
 
     // tell the perspective we have selected a ride
     page()->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
+}
+
+int
+AnalysisView::findRidesPerspective(RideItem* ride)
+{
+    // lets find one to switch to
+    foreach(Perspective *p, perspectives_) {
+        if (p->relevant(ride)) {
+            return perspectives_.indexOf(p);
+        }
+    }
+
+    // none of them want to be selected, so we can stay on the current one
+    // so long as it doesn't have an expression that failed...
+    if (page()->expression() != "") return 0;
+
+    // we can just return the current one
+    return perspectives_.indexOf(page());
 }
 
 void
@@ -127,27 +134,13 @@ AnalysisView::isBlank()
 }
 
 void
-AnalysisView::notifyViewStateRestored() {
+AnalysisView::notifyViewStateRestored()
+{
 
     // set the ride only when analysis is the startup view and no ride has been set.
     // otherwise when trends is the startup view and a ride is clicked thru, this part
     // of the analysis loading process overwrites the click thru selection. 
-    if (context->ride == nullptr) {
-
-        // lets select the first ride
-        QDateTime now = QDateTime::currentDateTime();
-        for (int i = context->athlete->rideCache->rides().count(); i > 0; --i) {
-            if (context->athlete->rideCache->rides()[i - 1]->dateTime <= now) {
-                context->athlete->selectRideFile(context->athlete->rideCache->rides()[i - 1]->fileName);
-                return;
-            }
-        }
-
-        // otherwise just select the latest ride
-        if (context->athlete->rideCache->rides().count() != 0) {
-            context->athlete->selectRideFile(context->athlete->rideCache->rides().last()->fileName);
-        }
-    }
+    setViewsInitialRide();
 }
 
 void
@@ -161,12 +154,11 @@ AnalysisView::notifyViewSidebarChanged() {
     }
 }
 
-void
-AnalysisView::setViewSpecificPerspective() {
+int
+AnalysisView::getViewSpecificPerspective() {
 
     // Setting the ride for analysis view also sets the perspective.
-    RideItem* ride = (RideItem*)context->currentRideItem();
-    if (ride != NULL) setRide(ride);
+    return findRidesPerspective(const_cast<RideItem*>(context->currentRideItem()));
 }
 
 void
@@ -327,6 +319,15 @@ TrendsView::isBlank()
 {
     if (context->athlete->rideCache->rides().count() > 0) return false;
     else return true;
+}
+
+void
+TrendsView::notifyViewStateRestored()
+{
+    // set the ride when trends is the startup view and no ride has been set.
+    // Trends needs a default initial ride to be set, as the UserChart's rangemode still relies upon a
+    // a selected flight, and requires future refactoring to remove the dependency on a selcted ride. 
+    setViewsInitialRide();
 }
 
 void
