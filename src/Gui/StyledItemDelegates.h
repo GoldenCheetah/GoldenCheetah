@@ -204,16 +204,17 @@ private slots:
 class ListEditWidget: public QWidget
 {
     Q_OBJECT
-
 public:
-    ListEditWidget(QWidget *parent = nullptr);
+    explicit ListEditWidget(QWidget *parent = nullptr);
 
     void setTitle(const QString &text);
     void setList(const QStringList &list);
     QStringList getList() const;
 
-public slots:
-    void showDialog();
+    void showDialog(QWidget *owner = nullptr);
+
+signals:
+    void editingFinished(const QStringList &newList);
 
 private slots:
     void itemChanged(QListWidgetItem *item);
@@ -223,16 +224,12 @@ private slots:
     void addItem();
     void deleteItem();
 
-signals:
-    void editingFinished();
-
 private:
+    QDialog *dialog = nullptr;
+    QLabel *title = nullptr;
+    QListWidget *listWidget = nullptr;
+    ActionButtonBox *actionButtons = nullptr;
     QStringList data;
-
-    QDialog *dialog;
-    QLabel *title;
-    QListWidget *listWidget;
-    ActionButtonBox *actionButtons;
 };
 
 
@@ -243,19 +240,18 @@ class ListEditDelegate: public QStyledItemDelegate
 public:
     ListEditDelegate(QObject *parent = nullptr);
 
-    void setTitle(const QString &title);
     void setDisplayLength(int limit, int reduce = 2);
 
-    virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-    virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
-    virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
-    virtual QString displayText(const QVariant &value, const QLocale &locale) const override;
+    QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    QString displayText(const QVariant &value, const QLocale &locale) const override;
+
+signals:
+    void requestListEdit(const QModelIndex &index) const;
 
 private slots:
     void commitAndCloseEditor();
 
 private:
-    QString title;
     int limit = -1;
     int reduce = 2;
 };
