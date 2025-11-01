@@ -627,9 +627,6 @@ ListEditWidget::ListEditWidget
 (QWidget *parent)
 : QWidget(parent)
 {
-    dialog = new QDialog(parent);
-    dialog->setModal(true);
-
     title = new QLabel();
     title->setWordWrap(true);
     title->setVisible(false);
@@ -645,23 +642,11 @@ ListEditWidget::ListEditWidget
     actionButtons->defaultConnect(ActionButtonBox::UpDownGroup, listWidget);
     actionButtons->defaultConnect(ActionButtonBox::AddDeleteGroup, listWidget);
 
-    QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-
-    QVBoxLayout *dialogLayout = new QVBoxLayout(dialog);
-    dialogLayout->addWidget(title);
-    dialogLayout->addWidget(listWidget);
-    dialogLayout->addWidget(actionButtons);
-    dialogLayout->addSpacing(10 * dpiYFactor);
-    dialogLayout->addWidget(buttons);
-
     connect(listWidget, &QListWidget::itemChanged, this, &ListEditWidget::itemChanged);
     connect(actionButtons, &ActionButtonBox::upRequested, this, &ListEditWidget::moveUp);
     connect(actionButtons, &ActionButtonBox::downRequested, this, &ListEditWidget::moveDown);
     connect(actionButtons, &ActionButtonBox::addRequested, this, &ListEditWidget::addItem);
     connect(actionButtons, &ActionButtonBox::deleteRequested, this, &ListEditWidget::deleteItem);
-    connect(buttons, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
-    connect(buttons, &QDialogButtonBox::rejected, dialog, &QDialog::reject);
-    connect(dialog, &QDialog::finished, this, &ListEditWidget::dialogFinished);
 }
 
 
@@ -669,12 +654,8 @@ void
 ListEditWidget::setTitle
 (const QString &text)
 {
-    if (text.trimmed().size() > 0) {
-        title->setText(text);
-        title->setVisible(true);
-    } else {
-        title->setVisible(false);
-    }
+    title->setVisible(! text.trimmed().isEmpty());
+    title->setText(text);
 }
 
 
@@ -702,8 +683,25 @@ ListEditWidget::getList
 
 void
 ListEditWidget::showDialog
-()
+(QWidget *owner)
 {
+    dialog = new QDialog(owner);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->setWindowModality(Qt::ApplicationModal);
+
+    QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+
+    QVBoxLayout *layout = new QVBoxLayout(dialog);
+    layout->addWidget(title);
+    layout->addWidget(listWidget);
+    layout->addWidget(actionButtons);
+    layout->addSpacing(10 * dpiYFactor);
+    layout->addWidget(buttons);
+
+    connect(buttons, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
+    connect(buttons, &QDialogButtonBox::rejected, dialog, &QDialog::reject);
+    connect(dialog, &QDialog::finished, this, &ListEditWidget::dialogFinished);
+
     dialog->show();
 }
 
@@ -727,8 +725,8 @@ ListEditWidget::dialogFinished
         for (int i = 0; i < listWidget->count(); ++i) {
             data << listWidget->item(i)->data(Qt::DisplayRole).toString().trimmed();
         }
+        emit editingFinished(data);
     }
-    emit editingFinished();
 }
 
 
@@ -768,21 +766,18 @@ void
 ListEditWidget::addItem
 ()
 {
-    int index = listWidget->count();
-    if (listWidget->currentItem() != nullptr) {
-        index = listWidget->row(listWidget->currentItem());
-    }
+    int index = listWidget->currentRow();
     if (index < 0) {
         index = 0;
     }
     QListWidgetItem *add = new QListWidgetItem();
     add->setFlags(add->flags() | Qt::ItemIsEditable);
-    listWidget->insertItem(index, add);
     QString text = tr("New");
     for (int i = 0; listWidget->findItems(text, Qt::MatchExactly).count() > 0; ++i) {
         text = tr("New (%1)").arg(i + 1);
     }
     add->setData(Qt::DisplayRole, text);
+    listWidget->insertItem(index, add);
     listWidget->setCurrentItem(add);
     listWidget->editItem(add);
 }
@@ -798,21 +793,12 @@ ListEditWidget::deleteItem
 }
 
 
-
 // ListEditDelegate ////////////////////////////////////////////////////////////////////
 
 ListEditDelegate::ListEditDelegate
 (QObject *parent)
 : QStyledItemDelegate(parent)
 {
-}
-
-
-void
-ListEditDelegate::setTitle
-(const QString &title)
-{
-    this->title = title;
 }
 
 
@@ -831,32 +817,8 @@ ListEditDelegate::createEditor
 {
     Q_UNUSED(option)
     Q_UNUSED(index)
-
-    ListEditWidget *editor = new ListEditWidget(parent);
-    editor->setTitle(title);
-    connect(editor, &ListEditWidget::editingFinished, this, &ListEditDelegate::commitAndCloseEditor);
-    editor->showDialog();
-
-    return editor;
-}
-
-
-void
-ListEditDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
-{
-    ListEditWidget *listEditor = static_cast<ListEditWidget*>(editor);
-    listEditor->setList(index.data(Qt::DisplayRole).toString().split(','));
-}
-
-
-void
-ListEditDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
-{
-    ListEditWidget *listEditor = static_cast<ListEditWidget*>(editor);
-    QString newValue = listEditor->getList().join(',');
-    if (model->data(index, Qt::EditRole).toString() != newValue) {
-        model->setData(index, newValue, Qt::EditRole);
-    }
+    emit requestListEdit(index);
+    return nullptr;
 }
 
 
