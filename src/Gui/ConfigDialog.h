@@ -166,6 +166,25 @@ class MeasuresConfig : public QWidget
         MeasuresConfigPage *measuresPage;
 };
 
+// PROCESSOR PAGE
+class ProcessorConfig : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        ProcessorConfig(QDir home, Context *context);
+
+        ProcessorPage *processorPage;
+
+    public slots:
+        qint32 saveClicked();
+
+    private:
+        QDir home;
+        Context *context;
+
+};
+
 class ConfigDialog : public QMainWindow
 {
     Q_OBJECT
@@ -196,5 +215,6 @@ class ConfigDialog : public QMainWindow
         IntervalConfig *interval;
         MeasuresConfig *measures;
         TrainConfig *train;
+        ProcessorConfig *processor;
 };
 #endif

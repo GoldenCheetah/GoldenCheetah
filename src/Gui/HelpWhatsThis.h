@@ -195,7 +195,6 @@ Q_OBJECT
                  Preferences_DataFields_Fields,
                  Preferences_DataFields_Notes_Keywords,
                  Preferences_DataFields_Defaults,
-                 Preferences_DataFields_Processing,
 
                  Preferences_Metrics,
                  Preferences_Metrics_Favourites,
@@ -208,6 +207,9 @@ Q_OBJECT
                  Preferences_Training_TrainDevices,
                  Preferences_Training_AddDeviceWizard,
                  Preferences_Training_VirtualBicycleSpecifications,
+
+                 Preferences_Processor,
+                 Preferences_Processor_Processing,
 
                  };
 

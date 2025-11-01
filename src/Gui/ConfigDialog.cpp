@@ -70,6 +70,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     static QIcon intervalIcon(QPixmap(":/images/stopwatch.png"));
     static QIcon measuresIcon(QPixmap(":/images/toolbar/main/measures.png"));
     static QIcon devicesIcon(QPixmap(":/images/devices/kickr.png"));
+    static QIcon processorIcon(QPixmap(":/images/activity-processor.png"));
 
     // Setup the signal mapping so the right config
     // widget is displayed when the icon is clicked
@@ -119,12 +120,17 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 5);
 
-
     added =head->addAction(devicesIcon, tr("Training"));
     added->setCheckable(true);
     added->setActionGroup(actionGroup);
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 6);
+
+    added =head->addAction(processorIcon, tr("Processors"));
+    added->setCheckable(true);
+    added->setActionGroup(actionGroup);
+    connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
+    iconMapper->setMapping(added, 7);
 
     // more space
     spacer = new QWidget(this);
@@ -170,6 +176,11 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     HelpWhatsThis *trainHelp = new HelpWhatsThis(train);
     train->setWhatsThis(trainHelp->getWhatsThisText(HelpWhatsThis::Preferences_Training));
     pagesWidget->addWidget(train);
+
+    processor = new ProcessorConfig(_home, context);
+    HelpWhatsThis *processorHelp = new HelpWhatsThis(general);
+    processor->setWhatsThis(processorHelp->getWhatsThisText(HelpWhatsThis::Preferences_Processor));
+    pagesWidget->addWidget(processor);
 
     QHBoxLayout *horizontalLayout = new QHBoxLayout;
     horizontalLayout->addWidget(pagesWidget, 1);
@@ -250,6 +261,7 @@ void ConfigDialog::saveClicked()
     changed |= train->saveClicked();
     changed |= interval->saveClicked();
     changed |= measures->saveClicked();
+    changed |= processor->saveClicked();
 
     hide();
 
@@ -479,4 +491,23 @@ qint32 TrainConfig::saveClicked()
     state |= workoutTagManagerPage->saveClicked();
 
     return state;
+}
+
+// PROCESSOR CONFIG
+ProcessorConfig::ProcessorConfig(QDir home, Context *context) :
+    home(home), context(context)
+{
+    processorPage = new ProcessorPage(context);
+
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->addWidget(processorPage);
+
+    layout->setSpacing(0);
+    layout->setContentsMargins(0,0,0,0);
+    setContentsMargins(0,0,0,0);
+}
+
+qint32 ProcessorConfig::saveClicked()
+{
+    return processorPage->saveClicked();
 }

@@ -2155,14 +2155,12 @@ MetadataPage::MetadataPage(Context *context) : context(context)
     keywordsPage = new KeywordsPage(this, keywordDefinitions);
     iconsPage = new IconsPage(fieldDefinitions, this);
     defaultsPage = new DefaultsPage(this, defaultDefinitions);
-    processorPage = new ProcessorPage(context);
 
     tabs = new QTabWidget(this);
     tabs->addTab(fieldsPage, tr("Fields"));
     tabs->addTab(keywordsPage, tr("Colour Keywords"));
     tabs->addTab(iconsPage, tr("Icons"));
     tabs->addTab(defaultsPage, tr("Defaults"));
-    tabs->addTab(processorPage, tr("Processors && Automation"));
 
     // refresh the keywords combo when change tabs .. will do more often than
     // needed but better that than less often than needed
@@ -2189,9 +2187,6 @@ MetadataPage::saveClicked()
 
     // write to metadata.xml
     RideMetadata::serialize(QDir(gcroot).canonicalPath() + "/metadata.xml", keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
-
-    // save processors config
-    processorPage->saveClicked();
 
     qint32 state = 0;
 
@@ -3151,7 +3146,7 @@ ProcessorPage::ProcessorPage(Context *context) : context(context)
     processorTree->setColumnHidden(PROCESSORTREE_COL_AUTOMATEDONLY, true);
     processorTree->setColumnHidden(PROCESSORTREE_COL_ID, true);
     HelpWhatsThis *help = new HelpWhatsThis(processorTree);
-    processorTree->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_DataFields_Processing));
+    processorTree->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Processor_Processing));
     basicTreeWidgetStyle(processorTree);
 
     QWidget *leftWidget = new QWidget();

@@ -368,8 +368,6 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("Preferences_Data%20Fields#notes-keywords").arg(tr("Definition of coloring rules for activities"));
     case Preferences_DataFields_Defaults:
         return text.arg("Preferences_Data%20Fields#defaults").arg(tr("Definition of default value(s) for data fields"));
-    case Preferences_DataFields_Processing:
-        return text.arg("Preferences_Data%20Fields#processing").arg(tr("Definition of processing default parameters for the fix, adjust,... tools"));
     case Preferences_Metrics:
         return text.arg("Preferences_Metrics").arg(tr("Metrics"));
     case Preferences_Metrics_Favourites:
@@ -392,9 +390,11 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("Preferences_Training#add-device-wizard").arg(tr("Add Train Devices"));
     case Preferences_Training_VirtualBicycleSpecifications:
         return text.arg("Preferences_Training#virtual-bicycle-specifications").arg(tr("Virtual Bicycle configuration for simulation rides"));
-
+    case Preferences_Processor:
+        return text.arg("Preferences_Processor").arg(tr("Processors & Automation"));
+    case Preferences_Processor_Processing:
+        return text.arg("Preferences_Processor#processing").arg(tr("Definition of processing default parameters for the fix, adjust,... tools"));
     }
-
     return text.arg("").arg("Golden Cheetah Wiki");
 
 }

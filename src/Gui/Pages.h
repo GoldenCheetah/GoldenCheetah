@@ -631,7 +631,6 @@ class MetadataPage : public QWidget
         IconsPage *iconsPage;
         FieldsPage *fieldsPage;
         DefaultsPage *defaultsPage;
-        ProcessorPage *processorPage;
 
         // local versions for modification
         QList<KeywordDefinition> keywordDefinitions;
