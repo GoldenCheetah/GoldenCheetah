@@ -127,24 +127,6 @@ AnalysisView::isBlank()
 }
 
 void
-AnalysisView::notifyViewStateRestored() {
-
-    // lets select the first ride
-    QDateTime now = QDateTime::currentDateTime();
-    for (int i = context->athlete->rideCache->rides().count(); i > 0; --i) {
-        if (context->athlete->rideCache->rides()[i - 1]->dateTime <= now) {
-            context->athlete->selectRideFile(context->athlete->rideCache->rides()[i - 1]->fileName);
-            break;
-        }
-    }
-
-    // otherwise just the latest
-    if (context->currentRideItem() == NULL && context->athlete->rideCache->rides().count() != 0) {
-        context->athlete->selectRideFile(context->athlete->rideCache->rides().last()->fileName);
-    }
-}
-
-void
 AnalysisView::notifyViewSidebarChanged() {
 
     // if user moved us then tell ride navigator
