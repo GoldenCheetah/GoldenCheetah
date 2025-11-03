@@ -42,6 +42,9 @@ PlanningCalendarWindow::PlanningCalendarWindow(Context *context)
 
     calendar = new Calendar(QDate::currentDate(), static_cast<Qt::DayOfWeek>(getFirstDayOfWeek()), context->athlete->measures);
 
+    setStartHour(8);
+    setEndHour(21);
+
     QVBoxLayout *mainLayout = new QVBoxLayout();
     setChartLayout(mainLayout);
     mainLayout->addWidget(calendar);
@@ -158,18 +161,27 @@ PlanningCalendarWindow::PlanningCalendarWindow(Context *context)
 
 
 int
+PlanningCalendarWindow::getDefaultView
+() const
+{
+    return defaultViewCombo->currentIndex();
+}
+
+
+void
+PlanningCalendarWindow::setDefaultView
+(int view)
+{
+    defaultViewCombo->setCurrentIndex(view);
+    calendar->setView(static_cast<CalendarView>(view));
+}
+
+
+int
 PlanningCalendarWindow::getFirstDayOfWeek
 () const
 {
     return firstDayOfWeekCombo->currentIndex() + 1;
-}
-
-
-bool
-PlanningCalendarWindow::isSummaryVisibleMonth
-() const
-{
-    return summaryMonthCheck->isChecked();
 }
 
 
@@ -182,12 +194,96 @@ PlanningCalendarWindow::setFirstDayOfWeek
 }
 
 
+int
+PlanningCalendarWindow::getStartHour
+() const
+{
+    return startHourSpin->value();
+}
+
+
+void
+PlanningCalendarWindow::setStartHour
+(int hour)
+{
+    startHourSpin->setValue(hour);
+    endHourSpin->setMinimum(hour + 1);
+    if (calendar != nullptr) {
+        calendar->setStartHour(hour);
+        updateActivities();
+    }
+}
+
+
+int
+PlanningCalendarWindow::getEndHour
+() const
+{
+    return endHourSpin->value();
+}
+
+
+void
+PlanningCalendarWindow::setEndHour
+(int hour)
+{
+    endHourSpin->setValue(hour);
+    startHourSpin->setMaximum(hour - 1);
+    if (calendar != nullptr) {
+        calendar->setEndHour(hour);
+        updateActivities();
+    }
+}
+
+
+bool
+PlanningCalendarWindow::isSummaryVisibleDay
+() const
+{
+    return summaryDayCheck->isChecked();
+}
+
+
+void
+PlanningCalendarWindow::setSummaryVisibleDay
+(bool visible)
+{
+    summaryDayCheck->setChecked(visible);
+    calendar->setSummaryDayVisible(visible);
+}
+
+
+bool
+PlanningCalendarWindow::isSummaryVisibleWeek
+() const
+{
+    return summaryWeekCheck->isChecked();
+}
+
+
+void
+PlanningCalendarWindow::setSummaryVisibleWeek
+(bool visible)
+{
+    summaryWeekCheck->setChecked(visible);
+    calendar->setSummaryWeekVisible(visible);
+}
+
+
+bool
+PlanningCalendarWindow::isSummaryVisibleMonth
+() const
+{
+    return summaryMonthCheck->isChecked();
+}
+
+
 void
 PlanningCalendarWindow::setSummaryVisibleMonth
-(bool svm)
+(bool visible)
 {
-    summaryMonthCheck->setChecked(svm);
-    calendar->setSummaryMonthVisible(svm);
+    summaryMonthCheck->setChecked(visible);
+    calendar->setSummaryMonthVisible(visible);
 }
 
 
@@ -376,12 +472,27 @@ PlanningCalendarWindow::mkControls
 ()
 {
     QLocale locale;
+    defaultViewCombo = new QComboBox();
+    defaultViewCombo->addItem(tr("Day View"));
+    defaultViewCombo->addItem(tr("Week View"));
+    defaultViewCombo->addItem(tr("Month View"));
+    defaultViewCombo->setCurrentIndex(static_cast<int>(CalendarView::Month));
     firstDayOfWeekCombo = new QComboBox();
     for (int i = Qt::Monday; i <= Qt::Sunday; ++i) {
         firstDayOfWeekCombo->addItem(locale.dayName(i, QLocale::LongFormat));
     }
     firstDayOfWeekCombo->setCurrentIndex(locale.firstDayOfWeek() - 1);
-    summaryMonthCheck = new QCheckBox(tr("Show weekly summary on month view"));
+    startHourSpin = new QSpinBox();
+    startHourSpin->setSuffix(":00");
+    startHourSpin->setMinimum(0);
+    endHourSpin = new QSpinBox();
+    endHourSpin->setSuffix(":00");
+    endHourSpin->setMaximum(24);
+    summaryDayCheck = new QCheckBox(tr("Day View"));
+    summaryDayCheck->setChecked(true);
+    summaryWeekCheck = new QCheckBox(tr("Week View"));
+    summaryWeekCheck->setChecked(true);
+    summaryMonthCheck = new QCheckBox(tr("Month View"));
     summaryMonthCheck->setChecked(true);
     primaryMainCombo = new QComboBox();
     primaryFallbackCombo = new QComboBox();
@@ -399,41 +510,59 @@ PlanningCalendarWindow::mkControls
     tertiaryCombo->setCurrentText("Notes");
     QStringList summaryMetrics { "ride_count", "total_distance", "coggan_tss", "workout_time" };
     multiMetricSelector = new MultiMetricSelector(tr("Available Metrics"), tr("Selected Metrics"), summaryMetrics);
+    multiMetricSelector->setMinimumHeight(300 * dpiYFactor);
 
     QFormLayout *formLayout = newQFormLayout();
-    formLayout->addRow(tr("First day of week"), firstDayOfWeekCombo);
+    formLayout->addRow(tr("Default View on Startup"), defaultViewCombo);
+    formLayout->addRow(tr("First Day of Week"), firstDayOfWeekCombo);
+    formLayout->addRow(tr("Default Start Time"), startHourSpin);
+    formLayout->addRow(tr("Default End Time"), endHourSpin);
+    formLayout->addRow(tr("Show Summary In"), summaryDayCheck);
+    formLayout->addRow("", summaryWeekCheck);
     formLayout->addRow("", summaryMonthCheck);
+    formLayout->addItem(new QSpacerItem(0, 10 * dpiYFactor, QSizePolicy::Minimum, QSizePolicy::Fixed));
     formLayout->addRow(new QLabel(HLO + tr("Calendar Entries") + HLC));
     formLayout->addRow(tr("Field for Primary Line"), primaryMainCombo);
     formLayout->addRow(tr("Fallback Field for Primary Line"), primaryFallbackCombo);
     formLayout->addRow(tr("Metric for Secondary Line"), secondaryCombo);
-    formLayout->addRow(tr("Field for Tertiary Line (day and week view)"), tertiaryCombo);
+    formLayout->addRow(tr("Field for Tertiary Line (Day and Week View)"), tertiaryCombo);
+    formLayout->addItem(new QSpacerItem(0, 10 * dpiYFactor, QSizePolicy::Minimum, QSizePolicy::Fixed));
     formLayout->addRow(new QLabel(HLO + tr("Summary") + HLC));
 
     QWidget *controlsWidget = new QWidget();
-
     QVBoxLayout *controlsLayout = new QVBoxLayout(controlsWidget);
     controlsLayout->addWidget(centerLayoutInWidget(formLayout, false));
-    controlsLayout->addWidget(multiMetricSelector, 2);
-    controlsLayout->addStretch(1);
+    controlsLayout->addWidget(multiMetricSelector);
+
+    QScrollArea *controlsScroller = new QScrollArea();
+    controlsScroller->setWidgetResizable(true);
+    controlsScroller->setWidget(controlsWidget);
 
 #if QT_VERSION < 0x060000
+    connect(startHourSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &PlanningCalendarWindow::setStartHour);
+    connect(endHourSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &PlanningCalendarWindow::setEndHour);
+    connect(defaultViewCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PlanningCalendarWindow::setDefaultView);
     connect(firstDayOfWeekCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int idx) { setFirstDayOfWeek(idx + 1); });
     connect(primaryMainCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PlanningCalendarWindow::updateActivities);
     connect(primaryFallbackCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PlanningCalendarWindow::updateActivities);
     connect(secondaryCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PlanningCalendarWindow::updateActivities);
     connect(tertiaryCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PlanningCalendarWindow::updateActivities);
 #else
+    connect(startHourSpin, &QSpinBox::valueChanged, this, &PlanningCalendarWindow::setStartHour);
+    connect(endHourSpin, &QSpinBox::valueChanged, this, &PlanningCalendarWindow::setEndHour);
+    connect(defaultViewCombo, &QComboBox::currentIndexChanged, this, &PlanningCalendarWindow::setDefaultView);
     connect(firstDayOfWeekCombo, &QComboBox::currentIndexChanged, [=](int idx) { setFirstDayOfWeek(idx + 1); });
     connect(primaryMainCombo, &QComboBox::currentIndexChanged, this, &PlanningCalendarWindow::updateActivities);
     connect(primaryFallbackCombo, &QComboBox::currentIndexChanged, this, &PlanningCalendarWindow::updateActivities);
     connect(secondaryCombo, &QComboBox::currentIndexChanged, this, &PlanningCalendarWindow::updateActivities);
     connect(tertiaryCombo, &QComboBox::currentIndexChanged, this, &PlanningCalendarWindow::updateActivities);
 #endif
+    connect(summaryDayCheck, &QCheckBox::toggled, this, &PlanningCalendarWindow::setSummaryVisibleDay);
+    connect(summaryWeekCheck, &QCheckBox::toggled, this, &PlanningCalendarWindow::setSummaryVisibleWeek);
     connect(summaryMonthCheck, &QCheckBox::toggled, this, &PlanningCalendarWindow::setSummaryVisibleMonth);
     connect(multiMetricSelector, &MultiMetricSelector::selectedChanged, this, &PlanningCalendarWindow::updateActivities);
 
-    setControls(controlsWidget);
+    setControls(controlsScroller);
 }
 
 

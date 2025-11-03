@@ -2232,8 +2232,6 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_DataFields_Notes_Keywords));
 
-    relatedDelegate.setTitle(tr("<h3>Alternative Keywords</h3>Add additional keyword to have the same color"));
-
     QHBoxLayout *field = new QHBoxLayout();
     fieldLabel = new QLabel(tr("Field"),this);
     fieldChooser = new QComboBox(this);
@@ -2292,6 +2290,19 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
     connect(actionButtons, &ActionButtonBox::addRequested, this, &KeywordsPage::addClicked);
     connect(actionButtons, &ActionButtonBox::deleteRequested, this, &KeywordsPage::deleteClicked);
     connect(fieldChooser, SIGNAL(currentIndexChanged(int)), this, SLOT(colorfieldChanged()));
+    QAbstractItemModel *model = keywords->model();
+    connect(&relatedDelegate, &ListEditDelegate::requestListEdit, this, [this, model](const QModelIndex &index) {
+        ListEditWidget *dlg = new ListEditWidget(nullptr);
+        dlg->setAttribute(Qt::WA_DeleteOnClose);
+        dlg->setTitle(tr("<h3>Alternative Keywords</h3>Add additional keyword to have the same color"));
+        dlg->setList(model->data(index, Qt::DisplayRole).toString().split(','));
+        dlg->showDialog(this);
+
+        connect(dlg, &ListEditWidget::editingFinished, this, [model, index, dlg](const QStringList &newList) {
+            model->setData(index, newList.join(','), Qt::EditRole);
+            dlg->deleteLater();
+        });
+    });
 
     keywords->setCurrentItem(keywords->invisibleRootItem()->child(0));
 }
@@ -2952,12 +2963,7 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_DataFields_Fields));
 
-    valueDelegate.setTitle(tr("<h3>Manage allowed values</h3>"
-                              "If the list is empty, any value is accepted. A list containing "
-                              "<tt>*</tt> as its only entry indicates previous values for the "
-                              "same field will be used to autocomplete input."));
     valueDelegate.setDisplayLength(15, 2);
-
     fields = new QTreeWidget;
     fields->headerItem()->setText(0, tr("Screen Tab"));
     fields->headerItem()->setText(1, tr("Field"));
@@ -3015,6 +3021,23 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     connect(actionButtons, &ActionButtonBox::downRequested, this, &FieldsPage::downClicked);
     connect(actionButtons, &ActionButtonBox::addRequested, this, &FieldsPage::addClicked);
     connect(actionButtons, &ActionButtonBox::deleteRequested, this, &FieldsPage::deleteClicked);
+    QAbstractItemModel *model = fields->model();
+    connect(&valueDelegate, &ListEditDelegate::requestListEdit, this, [this, model](const QModelIndex &index) {
+        ListEditWidget *dlg = new ListEditWidget(nullptr);
+        dlg->setAttribute(Qt::WA_DeleteOnClose);
+        dlg->setTitle(tr("<h3>Manage allowed values</h3>"
+                         "If the list is empty, any value is accepted. A list containing "
+                         "<tt>*</tt> as its only entry indicates previous values for the "
+                         "same field will be used to autocomplete input."));
+
+        dlg->setList(model->data(index, Qt::DisplayRole).toString().split(','));
+        dlg->showDialog(this);
+
+        connect(dlg, &ListEditWidget::editingFinished, this, [model, index, dlg](const QStringList &newList) {
+            model->setData(index, newList.join(','), Qt::EditRole);
+            dlg->deleteLater();
+        });
+    });
 
     fields->setCurrentItem(fields->invisibleRootItem()->child(0));
 }
@@ -3811,6 +3834,18 @@ MeasuresConfigPage::MeasuresConfigPage(QWidget *parent, Context *context) :
     connect(measuresActions, &ActionButtonBox::deleteRequested, this, &MeasuresConfigPage::removeMeasuresClicked);
     connect(measureFieldsActions, &ActionButtonBox::addRequested, this, &MeasuresConfigPage::addMeasuresFieldClicked);
     connect(measureFieldsActions, &ActionButtonBox::deleteRequested, this, &MeasuresConfigPage::removeMeasuresFieldClicked);
+    QAbstractItemModel *model = measuresFieldsTable->model();
+    connect(&meFiHeaderDelegate, &ListEditDelegate::requestListEdit, this, [this, model](const QModelIndex &index) {
+        ListEditWidget *dlg = new ListEditWidget(nullptr);
+        dlg->setAttribute(Qt::WA_DeleteOnClose);
+        dlg->setList(model->data(index, Qt::DisplayRole).toString().split(','));
+        dlg->showDialog(this);
+
+        connect(dlg, &ListEditWidget::editingFinished, this, [model, index, dlg](const QStringList &newList) {
+            model->setData(index, newList.join(','), Qt::EditRole);
+            dlg->deleteLater();
+        });
+    });
 
     refreshMeasuresTable();
 }

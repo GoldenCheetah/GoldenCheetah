@@ -327,10 +327,11 @@ RideNavigator::resetView()
     // initialise to whatever groupBy we want to start with
     tableView->sortByColumn(sortByIndex(), static_cast<Qt::SortOrder>(sortByOrder()));;
 
-    //tableView->setColumnHidden(0, true);
+    tableView->setColumnHidden(0, true);
     tableView->setColumnWidth(0,0);
 
-    // set the column widths
+    // set the column widths, column zero is the
+    // group by column, so we always set that to zero width.
     int columnnumber=0;
     foreach(QString size, _widths.split("|", Qt::SkipEmptyParts)) {
 
@@ -487,13 +488,15 @@ RideNavigator::eventFilter(QObject *object, QEvent *e)
             break;
         }
 
-        case QEvent::WindowActivate:
+        case QEvent::LayoutRequest:
         {
             active=true;
-            // set the column widths
+            // set the column widths, column zero is the
+            // group by column, so we always set that to zero width.
             int columnnumber=0;
             foreach(QString size, _widths.split("|", Qt::SkipEmptyParts)) {
-                tableView->setColumnWidth(columnnumber, size.toInt());
+                tableView->setColumnWidth(columnnumber, columnnumber ? size.toInt() : 0);
+                columnnumber++;
             }
             active=false;
             setWidth(geometry().width()); // calculate width...
@@ -605,9 +608,10 @@ RideNavigator::calcColumnsChanged(bool resized, int logicalIndex, int oldSize, i
     // correct width and store result
     setColumnWidth(geometry().width(), resized, logicalIndex, oldSize, newSize); // calculate width...
 
-    // get column widths
-    QString widths;
-    for (int i=0; i<tableView->header()->count(); i++) {
+    // get column widths, column zero is the
+    // group by column, so we always set that to zero width.
+    QString widths("0|");
+    for (int i=1; i<tableView->header()->count(); i++) {
         int index = tableView->header()->logicalIndex(i);
         if (tableView->header()->isSectionHidden(index) != true) {
            widths += QString("%1|").arg(tableView->columnWidth(index));

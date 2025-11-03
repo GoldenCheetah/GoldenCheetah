@@ -49,7 +49,6 @@ class AnalysisView : public AbstractView
 
     protected:
 
-        void notifyViewStateRestored() override;
         void notifyViewSidebarChanged() override;
         int getViewSpecificPerspective() override;
         void notifyViewSplitterMoved() override;

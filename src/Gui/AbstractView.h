@@ -187,7 +187,7 @@ class AbstractView : public QWidget
         void setViewsInitialRide();
 
         // Support view specific behaviour
-        virtual void notifyViewStateRestored() {}
+        virtual void notifyViewStateRestored();
         virtual void notifyViewPerspectiveAdded(Perspective* page);
         virtual void notifyViewSidebarChanged() {}
         virtual int getViewSpecificPerspective() { return 0; }

@@ -148,8 +148,10 @@ AbstractView::resizeEvent(QResizeEvent *)
 }
 
 void
-AbstractView::setViewsInitialRide()
+AbstractView::notifyViewStateRestored()
 {
+    // lets select the first ride if it has not been set,
+    // currently required to use DataFilter in any view.
     if (context->ride == nullptr) {
 
         // lets select the first ride
@@ -161,11 +163,11 @@ AbstractView::setViewsInitialRide()
             }
         }
 
-        // otherwise just select the latest ride
-        if (context->athlete->rideCache->rides().count() != 0) {
-            context->athlete->selectRideFile(context->athlete->rideCache->rides().last()->fileName);
-        }
-    }
+       // otherwise just select the latest ride
+       if (context->athlete->rideCache->rides().count() != 0) {
+           context->athlete->selectRideFile(context->athlete->rideCache->rides().last()->fileName);
+       }
+   }
 }
 
 void

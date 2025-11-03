@@ -134,16 +134,6 @@ AnalysisView::isBlank()
 }
 
 void
-AnalysisView::notifyViewStateRestored()
-{
-
-    // set the ride only when analysis is the startup view and no ride has been set.
-    // otherwise when trends is the startup view and a ride is clicked thru, this part
-    // of the analysis loading process overwrites the click thru selection. 
-    setViewsInitialRide();
-}
-
-void
 AnalysisView::notifyViewSidebarChanged() {
 
     // if user moved us then tell ride navigator
