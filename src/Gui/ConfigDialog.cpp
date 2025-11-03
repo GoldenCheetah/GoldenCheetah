@@ -178,7 +178,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     pagesWidget->addWidget(train);
 
     processor = new ProcessorConfig(_home, context);
-    HelpWhatsThis *processorHelp = new HelpWhatsThis(general);
+    HelpWhatsThis *processorHelp = new HelpWhatsThis(processor);
     processor->setWhatsThis(processorHelp->getWhatsThisText(HelpWhatsThis::Preferences_Processor));
     pagesWidget->addWidget(processor);
 
