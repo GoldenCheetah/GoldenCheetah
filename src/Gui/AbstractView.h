@@ -184,8 +184,6 @@ class AbstractView : public QWidget
 
         bool loaded;
 
-        void setViewsInitialRide();
-
         // Support view specific behaviour
         virtual void notifyViewStateRestored();
         virtual void notifyViewPerspectiveAdded(Perspective* page);
