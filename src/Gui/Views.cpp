@@ -312,15 +312,6 @@ TrendsView::isBlank()
 }
 
 void
-TrendsView::notifyViewStateRestored()
-{
-    // set the ride when trends is the startup view and no ride has been set.
-    // Trends needs a default initial ride to be set, as the UserChart's rangemode still relies upon a
-    // a selected flight, and requires future refactoring to remove the dependency on a selcted ride. 
-    setViewsInitialRide();
-}
-
-void
 TrendsView::justSelected()
 {
     if (isSelected()) {

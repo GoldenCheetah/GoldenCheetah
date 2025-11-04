@@ -130,9 +130,6 @@ class TrendsView : public AbstractView
         void justSelected();
         void dateRangeChanged(DateRange);
         void compareChanged(bool);
-
-    protected:
-        void notifyViewStateRestored() override;
 };
 
 #endif // _GC_Views_h
