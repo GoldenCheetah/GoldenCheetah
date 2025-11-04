@@ -243,6 +243,16 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 
     connect(athleteBrowseButton, SIGNAL(clicked()), this, SLOT(browseAthleteDir()));
 
+    startupView = new QComboBox();
+    startupView->addItem(tr("Trends"));
+    startupView->addItem(tr("Analysis"));
+    startupView->addItem(tr("Train"));
+
+    // map view indexes to combo box values, given that plan/diary is not available
+    int startView = appsettings->value(NULL, GC_STARTUP_VIEW, "1").toInt();
+    if (startView == 3) startView = 2;
+    startupView->setCurrentIndex(startView);
+
     QFormLayout *form = newQFormLayout();
     form->addRow(new QLabel(HLO + tr("Localization") + HLC));
     form->addRow(tr("Language"), langCombo);
@@ -252,6 +262,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     form->addItem(new QSpacerItem(0, 15 * dpiYFactor));
     form->addRow(new QLabel(HLO + tr("Application Behaviour") + HLC));
     form->addRow(tr("Athlete Library"), athleteDirectoryLayout);
+    form->addRow(tr("Startup View"), startupView);
     form->addRow("", warnOnExit);
     form->addRow("", openLastAthlete);
     form->addRow("", opendata);
@@ -304,6 +315,11 @@ GeneralPage::saveClicked()
         "en", "fr", "ja", "pt-br", "it", "de", "ru", "cs", "es", "pt", "zh-cn", "zh-tw", "nl", "sv"
     };
     appsettings->setValue(GC_LANG, langs[langCombo->currentIndex()]);
+
+    // map combo box values to view indexes, given that plan/diary is not available
+    int startView = startupView->currentIndex();
+    if (startView == 2) startView = 3;
+    appsettings->setValue(GC_STARTUP_VIEW, startView);
 
     // Garmin and cranks
     appsettings->setValue(GC_GARMIN_HWMARK, garminHWMarkedit->value());

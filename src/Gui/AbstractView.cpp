@@ -737,11 +737,9 @@ AbstractView::setPerspectives(QComboBox *perspectiveSelector, bool selectChart)
     if (!loaded || selectChart) {
         loaded = true;
 
-        // generally we just go to the first perspective
-        perspectiveSelected(0);
-
-        // allow views to override the default perspective (if required)
-        setViewSpecificPerspective();
+        // generally we just go to the first perspective, but we allow
+        // the views to override the default perspective (if required)
+        perspectiveSelected(getViewSpecificPerspective());
 
         // due to visibility optimisation we need to force the first tab to be selected in tab mode
         if (perspective_->currentStyle == 0 && perspective_->charts.count()) perspective_->tabSelected(0);

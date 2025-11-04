@@ -98,6 +98,7 @@ class GeneralPage : public QWidget
         Context *context;
 
         QComboBox *langCombo;
+        QComboBox* startupView;
         QComboBox *wbalForm;
         QCheckBox *garminSmartRecord;
         QCheckBox *warnOnExit;
