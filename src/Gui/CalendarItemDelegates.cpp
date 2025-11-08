@@ -351,12 +351,12 @@ CalendarDetailedDayDelegate::paint(QPainter *painter, const QStyleOptionViewItem
     initStyleOption(&opt, index);
 
     bool ok;
-    int pressedEntryIdx = index.data(Qt::UserRole + 2).toInt(&ok);
+    int pressedEntryIdx = index.data(PressedEntryRole).toInt(&ok);
     if (! ok) {
         pressedEntryIdx = -2;
     }
-    CalendarDay calendarDay = index.data(Qt::UserRole + 1).value<CalendarDay>();
-    QList<CalendarEntryLayout> layout = index.data(Qt::UserRole + 3).value<QList<CalendarEntryLayout>>();
+    CalendarDay calendarDay = index.data(DayRole).value<CalendarDay>();
+    QList<CalendarEntryLayout> layout = index.data(LayoutRole).value<QList<CalendarEntryLayout>>();
     entryTester.resize(index, layout.count());
 
     // Background
@@ -494,7 +494,7 @@ CalendarDetailedDayDelegate::helpEvent
     if (! event || ! view) {
         return false;
     }
-    CalendarDay day = index.data(Qt::UserRole + 1).value<CalendarDay>();
+    CalendarDay day = index.data(DayRole).value<CalendarDay>();
     if (toolTipDayEntry(event->globalPos(), view, day, entryTester.hitTest(index, event->pos()))) {
         return true;
     }
@@ -622,7 +622,7 @@ CalendarHeadlineDelegate::helpEvent
     if (! event || ! view) {
         return false;
     }
-    CalendarDay day = index.data(Qt::UserRole + 1).value<CalendarDay>();
+    CalendarDay day = index.data(DayRole).value<CalendarDay>();
     if (toolTipHeadlineEntry(event->globalPos(), view, day, headlineTester.hitTest(index, event->pos()))) {
         return true;
     }
@@ -704,7 +704,7 @@ CalendarTimeScaleDelegate::paint
     }
     int blockY = -1;
     QModelIndex scaleIndex = index.siblingAtColumn(0);
-    BlockIndicator blockIndicator = static_cast<BlockIndicator>(scaleIndex.data(Qt::UserRole + 1).toInt());
+    BlockIndicator blockIndicator = static_cast<BlockIndicator>(scaleIndex.data(BlockRole).toInt());
     if (blockIndicator == BlockIndicator::AllBlock) {
         blockY = option.rect.height();
     } else if (blockIndicator == BlockIndicator::BlockBeforeNow) {
@@ -717,7 +717,7 @@ CalendarTimeScaleDelegate::paint
         blockColor.setAlpha(180);
         painter->fillRect(rect, blockColor);
     }
-    int currentY = scaleIndex.data(Qt::UserRole).toInt();
+    int currentY = scaleIndex.data(CurrentYRole).toInt();
     if (currentY - option.rect.y() > blockY) {
         painter->save();
         painter->setPen(textPen);
@@ -779,14 +779,14 @@ CalendarCompactDayDelegate::paint
     QStyleOptionViewItem opt = option;
     initStyleOption(&opt, index);
 
-    CalendarDay calendarDay = index.data(Qt::UserRole + 1).value<CalendarDay>();
+    CalendarDay calendarDay = index.data(DayRole).value<CalendarDay>();
     QColor bgColor;
     QColor selColor = opt.palette.highlight().color();
     QColor dayColor;
     QColor entryColor;
 
     bool ok;
-    int pressedEntryIdx = index.data(Qt::UserRole + 2).toInt(&ok);
+    int pressedEntryIdx = index.data(PressedEntryRole).toInt(&ok);
     if (! ok) {
         pressedEntryIdx = -2;
     }
@@ -914,7 +914,7 @@ CalendarCompactDayDelegate::helpEvent
     if (! event || ! view) {
         return false;
     }
-    CalendarDay day = index.data(Qt::UserRole + 1).value<CalendarDay>();
+    CalendarDay day = index.data(DayRole).value<CalendarDay>();
     if (   (moreTester.hitTest(index, event->pos()) != -1 && toolTipMore(event->globalPos(), view, day))
         || (toolTipDayEntry(event->globalPos(), view, day, entryTester.hitTest(index, event->pos())))
         || (toolTipHeadlineEntry(event->globalPos(), view, day, headlineTester.hitTest(index, event->pos())))) {
@@ -941,7 +941,7 @@ CalendarSummaryDelegate::paint
     bool hasToolTip = false;
     const QColor bgColor = option.palette.color(QPalette::Active, QPalette::AlternateBase);
     const QColor fgColor = option.palette.color(QPalette::Active, QPalette::Text);
-    const CalendarSummary summary = index.data(Qt::UserRole).value<CalendarSummary>();
+    const CalendarSummary summary = index.data(SummaryRole).value<CalendarSummary>();
     QFont valueFont(painter->font());
     valueFont.setWeight(QFont::Normal);
     valueFont.setPointSize(valueFont.pointSize() * 0.95);
@@ -1018,7 +1018,7 @@ CalendarSummaryDelegate::helpEvent
         return false;
     }
 
-    CalendarSummary summary = index.data(Qt::UserRole).value<CalendarSummary>();
+    CalendarSummary summary = index.data(SummaryRole).value<CalendarSummary>();
     QString tooltip = "<table>";
     for (const std::pair<QString, QString> &p : summary.keyValues) {
         tooltip += QString("<tr><td><b>%1</b></td><td>&nbsp;</td><td align='right'>%2</td></tr>").arg(p.first).arg(p.second);
@@ -1035,13 +1035,235 @@ CalendarSummaryDelegate::sizeHint
 {
     Q_UNUSED(option)
 
-    const CalendarSummary summary = index.data(Qt::UserRole).value<CalendarSummary>();
+    const CalendarSummary summary = index.data(SummaryRole).value<CalendarSummary>();
     QFont font;
     font.setWeight(QFont::DemiBold);
     const QFontMetrics fontMetrics(font);
     const int lineHeight = fontMetrics.height();
 
     return QSize(10, vertMargin + (lineHeight + lineSpacing) * summary.keyValues.count() - lineSpacing);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// AgendaMultiDelegate
+
+AgendaMultiDelegate::AgendaMultiDelegate
+(QObject *parent)
+: QStyledItemDelegate(parent)
+{
+}
+
+void
+AgendaMultiDelegate::paint
+(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QStyleOptionViewItem opt = option;
+    initStyleOption(&opt, index);
+    opt.state &= ~QStyle::State_Selected;
+    opt.state &= ~QStyle::State_HasFocus;
+    opt.state &= ~QStyle::State_MouseOver;
+
+    int type = index.data(TypeRole).toInt();
+    if (type == 0) {
+        opt.displayAlignment = Qt::AlignLeft | Qt::AlignTop;
+
+        const bool hovered = index.data(HoverFlagRole).toBool();
+        const QString hoverText = index.data(HoverTextRole).toString();
+        const QFont hoverFont = index.data(HoverFontRole).value<QFont>();
+
+        if (hovered) {
+            if (! hoverText.isEmpty()) {
+                opt.text = hoverText;
+            }
+            if (hoverFont != QFont()) {
+                opt.font = hoverFont;
+            }
+        }
+
+        const QWidget *widget = opt.widget;
+        QStyle *style = widget ? widget->style() : QApplication::style();
+        style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, widget);
+    } else if (type == 1) {
+        const QWidget *widget = opt.widget;
+        QStyle *style = widget ? widget->style() : QApplication::style();
+        style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, widget);
+    } else if (type == 2) {
+        const int horPadding = 4 * dpiXFactor;
+        const QWidget *widget = option.widget;
+        QStyle *style = widget ? widget->style() : QApplication::style();
+        style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, widget);
+        int topMargin = index.data(MarginTopRole).toInt();
+        QStyleOption sepOpt;
+        sepOpt.rect = QRect(opt.rect.x() + horPadding + 1, opt.rect.y() + topMargin + 1, opt.rect.width() - 2 * horPadding - 2, 1);
+        sepOpt.palette = opt.palette;
+        sepOpt.state = QStyle::State_Enabled;
+        style->drawPrimitive(QStyle::PE_IndicatorToolBarSeparator, &sepOpt, painter, widget);
+    }
+}
+
+
+QSize
+AgendaMultiDelegate::sizeHint
+(const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QStyleOptionViewItem opt = option;
+    initStyleOption(&opt, index);
+
+    int type = index.data(TypeRole).toInt();
+    if (type == 0) {
+        QString text = index.data(Qt::DisplayRole).toString();
+        QFont normalFont = index.data(Qt::FontRole).value<QFont>();
+        if (! normalFont.family().isEmpty()) {
+            opt.font = normalFont;
+        }
+
+        QFontMetrics normalFM(opt.font);
+        QSize normalSize = normalFM.size(Qt::TextSingleLine, text);
+
+        QString hoverText = index.data(HoverTextRole).toString();
+        QFont hoverFont = index.data(HoverFontRole).value<QFont>();
+
+        QSize hoverSize = QSize(0, 0);
+        if (! hoverText.isEmpty() || hoverFont != QFont()) {
+            QFontMetrics hoverFM(hoverFont != QFont() ? hoverFont : opt.font);
+            hoverSize = hoverFM.size(Qt::TextSingleLine, hoverText.isEmpty() ? text : hoverText);
+        }
+
+        QSize maxSize(std::max(normalSize.width(), hoverSize.width()), std::max(normalSize.height(), hoverSize.height()));
+        maxSize += QSize(8, 4);
+
+        return maxSize;
+    } else if (type == 1) {
+        return QSize(opt.rect.width(), index.data(MarginTopRole).toInt());
+    } else if (type == 2) {
+        int topMargin = index.data(MarginTopRole).toInt();
+        int bottomMargin = index.data(MarginBottomRole).toInt();
+        const QWidget *widget = opt.widget;
+        QStyle *style = widget ? widget->style() : QApplication::style();
+        int sepHeight = style->pixelMetric(QStyle::PM_DefaultFrameWidth, nullptr, widget);
+        return QSize(option.rect.width(), sepHeight + topMargin + bottomMargin);
+    }
+    return QStyledItemDelegate::sizeHint(option, index);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// CalendarSingleActivityDelegate
+
+CalendarSingleActivityDelegate::CalendarSingleActivityDelegate
+(QObject *parent)
+{
+    Q_UNUSED(parent)
+}
+
+
+void
+CalendarSingleActivityDelegate::paint
+(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    CalendarEntry entry = index.data(EntryRole).value<CalendarEntry>();
+    bool hover = index.data(HoverFlagRole).toBool();
+
+    painter->save();
+    painter->setRenderHint(QPainter::Antialiasing);
+
+    QStyleOptionViewItem opt = option;
+    initStyleOption(&opt, index);
+    opt.state &= ~QStyle::State_Selected;
+    opt.state &= ~QStyle::State_HasFocus;
+    opt.state &= ~QStyle::State_MouseOver;
+    opt.text.clear();
+
+    const QWidget *widget = opt.widget;
+    QStyle *style = widget ? widget->style() : QApplication::style();
+    style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, widget);
+
+    QFontMetrics entryFM(painter->font());
+    const int horPadding = 4 * dpiXFactor;
+    const int lineSpacing = 2 * dpiYFactor;
+    const int lineHeight = entryFM.height();
+    const int radius = 4 * dpiXFactor;
+    const int iconSpacing = 4 * dpiXFactor;
+    const int iconWidth = 2 * lineHeight + lineSpacing;
+    const QSize pixmapSize(iconWidth, iconWidth);
+    QColor textColor = opt.palette.color(QPalette::Active, QPalette::Text);
+    QColor iconColor = entry.color;
+
+    if (hover) {
+        painter->save();
+        QRect hoverRect;
+        if (entry.type == ENTRY_TYPE_PLANNED_ACTIVITY) {
+            hoverRect = QRect(opt.rect.x() + horPadding + 1, opt.rect.y() + 1, opt.rect.width() - 2 * horPadding - 2, iconWidth - 2);
+        } else {
+            hoverRect = QRect(opt.rect.x() + horPadding + 1, opt.rect.y() + 1, opt.rect.width() - 2 * horPadding - 2, lineHeight - 2);
+        }
+        QColor bgColor = opt.palette.color(QPalette::Active, QPalette::Highlight);
+        bgColor.setAlphaF(0.2);
+        QColor bgBorder = bgColor;
+        bgBorder.setAlphaF(0.6);
+        iconColor = GCColor::invertColor(GCColor::blendedColor(bgColor, opt.palette.color(QPalette::Active, QPalette::AlternateBase)));
+        textColor = iconColor;
+
+        painter->setPen(bgBorder);
+        painter->setBrush(bgColor);
+        painter->drawRoundedRect(hoverRect, radius, radius);
+        painter->restore();
+    }
+
+    if (entry.type == ENTRY_TYPE_PLANNED_ACTIVITY) {
+        QPixmap pixmap = svgAsColoredPixmap(entry.iconFile, pixmapSize, iconSpacing, iconColor);
+        painter->drawPixmap(opt.rect.x() + horPadding, opt.rect.y(), pixmap);
+    } else {
+        QPixmap pixmap = svgOnBackground(entry.iconFile, QSize(lineHeight, lineHeight), iconSpacing, entry.color, radius);
+        painter->drawPixmap(opt.rect.x() + horPadding + lineHeight / 2, opt.rect.y(), pixmap);
+    }
+
+    painter->setPen(textColor);
+    QRect textRect(opt.rect.x() + iconWidth + iconSpacing + horPadding, opt.rect.y(), opt.rect.width() - iconWidth - iconSpacing - 2 * horPadding, lineHeight);
+
+    const QFontMetrics fm(painter->font());
+    QString primary(entry.primary);
+    QRect boundingRect = fm.boundingRect(primary);
+    if (boundingRect.width() > textRect.width()) {
+        primary = fm.elidedText(primary, Qt::ElideRight, textRect.width());
+    }
+
+    painter->drawText(textRect, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip, primary);
+    if (! entry.secondary.isEmpty()) {
+        textRect.translate(0, lineHeight + lineSpacing);
+        QString secondary = entry.secondary;
+        if (! entry.secondaryMetric.isEmpty()) {
+            secondary += " (" + entry.secondaryMetric + ")";
+        }
+        if (fm.boundingRect(secondary).width() > textRect.width()) {
+            secondary = fm.elidedText(secondary, Qt::ElideRight, textRect.width());
+        }
+        painter->drawText(textRect, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip, secondary);
+    }
+
+    painter->restore();
+}
+
+
+QSize
+CalendarSingleActivityDelegate::sizeHint
+(const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QVariant data = index.data(EntryRole);
+    if (! data.isNull()) {
+        QFontMetrics entryFM(option.font);
+        const int lineSpacing = 2 * dpiYFactor;
+        const int lineHeight = entryFM.height();
+        CalendarEntry entry = data.value<CalendarEntry>();
+        if (entry.type == ENTRY_TYPE_PLANNED_ACTIVITY) {
+            return QSize(100, 2 * lineHeight + lineSpacing);
+        } else {
+            return QSize(100, lineHeight);
+        }
+    } else {
+        return QSize(0, 0);
+    }
 }
 
 
@@ -1138,7 +1360,7 @@ static QRect
 paintHeadline
 (QPainter *painter, const QStyleOptionViewItem &opt, const QModelIndex &index, HitTester &headlineTester, const QString &dateFormat, int pressedEntryIdx, int leftMargin, int rightMargin, int topMargin, int lineSpacing, int radius)
 {
-    CalendarDay calendarDay = index.data(Qt::UserRole + 1).value<CalendarDay>();
+    CalendarDay calendarDay = index.data(CalendarHeadlineDelegate::DayRole).value<CalendarDay>();
     QColor dayColor;
     bool isToday = (calendarDay.date == QDate::currentDate());
     QLocale locale;

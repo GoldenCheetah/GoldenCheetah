@@ -43,6 +43,7 @@ extern QFont baseFont;
 // layout and widget styling
 extern void basicTreeWidgetStyle(QTreeWidget *tree, bool editable = true);
 extern QFormLayout *newQFormLayout(QWidget *parent = nullptr);
+extern QLayout *centerWidgetInLayout(QWidget *widget, bool margins = true);
 extern QLayout *centerLayout(QLayout *layout, bool margins = true);
 extern QWidget *centerLayoutInWidget(QLayout *layout, bool margins = true);
 

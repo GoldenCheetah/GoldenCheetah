@@ -94,6 +94,12 @@ private:
 
 class CalendarDetailedDayDelegate : public QStyledItemDelegate {
 public:
+    enum Roles {
+        DayRole = Qt::UserRole + 1, // [CalendarDay] Calendar day
+        PressedEntryRole,           // [int] Index of the currently pressed CalendarDay (see DayRole >> entries)
+        LayoutRole                  // [QList<CalendarEntryLayout>] Layout of the activities in one column
+    };
+
     explicit CalendarDetailedDayDelegate(TimeScaleData const * const timeScaleData, QObject *parent = nullptr);
 
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
@@ -109,6 +115,10 @@ private:
 
 class CalendarHeadlineDelegate : public QStyledItemDelegate {
 public:
+    enum Roles {
+        DayRole = Qt::UserRole + 1 // [CalendarDay] Calendar day
+    };
+
     explicit CalendarHeadlineDelegate(QObject *parent = nullptr);
 
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
@@ -124,6 +134,11 @@ private:
 
 class CalendarTimeScaleDelegate : public QStyledItemDelegate {
 public:
+    enum Roles {
+        CurrentYRole = Qt::UserRole, // [int] Current Y value of the mousepointer
+        BlockRole                    // [int / BlockIndicator] How the timescale should be marked as blocked
+    };
+
     explicit CalendarTimeScaleDelegate(TimeScaleData *timeScaleData, QObject *parent = nullptr);
 
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
@@ -138,6 +153,11 @@ private:
 
 class CalendarCompactDayDelegate : public QStyledItemDelegate {
 public:
+    enum Roles {
+        DayRole = Qt::UserRole + 1, // [CalendarDay] Calendar day
+        PressedEntryRole            // [int] Index of the currently pressed CalendarDay (see DayRole >> entries)
+    };
+
     explicit CalendarCompactDayDelegate(QObject *parent = nullptr);
 
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
@@ -151,6 +171,10 @@ public:
 
 class CalendarSummaryDelegate : public QStyledItemDelegate {
 public:
+    enum Roles {
+        SummaryRole = Qt::UserRole  // [CalendarSummary] Summary data
+    };
+
     explicit CalendarSummaryDelegate(int horMargin = 4, QObject *parent = nullptr);
 
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
@@ -162,6 +186,43 @@ private:
     const int horMargin;
     const int vertMargin = 4;
     const int lineSpacing = 2;
+};
+
+
+class AgendaMultiDelegate : public QStyledItemDelegate {
+public:
+    enum Roles {
+        // Qt::DisplayRole // [QString] The default text to display
+        // Qt::FontRole    // [QFont] The default font to use for text
+        HoverFlagRole = Qt::UserRole, // [bool] Hover flag. True if the item is hovered. If not set or invalid, treated as false
+        HoverTextRole,                // [QString] Hover text to display when the hover flag is true. If empty, the normal DisplayRole text is used
+        HoverFontRole,                // [QFont] Hover font to use when the hover flag is true. If default-constructed, the normal font is used
+        TypeRole,                     // [int] 0: Text
+                                      //       1: Spacer (Qt::UserRole + 4: Height)
+                                      //       2: Separator
+        MarginTopRole,                // [int] Margin above (Type Spacer + Separator only)
+        MarginBottomRole              // [int] Margin below (Type Separator only)
+    };
+
+    explicit AgendaMultiDelegate(QObject *parent = nullptr);
+
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+};
+
+
+class CalendarSingleActivityDelegate : public QStyledItemDelegate {
+public:
+    enum Roles {
+        EntryRole = Qt::UserRole, // [CalendarEntry] Entry to be displayed
+        HoverFlagRole,            // [bool] Hover flag. True if the item is hovered. If not set or invalid, treated as false
+        EntryDateRole             // [bool] Date of the CalendarEntry
+    };
+
+    explicit CalendarSingleActivityDelegate(QObject *parent = nullptr);
+
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 };
 
 #endif
