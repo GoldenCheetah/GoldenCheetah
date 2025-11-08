@@ -49,6 +49,7 @@
 #include "RideAutoImportConfig.h"
 #include "RemoteControl.h"
 #include "Measures.h"
+#include "MetricSelect.h"
 #include "TagStore.h"
 #include "ActionButtonBox.h"
 #include "StyledItemDelegates.h"
@@ -374,25 +375,11 @@ class FavouriteMetricsPage : public QWidget
         FavouriteMetricsPage(QWidget *parent = NULL);
 
     public slots:
-        void upClicked();
-        void downClicked();
-        void leftClicked();
-        void rightClicked();
-        void availChanged();
-        void selectedChanged();
         qint32 saveClicked();
 
     protected:
-        bool changed;
-        QListWidget *availList;
-        QListWidget *selectedList;
-#ifndef Q_OS_MAC
-        QToolButton *leftButton;
-        QToolButton *rightButton;
-#else
-        QPushButton *leftButton;
-        QPushButton *rightButton;
-#endif
+        bool changed = false;
+        MultiMetricSelector *multiMetricSelector;
 };
 
 class KeywordsPage : public QWidget
