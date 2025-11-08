@@ -242,8 +242,8 @@ after_build:
 - cmd: windeployqt --release GoldenCheetah.exe
 - cmd: copy c:\libs\10_Precompiled_DLL\usbexpress_3.5.1\USBXpress\USBXpress_API\Host\x64\SiUSBXp.dll
 - cmd: copy c:\libs\10_Precompiled_DLL\libsamplerate64\lib\libsamplerate-0.dll
-- cmd: copy c:\OpenSSL-v111-Win64\bin\lib*.dll
-- cmd: copy c:\OpenSSL-v111-Win64\license.txt "OpenSSL License.txt"
+- cmd: copy c:\OpenSSL-Win64\bin\lib*.dll
+- cmd: copy c:\OpenSSL-Win64\license.txt "OpenSSL License.txt"
 - cmd: xcopy /s /i /e /q C:\Python .
 - cmd: copy C:\Python\LICENSE.txt "PYTHON LICENSE.txt"
 - cmd: copy c:\tools\vcpkg\installed\x64-windows\bin\gsl*.dll
