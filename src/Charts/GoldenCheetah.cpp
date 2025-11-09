@@ -768,7 +768,10 @@ GcChartWindow::GcChartWindow(Context *context) : GcWindow(context), context(cont
     overlayWidget = NULL;
 
     connect(context, &Context::filterChanged, [&](void) { this->updateSearchFilterBlanking(); } );
+    // required as selecting a flight in search/filter results will update the blanking
     connect(context, &Context::rideSelected, [&](RideItem*) { this->updateSearchFilterBlanking(); } );
+    // view change required search/filter may have been applied before the view is loaded
+    connect(context, &Context::viewChanged, [&](int) { this->updateSearchFilterBlanking(); } );
 }
 
 void
@@ -852,13 +855,19 @@ GcChartWindow::updateSearchFilterBlanking()
 
     // the ride navigator display is unaffected by the search/filter blanking 
     if (context->isfiltered && (type() != GcWindowTypes::ActivityNavigator)) {
-        if (context->filters.empty()) {
-            // if a search/filter has no results, then blank the chart's contents
-            _searchFilterBlanking = SFWinBlankingType::NO_RESULTS;
-        } else if ((!context->filters.contains(context->currentRideItem()->fileName)) && GcWindowRegistry::isIdRelevantForType(type(), VIEW_ANALYSIS, true)) {
-            // the search/filter has results, but the current selected ride is not in the results, so need to blank
-            // any chart dependent on the current selected ride, to avoid the display of inconsistent chart info.
-            _searchFilterBlanking = SFWinBlankingType::ACTIVITY_NOT_IN_RESULTS; 
+
+        // only apply search/filter blanking to the analysis view charts
+        if (GcWindowRegistry::isIdRelevantForType(type(), VIEW_ANALYSIS, true)) {
+
+            if (context->filters.empty()) {
+                // if a search/filter has no results, then blank the chart's contents
+                _searchFilterBlanking = SFWinBlankingType::NO_RESULTS;
+
+            } else if (context->currentRideItem() && (!context->filters.contains(context->currentRideItem()->fileName)))  {
+                // the search/filter has results, but the current selected ride is not in the results, so need to blank
+                // charts dependent on the current selected ride, to avoid the display of inconsistent chart info.
+                _searchFilterBlanking = SFWinBlankingType::ACTIVITY_NOT_IN_RESULTS; 
+            }
         }
     }
     updateWindowBlanking();
