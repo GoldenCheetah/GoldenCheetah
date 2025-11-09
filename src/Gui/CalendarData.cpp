@@ -40,32 +40,52 @@ CalendarEntryLayouter::layout
 
 QList<QList<int>>
 CalendarEntryLayouter::groupOverlapping
-(const QList<CalendarEntry> &entries)
+(const QList<CalendarEntry> &entries) const
 {
+    struct TimedEntry {
+        int index;
+        qint64 startSecs;
+        qint64 endSecs;
+    };
+    QList<TimedEntry> normalized;
+
+    for (int i = 0; i < entries.size(); ++i) {
+        const CalendarEntry &entry = entries[i];
+        qint64 startSecs = entry.start.hour() * 3600 + entry.start.minute() * 60 + entry.start.second();
+        QTime endTime = entry.start.addSecs(entry.durationSecs);
+        qint64 endSecs = endTime.hour() * 3600 + endTime.minute() * 60 + endTime.second();
+        if (endTime < entry.start) {
+            endSecs += 24 * 3600;
+        }
+        normalized.append({ i, startSecs, endSecs });
+    }
+
+    std::sort(normalized.begin(), normalized.end(), [](const TimedEntry &a, const TimedEntry &b) {
+        return a.startSecs < b.startSecs;
+    });
+
     QList<QList<int>> clusters;
     QList<int> currentCluster;
-    QTime clusterEnd;
+    qint64 clusterEnd = -1;
 
-    for (int entryIdx = 0; entryIdx < entries.count(); ++entryIdx) {
-        const CalendarEntry &entry = entries[entryIdx];
-        QTime end = entry.start.addSecs(entry.durationSecs);
-
+    for (const TimedEntry &t : normalized) {
         if (currentCluster.isEmpty()) {
-            currentCluster.append(entryIdx);
-            clusterEnd = end;
+            currentCluster.append(t.index);
+            clusterEnd = t.endSecs;
         } else {
-            if (entry.start < clusterEnd) {
-                currentCluster.append(entryIdx);
-                if (end > clusterEnd) {
-                    clusterEnd = end;
+            if (t.startSecs < clusterEnd) {
+                currentCluster.append(t.index);
+                if (t.endSecs > clusterEnd) {
+                    clusterEnd = t.endSecs;
                 }
             } else {
                 clusters.append(currentCluster);
-                currentCluster = { entryIdx };
-                clusterEnd = end;
+                currentCluster = { t.index };
+                clusterEnd = t.endSecs;
             }
         }
     }
+
     if (! currentCluster.isEmpty()) {
         clusters.append(currentCluster);
     }
@@ -76,37 +96,38 @@ CalendarEntryLayouter::groupOverlapping
 
 QList<CalendarEntryLayout>
 CalendarEntryLayouter::assignColumns
-(const QList<int> &cluster, const QList<CalendarEntry> &entries)
+(const QList<int> &cluster, const QList<CalendarEntry> &entries) const
 {
-    QList<QTime> columns;
+    QList<qint64> columnEndTimes;
     QMap<int, int> entryColumns;
 
     for (int entryIdx : cluster) {
         const CalendarEntry &entry = entries[entryIdx];
-        QTime start = entry.start;
-        QTime end = start.addSecs(entry.durationSecs);
+        qint64 startSecs = entry.start.hour() * 3600 + entry.start.minute() * 60 + entry.start.second();
+        QTime endTime = entry.start.addSecs(entry.durationSecs);
+        qint64 endSecs = endTime.hour() * 3600 + endTime.minute() * 60 + endTime.second();
+        if (endTime < entry.start) {
+            endSecs += 24 * 3600;
+        }
         bool found = false;
-        for (int colIdx = 0; colIdx < columns.count(); ++colIdx) {
-            if (columns[colIdx] <= start) {
-                columns[colIdx] = end;
+        for (int colIdx = 0; colIdx < columnEndTimes.size(); ++colIdx) {
+            if (columnEndTimes[colIdx] <= startSecs) {
+                columnEndTimes[colIdx] = endSecs;
                 entryColumns[entryIdx] = colIdx;
                 found = true;
                 break;
             }
         }
         if (! found) {
-            columns << end;
-            entryColumns[entryIdx] = columns.count() - 1;
+            columnEndTimes << endSecs;
+            entryColumns[entryIdx] = columnEndTimes.size() - 1;
         }
     }
 
     QList<CalendarEntryLayout> result;
     for (int entryIdx : cluster) {
-        result << CalendarEntryLayout({
-            entryIdx,
-            entryColumns[entryIdx],
-            static_cast<int>(columns.count())
-        });
+        result << CalendarEntryLayout({ entryIdx, entryColumns[entryIdx], columnEndTimes.size() });
     }
+
     return result;
 }
