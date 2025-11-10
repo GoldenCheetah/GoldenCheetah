@@ -243,6 +243,16 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 
     connect(athleteBrowseButton, SIGNAL(clicked()), this, SLOT(browseAthleteDir()));
 
+    startupView = new QComboBox();
+    startupView->addItem(tr("Trends"));
+    startupView->addItem(tr("Analysis"));
+    startupView->addItem(tr("Train"));
+
+    // map view indexes to combo box values, given that plan/diary is not available
+    int startView = appsettings->value(NULL, GC_STARTUP_VIEW, "1").toInt();
+    if (startView == 3) startView = 2;
+    startupView->setCurrentIndex(startView);
+
     QFormLayout *form = newQFormLayout();
     form->addRow(new QLabel(HLO + tr("Localization") + HLC));
     form->addRow(tr("Language"), langCombo);
@@ -252,6 +262,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     form->addItem(new QSpacerItem(0, 15 * dpiYFactor));
     form->addRow(new QLabel(HLO + tr("Application Behaviour") + HLC));
     form->addRow(tr("Athlete Library"), athleteDirectoryLayout);
+    form->addRow(tr("Startup View"), startupView);
     form->addRow("", warnOnExit);
     form->addRow("", openLastAthlete);
     form->addRow("", opendata);
@@ -304,6 +315,11 @@ GeneralPage::saveClicked()
         "en", "fr", "ja", "pt-br", "it", "de", "ru", "cs", "es", "pt", "zh-cn", "zh-tw", "nl", "sv"
     };
     appsettings->setValue(GC_LANG, langs[langCombo->currentIndex()]);
+
+    // map combo box values to view indexes, given that plan/diary is not available
+    int startView = startupView->currentIndex();
+    if (startView == 2) startView = 3;
+    appsettings->setValue(GC_STARTUP_VIEW, startView);
 
     // Garmin and cranks
     appsettings->setValue(GC_GARMIN_HWMARK, garminHWMarkedit->value());
@@ -1575,61 +1591,10 @@ ColorsPage::saveClicked()
 }
 
 FavouriteMetricsPage::FavouriteMetricsPage(QWidget *parent) :
-    QWidget(parent), changed(false)
+    QWidget(parent)
 {
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Metrics_Favourites));
-
-    availList = new QListWidget;
-    availList->setSortingEnabled(true);
-    availList->setAlternatingRowColors(true);
-    availList->setSelectionMode(QAbstractItemView::SingleSelection);
-
-    QVBoxLayout *availLayout = new QVBoxLayout;
-    availLayout->addWidget(new QLabel(HLO + tr("Available Metrics") + HLC));
-    availLayout->addWidget(availList);
-
-    selectedList = new QListWidget;
-    selectedList->setAlternatingRowColors(true);
-    selectedList->setSelectionMode(QAbstractItemView::SingleSelection);
-
-    ActionButtonBox *actionButtons = new ActionButtonBox(ActionButtonBox::UpDownGroup);
-    actionButtons->defaultConnect(ActionButtonBox::UpDownGroup, selectedList);
-
-    QVBoxLayout *selectedLayout = new QVBoxLayout;
-    selectedLayout->addWidget(new QLabel(HLO + tr("Favourites") + HLC));
-    selectedLayout->addWidget(selectedList);
-    selectedLayout->addWidget(actionButtons);
-
-#ifndef Q_OS_MAC
-    leftButton = new QToolButton(this);
-    leftButton->setArrowType(Qt::LeftArrow);
-    leftButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    rightButton = new QToolButton(this);
-    rightButton->setArrowType(Qt::RightArrow);
-    rightButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    leftButton = new QPushButton("<");
-    rightButton = new QPushButton(">");
-#endif
-    leftButton->setEnabled(false);
-    rightButton->setEnabled(false);
-
-    QHBoxLayout *inexcLayout = new QHBoxLayout;
-    inexcLayout->addStretch();
-    inexcLayout->addWidget(leftButton);
-    inexcLayout->addWidget(rightButton);
-    inexcLayout->addStretch();
-
-    QVBoxLayout *buttonGrid = new QVBoxLayout;
-    buttonGrid->addStretch();
-    buttonGrid->addLayout(inexcLayout);
-    buttonGrid->addStretch();
-
-    QHBoxLayout *hlayout = new QHBoxLayout(this);;
-    hlayout->addLayout(availLayout, 2);
-    hlayout->addLayout(buttonGrid, 1);
-    hlayout->addLayout(selectedLayout, 2);
 
     QString s;
     if (appsettings->contains(GC_SETTINGS_FAVOURITE_METRICS))
@@ -1638,96 +1603,12 @@ FavouriteMetricsPage::FavouriteMetricsPage(QWidget *parent) :
         s = GC_SETTINGS_FAVOURITE_METRICS_DEFAULT;
     QStringList selectedMetrics = s.split(",");
 
-    const RideMetricFactory &factory = RideMetricFactory::instance();
-    for (int i = 0; i < factory.metricCount(); ++i) {
-        QString symbol = factory.metricName(i);
-        if (selectedMetrics.contains(symbol) || symbol.startsWith("compatibility_"))
-            continue;
-        QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
-        item->setData(Qt::UserRole, symbol);
-        item->setToolTip(m->description());
-        availList->addItem(item);
-    }
-    foreach (QString symbol, selectedMetrics) {
-        if (!factory.haveMetric(symbol))
-            continue;
-        QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
-        item->setData(Qt::UserRole, symbol);
-        item->setToolTip(m->description());
-        selectedList->addItem(item);
-    }
+    multiMetricSelector = new MultiMetricSelector(HLO + tr("Available Metrics") + HLC, HLO + tr("Favourites") + HLC, selectedMetrics);
 
-    connect(actionButtons, &ActionButtonBox::upRequested, this, &FavouriteMetricsPage::upClicked);
-    connect(actionButtons, &ActionButtonBox::downRequested, this, &FavouriteMetricsPage::downClicked);
-    connect(leftButton, SIGNAL(clicked()), this, SLOT(leftClicked()));
-    connect(rightButton, SIGNAL(clicked()), this, SLOT(rightClicked()));
-    connect(availList, SIGNAL(itemSelectionChanged()), this, SLOT(availChanged()));
-    connect(selectedList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedChanged()));
-}
+    QHBoxLayout *hlayout = new QHBoxLayout(this);
+    hlayout->addWidget(multiMetricSelector);
 
-void
-FavouriteMetricsPage::upClicked()
-{
-    assert(!selectedList->selectedItems().isEmpty());
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    int row = selectedList->row(item);
-    assert(row > 0);
-    selectedList->takeItem(row);
-    selectedList->insertItem(row - 1, item);
-    selectedList->setCurrentItem(item);
-    changed = true;
-}
-
-void
-FavouriteMetricsPage::downClicked()
-{
-    assert(!selectedList->selectedItems().isEmpty());
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    int row = selectedList->row(item);
-    assert(row < selectedList->count() - 1);
-    selectedList->takeItem(row);
-    selectedList->insertItem(row + 1, item);
-    selectedList->setCurrentItem(item);
-    changed = true;
-}
-
-void
-FavouriteMetricsPage::leftClicked()
-{
-    assert(!selectedList->selectedItems().isEmpty());
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    selectedList->takeItem(selectedList->row(item));
-    availList->addItem(item);
-    changed = true;
-    selectedChanged();
-}
-
-void
-FavouriteMetricsPage::rightClicked()
-{
-    assert(!availList->selectedItems().isEmpty());
-    QListWidgetItem *item = availList->selectedItems().first();
-    availList->takeItem(availList->row(item));
-    selectedList->addItem(item);
-    changed = true;
-}
-
-void
-FavouriteMetricsPage::availChanged()
-{
-    rightButton->setEnabled(!availList->selectedItems().isEmpty());
-}
-
-void
-FavouriteMetricsPage::selectedChanged()
-{
-    if (selectedList->selectedItems().isEmpty()) {
-        leftButton->setEnabled(false);
-        return;
-    }
-    leftButton->setEnabled(true);
+    connect(multiMetricSelector, &MultiMetricSelector::selectedChanged, [=]() { changed = true; });
 }
 
 qint32
@@ -1735,10 +1616,7 @@ FavouriteMetricsPage::saveClicked()
 {
     if (!changed) return 0;
 
-    QStringList metrics;
-    for (int i = 0; i < selectedList->count(); ++i)
-        metrics << selectedList->item(i)->data(Qt::UserRole).toString();
-    appsettings->setValue(GC_SETTINGS_FAVOURITE_METRICS, metrics.join(","));
+    appsettings->setValue(GC_SETTINGS_FAVOURITE_METRICS, multiMetricSelector->getSymbols().join(","));
 
     return 0;
 }
@@ -2216,8 +2094,6 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_DataFields_Notes_Keywords));
 
-    relatedDelegate.setTitle(tr("<h3>Alternative Keywords</h3>Add additional keyword to have the same color"));
-
     QHBoxLayout *field = new QHBoxLayout();
     fieldLabel = new QLabel(tr("Field"),this);
     fieldChooser = new QComboBox(this);
@@ -2276,6 +2152,19 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
     connect(actionButtons, &ActionButtonBox::addRequested, this, &KeywordsPage::addClicked);
     connect(actionButtons, &ActionButtonBox::deleteRequested, this, &KeywordsPage::deleteClicked);
     connect(fieldChooser, SIGNAL(currentIndexChanged(int)), this, SLOT(colorfieldChanged()));
+    QAbstractItemModel *model = keywords->model();
+    connect(&relatedDelegate, &ListEditDelegate::requestListEdit, this, [this, model](const QModelIndex &index) {
+        ListEditWidget *dlg = new ListEditWidget(nullptr);
+        dlg->setAttribute(Qt::WA_DeleteOnClose);
+        dlg->setTitle(tr("<h3>Alternative Keywords</h3>Add additional keyword to have the same color"));
+        dlg->setList(model->data(index, Qt::DisplayRole).toString().split(','));
+        dlg->showDialog(this);
+
+        connect(dlg, &ListEditWidget::editingFinished, this, [model, index, dlg](const QStringList &newList) {
+            model->setData(index, newList.join(','), Qt::EditRole);
+            dlg->deleteLater();
+        });
+    });
 
     keywords->setCurrentItem(keywords->invisibleRootItem()->child(0));
 }
@@ -2936,12 +2825,7 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_DataFields_Fields));
 
-    valueDelegate.setTitle(tr("<h3>Manage allowed values</h3>"
-                              "If the list is empty, any value is accepted. A list containing "
-                              "<tt>*</tt> as its only entry indicates previous values for the "
-                              "same field will be used to autocomplete input."));
     valueDelegate.setDisplayLength(15, 2);
-
     fields = new QTreeWidget;
     fields->headerItem()->setText(0, tr("Screen Tab"));
     fields->headerItem()->setText(1, tr("Field"));
@@ -2999,6 +2883,23 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     connect(actionButtons, &ActionButtonBox::downRequested, this, &FieldsPage::downClicked);
     connect(actionButtons, &ActionButtonBox::addRequested, this, &FieldsPage::addClicked);
     connect(actionButtons, &ActionButtonBox::deleteRequested, this, &FieldsPage::deleteClicked);
+    QAbstractItemModel *model = fields->model();
+    connect(&valueDelegate, &ListEditDelegate::requestListEdit, this, [this, model](const QModelIndex &index) {
+        ListEditWidget *dlg = new ListEditWidget(nullptr);
+        dlg->setAttribute(Qt::WA_DeleteOnClose);
+        dlg->setTitle(tr("<h3>Manage allowed values</h3>"
+                         "If the list is empty, any value is accepted. A list containing "
+                         "<tt>*</tt> as its only entry indicates previous values for the "
+                         "same field will be used to autocomplete input."));
+
+        dlg->setList(model->data(index, Qt::DisplayRole).toString().split(','));
+        dlg->showDialog(this);
+
+        connect(dlg, &ListEditWidget::editingFinished, this, [model, index, dlg](const QStringList &newList) {
+            model->setData(index, newList.join(','), Qt::EditRole);
+            dlg->deleteLater();
+        });
+    });
 
     fields->setCurrentItem(fields->invisibleRootItem()->child(0));
 }
@@ -3795,6 +3696,18 @@ MeasuresConfigPage::MeasuresConfigPage(QWidget *parent, Context *context) :
     connect(measuresActions, &ActionButtonBox::deleteRequested, this, &MeasuresConfigPage::removeMeasuresClicked);
     connect(measureFieldsActions, &ActionButtonBox::addRequested, this, &MeasuresConfigPage::addMeasuresFieldClicked);
     connect(measureFieldsActions, &ActionButtonBox::deleteRequested, this, &MeasuresConfigPage::removeMeasuresFieldClicked);
+    QAbstractItemModel *model = measuresFieldsTable->model();
+    connect(&meFiHeaderDelegate, &ListEditDelegate::requestListEdit, this, [this, model](const QModelIndex &index) {
+        ListEditWidget *dlg = new ListEditWidget(nullptr);
+        dlg->setAttribute(Qt::WA_DeleteOnClose);
+        dlg->setList(model->data(index, Qt::DisplayRole).toString().split(','));
+        dlg->showDialog(this);
+
+        connect(dlg, &ListEditWidget::editingFinished, this, [model, index, dlg](const QStringList &newList) {
+            model->setData(index, newList.join(','), Qt::EditRole);
+            dlg->deleteLater();
+        });
+    });
 
     refreshMeasuresTable();
 }

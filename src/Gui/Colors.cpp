@@ -184,11 +184,11 @@ void GCColor::setupColors()
         { tr("Data"), tr("HR Zone 10 Shading"), "HRCOLORZONE10", Qt::gray },
         { tr("Data"), tr("Aerolab Vrtual Elevation"), "COLORAEROVE", Qt::blue },
         { tr("Data"), tr("Aerolab Elevation"), "COLORAEROEL", Qt::green },
-        { tr("Gui"), tr("Calendar background"), "CCALCELL", Qt::white },
-        { tr("Gui"), tr("Calendar heading"), "CCALHEAD", QColor(230,230,230) },
+        { tr("Gui"), tr("Calendar Phase"), "CCALPHASE", QColor(153,151,234) },
+        { tr("Gui"), tr("Calendar Event"), "CCALEVENT", QColor(225,141,158) },
         { tr("Gui"), tr("Calendar Current Selection"), "CCALCURRENT", QColor(255,213,0) },
         { tr("Gui"), tr("Calendar Actual Workout"), "CCALACTUAL", Qt::green },
-        { tr("Gui"), tr("Calendar Planned Workout"), "CCALPLANNED", Qt::yellow },
+        { tr("Gui"), tr("Calendar Planned Workout"), "CCALPLANNED", QColor(247,145,48) },
         { tr("Gui"), tr("Calendar Today"), "CCALTODAY", Qt::cyan },
         { tr("Gui"), tr("Pop Up Windows Background"), "CPOPUP", Qt::lightGray },
         { tr("Gui"), tr("Pop Up Windows Foreground"), "CPOPUPTEXT", Qt::white },
@@ -321,11 +321,11 @@ void GCColor::setupColors()
     LightDefaultColorList[65].color = QColor(160,160,164); // 65:HR Zone 10 Shading
     LightDefaultColorList[66].color = QColor(0,0,255); // 66:Aerolab VE
     LightDefaultColorList[67].color = QColor(0,255,0); // 67:Aerolab Elevation
-    LightDefaultColorList[68].color = QColor(255,255,255); // 68:Calendar background
-    LightDefaultColorList[69].color = QColor(230,230,230); // 69:Calendar heading
+    LightDefaultColorList[68].color = QColor(153,151,234); // 68:Calendar Phase
+    LightDefaultColorList[69].color = QColor(225,141,158); // 69:Calendar Event
     LightDefaultColorList[70].color = QColor(48,140,198); // 70:Calendar Current Selection
     LightDefaultColorList[71].color = QColor(0,255,0); // 71:Calendar Actual Workout
-    LightDefaultColorList[72].color = QColor(255,177,21); // 72:Calendar Planned Workout
+    LightDefaultColorList[72].color = QColor(247,145,48); // 72:Calendar Planned Workout
     LightDefaultColorList[73].color = QColor(0,255,255); // 73:Calendar Today
     LightDefaultColorList[74].color = QColor(255,255,255); // 74:Pop Up Windows Background
     LightDefaultColorList[75].color = QColor(119,119,119); // 75:Pop Up Windows Foreground
@@ -1278,6 +1278,21 @@ newQFormLayout
         form->setLabelAlignment(Qt::AlignRight);
     }
     return form;
+}
+
+
+extern QLayout*
+centerWidgetInLayout
+(QWidget *widget, bool margins)
+{
+    QHBoxLayout *centerLayout = new QHBoxLayout();
+    if (! margins) {
+        centerLayout->setContentsMargins(0, 0, 0, 0);
+    }
+    centerLayout->addStretch(1);
+    centerLayout->addWidget(widget, 3);
+    centerLayout->addStretch(1);
+    return centerLayout;
 }
 
 

@@ -32,15 +32,14 @@
 #include "Settings.h"
 #include "Colors.h"
 
-#include <QGroupBox>
 #include <QLabel>
 #include <QComboBox>
 
 class WorkoutPlotWindow : public GcChartWindow
 {
     Q_OBJECT
-    G_OBJECT
 
+    Q_PROPERTY(int showNotifications READ showNotifications WRITE setShowNotifications USER true)
     Q_PROPERTY(int showColorZones READ showColorZones WRITE setShowColorZones USER true)
     Q_PROPERTY(int showTooltip READ showTooltip WRITE setShowTooltip USER true)
 
@@ -55,17 +54,22 @@ class WorkoutPlotWindow : public GcChartWindow
         void ergFileSelected(ErgFile *);
         void configChanged(qint32);
 
+        bool showNotifications() const;
+        void setShowNotifications(bool show);
         int showColorZones() const;
         void setShowColorZones(int index);
         int showTooltip() const;
         void setShowTooltip(int index);
 
     private:
+        QString title;
 
         Context *context;
         ErgFilePlot *ergPlot;
 
-        QGroupBox *ctrlsGroupBox;
+        QLabel *ctrlsCommonLabel;
+        QCheckBox *ctrlsShowNotification;
+        QLabel *ctrlsErgmodeLabel;
         QLabel *ctrlsSituationLabel;
         QComboBox *ctrlsSituation;
         QLabel *ctrlsShowTooltipLabel;

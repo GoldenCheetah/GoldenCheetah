@@ -261,8 +261,8 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="
                     ride->command->insertPoint(position++, add);
                 }
 
-            // stationary or greater than 30 seconds... fill with zeroes
-            } else if (gap > stop) {
+            // stationary or greater than stop seconds... fill with zeroes
+            } else if (stationary && gap >= tolerance || gap > stop) {
 
                 dropouts++;
                 dropouttime += gap;

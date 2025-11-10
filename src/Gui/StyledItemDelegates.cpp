@@ -339,16 +339,16 @@ DirectoryPathWidget::DirectoryPathWidget
 {
     lineEdit = new QLineEdit();
 
-    openButton = new QPushButton(tr("Browse"));
+    browseButton = new QPushButton(tr("Browse"));
 
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
     layout->addWidget(lineEdit, 1);
-    layout->addWidget(openButton, 0);
+    layout->addWidget(browseButton, 0);
 
-    connect(openButton, SIGNAL(clicked()), this, SLOT(openDialog()));
-    connect(lineEdit, SIGNAL(editingFinished()), this, SLOT(lineEditFinished()));
+    connect(browseButton, &QPushButton::clicked, this, &DirectoryPathWidget::handleBrowseClicked);
+    connect(lineEdit, &QLineEdit::editingFinished, this, &DirectoryPathWidget::lineEditFinished);
 }
 
 
@@ -377,28 +377,63 @@ DirectoryPathWidget::setPlaceholderText
 
 
 void
-DirectoryPathWidget::openDialog
+DirectoryPathWidget::setDelegateMode
+(bool delegateMode)
+{
+    this->delegateMode = delegateMode;
+}
+
+
+void
+DirectoryPathWidget::handleBrowseClicked
 ()
 {
-    QFileDialog fileDialog(this);
-    QStringList selectedDirs;
-    fileDialog.setFileMode(QFileDialog::Directory);
-    fileDialog.setOptions(QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if (delegateMode) {
+        QTimer::singleShot(0, this, [=]() {
+            openFileDialog();
+        });
+    } else {
+        openFileDialog();
+    }
+}
+
+
+void
+DirectoryPathWidget::openFileDialog
+()
+{
+#ifdef Q_OS_MACOS
+    // On macOS in delegate mode, emit a signal and let the delegate handle the dialog.
+    // This avoids widget lifecycle issues where the editor is destroyed during
+    // QFileDialog::exec().
+    if (delegateMode) {
+        emit browseRequested();
+        return; // The delegate must take over.
+    }
+#endif
+
+    // Standard modal dialog approach for non-delegate mode or non-macOS
+    QFileDialog dialog(window());
+    dialog.setFileMode(QFileDialog::Directory);
+    dialog.setOptions(  QFileDialog::ShowDirsOnly
+                      | QFileDialog::DontResolveSymlinks);
     QString path = lineEdit->text();
     if (path.isEmpty()) {
         path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
     }
-    fileDialog.setDirectory(path);
-    if (fileDialog.exec()) {
-        selectedDirs = fileDialog.selectedFiles();
-    }
-    if (selectedDirs.count() > 0) {
-        QString dir = selectedDirs.at(0);
-        if (dir != "") {
-            lineEdit->setText(dir);
+    dialog.setDirectory(path);
+    bool accepted = false;
+    if (dialog.exec() == QDialog::Accepted) {
+        const QStringList selectedDirs = dialog.selectedFiles();
+        if (! selectedDirs.isEmpty()) {
+            QString selectedDir = selectedDirs.first();
+            if (! selectedDir.isEmpty()) {
+                setPath(selectedDir);
+                accepted = true;
+            }
         }
     }
-    emit editingFinished();
+    emit editingFinished(accepted);
 }
 
 
@@ -412,8 +447,8 @@ DirectoryPathWidget::lineEditFinished
     }
     lineEditAlreadyFinished = true;
 
-    if (! openButton->hasFocus()) {
-        emit editingFinished();
+    if (! browseButton->hasFocus()) {
+        emit editingFinished(true);
     }
 }
 
@@ -435,8 +470,17 @@ DirectoryPathDelegate::createEditor
     Q_UNUSED(index)
 
     DirectoryPathWidget *editor = new DirectoryPathWidget(parent);
+    editor->setDelegateMode(true);
     editor->setPlaceholderText(placeholderText);
-    connect(editor, SIGNAL(editingFinished()), this, SLOT(commitAndCloseEditor()));
+
+    DirectoryPathDelegate *delegate = const_cast<DirectoryPathDelegate*>(this);
+#ifdef Q_OS_MACOS
+    // On macOS, the delegate handles the dialog to prevent lifecycle crashes.
+    connect(editor, &DirectoryPathWidget::browseRequested, delegate, [delegate, editor, index]() {
+        delegate->openFileDialogForEditor(editor, index);
+    });
+#endif
+    connect(editor, &DirectoryPathWidget::editingFinished, delegate, &DirectoryPathDelegate::onEditingFinished);
 
     return editor;
 }
@@ -446,8 +490,9 @@ void
 DirectoryPathDelegate::setEditorData
 (QWidget *editor, const QModelIndex &index) const
 {
-    DirectoryPathWidget *filepath = static_cast<DirectoryPathWidget*>(editor);
-    filepath->setPath(index.data(Qt::DisplayRole).toString());
+    if (DirectoryPathWidget *pathEditor = qobject_cast<DirectoryPathWidget*>(editor)) {
+        pathEditor->setPath(index.data(Qt::EditRole).toString());
+    }
 }
 
 
@@ -455,8 +500,9 @@ void
 DirectoryPathDelegate::setModelData
 (QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-    DirectoryPathWidget *filepath = static_cast<DirectoryPathWidget*>(editor);
-    model->setData(index, filepath->getPath(), Qt::DisplayRole);
+    if (DirectoryPathWidget *pathEditor = qobject_cast<DirectoryPathWidget*>(editor)) {
+        model->setData(index, pathEditor->getPath(), Qt::EditRole);
+    }
 }
 
 
@@ -518,14 +564,61 @@ DirectoryPathDelegate::setPlaceholderText
 
 
 void
-DirectoryPathDelegate::commitAndCloseEditor
-()
+DirectoryPathDelegate::onEditingFinished
+(bool accepted)
 {
-    QWidget *editor = qobject_cast<QWidget*>(sender());
-    emit commitData(editor);
-    emit closeEditor(editor);
+    DirectoryPathWidget *editor = qobject_cast<DirectoryPathWidget*>(sender());
+    if (editor) {
+        if (accepted) {
+            emit commitData(editor);
+        }
+        emit closeEditor(editor);
+    }
 }
 
+
+#ifdef Q_OS_MACOS
+void
+DirectoryPathDelegate::closeEditorForWidget
+(QWidget *editor)
+{
+    if (editor) {
+        emit closeEditor(editor, QAbstractItemDelegate::NoHint);
+    }
+}
+
+
+void
+DirectoryPathDelegate::openFileDialogForEditor
+(QWidget *editor, const QModelIndex &index) const
+{
+    QPointer<QWidget> pathEditor(editor);
+    QFileDialog dialog(pathEditor.data());
+    dialog.setFileMode(QFileDialog::Directory);
+    dialog.setOption(QFileDialog::ShowDirsOnly, true);
+    dialog.setOption(QFileDialog::DontUseNativeDialog, true);
+
+    if (dialog.exec() == QDialog::Accepted) {
+        // Check if the editor widget still exists before using it
+        if (!pathEditor.isNull()) {
+            QString selectedDir = dialog.selectedFiles().first();
+            // Write directly to the model - this persists the data
+            QAbstractItemModel *model = const_cast<QAbstractItemModel*>(index.model());
+            model->setData(index, selectedDir, Qt::EditRole);
+        }
+    }
+
+    // The editor might have been destroyed during dialog.exec().
+    // Schedule the closeEditor call to happen safely in the event loop.
+    if (!pathEditor.isNull()) {
+        QTimer::singleShot(0, const_cast<DirectoryPathDelegate*>(this), [this, pathEditor]() {
+            if (!pathEditor.isNull()) {
+                const_cast<DirectoryPathDelegate*>(this)->closeEditorForWidget(pathEditor.data());
+            }
+        });
+    }
+}
+#endif
 
 
 // ListEditWidget //////////////////////////////////////////////////////////////////////
@@ -534,9 +627,6 @@ ListEditWidget::ListEditWidget
 (QWidget *parent)
 : QWidget(parent)
 {
-    dialog = new QDialog(this);
-    dialog->setModal(true);
-
     title = new QLabel();
     title->setWordWrap(true);
     title->setVisible(false);
@@ -552,23 +642,11 @@ ListEditWidget::ListEditWidget
     actionButtons->defaultConnect(ActionButtonBox::UpDownGroup, listWidget);
     actionButtons->defaultConnect(ActionButtonBox::AddDeleteGroup, listWidget);
 
-    QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-
-    QVBoxLayout *dialogLayout = new QVBoxLayout(dialog);
-    dialogLayout->addWidget(title);
-    dialogLayout->addWidget(listWidget);
-    dialogLayout->addWidget(actionButtons);
-    dialogLayout->addSpacing(10 * dpiYFactor);
-    dialogLayout->addWidget(buttons);
-
     connect(listWidget, &QListWidget::itemChanged, this, &ListEditWidget::itemChanged);
     connect(actionButtons, &ActionButtonBox::upRequested, this, &ListEditWidget::moveUp);
     connect(actionButtons, &ActionButtonBox::downRequested, this, &ListEditWidget::moveDown);
     connect(actionButtons, &ActionButtonBox::addRequested, this, &ListEditWidget::addItem);
     connect(actionButtons, &ActionButtonBox::deleteRequested, this, &ListEditWidget::deleteItem);
-    connect(buttons, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
-    connect(buttons, &QDialogButtonBox::rejected, dialog, &QDialog::reject);
-    connect(dialog, &QDialog::finished, this, &ListEditWidget::dialogFinished);
 }
 
 
@@ -576,12 +654,8 @@ void
 ListEditWidget::setTitle
 (const QString &text)
 {
-    if (text.trimmed().size() > 0) {
-        title->setText(text);
-        title->setVisible(true);
-    } else {
-        title->setVisible(false);
-    }
+    title->setVisible(! text.trimmed().isEmpty());
+    title->setText(text);
 }
 
 
@@ -609,8 +683,25 @@ ListEditWidget::getList
 
 void
 ListEditWidget::showDialog
-()
+(QWidget *owner)
 {
+    dialog = new QDialog(owner);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->setWindowModality(Qt::ApplicationModal);
+
+    QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+
+    QVBoxLayout *layout = new QVBoxLayout(dialog);
+    layout->addWidget(title);
+    layout->addWidget(listWidget);
+    layout->addWidget(actionButtons);
+    layout->addSpacing(10 * dpiYFactor);
+    layout->addWidget(buttons);
+
+    connect(buttons, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
+    connect(buttons, &QDialogButtonBox::rejected, dialog, &QDialog::reject);
+    connect(dialog, &QDialog::finished, this, &ListEditWidget::dialogFinished);
+
     dialog->show();
 }
 
@@ -634,8 +725,8 @@ ListEditWidget::dialogFinished
         for (int i = 0; i < listWidget->count(); ++i) {
             data << listWidget->item(i)->data(Qt::DisplayRole).toString().trimmed();
         }
+        emit editingFinished(data);
     }
-    emit editingFinished();
 }
 
 
@@ -675,21 +766,18 @@ void
 ListEditWidget::addItem
 ()
 {
-    int index = listWidget->count();
-    if (listWidget->currentItem() != nullptr) {
-        index = listWidget->row(listWidget->currentItem());
-    }
+    int index = listWidget->currentRow();
     if (index < 0) {
         index = 0;
     }
     QListWidgetItem *add = new QListWidgetItem();
     add->setFlags(add->flags() | Qt::ItemIsEditable);
-    listWidget->insertItem(index, add);
     QString text = tr("New");
     for (int i = 0; listWidget->findItems(text, Qt::MatchExactly).count() > 0; ++i) {
         text = tr("New (%1)").arg(i + 1);
     }
     add->setData(Qt::DisplayRole, text);
+    listWidget->insertItem(index, add);
     listWidget->setCurrentItem(add);
     listWidget->editItem(add);
 }
@@ -705,21 +793,12 @@ ListEditWidget::deleteItem
 }
 
 
-
 // ListEditDelegate ////////////////////////////////////////////////////////////////////
 
 ListEditDelegate::ListEditDelegate
 (QObject *parent)
 : QStyledItemDelegate(parent)
 {
-}
-
-
-void
-ListEditDelegate::setTitle
-(const QString &title)
-{
-    this->title = title;
 }
 
 
@@ -738,32 +817,8 @@ ListEditDelegate::createEditor
 {
     Q_UNUSED(option)
     Q_UNUSED(index)
-
-    ListEditWidget *editor = new ListEditWidget(parent);
-    editor->setTitle(title);
-    connect(editor, &ListEditWidget::editingFinished, this, &ListEditDelegate::commitAndCloseEditor);
-    editor->showDialog();
-
-    return editor;
-}
-
-
-void
-ListEditDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
-{
-    ListEditWidget *listEditor = static_cast<ListEditWidget*>(editor);
-    listEditor->setList(index.data(Qt::DisplayRole).toString().split(','));
-}
-
-
-void
-ListEditDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
-{
-    ListEditWidget *listEditor = static_cast<ListEditWidget*>(editor);
-    QString newValue = listEditor->getList().join(',');
-    if (model->data(index, Qt::EditRole).toString() != newValue) {
-        model->setData(index, newValue, Qt::EditRole);
-    }
+    emit requestListEdit(index);
+    return nullptr;
 }
 
 

@@ -49,11 +49,13 @@ class AnalysisView : public AbstractView
 
     protected:
 
-        void notifyViewStateRestored() override;
         void notifyViewSidebarChanged() override;
-        void setViewSpecificPerspective() override;
+        int getViewSpecificPerspective() override;
         void notifyViewSplitterMoved() override;
 
+    private:
+
+        int findRidesPerspective(RideItem* ride);
 };
 
 class PlanSidebar;

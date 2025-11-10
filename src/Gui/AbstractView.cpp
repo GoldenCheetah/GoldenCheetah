@@ -148,6 +148,29 @@ AbstractView::resizeEvent(QResizeEvent *)
 }
 
 void
+AbstractView::notifyViewStateRestored()
+{
+    // lets select the first ride if it has not been set,
+    // currently required to use DataFilter in any view.
+    if (context->ride == nullptr) {
+
+        // lets select the first ride
+        QDateTime now = QDateTime::currentDateTime();
+        for (int i = context->athlete->rideCache->rides().count(); i > 0; --i) {
+            if (context->athlete->rideCache->rides()[i - 1]->dateTime <= now) {
+                context->athlete->selectRideFile(context->athlete->rideCache->rides()[i - 1]->fileName);
+                return;
+            }
+        }
+
+       // otherwise just select the latest ride
+       if (context->athlete->rideCache->rides().count() != 0) {
+           context->athlete->selectRideFile(context->athlete->rideCache->rides().last()->fileName);
+       }
+   }
+}
+
+void
 AbstractView::notifyViewPerspectiveAdded(Perspective* page)
 {
     page->styleChanged(0);
@@ -721,11 +744,9 @@ AbstractView::setPerspectives(QComboBox *perspectiveSelector, bool selectChart)
     if (!loaded || selectChart) {
         loaded = true;
 
-        // generally we just go to the first perspective
-        perspectiveSelected(0);
-
-        // allow views to override the default perspective (if required)
-        setViewSpecificPerspective();
+        // generally we just go to the first perspective, but we allow
+        // the views to override the default perspective (if required)
+        perspectiveSelected(getViewSpecificPerspective());
 
         // due to visibility optimisation we need to force the first tab to be selected in tab mode
         if (perspective_->currentStyle == 0 && perspective_->charts.count()) perspective_->tabSelected(0);

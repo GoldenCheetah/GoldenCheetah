@@ -68,37 +68,44 @@ AnalysisView::~AnalysisView()
 void
 AnalysisView::setRide(RideItem *ride)
 {
-    if (!loaded) return; // not loaded yet, all bets are off till then.
-
     // when ride selected, but not from the sidebar.
     static_cast<AnalysisSidebar*>(sidebar())->setRide(ride); // save settings
+
+    if (!loaded) return; // not loaded yet, all bets are off until the perspectives are loaded.
 
     // if we are the current view and the current perspective is no longer relevant
     // then lets go find one to switch to..
     if (context->mainWindow->athleteTab()->currentView() == 1 && page()->relevant(ride) != true) {
 
-        // lets find one to switch to
-        Perspective *found=page();
-        foreach(Perspective *p, perspectives_){
-            if (p->relevant(ride)) {
-                found =p;
-                break;
-            }
-        }
-
-        // none of them want to be selected, so we can stay on the current one
-        // so long as it doesn't have an expression that failed...
-        if (found == page() && page()->expression() != "")
-            found = perspectives_[0];
+        // lets find a perspective to switch to
+        int ridePerspectiveIdx = findRidesPerspective(ride);
 
         // if we need to switch, i.e. not already on it
-        if (found != page())  {
-            context->mainWindow->switchPerspective(perspectives_.indexOf(found));
+        if (ridePerspectiveIdx != perspectives_.indexOf(page()))  {
+            context->mainWindow->switchPerspective(ridePerspectiveIdx);
         }
     }
 
     // tell the perspective we have selected a ride
     page()->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
+}
+
+int
+AnalysisView::findRidesPerspective(RideItem* ride)
+{
+    // lets find one to switch to
+    foreach(Perspective *p, perspectives_) {
+        if (p->relevant(ride)) {
+            return perspectives_.indexOf(p);
+        }
+    }
+
+    // none of them want to be selected, so we can stay on the current one
+    // so long as it doesn't have an expression that failed...
+    if (page()->expression() != "") return 0;
+
+    // we can just return the current one
+    return perspectives_.indexOf(page());
 }
 
 void
@@ -127,24 +134,6 @@ AnalysisView::isBlank()
 }
 
 void
-AnalysisView::notifyViewStateRestored() {
-
-    // lets select the first ride
-    QDateTime now = QDateTime::currentDateTime();
-    for (int i = context->athlete->rideCache->rides().count(); i > 0; --i) {
-        if (context->athlete->rideCache->rides()[i - 1]->dateTime <= now) {
-            context->athlete->selectRideFile(context->athlete->rideCache->rides()[i - 1]->fileName);
-            break;
-        }
-    }
-
-    // otherwise just the latest
-    if (context->currentRideItem() == NULL && context->athlete->rideCache->rides().count() != 0) {
-        context->athlete->selectRideFile(context->athlete->rideCache->rides().last()->fileName);
-    }
-}
-
-void
 AnalysisView::notifyViewSidebarChanged() {
 
     // if user moved us then tell ride navigator
@@ -155,12 +144,11 @@ AnalysisView::notifyViewSidebarChanged() {
     }
 }
 
-void
-AnalysisView::setViewSpecificPerspective() {
+int
+AnalysisView::getViewSpecificPerspective() {
 
     // Setting the ride for analysis view also sets the perspective.
-    RideItem* ride = (RideItem*)context->currentRideItem();
-    if (ride != NULL) setRide(ride);
+    return findRidesPerspective(const_cast<RideItem*>(context->currentRideItem()));
 }
 
 void

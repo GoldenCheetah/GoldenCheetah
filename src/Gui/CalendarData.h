@@ -39,6 +39,7 @@ struct CalendarEntry {
     QString primary;
     QString secondary;
     QString secondaryMetric;
+    QString tertiary;
     QString iconFile;
     QColor color;
     QString reference;
@@ -57,9 +58,15 @@ struct CalendarEntryLayout {
     int columnCount;
 };
 
+enum class DayDimLevel {
+    None,
+    Full,
+    Partial
+};
+
 struct CalendarDay {
     QDate date;
-    bool isDimmed;
+    DayDimLevel isDimmed;
     QList<CalendarEntry> entries = QList<CalendarEntry>();
     QList<CalendarEntry> headlineEntries = QList<CalendarEntry>();
 };
@@ -81,8 +88,8 @@ public:
     QList<CalendarEntryLayout> layout(const QList<CalendarEntry> &entries);
 
 private:
-    QList<QList<int>> groupOverlapping(const QList<CalendarEntry> &entries);
-    QList<CalendarEntryLayout> assignColumns(const QList<int> &cluster, const QList<CalendarEntry> &entries);
+    QList<QList<int>> groupOverlapping(const QList<CalendarEntry> &entries) const;
+    QList<CalendarEntryLayout> assignColumns(const QList<int> &cluster, const QList<CalendarEntry> &entries) const;
 };
 
 #endif

@@ -23,7 +23,8 @@
 #include <QStackedWidget>
 #include <QTableWidget>
 #include <QCalendarWidget>
-#include <QPushButton>
+#include <QToolBar>
+#include <QMenu>
 #include <QLabel>
 #include <QComboBox>
 #include <QDate>
@@ -34,6 +35,8 @@
 #include "CalendarItemDelegates.h"
 #include "CalendarData.h"
 #include "TimeUtils.h"
+#include "Measures.h"
+#include "Qt5Compatibility.h"
 
 
 class CalendarOverview : public QCalendarWidget {
@@ -62,17 +65,30 @@ private:
 };
 
 
+enum class CalendarDayTableType {
+    Day,
+    Week
+};
+
+
 class CalendarDayTable : public QTableWidget {
     Q_OBJECT
 
 public:
-    explicit CalendarDayTable(const QDate &date, QWidget *parent = nullptr);
+    explicit CalendarDayTable(const QDate &date, CalendarDayTableType type = CalendarDayTableType::Day, Qt::DayOfWeek firstDayOfWeek = Qt::Monday, QWidget *parent = nullptr);
 
     bool setDay(const QDate &date);
+    QDate firstVisibleDay() const;
+    QDate firstVisibleDay(const QDate &date) const;
+    QDate lastVisibleDay() const;
+    QDate lastVisibleDay(const QDate &date) const;
     QDate selectedDate() const;
     bool isInDateRange(const QDate &date) const;
-    void fillEntries(const QList<CalendarEntry> &activityEntries, const CalendarSummary &summary, const QList<CalendarEntry> &headlineEntries);
+    void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries);
     void limitDateRange(const DateRange &dr);
+    void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
+    void setStartHour(int hour);
+    void setEndHour(int hour);
 
 signals:
     void dayClicked(const CalendarDay &day, const QTime &time);
@@ -104,8 +120,12 @@ private slots:
     void showContextMenu(const QPoint &pos);
 
 private:
+    Qt::DayOfWeek firstDayOfWeek = Qt::Monday;
     QDate date;
     DateRange dr;
+    CalendarDayTableType type;
+    int defaultStartHour = 8;
+    int defaultEndHour = 21;
 
     QTimer dragTimer;
     QPoint pressedPos;
@@ -121,6 +141,10 @@ class CalendarMonthTable : public QTableWidget {
     Q_OBJECT
 
 public:
+    enum CalendarDayTableRoles {
+        DateRole = Qt::UserRole + 1000 // [QDate] Date of cell
+    };
+
     explicit CalendarMonthTable(Qt::DayOfWeek firstDayOfWeek = Qt::Monday, QWidget *parent = nullptr);
     explicit CalendarMonthTable(const QDate &dateInMonth, Qt::DayOfWeek firstDayOfWeek = Qt::Monday, QWidget *parent = nullptr);
 
@@ -192,7 +216,137 @@ private:
 
 enum class CalendarView {
     Day = 0,
-    Month = 1
+    Week = 1,
+    Month = 2,
+    Agenda = 3
+};
+
+
+class CalendarDayView : public QWidget {
+    Q_OBJECT
+
+public:
+    explicit CalendarDayView(const QDate &date, Measures * const athleteMeasures = nullptr, QWidget *parent = nullptr);
+
+    bool setDay(const QDate &date);
+    void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
+    void setStartHour(int hour);
+    void setEndHour(int hour);
+    void setSummaryVisible(bool visible);
+    void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries);
+    void limitDateRange(const DateRange &dr);
+    QDate firstVisibleDay() const;
+    QDate lastVisibleDay() const;
+    QDate selectedDate() const;
+    void updateMeasures();
+
+signals:
+    void showInTrainMode(const CalendarEntry &activity);
+    void viewActivity(const CalendarEntry &activity);
+    void addActivity(bool plan, const QDate &day, const QTime &time);
+    void delActivity(const CalendarEntry &activity);
+    void entryMoved(const CalendarEntry &activity, const QDate &srcDay, const QDate &destDay, const QTime &destTime);
+    void dayChanged(const QDate &date);
+
+private:
+    Measures * const athleteMeasures;
+    CalendarOverview *dayDateSelector;
+    QTabWidget *measureTabs;
+    CalendarDayTable *dayTable;
+
+    bool measureDialog(const QDateTime &when, MeasuresGroup * const measuresGroup, bool update);
+    void updateMeasures(const QDate &date);
+};
+
+
+class CalendarWeekView : public QWidget {
+    Q_OBJECT
+
+public:
+    explicit CalendarWeekView(const QDate &date, QWidget *parent = nullptr);
+
+    bool setDay(const QDate &date);
+    void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
+    void setStartHour(int hour);
+    void setEndHour(int hour);
+    void setSummaryVisible(bool visible);
+    void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries);
+    void limitDateRange(const DateRange &dr);
+    QDate firstVisibleDay() const;
+    QDate firstVisibleDay(const QDate &date) const;
+    QDate lastVisibleDay() const;
+    QDate lastVisibleDay(const QDate &date) const;
+    QDate selectedDate() const;
+
+signals:
+    void showInTrainMode(const CalendarEntry &activity);
+    void viewActivity(const CalendarEntry &activity);
+    void addActivity(bool plan, const QDate &day, const QTime &time);
+    void delActivity(const CalendarEntry &activity);
+    void entryMoved(const CalendarEntry &activity, const QDate &srcDay, const QDate &destDay, const QTime &destTime);
+    void dayChanged(const QDate &date);
+
+private:
+    CalendarDayTable *weekTable;
+};
+
+
+struct CalendarAgendaStyles {
+    QFont defaultFont;
+    QFont relativeFont;
+    QFont hoverFont;
+    QFont headlineDefaultFont;
+    QFont headlineTodayFont;
+    QFont headlineEmptyFont;
+    QFont headlineSmallEmptyFont;
+
+    int sectionSpacerHeight;
+    int sectionEntrySpacerHeight;
+    int entrySpacerHeight;
+    int daySpacerHeight;
+};
+
+class CalendarAgendaView : public QWidget {
+    Q_OBJECT
+
+public:
+    explicit CalendarAgendaView(QWidget *parent = nullptr);
+
+    void updateDate();
+    void setDateRange(const DateRange &dateRange);
+    void setPastDays(int days);
+    void setFutureDays(int days);
+    void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries);
+    QDate firstVisibleDay() const;
+    QDate lastVisibleDay() const;
+    QDate selectedDate() const;
+
+signals:
+    void showInTrainMode(const CalendarEntry &activity);
+    void showInMonthView(const QDate &date);
+    void viewActivity(const CalendarEntry &activity);
+    void dayChanged(const QDate &date);
+
+protected:
+    bool eventFilter(QObject *watched, QEvent *event) override;
+    void changeEvent(QEvent *event) override;
+
+private:
+    QDate currentDate;
+    DateRange dateRange;
+    int pastDays = 7;
+    int futureDays = 7;
+    TreeWidget6 *agendaTree;
+    QTreeWidgetItem *lastHoveredItem = nullptr;
+    int lastHoveredColumn = -1;
+    void clearHover();
+    void addEntries(const QDate &today, const QDate &date, const QList<CalendarEntry> &entries, QTreeWidgetItem *parent, const CalendarAgendaStyles &cas);
+    void addSpacer(QTreeWidgetItem *parent, int height);
+    void addSeparator(QTreeWidgetItem *parent, int top, int bottom);
+    void fillStyles(CalendarAgendaStyles &cas) const;
+
+private slots:
+    void showContextMenu(const QPoint &pos);
 };
 
 
@@ -200,30 +354,35 @@ class Calendar : public QWidget {
     Q_OBJECT
 
 public:
-    explicit Calendar(Qt::DayOfWeek firstDayOfWeek = Qt::Monday, QWidget *parent = nullptr);
-    explicit Calendar(const QDate &dateInMonth, Qt::DayOfWeek firstDayOfWeek = Qt::Monday, QWidget *parent = nullptr);
+    explicit Calendar(const QDate &dateInMonth, Qt::DayOfWeek firstDayOfWeek = Qt::Monday, Measures * const athleteMeasures = nullptr, QWidget *parent = nullptr);
 
     void setDate(const QDate &dateInMonth, bool allowKeepMonth = false);
-    void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries);
+    void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries, bool isFiltered);
     QDate firstOfCurrentMonth() const;
     QDate firstVisibleDay() const;
     QDate lastVisibleDay() const;
     QDate selectedDate() const;
     CalendarView currentView() const;
 
-    bool addMonths(int months);
-    bool addYears(int years);
-    QDate fitDate(const QDate &date, bool preferToday = true) const;
-    bool canAddMonths(int months) const;
-    bool canAddYears(int years) const;
+    bool goNext(int amount);
+    QDate fitToMonth(const QDate &date, bool preferToday = true) const;
+    bool canGoNext(int amount) const;
     bool isInDateRange(const QDate &date) const;
+    int weekNumber(const QDate &date) const;
 
 public slots:
     void setView(CalendarView view);
     void activateDateRange(const DateRange &dr, bool allowKeepMonth = false);
     void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
+    void setStartHour(int hour);
+    void setEndHour(int hour);
+    void setAgendaPastDays(int days);
+    void setAgendaFutureDays(int days);
+    void setSummaryDayVisible(bool visible);
+    void setSummaryWeekVisible(bool visible);
     void setSummaryMonthVisible(bool visible);
     void applyNavIcons();
+    void updateMeasures();
 
 signals:
     void viewChanged(CalendarView newView, CalendarView oldView);
@@ -243,24 +402,37 @@ signals:
     void delRestday(const QDate &day);
 
 private:
-    QAction *prevYAction;
-    QAction *prevMAction;
-    QAction *nextMAction;
-    QAction *nextYAction;
+    QToolBar *toolbar;
+    QAction *prevAction;
+    QAction *nextAction;
     QAction *todayAction;
+    QAction *separator;
     QAction *dayAction;
+    QAction *weekAction;
     QAction *monthAction;
-    QLabel *dateLabel;
-    QStackedWidget *tableStack;
-    QWidget *dayCalendar;
-    CalendarOverview *dayDateSelector;
-    QLabel *dayPhaseLabel;
-    QLabel *dayEventLabel;
-    CalendarDayTable *dayTable;
-    CalendarMonthTable *monthTable;
+    QAction *agendaAction;
+    QToolButton *dateNavigator;
+    QAction *dateNavigatorAction;
+    QMenu *dateMenu;
+    QLabel *seasonLabel;
+    QAction *seasonLabelAction;
+    QAction *filterSpacerAction;
+    QLabel *filterLabel;
+    QAction *filterLabelAction;
+    QStackedWidget *viewStack;
+    CalendarDayView *dayView;
+    CalendarWeekView *weekView;
+    CalendarMonthTable *monthView;
+    CalendarAgendaView *agendaView;
     DateRange dateRange;
+    Qt::DayOfWeek firstDayOfWeek = Qt::Monday;
+    QDate lastNonAgendaDate;
 
     void setNavButtonState();
+    void updateHeader();
+
+private slots:
+    void populateDateMenu();
 };
 
 #endif

@@ -169,7 +169,11 @@ AthleteTab::view(int index)
 void
 AthleteTab::selectView(int index)
 {
-    if (views->currentIndex() == index) return; // not changing
+    // ensure an initial viewChanged() event occurs for the navigation model, otherwise if the
+    // startup view is trends (value zero) the guard rejects the selection as views->currentIndex() is zero
+    static bool startupView = true;
+    if (!startupView && views->currentIndex() == index) return; // not changing
+    startupView = false;
 
     emit viewChanged(index);
 
@@ -189,14 +193,6 @@ AthleteTab::rideSelected(RideItem*)
 {
     emit rideItemSelected(context->ride);
 
-    // update the ride property on all widgets
-    // to let them know they need to replot new
-    // selected ride (now the tree is up to date)
-    setRide(context->ride);
-
-    // notify that the intervals have been cleared too
-    context->notifyIntervalsChanged();
-
     // if we selected a ride we should be on the analysis
     // view-- this is new with the overview and click thru
     // coming in other charts but when navigation model is
@@ -215,6 +211,14 @@ AthleteTab::rideSelected(RideItem*)
             selectView(1);
         }
     }
+
+    // update the ride property on all widgets
+    // to let them know they need to replot new
+    // selected ride (now the tree is up to date)
+    setRide(context->ride);
+
+    // notify that the intervals have been cleared too
+    context->notifyIntervalsChanged();
 }
 
 ProgressLine::ProgressLine(QWidget *parent, Context *context) : QWidget(parent), context(context)
