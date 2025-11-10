@@ -68,10 +68,10 @@ AnalysisView::~AnalysisView()
 void
 AnalysisView::setRide(RideItem *ride)
 {
-    if (!loaded) return; // not loaded yet, all bets are off till then.
-
     // when ride selected, but not from the sidebar.
     static_cast<AnalysisSidebar*>(sidebar())->setRide(ride); // save settings
+
+    if (!loaded) return; // not loaded yet, all bets are off until the perspectives are loaded.
 
     // if we are the current view and the current perspective is no longer relevant
     // then lets go find one to switch to..
