@@ -768,7 +768,7 @@ GcChartWindow::GcChartWindow(Context *context) : GcWindow(context), context(cont
     overlayWidget = NULL;
 
     connect(context, &Context::filterChanged, [&](void) { this->updateSearchFilterBlanking(); } );
-    // required as selecting a flight in search/filter results will update the blanking
+    // required as selecting a ride in search/filter results will update the blanking
     connect(context, &Context::rideSelected, [&](RideItem*) { this->updateSearchFilterBlanking(); } );
     // view change required search/filter may have been applied before the view is loaded
     connect(context, &Context::viewChanged, [&](int) { this->updateSearchFilterBlanking(); } );
