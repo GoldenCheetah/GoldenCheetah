@@ -712,7 +712,7 @@ MainWindow::MainWindow(const QDir &home)
     switch (appsettings->value(NULL, GC_STARTUP_VIEW, "1").toInt()) {
         case 0: selectTrends(); break;
         case 1: selectAnalysis(); break;
-        case 2: selectDiary(); break;
+        case 2: selectPlan(); break;
         case 3: selectTrain(); break;
         default: selectAnalysis(); qDebug() << "Unknown startup view"; break;
     }
