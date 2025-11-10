@@ -276,8 +276,8 @@ class PaletteApplier {
 #define CHZONE10              65
 #define CAEROVE               66
 #define CAEROEL               67
-#define CCALCELL              68
-#define CCALHEAD              69
+#define CCALPHASE             68
+#define CCALEVENT             69
 #define CCALCURRENT           70
 #define CCALACTUAL            71
 #define CCALPLANNED           72

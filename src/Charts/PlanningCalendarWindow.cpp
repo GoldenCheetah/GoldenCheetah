@@ -846,7 +846,7 @@ PlanningCalendarWindow::getPhasesEvents
                 } else {
                     entry.iconFile = ":images/breeze/task-process-0.svg";
                 }
-                entry.color = Qt::yellow;  // TODO: Use color from GC-theme instead
+                entry.color = GColor(CCALEVENT);
                 entry.reference = event.id;
                 entry.start = QTime(0, 0, 0);
                 entry.durationSecs = 0;
@@ -871,7 +871,7 @@ PlanningCalendarWindow::getPhasesEvents
                     entry.primary = phase.getName();
                     entry.secondary = "";
                     entry.iconFile = QString(":images/breeze/network-mobile-%1.svg").arg(progress);
-                    entry.color = Qt::red;  // TODO: Use color from GC-theme instead
+                    entry.color = GColor(CCALPHASE);
                     entry.reference = phase.id().toString();
                     entry.start = QTime(0, 0, 1);
                     entry.type = ENTRY_TYPE_PHASE;
