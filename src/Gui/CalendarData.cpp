@@ -126,7 +126,11 @@ CalendarEntryLayouter::assignColumns
 
     QList<CalendarEntryLayout> result;
     for (int entryIdx : cluster) {
-        result << CalendarEntryLayout({ entryIdx, entryColumns[entryIdx], columnEndTimes.size() });
+        result << CalendarEntryLayout({
+            entryIdx,
+            entryColumns[entryIdx],
+            static_cast<int>(columnEndTimes.size())
+        });
     }
 
     return result;
