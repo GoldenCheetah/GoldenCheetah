@@ -471,6 +471,7 @@ typedef struct {
     int sidebarwidth; // width of sidebars in pixels
     bool sideanalysis;
     bool sidetrend;
+    bool sideplan;
     bool sidetrain;
     double linewidth; // default line width
 

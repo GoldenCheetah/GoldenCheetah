@@ -179,8 +179,13 @@ AbstractView::notifyViewPerspectiveAdded(Perspective* page)
 void
 AbstractView::setSidebar(QWidget *sidebar)
 {
-    sidebar_ = sidebar;
-    splitter->insertWidget(0, sidebar);
+    if (sidebar) {
+        sidebar_ = sidebar;
+        splitter->insertWidget(0, sidebar);
+    } else {
+        splitter->replaceWidget(0, nullptr);
+        sidebar_ = nullptr;
+    }
 
     configChanged(CONFIG_APPEARANCE);
 }

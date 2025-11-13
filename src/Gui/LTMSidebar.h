@@ -107,8 +107,6 @@ class LTMSidebar : public QWidget
 
         Context *context;
         bool active;
-        QDate from, to; // so we don't repeat update...
-
 
         Seasons *seasons;
         GcSplitterItem *seasonsWidget;

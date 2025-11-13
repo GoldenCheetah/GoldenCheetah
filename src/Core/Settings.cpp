@@ -868,6 +868,7 @@ breakout:
     returning.head = false;
     returning.sideanalysis = false;
     returning.sidetrend = false;
+    returning.sideplan = false;
     returning.sidetrain = true;
 
     // linewidth must be wholly divisible by 0.5
