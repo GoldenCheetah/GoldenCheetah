@@ -708,7 +708,8 @@ PlanningCalendarWindow::getActivities
             || rideItem == nullptr) {
             continue;
         }
-        if (context->isfiltered && ! context->filters.contains(rideItem->fileName)) {
+        if (   (context->isfiltered && ! context->filters.contains(rideItem->fileName))
+            || (context->ishomefiltered && ! context->homeFilters.contains(rideItem->fileName))) {
             continue;
         }
 
