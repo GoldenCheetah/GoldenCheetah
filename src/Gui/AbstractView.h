@@ -218,7 +218,7 @@ protected:
     Context *context;
     GcChartWindow *chart;
     Perspective *page; // current
-    int type; // what type of view is this VIEW_{HOME,ANALYSIS,DIARY,TRAIN}
+    int type; // what type of view is this VIEW_{HOME,ANALYSIS,PLAN,TRAIN}
     bool useDefault; // force a reset by using the default layouts
 
 };

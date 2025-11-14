@@ -29,7 +29,7 @@
 #include "TrainBottom.h"
 #include "Specification.h"
 
-QMap<Context*, LTMSidebar*> LTMSidebarView::LTMSidebars;
+QMap<Context*, LTMSidebar*> LTMSidebarView::LTMSidebars_;
 
 LTMSidebarView::LTMSidebarView(Context *context, int type, const QString& view, const QString& heading) :
     AbstractView(context, type, view, heading)
@@ -41,21 +41,21 @@ LTMSidebarView::LTMSidebarView(Context *context, int type, const QString& view, 
 
 LTMSidebarView::~LTMSidebarView()
 {
-    // each destructor destorys its own context related sidebar
+    // each destructor removes its own context related sidebar
     removeLTMSidebar(context);
 }
 
 LTMSidebar*
 LTMSidebarView::getLTMSidebar(Context *sbContext)
 {
-    QMap<Context*, LTMSidebar*>::const_iterator itr = LTMSidebars.find(sbContext);
-    if (itr == LTMSidebars.end()) {
+    QMap<Context*, LTMSidebar*>::const_iterator itr = LTMSidebars_.find(sbContext);
+    if (itr == LTMSidebars_.end()) {
 
         // need to create a sidebar for this context
-        LTMSidebars[sbContext] = new LTMSidebar(sbContext);
-        connect(LTMSidebars[sbContext], SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
+        LTMSidebars_[sbContext] = new LTMSidebar(sbContext);
+        connect(LTMSidebars_[sbContext], SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
     }
-    return LTMSidebars[sbContext];
+    return LTMSidebars_[sbContext];
 }
 
 void
@@ -64,7 +64,7 @@ LTMSidebarView::setLTMSidebarView(int newView)
     if ((newView == 0 && type == VIEW_TRENDS) || (newView == 2 && type == VIEW_PLAN))
     {
         // the newView is this one, so set the sidebar
-        setSidebar(LTMSidebars[context]);
+        setSidebar(LTMSidebars_[context]);
     } else {
         // the newView is not this one, so release the sidebar
         setSidebar(nullptr);
@@ -74,17 +74,17 @@ LTMSidebarView::setLTMSidebarView(int newView)
 void
 LTMSidebarView::removeLTMSidebar(Context *sbContext)
 {
-    QMap<Context*, LTMSidebar*>::const_iterator itr = LTMSidebars.find(sbContext);
-    if (itr != LTMSidebars.end()) {
-        delete LTMSidebars[sbContext];
-        LTMSidebars.erase(itr);
+    QMap<Context*, LTMSidebar*>::const_iterator itr = LTMSidebars_.find(sbContext);
+    if (itr != LTMSidebars_.end()) {
+        delete LTMSidebars_[sbContext];
+        LTMSidebars_.erase(itr);
     }
 }
 
 void
 LTMSidebarView::selectDateRange(Context *sbContext, DateRange dr)
 {
-    LTMSidebars[sbContext]->selectDateRange(dr);
+    LTMSidebars_[sbContext]->selectDateRange(dr);
 }
 
 void
@@ -230,7 +230,6 @@ AnalysisView::notifyViewSplitterMoved() {
     }
 }
 
-
 PlanView::PlanView(Context *context, QStackedWidget *controls) :
         LTMSidebarView(context, VIEW_PLAN, "plan", tr("Plan future activities"))
 {
@@ -241,21 +240,18 @@ PlanView::PlanView(Context *context, QStackedWidget *controls) :
     controls->addWidget(cstack);
     controls->setCurrentIndex(0);
 
+    setLTMSidebarView(2);
+    setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "plan", defaultAppearance.sideplan).toBool());
+
     pstack = new QStackedWidget(this);
     setPages(pstack);
     setBlank(b);
 
-    setLTMSidebarView(2);
-
-    setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "plan", defaultAppearance.sideplan).toBool());
     connect(this, SIGNAL(onSelectionChanged()), this, SLOT(justSelected()));
-
- 
 }
 
 PlanView::~PlanView()
 {
-    removeLTMSidebar(context);
     appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "plan", _sidebar);
 }
 
@@ -285,14 +281,14 @@ TrendsView::TrendsView(Context *context, QStackedWidget *controls) :
     controls->addWidget(cstack);
     controls->setCurrentIndex(0);
 
+    setLTMSidebarView(0);
+    setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "trend", defaultAppearance.sidetrend).toBool());
+
     pstack = new QStackedWidget(this);
     setPages(pstack);
     setBlank(b);
     setBottom(new ComparePane(context, this, ComparePane::season));
 
-    setLTMSidebarView(0);
-
-    setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "trend", defaultAppearance.sidetrend).toBool());
     connect(this, SIGNAL(onSelectionChanged()), this, SLOT(justSelected()));
     connect(bottomSplitter(), SIGNAL(compareChanged(bool)), this, SLOT(compareChanged(bool)));
     connect(bottomSplitter(), SIGNAL(compareClear()), bottom(), SLOT(clear()));
@@ -300,7 +296,6 @@ TrendsView::TrendsView(Context *context, QStackedWidget *controls) :
 
 TrendsView::~TrendsView()
 {
-    removeLTMSidebar(context);
     appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "trend", _sidebar);
 }
 

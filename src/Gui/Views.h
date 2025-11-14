@@ -60,7 +60,7 @@ class LTMSidebarView : public AbstractView
     private:
 
         // each athlete has their own LTMSidebar shared by the plan & trends views.
-        static QMap<Context*, LTMSidebar*> LTMSidebars;
+        static QMap<Context*, LTMSidebar*> LTMSidebars_;
 };
 
 class AnalysisView : public AbstractView
