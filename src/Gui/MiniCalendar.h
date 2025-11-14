@@ -16,8 +16,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _GC_DiarySidebar_h
-#define _GC_DiarySidebar_h 1
+#ifndef _GC_MiniCalendar_h
+#define _GC_MiniCalendar_h 1
 
 #include "GoldenCheetah.h"
 
@@ -156,43 +156,4 @@ class GcMultiCalendar : public QScrollArea
         RideItem *_ride;
 };
 
-class DiarySidebar : public QWidget // not a GcWindow - belongs on sidebar
-{
-    Q_OBJECT
-    G_OBJECT
-
-    public:
-
-        DiarySidebar(Context *);
-
-    public slots:
-
-        void setRide(RideItem *ride);
-        void refresh(); 
-
-        void configChanged(qint32);
-        void filterChanged() { multiCalendar->filterChanged(); }
-
-        void setDateRange();
-
-    signals:
-        void dateRangeChanged(DateRange);
-
-    protected:
-        Context *context;
-        RideItem *_ride;
-        int month, year;
-
-        QVBoxLayout *layout;
-        QGridLayout *dayLayout; // contains the day names and days
-
-        QWidget *calWidget;
-        GcMultiCalendar *multiCalendar;
-
-        //QPalette black, grey, white;
-        GcSplitter *splitter; // calendar vs summary
-        GcSplitterItem *calendarItem;
-
-        QDate from, to;
-};
-#endif // _GC_DiarySidebar_h
+#endif // _GC_MiniCalendar_h

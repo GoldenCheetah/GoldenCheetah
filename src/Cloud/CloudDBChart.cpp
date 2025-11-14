@@ -711,7 +711,7 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
         switch(g_chartView) {
         case 0 : view = tr("Trends"); break;
         case 1 : view = tr("Activities"); break;
-        case 2 : view = tr("Diary"); break;
+        case 2 : view = tr("Plan"); break;
         case 3 : view = tr("Train"); break;
         }
     } else
@@ -1069,7 +1069,7 @@ CloudDBChartListDialog::applyAllFilters() {
         case 0 : mask = VIEW_TRENDS; break;
         default:
         case 1 : mask = VIEW_ANALYSIS; break;
-        case 2 : mask = VIEW_DIARY; break;
+        case 2 : mask = VIEW_PLAN; break;
         case 3 : mask = VIEW_TRAIN; break;
     }
 
@@ -1084,7 +1084,7 @@ CloudDBChartListDialog::applyAllFilters() {
         // list does not contain any deleted chart id's
 
 
-        // first filter based on the current view (Home, Analysis, Diary) - but only on Imp
+        // first filter based on the current view (Home, Analysis, Plan) - but only on Imp
         bool chartOkForView = false;
         if (g_role == CloudDBCommon::UserImport) {
             int winId = chart.ChartType.toInt();

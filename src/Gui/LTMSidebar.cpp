@@ -308,9 +308,6 @@ LTMSidebar::configChanged(qint32)
     // set or reset the autofilter widgets
     autoFilterChanged();
 
-    // forget what we just used...
-    from = to = QDate();
-
     // let everyone know what date range we are starting with
     dateRangeTreeWidgetSelectionChanged();
 

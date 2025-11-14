@@ -149,10 +149,10 @@ class AbstractView : public QWidget
     protected:
 
         Context *context;
-        const int type; // used by windowregistry; e.g VIEW_TRAIN VIEW_ANALYSIS VIEW_DIARY VIEW_TRENDS
+        const int type; // used by windowregistry; e.g VIEW_TRAIN VIEW_ANALYSIS VIEW_PLAN VIEW_TRENDS
                         // we don't care what values are pass through to the GcWindowRegistry to decide
                         // what charts are relevant for this view.
-        const QString view; // type of view:  "train", "analysis", "diary", "home"
+        const QString view; // type of view:  "train", "analysis", "plan", "home"
         QString viewCfgPath; // directory path to the view's configuration
 
         // properties
@@ -218,7 +218,7 @@ protected:
     Context *context;
     GcChartWindow *chart;
     Perspective *page; // current
-    int type; // what type of view is this VIEW_{HOME,ANALYSIS,DIARY,TRAIN}
+    int type; // what type of view is this VIEW_{HOME,ANALYSIS,PLAN,TRAIN}
     bool useDefault; // force a reset by using the default layouts
 
 };
