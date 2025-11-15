@@ -64,7 +64,7 @@ GcWindowRegistry* GcWindows;
 void
 GcWindowRegistry::initialize()
 {
-  static GcWindowRegistry GcWindowsInit[36] = {
+  static GcWindowRegistry GcWindowsInit[] = {
     // name                     GcWinID
     { VIEW_TRENDS|VIEW_DIARY, tr("Season Overview"),GcWindowTypes::OverviewTrends },
     { VIEW_TRENDS|VIEW_DIARY, tr("Blank Overview "),GcWindowTypes::OverviewTrendsBlank },
@@ -97,7 +97,7 @@ GcWindowRegistry::initialize()
     { VIEW_ANALYSIS, tr("Scatter"),GcWindowTypes::Scatter },
     { VIEW_ANALYSIS, tr("Aerolab"),GcWindowTypes::Aerolab },
     //{ VIEW_TRENDS|VIEW_DIARY, tr("Calendar"),GcWindowTypes::Diary },
-    { VIEW_TRENDS|VIEW_DIARY, tr("Navigator"), GcWindowTypes::ActivityNavigator },
+    { VIEW_ANALYSIS, tr("Navigator"), GcWindowTypes::ActivityNavigator },
     //{ VIEW_DIARY|VIEW_TRENDS, tr("Summary "), GcWindowTypes::DateRangeSummary }, // DEPRECATED IN V3.6
     { VIEW_TRAIN, tr("Telemetry"),GcWindowTypes::DialWindow },
     { VIEW_TRAIN, tr("Workout"),GcWindowTypes::WorkoutPlot },
@@ -114,7 +114,8 @@ GcWindowRegistry::initialize()
   GcWindows = GcWindowsInit;
 }
 
-QStringList windowsForType(int type)
+QStringList
+GcWindowRegistry::windowsForType(int type)
 {
     QStringList returning;
 
@@ -135,7 +136,8 @@ GcWindowRegistry::title(GcWinID id)
     return QString("unknown");
 }
 
-QList<GcWinID> idsForType(int type)
+QList<GcWinID>
+GcWindowRegistry::idsForType(int type)
 {
     QList<GcWinID> returning;
 
@@ -144,6 +146,17 @@ QList<GcWinID> idsForType(int type)
             returning << GcWindows[i].id;
     }
     return returning;
+}
+
+bool
+GcWindowRegistry::isIdRelevantForType(GcWinID id, int type, bool strict)
+{
+    for(int i=0; GcWindows[i].relevance; i++) {
+        if (GcWindows[i].id == id) {
+            return (strict) ? GcWindows[i].relevance == type : GcWindows[i].relevance & type;
+        }
+    }
+    return false;
 }
 
 // instantiate a new window
@@ -218,7 +231,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
 
     case GcWindowTypes::RideMapWindow: returning = new RideMapWindow(context, RideMapWindow::OSM); break; // Deprecated Bing, default to OSM
 
-    case GcWindowTypes::ActivityNavigator: returning = new RideNavigator(context); break;
+    case GcWindowTypes::ActivityNavigator: returning = new RideNavigator(context, true); break;
     case GcWindowTypes::WorkoutWindow: returning = new WorkoutWindow(context); break;
 
     case GcWindowTypes::WebPageWindow: returning = new WebPageWindow(context); break;
