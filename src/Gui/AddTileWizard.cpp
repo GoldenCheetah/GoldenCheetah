@@ -143,11 +143,31 @@ AddTileConfig::initializePage()
 {
     setTitle(QString(tr("Tile Settings")));
 
+    // Clear old layout content from "main"
+    // (widgets AND spacers from previous visits)
+    while (main->count() > 0) {
+        QLayoutItem *it = main->takeAt(0);
+
+        if (it->widget()) {
+            // if this is the old config widget, hide it but DON'T delete it yet
+            if (it->widget() == wizard->config) {
+                it->widget()->hide();
+                it->widget()->setParent(nullptr);
+            } else {
+                delete it->widget();
+            }
+        }
+
+        delete it; // deletes QLayoutItem or QSpacerItem
+    }
+
+    // if we had an old config/item, clean that up
     if (wizard->config) {
-        wizard->config->hide();
-        main->removeWidget(wizard->config);
-        wizard->config = NULL;
+        wizard->config = nullptr;
+    }
+    if (wizard->item) {
         delete wizard->item;
+        wizard->item = nullptr;
     }
 
     // new item with default settings to configure and add
