@@ -31,8 +31,8 @@
 
 QMap<Context*, LTMSidebar*> LTMSidebarView::LTMSidebars_;
 
-LTMSidebarView::LTMSidebarView(Context *context, int type, const QString& view, const QString& heading) :
-    AbstractView(context, type, view, heading)
+LTMSidebarView::LTMSidebarView(Context *context, GcViewType viewType, const QString& view, const QString& heading) :
+    AbstractView(context, viewType, view, heading)
 {
     // get or create the LTMSidebar shared between the views
     getLTMSidebar(context);
@@ -66,7 +66,7 @@ void LTMSidebarView::showEvent(QShowEvent*)
     setSidebar(LTMSidebars_[context]);
 
     // update the sidebar's preset chart visibility
-    LTMSidebars_[context]->updatePresetChartsOnShow(type);
+    LTMSidebars_[context]->updatePresetChartsOnShow(_viewType);
 
     // update sidebar for the new view
     sidebarChanged();
@@ -112,7 +112,7 @@ LTMSidebarView::dateRangeChanged(DateRange dr)
 }
 
 AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) :
-        AbstractView(context, VIEW_ANALYSIS, "analysis", tr("Compare Activities and Intervals"))
+        AbstractView(context, GcViewType::VIEW_ANALYSIS, "analysis", tr("Compare Activities and Intervals"))
 {
     analSidebar = new AnalysisSidebar(context);
     BlankStateAnalysisPage *b = new BlankStateAnalysisPage(context);
@@ -158,7 +158,7 @@ AnalysisView::setRide(RideItem *ride)
 
     // if we are the current view and the current perspective is no longer relevant
     // then lets go find one to switch to..
-    if (context->mainWindow->athleteTab()->currentView() == 1 && page()->relevant(ride) != true) {
+    if (context->mainWindow->athleteTab()->currentViewType() == GcViewType::VIEW_ANALYSIS && page()->relevant(ride) != true) {
 
         // lets find a perspective to switch to
         int ridePerspectiveIdx = findRidesPerspective(ride);
@@ -247,7 +247,7 @@ AnalysisView::notifyViewSplitterMoved() {
 }
 
 PlanView::PlanView(Context *context, QStackedWidget *controls) :
-        LTMSidebarView(context, VIEW_PLAN, "plan", tr("Plan future activities"))
+        LTMSidebarView(context, GcViewType::VIEW_PLAN, "plan", tr("Plan future activities"))
 {
     BlankStatePlanPage *b = new BlankStatePlanPage(context);
 
@@ -276,7 +276,7 @@ PlanView::isBlank()
 }
 
 TrendsView::TrendsView(Context *context, QStackedWidget *controls) :
-        LTMSidebarView(context, VIEW_TRENDS, "home", tr("Compare Date Ranges"))
+        LTMSidebarView(context, GcViewType::VIEW_TRENDS, "home", tr("Compare Date Ranges"))
 {
     BlankStateHomePage *b = new BlankStateHomePage(context);
 
@@ -342,7 +342,7 @@ TrendsView::isBlank()
 }
 
 TrainView::TrainView(Context *context, QStackedWidget *controls) :
-        AbstractView(context, VIEW_TRAIN, "train", tr("Intensity Adjustments and Workout Control"))
+        AbstractView(context, GcViewType::VIEW_TRAIN, "train", tr("Intensity Adjustments and Workout Control"))
 {
     trainTool = new TrainSidebar(context);
     trainTool->setTrainView(this);

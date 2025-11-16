@@ -146,6 +146,7 @@ Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
     isfiltered = ishomefiltered = false;
     isCompareIntervals = isCompareDateRanges = false;
     isRunning = isPaused = false;
+    viewType = GcViewType::NO_VIEW_SET;
 
     connect(this, SIGNAL(loadProgress(QString, double)), mainWindow, SLOT(loadProgress(QString, double)));
 

@@ -436,7 +436,8 @@ CloudDBChartClient::unmarshallAPIv1Object(QJsonObject* object, ChartAPIv1* chart
 static const int chartImageWidth = 320;
 static const int chartImageHeight = 240;
 
-CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
+CloudDBChartListDialog::CloudDBChartListDialog() :
+    const_stepSize(5), g_chartViewType(GcViewType::VIEW_TRENDS)
 {
    g_client = new CloudDBChartClient();
    g_currentHeaderList = new QList<CommonAPIHeaderV1>;
@@ -615,10 +616,10 @@ CloudDBChartListDialog::closeEvent(QCloseEvent* event) {
 }
 
 bool
-CloudDBChartListDialog::prepareData(QString athlete, CloudDBCommon::UserRole role, int chartView) {
+CloudDBChartListDialog::prepareData(QString athlete, CloudDBCommon::UserRole role, GcViewType chartViewType) {
 
     g_role = role;
-    g_chartView = chartView;
+    g_chartViewType = chartViewType;
     // and now initialize the dialog
     setVisibleButtonsForRole();
 
@@ -709,11 +710,12 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
 
     QString view = tr("unknown");
     if (g_role == CloudDBCommon::UserImport ) {
-        switch(g_chartView) {
-        case 0 : view = tr("Trends"); break;
-        case 1 : view = tr("Activities"); break;
-        case 2 : view = tr("Plan"); break;
-        case 3 : view = tr("Train"); break;
+        switch(g_chartViewType) {
+        case GcViewType::VIEW_TRENDS : view = tr("Trends"); break;
+        case GcViewType::VIEW_ANALYSIS : view = tr("Activities"); break;
+        case GcViewType::VIEW_PLAN : view = tr("Plan"); break;
+        case GcViewType::VIEW_TRAIN : view = tr("Train"); break;
+        default: qDebug() << "Unhandled view type: " << static_cast<std::underlying_type_t<GcViewType>>(g_chartViewType); break;
         }
     } else
     {
@@ -1063,16 +1065,7 @@ CloudDBChartListDialog::languageFilterChanged(int) {
 void
 CloudDBChartListDialog::applyAllFilters() {
 
-
     // setup to only show charts that are relevant to the current view
-    unsigned int mask=0;
-    switch(g_chartView) {
-        case 0 : mask = VIEW_TRENDS; break;
-        default:
-        case 1 : mask = VIEW_ANALYSIS; break;
-        case 2 : mask = VIEW_PLAN; break;
-        case 3 : mask = VIEW_TRAIN; break;
-    }
 
     QStringList searchList;
     g_currentHeaderList->clear();
@@ -1084,13 +1077,13 @@ CloudDBChartListDialog::applyAllFilters() {
 
         // list does not contain any deleted chart id's
 
-
         // first filter based on the current view (Home, Analysis, Plan) - but only on Imp
+        // note: g_chartViewType is both the view type and the view relevance mask.
         bool chartOkForView = false;
         if (g_role == CloudDBCommon::UserImport) {
             int winId = chart.ChartType.toInt();
-            for (int i = 0; GcWindows[i].relevance; i++) {
-                if (GcWindows[i].id == winId && (GcWindows[i].relevance & mask)) {
+            for (int i = 0; GcWindows[i].relevance != GcViewType::NO_VIEW_SET; i++) {
+                if (GcWindows[i].id == winId && (GcWindows[i].relevance & g_chartViewType)) {
                     chartOkForView = true;
                     break;
                 }

@@ -266,14 +266,25 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     connect(athleteBrowseButton, SIGNAL(clicked()), this, SLOT(browseAthleteDir()));
 
     startupView = new QComboBox();
-    startupView->addItem(tr("Trends"));
-    startupView->addItem(tr("Analysis"));
-    startupView->addItem(tr("Plan"));
-    startupView->addItem(tr("Train"));
+    startupView->addItem(tr("Trends")); // startViewIdx = 0
+    startupView->addItem(tr("Analysis")); // startViewIdx = 1
+    startupView->addItem(tr("Plan")); // startViewIdx = 2
+    startupView->addItem(tr("Train")); // startViewIdx = 3
 
-    // map view indexes to combo box values
-    int startView = appsettings->value(NULL, GC_STARTUP_VIEW, "1").toInt();
-    startupView->setCurrentIndex(startView);
+    // map viewTypes to combo box index values, default to analysis view
+    int startViewIdx = 1;
+    GcViewType viewType = static_cast<GcViewType>(appsettings->value(NULL, GC_STARTUP_VIEW,
+                                QString::number(static_cast<int>(GcViewType::VIEW_ANALYSIS))).toInt());
+    switch (viewType) {
+        case GcViewType::VIEW_TRENDS: startViewIdx = 0; break;
+        case GcViewType::VIEW_ANALYSIS: startViewIdx = 1; break;
+        case GcViewType::VIEW_PLAN: startViewIdx = 2; break;
+        case GcViewType::VIEW_TRAIN: startViewIdx = 3; break;
+        default: {
+            qDebug() << "Startup view not specified or unknown value in GeneralPage, defaulting to analysis view";
+        } break;
+    }
+    startupView->setCurrentIndex(startViewIdx);
 
     QFormLayout *form = newQFormLayout();
     form->addRow(new QLabel(HLO + tr("Localization") + HLC));
@@ -338,9 +349,16 @@ GeneralPage::saveClicked()
     };
     appsettings->setValue(GC_LANG, langs[langCombo->currentIndex()]);
 
-    // map combo box values to view indexes
-    int startView = startupView->currentIndex();
-    appsettings->setValue(GC_STARTUP_VIEW, startView);
+    // map combo box index values to viewTypes, default to analysis view
+    GcViewType startupViewType = GcViewType::VIEW_ANALYSIS;
+    switch (startupView->currentIndex()) {
+        case 0: startupViewType = GcViewType::VIEW_TRENDS; break;
+        case 1: startupViewType = GcViewType::VIEW_ANALYSIS; break;
+        case 2: startupViewType = GcViewType::VIEW_PLAN; break;
+        case 3: startupViewType = GcViewType::VIEW_TRAIN; break;
+        default: qDebug() << "Unhandled startup view in GeneralPage:" << static_cast<std::underlying_type_t<GcViewType>>(startupView->currentIndex()); break;
+    }
+    appsettings->setValue(GC_STARTUP_VIEW, static_cast<std::underlying_type_t<GcViewType>>(startupViewType));
 
     // Garmin and cranks
     appsettings->setValue(GC_GARMIN_HWMARK, garminHWMarkedit->value());
