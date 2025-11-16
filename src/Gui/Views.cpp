@@ -65,6 +65,8 @@ LTMSidebarView::setLTMSidebarView(int newView)
     {
         // the newView is this one, so set the sidebar
         setSidebar(LTMSidebars_[context]);
+        // update sidebar for newView
+        sidebarChanged();
     } else {
         // the newView is not this one, so release the sidebar
         setSidebar(nullptr);

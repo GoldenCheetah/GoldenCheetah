@@ -1338,9 +1338,11 @@ MainWindow::setToolButtons()
 {
     int select = currentAthleteTab->isTiled() ? 1 : 0;
     int lowselected = currentAthleteTab->isBottomRequested() ? 1 : 0;
+    int sidebarselected = currentAthleteTab->isSidebarEnabled() ? 1 : 0;
 
     styleAction->setChecked(select);
     showhideLowbar->setChecked(lowselected);
+    showhideSidebar->setChecked(sidebarselected);
 
     //if (styleSelector->isSegmentSelected(select) == false)
         //styleSelector->setSegmentSelected(select, true);
