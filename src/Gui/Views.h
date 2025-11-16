@@ -46,13 +46,15 @@ class LTMSidebarView : public AbstractView
 
     protected slots:
 
-        void setLTMSidebarView(int newView); // also called by viewChanged
         void dateRangeChanged(DateRange);
 
     protected:
 
         LTMSidebarView(Context *context, int type, const QString& view, const QString& heading);
         virtual ~LTMSidebarView();
+
+        void showEvent(QShowEvent*) override;
+        void hideEvent(QHideEvent*) override;
 
         LTMSidebar* getLTMSidebar(Context *sbContext);
         void removeLTMSidebar(Context *sbContext);

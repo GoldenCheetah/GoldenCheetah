@@ -35,8 +35,6 @@ LTMSidebarView::LTMSidebarView(Context *context, int type, const QString& view, 
     AbstractView(context, type, view, heading)
 {
     getLTMSidebar(context);
-
-    connect(context, SIGNAL(viewChanged(int)), this, SLOT(setLTMSidebarView(int)));
 }
 
 LTMSidebarView::~LTMSidebarView()
@@ -58,19 +56,18 @@ LTMSidebarView::getLTMSidebar(Context *sbContext)
     return LTMSidebars_[sbContext];
 }
 
-void
-LTMSidebarView::setLTMSidebarView(int newView)
+void LTMSidebarView::showEvent(QShowEvent*)
 {
-    if ((newView == 0 && type == VIEW_TRENDS) || (newView == 2 && type == VIEW_PLAN))
-    {
-        // the newView is this one, so set the sidebar
-        setSidebar(LTMSidebars_[context]);
-        // update sidebar for newView
-        sidebarChanged();
-    } else {
-        // the newView is not this one, so release the sidebar
-        setSidebar(nullptr);
-    }
+    // the show event always follows the hide event, so set the sidebar
+    setSidebar(LTMSidebars_[context]);
+    // update sidebar for the new view
+    sidebarChanged();
+}
+
+void LTMSidebarView::hideEvent(QHideEvent*)
+{
+    // the hide event always precedes the show event, so release the sidebar
+    setSidebar(nullptr);
 }
 
 void
@@ -242,7 +239,6 @@ PlanView::PlanView(Context *context, QStackedWidget *controls) :
     controls->addWidget(cstack);
     controls->setCurrentIndex(0);
 
-    setLTMSidebarView(2);
     setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "plan", defaultAppearance.sideplan).toBool());
 
     pstack = new QStackedWidget(this);
@@ -283,7 +279,6 @@ TrendsView::TrendsView(Context *context, QStackedWidget *controls) :
     controls->addWidget(cstack);
     controls->setCurrentIndex(0);
 
-    setLTMSidebarView(0);
     setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "trend", defaultAppearance.sidetrend).toBool());
 
     pstack = new QStackedWidget(this);

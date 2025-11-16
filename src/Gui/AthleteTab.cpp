@@ -174,6 +174,9 @@ AthleteTab::selectView(int index)
     if (startupViewChangeSent && views->currentIndex() == index) return; // not changing
     startupViewChangeSent = true;
 
+    // suspend screen updates while the view is changed.
+    views->setUpdatesEnabled(false);
+
     emit viewChanged(index);
 
     // first we deselect the current
@@ -185,6 +188,9 @@ AthleteTab::selectView(int index)
     masterControls->setCurrentIndex(index);
     context->setIndex(index);
     context->mainWindow->resetPerspective(index); // set perspective for this view
+
+    // enable screen updates to render the view without flickering
+    views->setUpdatesEnabled(true);
 }
 
 void
