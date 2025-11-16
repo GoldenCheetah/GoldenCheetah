@@ -1160,11 +1160,16 @@ RideImportWizard::abortClicked()
     phaseLabel->setText(donemessage);
     abortButton->setText(tr("Finish"));
     aborted = false;
+
+    // notify everyone that the auto import process is complete
+    context->notifyAutoImportCompleted();
+
     if (autoImportStealth) {
         abortClicked();  // simulate pressing the "Finish" button - even if the window got visible
     } else {
         if (!isActiveWindow()) activateWindow();
     }
+
 }
 
 

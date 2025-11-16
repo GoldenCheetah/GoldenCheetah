@@ -62,6 +62,7 @@ PlanningCalendarWindow::PlanningCalendarWindow(Context *context)
     });
     connect(context, &Context::filterChanged, this, &PlanningCalendarWindow::updateActivities);
     connect(context, &Context::homeFilterChanged, this, &PlanningCalendarWindow::updateActivities);
+    connect(context, &Context::autoImportCompleted, this, &PlanningCalendarWindow::updateActivities);
     connect(context, &Context::rideAdded, this, &PlanningCalendarWindow::updateActivitiesIfInRange);
     connect(context, &Context::rideDeleted, this, &PlanningCalendarWindow::updateActivitiesIfInRange);
     connect(context, &Context::rideChanged, this, &PlanningCalendarWindow::updateActivitiesIfInRange);
