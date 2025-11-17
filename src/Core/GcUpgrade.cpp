@@ -129,7 +129,7 @@ GcUpgrade::upgrade(const QDir &home)
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/analysis/hide/1"), true);
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/analysis/hide/2"), false);
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/analysis/hide/3"), true);
-            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/plan/hide"), true);
+            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/plan/hide"), !defaults.sideplan);
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/plan/hide/0"), false);
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/plan/hide/1"), false);
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/plan/hide/2"), true);

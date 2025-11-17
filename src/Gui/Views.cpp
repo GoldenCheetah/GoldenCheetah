@@ -60,6 +60,9 @@ void LTMSidebarView::showEvent(QShowEvent*)
 {
     // the show event always follows the hide event, so set the sidebar
     setSidebar(LTMSidebars_[context]);
+
+    LTMSidebars_[context]->enablePresetCharts(type == VIEW_TRENDS);
+
     // update sidebar for the new view
     sidebarChanged();
 }

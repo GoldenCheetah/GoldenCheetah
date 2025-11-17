@@ -249,6 +249,25 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 }
 
 void
+LTMSidebar::enablePresetCharts(bool enabled)
+{
+    // show/hide the splitter toolbar icon
+    chartsWidget->controlAction->setVisible(enabled);
+
+    if (enabled) {
+
+        // if the preset charts were previously visible display it
+        if (chartsWidgetVisible) chartsWidget->show();
+
+    } else {
+
+        // remember the preset charts visiblity before disabling it
+        chartsWidgetVisible = chartsWidget->isVisible();
+        chartsWidget->hide();
+    }
+}
+
+void
 LTMSidebar::presetsChanged()
 {
     // rebuild the preset chart list as the presets have changed
