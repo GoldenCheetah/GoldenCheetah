@@ -30,7 +30,7 @@
 
 #include <QPaintEvent>
 
-AthleteTab::AthleteTab(Context *context) : QWidget(context->mainWindow), context(context), noswitch(true)
+AthleteTab::AthleteTab(Context *context) : QWidget(context->mainWindow), context(context), noswitch(true), startupViewChangeSent(false)
 {
     context->tab = this;
     init = false;
@@ -171,9 +171,8 @@ AthleteTab::selectView(int index)
 {
     // ensure an initial viewChanged() event occurs for the navigation model, otherwise if the
     // startup view is trends (value zero) the guard rejects the selection as views->currentIndex() is zero
-    static bool startupView = true;
-    if (!startupView && views->currentIndex() == index) return; // not changing
-    startupView = false;
+    if (startupViewChangeSent && views->currentIndex() == index) return; // not changing
+    startupViewChangeSent = true;
 
     emit viewChanged(index);
 
