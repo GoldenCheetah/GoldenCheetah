@@ -77,9 +77,9 @@ SixCycle::~SixCycle() {
 }
 
 void
-SixCycle::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
+SixCycle::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    reply->ignoreSslErrors();
+    CloudDBCommon::sslErrors(reply, errors);
 }
 
 // open by connecting and getting a basic list of folders available

@@ -73,8 +73,8 @@ Nolio::~Nolio() {
     if (context) delete nam;
 }
 
-void Nolio::onSslErrors(QNetworkReply *reply, const QList<QSslError>&){
-    reply->ignoreSslErrors();
+void Nolio::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors){
+    CloudDBCommon::sslErrors(reply, errors);
 }
 
 bool Nolio::open(QStringList &errors){

@@ -78,9 +78,9 @@ Xert::~Xert() {
 }
 
 void
-Xert::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
+Xert::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    reply->ignoreSslErrors();
+    CloudDBCommon::sslErrors(reply, errors);
 }
 
 bool

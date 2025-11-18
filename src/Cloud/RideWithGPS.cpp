@@ -72,9 +72,9 @@ RideWithGPS::~RideWithGPS() {
 }
 
 void
-RideWithGPS::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
+RideWithGPS::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    reply->ignoreSslErrors();
+    CloudDBCommon::sslErrors(reply, errors);
 }
 
 bool

@@ -555,15 +555,8 @@ CalDAV::userpass(QNetworkReply*,QAuthenticator*a)
 void
 CalDAV::sslErrors(QNetworkReply* reply ,QList<QSslError> errors)
 {
-    QString errorString = "";
-    foreach (const QSslError e, errors ) {
-        if (!errorString.isEmpty())
-            errorString += ", ";
-        errorString += e.errorString();
-    }
     if (!(mode == Events && ignoreDownloadErrors)) {
-        QMessageBox::warning(context->mainWindow, tr("HTTP"), tr("SSL error(s) has occurred: %1").arg(errorString));
         mode = None;
-        reply->ignoreSslErrors();
+        CloudDBCommon::sslErrors(reply, errors);
     }
 }

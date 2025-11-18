@@ -180,11 +180,10 @@ OAuthDialog::~OAuthDialog()
   delete view;  // view was constructed without a parent to delete it
 }
 
-// just ignore SSL handshake errors at all times
 void
-OAuthDialog::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
+OAuthDialog::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    reply->ignoreSslErrors();
+  CloudDBCommon::sslErrors(reply, errors);
 }
 
 

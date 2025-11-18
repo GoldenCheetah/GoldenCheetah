@@ -471,8 +471,8 @@ StravaRoutesDownload::readFile(QByteArray *data, int routeId)
 
 
 void
-StravaRoutesDownload::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
+StravaRoutesDownload::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    reply->ignoreSslErrors();
+    CloudDBCommon::sslErrors(reply, errors);
 }
 

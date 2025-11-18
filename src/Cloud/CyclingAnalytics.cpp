@@ -71,9 +71,9 @@ CyclingAnalytics::~CyclingAnalytics() {
 }
 
 void
-CyclingAnalytics::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
+CyclingAnalytics::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    reply->ignoreSslErrors();
+    CloudDBCommon::sslErrors(reply, errors);
 }
 
 bool

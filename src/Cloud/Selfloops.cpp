@@ -70,9 +70,9 @@ Selfloops::~Selfloops() {
 }
 
 void
-Selfloops::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
+Selfloops::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    reply->ignoreSslErrors();
+    CloudDBCommon::sslErrors(reply, errors);
 }
 
 bool

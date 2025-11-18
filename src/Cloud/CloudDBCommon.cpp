@@ -301,7 +301,7 @@ CloudDBCommon::sslErrors(QNetworkReply* reply ,QList<QSslError> errors)
         errorString += e.errorString();
     }
     QMessageBox::warning(NULL, tr("HTTP"), tr("SSL error(s) has occurred: %1").arg(errorString));
-    reply->ignoreSslErrors();
+    //reply->ignoreSslErrors(); // disabled for security reasons
 }
 
 

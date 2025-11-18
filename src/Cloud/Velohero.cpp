@@ -74,9 +74,9 @@ Velohero::~Velohero() {
 }
 
 void
-Velohero::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
+Velohero::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    reply->ignoreSslErrors();
+    CloudDBCommon::sslErrors(reply, errors);
 }
 
 bool
