@@ -34,7 +34,11 @@ QMap<Context*, LTMSidebar*> LTMSidebarView::LTMSidebars_;
 LTMSidebarView::LTMSidebarView(Context *context, int type, const QString& view, const QString& heading) :
     AbstractView(context, type, view, heading)
 {
+    // get or create the LTMSidebar shared between the views
     getLTMSidebar(context);
+
+    // each view's constructor needs to register the dateRangeChanged signal.
+    connect(LTMSidebars_[context], SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
 }
 
 LTMSidebarView::~LTMSidebarView()
@@ -51,7 +55,6 @@ LTMSidebarView::getLTMSidebar(Context *sbContext)
 
         // need to create a sidebar for this context
         LTMSidebars_[sbContext] = new LTMSidebar(sbContext);
-        connect(LTMSidebars_[sbContext], SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
     }
     return LTMSidebars_[sbContext];
 }
@@ -310,6 +313,8 @@ TrendsView::compareChanged(bool state)
 int
 TrendsView::countActivities(Perspective *perspective, DateRange dr)
 {
+    printf("TrendsView::countActivities\n");
+
     // get the filterset for the current daterange
     // using the data filter expression
     int returning=0;
