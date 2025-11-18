@@ -313,8 +313,6 @@ TrendsView::compareChanged(bool state)
 int
 TrendsView::countActivities(Perspective *perspective, DateRange dr)
 {
-    printf("TrendsView::countActivities\n");
-
     // get the filterset for the current daterange
     // using the data filter expression
     int returning=0;
