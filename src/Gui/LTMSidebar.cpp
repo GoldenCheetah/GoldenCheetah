@@ -221,6 +221,14 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 
     splitter->prepare(context->athlete->cyclist, "LTM");
 
+    // set the initial chartWidget visibility
+    QString hidesetting = GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/LTM/hide/4");
+    QVariant hidden = appsettings->cvalue(context->athlete->cyclist, hidesetting);
+    chartsWidgetVisible = !((hidden != QVariant()) && (hidden.toBool()));
+
+    // track changes to the chartWidget visibility
+    connect(chartsWidget->controlAction, SIGNAL(triggered(void)), this, SLOT(chartVisibilityChanged()));
+
     // our date ranges
     connect(dateRangeTree,SIGNAL(itemSelectionChanged()), this, SLOT(dateRangeTreeWidgetSelectionChanged()));
     connect(dateRangeTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(dateRangePopup(const QPoint &)));
@@ -249,20 +257,25 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 }
 
 void
-LTMSidebar::enablePresetCharts(bool enabled)
+LTMSidebar::chartVisibilityChanged()
 {
+    chartsWidgetVisible = chartsWidget->isVisible();
+}
+
+void
+LTMSidebar::updatePresetChartsOnShow(int viewType)
+{
+    bool trendsView(viewType == VIEW_TRENDS);
+
     // show/hide the splitter toolbar icon
-    chartsWidget->controlAction->setVisible(enabled);
+    chartsWidget->controlAction->setVisible(trendsView);
 
-    if (enabled) {
-
-        // if the preset charts were previously visible display it
+    if (trendsView) {
+        // if it is trends view and charts were previously visible
         if (chartsWidgetVisible) chartsWidget->show();
-
     } else {
-
-        // remember the preset charts visiblity before disabling it
-        chartsWidgetVisible = chartsWidget->isVisible();
+        // if it is not trends view, then the LTMSidebar doesn't display
+        // the preset charts, so hide the charts
         chartsWidget->hide();
     }
 }
