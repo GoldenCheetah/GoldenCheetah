@@ -743,9 +743,11 @@ CalendarDayTable::showContextMenu
                 emit addActivity(false, day.date, time);
             });
         } else {
+#if defined(GC_ACTIVITY_PLAN)
             contextMenu.addAction(tr("Add planned activity..."), this, [=]() {
                 emit addActivity(true, day.date, time);
             });
+#endif
         }
     }
     contextMenu.exec(viewport()->mapToGlobal(pos));
@@ -1337,6 +1339,7 @@ CalendarMonthTable::showContextMenu
                 emit addActivity(false, day.date, time);
             });
         }
+#if defined(GC_ACTIVITY_PLAN)
         if (day.date >= QDate::currentDate()) {
             contextMenu.addAction(tr("Add planned activity..."), this, [=]() {
                 QTime time = QTime::currentTime();
@@ -1365,6 +1368,7 @@ CalendarMonthTable::showContextMenu
                 });
             }
         }
+#endif
     }
     contextMenu.exec(viewport()->mapToGlobal(pos));
     if (pressedIndex.isValid()) {
@@ -1799,6 +1803,7 @@ CalendarWeekView::selectedDate
 }
 
 
+#if defined(GC_CALENDAR_AGENDA)
 //////////////////////////////////////////////////////////////////////////////
 // CalendarAgendaView
 
@@ -2302,6 +2307,7 @@ CalendarAgendaView::showContextMenu
 
     contextMenu.exec(agendaTree->viewport()->mapToGlobal(pos));
 }
+#endif
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -2317,13 +2323,17 @@ Calendar::Calendar
     dayView = new CalendarDayView(dateInMonth, athleteMeasures);
     weekView = new CalendarWeekView(dateInMonth);
     monthView = new CalendarMonthTable(dateInMonth, firstDayOfWeek);
+#if defined(GC_CALENDAR_AGENDA)
     agendaView = new CalendarAgendaView();
+#endif
 
     viewStack = new QStackedWidget();
     viewStack->addWidget(dayView);
     viewStack->addWidget(weekView);
     viewStack->addWidget(monthView);
+#if defined(GC_CALENDAR_AGENDA)
     viewStack->addWidget(agendaView);
+#endif
 
     toolbar = new QToolBar();
 
@@ -2373,10 +2383,12 @@ Calendar::Calendar
     monthAction->setActionGroup(viewGroup);
     connect(monthAction, &QAction::triggered, [=]() { setView(CalendarView::Month); });
 
+#if defined(GC_CALENDAR_AGENDA)
     agendaAction = toolbar->addAction(tr("Agenda"));
     agendaAction->setCheckable(true);
     agendaAction->setActionGroup(viewGroup);
     connect(agendaAction, &QAction::triggered, [=]() { setView(CalendarView::Agenda); });
+#endif
 
     applyNavIcons();
 
@@ -2434,6 +2446,7 @@ Calendar::Calendar
         }
     });
 
+#if defined(GC_CALENDAR_AGENDA)
     connect(agendaView, &CalendarAgendaView::dayChanged, [=](const QDate &date) {
         if (currentView() == CalendarView::Agenda) {
             emit dayChanged(date);
@@ -2449,6 +2462,7 @@ Calendar::Calendar
             setDate(date);
         }
     });
+#endif
 
     connect(prevAction, &QAction::triggered, [=]() { goNext(-1); });
     connect(nextAction, &QAction::triggered, [=]() { goNext(1); });
@@ -2479,9 +2493,11 @@ Calendar::setDate
         if (monthView->isInDateRange(date)) {
             monthView->setMonth(date, allowKeepMonth);
         }
+#if defined(GC_CALENDAR_AGENDA)
     } else if (currentView() == CalendarView::Agenda) {
         agendaView->updateDate();
         agendaView->setDateRange(dateRange);
+#endif
     }
 }
 
@@ -2496,8 +2512,10 @@ Calendar::fillEntries
         weekView->fillEntries(activityEntries, summaries, headlineEntries);
     } else if (currentView() == CalendarView::Month) {
         monthView->fillEntries(activityEntries, summaries, headlineEntries);
+#if defined(GC_CALENDAR_AGENDA)
     } else if (currentView() == CalendarView::Agenda) {
         agendaView->fillEntries(activityEntries, summaries, headlineEntries);
+#endif
     }
     filterSpacerAction->setVisible(isFiltered);
     filterLabelAction->setVisible(isFiltered);
@@ -2522,8 +2540,10 @@ Calendar::firstVisibleDay
         return weekView->firstVisibleDay();
     } else if (currentView() == CalendarView::Month) {
         return monthView->firstVisibleDay();
+#if defined(GC_CALENDAR_AGENDA)
     } else if (currentView() == CalendarView::Agenda) {
         return agendaView->firstVisibleDay();
+#endif
     }
     return QDate();
 }
@@ -2539,8 +2559,10 @@ Calendar::lastVisibleDay
         return weekView->lastVisibleDay();
     } else if (currentView() == CalendarView::Month) {
         return monthView->lastVisibleDay();
+#if defined(GC_CALENDAR_AGENDA)
     } else if (currentView() == CalendarView::Agenda) {
         return agendaView->lastVisibleDay();
+#endif
     }
     return QDate();
 }
@@ -2556,8 +2578,10 @@ Calendar::selectedDate
         return weekView->selectedDate();
     } else if (currentView() == CalendarView::Month) {
         return monthView->selectedDate();
+#if defined(GC_CALENDAR_AGENDA)
     } else if (currentView() == CalendarView::Agenda) {
         return agendaView->selectedDate();
+#endif
     }
     return QDate();
 }
@@ -2590,8 +2614,10 @@ Calendar::goNext
         if ((ret = newDate.isValid())) {
             setDate(newDate);
         }
+#if defined(GC_CALENDAR_AGENDA)
     } else if (currentView() == CalendarView::Agenda) {
         ret = false;
+#endif
     }
     return ret;
 }
@@ -2636,8 +2662,10 @@ Calendar::canGoNext
         fom = fom.addMonths(amount);
         lom = lom.addMonths(amount);
         return isInDateRange(fom) || isInDateRange(lom);
+#if defined(GC_CALENDAR_AGENDA)
     } else if (currentView() == CalendarView::Agenda) {
         return false;
+#endif
     }
     return false;
 }
@@ -2661,11 +2689,15 @@ bool
 Calendar::isInDateRange
 (const QDate &date) const
 {
+#if defined(GC_CALENDAR_AGENDA)
     if (currentView() != CalendarView::Agenda) {
         return date.isValid() && dateRange.pass(date);
     } else {
         return false;
     }
+#else
+    return date.isValid() && dateRange.pass(date);
+#endif
 }
 
 
@@ -2682,9 +2714,11 @@ Calendar::activateDateRange
         setDate(currentDate, false);
     } else if (currentView() == CalendarView::Month) {
         setDate(fitToMonth(currentDate, false), true);
+#if defined(GC_CALENDAR_AGENDA)
     } else if (currentView() == CalendarView::Agenda) {
         agendaView->updateDate(); // AgendaView always uses today
         agendaView->setDateRange(dateRange); // AgendaView needs daterange for "Show in month view"
+#endif
     }
     seasonLabel->setText(tr("Season: %1").arg(dateRange.name));
     emit dateRangeActivated(dr.name);
@@ -2726,6 +2760,7 @@ Calendar::setEndHour
 }
 
 
+#if defined(GC_CALENDAR_AGENDA)
 void
 Calendar::setAgendaPastDays
 (int days)
@@ -2740,6 +2775,7 @@ Calendar::setAgendaFutureDays
 {
     agendaView->setFutureDays(days);
 }
+#endif
 
 
 void
@@ -2808,6 +2844,7 @@ Calendar::updateHeader
         separator->setVisible(true);
         dateNavigatorAction->setVisible(true);
         seasonLabelAction->setVisible(false);
+#if defined(GC_CALENDAR_AGENDA)
     } else if (currentView() == CalendarView::Agenda) {
         prevAction->setVisible(false);
         nextAction->setVisible(false);
@@ -2815,6 +2852,7 @@ Calendar::updateHeader
         separator->setVisible(false);
         dateNavigatorAction->setVisible(false);
         seasonLabelAction->setVisible(true);
+#endif
     }
 }
 
@@ -2855,6 +2893,7 @@ Calendar::setView
     int oldIdx = viewStack->currentIndex();
     if (idx != oldIdx) {
         QDate useDate = selectedDate();
+#if defined(GC_CALENDAR_AGENDA)
         if (lastNonAgendaDate.isValid()) {
             useDate = lastNonAgendaDate;
         }
@@ -2876,6 +2915,18 @@ Calendar::setView
             agendaView->updateDate();
             agendaView->setDateRange(dateRange);
         }
+#else
+        if (view == CalendarView::Day) {
+            dayAction->setChecked(true);
+            dayView->setDay(useDate);
+        } else if (view == CalendarView::Week) {
+            weekAction->setChecked(true);
+            weekView->setDay(useDate);
+        } else if (view == CalendarView::Month) {
+            monthAction->setChecked(true);
+            monthView->setMonth(fitToMonth(selectedDate(), false), true);
+        }
+#endif
         viewStack->setCurrentIndex(idx);
         emit viewChanged(view, static_cast<CalendarView>(oldIdx));
         updateHeader();

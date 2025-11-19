@@ -73,8 +73,8 @@ Nolio::~Nolio() {
     if (context) delete nam;
 }
 
-void Nolio::onSslErrors(QNetworkReply *reply, const QList<QSslError>&){
-    reply->ignoreSslErrors();
+void Nolio::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors){
+    sslErrors(context->mainWindow, reply, errors);
 }
 
 bool Nolio::open(QStringList &errors){

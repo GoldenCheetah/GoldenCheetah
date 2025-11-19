@@ -16,8 +16,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _GC_PlanningCalendarWindow_h
-#define _GC_PlanningCalendarWindow_h
+#ifndef _GC_CalendarWindow_h
+#define _GC_CalendarWindow_h
 
 #include "GoldenCheetah.h"
 
@@ -34,7 +34,7 @@
 #include "CalendarData.h"
 
 
-class PlanningCalendarWindow : public GcChartWindow
+class CalendarWindow : public GcChartWindow
 {
     Q_OBJECT
 
@@ -42,8 +42,10 @@ class PlanningCalendarWindow : public GcChartWindow
     Q_PROPERTY(int firstDayOfWeek READ getFirstDayOfWeek WRITE setFirstDayOfWeek USER true)
     Q_PROPERTY(int startHour READ getStartHour WRITE setStartHour USER true)
     Q_PROPERTY(int endHour READ getEndHour WRITE setEndHour USER true)
+#if defined(GC_CALENDAR_AGENDA)
     Q_PROPERTY(int agendaPastDays READ getAgendaPastDays WRITE setAgendaPastDays USER true)
     Q_PROPERTY(int agendaFutureDays READ getAgendaFutureDays WRITE setAgendaFutureDays USER true)
+#endif
     Q_PROPERTY(bool summaryVisibleDay READ isSummaryVisibleDay WRITE setSummaryVisibleDay USER true)
     Q_PROPERTY(bool summaryVisibleWeek READ isSummaryVisibleWeek WRITE setSummaryVisibleWeek USER true)
     Q_PROPERTY(bool summaryVisibleMonth READ isSummaryVisibleMonth WRITE setSummaryVisibleMonth USER true)
@@ -54,14 +56,16 @@ class PlanningCalendarWindow : public GcChartWindow
     Q_PROPERTY(QString summaryMetrics READ getSummaryMetrics WRITE setSummaryMetrics USER true)
 
     public:
-        PlanningCalendarWindow(Context *context);
+        CalendarWindow(Context *context);
 
         int getDefaultView() const;
         int getFirstDayOfWeek() const;
         int getStartHour() const;
         int getEndHour() const;
+#if defined(GC_CALENDAR_AGENDA)
         int getAgendaPastDays() const;
         int getAgendaFutureDays() const;
+#endif
         bool isSummaryVisibleDay() const;
         bool isSummaryVisibleWeek() const;
         bool isSummaryVisibleMonth() const;
@@ -80,8 +84,10 @@ class PlanningCalendarWindow : public GcChartWindow
         void setFirstDayOfWeek(int fdw);
         void setStartHour(int hour);
         void setEndHour(int hour);
+#if defined(GC_CALENDAR_AGENDA)
         void setAgendaPastDays(int days);
         void setAgendaFutureDays(int days);
+#endif
         void setSummaryVisibleDay(bool visible);
         void setSummaryVisibleWeek(bool visible);
         void setSummaryVisibleMonth(bool svm);
@@ -101,8 +107,10 @@ class PlanningCalendarWindow : public GcChartWindow
         QComboBox *firstDayOfWeekCombo;
         QSpinBox *startHourSpin;
         QSpinBox *endHourSpin;
+#if defined(GC_CALENDAR_AGENDA)
         QSpinBox *agendaPastDaysSpin;
         QSpinBox *agendaFutureDaysSpin;
+#endif
         QCheckBox *summaryDayCheck;
         QCheckBox *summaryWeekCheck;
         QCheckBox *summaryMonthCheck;
