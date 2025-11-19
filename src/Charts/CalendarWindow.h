@@ -16,8 +16,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _GC_PlanningCalendarWindow_h
-#define _GC_PlanningCalendarWindow_h
+#ifndef _GC_CalendarWindow_h
+#define _GC_CalendarWindow_h
 
 #include "GoldenCheetah.h"
 
@@ -34,7 +34,7 @@
 #include "CalendarData.h"
 
 
-class PlanningCalendarWindow : public GcChartWindow
+class CalendarWindow : public GcChartWindow
 {
     Q_OBJECT
 
@@ -54,7 +54,7 @@ class PlanningCalendarWindow : public GcChartWindow
     Q_PROPERTY(QString summaryMetrics READ getSummaryMetrics WRITE setSummaryMetrics USER true)
 
     public:
-        PlanningCalendarWindow(Context *context);
+        CalendarWindow(Context *context);
 
         int getDefaultView() const;
         int getFirstDayOfWeek() const;
