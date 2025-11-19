@@ -743,9 +743,11 @@ CalendarDayTable::showContextMenu
                 emit addActivity(false, day.date, time);
             });
         } else {
+#if defined(GC_ACTIVITY_PLAN)
             contextMenu.addAction(tr("Add planned activity..."), this, [=]() {
                 emit addActivity(true, day.date, time);
             });
+#endif
         }
     }
     contextMenu.exec(viewport()->mapToGlobal(pos));
@@ -1337,6 +1339,7 @@ CalendarMonthTable::showContextMenu
                 emit addActivity(false, day.date, time);
             });
         }
+#if defined(GC_ACTIVITY_PLAN)
         if (day.date >= QDate::currentDate()) {
             contextMenu.addAction(tr("Add planned activity..."), this, [=]() {
                 QTime time = QTime::currentTime();
@@ -1365,6 +1368,7 @@ CalendarMonthTable::showContextMenu
                 });
             }
         }
+#endif
     }
     contextMenu.exec(viewport()->mapToGlobal(pos));
     if (pressedIndex.isValid()) {
