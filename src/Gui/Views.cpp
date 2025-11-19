@@ -97,8 +97,6 @@ LTMSidebarView::selectDateRange(Context *sbContext, DateRange dr)
 void
 LTMSidebarView::justSelected()
 {
-    printf("LTMSidebarView::justSelected\n");
-
     if (isSelected()) {
         // force date range refresh
         LTMSidebars_[context]->dateRangeTreeWidgetSelectionChanged();
