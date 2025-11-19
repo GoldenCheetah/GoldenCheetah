@@ -1276,6 +1276,8 @@ MainWindow::selectAnalysis()
     perspectiveSelector->show();
     searchBox->show();
     workoutFilterBox->hide();
+    showhideLowbar->setText(tr("Show Compare Pane"));
+    showhideLowbar->setVisible(true);
     setToolButtons();
 }
 
@@ -1291,6 +1293,8 @@ MainWindow::selectTrain()
     perspectiveSelector->show();
     searchBox->hide();
     workoutFilterBox->show();
+    showhideLowbar->setText(tr("Workout Control Pane"));
+    showhideLowbar->setVisible(true);
     setToolButtons();
 }
 
@@ -1306,6 +1310,7 @@ MainWindow::selectPlan()
     perspectiveSelector->show();
     searchBox->show();
     workoutFilterBox->hide();
+    showhideLowbar->setVisible(false);
     setToolButtons();
 }
 
@@ -1321,6 +1326,8 @@ MainWindow::selectTrends()
     perspectiveSelector->show();
     searchBox->show();
     workoutFilterBox->hide();
+    showhideLowbar->setText(tr("Show Compare Pane"));
+    showhideLowbar->setVisible(true);
     setToolButtons();
 }
 
