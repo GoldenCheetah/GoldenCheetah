@@ -72,7 +72,7 @@ PolarFlow::~PolarFlow() {
 void
 PolarFlow::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    CloudDBCommon::sslErrors(reply, errors);
+    sslErrors(context->mainWindow, reply, errors);
 }
 
 // open by connecting and getting a basic list of folders available

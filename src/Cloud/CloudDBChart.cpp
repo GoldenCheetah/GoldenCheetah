@@ -19,6 +19,7 @@
 #include "CloudDBChart.h"
 #include "CloudDBCommon.h"
 #include "CloudDBStatus.h"
+#include "CloudService.h"
 
 #include "LTMChartParser.h"
 #include "GcUpgrade.h"
@@ -243,7 +244,7 @@ CloudDBChartClient::getAllChartHeader(QList<CommonAPIHeaderV1>* header) {
 void
 CloudDBChartClient::sslErrors(QNetworkReply* reply ,QList<QSslError> errors)
 {
-    CloudDBCommon::sslErrors(reply, errors);
+    CloudService::sslErrors(nullptr, reply, errors);
 }
 
 // Internal Methods

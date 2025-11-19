@@ -62,7 +62,7 @@ void
 Azum::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
     printd("Azum::onSslErrors\n");
-    CloudDBCommon::sslErrors(reply, errors);
+    sslErrors(context->mainWindow, reply, errors);
 }
 
 bool

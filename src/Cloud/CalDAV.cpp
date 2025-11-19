@@ -21,6 +21,7 @@
 #include "CalDAV.h"
 #include "MainWindow.h"
 #include "Athlete.h"
+#include "CloudService.h"
 
 CalDAV::CalDAV(Context *context) : context(context), mode(None)
 {
@@ -557,6 +558,6 @@ CalDAV::sslErrors(QNetworkReply* reply ,QList<QSslError> errors)
 {
     if (!(mode == Events && ignoreDownloadErrors)) {
         mode = None;
-        CloudDBCommon::sslErrors(reply, errors);
+        CloudService::sslErrors(context->mainWindow, reply, errors);
     }
 }

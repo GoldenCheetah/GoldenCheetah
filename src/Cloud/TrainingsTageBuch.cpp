@@ -75,7 +75,7 @@ TrainingsTageBuch::~TrainingsTageBuch() {
 void
 TrainingsTageBuch::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    CloudDBCommon::sslErrors(reply, errors);
+    sslErrors(context->mainWindow, reply, errors);
 }
 
 bool

@@ -72,7 +72,7 @@ Selfloops::~Selfloops() {
 void
 Selfloops::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    CloudDBCommon::sslErrors(reply, errors);
+    sslErrors(context->mainWindow, reply, errors);
 }
 
 bool

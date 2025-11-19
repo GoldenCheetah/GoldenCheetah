@@ -74,7 +74,7 @@ Nolio::~Nolio() {
 }
 
 void Nolio::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors){
-    CloudDBCommon::sslErrors(reply, errors);
+    sslErrors(context->mainWindow, reply, errors);
 }
 
 bool Nolio::open(QStringList &errors){

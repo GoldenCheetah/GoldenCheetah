@@ -21,6 +21,7 @@
 #include "TrainDB.h"
 #include "HelpWhatsThis.h"
 #include "TimeUtils.h"
+#include "CloudService.h"
 
 StravaRoutesDownload::StravaRoutesDownload(Context *context) : QDialog(context->mainWindow), context(context)
 {
@@ -473,6 +474,6 @@ StravaRoutesDownload::readFile(QByteArray *data, int routeId)
 void
 StravaRoutesDownload::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    CloudDBCommon::sslErrors(reply, errors);
+    CloudService::sslErrors(context->mainWindow, reply, errors);
 }
 

@@ -182,6 +182,7 @@ class CloudService : public QObject {
         void compressRide(RideFile*ride, QByteArray &data, QString id);
         RideFile *uncompressRide(QByteArray *data, QString id, QStringList &errors);
         QString uploadExtension();
+        static void sslErrors(QWidget *parent, QNetworkReply* reply ,QList<QSslError> errors);
 
         // APPSETTINGS SYMBOLS - SERVICE SPECIFIC
         QString syncOnImportSettingName() const { return QString("%1/%2/syncimport").arg(GC_QSETTINGS_ATHLETE_PRIVATE).arg(id()); }

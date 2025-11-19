@@ -17,6 +17,7 @@
  */
 
 #include "OpenData.h"
+#include "CloudService.h"
 #include "Settings.h"
 #include "Secrets.h"
 #include "Colors.h"
@@ -60,7 +61,7 @@ static int OpenDataVersion = 1;
 
 OpenData::OpenData(Context *context) : context(context) {}
 OpenData::~OpenData() {}
-void OpenData::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors) { CloudDBCommon::sslErrors(reply, errors); }
+void OpenData::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors) { CloudService::sslErrors(context->mainWindow, reply, errors); }
 
 // check if its time to ask or send data
 void
