@@ -37,8 +37,9 @@ LTMSidebarView::LTMSidebarView(Context *context, int type, const QString& view, 
     // get or create the LTMSidebar shared between the views
     getLTMSidebar(context);
 
-    // each view's constructor needs to register the dateRangeChanged signal.
+    // each view's constructor needs to register these signals.
     connect(LTMSidebars_[context], SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
+    connect(this, SIGNAL(onSelectionChanged()), this, SLOT(justSelected()));
 }
 
 LTMSidebarView::~LTMSidebarView()
@@ -91,6 +92,17 @@ void
 LTMSidebarView::selectDateRange(Context *sbContext, DateRange dr)
 {
     LTMSidebars_[sbContext]->selectDateRange(dr);
+}
+
+void
+LTMSidebarView::justSelected()
+{
+    printf("LTMSidebarView::justSelected\n");
+
+    if (isSelected()) {
+        // force date range refresh
+        LTMSidebars_[context]->dateRangeTreeWidgetSelectionChanged();
+    }
 }
 
 void
@@ -251,8 +263,6 @@ PlanView::PlanView(Context *context, QStackedWidget *controls) :
     pstack = new QStackedWidget(this);
     setPages(pstack);
     setBlank(b);
-
-    connect(this, SIGNAL(onSelectionChanged()), this, SLOT(justSelected()));
 }
 
 PlanView::~PlanView()
@@ -265,15 +275,6 @@ PlanView::isBlank()
 {
     if (context->athlete->rideCache->rides().count() > 0) return false;
     else return true;
-}
-
-void
-PlanView::justSelected()
-{
-    if (isSelected()) {
-        // force date range refresh
-        getLTMSidebar(context)->dateRangeTreeWidgetSelectionChanged();
-    }
 }
 
 TrendsView::TrendsView(Context *context, QStackedWidget *controls) :
@@ -293,7 +294,6 @@ TrendsView::TrendsView(Context *context, QStackedWidget *controls) :
     setBlank(b);
     setBottom(new ComparePane(context, this, ComparePane::season));
 
-    connect(this, SIGNAL(onSelectionChanged()), this, SLOT(justSelected()));
     connect(bottomSplitter(), SIGNAL(compareChanged(bool)), this, SLOT(compareChanged(bool)));
     connect(bottomSplitter(), SIGNAL(compareClear()), bottom(), SLOT(clear()));
 }
@@ -341,15 +341,6 @@ TrendsView::isBlank()
 {
     if (context->athlete->rideCache->rides().count() > 0) return false;
     else return true;
-}
-
-void
-TrendsView::justSelected()
-{
-    if (isSelected()) {
-        // force date range refresh
-        getLTMSidebar(context)->dateRangeTreeWidgetSelectionChanged();
-    }
 }
 
 TrainView::TrainView(Context *context, QStackedWidget *controls) :

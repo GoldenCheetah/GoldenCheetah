@@ -46,6 +46,7 @@ class LTMSidebarView : public AbstractView
 
     protected slots:
 
+        void justSelected();
         void dateRangeChanged(DateRange);
 
     protected:
@@ -108,7 +109,6 @@ class PlanView : public LTMSidebarView
     public slots:
 
         bool isBlank() override;
-        void justSelected();
 };
 
 class TrainView : public AbstractView
@@ -153,7 +153,6 @@ class TrendsView : public LTMSidebarView
     public slots:
 
         bool isBlank() override;
-        void justSelected();
         void compareChanged(bool);
 };
 
