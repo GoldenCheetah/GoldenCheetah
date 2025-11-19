@@ -64,11 +64,14 @@ GcWindowRegistry* GcWindows;
 void
 GcWindowRegistry::initialize()
 {
-  static GcWindowRegistry GcWindowsInit[36] = {
+  static GcWindowRegistry GcWindowsInit[] = {
     // name                     GcWinID
-    { VIEW_TRENDS|VIEW_PLAN, tr("Season Overview"),GcWindowTypes::OverviewTrends },
-    { VIEW_TRENDS|VIEW_PLAN, tr("Blank Overview "),GcWindowTypes::OverviewTrendsBlank },
-    { VIEW_TRENDS|VIEW_PLAN, tr("User Chart"),GcWindowTypes::UserTrends },
+    { VIEW_TRENDS, tr("Season Overview"),GcWindowTypes::OverviewTrends },
+    { VIEW_TRENDS, tr("Blank Overview "),GcWindowTypes::OverviewTrendsBlank },
+    { VIEW_PLAN, tr("Plan Overview"),GcWindowTypes::OverviewPlan },
+    { VIEW_PLAN, tr("Blank Overview "),GcWindowTypes::OverviewPlanBlank },
+    { VIEW_TRENDS, tr("User Chart"),GcWindowTypes::UserTrends },
+    { VIEW_PLAN, tr("User Chart"),GcWindowTypes::UserPlan },
     { VIEW_TRENDS|VIEW_PLAN, tr("Trends"),GcWindowTypes::LTM },
     { VIEW_TRENDS|VIEW_PLAN, tr("TreeMap"),GcWindowTypes::TreeMap },
     //{ VIEW_TRENDS, tr("Weekly Summary"),GcWindowTypes::WeeklySummary },// DEPRECATED
@@ -233,21 +236,27 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     // summary and old ride summary charts now replaced with an Overview - note id gets reset
     case GcWindowTypes::Summary:
     case GcWindowTypes::RideSummary:
-    case GcWindowTypes::Overview: returning = new OverviewWindow(context, ANALYSIS); if (id != GcWindowTypes::Overview) { id=GcWindowTypes::Overview; static_cast<OverviewWindow*>(returning)->setConfiguration(""); } break;
+    case GcWindowTypes::Overview: returning = new OverviewWindow(context, OverviewScope::ANALYSIS); if (id != GcWindowTypes::Overview) { id=GcWindowTypes::Overview; static_cast<OverviewWindow*>(returning)->setConfiguration(""); } break;
 
     // blank analysis overview - note id gets reset
-    case GcWindowTypes::OverviewAnalysisBlank: returning = new OverviewWindow(context, ANALYSIS, true); id=GcWindowTypes::Overview; break;
+    case GcWindowTypes::OverviewAnalysisBlank: returning = new OverviewWindow(context, OverviewScope::ANALYSIS, true); id=GcWindowTypes::Overview; break;
 
     // old summary now gets a trends overview - note id gets reset
     case GcWindowTypes::DateRangeSummary: // deprecated so now replace with overview
-    case GcWindowTypes::OverviewTrends: returning = new OverviewWindow(context, TRENDS); if (id != GcWindowTypes::OverviewTrends) { id=GcWindowTypes::OverviewTrends; static_cast<OverviewWindow*>(returning)->setConfiguration(""); } break;
+    case GcWindowTypes::OverviewTrends: returning = new OverviewWindow(context, OverviewScope::TRENDS); if (id != GcWindowTypes::OverviewTrends) { id=GcWindowTypes::OverviewTrends; static_cast<OverviewWindow*>(returning)->setConfiguration(""); } break;
 
     // blank trends overview - note id gets reset
-    case GcWindowTypes::OverviewTrendsBlank: returning = new OverviewWindow(context, TRENDS, true); id=GcWindowTypes::OverviewTrends; break;
+    case GcWindowTypes::OverviewTrendsBlank: returning = new OverviewWindow(context, OverviewScope::TRENDS, true); id=GcWindowTypes::OverviewTrends; break;
+
+    // plan specific charts - note id gets reset for overview & blank
+    case GcWindowTypes::OverviewPlan: returning = new OverviewWindow(context, OverviewScope::PLAN); if (id != GcWindowTypes::OverviewPlan) { id=GcWindowTypes::OverviewPlan; static_cast<OverviewWindow*>(returning)->setConfiguration(""); } break;
+    case GcWindowTypes::OverviewPlanBlank: returning = new OverviewWindow(context, OverviewScope::PLAN, true); id=GcWindowTypes::OverviewPlan; break;
+    case GcWindowTypes::UserPlan: returning = new UserChartWindow(context, true); break;
 
     case GcWindowTypes::SeasonPlan: returning = new PlanningWindow(context); break;
     case GcWindowTypes::UserAnalysis: returning = new UserChartWindow(context, false); break;
     case GcWindowTypes::UserTrends: returning = new UserChartWindow(context, true); break;
+
     case GcWindowTypes::Diary:
     case GcWindowTypes::Calendar: returning = new PlanningCalendarWindow(context); break;
     default: return NULL; break;
