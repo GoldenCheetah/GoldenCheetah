@@ -51,7 +51,15 @@ class ChartSpace;
 class ChartSpaceItemFactory;
 
 // we need a scope for a chart space, one or more of
-enum OverviewScope { ANALYSIS=0x01, TRENDS=0x02, ATHLETES=0x04 };
+enum class OverviewScope : unsigned int { NO_SCOPE_SET=0x00, ANALYSIS=0x01, TRENDS=0x02, ATHLETES=0x04, PLAN=0x08 };
+
+// support bitwise "|" and "&" operators for the OverviewScope class
+inline constexpr OverviewScope operator|(OverviewScope Lhs, OverviewScope Rhs) {
+    return static_cast<OverviewScope>( static_cast<std::underlying_type_t<OverviewScope>>(Lhs) | static_cast<std::underlying_type_t<OverviewScope>>(Rhs) );
+}
+inline constexpr bool operator&(OverviewScope Lhs, OverviewScope Rhs) {
+    return static_cast<std::underlying_type_t<OverviewScope>>(Lhs) & static_cast<std::underlying_type_t<OverviewScope>>(Rhs);
+}
 
 // we need to intercept the graphics scene drag and drop
 // events and send them to MainWindow
@@ -223,7 +231,7 @@ class ChartSpace : public QWidget
 
     public:
 
-        ChartSpace(Context *context, int scope, GcWindow *window);
+        ChartSpace(Context *context, OverviewScope scope, GcWindow *window);
         QGraphicsScene *getScene() { return scene; }
 
         // current state for event processing
@@ -234,7 +242,7 @@ class ChartSpace : public QWidget
 
         // used by children
         Context *context;
-        int scope;
+        OverviewScope scope;
         int mincols;
 
         QGraphicsView *view;
@@ -375,11 +383,12 @@ class ChartSpace : public QWidget
 // each chart has an entry like this in the registry
 struct ChartSpaceItemDetail {
 
-    ChartSpaceItemDetail() : ChartSpaceItemDetail(0,"","",0,NULL) {}
-    ChartSpaceItemDetail(int type, QString quick, QString description, int scope, ChartSpaceItem* (*create)(ChartSpace *))
+    ChartSpaceItemDetail() : ChartSpaceItemDetail(0,"","",OverviewScope::NO_SCOPE_SET,NULL) {}
+    ChartSpaceItemDetail(int type, QString quick, QString description, OverviewScope scope, ChartSpaceItem* (*create)(ChartSpace *))
         : type(type), scope(scope), quick(quick), description(description), create(create) {}
 
-    int type, scope; // scope needs enums at some point
+    int type;
+    OverviewScope scope;
     QString quick, description;
     ChartSpaceItem* (*create)(ChartSpace *);
 };
@@ -396,7 +405,7 @@ class ChartSpaceItemRegistry {
         }
 
         // register chartspace items
-        bool addItem(int type, QString quick, QString description, int scope, ChartSpaceItem* (*create)(ChartSpace *)) {
+        bool addItem(int type, QString quick, QString description, OverviewScope scope, ChartSpaceItem* (*create)(ChartSpace *)) {
 
             // add to registry
             _items.append(ChartSpaceItemDetail(type, quick, description, scope, create));
