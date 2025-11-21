@@ -99,6 +99,10 @@ class AthleteTab: public QWidget
         // model isn't undo/redo ride selection
         bool noswitch;
 
+        // flag to ensure an initial viewChanged()
+        // event occurs for the navigation model
+        bool startupViewChangeSent;
+
         // Each of the views
         QStackedWidget *views;
         AnalysisView *analysisView;
