@@ -122,6 +122,9 @@ class RChart : public GcChartWindow {
         // enable stopping long running scripts
         bool eventFilter(QObject *, QEvent *e);
 
+        // the chart displays information related to the selected ride
+        bool selectedRideInfo() const override { return ridesummary; }
+
         QStackedWidget *stack;
         QSplitter *splitter;
         QSplitter *leftsplitter;

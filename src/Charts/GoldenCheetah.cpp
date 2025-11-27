@@ -856,8 +856,9 @@ GcChartWindow::updateSearchFilterBlanking()
     // the ride navigator display is unaffected by the search/filter blanking 
     if (context->isfiltered && (type() != GcWindowTypes::ActivityNavigator)) {
 
-        // only apply search/filter blanking to the analysis view charts
-        if (GcWindowRegistry::isIdRelevantForType(type(), VIEW_ANALYSIS, true)) {
+        // only apply search/filter blanking to those charts which
+        // display information related to the selected ride/activity
+        if (selectedRideInfo()) {
 
             if (context->filters.empty()) {
                 // if a search/filter has no results, then blank the chart's contents

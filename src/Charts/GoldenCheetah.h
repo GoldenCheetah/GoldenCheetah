@@ -278,6 +278,11 @@ private:
     void updateSearchFilterBlanking();
     void updateWindowBlanking();
 
+protected:
+
+    // the default is the chart doesn't display information related to the selected ride
+    bool virtual selectedRideInfo() const { return false; }
+
 public:
 
     // reveal

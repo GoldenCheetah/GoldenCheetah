@@ -104,7 +104,6 @@ class GcWindowRegistry {
     static QStringList windowsForType(int type);
     static QList<GcWinID> idsForType(int type);
     static QString title(GcWinID id);
-    static bool isIdRelevantForType(GcWinID id, int type, bool strict);
 };
 
 extern GcWindowRegistry* GcWindows;

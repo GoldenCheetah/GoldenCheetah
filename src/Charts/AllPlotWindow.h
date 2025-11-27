@@ -274,6 +274,9 @@ class AllPlotWindow : public GcChartWindow
         void setAllPlotWidgets(RideItem *rideItem);
         bool event(QEvent *event);
 
+        // the chart displays information related to the selected ride
+        bool selectedRideInfo() const override { return true; }
+
         // cached state
         RideItem *current;
         int selection;

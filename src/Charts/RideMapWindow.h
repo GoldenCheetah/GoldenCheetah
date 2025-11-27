@@ -240,6 +240,10 @@ class RideMapWindow : public GcChartWindow
         void updateFrame();
 
     protected:
+
+        // the chart displays information related to the selected ride
+        bool selectedRideInfo() const override { return true; }
+
         SmallPlot *smallPlot;
         bool event(QEvent *event);
         bool stale;

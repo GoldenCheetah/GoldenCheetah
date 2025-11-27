@@ -116,6 +116,9 @@ class AerolabWindow : public GcChartWindow {
 
   void refresh(RideItem *_rideItem, bool newzoom);
   bool hasNewParametersInRide();
+
+  // the chart displays information related to the selected ride
+  bool selectedRideInfo() const override { return true; }
 };
 
 #endif // _GC_AerolabWindow_h

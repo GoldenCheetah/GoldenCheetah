@@ -164,6 +164,9 @@ class ScatterWindow : public GcChartWindow
         bool firstShow = true;
         bool event(QEvent *event);
 
+        // the chart displays information related to the selected ride
+        bool selectedRideInfo() const override { return true; }
+
     private:
         // reveal controls
         QxtStringSpinBox    *rxSelector,

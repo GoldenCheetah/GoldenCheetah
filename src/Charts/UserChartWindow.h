@@ -56,6 +56,11 @@ class UserChartWindow : public GcChartWindow {
         // redraw
         void refresh();
 
+    protected:
+
+        // the chart displays information related to the selected ride
+        bool selectedRideInfo() const override { return !rangemode; }
+
     private:
 
         Context *context;

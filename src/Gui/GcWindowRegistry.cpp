@@ -148,17 +148,6 @@ GcWindowRegistry::idsForType(int type)
     return returning;
 }
 
-bool
-GcWindowRegistry::isIdRelevantForType(GcWinID id, int type, bool strict)
-{
-    for(int i=0; GcWindows[i].relevance; i++) {
-        if (GcWindows[i].id == id) {
-            return (strict) ? GcWindows[i].relevance == type : GcWindows[i].relevance & type;
-        }
-    }
-    return false;
-}
-
 // instantiate a new window
 GcChartWindow *
 GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
