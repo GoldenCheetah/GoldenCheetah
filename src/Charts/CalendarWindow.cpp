@@ -44,10 +44,8 @@ CalendarWindow::CalendarWindow(Context *context)
 
     setStartHour(8);
     setEndHour(21);
-#if defined(GC_CALENDAR_AGENDA)
     setAgendaPastDays(7);
     setAgendaFutureDays(7);
-#endif
 
     QVBoxLayout *mainLayout = new QVBoxLayout();
     setChartLayout(mainLayout);
@@ -240,7 +238,6 @@ CalendarWindow::setEndHour
 }
 
 
-#if defined(GC_CALENDAR_AGENDA)
 int
 CalendarWindow::getAgendaPastDays
 () const
@@ -279,7 +276,6 @@ CalendarWindow::setAgendaFutureDays
         updateActivities();
     }
 }
-#endif
 
 
 bool
@@ -522,9 +518,7 @@ CalendarWindow::mkControls
     defaultViewCombo->addItem(tr("Day"));
     defaultViewCombo->addItem(tr("Week"));
     defaultViewCombo->addItem(tr("Month"));
-#if defined(GC_CALENDAR_AGENDA)
     defaultViewCombo->addItem(tr("Agenda"));
-#endif
     defaultViewCombo->setCurrentIndex(static_cast<int>(CalendarView::Month));
     firstDayOfWeekCombo = new QComboBox();
     for (int i = Qt::Monday; i <= Qt::Sunday; ++i) {
@@ -537,14 +531,12 @@ CalendarWindow::mkControls
     endHourSpin = new QSpinBox();
     endHourSpin->setSuffix(":00");
     endHourSpin->setMaximum(24);
-#if defined(GC_CALENDAR_AGENDA)
     agendaPastDaysSpin = new QSpinBox();
     agendaPastDaysSpin->setMaximum(31);
     agendaPastDaysSpin->setSuffix(" " + tr("day(s)"));
     agendaFutureDaysSpin = new QSpinBox();
     agendaFutureDaysSpin->setMaximum(31);
     agendaFutureDaysSpin->setSuffix(" " + tr("day(s)"));
-#endif
     summaryDayCheck = new QCheckBox(tr("Day View"));
     summaryDayCheck->setChecked(true);
     summaryWeekCheck = new QCheckBox(tr("Week View"));
@@ -576,10 +568,8 @@ CalendarWindow::mkControls
     generalForm->addRow(tr("First Day of Week"), firstDayOfWeekCombo);
     generalForm->addRow(tr("Default Start Time"), startHourSpin);
     generalForm->addRow(tr("Default End Time"), endHourSpin);
-#if defined(GC_CALENDAR_AGENDA)
     generalForm->addRow(tr("Agenda: Look Back"), agendaPastDaysSpin);
     generalForm->addRow(tr("Agenda: Look Forward"), agendaFutureDaysSpin);
-#endif
     generalForm->addRow(tr("Show Summary In"), summaryDayCheck);
     generalForm->addRow("", summaryWeekCheck);
     generalForm->addRow("", summaryMonthCheck);
@@ -599,10 +589,8 @@ CalendarWindow::mkControls
 #if QT_VERSION < 0x060000
     connect(startHourSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &CalendarWindow::setStartHour);
     connect(endHourSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &CalendarWindow::setEndHour);
-#if defined(GC_CALENDAR_AGENDA)
     connect(agendaPastDaysSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &CalendarWindow::setAgendaPastDays);
     connect(agendaFutureDaysSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &CalendarWindow::setAgendaFutureDays);
-#endif
     connect(defaultViewCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CalendarWindow::setDefaultView);
     connect(firstDayOfWeekCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int idx) { setFirstDayOfWeek(idx + 1); });
     connect(primaryMainCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CalendarWindow::updateActivities);
@@ -612,10 +600,8 @@ CalendarWindow::mkControls
 #else
     connect(startHourSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setStartHour);
     connect(endHourSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setEndHour);
-#if defined(GC_CALENDAR_AGENDA)
     connect(agendaPastDaysSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setAgendaPastDays);
     connect(agendaFutureDaysSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setAgendaFutureDays);
-#endif
     connect(defaultViewCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::setDefaultView);
     connect(firstDayOfWeekCombo, &QComboBox::currentIndexChanged, [=](int idx) { setFirstDayOfWeek(idx + 1); });
     connect(primaryMainCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::updateActivities);

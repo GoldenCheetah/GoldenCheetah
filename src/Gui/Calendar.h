@@ -218,9 +218,7 @@ enum class CalendarView {
     Day = 0,
     Week = 1,
     Month = 2,
-#if defined(GC_CALENDAR_AGENDA)
     Agenda = 3
-#endif
 };
 
 
@@ -293,7 +291,6 @@ private:
 };
 
 
-#if defined(GC_CALENDAR_AGENDA)
 struct CalendarAgendaStyles {
     QFont defaultFont;
     QFont relativeFont;
@@ -351,7 +348,6 @@ private:
 private slots:
     void showContextMenu(const QPoint &pos);
 };
-#endif
 
 
 class Calendar : public QWidget {
@@ -380,10 +376,8 @@ public slots:
     void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
     void setStartHour(int hour);
     void setEndHour(int hour);
-#if defined(GC_CALENDAR_AGENDA)
     void setAgendaPastDays(int days);
     void setAgendaFutureDays(int days);
-#endif
     void setSummaryDayVisible(bool visible);
     void setSummaryWeekVisible(bool visible);
     void setSummaryMonthVisible(bool visible);
@@ -429,14 +423,10 @@ private:
     CalendarDayView *dayView;
     CalendarWeekView *weekView;
     CalendarMonthTable *monthView;
-#if defined(GC_CALENDAR_AGENDA)
     CalendarAgendaView *agendaView;
-#endif
     DateRange dateRange;
     Qt::DayOfWeek firstDayOfWeek = Qt::Monday;
-#if defined(GC_CALENDAR_AGENDA)
     QDate lastNonAgendaDate;
-#endif
 
     void setNavButtonState();
     void updateHeader();
