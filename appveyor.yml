@@ -222,12 +222,12 @@ build_script:
 # Windows
 - cmd: qmake.exe build.pro -r -spec win32-msvc
 - cmd: if not exist qwt\lib\qwt.lib jom -j1 sub-qwt & exit /b 1
-- cmd: jom -j4 sub-src
+- cmd: jom -j2 sub-src
 
 # Linux / macOS
 - sh: qmake build.pro -r QMAKE_CXXFLAGS_WARN_ON+="-Wno-unused-private-field -Wno-c++11-narrowing -Wno-deprecated-declarations -Wno-deprecated-register -Wno-nullability-completeness -Wno-sign-compare -Wno-inconsistent-missing-override" QMAKE_CFLAGS_WARN_ON+="-Wno-deprecated-declarations -Wno-sign-compare"
 - sh: if test ! -f qwt/lib/libqwt.a; then make sub-qwt; false; fi
-- sh: make -j4 sub-src
+- sh: make -j2 sub-src
 
 after_build:
 
@@ -260,7 +260,7 @@ after_build:
 
 # Build the installer
 - cmd: makensis GC3.7-Master-W64-QT6.nsi
-- cmd: move GoldenCheetah_v3.7_64bit_Windows.exe ..\..\GoldenCheetah_v3.7_x64.exe
+- cmd: move GoldenCheetah_v3.7.1_64bit_Windows.exe ..\..\GoldenCheetah_v3.7_x64.exe
 - cmd: cd ..\..
 
 # Linux / macOS

@@ -125,7 +125,7 @@
 #define VERSION35_BUILD   3990 // released
 #define VERSION36_BUILD   5000 // released 5/8/23
 #define VERSION37_BUILD   5005 // released 28/3/25
-#define VERSION37_SP1     5006 // released 20/11/25
+#define VERSION37_SP1     5006 // released 20/11/25 - latest snapshot 28/11/25
 
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG
@@ -133,7 +133,7 @@
 // the next two will with each build/release
 #define VERSION_LATEST 5006
 #define VERSION_STRING "V3.7.1"
-#define GC_VERSION VERSION_STRING // To force version string on non-tagged ci builds
+//#define GC_VERSION VERSION_STRING // To force version string on non-tagged ci builds
 
 // default config for this release cycle
 #define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/3.8"

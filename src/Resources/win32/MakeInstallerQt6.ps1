@@ -3,7 +3,7 @@ qmake --version
 windeployqt --force .\GoldenCheetah.exe
 copy ..\Resources\win32\GC3.7-Master-W64-QT6.nsi .\GC3.7-Master-W64-QT6.nsi
 C:\Program` Files` `(x86`)\NSIS\makensis.exe .\GC3.7-Master-W64-QT6.nsi
-move -force .\GoldenCheetah_v3.7_64bit_Windows.exe .\GoldenCheetah_v3.7_x64Qt6.exe
+move -force .\GoldenCheetah_v3.7.1_64bit_Windows.exe .\GoldenCheetah_v3.7_x64Qt6.exe
 
 ### Generate version file with SHA
 .\GoldenCheetah --version 2>.\GCversionWindowsQt6.txt
