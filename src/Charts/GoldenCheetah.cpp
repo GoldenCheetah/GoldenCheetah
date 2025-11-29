@@ -758,6 +758,7 @@ GcChartWindow::GcChartWindow(Context *context) : GcWindow(context), context(cont
     font.setPointSize(font.pointSize() + 4);
     font.setWeight(QFont::Bold);
     _blankLabel->setFont(font);
+    _blankLabel->setStyleSheet("QLabel {color : gray;}");
 
     _defaultBlankLayout->addStretch();
     _defaultBlankLayout->addWidget(blankImg);
@@ -767,10 +768,9 @@ GcChartWindow::GcChartWindow(Context *context) : GcWindow(context), context(cont
 
     overlayWidget = NULL;
 
+    // update the search/filter blanking on changes
     connect(context, &Context::filterChanged, [&](void) { this->updateSearchFilterBlanking(); } );
-    // required as selecting a ride in search/filter results will update the blanking
     connect(context, &Context::rideSelected, [&](RideItem*) { this->updateSearchFilterBlanking(); } );
-    // view change required search/filter may have been applied before the view is loaded
     connect(context, &Context::viewChanged, [&](int) { this->updateSearchFilterBlanking(); } );
 }
 
