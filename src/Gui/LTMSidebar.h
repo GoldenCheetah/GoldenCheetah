@@ -50,6 +50,8 @@ class LTMSidebar : public QWidget
         int newSeason(QString, QDate, QDate, int);
         void updateSeason(int, QString, QDate, QDate, int);
 
+        void updatePresetChartsOnShow(int viewType);
+
     signals:
         void dateRangeChanged(DateRange);
 
@@ -103,18 +105,21 @@ class LTMSidebar : public QWidget
         void setAutoFilterMenu();
         void autoFilterRefresh(); // refresh the value lists
 
+    protected slots:
+
+        void chartVisibilityChanged();
+
     private:
 
         Context *context;
         bool active;
-        QDate from, to; // so we don't repeat update...
-
 
         Seasons *seasons;
         GcSplitterItem *seasonsWidget;
         SeasonTreeView *dateRangeTree;
         QTreeWidgetItem *allDateRanges;
 
+        bool chartsWidgetVisible;
         GcSplitterItem *chartsWidget;
         ChartTreeView *chartTree;
         QTreeWidgetItem *allCharts;
