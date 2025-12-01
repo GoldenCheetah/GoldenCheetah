@@ -19,13 +19,6 @@
 #GSL_INCLUDES = c:\vcpkg\installed\x64-windows\include
 #GSL_LIBS = -LC:\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas
 
-# Uncomment below if you want to enable the planning dialog
-# (calendar and main menu)
-#DEFINES += GC_ACTIVITY_PLAN
-
-# Uncomment below if you want to enable the calendar agenda
-#DEFINES += GC_CALENDAR_AGENDA
-
 # If you have conflicts with min/max macros defined in windows.h
 # then uncomment the following line.
 #DEFINES += NOMINMAX
