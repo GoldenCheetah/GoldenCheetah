@@ -606,7 +606,7 @@ HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPl
            Charts/MetadataWindow.h Charts/MUPlot.h Charts/MUPool.h Charts/MUWidget.h Charts/PfPvPlot.h Charts/PfPvWindow.h \
            Charts/PowerHist.h Charts/ReferenceLineDialog.h Charts/RideEditor.h Charts/RideMapWindow.h \
            Charts/ScatterPlot.h Charts/ScatterWindow.h Charts/SmallPlot.h Charts/TreeMapPlot.h \
-           Charts/TreeMapWindow.h Charts/ZoneScaleDraw.h Charts/PlanningCalendarWindow.h
+           Charts/TreeMapWindow.h Charts/ZoneScaleDraw.h Charts/CalendarWindow.h
 
 # cloud services
 HEADERS += Cloud/CalendarDownload.h Cloud/CloudService.h \
@@ -652,7 +652,7 @@ HEADERS += Gui/AboutDialog.h Gui/AddIntervalDialog.h Gui/AnalysisSidebar.h Gui/C
            Gui/PerspectiveDialog.h Gui/SplashScreen.h Gui/StyledItemDelegates.h Gui/MetadataDialog.h Gui/ActionButtonBox.h \
            Gui/MetricOverrideDialog.h Gui/RepeatScheduleWizard.h \
            Gui/Calendar.h Gui/CalendarData.h Gui/CalendarItemDelegates.h \
-           Gui/IconManager.h
+           Gui/IconManager.h Gui/Qt5Compatibility.h
 
 # metrics and models
 HEADERS += Metrics/Banister.h Metrics/CPSolver.h Metrics/Estimator.h Metrics/ExtendedCriticalPower.h Metrics/HrZones.h Metrics/PaceZones.h \
@@ -716,7 +716,7 @@ SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts
            Charts/MetadataWindow.cpp Charts/MUPlot.cpp Charts/MUWidget.cpp Charts/PfPvPlot.cpp Charts/PfPvWindow.cpp \
            Charts/PowerHist.cpp Charts/ReferenceLineDialog.cpp Charts/RideEditor.cpp Charts/RideMapWindow.cpp \
            Charts/ScatterPlot.cpp Charts/ScatterWindow.cpp Charts/SmallPlot.cpp Charts/TreeMapPlot.cpp \
-           Charts/TreeMapWindow.cpp Charts/PlanningCalendarWindow.cpp
+           Charts/TreeMapWindow.cpp Charts/CalendarWindow.cpp
 
 ## Cloud Services / Web resources
 SOURCES += Cloud/CalendarDownload.cpp Cloud/CloudService.cpp \

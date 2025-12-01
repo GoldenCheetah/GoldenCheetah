@@ -16,7 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "PlanningCalendarWindow.h"
+#include "CalendarWindow.h"
 
 #include <QComboBox>
 
@@ -35,7 +35,7 @@
 #define HLC "</h4>"
 
 
-PlanningCalendarWindow::PlanningCalendarWindow(Context *context)
+CalendarWindow::CalendarWindow(Context *context)
 : GcChartWindow(context), context(context)
 {
     mkControls();
@@ -44,6 +44,8 @@ PlanningCalendarWindow::PlanningCalendarWindow(Context *context)
 
     setStartHour(8);
     setEndHour(21);
+    setAgendaPastDays(7);
+    setAgendaFutureDays(7);
 
     QVBoxLayout *mainLayout = new QVBoxLayout();
     setChartLayout(mainLayout);
@@ -58,12 +60,12 @@ PlanningCalendarWindow::PlanningCalendarWindow(Context *context)
             updateSeason(season, false);
         }
     });
-    connect(context, &Context::filterChanged, this, &PlanningCalendarWindow::updateActivities);
-    connect(context, &Context::homeFilterChanged, this, &PlanningCalendarWindow::updateActivities);
-    connect(context, &Context::rideAdded, this, &PlanningCalendarWindow::updateActivitiesIfInRange);
-    connect(context, &Context::rideDeleted, this, &PlanningCalendarWindow::updateActivitiesIfInRange);
-    connect(context, &Context::rideChanged, this, &PlanningCalendarWindow::updateActivitiesIfInRange);
-    connect(context, &Context::configChanged, this, &PlanningCalendarWindow::configChanged);
+    connect(context, &Context::filterChanged, this, &CalendarWindow::updateActivities);
+    connect(context, &Context::homeFilterChanged, this, &CalendarWindow::updateActivities);
+    connect(context, &Context::rideAdded, this, &CalendarWindow::updateActivitiesIfInRange);
+    connect(context, &Context::rideDeleted, this, &CalendarWindow::updateActivitiesIfInRange);
+    connect(context, &Context::rideChanged, this, &CalendarWindow::updateActivitiesIfInRange);
+    connect(context, &Context::configChanged, this, &CalendarWindow::configChanged);
     connect(calendar, &Calendar::showInTrainMode, [=](CalendarEntry activity) {
         for (RideItem *rideItem : context->athlete->rideCache->rides()) {
             if (rideItem != nullptr && rideItem->fileName == activity.reference) {
@@ -150,9 +152,9 @@ PlanningCalendarWindow::PlanningCalendarWindow(Context *context)
         }
         QApplication::restoreOverrideCursor();
     });
-    connect(calendar, &Calendar::dayChanged, this, &PlanningCalendarWindow::updateActivities);
-    connect(calendar, &Calendar::monthChanged, this, &PlanningCalendarWindow::updateActivities);
-    connect(calendar, &Calendar::viewChanged, this, &PlanningCalendarWindow::updateActivities);
+    connect(calendar, &Calendar::dayChanged, this, &CalendarWindow::updateActivities);
+    connect(calendar, &Calendar::monthChanged, this, &CalendarWindow::updateActivities);
+    connect(calendar, &Calendar::viewChanged, this, &CalendarWindow::updateActivities);
 
     QTimer::singleShot(0, this, [this]() {
         configChanged(CONFIG_APPEARANCE);
@@ -161,7 +163,7 @@ PlanningCalendarWindow::PlanningCalendarWindow(Context *context)
 
 
 int
-PlanningCalendarWindow::getDefaultView
+CalendarWindow::getDefaultView
 () const
 {
     return defaultViewCombo->currentIndex();
@@ -169,7 +171,7 @@ PlanningCalendarWindow::getDefaultView
 
 
 void
-PlanningCalendarWindow::setDefaultView
+CalendarWindow::setDefaultView
 (int view)
 {
     defaultViewCombo->setCurrentIndex(view);
@@ -178,7 +180,7 @@ PlanningCalendarWindow::setDefaultView
 
 
 int
-PlanningCalendarWindow::getFirstDayOfWeek
+CalendarWindow::getFirstDayOfWeek
 () const
 {
     return firstDayOfWeekCombo->currentIndex() + 1;
@@ -186,7 +188,7 @@ PlanningCalendarWindow::getFirstDayOfWeek
 
 
 void
-PlanningCalendarWindow::setFirstDayOfWeek
+CalendarWindow::setFirstDayOfWeek
 (int fdw)
 {
     firstDayOfWeekCombo->setCurrentIndex(std::min(static_cast<int>(Qt::Sunday), std::max(static_cast<int>(Qt::Monday), fdw)) - 1);
@@ -195,7 +197,7 @@ PlanningCalendarWindow::setFirstDayOfWeek
 
 
 int
-PlanningCalendarWindow::getStartHour
+CalendarWindow::getStartHour
 () const
 {
     return startHourSpin->value();
@@ -203,7 +205,7 @@ PlanningCalendarWindow::getStartHour
 
 
 void
-PlanningCalendarWindow::setStartHour
+CalendarWindow::setStartHour
 (int hour)
 {
     startHourSpin->setValue(hour);
@@ -216,7 +218,7 @@ PlanningCalendarWindow::setStartHour
 
 
 int
-PlanningCalendarWindow::getEndHour
+CalendarWindow::getEndHour
 () const
 {
     return endHourSpin->value();
@@ -224,7 +226,7 @@ PlanningCalendarWindow::getEndHour
 
 
 void
-PlanningCalendarWindow::setEndHour
+CalendarWindow::setEndHour
 (int hour)
 {
     endHourSpin->setValue(hour);
@@ -236,8 +238,48 @@ PlanningCalendarWindow::setEndHour
 }
 
 
+int
+CalendarWindow::getAgendaPastDays
+() const
+{
+    return agendaPastDaysSpin->value();
+}
+
+
+void
+CalendarWindow::setAgendaPastDays
+(int days)
+{
+    agendaPastDaysSpin->setValue(days);
+    if (calendar != nullptr) {
+        calendar->setAgendaPastDays(days);
+        updateActivities();
+    }
+}
+
+
+int
+CalendarWindow::getAgendaFutureDays
+() const
+{
+    return agendaFutureDaysSpin->value();
+}
+
+
+void
+CalendarWindow::setAgendaFutureDays
+(int days)
+{
+    agendaFutureDaysSpin->setValue(days);
+    if (calendar != nullptr) {
+        calendar->setAgendaFutureDays(days);
+        updateActivities();
+    }
+}
+
+
 bool
-PlanningCalendarWindow::isSummaryVisibleDay
+CalendarWindow::isSummaryVisibleDay
 () const
 {
     return summaryDayCheck->isChecked();
@@ -245,7 +287,7 @@ PlanningCalendarWindow::isSummaryVisibleDay
 
 
 void
-PlanningCalendarWindow::setSummaryVisibleDay
+CalendarWindow::setSummaryVisibleDay
 (bool visible)
 {
     summaryDayCheck->setChecked(visible);
@@ -254,7 +296,7 @@ PlanningCalendarWindow::setSummaryVisibleDay
 
 
 bool
-PlanningCalendarWindow::isSummaryVisibleWeek
+CalendarWindow::isSummaryVisibleWeek
 () const
 {
     return summaryWeekCheck->isChecked();
@@ -262,7 +304,7 @@ PlanningCalendarWindow::isSummaryVisibleWeek
 
 
 void
-PlanningCalendarWindow::setSummaryVisibleWeek
+CalendarWindow::setSummaryVisibleWeek
 (bool visible)
 {
     summaryWeekCheck->setChecked(visible);
@@ -271,7 +313,7 @@ PlanningCalendarWindow::setSummaryVisibleWeek
 
 
 bool
-PlanningCalendarWindow::isSummaryVisibleMonth
+CalendarWindow::isSummaryVisibleMonth
 () const
 {
     return summaryMonthCheck->isChecked();
@@ -279,7 +321,7 @@ PlanningCalendarWindow::isSummaryVisibleMonth
 
 
 void
-PlanningCalendarWindow::setSummaryVisibleMonth
+CalendarWindow::setSummaryVisibleMonth
 (bool visible)
 {
     summaryMonthCheck->setChecked(visible);
@@ -288,7 +330,7 @@ PlanningCalendarWindow::setSummaryVisibleMonth
 
 
 bool
-PlanningCalendarWindow::isFiltered
+CalendarWindow::isFiltered
 () const
 {
     return (context->ishomefiltered || context->isfiltered);
@@ -296,7 +338,7 @@ PlanningCalendarWindow::isFiltered
 
 
 QString
-PlanningCalendarWindow::getPrimaryMainField
+CalendarWindow::getPrimaryMainField
 () const
 {
     return primaryMainCombo->currentText();
@@ -304,7 +346,7 @@ PlanningCalendarWindow::getPrimaryMainField
 
 
 void
-PlanningCalendarWindow::setPrimaryMainField
+CalendarWindow::setPrimaryMainField
 (const QString &name)
 {
     primaryMainCombo->setCurrentText(name);
@@ -312,7 +354,7 @@ PlanningCalendarWindow::setPrimaryMainField
 
 
 QString
-PlanningCalendarWindow::getPrimaryFallbackField
+CalendarWindow::getPrimaryFallbackField
 () const
 {
     return primaryFallbackCombo->currentText();
@@ -320,7 +362,7 @@ PlanningCalendarWindow::getPrimaryFallbackField
 
 
 void
-PlanningCalendarWindow::setPrimaryFallbackField
+CalendarWindow::setPrimaryFallbackField
 (const QString &name)
 {
     primaryFallbackCombo->setCurrentText(name);
@@ -328,7 +370,7 @@ PlanningCalendarWindow::setPrimaryFallbackField
 
 
 QString
-PlanningCalendarWindow::getSecondaryMetric
+CalendarWindow::getSecondaryMetric
 () const
 {
     return secondaryCombo->currentData(Qt::UserRole).toString();
@@ -336,7 +378,7 @@ PlanningCalendarWindow::getSecondaryMetric
 
 
 QString
-PlanningCalendarWindow::getTertiaryField
+CalendarWindow::getTertiaryField
 () const
 {
     return tertiaryCombo->currentText();
@@ -344,7 +386,7 @@ PlanningCalendarWindow::getTertiaryField
 
 
 void
-PlanningCalendarWindow::setTertiaryField
+CalendarWindow::setTertiaryField
 (const QString &name)
 {
     tertiaryCombo->setCurrentText(name);
@@ -352,7 +394,7 @@ PlanningCalendarWindow::setTertiaryField
 
 
 QString
-PlanningCalendarWindow::getSummaryMetrics
+CalendarWindow::getSummaryMetrics
 () const
 {
     return multiMetricSelector->getSymbols().join(',');
@@ -360,7 +402,7 @@ PlanningCalendarWindow::getSummaryMetrics
 
 
 QStringList
-PlanningCalendarWindow::getSummaryMetricsList
+CalendarWindow::getSummaryMetricsList
 () const
 {
     return multiMetricSelector->getSymbols();
@@ -368,7 +410,7 @@ PlanningCalendarWindow::getSummaryMetricsList
 
 
 void
-PlanningCalendarWindow::setSecondaryMetric
+CalendarWindow::setSecondaryMetric
 (const QString &name)
 {
     secondaryCombo->setCurrentIndex(std::max(0, secondaryCombo->findData(name)));
@@ -376,7 +418,7 @@ PlanningCalendarWindow::setSecondaryMetric
 
 
 void
-PlanningCalendarWindow::setSummaryMetrics
+CalendarWindow::setSummaryMetrics
 (const QString &summaryMetrics)
 {
     multiMetricSelector->setSymbols(summaryMetrics.split(',', Qt::SkipEmptyParts));
@@ -384,7 +426,7 @@ PlanningCalendarWindow::setSummaryMetrics
 
 
 void
-PlanningCalendarWindow::setSummaryMetrics
+CalendarWindow::setSummaryMetrics
 (const QStringList &summaryMetrics)
 {
     multiMetricSelector->setSymbols(summaryMetrics);
@@ -392,7 +434,7 @@ PlanningCalendarWindow::setSummaryMetrics
 
 
 void
-PlanningCalendarWindow::configChanged
+CalendarWindow::configChanged
 (qint32 what)
 {
     bool refreshActivities = false;
@@ -468,14 +510,15 @@ PlanningCalendarWindow::configChanged
 
 
 void
-PlanningCalendarWindow::mkControls
+CalendarWindow::mkControls
 ()
 {
     QLocale locale;
     defaultViewCombo = new QComboBox();
-    defaultViewCombo->addItem(tr("Day View"));
-    defaultViewCombo->addItem(tr("Week View"));
-    defaultViewCombo->addItem(tr("Month View"));
+    defaultViewCombo->addItem(tr("Day"));
+    defaultViewCombo->addItem(tr("Week"));
+    defaultViewCombo->addItem(tr("Month"));
+    defaultViewCombo->addItem(tr("Agenda"));
     defaultViewCombo->setCurrentIndex(static_cast<int>(CalendarView::Month));
     firstDayOfWeekCombo = new QComboBox();
     for (int i = Qt::Monday; i <= Qt::Sunday; ++i) {
@@ -488,6 +531,12 @@ PlanningCalendarWindow::mkControls
     endHourSpin = new QSpinBox();
     endHourSpin->setSuffix(":00");
     endHourSpin->setMaximum(24);
+    agendaPastDaysSpin = new QSpinBox();
+    agendaPastDaysSpin->setMaximum(31);
+    agendaPastDaysSpin->setSuffix(" " + tr("day(s)"));
+    agendaFutureDaysSpin = new QSpinBox();
+    agendaFutureDaysSpin->setMaximum(31);
+    agendaFutureDaysSpin->setSuffix(" " + tr("day(s)"));
     summaryDayCheck = new QCheckBox(tr("Day View"));
     summaryDayCheck->setChecked(true);
     summaryWeekCheck = new QCheckBox(tr("Week View"));
@@ -510,64 +559,67 @@ PlanningCalendarWindow::mkControls
     tertiaryCombo->setCurrentText("Notes");
     QStringList summaryMetrics { "ride_count", "total_distance", "coggan_tss", "workout_time" };
     multiMetricSelector = new MultiMetricSelector(tr("Available Metrics"), tr("Selected Metrics"), summaryMetrics);
+    multiMetricSelector->setContentsMargins(10 * dpiXFactor, 10 * dpiYFactor, 10 * dpiXFactor, 10 * dpiYFactor);
     multiMetricSelector->setMinimumHeight(300 * dpiYFactor);
 
-    QFormLayout *formLayout = newQFormLayout();
-    formLayout->addRow(tr("Default View on Startup"), defaultViewCombo);
-    formLayout->addRow(tr("First Day of Week"), firstDayOfWeekCombo);
-    formLayout->addRow(tr("Default Start Time"), startHourSpin);
-    formLayout->addRow(tr("Default End Time"), endHourSpin);
-    formLayout->addRow(tr("Show Summary In"), summaryDayCheck);
-    formLayout->addRow("", summaryWeekCheck);
-    formLayout->addRow("", summaryMonthCheck);
-    formLayout->addItem(new QSpacerItem(0, 10 * dpiYFactor, QSizePolicy::Minimum, QSizePolicy::Fixed));
-    formLayout->addRow(new QLabel(HLO + tr("Calendar Entries") + HLC));
-    formLayout->addRow(tr("Field for Primary Line"), primaryMainCombo);
-    formLayout->addRow(tr("Fallback Field for Primary Line"), primaryFallbackCombo);
-    formLayout->addRow(tr("Metric for Secondary Line"), secondaryCombo);
-    formLayout->addRow(tr("Field for Tertiary Line (Day and Week View)"), tertiaryCombo);
-    formLayout->addItem(new QSpacerItem(0, 10 * dpiYFactor, QSizePolicy::Minimum, QSizePolicy::Fixed));
-    formLayout->addRow(new QLabel(HLO + tr("Summary") + HLC));
+    QFormLayout *generalForm = newQFormLayout();
+    generalForm->setContentsMargins(0, 10 * dpiYFactor, 0, 10 * dpiYFactor);
+    generalForm->addRow(tr("Startup View"), defaultViewCombo);
+    generalForm->addRow(tr("First Day of Week"), firstDayOfWeekCombo);
+    generalForm->addRow(tr("Default Start Time"), startHourSpin);
+    generalForm->addRow(tr("Default End Time"), endHourSpin);
+    generalForm->addRow(tr("Agenda: Look Back"), agendaPastDaysSpin);
+    generalForm->addRow(tr("Agenda: Look Forward"), agendaFutureDaysSpin);
+    generalForm->addRow(tr("Show Summary In"), summaryDayCheck);
+    generalForm->addRow("", summaryWeekCheck);
+    generalForm->addRow("", summaryMonthCheck);
 
-    QWidget *controlsWidget = new QWidget();
-    QVBoxLayout *controlsLayout = new QVBoxLayout(controlsWidget);
-    controlsLayout->addWidget(centerLayoutInWidget(formLayout, false));
-    controlsLayout->addWidget(multiMetricSelector);
+    QFormLayout *entriesForm = newQFormLayout();
+    entriesForm->setContentsMargins(0, 10 * dpiYFactor, 0, 10 * dpiYFactor);
+    entriesForm->addRow(tr("Field for Primary Line"), primaryMainCombo);
+    entriesForm->addRow(tr("Fallback Field for Primary Line"), primaryFallbackCombo);
+    entriesForm->addRow(tr("Metric for Secondary Line"), secondaryCombo);
+    entriesForm->addRow(tr("Field for Tertiary Line (Day and Week View)"), tertiaryCombo);
 
-    QScrollArea *controlsScroller = new QScrollArea();
-    controlsScroller->setWidgetResizable(true);
-    controlsScroller->setWidget(controlsWidget);
+    QTabWidget *controlsTabs = new QTabWidget();
+    controlsTabs->addTab(centerLayoutInWidget(generalForm, false), tr("General"));
+    controlsTabs->addTab(centerLayoutInWidget(entriesForm, false), tr("Calendar Entries"));
+    controlsTabs->addTab(multiMetricSelector, tr("Summary"));
 
 #if QT_VERSION < 0x060000
-    connect(startHourSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &PlanningCalendarWindow::setStartHour);
-    connect(endHourSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &PlanningCalendarWindow::setEndHour);
-    connect(defaultViewCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PlanningCalendarWindow::setDefaultView);
+    connect(startHourSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &CalendarWindow::setStartHour);
+    connect(endHourSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &CalendarWindow::setEndHour);
+    connect(agendaPastDaysSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &CalendarWindow::setAgendaPastDays);
+    connect(agendaFutureDaysSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &CalendarWindow::setAgendaFutureDays);
+    connect(defaultViewCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CalendarWindow::setDefaultView);
     connect(firstDayOfWeekCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int idx) { setFirstDayOfWeek(idx + 1); });
-    connect(primaryMainCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PlanningCalendarWindow::updateActivities);
-    connect(primaryFallbackCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PlanningCalendarWindow::updateActivities);
-    connect(secondaryCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PlanningCalendarWindow::updateActivities);
-    connect(tertiaryCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PlanningCalendarWindow::updateActivities);
+    connect(primaryMainCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CalendarWindow::updateActivities);
+    connect(primaryFallbackCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CalendarWindow::updateActivities);
+    connect(secondaryCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CalendarWindow::updateActivities);
+    connect(tertiaryCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CalendarWindow::updateActivities);
 #else
-    connect(startHourSpin, &QSpinBox::valueChanged, this, &PlanningCalendarWindow::setStartHour);
-    connect(endHourSpin, &QSpinBox::valueChanged, this, &PlanningCalendarWindow::setEndHour);
-    connect(defaultViewCombo, &QComboBox::currentIndexChanged, this, &PlanningCalendarWindow::setDefaultView);
+    connect(startHourSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setStartHour);
+    connect(endHourSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setEndHour);
+    connect(agendaPastDaysSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setAgendaPastDays);
+    connect(agendaFutureDaysSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setAgendaFutureDays);
+    connect(defaultViewCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::setDefaultView);
     connect(firstDayOfWeekCombo, &QComboBox::currentIndexChanged, [=](int idx) { setFirstDayOfWeek(idx + 1); });
-    connect(primaryMainCombo, &QComboBox::currentIndexChanged, this, &PlanningCalendarWindow::updateActivities);
-    connect(primaryFallbackCombo, &QComboBox::currentIndexChanged, this, &PlanningCalendarWindow::updateActivities);
-    connect(secondaryCombo, &QComboBox::currentIndexChanged, this, &PlanningCalendarWindow::updateActivities);
-    connect(tertiaryCombo, &QComboBox::currentIndexChanged, this, &PlanningCalendarWindow::updateActivities);
+    connect(primaryMainCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::updateActivities);
+    connect(primaryFallbackCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::updateActivities);
+    connect(secondaryCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::updateActivities);
+    connect(tertiaryCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::updateActivities);
 #endif
-    connect(summaryDayCheck, &QCheckBox::toggled, this, &PlanningCalendarWindow::setSummaryVisibleDay);
-    connect(summaryWeekCheck, &QCheckBox::toggled, this, &PlanningCalendarWindow::setSummaryVisibleWeek);
-    connect(summaryMonthCheck, &QCheckBox::toggled, this, &PlanningCalendarWindow::setSummaryVisibleMonth);
-    connect(multiMetricSelector, &MultiMetricSelector::selectedChanged, this, &PlanningCalendarWindow::updateActivities);
+    connect(summaryDayCheck, &QCheckBox::toggled, this, &CalendarWindow::setSummaryVisibleDay);
+    connect(summaryWeekCheck, &QCheckBox::toggled, this, &CalendarWindow::setSummaryVisibleWeek);
+    connect(summaryMonthCheck, &QCheckBox::toggled, this, &CalendarWindow::setSummaryVisibleMonth);
+    connect(multiMetricSelector, &MultiMetricSelector::selectedChanged, this, &CalendarWindow::updateActivities);
 
-    setControls(controlsScroller);
+    setControls(controlsTabs);
 }
 
 
 void
-PlanningCalendarWindow::updatePrimaryConfigCombos
+CalendarWindow::updatePrimaryConfigCombos
 ()
 {
     QString mainField = getPrimaryMainField();
@@ -593,7 +645,7 @@ PlanningCalendarWindow::updatePrimaryConfigCombos
 
 
 void
-PlanningCalendarWindow::updateSecondaryConfigCombo
+CalendarWindow::updateSecondaryConfigCombo
 ()
 {
     QString symbol = getSecondaryMetric();
@@ -614,7 +666,7 @@ PlanningCalendarWindow::updateSecondaryConfigCombo
 
 
 void
-PlanningCalendarWindow::updateTertiaryConfigCombo
+CalendarWindow::updateTertiaryConfigCombo
 ()
 {
     QString field = getTertiaryField();
@@ -634,7 +686,7 @@ PlanningCalendarWindow::updateTertiaryConfigCombo
 
 
 QHash<QDate, QList<CalendarEntry>>
-PlanningCalendarWindow::getActivities
+CalendarWindow::getActivities
 (const QDate &firstDay, const QDate &lastDay) const
 {
     QHash<QDate, QList<CalendarEntry>> activities;
@@ -656,7 +708,8 @@ PlanningCalendarWindow::getActivities
             || rideItem == nullptr) {
             continue;
         }
-        if (context->isfiltered && ! context->filters.contains(rideItem->fileName)) {
+        if (   (context->isfiltered && ! context->filters.contains(rideItem->fileName))
+            || (context->ishomefiltered && ! context->homeFilters.contains(rideItem->fileName))) {
             continue;
         }
 
@@ -694,7 +747,7 @@ PlanningCalendarWindow::getActivities
 
         activity.iconFile = IconManager::instance().getFilepath(rideItem);
         if (rideItem->color.alpha() < 255 || rideItem->planned) {
-            activity.color = QColor("#F79130");
+            activity.color = GColor(CCALPLANNED);
         } else {
             activity.color = rideItem->color;
         }
@@ -720,7 +773,7 @@ PlanningCalendarWindow::getActivities
 
 
 QList<CalendarSummary>
-PlanningCalendarWindow::getSummaries
+CalendarWindow::getSummaries
 (const QDate &firstDay, const QDate &lastDay, int timeBucketSize) const
 {
     QStringList symbols = getSummaryMetricsList();
@@ -766,37 +819,10 @@ PlanningCalendarWindow::getSummaries
 
 
 QHash<QDate, QList<CalendarEntry>>
-PlanningCalendarWindow::getPhasesEvents
+CalendarWindow::getPhasesEvents
 (const Season &season, const QDate &firstDay, const QDate &lastDay) const
 {
     QHash<QDate, QList<CalendarEntry>> phasesEvents;
-    for (const Phase &phase : season.phases) {
-        if (phase.getAbsoluteStart().isValid() && phase.getAbsoluteEnd().isValid()) {
-            int duration = std::max(qint64(1), phase.getAbsoluteStart().daysTo(phase.getAbsoluteEnd()));
-            for (QDate date = phase.getAbsoluteStart(); date <= phase.getAbsoluteEnd(); date = date.addDays(1)) {
-                if (   (   (   firstDay.isValid()
-                            && date >= firstDay)
-                        || ! firstDay.isValid())
-                    && (   (   lastDay.isValid()
-                            && date <= lastDay)
-                        || ! lastDay.isValid())) {
-                    int progress = int(phase.getAbsoluteStart().daysTo(date) / double(duration) * 5.0) * 20;
-                    CalendarEntry entry;
-                    entry.primary = phase.getName();
-                    entry.secondary = "";
-                    entry.iconFile = QString(":images/breeze/network-mobile-%1.svg").arg(progress);
-                    entry.color = Qt::red;
-                    entry.reference = phase.id().toString();
-                    entry.start = QTime(0, 0, 1);
-                    entry.type = ENTRY_TYPE_PHASE;
-                    entry.isRelocatable = false;
-                    entry.spanStart = phase.getStart();
-                    entry.spanEnd = phase.getEnd();
-                    phasesEvents[date] << entry;
-                }
-            }
-        }
-    }
     QList<Season> tmpSeasons = context->athlete->seasons->seasons;
     std::sort(tmpSeasons.begin(), tmpSeasons.end(), Season::LessThanForStarts);
     for (const Season &s : tmpSeasons) {
@@ -821,7 +847,7 @@ PlanningCalendarWindow::getPhasesEvents
                 } else {
                     entry.iconFile = ":images/breeze/task-process-0.svg";
                 }
-                entry.color = Qt::yellow;
+                entry.color = GColor(CCALEVENT);
                 entry.reference = event.id;
                 entry.start = QTime(0, 0, 0);
                 entry.durationSecs = 0;
@@ -831,13 +857,40 @@ PlanningCalendarWindow::getPhasesEvents
             }
         }
     }
+    for (const Phase &phase : season.phases) {
+        if (phase.getAbsoluteStart().isValid() && phase.getAbsoluteEnd().isValid()) {
+            int duration = std::max(qint64(1), phase.getAbsoluteStart().daysTo(phase.getAbsoluteEnd()));
+            for (QDate date = phase.getAbsoluteStart(); date <= phase.getAbsoluteEnd(); date = date.addDays(1)) {
+                if (   (   (   firstDay.isValid()
+                            && date >= firstDay)
+                        || ! firstDay.isValid())
+                    && (   (   lastDay.isValid()
+                            && date <= lastDay)
+                        || ! lastDay.isValid())) {
+                    int progress = int(phase.getAbsoluteStart().daysTo(date) / double(duration) * 5.0) * 20;
+                    CalendarEntry entry;
+                    entry.primary = phase.getName();
+                    entry.secondary = "";
+                    entry.iconFile = QString(":images/breeze/network-mobile-%1.svg").arg(progress);
+                    entry.color = GColor(CCALPHASE);
+                    entry.reference = phase.id().toString();
+                    entry.start = QTime(0, 0, 1);
+                    entry.type = ENTRY_TYPE_PHASE;
+                    entry.isRelocatable = false;
+                    entry.spanStart = phase.getStart();
+                    entry.spanEnd = phase.getEnd();
+                    phasesEvents[date] << entry;
+                }
+            }
+        }
+    }
 
     return phasesEvents;
 }
 
 
 void
-PlanningCalendarWindow::updateActivities
+CalendarWindow::updateActivities
 ()
 {
     Season const *season = context->currentSeason();
@@ -854,12 +907,12 @@ PlanningCalendarWindow::updateActivities
     } else {
         summaries = getSummaries(calendar->firstVisibleDay(), calendar->lastVisibleDay(), 7);
     }
-    calendar->fillEntries(activities, summaries, phasesEvents);
+    calendar->fillEntries(activities, summaries, phasesEvents, isFiltered());
 }
 
 
 void
-PlanningCalendarWindow::updateActivitiesIfInRange
+CalendarWindow::updateActivitiesIfInRange
 (RideItem *rideItem)
 {
     if (calendar->currentView() == CalendarView::Day) {
@@ -876,7 +929,7 @@ PlanningCalendarWindow::updateActivitiesIfInRange
 
 
 void
-PlanningCalendarWindow::updateSeason
+CalendarWindow::updateSeason
 (Season const *season, bool allowKeepMonth)
 {
     if (season == nullptr) {
@@ -890,7 +943,7 @@ PlanningCalendarWindow::updateSeason
 
 
 bool
-PlanningCalendarWindow::movePlannedActivity
+CalendarWindow::movePlannedActivity
 (RideItem *rideItem, const QDate &destDay, const QTime &destTime)
 {
     bool ret = false;

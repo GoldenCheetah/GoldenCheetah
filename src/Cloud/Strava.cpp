@@ -81,9 +81,9 @@ QImage Strava::logo() const
 }
 
 void
-Strava::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
+Strava::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    reply->ignoreSslErrors();
+    sslErrors(context->mainWindow, reply, errors);
 }
 
 bool

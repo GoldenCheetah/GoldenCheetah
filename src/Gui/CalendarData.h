@@ -88,8 +88,8 @@ public:
     QList<CalendarEntryLayout> layout(const QList<CalendarEntry> &entries);
 
 private:
-    QList<QList<int>> groupOverlapping(const QList<CalendarEntry> &entries);
-    QList<CalendarEntryLayout> assignColumns(const QList<int> &cluster, const QList<CalendarEntry> &entries);
+    QList<QList<int>> groupOverlapping(const QList<CalendarEntry> &entries) const;
+    QList<CalendarEntryLayout> assignColumns(const QList<int> &cluster, const QList<CalendarEntry> &entries) const;
 };
 
 #endif

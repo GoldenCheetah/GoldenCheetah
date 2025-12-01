@@ -20,6 +20,7 @@
 #include "CloudDBUserMetric.h"
 #include "CloudDBCommon.h"
 #include "CloudDBStatus.h"
+#include "CloudService.h"
 
 #include "UserMetricParser.h"
 #include "GcUpgrade.h"
@@ -213,7 +214,7 @@ CloudDBUserMetricClient::getAllUserMetricHeader(QList<CommonAPIHeaderV1>* header
 void
 CloudDBUserMetricClient::sslErrors(QNetworkReply* reply ,QList<QSslError> errors)
 {
-    CloudDBCommon::sslErrors(reply, errors);
+    CloudService::sslErrors(nullptr, reply, errors);
 }
 
 // Internal Methods

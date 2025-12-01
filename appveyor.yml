@@ -6,9 +6,9 @@ branches:
     - master
 
 image:
-  - Visual Studio 2019
   - macos-monterey
   - Ubuntu2204
+  - Visual Studio 2019
 
 environment:
   APPVEYOR_SAVE_CACHE_ON_ERROR: true
@@ -222,12 +222,12 @@ build_script:
 # Windows
 - cmd: qmake.exe build.pro -r -spec win32-msvc
 - cmd: if not exist qwt\lib\qwt.lib jom -j1 sub-qwt & exit /b 1
-- cmd: jom -j4 sub-src
+- cmd: jom -j2 sub-src
 
 # Linux / macOS
 - sh: qmake build.pro -r QMAKE_CXXFLAGS_WARN_ON+="-Wno-unused-private-field -Wno-c++11-narrowing -Wno-deprecated-declarations -Wno-deprecated-register -Wno-nullability-completeness -Wno-sign-compare -Wno-inconsistent-missing-override" QMAKE_CFLAGS_WARN_ON+="-Wno-deprecated-declarations -Wno-sign-compare"
-- sh: if test ! -f qwt/lib/libqwt.a; then make sub-qwt; fi
-- sh: make -j4 sub-src
+- sh: if test ! -f qwt/lib/libqwt.a; then make sub-qwt; false; fi
+- sh: make -j2 sub-src
 
 after_build:
 
@@ -242,8 +242,8 @@ after_build:
 - cmd: windeployqt --release GoldenCheetah.exe
 - cmd: copy c:\libs\10_Precompiled_DLL\usbexpress_3.5.1\USBXpress\USBXpress_API\Host\x64\SiUSBXp.dll
 - cmd: copy c:\libs\10_Precompiled_DLL\libsamplerate64\lib\libsamplerate-0.dll
-- cmd: copy c:\OpenSSL-v111-Win64\bin\lib*.dll
-- cmd: copy c:\OpenSSL-v111-Win64\license.txt "OpenSSL License.txt"
+- cmd: copy c:\OpenSSL-Win64\bin\lib*.dll
+- cmd: copy c:\OpenSSL-Win64\license.txt "OpenSSL License.txt"
 - cmd: xcopy /s /i /e /q C:\Python .
 - cmd: copy C:\Python\LICENSE.txt "PYTHON LICENSE.txt"
 - cmd: copy c:\tools\vcpkg\installed\x64-windows\bin\gsl*.dll
@@ -260,7 +260,7 @@ after_build:
 
 # Build the installer
 - cmd: makensis GC3.7-Master-W64-QT6.nsi
-- cmd: move GoldenCheetah_v3.7_64bit_Windows.exe ..\..\GoldenCheetah_v3.7_x64.exe
+- cmd: move GoldenCheetah_v3.7.1_64bit_Windows.exe ..\..\GoldenCheetah_v3.7_x64.exe
 - cmd: cd ..\..
 
 # Linux / macOS

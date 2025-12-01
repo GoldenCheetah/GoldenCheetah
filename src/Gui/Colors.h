@@ -43,6 +43,7 @@ extern QFont baseFont;
 // layout and widget styling
 extern void basicTreeWidgetStyle(QTreeWidget *tree, bool editable = true);
 extern QFormLayout *newQFormLayout(QWidget *parent = nullptr);
+extern QLayout *centerWidgetInLayout(QWidget *widget, bool margins = true);
 extern QLayout *centerLayout(QLayout *layout, bool margins = true);
 extern QWidget *centerLayoutInWidget(QLayout *layout, bool margins = true);
 
@@ -275,8 +276,8 @@ class PaletteApplier {
 #define CHZONE10              65
 #define CAEROVE               66
 #define CAEROEL               67
-#define CCALCELL              68
-#define CCALHEAD              69
+#define CCALPHASE             68
+#define CCALEVENT             69
 #define CCALCURRENT           70
 #define CCALACTUAL            71
 #define CCALPLANNED           72

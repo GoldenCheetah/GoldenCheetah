@@ -1591,61 +1591,10 @@ ColorsPage::saveClicked()
 }
 
 FavouriteMetricsPage::FavouriteMetricsPage(QWidget *parent) :
-    QWidget(parent), changed(false)
+    QWidget(parent)
 {
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Metrics_Favourites));
-
-    availList = new QListWidget;
-    availList->setSortingEnabled(true);
-    availList->setAlternatingRowColors(true);
-    availList->setSelectionMode(QAbstractItemView::SingleSelection);
-
-    QVBoxLayout *availLayout = new QVBoxLayout;
-    availLayout->addWidget(new QLabel(HLO + tr("Available Metrics") + HLC));
-    availLayout->addWidget(availList);
-
-    selectedList = new QListWidget;
-    selectedList->setAlternatingRowColors(true);
-    selectedList->setSelectionMode(QAbstractItemView::SingleSelection);
-
-    ActionButtonBox *actionButtons = new ActionButtonBox(ActionButtonBox::UpDownGroup);
-    actionButtons->defaultConnect(ActionButtonBox::UpDownGroup, selectedList);
-
-    QVBoxLayout *selectedLayout = new QVBoxLayout;
-    selectedLayout->addWidget(new QLabel(HLO + tr("Favourites") + HLC));
-    selectedLayout->addWidget(selectedList);
-    selectedLayout->addWidget(actionButtons);
-
-#ifndef Q_OS_MAC
-    leftButton = new QToolButton(this);
-    leftButton->setArrowType(Qt::LeftArrow);
-    leftButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    rightButton = new QToolButton(this);
-    rightButton->setArrowType(Qt::RightArrow);
-    rightButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    leftButton = new QPushButton("<");
-    rightButton = new QPushButton(">");
-#endif
-    leftButton->setEnabled(false);
-    rightButton->setEnabled(false);
-
-    QHBoxLayout *inexcLayout = new QHBoxLayout;
-    inexcLayout->addStretch();
-    inexcLayout->addWidget(leftButton);
-    inexcLayout->addWidget(rightButton);
-    inexcLayout->addStretch();
-
-    QVBoxLayout *buttonGrid = new QVBoxLayout;
-    buttonGrid->addStretch();
-    buttonGrid->addLayout(inexcLayout);
-    buttonGrid->addStretch();
-
-    QHBoxLayout *hlayout = new QHBoxLayout(this);;
-    hlayout->addLayout(availLayout, 2);
-    hlayout->addLayout(buttonGrid, 1);
-    hlayout->addLayout(selectedLayout, 2);
 
     QString s;
     if (appsettings->contains(GC_SETTINGS_FAVOURITE_METRICS))
@@ -1654,96 +1603,12 @@ FavouriteMetricsPage::FavouriteMetricsPage(QWidget *parent) :
         s = GC_SETTINGS_FAVOURITE_METRICS_DEFAULT;
     QStringList selectedMetrics = s.split(",");
 
-    const RideMetricFactory &factory = RideMetricFactory::instance();
-    for (int i = 0; i < factory.metricCount(); ++i) {
-        QString symbol = factory.metricName(i);
-        if (selectedMetrics.contains(symbol) || symbol.startsWith("compatibility_"))
-            continue;
-        QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
-        item->setData(Qt::UserRole, symbol);
-        item->setToolTip(m->description());
-        availList->addItem(item);
-    }
-    foreach (QString symbol, selectedMetrics) {
-        if (!factory.haveMetric(symbol))
-            continue;
-        QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
-        item->setData(Qt::UserRole, symbol);
-        item->setToolTip(m->description());
-        selectedList->addItem(item);
-    }
+    multiMetricSelector = new MultiMetricSelector(HLO + tr("Available Metrics") + HLC, HLO + tr("Favourites") + HLC, selectedMetrics);
 
-    connect(actionButtons, &ActionButtonBox::upRequested, this, &FavouriteMetricsPage::upClicked);
-    connect(actionButtons, &ActionButtonBox::downRequested, this, &FavouriteMetricsPage::downClicked);
-    connect(leftButton, SIGNAL(clicked()), this, SLOT(leftClicked()));
-    connect(rightButton, SIGNAL(clicked()), this, SLOT(rightClicked()));
-    connect(availList, SIGNAL(itemSelectionChanged()), this, SLOT(availChanged()));
-    connect(selectedList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedChanged()));
-}
+    QHBoxLayout *hlayout = new QHBoxLayout(this);
+    hlayout->addWidget(multiMetricSelector);
 
-void
-FavouriteMetricsPage::upClicked()
-{
-    assert(!selectedList->selectedItems().isEmpty());
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    int row = selectedList->row(item);
-    assert(row > 0);
-    selectedList->takeItem(row);
-    selectedList->insertItem(row - 1, item);
-    selectedList->setCurrentItem(item);
-    changed = true;
-}
-
-void
-FavouriteMetricsPage::downClicked()
-{
-    assert(!selectedList->selectedItems().isEmpty());
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    int row = selectedList->row(item);
-    assert(row < selectedList->count() - 1);
-    selectedList->takeItem(row);
-    selectedList->insertItem(row + 1, item);
-    selectedList->setCurrentItem(item);
-    changed = true;
-}
-
-void
-FavouriteMetricsPage::leftClicked()
-{
-    assert(!selectedList->selectedItems().isEmpty());
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    selectedList->takeItem(selectedList->row(item));
-    availList->addItem(item);
-    changed = true;
-    selectedChanged();
-}
-
-void
-FavouriteMetricsPage::rightClicked()
-{
-    assert(!availList->selectedItems().isEmpty());
-    QListWidgetItem *item = availList->selectedItems().first();
-    availList->takeItem(availList->row(item));
-    selectedList->addItem(item);
-    changed = true;
-}
-
-void
-FavouriteMetricsPage::availChanged()
-{
-    rightButton->setEnabled(!availList->selectedItems().isEmpty());
-}
-
-void
-FavouriteMetricsPage::selectedChanged()
-{
-    if (selectedList->selectedItems().isEmpty()) {
-        leftButton->setEnabled(false);
-        return;
-    }
-    leftButton->setEnabled(true);
+    connect(multiMetricSelector, &MultiMetricSelector::selectedChanged, [=]() { changed = true; });
 }
 
 qint32
@@ -1751,10 +1616,7 @@ FavouriteMetricsPage::saveClicked()
 {
     if (!changed) return 0;
 
-    QStringList metrics;
-    for (int i = 0; i < selectedList->count(); ++i)
-        metrics << selectedList->item(i)->data(Qt::UserRole).toString();
-    appsettings->setValue(GC_SETTINGS_FAVOURITE_METRICS, metrics.join(","));
+    appsettings->setValue(GC_SETTINGS_FAVOURITE_METRICS, multiMetricSelector->getSymbols().join(","));
 
     return 0;
 }

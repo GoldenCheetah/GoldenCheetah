@@ -13334,7 +13334,8 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/GcCalendarModel.h" line="113"/>
         <source>Date</source>
-        <translation>Data</translation>
+        <translatorcomment>Please don&apos;t translate to Data since it collides with other special field name</translatorcomment>
+        <translation>Data di inizio</translation>
     </message>
     <message>
         <location filename="../../Core/GcCalendarModel.h" line="114"/>
@@ -14555,7 +14556,8 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="901"/>
         <source>Date</source>
-        <translation>Data</translation>
+        <translatorcomment>Please don&apos;t translate to Data since it collides with other special field name</translatorcomment>
+        <translation>Data di inizio</translation>
     </message>
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="909"/>
@@ -22582,7 +22584,8 @@ Nessuna uscita in bici trovata da importare.
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="1125"/>
         <source>Date</source>
-        <translation>Data</translation>
+        <translatorcomment>Please don&apos;t translate to Data since it collides with other special field name</translatorcomment>
+        <translation>Data di inizio</translation>
     </message>
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="1127"/>
@@ -29673,7 +29676,8 @@ Vuoi continuare?</translation>
         <location filename="../../Gui/RideNavigator.cpp" line="42"/>
         <location filename="../../Gui/RideNavigator.cpp" line="245"/>
         <source>*|Workout Code|Date|</source>
-        <translation>*|Codice Allenamento|Data|</translation>
+        <translatorcomment>Please don&apos;t translate Date to Data since it collides with other special field</translatorcomment>
+        <translation>*|Codice Allenamento|Data di inizio|</translation>
     </message>
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="257"/>
@@ -29691,7 +29695,8 @@ Vuoi continuare?</translation>
         <location filename="../../Gui/RideNavigator.cpp" line="261"/>
         <location filename="../../Gui/RideNavigator.cpp" line="262"/>
         <source>Date</source>
-        <translation>Data</translation>
+        <translatorcomment>Please don&apos;t translate to Data since it collides with other special field name</translatorcomment>
+        <translation>Data di inizio</translation>
     </message>
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="263"/>

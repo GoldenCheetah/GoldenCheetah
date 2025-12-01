@@ -292,20 +292,6 @@ CloudDBCommon::unmarshallAPIHeaderV1(QByteArray json, QList<CommonAPIHeaderV1> *
 }
 
 void
-CloudDBCommon::sslErrors(QNetworkReply* reply ,QList<QSslError> errors)
-{
-    QString errorString = "";
-    foreach (const QSslError e, errors ) {
-        if (!errorString.isEmpty())
-            errorString += ", ";
-        errorString += e.errorString();
-    }
-    QMessageBox::warning(NULL, tr("HTTP"), tr("SSL error(s) has occurred: %1").arg(errorString));
-    reply->ignoreSslErrors();
-}
-
-
-void
 CloudDBCommon::unmarshallAPIHeaderV1Object(QJsonObject* object, CommonAPIHeaderV1* chartHeader) {
 
     chartHeader->Id = object->value("id").toDouble();

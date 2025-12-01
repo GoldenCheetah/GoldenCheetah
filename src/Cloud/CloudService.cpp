@@ -288,6 +288,19 @@ CloudService::uncompressRide(QByteArray *data, QString name, QStringList &errors
     return ride;
 }
 
+void
+CloudService::sslErrors(QWidget* parent, QNetworkReply* reply ,QList<QSslError> errors)
+{
+    QString errorString = "";
+    foreach (const QSslError e, errors ) {
+        if (!errorString.isEmpty())
+            errorString += ", ";
+        errorString += e.errorString();
+    }
+    QMessageBox::warning(parent, tr("HTTP"), tr("SSL error(s) has occurred: %1").arg(errorString));
+    //reply->ignoreSslErrors(); // disabled for security reasons
+}
+
 QString
 CloudService::uploadExtension() {
     QString spec;
