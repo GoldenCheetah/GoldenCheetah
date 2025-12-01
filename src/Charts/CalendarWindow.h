@@ -93,10 +93,15 @@ class CalendarWindow : public GcChartWindow
         void setSummaryMetrics(const QStringList &summaryMetrics);
         void configChanged(qint32);
 
+    protected:
+
+        void showEvent(QShowEvent*) override;
+
     private:
         Context *context;
         bool first = true;
 
+        QPalette palette;
         QComboBox *defaultViewCombo;
         QComboBox *firstDayOfWeekCombo;
         QSpinBox *startHourSpin;
