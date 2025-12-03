@@ -88,6 +88,10 @@ class HrPwWindow : public GcChartWindow
         void setDelay(int);
 
     protected:
+
+        // the chart displays information related to the selected ride
+        bool selectedRideInfo() const override { return true; }
+
         Context *context;
         HrPwPlot  *hrPwPlot;
         SmallPlot *smallPlot;

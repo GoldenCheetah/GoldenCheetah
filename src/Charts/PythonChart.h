@@ -156,6 +156,9 @@ class PythonChart : public GcChartWindow, public PythonHost {
         // enable stopping long running scripts
         bool eventFilter(QObject *, QEvent *e);
 
+        // the chart displays information related to the selected ride
+        bool selectedRideInfo() const override { return ridesummary; }
+
         QSplitter *splitter;
         QSplitter *leftsplitter;
 
