@@ -161,6 +161,14 @@ CalendarWindow::CalendarWindow(Context *context)
     });
 }
 
+void
+CalendarWindow::showEvent(QShowEvent*)
+{
+    // When the chart is added to the Perspective's QStackedWidget, the Perspective's style sheets
+    // can conflict with the local calendar palette settings causing the appearance to be lost.
+    // Therefore re-apply the palette upon showEvent to ensure correct calendar appearance.
+    PaletteApplier::setPaletteRecursively(this, palette, true);
+}
 
 int
 CalendarWindow::getDefaultView
@@ -467,7 +475,6 @@ CalendarWindow::configChanged
             inactiveText = GCColor::inactiveColor(activeText, 2.5);
         }
 
-        QPalette palette;
         palette.setColor(QPalette::Active, QPalette::Window, activeWindow);
         palette.setColor(QPalette::Active, QPalette::WindowText, activeText);
         palette.setColor(QPalette::Active, QPalette::Base, activeBase);
