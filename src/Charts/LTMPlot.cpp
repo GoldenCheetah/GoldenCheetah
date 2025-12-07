@@ -1088,7 +1088,7 @@ LTMPlot::setData(LTMSettings *set)
             linearGradient.setColorAt(1.0, brushColor);
             linearGradient.setSpread(QGradient::PadSpread);
             current->setBrush(linearGradient);
-            current->setPen(QPen(Qt::NoPen));
+            current->setPen(QPen(metricDetail.penColor));
             current->setCurveAttribute(QwtPlotCurve::Inverted, true);
 
             current->setSymbol(NULL);
