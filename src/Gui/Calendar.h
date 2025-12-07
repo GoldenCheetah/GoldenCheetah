@@ -36,7 +36,6 @@
 #include "CalendarData.h"
 #include "TimeUtils.h"
 #include "Measures.h"
-#include "Qt5Compatibility.h"
 
 
 class CalendarOverview : public QCalendarWidget {
@@ -218,7 +217,6 @@ enum class CalendarView {
     Day = 0,
     Week = 1,
     Month = 2,
-    Agenda = 3
 };
 
 
@@ -291,65 +289,6 @@ private:
 };
 
 
-struct CalendarAgendaStyles {
-    QFont defaultFont;
-    QFont relativeFont;
-    QFont hoverFont;
-    QFont headlineDefaultFont;
-    QFont headlineTodayFont;
-    QFont headlineEmptyFont;
-    QFont headlineSmallEmptyFont;
-
-    int sectionSpacerHeight;
-    int sectionEntrySpacerHeight;
-    int entrySpacerHeight;
-    int daySpacerHeight;
-};
-
-class CalendarAgendaView : public QWidget {
-    Q_OBJECT
-
-public:
-    explicit CalendarAgendaView(QWidget *parent = nullptr);
-
-    void updateDate();
-    void setDateRange(const DateRange &dateRange);
-    void setPastDays(int days);
-    void setFutureDays(int days);
-    void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries);
-    QDate firstVisibleDay() const;
-    QDate lastVisibleDay() const;
-    QDate selectedDate() const;
-
-signals:
-    void showInTrainMode(const CalendarEntry &activity);
-    void showInMonthView(const QDate &date);
-    void viewActivity(const CalendarEntry &activity);
-    void dayChanged(const QDate &date);
-
-protected:
-    bool eventFilter(QObject *watched, QEvent *event) override;
-    void changeEvent(QEvent *event) override;
-
-private:
-    QDate currentDate;
-    DateRange dateRange;
-    int pastDays = 7;
-    int futureDays = 7;
-    TreeWidget6 *agendaTree;
-    QTreeWidgetItem *lastHoveredItem = nullptr;
-    int lastHoveredColumn = -1;
-    void clearHover();
-    void addEntries(const QDate &today, const QDate &date, const QList<CalendarEntry> &entries, QTreeWidgetItem *parent, const CalendarAgendaStyles &cas);
-    void addSpacer(QTreeWidgetItem *parent, int height);
-    void addSeparator(QTreeWidgetItem *parent, int top, int bottom);
-    void fillStyles(CalendarAgendaStyles &cas) const;
-
-private slots:
-    void showContextMenu(const QPoint &pos);
-};
-
-
 class Calendar : public QWidget {
     Q_OBJECT
 
@@ -376,8 +315,6 @@ public slots:
     void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
     void setStartHour(int hour);
     void setEndHour(int hour);
-    void setAgendaPastDays(int days);
-    void setAgendaFutureDays(int days);
     void setSummaryDayVisible(bool visible);
     void setSummaryWeekVisible(bool visible);
     void setSummaryMonthVisible(bool visible);
@@ -410,7 +347,6 @@ private:
     QAction *dayAction;
     QAction *weekAction;
     QAction *monthAction;
-    QAction *agendaAction;
     QToolButton *dateNavigator;
     QAction *dateNavigatorAction;
     QMenu *dateMenu;
@@ -423,10 +359,8 @@ private:
     CalendarDayView *dayView;
     CalendarWeekView *weekView;
     CalendarMonthTable *monthView;
-    CalendarAgendaView *agendaView;
     DateRange dateRange;
     Qt::DayOfWeek firstDayOfWeek = Qt::Monday;
-    QDate lastNonAgendaDate;
 
     void setNavButtonState();
     void updateHeader();
