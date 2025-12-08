@@ -12,6 +12,7 @@ image:
 
 environment:
   APPVEYOR_SAVE_CACHE_ON_ERROR: true
+  MACOS_PYTHON_VERSION: "3.11"
   GC_GOOGLE_CALENDAR_CLIENT_SECRET:
     secure: hwjHTrSAMEbKd9PA+5x/zI4x5Uk4KQm1hdfZzkwiu8k=
   GC_GOOGLE_DRIVE_CLIENT_ID:
@@ -62,11 +63,6 @@ init:
 - cmd: call c:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\VC\Auxiliary\Build\vcvarsall.bat amd64
 # Setup NSIS
 - cmd: set PATH=%PATH%;C:\"Program Files (x86)"\NSIS
-# install Python 3.7
-- cmd: appveyor DownloadFile "https://www.python.org/ftp/python/3.7.9/python-3.7.9-amd64.exe"
-- cmd: python-3.7.9-amd64.exe /quiet InstallAllUsers=1 PrependPath=1 TargetDir="C:\Python37-x64"
-- cmd: c:\python37-x64\python --version
-- cmd: del python-3.7.9-amd64.exe
 
 # Linux / macOS
 - sh: >-
@@ -90,7 +86,6 @@ init:
 cache:
 - gc-ci-libs.zip -> appveyor.yml
 - jom_1_1_3.zip
-- sip-4.19.8 -> appveyor.yml
 - C:\R
 - C:\Python -> src\Python\requirements.txt
 - c:\tools\vcpkg\installed\
@@ -130,41 +125,35 @@ install:
 - cmd: R --version
 - cmd: echo DEFINES+=GC_WANT_R >> src\gcconfig.pri
 
-# Get Python embeddable and install packages
+# Get Python and add to config
 - ps: >-
-    if ($isWindows -And -not (Test-Path 'C:\Python')) {
-      Start-FileDownload "https://www.python.org/ftp/python/3.7.9/python-3.7.9-embed-amd64.zip" Python.zip
-      7z x Python.zip -oC:\Python\
-      echo python37.zip . '' 'import site' | Out-File C:\Python\python37._pth -Encoding ascii
-      mkdir C:\Python\lib\site-packages
-      c:\python37-x64\python -m pip install --upgrade pip
-      c:\python37-x64\python -m pip install -r src\Python\requirements.txt -t C:\Python\lib\site-packages
+    if ($isWindows -And -not (Test-Path 'C:\Python\python.exe')) {
+      $pyurl = "https://www.python.org/ftp/python/3.11.9/python-3.11.9-embed-amd64.zip"
+      Start-FileDownload $pyurl "python-embed.zip"
+      Expand-Archive -Path python-embed.zip -DestinationPath C:\Python -Force
+      # Enable pip in embedded Python
+      (Get-Content C:\Python\python311._pth) -replace '#import site', 'import site' | Set-Content C:\Python\python311._pth
+      Start-FileDownload "https://bootstrap.pypa.io/get-pip.py" "get-pip.py"
+      C:\Python\python.exe get-pip.py --no-warn-script-location
     }
-
-# Get SIP and and install on Python
-- ps: >-
-    if ($isWindows -And -not (Test-Path 'sip-4.19.8')) {
-      Start-FileDownload "https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.zip"
-        7z x sip-4.19.8.zip
-        cd sip-4.19.8
-        c:\python37-x64\python --version
-        c:\python37-x64\python configure.py
-        jom -j2
-        cd ..
-    }
-- cmd: cd sip-4.19.8 & nmake install & cd ..
-
-# Add Python (avoiding collision between GC Context.h and Python context.h)
-- cmd: echo DEFINES+=GC_WANT_PYTHON >> src\gcconfig.pri
-- cmd: echo PYTHONINCLUDES=-ICore -I\"c:\python37-x64\include\" >> src\gcconfig.pri
-- cmd: echo PYTHONLIBS=-L\"c:\python37-x64\libs\" -lpython37 >> src\gcconfig.pri
+- cmd: set PATH=%PATH%;C:\Python\Scripts\;C:\Python\;
+- cmd: python --version
+- cmd: sed -i "s|#GC_WANT_PYTHON.=.*|GC_WANT_PYTHON=true|" src/gcconfig.pri
 
 # GSL
 - cmd: echo GSL_INCLUDES=c:\tools\vcpkg\installed\x64-windows\include >> src\gcconfig.pri
 - cmd: echo GSL_LIBS=-Lc:\tools\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas >> src\gcconfig.pri
 
-# Linux / macOS
+# Linux / macOS - install dependencies first (including Python 3.11 on macOS)
 - sh: bash appveyor/$OS_NAME/install.sh
+
+# Upgrade pip to ensure you have the latest version
+- cmd: python -m pip install --upgrade pip
+- sh: if ! $CI_LINUX; then export PATH="/usr/local/opt/python@${MACOS_PYTHON_VERSION}/bin:$PATH"; fi && python3 -m pip install --upgrade pip
+# Install your project's dependencies from a requirements.txt file
+- sh: export PATH=$PATH:$(python3-config --exec-prefix)/bin
+- cmd: python -m pip install --only-binary :all: -r src/Python/requirements.txt
+- sh: if ! $CI_LINUX; then export PATH="/usr/local/opt/python@${MACOS_PYTHON_VERSION}/bin:$PATH"; fi && python3 -m pip install -r src/Python/requirements.txt
 
 before_build:
 

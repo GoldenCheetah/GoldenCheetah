@@ -245,23 +245,23 @@ contains(DEFINES, "GC_WANT_PYTHON") {
             INCLUDEPATH += ./Python
 
             DEFINES += SIP_STATIC_MODULE
-            !isEmpty(PYTHONINCLUDES) QMAKE_CXXFLAGS += $${PYTHONINCLUDES}
+            !isEmpty(PYTHONINCLUDES) {
+                QMAKE_CXXFLAGS += $${PYTHONINCLUDES}
+                QMAKE_CFLAGS += $${PYTHONINCLUDES}
+            }
             LIBS += $${PYTHONLIBS}
+
+            # Link against the separate SIP static library
+            LIBS += -L$$PWD/Python/SIP/ -lsip_lib
 
             ## Python integration
             HEADERS += Python/PythonEmbed.h Charts/PythonChart.h Python/PythonSyntax.h
             SOURCES += Python/PythonEmbed.cpp Charts/PythonChart.cpp Python/PythonSyntax.cpp
 
-            ## Python SIP generated module
-            SOURCES += Python/SIP/sipgoldencheetahBindings.cpp Python/SIP/sipgoldencheetahcmodule.cpp
-            SOURCES += Python/SIP/Bindings.cpp
-
-            ## SIP type conversion
-            SOURCES += Python/SIP/sipgoldencheetahQString.cpp
-            SOURCES += Python/SIP/sipgoldencheetahQStringList.cpp
-            SOURCES += Python/SIP/sipgoldencheetahPythonDataSeries.cpp \
-                       Python/SIP/sipgoldencheetahPythonXDataSeries.cpp
             DEFINES += GC_HAVE_PYTHON
+
+            ## Python data processors
+
 
             ## Python data processors
             HEADERS += FileIO/FixPyScriptsDialog.h FileIO/FixPySettings.h FileIO/FixPyRunner.h \
@@ -269,7 +269,6 @@ contains(DEFINES, "GC_WANT_PYTHON") {
 
             SOURCES += FileIO/FixPyScriptsDialog.cpp FileIO/FixPySettings.cpp FileIO/FixPyRunner.cpp \
                        FileIO/FixPyDataProcessor.cpp
-
 }
 
 ###====================

@@ -62,9 +62,7 @@ sed -i "" "s|#\(DEFINES += GC_VIDEO_QT6.*\)|\1 |" src/gcconfig.pri
 sed -i "" "s|#\(DEFINES += GC_WANT_R.*\)|\1 |" src/gcconfig.pri
 
 # Python (avoiding collision between GC Context.h and Python context.h)
-echo DEFINES += GC_WANT_PYTHON >> src/gcconfig.pri
-echo PYTHONINCLUDES = -ICore `python3.7-config --includes` >> src/gcconfig.pri
-echo PYTHONLIBS = `python3.7-config --ldflags` >> src/gcconfig.pri
+sed -i "" "s|#GC_WANT_PYTHON.=.*|GC_WANT_PYTHON=true|" src/gcconfig.pri
 
 # TrainerDay Query API
 echo DEFINES += GC_WANT_TRAINERDAY_API >> src/gcconfig.pri

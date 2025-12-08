@@ -8,16 +8,52 @@
 #CONFIG += debug
 #CONFIG += release
 
-# uncomment below and configure the location of the GNU scientific library,
-# this is a mandatory dependency.
+###############################################################################
+# GSL (GNU SCIENTIFIC LIBRARY) CONFIGURATION - REQUIRED
+###############################################################################
+# The GNU Scientific Library is a mandatory dependency.
+# 
+# RECOMMENDED INSTALLATION:
+#   Linux:   sudo apt-get install libgsl-dev
+#   macOS:   brew install gsl
+#   Windows: vcpkg install gsl
 #
-# Linux/Mac - use apt/homebrew to install and edit to your install location
+# The build system will attempt to auto-configure based on your platform.
+# You can override by uncommenting and setting the variables below.
+#
+###############################################################################
+
+# Override GSL paths if needed (optional - auto-configured if not set):
 #GSL_INCLUDES = /usr/include
 #GSL_LIBS = -lgsl -lgslcblas -lm
-#
-# Windows - use vcpkg to install and edit to your install location
-#GSL_INCLUDES = c:\vcpkg\installed\x64-windows\include
-#GSL_LIBS = -LC:\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas
+
+###############################################################################
+# AUTOMATIC GSL CONFIGURATION (DO NOT EDIT BELOW THIS LINE)
+###############################################################################
+
+isEmpty(GSL_INCLUDES)|isEmpty(GSL_LIBS) {
+    win32 {
+        # Windows with vcpkg
+        isEmpty(GSL_INCLUDES) {
+            GSL_INCLUDES = c:\\vcpkg\\installed\\x64-windows\\include
+        }
+        isEmpty(GSL_LIBS) {
+            GSL_LIBS = -LC:\\vcpkg\\installed\\x64-windows\\lib -lgsl -lgslcblas
+        }
+    } else {
+        # Linux and macOS
+        isEmpty(GSL_INCLUDES) {
+            GSL_INCLUDES = /usr/include
+        }
+        isEmpty(GSL_LIBS) {
+            GSL_LIBS = -lgsl -lgslcblas -lm
+        }
+    }
+}
+
+message("GSL configuration:")
+message("  Includes: $$GSL_INCLUDES")
+message("  Libs: $$GSL_LIBS")
 
 # If you have conflicts with min/max macros defined in windows.h
 # then uncomment the following line.
@@ -29,24 +65,58 @@
 # can be run to install these packages; see it for more info.
 #DEFINES += GC_WANT_R
 
-# Uncomment below if you want Python charting / ML etc
-# You will need Python Development tools installed
+###############################################################################
+# PYTHON CONFIGURATION
+###############################################################################
+# To enable Python support, set GC_WANT_PYTHON = true and optionally configure the
+# Python version. The build system will automatically detect your platform
+# and configure the appropriate paths.
 #
-# Libs needed can typically be found by calling e.g
-# python3.6-config --libs
+# REQUIRED SETTING:
+#   GC_WANT_PYTHON = true              # Enable Python support
 #
-# below 3 lines work well on Linux style OS
-#DEFINES += GC_WANT_PYTHON
-#PYTHONINCLUDES = -I/usr/include/python3.6
-#PYTHONLIBS = -L/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu -lpython3.6m
-# below 3 lines work well on Windows
-#DEFINES += GC_WANT_PYTHON
-#PYTHONINCLUDES = -I\"C:\Program Files\Python36\include\"
-#PYTHONLIBS = -L\"C:\Program Files\Python36\libs\" -lpython36
-#Below work ok on MacOS High Sierra
-#DEFINES += GC_WANT_PYTHON
-#PYTHONINCLUDES = -I/Library/Frameworks/Python.framework/Versions/3.6/include/python3.6m
-#PYTHONLIBS = -L/Library/Frameworks/Python.framework/Versions/3.6/lib -lpython3.6m
+# OPTIONAL SETTINGS:
+#   PYTHON_VERSION = <version>         # Override Python version
+#   PYTHONINCLUDES = <custom path>     # Override include path
+#   PYTHONLIBS = <custom libs>         # Override library path
+#
+# EXAMPLES:
+#   GC_WANT_PYTHON = true
+#
+# You can find the correct library paths by running:
+#   python3.11-config --includes
+#   python3.11-config --libs
+#
+###############################################################################
+
+# Uncomment and configure these lines to enable Python:
+#GC_WANT_PYTHON = true
+
+# Custom paths (optional - auto-configured if not set):
+#PYTHONINCLUDES = -I/usr/include/python3.11
+#PYTHONLIBS = -L/usr/lib/python3.11/config-3.11-x86_64-linux-gnu -lpython3.11
+
+###############################################################################
+# AUTOMATIC PYTHON CONFIGURATION (DO NOT EDIT BELOW THIS LINE)
+###############################################################################
+
+equals(GC_WANT_PYTHON, true) {
+    DEFINES += GC_WANT_PYTHON    
+    # Auto-configure platform-specific paths if not manually set
+    isEmpty(PYTHON_VERSION) {
+        PYTHON_VERSION = $$system("python3-config --ldflags|sed s/.*python//|sed s~/.*~~")
+    }
+    isEmpty(PYTHONINCLUDES) {     
+        PYTHONINCLUDES = $$system("python3-config --includes")
+    }
+    isEmpty(PYTHONLIBS) {
+        PYTHONLIBS = $$system("python3-config --ldflags")
+        PYTHONLIBS += -lpython$${PYTHON_VERSION}
+    }    
+    message("Python configuration:")
+    message("  Includes: $$PYTHONINCLUDES")
+    message("  Libs: $$PYTHONLIBS")
+}
 
 # put output into a separate dir
 # to keep main directory clear

@@ -85,7 +85,7 @@ public:
         %MethodCode
         sipRes = new QString(sipCpp->name);
         %End
-    SIP_SSIZE_T __len__();
+    Py_ssize_t __len__();
         %MethodCode
         sipRes = sipCpp->count;
         %End
@@ -270,7 +270,7 @@ public:
         %MethodCode
         sipRes = new QString(sipCpp->name());
         %End
-    SIP_SSIZE_T __len__();
+    Py_ssize_t __len__();
         %MethodCode
         sipRes = sipCpp->count();
         %End

@@ -35,9 +35,7 @@ sed -i "s|#\(SAMPLERATE_INSTALL =\).*|\1 /usr|" src/gcconfig.pri
 # SRMIO
 sed -i "s|#\(SRMIO_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
 # Python
-echo DEFINES += GC_WANT_PYTHON >> src/gcconfig.pri
-echo PYTHONINCLUDES = -I/usr/include/python3.7 >> src/gcconfig.pri
-echo PYTHONLIBS = -L/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu -lpython3.7m >> src/gcconfig.pri
+sed -i "s/|#GC_WANT_PYTHON.=.*|GC_WANT_PYTHON=true|" src/gcconfig.pri
 # GSL
 echo GSL_LIBS = -lgsl -lgslcblas -lm >> src/gcconfig.pri
 # TrainerDay Query API

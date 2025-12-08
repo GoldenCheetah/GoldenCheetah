@@ -59,3 +59,13 @@ tags
 #ignore qm
 *.qm
 
+
+# Python SIP generated files
+Python/SIP/sip*.c
+Python/SIP/sip*.cpp
+Python/SIP/sip*.h
+Python/SIP/sip.h
+Python/SIP/build/
+
+# Whitelist SIP Makefile
+!Python/SIP/Makefile
