@@ -135,7 +135,6 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     garminHWMarkedit->setValue(garminHWMark.toInt());
 
     connect(garminSmartRecord, &QCheckBox::stateChanged, [=](int state) { garminHWMarkedit->setEnabled(state); });
-    garminSmartRecord->setCheckState(! (isGarminSmartRecording.toInt() > 0) ? Qt::Checked : Qt::Unchecked);
     garminSmartRecord->setCheckState(isGarminSmartRecording.toInt() > 0 ? Qt::Checked : Qt::Unchecked);
 
     // Elevation hysterisis  GC_ELEVATION_HYSTERISIS
@@ -195,7 +194,6 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     connect(rBrowseButton, SIGNAL(clicked()), this, SLOT(browseRDir()));
     connect(embedR, &QCheckBox::stateChanged, [=](int state) { rDirectorySel->setEnabled(state); });
 
-    embedR->setChecked(! appsettings->value(NULL, GC_EMBED_R, true).toBool());
     embedR->setChecked(appsettings->value(NULL, GC_EMBED_R, true).toBool());
 #endif
 
@@ -218,7 +216,6 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     connect(pythonBrowseButton, SIGNAL(clicked()), this, SLOT(browsePythonDir()));
     connect(embedPython, &QCheckBox::stateChanged, [=](int state) { pythonDirectorySel->setEnabled(state); });
 
-    embedPython->setChecked(! appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool());
     embedPython->setChecked(appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool());
 #endif
 
