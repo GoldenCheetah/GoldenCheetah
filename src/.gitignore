@@ -60,3 +60,7 @@ tags
 #ignore qm
 *.qm
 
+
+# Python SIP generated files
+Python/SIP/build/
+

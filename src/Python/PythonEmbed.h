@@ -118,21 +118,25 @@ class PythonEmbed {
 #ifndef PYTHON_DEBUG
 #define PYTHON_DEBUG false
 #endif
+
+#include <QDebug>
+#include <stdio.h>
+
 #ifdef Q_CC_MSVC
 #define printd(fmt, ...) do {                                                \
     if (PYTHON_DEBUG) {                                 \
-        printf("[%s:%d %s] " fmt , __FILE__, __LINE__,        \
-               __FUNCTION__, __VA_ARGS__);                    \
-        fflush(stdout);                                       \
+        qDebug() << "PythonEmbed:" << QString::asprintf("[%s:%d %s] " fmt, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__); \
+        fprintf(stderr, "[%s:%d %s] " fmt, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__); \
+        fflush(stderr);                                       \
     }                                                         \
 } while(0)
 #else
 #define printd(fmt, args...)                                            \
     do {                                                                \
         if (PYTHON_DEBUG) {                                       \
-            printf("[%s:%d %s] " fmt , __FILE__, __LINE__,              \
-                   __FUNCTION__, ##args);                               \
-            fflush(stdout);                                             \
+            qDebug() << "PythonEmbed:" << QString::asprintf("[%s:%d %s] " fmt, __FILE__, __LINE__, __FUNCTION__, ##args); \
+            fprintf(stderr, "[%s:%d %s] " fmt, __FILE__, __LINE__, __FUNCTION__, ##args); \
+            fflush(stderr);                                             \
         }                                                               \
     } while(0)
 #endif
