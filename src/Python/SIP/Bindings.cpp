@@ -23,7 +23,10 @@
 
 #include <QWebEngineView>
 #include <QUrl>
+
+#undef slots
 #include <datetime.h> // for Python datetime macros
+#define slots Q_SLOTS
 
 long Bindings::threadid() const
 {
