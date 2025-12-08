@@ -131,6 +131,7 @@
 #define VERSION31_BUILD VERSION31_UPG
 
 // the next two will with each build/release
+// note: the GC version check functionality in mainWindow is dependent upon format of VERSION_STRING
 #define VERSION_LATEST 5006
 #define VERSION_STRING "V3.7.1"
 //#define GC_VERSION VERSION_STRING // To force version string on non-tagged ci builds

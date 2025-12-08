@@ -756,7 +756,7 @@ MainWindow::MainWindow(const QDir &home)
     }
 
     versionClient = new CloudDBVersionClient();
-    versionClient->informUserAboutLatestVersions();
+    // versionClient->informUserAboutLatestVersions();
 
 
 
@@ -765,6 +765,75 @@ MainWindow::MainWindow(const QDir &home)
     // get rid of splash when currentTab is shown
     delete splash;
     splash = nullptr;
+
+    gcVersionCheck();
+}
+
+void
+MainWindow::gcVersionCheck()
+{
+    // update check is done only once every xx days - to prevent unecessary requests
+    QDate lastUpdateCheck = (appsettings->value(NULL, GC_LAST_VERSION_CHECK_DATE, QDate(1990, 1, 1)).toDate());
+    qDebug() << "Last version check: " << lastUpdateCheck.toString();
+
+    if (QDate::currentDate() > lastUpdateCheck.addDays(31)) {
+
+        // fetch the latest version of GcUpgrade.h from goldencheetah github project
+        connect(&networkAccessMngr, SIGNAL(finished(QNetworkReply*)), this, SLOT(gcVersionResponse(QNetworkReply*)));
+        QString request("https://raw.githubusercontent.com/GoldenCheetah/GoldenCheetah/refs/heads/master/src/Core/GcUpgrade.h");
+        networkAccessMngr.get(QNetworkRequest(QUrl(request)));
+     
+        // update check is complete, set the date for next check period
+        appsettings->setValue(GC_LAST_VERSION_CHECK_DATE, QDate::currentDate());
+   }
+}
+
+void
+MainWindow::gcVersionResponse(QNetworkReply *reply)
+{
+    if (reply->error() == QNetworkReply::NoError) {
+
+        QString fileContents(reply->readAll());
+
+        // extract the build id
+        QRegularExpression re("#define VERSION_LATEST (\\d+)");
+        QRegularExpressionMatch match = re.match(fileContents);
+
+        // extract the version string
+        QRegularExpression reStr("#define VERSION_STRING \"(V.*)\"");
+        QRegularExpressionMatch matchStr = reStr.match(fileContents);
+
+        if (match.hasMatch() && matchStr.hasMatch()) {
+
+            int gitHubBuildId(match.captured(1).toInt());
+            QString gitHubVersionStr(matchStr.captured(1));
+
+            qDebug() << "Github build id:" << gitHubBuildId << ", local version build id:" << VERSION_LATEST;
+
+            // Remind the user if they are not running the latest version
+            if (gitHubBuildId > VERSION_LATEST) {
+
+                QString msgText = "<b>" + tr("Version ") + gitHubVersionStr + " (Build id: " + QString::number(gitHubBuildId) + ")" + tr(" is available") + "</b>" +
+                                    "<br><br>" + tr("Your version is ") + VERSION_STRING + " (Build id: " + QString::number(VERSION_LATEST) + ")" +
+                                    "<br><br>" + tr("It is recommended that you upgrade for security and stability updates, plus new features") +
+                                    "<br><br><a href='https://www.goldencheetah.org/#section-download'>" + tr("See GoldenCheetah Downloads") + "</a><br>";
+
+                // Display warning/nag dialog
+                QMessageBox msgBox(this);
+                msgBox.setIcon(QMessageBox::Warning);
+                msgBox.setTextFormat(Qt::RichText);
+                msgBox.setText(msgText);
+                msgBox.exec();
+            }
+        } else {
+            qDebug() << "Cannot extract VERSION_LATEST from GcUpgrade.h";
+        }
+    } else {
+        qDebug() << "Github request for GcUpgrade.h file failed";
+    }
+
+    // tidy up memory allocated to us
+    reply->deleteLater();
 }
 
 
