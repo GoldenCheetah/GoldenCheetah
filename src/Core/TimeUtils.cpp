@@ -94,6 +94,27 @@ QString time_to_string_minutes(double secs)
     return result;
 }
 
+int daysToWeeks(int days)
+{
+    return std::round(std::abs(days) / 7.0);
+}
+
+int daysToMonths(int days)
+{
+    return std::round(std::abs(days) / 30.44);
+}
+
+ShowDaysAsUnit showDaysAs(int days)
+{
+    int d = std::abs(days);
+    if (d <= 13) {
+        return ShowDaysAsUnit::Days;
+    } else if (d <= 59) {
+        return ShowDaysAsUnit::Weeks;
+    }
+    return ShowDaysAsUnit::Months;
+}
+
 double str_to_interval(QString s)
 {
     QRegExp rx("(\\d+\\s*h)?\\s*(\\d{1,2}\\s*m)?\\s*(\\d{1,2})(\\.\\d+)?\\s*s");

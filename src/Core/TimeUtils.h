@@ -34,6 +34,15 @@ double str_to_interval(QString s);     // convert 1h 2m 3s -> 3123.0 , e.g.
 QString time_to_string(double secs, bool forceMinutes=false);   // output like 1:02:03
 QString time_to_string_for_sorting(double secs);   // output always xx:yy:zz
 QString time_to_string_minutes(double secs); // output always hh:mm - seconds are cut-off
+extern int daysToWeeks(int days);
+extern int daysToMonths(int days);
+enum class ShowDaysAsUnit {
+    Days,
+    Weeks,
+    Months
+};
+extern ShowDaysAsUnit showDaysAs(int days);
+
 
 /* takes a string containing an ISO 8601 timestamp and converts it to local time
 */

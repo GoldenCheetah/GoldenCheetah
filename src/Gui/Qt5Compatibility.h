@@ -40,7 +40,6 @@ class TreeWidget6 : public QTreeWidget
         QTreeWidgetItem* itemFromIndex(const QModelIndex &index) const {
             return QTreeWidget::itemFromIndex(index);
         }
-
 };
 #else
 typedef QTreeWidget TreeWidget6;

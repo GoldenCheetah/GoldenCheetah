@@ -554,12 +554,12 @@ EditPhaseDialog::EditPhaseDialog(Context *context, Phase *phase, Season &season)
     typeEdit->setCurrentIndex(typeEdit->findData(phase->getType()));
 
     fromEdit = new QDateEdit();
-    fromEdit->setDateRange(season.getStart(), season.getEnd());
+    fromEdit->setDateRange(season.getStart(), phase->getEnd().isValid() ? phase->getEnd().addDays(-1) : season.getEnd());
     fromEdit->setDate(phase->getStart());
     fromEdit->setCalendarPopup(true);
 
     toEdit = new QDateEdit();
-    toEdit->setDateRange(season.getStart(), season.getEnd());
+    toEdit->setDateRange(phase->getEnd().isValid() ? phase->getStart().addDays(1) : season.getStart(), season.getEnd());
     toEdit->setDate(phase->getEnd());
     toEdit->setCalendarPopup(true);
 
@@ -596,6 +596,8 @@ EditPhaseDialog::EditPhaseDialog(Context *context, Phase *phase, Season &season)
     connect(applyButton, SIGNAL(clicked()), this, SLOT(applyClicked()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
     connect(nameEdit, SIGNAL(textChanged(const QString &)), this, SLOT(nameChanged()));
+    connect(fromEdit, &QDateEdit::dateChanged, this, [this](const QDate &date) { toEdit->setMinimumDate(date.addDays(1)); });
+    connect(toEdit, &QDateEdit::dateChanged, this, [this](const QDate &date) { fromEdit->setMaximumDate(date.addDays(-1)); });
 
     // initialize button state
     nameChanged();
