@@ -44,6 +44,7 @@
 #include "WebPageWindow.h"
 #include "LiveMapWebPageWindow.h"
 #include "CalendarWindow.h"
+#include "AgendaWindow.h"
 #ifdef GC_WANT_R
 #include "RChart.h"
 #endif
@@ -93,9 +94,9 @@ GcWindowRegistry::initialize()
     { VIEW_ANALYSIS, tr("Heartrate vs Power"),GcWindowTypes::HrPw },
     { VIEW_ANALYSIS, tr("Map"),GcWindowTypes::RideMapWindow },
     { VIEW_ANALYSIS, tr("R Chart"),GcWindowTypes::RConsole },
-    { VIEW_TRENDS, tr("R Chart "),GcWindowTypes::RConsoleSeason },
+    { VIEW_TRENDS|VIEW_PLAN, tr("R Chart "),GcWindowTypes::RConsoleSeason },
     { VIEW_ANALYSIS, tr("Python Chart"),GcWindowTypes::Python },
-    { VIEW_TRENDS, tr("Python Chart "),GcWindowTypes::PythonSeason },
+    { VIEW_TRENDS|VIEW_PLAN, tr("Python Chart "),GcWindowTypes::PythonSeason },
     //{ VIEW_ANALYSIS, tr("Bing Map"),GcWindowTypes::BingMap },
     { VIEW_ANALYSIS, tr("Scatter"),GcWindowTypes::Scatter },
     { VIEW_ANALYSIS, tr("Aerolab"),GcWindowTypes::Aerolab },
@@ -112,6 +113,7 @@ GcWindowRegistry::initialize()
     { VIEW_TRAIN, tr("Elevation Chart"),GcWindowTypes::ElevationChart },
     { VIEW_ANALYSIS|VIEW_TRENDS|VIEW_TRAIN, tr("Web page"),GcWindowTypes::WebPageWindow },
     { VIEW_TRENDS|VIEW_PLAN, tr("Calendar"),GcWindowTypes::Calendar },
+    { VIEW_TRENDS|VIEW_PLAN, tr("Agenda"),GcWindowTypes::Agenda },
     { 0, "", GcWindowTypes::None }};
   // initialize the global registry
   GcWindows = GcWindowsInit;
@@ -259,6 +261,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
 
     case GcWindowTypes::Diary:
     case GcWindowTypes::Calendar: returning = new CalendarWindow(context); break;
+    case GcWindowTypes::Agenda: returning = new AgendaWindow(context); break;
     default: return NULL; break;
     }
     if (returning) returning->setProperty("type", QVariant::fromValue<GcWinID>(id));

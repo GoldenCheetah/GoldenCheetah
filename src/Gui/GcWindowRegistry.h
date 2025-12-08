@@ -79,9 +79,10 @@ enum gcwinid {
         OverviewTrendsBlank=50,
         ElevationChart=51,
         Calendar=52,
-        UserPlan=53,
-        OverviewPlan=54,
-        OverviewPlanBlank = 55
+        Agenda=53,
+        UserPlan=54,
+        OverviewPlan=55,
+        OverviewPlanBlank = 56
 };
 };
 typedef enum GcWindowTypes::gcwinid GcWinID;

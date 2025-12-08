@@ -44,8 +44,6 @@ CalendarWindow::CalendarWindow(Context *context)
 
     setStartHour(8);
     setEndHour(21);
-    setAgendaPastDays(7);
-    setAgendaFutureDays(7);
 
     QVBoxLayout *mainLayout = new QVBoxLayout();
     setChartLayout(mainLayout);
@@ -161,6 +159,14 @@ CalendarWindow::CalendarWindow(Context *context)
     });
 }
 
+void
+CalendarWindow::showEvent(QShowEvent*)
+{
+    // When the chart is added to the Perspective's QStackedWidget, the Perspective's style sheets
+    // can conflict with the local calendar palette settings causing the appearance to be lost.
+    // Therefore re-apply the palette upon showEvent to ensure correct calendar appearance.
+    PaletteApplier::setPaletteRecursively(this, palette, true);
+}
 
 int
 CalendarWindow::getDefaultView
@@ -233,46 +239,6 @@ CalendarWindow::setEndHour
     startHourSpin->setMaximum(hour - 1);
     if (calendar != nullptr) {
         calendar->setEndHour(hour);
-        updateActivities();
-    }
-}
-
-
-int
-CalendarWindow::getAgendaPastDays
-() const
-{
-    return agendaPastDaysSpin->value();
-}
-
-
-void
-CalendarWindow::setAgendaPastDays
-(int days)
-{
-    agendaPastDaysSpin->setValue(days);
-    if (calendar != nullptr) {
-        calendar->setAgendaPastDays(days);
-        updateActivities();
-    }
-}
-
-
-int
-CalendarWindow::getAgendaFutureDays
-() const
-{
-    return agendaFutureDaysSpin->value();
-}
-
-
-void
-CalendarWindow::setAgendaFutureDays
-(int days)
-{
-    agendaFutureDaysSpin->setValue(days);
-    if (calendar != nullptr) {
-        calendar->setAgendaFutureDays(days);
         updateActivities();
     }
 }
@@ -442,6 +408,7 @@ CalendarWindow::configChanged
         || (what & CONFIG_USERMETRICS)) {
         updatePrimaryConfigCombos();
         updateSecondaryConfigCombo();
+        updateTertiaryConfigCombo();
         multiMetricSelector->updateMetrics();
     }
     if (what & CONFIG_ATHLETE) {
@@ -467,7 +434,6 @@ CalendarWindow::configChanged
             inactiveText = GCColor::inactiveColor(activeText, 2.5);
         }
 
-        QPalette palette;
         palette.setColor(QPalette::Active, QPalette::Window, activeWindow);
         palette.setColor(QPalette::Active, QPalette::WindowText, activeText);
         palette.setColor(QPalette::Active, QPalette::Base, activeBase);
@@ -518,7 +484,6 @@ CalendarWindow::mkControls
     defaultViewCombo->addItem(tr("Day"));
     defaultViewCombo->addItem(tr("Week"));
     defaultViewCombo->addItem(tr("Month"));
-    defaultViewCombo->addItem(tr("Agenda"));
     defaultViewCombo->setCurrentIndex(static_cast<int>(CalendarView::Month));
     firstDayOfWeekCombo = new QComboBox();
     for (int i = Qt::Monday; i <= Qt::Sunday; ++i) {
@@ -531,12 +496,6 @@ CalendarWindow::mkControls
     endHourSpin = new QSpinBox();
     endHourSpin->setSuffix(":00");
     endHourSpin->setMaximum(24);
-    agendaPastDaysSpin = new QSpinBox();
-    agendaPastDaysSpin->setMaximum(31);
-    agendaPastDaysSpin->setSuffix(" " + tr("day(s)"));
-    agendaFutureDaysSpin = new QSpinBox();
-    agendaFutureDaysSpin->setMaximum(31);
-    agendaFutureDaysSpin->setSuffix(" " + tr("day(s)"));
     summaryDayCheck = new QCheckBox(tr("Day View"));
     summaryDayCheck->setChecked(true);
     summaryWeekCheck = new QCheckBox(tr("Week View"));
@@ -564,22 +523,30 @@ CalendarWindow::mkControls
 
     QFormLayout *generalForm = newQFormLayout();
     generalForm->setContentsMargins(0, 10 * dpiYFactor, 0, 10 * dpiYFactor);
+    generalForm->addRow(new QLabel(HLO + tr("Calendar Basics") + HLC));
     generalForm->addRow(tr("Startup View"), defaultViewCombo);
     generalForm->addRow(tr("First Day of Week"), firstDayOfWeekCombo);
+    generalForm->addItem(new QSpacerItem(0, 20 * dpiYFactor));
+    generalForm->addRow(new QLabel(HLO + tr("Default Times") + HLC));
     generalForm->addRow(tr("Default Start Time"), startHourSpin);
     generalForm->addRow(tr("Default End Time"), endHourSpin);
-    generalForm->addRow(tr("Agenda: Look Back"), agendaPastDaysSpin);
-    generalForm->addRow(tr("Agenda: Look Forward"), agendaFutureDaysSpin);
+    generalForm->addItem(new QSpacerItem(0, 20 * dpiYFactor));
+    generalForm->addRow(new QLabel(HLO + tr("Summary Options") + HLC));
     generalForm->addRow(tr("Show Summary In"), summaryDayCheck);
     generalForm->addRow("", summaryWeekCheck);
     generalForm->addRow("", summaryMonthCheck);
 
     QFormLayout *entriesForm = newQFormLayout();
     entriesForm->setContentsMargins(0, 10 * dpiYFactor, 0, 10 * dpiYFactor);
-    entriesForm->addRow(tr("Field for Primary Line"), primaryMainCombo);
-    entriesForm->addRow(tr("Fallback Field for Primary Line"), primaryFallbackCombo);
-    entriesForm->addRow(tr("Metric for Secondary Line"), secondaryCombo);
-    entriesForm->addRow(tr("Field for Tertiary Line (Day and Week View)"), tertiaryCombo);
+    entriesForm->addRow(new QLabel(HLO + tr("Main Line") + HLC));
+    entriesForm->addRow(tr("Field"), primaryMainCombo);
+    entriesForm->addRow(tr("Fallback Field"), primaryFallbackCombo);
+    entriesForm->addItem(new QSpacerItem(0, 20 * dpiYFactor));
+    entriesForm->addRow(new QLabel(HLO + tr("Metric Line") + HLC));
+    entriesForm->addRow(tr("Metric"), secondaryCombo);
+    entriesForm->addItem(new QSpacerItem(0, 20 * dpiYFactor));
+    entriesForm->addRow(new QLabel(HLO + tr("Detail Line (Day and Week View only)") + HLC));
+    entriesForm->addRow(tr("Field"), tertiaryCombo);
 
     QTabWidget *controlsTabs = new QTabWidget();
     controlsTabs->addTab(centerLayoutInWidget(generalForm, false), tr("General"));
@@ -589,8 +556,6 @@ CalendarWindow::mkControls
 #if QT_VERSION < 0x060000
     connect(startHourSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &CalendarWindow::setStartHour);
     connect(endHourSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &CalendarWindow::setEndHour);
-    connect(agendaPastDaysSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &CalendarWindow::setAgendaPastDays);
-    connect(agendaFutureDaysSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &CalendarWindow::setAgendaFutureDays);
     connect(defaultViewCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CalendarWindow::setDefaultView);
     connect(firstDayOfWeekCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int idx) { setFirstDayOfWeek(idx + 1); });
     connect(primaryMainCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CalendarWindow::updateActivities);
@@ -600,8 +565,6 @@ CalendarWindow::mkControls
 #else
     connect(startHourSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setStartHour);
     connect(endHourSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setEndHour);
-    connect(agendaPastDaysSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setAgendaPastDays);
-    connect(agendaFutureDaysSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setAgendaFutureDays);
     connect(defaultViewCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::setDefaultView);
     connect(firstDayOfWeekCombo, &QComboBox::currentIndexChanged, [=](int idx) { setFirstDayOfWeek(idx + 1); });
     connect(primaryMainCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::updateActivities);
