@@ -2,9 +2,9 @@
 #
 # Core Tools
 #
-sip == 4.19.8
+sip
 numpy
-pandas == 1.2.3
+pandas
 scipy
 lmfit
 plotly
