@@ -28,6 +28,7 @@
 #include <QRadioButton>
 #include <QDoubleSpinBox>
 #include <QComboBox>
+#include <QObject>
 
 QString interval_to_str(double secs);  // output like 1h 2m 3s
 double str_to_interval(QString s);     // convert 1h 2m 3s -> 3123.0 , e.g.
@@ -81,7 +82,7 @@ class DateRange : QObject
         bool isValid() const { return valid; }
 
 
-    signals:
+    Q_SIGNALS:
         void changed(QDate from, QDate to);
 
     protected:
@@ -133,10 +134,10 @@ class DateSettingsEdit : public QWidget
         int prevN() { return prevperiod->value(); }
         void setPrevN(int x) { return prevperiod->setValue(x); }
 
-    private slots:
+    private Q_SLOTS:
         void setDateSettings();
 
-    signals:
+    Q_SIGNALS:
         void useStandardRange();
         void useThruToday();
         void useCustomRange(DateRange);

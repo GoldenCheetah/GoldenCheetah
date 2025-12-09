@@ -41,6 +41,7 @@ class Perspective;
 #include <QMetaType>
 #include <QFrame>
 #include <QtGui>
+#include <QObject>
 
 #include "GcWindowRegistry.h"
 #include "TimeUtils.h"
@@ -121,10 +122,10 @@ private:
     int oWidth, oHeight, oX, oY, mX, mY;
     double oHeightFactor, oWidthFactor;
 
-public slots:
+public Q_SLOTS:
     void _closeWindow();
 
-signals:
+Q_SIGNALS:
     void controlsChanged(QWidget*);
     void titleChanged(QString);
     void subtitleChanged(QString);
@@ -302,7 +303,7 @@ public:
     void setControls(QWidget *x);
     void addHelper(QString name, QWidget *widget); // add to the overlay widget
 
-public slots:
+public Q_SLOTS:
     void hideRevealControls();
     void saveImage();
     void saveChart();
