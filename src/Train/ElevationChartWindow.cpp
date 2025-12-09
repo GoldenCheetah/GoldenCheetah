@@ -18,7 +18,7 @@ namespace elevationChart {
 #if defined(CXX17)
 #define CONSTEXPR      constexpr
 #define CONSTEXPR_FUNC constexpr
-#else constexpr
+#else
 #define CONSTEXPR      static const
 #define CONSTEXPR_FUNC
 #endif
