@@ -20,29 +20,10 @@ sudo installer -pkg R-4.1.1.pkg -target /
 R --version
 
 # SRMIO
-if [ -z "$(ls -A srmio)" ]; then
-    git clone https://github.com/rclasen/srmio.git
-    cd srmio
-    sh genautomake.sh
-    ./configure --disable-shared --enable-static
-    make -j2 --silent
-    cd ..
-fi
-cd srmio
-sudo make install
-cd ..
+bash appveyor/common/install_srmio.sh
 
 # D2XX - refresh cache if folder is empty
-if [ -z "$(ls -A D2XX)" ]; then
-    mkdir -p D2XX
-    curl -O https://ftdichip.com/wp-content/uploads/2021/05/D2XX1.4.24.zip
-    unzip D2XX1.4.24.zip
-    hdiutil mount D2XX1.4.24.dmg
-    cp /Volumes/dmg/release/build/libftd2xx.1.4.24.dylib D2XX
-    cp /Volumes/dmg/release/build/libftd2xx.a D2XX
-    cp /Volumes/dmg/release/*.h D2XX
-fi
-sudo cp D2XX/libftd2xx.1.4.24.dylib /usr/local/lib
+bash appveyor/common/install_d2xx.sh
 
 # Python 3.7.8
 curl -O https://www.python.org/ftp/python/3.7.9/python-3.7.9-macosx10.9.pkg
@@ -58,16 +39,6 @@ if [ -z "$(ls -A site-packages)" ]; then
 fi
 
 # Python SIP
-if [ -z "$(ls -A sip-4.19.8)" ]; then
-    curl -k -L -O https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.tar.gz
-    tar xf sip-4.19.8.tar.gz
-    cd sip-4.19.8
-    python3.7 configure.py
-    make -j2
-    cd ..
-fi
-cd sip-4.19.8
-sudo make install
-cd ..
+bash appveyor/common/install_sip.sh
 
 exit
