@@ -242,7 +242,7 @@ FixDeriveDistance::postProcess(RideFile *ride, DataProcessorConfig *config=0, QS
         QString log = ride->getTag("Change History", "");
         log +=  tr("Derive Distance from GPS on ");
         log +=  QDateTime::currentDateTime().toString();
-        if (ride->command->changeLog().count()>0)
+        if (ride->command->changeLog().length()>0)
             log +=  ":\n" + ride->command->changeLog();
         ride->setTag("Change History", log);
     }

@@ -701,6 +701,7 @@ GenericSelectTool::moved(QPointF pos)
 
                 // pointsVector
                 if (series->type() == QAbstractSeries::SeriesTypeLine || series->type() == QAbstractSeries::SeriesTypeArea) {
+
                     QXYSeries *line = series->type() == QAbstractSeries::SeriesTypeLine ? static_cast<QXYSeries*>(series) :
                                                                               static_cast<QAreaSeries*>(series)->upperSeries();
                     // value we want
@@ -721,7 +722,6 @@ GenericSelectTool::moved(QPointF pos)
                         if (p.x() != 0 && (nearestx == -9999 || (std::fabs(p.x()-xvalue)) < std::fabs((nearestx-xvalue)))) nearestx = p.x();
                     }
                 }
-
             }
 
             // run over what we found, updating paint points and signal (for legend)

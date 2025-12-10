@@ -555,8 +555,8 @@ ChartBarItem::event(QEvent *e)
 
             // selected with a click (not release)
             state = Click;
-            clickpos.setX(static_cast<QMouseEvent*>(e)->x());
-            clickpos.setY(static_cast<QMouseEvent*>(e)->y());
+            clickpos.setX(static_cast<QMouseEvent*>(e)->position().x());
+            clickpos.setY(static_cast<QMouseEvent*>(e)->position().y());
             emit clicked(checked);
         }
     }
@@ -605,21 +605,21 @@ ChartBarItem::event(QEvent *e)
             dragging->checked = checked;
             dragging->setFixedWidth(geometry().width());
             dragging->setFixedHeight(geometry().height());
-            QPoint newpos = chartbar->mapFromGlobal(static_cast<QMouseEvent*>(e)->globalPos());
+            QPoint newpos = chartbar->mapFromGlobal(static_cast<QMouseEvent*>(e)->globalPosition().toPoint());
             dragging->move(QPoint(newpos.x()-clickpos.x(),0));
             dragging->show();
 
         } else if (state == Drag) {
 
             // move the clone tab for visual feedback
-            QPoint newpos = chartbar->mapFromGlobal(static_cast<QMouseEvent*>(e)->globalPos());
+            QPoint newpos = chartbar->mapFromGlobal(static_cast<QMouseEvent*>(e)->globalPosition().toPoint());
             dragging->move(QPoint(newpos.x()-clickpos.x(),0));
 
             // where are we currently?
             int cindex = chartbar->layout->indexOf(this);
 
             // work out where we should have dragged to
-            int indexpos = indexPos(static_cast<QMouseEvent*>(e)->x());
+            int indexpos = indexPos(static_cast<QMouseEvent*>(e)->position().x());
 
             // if moving left, just do it...
             if (cindex > indexpos) {

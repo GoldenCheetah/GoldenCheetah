@@ -3695,7 +3695,7 @@ QList<CIQinfo> CIQinfo::listFromJson(const QString& src)
     if (doc.isArray())
     {
         QJsonArray ciqArray = doc.array();
-        foreach (const QJsonValue& ciqValue, ciqArray)
+        for (const QJsonValue& ciqValue : ciqArray)
         {
             QJsonObject ciqObj = ciqValue.toObject();
             ciqList.append(CIQinfo(ciqObj));
@@ -3716,7 +3716,7 @@ CIQinfo::CIQinfo(const QJsonObject& obj)
     devid = obj[QString(CIQ_ID)].toInt();
 
     QJsonArray jsonfields = obj[QString(FIELDS_KEY)].toArray();
-    foreach (const QJsonValue& field, jsonfields)
+    for (const QJsonValue& field : jsonfields)
     {
         QJsonObject fieldObj = field.toObject();
         CIQfield ciqfield(fieldObj[CIQ_FIELD_MESSAGE].toString(),

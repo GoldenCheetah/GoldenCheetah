@@ -519,35 +519,35 @@ TrainerDayAPIDialog::setBoxState
     QGroupBox *box = groupBoxes[idx];
     switch (state) {
     case TrainerDayAPIDialogState::importNew:
-        groupBoxes[idx]->setChecked(false);
-        groupBoxes[idx]->setCheckable(allowReimport->isChecked());
-        groupBoxes[idx]->setTitle(workoutTitle + " - " + tr("successfully imported"));
-        groupBoxes[idx]->setProperty("imported", 1);
+        box->setChecked(false);
+        box->setCheckable(allowReimport->isChecked());
+        box->setTitle(workoutTitle + " - " + tr("successfully imported"));
+        box->setProperty("imported", 1);
         break;
     case TrainerDayAPIDialogState::importOld:
-        groupBoxes[idx]->setChecked(false);
-        groupBoxes[idx]->setCheckable(allowReimport->isChecked());
-        groupBoxes[idx]->setTitle(workoutTitle + " - " + tr("already imported"));
-        groupBoxes[idx]->setProperty("imported", 1);
+        box->setChecked(false);
+        box->setCheckable(allowReimport->isChecked());
+        box->setTitle(workoutTitle + " - " + tr("already imported"));
+        box->setProperty("imported", 1);
         break;
     case TrainerDayAPIDialogState::importFailed:
-        groupBoxes[idx]->setChecked(true);
-        groupBoxes[idx]->setCheckable(true);
-        groupBoxes[idx]->setTitle(workoutTitle + " - " + tr("import failed"));
-        groupBoxes[idx]->setProperty("imported", 0);
+        box->setChecked(true);
+        box->setCheckable(true);
+        box->setTitle(workoutTitle + " - " + tr("import failed"));
+        box->setProperty("imported", 0);
         break;
     case TrainerDayAPIDialogState::unimportedFile:
-        groupBoxes[idx]->setChecked(false);
-        groupBoxes[idx]->setCheckable(allowReimport->isChecked());
-        groupBoxes[idx]->setTitle(workoutTitle + " - " + tr("available in filesystem but not imported"));
-        groupBoxes[idx]->setProperty("imported", 0);
+        box->setChecked(false);
+        box->setCheckable(allowReimport->isChecked());
+        box->setTitle(workoutTitle + " - " + tr("available in filesystem but not imported"));
+        box->setProperty("imported", 0);
         break;
     case TrainerDayAPIDialogState::readyForImport:
     default:
-        groupBoxes[idx]->setChecked(true);
-        groupBoxes[idx]->setCheckable(true);
-        groupBoxes[idx]->setTitle(workoutTitle);
-        groupBoxes[idx]->setProperty("imported", 0);
+        box->setChecked(true);
+        box->setCheckable(true);
+        box->setTitle(workoutTitle);
+        box->setProperty("imported", 0);
         break;
     }
 }

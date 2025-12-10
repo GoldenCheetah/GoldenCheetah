@@ -683,7 +683,7 @@ UserChart::applySettings(QString x)
             delete static_cast<UserChartData*>(series.user1);
 
     seriesinfo.clear();
-    foreach(QJsonValue it, obj["SERIES"].toArray()) {
+    for(const QJsonValue &it : obj["SERIES"].toArray()) {
 
         // should be an array of objects
         QJsonObject series=it.toObject();
@@ -715,7 +715,7 @@ UserChart::applySettings(QString x)
 
     // array of axes
     axisinfo.clear();
-    foreach(QJsonValue it, obj["AXES"].toArray()) {
+    for(const QJsonValue &it : obj["AXES"].toArray()) {
 
         // should be an array of objects
         QJsonObject axis=it.toObject();
