@@ -478,7 +478,7 @@ GenericSelectTool::clicked(QPointF pos)
 }
 
 bool
-GenericSelectTool::released(QPointF pos)
+GenericSelectTool::released([[maybe_unused]] QPointF pos)
 {
     if (mode == RECTANGLE || mode == XRANGE) {
 
