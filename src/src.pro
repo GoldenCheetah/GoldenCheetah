@@ -45,6 +45,13 @@ greaterThan(QT_MAJOR_VERSION, 5) {
 }
 CONFIG += c++11
 
+###==========================
+### PRECOMPILED HEADER
+###==========================
+PRECOMPILED_HEADER = stable.h
+CONFIG += precompile_header
+
+
 
 ###=======================================================================
 ### Directory Structure - Split into subdirs to be more manageable
@@ -155,6 +162,10 @@ macx {
     HEADERS += Train/VideoWindow.h
     SOURCES += Train/VideoWindow.cpp
 
+    # PCH crashes clang if we have multiple -arch flags (universal binary)
+    message("Disabling Precompiled Headers on macOS to avoid multi-arch Clang errors.")
+    CONFIG -= precompile_header
+
 } else {
 
     # not on mac we need our own full screen support and segment control button
@@ -164,6 +175,8 @@ macx {
     HEADERS += Train/VideoWindow.h
     SOURCES += Train/VideoWindow.cpp
 }
+
+
 
 # X11
 if (defined(GC_WANT_X11)) {
@@ -587,6 +600,9 @@ LEXSOURCES  += Core/DataFilter.l \
                Train/WorkoutFilter.l \
                Train/TrainerDayAPIQuery.l
 
+# Fix parallel build races (YACC headers must exist before LEX runs)
+compiler_lex_make_all.depends += compiler_yacc_decl_make_all
+
 
 ###=========================================
 ### HEADER FILES [scanned by qmake, for moc]
@@ -829,4 +845,18 @@ DEFERRES += Core/RouteWindow.h Core/RouteWindow.cpp Core/RouteItem.h Core/RouteI
 ###====================
 
 OTHER_FILES +=   Resources/python/library.py Python/SIP/goldencheetah.sip
+
+
+###============================================================================
+### FIX: Disable Precompiled Header for C files
+### The PCH contains C++ specific headers (Qt, STL) which causes compilation errors
+### when the PCH is forced upon C files by gcc.
+###============================================================================
+
+for(src, SOURCES) {
+    contains(src, .*\.c$) {
+        eval($${src}.CONFIG -= precompile_header)
+    }
+}
+
 

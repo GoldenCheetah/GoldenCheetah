@@ -64,3 +64,16 @@ doc/contrib/WASP Packet Protocol.pdf
 
 # Qt testlib
 target_wrapper.sh
+
+# Precompiled Headers
+*.gch
+*.pch
+*.gch/
+_pch/
+
+# Generated Source Files
+*_lex.cpp
+*_yacc.cpp
+*_yacc.h
+qrc_*.cpp
+
