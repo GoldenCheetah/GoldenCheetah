@@ -221,14 +221,13 @@ build_script:
 
 # Windows
 - cmd: qmake.exe build.pro -r -spec win32-msvc
-- cmd: if not exist qwt\lib\qwt.lib jom -j4 sub-qwt
-# QWT has issues with parallell builds.
-- cmd: jom sub-src
+- cmd: if not exist qwt\lib\qwt.lib jom -j1 sub-qwt
+- cmd: jom -j2 sub-src
 
 # Linux / macOS
 - sh: qmake build.pro -r QMAKE_CXXFLAGS_WARN_ON+="-Wno-unused-private-field -Wno-c++11-narrowing -Wno-deprecated-declarations -Wno-deprecated-register -Wno-nullability-completeness -Wno-sign-compare -Wno-inconsistent-missing-override" QMAKE_CFLAGS_WARN_ON+="-Wno-deprecated-declarations -Wno-sign-compare"
 - sh: if test ! -f qwt/lib/libqwt.a; then make sub-qwt; fi
-- sh: make -j4 sub-src
+- sh: make -j2 sub-src
 
 after_build:
 
