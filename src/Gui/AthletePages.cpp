@@ -1212,7 +1212,7 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     pmaxDelegate.setShowSuffixOnEdit(true);
     pmaxDelegate.setShowSuffixOnDisplay(true);
 
-    ranges = new TreeWidget6();
+    ranges = new QTreeWidget();
     ranges->headerItem()->setText(CPPAGE_RANGES_COL_RNUM, "_rnum");
     ranges->headerItem()->setText(CPPAGE_RANGES_COL_STARTDATE, tr("Start Date"));
     ranges->headerItem()->setText(CPPAGE_RANGES_COL_CP, tr("Critical Power"));
