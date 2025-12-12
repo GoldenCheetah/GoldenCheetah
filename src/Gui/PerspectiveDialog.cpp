@@ -49,7 +49,7 @@ PerspectiveDialog::PerspectiveDialog(QWidget *parent, AbstractView *tabView) : Q
 
     QString typedesc;
     switch (tabView->type) {
-    case VIEW_DIARY:
+    case VIEW_PLAN:
     case VIEW_TRENDS: typedesc=tr("Activities filter"); break;
     case VIEW_ANALYSIS: typedesc=tr("Switch expression"); break;
     case VIEW_TRAIN: typedesc=tr("Switch for"); break;
@@ -59,6 +59,7 @@ PerspectiveDialog::PerspectiveDialog(QWidget *parent, AbstractView *tabView) : Q
     perspectiveTable->setColumnCount(2);
     QStringList headers = (QStringList() << tr(" Name ") << typedesc);
     perspectiveTable->setHorizontalHeaderLabels(headers);
+    perspectiveTable->horizontalHeader()->setHighlightSections(false);
     QFont font = perspectiveTable->horizontalHeaderItem(0)->font();
     font.setBold(false);
     perspectiveTable->horizontalHeaderItem(0)->setFont(font);
@@ -153,7 +154,7 @@ void PerspectiveDialog::setTables()
         switch (tabView->type) {
         case VIEW_TRENDS:
         case VIEW_ANALYSIS:
-        case VIEW_DIARY: description = perspective->expression(); break;
+        case VIEW_PLAN: description = perspective->expression(); break;
         case VIEW_TRAIN: {
             switch (perspective->trainswitch) {
             case Perspective::None: description=tr("Don't switch"); break;
@@ -271,7 +272,7 @@ PerspectiveDialog::addPerspectiveClicked()
         switch (tabView->type) {
         case VIEW_TRENDS:
         case VIEW_ANALYSIS:
-        case VIEW_DIARY: newone->setExpression(expression); break;
+        case VIEW_PLAN: newone->setExpression(expression); break;
         case VIEW_TRAIN: newone->setTrainSwitch(trainswitch); break;
         default: qDebug() << "Unknown view type in PerspectiveDialog:" << tabView->type; break;
         }
@@ -294,7 +295,7 @@ PerspectiveDialog::exportPerspectiveClicked()
     switch (tabView->type) {
     case VIEW_TRENDS: typedesc="Trends"; break;
     case VIEW_ANALYSIS: typedesc="Analysis"; break;
-    case VIEW_DIARY: typedesc="Diary"; break;
+    case VIEW_PLAN: typedesc="Plan"; break;
     case VIEW_TRAIN: typedesc="Train"; break;
     default: qDebug() << "Unknown view type in PerspectiveDialog:" << tabView->type; break;
     }

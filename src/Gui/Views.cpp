@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2013 Mark Liversedge (liversedge@gmail.com)
+ * LTMSidebarView Copyright (c) 2025 Paul Johnson (paulj49457@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -19,7 +20,7 @@
 #include "Views.h"
 #include "RideCache.h"
 #include "AnalysisSidebar.h"
-#include "DiarySidebar.h"
+#include "MiniCalendar.h"
 #include "TrainSidebar.h"
 #include "LTMSidebar.h"
 #include "BlankState.h"
@@ -27,6 +28,88 @@
 #include "ComparePane.h"
 #include "TrainBottom.h"
 #include "Specification.h"
+
+QMap<Context*, LTMSidebar*> LTMSidebarView::LTMSidebars_;
+
+LTMSidebarView::LTMSidebarView(Context *context, int type, const QString& view, const QString& heading) :
+    AbstractView(context, type, view, heading)
+{
+    // get or create the LTMSidebar shared between the views
+    getLTMSidebar(context);
+
+    // each view's constructor needs to register these signals.
+    connect(LTMSidebars_[context], SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
+    connect(this, SIGNAL(onSelectionChanged()), this, SLOT(justSelected()));
+}
+
+LTMSidebarView::~LTMSidebarView()
+{
+    // each destructor removes its own context related sidebar
+    removeLTMSidebar(context);
+}
+
+LTMSidebar*
+LTMSidebarView::getLTMSidebar(Context *sbContext)
+{
+    QMap<Context*, LTMSidebar*>::const_iterator itr = LTMSidebars_.find(sbContext);
+    if (itr == LTMSidebars_.end()) {
+
+        // need to create a sidebar for this context
+        LTMSidebars_[sbContext] = new LTMSidebar(sbContext);
+    }
+    return LTMSidebars_[sbContext];
+}
+
+void LTMSidebarView::showEvent(QShowEvent*)
+{
+    // the show event always follows the hide event, so set the sidebar
+    setSidebar(LTMSidebars_[context]);
+
+    // update the sidebar's preset chart visibility
+    LTMSidebars_[context]->updatePresetChartsOnShow(type);
+
+    // update sidebar for the new view
+    sidebarChanged();
+}
+
+void LTMSidebarView::hideEvent(QHideEvent*)
+{
+    // the hide event always precedes the show event, so release the sidebar
+    setSidebar(nullptr);
+}
+
+void
+LTMSidebarView::removeLTMSidebar(Context *sbContext)
+{
+    QMap<Context*, LTMSidebar*>::const_iterator itr = LTMSidebars_.find(sbContext);
+    if (itr != LTMSidebars_.end()) {
+        delete LTMSidebars_[sbContext];
+        LTMSidebars_.erase(itr);
+    }
+}
+
+void
+LTMSidebarView::selectDateRange(Context *sbContext, DateRange dr)
+{
+    LTMSidebars_[sbContext]->selectDateRange(dr);
+}
+
+void
+LTMSidebarView::justSelected()
+{
+    if (isSelected()) {
+        // force date range refresh
+        LTMSidebars_[context]->dateRangeTreeWidgetSelectionChanged();
+    }
+}
+
+void
+LTMSidebarView::dateRangeChanged(DateRange dr)
+{
+    emit dateChanged(dr);
+    context->notifyDateRangeChanged(dr);
+    if (loaded) page()->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
+}
 
 AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) :
         AbstractView(context, VIEW_ANALYSIS, "analysis", tr("Compare Activities and Intervals"))
@@ -163,78 +246,52 @@ AnalysisView::notifyViewSplitterMoved() {
     }
 }
 
-
-DiaryView::DiaryView(Context *context, QStackedWidget *controls) :
-        AbstractView(context, VIEW_DIARY, "diary", tr("Compare Activities and Intervals"))
+PlanView::PlanView(Context *context, QStackedWidget *controls) :
+        LTMSidebarView(context, VIEW_PLAN, "plan", tr("Plan future activities"))
 {
-    diarySidebar = new DiarySidebar(context);
-    BlankStateDiaryPage *b = new BlankStateDiaryPage(context);
-
-    setSidebar(diarySidebar);
+    BlankStatePlanPage *b = new BlankStatePlanPage(context);
 
     // each perspective has a stack of controls
     cstack = new QStackedWidget(this);
     controls->addWidget(cstack);
     controls->setCurrentIndex(0);
 
+    setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "plan", defaultAppearance.sideplan).toBool());
+
     pstack = new QStackedWidget(this);
     setPages(pstack);
     setBlank(b);
-
-    setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "diary", false).toBool());
-    connect(diarySidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
 }
 
-DiaryView::~DiaryView()
+PlanView::~PlanView()
 {
-    appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "diary", _sidebar);
-    delete diarySidebar;
-}
-
-void
-DiaryView::setRide(RideItem*ride)
-{
-    if (loaded) {
-        static_cast<DiarySidebar*>(sidebar())->setRide(ride);
-        page()->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
-    }
-}
-
-void
-DiaryView::dateRangeChanged(DateRange dr)
-{
-    //context->notifyDateRangeChanged(dr); // diary view deprecated and not part of navigation model
-    if (loaded) page()->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
+    appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "plan", _sidebar);
 }
 
 bool
-DiaryView::isBlank()
+PlanView::isBlank()
 {
     if (context->athlete->rideCache->rides().count() > 0) return false;
     else return true;
 }
 
 TrendsView::TrendsView(Context *context, QStackedWidget *controls) :
-        AbstractView(context, VIEW_TRENDS, "home", tr("Compare Date Ranges"))
+        LTMSidebarView(context, VIEW_TRENDS, "home", tr("Compare Date Ranges"))
 {
-    sidebar = new LTMSidebar(context);
     BlankStateHomePage *b = new BlankStateHomePage(context);
-
-    setSidebar(sidebar);
 
     // each perspective has a stack of controls
     cstack = new QStackedWidget(this);
     controls->addWidget(cstack);
     controls->setCurrentIndex(0);
 
+    setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "trend", defaultAppearance.sidetrend).toBool());
+
     pstack = new QStackedWidget(this);
     setPages(pstack);
     setBlank(b);
     setBottom(new ComparePane(context, this, ComparePane::season));
 
-    setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "trend", defaultAppearance.sidetrend).toBool());
-    connect(sidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
-    connect(this, SIGNAL(onSelectionChanged()), this, SLOT(justSelected()));
     connect(bottomSplitter(), SIGNAL(compareChanged(bool)), this, SLOT(compareChanged(bool)));
     connect(bottomSplitter(), SIGNAL(compareClear()), bottom(), SLOT(clear()));
 }
@@ -242,7 +299,6 @@ TrendsView::TrendsView(Context *context, QStackedWidget *controls) :
 TrendsView::~TrendsView()
 {
     appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "trend", _sidebar);
-    delete sidebar;
 }
 
 void
@@ -278,46 +334,11 @@ TrendsView::countActivities(Perspective *perspective, DateRange dr)
 
 }
 
-void
-TrendsView::dateRangeChanged(DateRange dr)
-{
-#if 0 // commented out auto switching perspectives on trends because it was annoying...
-    // if there are no activities for the current perspective
-    // lets switch to one that has the most
-    if (countActivities(page(), dr) == 0) {
-
-        int max=0;
-        int index=perspectives_.indexOf(page());
-        int switchto=index;
-        for (int i=0; i<perspectives_.count(); i++) {
-            int count = countActivities(perspectives_[i], dr);
-            if (count > max) { max=count; switchto=i; }
-        }
-
-        // if we found a better one
-        if (index != switchto)  context->mainWindow->switchPerspective(switchto);
-    }
-#endif
-
-    // Once the right perspective is set, we can go ahead and update everyone
-    emit dateChanged(dr);
-    context->notifyDateRangeChanged(dr);
-    if (loaded) page()->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
-}
 bool
 TrendsView::isBlank()
 {
     if (context->athlete->rideCache->rides().count() > 0) return false;
     else return true;
-}
-
-void
-TrendsView::justSelected()
-{
-    if (isSelected()) {
-        // force date range refresh
-        static_cast<LTMSidebar*>(sidebar)->dateRangeTreeWidgetSelectionChanged();
-    }
 }
 
 TrainView::TrainView(Context *context, QStackedWidget *controls) :

@@ -16,7 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "DiarySidebar.h"
+#include "MiniCalendar.h"
 
 #include "Context.h"
 #include "Athlete.h"
@@ -30,89 +30,6 @@
 #include "Settings.h"
 #include "HelpWhatsThis.h"
 
-//********************************************************************************
-// CALENDAR SIDEBAR (DiarySidebar)
-//********************************************************************************
-DiarySidebar::DiarySidebar(Context *context) : context(context)
-{
-    setContentsMargins(0,0,0,0);
-    setAutoFillBackground(true);
-
-    month = year = 0;
-    _ride = NULL;
-
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(0,0,0,0);
-    mainLayout->setSpacing(0);
-
-    // Splitter - cal at top, summary at bottom
-    splitter = new GcSplitter(Qt::Vertical);
-    mainLayout->addWidget(splitter);
-
-    // calendar
-    calendarItem = new GcSplitterItem(tr("Calendar"), iconFromPNG(":images/sidebar/calendar.png"), this);
-
-    // cal widget
-    calWidget = new QWidget(this);
-    calWidget->setObjectName("calWidget");
-    calWidget->setContentsMargins(0,0,0,0);
-    calWidget->setAutoFillBackground(true);
-    layout = new QVBoxLayout(calWidget);
-    layout->setSpacing(0);
-    layout->setContentsMargins(0,0,0,0);
-    calendarItem->addWidget(calWidget);
-
-    HelpWhatsThis *helpCalendarItem = new HelpWhatsThis(calendarItem);
-    calendarItem->setWhatsThis(helpCalendarItem->getWhatsThisText(HelpWhatsThis::SideBarDiaryView_Calendar));
-
-    splitter->addWidget(calendarItem);
-    splitter->prepare(context->athlete->cyclist, "diary");
-
-    multiCalendar = new GcMultiCalendar(context);
-    layout->addWidget(multiCalendar);
-
-    // refresh on these events...
-    connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
-    connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
-    connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(refresh()));
-    connect(context, SIGNAL(refreshEnd()), this, SLOT(refresh()));
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
-
-    // set up for current selections
-    configChanged(CONFIG_APPEARANCE);
-}
-
-void
-DiarySidebar::configChanged(qint32)
-{
-    // apply
-    multiCalendar->refresh();
-
-    // and summary .. forgetting what we already prepared
-    from = to = QDate();
-
-    // set the charts range
-    setDateRange();
-}
-
-void
-DiarySidebar::refresh()
-{
-    if (!isHidden()) {
-        multiCalendar->refresh();
-        setDateRange();
-    }
-    repaint();
-}
-
-void
-DiarySidebar::setRide(RideItem *ride)
-{
-    _ride = ride;
-
-    multiCalendar->setRide(ride);
-    setDateRange();
-}
 
 bool
 GcLabel::event(QEvent *e)
@@ -635,29 +552,6 @@ GcMiniCalendar::setDate(int _month, int _year)
                 } else d->setSelected(false);
             }
         }
-    }
-}
-
-void
-DiarySidebar::setDateRange()
-{
-    QDate when;
-    if (_ride && _ride->ride()) when = _ride->dateTime.date();
-    else when = QDate::currentDate();
-
-    // what date range should we use?
-    QDate newFrom = when.addDays((when.dayOfWeek()-1)*-1);
-    QDate newTo = newFrom.addDays(6);
-
-    // if changed lets tell everyone
-    if (newFrom != from || newTo != to) {
-
-        // date range changed lets refresh
-        from = newFrom;
-        to = newTo;
-        QString name = QString(tr("Week Commencing %1")).arg(from.toString(tr("dddd MMMM d")));
-
-        emit dateRangeChanged(DateRange(from, to, name));
     }
 }
 
