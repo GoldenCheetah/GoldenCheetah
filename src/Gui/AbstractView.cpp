@@ -183,7 +183,7 @@ AbstractView::setSidebar(QWidget *sidebar)
 
     if (sidebar) {
         // if the sidebar widget is already attached to another view's splitter,
-        // it moved to the new position within this view's splitter
+        // it is moved to the new position within this view's splitter
         splitter->insertWidget(0, sidebar);
     } 
 

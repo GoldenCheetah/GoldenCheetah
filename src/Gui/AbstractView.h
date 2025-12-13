@@ -58,15 +58,9 @@ class AbstractView : public QWidget
         virtual ~AbstractView();
         virtual void close() {};
 
-        // add the widgets to the view
-        void setSidebar(QWidget *sidebar);
+        // get the view's widgets
         QWidget *sidebar() { return sidebar_; }
-        void setPages(QStackedWidget *pages);
         Perspective *page() { return perspective_;}
-        void setBlank(BlankStatePage *blank);
-        BlankStatePage *blank() { return blank_; }
-        void setBottom(QWidget *bottom);
-        QWidget *bottom() { return bottom_; }
 
         // sidebar
         static QString ourStyleSheet();
@@ -183,6 +177,14 @@ class AbstractView : public QWidget
         BlankStatePage *blank_;
 
         bool loaded;
+
+        // add the widgets to the view
+        void setSidebar(QWidget *sidebar);
+        void setPages(QStackedWidget *pages);
+        void setBlank(BlankStatePage *blank);
+        BlankStatePage *blank() { return blank_; }
+        void setBottom(QWidget *bottom);
+        QWidget *bottom() { return bottom_; }
 
         // Support view specific behaviour
         virtual void notifyViewStateRestored();
