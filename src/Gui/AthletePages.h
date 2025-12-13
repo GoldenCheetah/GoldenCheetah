@@ -52,7 +52,6 @@
 #include "RemoteControl.h"
 #include "Measures.h"
 #include "StyledItemDelegates.h"
-#include "Qt5Compatibility.h"
 
 class MeasuresPage : public QWidget
 {
@@ -299,7 +298,7 @@ class CPPage : public QWidget
         Context *context;
         Zones *zones_;
         SchemePage *schemePage;
-        TreeWidget6 *ranges;
+        QTreeWidget *ranges;
         QTreeWidget *zones;
         QPushButton *reviewButton;
         QPushButton *defaultButton;

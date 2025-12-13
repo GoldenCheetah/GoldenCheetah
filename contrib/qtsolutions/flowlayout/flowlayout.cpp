@@ -155,7 +155,7 @@ QSize FlowLayout::sizeHint() const
 QSize FlowLayout::minimumSize() const
 {
     QSize size;
-    for (const QLayoutItem *item : qAsConst(itemList))
+    for (const QLayoutItem *item : std::as_const(itemList))
         size = size.expandedTo(item->minimumSize());
 
     const QMargins margins = contentsMargins();
@@ -176,7 +176,7 @@ int FlowLayout::doLayout(const QRect &rect, bool testOnly) const
 //! [9]
 
     QList<int> lineHeights;
-    for (QLayoutItem *item : qAsConst(itemList)) {
+    for (QLayoutItem *item : std::as_const(itemList)) {
         const QWidget *wid = item->widget();
         int spaceX = horizontalSpacing();
         if (spaceX == -1)
@@ -207,7 +207,7 @@ int FlowLayout::doLayout(const QRect &rect, bool testOnly) const
     int row = 0;
 
 //! [10]
-    for (QLayoutItem *item : qAsConst(itemList)) {
+    for (QLayoutItem *item : std::as_const(itemList)) {
         lineHeight = lineHeights.value(row, item->sizeHint().height());
         const QWidget *wid = item->widget();
         int spaceX = horizontalSpacing();

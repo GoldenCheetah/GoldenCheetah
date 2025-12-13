@@ -7185,7 +7185,7 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
         if (mouseEvent->button() == Qt::MouseButton::MiddleButton)
         {
             isPanning = true;
-            panOriginX = mouseEvent->globalX();
+            panOriginX = mouseEvent->globalPosition().x();
         }
     }
     else if (event->type() == QEvent::MouseButtonRelease)
@@ -7198,7 +7198,7 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
     {
         // the actual panning logic
         QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
-        int diffX = mouseEvent->globalX() - panOriginX;
+        int diffX = mouseEvent->globalPosition().x() - panOriginX;
         QxtSpanSlider* slider = window->spanSlider;
 
         // ride length in seconds
@@ -7206,7 +7206,7 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
         int movement = (int)(diffX * (total / 1000.0));
         if (movement != 0)
         {
-            panOriginX = mouseEvent->globalX();
+            panOriginX = mouseEvent->globalPosition().x();
             int newLower = slider->lowerValue() + movement;
             int newUpper = slider->upperValue() + movement;
             if (newUpper <= slider->maximum() && newLower >= slider->minimum())
@@ -7272,18 +7272,18 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
 
         if (axis == QwtAxis::YLeft && event->type() == QEvent::MouseButtonDblClick) {
             QMouseEvent *m = static_cast<QMouseEvent*>(event);
-            confirmTmpReference(invTransform(axis, m->y()),axis, RideFile::watts, true); // do show delete stuff
+            confirmTmpReference(invTransform(axis, m->position().y()),axis, RideFile::watts, true); // do show delete stuff
             return false;
         }
         if (axis == QwtAxis::YLeft && event->type() == QEvent::MouseMove) {
             QMouseEvent *m = static_cast<QMouseEvent*>(event);
-            plotTmpReference(axis, m->x()-axisWidget(axis)->width(), m->y(), RideFile::watts);
+            plotTmpReference(axis, m->position().x()-axisWidget(axis)->width(), m->position().y(), RideFile::watts);
             return false;
         }
         if (axis == QwtAxis::YLeft && event->type() == QEvent::MouseButtonRelease) {
             QMouseEvent *m = static_cast<QMouseEvent*>(event);
-            if (m->x()>axisWidget(axis)->width()) {
-                confirmTmpReference(invTransform(axis, m->y()),axis, RideFile::watts, false); // don't show delete stuff
+            if (m->position().x()>axisWidget(axis)->width()) {
+                confirmTmpReference(invTransform(axis, m->position().y()),axis, RideFile::watts, false); // don't show delete stuff
                 return false;
             } else  if (standard->tmpReferenceLines.count()) {
                 plotTmpReference(axis, 0, 0, RideFile::watts); //unplot
@@ -7303,18 +7303,18 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
 
         if (axis != QwtAxisId(-1,-1) && event->type() == QEvent::MouseButtonDblClick) {
             QMouseEvent *m = static_cast<QMouseEvent*>(event);
-            confirmTmpReference(invTransform(axis, m->y()),axis.id, RideFile::hr, true); // do show delete stuff
+            confirmTmpReference(invTransform(axis, m->position().y()),axis.id, RideFile::hr, true); // do show delete stuff
             return false;
         }
         if (axis != QwtAxisId(-1,-1) && event->type() == QEvent::MouseMove) {
             QMouseEvent *m = static_cast<QMouseEvent*>(event);
-            plotTmpReference(axis, m->x()-axisWidget(axis)->width(), m->y(), RideFile::hr);
+            plotTmpReference(axis, m->position().x()-axisWidget(axis)->width(), m->position().y(), RideFile::hr);
             return false;
         }
         if (axis != QwtAxisId(-1,-1) && event->type() == QEvent::MouseButtonRelease) {
             QMouseEvent *m = static_cast<QMouseEvent*>(event);
-            if (m->x()>axisWidget(axis)->width()) {
-                confirmTmpReference(invTransform(axis, m->y()),axis.id, RideFile::hr, false); // don't show delete stuff
+            if (m->position().x()>axisWidget(axis)->width()) {
+                confirmTmpReference(invTransform(axis, m->position().y()),axis.id, RideFile::hr, false); // don't show delete stuff
                 return false;
             } else  if (standard->tmpReferenceLines.count()) {
                 plotTmpReference(axis.id, 0, 0, RideFile::hr); //unplot
@@ -7334,23 +7334,23 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
 
         if (event->type() == QEvent::MouseButtonDblClick) {
 
-            confirmTmpExhaustion(m->x(), true); // do show delete stuff
+            confirmTmpExhaustion(m->position().x(), true); // do show delete stuff
             return false;
 
         } else if (event->type() == QEvent::MouseMove) {
 
             // plot a temporary marker
-            plotTmpExhaustion(m->x());
+            plotTmpExhaustion(m->position().x());
             return true;
 
         } else if (event->type() == QEvent::MouseButtonRelease) {
 
             // only respond if we are on the plot, which is above so
             // therefore has a y-value that is negative
-            if (m->y() < 0) {
+            if (m->position().y() < 0) {
 
                 // confirm and add to references + intervals
-                confirmTmpExhaustion(m->x());
+                confirmTmpExhaustion(m->position().x());
                 return true;
 
             } else {

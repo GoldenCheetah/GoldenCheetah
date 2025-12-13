@@ -702,14 +702,14 @@ GenericSelectTool::moved(QPointF pos)
                 if (series->type() == QAbstractSeries::SeriesTypeLine || series->type() == QAbstractSeries::SeriesTypeArea) {
 
                     // we take a copy, would love to avoid this.
-                    QVector<QPointF> p = series->type() == QAbstractSeries::SeriesTypeLine ? static_cast<QLineSeries*>(series)->pointsVector() :
-                                                                              static_cast<QAreaSeries*>(series)->upperSeries()->pointsVector();
+                    QList<QPointF> p = series->type() == QAbstractSeries::SeriesTypeLine ? static_cast<QLineSeries*>(series)->points() :
+                                                                              static_cast<QAreaSeries*>(series)->upperSeries()->points();
 
                     // value we want
                     QPointF x= QPointF(xvalue,0);
 
                     // lower_bound to value near x
-                    QVector<QPointF>::const_iterator i = std::lower_bound(p.begin(), p.end(), x, CompareQPointFX());
+                    QList<QPointF>::const_iterator i = std::lower_bound(p.begin(), p.end(), x, CompareQPointFX());
 
                     if (i != p.end()) {
                         // collect them away
