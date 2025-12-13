@@ -7,6 +7,8 @@ Makefile
 *~
 *.orig
 *.rej
+*.log
+
 # old skool
 .svn
 *.pri
@@ -48,6 +50,7 @@ build-src*
 qwt/src/debug/
 qwt/src/release/
 src/Makefile.Debug
+src/Makefile.src
 src/Makefile.Release
 src/object_script.GoldenCheetah.Debug
 src/object_script.GoldenCheetah.Release
@@ -76,4 +79,11 @@ _pch/
 *_yacc.cpp
 *_yacc.h
 qrc_*.cpp
+*.moc
 
+# Unittests
+unittests/Core/season/season
+unittests/Core/seasonOffset/seasonOffset
+unittests/Core/seasonParser/seasonParser
+unittests/Core/units/units
+unittests/Gui/calendarData/calendarData

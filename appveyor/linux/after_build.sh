@@ -35,11 +35,11 @@ chmod a+x linuxdeployqt-continuous-x86_64.AppImage
 ### Deploy to appdir
 ./linuxdeployqt-continuous-x86_64.AppImage appdir/GoldenCheetah -verbose=2 -bundle-non-qt-libs -exclude-libs=libqsqlmysql,libqsqlpsql,libqsqlmimer,libqsqlodbc,libnss3,libnssutil3,libxcb-dri3.so.0 -unsupported-allow-new-glibc
 
-# Add Python and core modules
-wget --no-verbose https://github.com/niess/python-appimage/releases/download/python3.7/python3.7.17-cp37-cp37m-manylinux1_x86_64.AppImage
-chmod +x python3.7.17-cp37-cp37m-manylinux1_x86_64.AppImage
-./python3.7.17-cp37-cp37m-manylinux1_x86_64.AppImage --appimage-extract
-rm -f python3.7.17-cp37-cp37m-manylinux1_x86_64.AppImage
+# Add Python 3.11 and core modules
+wget --no-verbose https://github.com/niess/python-appimage/releases/download/python3.11/python3.11.9-cp311-cp311-manylinux_2_28_x86_64.AppImage
+chmod +x python3.11.9-cp311-cp311-manylinux_2_28_x86_64.AppImage
+./python3.11.9-cp311-cp311-manylinux_2_28_x86_64.AppImage --appimage-extract
+rm -f python3.11.9-cp311-cp311-manylinux_2_28_x86_64.AppImage
 export PATH="$(pwd)/squashfs-root/usr/bin:$PATH"
 pip install --upgrade pip
 pip install -q -r Python/requirements.txt
