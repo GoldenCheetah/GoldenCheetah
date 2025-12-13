@@ -786,7 +786,7 @@ AgendaWindow::editEventEntry
     SeasonEvent *seasonEvent = nullptr;
     for (Season &s : context->athlete->seasons->seasons) {
         for (SeasonEvent &event : s.events) {
-            // FIXME: Ugly comparison required becuase SeasonEvent::id is not populated
+            // FIXME: Ugly comparison required because SeasonEvent::id is not populated
             if (   event.name == entry.primary
                 && (   (event.priority == 0 && entry.secondary == tr("Uncategorized"))
                     || (event.priority == 1 && entry.secondary == tr("Category A"))
