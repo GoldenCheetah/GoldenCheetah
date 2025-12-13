@@ -1805,7 +1805,7 @@ paintMetric
     painter->setFont(font);
     QFontMetrics valueFM(font);
     int valueWidth = valueFM.horizontalAdvance(value);
-    painter->drawText(rect, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip, value);
+    painter->drawText(rect, Qt::AlignLeft | Qt::AlignTop, value);
     if (! label.isEmpty()) {
         QRect labelRect(rect);
         labelRect.setX(rect.x() + valueWidth + valueFM.horizontalAdvance(" "));
