@@ -72,6 +72,8 @@ init:
 - sh: >-
     if $CI_LINUX; then
       export OS_NAME=linux
+      # Select gcc-11 for AppImage backward compatibility
+      sudo update-alternatives --set gcc "/usr/bin/gcc-11"
       # Setup QT 6.8
       export QTDIR=$HOME/Qt/6.8
       export LD_LIBRARY_PATH=$QTDIR:$LD_LIBRARY_PATH
