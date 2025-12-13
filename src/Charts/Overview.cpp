@@ -24,7 +24,7 @@
 #include "Utils.h"
 #include "HelpWhatsThis.h"
 
-OverviewWindow::OverviewWindow(Context *context, int scope, bool blank) : GcChartWindow(context), context(context), configured(false), scope(scope), blank(blank)
+OverviewWindow::OverviewWindow(Context *context, OverviewScope scope, bool blank) : GcChartWindow(context), context(context), configured(false), scope(scope), blank(blank)
 {
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(COVERVIEWBACKGROUND));
@@ -72,7 +72,7 @@ OverviewWindow::OverviewWindow(Context *context, int scope, bool blank) : GcChar
         connect(this, SIGNAL(rideItemChanged(RideItem*)), space, SLOT(rideSelected(RideItem*)));
     }
 
-    if (scope & OverviewScope::TRENDS) {
+    if (scope & (OverviewScope::TRENDS | OverviewScope::PLAN)) {
         connect(this, SIGNAL(dateRangeChanged(DateRange)), space, SLOT(dateRangeChanged(DateRange)));
         connect(context, SIGNAL(filterChanged()), space, SLOT(filterChanged()));
         connect(context, SIGNAL(homeFilterChanged()), space, SLOT(filterChanged()));
@@ -103,7 +103,7 @@ OverviewWindow::addTile()
 
         // update after config changed
         if (added->parent->scope & OverviewScope::ANALYSIS && added->parent->currentRideItem) added->setData(added->parent->currentRideItem);
-        if (added->parent->scope & OverviewScope::TRENDS ) added->setDateRange(added->parent->currentDateRange);
+        if (added->parent->scope & (OverviewScope::TRENDS | OverviewScope::PLAN)) added->setDateRange(added->parent->currentDateRange);
 
         // update geometry
         space->updateGeometry();
@@ -135,7 +135,13 @@ OverviewWindow::importChart()
     QList<QMap<QString,QString> > props = GcChartWindow::chartPropertiesFromFile(fileName);
 
     // we only support user charts, and they must be relevant to the current view
-    QString want = QString("%1").arg(scope == OverviewScope::ANALYSIS ? GcWindowTypes::UserAnalysis : GcWindowTypes::UserTrends);
+    QString want;
+    switch (scope) {
+    case OverviewScope::ANALYSIS: want = QString("%1").arg(GcWindowTypes::UserAnalysis); break;
+    case OverviewScope::TRENDS: want = QString("%1").arg(GcWindowTypes::UserTrends); break;
+    case OverviewScope::PLAN: want = QString("%1").arg(GcWindowTypes::UserPlan); break;
+    default: break;
+    }
 
     // we look through all charts, but only import the first relevant one
     for (int i=0; i<props.count(); i++) {
@@ -158,8 +164,8 @@ OverviewWindow::importChart()
 
             // initialise to current selected daterange / activity as appropriate
             // need to do after geometry as it won't be visible till added to space
-            if (scope == OverviewScope::ANALYSIS && space->currentRideItem) add->setData(space->currentRideItem);
-            if (scope == OverviewScope::TRENDS ) add->setDateRange(space->currentDateRange);
+            if (scope & OverviewScope::ANALYSIS && space->currentRideItem) add->setData(space->currentRideItem);
+            if (scope & (OverviewScope::TRENDS | OverviewScope::PLAN)) add->setDateRange(space->currentDateRange);
 
             // and update- sometimes a little wonky
             space->updateGeometry();
@@ -346,8 +352,12 @@ defaultsetup:
         // so we open the json doc and extract the config element
         //
         QString source;
-        if (scope == OverviewScope::ANALYSIS) source = ":charts/overview-analysis.gchart";
-        if (scope == OverviewScope::TRENDS) source = ":charts/overview-trends.gchart";
+        switch (scope) {
+        case OverviewScope::ANALYSIS: source = ":charts/overview-analysis.gchart"; break;
+        case OverviewScope::TRENDS: source = ":charts/overview-trends.gchart"; break;
+        case OverviewScope::PLAN: source = ":charts/overview-plan.gchart"; break;
+        default: break;
+        }
 
         QFile file(source);
         if (file.open(QIODevice::ReadOnly)) {
@@ -661,7 +671,7 @@ OverviewConfigDialog::close()
 
         // update after config changed
         if (item->parent->scope & OverviewScope::ANALYSIS && item->parent->currentRideItem) item->setData(item->parent->currentRideItem);
-        if (item->parent->scope & OverviewScope::TRENDS ) item->setDateRange(item->parent->currentDateRange);
+        if (item->parent->scope & (OverviewScope::TRENDS | OverviewScope::PLAN)) item->setDateRange(item->parent->currentDateRange);
 
         item=NULL;
     }
@@ -727,11 +737,21 @@ OverviewConfigDialog::exportChart()
     out.setCodec ("UTF-8");
 #endif
 
+    QString viewName;
+    int chartId = GcWindowTypes::None;
+
+    switch (item->parent->scope) {
+    case OverviewScope::ANALYSIS: chartId = GcWindowTypes::UserAnalysis; viewName = "analysis"; break;
+    case OverviewScope::TRENDS: chartId = GcWindowTypes::UserTrends; viewName = "home"; break;
+    case OverviewScope::PLAN: chartId = GcWindowTypes::UserPlan; viewName = "plan"; break;
+    default: break;
+    }
+
     // serialise (mimicing real exporter in GoldenCheetah.cpp
     out <<"{\n\t\"CHART\":{\n";
     out <<"\t\t\"VERSION\":\"1\",\n";
-    out <<"\t\t\"VIEW\":\"" << (item->parent->scope == OverviewScope::ANALYSIS ? "analysis" : "home") << "\",\n";
-    out <<"\t\t\"TYPE\":\"" << (item->parent->scope == OverviewScope::ANALYSIS ? "46" : "45") << "\",\n";
+    out <<"\t\t\"VIEW\":\"" << viewName << "\",\n";
+    out <<"\t\t\"TYPE\":\"" << QString::number(chartId) << "\",\n";
 
     // PROPERTIES
     out <<"\t\t\"PROPERTIES\":{\n";
