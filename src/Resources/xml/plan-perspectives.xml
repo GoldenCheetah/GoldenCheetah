@@ -1,41 +1,59 @@
 <layouts>
-    <layout name="General" style="0" type="4" expression="" trainswitch="0">
-        <chart id="52" name="" title="Calendar" >
-            <property name="title" type="QString" value="Calendar" />
-            <property name="subtitle" type="QString" value="" />
-            <property name="widthFactor" type="double" value="2" />
-            <property name="heightFactor" type="double" value="2" />
-            <property name="style" type="int" value="0" />
-            <property name="resizable" type="bool" value="0" />
-            <property name="defaultView" type="int" value="2" />
-            <property name="firstDayOfWeek" type="int" value="1" />
-            <property name="startHour" type="int" value="8" />
-            <property name="endHour" type="int" value="21" />
-            <property name="summaryVisibleDay" type="bool" value="1" />
-            <property name="summaryVisibleWeek" type="bool" value="1" />
-            <property name="summaryVisibleMonth" type="bool" value="1" />
-            <property name="primaryMainField" type="QString" value="iNotes" />
-            <property name="primaryFallbackField" type="QString" value="Workout Code" />
-            <property name="secondaryMetric" type="QString" value="workout_time" />
-            <property name="tertiaryField" type="QString" value="Notes" />
-            <property name="summaryMetrics" type="QString" value="ride_count,total_distance,coggan_tss,workout_time" />
-        </chart>
-        <chart id="53" name="" title="Agenda" >
-            <property name="title" type="QString" value="Agenda" />
-            <property name="subtitle" type="QString" value="" />
-            <property name="widthFactor" type="double" value="2" />
-            <property name="heightFactor" type="double" value="2" />
-            <property name="style" type="int" value="0" />
-            <property name="resizable" type="bool" value="0" />
-            <property name="agendaPastDays" type="int" value="7" />
-            <property name="agendaFutureDays" type="int" value="7" />
-            <property name="primaryMainField" type="QString" value="iNotes" />
-            <property name="primaryFallbackField" type="QString" value="Workout Code" />
-            <property name="secondaryMetric" type="QString" value="workout_time" />
-            <property name="showTertiaryFor" type="int" value="0" />
-            <property name="tertiaryField" type="QString" value="Notes" />
-            <property name="activityMaxTertiaryLines" type="int" value="3" />
-            <property name="eventMaxTertiaryLines" type="int" value="3" />
-        </chart>
-    </layout>
+<layout name="General" style="0" type="4" expression="" trainswitch="0">
+	<chart id="52" name="" title="Calendar" >
+		<property name="title" type="QString" value="Calendar" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="defaultView" type="int" value="2" />
+		<property name="firstDayOfWeek" type="int" value="1" />
+		<property name="startHour" type="int" value="8" />
+		<property name="endHour" type="int" value="21" />
+		<property name="summaryVisibleDay" type="bool" value="1" />
+		<property name="summaryVisibleWeek" type="bool" value="1" />
+		<property name="summaryVisibleMonth" type="bool" value="1" />
+		<property name="primaryMainField" type="QString" value="Route" />
+		<property name="primaryFallbackField" type="QString" value="Workout Code" />
+		<property name="secondaryMetric" type="QString" value="workout_time" />
+		<property name="tertiaryField" type="QString" value="Notes" />
+		<property name="summaryMetrics" type="QString" value="ride_count,total_distance,coggan_tss,workout_time" />
+	</chart>
+	<chart id="53" name="" title="Agenda" >
+		<property name="title" type="QString" value="Agenda" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="agendaPastDays" type="int" value="7" />
+		<property name="agendaFutureDays" type="int" value="7" />
+		<property name="primaryMainField" type="QString" value="Route" />
+		<property name="primaryFallbackField" type="QString" value="Workout Code" />
+		<property name="secondaryMetric" type="QString" value="workout_time" />
+		<property name="showTertiaryFor" type="int" value="0" />
+		<property name="tertiaryField" type="QString" value="Notes" />
+		<property name="activityMaxTertiaryLines" type="int" value="3" />
+		<property name="eventMaxTertiaryLines" type="int" value="3" />
+	</chart>
+	<chart id="45" name="" title="Expected PMC (TriScore)" >
+		<property name="title" type="QString" value="Expected PMC (TriScore)" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="settings" type="QString" value="{ &quot;title&quot;: &quot;Triathlon PMC &quot;,\n&quot;description&quot;: &quot;PMC based on completed activities until today and planned ones going forward. &quot;,\n&quot;type&quot;: 1,\n&quot;animate&quot;: false,\n&quot;intervalrefresh&quot;: false,\n&quot;legendpos&quot;: 2,\n&quot;stack&quot;: false,\n&quot;orientation&quot;: 2,\n&quot;bgcolor&quot;: &quot;#010102&quot;, \n&quot;scale&quot;: 1,\n&quot;SERIES&quot;: [\n{ &quot;name&quot;: &quot;TSB &quot;, &quot;group&quot;: &quot; &quot;, &quot;xname&quot;: &quot;Date &quot;, &quot;yname&quot;: &quot;TriScore &quot;, &quot;program&quot;: &quot;{:sl:n    x { pmc(TriScore, date, expected); }:sl:n    y { pmc(TriScore, sb, expected); }:sl:n} &quot;, &quot;line&quot;: 1, &quot;symbol&quot;: 0, &quot;size&quot;: 3, &quot;color&quot;: &quot;#01012a&quot;, &quot;opacity&quot;: 100, &quot;legend&quot;: true, &quot;opengl&quot;: true, &quot;datalabels&quot;: false, &quot;aggregate&quot;: -1, &quot;fill&quot;: false},\n{ &quot;name&quot;: &quot;ATL &quot;, &quot;group&quot;: &quot; &quot;, &quot;xname&quot;: &quot;Date &quot;, &quot;yname&quot;: &quot;TriScore &quot;, &quot;program&quot;: &quot;{:sl:n    x { pmc(TriScore, date, expected); }:sl:n    y { pmc(TriScore, sts, expected); }:sl:n} &quot;, &quot;line&quot;: 1, &quot;symbol&quot;: 0, &quot;size&quot;: 3, &quot;color&quot;: &quot;#010128&quot;, &quot;opacity&quot;: 100, &quot;legend&quot;: true, &quot;opengl&quot;: true, &quot;datalabels&quot;: false, &quot;aggregate&quot;: -1, &quot;fill&quot;: false},\n{ &quot;name&quot;: &quot;CTL &quot;, &quot;group&quot;: &quot; &quot;, &quot;xname&quot;: &quot;Date &quot;, &quot;yname&quot;: &quot;TriScore &quot;, &quot;program&quot;: &quot;{:sl:n    finalise {:sl:n        # Add a marker for each event:sl:n        sapply(events(date), { annotate(vline, events(name)[i], solid, x); });:sl:n        annotate(vline, :qu:Today:qu:, dash, Today);:sl:n        annotate(hline, :qu:0:qu:, solid, 0);:sl:n    }:sl:n:sl:n    x { pmc(TriScore, date, expected); }:sl:n    y { pmc(TriScore, lts, expected); }:sl:n}:sl:n &quot;, &quot;line&quot;: 1, &quot;symbol&quot;: 0, &quot;size&quot;: 3, &quot;color&quot;: &quot;#010129&quot;, &quot;opacity&quot;: 100, &quot;legend&quot;: true, &quot;opengl&quot;: true, &quot;datalabels&quot;: false, &quot;aggregate&quot;: -1, &quot;fill&quot;: false},\n{ &quot;name&quot;: &quot;Gym &quot;, &quot;group&quot;: &quot; &quot;, &quot;xname&quot;: &quot;Date &quot;, &quot;yname&quot;: &quot;TriScore &quot;, &quot;program&quot;: &quot;{:sl:n    x { pmc(isXtrain ? TriScore : 0, date, expected); }:sl:n    y { pmc(isXtrain ? TriScore : 0, lts, expected); }:sl:n}:sl:n &quot;, &quot;line&quot;: 1, &quot;symbol&quot;: 0, &quot;size&quot;: 3, &quot;color&quot;: &quot;#ffff7f&quot;, &quot;opacity&quot;: 100, &quot;legend&quot;: true, &quot;opengl&quot;: true, &quot;datalabels&quot;: false, &quot;aggregate&quot;: -1, &quot;fill&quot;: false},\n{ &quot;name&quot;: &quot;Run &quot;, &quot;group&quot;: &quot; &quot;, &quot;xname&quot;: &quot;Date &quot;, &quot;yname&quot;: &quot;TriScore &quot;, &quot;program&quot;: &quot;{:sl:n    x { pmc(GOVSS, date, expected); }:sl:n    y { pmc(GOVSS, lts, expected); }:sl:n} &quot;, &quot;line&quot;: 1, &quot;symbol&quot;: 0, &quot;size&quot;: 3, &quot;color&quot;: &quot;#010120&quot;, &quot;opacity&quot;: 100, &quot;legend&quot;: true, &quot;opengl&quot;: true, &quot;datalabels&quot;: false, &quot;aggregate&quot;: -1, &quot;fill&quot;: false},\n{ &quot;name&quot;: &quot;Bike &quot;, &quot;group&quot;: &quot; &quot;, &quot;xname&quot;: &quot;Date &quot;, &quot;yname&quot;: &quot;TriScore &quot;, &quot;program&quot;: &quot;{:sl:n    x { pmc(BikeStress, date, expected); }:sl:n    y { pmc(BikeStress, lts, expected); }:sl:n} &quot;, &quot;line&quot;: 1, &quot;symbol&quot;: 0, &quot;size&quot;: 3, &quot;color&quot;: &quot;#01016f&quot;, &quot;opacity&quot;: 100, &quot;legend&quot;: true, &quot;opengl&quot;: true, &quot;datalabels&quot;: false, &quot;aggregate&quot;: -1, &quot;fill&quot;: false},\n{ &quot;name&quot;: &quot;Swim &quot;, &quot;group&quot;: &quot; &quot;, &quot;xname&quot;: &quot;Date &quot;, &quot;yname&quot;: &quot;TriScore &quot;, &quot;program&quot;: &quot;{:sl:n    x { pmc(SwimScore, date, expected); }:sl:n    y { pmc(SwimScore, lts, expected); }:sl:n} &quot;, &quot;line&quot;: 1, &quot;symbol&quot;: 0, &quot;size&quot;: 3, &quot;color&quot;: &quot;#01016e&quot;, &quot;opacity&quot;: 100, &quot;legend&quot;: true, &quot;opengl&quot;: true, &quot;datalabels&quot;: false, &quot;aggregate&quot;: -1, &quot;fill&quot;: false} ]\n,\n&quot;AXES&quot;: [\n{ &quot;name&quot;: &quot;Date &quot;, &quot;type&quot;: 1, &quot;orientation&quot;: 1, &quot;align&quot;: 1, &quot;minx&quot;: 0, &quot;maxx&quot;: 0, &quot;miny&quot;: 0, &quot;maxy&quot;: 0, &quot;smooth&quot;: 0, &quot;groupby&quot;: 0, &quot;visible&quot;: true, &quot;fixed&quot;: false, &quot;log&quot;: false, &quot;minorgrid&quot;: false, &quot;majorgrid&quot;: true, &quot;labelcolor&quot;: &quot;#55aaff&quot;, &quot;axiscolor&quot;: &quot;#55aaff&quot;},\n{ &quot;name&quot;: &quot;TriScore &quot;, &quot;type&quot;: 0, &quot;orientation&quot;: 2, &quot;align&quot;: 1, &quot;minx&quot;: 0, &quot;maxx&quot;: 0, &quot;miny&quot;: -30, &quot;maxy&quot;: 150, &quot;smooth&quot;: 0, &quot;groupby&quot;: 0, &quot;visible&quot;: true, &quot;fixed&quot;: false, &quot;log&quot;: false, &quot;minorgrid&quot;: false, &quot;majorgrid&quot;: true, &quot;labelcolor&quot;: &quot;#01012a&quot;, &quot;axiscolor&quot;: &quot;#01012a&quot;} ]\n}" />
+	</chart>
+	<chart id="45" name="" title="Expected PMC (TriScore)" >
+		<property name="title" type="QString" value="Expected PMC (TriScore)" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="settings" type="QString" value="{ &quot;title&quot;: &quot;Triathlon PMC &quot;,\n&quot;description&quot;: &quot;PMC based on completed activities until today and planned ones going forward. &quot;,\n&quot;type&quot;: 1,\n&quot;animate&quot;: false,\n&quot;intervalrefresh&quot;: false,\n&quot;legendpos&quot;: 2,\n&quot;stack&quot;: false,\n&quot;orientation&quot;: 2,\n&quot;bgcolor&quot;: &quot;#010102&quot;, \n&quot;scale&quot;: 1,\n&quot;SERIES&quot;: [\n{ &quot;name&quot;: &quot;TSB &quot;, &quot;group&quot;: &quot; &quot;, &quot;xname&quot;: &quot;Date &quot;, &quot;yname&quot;: &quot;TriScore &quot;, &quot;program&quot;: &quot;{:sl:n    x { pmc(TriScore, date, expected); }:sl:n    y { pmc(TriScore, sb, expected); }:sl:n} &quot;, &quot;line&quot;: 1, &quot;symbol&quot;: 0, &quot;size&quot;: 3, &quot;color&quot;: &quot;#01012a&quot;, &quot;opacity&quot;: 100, &quot;legend&quot;: true, &quot;opengl&quot;: true, &quot;datalabels&quot;: false, &quot;aggregate&quot;: -1, &quot;fill&quot;: false},\n{ &quot;name&quot;: &quot;ATL &quot;, &quot;group&quot;: &quot; &quot;, &quot;xname&quot;: &quot;Date &quot;, &quot;yname&quot;: &quot;TriScore &quot;, &quot;program&quot;: &quot;{:sl:n    x { pmc(TriScore, date, expected); }:sl:n    y { pmc(TriScore, sts, expected); }:sl:n} &quot;, &quot;line&quot;: 1, &quot;symbol&quot;: 0, &quot;size&quot;: 3, &quot;color&quot;: &quot;#010128&quot;, &quot;opacity&quot;: 100, &quot;legend&quot;: true, &quot;opengl&quot;: true, &quot;datalabels&quot;: false, &quot;aggregate&quot;: -1, &quot;fill&quot;: false},\n{ &quot;name&quot;: &quot;CTL &quot;, &quot;group&quot;: &quot; &quot;, &quot;xname&quot;: &quot;Date &quot;, &quot;yname&quot;: &quot;TriScore &quot;, &quot;program&quot;: &quot;{:sl:n    finalise {:sl:n        # Add a marker for each event:sl:n        sapply(events(date), { annotate(vline, events(name)[i], solid, x); });:sl:n        annotate(vline, :qu:Today:qu:, dash, Today);:sl:n        annotate(hline, :qu:0:qu:, solid, 0);:sl:n    }:sl:n:sl:n    x { pmc(TriScore, date, expected); }:sl:n    y { pmc(TriScore, lts, expected); }:sl:n}:sl:n &quot;, &quot;line&quot;: 1, &quot;symbol&quot;: 0, &quot;size&quot;: 3, &quot;color&quot;: &quot;#010129&quot;, &quot;opacity&quot;: 100, &quot;legend&quot;: true, &quot;opengl&quot;: true, &quot;datalabels&quot;: false, &quot;aggregate&quot;: -1, &quot;fill&quot;: false},\n{ &quot;name&quot;: &quot;Gym &quot;, &quot;group&quot;: &quot; &quot;, &quot;xname&quot;: &quot;Date &quot;, &quot;yname&quot;: &quot;TriScore &quot;, &quot;program&quot;: &quot;{:sl:n    x { pmc(isXtrain ? TriScore : 0, date, expected); }:sl:n    y { pmc(isXtrain ? TriScore : 0, lts, expected); }:sl:n}:sl:n &quot;, &quot;line&quot;: 1, &quot;symbol&quot;: 0, &quot;size&quot;: 3, &quot;color&quot;: &quot;#ffff7f&quot;, &quot;opacity&quot;: 100, &quot;legend&quot;: true, &quot;opengl&quot;: true, &quot;datalabels&quot;: false, &quot;aggregate&quot;: -1, &quot;fill&quot;: false},\n{ &quot;name&quot;: &quot;Run &quot;, &quot;group&quot;: &quot; &quot;, &quot;xname&quot;: &quot;Date &quot;, &quot;yname&quot;: &quot;TriScore &quot;, &quot;program&quot;: &quot;{:sl:n    x { pmc(GOVSS, date, expected); }:sl:n    y { pmc(GOVSS, lts, expected); }:sl:n} &quot;, &quot;line&quot;: 1, &quot;symbol&quot;: 0, &quot;size&quot;: 3, &quot;color&quot;: &quot;#010120&quot;, &quot;opacity&quot;: 100, &quot;legend&quot;: true, &quot;opengl&quot;: true, &quot;datalabels&quot;: false, &quot;aggregate&quot;: -1, &quot;fill&quot;: false},\n{ &quot;name&quot;: &quot;Bike &quot;, &quot;group&quot;: &quot; &quot;, &quot;xname&quot;: &quot;Date &quot;, &quot;yname&quot;: &quot;TriScore &quot;, &quot;program&quot;: &quot;{:sl:n    x { pmc(BikeStress, date, expected); }:sl:n    y { pmc(BikeStress, lts, expected); }:sl:n} &quot;, &quot;line&quot;: 1, &quot;symbol&quot;: 0, &quot;size&quot;: 3, &quot;color&quot;: &quot;#01016f&quot;, &quot;opacity&quot;: 100, &quot;legend&quot;: true, &quot;opengl&quot;: true, &quot;datalabels&quot;: false, &quot;aggregate&quot;: -1, &quot;fill&quot;: false},\n{ &quot;name&quot;: &quot;Swim &quot;, &quot;group&quot;: &quot; &quot;, &quot;xname&quot;: &quot;Date &quot;, &quot;yname&quot;: &quot;TriScore &quot;, &quot;program&quot;: &quot;{:sl:n    x { pmc(SwimScore, date, expected); }:sl:n    y { pmc(SwimScore, lts, expected); }:sl:n} &quot;, &quot;line&quot;: 1, &quot;symbol&quot;: 0, &quot;size&quot;: 3, &quot;color&quot;: &quot;#01016e&quot;, &quot;opacity&quot;: 100, &quot;legend&quot;: true, &quot;opengl&quot;: true, &quot;datalabels&quot;: false, &quot;aggregate&quot;: -1, &quot;fill&quot;: false} ]\n,\n&quot;AXES&quot;: [\n{ &quot;name&quot;: &quot;Date &quot;, &quot;type&quot;: 1, &quot;orientation&quot;: 1, &quot;align&quot;: 1, &quot;minx&quot;: 0, &quot;maxx&quot;: 0, &quot;miny&quot;: 0, &quot;maxy&quot;: 0, &quot;smooth&quot;: 0, &quot;groupby&quot;: 0, &quot;visible&quot;: true, &quot;fixed&quot;: false, &quot;log&quot;: false, &quot;minorgrid&quot;: false, &quot;majorgrid&quot;: true, &quot;labelcolor&quot;: &quot;#55aaff&quot;, &quot;axiscolor&quot;: &quot;#55aaff&quot;},\n{ &quot;name&quot;: &quot;TriScore &quot;, &quot;type&quot;: 0, &quot;orientation&quot;: 2, &quot;align&quot;: 1, &quot;minx&quot;: 0, &quot;maxx&quot;: 0, &quot;miny&quot;: -30, &quot;maxy&quot;: 150, &quot;smooth&quot;: 0, &quot;groupby&quot;: 0, &quot;visible&quot;: true, &quot;fixed&quot;: false, &quot;log&quot;: false, &quot;minorgrid&quot;: false, &quot;majorgrid&quot;: true, &quot;labelcolor&quot;: &quot;#01012a&quot;, &quot;axiscolor&quot;: &quot;#01012a&quot;} ]\n}" />
+	</chart>
+</layout>
 </layouts>
