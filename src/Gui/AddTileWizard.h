@@ -31,7 +31,7 @@ class AddTileWizard : public QWizard
 
 public:
 
-    AddTileWizard(Context *context, ChartSpace *space, int scope, ChartSpaceItem * &added);
+    AddTileWizard(Context *context, ChartSpace *space, OverviewScope scope, ChartSpaceItem * &added);
     QSize sizeHint() const { return QSize(600,650); }
 
     Context *context;
@@ -39,7 +39,7 @@ public:
 
     // what type of chart
     int type;
-    int scope;
+    OverviewScope scope;
 
     // add here
     ChartSpace *space;

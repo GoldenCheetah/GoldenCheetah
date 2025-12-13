@@ -65,15 +65,18 @@ GcWindowRegistry* GcWindows;
 void
 GcWindowRegistry::initialize()
 {
-  static GcWindowRegistry GcWindowsInit[36] = {
+  static GcWindowRegistry GcWindowsInit[] = {
     // name                     GcWinID
-    { VIEW_TRENDS|VIEW_DIARY, tr("Season Overview"),GcWindowTypes::OverviewTrends },
-    { VIEW_TRENDS|VIEW_DIARY, tr("Blank Overview "),GcWindowTypes::OverviewTrendsBlank },
-    { VIEW_TRENDS|VIEW_DIARY, tr("User Chart"),GcWindowTypes::UserTrends },
-    { VIEW_TRENDS|VIEW_DIARY, tr("Trends"),GcWindowTypes::LTM },
-    { VIEW_TRENDS|VIEW_DIARY, tr("TreeMap"),GcWindowTypes::TreeMap },
+    { VIEW_TRENDS, tr("Season Overview"),GcWindowTypes::OverviewTrends },
+    { VIEW_TRENDS, tr("Blank Overview "),GcWindowTypes::OverviewTrendsBlank },
+    { VIEW_PLAN, tr("Plan Overview"),GcWindowTypes::OverviewPlan },
+    { VIEW_PLAN, tr("Blank Overview "),GcWindowTypes::OverviewPlanBlank },
+    { VIEW_TRENDS, tr("User Chart"),GcWindowTypes::UserTrends },
+    { VIEW_PLAN, tr("User Chart"),GcWindowTypes::UserPlan },
+    { VIEW_TRENDS|VIEW_PLAN, tr("Trends"),GcWindowTypes::LTM },
+    { VIEW_TRENDS|VIEW_PLAN, tr("TreeMap"),GcWindowTypes::TreeMap },
     //{ VIEW_TRENDS, tr("Weekly Summary"),GcWindowTypes::WeeklySummary },// DEPRECATED
-    { VIEW_TRENDS|VIEW_DIARY,  tr("Power Duration "),GcWindowTypes::CriticalPowerSummary },
+    { VIEW_TRENDS|VIEW_PLAN,  tr("Power Duration "),GcWindowTypes::CriticalPowerSummary },
     //{ VIEW_TRENDS,  tr("Training Plan"),GcWindowTypes::SeasonPlan },
     //{ VIEW_TRENDS|VIEW_DIARY,  tr("Performance Manager"),GcWindowTypes::PerformanceManager },
     { VIEW_ANALYSIS, tr("Activity Overview"),GcWindowTypes::Overview },
@@ -86,19 +89,19 @@ GcWindowRegistry::initialize()
     { VIEW_ANALYSIS, tr("Performance"),GcWindowTypes::AllPlot },
     { VIEW_ANALYSIS, tr("Power Duration"),GcWindowTypes::CriticalPower },
     { VIEW_ANALYSIS, tr("Histogram"),GcWindowTypes::Histogram },
-    { VIEW_TRENDS|VIEW_DIARY, tr("Distribution"),GcWindowTypes::Distribution },
+    { VIEW_TRENDS|VIEW_PLAN, tr("Distribution"),GcWindowTypes::Distribution },
     { VIEW_ANALYSIS, tr("Pedal Force vs Velocity"),GcWindowTypes::PfPv },
     { VIEW_ANALYSIS, tr("Heartrate vs Power"),GcWindowTypes::HrPw },
     { VIEW_ANALYSIS, tr("Map"),GcWindowTypes::RideMapWindow },
     { VIEW_ANALYSIS, tr("R Chart"),GcWindowTypes::RConsole },
-    { VIEW_TRENDS, tr("R Chart "),GcWindowTypes::RConsoleSeason },
+    { VIEW_TRENDS|VIEW_PLAN, tr("R Chart "),GcWindowTypes::RConsoleSeason },
     { VIEW_ANALYSIS, tr("Python Chart"),GcWindowTypes::Python },
-    { VIEW_TRENDS, tr("Python Chart "),GcWindowTypes::PythonSeason },
+    { VIEW_TRENDS|VIEW_PLAN, tr("Python Chart "),GcWindowTypes::PythonSeason },
     //{ VIEW_ANALYSIS, tr("Bing Map"),GcWindowTypes::BingMap },
     { VIEW_ANALYSIS, tr("Scatter"),GcWindowTypes::Scatter },
     { VIEW_ANALYSIS, tr("Aerolab"),GcWindowTypes::Aerolab },
     //{ VIEW_TRENDS|VIEW_DIARY, tr("Calendar"),GcWindowTypes::Diary },
-    { VIEW_TRENDS|VIEW_DIARY, tr("Navigator"), GcWindowTypes::ActivityNavigator },
+    { VIEW_TRENDS|VIEW_PLAN, tr("Navigator"), GcWindowTypes::ActivityNavigator },
     //{ VIEW_DIARY|VIEW_TRENDS, tr("Summary "), GcWindowTypes::DateRangeSummary }, // DEPRECATED IN V3.6
     { VIEW_TRAIN, tr("Telemetry"),GcWindowTypes::DialWindow },
     { VIEW_TRAIN, tr("Workout"),GcWindowTypes::WorkoutPlot },
@@ -109,8 +112,8 @@ GcWindowRegistry::initialize()
     { VIEW_TRAIN, tr("Live Map"),GcWindowTypes::LiveMapWebPageWindow },
     { VIEW_TRAIN, tr("Elevation Chart"),GcWindowTypes::ElevationChart },
     { VIEW_ANALYSIS|VIEW_TRENDS|VIEW_TRAIN, tr("Web page"),GcWindowTypes::WebPageWindow },
-    { VIEW_TRENDS, tr("Calendar"),GcWindowTypes::Calendar },
-    { VIEW_TRENDS, tr("Agenda"),GcWindowTypes::Agenda },
+    { VIEW_TRENDS|VIEW_PLAN, tr("Calendar"),GcWindowTypes::Calendar },
+    { VIEW_TRENDS|VIEW_PLAN, tr("Agenda"),GcWindowTypes::Agenda },
     { 0, "", GcWindowTypes::None }};
   // initialize the global registry
   GcWindows = GcWindowsInit;
@@ -235,21 +238,27 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     // summary and old ride summary charts now replaced with an Overview - note id gets reset
     case GcWindowTypes::Summary:
     case GcWindowTypes::RideSummary:
-    case GcWindowTypes::Overview: returning = new OverviewWindow(context, ANALYSIS); if (id != GcWindowTypes::Overview) { id=GcWindowTypes::Overview; static_cast<OverviewWindow*>(returning)->setConfiguration(""); } break;
+    case GcWindowTypes::Overview: returning = new OverviewWindow(context, OverviewScope::ANALYSIS); if (id != GcWindowTypes::Overview) { id=GcWindowTypes::Overview; static_cast<OverviewWindow*>(returning)->setConfiguration(""); } break;
 
     // blank analysis overview - note id gets reset
-    case GcWindowTypes::OverviewAnalysisBlank: returning = new OverviewWindow(context, ANALYSIS, true); id=GcWindowTypes::Overview; break;
+    case GcWindowTypes::OverviewAnalysisBlank: returning = new OverviewWindow(context, OverviewScope::ANALYSIS, true); id=GcWindowTypes::Overview; break;
 
     // old summary now gets a trends overview - note id gets reset
     case GcWindowTypes::DateRangeSummary: // deprecated so now replace with overview
-    case GcWindowTypes::OverviewTrends: returning = new OverviewWindow(context, TRENDS); if (id != GcWindowTypes::OverviewTrends) { id=GcWindowTypes::OverviewTrends; static_cast<OverviewWindow*>(returning)->setConfiguration(""); } break;
+    case GcWindowTypes::OverviewTrends: returning = new OverviewWindow(context, OverviewScope::TRENDS); if (id != GcWindowTypes::OverviewTrends) { id=GcWindowTypes::OverviewTrends; static_cast<OverviewWindow*>(returning)->setConfiguration(""); } break;
 
     // blank trends overview - note id gets reset
-    case GcWindowTypes::OverviewTrendsBlank: returning = new OverviewWindow(context, TRENDS, true); id=GcWindowTypes::OverviewTrends; break;
+    case GcWindowTypes::OverviewTrendsBlank: returning = new OverviewWindow(context, OverviewScope::TRENDS, true); id=GcWindowTypes::OverviewTrends; break;
+
+    // plan specific charts - note id gets reset for overview & blank
+    case GcWindowTypes::OverviewPlan: returning = new OverviewWindow(context, OverviewScope::PLAN); if (id != GcWindowTypes::OverviewPlan) { id=GcWindowTypes::OverviewPlan; static_cast<OverviewWindow*>(returning)->setConfiguration(""); } break;
+    case GcWindowTypes::OverviewPlanBlank: returning = new OverviewWindow(context, OverviewScope::PLAN, true); id=GcWindowTypes::OverviewPlan; break;
+    case GcWindowTypes::UserPlan: returning = new UserChartWindow(context, true); break;
 
     case GcWindowTypes::SeasonPlan: returning = new PlanningWindow(context); break;
     case GcWindowTypes::UserAnalysis: returning = new UserChartWindow(context, false); break;
     case GcWindowTypes::UserTrends: returning = new UserChartWindow(context, true); break;
+
     case GcWindowTypes::Diary:
     case GcWindowTypes::Calendar: returning = new CalendarWindow(context); break;
     case GcWindowTypes::Agenda: returning = new AgendaWindow(context); break;
