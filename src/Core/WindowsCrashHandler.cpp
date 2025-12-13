@@ -43,10 +43,7 @@ static std::string getCrashFileName()
     if (installation_crash_path.length() > 0 ) {
       ret << installation_crash_path << "\\";
     }
-
-    struct tm timeInfo;
-    localtime_s(&timeInfo, &nowTimeT);
-    ret << "crash_" << std::put_time(&timeInfo, "%H%M_%d%m%y");
+    ret << "crash_" << std::put_time(std::localtime(&nowTimeT), "%H%M_%d%m%y");
     return ret.str();
 }
 
