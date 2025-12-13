@@ -19,6 +19,7 @@
 #include "SeasonDialogs.h"
 #include "Seasons.h"
 #include "Athlete.h"
+#include "Colors.h"
 
 #include <QString>
 #include <QFormLayout>
@@ -152,9 +153,9 @@ EditSeasonDialog::EditSeasonDialog
     endValueStack->addWidget(new QLabel(tr("Up to current day and month")));
 
     statusLabel = new QLabel();
-    statusLabel->setWordWrap(true);
+    statusLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     warningLabel = new QLabel();
-    warningLabel->setWordWrap(true);
+    warningLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
     seedEdit = new QDoubleSpinBox();
     seedEdit->setDecimals(0);
@@ -174,7 +175,7 @@ EditSeasonDialog::EditSeasonDialog
     applyButton = buttonBox->addButton(tr("&OK"), QDialogButtonBox::AcceptRole);
     QPushButton *cancelButton = buttonBox->addButton(tr("&Cancel"), QDialogButtonBox::RejectRole);
 
-    QFormLayout *formLayout = new QFormLayout(this);
+    QFormLayout *formLayout = newQFormLayout(this);
     formLayout->addRow(tr("Name"), nameEdit);
     formLayout->addRow(tr("Type"), typeCombo);
     formLayout->addRow(startCombo, startValueStack);
@@ -475,6 +476,9 @@ EditSeasonEventDialog::EditSeasonEventDialog(Context *context, SeasonEvent *even
 {
     setWindowTitle(tr("Edit Event"));
 
+    QLabel *seasonLabel = new QLabel();
+    seasonLabel->setText(season.getName());
+
     nameEdit = new QLineEdit(this);
     nameEdit->setText(event->name);
 
@@ -494,7 +498,8 @@ EditSeasonEventDialog::EditSeasonEventDialog(Context *context, SeasonEvent *even
     applyButton = buttonBox->addButton(tr("&OK"), QDialogButtonBox::AcceptRole);
     QPushButton *cancelButton = buttonBox->addButton(tr("&Cancel"), QDialogButtonBox::RejectRole);
 
-    QFormLayout *formLayout = new QFormLayout(this);
+    QFormLayout *formLayout = newQFormLayout(this);
+    formLayout->addRow(tr("Season"), seasonLabel);
     formLayout->addRow(tr("Name"), nameEdit);
     formLayout->addRow(tr("Date"), dateEdit);
     formLayout->addRow(tr("Priority"), priorityEdit);
@@ -542,6 +547,9 @@ EditPhaseDialog::EditPhaseDialog(Context *context, Phase *phase, Season &season)
 {
     setWindowTitle(tr("Edit Date Range"));
 
+    QLabel *seasonLabel = new QLabel();
+    seasonLabel->setText(season.getName());
+
     nameEdit = new QLineEdit();
     nameEdit->setText(phase->getName());
 
@@ -583,7 +591,8 @@ EditPhaseDialog::EditPhaseDialog(Context *context, Phase *phase, Season &season)
     applyButton = buttonBox->addButton(tr("&OK"), QDialogButtonBox::AcceptRole);
     QPushButton *cancelButton = buttonBox->addButton(tr("&Cancel"), QDialogButtonBox::RejectRole);
 
-    QFormLayout *formLayout = new QFormLayout(this);
+    QFormLayout *formLayout = newQFormLayout(this);
+    formLayout->addRow(tr("Season"), seasonLabel);
     formLayout->addRow(tr("Name"), nameEdit);
     formLayout->addRow(tr("Type"), typeEdit);
     formLayout->addRow(tr("From"), fromEdit);

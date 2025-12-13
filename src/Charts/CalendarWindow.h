@@ -123,6 +123,12 @@ class CalendarWindow : public GcChartWindow
         void updateActivitiesIfInRange(RideItem *rideItem);
         void updateSeason(Season const *season, bool allowKeepMonth = false);
         bool movePlannedActivity(RideItem *rideItem, const QDate &destDay, const QTime &destTime = QTime());
+        void addEvent(const QDate &date);
+        void editEvent(const CalendarEntry &entry);
+        void delEvent(const CalendarEntry &entry);
+        void addPhase(const QDate &date);
+        void editPhase(const CalendarEntry &entry);
+        void delPhase(const CalendarEntry &entry);
 };
 
 #endif

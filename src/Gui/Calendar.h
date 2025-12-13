@@ -84,7 +84,7 @@ public:
     QDate selectedDate() const;
     bool isInDateRange(const QDate &date) const;
     void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries);
-    void limitDateRange(const DateRange &dr);
+    void limitDateRange(const DateRange &dr, bool canHavePhasesOrEvents = false);
     void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
     void setStartHour(int hour);
     void setEndHour(int hour);
@@ -100,6 +100,12 @@ signals:
     void viewActivity(const CalendarEntry &activity);
     void addActivity(bool plan, const QDate &day, const QTime &time);
     void delActivity(const CalendarEntry &activity);
+    void addEvent(const QDate &date);
+    void editEvent(const CalendarEntry &entry);
+    void delEvent(const CalendarEntry &entry);
+    void addPhase(const QDate &date);
+    void editPhase(const CalendarEntry &entry);
+    void delPhase(const CalendarEntry &entry);
 
 protected:
     void changeEvent(QEvent *event) override;
@@ -122,6 +128,7 @@ private:
     Qt::DayOfWeek firstDayOfWeek = Qt::Monday;
     QDate date;
     DateRange dr;
+    bool canHavePhasesOrEvents = false;
     CalendarDayTableType type;
     int defaultStartHour = 8;
     int defaultEndHour = 21;
@@ -133,6 +140,8 @@ private:
     TimeScaleData timeScaleData;
 
     void setDropIndicator(int y, BlockIndicator block);
+    QMenu *makeHeaderMenu(const QModelIndex &index, const QPoint &pos);
+    QMenu *makeActivityMenu(const QModelIndex &index, const QPoint &pos);
 };
 
 
@@ -155,7 +164,7 @@ public:
     QDate firstVisibleDay() const;
     QDate lastVisibleDay() const;
     QDate selectedDate() const;
-    void limitDateRange(const DateRange &dr, bool allowKeepMonth = false);
+    void limitDateRange(const DateRange &dr, bool allowKeepMonth = false, bool canHavePhasesOrEvents = false);
     void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
 
 signals:
@@ -180,6 +189,12 @@ signals:
     void repeatSchedule(const QDate &day);
     void insertRestday(const QDate &day);
     void delRestday(const QDate &day);
+    void addEvent(const QDate &date);
+    void editEvent(const CalendarEntry &entry);
+    void delEvent(const CalendarEntry &entry);
+    void addPhase(const QDate &date);
+    void editPhase(const CalendarEntry &entry);
+    void delPhase(const CalendarEntry &entry);
 
 protected:
     void changeEvent(QEvent *event) override;
@@ -205,6 +220,7 @@ private:
     QDate endDate; // last visible date
     QDate currentDate; // currently selected date
     DateRange dr;
+    bool canHavePhasesOrEvents = false;
 
     QTimer dragTimer;
     QPoint pressedPos;
@@ -232,7 +248,7 @@ public:
     void setEndHour(int hour);
     void setSummaryVisible(bool visible);
     void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries);
-    void limitDateRange(const DateRange &dr);
+    void limitDateRange(const DateRange &dr, bool canHavePhasesOrEvents = false);
     QDate firstVisibleDay() const;
     QDate lastVisibleDay() const;
     QDate selectedDate() const;
@@ -245,6 +261,12 @@ signals:
     void delActivity(const CalendarEntry &activity);
     void entryMoved(const CalendarEntry &activity, const QDate &srcDay, const QDate &destDay, const QTime &destTime);
     void dayChanged(const QDate &date);
+    void addEvent(const QDate &date);
+    void editEvent(const CalendarEntry &entry);
+    void delEvent(const CalendarEntry &entry);
+    void addPhase(const QDate &date);
+    void editPhase(const CalendarEntry &entry);
+    void delPhase(const CalendarEntry &entry);
 
 private:
     Measures * const athleteMeasures;
@@ -269,7 +291,7 @@ public:
     void setEndHour(int hour);
     void setSummaryVisible(bool visible);
     void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries);
-    void limitDateRange(const DateRange &dr);
+    void limitDateRange(const DateRange &dr, bool canHavePhasesOrEvents = false);
     QDate firstVisibleDay() const;
     QDate firstVisibleDay(const QDate &date) const;
     QDate lastVisibleDay() const;
@@ -283,6 +305,12 @@ signals:
     void delActivity(const CalendarEntry &activity);
     void entryMoved(const CalendarEntry &activity, const QDate &srcDay, const QDate &destDay, const QTime &destTime);
     void dayChanged(const QDate &date);
+    void addEvent(const QDate &date);
+    void editEvent(const CalendarEntry &entry);
+    void delEvent(const CalendarEntry &entry);
+    void addPhase(const QDate &date);
+    void editPhase(const CalendarEntry &entry);
+    void delPhase(const CalendarEntry &entry);
 
 private:
     CalendarDayTable *weekTable;
@@ -311,7 +339,7 @@ public:
 
 public slots:
     void setView(CalendarView view);
-    void activateDateRange(const DateRange &dr, bool allowKeepMonth = false);
+    void activateDateRange(const DateRange &dr, bool allowKeepMonth = false, bool canHavePhasesOrEvents = false);
     void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
     void setStartHour(int hour);
     void setEndHour(int hour);
@@ -337,6 +365,12 @@ signals:
     void moveActivity(const CalendarEntry &activity, const QDate &srcDay, const QDate &destDay, const QTime &destTime);
     void insertRestday(const QDate &day);
     void delRestday(const QDate &day);
+    void addEvent(const QDate &date);
+    void editEvent(const CalendarEntry &entry);
+    void delEvent(const CalendarEntry &entry);
+    void addPhase(const QDate &date);
+    void editPhase(const CalendarEntry &entry);
+    void delPhase(const CalendarEntry &entry);
 
 private:
     QToolBar *toolbar;

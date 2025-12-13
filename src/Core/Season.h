@@ -197,6 +197,7 @@ class Season
 
         bool isAbsolute() const;
         bool hasPhaseOrEvent() const;
+        bool canHavePhasesOrEvents() const;
 
         static bool LessThanForStarts(const Season &a, const Season &b);
 

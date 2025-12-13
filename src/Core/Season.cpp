@@ -502,6 +502,17 @@ Season::hasPhaseOrEvent
 }
 
 
+bool
+Season::canHavePhasesOrEvents
+() const
+{
+    return   (   getType() == Season::season
+              || getType() == Season::cycle
+              || getType() == Season::adhoc)
+           && isAbsolute();
+}
+
+
 bool Season::LessThanForStarts(const Season &a, const Season &b)
 {
     return a.getStart().toJulianDay() < b.getStart().toJulianDay();
