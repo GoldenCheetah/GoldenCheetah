@@ -22,6 +22,7 @@
 #include "AbstractView.h"
 #include "RideFileCommand.h"
 #include "Utils.h"
+#include "SeriesIterator.h"
 
 #include <limits>
 #include <cmath> // for isinf() isnan()
@@ -478,7 +479,7 @@ GenericSelectTool::clicked(QPointF pos)
 }
 
 bool
-GenericSelectTool::released(QPointF pos)
+GenericSelectTool::released(QPointF /* pos */)
 {
     if (mode == RECTANGLE || mode == XRANGE) {
 
@@ -700,23 +701,24 @@ GenericSelectTool::moved(QPointF pos)
 
                 // pointsVector
                 if (series->type() == QAbstractSeries::SeriesTypeLine || series->type() == QAbstractSeries::SeriesTypeArea) {
-
-                    // we take a copy, would love to avoid this.
-                    QVector<QPointF> p = series->type() == QAbstractSeries::SeriesTypeLine ? static_cast<QLineSeries*>(series)->pointsVector() :
-                                                                              static_cast<QAreaSeries*>(series)->upperSeries()->pointsVector();
-
+                    QXYSeries *line = series->type() == QAbstractSeries::SeriesTypeLine ? static_cast<QXYSeries*>(series) :
+                                                                              static_cast<QAreaSeries*>(series)->upperSeries();
                     // value we want
                     QPointF x= QPointF(xvalue,0);
 
-                    // lower_bound to value near x
-                    QVector<QPointF>::const_iterator i = std::lower_bound(p.begin(), p.end(), x, CompareQPointFX());
+                    // use iterator wrapper to avoid copy
+                    SeriesIterator begin(line, 0);
+                    SeriesIterator end(line, line->count());
+                    SeriesIterator it = std::lower_bound(begin, end, x, CompareQPointFX());
 
-                    if (i != p.end()) {
+                    if (it != end) {
+                        QPointF p = *it;
+
                         // collect them away
-                        vals.insert(series, GPointF(i->x(), i->y(), i-p.begin()));
+                        vals.insert(series, GPointF(p.x(), p.y(), it - begin));
 
                         // nearest x?
-                        if (i->x() != 0 && (nearestx == -9999 || (std::fabs(i->x()-xvalue)) < std::fabs((nearestx-xvalue)))) nearestx = i->x();
+                        if (p.x() != 0 && (nearestx == -9999 || (std::fabs(p.x()-xvalue)) < std::fabs((nearestx-xvalue)))) nearestx = p.x();
                     }
                 }
 

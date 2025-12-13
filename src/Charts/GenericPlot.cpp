@@ -1280,7 +1280,9 @@ GenericPlot::configureAxis(QString name, bool visible, int align, double min, do
             if (series->type() == QAbstractSeries::SeriesType::SeriesTypeScatter ||
                 series->type() == QAbstractSeries::SeriesType::SeriesTypeBar ||
                 series->type() == QAbstractSeries::SeriesType::SeriesTypeLine) {
-                foreach(QPointF point, static_cast<QXYSeries*>(series)->pointsVector()) {
+                QXYSeries *s = static_cast<QXYSeries*>(series);
+                for(int i=0; i<s->count(); i++) {
+                    QPointF point = s->at(i);
                     if (usey) {
                         if (setmin && point.y() < min) min=point.y();
                         else if (!setmin) { min=point.y(); setmin=true; }
@@ -1309,7 +1311,9 @@ GenericPlot::configureAxis(QString name, bool visible, int align, double min, do
                 if (series->type() == QAbstractSeries::SeriesType::SeriesTypeScatter ||
                     series->type() == QAbstractSeries::SeriesType::SeriesTypeBar ||
                     series->type() == QAbstractSeries::SeriesType::SeriesTypeLine) {
-                    foreach(QPointF point, static_cast<QXYSeries*>(series)->pointsVector()) {
+                    QXYSeries *s = static_cast<QXYSeries*>(series);
+                    for(int i=0; i<s->count(); i++) {
+                        QPointF point = s->at(i);
                         if (usey) {
                             if (setmax && point.y() > max) max=point.y();
                             else if (!setmax) { max=point.y(); setmax=true; }
