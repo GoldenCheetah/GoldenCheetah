@@ -49,6 +49,7 @@ AgendaWindow::AgendaWindow(Context *context)
     setPrimaryMainField("Route");
     setPrimaryFallbackField("Workout Code");
     setSecondaryMetric("workout_time");
+    setShowSecondaryLabel(true);
     setTertiaryField("Notes");
     setShowTertiaryFor(0);
     setActivityMaxTertiaryLines(3);
@@ -190,6 +191,22 @@ AgendaWindow::getSecondaryMetric
 () const
 {
     return secondaryCombo->currentData(Qt::UserRole).toString();
+}
+
+
+void
+AgendaWindow::setShowSecondaryLabel
+(bool showSecondaryLabel)
+{
+    showSecondaryLabelCheck->setChecked(showSecondaryLabel);
+}
+
+
+bool
+AgendaWindow::isShowSecondaryLabel
+() const
+{
+    return showSecondaryLabelCheck->isChecked();
 }
 
 
@@ -357,6 +374,7 @@ AgendaWindow::mkControls
     primaryMainCombo = new QComboBox();
     primaryFallbackCombo = new QComboBox();
     secondaryCombo = new QComboBox();
+    showSecondaryLabelCheck = new QCheckBox(tr("Show Label"));
     showTertiaryForCombo = new QComboBox();
     tertiaryCombo = new QComboBox();
     updatePrimaryConfigCombos();
@@ -388,20 +406,29 @@ AgendaWindow::mkControls
     activityForm->addItem(new QSpacerItem(0, 20 * dpiYFactor));
     activityForm->addRow(new QLabel(HLO + tr("Metric Line") + HLC));
     activityForm->addRow(tr("Metric"), secondaryCombo);
+    activityForm->addRow("", showSecondaryLabelCheck);
     activityForm->addItem(new QSpacerItem(0, 20 * dpiYFactor));
     activityForm->addRow(new QLabel(HLO + tr("Detail Line") + HLC));
     activityForm->addRow(tr("Show Line for"), showTertiaryForCombo);
     activityForm->addRow(tr("Field"), tertiaryCombo);
     activityForm->addRow(tr("Visible Lines"), activityMaxTertiaryLinesSpin);
 
+    QScrollArea *activityScroller = new QScrollArea();
+    activityScroller->setWidgetResizable(true);
+    activityScroller->setWidget(centerLayoutInWidget(activityForm, false));
+
     QFormLayout *eventForm = newQFormLayout();
     eventForm->setContentsMargins(0, 10 * dpiYFactor, 0, 10 * dpiYFactor);
     eventForm->addRow(new QLabel(HLO + tr("Detail Line") + HLC));
     eventForm->addRow(tr("Visible Lines"), eventMaxTertiaryLinesSpin);
 
+    QScrollArea *eventScroller = new QScrollArea();
+    eventScroller->setWidgetResizable(true);
+    eventScroller->setWidget(centerLayoutInWidget(eventForm, false));
+
     QTabWidget *controlsTabs = new QTabWidget();
-    controlsTabs->addTab(centerLayoutInWidget(activityForm, false), tr("Activities"));
-    controlsTabs->addTab(centerLayoutInWidget(eventForm, false), tr("Events"));
+    controlsTabs->addTab(activityScroller, tr("Activities"));
+    controlsTabs->addTab(eventScroller, tr("Events"));
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     connect(agendaPastDaysSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &AgendaWindow::setAgendaPastDays);
@@ -424,6 +451,7 @@ AgendaWindow::mkControls
     connect(activityMaxTertiaryLinesSpin, &QSpinBox::valueChanged, this, &AgendaWindow::setActivityMaxTertiaryLines);
     connect(eventMaxTertiaryLinesSpin, &QSpinBox::valueChanged, this, &AgendaWindow::setEventMaxTertiaryLines);
 #endif
+    connect(showSecondaryLabelCheck, &QCheckBox::toggled, this, &AgendaWindow::updateActivities);
 
     setControls(controlsTabs);
 }
@@ -546,9 +574,11 @@ AgendaWindow::getActivities
             if (! rideMetricUnit.isEmpty()) {
                 activity.secondary += " " + rideMetricUnit;
             }
-            activity.secondaryMetric = rideMetricName;
+            if (isShowSecondaryLabel()) {
+                activity.secondaryMetric = rideMetricName;
+            }
         } else {
-            activity.secondary = "";
+            activity.secondary = tr("N/A");
             activity.secondaryMetric = "";
         }
         if (showTertiaryFor == 0 || (showTertiaryFor == 1 && rideItem->dateTime.date() == today)) {
@@ -711,6 +741,10 @@ void
 AgendaWindow::updateActivities
 ()
 {
+    if (agendaView->selectedDate() != QDate::currentDate()) {
+        agendaView->updateDate();
+        return;
+    }
     QHash<QDate, QList<CalendarEntry>> activities = getActivities(agendaView->firstVisibleDay(), agendaView->selectedDate(), agendaView->lastVisibleDay());
     std::pair<QList<CalendarEntry>, QList<CalendarEntry>> phases;
     QHash<QDate, QList<CalendarEntry>> events;

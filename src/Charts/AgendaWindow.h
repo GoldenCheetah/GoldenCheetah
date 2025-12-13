@@ -43,6 +43,7 @@ class AgendaWindow : public GcChartWindow
     Q_PROPERTY(QString primaryMainField READ getPrimaryMainField WRITE setPrimaryMainField USER true)
     Q_PROPERTY(QString primaryFallbackField READ getPrimaryFallbackField WRITE setPrimaryFallbackField USER true)
     Q_PROPERTY(QString secondaryMetric READ getSecondaryMetric WRITE setSecondaryMetric USER true)
+    Q_PROPERTY(bool showSecondaryLabel READ isShowSecondaryLabel WRITE setShowSecondaryLabel USER true)
     Q_PROPERTY(int showTertiaryFor READ getShowTertiaryFor WRITE setShowTertiaryFor USER true)
     Q_PROPERTY(QString tertiaryField READ getTertiaryField WRITE setTertiaryField USER true)
     Q_PROPERTY(int activityMaxTertiaryLines READ getActivityMaxTertiaryLines WRITE setActivityMaxTertiaryLines USER true)
@@ -59,6 +60,7 @@ class AgendaWindow : public GcChartWindow
         QString getPrimaryMainField() const;
         QString getPrimaryFallbackField() const;
         QString getSecondaryMetric() const;
+        bool isShowSecondaryLabel() const;
         int getShowTertiaryFor() const;
         QString getTertiaryField() const;
         int getActivityMaxTertiaryLines() const;
@@ -70,6 +72,7 @@ class AgendaWindow : public GcChartWindow
         void setPrimaryMainField(const QString &name);
         void setPrimaryFallbackField(const QString &name);
         void setSecondaryMetric(const QString &name);
+        void setShowSecondaryLabel(bool showSecondaryLabel);
         void setShowTertiaryFor(int showFor);
         void setTertiaryField(const QString &name);
         void setActivityMaxTertiaryLines(int maxTertiaryLines);
@@ -88,6 +91,7 @@ class AgendaWindow : public GcChartWindow
         QComboBox *primaryMainCombo;
         QComboBox *primaryFallbackCombo;
         QComboBox *secondaryCombo;
+        QCheckBox *showSecondaryLabelCheck;
         QComboBox *showTertiaryForCombo;
         QComboBox *tertiaryCombo;
         QSpinBox *activityMaxTertiaryLinesSpin;
