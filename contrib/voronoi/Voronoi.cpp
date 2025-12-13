@@ -778,12 +778,12 @@ Voronoi::line(float ax, float ay, float bx, float by)
     }
 
 void
-Voronoi::circle(float ax, float ay, float radius)
+Voronoi::circle([[maybe_unused]] float ax, [[maybe_unused]] float ay, [[maybe_unused]] float radius)
     {
     }
 
 void
-Voronoi::range(float pxmin, float pxmax, float pymin, float pymax)
+Voronoi::range([[maybe_unused]] float pxmin, [[maybe_unused]] float pxmax, [[maybe_unused]] float pymin, [[maybe_unused]] float pymax)
     {
     }
 

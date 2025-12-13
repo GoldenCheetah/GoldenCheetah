@@ -438,7 +438,7 @@ CalendarDetailedDayDelegate::paint
         int iconWidth = 0;
         if (height >= lineHeight && columnWidth >= lineHeight) {
             QColor pixmapColor(entry.color);
-            int headlineOffset = 0;
+            // int headlineOffset = 0;
             if (height >= 2 * lineHeight + priSecSpacing && columnWidth >= 2 * lineHeight + priSecSpacing) {
                 iconWidth = 2 * lineHeight + priSecSpacing;
             } else {
@@ -605,9 +605,9 @@ CalendarHeadlineDelegate::paint
     const int leftMargin = 4 * dpiXFactor;
     const int rightMargin = 4 * dpiXFactor;
     const int topMargin = 2 * dpiYFactor;
-    const int bottomMargin = 4 * dpiYFactor;
+    // const int bottomMargin = 4 * dpiYFactor;
     const int lineSpacing = 2 * dpiYFactor;
-    const int iconSpacing = 2 * dpiXFactor;
+    // const int iconSpacing = 2 * dpiXFactor;
     const int radius = 4 * dpiXFactor;
 
     // Headline: Date, Phases and Events
@@ -1303,7 +1303,7 @@ AgendaEntryDelegate::paint
     QFontMetrics line1FM(line1Font);
     const int lineSpacing = attributes.lineSpacing * dpiYFactor;
     const int lineHeight = line1FM.height();
-    const int radius = 4 * dpiXFactor;
+    // const int radius = 4 * dpiXFactor;
     const int iconInnerSpacing = 4 * dpiXFactor;
     const int iconTextSpacing = attributes.iconTextSpacing * dpiXFactor;
     const int iconWidth = 2 * lineHeight + lineSpacing;
@@ -1424,7 +1424,7 @@ AgendaEntryDelegate::sizeHint
             const int iconWidth = 2 * lineHeight + lineSpacing;
             int tertiaryWidth = width - iconWidth - attributes.iconTextSpacing * dpiXFactor - attributes.padding.left() - attributes.padding.right();
             int numLines;
-            int tertiary;
+            // int tertiary;
             layoutTertiaryText(entry.tertiary, option.font, tertiaryWidth, numLines, tertiaryHeight, nullptr, true);
             tertiaryHeight += 2 * lineSpacing;
         }

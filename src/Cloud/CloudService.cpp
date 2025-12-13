@@ -289,7 +289,7 @@ CloudService::uncompressRide(QByteArray *data, QString name, QStringList &errors
 }
 
 void
-CloudService::sslErrors(QWidget* parent, QNetworkReply* reply ,QList<QSslError> errors)
+CloudService::sslErrors(QWidget* parent, [[maybe_unused]] QNetworkReply* reply ,QList<QSslError> errors)
 {
     QString errorString = "";
     foreach (const QSslError e, errors ) {

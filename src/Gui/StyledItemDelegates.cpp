@@ -813,7 +813,7 @@ ListEditDelegate::setDisplayLength
 
 QWidget*
 ListEditDelegate::createEditor
-(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+([[maybe_unused]] QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     Q_UNUSED(option)
     Q_UNUSED(index)
