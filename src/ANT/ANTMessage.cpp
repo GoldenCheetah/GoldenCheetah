@@ -375,7 +375,7 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
             {
 
                 // page no is first 7 bits, page change toggle is bit 8
-                bool page_toggle = data_page&128;
+                // bool page_toggle = data_page&128;
                 data_page &= 127;
 
                 // Heartrate is fairly simple. Although

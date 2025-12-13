@@ -416,8 +416,8 @@ GcWindow::spotHotSpot(QMouseEvent *e)
     int borderWidth = 3;
 
     // account for offset by mapping to GcWindow geom
-    int _y = e->y();
-    int _x = e->x();
+    int _y = e->position().y();
+    int _x = e->position().x();
     int _height = height();
     int _width = width();
 

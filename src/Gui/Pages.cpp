@@ -134,7 +134,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     garminHWMarkedit->setSuffix(" " + tr("s"));
     garminHWMarkedit->setValue(garminHWMark.toInt());
 
-    connect(garminSmartRecord, &QCheckBox::stateChanged, [=](int state) { garminHWMarkedit->setEnabled(state); });
+    connect(garminSmartRecord, &QCheckBox::checkStateChanged, [=](int state) { garminHWMarkedit->setEnabled(state); });
     garminSmartRecord->setCheckState(! (isGarminSmartRecording.toInt() > 0) ? Qt::Checked : Qt::Unchecked);
     garminSmartRecord->setCheckState(isGarminSmartRecording.toInt() > 0 ? Qt::Checked : Qt::Unchecked);
 
@@ -216,7 +216,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     pythonDirectoryLayout->addWidget(pythonBrowseButton);
 
     connect(pythonBrowseButton, SIGNAL(clicked()), this, SLOT(browsePythonDir()));
-    connect(embedPython, &QCheckBox::stateChanged, [=](int state) { pythonDirectorySel->setEnabled(state); });
+    connect(embedPython, &QCheckBox::checkStateChanged, [=](int state) { pythonDirectorySel->setEnabled(state); });
 
     embedPython->setChecked(! appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool());
     embedPython->setChecked(appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool());
