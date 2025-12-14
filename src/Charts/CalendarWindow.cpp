@@ -45,6 +45,7 @@ CalendarWindow::CalendarWindow(Context *context)
 
     setStartHour(8);
     setEndHour(21);
+    setShowSecondaryLabel(true);
 
     QVBoxLayout *mainLayout = new QVBoxLayout();
     setChartLayout(mainLayout);
@@ -350,6 +351,14 @@ CalendarWindow::getSecondaryMetric
 }
 
 
+bool
+CalendarWindow::isShowSecondaryLabel
+() const
+{
+    return showSecondaryLabelCheck->isChecked();
+}
+
+
 QString
 CalendarWindow::getTertiaryField
 () const
@@ -387,6 +396,14 @@ CalendarWindow::setSecondaryMetric
 (const QString &name)
 {
     secondaryCombo->setCurrentIndex(std::max(0, secondaryCombo->findData(name)));
+}
+
+
+void
+CalendarWindow::setShowSecondaryLabel
+(bool showSecondaryLabel)
+{
+    showSecondaryLabelCheck->setChecked(showSecondaryLabel);
 }
 
 
@@ -512,6 +529,7 @@ CalendarWindow::mkControls
     primaryMainCombo = new QComboBox();
     primaryFallbackCombo = new QComboBox();
     secondaryCombo = new QComboBox();
+    showSecondaryLabelCheck = new QCheckBox(tr("Show Label"));
     tertiaryCombo = new QComboBox();
     updatePrimaryConfigCombos();
     updateSecondaryConfigCombo();
@@ -551,6 +569,7 @@ CalendarWindow::mkControls
     entriesForm->addItem(new QSpacerItem(0, 20 * dpiYFactor));
     entriesForm->addRow(new QLabel(HLO + tr("Metric Line") + HLC));
     entriesForm->addRow(tr("Metric"), secondaryCombo);
+    entriesForm->addRow("", showSecondaryLabelCheck);
     entriesForm->addItem(new QSpacerItem(0, 20 * dpiYFactor));
     entriesForm->addRow(new QLabel(HLO + tr("Detail Line (Day and Week View only)") + HLC));
     entriesForm->addRow(tr("Field"), tertiaryCombo);
@@ -582,6 +601,7 @@ CalendarWindow::mkControls
     connect(summaryDayCheck, &QCheckBox::toggled, this, &CalendarWindow::setSummaryVisibleDay);
     connect(summaryWeekCheck, &QCheckBox::toggled, this, &CalendarWindow::setSummaryVisibleWeek);
     connect(summaryMonthCheck, &QCheckBox::toggled, this, &CalendarWindow::setSummaryVisibleMonth);
+    connect(showSecondaryLabelCheck, &QCheckBox::toggled, this, &CalendarWindow::updateActivities);
     connect(multiMetricSelector, &MultiMetricSelector::selectedChanged, this, &CalendarWindow::updateActivities);
 
     setControls(controlsTabs);
@@ -704,7 +724,9 @@ CalendarWindow::getActivities
             if (! rideMetricUnit.isEmpty()) {
                 activity.secondary += " " + rideMetricUnit;
             }
-            activity.secondaryMetric = rideMetricName;
+            if (isShowSecondaryLabel()) {
+                activity.secondaryMetric = rideMetricName;
+            }
         } else {
             activity.secondary = "";
             activity.secondaryMetric = "";

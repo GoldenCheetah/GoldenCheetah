@@ -36,6 +36,7 @@ static bool toolTipHeadlineEntry(const QPoint &pos, QAbstractItemView *view, con
 static bool toolTipDayEntry(const QPoint &pos, QAbstractItemView *view, const CalendarDay &day, int idx);
 static bool toolTipMore(const QPoint &pos, QAbstractItemView *view, const CalendarDay &day);
 static QRect paintHeadline(QPainter *painter, const QStyleOptionViewItem &opt, const QModelIndex &index, HitTester &headlineTester, const QString &dateFormat, int pressedEntryIdx, int leftMargin, int rightMargin, int topMargin, int lineSpacing, int radius);
+static void paintMetric(QPainter *painter, const QRect &rect, const QFont::Weight &valueWeight, const QFont::Weight &labelWeight, const QString &value, const QString &label);
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -463,11 +464,7 @@ CalendarDetailedDayDelegate::paint
             painter->drawText(textRect, Qt::AlignLeft | Qt::AlignTop, entry.primary);
             if (--numLines > 0 && ! entry.secondary.isEmpty()) {
                 textRect.translate(0, lineHeight + priSecSpacing);
-                if (! entry.secondaryMetric.isEmpty()) {
-                    painter->drawText(textRect, Qt::AlignLeft | Qt::AlignTop, entry.secondary + " (" + entry.secondaryMetric + ")");
-                } else {
-                    painter->drawText(textRect, Qt::AlignLeft | Qt::AlignTop, entry.secondary);
-                }
+                paintMetric(painter, textRect, QFont::Normal, QFont::ExtraLight, entry.secondary, entry.secondaryMetric);
             }
             if (--numLines > 0 && ! entry.tertiary.isEmpty()) {
                 QRect tertiaryRect(left + horPadding,
@@ -875,7 +872,7 @@ CalendarCompactDayDelegate::paint
                           titleRect.y() + lineSpacing + lineHeight,
                           titleRect.width(),
                           titleRect.height());
-            painter->drawText(subRect, Qt::AlignLeft | Qt::AlignTop, calEntry.secondary + " (" + calEntry.secondaryMetric + ")");
+            paintMetric(painter, subRect, QFont::Normal, QFont::ExtraLight, calEntry.secondary, calEntry.secondaryMetric);
         }
         painter->restore();
 
@@ -1340,51 +1337,23 @@ AgendaEntryDelegate::paint
     painter->drawText(textRect, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip, primary);
     painter->restore();
     if (! entry.secondary.isEmpty()) {
-        painter->save();
-        QFont metricValueFont = painter->font();
-        metricValueFont.setWeight(secondaryWeight);
-        QFontMetrics metricValueFM(metricValueFont);
-        painter->setFont(metricValueFont);
         textRect.translate(0, lineHeight + lineSpacing);
-        QRect secRect = metricValueFM.boundingRect(entry.secondary);
-        secRect.setRect(textRect.x(), textRect.y(), secRect.width(), secRect.height());
-        painter->drawText(secRect, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip, entry.secondary);
+        paintMetric(painter, textRect, secondaryWeight, secondaryMetricWeight, entry.secondary, entry.secondaryMetric);
+    }
+    if (! entry.tertiary.isEmpty()) {
+        painter->save();
+        painter->setPen(GCColor::inactiveColor(painter->pen().color(), attributes.tertiaryDimLevel));
+        int y = opt.rect.y() + attributes.padding.top() + pixmapSize.height() + 2 * lineSpacing;
+        QStringList tertiaryLines;
+        int numLines;
+        int tertiaryHeight;
+        layoutTertiaryText(entry.tertiary, opt.font, textWidth, numLines, tertiaryHeight, &tertiaryLines, true);
+        QRect tertiaryRect(textX, y, textWidth, lineHeight);
+        for (const QString &tertiaryLine : tertiaryLines) {
+            painter->drawText(tertiaryRect, Qt::AlignLeft | Qt::AlignTop, tertiaryLine);
+            tertiaryRect.translate(0, lineHeight);
+        }
         painter->restore();
-        if (! entry.secondaryMetric.isEmpty()) {
-            painter->save();
-            QFont metricLabelFont = painter->font();
-            metricLabelFont.setWeight(secondaryMetricWeight);
-            QFontMetrics metricLabelFM(metricLabelFont);
-            painter->setFont(metricLabelFont);
-            int remainingWidth = opt.rect.x() + opt.rect.width() - secRect.right() - attributes.padding.left() - attributes.padding.right();
-
-            QString txt = " " + entry.secondaryMetric;
-            QRect secMetricRect = metricLabelFM.boundingRect(txt);
-            if (secMetricRect.width() > remainingWidth) {
-                txt = metricLabelFM.elidedText(txt, Qt::ElideRight, remainingWidth);
-            }
-            secMetricRect.setRect(secRect.x() + secRect.width() + 2 * dpiXFactor,
-                                  secRect.y(),
-                                  remainingWidth,
-                                  secMetricRect.height());
-            painter->drawText(secMetricRect, Qt::AlignLeft | Qt::AlignTop, txt);
-            painter->restore();
-        }
-        if (! entry.tertiary.isEmpty()) {
-            painter->save();
-            painter->setPen(GCColor::inactiveColor(painter->pen().color(), attributes.tertiaryDimLevel));
-            int y = opt.rect.y() + attributes.padding.top() + pixmapSize.height() + 2 * lineSpacing;
-            QStringList tertiaryLines;
-            int numLines;
-            int tertiaryHeight;
-            layoutTertiaryText(entry.tertiary, opt.font, textWidth, numLines, tertiaryHeight, &tertiaryLines, true);
-            QRect tertiaryRect(textX, y, textWidth, lineHeight);
-            for (const QString &tertiaryLine : tertiaryLines) {
-                painter->drawText(tertiaryRect, Qt::AlignLeft | Qt::AlignTop, tertiaryLine);
-                tertiaryRect.translate(0, lineHeight);
-            }
-            painter->restore();
-        }
     }
 
     painter->restore();
@@ -1772,6 +1741,7 @@ paintHeadline
     CalendarDay calendarDay = index.data(CalendarHeadlineDelegate::DayRole).value<CalendarDay>();
     QColor dayColor;
     bool isToday = (calendarDay.date == QDate::currentDate());
+    bool selected = false;
     QLocale locale;
     QString dateText = locale.toString(calendarDay.date, dateFormat);
 
@@ -1802,6 +1772,7 @@ paintHeadline
     } else {
         dayColor = opt.palette.color((calendarDay.isDimmed == DayDimLevel::Full || calendarDay.isDimmed == DayDimLevel::Partial) ? QPalette::Disabled : QPalette::Active, QPalette::Text);
     }
+    selected = pressedEntryIdx < 0 && opt.state & QStyle::State_Selected;
 
     painter->setFont(dayFont);
     painter->setPen(dayColor);
@@ -1814,11 +1785,34 @@ paintHeadline
         if (x < dayRect.x() + dayRect.width() + lineSpacing) {
             break;
         }
-        QPixmap pixmap = svgOnBackground(calEntry.iconFile, QSize(lineHeight, lineHeight), 0, calEntry.color, radius);
+        QPixmap pixmap = svgAsColoredPixmap(calEntry.iconFile, QSize(lineHeight, lineHeight), 0, selected ? dayColor : calEntry.color);
         QRect headlineEntryRect(x, opt.rect.y() + topMargin, lineHeight, lineHeight);
         painter->drawPixmap(x, opt.rect.y() + topMargin, pixmap);
         headlineTester.append(index, headlineEntryRect);
     }
 
     return dayRect;
+}
+
+
+static void
+paintMetric
+(QPainter *painter, const QRect &rect, const QFont::Weight &valueWeight, const QFont::Weight &labelWeight, const QString &value, const QString &label)
+{
+    painter->save();
+    QFont font = painter->font();
+    font.setWeight(valueWeight);
+    painter->setFont(font);
+    QFontMetrics valueFM(font);
+    int valueWidth = valueFM.horizontalAdvance(value);
+    painter->drawText(rect, Qt::AlignLeft | Qt::AlignTop, value);
+    if (! label.isEmpty()) {
+        QRect labelRect(rect);
+        labelRect.setX(rect.x() + valueWidth + valueFM.horizontalAdvance(" "));
+        font.setWeight(labelWeight);
+        QFontMetrics labelFM(font);
+        painter->setFont(font);
+        painter->drawText(labelRect, Qt::AlignLeft | Qt::AlignTop, label);
+    }
+    painter->restore();
 }
