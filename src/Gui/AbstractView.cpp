@@ -583,6 +583,10 @@ AbstractView::setPages(QStackedWidget *pages)
     mainSplitter->setCollapsible(0, false);
     splitter->insertWidget(-1, mainSplitter);
 
+    // prevent the pages being collapsed by the splitter
+    int index = splitter->indexOf(mainSplitter);
+    splitter->setCollapsible(index, false);
+
     // restore sizes
     QString setting = QString("%1/%2").arg(GC_SETTINGS_SPLITTER_SIZES).arg(type);
     QVariant splitterSizes = appsettings->cvalue(context->athlete->cyclist, setting); 
