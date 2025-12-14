@@ -460,6 +460,11 @@ LTMSidebar::resetSeasons()
     // delete it and its children
     dateRangeTree->clear();
 
+    // clear events - we need to add for currently selected season
+    for (int i = allEvents->childCount(); i > 0; i--) {
+        delete allEvents->takeChild(0);
+    }
+
     // by default choose last 3 months not first one, since the first one is all dates
     // and that means aggregating all data when first starting...
     QString id = appsettings->cvalue(context->athlete->cyclist, GC_LTM_LAST_DATE_RANGE, "{00000000-0000-0000-0000-000000000012}").toString();
@@ -485,6 +490,22 @@ LTMSidebar::resetSeasons()
             }
             addPhase->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
             addPhase->setText(0, phase.getName());
+        }
+
+        // Events
+        if (context->currentSeason() != nullptr && context->currentSeason()->id() == season.id()) {
+            // add this seasons events
+            for (int j = 0; j < season.events.count(); j++) {
+                SeasonEvent event = season.events.at(j);
+                QTreeWidgetItem *add = new QTreeWidgetItem(allEvents);
+                add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+                add->setText(0, event.name);
+                add->setText(1, event.date.toString("MMM d, yyyy"));
+                add->setText(2, SeasonEvent::priorityList().at(event.priority));
+            }
+
+            // make sure they fit
+            eventTree->header()->resizeSections(QHeaderView::ResizeToContents);
         }
     }
 
