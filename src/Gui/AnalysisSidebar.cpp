@@ -416,7 +416,7 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
             QString filter = buildWorkoutFilter(rideItem);
             if (! filter.isEmpty()) {
                 QAction *actStartWorkout = new QAction(tr("Show in Train Mode..."), rideNavigator);
-                connect(actStartWorkout, &QAction::triggered, [=]() {
+                connect(actStartWorkout, &QAction::triggered, this, [this, filter]() {
                     context->mainWindow->fillinWorkoutFilterBox(filter);
                     context->mainWindow->selectTrain();
                     context->notifySelectWorkout(0);

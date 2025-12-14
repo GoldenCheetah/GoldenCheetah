@@ -741,8 +741,8 @@ CalendarDayTable::makeHeaderMenu
         const CalendarEntry &entry = day.headlineEntries[entryIdx];
         switch (entry.type) {
         case ENTRY_TYPE_EVENT: {
-            QAction *editEventAction = contextMenu->addAction(tr("Edit event..."), this, [=]() { emit editEvent(entry); });
-            QAction *delEventAction = contextMenu->addAction(tr("Delete event"), this, [=]() { emit delEvent(entry); });
+            QAction *editEventAction = contextMenu->addAction(tr("Edit event..."), this, [this, entry]() { emit editEvent(entry); });
+            QAction *delEventAction = contextMenu->addAction(tr("Delete event"), this, [this, entry]() { emit delEvent(entry); });
             if (! isInDateRange(day.date) || ! canHavePhasesOrEvents) {
                 editEventAction->setEnabled(false);
                 delEventAction->setEnabled(false);
@@ -750,8 +750,8 @@ CalendarDayTable::makeHeaderMenu
             break;
         }
         case ENTRY_TYPE_PHASE: {
-            QAction *editPhaseAction = contextMenu->addAction(tr("Edit phase..."), this, [=]() { emit editPhase(entry); });
-            QAction *delPhaseAction = contextMenu->addAction(tr("Delete phase..."), this, [=]() { emit delPhase(entry); });
+            QAction *editPhaseAction = contextMenu->addAction(tr("Edit phase..."), this, [this, entry]() { emit editPhase(entry); });
+            QAction *delPhaseAction = contextMenu->addAction(tr("Delete phase..."), this, [this, entry]() { emit delPhase(entry); });
             if (! isInDateRange(day.date) || ! canHavePhasesOrEvents) {
                 editPhaseAction->setEnabled(false);
                 delPhaseAction->setEnabled(false);
@@ -762,8 +762,8 @@ CalendarDayTable::makeHeaderMenu
             break;
         }
     } else {
-        QAction *addPhaseAction = contextMenu->addAction(tr("Add phase..."), this, [=]() { emit addPhase(day.date); });
-        QAction *addEventAction = contextMenu->addAction(tr("Add event..."), this, [=]() { emit addEvent(day.date); });
+        QAction *addPhaseAction = contextMenu->addAction(tr("Add phase..."), this, [this, day]() { emit addPhase(day.date); });
+        QAction *addEventAction = contextMenu->addAction(tr("Add event..."), this, [this, day]() { emit addEvent(day.date); });
         if (! isInDateRange(day.date) || ! canHavePhasesOrEvents) {
             addPhaseAction->setEnabled(false);
             addEventAction->setEnabled(false);
@@ -786,23 +786,23 @@ CalendarDayTable::makeActivityMenu
         CalendarEntry calEntry = day.entries[entryIdx];
         switch (calEntry.type) {
         case ENTRY_TYPE_ACTIVITY:
-            contextMenu->addAction(tr("View activity..."), this, [=]() {
+            contextMenu->addAction(tr("View activity..."), this, [this, calEntry]() {
                 emit viewActivity(calEntry);
             });
-            contextMenu->addAction(tr("Delete activity"), this, [=]() {
+            contextMenu->addAction(tr("Delete activity"), this, [this, calEntry]() {
                 emit delActivity(calEntry);
             });
             break;
         case ENTRY_TYPE_PLANNED_ACTIVITY:
             if (calEntry.hasTrainMode) {
-                contextMenu->addAction(tr("Show in train node..."), this, [=]() {
+                contextMenu->addAction(tr("Show in train node..."), this, [this, calEntry]() {
                     emit showInTrainMode(calEntry);
                 });
             }
-            contextMenu->addAction(tr("View planned activity..."), this, [=]() {
+            contextMenu->addAction(tr("View planned activity..."), this, [this, calEntry]() {
                 emit viewActivity(calEntry);
             });
-            contextMenu->addAction(tr("Delete planned activity"), this, [=]() {
+            contextMenu->addAction(tr("Delete planned activity"), this, [this, calEntry]() {
                 emit delActivity(calEntry);
             });
             break;
@@ -814,16 +814,16 @@ CalendarDayTable::makeActivityMenu
         if (   day.date < QDate::currentDate()
             || (   day.date == QDate::currentDate()
                 && time < QTime::currentTime())) {
-            contextMenu->addAction(tr("Add activity..."), this, [=]() {
+            contextMenu->addAction(tr("Add activity..."), this, [this, day, time]() {
                 emit addActivity(false, day.date, time);
             });
         } else {
-            contextMenu->addAction(tr("Add planned activity..."), this, [=]() {
+            contextMenu->addAction(tr("Add planned activity..."), this, [this, day, time]() {
                 emit addActivity(true, day.date, time);
             });
         }
-        QAction *addPhaseAction = contextMenu->addAction(tr("Add phase..."), this, [=]() { emit addPhase(day.date); });
-        QAction *addEventAction = contextMenu->addAction(tr("Add event..."), this, [=]() { emit addEvent(day.date); });
+        QAction *addPhaseAction = contextMenu->addAction(tr("Add phase..."), this, [this, day]() { emit addPhase(day.date); });
+        QAction *addEventAction = contextMenu->addAction(tr("Add event..."), this, [this, day]() { emit addEvent(day.date); });
         if (! isInDateRange(day.date) || ! canHavePhasesOrEvents) {
             addPhaseAction->setEnabled(false);
             addEventAction->setEnabled(false);
@@ -858,7 +858,7 @@ CalendarMonthTable::CalendarMonthTable
 
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, &CalendarMonthTable::customContextMenuRequested, this, &CalendarMonthTable::showContextMenu);
-    connect(this, &QTableWidget::itemSelectionChanged, [=]() {
+    connect(this, &QTableWidget::itemSelectionChanged, this, [this]() {
         QList<QTableWidgetItem*> selection = selectedItems();
         if (selection.count() > 0) {
             QTableWidgetItem *item = selection[0];
@@ -1370,23 +1370,23 @@ CalendarMonthTable::showContextMenu
         CalendarEntry calEntry = day.entries[entryIdx];
         switch (calEntry.type) {
         case ENTRY_TYPE_ACTIVITY:
-            contextMenu.addAction(tr("View activity..."), this, [=]() {
+            contextMenu.addAction(tr("View activity..."), this, [this, calEntry]() {
                 emit viewActivity(calEntry);
             });
-            contextMenu.addAction(tr("Delete activity"), this, [=]() {
+            contextMenu.addAction(tr("Delete activity"), this, [this, calEntry]() {
                 emit delActivity(calEntry);
             });
             break;
         case ENTRY_TYPE_PLANNED_ACTIVITY:
             if (calEntry.hasTrainMode) {
-                contextMenu.addAction(tr("Show in train mode..."), this, [=]() {
+                contextMenu.addAction(tr("Show in train mode..."), this, [this, calEntry]() {
                     emit showInTrainMode(calEntry);
                 });
             }
-            contextMenu.addAction(tr("View planned activity..."), this, [=]() {
+            contextMenu.addAction(tr("View planned activity..."), this, [this, calEntry]() {
                 emit viewActivity(calEntry);
             });
-            contextMenu.addAction(tr("Delete planned activity"), this, [=]() {
+            contextMenu.addAction(tr("Delete planned activity"), this, [this, calEntry]() {
                 emit delActivity(calEntry);
             });
             break;
@@ -1397,8 +1397,8 @@ CalendarMonthTable::showContextMenu
         const CalendarEntry &entry = day.headlineEntries[headlineEntryIdx];
         switch (entry.type) {
         case ENTRY_TYPE_EVENT: {
-            QAction *editEventAction = contextMenu.addAction(tr("Edit event..."), this, [=]() { emit editEvent(entry); });
-            QAction *delEventAction = contextMenu.addAction(tr("Delete event"), this, [=]() { emit delEvent(entry); });
+            QAction *editEventAction = contextMenu.addAction(tr("Edit event..."), this, [this, entry]() { emit editEvent(entry); });
+            QAction *delEventAction = contextMenu.addAction(tr("Delete event"), this, [this, entry]() { emit delEvent(entry); });
             if (! isInDateRange(day.date) || ! canHavePhasesOrEvents) {
                 editEventAction->setEnabled(false);
                 delEventAction->setEnabled(false);
@@ -1406,8 +1406,8 @@ CalendarMonthTable::showContextMenu
             break;
         }
         case ENTRY_TYPE_PHASE: {
-            QAction *editPhaseAction = contextMenu.addAction(tr("Edit phase..."), this, [=]() { emit editPhase(entry); });
-            QAction *delPhaseAction = contextMenu.addAction(tr("Delete phase"), this, [=]() { emit delPhase(entry); });
+            QAction *editPhaseAction = contextMenu.addAction(tr("Edit phase..."), this, [this, entry]() { emit editPhase(entry); });
+            QAction *delPhaseAction = contextMenu.addAction(tr("Delete phase"), this, [this, entry]() { emit delPhase(entry); });
             if (! isInDateRange(day.date) || ! canHavePhasesOrEvents) {
                 editPhaseAction->setEnabled(false);
                 delPhaseAction->setEnabled(false);
@@ -1419,7 +1419,7 @@ CalendarMonthTable::showContextMenu
         }
     } else {
         if (day.date <= QDate::currentDate()) {
-            contextMenu.addAction(tr("Add activity..."), this, [=]() {
+            contextMenu.addAction(tr("Add activity..."), this, [this, day]() {
                 QTime time = QTime::currentTime();
                 if (day.date == QDate::currentDate()) {
                     time = time.addSecs(std::max(-4 * 3600, time.secsTo(QTime(0, 0))));
@@ -1428,7 +1428,7 @@ CalendarMonthTable::showContextMenu
             });
         }
         if (day.date >= QDate::currentDate()) {
-            contextMenu.addAction(tr("Add planned activity..."), this, [=]() {
+            contextMenu.addAction(tr("Add planned activity..."), this, [this, day]() {
                 QTime time = QTime::currentTime();
                 if (day.date == QDate::currentDate()) {
                     time = time.addSecs(std::min(4 * 3600, time.secsTo(QTime(23, 59, 59))));
@@ -1436,15 +1436,15 @@ CalendarMonthTable::showContextMenu
                 emit addActivity(true, day.date, time);
             });
         }
-        QAction *addPhaseAction = contextMenu.addAction(tr("Add phase..."), this, [=]() { emit addPhase(day.date); });
-        QAction *addEventAction = contextMenu.addAction(tr("Add event..."), this, [=]() { emit addEvent(day.date); });
+        QAction *addPhaseAction = contextMenu.addAction(tr("Add phase..."), this, [this, day]() { emit addPhase(day.date); });
+        QAction *addEventAction = contextMenu.addAction(tr("Add event..."), this, [this, day]() { emit addEvent(day.date); });
         if (! isInDateRange(day.date) || ! canHavePhasesOrEvents) {
             addPhaseAction->setEnabled(false);
             addEventAction->setEnabled(false);
         }
         if (day.date >= QDate::currentDate()) {
             contextMenu.addSeparator();
-            contextMenu.addAction(tr("Repeat schedule..."), this, [=]() {
+            contextMenu.addAction(tr("Repeat schedule..."), this, [this, day]() {
                 emit repeatSchedule(day.date);
             });
             bool hasPlannedActivity = false;
@@ -1455,11 +1455,11 @@ CalendarMonthTable::showContextMenu
                 }
             }
             if (hasPlannedActivity) {
-                contextMenu.addAction(tr("Insert restday"), this, [=]() {
+                contextMenu.addAction(tr("Insert restday"), this, [this, day]() {
                     emit insertRestday(day.date);
                 });
             } else {
-                contextMenu.addAction(tr("Delete restday"), this, [=]() {
+                contextMenu.addAction(tr("Delete restday"), this, [this, day]() {
                     emit delRestday(day.date);
                 });
             }
@@ -1500,12 +1500,12 @@ CalendarDayView::CalendarDayView
     dayLayout->addWidget(dayLeftPane);
     dayLayout->addWidget(dayTable);
 
-    connect(dayDateSelector, &QCalendarWidget::selectionChanged, [=]() {
+    connect(dayDateSelector, &QCalendarWidget::selectionChanged, this, [this]() {
         if (dayTable->selectedDate() != dayDateSelector->selectedDate()) {
             setDay(dayDateSelector->selectedDate());
         }
     });
-    connect(dayTable, &CalendarDayTable::dayChanged, [=](const QDate &date) {
+    connect(dayTable, &CalendarDayTable::dayChanged, this, [this](const QDate &date) {
         dayDateSelector->setSelectedDate(date);
         emit dayChanged(date);
     });
@@ -1681,9 +1681,9 @@ CalendarDayView::updateMeasures
         }
         if (buttonType == 0) {
             QPushButton *addButton = new QPushButton(tr("Add Measure"));
-            connect(addButton, &QPushButton::clicked, [=]() {
+            connect(addButton, &QPushButton::clicked, this, [this, date, measuresGroup]() {
                 if (measureDialog(QDateTime(date, QTime::currentTime()), measuresGroup, false)) {
-                    QTimer::singleShot(0, this, [=]() {
+                    QTimer::singleShot(0, this, [this, date]() {
                         updateMeasures(date);
                     });
                 }
@@ -1691,9 +1691,9 @@ CalendarDayView::updateMeasures
             measureLayout->addWidget(addButton);
         } else {
             QPushButton *editButton = new QPushButton(tr("Edit Measure"));
-            connect(editButton, &QPushButton::clicked, [=]() {
+            connect(editButton, &QPushButton::clicked, this, [this, date, measure, measuresGroup]() {
                 if (measureDialog(measure.when, measuresGroup, true)) {
-                    QTimer::singleShot(0, this, [=]() {
+                    QTimer::singleShot(0, this, [this, date]() {
                         updateMeasures(date);
                     });
                 }
@@ -1966,21 +1966,21 @@ Calendar::Calendar
     dayAction->setCheckable(true);
     dayAction->setActionGroup(viewGroup);
 
-    connect(dayAction, &QAction::triggered, [=]() { setView(CalendarView::Day); });
+    connect(dayAction, &QAction::triggered, this, [this]() { setView(CalendarView::Day); });
 
     weekAction = toolbar->addAction(tr("Week"));
     weekAction->setCheckable(true);
     weekAction->setActionGroup(viewGroup);
-    connect(weekAction, &QAction::triggered, [=]() { setView(CalendarView::Week); });
+    connect(weekAction, &QAction::triggered, this, [this]() { setView(CalendarView::Week); });
 
     monthAction = toolbar->addAction(tr("Month"));
     monthAction->setCheckable(true);
     monthAction->setActionGroup(viewGroup);
-    connect(monthAction, &QAction::triggered, [=]() { setView(CalendarView::Month); });
+    connect(monthAction, &QAction::triggered, this, [this]() { setView(CalendarView::Month); });
 
     applyNavIcons();
 
-    connect(dayView, &CalendarDayView::dayChanged, [=](const QDate &date) {
+    connect(dayView, &CalendarDayView::dayChanged, this, [this](const QDate &date) {
         if (currentView() == CalendarView::Day) {
             emit dayChanged(date);
             updateHeader();
@@ -1999,7 +1999,7 @@ Calendar::Calendar
     connect(dayView, &CalendarDayView::editEvent, this, &Calendar::editEvent);
     connect(dayView, &CalendarDayView::delEvent, this, &Calendar::delEvent);
 
-    connect(weekView, &CalendarWeekView::dayChanged, [=](const QDate &date) {
+    connect(weekView, &CalendarWeekView::dayChanged, this, [this](const QDate &date) {
         if (currentView() == CalendarView::Week) {
             emit dayChanged(date);
             updateHeader();
@@ -2018,16 +2018,16 @@ Calendar::Calendar
     connect(weekView, &CalendarWeekView::editEvent, this, &Calendar::editEvent);
     connect(weekView, &CalendarWeekView::delEvent, this, &Calendar::delEvent);
 
-    connect(monthView, &CalendarMonthTable::entryDblClicked, [=](const CalendarDay &day, int entryIdx) {
+    connect(monthView, &CalendarMonthTable::entryDblClicked, this, [this](const CalendarDay &day, int entryIdx) {
         viewActivity(day.entries[entryIdx]);
     });
-    connect(monthView, &CalendarMonthTable::daySelected, [=](const CalendarDay &day) {
+    connect(monthView, &CalendarMonthTable::daySelected, this, [this](const CalendarDay &day) {
         emit daySelected(day.date);
     });
-    connect(monthView, &CalendarMonthTable::moreClicked, [=]() {
+    connect(monthView, &CalendarMonthTable::moreClicked, this, [this]() {
         setView(CalendarView::Day);
     });
-    connect(monthView, &CalendarMonthTable::dayDblClicked, [=]() {
+    connect(monthView, &CalendarMonthTable::dayDblClicked, this, [this]() {
         setView(CalendarView::Day);
     });
     connect(monthView, &CalendarMonthTable::showInTrainMode, this, &Calendar::showInTrainMode);
@@ -2044,7 +2044,7 @@ Calendar::Calendar
     connect(monthView, &CalendarMonthTable::delEvent, this, &Calendar::delEvent);
     connect(monthView, &CalendarMonthTable::insertRestday, this, &Calendar::insertRestday);
     connect(monthView, &CalendarMonthTable::delRestday, this, &Calendar::delRestday);
-    connect(monthView, &CalendarMonthTable::monthChanged, [=](const QDate &month, const QDate &firstVisible, const QDate &lastVisible) {
+    connect(monthView, &CalendarMonthTable::monthChanged, this, [this](const QDate &month, const QDate &firstVisible, const QDate &lastVisible) {
         if (currentView() == CalendarView::Month) {
             emit monthChanged(month, firstVisible, lastVisible);
             updateHeader();
@@ -2052,9 +2052,9 @@ Calendar::Calendar
         }
     });
 
-    connect(prevAction, &QAction::triggered, [=]() { goNext(-1); });
-    connect(nextAction, &QAction::triggered, [=]() { goNext(1); });
-    connect(todayAction, &QAction::triggered, [=]() { setDate(QDate::currentDate()); });
+    connect(prevAction, &QAction::triggered, this, [this]() { goNext(-1); });
+    connect(nextAction, &QAction::triggered, this, [this]() { goNext(1); });
+    connect(todayAction, &QAction::triggered, this, [this]() { setDate(QDate::currentDate()); });
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(toolbar);
@@ -2464,7 +2464,7 @@ Calendar::populateDateMenu
                     }
                 }
                 if (actualDate.month() == date.month()) {
-                    connect(action, &QAction::triggered, [=]() {
+                    connect(action, &QAction::triggered, this, [this, actualDate]() {
                         setDate(actualDate);
                     });
                 }
@@ -2486,7 +2486,7 @@ Calendar::populateDateMenu
                         date = dateRange.to;
                     }
                 }
-                connect(action, &QAction::triggered, [=]() {
+                connect(action, &QAction::triggered, this, [this, date]() {
                     setDate(date);
                 });
             }

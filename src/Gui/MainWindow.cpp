@@ -531,9 +531,9 @@ MainWindow::MainWindow(const QDir &home)
     rideMenu->addAction(tr("&Import from file..."), this, SLOT (importFile()), QKeySequence("Ctrl+I"));
     rideMenu->addAction(tr("&Manual entry..."), this, SLOT(manualRide()), QKeySequence("Ctrl+M"));
     QAction *actionPlan = new QAction(tr("&Plan activity..."));
-    connect(context, &Context::start, this, [=]() { actionPlan->setEnabled(false); }); // The dialog can change the contexts workout
-    connect(context, &Context::stop, this, [=]() { actionPlan->setEnabled(true); });   // temporarily which might cause unwanted effects
-    connect(actionPlan, &QAction::triggered, this, [=]() { planActivity(); });
+    connect(context, &Context::start, this, [this, actionPlan]() { actionPlan->setEnabled(false); }); // The dialog can change the contexts workout
+    connect(context, &Context::stop, this, [this, actionPlan]() { actionPlan->setEnabled(true); });   // temporarily which might cause unwanted effects
+    connect(actionPlan, &QAction::triggered, this, [this]() { planActivity(); });
     rideMenu->addAction(actionPlan);
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Export..."), this, SLOT(exportRide()), QKeySequence("Ctrl+E"));
