@@ -1792,7 +1792,7 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
 
     // set cursor busy whilst we aggregate -- bit of feedback
     // and less intrusive than a popup box
-    context->mainWindow->setCursor(Qt::WaitCursor);
+    context->mainWidget()->setCursor(Qt::WaitCursor);
 
     // Iterate over the ride files (not the cpx files since they /might/ not
     // exist, or /might/ be out of date.
@@ -1865,7 +1865,7 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
     }
 
     // set the cursor back to normal
-    context->mainWindow->setCursor(Qt::ArrowCursor);
+    context->mainWidget()->setCursor(Qt::ArrowCursor);
 
     // lets add to the cache for others to re-use -- but not if filtered or incomplete
     if (incomplete == false && !context->isfiltered && (!context->ishomefiltered || !onhome) && !filter) {

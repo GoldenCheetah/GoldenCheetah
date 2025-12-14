@@ -1,0 +1,387 @@
+#ifndef _GC_SettingsConstants_h
+#define _GC_SettingsConstants_h
+
+/*
+ *  Global GC Properties which are not stored as GSettings are defined here
+ */
+
+#define GC_SETTINGS_CO                        "goldencheetah.org"
+#ifndef GC_SETTINGS_APP
+#define GC_SETTINGS_APP                       "GoldenCheetah"
+#endif
+#define GC_SETTINGS_FAVOURITE_METRICS_DEFAULT "workout_time,time_recording,time_riding,total_distance,distance_swim,total_work,average_power,average_hr,average_cad,average_run_cad,average_speed,pace,pace_swim"
+#define GC_UNIT_METRIC                       "Metric"
+#define GC_UNIT_IMPERIAL                     "Imperial"
+
+//Cycling Analytics / see also Athlete parameter
+#define GC_CYCLINGANALYTICS_CLIENT_ID    "1504958" // app id
+
+// Withings/Nokia
+#ifndef GC_NOKIA_CLIENT_ID
+#define GC_NOKIA_CLIENT_ID    "eaa338e1f64bcdb8579d21550df661c84d1d28e2053c5d0ede4600c1ebc8b6cd"
+#endif
+
+// Dropbox id
+#ifndef GC_DROPBOX_CLIENT_ID
+#define GC_DROPBOX_CLIENT_ID "753fbblhri06ah3"
+#endif
+
+// PolarFlow client ID
+#ifndef GC_POLARFLOW_CLIENT_ID
+#define GC_POLARFLOW_CLIENT_ID "Not defined"
+#endif
+
+// Azum
+#ifndef GC_AZUM_CLIENT_ID
+#define GC_AZUM_CLIENT_ID "2XVhIzyXCSyM2gzq4zcK0YM0R5TJRBuH4CgtdpSw"
+#endif
+
+
+// Xert
+#ifndef GC_XERT_CLIENT_ID
+#define GC_XERT_CLIENT_ID "xert_goldencheetah"
+#endif
+
+// - Prefixes to be used for the QSettings in any code - to identify which QSettings are to be used
+
+#define GC_QSETTINGS_SYSTEM              "<system>"
+#define GC_QSETTINGS_GLOBAL_GENERAL      "<global-general>"
+#define GC_QSETTINGS_GLOBAL_TRAIN        "<global-trainmode>"
+#define GC_QSETTINGS_ATHLETE_GENERAL     "<athlete-general>"
+#define GC_QSETTINGS_ATHLETE_LAYOUT      "<athlete-layout>"
+#define GC_QSETTINGS_ATHLETE_PREFERENCES "<athlete-preferences>"
+#define GC_QSETTINGS_ATHLETE_PRIVATE     "<athlete-private>"
+
+// -----------------------------------------------------------------------------------------------------------------------
+//    System specific properties - OS/PC dependent - stored in .ini file in the OS specific directory defined by QSettings
+// -----------------------------------------------------------------------------------------------------------------------
+
+#define GC_HOMEDIR                      "<system>homedirectory"
+#define GC_START_HTTP                   "<system>starthttp"
+#define GC_EMBED_R                      "<system>embedR"
+#define GC_EMBED_PYTHON                 "<system>embedPython"
+
+#define GC_SETTINGS_LAST                "<system>mainwindow/lastOpened"
+#define GC_SETTINGS_MAIN_GEOM           "<system>mainwindow/geometry"
+#define GC_SETTINGS_MAIN_STATE          "<system>mainwindow/state"
+#define GC_SETTINGS_MAIN_SIDEBAR        "<system>mainwindow/sidebar/"
+#define GC_SETTINGS_LAST_IMPORT_PATH    "<system>mainwindow/lastImportPath"
+#define GC_SETTINGS_LAST_WORKOUT_PATH   "<system>mainwindow/lastWorkoutPath"
+#define GC_LAST_DOWNLOAD_DEVICE         "<system>mainwindow/lastDownloadDevice"
+#define GC_LAST_DOWNLOAD_PORT           "<system>mainwindow/lastDownloadPort"
+
+// batch export last options
+#define GC_BE_LASTDIR                   "<system>batchexport/lastdir"
+#define GC_BE_LASTFMT                   "<system>batchexport/lastfmt"
+// Fonts
+#define GC_FONT_DEFAULT                 "<system>font/default"
+#define GC_FONT_CHARTLABELS             "<system>font/chartlabels"
+#define GC_FONT_DEFAULT_SIZE            "<system>font/defaultsize"
+#define GC_FONT_CHARTLABELS_SIZE        "<system>font/chartlabelssize"
+#define GC_FONT_SCALE                   "<system>font/scale"
+
+// Location of R Installation - follows R_HOME semantics
+#define GC_R_HOME                       "<system>r_home"
+
+// Location of Python Installation - follows PYTHONHOME semantics
+#define GC_PYTHON_HOME                       "<system>pythonhome"
+
+// --------------------------------------------------------------------
+// Global Properties - Stored in "root" of the active Athlete Directory
+// --------------------------------------------------------------------
+
+
+#define GC_SETTINGS_FAVOURITE_METRICS    "<global-general>rideSummaryWindow/intervalMetrics"
+#define GC_TABBAR                       "<global-general>show/tabbar"                        // show tabbar
+#define GC_WBALFORM                     "<global-general>wbal/formula"                       // wbal formula to use
+#define GC_BIKESCOREDAYS                    "<global-general>bikeScoreDays"
+#define GC_BIKESCOREMODE                    "<global-general>bikeScoreMode"
+#define GC_WARNCONVERT                  "<global-general>warnconvert"
+#define GC_WARNEXIT                     "<global-general>warnexit"
+#define GC_OPENLASTATHLETE              "<global-general>openlastathlete"
+#define GC_HIST_BIN_WIDTH               "<global-general>histogamWindow/binWidth"
+#define GC_WORKOUTDIR                   "<global-general>workoutDir"                         // used for Workouts and Videosyn files
+#define GC_LINEWIDTH                    "<global-general>linewidth"
+#define GC_ANTIALIAS                    "<global-general>antialias"
+#define GC_MAC_FORMS                    "<global-general>macForms"
+#define GC_RIDEBG                       "<global-general>rideBG"
+#define GC_RIDESCROLL                   "<global-general>rideScroll"
+#define GC_RIDEHEAD                     "<global-general>rideHead"
+#define GC_SHADEZONES                   "<global-general>shadezones"
+#define GC_LANG                         "<global-general>lang"
+#define GC_PACE                         "<global-general>pace"
+#define GC_SWIMPACE                     "<global-general>swimpace"
+#define GC_ELEVATION_HYSTERESIS         "<global-general>elevationHysteresis"
+#define GC_UNIT                         "<global-general>unit"
+#define GC_ALLOW_TELEMETRY              "<global-general>telemetryAllowed"
+#define GC_ALLOW_TELEMETRY_DATE         "<global-general>telemetryDecisionDate"
+#define GC_TELEMETRY_ID                 "<global-general>telemetryId"
+#define GC_TELEMETRY_UPDATE_COUNTER     "<global-general>telemetryUpdateCounter"
+#define GC_LAST_VERSION_CHECKED         "<global-general>lastVersionChecked"
+#define GC_LAST_VERSION_CHECK_DATE      "<global-general>lastVersionCheckDate"
+#define GC_STARTUP_VIEW                 "<global-general>startupView"
+
+
+
+// Fit/Tcx Smart recording
+#define GC_GARMIN_SMARTRECORD           "<global-general>garminSmartRecord"
+#define GC_GARMIN_HWMARK                "<global-general>garminHWMark"
+
+// data processor config
+#define GC_DPFG_TOLERANCE               "<global-general>dataprocess/fixgaps/tolerance"
+#define GC_DPFG_STOP                    "<global-general>dataprocess/fixgaps/stop"
+#define GC_DPFS_MAX                     "<global-general>dataprocess/fixspikes/max"
+#define GC_DPFS_VARIANCE                "<global-general>dataprocess/fixspikes/variance"
+#define GC_DPFS_MEDWINSIZ               "<global-general>dataprocess/fixspikes/medwinsiz"
+#define GC_DPFS_MEDALGO                 "<global-general>dataprocess/fixspikes/medalgo"
+#define GC_DPTA                         "<global-general>dataprocess/torqueadjust/adjustment"
+#define GC_DPPA                         "<global-general>dataprocess/poweradjust/adjustment"
+#define GC_DPPA_ABS                     "<global-general>dataprocess/poweradjust/adjustment_abs"
+#define GC_DPFHRS_MAX                   "<global-general>dataprocess/fixhrspikes/max"
+#define GC_DPDD_UCS                     "<global-general>dataprocess/fixderivedistance/usecubicsplines"
+#define GC_DPDP_BIKEWEIGHT              "<global-general>dataprocess/fixderivepower/bikewheight"
+#define GC_DPDP_CRR                     "<global-general>dataprocess/fixderivepower/crr"
+#define GC_DPDP_CDA                     "<global-general>dataprocess/fixderivepower/cda"
+#define GC_DPDP_DRAFTM                  "<global-general>dataprocess/fixderivepower/draftm"
+#define GC_DPRP_EQUIPWEIGHT             "<global-general>dataprocess/fixrunningpower/equipwheight"
+#define GC_DPDR_DRAFTM                  "<global-general>dataprocess/fixrunningpower/draftm"
+#define GC_DPFV_MA                      "<global-general>dataprocess/fixspeed/ma"
+#define GC_CAD2SMO2                     "<global-general>dataprocess/fixmoxy/cad2smo2"
+#define GC_SPD2THB		            	"<global-general>dataprocess/fixmoxy/spd2thb"
+#define GC_DPFLS_PL                     "<global-general>dataprocess/fixlapswim/pool_length"
+#define GC_DPFLS_MR                     "<global-general>dataprocess/fixlapswim/min_rest"
+#define GC_RR_MAX                       "<global-general>dataprocess/filterhrv/rr_max"                 //
+#define GC_RR_MIN                       "<global-general>dataprocess/filterhrv/rr_min"                 //
+#define GC_RR_FILT                      "<global-general>dataprocess/filterhrv/rr_filt"                 //
+#define GC_RR_WINDOW                    "<global-general>dataprocess/filterhrv/rr_window"
+#define GC_RR_SET_REST_HRV              "<global-general>dataprocess/filterhrv/rr_set_rest_hrv"
+#define GC_MOXY_FIX_SMO2                "<global-general>dataprocess/fixmoxydata/fix_smo2"
+#define GC_MOXY_FIX_THB                 "<global-general>dataprocess/fixmoxydata/fix_thb"
+#define GC_MOXY_FIX_THB_MAX             "<global-general>dataprocess/fixmoxydata/fix_thb_max"
+#define GC_FIXGPS_ALTITUDE_FIX_DEGREE   "<global-general>dataprocess/fixgps/altitude_degree"
+#define GC_FIXGPS_ALTITUDE_FIX_DEGREE1  "<global-general>dataprocess/fixgps/altitude_degree1"
+#define GC_FIXGPS_ALTITUDE_FIX_DOAPPLY  "<global-general>dataprocess/fixgps/altitude_doapply"
+#define GC_FIXGPS_ALTITUDE_OUTLIER_PERCENT "<global-general>dataprocess/fixgps/altitude_outlier_percent"
+#define GC_FIXGPS_ROUTE_FIX_DEGREE      "<global-general>dataprocess/fixgps/route_degree"
+#define GC_FIXGPS_ROUTE_FIX_DEGREE1     "<global-general>dataprocess/fixgps/route_degree1"
+#define GC_FIXGPS_ROUTE_FIX_DOAPPLY     "<global-general>dataprocess/fixgps/route_doapply"
+#define GC_FIXGPS_ROUTE_OUTLIER_PERCENT "<global-general>dataprocess/fixgps/route_outlier_percent"
+
+// device Configurations NAME/SPEC/TYPE/DEFI/DEFR all get a number appended
+// to them to specify which configured device i.e. devices1 ... devicesn where
+// n is defined in GC_DEV_COUNT
+#define GC_DEV_COUNT                    "<global-trainmode>devices"
+#define GC_DEV_NAME                     "<global-trainmode>devicename"
+#define GC_DEV_SPEC                     "<global-trainmode>devicespec"
+#define GC_DEV_PROF                     "<global-trainmode>deviceprof"
+#define GC_DEV_TYPE                     "<global-trainmode>devicetype"
+#define GC_DEV_STRIDE                   "<global-trainmode>devicestride"
+#define GC_DEV_WHEEL                    "<global-trainmode>devicewheel"
+#define GC_DEV_VIRTUAL                  "<global-trainmode>devicepostProcess"
+#define GC_DEV_VIRTUALPOWER             "<global-trainmode>devicevirtualPower"
+#define FORTIUS_FIRMWARE                "<global-trainmode>fortius/firmware"
+#define FORTIUS_CALIBRATION             "<global-trainmode>fortius/calibration"
+#define IMAGIC_FIRMWARE                 "<global-trainmode>imagic/firmware"
+#define SRM_OFFSET                      "<global-trainmode>srm/offset"
+#define TRAIN_MULTI                     "<global-trainmode>train/multi"
+#define TRAIN_AUTOCONNECT               "<global-trainmode>train/autoconnect"
+#define TRAIN_STARTDELAY                "<global-trainmode>train/startdelay"
+#define TRAIN_AUTOHIDE                  "<global-trainmode>train/autohide"
+#define TRAIN_LAPALERT                  "<global-trainmode>train/lapalert"
+#define TRAIN_USESIMULATEDSPEED         "<global-trainmode>train/usesimulatedspeed"
+#define TRAIN_USESIMULATEDHYPOXIA       "<global-trainmode>train/usesimulatedhypoxia"
+#define TRAIN_COALESCE_SECTIONS         "<global-trainmode>train/coalesceSections"
+#define TRAIN_TOOLTIPS                  "<global-trainmode>train/tooltips"
+#define TRAIN_TELEMETRY_FONT_SCALING    "<global-trainmode>train/telemetryFontScaling"
+#define GC_REMOTE_START                 "<global-trainmode>remote/start"
+#define GC_REMOTE_STOP                  "<global-trainmode>remote/stop"
+#define GC_REMOTE_LAP                   "<global-trainmode>remote/lap"
+#define GC_REMOTE_HIGHER                "<global-trainmode>remote/higher"
+#define GC_REMOTE_LOWER                 "<global-trainmode>remote/lower"
+#define GC_REMOTE_CALIBRATE             "<global-trainmode>remote/calibrate"
+
+// --------------------------------------------------------------------------------
+// Athlete Specific Properties - Stored in /config subfolder of the related athlete
+// --------------------------------------------------------------------------------
+
+#define GC_ATHLETE_ID                   "<athlete-general>id"
+#define GC_VERSION_USED                 "<athlete-general>versionused"
+#define GC_SAFEEXIT                     "<athlete-general>safeexit"
+#define GC_UPGRADE_FOLDER_SUCCESS       "<athlete-general>upgradesuccess/folder"     // success tracking of folder upgrade stored on athlete level
+#define GC_ATHLETE_SNIPPETID            "<athlete-general>snippetid"
+
+#define GC_OPENDATA_GRANTED             "<athlete-general>opendata/allowed"         // did the user grant permission? (Y, N, X)
+                                                                                    // X means we haven't asked yet (default)
+#define GC_OPENDATA_RUNCOUNT            "<athlete-general>opendata/runcount"        // times launched, so ask after a while and
+                                                                                    // make sure they're a regular user
+#define GC_OPENDATA_LASTPOSTED          "<athlete-general>opendata/postingdate"     // when did we last send data?
+#define GC_OPENDATA_LASTPOSTCOUNT       "<athlete-general>opendata/count"           // when we last posted how many workouts?
+#define GC_OPENDATA_LASTPOSTVERSION     "<athlete-general>opendata/version"         // when we last posted how many workouts?
+
+#define GC_LTM_LAST_DATE_RANGE          "<athlete-layout>ltmwindow/lastDateRange"
+#define GC_LTM_AUTOFILTERS              "<athlete-layout>ltmwindow/autofilters"
+#define GC_BLANK_ANALYSIS               "<athlete-layout>blank/analysis"
+#define GC_BLANK_TRAIN                  "<athlete-layout>blank/train"
+#define GC_BLANK_HOME                   "<athlete-layout>blank/home"
+#define GC_BLANK_DIARY                  "<athlete-layout>blank/diary"
+#define GC_SETTINGS_SPLITTER_SIZES      "<athlete-layout>mainwindow/splitterSizes"
+
+
+#define GC_NICKNAME                     "<athlete-preferences>nickname"
+#define GC_DOB                          "<athlete-preferences>dob"
+#define GC_WEIGHT                       "<athlete-preferences>weight"
+#define GC_HEIGHT                       "<athlete-preferences>height"
+#define GC_WBALTAU                      "<athlete-preferences>wbaltau"
+#define GC_SEX                          "<athlete-preferences>sex"
+#define GC_BIO                          "<athlete-preferences>bio"
+#define GC_AVATAR                       "<athlete-preferences>avatar"
+#define GC_DISCOVERY                    "<athlete-preferences>intervals/discovery"   // intervals to discover
+#define GC_SB_TODAY                     "<athlete-preferences>PMshowSBtoday"
+#define GC_LTS_DAYS                             "<athlete-preferences>LTSdays"
+#define GC_STS_DAYS                             "<athlete-preferences>STSdays"
+#define GC_CRANKLENGTH                  "<athlete-preferences>crankLength"
+#define GC_WHEELSIZE                    "<athlete-preferences>wheelsize"
+#define GC_USE_CP_FOR_FTP               "<athlete-preferences>cp/useforftp"                       // use CP for FTP
+#define GC_USE_CP_MODEL                 "<athlete-preferences>cp/useModel"
+#define GC_NETWORKFILESTORE_FOLDER      "<athlete-preferences>networkfilestore/folder"            // folder to sync with
+#define GC_AUTOBACKUP_FOLDER            "<athlete-preferences>autobackup/folder"
+#define GC_AUTOBACKUP_PERIOD            "<athlete-preferences>autobackup/period"                  // how often is the Athlete Folder backuped up / 0 == never
+#define GC_AUTOBACKUP_COUNTER           "<athlete-preferences>autobackup/counter"                 // counts to the next backup
+
+#define GC_CLOUDDB_TC_ACCEPTANCE       "<athlete-preferences>clouddb/acceptance"                  // bool
+#define GC_CLOUDDB_TC_ACCEPTANCE_DATE  "<athlete-preferences>clouddb/acceptancedate"              // date/time string of acceptance
+#define GC_CLOUDDB_EMAIL               "<athlete-preferences>clouddb/email"
+
+// ride navigator
+#define GC_NAVHEADINGS                  "<athlete-preferences>navigator/headings"
+#define GC_NAVHEADINGWIDTHS             "<athlete-preferences>navigator/headingwidths"
+#define GC_NAVGROUPBY                   "<athlete-preferences>navigator/groupby"
+#define GC_SORTBY                       "<athlete-preferences>navigator/sortby"
+#define GC_SORTBYORDER                  "<athlete-preferences>navigator/sortbyorder"
+// Calendar sync
+#define GC_WEBCAL_URL                   "<athlete-preferences>webcal_url"
+// Default view on Diary
+#define GC_DIARY_VIEW                   "<athlete-preferences>diaryview"
+
+// OSM Tileserver
+#define GC_OSM_TS_DEFAULT               "<athlete-preferences>osmts/default"
+#define GC_OSM_DEFAULT_GRAY             "<athlete-preferences>osm/default_gray"
+#define GC_OSM_TS_A                     "<athlete-preferences>osmts/a"
+#define GC_OSM_A_GRAY                   "<athlete-preferences>osm/a_gray"
+#define GC_OSM_TS_B                     "<athlete-preferences>osmts/b"
+#define GC_OSM_B_GRAY                   "<athlete-preferences>osm/b_gray"
+#define GC_OSM_TS_C                     "<athlete-preferences>osmts/c"
+#define GC_OSM_C_GRAY                   "<athlete-preferences>osm/c_gray"
+
+// BodyMeasures Download
+#define GC_BM_LAST_TYPE                 "<athlete-preferences>bm/last_type"
+#define GC_BM_LAST_TIMEFRAME            "<athlete-preferences>bm/last_timeframe"
+
+// Sim Bicycle
+#define GC_SIM_BICYCLE_MASSWITHOUTWHEELSG     "<athlete-preferences>sim_bicycle/MassWithoutWheelsG"
+#define GC_SIM_BICYCLE_FRONTWHEELG            "<athlete-preferences>sim_bicycle/FrontWheelG"
+#define GC_SIM_BICYCLE_FRONTSPOKECOUNT        "<athlete-preferences>sim_bicycle/FrontSpokeCount"
+#define GC_SIM_BICYCLE_FRONTSPOKENIPPLEG      "<athlete-preferences>sim_bicycle/FrontSpokeNippleG"
+#define GC_SIM_BICYCLE_FRONTRIMG              "<athlete-preferences>sim_bicycle/FrontRimG"
+#define GC_SIM_BICYCLE_FRONTROTORG            "<athlete-preferences>sim_bicycle/FrontRotorG"
+#define GC_SIM_BICYCLE_FRONTSKEWERG           "<athlete-preferences>sim_bicycle/FrontSkewerG"
+#define GC_SIM_BICYCLE_FRONTTIREG             "<athlete-preferences>sim_bicycle/FrontTireG"
+#define GC_SIM_BICYCLE_FRONTTUBESEALANTG      "<athlete-preferences>sim_bicycle/FrontTubeSealantG"
+#define GC_SIM_BICYCLE_FRONTOUTERRADIUSM      "<athlete-preferences>sim_bicycle/FrontOuterRadiusM"
+#define GC_SIM_BICYCLE_FRONTRIMINNERRADIUSM   "<athlete-preferences>sim_bicycle/FrontRimInnerRadiusM"
+#define GC_SIM_BICYCLE_REARWHEELG             "<athlete-preferences>sim_bicycle/RearWheelG"
+#define GC_SIM_BICYCLE_REARSPOKECOUNT         "<athlete-preferences>sim_bicycle/RearSpokeCount"
+#define GC_SIM_BICYCLE_REARSPOKENIPPLEG       "<athlete-preferences>sim_bicycle/RearSpokeNippleG"
+#define GC_SIM_BICYCLE_REARRIMG               "<athlete-preferences>sim_bicycle/RearRimG"
+#define GC_SIM_BICYCLE_REARROTORG             "<athlete-preferences>sim_bicycle/RearRotor"
+#define GC_SIM_BICYCLE_REARSKEWERG            "<athlete-preferences>sim_bicycle/RearSkewerG"
+#define GC_SIM_BICYCLE_REARTIREG              "<athlete-preferences>sim_bicycle/RearTireG"
+#define GC_SIM_BICYCLE_REARTUBESEALANTG       "<athlete-preferences>sim_bicycle/RearTubeSealantG"
+#define GC_SIM_BICYCLE_REAROUTERRADIUSM       "<athlete-preferences>sim_bicycle/RearOuterRadiusM"
+#define GC_SIM_BICYCLE_REARRIMINNERRADIUSM    "<athlete-preferences>sim_bicycle/RearRimInnerRadiusM"
+#define GC_SIM_BICYCLE_CASSETTEG              "<athlete-preferences>sim_bicycle/CassetteG"
+#define GC_SIM_BICYCLE_CRR                    "<athlete-preferences>sim_bicycle/CRR"
+#define GC_SIM_BICYCLE_Cm                     "<athlete-preferences>sim_bicycle/Cm"
+#define GC_SIM_BICYCLE_Cd                     "<athlete-preferences>sim_bicycle/Cd"
+#define GC_SIM_BICYCLE_Am2                    "<athlete-preferences>sim_bicycle/Am2"
+#define GC_SIM_BICYCLE_Tk                     "<athlete-preferences>sim_bicycle/Tk"
+#define GC_SIM_BICYCLE_ACTUALTRAINERALTITUDEM "<athlete-preferences>sim_bicycle/ActualTrainerAltitudeM"
+
+#define GC_RWGPSUSER                    "<athlete-private>rwgps/user"
+#define GC_RWGPSPASS                    "<athlete-private>rwgps/pass"
+#define GC_RWGPS_AUTH_TOKEN             "<athlete-private>rwgps/auth_token"
+#define GC_TTBUSER                      "<athlete-private>ttb/user"
+#define GC_TTBPASS                      "<athlete-private>ttb/pass"
+#define GC_VELOHEROUSER                 "<athlete-private>velohero/user"
+#define GC_VELOHEROPASS                 "<athlete-private>velohero/pass"
+#define GC_SPORTPLUSHEALTHUSER          "<athlete-private>sph/user"
+#define GC_SPORTPLUSHEALTHPASS          "<athlete-private>sph/pass"
+#define GC_SELUSER                      "<athlete-private>sel/user"
+#define GC_SELPASS                      "<athlete-private>sel/pass"
+#define GC_WIURL                        "<athlete-private>wi/url"
+#define GC_WIUSER                       "<athlete-private>wi/user"
+#define GC_WIKEY                        "<athlete-private>wi/key"
+#define GC_DVURL                        "<athlete-private>dv/url"
+#define GC_DVUSER                       "<athlete-private>dv/user"
+#define GC_DVPASS                       "<athlete-private>dv/pass"
+#define GC_DVCALDAVTYPE                 "<athlete-private>dv/type"
+
+//Dropbox oauth keys
+#define GC_DROPBOX_TOKEN                "<athlete-private>dropbox/token"
+#define GC_DROPBOX_FOLDER               "<athlete-private>dropbox/folder"
+#define GC_DROPBOX_FORMAT               "<athlete-private>dropbox/format"
+
+//Withings
+#define GC_WITHINGS_TOKEN               "<athlete-private>withings_token"
+#define GC_WITHINGS_SECRET              "<athlete-private>withings_secret"
+
+//Nokia
+#define GC_NOKIA_TOKEN                  "<athlete-private>nokia_token"
+#define GC_NOKIA_REFRESH_TOKEN          "<athlete-private>nokia_refresh_token"
+
+//Strava
+#define GC_STRAVA_TOKEN                 "<athlete-private>strava_token"
+#define GC_STRAVA_REFRESH_TOKEN         "<athlete-private>strava_refresh_token"
+#define GC_STRAVA_LAST_REFRESH          "<athlete-private>strava_last_refresh"
+#define GC_STRAVA_ACTIVITY_NAME         "<athlete-private>strava_metaname"
+
+//Cycling Analytics
+#define GC_CYCLINGANALYTICS_TOKEN       "<athlete-private>cyclinganalytics_token"
+
+//SixCycle
+#define GC_SIXCYCLE_USER                "<athlete-private>sixcycle_user"
+#define GC_SIXCYCLE_PASS                "<athlete-private>sixcycle_pass"
+#define GC_SIXCYCLE_URL                 "<athlete-private>sixcycle_url"
+
+// Azum
+#define GC_AZUM_ACCESS_TOKEN            "<athlete-private>azum_access_token"
+#define GC_AZUM_REFRESH_TOKEN           "<athlete-private>azum_refresh_token"
+#define GC_AZUM_USERKEY                 "<athlete-private>azum_userkey"
+#define GC_AZUM_URL                     "<athlete-private>azum_url"
+#define GC_AZUM_ATHLETE_ID              "<athlete-private>azum_athlete_id"
+
+// Polar Flow
+#define GC_POLARFLOW_TOKEN             "<athlete-private>polarflow_token"
+#define GC_POLARFLOW_USER_ID           "<athlete-private>polarflow_user_id"
+
+// SportTracks
+#define GC_SPORTTRACKS_TOKEN           "<athlete-private>sporttracks/sporttracks_token"
+#define GC_SPORTTRACKS_REFRESH_TOKEN   "<athlete-private>sporttracks/refresh_token"
+#define GC_SPORTTRACKS_LAST_REFRESH    "<athlete-private>sporttracks/last_refresh"
+
+// Xert
+#define GC_XERTUSER                    "<athlete-private>xert/user"
+#define GC_XERTPASS                    "<athlete-private>xert/pass"
+#define GC_XERT_TOKEN                  "<athlete-private>xert/xert_token"
+#define GC_XERT_REFRESH_TOKEN          "<athlete-private>xert/refresh_token"
+#define GC_XERT_LAST_REFRESH           "<athlete-private>xert/last_refresh"
+
+// Nolio
+#define GC_NOLIO_ACCESS_TOKEN          "<global-general>nolio_access_token"
+#define GC_NOLIO_REFRESH_TOKEN         "<global-general>nolio_refresh_token"
+#define GC_NOLIO_LAST_REFRESH          "<global-general>nolio_last_refresh"
+#define GC_NOLIO_URL                   "<athlete-private>nolio_url"
+#define GC_NOLIO_ATHLETE_ID            "<athlete-private>nolio_athlete_id"
+#define GC_NOLIO_ATHLETE_NAME          "<athlete-private>nolio_athlete_name"
+
+#endif

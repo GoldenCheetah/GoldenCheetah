@@ -634,10 +634,6 @@ MainWindow::MainWindow(const QDir &home)
 
     // VIEW MENU
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
-#ifndef Q_OS_MAC
-    viewMenu->addAction(tr("Toggle Full Screen"), this, SLOT(toggleFullScreen()), QKeySequence("F11"));
-#endif
-    showhideViewbar = viewMenu->addAction(tr("Show View Sidebar"), this, SLOT(showViewbar(bool)), QKeySequence("F2"));
     showhideViewbar->setCheckable(true);
     showhideViewbar->setChecked(true);
     showhideSidebar = viewMenu->addAction(tr("Show Left Sidebar"), this, SLOT(showSidebar(bool)), QKeySequence("F3"));
@@ -1094,7 +1090,7 @@ MainWindow::closeEvent(QCloseEvent* event)
         // only check for unsaved if autoimport is not running any more
         if (!importrunning) {
             // do we need to save?
-            if (tab->context->mainWindow->saveRideExitDialog(tab->context) == true)
+            if (saveRideExitDialog(tab->context) == true)
                 removeAthleteTab(tab);
             else
                 needtosave = true;
@@ -1332,11 +1328,14 @@ MainWindow::selectTrends()
 }
 
 
-bool
-MainWindow::isStarting
-() const
+bool MainWindow::isStarting() const
 {
-    return splash != nullptr;
+    return splash != NULL;
+}
+
+bool MainWindow::isAthleteOpen(QString name) const
+{
+    return athletetabs.contains(name);
 }
 
 
@@ -1844,7 +1843,7 @@ MainWindow::revertRide()
 
     // in case reverted ride has different starttime
     currentAthleteTab->context->ride->setStartTime(currentAthleteTab->context->ride->ride()->startTime());
-    currentAthleteTab->context->ride->ride()->emitReverted();
+    currentAthleteTab->context->ride->ride()->notifyReverted();
 
     // and notify everyone we changed which also has the side
     // effect of updating the cached values too

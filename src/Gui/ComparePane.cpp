@@ -726,7 +726,7 @@ ComparePane::dropEvent(QDropEvent *event)
             }
 
             // now extract XDATA series too
-            QMapIterator<QString, XDataSeries *>xi(ride->xdata_);
+            QMapIterator<QString, XDataSeries *>xi(ride->mutableXData());
             xi.toFront();
             while(xi.hasNext()) {
                 xi.next();
@@ -773,8 +773,8 @@ ComparePane::dropEvent(QDropEvent *event)
             //                            so UserData can be generated from this rideItem
             add.rideItem = new RideItem(add.data, add.data->context);
             add.rideItem->setFrom(*rideItem, true); // this wipes ride_ so put back
-            add.rideItem->ride_ = add.data;
-            add.rideItem->metadata_ = add.data->tags();
+            add.rideItem->setRide(add.data);
+            add.rideItem->metadata() = add.data->tags();
             add.rideItem->getWeight();
             add.rideItem->isRun = add.data->isRun();
             add.rideItem->isSwim = add.data->isSwim();
@@ -785,17 +785,17 @@ ComparePane::dropEvent(QDropEvent *event)
             const RideMetricFactory &factory = RideMetricFactory::instance();
 
             QHash<QString,RideMetricPtr> computed= RideMetric::computeMetrics(add.rideItem, Specification(), factory.allMetrics());
-            add.rideItem->metrics_.fill(0, factory.metricCount());
-            add.rideItem->count_.fill(0, factory.metricCount());
+            add.rideItem->metrics().fill(0, factory.metricCount());
+            add.rideItem->counts().fill(0, factory.metricCount());
             QHashIterator<QString, RideMetricPtr> l(computed);
             while (l.hasNext()) {
                 l.next();
-                add.rideItem->metrics_[l.value()->index()] = l.value()->value();
-                add.rideItem->count_[l.value()->index()] = l.value()->count();
+                add.rideItem->metrics()[l.value()->index()] = l.value()->value();
+                add.rideItem->counts()[l.value()->index()] = l.value()->count();
             }
             for(int j=0; j<factory.metricCount(); j++)
-                if (std::isinf(add.rideItem->metrics_[j]) || std::isnan(add.rideItem->metrics_[j]))
-                    add.rideItem->metrics_[j] = 0.00f;
+                if (std::isinf(add.rideItem->metrics()[j]) || std::isnan(add.rideItem->metrics()[j]))
+                    add.rideItem->metrics()[j] = 0.00f;
             // end of fake RideItem hack XXX
 
             // now add but only if not empty
@@ -921,8 +921,8 @@ ComparePane::dropEvent(QDropEvent *event)
                             //                            so UserData can be generated from this rideItem
                             add.rideItem = new RideItem(add.data, add.data->context);
                             add.rideItem->setFrom(*matched->rideItem(), true); // this wipes ride_ so put back below
-                            add.rideItem->ride_ = add.data;
-                            add.rideItem->metadata_ = add.data->tags();
+                            add.rideItem->setRide(add.data);
+                            add.rideItem->metadata() = add.data->tags();
                             add.rideItem->getWeight();
                             add.rideItem->isRun = add.data->isRun();
                             add.rideItem->isSwim = add.data->isSwim();
@@ -931,17 +931,17 @@ ComparePane::dropEvent(QDropEvent *event)
 
                             const RideMetricFactory &factory = RideMetricFactory::instance();
                             QHash<QString,RideMetricPtr> computed= RideMetric::computeMetrics(add.rideItem, Specification(), factory.allMetrics());
-                            add.rideItem->metrics_.fill(0, factory.metricCount());
-                            add.rideItem->count_.fill(0, factory.metricCount());
+                            add.rideItem->metrics().fill(0, factory.metricCount());
+                            add.rideItem->counts().fill(0, factory.metricCount());
                             QHashIterator<QString, RideMetricPtr> l(computed);
                             while (l.hasNext()) {
                                 l.next();
-                                add.rideItem->metrics_[l.value()->index()] = l.value()->value();
-                                add.rideItem->count_[l.value()->index()] = l.value()->count();
+                                add.rideItem->metrics()[l.value()->index()] = l.value()->value();
+                                add.rideItem->counts()[l.value()->index()] = l.value()->count();
                             }
                             for(int j=0; j<factory.metricCount(); j++)
-                                if (std::isinf(add.rideItem->metrics_[j]) || std::isnan(add.rideItem->metrics_[j]))
-                                    add.rideItem->metrics_[j] = 0.00f;
+                                if (std::isinf(add.rideItem->metrics()[j]) || std::isnan(add.rideItem->metrics()[j]))
+                                    add.rideItem->metrics()[j] = 0.00f;
                             // end of fake RideItem hack XXX
 
                             // just use standard colors and cycle round

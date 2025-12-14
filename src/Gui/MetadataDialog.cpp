@@ -26,7 +26,7 @@
 #include <QFormLayout>
 
 MetadataDialog::MetadataDialog(Context* context, const QString& fieldName, const QString& value, QPoint pos) :
-    QDialog(context->mainWindow), context_(context), completer_(nullptr), pos_(pos)
+    QDialog(context->mainWidget()), context_(context), completer_(nullptr), pos_(pos)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("Metadata Editor"));
@@ -157,8 +157,8 @@ void
 MetadataDialog::showEvent(QShowEvent*)
 {
 
-    QSize gcWindowSize = context_->mainWindow->size();
-    QPoint gcWindowPosn = context_->mainWindow->pos();
+    QSize gcWindowSize = context_->mainWidget()->size();
+    QPoint gcWindowPosn = context_->mainWidget()->pos();
 
     int xLimit = gcWindowPosn.x() + gcWindowSize.width() - geometry().width() - 10;
     int yLimit = gcWindowPosn.y() + gcWindowSize.height() - geometry().height() - 10;

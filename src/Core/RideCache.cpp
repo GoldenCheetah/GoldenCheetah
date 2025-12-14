@@ -215,14 +215,14 @@ RideCache::configChanged(qint32 what)
     // if the wbal formula changed invalidate all cached values
     if (what & CONFIG_WBAL) {
         foreach(RideItem *item, rides()) {
-            if (item->isOpen()) item->ride()->wstale=true;
+            if (item->isOpen()) item->ride()->setWStale(true);
         }
     }
 
     // if metadata changed then recompute diary text
     if (what & CONFIG_FIELDS) {
         foreach(RideItem *item, rides()) {
-            item->metadata_.insert("Calendar Text", GlobalContext::context()->rideMetadata->calendarText(item));
+            item->metadata().insert("Calendar Text", GlobalContext::context()->rideMetadata->calendarText(item));
         }
     }
 
@@ -406,7 +406,8 @@ RideCache::removeRide(const QString& filenameToDelete) {
     if (select) {
 
         // we don't want the whole delete, select next flicker
-        context->mainWindow->setUpdatesEnabled(false);
+        // we don't want the whole delete, select next flicker
+        if (updateCallback_) updateCallback_(false);
 
         // select a different ride
         context->ride = select;
@@ -415,7 +416,7 @@ RideCache::removeRide(const QString& filenameToDelete) {
         context->notifyRideDeleted(todelete);
 
         // now we can update
-        context->mainWindow->setUpdatesEnabled(true);
+        if (updateCallback_) updateCallback_(true);
         QApplication::processEvents();
 
         // now select another ride

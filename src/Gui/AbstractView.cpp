@@ -602,7 +602,7 @@ AbstractView::setPages(QStackedWidget *pages)
             QList<int> sizes;
 
             sizes.append(200);
-            sizes.append(context->mainWindow->width()-200);
+            sizes.append(context->mainWidget()->width()-200);
             splitter->setSizes(sizes);
             
         }
@@ -623,7 +623,7 @@ void
 AbstractView::dragEvent(bool x)
 {
     setBottomRequested(x);
-    context->mainWindow->setToolButtons(); // toolbuttons reflect show/hide status
+    context->setToolButtons(); // toolbuttons reflect show/hide status
 }
 
 // hide and show bottom - but with a little animation ...
@@ -692,7 +692,7 @@ AbstractView::sidebarChanged()
     if (sidebar_ == NULL) return;
 
     // tell main window qmenu we changed
-    if (context->mainWindow->init) context->mainWindow->showhideSidebar->setChecked(_sidebar);
+    if (context->isMainWindowInitialized() && context->showHideSidebarAction()) context->showHideSidebarAction()->setChecked(_sidebar);
 
     if (sidebarEnabled()) {
 
@@ -806,7 +806,7 @@ AbstractView::selectionChanged()
     if (isSelected()) {
 
         // makes sure menu now reflects our setting
-        context->mainWindow->showhideSidebar->setChecked(_sidebar);
+        if (context->showHideSidebarAction()) context->showHideSidebarAction()->setChecked(_sidebar);
 
         // or do we need to show blankness?
         if (isBlank() && blank_ && perspective_ && blank_->canShow()) {

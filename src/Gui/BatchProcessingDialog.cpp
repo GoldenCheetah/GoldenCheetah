@@ -38,7 +38,7 @@
 #include <QButtonGroup>
 #include <QMessageBox>
 
-BatchProcessingDialog::BatchProcessingDialog(Context* context) : QDialog(context->mainWindow), context(context),
+BatchProcessingDialog::BatchProcessingDialog(Context* context) : QDialog(context->mainWidget()), context(context),
 processed(0), fails(0), numFilesToProcess(0), metadataCompleter(nullptr) {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("Activity Batch Processing"));

@@ -307,7 +307,7 @@ Banister::refresh()
             // is a weekly performance already identified
             // This applies only when performance metric is power_index
             if (!(todaybest > 0) && perf_symbol == "power_index") {
-                Performance p = context->athlete->rideCache->estimator->getPerformanceForDate(item->dateTime.date(), item->sport);
+                Performance p = context->athlete->rideCache->getEstimator()->getPerformanceForDate(item->dateTime.date(), item->sport);
                 if (!p.submaximal && p.powerIndex > 0) {
 
                     // its not submax

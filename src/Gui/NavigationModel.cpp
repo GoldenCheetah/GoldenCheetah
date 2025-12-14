@@ -23,15 +23,16 @@
 // probably needs refactoring out at some point.
 #include "NewSideBar.h"
 #include "MainWindow.h"
+#include "LTMSidebar.h"
 
 
 NavigationModel::NavigationModel(AthleteTab *tab) : tab(tab), block(false), viewinit(false), drinit(false), iteminit(false)
 {
     connect(tab, SIGNAL(viewChanged(int)), this, SLOT(viewChanged(int)));
     connect(tab, SIGNAL(rideItemSelected(RideItem*)), this, SLOT(rideChanged(RideItem*)));
-    connect(tab->context, SIGNAL(dateRangeSelected(DateRange)), this, SLOT(dateChanged(DateRange)));
-    connect(tab->context->mainWindow, SIGNAL(backClicked()), this, SLOT(back()));
-    connect(tab->context->mainWindow, SIGNAL(forwardClicked()), this, SLOT(forward()));
+    connect(qobject_cast<LTMSidebar*>(static_cast<TrendsView*>(tab->view(0))->sidebar()), SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateChanged(DateRange)));
+    connect(static_cast<MainWindow*>(tab->context->mainWidget()), SIGNAL(backClicked()), this, SLOT(back()));
+    connect(static_cast<MainWindow*>(tab->context->mainWidget()), SIGNAL(forwardClicked()), this, SLOT(forward()));
 
     stackpointer=-1;
 }
@@ -153,10 +154,10 @@ NavigationModel::action(bool redo, NavigationEvent event)
         view = redo ? event.after.toInt() : event.before.toInt();
 
         switch (view) {
-        case 0:  tab->context->mainWindow->selectTrends(); break;
-        case 1:  tab->context->mainWindow->selectAnalysis(); break;
-        case 2:  tab->context->mainWindow->selectPlan(); break;
-        case 3:  tab->context->mainWindow->selectTrain(); break;
+        case 0:  tab->context->switchToTrendsView(); break;
+        case 1:  tab->context->switchToAnalysisView(); break;
+        case 2:  tab->context->switchToDiaryView(); break;
+        case 3:  tab->context->switchToTrainView(); break;
         }
     }
     break;
@@ -166,7 +167,7 @@ NavigationModel::action(bool redo, NavigationEvent event)
         RideItem *pitem = redo ? event.after.value<RideItem*>() : event.before.value<RideItem*>();
 
         // don't select deleted rides (!!)
-        if (!tab->context->athlete->rideCache->deletelist.contains(pitem)) {
+        if (!tab->context->athlete->rideCache->deletedItems().contains(pitem)) {
             item = pitem;
             tab->setNoSwitch(true); // can't be doing that when we are undo/redo ride selection
             tab->context->athlete->selectRideFile(item->fileName);
@@ -190,7 +191,7 @@ void
 NavigationModel::back()
 {
     // are we the current tab?
-    if (tab->context->mainWindow->athleteTab() == tab) {
+    if (tab->context->isCurrent()) {
         if (stackpointer >= 0) {
 
             // we need to check for rideselects+view change
@@ -216,7 +217,7 @@ void
 NavigationModel::forward()
 {
     // are we the current tab?
-    if (tab->context->mainWindow->athleteTab() == tab) {
+    if (tab->context->isCurrent()) {
         if ((stackpointer+1) < stack.count() && stack.count()) {
 
             // check for ride select followed by view change to analysis

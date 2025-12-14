@@ -20,13 +20,14 @@
 #define _GC_RideCache_h 1
 
 #include "GoldenCheetah.h"
-#include "MainWindow.h"
+// #include "MainWindow.h"
 #include "RideFile.h"
 #include "RideItem.h"
 #include "PDModel.h"
 
 #include <QVector>
 #include <QThread>
+#include <functional> // for callback
 
 #include <QFuture>
 #include <QFutureWatcher>
@@ -103,6 +104,10 @@ class RideCache : public QObject
         void refresh();
         double progress() { return progress_; }
 
+        // callback for UI updates
+        using UpdateCallback = std::function<void(bool)>;
+        void setUpdateCallback(UpdateCallback cb) { updateCallback_ = cb; }
+
     public slots:
 
         // restore / dump cache to disk (json)
@@ -139,15 +144,17 @@ class RideCache : public QObject
         // us telling the world the item changed
         void itemChanged(RideItem*);
 
-    protected:
+    public:
+        // Public accessors for formerly protected members (replacing friend access)
+        Estimator *getEstimator() { return estimator; }
+        const Estimator *getEstimator() const { return estimator; }
+        QVector<RideItem*> &deletedItems() { return deletelist; }
+        Context *getContext() { return context; }
+        const QDir &getRideDirectory() const { return directory; }
+        const QDir &getPlannedDirectory() const { return plannedDirectory; }
 
-        friend class ::Athlete;
-        friend class ::MainWindow; // save dialog
-        friend class ::LTMPlot; // get weekly performances
-        friend class ::Banister; // get weekly performances
-        friend class ::Leaf; // get weekly performances
-        friend class ::RideItem; // adds to deletelist in destructor
-        friend class ::NavigationModel; // checks deletelist during redo/undo
+    private:
+        // RideCacheRefreshThread requires deep access - it's an implementation helper
         friend class ::RideCacheRefreshThread;
 
         Context *context;
@@ -165,6 +172,7 @@ class RideCache : public QObject
 
         Estimator *estimator;
         bool first; // updated when estimates are marked stale
+        UpdateCallback updateCallback_;
 };
 
 class AthleteBest

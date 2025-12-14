@@ -164,7 +164,7 @@ static QDateTime propertyToDate(icalproperty *p)
     }
 }
 
-ICalendar::ICalendar(Context *context) : QWidget(context->mainWindow), context(context)
+ICalendar::ICalendar(Context *context) : QWidget(context->mainWidget()), context(context)
 {
     // get from local and remote calendar
 

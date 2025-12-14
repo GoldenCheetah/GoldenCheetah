@@ -463,7 +463,7 @@ DataFilter::completerList(Context *context, bool withSymbols)
     }
 
     // get sorted list of metrics and metadata fields
-    QStringList names = context->rideNavigator->logicalHeadings;
+    QStringList names = context->rideNavigator->getLogicalHeadings();
 
     std::sort(names.begin(), names.end(), insensitiveLessThan);
 
@@ -7755,7 +7755,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                                 }
                             } else {
                                 // look for bests on the same day
-                                Performance onday = m->context->athlete->rideCache->estimator->getPerformanceForDate(m->dateTime.date(), m->sport);
+                                Performance onday = m->context->athlete->rideCache->getEstimator()->getPerformanceForDate(m->dateTime.date(), m->sport);
                                 if (onday.duration >0) {
                                     double value = wantduration ? onday.duration : onday.power;
                                     returning.number() += value;
@@ -7801,7 +7801,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                                 if (sport.isEmpty()) sport = "Bike"; // default to Bike estimates for backward compatibility
 
                                 // weekly best performances
-                                QList<Performance> perfs = m->context->athlete->rideCache->estimator->allPerformances();
+                                QList<Performance> perfs = m->context->athlete->rideCache->getEstimator()->allPerformances();
                                 foreach(Performance p, perfs) {
                                     if (p.submaximal == false && p.sport == sport && p.when >= d.from && p.when <= d.to) {
                                         double value = wantduration ? p.duration : p.power;

@@ -155,7 +155,7 @@ BlankStateAnalysisPage::BlankStateAnalysisPage(Context *context) : BlankStatePag
     scCloud.buttonLabel = tr("Cloud Download");
     scCloud.buttonIconPath = ":images/mac/download.png";
     QPushButton *cloudButton = addToShortCuts(scCloud);
-    connect(cloudButton, SIGNAL(clicked()), context->mainWindow, SLOT(importCloud()));
+    connect(cloudButton, SIGNAL(clicked()), context, SLOT(importCloud()));
 
 
     ShortCut scImport;
@@ -163,14 +163,14 @@ BlankStateAnalysisPage::BlankStateAnalysisPage(Context *context) : BlankStatePag
     scImport.buttonLabel = tr("Import data");
     scImport.buttonIconPath = ":images/mac/download.png";
     QPushButton *importButton = addToShortCuts(scImport);
-    connect(importButton, SIGNAL(clicked()), context->mainWindow, SLOT(importFile()));
+    connect(importButton, SIGNAL(clicked()), context, SLOT(importFile()));
 
     ShortCut scDownload;
     scDownload.label = tr("Download from serial device.");
     scDownload.buttonLabel = tr("Download from device");
     scDownload.buttonIconPath = ":images/mac/download.png";
     QPushButton *downloadButton = addToShortCuts(scDownload);
-    connect(downloadButton, SIGNAL(clicked()), context->mainWindow, SLOT(downloadRide()));
+    connect(downloadButton, SIGNAL(clicked()), context, SLOT(downloadRide()));
 
     canShow_ = !appsettings->cvalue(context->athlete->cyclist, GC_BLANK_ANALYSIS).toBool();
 }
@@ -192,14 +192,14 @@ BlankStateHomePage::BlankStateHomePage(Context *context) : BlankStatePage(contex
     scImport.buttonLabel = tr("Import data");
     scImport.buttonIconPath = ":images/mac/download.png";
     QPushButton *importButton = addToShortCuts(scImport);
-    connect(importButton, SIGNAL(clicked()), context->mainWindow, SLOT(importFile()));
+    connect(importButton, SIGNAL(clicked()), context, SLOT(importFile()));
 
     ShortCut scDownload;
     scDownload.label = tr("Download from serial device.");
     scDownload.buttonLabel = tr("Download from device");
     scDownload.buttonIconPath = ":images/mac/download.png";
     QPushButton *downloadButton = addToShortCuts(scDownload);
-    connect(downloadButton, SIGNAL(clicked()), context->mainWindow, SLOT(downloadRide()));
+    connect(downloadButton, SIGNAL(clicked()), context, SLOT(downloadRide()));
 
     canShow_ = !appsettings->cvalue(context->athlete->cyclist, GC_BLANK_HOME).toBool();
 }
@@ -209,7 +209,7 @@ BlankStateHomePage::BlankStateHomePage(Context *context) : BlankStatePage(contex
 //
 BlankStatePlanPage::BlankStatePlanPage(Context *context) : BlankStatePage(context)
 {
-    dontShow->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_BLANK_PLAN, false).toBool());
+    dontShow->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_BLANK_DIARY, false).toBool());
     welcomeTitle->setText(tr("Plan"));
     welcomeText->setText(tr("No ride ?\nLet's start with some data."));
 
@@ -221,16 +221,18 @@ BlankStatePlanPage::BlankStatePlanPage(Context *context) : BlankStatePage(contex
     scImport.buttonLabel = tr("Import data");
     scImport.buttonIconPath = ":images/mac/download.png";
     QPushButton *importButton = addToShortCuts(scImport);
-    connect(importButton, SIGNAL(clicked()), context->mainWindow, SLOT(importFile()));
+    connect(importButton, SIGNAL(clicked()), context, SLOT(importFile()));
+
+    connect(importButton, SIGNAL(clicked()), context, SLOT(importFile()));
 
     ShortCut scDownload;
     scDownload.label = tr("Download from serial device.");
     scDownload.buttonLabel = tr("Download from device");
     scDownload.buttonIconPath = ":images/mac/download.png";
     QPushButton *downloadButton = addToShortCuts(scDownload);
-    connect(downloadButton, SIGNAL(clicked()), context->mainWindow, SLOT(downloadRide()));
+    connect(downloadButton, SIGNAL(clicked()), context, SLOT(downloadRide()));
 
-    canShow_ = !appsettings->cvalue(context->athlete->cyclist, GC_BLANK_PLAN).toBool();
+    canShow_ = !appsettings->cvalue(context->athlete->cyclist, GC_BLANK_DIARY).toBool();
 }
 
 //
@@ -252,7 +254,7 @@ BlankStateTrainPage::BlankStateTrainPage(Context *context) : BlankStatePage(cont
     scAddDevice.buttonLabel = tr("Add device");
     scAddDevice.buttonIconPath = ":images/devices/kickr.png";
     QPushButton *addDeviceButton = addToShortCuts(scAddDevice);
-    connect(addDeviceButton, SIGNAL(clicked()), context->mainWindow, SLOT(addDevice()));
+    connect(addDeviceButton, SIGNAL(clicked()), context, SLOT(addDevice()));
 
 
     ShortCut scImportWorkout;
@@ -260,14 +262,14 @@ BlankStateTrainPage::BlankStateTrainPage(Context *context) : BlankStatePage(cont
     scImportWorkout.buttonLabel = tr("Scan hard drives");
     scImportWorkout.buttonIconPath = ":images/toolbar/Disk.png";
     QPushButton *importWorkoutButton = addToShortCuts(scImportWorkout);
-    connect(importWorkoutButton, SIGNAL(clicked()), context->mainWindow, SLOT(manageLibrary()));
+    connect(importWorkoutButton, SIGNAL(clicked()), context, SLOT(manageLibrary()));
 
     ShortCut scDownloadWorkout;
     scDownloadWorkout.label = tr("Download workout files from the Erg DB.");
     scDownloadWorkout.buttonLabel = tr("Download workouts");
     scDownloadWorkout.buttonIconPath = ":images/mac/download.png";
     QPushButton *downloadWorkoutButton = addToShortCuts(scDownloadWorkout);
-    connect(downloadWorkoutButton, SIGNAL(clicked()), context->mainWindow, SLOT(downloadTrainerDay()));
+    connect(downloadWorkoutButton, SIGNAL(clicked()), context, SLOT(downloadTrainerDay()));
 
     canShow_ = !appsettings->cvalue(context->athlete->cyclist, GC_BLANK_TRAIN).toBool();
 }
@@ -281,7 +283,7 @@ BlankStateAnalysisPage::saveState()
 void
 BlankStatePlanPage::saveState()
 {
-    appsettings->setCValue(context->athlete->cyclist, GC_BLANK_PLAN, dontShow->isChecked());
+    appsettings->setCValue(context->athlete->cyclist, GC_BLANK_DIARY, dontShow->isChecked());
 }
 void
 BlankStateHomePage::saveState()

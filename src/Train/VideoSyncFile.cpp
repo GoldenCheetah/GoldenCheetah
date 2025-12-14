@@ -20,6 +20,7 @@
 #include "VideoSyncFile.h"
 
 #include <stdint.h>
+#include "RideFile.h"
 #include "Units.h"
 
 #include "TTSReader.h"

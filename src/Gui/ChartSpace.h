@@ -71,10 +71,10 @@ class GGraphicsView : public QGraphicsView
         }
 
     protected:
-        void dragEnterEvent(QDragEnterEvent *event) { context->mainWindow->dragEnterEvent(event); }
-        void dragLeaveEvent(QDragLeaveEvent *event) { context->mainWindow->dragLeaveEvent(event); }
-        void dropEvent(QDropEvent *event) { context->mainWindow->dropEvent(event); }
-        void dragMoveEvent(QDragMoveEvent *event) { context->mainWindow->dragMoveEvent(event); }
+        void dragEnterEvent(QDragEnterEvent *event) { context->forwardDragEnter(event); }
+        void dragLeaveEvent(QDragLeaveEvent *event) { context->forwardDragLeave(event); }
+        void dropEvent(QDropEvent *event) { context->forwardDrop(event); }
+        void dragMoveEvent(QDragMoveEvent *event) { context->forwardDragMove(event); }
 
     private:
         Context *context;

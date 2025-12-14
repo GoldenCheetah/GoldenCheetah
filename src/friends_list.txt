@@ -1,0 +1,159 @@
+./Charts/Aerolab.h:  friend class ::AerolabWindow;
+./Charts/Aerolab.h:  friend class ::IntervalAerolabData;
+./Charts/AllPlot.h:        friend class ::AllPlotBackground;
+./Charts/AllPlot.h:        friend class ::AllPlotZoneLabel;
+./Charts/AllPlot.h:        friend class ::AllPlotWindow;
+./Charts/AllPlot.h:        friend class ::MergeAdjust;
+./Charts/AllPlot.h:        friend class ::IntervalPlotData;
+./Charts/AllPlot.h:        friend class ::AllPlotObject;
+./Charts/AllPlotWindow.h:        friend class IntervalPlotData;
+./Charts/AllPlotWindow.h:        friend class Context;
+./Charts/AllPlotWindow.h:        friend class AllPlot;
+./Charts/ChartBar.h:    friend class ::ChartBarItem;
+./Charts/CriticalPowerWindow.h:        friend class ::CPPlot;
+./Charts/CriticalPowerWindow.h:        friend class ::MUPlot;
+./Charts/GenericChart.h:        friend class GenericSelectTool;
+./Charts/GenericChart.h:        friend class GenericLegend;
+./Charts/GenericPlot.h:        friend class GenericSelectTool;
+./Charts/GenericPlot.h:        friend class GenericAnnotationController;
+./Charts/GenericPlot.h:        friend class GenericLines;
+./Charts/GenericPlot.h:        friend class StraightLine;
+./Charts/GenericPlot.h:        friend class GenericLR;
+./Charts/GenericPlot.h:        friend class GenericLegend;
+./Charts/GenericSelectTool.h:    friend class ::GenericPlot;
+./Charts/HrPwPlot.h:        friend class ::HrPwPlotBackground;
+./Charts/HrPwPlot.h:        friend class ::HrPwPlotZoneLabel;
+./Charts/HrPwPlot.h:        friend class ::HrPwWindow;
+./Charts/LTMPlot.h:        friend class ::LTMPlotBackground;
+./Charts/LTMPlot.h:        friend class ::LTMPlotZoneLabel;
+./Charts/LTMPlot.h:        friend class ::LTMWindow;
+./Charts/LTMWindow.h:    friend class ::AllPlot;
+./Charts/PfPvPlot.h:        friend class ::PfPvPlotZoneLabel;
+./Charts/PowerHist.h:    friend class ::PaceHistBackground;
+./Charts/PowerHist.h:    friend class ::PaceHistZoneLabel;
+./Charts/PowerHist.h:    friend class ::HrHistBackground;
+./Charts/PowerHist.h:    friend class ::HrHistZoneLabel;
+./Charts/PowerHist.h:    friend class ::PowerHistBackground;
+./Charts/PowerHist.h:    friend class ::PowerHistZoneLabel;
+./Charts/PowerHist.h:    friend class ::HistogramWindow;
+./Charts/RideEditor.h:    friend class ::FindDialog;
+./Charts/RideEditor.h:    friend class ::AnomalyDialog;
+./Charts/RideEditor.h:    friend class ::PasteSpecialDialog;
+./Charts/RideEditor.h:    friend class ::CellDelegate;
+./Charts/RideEditor.h:    friend class ::XDataCellDelegate;
+./Charts/UserChart.h:    friend class ::Leaf; // data filter eval accessing our curve data
+./Charts/UserChart.h:    friend class ::UserChartOverviewItem; // get chartinfo.bgcolor
+./Charts/UserChart.h:    friend class ::UserChartWindow; // get chartinfo.bgcolor
+./Cloud/TrainingsTageBuch.h:    friend class TrainingsTageBuch;
+./Cloud/TrainingsTageBuch.h:    friend class TrainingsTageBuch;
+./Cloud/TrainingsTageBuch.h:    friend class TrainingsTageBuch;
+./Cloud/TrainingsTageBuch.h:    friend class TrainingsTageBuch;
+./Cloud/Velohero.h:    friend class Velohero;
+./Cloud/Velohero.h:    friend class Velohero;
+./Cloud/Velohero.h:    friend class Velohero;
+./Core/Quadtree.h:    friend class ::Quadtree;
+./Core/Quadtree.h:    friend class ::GenericPlot;
+./Core/Quadtree.h:    friend class ::GenericPlot;
+./Core/RideCache.h:        friend class ::Athlete;
+./Core/RideCache.h:        friend class ::MainWindow; // save dialog
+./Core/RideCache.h:        friend class ::LTMPlot; // get weekly performances
+./Core/RideCache.h:        friend class ::Banister; // get weekly performances
+./Core/RideCache.h:        friend class ::Leaf; // get weekly performances
+./Core/RideCache.h:        friend class ::RideItem; // adds to deletelist in destructor
+./Core/RideCache.h:        friend class ::NavigationModel; // checks deletelist during redo/undo
+./Core/RideCache.h:        friend class ::RideCacheRefreshThread;
+./Core/RideItem.h:        friend class ::RideCache;
+./Core/RideItem.h:        friend class ::RideCacheModel;
+./Core/RideItem.h:        friend class ::IntervalItem;
+./Core/RideItem.h:        friend class ::IntervalSummaryWindow;
+./Core/RideItem.h:        friend class ::UserData;
+./Core/RideItem.h:        friend class ::ComparePane;
+./Core/RideItem.h.bak:        friend class ::RideCache;
+./Core/RideItem.h.bak:        friend class ::RideCacheModel;
+./Core/RideItem.h.bak:        friend class ::IntervalItem;
+./Core/RideItem.h.bak:        friend class ::IntervalSummaryWindow;
+./Core/RideItem.h.bak:        friend class ::UserData;
+./Core/RideItem.h.bak:        friend class ::ComparePane;
+./Core/RideItem.h.test:        friend class ::RideCache;
+./Core/RideItem.h.test:        friend class ::RideCacheModel;
+./Core/RideItem.h.test:        friend class ::IntervalItem;
+./Core/RideItem.h.test:        friend class ::IntervalSummaryWindow;
+./Core/RideItem.h.test:        friend class ::UserData;
+./Core/RideItem.h.test:        friend class ::ComparePane;
+./Core/Route.h:    friend class ::RideItem; // access the route/ride map
+./Core/Specification.h:    friend class ::RideFileIterator;
+./Core/UserData.h:    friend class ::UserDataParser;
+./Core/UserData.h:    friend class ::EditUserDataDialog;
+./FileIO/FilterHRV.cpp:    friend class ::FilterHrvOutliers;
+./FileIO/FixAeroPod.cpp:    friend class ::FixAeroPod;
+./FileIO/FixDeriveDistance.cpp:    friend class ::FixDeriveDistance;
+./FileIO/FixDeriveHeadwind.cpp:    friend class ::FixDeriveHeadwind;
+./FileIO/FixDerivePower.cpp:    friend class ::FixDerivePower;
+./FileIO/FixDeriveTorque.cpp:    friend class ::FixDeriveTorque;
+./FileIO/FixElevation.cpp:    friend class ::FixElevation;
+./FileIO/FixFreewheeling.cpp:    friend class ::FixFreewheeling;
+./FileIO/FixGaps.cpp:    friend class ::FixGaps;
+./FileIO/FixGPS.cpp:    friend class ::FixGPS;
+./FileIO/FixHRSpikes.cpp:    friend class ::FixHRSpikes;
+./FileIO/FixLapSwim.cpp:    friend class ::FixLapSwim;
+./FileIO/FixMoxy.cpp:    friend class ::FixMoxy;
+./FileIO/FixPower.cpp:    friend class ::FixPower;
+./FileIO/FixRunningCadence.cpp:    friend class ::FixRunningCadence;
+./FileIO/FixRunningPower.cpp:    friend class ::FixRunningPower;
+./FileIO/FixSmO2.cpp:    friend class ::FixSmO2;
+./FileIO/FixSpeed.cpp:    friend class ::FixSpeed;
+./FileIO/FixSpikes.cpp:    friend class ::FixSpikes;
+./FileIO/FixTorque.cpp:    friend class ::FixTorque;
+./FileIO/RideFile.h:        friend class RideFileCommand; // tells us we were modified
+./FileIO/RideFile.h:        friend class RideCache; // tells us if wbal is stale
+./FileIO/RideFile.h:        friend class RideItem; // derived/wbal stale
+./FileIO/RideFile.h:        friend class IntervalItem; // access intervals 
+./FileIO/RideFile.h:        friend class MainWindow; // tells us we were modified
+./FileIO/RideFile.h:        friend class ComparePane;
+./FileIO/RideFile.h:        friend class Context; // tells us we were saved
+./FileIO/RideFile.h:        friend class Athlete; // tells us we were saved
+./FileIO/RideFile.h:        friend class RideFileFactory;
+./FileIO/RideFile.h:        friend class TcxFileReader;
+./FileIO/RideFile.h:        friend class ManualActivityWizard;
+./FileIO/RideFile.h:        friend class PolarFileReader;
+./FileIO/RideFile.h:        friend class Strava;
+./FileIO/RideFile.h:        friend class ErgFile; // access to intervals
+./FileIO/RideFile.h:        friend class MergeActivityWizard;
+./FileIO/RideFile.h:        friend class SplitActivityWizard;
+./FileIO/RideFile.h:        friend class SplitConfirm;
+./FileIO/RideFile.h:        friend class SplitSelect;
+./FileIO/RideFile.h:        friend class FixLapSwim;
+./FileIO/RideFile.h:        friend class Snippets;
+./FileIO/RideFile.h:        friend class ::MetricAggregator;
+./FileIO/RideFile.h:        friend class ::RideCache;
+./FileIO/RideFile.h:        friend class ::AthleteCard;
+./FileIO/RideFileCommand.h:    friend class LUWCommand;
+./FileIO/Snippets.cpp:    friend class ::Snippets;
+./FileIO/XDataTableModel.h:    friend class ::XDataEditor;
+./Gui/AbstractView.h:    friend class ::MainWindow;
+./Gui/AbstractView.h:    friend class ::TrainSidebar;
+./Gui/AbstractView.h:    friend class ::PerspectiveDialog;
+./Gui/AthleteTab.h:        friend class ::MainWindow;
+./Gui/AthleteTab.h:        friend class ::NavigationModel;
+./Gui/AthleteTab.h:        friend class ::AthleteLoader;
+./Gui/ChartSpace.h:    friend class ::ChartSpace;
+./Gui/GcSideBarItem.h:    friend class ::GcSplitterItem;
+./Gui/MainWindow.h:    friend class Context;
+./Gui/NewSideBar.h:    friend class ::NewSideBarItem;
+./Gui/Pages.h:    friend class ::KeywordsPage;
+./Gui/Pages.h:    friend class ::DefaultsPage;
+./Gui/RideNavigator.h:    friend class ::NavigatorCellDelegate;
+./Gui/RideNavigator.h:    friend class ::GroupByModel;
+./Gui/RideNavigator.h:    friend class ::DiarySidebar;
+./Gui/RideNavigator.h:    friend class ::GcMiniCalendar;
+./Gui/RideNavigator.h:    friend class ::DataFilter;
+./Gui/RideNavigator.h:    friend class ::SearchBox;
+./Gui/RideNavigator.h:    friend class ::EditMetricDetailDialog;
+./Gui/RideNavigator.h:    friend class ::EditUserDataDialog;
+./Gui/RideNavigator.h:    friend class ::EditUserMetricDialog;
+./Gui/RideNavigator.h:    friend class ::EditUserSeriesDialog;
+./Gui/RideNavigator.h:    friend class ::OverviewItemConfig;
+./Metrics/Estimator.h:        friend class ::Athlete;
+./Metrics/Estimator.h:        friend class ::Banister;
+./Train/MeterWidget.h:    friend class VideoLayoutParser;
+./Train/TrainSidebar.h:        friend class ::MultiDeviceDialog;

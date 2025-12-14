@@ -365,7 +365,7 @@ CloudServiceUploadDialog::CloudServiceUploadDialog(QWidget *parent, Context *con
                     // save
                     context->notifyMetadataFlush();
                     context->ride->notifyRideMetadataChanged();
-                    context->mainWindow->saveSilent(context, item);
+                    context->saveSilent(item);
                     break;
                 case QMessageBox::Ignore:
                     // just proceed
@@ -706,7 +706,7 @@ FolderNameDialog::FolderNameDialog(QWidget *parent) : QDialog(parent)
 }
 
 CloudServiceSyncDialog::CloudServiceSyncDialog(Context *context, CloudService *store)
-    : QDialog(context->mainWindow, Qt::Dialog), context(context), store(store), downloading(false), aborted(false)
+    : QDialog(context->mainWidget(), Qt::Dialog), context(context), store(store), downloading(false), aborted(false)
 {
     setWindowTitle(tr("Synchronise ") + store->uiName());
     setMinimumSize(850 *dpiXFactor,450 *dpiYFactor);
@@ -936,7 +936,7 @@ CloudServiceSyncDialog::CloudServiceSyncDialog(Context *context, CloudService *s
             // save
             if (dirtyList.count() > 0) {
                 for (int i=0; i<dirtyList.count(); i++) {
-                    context->mainWindow->saveSilent(context, dirtyList.at(i));
+                    context->saveSilent(dirtyList.at(i));
                 }
             }
             break;

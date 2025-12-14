@@ -138,8 +138,7 @@ SpinScanPlotWindow::pause()
 {
 }
 
-void
-SpinScanPlotWindow::telemetryUpdate(RealtimeData rtData)
+void SpinScanPlotWindow::telemetryUpdate(const RealtimeData &rtData)
 {
     for (int i=0; i<24; i++) {
         rtot[i] += rtData.spinScan[i];

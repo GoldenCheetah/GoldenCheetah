@@ -69,16 +69,6 @@ class RideNavigator : public GcChartWindow
     Q_PROPERTY(QString columns READ columns WRITE setColumns USER true)
     Q_PROPERTY(QString widths READ widths WRITE setWidths USER true)
 
-    friend class ::NavigatorCellDelegate;
-    friend class ::GroupByModel;
-    friend class ::GcMiniCalendar;
-    friend class ::DataFilter;
-    friend class ::SearchBox;
-    friend class ::EditMetricDetailDialog;
-    friend class ::EditUserDataDialog;
-    friend class ::EditUserMetricDialog;
-    friend class ::EditUserSeriesDialog;
-    friend class ::OverviewItemConfig;
 
     public:
         RideNavigator(Context *, bool mainwindow = false);
@@ -90,6 +80,20 @@ class RideNavigator : public GcChartWindow
         RideTreeView *tableView; // the view
 
         Context *context;
+
+        // Public accessors (replacing friend class access)
+        const QList<QString> &getLogicalHeadings() const { return logicalHeadings; }
+        const QList<QString> &getVisualHeadings() const { return visualHeadings; }
+        const QMap<QString, QString> &getNameMap() const { return nameMap; }
+        const QMap<QString, const RideMetric *> &getColumnMetrics() const { return columnMetrics; }
+        GroupByModel *getGroupByModel() { return groupByModel; }
+        RideNavigatorSortProxyModel *getSortModel() { return sortModel; }
+
+        // Additional accessors for NavigatorCellDelegate
+        int getFontHeight() const { return fontHeight; }
+        int getPwidth() const { return pwidth; }
+        QColor getReverseColor() const { return reverseColor; }
+        bool hasCalendarTextEnabled() const { return hasCalendarText; }
 
     public slots:
 
@@ -161,7 +165,7 @@ class RideNavigator : public GcChartWindow
         void searchStrings(QStringList);
         void clearSearch();
 
-    protected:
+    private:
         GroupByModel *groupByModel; // for group by
         RideNavigatorSortProxyModel *sortModel; // for sort/filter
 
@@ -263,7 +267,7 @@ class ColumnChooser : public QWidget
 
 
 public:
-    ColumnChooser(QList<QString>&columnHeadings);
+    ColumnChooser(const QList<QString>&columnHeadings);
 
 public slots:
     void buttonClicked(QString name);

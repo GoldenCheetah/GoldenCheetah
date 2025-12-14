@@ -56,7 +56,7 @@ static const double MINIMUM_R2_FIT = 0.75f;
  *
  *---------------------------------------------------------------------*/
 
-MergeActivityWizard::MergeActivityWizard(Context *context) : QWizard(context->mainWindow), context(context)
+MergeActivityWizard::MergeActivityWizard(Context *context) : QWizard(context->mainWidget()), context(context)
 {
 #ifdef Q_OS_MAC
     setWizardStyle(QWizard::ModernStyle);
@@ -1404,7 +1404,7 @@ MergeConfirm::validatePage()
     wizard->current->notifyRideDataChanged();
     wizard->combined->recalculateDerivedSeries(true);
     wizard->current->setRide(wizard->combined);
-    wizard->context->mainWindow->saveSilent(wizard->context, wizard->current);
+    wizard->context->saveSilent(wizard->current);
     wizard->current->setDirty(false); // lose changes
 
     return true;

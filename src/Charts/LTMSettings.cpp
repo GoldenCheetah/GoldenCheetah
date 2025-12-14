@@ -34,7 +34,7 @@
  * EDIT CHART DIALOG
  *--------------------------------------------------------------------*/
 EditChartDialog::EditChartDialog(Context *context, LTMSettings *settings, QList<LTMSettings>presets) :
-    QDialog(context->mainWindow, Qt::Dialog), context(context), settings(settings), presets(presets)
+    QDialog(context->mainWidget(), Qt::Dialog), context(context), settings(settings), presets(presets)
 {
     setWindowTitle(tr("Enter Chart Name"));
 

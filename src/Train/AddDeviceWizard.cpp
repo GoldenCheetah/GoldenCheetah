@@ -40,7 +40,7 @@
 //
 
 // Main wizard
-AddDeviceWizard::AddDeviceWizard(Context *context) : QWizard(context->mainWindow), context(context), controller(NULL)
+AddDeviceWizard::AddDeviceWizard(Context *context) : QWizard(context->mainWidget()), context(context), controller(NULL)
 {
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Training_AddDeviceWizard));

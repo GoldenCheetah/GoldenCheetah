@@ -18,7 +18,7 @@
 
 #ifndef _RideFile_h
 #define _RideFile_h
-#include "GoldenCheetah.h"
+#include "GcMacros.h"
 
 #include <QDate>
 #include <QDir>
@@ -199,37 +199,11 @@ class RideFile : public QObject // QObject to emit signals
 
     public:
 
-        friend class RideFileCommand; // tells us we were modified
-        friend class RideCache; // tells us if wbal is stale
-        friend class RideItem; // derived/wbal stale
-        friend class IntervalItem; // access intervals 
-        friend class MainWindow; // tells us we were modified
-        friend class ComparePane;
-        friend class Context; // tells us we were saved
-        friend class Athlete; // tells us we were saved
-
-        // file format writers have more access
-        friend class RideFileFactory;
-        friend struct FitlogFileReader;
-        friend struct GcFileReader;
-        friend class TcxFileReader;
-        friend struct PwxFileReader;
-        friend struct JsonFileReader;
-        friend class ManualActivityWizard;
-        friend class PolarFileReader;
-        friend class Strava;
-        friend class ErgFile; // access to intervals
-        // split and mergers
-        friend class MergeActivityWizard;
-        friend class SplitActivityWizard;
-        friend class SplitConfirm;
-        friend class SplitSelect;
-        // fix tools
-        friend class FixLapSwim;
-        friend class Snippets;
-        friend struct FitFileParser;
-
         // utility
+        QVector<RideFilePoint*> &mutableDataPoints() { return dataPoints_; }
+        QMap<QString, XDataSeries*> &mutableXData() { return xdata_; }
+        RideFileDataPresent &mutableDataPresent() { return dataPresent; }
+        
         static unsigned int computeFileCRC(QString); 
         void updateDataTag();
 
@@ -442,6 +416,17 @@ class RideFile : public QObject // QObject to emit signals
         void appendXDataPoints(QString xdata, QVector<XDataPoint *> points);
         // ************************************************************
 
+    public: // Signals (now via wrappers) but kept for QObject
+        void notifySaved() { emitSaved(); }
+        void notifyReverted() { emitReverted(); }
+        void notifyModified() { emitModified(); }
+        
+        // Exposed for RideItem / Managers
+        const QList<RideFileInterval*> &intervals() const { return intervals_; }
+        void setWStale(bool s) { wstale = s; }
+        void fillInIntervals();
+        void clearIntervals();
+
     signals:
         void saved();
         void reverted();
@@ -450,16 +435,12 @@ class RideFile : public QObject // QObject to emit signals
 
     protected:
 
-        //  should access via IntervalItem
-        const QList<RideFileInterval*> &intervals() const { return intervals_; }
-
         // xdata series
         QMap<QString, XDataSeries*> xdata_;
         QList<CIQinfo> ciqinfo_; //ciq metadata
 
-        void clearIntervals();
-        void fillInIntervals();
 
+        
         void emitSaved();
         void emitReverted();
         void emitModified();
@@ -682,22 +663,16 @@ class RideFileFactory {
 
         RideFileFactory() {}
 
-    protected:
-
-        friend class ::MetricAggregator;
-        friend class ::RideCache;
-        friend class ::AthleteCard;
-
-        // will become private as code should work with
-        // in memory representation not on disk .. but as we
-        // migrate will add friends in here.
-        // NOTE: DO NOT USE THIS, USE THE athlete->rideCache
-        //       TO GET ACCESS TO THE RIDE LIST AND RIDE DATA
-        QStringList listRideFiles(const QDir &dir) const;
-
     public:
 
-        static RideFileFactory &instance();
+         static RideFileFactory &instance();
+
+         // will become private as code should work with
+         // in memory representation not on disk .. but as we
+         // migrate will add friends in here.
+         // NOTE: DO NOT USE THIS, USE THE athlete->rideCache
+         //       TO GET ACCESS TO THE RIDE LIST AND RIDE DATA
+         QStringList listRideFiles(const QDir &dir) const;
 
         int registerReader(const QString &suffix, const QString &description,
                            RideFileReader *reader);

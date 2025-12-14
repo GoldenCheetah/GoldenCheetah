@@ -25,7 +25,7 @@
 #include "Utils.h"
 #include "Colors.h"
 
-LTMPopup::LTMPopup(Context *context) : QWidget(context->mainWindow), context(context)
+LTMPopup::LTMPopup(Context *context) : QWidget(context->mainWidget()), context(context)
 {
     // get application settings
     setAutoFillBackground(false);

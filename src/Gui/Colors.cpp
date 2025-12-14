@@ -35,9 +35,8 @@
 #endif
 
 //
-// Dialog scaling
+// Dialog scaling - dpiXFactor/dpiYFactor defined in Utils.cpp, declared extern in Utils.h
 //
-double dpiXFactor, dpiYFactor;  // scale factor to apply to display
 QFont baseFont;                 // base font scaled to display (before user scaling applied)
 
 // find the right pixelSize for font and height

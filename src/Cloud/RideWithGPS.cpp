@@ -74,7 +74,7 @@ RideWithGPS::~RideWithGPS() {
 void
 RideWithGPS::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    sslErrors(context->mainWindow, reply, errors);
+    sslErrors(context->mainWidget(), reply, errors);
 }
 
 bool

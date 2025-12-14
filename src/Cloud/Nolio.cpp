@@ -74,7 +74,7 @@ Nolio::~Nolio() {
 }
 
 void Nolio::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors){
-    sslErrors(context->mainWindow, reply, errors);
+    sslErrors(context->mainWidget(), reply, errors);
 }
 
 bool Nolio::open(QStringList &errors){

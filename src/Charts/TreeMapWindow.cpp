@@ -35,9 +35,9 @@
 #include <QString>
 
 #include <qwt_plot_panner.h>
-#include <qwt_plot_zoomer.h>
-#include <qwt_plot_picker.h>
 #include <qwt_plot_marker.h>
+
+extern QString gcroot;
 
 TreeMapWindow::TreeMapWindow(Context *context) :
             GcChartWindow(context), context(context), active(false), dirty(true), useCustom(false), useToToday(false)

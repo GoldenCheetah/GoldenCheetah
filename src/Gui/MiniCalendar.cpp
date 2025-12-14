@@ -558,7 +558,7 @@ GcMiniCalendar::setDate(int _month, int _year)
 //********************************************************************************
 // MULTI CALENDAR (GcMultiCalendar)
 //********************************************************************************
-GcMultiCalendar::GcMultiCalendar(Context *context) : QScrollArea(context->mainWindow), context(context), active(false)
+GcMultiCalendar::GcMultiCalendar(Context *context) : QScrollArea(context->mainWidget()), context(context), active(false)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setContentsMargins(0,0,0,0);

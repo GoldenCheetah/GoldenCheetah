@@ -200,10 +200,10 @@ MainWindow::saveSilent(Context *context, RideItem *rideItem)
 
 
     // mark clean as we have now saved the data
-    rideItem->ride()->emitSaved();
+    rideItem->ride()->notifySaved();
 
     // model estimates (lazy refresh)
-    context->athlete->rideCache->estimator->refresh();
+    context->athlete->rideCache->getEstimator()->refresh();
     QGuiApplication::restoreOverrideCursor();
 }
 

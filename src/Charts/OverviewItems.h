@@ -26,6 +26,7 @@
 #include <QGraphicsItem>
 #include "MetadataDialog.h"
 #include "MetricOverrideDialog.h"
+#include "SearchFilterBox.h"
 
 // qt charts for zone chart
 #include <QtCharts>

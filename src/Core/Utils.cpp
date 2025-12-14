@@ -651,3 +651,23 @@ double myisnan(double x) { return isnan(x); } // math.h
 
 
 };
+
+// Global DPI factors
+double dpiXFactor = 1.0;
+double dpiYFactor = 1.0;
+
+#include <QWidget>
+#include <QScreen>
+#include <QApplication>
+
+void setDpiFactors(QWidget *widget)
+{
+    if (widget) {
+        QScreen *screen = widget->screen();
+        if (!screen) screen = QGuiApplication::primaryScreen();
+        if (screen) {
+            dpiXFactor = screen->logicalDotsPerInchX() / 96.0;
+            dpiYFactor = screen->logicalDotsPerInchY() / 96.0;
+        }
+    }
+}

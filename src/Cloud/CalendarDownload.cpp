@@ -44,7 +44,7 @@ CalendarDownload::download()
     QNetworkReply *reply = nam->get(QNetworkRequest(QUrl(request)));
 
     if (reply->error() != QNetworkReply::NoError) {
-        QMessageBox::warning(context->mainWindow, tr("Calendar Data Download"), reply->errorString());
+        QMessageBox::warning(context->mainWidget(), tr("Calendar Data Download"), reply->errorString());
         return false;
     }
     return true;

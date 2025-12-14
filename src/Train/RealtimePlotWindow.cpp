@@ -168,8 +168,7 @@ RealtimePlotWindow::pause()
 {
 }
 
-void
-RealtimePlotWindow::telemetryUpdate(RealtimeData rtData)
+void RealtimePlotWindow::telemetryUpdate(const RealtimeData &rtData)
 {
 
     // lets apply smoothing if we have to

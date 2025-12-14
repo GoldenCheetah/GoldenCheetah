@@ -67,7 +67,7 @@ UserData::isEmpty()
 }
 
 EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
-    QDialog(context->mainWindow, Qt::Dialog), context(context), here(here)
+    QDialog(context->mainWidget(), Qt::Dialog), context(context), here(here)
 {
     setWindowTitle(tr("User Data Series"));
 
@@ -271,7 +271,7 @@ UserData::setRideItem(RideItem*m)
         DataFilter parser(this, rideItem->context, formula);
 
         // is it cached ?
-        vector = rideItem->userCache.value(parser.signature(), QVector<double>());
+        vector = rideItem->mutableUserCache().value(parser.signature(), QVector<double>());
 
         if (vector.count() == 0 && rideItem->ride()) {
 
@@ -282,7 +282,7 @@ UserData::setRideItem(RideItem*m)
             }
 
             // cache for next time !
-            rideItem->userCache.insert(parser.signature(), vector);
+            rideItem->mutableUserCache().insert(parser.signature(), vector);
         }
     }
 }

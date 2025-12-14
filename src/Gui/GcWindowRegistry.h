@@ -19,7 +19,9 @@
 #ifndef _GC_GcWindowRegistry_h
 #define _GC_GcWindowRegistry_h
 
-#include "GoldenCheetah.h"
+#include <QObject>
+#include <QMetaType>
+#include <QCoreApplication>
 #include <QApplication>
 
 class Context;

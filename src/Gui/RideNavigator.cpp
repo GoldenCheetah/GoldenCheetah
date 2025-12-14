@@ -890,7 +890,7 @@ GroupByModel::groupFromValue(QString headingName, QString value, double rank, do
     }
 
     // Use upper quartile for anything left that is a metric
-    if (rideNavigator->columnMetrics.value(headingName, NULL) != NULL) {
+    if (rideNavigator->getColumnMetrics().value(headingName, NULL) != NULL) {
 
         double quartile = rank / count;
 
@@ -1080,10 +1080,10 @@ QSize NavigatorCellDelegate::sizeHint(const QStyleOptionViewItem & /*option*/, c
 {
     QSize s;
 
-    if (rideNavigator->groupByModel->mapToSource(rideNavigator->sortModel->mapToSource(index)) != QModelIndex() &&
-        rideNavigator->hasCalendarText) {
-        s.setHeight((rideNavigator->fontHeight+2) * 4);
-    } else s.setHeight(rideNavigator->fontHeight + 2);
+    if (rideNavigator->getGroupByModel()->mapToSource(rideNavigator->getSortModel()->mapToSource(index)) != QModelIndex() &&
+        rideNavigator->hasCalendarTextEnabled()) {
+        s.setHeight((rideNavigator->getFontHeight()+2) * 4);
+    } else s.setHeight(rideNavigator->getFontHeight() + 2);
     return s;
 }
 
@@ -1113,7 +1113,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             //selected = true;
     //}
 
-    if ((m=rideNavigator->columnMetrics.value(columnName, NULL)) != NULL) {
+    if ((m=rideNavigator->getColumnMetrics().value(columnName, NULL)) != NULL) {
 
         // get double from model, special case QTime to avoid default .000 msecs
         if ((QMetaType::Type)index.model()->data(index, Qt::DisplayRole).type() == QMetaType::QTime)
@@ -1186,13 +1186,13 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         QPen isColor = painter->pen();
         QFont isFont = painter->font();
         painter->setPen(rpen);
-        painter->drawLine(0,myOption.rect.y(),rideNavigator->pwidth-1,myOption.rect.y());
-        painter->drawLine(0,myOption.rect.y()+myOption.rect.height(),rideNavigator->pwidth-1,myOption.rect.y()+myOption.rect.height());
+        painter->drawLine(0,myOption.rect.y(),rideNavigator->getPwidth()-1,myOption.rect.y());
+        painter->drawLine(0,myOption.rect.y()+myOption.rect.height(),rideNavigator->getPwidth()-1,myOption.rect.y()+myOption.rect.height());
         painter->drawLine(0,myOption.rect.y()+myOption.rect.height(),0,myOption.rect.y()+myOption.rect.height());
-        painter->drawLine(rideNavigator->pwidth-1, myOption.rect.y(), rideNavigator->pwidth-1, myOption.rect.y()+myOption.rect.height());
+        painter->drawLine(rideNavigator->getPwidth()-1, myOption.rect.y(), rideNavigator->getPwidth()-1, myOption.rect.y()+myOption.rect.height());
 
         // indent first column and draw all in plotmarker color
-        myOption.rect.setHeight(rideNavigator->fontHeight + 2); //added
+        myOption.rect.setHeight(rideNavigator->getFontHeight() + 2); //added
         myOption.font.setWeight(QFont::Bold);
 
         QFont boldened = painter->font();
@@ -1201,7 +1201,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         if (!selected) {
             // not selected, so invert ride plot color
             if (hover) painter->setPen(QColor(Qt::black));
-            else painter->setPen(rideBG ? rideNavigator->reverseColor : userColor);
+            else painter->setPen(rideBG ? rideNavigator->getReverseColor() : userColor);
         } else if (!focus) { // selected but out of focus //
             painter->setPen(QColor(Qt::black));
         }
@@ -1218,13 +1218,13 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         painter->setFont(isFont);
 
         // now get the calendar text to appear ...
-        if (rideNavigator->hasCalendarText) {
-            QRect high(myOption.rect.x()+myOption.rect.width() - (7*dpiXFactor), myOption.rect.y(), (7*dpiXFactor), (rideNavigator->fontHeight+2) * 4);
+        if (rideNavigator->hasCalendarTextEnabled()) {
+            QRect high(myOption.rect.x()+myOption.rect.width() - (7*dpiXFactor), myOption.rect.y(), (7*dpiXFactor), (rideNavigator->getFontHeight()+2) * 4);
 
             myOption.rect.setX(0);
-            myOption.rect.setY(myOption.rect.y() + rideNavigator->fontHeight + 2);//was +23
-            myOption.rect.setWidth(rideNavigator->pwidth);
-            myOption.rect.setHeight(rideNavigator->fontHeight * 3); //was 36
+            myOption.rect.setY(myOption.rect.y() + rideNavigator->getFontHeight() + 2);//was +23
+            myOption.rect.setWidth(rideNavigator->getPwidth());
+            myOption.rect.setHeight(rideNavigator->getFontHeight() * 3); //was 36
             //myOption.font.setPointSize(myOption.font.pointSize());
             myOption.font.setWeight(QFont::Normal);
 
@@ -1239,7 +1239,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             if (!selected) {
                 // not selected, so invert ride plot color
                 if (hover) painter->setPen(QPen(Qt::black));
-                else painter->setPen(rideBG ? rideNavigator->reverseColor : GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+                else painter->setPen(rideBG ? rideNavigator->getReverseColor() : GCColor::invertColor(GColor(CPLOTBACKGROUND)));
             }
             painter->drawText(myOption.rect, Qt::AlignLeft | Qt::TextWordWrap, calendarText);
             painter->setPen(isColor);
@@ -1259,7 +1259,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
                 QPen isColor = painter->pen();
                 QFont isFont = painter->font();
                 painter->setPen(rpen);
-                painter->drawLine(rideNavigator->pwidth-1, myOption.rect.y(), rideNavigator->pwidth-1, myOption.rect.y()+myOption.rect.height());
+                painter->drawLine(rideNavigator->getPwidth()-1, myOption.rect.y(), rideNavigator->getPwidth()-1, myOption.rect.y()+myOption.rect.height());
                 painter->setPen(isColor);
             }
         }
@@ -1269,8 +1269,8 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         if (value != "") {
             myOption.displayAlignment = Qt::AlignLeft | Qt::AlignBottom;
             myOption.rect.setX(0);
-            myOption.rect.setHeight(rideNavigator->fontHeight + 2);
-            myOption.rect.setWidth(rideNavigator->pwidth);
+            myOption.rect.setHeight(rideNavigator->getFontHeight() + 2);
+            myOption.rect.setWidth(rideNavigator->getPwidth());
             painter->fillRect(myOption.rect, GColor(CPLOTBACKGROUND));
         }
         QPen isColor = painter->pen();
@@ -1286,7 +1286,7 @@ static bool insensitiveLessThan(const QString &a, const QString &b)
     return a.toLower() < b.toLower();
 }
 
-ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
+ColumnChooser::ColumnChooser(const QList<QString>&logicalHeadings)
 {
     // wipe away everything when you close please...
     setWindowTitle(tr("Column Chooser"));

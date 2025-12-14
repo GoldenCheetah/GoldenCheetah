@@ -30,7 +30,7 @@
 
 #include <QPaintEvent>
 
-AthleteTab::AthleteTab(Context *context) : QWidget(context->mainWindow), context(context), noswitch(true), startupViewChangeSent(false)
+AthleteTab::AthleteTab(Context *context) : QWidget(context->mainWidget()), context(context), noswitch(true)
 {
     context->tab = this;
     init = false;
@@ -187,7 +187,7 @@ AthleteTab::selectView(int index)
     view(index)->setSelected(true);
     masterControls->setCurrentIndex(index);
     context->setIndex(index);
-    context->mainWindow->resetPerspective(index); // set perspective for this view
+    context->resetPerspective(index); // set perspective for this view
 
     // enable screen updates to render the view without flickering
     views->setUpdatesEnabled(true);
@@ -212,7 +212,7 @@ AthleteTab::rideSelected(RideItem*)
         // as important to be aware that perspectives are loaded
         // when the view is selected by the user and no earlier
         if (analysisView->page() != NULL) {
-            context->mainWindow->newSidebar()->setItemSelected(GcSideBarBtnId::ACTIVITIES_BTN, true);
+            if (context->sidebar()) context->sidebar()->setItemSelected(GcSideBarBtnId::ACTIVITIES_BTN, true);
             selectView(1);
         }
     }

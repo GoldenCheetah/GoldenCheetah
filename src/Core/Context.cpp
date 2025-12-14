@@ -17,6 +17,7 @@
  */
 
 #include "Context.h"
+#include "MainWindow.h"
 #include "Settings.h"
 #include "Athlete.h"
 #include "RideMetadata.h"
@@ -138,14 +139,10 @@ GlobalContext *GlobalContext::context()
 
 bool Context::isValid(Context *p) { return p != NULL &&_contexts.contains(p); }
 
-Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
+Context::Context(MainWindow *mainWindow): DataContext(mainWindow), mainWindow(mainWindow)
 {
-    ride = NULL;
-    workout = NULL;
-    videosync = NULL;
     isfiltered = ishomefiltered = false;
-    isCompareIntervals = isCompareDateRanges = false;
-    isRunning = isPaused = false;
+    showSidebar = showLowbar = showToolbar = true;
 
     connect(this, SIGNAL(loadProgress(QString, double)), mainWindow, SLOT(loadProgress(QString, double)));
 
@@ -167,41 +164,92 @@ Context::~Context()
     if (i >= 0) _contexts.removeAt(i);
 }
 
-void 
-Context::notifyCompareIntervals(bool state) 
-{ 
-    isCompareIntervals = state; 
-    emit compareIntervalsStateChanged(state); 
-}
-
-void 
-Context::notifyCompareIntervalsChanged() 
-{
-    if (isCompareIntervals) {
-        emit compareIntervalsChanged(); 
-    }
-}
-
-void 
-Context::notifyCompareDateRanges(bool state)
-{
-    isCompareDateRanges = state;
-    emit compareDateRangesStateChanged(state); 
-}
-
-void 
-Context::notifyCompareDateRangesChanged()
-{ 
-    if (isCompareDateRanges) {
-        emit compareDateRangesChanged(); 
-    }
-}
-
 void
 Context::notifyConfigChanged(qint32 state)
 {
     QApplication::setOverrideCursor(Qt::WaitCursor);
     emit configChanged(state);
     QApplication::restoreOverrideCursor();
+}
+
+#include "RealtimeData.h"
+#include "ErgFile.h"
+#include <QStatusBar>
+
+// API to access MainWindow functionality without exposing the pointer
+QWidget *Context::mainWidget() const { return mainWindow; }
+void Context::switchToTrainView() { if(mainWindow) mainWindow->selectTrain(); }
+void Context::switchToTrendsView() { if(mainWindow) mainWindow->selectTrends(); }
+void Context::switchToAnalysisView() { if(mainWindow) mainWindow->selectAnalysis(); }
+void Context::switchToDiaryView() { if(mainWindow) mainWindow->selectPlan(); }
+bool Context::isCurrent() const { return mainWindow ? mainWindow->athleteTab() == tab : false; }
+void Context::requestImportFile() { if (mainWindow) mainWindow->importFile(); }
+void Context::requestDownloadRide() { if (mainWindow) mainWindow->downloadRide(); }
+void Context::fillinWorkoutFilterBox(const QString &text) {
+    if (mainWindow) mainWindow->fillinWorkoutFilterBox(text);
+}
+
+// Proxies for slots
+void Context::importFile() { if(mainWindow) mainWindow->importFile(); }
+void Context::importCloud() { if(mainWindow) mainWindow->importCloud(); }
+void Context::downloadRide() { if(mainWindow) mainWindow->downloadRide(); }
+void Context::addDevice() { if(mainWindow) mainWindow->addDevice(); }
+void Context::manageLibrary() { if(mainWindow) mainWindow->manageLibrary(); }
+void Context::downloadTrainerDay() { if(mainWindow) mainWindow->downloadTrainerDay(); }
+void Context::importChart() { if (mainWindow) mainWindow->importChart(); }
+void Context::addChart(QAction *action) { if (mainWindow) mainWindow->addChart(action); }
+void Context::setChartMenu(QMenu *menu) { if (mainWindow) mainWindow->setChartMenu(menu); }
+void Context::openAthleteTab(QString path) { if(mainWindow) mainWindow->openAthleteTab(path); }
+void Context::closeAthleteTab(QString path)
+{
+    mainWindow->closeAthleteTab(path);
+}
+
+void Context::setSidebarVisible(bool show)
+{
+    mainWindow->showSidebar(show);
+}
+
+void Context::setLowbarVisible(bool show)
+{
+    mainWindow->showLowbar(show);
+}
+
+void Context::importWorkout() { if(mainWindow) mainWindow->importWorkout(); }
+void Context::showWorkoutWizard() { if(mainWindow) mainWindow->showWorkoutWizard(); }
+void Context::downloadStravaRoutes() { if(mainWindow) mainWindow->downloadStravaRoutes(); }
+void Context::switchPerspective(int index) { if(mainWindow) mainWindow->switchPerspective(index); }
+
+void Context::forwardDragEnter(QDragEnterEvent *event) { if (mainWindow) mainWindow->dragEnterEvent(event); }
+void Context::forwardDragLeave(QDragLeaveEvent *event) { if (mainWindow) mainWindow->dragLeaveEvent(event); }
+void Context::forwardDragMove(QDragMoveEvent *event) { if (mainWindow) mainWindow->dragMoveEvent(event); }
+void Context::forwardDrop(QDropEvent *event) { if (mainWindow) mainWindow->dropEvent(event); }
+
+bool Context::isStarting() const { return mainWindow ? mainWindow->isStarting() : false; }
+void Context::saveSilent(RideItem *item) { if (mainWindow) mainWindow->saveSilent(this, item); }
+bool Context::saveRideSingleDialog(RideItem *item) { return mainWindow ? mainWindow->saveRideSingleDialog(this, item) : false; }
+
+void Context::saveRide() { if(mainWindow) mainWindow->saveRide(); }
+void Context::revertRide() { if(mainWindow) mainWindow->revertRide(); }
+void Context::deleteRide() { if(mainWindow) mainWindow->deleteRide(); }
+void Context::splitRide() { if(mainWindow) mainWindow->splitRide(); }
+
+#include "NewSideBar.h"
+void Context::resetPerspective(int index) { if(mainWindow) mainWindow->resetPerspective(index); }
+void Context::setToolButtons() { if(mainWindow) mainWindow->setToolButtons(); }
+NewSideBar *Context::sidebar() { return mainWindow ? mainWindow->sidebar : nullptr; }
+QAction *Context::showHideSidebarAction() { return mainWindow ? mainWindow->showhideSidebar : nullptr; }
+bool Context::isMainWindowInitialized() { return mainWindow ? mainWindow->init : false; }
+
+void Context::notifySetNotification(QString msg, int timeout)
+{
+    if (mainWindow && mainWindow->statusBar()) {
+        mainWindow->statusBar()->showMessage(msg, timeout*1000);
+    }
+}
+
+void Context::notifyTelemetryUpdate(const RealtimeData &rtData)
+{
+    DataContext::notifyTelemetryUpdate(rtData);
 }
 

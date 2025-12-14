@@ -22,7 +22,7 @@
 #include "HelpWhatsThis.h"
 #include "Secrets.h"
 
-TrainerDayDownloadDialog::TrainerDayDownloadDialog(Context *context) : QDialog(context->mainWindow), context(context)
+TrainerDayDownloadDialog::TrainerDayDownloadDialog(Context *context) : QDialog(context->mainWidget()), context(context)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);

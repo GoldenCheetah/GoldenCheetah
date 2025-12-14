@@ -241,7 +241,7 @@ RideFileCommand::doCommand(RideCommand *cmd, bool noexec)
     endCommand(false, cmd); // signal - even if LUW
 
     // we changed it!
-    ride->emitModified();
+    ride->notifyModified();
 }
 
 void

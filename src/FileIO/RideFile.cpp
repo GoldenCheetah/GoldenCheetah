@@ -910,15 +910,16 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
         QString tmp = context->athlete->home->temp().absolutePath() + "/" + QFileInfo(file.fileName()).baseName() + "." + suffix;
 
         QFile ufile(tmp); // look at uncompressed version mot the source
-        ufile.open(QFile::ReadWrite);
-        ufile.write(data);
-        ufile.close();
+        if (ufile.open(QFile::ReadWrite)) {
+            ufile.write(data);
+            ufile.close();
 
-        // open and read the  uncompressed file
-        result = reader->openRideFile(ufile, errors, rideList);
+            // open and read the  uncompressed file
+            result = reader->openRideFile(ufile, errors, rideList);
 
-        // now zap the temporary file
-        ufile.remove();
+            // now zap the temporary file
+            ufile.remove();
+        }
 
     } else {
 
@@ -966,7 +967,7 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
         }
         // now remove metadata that was inserted into
         // interval metadata from the main tags
-        foreach(QString key, removelist) result->tags_.remove(key);
+        foreach(QString key, removelist) result->removeTag(key);
 
         if (result->intervals().empty()) result->fillInIntervals();
         // override the file ride time with that set from the filename

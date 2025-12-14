@@ -24,7 +24,7 @@
 #include "IntervalItem.h"
 #include "IntervalTreeView.h"
 #include "SmallPlot.h"
-#include "Context.h"
+#include "RealtimeData.h"
 #include "Athlete.h"
 #include "Settings.h"
 #include "Colors.h"
@@ -229,7 +229,7 @@ void LiveMapWebPageWindow::configChanged(qint32)
 }
 
 // Update position on the map when telemetry changes.
-void LiveMapWebPageWindow::telemetryUpdate(RealtimeData rtd)
+void LiveMapWebPageWindow::telemetryUpdate(const RealtimeData &rtd)
 {
     if (!isVisible())
         return;

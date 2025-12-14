@@ -76,7 +76,7 @@ Velohero::~Velohero() {
 void
 Velohero::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    sslErrors(context->mainWindow, reply, errors);
+    sslErrors(context->mainWidget(), reply, errors);
 }
 
 bool

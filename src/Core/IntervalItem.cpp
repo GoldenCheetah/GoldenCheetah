@@ -104,7 +104,7 @@ IntervalItem::refresh()
     count_.fill(0, factory.metricCount());
 
     // don't open on our account - we should be called with a ride available
-    RideFile *f = rideItem_->ride_;
+    RideFile *f = rideItem_->ride(false);
     if (!f) return;
 
 

@@ -75,7 +75,7 @@ TrainingsTageBuch::~TrainingsTageBuch() {
 void
 TrainingsTageBuch::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    sslErrors(context->mainWindow, reply, errors);
+    sslErrors(context->mainWidget(), reply, errors);
 }
 
 bool

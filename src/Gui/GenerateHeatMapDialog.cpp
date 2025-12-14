@@ -25,7 +25,7 @@
 #include "Colors.h"
 #include "HelpWhatsThis.h"
 
-GenerateHeatMapDialog::GenerateHeatMapDialog(Context *context) : QDialog(context->mainWindow), context(context)
+GenerateHeatMapDialog::GenerateHeatMapDialog(Context *context) : QDialog(context->mainWidget()), context(context)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     //setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint); // must stop using this flag!

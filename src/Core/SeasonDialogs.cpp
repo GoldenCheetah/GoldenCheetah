@@ -31,7 +31,7 @@
 
 EditSeasonDialog::EditSeasonDialog
 (Context *context, Season *season)
-: QDialog(context->mainWindow, Qt::Dialog), context(context), season(season)
+: QDialog(context->mainWidget(), Qt::Dialog), context(context), season(season)
 {
     setWindowTitle(tr("Edit Date Range"));
 
@@ -471,7 +471,7 @@ EditSeasonDialog::getSeasonOffset
  *--------------------------------------------------------------------*/
 
 EditSeasonEventDialog::EditSeasonEventDialog(Context *context, SeasonEvent *event, Season &season) :
-    QDialog(context->mainWindow, Qt::Dialog), context(context), event(event)
+    QDialog(context->mainWidget(), Qt::Dialog), context(context), event(event)
 {
     setWindowTitle(tr("Edit Event"));
 
@@ -538,7 +538,7 @@ void EditSeasonEventDialog::nameChanged()
  *--------------------------------------------------------------------*/
 
 EditPhaseDialog::EditPhaseDialog(Context *context, Phase *phase, Season &season) :
-    QDialog(context->mainWindow, Qt::Dialog), context(context), phase(phase)
+    QDialog(context->mainWidget(), Qt::Dialog), context(context), phase(phase)
 {
     setWindowTitle(tr("Edit Date Range"));
 

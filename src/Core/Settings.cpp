@@ -684,7 +684,7 @@ GSettings::upgradeAthlete(QString athlete) {
     migrateCValue(athlete, GC_BLANK_ANALYSIS);
     migrateCValue(athlete, GC_BLANK_TRAIN);
     migrateCValue(athlete, GC_BLANK_HOME);
-    migrateCValue(athlete, GC_BLANK_PLAN);
+    migrateCValue(athlete, GC_BLANK_DIARY);
     migrateCValue(athlete, GC_NICKNAME);
     migrateCValue(athlete, GC_DOB);
     migrateCValue(athlete, GC_WEIGHT);

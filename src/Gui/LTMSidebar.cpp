@@ -61,7 +61,7 @@
 #include "SpecialFields.h"
 
 
-LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context(context), active(false),
+LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWidget()), context(context), active(false),
                                            isqueryfilter(false), isautofilter(false)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -762,9 +762,9 @@ LTMSidebar::eventPopup()
 void
 LTMSidebar::manageFilters()
 {
-    EditNamedSearches *editor = new EditNamedSearches(context->mainWindow, context);
-    editor->move(QCursor::pos()+QPoint(10,-200));
-    editor->show();
+    EditNamedSearches *editor = new EditNamedSearches(context->mainWidget(), context);
+    editor->exec();
+    delete editor;
 }
 
 void

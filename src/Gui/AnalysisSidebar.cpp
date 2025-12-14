@@ -42,7 +42,7 @@
 // Show in Train Mode
 #include "WorkoutFilter.h"
 
-AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow), context(context)
+AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWidget()), context(context)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0,0,0,0);
@@ -389,16 +389,16 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
 
 
         QAction *actSaveRide = new QAction(tr("Save Changes"), rideNavigator);
-        connect(actSaveRide, SIGNAL(triggered(void)), context->mainWindow, SLOT(saveRide()));
+        connect(actSaveRide, SIGNAL(triggered(void)), context, SLOT(saveRide()));
 
         QAction *revertRide = new QAction(tr("Revert to Saved version"), rideNavigator);
-        connect(revertRide, SIGNAL(triggered(void)), context->mainWindow, SLOT(revertRide()));
+        connect(revertRide, SIGNAL(triggered(void)), context, SLOT(revertRide()));
 
         QAction *actDeleteRide = new QAction(tr("Delete Activity"), rideNavigator);
-        connect(actDeleteRide, SIGNAL(triggered(void)), context->mainWindow, SLOT(deleteRide()));
+        connect(actDeleteRide, SIGNAL(triggered(void)), context, SLOT(deleteRide()));
 
         QAction *actSplitRide = new QAction(tr("Split Activity"), rideNavigator);
-        connect(actSplitRide, SIGNAL(triggered(void)), context->mainWindow, SLOT(splitRide()));
+        connect(actSplitRide, SIGNAL(triggered(void)), context, SLOT(splitRide()));
 
         if (rideItem->isDirty() == true) {
           menu.addAction(actSaveRide);
@@ -417,8 +417,8 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
             if (! filter.isEmpty()) {
                 QAction *actStartWorkout = new QAction(tr("Show in Train Mode..."), rideNavigator);
                 connect(actStartWorkout, &QAction::triggered, [=]() {
-                    context->mainWindow->fillinWorkoutFilterBox(filter);
-                    context->mainWindow->selectTrain();
+                    context->fillinWorkoutFilterBox(filter);
+                    context->switchToTrainView();
                     context->notifySelectWorkout(0);
                 });
                 menu.addAction(actStartWorkout);

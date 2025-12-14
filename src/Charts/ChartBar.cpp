@@ -27,7 +27,7 @@ static int spacing_=12;
 #else
 static int spacing_=8;
 #endif
-ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(context)
+ChartBar::ChartBar(Context *context) : QWidget(context->mainWidget()), context(context)
 {
     // left / right scroller icon
     static QIcon leftIcon = iconFromPNG(":images/mac/left.png");
@@ -117,16 +117,16 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     barMenu = new QMenu("Add");
     chartMenu = barMenu->addMenu(tr("New Chart"));
 
-    barMenu->addAction(tr("Import Chart ..."), context->mainWindow, SLOT(importChart()));
+    barMenu->addAction(tr("Import Chart ..."), context, SLOT(importChart()));
 
 #ifdef GC_HAS_CLOUD_DB
-    barMenu->addAction(tr("Download Chart..."), context->mainWindow, SLOT(addChartFromCloudDB()));
+    barMenu->addAction(tr("Download Chart..."), context, SLOT(addChartFromCloudDB()));
 #endif
 
     // menu
     connect(menuButton, SIGNAL(clicked()), this, SLOT(menuPopup()));
-    connect(chartMenu, SIGNAL(aboutToShow()), this, SLOT(setChartMenu()));
-    connect(chartMenu, SIGNAL(triggered(QAction*)), context->mainWindow, SLOT(addChart(QAction*)));
+    connect(chartMenu, SIGNAL(aboutToShow()), context, SLOT(setChartMenu()));
+    connect(chartMenu, SIGNAL(triggered(QAction*)), context, SLOT(addChart(QAction*)));
 
     // trap resize / mouse events
     installEventFilter(this);
@@ -204,7 +204,7 @@ ChartBar::addWidget(QString title)
 void
 ChartBar::setChartMenu()
 {
-    context->mainWindow->setChartMenu(chartMenu);
+    context->setChartMenu(chartMenu);
 }
 
 void

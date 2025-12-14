@@ -20,6 +20,7 @@
 #include "WorkoutWindow.h"
 #include "WorkoutWidget.h"
 #include "WorkoutWidgetItems.h"
+#include "RealtimeData.h"
 #include "HelpWhatsThis.h"
 
 static int MINTOOLHEIGHT = 350; // smaller than this, lose the toolbar

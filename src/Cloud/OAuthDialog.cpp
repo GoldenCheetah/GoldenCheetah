@@ -183,7 +183,7 @@ OAuthDialog::~OAuthDialog()
 void
 OAuthDialog::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-  CloudService::sslErrors(context->mainWindow, reply, errors);
+  CloudService::sslErrors(context->mainWidget(), reply, errors);
 }
 
 

@@ -423,7 +423,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
 
     // capture keyboard events so we can control during
     // a workout using basic keyboard controls
-    context->mainWindow->installEventFilter(this);
+    context->mainWidget()->installEventFilter(this);
 
 #ifndef Q_OS_MAC
     //toolbarButtons->hide();
@@ -546,11 +546,11 @@ TrainSidebar::workoutPopup()
     }
 
     // connect menu to functions
-    connect(import, SIGNAL(triggered(void)), context->mainWindow, SLOT(importWorkout(void)));
-    connect(wizard, SIGNAL(triggered(void)), context->mainWindow, SLOT(showWorkoutWizard(void)));
-    connect(download, SIGNAL(triggered(void)), context->mainWindow, SLOT(downloadTrainerDay(void)));
-    connect(dlStravaRoutes, SIGNAL(triggered(void)), context->mainWindow, SLOT(downloadStravaRoutes(void)));
-    connect(scan, SIGNAL(triggered(void)), context->mainWindow, SLOT(manageLibrary(void)));
+    connect(import, SIGNAL(triggered(void)), context, SLOT(importWorkout(void)));
+    connect(wizard, SIGNAL(triggered(void)), context, SLOT(showWorkoutWizard(void)));
+    connect(download, SIGNAL(triggered(void)), context, SLOT(downloadTrainerDay(void)));
+    connect(dlStravaRoutes, SIGNAL(triggered(void)), context, SLOT(downloadStravaRoutes(void)));
+    connect(scan, SIGNAL(triggered(void)), context, SLOT(manageLibrary(void)));
 
     // execute the menu
     menu.exec(trainSplitter->mapToGlobal(QPoint(workoutItem->pos().x()+workoutItem->width()-20,
@@ -630,8 +630,8 @@ TrainSidebar::mediaPopup()
     menu.addAction(scan);
 
     // connect menu to functions
-    connect(import, SIGNAL(triggered(void)), context->mainWindow, SLOT(importWorkout(void)));
-    connect(scan, SIGNAL(triggered(void)), context->mainWindow, SLOT(manageLibrary(void)));
+    connect(import, SIGNAL(triggered(void)), context, SLOT(importWorkout(void)));
+    connect(scan, SIGNAL(triggered(void)), context, SLOT(manageLibrary(void)));
 
     QModelIndex current = mediaTree->currentIndex();
     QModelIndex target = vsortModel->mapToSource(current);
@@ -659,8 +659,8 @@ TrainSidebar::videosyncPopup()
     menu.addAction(scan);
 
     // connect menu to functions
-    connect(import, SIGNAL(triggered(void)), context->mainWindow, SLOT(importWorkout(void)));
-    connect(scan, SIGNAL(triggered(void)), context->mainWindow, SLOT(manageLibrary(void)));
+    connect(import, SIGNAL(triggered(void)), context, SLOT(importWorkout(void)));
+    connect(scan, SIGNAL(triggered(void)), context, SLOT(manageLibrary(void)));
 
     QModelIndex current = videosyncTree->currentIndex();
     QModelIndex target = vssortModel->mapToSource(current);
@@ -996,7 +996,7 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
 
             for(int i=0; i<trainView->perspectives_.count(); i++) {
                 if (trainView->perspectives_[i]->trainSwitch() == want) {
-                    context->mainWindow->switchPerspective(i);
+                    context->switchPerspective(i);
                     break;
                 }
             }
@@ -1361,8 +1361,8 @@ void TrainSidebar::Start()       // when start button is pressed
         SetThreadExecutionState(ES_DISPLAY_REQUIRED | ES_CONTINUOUS);
 #endif
 
-        context->mainWindow->showSidebar(false);
-        if (appsettings->value(this, TRAIN_AUTOHIDE, false).toBool()) context->mainWindow->showLowbar(false);
+        context->setSidebarVisible(false);
+        if (appsettings->value(this, TRAIN_AUTOHIDE, false).toBool()) context->setLowbarVisible(false);
 
         // Stop users from selecting different devices
         // media or workouts whilst a workout is in progress
@@ -1544,8 +1544,8 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     workoutTree->setEnabled(true);
     deviceTree->setEnabled(true);
 
-    context->mainWindow->showSidebar(true);
-    if (appsettings->value(this, TRAIN_AUTOHIDE, false).toBool()) context->mainWindow->showLowbar(true);
+    context->setSidebarVisible(true);
+    if (appsettings->value(this, TRAIN_AUTOHIDE, false).toBool()) context->setLowbarVisible(true);
 
     //reset all calibration data
     calibrating = startCalibration = restartCalibration = finishCalibration = false;
@@ -2975,7 +2975,7 @@ void TrainSidebar::adjustIntensity(int value)
     if (!ergFile) return; // no workout selected
 
     // block signals temporarily
-    context->mainWindow->blockSignals(true);
+    context->mainWidget()->blockSignals(true);
 
     // work through the ergFile from NOW
     // adjusting back from last setting
@@ -3047,7 +3047,7 @@ void TrainSidebar::adjustIntensity(int value)
     ergFileQueryAdapter.resetQueryState();
 
     // unblock signals now we are done
-    context->mainWindow->blockSignals(false);
+    context->mainWidget()->blockSignals(false);
 
     // force replot
     context->notifySetNow(context->getNow());
@@ -3147,7 +3147,7 @@ TrainSidebar::devicePopup()
     QMenu menu(deviceTree);
 
     QAction *addDevice = new QAction(tr("Add Device"), deviceTree);
-    connect(addDevice, SIGNAL(triggered(void)), context->mainWindow, SLOT(addDevice()));
+    connect(addDevice, SIGNAL(triggered(void)), context, SLOT(addDevice()));
     menu.addAction(addDevice);
 
     if (deviceTree->selectedItems().size() == 1) {
@@ -3165,7 +3165,7 @@ TrainSidebar::deviceTreeMenuPopup(const QPoint &pos)
 {
     QMenu menu(deviceTree);
     QAction *addDevice = new QAction(tr("Add Device"), deviceTree);
-    connect(addDevice, SIGNAL(triggered(void)), context->mainWindow, SLOT(addDevice()));
+    connect(addDevice, SIGNAL(triggered(void)), context, SLOT(addDevice()));
     menu.addAction(addDevice);
 
     if (deviceTree->selectedItems().size() == 1) {

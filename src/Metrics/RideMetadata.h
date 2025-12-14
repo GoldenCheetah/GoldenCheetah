@@ -18,9 +18,10 @@
 
 #ifndef _GC_RideMetadata_h
 #define _GC_RideMetadata_h
-#include "GoldenCheetah.h"
+#include "GcMacros.h"
 
 #include "Context.h"
+#include "RideItem.h"
 
 #include <QWidget>
 #include <QLabel>
@@ -44,6 +45,7 @@ enum class GcFieldType : int {
     FIELD_CHECKBOX = 7
 };
 
+class RideCache;
 class RideMetadata;
 class RideFileInterval;
 class RideEditor;

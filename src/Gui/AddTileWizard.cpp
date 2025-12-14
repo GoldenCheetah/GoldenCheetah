@@ -37,7 +37,7 @@
 
 // Main wizard - if passed a service name we are in edit mode, not add mode.
 AddTileWizard::AddTileWizard(Context *context, ChartSpace *space, OverviewScope scope, ChartSpaceItem * &added)
-    : QWizard(context->mainWindow), context(context), scope(scope), space(space), added(added)
+    : QWizard(context->mainWidget()), context(context), scope(scope), space(space), added(added)
 {
     HelpWhatsThis *help = new HelpWhatsThis(this);
     if (scope & OverviewScope::ANALYSIS) this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Overview));

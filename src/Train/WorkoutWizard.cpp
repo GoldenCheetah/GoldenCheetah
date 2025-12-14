@@ -798,7 +798,7 @@ bool ImportPage::SaveWorkout()
     return true;
 }
 
-WorkoutWizard::WorkoutWizard(Context *context) :QWizard(context->mainWindow)
+WorkoutWizard::WorkoutWizard(Context *context) :QWizard(context->mainWidget())
 {
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Tools_CreateWorkout));

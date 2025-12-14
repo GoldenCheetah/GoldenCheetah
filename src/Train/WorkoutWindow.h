@@ -34,6 +34,7 @@
 
 #include "Context.h"
 #include "RideFile.h" // for data series types
+#include "ErgFile.h"
 #include "Library.h"  // workout library
 #include "AbstractView.h"  // stylesheet for scroller
 

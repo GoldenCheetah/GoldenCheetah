@@ -79,4 +79,10 @@ namespace Utils
     double myisnan(double x);
 };
 
+// Global DPI factors
+extern double dpiXFactor;
+extern double dpiYFactor;
+class QWidget;
+void setDpiFactors(QWidget *widget);
+
 #endif

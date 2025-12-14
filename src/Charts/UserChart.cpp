@@ -1348,7 +1348,7 @@ UserChartSettings::refreshAxesTab()
 // Data series settings
 //
 EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, GenericSeriesInfo &info)
-    : QDialog(context->mainWindow, Qt::Dialog), context(context), original(info)
+    : QDialog(context->mainWidget(), Qt::Dialog), context(context), original(info)
 {
     setWindowTitle(tr("Edit Data Series"));
 
@@ -1609,7 +1609,7 @@ EditUserSeriesDialog::okClicked()
 // Axis settings
 //
 EditUserAxisDialog::EditUserAxisDialog(Context *context, GenericAxisInfo &info)
-    : QDialog(context->mainWindow, Qt::Dialog), context(context), original(info)
+    : QDialog(context->mainWidget(), Qt::Dialog), context(context), original(info)
 {
     setWindowTitle(tr("Edit Axis"));
 

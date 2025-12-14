@@ -18,6 +18,7 @@
  */
 
 #include "NewAthleteWizard.h"
+#include "MainWindow.h"
 #include "Zones.h"
 #include "HrZones.h"
 #include "PaceZones.h"

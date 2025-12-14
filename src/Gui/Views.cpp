@@ -158,14 +158,14 @@ AnalysisView::setRide(RideItem *ride)
 
     // if we are the current view and the current perspective is no longer relevant
     // then lets go find one to switch to..
-    if (context->mainWindow->athleteTab()->currentView() == 1 && page()->relevant(ride) != true) {
+    if (context->tab->currentView() == 1 && page()->relevant(ride) != true) {
 
         // lets find a perspective to switch to
         int ridePerspectiveIdx = findRidesPerspective(ride);
 
         // if we need to switch, i.e. not already on it
         if (ridePerspectiveIdx != perspectives_.indexOf(page()))  {
-            context->mainWindow->switchPerspective(ridePerspectiveIdx);
+            context->resetPerspective(ridePerspectiveIdx);
         }
     }
 
@@ -222,7 +222,7 @@ AnalysisView::notifyViewSidebarChanged() {
     // if user moved us then tell ride navigator
     // all a bit of a hack to stop the column widths from
     // being adjusted as the splitter gets resized and reset
-    if (context->mainWindow->init && context->tab->init && active == false && context->rideNavigator->geometry().width() != 100) {
+    if (context->isMainWindowInitialized() && context->tab->init && active == false && context->rideNavigator->geometry().width() != 100) {
         context->rideNavigator->setWidth(context->rideNavigator->geometry().width());
     }
 }

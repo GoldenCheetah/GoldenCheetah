@@ -47,7 +47,7 @@
  * Master widget for Metadata Entry
  *--------------------------------------------------------------------*/
 RideMetadata::RideMetadata(Context *context, bool singlecolumn) :
-    QWidget(context != NULL ? context->mainWindow : NULL), singlecolumn(singlecolumn), context(context)
+    QWidget(context != NULL ? context->mainWidget() : NULL), singlecolumn(singlecolumn), context(context)
 {
     active = false;
 
@@ -1633,10 +1633,12 @@ FieldDefinition::calendarText(QString value)
         if (name == "Start Time") {
             return QString("%1: %2\n").arg(name).arg(QTime(0, 0, 0).addSecs(value.toInt()).toString("hh:mm:ss.zzz"));
         }
+        [[fallthrough]];
         case GcFieldType::FIELD_DATE:
         if (name == "Start Date") {
             return QString("%1: %2\n").arg(name).arg(QDate(1900, 01, 01).addDays(value.toInt()).toString("dd/MM/yyyy"));
         }
+        [[fallthrough]];
         case GcFieldType::FIELD_INTEGER:
         case GcFieldType::FIELD_DOUBLE:
         case GcFieldType::FIELD_CHECKBOX:

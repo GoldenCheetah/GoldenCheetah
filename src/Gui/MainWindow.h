@@ -85,6 +85,8 @@ class MainWindow : public QMainWindow
     Q_OBJECT
     G_OBJECT
 
+    friend class Context;
+
     public:
 
         MainWindow(const QDir &home);
@@ -104,14 +106,10 @@ class MainWindow : public QMainWindow
         void switchPerspective(int index);
 
         bool isStarting() const;
+        bool isAthleteOpen(QString name) const;
 
     protected:
 
-        // used by ChooseCyclistDialog to see which athletes
-        // have already been opened
-        friend class ::ChooseCyclistDialog;
-        friend class ::AthleteLoader;
-        friend class ::GGraphicsView;
         QMap<QString,AthleteTab*> athletetabs;
         AthleteTab *currentAthleteTab;
         QList<AthleteTab*> tabList;

@@ -46,7 +46,7 @@
 // Filter / formula
 #include "DataFilter.h"
 
-LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mainWindow), settings(settings), context(context), active(false), _amFiltered(false)
+LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mainWidget()), settings(settings), context(context), active(false), _amFiltered(false)
 {
     setStyleSheet("QFrame { FrameStyle = QFrame::NoFrame };"
                   "QWidget { background = Qt::white; border:0 px; margin: 2px; };");
@@ -1602,7 +1602,7 @@ EditMetricDetailDialog::measureGroupChanged()
  *--------------------------------------------------------------------*/
 
 EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmTool, MetricDetail *metricDetail) :
-    QDialog(context->mainWindow, Qt::Dialog), context(context), ltmTool(ltmTool), metricDetail(metricDetail)
+    QDialog(context->mainWidget(), Qt::Dialog), context(context), ltmTool(ltmTool), metricDetail(metricDetail)
 {
     setWindowTitle(tr("Curve Settings"));
 

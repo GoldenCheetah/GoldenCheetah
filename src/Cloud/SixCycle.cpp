@@ -17,6 +17,8 @@
  */
 
 #include "SixCycle.h"
+#include "Context.h"
+#include "MainWindow.h"
 #include "Athlete.h"
 #include "Settings.h"
 #include <QByteArray>
@@ -79,7 +81,7 @@ SixCycle::~SixCycle() {
 void
 SixCycle::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    sslErrors(context->mainWindow, reply, errors);
+    sslErrors(context->mainWidget(), reply, errors);
 }
 
 // open by connecting and getting a basic list of folders available

@@ -27,7 +27,7 @@
 #include <QDebug>
 
 MetricOverrideDialog::MetricOverrideDialog(Context* context, const QString& fieldName, const double value, QPoint pos) :
-    QDialog(context->mainWindow), context_(context), fieldName_(fieldName), pos_(pos)
+    QDialog(context->mainWidget()), context_(context), fieldName_(fieldName), pos_(pos)
 {
     setAttribute(Qt::WA_DeleteOnClose);
 
@@ -133,8 +133,8 @@ void
 MetricOverrideDialog::showEvent(QShowEvent*)
 {
 
-    QSize gcWindowSize = context_->mainWindow->size();
-    QPoint gcWindowPosn = context_->mainWindow->pos();
+    QSize gcWindowSize = context_->mainWidget()->size();
+    QPoint gcWindowPosn = context_->mainWidget()->pos();
 
     int xLimit = gcWindowPosn.x() + gcWindowSize.width() - geometry().width() - 10;
     int yLimit = gcWindowPosn.y() + gcWindowSize.height() - geometry().height() - 10;

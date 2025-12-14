@@ -19,7 +19,7 @@
 
 #ifndef _GC_RideItem_h
 #define _GC_RideItem_h 1
-#include "GoldenCheetah.h"
+#include "GcMacros.h"
 
 #include "RideMetric.h"
 #include "Measures.h"
@@ -45,41 +45,7 @@ class RideItem : public QObject
     G_OBJECT
 
 
-    protected:
 
-        friend class ::RideCache;
-        friend class ::RideCacheModel;
-        friend class ::IntervalItem;
-        friend class ::IntervalSummaryWindow;
-        friend class ::UserData;
-        friend class ::ComparePane;
-
-        // ridefile
-        RideFile *ride_;
-        RideFileCache *fileCache_;
-
-        // precomputed metrics & user overrides
-        QVector<double> metrics_;
-        QVector<double> count_;
-
-        // std deviation metrics need these to aggregate
-        QMap<int, double> stdmean_;
-        QMap<int, double> stdvariance_;
-
-        // metadata (used by navigator)
-        QMap<QString,QString> metadata_;
-
-        // xdata series definitions
-        QMap<QString,QStringList>xdata_;
-
-        // got any intervals
-        QList<IntervalItem*> intervals_;
-        QStringList errors_;
-
-        // userdata cache
-        QMap<QString, QVector<double> > userCache;
-
-        unsigned long metaCRC();
 
     public slots:
         void modified();
@@ -111,7 +77,37 @@ class RideItem : public QObject
         // set metric values e.g. when working with intervals
         void setFrom(QHash<QString, RideMetricPtr>);
 
-        // add interval e.g. during load of rideDB.json
+    protected:
+
+        // ridefile
+        RideFile *ride_;
+        RideFileCache *fileCache_;
+
+        // precomputed metrics & user overrides
+        QVector<double> metrics_;
+        QVector<double> count_;
+
+        // std deviation metrics need these to aggregate
+        QMap<int, double> stdmean_;
+        QMap<int, double> stdvariance_;
+
+        // metadata (used by navigator)
+        QMap<QString,QString> metadata_;
+
+        // xdata series definitions
+        QMap<QString,QStringList>xdata_;
+
+        // got any intervals
+        QList<IntervalItem*> intervals_;
+        QStringList errors_;
+
+        // userdata cache
+        QMap<QString, QVector<double> > userCache;
+
+        unsigned long metaCRC();
+
+    public:
+        QMap<QString, QVector<double> > &mutableUserCache() { return userCache; }
         void addInterval(IntervalItem interval);
         void clearIntervals() { intervals_.clear(); } // does NOT delete them
 
@@ -231,7 +227,7 @@ class RideItem : public QObject
         void updateIntervals();
 };
 
-Q_DECLARE_OPAQUE_POINTER(RideItem*);
+// Q_DECLARE_OPAQUE_POINTER(RideItem*) is in GcWindow.h to handle moc ordering
 Q_DECLARE_METATYPE(RideItem*)
 
 #endif // _GC_RideItem_h

@@ -30,7 +30,7 @@ static const double defaultMinimumGap = 1; // 1 minute
 static const double defaultMinimumSegmentSize = 5; // 5 minutes
 
 // Main wizard
-SplitActivityWizard::SplitActivityWizard(Context *context) : QWizard(context->mainWindow), context(context)
+SplitActivityWizard::SplitActivityWizard(Context *context) : QWizard(context->mainWidget()), context(context)
 {
 #ifdef Q_OS_MAX
     setWizardStyle(QWizard::ModernStyle);

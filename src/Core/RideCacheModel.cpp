@@ -91,20 +91,19 @@ RideCacheModel::data(const QModelIndex &index, int role) const
                 // version using the right metric/imperial conversion
                 RideMetric *m = const_cast<RideMetric*>(factory->rideMetric(factory->metricName(i)));
 
-                // bit of a kludge, but will return times as QTime,
-                // stuff with no decimal places as a number,
-                // but not if high precision, which means
-                // metrics with high precision don't sort this is crap XXX
+                // check bounds
+                if (rideCache->rides().at(index.row())->metrics().count() <= m->index()) return QVariant();
+                double value = rideCache->rides().at(index.row())->metrics()[m->index()];
+
                 if (m->isTime()) {
-                    return QTime(0,0,0).addSecs(rideCache->rides().at(index.row())->metrics_[m->index()]);
+                    return QTime(0,0,0).addSecs(value);
                 } else if (m->units(true) != "km" && m->precision() > 0) {
-                    m->setValue(rideCache->rides().at(index.row())->metrics_[m->index()]);
+                    m->setValue(value);
                     return m->toString(GlobalContext::context()->useMetricUnits); // string
                 } else {
 
                     // make low precision numbers sort, including distance which we picked
                     // up as a special case. not sure about pace ....
-                    double value = rideCache->rides().at(index.row())->metrics_[m->index()];
 
                     // convert to imperial if needed
                     if (GlobalContext::context()->useMetricUnits == false) 
@@ -112,7 +111,6 @@ RideCacheModel::data(const QModelIndex &index, int role) const
 
                     return round(value);
                 }
-
             } else {
 
                 // is a metadata

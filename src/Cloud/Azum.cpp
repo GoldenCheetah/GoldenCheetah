@@ -62,7 +62,7 @@ void
 Azum::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
     printd("Azum::onSslErrors\n");
-    sslErrors(context->mainWindow, reply, errors);
+    sslErrors(context->mainWidget(), reply, errors);
 }
 
 bool

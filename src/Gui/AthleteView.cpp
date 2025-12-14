@@ -3,6 +3,7 @@
 #include "AbstractView.h"
 #include "JsonRideFile.h" // for DATETIME_FORMAT
 #include "HelpWhatsThis.h"
+#include "MainWindow.h"
 
 // athlete card
 static bool _registerItems()
@@ -48,9 +49,9 @@ AthleteView::AthleteView(Context *context) : ChartSpace(context, OverviewScope::
     // athlete config dialog...
     connect(this, SIGNAL(itemConfigRequested(ChartSpaceItem*, QPoint)), this, SLOT(configItem(ChartSpaceItem*, QPoint)));
     // new athlete
-    connect(context->mainWindow, SIGNAL(newAthlete(QString)), this, SLOT(newAthlete(QString)));
+    connect(static_cast<MainWindow*>(context->mainWidget()), SIGNAL(newAthlete(QString)), this, SLOT(newAthlete(QString)));
     // delete athlete
-    connect(context->mainWindow, SIGNAL(deletedAthlete(QString)), this, SLOT(deleteAthlete(QString)));
+    connect(static_cast<MainWindow*>(context->mainWidget()), SIGNAL(deletedAthlete(QString)), this, SLOT(deleteAthlete(QString)));
 }
 
 void
@@ -148,7 +149,7 @@ AthleteCard::AthleteCard(ChartSpace *parent, QString path) : ChartSpaceItem(pare
         anchor=false;
     }
 
-    connect(parent->context->mainWindow, SIGNAL(openingAthlete(QString,Context*)), this, SLOT(opening(QString,Context*)));
+    connect(static_cast<MainWindow*>(parent->context->mainWidget()), SIGNAL(openingAthlete(QString,Context*)), this, SLOT(opening(QString,Context*)));
     connect(parent->context, SIGNAL(athleteClose(QString,Context*)), this, SLOT(closing(QString,Context*)));
 
     // set stats to none
@@ -210,8 +211,8 @@ AthleteCard::configAthlete()
 void
 AthleteCard::clicked()
 {
-    if (loadprogress==100) parent->context->mainWindow->closeAthleteTab(path);
-    else parent->context->mainWindow->openAthleteTab(path);
+    if (loadprogress==100) parent->context->closeAthleteTab(path);
+    else parent->context->openAthleteTab(path);
 }
 
 void

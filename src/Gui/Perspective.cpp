@@ -1330,7 +1330,7 @@ GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcChartWindow **h
     // the chart uses it to decide something - apologies for the convoluted
     // method to determine the perspective, but its rare to use this outside
     // the context of a chart or a view
-    win->setProperty("perspective", QVariant::fromValue<Perspective*>(context->mainWindow->athleteTab()->view(context->mainWindow->athleteTab()->currentView())->page()));
+    win->setProperty("perspective", QVariant::fromValue<Perspective*>(context->tab->view(context->tab->currentView())->page()));
     chartLayout->addWidget(win);
     //win->setFrameStyle(QFrame::Box);
 
@@ -1856,13 +1856,13 @@ ImportChartDialog::importClicked()
             }
 
             int x=0;
-            if (view == tr("Trends"))      { x=0; context->mainWindow->selectTrends(); }
-            if (view == tr("Activities"))  { x=1; context->mainWindow->selectAnalysis(); }
-            if (view == tr("Plan"))        { x=2; context->mainWindow->selectPlan(); }
-            if (view == tr("Train"))       { x=3; context->mainWindow->selectTrain(); }
+            if (view == tr("Trends"))      { x=0; context->switchToTrendsView(); }
+            if (view == tr("Activities"))  { x=1; context->switchToAnalysisView(); }
+            if (view == tr("Diary"))       { x=2; context->switchToDiaryView(); }
+            if (view == tr("Train"))       { x=3; context->switchToTrainView(); }
 
             // add to the currently selected tab and select if only adding one chart
-            context->mainWindow->athleteTab()->view(x)->importChart(list[i], (list.count()==1));
+            context->tab->view(x)->importChart(list[i], (list.count()==1));
         }
     }
     accept();

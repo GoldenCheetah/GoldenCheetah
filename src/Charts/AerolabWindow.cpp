@@ -692,7 +692,7 @@ void AerolabWindow::saveParametersInRide()
         rideItem()->ride()->setTag("aerolab.Comment", QString("%1").arg(commentEdit->text()));
         rideItem()->setDirty(true);
 
-        context->mainWindow->saveSilent(context, rideItem());
+        context->saveSilent( rideItem());
         btnSave->setEnabled(false);
      }
 }

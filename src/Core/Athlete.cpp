@@ -98,9 +98,9 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
         QFile zonesFile(home->config().canonicalPath() + "/" + zones_[i]->fileName());
         if (zonesFile.exists()) {
             if (!zones_[i]->read(zonesFile)) {
-                QMessageBox::critical(context->mainWindow, tr("Zones File %1 Error").arg(zones_[i]->fileName()), zones_[i]->errorString());
+                QMessageBox::critical(context->mainWidget(), tr("Zones File %1 Error").arg(zones_[i]->fileName()), zones_[i]->errorString());
             } else if (! zones_[i]->warningString().isEmpty()) {
-                QMessageBox::warning(context->mainWindow, tr("Reading Zones File %1").arg(zones_[i]->fileName()), zones_[i]->warningString());
+                QMessageBox::warning(context->mainWidget(), tr("Reading Zones File %1").arg(zones_[i]->fileName()), zones_[i]->warningString());
             }
         }
         if (i != "Bike" && zones_[i]->getRangeSize() == 0) { // No Power zones
@@ -118,9 +118,9 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
         QFile hrzonesFile(home->config().canonicalPath() + "/" + hrzones_[i]->fileName());
         if (hrzonesFile.exists()) {
             if (!hrzones_[i]->read(hrzonesFile)) {
-                QMessageBox::critical(context->mainWindow, tr("HR Zones File %1 Error").arg(hrzones_[i]->fileName()), hrzones_[i]->errorString());
+                QMessageBox::critical(context->mainWidget(), tr("HR Zones File %1 Error").arg(hrzones_[i]->fileName()), hrzones_[i]->errorString());
             } else if (! hrzones_[i]->warningString().isEmpty()) {
-                QMessageBox::warning(context->mainWindow, tr("Reading HR Zones File %1").arg(hrzones_[i]->fileName()), hrzones_[i]->warningString());
+                QMessageBox::warning(context->mainWidget(), tr("Reading HR Zones File %1").arg(hrzones_[i]->fileName()), hrzones_[i]->warningString());
             }
         }
         if (i != "Bike" && hrzones_[i]->getRangeSize() == 0) { // No HR zones
@@ -137,7 +137,7 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
         QFile pacezonesFile(home->config().canonicalPath() + "/" + pacezones_[i]->fileName());
         if (pacezonesFile.exists()) {
             if (!pacezones_[i]->read(pacezonesFile)) {
-                QMessageBox::critical(context->mainWindow, tr("Pace Zones File %1 Error").arg(pacezones_[i]->fileName()), pacezones_[i]->errorString());
+                QMessageBox::critical(context->mainWidget(), tr("Pace Zones File %1 Error").arg(pacezones_[i]->fileName()), pacezones_[i]->errorString());
             }
         }
     }
@@ -171,11 +171,15 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     // now most dependencies are in get cache
     QEventLoop loop;
     rideCache = new RideCache(context);
+    rideCache->setUpdateCallback([context](bool enable){
+        if (context && context->mainWidget())
+            context->mainWidget()->setUpdatesEnabled(enable);
+    });
     connect(rideCache, SIGNAL(loadComplete()), &loop, SLOT(quit()));
     connect(rideCache, SIGNAL(loadComplete()), this, SLOT(loadComplete()));
 
     // we need to block on load complete if first (before mainwindow ready)
-    if (context->mainWindow->isStarting()) {
+    if (context->isStarting()) {
         loop.exec();
     }
 }
@@ -477,9 +481,9 @@ Athlete::getPDEstimates() const
     QList<PDEstimate> returning;
 
     // get estimates
-    rideCache->estimator->lock.lock();
-    returning = rideCache->estimator->estimates;
-    rideCache->estimator->lock.unlock();
+    rideCache->getEstimator()->lock.lock();
+    returning = rideCache->getEstimator()->estimates;
+    rideCache->getEstimator()->lock.unlock();
 
     return returning;
 }

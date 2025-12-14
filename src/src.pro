@@ -618,7 +618,7 @@ HEADERS  += ANT/ANTChannel.h ANT/ANT.h ANT/ANTlocalController.h ANT/ANTLogger.h 
 HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPlotInterval.h Charts/AllPlotSlopeCurve.h \
            Charts/AllPlotWindow.h Charts/BlankState.h Charts/ChartBar.h Charts/ChartSettings.h \
            Charts/CpPlotCurve.h Charts/CPPlot.h Charts/CriticalPowerWindow.h Charts/DaysScaleDraw.h Charts/ExhaustionDialog.h Charts/GcOverlayWidget.h \
-           Charts/GcPane.h Charts/GoldenCheetah.h Charts/HistogramWindow.h \
+           Charts/GcPane.h Charts/GcChartWindow.h Charts/GoldenCheetah.h Charts/HistogramWindow.h \
            Charts/HrPwPlot.h Charts/HrPwWindow.h Charts/IndendPlotMarker.h Charts/IntervalSummaryWindow.h Charts/LogTimeScaleDraw.h \
            Charts/LTMCanvasPicker.h Charts/LTMChartParser.h Charts/LTMOutliers.h Charts/LTMPlot.h Charts/LTMPopup.h \
            Charts/LTMSettings.h Charts/LTMTool.h Charts/LTMTrend2.h Charts/LTMTrend.h Charts/LTMWindow.h \
@@ -636,7 +636,7 @@ HEADERS += Cloud/CalendarDownload.h Cloud/CloudService.h \
            Cloud/Azum.h
 
 # core data 
-HEADERS += Core/Athlete.h Core/Context.h Core/DataFilter.h Core/FreeSearch.h Core/GcCalendarModel.h Core/GcUpgrade.h \
+HEADERS += Core/Athlete.h Core/DataContext.h Core/Context.h Core/DataFilter.h Core/FreeSearch.h Core/GcCalendarModel.h Core/GcUpgrade.h \
            Core/IdleTimer.h Core/IntervalItem.h Core/NamedSearch.h Core/RideCache.h Core/RideCacheModel.h Core/RideDB.h \
            Core/RideItem.h Core/Route.h Core/RouteParser.h Core/Season.h Core/SeasonDialogs.h Core/Seasons.h Core/Secrets.h Core/Settings.h \
            Core/Specification.h Core/TimeUtils.h Core/Units.h Core/UserData.h Core/Utils.h \
@@ -662,7 +662,7 @@ HEADERS += FileIO/ArchiveFile.h FileIO/AthleteBackup.h  FileIO/Bin2RideFile.h Fi
 HEADERS += Gui/AboutDialog.h Gui/AddIntervalDialog.h Gui/AnalysisSidebar.h Gui/ChooseCyclistDialog.h Gui/ColorButton.h \
            Gui/Colors.h Gui/CompareDateRange.h Gui/CompareInterval.h Gui/ComparePane.h Gui/ConfigDialog.h Gui/MiniCalendar.h \
            Gui/DragBar.h Gui/EstimateCPDialog.h Gui/GcCrashDialog.h Gui/GcSideBarItem.h Gui/GcToolBar.h Gui/GcWindowLayout.h \
-           Gui/GcWindowRegistry.h Gui/GenerateHeatMapDialog.h Gui/HelpWhatsThis.h Gui/HelpWindow.h \
+           Gui/GcWindow.h Gui/GcWindowRegistry.h Gui/GenerateHeatMapDialog.h Gui/HelpWhatsThis.h Gui/HelpWindow.h \
            Gui/IntervalTreeView.h Gui/LTMSidebar.h Gui/MainWindow.h Gui/NewAthleteWizard.h Gui/Pages.h Gui/RideNavigator.h Gui/RideNavigatorProxy.h \
            Gui/SaveDialogs.h Gui/SearchBox.h Gui/SearchFilterBox.h Gui/SolveCPDialog.h Gui/AthleteTab.h Gui/AbstractView.h Gui/ToolsRhoEstimator.h \
            Gui/Views.h Gui/BatchProcessingDialog.h Gui/DownloadRideDialog.h Gui/ManualActivityWizard.h Gui/NewSideBar.h \
@@ -728,7 +728,7 @@ SOURCES += ANT/ANTChannel.cpp ANT/ANT.cpp ANT/ANTlocalController.cpp ANT/ANTLogg
 SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts/AllPlotInterval.cpp Charts/AllPlotSlopeCurve.cpp \
            Charts/AllPlotWindow.cpp Charts/BlankState.cpp Charts/ChartBar.cpp Charts/ChartSettings.cpp \
            Charts/CPPlot.cpp Charts/CpPlotCurve.cpp Charts/CriticalPowerWindow.cpp Charts/ExhaustionDialog.cpp Charts/GcOverlayWidget.cpp Charts/GcPane.cpp \
-           Charts/GoldenCheetah.cpp Charts/HistogramWindow.cpp Charts/HrPwPlot.cpp \
+           Charts/GcChartWindow.cpp Charts/GoldenCheetah.cpp Charts/HistogramWindow.cpp Charts/HrPwPlot.cpp \
            Charts/HrPwWindow.cpp Charts/IndendPlotMarker.cpp Charts/IntervalSummaryWindow.cpp Charts/LogTimeScaleDraw.cpp \
            Charts/LTMCanvasPicker.cpp Charts/LTMChartParser.cpp Charts/LTMOutliers.cpp Charts/LTMPlot.cpp Charts/LTMPopup.cpp \
            Charts/LTMSettings.cpp Charts/LTMTool.cpp Charts/LTMTrend.cpp Charts/LTMWindow.cpp \
@@ -746,7 +746,7 @@ SOURCES += Cloud/CalendarDownload.cpp Cloud/CloudService.cpp \
            Cloud/Azum.cpp
 
 ## Core Data Structures
-SOURCES += Core/Athlete.cpp Core/Context.cpp Core/DataFilter.cpp Core/FreeSearch.cpp Core/GcUpgrade.cpp Core/IdleTimer.cpp \
+SOURCES += Core/Athlete.cpp Core/DataContext.cpp Core/Context.cpp Core/DataFilter.cpp Core/FreeSearch.cpp Core/GcUpgrade.cpp Core/IdleTimer.cpp \
            Core/IntervalItem.cpp Core/main.cpp Core/NamedSearch.cpp Core/RideCache.cpp Core/RideCacheModel.cpp Core/RideItem.cpp \
            Core/Route.cpp Core/RouteParser.cpp Core/Season.cpp Core/SeasonDialogs.cpp Core/Seasons.cpp Core/Settings.cpp Core/Specification.cpp \
            Core/TimeUtils.cpp Core/Units.cpp Core/UserData.cpp Core/Utils.cpp \
@@ -775,7 +775,7 @@ SOURCES += FileIO/ArchiveFile.cpp FileIO/AthleteBackup.cpp FileIO/Bin2RideFile.c
 SOURCES += Gui/AboutDialog.cpp Gui/AddIntervalDialog.cpp Gui/AnalysisSidebar.cpp Gui/ChooseCyclistDialog.cpp Gui/ColorButton.cpp \
            Gui/Colors.cpp Gui/CompareDateRange.cpp Gui/CompareInterval.cpp Gui/ComparePane.cpp Gui/ConfigDialog.cpp Gui/MiniCalendar.cpp \
            Gui/DragBar.cpp Gui/EstimateCPDialog.cpp Gui/GcCrashDialog.cpp Gui/GcSideBarItem.cpp Gui/GcToolBar.cpp Gui/GcWindowLayout.cpp \
-           Gui/GcWindowRegistry.cpp Gui/GenerateHeatMapDialog.cpp Gui/HelpWhatsThis.cpp Gui/HelpWindow.cpp \
+           Gui/GcWindowRegistry.cpp Gui/GcWindow.cpp Gui/GenerateHeatMapDialog.cpp Gui/HelpWhatsThis.cpp Gui/HelpWindow.cpp \
            Gui/IntervalTreeView.cpp Gui/LTMSidebar.cpp Gui/MainWindow.cpp Gui/NewAthleteWizard.cpp Gui/Pages.cpp Gui/RideNavigator.cpp Gui/SaveDialogs.cpp \
            Gui/SearchBox.cpp Gui/SearchFilterBox.cpp Gui/SolveCPDialog.cpp Gui/AthleteTab.cpp Gui/AbstractView.cpp Gui/ToolsRhoEstimator.cpp Gui/Views.cpp \
            Gui/BatchProcessingDialog.cpp Gui/DownloadRideDialog.cpp Gui/ManualActivityWizard.cpp Gui/EditUserMetricDialog.cpp Gui/NewSideBar.cpp \

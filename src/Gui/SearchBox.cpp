@@ -274,13 +274,13 @@ void SearchBox::runMenu(QAction *x)
     if (x->text() == tr("Add to Named Filters")) addNamed();
     else if (x->text() == tr("Manage Filters")) {
 
-        EditNamedSearches *editor = new EditNamedSearches(context->mainWindow, context);
+        EditNamedSearches *editor = new EditNamedSearches(context->mainWidget(), context);
         editor->move(QCursor::pos() - QPoint(460, -5));
         editor->show();
 
     } else if (x->text() == tr("Column Chooser")) {
 
-        ColumnChooser *selector = new ColumnChooser(context->rideNavigator->logicalHeadings);
+        ColumnChooser *selector = new ColumnChooser(context->rideNavigator->getLogicalHeadings());
         selector->show();
 
     } else {

@@ -631,8 +631,8 @@ OverviewConfigDialog::OverviewConfigDialog(ChartSpaceItem*item, QPoint pos) : QD
 void
 OverviewConfigDialog::showEvent(QShowEvent*)
 {
-    QSize gcWindowSize = item->parent->context->mainWindow->size();
-    QPoint gcWindowPosn = item->parent->context->mainWindow->pos();
+    QSize gcWindowSize = item->parent->context->mainWidget()->size();
+    QPoint gcWindowPosn = item->parent->context->mainWidget()->pos();
 
     int xLimit = gcWindowPosn.x() + gcWindowSize.width() - geometry().width() -10;
     int yLimit = gcWindowPosn.y() + gcWindowSize.height() - geometry().height() -10;

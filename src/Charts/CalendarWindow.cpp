@@ -69,8 +69,8 @@ CalendarWindow::CalendarWindow(Context *context)
             if (rideItem != nullptr && rideItem->fileName == activity.reference) {
                 QString filter = buildWorkoutFilter(rideItem);
                 if (! filter.isEmpty()) {
-                    context->mainWindow->fillinWorkoutFilterBox(filter);
-                    context->mainWindow->selectTrain();
+                    if (context->mainWidget()) context->fillinWorkoutFilterBox(filter);
+                    context->switchToTrainView();
                     context->notifySelectWorkout(0);
                 }
                 break;
@@ -81,7 +81,7 @@ CalendarWindow::CalendarWindow(Context *context)
         for (RideItem *rideItem : context->athlete->rideCache->rides()) {
             if (rideItem != nullptr && rideItem->fileName == activity.reference) {
                 context->notifyRideSelected(rideItem);
-                context->mainWindow->selectAnalysis();
+                context->switchToAnalysisView();
                 break;
             }
         }

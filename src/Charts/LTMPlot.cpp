@@ -3833,12 +3833,12 @@ LTMPlot::createPerformanceData(Context *context, LTMSettings *settings, MetricDe
         }
         if (metricDetail.perfs && value <= 0) {
             // is there a weekly performance today?
-            Performance p = context->athlete->rideCache->estimator->getPerformanceForDate(date, sport);
+            Performance p = context->athlete->rideCache->getEstimator()->getPerformanceForDate(date, sport);
             if (!p.submaximal) value = p.powerIndex;
         }
         if (metricDetail.submax && value <= 0) {
             // is there a submax weekly performance today?
-            Performance p = context->athlete->rideCache->estimator->getPerformanceForDate(date, sport);
+            Performance p = context->athlete->rideCache->getEstimator()->getPerformanceForDate(date, sport);
             if (p.submaximal) value = p.powerIndex;
         }
 

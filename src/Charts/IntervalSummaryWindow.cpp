@@ -220,9 +220,9 @@ QString IntervalSummaryWindow::summary(QList<IntervalItem*> intervals, QString &
     RideItem *fake;
     fake = new RideItem(&f, context);
     fake->setFrom(*const_cast<RideItem*>(context->currentRideItem()), true); // this wipes ride_ so put back
-    fake->ride_ = &f;
+    fake->setRide(&f);
     fake->getWeight();
-    fake->intervals_.clear(); // don't accidentally wipe these!!!!
+    fake->clearIntervals(); // don't accidentally wipe these!!!!
     fake->samples = f.dataPoints().count() > 0;
     QHash<QString,RideMetricPtr> metrics = RideMetric::computeMetrics(fake, Specification(), intervalMetrics);
 
@@ -230,9 +230,9 @@ QString IntervalSummaryWindow::summary(QList<IntervalItem*> intervals, QString &
     RideItem *notfake;
     notfake = new RideItem(&notf, context);
     notfake->setFrom(*const_cast<RideItem*>(context->currentRideItem()), true); // this wipes ride_ so put back
-    notfake->ride_ = &notf;
+    notfake->setRide(&notf);
     notfake->getWeight();
-    fake->intervals_.clear(); // don't accidentally wipe these!!!!
+    fake->clearIntervals(); // don't accidentally wipe these!!!!
     notfake->samples = notf.dataPoints().count() > 0;
     QHash<QString,RideMetricPtr> notmetrics = RideMetric::computeMetrics(notfake, Specification(), intervalMetrics);
 
@@ -290,10 +290,11 @@ QString IntervalSummaryWindow::summary(QList<IntervalItem*> intervals, QString &
     temp.rideItem_ = NULL;
 
     // zap references to real, and delete temporary ride item
-    fake->ride_ = NULL;
-    delete fake;
+    fake->setRide(NULL);
     
-    notfake->ride_ = NULL;
+    // we need to set the ride on notfake back to NULL
+    // so it doesn't try and delete it!
+    notfake->setRide(NULL);
     delete notfake;
 
     return returning;

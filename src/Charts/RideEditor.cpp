@@ -113,7 +113,7 @@ getPaste(QVector<QVector<double> >&cells, QStringList &seps, QStringList &head, 
     }
 }
 
-RideEditor::RideEditor(Context *context) : QWidget(context->mainWindow), data(NULL), ride(NULL), context(context), inLUW(false), colMapper(NULL)
+RideEditor::RideEditor(Context *context) : QWidget(context->mainWidget()), data(NULL), ride(NULL), context(context), inLUW(false), colMapper(NULL)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setSpacing(0);
@@ -438,7 +438,7 @@ void
 RideEditor::saveFile()
 {
     if (ride && ride->isDirty()) {
-        context->mainWindow->saveRideSingleDialog(context, ride);
+        context->saveRideSingleDialog(ride);
     }
 }
 

@@ -19,9 +19,11 @@
 
 #ifndef _VideoSyncFile_h
 #define _VideoSyncFile_h
-#include "GoldenCheetah.h"
-#include "Context.h"
+// #include "GoldenCheetah.h"
+// #include "Context.h"
 #include "VideoSyncFileBase.h"
+
+class Context;
 
 #include <QtGui>
 #include <QObject>
