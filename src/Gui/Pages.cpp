@@ -134,7 +134,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     garminHWMarkedit->setSuffix(" " + tr("s"));
     garminHWMarkedit->setValue(garminHWMark.toInt());
 
-    connect(garminSmartRecord, &QCheckBox::stateChanged, [=](int state) { garminHWMarkedit->setEnabled(state); });
+    connect(garminSmartRecord, &QCheckBox::stateChanged, this, [this](int state) { garminHWMarkedit->setEnabled(state); });
     garminSmartRecord->setCheckState(! (isGarminSmartRecording.toInt() > 0) ? Qt::Checked : Qt::Unchecked);
     garminSmartRecord->setCheckState(isGarminSmartRecording.toInt() > 0 ? Qt::Checked : Qt::Unchecked);
 
@@ -193,7 +193,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     //XXrBrowseButton->setFixedWidth(120);
 
     connect(rBrowseButton, SIGNAL(clicked()), this, SLOT(browseRDir()));
-    connect(embedR, &QCheckBox::stateChanged, [=](int state) { rDirectorySel->setEnabled(state); });
+    connect(embedR, &QCheckBox::stateChanged, this, [this](int state) { rDirectorySel->setEnabled(state); });
 
     embedR->setChecked(! appsettings->value(NULL, GC_EMBED_R, true).toBool());
     embedR->setChecked(appsettings->value(NULL, GC_EMBED_R, true).toBool());
@@ -216,7 +216,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     pythonDirectoryLayout->addWidget(pythonBrowseButton);
 
     connect(pythonBrowseButton, SIGNAL(clicked()), this, SLOT(browsePythonDir()));
-    connect(embedPython, &QCheckBox::stateChanged, [=](int state) { pythonDirectorySel->setEnabled(state); });
+    connect(embedPython, &QCheckBox::stateChanged, this, [this](int state) { pythonDirectorySel->setEnabled(state); });
 
     embedPython->setChecked(! appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool());
     embedPython->setChecked(appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool());
@@ -1607,7 +1607,7 @@ FavouriteMetricsPage::FavouriteMetricsPage(QWidget *parent) :
     QHBoxLayout *hlayout = new QHBoxLayout(this);
     hlayout->addWidget(multiMetricSelector);
 
-    connect(multiMetricSelector, &MultiMetricSelector::selectedChanged, [=]() { changed = true; });
+    connect(multiMetricSelector, &MultiMetricSelector::selectedChanged, this, [this]() { changed = true; });
 }
 
 qint32
@@ -1674,7 +1674,7 @@ CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
     layout->addWidget(actionButtons);
 
     connect(table, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(doubleClicked(QTreeWidgetItem*, int)));
-    connect(table, &QTreeWidget::currentItemChanged, [=] (QTreeWidgetItem*) {
+    connect(table, &QTreeWidget::currentItemChanged, this, [this, actionButtons] (QTreeWidgetItem*) {
             bool selected = table->currentItem() != nullptr;
             actionButtons->setButtonEnabled(ActionButtonBox::Edit, selected);
             exportButton->setEnabled(selected);
@@ -2370,7 +2370,7 @@ IconsPage::IconsPage
     mainLayout->addLayout(contentLayout);
     mainLayout->addLayout(actionLayout);
 
-    connect(downloadButton, &QPushButton::clicked, [=]() {
+    connect(downloadButton, &QPushButton::clicked, this, [this]() {
         QUrl url(QString("%1/icons.zip").arg(VERSION_CONFIG_PREFIX));
         if (IconManager::instance().importBundle(url)) {
             initSportTree();
@@ -2379,7 +2379,7 @@ IconsPage::IconsPage
             QMessageBox::warning(nullptr, tr("Icon Bundle"), tr("Bundle file %1 cannot be imported.").arg(url.toString()));
         }
     });
-    connect(importButton, &QPushButton::clicked, [=]() {
+    connect(importButton, &QPushButton::clicked, this, [this]() {
         QString zipFile = QFileDialog::getOpenFileName(this, tr("Import Icons"), "", tr("Zip Files (*.zip)"));
         if (! zipFile.isEmpty() && IconManager::instance().importBundle(zipFile)) {
             initSportTree();
@@ -2388,7 +2388,7 @@ IconsPage::IconsPage
             QMessageBox::warning(nullptr, tr("Icon Bundle"), tr("Bundle file %1 cannot be imported.").arg(zipFile));
         }
     });
-    connect(exportButton, &QPushButton::clicked, [=]() {
+    connect(exportButton, &QPushButton::clicked, this, [this]() {
         QString zipFile = QFileDialog::getSaveFileName(this, tr("Export Icons"), "", tr("Zip Files (*.zip)"));
         if (zipFile.isEmpty() || ! IconManager::instance().exportBundle(zipFile)) {
             QMessageBox::warning(nullptr, tr("Icon Bundle"), tr("Bundle file %1 cannot be created.").arg(zipFile));

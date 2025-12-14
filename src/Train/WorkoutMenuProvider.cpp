@@ -259,7 +259,7 @@ WorkoutMenuProvider::addActions
     QList<WorkoutFilterStore::StorableWorkoutFilter> filters = store.getWorkoutFilters();
     for (const WorkoutFilterStore::StorableWorkoutFilter &filter : filters) {
         QAction *action = menu->addAction(filter.name);
-        connect(action, &QAction::triggered, this, [=]() {
+        connect(action, &QAction::triggered, this, [this, filter]() {
             editor->setText(filter.filter);
         });
         editorDiffers &= (filter.filter != editorText);
@@ -318,8 +318,12 @@ WorkoutMenuProvider::addTagDialog
     layout->addWidget(matchMode);
     layout->addWidget(buttonBox);
 
-    connect(filterEdit, &WorkoutFilterBox::textChanged, this, [=](const QString &text) { filterModel->setContains(text.trimmed()); });
-    connect(tagList->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=]() { buttonBox->button(QDialogButtonBox::Ok)->setEnabled(tagList->selectionModel()->hasSelection()); });
+    connect(filterEdit, &WorkoutFilterBox::textChanged, this, [this, filterModel](const QString &text) {
+        filterModel->setContains(text.trimmed());
+    });
+    connect(tagList->selectionModel(), &QItemSelectionModel::selectionChanged, this, [this, buttonBox, tagList]() {
+        buttonBox->button(QDialogButtonBox::Ok)->setEnabled(tagList->selectionModel()->hasSelection());
+    });
     connect(buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
     connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
 
@@ -379,18 +383,18 @@ WorkoutMenuProvider::manageFiltersDialog
     layout->addWidget(buttonBox);
 
     connect(filterTree, &QTreeWidget::itemChanged, this, &WorkoutMenuProvider::manageItemChanged);
-    QMetaObject::Connection conn = connect(this, &WorkoutMenuProvider::itemsRecreated, this, [=]() {
+    QMetaObject::Connection conn = connect(this, &WorkoutMenuProvider::itemsRecreated, this, [this, filterTree, actionButtons, execute, update]() {
         bool hasItem = filterTree->currentItem() != nullptr;
         actionButtons->setButtonEnabled(ActionButtonBox::Delete, hasItem);
         execute->setEnabled(hasItem);
         update->setEnabled(hasItem && ! editor->text().trimmed().isEmpty());
     });
-    connect(execute, &QPushButton::clicked, this, [=]() {
+    connect(execute, &QPushButton::clicked, this, [this, filterTree]() {
         if (filterTree->currentItem() != nullptr) {
             editor->setText(filterTree->currentItem()->data(1, Qt::DisplayRole).toString());
         }
     });
-    connect(update, &QPushButton::clicked, this, [=]() {
+    connect(update, &QPushButton::clicked, this, [this, filterTree]() {
         if (filterTree->currentItem() != nullptr && ! editor->text().trimmed().isEmpty()) {
             int index = filterTree->currentItem()->data(2, Qt::DisplayRole).toInt();
             QString name = filterTree->currentItem()->data(0, Qt::DisplayRole).toString();
@@ -398,12 +402,14 @@ WorkoutMenuProvider::manageFiltersDialog
             manageFillItems(filterTree, index);
         }
     });
-    connect(actionButtons, &ActionButtonBox::upRequested, this, [=]() { manageMoveUp(filterTree->currentItem()); });
-    connect(actionButtons, &ActionButtonBox::downRequested, this, [=]() { manageMoveDown(filterTree->currentItem()); });
-    connect(actionButtons, &ActionButtonBox::addRequested, this, [=]() { manageAdd(filterTree); });
-    connect(actionButtons, &ActionButtonBox::deleteRequested, this, [=]() { manageDelete(filterTree->currentItem()); });
+    connect(actionButtons, &ActionButtonBox::upRequested, this, [this, filterTree]() { manageMoveUp(filterTree->currentItem()); });
+    connect(actionButtons, &ActionButtonBox::downRequested, this, [this, filterTree]() { manageMoveDown(filterTree->currentItem()); });
+    connect(actionButtons, &ActionButtonBox::addRequested, this, [this, filterTree]() { manageAdd(filterTree); });
+    connect(actionButtons, &ActionButtonBox::deleteRequested, this, [this, filterTree]() { manageDelete(filterTree->currentItem()); });
     connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::accept);
-    QMetaObject::Connection updateEnabledConn = connect(editor, &WorkoutFilterBox::textChanged, this, [=](const QString &text) { update->setEnabled(! text.trimmed().isEmpty()); });
+    QMetaObject::Connection updateEnabledConn = connect(editor, &WorkoutFilterBox::textChanged, this, [this, update](const QString &text) {
+        update->setEnabled(! text.trimmed().isEmpty());
+    });
 
     manageFillItems(filterTree);
 
@@ -435,7 +441,9 @@ WorkoutMenuProvider::addFilterDialog
 
     connect(buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
     connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
-    connect(nameEdit, &QLineEdit::textChanged, this, [=](const QString &text) { buttonBox->button(QDialogButtonBox::Ok)->setEnabled(! text.trimmed().isEmpty()); });
+    connect(nameEdit, &QLineEdit::textChanged, this, [this, buttonBox](const QString &text) {
+        buttonBox->button(QDialogButtonBox::Ok)->setEnabled(! text.trimmed().isEmpty());
+    });
     nameEdit->setClearButtonEnabled(true);
 
     if (dialog.exec() == QDialog::Accepted) {

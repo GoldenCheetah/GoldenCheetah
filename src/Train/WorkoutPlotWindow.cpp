@@ -74,10 +74,10 @@ WorkoutPlotWindow::WorkoutPlotWindow(Context *context) :
     connect(context, SIGNAL(start()), ergPlot, SLOT(start()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
-    connect(notificationTimer, &QTimer::timeout, this, [=]() {
+    connect(notificationTimer, &QTimer::timeout, this, [this]() {
         setProperty("subtitle", title);
     });
-    connect(context, &Context::setNotification, this, [=](QString notification, int timeout) {
+    connect(context, &Context::setNotification, this, [this, notificationTimer](QString notification, int timeout) {
         if (! showNotifications()) {
             return;
         }
@@ -91,7 +91,7 @@ WorkoutPlotWindow::WorkoutPlotWindow(Context *context) :
 
         setProperty("subtitle", notification);
     });
-    connect(context, &Context::clearNotification, this, [=]() {
+    connect(context, &Context::clearNotification, this, [this]() {
         setProperty("subtitle", title);
     });
 

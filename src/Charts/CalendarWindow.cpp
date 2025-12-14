@@ -51,10 +51,10 @@ CalendarWindow::CalendarWindow(Context *context)
     setChartLayout(mainLayout);
     mainLayout->addWidget(calendar);
 
-    connect(context->athlete->seasons, &Seasons::seasonsChanged, [=]() {
-        updateSeason(context->currentSeason(), true);
+    connect(context->athlete->seasons, &Seasons::seasonsChanged, this, [this]() {
+        updateSeason(this->context->currentSeason(), true);
     });
-    connect(context, &Context::seasonSelected, [=](Season const *season, bool changed) {
+    connect(context, &Context::seasonSelected, this, [this](Season const *season, bool changed) {
         if (changed || first) {
             first = false;
             updateSeason(season, false);
@@ -66,59 +66,59 @@ CalendarWindow::CalendarWindow(Context *context)
     connect(context, &Context::rideDeleted, this, &CalendarWindow::updateActivitiesIfInRange);
     connect(context, &Context::rideChanged, this, &CalendarWindow::updateActivitiesIfInRange);
     connect(context, &Context::configChanged, this, &CalendarWindow::configChanged);
-    connect(calendar, &Calendar::showInTrainMode, [=](CalendarEntry activity) {
-        for (RideItem *rideItem : context->athlete->rideCache->rides()) {
+    connect(calendar, &Calendar::showInTrainMode, this, [this](CalendarEntry activity) {
+        for (RideItem *rideItem : this->context->athlete->rideCache->rides()) {
             if (rideItem != nullptr && rideItem->fileName == activity.reference) {
                 QString filter = buildWorkoutFilter(rideItem);
                 if (! filter.isEmpty()) {
-                    context->mainWindow->fillinWorkoutFilterBox(filter);
-                    context->mainWindow->selectTrain();
-                    context->notifySelectWorkout(0);
+                    this->context->mainWindow->fillinWorkoutFilterBox(filter);
+                    this->context->mainWindow->selectTrain();
+                    this->context->notifySelectWorkout(0);
                 }
                 break;
             }
         }
     });
-    connect(calendar, &Calendar::viewActivity, [=](CalendarEntry activity) {
-        for (RideItem *rideItem : context->athlete->rideCache->rides()) {
+    connect(calendar, &Calendar::viewActivity, this, [this](CalendarEntry activity) {
+        for (RideItem *rideItem : this->context->athlete->rideCache->rides()) {
             if (rideItem != nullptr && rideItem->fileName == activity.reference) {
-                context->notifyRideSelected(rideItem);
-                context->mainWindow->selectAnalysis();
+                this->context->notifyRideSelected(rideItem);
+                this->context->mainWindow->selectAnalysis();
                 break;
             }
         }
     });
-    connect(calendar, &Calendar::addActivity, [=](bool plan, const QDate &day, const QTime &time) {
-        context->tab->setNoSwitch(true);
-        ManualActivityWizard wizard(context, plan, QDateTime(day, time));
+    connect(calendar, &Calendar::addActivity, this, [this](bool plan, const QDate &day, const QTime &time) {
+        this->context->tab->setNoSwitch(true);
+        ManualActivityWizard wizard(this->context, plan, QDateTime(day, time));
         wizard.exec();
-        context->tab->setNoSwitch(false);
+        this->context->tab->setNoSwitch(false);
     });
-    connect(calendar, &Calendar::repeatSchedule, [=](const QDate &day) {
-        context->tab->setNoSwitch(true);
-        RepeatScheduleWizard wizard(context, day);
+    connect(calendar, &Calendar::repeatSchedule, this, [this](const QDate &day) {
+        this->context->tab->setNoSwitch(true);
+        RepeatScheduleWizard wizard(this->context, day);
         if (wizard.exec() == QDialog::Accepted) {
             // Context::rideDeleted is not always emitted, therefore forcing the update
             updateActivities();
         }
-        context->tab->setNoSwitch(false);
+        this->context->tab->setNoSwitch(false);
     });
-    connect(calendar, &Calendar::delActivity, [=](CalendarEntry activity) {
+    connect(calendar, &Calendar::delActivity, this, [this](CalendarEntry activity) {
         QMessageBox::StandardButton res = QMessageBox::question(this, tr("Delete Activity"), tr("Are you sure you want to delete %1?").arg(activity.reference));
         if (res == QMessageBox::Yes) {
-            context->tab->setNoSwitch(true);
-            context->athlete->rideCache->removeRide(activity.reference);
-            context->tab->setNoSwitch(false);
+            this->context->tab->setNoSwitch(true);
+            this->context->athlete->rideCache->removeRide(activity.reference);
+            this->context->tab->setNoSwitch(false);
 
             // Context::rideDeleted is not always emitted, therefore forcing the update
             updateActivities();
         }
     });
-    connect(calendar, &Calendar::moveActivity, [=](CalendarEntry activity, const QDate &srcDay, const QDate &destDay, const QTime &destTime) {
+    connect(calendar, &Calendar::moveActivity, this, [this](CalendarEntry activity, const QDate &srcDay, const QDate &destDay, const QTime &destTime) {
         Q_UNUSED(srcDay)
 
         QApplication::setOverrideCursor(Qt::WaitCursor);
-        for (RideItem *rideItem : context->athlete->rideCache->rides()) {
+        for (RideItem *rideItem : this->context->athlete->rideCache->rides()) {
             if (rideItem != nullptr && rideItem->fileName == activity.reference) {
                 movePlannedActivity(rideItem, destDay, destTime);
                 break;
@@ -126,10 +126,10 @@ CalendarWindow::CalendarWindow(Context *context)
         }
         QApplication::restoreOverrideCursor();
     });
-    connect(calendar, &Calendar::insertRestday, [=](const QDate &day) {
+    connect(calendar, &Calendar::insertRestday, this, [this](const QDate &day) {
         QApplication::setOverrideCursor(Qt::WaitCursor);
         QList<RideItem*> plannedRides;
-        for (RideItem *rideItem : context->athlete->rideCache->rides()) {
+        for (RideItem *rideItem : this->context->athlete->rideCache->rides()) {
             if (rideItem != nullptr && rideItem->planned && rideItem->dateTime.date() >= day) {
                 plannedRides << rideItem;
             }
@@ -141,10 +141,10 @@ CalendarWindow::CalendarWindow(Context *context)
         updateActivities();
         QApplication::restoreOverrideCursor();
     });
-    connect(calendar, &Calendar::delRestday, [=](const QDate &day) {
+    connect(calendar, &Calendar::delRestday, this, [this](const QDate &day) {
         QApplication::setOverrideCursor(Qt::WaitCursor);
         QList<RideItem*> plannedRides;
-        for (RideItem *rideItem : context->athlete->rideCache->rides()) {
+        for (RideItem *rideItem : this->context->athlete->rideCache->rides()) {
             if (rideItem != nullptr && rideItem->planned && rideItem->dateTime.date() >= day) {
                 QDate destDay = rideItem->dateTime.date().addDays(-1);
                 movePlannedActivity(rideItem, destDay, rideItem->dateTime.time());
@@ -167,6 +167,7 @@ CalendarWindow::CalendarWindow(Context *context)
     });
 }
 
+
 void
 CalendarWindow::showEvent(QShowEvent*)
 {
@@ -175,6 +176,7 @@ CalendarWindow::showEvent(QShowEvent*)
     // Therefore re-apply the palette upon showEvent to ensure correct calendar appearance.
     PaletteApplier::setPaletteRecursively(this, palette, true);
 }
+
 
 int
 CalendarWindow::getDefaultView
@@ -583,7 +585,7 @@ CalendarWindow::mkControls
     connect(startHourSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &CalendarWindow::setStartHour);
     connect(endHourSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &CalendarWindow::setEndHour);
     connect(defaultViewCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CalendarWindow::setDefaultView);
-    connect(firstDayOfWeekCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int idx) { setFirstDayOfWeek(idx + 1); });
+    connect(firstDayOfWeekCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int idx) { setFirstDayOfWeek(idx + 1); });
     connect(primaryMainCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CalendarWindow::updateActivities);
     connect(primaryFallbackCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CalendarWindow::updateActivities);
     connect(secondaryCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CalendarWindow::updateActivities);
@@ -592,7 +594,7 @@ CalendarWindow::mkControls
     connect(startHourSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setStartHour);
     connect(endHourSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setEndHour);
     connect(defaultViewCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::setDefaultView);
-    connect(firstDayOfWeekCombo, &QComboBox::currentIndexChanged, [=](int idx) { setFirstDayOfWeek(idx + 1); });
+    connect(firstDayOfWeekCombo, &QComboBox::currentIndexChanged, this, [this](int idx) { setFirstDayOfWeek(idx + 1); });
     connect(primaryMainCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::updateActivities);
     connect(primaryFallbackCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::updateActivities);
     connect(secondaryCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::updateActivities);

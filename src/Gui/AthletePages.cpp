@@ -2040,8 +2040,8 @@ CPPage::mkReviewRow
         grid->addWidget(estimate, row, 4);
 
         connect(
-            accept, &QCheckBox::toggled,
-            [=](bool checked) {
+            accept, &QCheckBox::toggled, this,
+            [this, current, estimate](bool checked) {
                 current->setEnabled(! checked);
                 estimate->setEnabled(checked);
             }
@@ -2066,8 +2066,8 @@ CPPage::connectReviewDialogApplyButton
         if (checkboxes[i] != nullptr) {
             hasChecked |= checkboxes[i]->isChecked();
             connect(
-                checkboxes[i], &QCheckBox::toggled,
-                [=](bool checked) {
+                checkboxes[i], &QCheckBox::toggled, this,
+                [this, checkboxes, applyButton](bool checked) {
                     bool anyChecked = checked;
                     int j = 0;
                     while (! anyChecked && j < checkboxes.size()) {

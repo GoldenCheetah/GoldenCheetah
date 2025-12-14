@@ -183,7 +183,7 @@ RepeatSchedulePageSetup::RepeatSchedulePageSetup
     all->addWidget(scrollArea);
     setLayout(all);
 
-    connect(seasonTree, &QTreeWidget::currentItemChanged, [=](QTreeWidgetItem *current) {
+    connect(seasonTree, &QTreeWidget::currentItemChanged, this, [this, startDate, endDate, when](QTreeWidgetItem *current) {
         if (current != nullptr) {
             QDate seasonStart(current->data(0, Qt::UserRole).toDate());
             QDate seasonEnd(current->data(0, Qt::UserRole + 1).toDate());
@@ -197,10 +197,10 @@ RepeatSchedulePageSetup::RepeatSchedulePageSetup
             endDate->setDate(seasonEnd);
         }
     });
-    connect(startDate, &QDateEdit::dateChanged, [=](QDate date) {
+    connect(startDate, &QDateEdit::dateChanged, this, [this, endDate](QDate date) {
         endDate->setMinimumDate(date);
     });
-    connect(endDate, &QDateEdit::dateChanged, [=](QDate date) {
+    connect(endDate, &QDateEdit::dateChanged, this, [this, startDate](QDate date) {
         startDate->setMaximumDate(date);
     });
 
@@ -299,7 +299,7 @@ RepeatSchedulePageActivities::initializePage
         QVBoxLayout *layout = new QVBoxLayout(selectionWidget);
         layout->addWidget(selectionBox, 0, Qt::AlignCenter);
         activityTree->setItemWidget(item, 0, selectionWidget);
-        connect(selectionBox, &QCheckBox::toggled, [=](bool checked) {
+        connect(selectionBox, &QCheckBox::toggled, this, [this, item](bool checked) {
             item->setData(1, Qt::UserRole + 1, checked);
             numSelected += checked ? 1 : -1;
             emit completeChanged();

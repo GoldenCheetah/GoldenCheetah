@@ -302,9 +302,9 @@ ManualActivityPageBasics::ManualActivityPageBasics
     if (plan) {
 
 #if QT_VERSION >= 0x060000
-        connect(woTypeEdit, &QComboBox::currentIndexChanged, [=](int index) {
+        connect(woTypeEdit, &QComboBox::currentIndexChanged, this, [this, sportEdit](int index) {
 #else
-        connect(woTypeEdit, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
+        connect(woTypeEdit, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this, sportEdit](int index) {
 #endif
             sportEdit->setEnabled(index != 0);
             if (index == 0) {
@@ -562,10 +562,10 @@ ManualActivityPageWorkout::ManualActivityPageWorkout
     registerField("woIsoPower", woIsoPower);
     registerField("woXPower", woXPower);
 
-    connect(workoutFilterBox, &WorkoutFilterBox::workoutFiltersChanged, [=](QList<ModelFilter*> &f) {
+    connect(workoutFilterBox, &WorkoutFilterBox::workoutFiltersChanged, this, [this](QList<ModelFilter*> &f) {
         sortModel->setFilters(f);
     });
-    connect(workoutFilterBox, &WorkoutFilterBox::workoutFiltersRemoved, [=]() {
+    connect(workoutFilterBox, &WorkoutFilterBox::workoutFiltersRemoved, this, [this]() {
         sortModel->removeFilters();
     });
     connect(workoutTree->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ManualActivityPageWorkout::selectionChanged);
