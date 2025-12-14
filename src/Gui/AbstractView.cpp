@@ -33,6 +33,8 @@
 #include "GcUpgrade.h"
 #include "LTMWindow.h"
 
+const int SIDEBAR_DEFAULT_WIDTH=200;
+
 AbstractView::AbstractView(Context *context, int type, const QString& view, const QString& heading) :
     QWidget(context->tab), context(context), type(type), view(view),
     _sidebar(true), _tiled(false), _selected(false), lastHeight(130*dpiYFactor), sidewidth(0),
@@ -122,7 +124,7 @@ AbstractView::resizeEvent(QResizeEvent *)
 {
     active = true; // we're mucking about, so ignore in splitterMoved ...
 
-    if (sidewidth < 200) {
+    if (sidewidth < SIDEBAR_DEFAULT_WIDTH) {
         sidewidth = splitter->sizes()[0];
     } else {
 
@@ -601,8 +603,8 @@ AbstractView::setPages(QStackedWidget *pages)
             // sensible default as never run before!
             QList<int> sizes;
 
-            sizes.append(200);
-            sizes.append(context->mainWindow->width()-200);
+            sizes.append(SIDEBAR_DEFAULT_WIDTH);
+            sizes.append(context->mainWindow->width()-SIDEBAR_DEFAULT_WIDTH);
             splitter->setSizes(sizes);
             
         }
@@ -657,7 +659,7 @@ AbstractView::setShowBottom(bool x)
         } else {
 
             // need a hide animator to hide on timeout
-            //anim->setDuration(200);
+            //anim->setDuration(SIDEBAR_DEFAULT_WIDTH);
             //anim->setEasingCurve(QEasingCurve(QEasingCurve::Linear));
             //anim->setKeyValueAt(0,mainSplitter->maxhpos()-(lastHeight+22));
             //anim->setKeyValueAt(1,mainSplitter->maxhpos()-22);
@@ -705,14 +707,30 @@ AbstractView::sidebarChanged()
         QVariant splitterSizes = appsettings->cvalue(context->athlete->cyclist, setting);
         if (splitterSizes.toByteArray().size() > 1 ) {
             splitter->restoreState(splitterSizes.toByteArray());
-            splitter->setOpaqueResize(true); // redraw when released, snappier UI
+        } else {
+
+            // use old (v3 or earlier) mechanism
+            QVariant splitterSizes = appsettings->cvalue(context->athlete->cyclist, GC_SETTINGS_SPLITTER_SIZES);
+            if (splitterSizes.toByteArray().size() > 1 ) {
+
+                splitter->restoreState(splitterSizes.toByteArray());
+
+            } else {
+
+                // apply sensible default as no configuration exists!
+                QList<int> sizes;
+
+                sizes.append(SIDEBAR_DEFAULT_WIDTH);
+                sizes.append(context->mainWindow->width()-SIDEBAR_DEFAULT_WIDTH);
+                splitter->setSizes(sizes);
+            }
         }
 
-        // if it was collapsed we need set to at least 200
+        // if it was collapsed we need set to at least SIDEBAR_DEFAULT_WIDTH
         // unless the mainwindow isn't big enough
         if (sidebar_->width()<10) {
-            int size = width() - 200 * dpiXFactor;
-            if (size>(200* dpiXFactor)) size = 200* dpiXFactor;
+            int size = width() - SIDEBAR_DEFAULT_WIDTH * dpiXFactor;
+            if (size>(SIDEBAR_DEFAULT_WIDTH* dpiXFactor)) size = SIDEBAR_DEFAULT_WIDTH* dpiXFactor;
 
             QList<int> sizes;
             sizes.append(size);
