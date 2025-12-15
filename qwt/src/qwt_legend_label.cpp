@@ -276,7 +276,6 @@ QSize QwtLegendLabel::sizeHint() const
     if ( m_data->itemMode != QwtLegendData::ReadOnly )
     {
         sz += buttonShift( this );
-        sz = qwtExpandedToGlobalStrut( sz );
     }
 
     return sz;

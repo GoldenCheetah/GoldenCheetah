@@ -159,11 +159,7 @@ RideFile::computeFileCRC(QString filename)
     rawstream->readRawData(&data[0], file.size());
     file.close();
 
-#if QT_VERSION < 0x060000
-    return qChecksum(&data[0], file.size());
-#else
     return qChecksum(QByteArrayView(&data[0], file.size()));
-#endif
 }
 
 void

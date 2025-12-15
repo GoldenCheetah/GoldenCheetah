@@ -607,16 +607,11 @@ void QwtCounter::wheelEvent( QWheelEvent* event )
             increment = m_data->increment[2];
     }
 
-#if QT_VERSION < 0x050e00
-    const QPoint wheelPos = event->pos();
-    const int wheelDelta = event->delta();
-#else
     const QPoint wheelPos = event->position().toPoint();
 
     const QPoint delta = event->angleDelta();
     const int wheelDelta = ( qAbs( delta.x() ) > qAbs( delta.y() ) )
         ? delta.x() : delta.y();
-#endif
 
     for ( int i = 0; i < m_data->numButtons; i++ )
     {

@@ -258,8 +258,7 @@ void QwtArrowButton::drawArrow( QPainter* painter,
  */
 QSize QwtArrowButton::sizeHint() const
 {
-    const QSize hint = minimumSizeHint();
-    return qwtExpandedToGlobalStrut( hint );
+    return minimumSizeHint();
 }
 
 /*!

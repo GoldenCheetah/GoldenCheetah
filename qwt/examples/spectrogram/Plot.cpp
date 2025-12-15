@@ -383,11 +383,7 @@ void Plot::drawItems( QPainter* painter, const QRectF& canvasRect,
 void Plot::printPlot()
 {
     QPrinter printer( QPrinter::HighResolution );
-#if QT_VERSION >= 0x050300
     printer.setPageOrientation( QPageLayout::Landscape );
-#else
-    printer.setOrientation( QPrinter::Landscape );
-#endif
     printer.setOutputFileName( "spectrogram.pdf" );
 
     QPrintDialog dialog( &printer );

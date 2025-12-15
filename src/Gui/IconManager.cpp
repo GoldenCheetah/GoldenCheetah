@@ -340,9 +340,6 @@ IconManager::downloadUrl
 {
     QNetworkAccessManager manager;
     QNetworkRequest request(url);
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
-#endif
     QNetworkReply *reply = manager.get(request);
 
     QTimer timeoutTimer;

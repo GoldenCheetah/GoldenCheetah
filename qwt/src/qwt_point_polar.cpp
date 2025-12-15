@@ -9,14 +9,10 @@
 #include "qwt_point_polar.h"
 #include "qwt_math.h"
 
-#if QT_VERSION >= 0x050200
-
 static QwtPointPolar qwtPointToPolar( const QPointF& point )
 {
     return QwtPointPolar( point );
 }
-
-#endif
 
 namespace
 {
@@ -26,10 +22,8 @@ namespace
         {
             qRegisterMetaType< QwtPointPolar >();
 
-#if QT_VERSION >= 0x050200
             QMetaType::registerConverter< QPointF, QwtPointPolar >( qwtPointToPolar );
             QMetaType::registerConverter< QwtPointPolar, QPointF >( &QwtPointPolar::toPoint );
-#endif
         }
 
     } qwtRegisterQwtPointPolar;

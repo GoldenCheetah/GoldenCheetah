@@ -5,7 +5,7 @@
 #                                                                             #
 ###############################################################################
 
-!versionAtLeast(QT_VERSION, 5.15):error("Use at least Qt version 5.15")
+!versionAtLeast(QT_VERSION, 6.5.3):error("Use at least Qt version 6.5.3")
 
 ###==========================
 ### IMPORT USER CONFIGURATION
@@ -236,7 +236,7 @@ RESOURCES = $${PWD}/Resources/application.qrc
 ### OPTIONAL => Embed Python
 ###=========================
 
-notsupported = "INFO: Embedded Python requires version QT >= 5.8, no support for"
+notsupported = "INFO: Embedded Python requires version QT >= 6.5.3, no support for"
 notsupported += $${QT_VERSION}
 
 contains(DEFINES, "GC_WANT_PYTHON") {
@@ -498,11 +498,11 @@ SOURCES +=  $$HTPATH/httpglobal.cpp \
 ### OPTIONAL => CLOUD DB [Google App Engine Integration]
 ###=====================================================
 
-##----------------------------------------------##
-## CloudDB is only supported on QT5.5 or higher ##
-##----------------------------------------------##
+##------------------------------------------------##
+## CloudDB is only supported on QT6.5.3 or higher ##
+##------------------------------------------------##
 
-notsupported = "INFO: CloudDB requires version QT >= 5.5, no support for"
+notsupported = "INFO: CloudDB requires version QT >= 6.5.3, no support for"
 notsupported += $${QT_VERSION}
 
 equals(CloudDB, active) {

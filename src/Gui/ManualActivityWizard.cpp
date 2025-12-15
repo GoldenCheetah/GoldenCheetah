@@ -301,11 +301,8 @@ ManualActivityPageBasics::ManualActivityPageBasics
     woTypeEdit->setCurrentIndex(1);
     if (plan) {
 
-#if QT_VERSION >= 0x060000
         connect(woTypeEdit, &QComboBox::currentIndexChanged, this, [this, sportEdit](int index) {
-#else
-        connect(woTypeEdit, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this, sportEdit](int index) {
-#endif
+
             sportEdit->setEnabled(index != 0);
             if (index == 0) {
                 sportEdit->setText("Bike");
@@ -873,15 +870,9 @@ ManualActivityPageMetrics::ManualActivityPageMetrics
     connect(swimDistanceEdit, &QDoubleSpinBox::editingFinished, this, &ManualActivityPageMetrics::updateEstimates);
     connect(paceIntervals, &QCheckBox::toggled, this, &ManualActivityPageMetrics::updateVisibility);
     connect(lapsEditor, &LapsEditorWidget::editingFinished, this, &ManualActivityPageMetrics::updateEstimates);
-#if QT_VERSION >= 0x060000
     connect(estimateByEdit, &QComboBox::currentIndexChanged, this, &ManualActivityPageMetrics::updateVisibility);
     connect(estimateByEdit, &QComboBox::currentIndexChanged, this, &ManualActivityPageMetrics::updateEstimates);
     connect(estimationDaysEdit, &QSpinBox::valueChanged, this, &ManualActivityPageMetrics::updateEstimates);
-#else
-    connect(estimateByEdit, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ManualActivityPageMetrics::updateVisibility);
-    connect(estimateByEdit, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ManualActivityPageMetrics::updateEstimates);
-    connect(estimationDaysEdit, QOverload<int>::of(&QSpinBox::valueChanged), this, &ManualActivityPageMetrics::updateEstimates);
-#endif
 
     registerField("averageHr", averageHrEdit);
     registerField("averagePower", averagePowerEdit);

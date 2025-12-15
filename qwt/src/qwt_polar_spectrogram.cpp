@@ -292,11 +292,7 @@ QImage QwtPolarSpectrogram::renderImage(
         else
         {
             futures += QtConcurrent::run(
-#if QT_VERSION >= 0x060000
                 &QwtPolarSpectrogram::renderTileInfo, this,
-#else
-                this, &QwtPolarSpectrogram::renderTileInfo,
-#endif
                 azimuthMap, radialMap, pole, &tileInfos[i] );
         }
     }

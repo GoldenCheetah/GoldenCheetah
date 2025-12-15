@@ -581,16 +581,6 @@ CalendarWindow::mkControls
     controlsTabs->addTab(centerLayoutInWidget(entriesForm, false), tr("Calendar Entries"));
     controlsTabs->addTab(multiMetricSelector, tr("Summary"));
 
-#if QT_VERSION < 0x060000
-    connect(startHourSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &CalendarWindow::setStartHour);
-    connect(endHourSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &CalendarWindow::setEndHour);
-    connect(defaultViewCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CalendarWindow::setDefaultView);
-    connect(firstDayOfWeekCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int idx) { setFirstDayOfWeek(idx + 1); });
-    connect(primaryMainCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CalendarWindow::updateActivities);
-    connect(primaryFallbackCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CalendarWindow::updateActivities);
-    connect(secondaryCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CalendarWindow::updateActivities);
-    connect(tertiaryCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CalendarWindow::updateActivities);
-#else
     connect(startHourSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setStartHour);
     connect(endHourSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setEndHour);
     connect(defaultViewCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::setDefaultView);
@@ -599,7 +589,6 @@ CalendarWindow::mkControls
     connect(primaryFallbackCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::updateActivities);
     connect(secondaryCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::updateActivities);
     connect(tertiaryCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::updateActivities);
-#endif
     connect(summaryDayCheck, &QCheckBox::toggled, this, &CalendarWindow::setSummaryVisibleDay);
     connect(summaryWeekCheck, &QCheckBox::toggled, this, &CalendarWindow::setSummaryVisibleWeek);
     connect(summaryMonthCheck, &QCheckBox::toggled, this, &CalendarWindow::setSummaryVisibleMonth);

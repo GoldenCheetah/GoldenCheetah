@@ -18,10 +18,6 @@ class QwtColumnRect;
 class QColor;
 class QPolygonF;
 
-#if QT_VERSION < 0x060000
-template< typename T > class QVector;
-#endif
-
 /*!
    \brief QwtPlotHistogram represents a series of samples, where an interval
          is associated with a value ( \f$y = f([x1,x2])\f$ ).

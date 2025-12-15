@@ -15,23 +15,9 @@
 
 #include <limits>
 
-#if QT_VERSION >= 0x050000
-
 typedef qint64 QwtJulianDay;
 static const QwtJulianDay minJulianDayD = Q_INT64_C( -784350574879 );
 static const QwtJulianDay maxJulianDayD = Q_INT64_C( 784354017364 );
-
-#else
-
-// QDate stores the Julian day as unsigned int, but
-// there is QDate::fromJulianDay( int ). That's why
-// we have the range [ 1, INT_MAX ]
-
-typedef int QwtJulianDay;
-static const QwtJulianDay minJulianDayD = 1;
-static const QwtJulianDay maxJulianDayD = std::numeric_limits< int >::max();
-
-#endif
 
 static QString qwtExpandedFormat( const QString& format,
     const QDateTime& dateTime, QwtDate::Week0Type week0Type )
@@ -215,38 +201,6 @@ static inline qint64 qwtFloorDiv( int a, int b )
 
 #endif
 
-static inline QDate qwtToDate( int year, int month = 1, int day = 1 )
-{
-#if QT_VERSION >= 0x050000
-    return QDate( year, month, day );
-#else
-    if ( year > 100000 )
-    {
-        // code from QDate but using doubles to avoid overflows
-        // for large values
-
-        const int m1 = ( month - 14 ) / 12;
-        const int m2 = ( 367 * ( month - 2 - 12 * m1 ) ) / 12;
-        const double y1 = std::floor( ( 4900.0 + year + m1 ) / 100 );
-
-        const double jd = std::floor( ( 1461.0 * ( year + 4800 + m1 ) ) / 4 ) + m2
-            - std::floor( ( 3 * y1 ) / 4 ) + day - 32075;
-
-        if ( jd > maxJulianDayD )
-        {
-            qWarning() << "qwtToDate: overflow";
-            return QDate();
-        }
-
-        return QDate::fromJulianDay( static_cast< QwtJulianDay >( jd ) );
-    }
-    else
-    {
-        return QDate( year, month, day );
-    }
-#endif
-}
-
 /*!
    Translate from double to QDateTime
 
@@ -382,8 +336,8 @@ QDateTime QwtDate::ceil( const QDateTime& dateTime, IntervalType intervalType )
         case QwtDate::Month:
         {
             dt.setTime( QTime( 0, 0 ) );
-            dt.setDate( qwtToDate( dateTime.date().year(),
-                dateTime.date().month() ) );
+            dt.setDate( QDate( dateTime.date().year(),
+                dateTime.date().month(), 1 ) );
 
             if ( dt < dateTime )
                 dt = dt.addMonths( 1 );
@@ -403,7 +357,7 @@ QDateTime QwtDate::ceil( const QDateTime& dateTime, IntervalType intervalType )
             if ( year == 0 )
                 year++; // there is no year 0
 
-            dt.setDate( qwtToDate( year ) );
+            dt.setDate( QDate( year, 1, 1 ) );
             break;
         }
     }
@@ -464,8 +418,8 @@ QDateTime QwtDate::floor( const QDateTime& dateTime,
         {
             dt.setTime( QTime( 0, 0 ) );
 
-            const QDate date = qwtToDate( dt.date().year(),
-                dt.date().month() );
+            const QDate date = QDate( dt.date().year(),
+                dt.date().month(), 1 );
             dt.setDate( date );
 
             break;
@@ -474,7 +428,7 @@ QDateTime QwtDate::floor( const QDateTime& dateTime,
         {
             dt.setTime( QTime( 0, 0 ) );
 
-            const QDate date = qwtToDate( dt.date().year() );
+            const QDate date = QDate( dt.date().year(), 1, 1 );
             dt.setDate( date );
 
             break;
@@ -644,11 +598,7 @@ int QwtDate::utcOffset( const QDateTime& dateTime )
         }
         case Qt::OffsetFromUTC:
         {
-#if QT_VERSION >= 0x050200
             seconds = dateTime.offsetFromUtc();
-#else
-            seconds = dateTime.utcOffset();
-#endif
             break;
         }
         default:

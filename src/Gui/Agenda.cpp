@@ -18,9 +18,6 @@
 
 #include "Agenda.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-#include <QAbstractItemDelegate>
-#endif
 #include <QHeaderView>
 #include <QGridLayout>
 #include <QToolTip>
@@ -188,15 +185,6 @@ AgendaTree::leaveEvent
 }
 
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-void
-AgendaTree::enterEvent
-(QEvent *event)
-{
-    if (! contextMenuIndex.isValid()) {
-        mapFromGlobal(QCursor::pos());
-    }
-#else
 void
 AgendaTree::enterEvent
 (QEnterEvent *event)
@@ -204,7 +192,6 @@ AgendaTree::enterEvent
     if (! contextMenuIndex.isValid()) {
         updateHoveredIndex(event->position().toPoint());
     }
-#endif
     QTreeWidget::enterEvent(event);
 }
 

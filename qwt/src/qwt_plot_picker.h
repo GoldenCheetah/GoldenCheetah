@@ -18,10 +18,6 @@ class QwtPlot;
 class QPointF;
 class QRectF;
 
-#if QT_VERSION < 0x060000
-template< typename T > class QVector;
-#endif
-
 /*!
    \brief QwtPlotPicker provides selections on a plot canvas
 

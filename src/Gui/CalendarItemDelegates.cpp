@@ -59,14 +59,7 @@ void
 HitTester::resize
 (const QModelIndex &index, qsizetype size)
 {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    rects[index].clear();
-    for (int i = 0; i < size; ++i) {
-        rects[index] << QRect();
-    }
-#else
     rects[index].resize(size);
-#endif
 }
 
 
@@ -1283,11 +1276,7 @@ AgendaEntryDelegate::paint
         secondaryMetricWeight = attributes.secondaryMetricHoverWeight;
     }
     if (primaryWeight == 0) {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-        primaryWeight = static_cast<QFont::Weight>(line1Font.weight());
-#else
         primaryWeight = line1Font.weight();
-#endif
     }
     if (secondaryWeight == 0) {
         secondaryWeight = primaryWeight;

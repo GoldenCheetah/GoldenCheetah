@@ -177,15 +177,11 @@ static void qwtUpdateContentsRect( int fw, QWidget* canvas )
 
 static void qwtFillRegion( QPainter* painter, const QRegion& region )
 {
-#if QT_VERSION >= 0x050800
     for ( QRegion::const_iterator it = region.cbegin();
         it != region.cend(); ++it )
     {
         painter->drawRect( *it );
     }
-#else
-    painter->drawRects( region.rects() );
-#endif
 }
 
 static void qwtDrawBackground( QPainter* painter, QWidget* canvas )
@@ -649,13 +645,8 @@ void QwtPlotAbstractCanvas::drawBorder( QPainter* painter )
         const int frameShape = w->property( "frameShape" ).toInt();
         const int frameShadow = w->property( "frameShadow" ).toInt();
 
-#if QT_VERSION < 0x050000
-        QStyleOptionFrameV3 opt;
-#else
         QStyleOptionFrame opt;
-#endif
         opt.initFrom( w );
-
         opt.frameShape = QFrame::Shape( int( opt.frameShape ) | frameShape );
 
         switch (frameShape)

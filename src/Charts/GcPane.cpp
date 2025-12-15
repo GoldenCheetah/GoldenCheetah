@@ -173,11 +173,7 @@ GcPane::spotHotSpot(QMouseEvent *e)
 }
 
 void
-#if QT_VERSION >= 0x060000
 GcPane::enterEvent(QEnterEvent *)
-#else
-GcPane::enterEvent(QEvent *)
-#endif
 {
     repaint();
 }

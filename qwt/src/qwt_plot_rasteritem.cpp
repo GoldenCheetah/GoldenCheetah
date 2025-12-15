@@ -374,9 +374,6 @@ static bool qwtUseCache( QwtPlotRasterItem::CachePolicy policy,
         {
             case QPaintEngine::SVG:
             case QPaintEngine::Pdf:
-#if QT_VERSION < 0x060000
-            case QPaintEngine::PostScript:
-#endif
             case QPaintEngine::MacPrinter:
             case QPaintEngine::Picture:
                 break;
@@ -695,10 +692,8 @@ void QwtPlotRasterItem::draw( QPainter* painter,
 
         auto imageSize = paintRect.size();
 
-#if QT_VERSION >= 0x050000
         const auto pixelRatio = QwtPainter::devicePixelRatio( painter->device() );
         imageSize *= pixelRatio;
-#endif
 
         image = compose(xxMap, yyMap,
             area, paintRect, imageSize.toSize(), doCache);
@@ -706,9 +701,7 @@ void QwtPlotRasterItem::draw( QPainter* painter,
         if ( image.isNull() )
             return;
 
-#if QT_VERSION >= 0x050000
         image.setDevicePixelRatio( pixelRatio );
-#endif
 
         // Remove pixels at the boundaries, when explicitly
         // excluded in the intervals

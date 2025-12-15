@@ -338,11 +338,7 @@ Routes::getFingerprint() const
     foreach(RouteSegment segment, routes) ba += segment.id().toByteArray();
 
     // we spot other things separately
-#if QT_VERSION < 0x060000
-    return qChecksum(ba, ba.length());
-#else
     return qChecksum(ba);
-#endif
 }
 
 void

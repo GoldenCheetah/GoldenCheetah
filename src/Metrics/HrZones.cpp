@@ -113,9 +113,6 @@ bool HrZones::read(QFile &file)
         return false;
     }
     QTextStream fileStream(&file);
-#if QT_VERSION < 0x060000
-    fileStream.setCodec("UTF-8");
-#endif
 
     QRegExp commentrx("\\s*#.*$");
     QRegExp blankrx("^[ \t]*$");
@@ -732,9 +729,6 @@ void HrZones::write(QDir home)
     if (file.open(QFile::WriteOnly))
     {
         QTextStream stream(&file);
-#if QT_VERSION < 0x060000
-        stream.setCodec("UTF-8");
-#endif
         stream << strzones;
         file.close();
     } else {
@@ -924,11 +918,8 @@ HrZones::getFingerprint() const
         }
     }
     QByteArray ba = QByteArray::number(x);
-#if QT_VERSION < 0x060000
-    return qChecksum(ba, ba.length());
-#else
+
     return qChecksum(ba);
-#endif
 }
 
 quint16
@@ -952,9 +943,6 @@ HrZones::getFingerprint(QDate forDate) const
         }
     }
     QByteArray ba = QByteArray::number(x);
-#if QT_VERSION < 0x060000
-    return qChecksum(ba, ba.length());
-#else
+
     return qChecksum(ba);
-#endif
 }

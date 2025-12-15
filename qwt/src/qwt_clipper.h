@@ -19,10 +19,6 @@ class QRectF;
 class QPolygon;
 class QPolygonF;
 
-#if QT_VERSION < 0x060000
-template< typename T > class QVector;
-#endif
-
 /*!
    \brief Some clipping algorithms
  */

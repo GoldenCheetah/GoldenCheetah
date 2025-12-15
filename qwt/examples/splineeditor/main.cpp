@@ -57,13 +57,9 @@ namespace
                 parameterBox->addItem( "Chordal" );
                 parameterBox->addItem( "Manhattan" );
                 toolBar->addWidget( parameterBox );
-#if QT_VERSION >= 0x060000
+
                 connect( parameterBox, SIGNAL(textActivated(const QString&)),
                     plot, SLOT(setParametric(const QString&)) );
-#else
-                connect( parameterBox, SIGNAL(activated(const QString&)),
-                    plot, SLOT(setParametric(const QString&)) );
-#endif
 
                 parameterBox->setCurrentIndex( 2 ); // chordal
                 plot->setParametric( parameterBox->currentText() );
@@ -84,13 +80,9 @@ namespace
             boundaryBox->addItem( "Not a Knot" );
 
             toolBar->addWidget( boundaryBox );
-#if QT_VERSION >= 0x060000
+
             connect( boundaryBox, SIGNAL(textActivated(const QString&)),
                 plot, SLOT(setBoundaryCondition(const QString&)) );
-#else
-            connect( boundaryBox, SIGNAL(activated(const QString&)),
-                plot, SLOT(setBoundaryCondition(const QString&)) );
-#endif
 
             addToolBar( toolBar );
         }

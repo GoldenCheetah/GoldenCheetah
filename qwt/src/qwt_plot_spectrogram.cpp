@@ -531,11 +531,7 @@ QImage QwtPlotSpectrogram::renderImage(
         else
         {
             futures += QtConcurrent::run(
-#if QT_VERSION >= 0x060000
                 &QwtPlotSpectrogram::renderTile, this,
-#else
-                this, &QwtPlotSpectrogram::renderTile,
-#endif
                 xMap, yMap, tile, &image );
         }
     }

@@ -76,11 +76,6 @@
 
 #endif // Q_OS_LINUX || Q_OS_WIN
 
-// now check for stupid settings
-#if defined GC_VIDEO_QT6 && QT_VERSION < 0x060000
-#error "Qt6 Video is not supported on Qt5"
-#endif
-
 //----------------------------------------------------------------------
 // Now options are set lets pull in the headers we need then
 //----------------------------------------------------------------------

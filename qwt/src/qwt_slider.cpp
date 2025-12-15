@@ -911,8 +911,7 @@ bool QwtSlider::hasGroove() const
  */
 QSize QwtSlider::sizeHint() const
 {
-    const QSize hint = minimumSizeHint();
-    return qwtExpandedToGlobalStrut( hint );
+    return minimumSizeHint();
 }
 
 /*!

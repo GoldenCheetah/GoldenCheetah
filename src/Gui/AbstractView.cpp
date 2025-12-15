@@ -307,9 +307,6 @@ AbstractView::saveState()
     };
     file.resize(0);
     QTextStream out(&file);
-#if QT_VERSION < 0x060000
-    out.setCodec("UTF-8");
-#endif
 
     // is just a collection of layout (aka old HomeWindow name-layout.xml)
     out<<"<layouts>\n";

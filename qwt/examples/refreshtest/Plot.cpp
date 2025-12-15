@@ -18,9 +18,7 @@
 
 #ifndef QWT_NO_OPENGL
 
-#if QT_VERSION >= 0x050400
 #define USE_OPENGL_WIDGET 1
-#endif
 
 #if USE_OPENGL_WIDGET
     #include <QwtPlotOpenGLCanvas>

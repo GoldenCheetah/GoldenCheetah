@@ -27,20 +27,7 @@
 #include <qstyleoption.h>
 #include <qpaintengine.h>
 #include <qapplication.h>
-
-#if QT_VERSION >= 0x060000
 #include <qscreen.h>
-#else
-#include <qdesktopwidget.h>
-#endif
-
-#if QT_VERSION < 0x050000
-
-#ifdef Q_WS_X11
-#include <qx11info_x11.h>
-#endif
-
-#endif
 
 #include <cstring>
 
@@ -75,15 +62,7 @@ static inline bool qwtIsRasterPaintEngineBuggy()
     return isBuggy == 1;
 #endif
 
-#if QT_VERSION < 0x050000
-    return true;
-#elif QT_VERSION < 0x050100
     return false;
-#elif QT_VERSION < 0x050400
-    return true;
-#else
-    return false;
-#endif
 }
 
 static inline bool qwtIsClippingNeeded(
@@ -175,21 +154,12 @@ static inline QSize qwtScreenResolution()
         /*
             We might have screens with different resolutions. TODO ...
          */
-#if QT_VERSION >= 0x060000
         QScreen* screen = QGuiApplication::primaryScreen();
         if ( screen )
         {
             screenResolution.setWidth( screen->logicalDotsPerInchX() );
             screenResolution.setHeight( screen->logicalDotsPerInchY() );
         }
-#else
-        QDesktopWidget* desktop = QApplication::desktop();
-        if ( desktop )
-        {
-            screenResolution.setWidth( desktop->logicalDpiX() );
-            screenResolution.setHeight( desktop->logicalDpiY() );
-        }
-#endif
     }
 
     return screenResolution;
@@ -1369,12 +1339,7 @@ void QwtPainter::drawBackgound( QPainter* painter,
 int QwtPainter::horizontalAdvance(
     const QFontMetrics& fontMetrics, const QString& text )
 {
-#if QT_VERSION >= 0x050b00
     return fontMetrics.horizontalAdvance( text );
-#else
-    return fontMetrics.width( text );
-#endif
-
 }
 
 /*!
@@ -1387,11 +1352,7 @@ int QwtPainter::horizontalAdvance(
 qreal QwtPainter::horizontalAdvance(
     const QFontMetricsF& fontMetrics, const QString& text )
 {
-#if QT_VERSION >= 0x050b00
     return fontMetrics.horizontalAdvance( text );
-#else
-    return fontMetrics.width( text );
-#endif
 }
 
 /*!
@@ -1404,11 +1365,7 @@ qreal QwtPainter::horizontalAdvance(
 int QwtPainter::horizontalAdvance(
     const QFontMetrics& fontMetrics, QChar ch )
 {
-#if QT_VERSION >= 0x050b00
     return fontMetrics.horizontalAdvance( ch );
-#else
-    return fontMetrics.width( ch );
-#endif
 }
 
 /*!
@@ -1421,11 +1378,7 @@ int QwtPainter::horizontalAdvance(
 qreal QwtPainter::horizontalAdvance(
     const QFontMetricsF& fontMetrics, QChar ch )
 {
-#if QT_VERSION >= 0x050b00
     return fontMetrics.horizontalAdvance( ch );
-#else
-    return fontMetrics.width( ch );
-#endif
 }
 
 /*!
@@ -1441,9 +1394,6 @@ QFont QwtPainter::scaledFont( const QFont& font, const QPaintDevice* paintDevice
 {
     if ( paintDevice == NULL )
     {
-#if QT_VERSION < 0x060000
-        paintDevice = QApplication::desktop();
-#else
         class PaintDevice : public QPaintDevice
         {
             virtual QPaintEngine* paintEngine() const QWT_OVERRIDE
@@ -1468,7 +1418,6 @@ QFont QwtPainter::scaledFont( const QFont& font, const QPaintDevice* paintDevice
 
         static PaintDevice dummyPaintDevice;
         paintDevice = &dummyPaintDevice;
-#endif
     }
 
     return QFont( font, const_cast< QPaintDevice* >( paintDevice ) );
@@ -1482,23 +1431,13 @@ qreal QwtPainter::devicePixelRatio( const QPaintDevice* paintDevice )
 {
     qreal pixelRatio = 0.0;
 
-#if QT_VERSION >= 0x050100
     if ( paintDevice )
     {
-#if QT_VERSION >= 0x050600
         pixelRatio = paintDevice->devicePixelRatioF();
-#else
-        pixelRatio = paintDevice->devicePixelRatio();
-#endif
     }
-#else
-    Q_UNUSED( paintDevice )
-#endif
 
-#if QT_VERSION >= 0x050000
     if ( pixelRatio == 0.0 && qApp )
         pixelRatio = qApp->devicePixelRatio();
-#endif
 
     if ( pixelRatio == 0.0 )
         pixelRatio = 1.0;
@@ -1516,14 +1455,10 @@ QPixmap QwtPainter::backingStore( QWidget* widget, const QSize& size )
 {
     QPixmap pm;
 
-#if QT_VERSION >= 0x050000
     const qreal pixelRatio = QwtPainter::devicePixelRatio( widget );
 
     pm = QPixmap( size * pixelRatio );
     pm.setDevicePixelRatio( pixelRatio );
-#else
-    pm = QPixmap( size );
-#endif
 
 #ifdef Q_WS_X11
     if ( widget && isX11GraphicsSystem() )

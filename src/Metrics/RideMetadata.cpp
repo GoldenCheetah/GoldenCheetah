@@ -1590,11 +1590,7 @@ FieldDefinition::fingerprint(QList<FieldDefinition> list)
         ba.append(def.values.join("").toUtf8());
     }
 
-#if QT_VERSION < 0x060000
-    return qChecksum(ba, ba.length());
-#else
     return qChecksum(ba);
-#endif
 }
 
 QCompleter *
@@ -1661,11 +1657,7 @@ KeywordDefinition::fingerprint(QList<KeywordDefinition> list)
         ba.append(def.tokens.join("").toUtf8());
     }
 
-#if QT_VERSION < 0x060000
-    return qChecksum(ba, ba.length());
-#else
     return qChecksum(ba);
-#endif
 }
 
 /*----------------------------------------------------------------------
@@ -1687,9 +1679,6 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
     };
     file.resize(0);
     QTextStream out(&file);
-#if QT_VERSION < 0x060000
-    out.setCodec("UTF-8");
-#endif
 
     // begin document
     out << "<metadata>\n";

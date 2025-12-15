@@ -10,10 +10,6 @@
 class QwtOHLCSample;
 class QString;
 
-#if QT_VERSION < 0x060000
-template< typename T > class QVector;
-#endif
-
 namespace QuoteFactory
 {
     enum Stock

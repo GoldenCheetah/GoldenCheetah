@@ -9,14 +9,10 @@
 
 #include "qwt_point_3d.h"
 
-#if QT_VERSION >= 0x050200
-
 static QwtPoint3D qwtPointToPoint3D( const QPointF& point )
 {
     return QwtPoint3D( point );
 }
-
-#endif
 
 namespace
 {
@@ -26,9 +22,7 @@ namespace
         {
             qRegisterMetaType< QwtPoint3D >();
 
-#if QT_VERSION >= 0x050200
             QMetaType::registerConverter< QPointF, QwtPoint3D >( qwtPointToPoint3D );
-#endif
         }
     } qwtRegisterQwtPoint3D;
 }

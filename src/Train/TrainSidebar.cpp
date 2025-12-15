@@ -39,12 +39,7 @@
 #include <QInputEvent>
 #include <QKeyEvent>
 #include <QMutexLocker>
-
-#if QT_VERSION >= 0x060000
 #include <QSoundEffect>
-#else
-#include <QSound>
-#endif
 
 // Three current realtime device types supported are:
 #include "RealtimeController.h"
@@ -2088,13 +2083,9 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
                     if (fPlayAudio) {
                         lapAudioThisLap = false;
-#if QT_VERSION >= 0x060000
                         static QSoundEffect effect;
                         effect.setSource(QUrl::fromLocalFile(":audio/lap.wav"));
                         effect.play();
-#else
-                        QSound::play(":audio/lap.wav");
-#endif
                     }
                 }
 

@@ -208,11 +208,7 @@ void Plot::populate()
         marker->setLinePen( colors[ i % numColors ], 0, Qt::DashLine );
         marker->setVisible( false );
 
-#if QT_VERSION >= 0x050e00
         QDateTime dt = QDate( 2010, 1, 1 ).startOfDay();
-#else
-        QDateTime dt( QDate( 2010, 1, 1 ) );
-#endif
         dt = dt.addDays( 77 * ( i + 1 ) );
 
         marker->setValue( QwtDate::toDouble( dt ), 0.0 );

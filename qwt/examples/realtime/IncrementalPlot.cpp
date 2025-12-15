@@ -47,9 +47,6 @@ IncrementalPlot::IncrementalPlot( QWidget* parent )
 
     if ( QwtPainter::isX11GraphicsSystem() )
     {
-#if QT_VERSION < 0x050000
-        canvas()->setAttribute( Qt::WA_PaintOutsidePaintEvent, true );
-#endif
         canvas()->setAttribute( Qt::WA_PaintOnScreen, true );
     }
 

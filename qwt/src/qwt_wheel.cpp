@@ -323,16 +323,11 @@ void QwtWheel::timerEvent( QTimerEvent* event )
  */
 void QwtWheel::wheelEvent( QWheelEvent* event )
 {
-#if QT_VERSION < 0x050e00
-    const QPoint wheelPos = event->pos();
-    const int wheelDelta = event->delta();
-#else
     const QPoint wheelPos = event->position().toPoint();
 
     const QPoint delta = event->angleDelta();
     const int wheelDelta = ( qAbs( delta.x() ) > qAbs( delta.y() ) )
         ? delta.x() : delta.y();
-#endif
 
     if ( !wheelRect().contains( wheelPos ) )
     {
@@ -951,8 +946,7 @@ int QwtWheel::wheelWidth() const
  */
 QSize QwtWheel::sizeHint() const
 {
-    const QSize hint = minimumSizeHint();
-    return qwtExpandedToGlobalStrut( hint );
+    return minimumSizeHint();
 }
 
 /*!
