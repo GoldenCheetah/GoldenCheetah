@@ -10,7 +10,11 @@
 #include <qglobal.h>
 #include <QtPlugin>
 
+#if QT_VERSION >= 0x050600
 #include <QtUiPlugin/QDesignerCustomWidgetInterface>
+#else
+#include <QDesignerCustomWidgetInterface>
+#endif
 
 #ifndef NO_QWT_PLOT
 #include "qwt_plot.h"
@@ -482,7 +486,10 @@ namespace
     {
         Q_OBJECT
         Q_INTERFACES( QDesignerCustomWidgetCollectionInterface )
+
+#if QT_VERSION >= 0x050000
         Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QDesignerCustomWidgetCollectionInterface" )
+#endif
 
       public:
         WidgetCollectionInterface()
@@ -523,5 +530,9 @@ namespace
         QList< QDesignerCustomWidgetInterface* > m_plugins;
     };
 }
+
+#if QT_VERSION < 0x050000
+Q_EXPORT_PLUGIN2( QwtDesignerPlugin, WidgetCollectionInterface )
+#endif
 
 #include "qwt_designer_plugin.moc"

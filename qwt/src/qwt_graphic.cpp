@@ -17,12 +17,17 @@
 #include <qimage.h>
 #include <qpixmap.h>
 #include <qpainterpath.h>
+
+#if QT_VERSION >= 0x050000
+
 #include <qguiapplication.h>
 
 static inline qreal qwtDevicePixelRatio()
 {
     return qGuiApp ? qGuiApp->devicePixelRatio() : 1.0;
 }
+
+#endif
 
 static bool qwtHasScalablePen( const QPainter* painter )
 {
@@ -33,6 +38,14 @@ static bool qwtHasScalablePen( const QPainter* painter )
     if ( pen.style() != Qt::NoPen && pen.brush().style() != Qt::NoBrush )
     {
         scalablePen = !pen.isCosmetic();
+#if QT_VERSION < 0x050000
+        if ( !scalablePen && pen.widthF() == 0.0 )
+        {
+            const QPainter::RenderHints hints = painter->renderHints();
+            if ( hints.testFlag( QPainter::NonCosmeticDefaultPen ) )
+                scalablePen = true;
+        }
+#endif
     }
 
     return scalablePen;
@@ -79,6 +92,14 @@ static inline void qwtExecCommand(
             if ( painter->transform().isScaling() )
             {
                 bool isCosmetic = painter->pen().isCosmetic();
+#if QT_VERSION < 0x050000
+                if ( isCosmetic && painter->pen().widthF() == 0.0 )
+                {
+                    QPainter::RenderHints hints = painter->renderHints();
+                    if ( hints.testFlag( QPainter::NonCosmeticDefaultPen ) )
+                        isCosmetic = false;
+                }
+#endif
 
                 if ( isCosmetic )
                 {
@@ -795,6 +816,7 @@ QPixmap QwtGraphic::toPixmap( qreal devicePixelRatio ) const
 
     const QSizeF sz = defaultSize();
 
+#if QT_VERSION >= 0x050000
     if ( devicePixelRatio <= 0.0 )
         devicePixelRatio = qwtDevicePixelRatio();
 
@@ -803,6 +825,15 @@ QPixmap QwtGraphic::toPixmap( qreal devicePixelRatio ) const
 
     QPixmap pixmap( w, h );
     pixmap.setDevicePixelRatio( devicePixelRatio );
+#else
+    Q_UNUSED( devicePixelRatio )
+
+    const int w = qwtCeil( sz.width() );
+    const int h = qwtCeil( sz.height() );
+
+    QPixmap pixmap( w, h );
+#endif
+
     pixmap.fill( Qt::transparent );
 
     const QRectF r( 0.0, 0.0, sz.width(), sz.height() );
@@ -832,6 +863,7 @@ QPixmap QwtGraphic::toPixmap( qreal devicePixelRatio ) const
 QPixmap QwtGraphic::toPixmap( const QSize& size,
     Qt::AspectRatioMode aspectRatioMode, qreal devicePixelRatio ) const
 {
+#if QT_VERSION >= 0x050000
     if ( devicePixelRatio <= 0.0 )
         devicePixelRatio = qwtDevicePixelRatio();
 
@@ -840,6 +872,10 @@ QPixmap QwtGraphic::toPixmap( const QSize& size,
 
     QPixmap pixmap( w, h );
     pixmap.setDevicePixelRatio( devicePixelRatio );
+#else
+    Q_UNUSED( devicePixelRatio )
+    QPixmap pixmap( size );
+#endif
     pixmap.fill( Qt::transparent );
 
     const QRect r( 0, 0, size.width(), size.height() );
@@ -871,6 +907,7 @@ QPixmap QwtGraphic::toPixmap( const QSize& size,
 QImage QwtGraphic::toImage( const QSize& size,
     Qt::AspectRatioMode aspectRatioMode, qreal devicePixelRatio  ) const
 {
+#if QT_VERSION >= 0x050000
     if ( devicePixelRatio <= 0.0 )
         devicePixelRatio = qwtDevicePixelRatio();
 
@@ -879,6 +916,11 @@ QImage QwtGraphic::toImage( const QSize& size,
 
     QImage image( w, h, QImage::Format_ARGB32_Premultiplied );
     image.setDevicePixelRatio( devicePixelRatio );
+#else
+    Q_UNUSED( devicePixelRatio )
+    QImage image( size, QImage::Format_ARGB32_Premultiplied );
+#endif
+
     image.fill( 0 );
 
     const QRect r( 0, 0, size.width(), size.height() );
@@ -915,6 +957,7 @@ QImage QwtGraphic::toImage( qreal devicePixelRatio ) const
 
     const QSizeF sz = defaultSize();
 
+#if QT_VERSION >= 0x050000
     if ( devicePixelRatio <= 0.0 )
         devicePixelRatio = qwtDevicePixelRatio();
 
@@ -923,6 +966,15 @@ QImage QwtGraphic::toImage( qreal devicePixelRatio ) const
 
     QImage image( w, h, QImage::Format_ARGB32 );
     image.setDevicePixelRatio( devicePixelRatio );
+#else
+    Q_UNUSED( devicePixelRatio )
+
+    const int w = qwtCeil( sz.width() );
+    const int h = qwtCeil( sz.height() );
+
+    QImage image( w, h, QImage::Format_ARGB32 );
+#endif
+
     image.fill( 0 );
 
     const QRect r( 0, 0, sz.width(), sz.height() );

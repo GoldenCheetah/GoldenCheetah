@@ -272,7 +272,11 @@ QDateTime QwtDateScaleDraw::toDateTime( double value ) const
     if ( m_data->timeSpec == Qt::OffsetFromUTC )
     {
         dt = dt.addSecs( m_data->utcOffset );
+#if QT_VERSION >= 0x050200
         dt.setOffsetFromUtc( m_data->utcOffset );
+#else
+        dt.setUtcOffset( m_data->utcOffset );
+#endif
     }
 
     return dt;

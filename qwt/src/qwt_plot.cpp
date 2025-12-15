@@ -806,6 +806,11 @@ void QwtPlot::drawItems( QPainter* painter, const QRectF& canvasRect,
             painter->setRenderHint( QPainter::Antialiasing,
                 item->testRenderHint( QwtPlotItem::RenderAntialiased ) );
 
+#if QT_VERSION < 0x050100
+            painter->setRenderHint( QPainter::HighQualityAntialiasing,
+                item->testRenderHint( QwtPlotItem::RenderAntialiased ) );
+#endif
+
             item->draw( painter,
                 mapTable.map( xAxis ), mapTable.map( yAxis ), canvasRect );
 

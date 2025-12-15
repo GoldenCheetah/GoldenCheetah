@@ -48,7 +48,11 @@ void PlotBox::printDocument()
     }
 
     printer.setCreator( "polar plot demo example" );
+#if QT_VERSION >= 0x050300
     printer.setPageOrientation( QPageLayout::Landscape );
+#else
+    printer.setOrientation( QPrinter::Landscape );
+#endif
 
     QPrintDialog dialog( &printer );
     if ( dialog.exec() )

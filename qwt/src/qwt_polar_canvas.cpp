@@ -137,7 +137,11 @@ void QwtPolarCanvas::setPaintAttribute( PaintAttribute attribute, bool on )
                 if ( isVisible() )
                 {
                     const QRect cr = contentsRect();
+#if QT_VERSION >= 0x050000
                     *m_data->backingStore = grab( cr );
+#else
+                    *m_data->backingStore = QPixmap::grabWidget( this, cr );
+#endif
                 }
             }
             else

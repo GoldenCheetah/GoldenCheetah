@@ -832,7 +832,8 @@ int QwtKnob::markerSize() const
  */
 QSize QwtKnob::sizeHint() const
 {
-    return qwtKnobSizeHint( this, 50 );
+    const QSize hint = qwtKnobSizeHint( this, 50 );
+    return qwtExpandedToGlobalStrut( hint );
 }
 
 /*!

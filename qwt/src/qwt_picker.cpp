@@ -1099,8 +1099,11 @@ void QwtPicker::widgetMouseDoubleClickEvent( QMouseEvent* mouseEvent )
  */
 void QwtPicker::widgetWheelEvent( QWheelEvent* wheelEvent )
 {
+#if QT_VERSION < 0x050e00
+    const QPoint wheelPos = wheelEvent->pos();
+#else
     const QPoint wheelPos = wheelEvent->position().toPoint();
-
+#endif
     if ( pickArea().contains( wheelPos ) )
         m_data->trackerPosition = wheelPos;
     else
@@ -1376,7 +1379,12 @@ void QwtPicker::remove()
 {
     if ( m_data->isActive && !m_data->pickedPoints.isEmpty() )
     {
+#if QT_VERSION >= 0x050100
         const QPoint pos = m_data->pickedPoints.takeLast();
+#else
+        const QPoint pos = m_data->pickedPoints.last();
+        m_data->pickedPoints.resize( m_data->pickedPoints.count() - 1 );
+#endif
 
         updateDisplay();
         Q_EMIT removed( pos );

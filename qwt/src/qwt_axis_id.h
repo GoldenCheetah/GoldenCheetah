@@ -56,10 +56,28 @@ inline bool QwtAxisId::isYAxis() const
     return QwtAxis::isYAxis( pos );
 }
 
+#if QT_VERSION < 0x050000
+
+inline uint qHash( const QwtAxisId &axisId ) noexcept
+{
+    return qHash(axisId.pos) ^ qHash(axisId.id);
+}
+
+#elif QT_VERSION < 0x060000
+
+inline uint qHash( const QwtAxisId& axisId, uint seed = 0 ) noexcept
+{
+    return qHash( axisId.pos, seed ) ^ qHash( axisId.id, seed );
+}
+
+#else
+
 inline size_t qHash( const QwtAxisId& axisId, size_t seed = 0 ) noexcept
 {
     return qHash( axisId.pos, seed ) ^ qHash( axisId.id, seed );
 }
+
+#endif
 
 namespace QwtAxis
 {

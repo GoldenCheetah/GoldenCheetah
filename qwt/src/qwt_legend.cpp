@@ -756,7 +756,11 @@ void QwtLegend::renderItem( QPainter* painter,
         titleRect.setX( iconRect.right() + 2 * label->spacing() );
 
         QFont labelFont = label->font();
+#if QT_VERSION >= 0x060000
         labelFont.setResolveMask( QFont::AllPropertiesResolved );
+#else
+        labelFont.resolve( QFont::AllPropertiesResolved );
+#endif
 
         painter->setFont( labelFont );
         painter->setPen( label->palette().color( QPalette::Text ) );

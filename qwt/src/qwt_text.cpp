@@ -19,10 +19,14 @@
 #include <qbrush.h>
 #include <qpainter.h>
 
+#if QT_VERSION >= 0x050200
+
 static QwtText qwtStringToText( const QString& text )
 {
     return QwtText( text );
 }
+
+#endif
 
 namespace
 {
@@ -32,7 +36,9 @@ namespace
         {
             qRegisterMetaType< QwtText >();
 
+#if QT_VERSION >= 0x050200
             QMetaType::registerConverter< QString, QwtText >( qwtStringToText );
+#endif
         }
 
     } qwtRegisterQwtText;

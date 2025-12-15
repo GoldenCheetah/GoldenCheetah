@@ -13,6 +13,10 @@
 #include "qwt_global.h"
 #include "qwt_raster_data.h"
 
+#if QT_VERSION < 0x060000
+template< typename T > class QVector;
+#endif
+
 /*!
    \brief A class representing a matrix of values as raster data
 

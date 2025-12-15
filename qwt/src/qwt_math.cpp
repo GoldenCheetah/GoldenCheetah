@@ -8,7 +8,9 @@
  *****************************************************************************/
 
 #include "qwt_math.h"
+#if QT_VERSION >= 0x050a00
 #include <qrandom.h>
+#endif
 
 /*!
    \brief Normalize an angle to be int the range [0.0, 2 * PI[
@@ -45,5 +47,9 @@ double qwtNormalizeDegrees( double degrees )
  */
 quint32 qwtRand()
 {
+#if QT_VERSION >= 0x050a00
     return QRandomGenerator::global()->generate();
+#else
+    return static_cast< quint32 >( qrand() ); // [0, RAND_MAX ]
+#endif
 }

@@ -19,6 +19,10 @@ class QPainterPath;
 class QLineF;
 class QPolygonF;
 
+#if QT_VERSION < 0x060000
+template< typename T > class QVector;
+#endif
+
 /*!
    \brief Base class for all splines
 

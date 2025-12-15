@@ -304,9 +304,13 @@ void QwtAbstractSlider::wheelEvent( QWheelEvent* event )
     if ( !m_data->isValid || m_data->isScrolling )
         return;
 
+#if QT_VERSION < 0x050000
+    const int wheelDelta = event->delta();
+#else
     const QPoint delta = event->angleDelta();
     const int wheelDelta = ( qAbs( delta.x() ) > qAbs( delta.y() ) )
         ? delta.x() : delta.y();
+#endif
 
     int numSteps = 0;
 

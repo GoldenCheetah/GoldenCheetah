@@ -88,7 +88,12 @@ void QwtPlotCanvas::setPaintAttribute( PaintAttribute attribute, bool on )
 
                 if ( isVisible() )
                 {
+#if QT_VERSION >= 0x050000
                     *m_data->backingStore = grab( rect() );
+#else
+                    *m_data->backingStore =
+                        QPixmap::grabWidget( this, rect() );
+#endif
                 }
             }
             else

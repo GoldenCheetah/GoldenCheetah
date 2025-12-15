@@ -34,11 +34,17 @@ static QRegion qwtAlphaMask( const QImage& image, const QRegion& region )
     QRegion mask;
     QRect rect;
 
+#if QT_VERSION >= 0x050800
     for ( QRegion::const_iterator it = region.cbegin();
         it != region.cend(); ++it )
     {
         const QRect& r = *it;
-
+#else
+    const QVector< QRect > rects = region.rects();
+    for ( int i = 0; i < rects.size(); i++ )
+    {
+        const QRect& r = rects[i];
+#endif
         int x1, x2, y1, y2;
         r.getCoords( &x1, &y1, &x2, &y2 );
 
@@ -286,12 +292,21 @@ void QwtWidgetOverlay::paintEvent( QPaintEvent* event )
         }
         else
         {
+#if QT_VERSION >= 0x050800
             for ( QRegion::const_iterator it = clipRegion.cbegin();
                 it != clipRegion.cend(); ++it )
             {
                 const QRect& r = *it;
                 painter.drawImage( r.topLeft(), image, r );
             }
+#else
+            const QVector< QRect > rects = clipRegion.rects();
+            for ( int i = 0; i < rects.size(); i++ )
+            {
+                const QRect& r = rects[i];
+                painter.drawImage( r.topLeft(), image, r );
+            }
+#endif
         }
     }
     else

@@ -34,12 +34,26 @@
 
 #ifndef QT_NO_PDF
 
+// QPdfWriter::setResolution() has been introduced with
+// Qt 5.3. Guess it is o.k. to stay with QPrinter for older
+// versions.
+
+#if QT_VERSION >= 0x050300
+
 #ifndef QWT_FORMAT_PDF
 #define QWT_FORMAT_PDF 1
 #endif
 
 #define QWT_PDF_WRITER 1
 
+#endif
+#endif
+
+#ifndef QT_NO_PRINTER
+// postscript support has been dropped in Qt5
+#if QT_VERSION < 0x050000
+#define QWT_FORMAT_POSTSCRIPT 1
+#endif
 #endif
 
 #if QWT_FORMAT_SVG

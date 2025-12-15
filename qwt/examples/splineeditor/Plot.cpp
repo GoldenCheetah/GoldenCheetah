@@ -576,7 +576,11 @@ void Plot::setOverlaying( bool on )
 void Plot::printPlot()
 {
     QPrinter printer( QPrinter::HighResolution );
+#if QT_VERSION >= 0x050300
     printer.setPageOrientation( QPageLayout::Landscape );
+#else
+    printer.setOrientation( QPrinter::Landscape );
+#endif
     printer.setOutputFileName( "spline.pdf" );
 
     QPrintDialog dialog( &printer );

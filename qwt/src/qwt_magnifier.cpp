@@ -437,9 +437,13 @@ void QwtMagnifier::widgetWheelEvent( QWheelEvent* wheelEvent )
 
     if ( m_data->wheelFactor != 0.0 )
     {
+#if QT_VERSION < 0x050000
+        const int wheelDelta = wheelEvent->delta();
+#else
         const QPoint delta = wheelEvent->angleDelta();
         const int wheelDelta = ( qAbs( delta.x() ) > qAbs( delta.y() ) )
             ? delta.x() : delta.y();
+#endif
 
         /*
             A positive delta indicates that the wheel was

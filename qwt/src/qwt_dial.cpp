@@ -688,7 +688,11 @@ QSize QwtDial::sizeHint() const
 
     const int d = 6 * sh + 2 * lineWidth();
 
-    return QSize( d, d );
+    QSize hint( d, d );
+    if ( !isReadOnly() )
+        hint = qwtExpandedToGlobalStrut( hint );
+
+    return hint;
 }
 
 /*!
@@ -824,7 +828,11 @@ void QwtDial::changeEvent( QEvent* event )
  */
 void QwtDial::wheelEvent( QWheelEvent* event )
 {
+#if QT_VERSION < 0x050e00
+    const QPoint wheelPos = event->pos();
+#else
     const QPoint wheelPos = event->position().toPoint();
+#endif
 
     const QRegion region( innerRect(), QRegion::Ellipse );
     if ( region.contains( wheelPos ) )

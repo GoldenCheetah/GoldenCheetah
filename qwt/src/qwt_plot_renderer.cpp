@@ -41,12 +41,26 @@
 
 #ifndef QT_NO_PDF
 
+// QPdfWriter::setResolution() has been introduced with
+// Qt 5.3. Guess it is o.k. to stay with QPrinter for older
+// versions.
+
+#if QT_VERSION >= 0x050300
+
 #ifndef QWT_FORMAT_PDF
 #define QWT_FORMAT_PDF 1
 #endif
 
 #define QWT_PDF_WRITER 1
 
+#endif
+#endif
+
+#ifndef QT_NO_PRINTER
+// postscript support has been dropped in Qt5
+#if QT_VERSION < 0x050000
+#define QWT_FORMAT_POSTSCRIPT 1
+#endif
 #endif
 
 #if QWT_FORMAT_SVG
@@ -103,8 +117,11 @@ static QPainterPath qwtCanvasClip(
 static inline QFont qwtResolvedFont( const QWidget* widget )
 {
     QFont font = widget->font();
-
+#if QT_VERSION >= 0x060000
     font.setResolveMask( QFont::AllPropertiesResolved );
+#else
+    font.resolve( QFont::AllPropertiesResolved );
+#endif
 
     return font;
 }
