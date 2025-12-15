@@ -134,7 +134,14 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     garminHWMarkedit->setSuffix(" " + tr("s"));
     garminHWMarkedit->setValue(garminHWMark.toInt());
 
-    connect(garminSmartRecord, &QCheckBox::stateChanged, this, [this](int state) { garminHWMarkedit->setEnabled(state); });
+    connect(garminSmartRecord, 
+#if QT_VERSION < 0x060700
+            &QCheckBox::stateChanged,
+#else
+            QOverload<Qt::CheckState>::of(&QCheckBox::checkStateChanged),
+#endif
+            this, [this](int state) { garminHWMarkedit->setEnabled(state); });
+
     garminSmartRecord->setCheckState(! (isGarminSmartRecording.toInt() > 0) ? Qt::Checked : Qt::Unchecked);
     garminSmartRecord->setCheckState(isGarminSmartRecording.toInt() > 0 ? Qt::Checked : Qt::Unchecked);
 
@@ -193,7 +200,13 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     //XXrBrowseButton->setFixedWidth(120);
 
     connect(rBrowseButton, SIGNAL(clicked()), this, SLOT(browseRDir()));
-    connect(embedR, &QCheckBox::stateChanged, this, [this](int state) { rDirectorySel->setEnabled(state); });
+    connect(embedR,
+#if QT_VERSION < 0x060700
+            &QCheckBox::stateChanged,
+#else
+            QOverload<Qt::CheckState>::of(&QCheckBox::checkStateChanged),
+#endif
+            this, [this](int state) { rDirectorySel->setEnabled(state); });
 
     embedR->setChecked(! appsettings->value(NULL, GC_EMBED_R, true).toBool());
     embedR->setChecked(appsettings->value(NULL, GC_EMBED_R, true).toBool());
@@ -216,7 +229,13 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     pythonDirectoryLayout->addWidget(pythonBrowseButton);
 
     connect(pythonBrowseButton, SIGNAL(clicked()), this, SLOT(browsePythonDir()));
-    connect(embedPython, &QCheckBox::stateChanged, this, [this](int state) { pythonDirectorySel->setEnabled(state); });
+    connect(embedPython,
+#if QT_VERSION < 0x060700
+            &QCheckBox::stateChanged,
+#else
+            QOverload<Qt::CheckState>::of(&QCheckBox::checkStateChanged),
+#endif
+            this, [this](int state) { pythonDirectorySel->setEnabled(state); });
 
     embedPython->setChecked(! appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool());
     embedPython->setChecked(appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool());
