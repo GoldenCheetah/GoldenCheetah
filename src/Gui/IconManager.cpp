@@ -349,7 +349,7 @@ IconManager::downloadUrl
     timeoutTimer.setSingleShot(true);
     QEventLoop loop;
     QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-    QObject::connect(&timeoutTimer, &QTimer::timeout, [&]() {
+    QObject::connect(&timeoutTimer, &QTimer::timeout, &loop, [&]() {
         reply->abort();
         loop.quit();
     });

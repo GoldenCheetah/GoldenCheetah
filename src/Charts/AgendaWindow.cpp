@@ -80,7 +80,7 @@ AgendaWindow::AgendaWindow(Context *context)
             }
         }
     });
-    connect(agendaView, &AgendaView::viewActivity, [this, context](const CalendarEntry &activity) {
+    connect(agendaView, &AgendaView::viewActivity, this, [this, context](const CalendarEntry &activity) {
         for (RideItem *rideItem : context->athlete->rideCache->rides()) {
             if (rideItem != nullptr && rideItem->fileName == activity.reference) {
                 context->notifyRideSelected(rideItem);

@@ -155,15 +155,17 @@ GColorDialog::GColorDialog(QColor selected, QWidget *parent, bool all) : QDialog
     if (original.red() == 1 && original.green() == 1) {
         tabwidget->setCurrentIndex(0);
         for(int i=0; i<colorlist->invisibleRootItem()->childCount(); i++) {
-            if (colorlist->invisibleRootItem()->child(i)->data(0, Qt::UserRole).toInt() == original.blue()) {
-                colorlist->setCurrentItem(colorlist->invisibleRootItem()->child(i));
+            QTreeWidgetItem *item = colorlist->invisibleRootItem()->child(i);
+            if (item && item->data(0, Qt::UserRole).toInt() == original.blue()) {
+                colorlist->setCurrentItem(item);
                 break;
             }
         }
         colordialog->setCurrentColor(GColor(original.blue()));
     } else {
         tabwidget->setCurrentIndex(1);
-        colorlist->setCurrentItem(colorlist->invisibleRootItem()->child(CPOWER));
+        QTreeWidgetItem *item = colorlist->invisibleRootItem()->child(CPOWER);
+        if (item) colorlist->setCurrentItem(item);
         colordialog->setCurrentColor(original);
     }
     // returning what we got
@@ -190,7 +192,8 @@ GColorDialog::searchFilter(QString text)
     for(int i=0; i<colorlist->invisibleRootItem()->childCount(); i++) {
         if (empty) colorlist->setRowHidden(i, colorlist->rootIndex(), false);
         else {
-            QString text = colorlist->invisibleRootItem()->child(i)->text(0);
+            QTreeWidgetItem *item = colorlist->invisibleRootItem()->child(i);
+            QString text = item ? item->text(0) : "";
             bool found=false;
             foreach(QString tok, toks) {
                 if (text.contains(tok, Qt::CaseInsensitive)) {
@@ -231,7 +234,8 @@ void
 GColorDialog::gcOKClicked()
 {
     int index = colorlist->invisibleRootItem()->indexOfChild(colorlist->currentItem());
-    index = colorlist->invisibleRootItem()->child(index)->data(0, Qt::UserRole).toInt();
+    QTreeWidgetItem *item = colorlist->invisibleRootItem()->child(index);
+    if (item) index = item->data(0, Qt::UserRole).toInt();
     returning = QColor(1,1,index);
     accept();
 }

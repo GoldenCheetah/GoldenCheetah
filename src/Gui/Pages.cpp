@@ -841,7 +841,8 @@ RemotePage::RemotePage(QWidget *parent, Context *context) : QWidget(parent), con
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(fields, 0, Qt::Alignment());
 
-    fields->setCurrentItem(fields->invisibleRootItem()->child(0));
+    if (fields->invisibleRootItem()->childCount() > 0)
+        fields->setCurrentItem(fields->invisibleRootItem()->child(0));
 }
 
 qint32
@@ -851,7 +852,8 @@ RemotePage::saveClicked()
     QList<CmdMap> cmdMaps = remote->getMappings(); // Load the remote control mappings
 
     for (int i = 0; i < cmdMaps.size(); i++) {
-        int cmdIndex = fields->invisibleRootItem()->child(i)->data(1, Qt::DisplayRole).toInt();
+        QTreeWidgetItem *item = fields->invisibleRootItem()->child(i);
+        int cmdIndex = item ? item->data(1, Qt::DisplayRole).toInt() : -1;
         if (cmdIndex) {
             cmdMaps[i].setAntCmdId(antCmds[cmdIndex - 1].getCmdId());
         } else {
@@ -1143,7 +1145,8 @@ WorkoutTagManagerPage::WorkoutTagManagerPage
     connect(tw->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)), this, SLOT(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)));
     connect(dynamic_cast<QObject*>(tagStore), SIGNAL(tagsChanged(int, int, int)), this, SLOT(tagStoreChanged(int, int, int)));
 
-    tw->setCurrentItem(tw->invisibleRootItem()->child(0));
+    if (tw->invisibleRootItem()->childCount() > 0)
+        tw->setCurrentItem(tw->invisibleRootItem()->child(0));
 }
 
 
@@ -1442,7 +1445,8 @@ ColorsPage::searchFilter(QString text)
     for(int i=0; i<colors->invisibleRootItem()->childCount(); i++) {
         if (empty) colors->setRowHidden(i, colors->rootIndex(), false);
         else {
-            QString text = colors->invisibleRootItem()->child(i)->text(1);
+            QTreeWidgetItem *item = colors->invisibleRootItem()->child(i);
+            QString text = item ? item->text(1) : "";
             bool found=false;
             foreach(QString tok, toks) {
                 if (text.contains(tok, Qt::CaseInsensitive)) {
@@ -1550,6 +1554,7 @@ ColorsPage::saveClicked()
     // run down and get the current colors and save
     for (int i=0; colorSet[i].name != ""; i++) {
         QTreeWidgetItem *current = colors->invisibleRootItem()->child(i);
+        if (!current) continue;
         QColor newColor = ((ColorButton*)colors->itemWidget(current, 2))->getColor();
         QString colorstring = QString("%1:%2:%3").arg(newColor.red())
                                                  .arg(newColor.green())
@@ -2165,7 +2170,8 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
         });
     });
 
-    keywords->setCurrentItem(keywords->invisibleRootItem()->child(0));
+    if (keywords->invisibleRootItem()->childCount() > 0)
+        keywords->setCurrentItem(keywords->invisibleRootItem()->child(0));
 }
 
 void
@@ -2286,6 +2292,7 @@ KeywordsPage::getDefinitions(QList<KeywordDefinition> &keywordList)
     for (int idx =0; idx < keywords->invisibleRootItem()->childCount(); idx++) {
         KeywordDefinition add;
         QTreeWidgetItem *item = keywords->invisibleRootItem()->child(idx);
+        if (!item) continue;
 
         add.name = item->text(0);
         add.color = ((ColorButton*)keywords->itemWidget(item, 1))->getColor();
@@ -2900,7 +2907,8 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
         });
     });
 
-    fields->setCurrentItem(fields->invisibleRootItem()->child(0));
+    if (fields->invisibleRootItem()->childCount() > 0)
+        fields->setCurrentItem(fields->invisibleRootItem()->child(0));
 }
 
 void
@@ -2999,6 +3007,7 @@ FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
 
         FieldDefinition add;
         QTreeWidgetItem *item = fields->invisibleRootItem()->child(idx);
+        if (!item) continue;
 
         // silently ignore duplicates
         if (checkdups.contains(item->text(1))) continue;
@@ -3104,6 +3113,7 @@ ProcessorPage::saveClicked()
     // write away separately
     for (int i = 0; i < processorTree->invisibleRootItem()->childCount(); i++) {
         QTreeWidgetItem *item = processorTree->invisibleRootItem()->child(i);
+        if (!item) continue;
         QString id = item->data(PROCESSORTREE_COL_ID, Qt::DisplayRole).toString();
 
         if (dps.contains(id)) {
@@ -3266,6 +3276,7 @@ ProcessorPage::reload
     QTreeWidgetItem *selItem = nullptr;
     for (int i = 0; i < processorTree->invisibleRootItem()->childCount(); ++i) {
         QTreeWidgetItem *nextItem = processorTree->invisibleRootItem()->child(i);
+        if (!nextItem) continue;
         if (! nextItem->isHidden()) {
             selItem = nextItem;
         }
@@ -3285,6 +3296,7 @@ ProcessorPage::reload
     QTreeWidgetItem *selItem = nullptr;
     for (int i = 0; i <= selectRow && i < processorTree->invisibleRootItem()->childCount(); ++i) {
         QTreeWidgetItem *nextItem = processorTree->invisibleRootItem()->child(i);
+        if (!nextItem) continue;
         if (! nextItem->isHidden()) {
             selItem = nextItem;
         }
@@ -3367,6 +3379,7 @@ ProcessorPage::toggleCoreProcessors
     QTreeWidgetItem *firstVisible = nullptr;
     for (int i = 0; i < processorTree->invisibleRootItem()->childCount(); ++i) {
         QTreeWidgetItem *item = processorTree->invisibleRootItem()->child(i);
+        if (!item) continue;
         bool isCore = item->data(PROCESSORTREE_COL_CORE, Qt::DisplayRole).toBool();
         item->setHidden(checked && (! checked || isCore));
         if (firstVisible == nullptr && ! item->isHidden()) {
@@ -3490,7 +3503,8 @@ DefaultsPage::DefaultsPage
     connect(actionButtons, &ActionButtonBox::addRequested, this, &DefaultsPage::addClicked);
     connect(actionButtons, &ActionButtonBox::deleteRequested, this, &DefaultsPage::deleteClicked);
 
-    defaults->setCurrentItem(defaults->invisibleRootItem()->child(0));
+    if (defaults->invisibleRootItem()->childCount() > 0)
+        defaults->setCurrentItem(defaults->invisibleRootItem()->child(0));
 }
 
 void
@@ -3561,6 +3575,7 @@ DefaultsPage::getDefinitions(QList<DefaultDefinition> &defaultList)
 
         DefaultDefinition add;
         QTreeWidgetItem *item = defaults->invisibleRootItem()->child(idx);
+        if (!item) continue;
 
         add.field = sp.internalName(item->text(0));
         add.value = item->text(1);

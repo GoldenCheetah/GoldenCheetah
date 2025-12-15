@@ -72,7 +72,7 @@ class FixSpikesConfig : public DataProcessorConfig
             medWinSize->setSuffix(" " + tr("Points"));
 
             // Ensure only odd numbers are set for the median window
-            connect(medWinSize, QOverload<int>::of(&QSpinBox::valueChanged),
+            connect(medWinSize, QOverload<int>::of(&QSpinBox::valueChanged), this,
                 [=](int i) {(i % 2) ? medWinSize->setValue(i) : medWinSize->setValue(i + 1); });
 
             layout->addRow("", algo);
