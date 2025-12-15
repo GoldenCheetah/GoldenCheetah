@@ -278,9 +278,7 @@ QString GcCrashDialog::versionHTML()
             .arg(usbxpress)
             .arg(libusb)
             .arg(vlc)
-#if defined GC_VIDEO_QT5
-            .arg("qt5")
-#elif defined GC_VIDEO_QT6
+#if defined GC_VIDEO_QT6
             .arg("qt6")
 #elif defined GC_VIDEO_VLC
             .arg("vlc")

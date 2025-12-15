@@ -155,7 +155,6 @@ macx {
     # on mac we use native buttons and video, but have native fullscreen support
     LIBS    += -lobjc -framework IOKit -framework AppKit
 
-    # GC_VIDEO_QT5 will enable Qt5 video support,
     # GC_VIDEO_QT6 will enable Qt6 video support,
     # GC_VIDEO_VLC will enable VLC video support,
     # otherwise we have a blank videowindow, it will do nothing

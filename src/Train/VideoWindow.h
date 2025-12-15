@@ -28,7 +28,6 @@
 // Options are, GC_VIDEO_xxxx where xxxx is one of:
 // GC_VIDEO_VLC
 // GC_VIDEO_NONE
-// GC_VIDEO_QT5
 // GC_VIDEO_QT6
 //
 // If the user hasn't set one of the above then we determine
@@ -40,7 +39,7 @@
 #ifdef Q_OS_MAC
 
 // if we aint chosen one or the other then use none
-#if !defined GC_VIDEO_NONE && !defined GC_VIDEO_QT5 && !defined GC_VIDEO_QT6 && !defined GC_VIDEO_VLC
+#if !defined GC_VIDEO_NONE && !defined GC_VIDEO_QT6 && !defined GC_VIDEO_VLC
 #define GC_VIDEO_NONE
 #endif
 
@@ -50,8 +49,8 @@
 #endif
 
 // but qt5 *is* supported, but use at your own risk!
-#if defined (GC_VIDEO_QT5) || defined (GC_VIDEO_QT6)
-#warning "QT 5/6 video is supported experimentally in this version"
+#if defined (GC_VIDEO_QT6)
+#warning "QT6 video is supported experimentally in this version"
 #endif
 
 #endif //Q_OS_MAC
@@ -63,14 +62,14 @@
 #if defined Q_OS_LINUX || defined Q_OS_WIN
 
 // did the user specify location for VLC but not GC_VIDEO_XXXX
-#if defined GC_HAVE_VLC && !defined GC_VIDEO_NONE && !defined GC_VIDEO_QT5 && !defined GC_VIDEO_QT6
+#if defined GC_HAVE_VLC && !defined GC_VIDEO_NONE && !defined GC_VIDEO_QT6
 #if !defined GC_VIDEO_VLC
 #define GC_VIDEO_VLC
 #endif
 #endif
 
 // if we aint chosen one then use none
-#if !defined GC_VIDEO_NONE && !defined GC_VIDEO_QT5 && !defined GC_VIDEO_QT6 && !defined GC_VIDEO_VLC
+#if !defined GC_VIDEO_NONE && !defined GC_VIDEO_QT6 && !defined GC_VIDEO_VLC
 #define GC_VIDEO_NONE
 #endif
 
@@ -98,15 +97,10 @@ extern "C" {
 
 #endif // VLC
 
-#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6) // QT5/6 Video Stuff
+#if defined(GC_VIDEO_QT6) // QT6 Video Stuff
 #include <QVideoWidget>
 #include <QMediaPlayer>
-#endif
-#ifdef GC_VIDEO_QT6
 #include <QAudioOutput>
-#endif
-#ifdef GC_VIDEO_QT5
-#include <QMediaContent>
 #endif
 
 // QT stuff etc
@@ -310,10 +304,7 @@ class VideoWindow : public GcChartWindow
         mutable OrderedAsync vlcDispatch;
 #endif
 
-#ifdef GC_VIDEO_QT5
-        QMediaContent mc;
-#endif
-#if defined(GC_VIDEO_QT5) || defined(GC_VIDEO_QT6)
+#if defined(GC_VIDEO_QT6)
         // QT native
         QVideoWidget *wd;
         QMediaPlayer *mp;
