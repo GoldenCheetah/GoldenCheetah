@@ -436,7 +436,6 @@ void VideoWindow::startPlayback()
         double videoSyncFrameRate = currentVideoSyncFile->videoFrameRate();
         if (videoSyncFrameRate > 0.) {
             bool ok=false;
-#ifdef GC_VIDEO_QT6
             auto md = mp->metaData();
             auto rate = md.value(QMediaMetaData::VideoFrameRate);
             
@@ -444,7 +443,6 @@ void VideoWindow::startPlayback()
             if (mediaFrameRate > 0.) {
                 videoSyncTimeAdjustFactor = videoSyncFrameRate / mediaFrameRate;
             }
-#endif
             if (!ok) //fallback to duration
             {
                 // QT5 doesn't expose media frame rate so make due with duration.

@@ -43,14 +43,14 @@
 #define GC_VIDEO_NONE
 #endif
 
-// but qt5 and vlc are not experimental options !
+// but vlc is an experimental option !
 #if defined GC_VIDEO_VLC
 #warning "VLC is supported experimentally on Mac OS X builds of GoldenCheetah"
 #endif
 
-// but qt5 *is* supported, but use at your own risk!
+// but qt6 *is* supported, but use at your own risk!
 #if defined (GC_VIDEO_QT6)
-#warning "QT6 video is supported experimentally in this version"
+#warning "QT6 video is supported experimentally on Mac OS X builds of GoldenCheetah"
 #endif
 
 #endif //Q_OS_MAC

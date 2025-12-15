@@ -32,18 +32,13 @@ CONFIG(debug, debug|release) { QMAKE_CXXFLAGS += -DGC_DEBUG }
 
 
 ###========================================================================
-### QT5.14.2 officially supported which mandates c++11 support in toolchain
+### QT6.5.3 officially supported which mandates c++17 support in toolchain
 ###========================================================================
 
 # always
 QT += xml sql network svg  widgets concurrent serialport multimedia multimediawidgets \
-      webenginecore webenginewidgets webchannel positioning
-greaterThan(QT_MAJOR_VERSION, 5) {
-    QT += webenginequick core5compat
-} else {
-    QT += webengine
-}
-CONFIG += c++11
+      webenginecore webenginewidgets webchannel positioning webenginequick core5compat
+CONFIG += c++17
 
 ###==========================
 ### PRECOMPILED HEADER
@@ -527,13 +522,6 @@ equals(CloudDB, active) {
 #                                                                             #
 ###############################################################################
 
-
-
-###===========================================
-### FEATURES ENABLED WHEN HAVE QT5 [or higher]
-###===========================================
-
-# Features that only work with QT5 or higher
 SOURCES += Cloud/Dropbox.cpp
 HEADERS += Cloud/Dropbox.h
 SOURCES += Cloud/OpenData.cpp

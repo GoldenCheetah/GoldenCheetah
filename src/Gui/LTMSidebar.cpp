@@ -815,8 +815,6 @@ LTMSidebar::setAutoFilterMenu()
             GcSplitterItem *item = filterSplitter->removeItem(action->text());
             if (item) delete item; // will be removed from splitter too
 
-            // if you crash on this line compile with QT5.3 or higher
-            // or at least avoid the 5.3 RC1 release (see QTBUG-38685)
             autoFilterMenu->addAction(action);
             autoFilterState << false;
         }

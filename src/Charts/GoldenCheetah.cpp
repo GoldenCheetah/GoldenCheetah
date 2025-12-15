@@ -1014,7 +1014,7 @@ GcChartWindow::chartPropertiesFromString(QString contents) {
 
     QList<QMap<QString,QString> > returning;
 
-    // parse via MVJson to avoid QT5 dependency
+    // parse via MVJson
     MVJSONReader json(string(contents.toStdString()));
 
     if (json.root && json.root->hasField("CHART")) {
