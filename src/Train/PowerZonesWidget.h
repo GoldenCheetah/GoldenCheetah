@@ -39,17 +39,17 @@ class PowerZonesWidget : public QWidget
     Q_OBJECT
 
     public:
-        PowerZonesWidget(QList<QColor> colors, QList<QString> names, QWidget *parent = nullptr);
+        PowerZonesWidget(const QList<QColor> &colors, const QList<QString> &shortNames, const QList<QString> &names, QWidget *parent = nullptr);
         ~PowerZonesWidget();
 
-        void setPowerZones(QList<double> zones, int dominantZone, long duration);
+        void setPowerZones(const QList<double> &zones, int dominantZone, long duration);
 
         void setContentsMargins(int left, int top, int right, int bottom);
         void setContentsMargins(const QMargins &margins);
 
     public slots:
-        void setColors(QList<QColor> colors);
-        void setNames(QList<QString> names);
+        void setColors(const QList<QColor> &colors);
+        void setNames(const QList<QString> &shortNames, const QList<QString> &names);
 
     protected:
         virtual void paintEvent(QPaintEvent *event);
@@ -59,6 +59,7 @@ class PowerZonesWidget : public QWidget
 
     private:
         QList<QColor> colors;
+        QList<QString> shortNames;
         QList<QString> names;
         QList<double> zones;
         int dominantZone;
@@ -69,6 +70,7 @@ class PowerZonesWidget : public QWidget
 
         int rowTop(int rowHeight, int row) const;
         QColor color(int idx) const;
+        QString shortName(int idx) const;
         QString name(int idx) const;
         void fillDetailsDoc();
         void adjustHeight();

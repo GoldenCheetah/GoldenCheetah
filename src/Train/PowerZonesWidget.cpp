@@ -27,8 +27,8 @@
 
 
 PowerZonesWidget::PowerZonesWidget
-(QList<QColor> colors, QList<QString> names, QWidget *parent)
-: QWidget(parent), colors(colors), names(names), zones(), dominantZone(0), duration(0), collapsed(true)
+(const QList<QColor> &colors, const QList<QString> &shortNames, const QList<QString> &names, QWidget *parent)
+: QWidget(parent), colors(colors), shortNames(shortNames), names(names), zones(), dominantZone(0), duration(0), collapsed(true)
 {
     setContentsMargins(0, 0, 0, 0);
     setCursor(Qt::PointingHandCursor);
@@ -66,7 +66,7 @@ PowerZonesWidget::setContentsMargins
 
 void
 PowerZonesWidget::setPowerZones
-(QList<double> zones, int dominantZone, long duration)
+(const QList<double> &zones, int dominantZone, long duration)
 {
     this->zones = zones;
     this->dominantZone = dominantZone;
@@ -78,7 +78,7 @@ PowerZonesWidget::setPowerZones
 
 void
 PowerZonesWidget::setColors
-(QList<QColor> colors)
+(const QList<QColor> &colors)
 {
     this->colors = colors;
     fillDetailsDoc();
@@ -88,8 +88,9 @@ PowerZonesWidget::setColors
 
 void
 PowerZonesWidget::setNames
-(QList<QString> names)
+(const QList<QString> &shortNames, const QList<QString> &names)
 {
+    this->shortNames = shortNames;
     this->names = names;
     fillDetailsDoc();
     repaint();
@@ -134,7 +135,7 @@ PowerZonesWidget::paintEvent
         }
         painter.fillRect(zoneBarRect, color(i));
         painter.setPen(QPen(GCColor::invertColor(color(i))));
-        painter.drawText(zoneBarRect, Qt::AlignCenter, QString("Z%1").arg(i + 1));
+        painter.drawText(zoneBarRect, Qt::AlignCenter, shortName(i));
         sumPercentLeft += zones[i];
         lastRight = zoneLeft + zoneWidth;
     }
@@ -215,6 +216,18 @@ PowerZonesWidget::color
 
 
 QString
+PowerZonesWidget::shortName
+(int idx) const
+{
+    if (idx >= 0 && idx < shortNames.length()) {
+        return shortNames[idx];
+    } else {
+        return "_out of range_";
+    }
+}
+
+
+QString
 PowerZonesWidget::name
 (int idx) const
 {
@@ -248,12 +261,12 @@ PowerZonesWidget::fillDetailsDoc
         }
         if (i == dominantZone - 1) {
             detailsText.append(QString("<tr><td%6>&nbsp;</td>"
-                                       "    <td><b>Z%1</b></td>"
+                                       "    <td><b>%1</b></td>"
                                        "    <td><b>%2</b></td>"
                                        "    <td><b>%3:%4</b></td>"
                                        "    <td align=\"right\"><b>%5 %</b></td>"
                                        "</tr>")
-                                     .arg(i + 1)
+                                     .arg(shortName(i))
                                      .arg(name(i))
                                      .arg(durationHours, 2, 10, QChar('0'))
                                      .arg(durationMins, 2, 10, QChar('0'))
@@ -261,12 +274,12 @@ PowerZonesWidget::fillDetailsDoc
                                      .arg(cellColor));
         } else {
             detailsText.append(QString("<tr><td%6>&nbsp;</td>"
-                                       "    <td%7>Z%1</td>"
+                                       "    <td%7>%1</td>"
                                        "    <td%7>%2</td>"
                                        "    <td%7>%3:%4</td>"
                                        "    <td align=\"right\" %7>%5 %</td>"
                                        "</tr>")
-                                     .arg(i + 1)
+                                     .arg(shortName(i))
                                      .arg(name(i))
                                      .arg(durationHours, 2, 10, QChar('0'))
                                      .arg(durationMins, 2, 10, QChar('0'))
