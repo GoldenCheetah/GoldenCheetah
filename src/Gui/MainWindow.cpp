@@ -893,9 +893,7 @@ MainWindow::importChart()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Select Chart file to import"), "", tr("GoldenCheetah Chart Files (*.gchart)"));
 
-    if (fileName.isEmpty()) {
-        QMessageBox::critical(this, tr("Import Chart"), tr("No chart file selected!"));
-    } else {
+    if (!fileName.isEmpty()) {
         importCharts(QStringList()<<fileName);
     }
 }
