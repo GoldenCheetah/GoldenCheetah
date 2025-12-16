@@ -117,10 +117,12 @@ void
 IconManager::assignIcon
 (const QString &field, const QString &value, const QString &filename)
 {
+    // Normalize Sport values
+    QString normValue = field == "Sport" ? RideFile::sportTag(value) : value;
     if (! filename.isEmpty()) {
-        icons[field][value] = filename;
+        icons[field][normValue] = filename;
     } else if (icons.contains(field)) {
-        icons[field].remove(value);
+        icons[field].remove(normValue);
     }
     saveConfig();
 }
