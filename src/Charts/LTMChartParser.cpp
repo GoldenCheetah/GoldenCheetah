@@ -182,10 +182,9 @@ ChartTreeView::dropEvent(QDropEvent* event)
     context->notifyPresetsChanged();
 
     clearSelection();
-    // xxx dgr removed because
-    // select it!
     /*foreach (int idx, idxToList) {
-        invisibleRootItem()->child(idx)->setSelected(true);
+        QTreeWidgetItem *item = invisibleRootItem()->child(idx);
+        if (item) item->setSelected(true);
     }*/
 }
 

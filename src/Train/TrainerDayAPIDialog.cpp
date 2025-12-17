@@ -359,7 +359,7 @@ TrainerDayAPIDialog::parseWorkoutResults
                     zoneColors << zoneColor(j, numZones);
                 }
             }
-            PowerZonesWidget *powerZones = new PowerZonesWidget(zoneColors, context->athlete->zones("Bike")->getZoneDescriptions(zonerange));
+            PowerZonesWidget *powerZones = new PowerZonesWidget(zoneColors, context->athlete->zones("Bike")->getZoneNames(zonerange), context->athlete->zones("Bike")->getZoneDescriptions(zonerange));
             powerZones->setPowerZones(ergFile->powerZonesPC(), ergFile->dominantZoneInt(), ergFile->duration());
             powerZones->setContentsMargins(0, 5, 0, 10);
 

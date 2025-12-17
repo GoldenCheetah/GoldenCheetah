@@ -507,7 +507,7 @@ ManualActivityPageWorkout::ManualActivityPageWorkout
             zoneColors << zoneColor(j, numZones);
         }
     }
-    infoWidget = new InfoWidget(zoneColors, context->athlete->zones("Bike")->getZoneDescriptions(zonerange), false, false);
+    infoWidget = new InfoWidget(zoneColors, context->athlete->zones("Bike")->getZoneNames(zonerange), context->athlete->zones("Bike")->getZoneDescriptions(zonerange), false, false);
 
     QWidget *detailsWrapperWidget = new QWidget();
     QHBoxLayout *detailsWrapperLayout = new QHBoxLayout(detailsWrapperWidget);

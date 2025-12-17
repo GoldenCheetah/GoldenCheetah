@@ -276,12 +276,8 @@ processed(0), fails(0), numFilesToProcess(0), metadataCompleter(nullptr) {
         QTreeWidgetItem* current = files->invisibleRootItem()->child(i);
 
         connect(static_cast<QCheckBox*>(files->itemWidget(current, 0)),
-#if QT_VERSION < 0x060700
-            QOverload<int>::of(&QCheckBox::stateChanged),
-#else
-            QOverload<Qt::CheckState>::of(&QCheckBox::checkStateChanged),
-#endif
-            this, [=](int) { this->fileSelected(current); });
+            QOverload<int>::of(&QCheckBox::stateChanged), this,
+            [=](int) { this->fileSelected(current); });
     }
 
     // Data processor signals
