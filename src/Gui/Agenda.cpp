@@ -911,17 +911,17 @@ AgendaView::AgendaView
     seasonLabel->setFont(seasonFont);
 
     activityTree = new ActivityTree();
-    connect(activityTree, &ActivityTree::dayChanged, [this](const QDate &date) { emit dayChanged(date); });
-    connect(activityTree, &ActivityTree::showInTrainMode, [this](const CalendarEntry &activity) { emit showInTrainMode(activity); });
-    connect(activityTree, &ActivityTree::viewActivity, [this](const CalendarEntry &activity) { emit viewActivity(activity); });
+    connect(activityTree, &ActivityTree::dayChanged, this, [this](const QDate &date) { emit dayChanged(date); });
+    connect(activityTree, &ActivityTree::showInTrainMode, this, [this](const CalendarEntry &activity) { emit showInTrainMode(activity); });
+    connect(activityTree, &ActivityTree::viewActivity, this, [this](const CalendarEntry &activity) { emit viewActivity(activity); });
 
     phaseTree = new PhaseTree();
-    connect(phaseTree, &PhaseTree::dayChanged, [this](const QDate &date) { emit dayChanged(date); });
-    connect(phaseTree, &PhaseTree::editPhaseEntry, [this](const CalendarEntry &phase) { emit editPhaseEntry(phase); });
+    connect(phaseTree, &PhaseTree::dayChanged, this, [this](const QDate &date) { emit dayChanged(date); });
+    connect(phaseTree, &PhaseTree::editPhaseEntry, this, [this](const CalendarEntry &phase) { emit editPhaseEntry(phase); });
 
     eventTree = new EventTree();
-    connect(eventTree, &EventTree::dayChanged, [this](const QDate &date) { emit dayChanged(date); });
-    connect(eventTree, &EventTree::editEventEntry, [this](const CalendarEntry &event) { emit editEventEntry(event); });
+    connect(eventTree, &EventTree::dayChanged, this, [this](const QDate &date) { emit dayChanged(date); });
+    connect(eventTree, &EventTree::editEventEntry, this, [this](const CalendarEntry &event) { emit editEventEntry(event); });
 
     QGridLayout* headLayout = new QGridLayout();
     headLayout->setColumnStretch(0, 1);
