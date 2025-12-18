@@ -168,11 +168,7 @@ RideItem::metaCRC()
         ba.append(i.key().toUtf8());
         ba.append(i.value().toUtf8());
     }
-#if QT_VERSION < 0x060000
-    return qChecksum(ba, ba.length());
-#else
     return qChecksum(ba);
-#endif
 }
 
 RideFile *RideItem::ride(bool open)

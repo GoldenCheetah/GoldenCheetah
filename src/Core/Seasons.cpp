@@ -235,9 +235,6 @@ SeasonParser::serialize(QString filename, QList<Season> Seasons)
     };
     file.resize(0);
     QTextStream out(&file);
-#if QT_VERSION < 0x060000
-    out.setCodec("UTF-8");
-#endif
 
     // begin document
     out << "<seasons>\n";

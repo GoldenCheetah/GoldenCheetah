@@ -63,12 +63,12 @@ AthleteTab::AthleteTab(Context *context) : QWidget(context->mainWindow), context
     homeControls->setContentsMargins(0,0,0,0);
     homeView = new TrendsView(context, homeControls);
 
-    // Diary
-    diaryControls = new QStackedWidget(this);
-    diaryControls->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
-    diaryControls->setCurrentIndex(0);
-    diaryControls->setContentsMargins(0,0,0,0);
-    diaryView = new DiaryView(context, diaryControls);
+    // Plan
+    planControls = new QStackedWidget(this);
+    planControls->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
+    planControls->setCurrentIndex(0);
+    planControls->setContentsMargins(0,0,0,0);
+    planView = new PlanView(context, planControls);
 
     // Train
     trainControls = new QStackedWidget(this);
@@ -83,12 +83,12 @@ AthleteTab::AthleteTab(Context *context) : QWidget(context->mainWindow), context
     // when switching views
     views->addWidget(homeView);
     views->addWidget(analysisView);
-    views->addWidget(diaryView);
+    views->addWidget(planView);
     views->addWidget(trainView);
 
     masterControls->addWidget(homeControls);
     masterControls->addWidget(analysisControls);
-    masterControls->addWidget(diaryControls);
+    masterControls->addWidget(planControls);
     masterControls->addWidget(trainControls);
 
     // the dialog box for the chart settings
@@ -115,7 +115,7 @@ AthleteTab::~AthleteTab()
     delete analysisView;
     delete homeView;
     delete trainView;
-    delete diaryView;
+    delete planView;
     delete views;
     delete nav;
 }
@@ -126,7 +126,7 @@ AthleteTab::close()
     analysisView->close();
     homeView->close();
     trainView->close();
-    diaryView->close();
+    planView->close();
 }
 
 /******************************************************************************
@@ -151,7 +151,7 @@ void AthleteTab::setRide(RideItem*ride)
     analysisView->setRide(ride);
     homeView->setRide(ride);
     trainView->setRide(ride);
-    diaryView->setRide(ride);
+    planView->setRide(ride);
 }
 
 AbstractView *
@@ -161,7 +161,7 @@ AthleteTab::view(int index)
         case 0 : return homeView;
         default:
         case 1 : return analysisView;
-        case 2 : return diaryView;
+        case 2 : return planView;
         case 3 : return trainView;
     }
 }
@@ -174,6 +174,9 @@ AthleteTab::selectView(int index)
     if (startupViewChangeSent && views->currentIndex() == index) return; // not changing
     startupViewChangeSent = true;
 
+    // suspend screen updates while the view is changed.
+    views->setUpdatesEnabled(false);
+
     emit viewChanged(index);
 
     // first we deselect the current
@@ -185,6 +188,9 @@ AthleteTab::selectView(int index)
     masterControls->setCurrentIndex(index);
     context->setIndex(index);
     context->mainWindow->resetPerspective(index); // set perspective for this view
+
+    // enable screen updates to render the view without flickering
+    views->setUpdatesEnabled(true);
 }
 
 void

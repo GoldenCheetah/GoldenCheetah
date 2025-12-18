@@ -9,6 +9,8 @@ equals(GC_UNITTESTS, active) {
 			   Core/season \
 			   Core/seasonParser \
 			   Core/units \
+			   Core/signalSafety \
+			   Core/splineCrash \
 			   Gui/calendarData
 	CONFIG += ordered
 } else {

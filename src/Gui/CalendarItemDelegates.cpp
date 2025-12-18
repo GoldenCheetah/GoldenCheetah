@@ -26,14 +26,17 @@
 #include <QPixmap>
 #include <QSvgRenderer>
 #include <QPainterPath>
+#include <QHeaderView>
 
 #include "CalendarData.h"
 #include "Colors.h"
+#include "Agenda.h"
 
 static bool toolTipHeadlineEntry(const QPoint &pos, QAbstractItemView *view, const CalendarDay &day, int idx);
 static bool toolTipDayEntry(const QPoint &pos, QAbstractItemView *view, const CalendarDay &day, int idx);
 static bool toolTipMore(const QPoint &pos, QAbstractItemView *view, const CalendarDay &day);
 static QRect paintHeadline(QPainter *painter, const QStyleOptionViewItem &opt, const QModelIndex &index, HitTester &headlineTester, const QString &dateFormat, int pressedEntryIdx, int leftMargin, int rightMargin, int topMargin, int lineSpacing, int radius);
+static void paintMetric(QPainter *painter, const QRect &rect, const QFont::Weight &valueWeight, const QFont::Weight &labelWeight, const QString &value, const QString &label);
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -56,14 +59,7 @@ void
 HitTester::resize
 (const QModelIndex &index, qsizetype size)
 {
-#if QT_VERSION < 0x060000
-    rects[index].clear();
-    for (int i = 0; i < size; ++i) {
-        rects[index] << QRect();
-    }
-#else
     rects[index].resize(size);
-#endif
 }
 
 
@@ -342,7 +338,8 @@ CalendarDetailedDayDelegate::CalendarDetailedDayDelegate
 
 
 void
-CalendarDetailedDayDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+CalendarDetailedDayDelegate::paint
+(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing, true);
@@ -460,11 +457,7 @@ CalendarDetailedDayDelegate::paint(QPainter *painter, const QStyleOptionViewItem
             painter->drawText(textRect, Qt::AlignLeft | Qt::AlignTop, entry.primary);
             if (--numLines > 0 && ! entry.secondary.isEmpty()) {
                 textRect.translate(0, lineHeight + priSecSpacing);
-                if (! entry.secondaryMetric.isEmpty()) {
-                    painter->drawText(textRect, Qt::AlignLeft | Qt::AlignTop, entry.secondary + " (" + entry.secondaryMetric + ")");
-                } else {
-                    painter->drawText(textRect, Qt::AlignLeft | Qt::AlignTop, entry.secondary);
-                }
+                paintMetric(painter, textRect, QFont::Normal, QFont::ExtraLight, entry.secondary, entry.secondaryMetric);
             }
             if (--numLines > 0 && ! entry.tertiary.isEmpty()) {
                 QRect tertiaryRect(left + horPadding,
@@ -872,7 +865,7 @@ CalendarCompactDayDelegate::paint
                           titleRect.y() + lineSpacing + lineHeight,
                           titleRect.width(),
                           titleRect.height());
-            painter->drawText(subRect, Qt::AlignLeft | Qt::AlignTop, calEntry.secondary + " (" + calEntry.secondaryMetric + ")");
+            paintMetric(painter, subRect, QFont::Normal, QFont::ExtraLight, calEntry.secondary, calEntry.secondaryMetric);
         }
         painter->restore();
 
@@ -1054,25 +1047,28 @@ AgendaMultiDelegate::AgendaMultiDelegate
 {
 }
 
+
 void
 AgendaMultiDelegate::paint
 (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QStyleOptionViewItem opt = option;
     initStyleOption(&opt, index);
+    int type = index.data(TypeRole).toInt();
+    bool hover = (type == 0) && opt.state & QStyle::State_MouseOver;
     opt.state &= ~QStyle::State_Selected;
     opt.state &= ~QStyle::State_HasFocus;
     opt.state &= ~QStyle::State_MouseOver;
 
-    int type = index.data(TypeRole).toInt();
-    if (type == 0) {
+    if (type == 0) { // Dual Line Text
         opt.displayAlignment = Qt::AlignLeft | Qt::AlignTop;
 
-        const bool hovered = index.data(HoverFlagRole).toBool();
-        const QString hoverText = index.data(HoverTextRole).toString();
-        const QFont hoverFont = index.data(HoverFontRole).value<QFont>();
+        const QString secondaryText = index.data(SecondaryDisplayRole).toString();
+        const QString secondaryHoverText = index.data(SecondaryHoverTextRole).toString();
 
-        if (hovered) {
+        if (hover) {
+            const QString hoverText = index.data(HoverTextRole).toString();
+            const QFont hoverFont = index.data(HoverFontRole).value<QFont>();
             if (! hoverText.isEmpty()) {
                 opt.text = hoverText;
             }
@@ -1081,24 +1077,51 @@ AgendaMultiDelegate::paint
             }
         }
 
+        QFontMetrics upperFM(opt.font);
+        QRect upperRect(opt.rect.x() + attributes.paddingDL.left(),
+                        opt.rect.y() + attributes.paddingDL.top(),
+                        std::max(0, opt.rect.width() - attributes.paddingDL.left() - attributes.paddingDL.right()),
+                        std::min(opt.rect.height(), upperFM.height()));
+
+        const QWidget *widget = opt.widget;
+        QStyle *style = widget ? widget->style() : QApplication::style();
+        opt.rect = upperRect;
+        style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, widget);
+
+        if (   (   ! hover
+                && ! secondaryText.isEmpty())
+            || (   hover
+                && ! secondaryHoverText.isEmpty())) {
+            opt.text = secondaryText;
+            if (! hover) {
+                const QFont secondaryFont = index.data(SecondaryFontRole).value<QFont>();
+                if (secondaryFont != QFont()) {
+                    opt.font = secondaryFont;
+                }
+            } else {
+                const QFont secondaryHoverFont = index.data(SecondaryHoverFontRole).value<QFont>();
+                if (secondaryHoverFont != QFont()) {
+                    opt.font = secondaryHoverFont;
+                }
+                if (! secondaryHoverText.isEmpty()) {
+                    opt.text = secondaryHoverText;
+                }
+            }
+            QFontMetrics lowerFM(opt.font);
+            opt.rect.translate(0, opt.rect.height());
+            opt.rect.setHeight(lowerFM.height());
+            style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, widget);
+        }
+    } else if (type == 1) { // Headline
+        opt.displayAlignment = Qt::AlignLeft | Qt::AlignTop;
+        opt.rect = QRect(opt.rect.x() + attributes.paddingHL.left(),
+                         opt.rect.y() + attributes.paddingHL.top(),
+                         std::max(0, opt.rect.width() - attributes.paddingHL.left() - attributes.paddingHL.right()),
+                         std::min(opt.rect.height(), opt.fontMetrics.height()));
+
         const QWidget *widget = opt.widget;
         QStyle *style = widget ? widget->style() : QApplication::style();
         style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, widget);
-    } else if (type == 1) {
-        const QWidget *widget = opt.widget;
-        QStyle *style = widget ? widget->style() : QApplication::style();
-        style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, widget);
-    } else if (type == 2) {
-        const int horPadding = 4 * dpiXFactor;
-        const QWidget *widget = option.widget;
-        QStyle *style = widget ? widget->style() : QApplication::style();
-        style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, widget);
-        int topMargin = index.data(MarginTopRole).toInt();
-        QStyleOption sepOpt;
-        sepOpt.rect = QRect(opt.rect.x() + horPadding + 1, opt.rect.y() + topMargin + 1, opt.rect.width() - 2 * horPadding - 2, 1);
-        sepOpt.palette = opt.palette;
-        sepOpt.state = QStyle::State_Enabled;
-        style->drawPrimitive(QStyle::PE_IndicatorToolBarSeparator, &sepOpt, painter, widget);
     }
 }
 
@@ -1111,7 +1134,7 @@ AgendaMultiDelegate::sizeHint
     initStyleOption(&opt, index);
 
     int type = index.data(TypeRole).toInt();
-    if (type == 0) {
+    if (type == 0) { // Dual Line Text
         QString text = index.data(Qt::DisplayRole).toString();
         QFont normalFont = index.data(Qt::FontRole).value<QFont>();
         if (! normalFont.family().isEmpty()) {
@@ -1121,55 +1144,118 @@ AgendaMultiDelegate::sizeHint
         QFontMetrics normalFM(opt.font);
         QSize normalSize = normalFM.size(Qt::TextSingleLine, text);
 
-        QString hoverText = index.data(HoverTextRole).toString();
+        const QString hoverText = index.data(HoverTextRole).toString();
         QFont hoverFont = index.data(HoverFontRole).value<QFont>();
 
         QSize hoverSize = QSize(0, 0);
-        if (! hoverText.isEmpty() || hoverFont != QFont()) {
-            QFontMetrics hoverFM(hoverFont != QFont() ? hoverFont : opt.font);
+        if (! hoverText.isEmpty()) {
+            if (hoverFont == QFont()) {
+                hoverFont = opt.font;
+            }
+            QFontMetrics hoverFM(hoverFont);
             hoverSize = hoverFM.size(Qt::TextSingleLine, hoverText.isEmpty() ? text : hoverText);
         }
-
         QSize maxSize(std::max(normalSize.width(), hoverSize.width()), std::max(normalSize.height(), hoverSize.height()));
-        maxSize += QSize(8, 4);
+
+        QSize secondarySize(0, 0);
+        const QString secondaryText = index.data(SecondaryDisplayRole).toString();
+        if (! secondaryText.isEmpty()) {
+            QFont secondaryFont = index.data(SecondaryFontRole).value<QFont>();
+            if (secondaryFont == QFont()) {
+                secondaryFont = normalFont;
+            }
+            QFontMetrics secondaryFM(secondaryFont);
+            secondarySize = secondaryFM.size(Qt::TextSingleLine, secondaryText);
+        }
+        const QString secondaryHoverText = index.data(SecondaryHoverTextRole).toString();
+        if (! secondaryHoverText.isEmpty()) {
+            QFont secondaryHoverFont = index.data(SecondaryHoverFontRole).value<QFont>();
+            if (secondaryHoverFont == QFont()) {
+                secondaryHoverFont = hoverFont;
+            }
+            QFontMetrics secondaryHoverFM(secondaryHoverFont);
+            QSize secondaryHoverSize = secondaryHoverFM.size(Qt::TextSingleLine, secondaryText);
+            secondarySize.setWidth(std::max(secondarySize.width(), secondaryHoverSize.width()));
+            secondarySize.setHeight(std::max(secondarySize.height(), secondaryHoverSize.height()));
+        }
+        maxSize.setWidth(std::max(maxSize.width(), secondarySize.width()));
+        maxSize.setHeight(maxSize.height() + secondarySize.height());
+
+        maxSize += QSize(8 + attributes.paddingDL.left() + attributes.paddingDL.right(), 4 + attributes.paddingDL.top() + attributes.paddingDL.bottom());
 
         return maxSize;
-    } else if (type == 1) {
-        return QSize(opt.rect.width(), index.data(MarginTopRole).toInt());
-    } else if (type == 2) {
-        int topMargin = index.data(MarginTopRole).toInt();
-        int bottomMargin = index.data(MarginBottomRole).toInt();
+    } else if (type == 1) { // Headline
         const QWidget *widget = opt.widget;
         QStyle *style = widget ? widget->style() : QApplication::style();
-        int sepHeight = style->pixelMetric(QStyle::PM_DefaultFrameWidth, nullptr, widget);
-        return QSize(option.rect.width(), sepHeight + topMargin + bottomMargin);
+        int height = style->sizeFromContents(QStyle::CT_ItemViewItem, &opt, QSize(), opt.widget).height();
+        return QSize(option.rect.width(), height + attributes.paddingHL.top() + attributes.paddingHL.bottom());
     }
     return QStyledItemDelegate::sizeHint(option, index);
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
-// CalendarSingleActivityDelegate
-
-CalendarSingleActivityDelegate::CalendarSingleActivityDelegate
-(QObject *parent)
+AgendaMultiDelegate::Attributes
+AgendaMultiDelegate::getAttributes
+() const
 {
-    Q_UNUSED(parent)
+    return attributes;
 }
 
 
 void
-CalendarSingleActivityDelegate::paint
+AgendaMultiDelegate::setAttributes
+(const Attributes &attributes)
+{
+    this->attributes = attributes;
+}
+
+
+void
+AgendaMultiDelegate::initStyleOption
+(QStyleOptionViewItem *option, const QModelIndex &index) const
+{
+    QStyledItemDelegate::initStyleOption(option, index);
+
+    if (AgendaTree *tree = qobject_cast<AgendaTree*>(parent())) {
+        if (tree->isRowHovered(index)) {
+            option->state |= QStyle::State_MouseOver;
+        } else {
+            option->state &= ~QStyle::State_MouseOver;
+        }
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// AgendaEntryDelegate
+
+AgendaEntryDelegate::AgendaEntryDelegate
+(QTreeWidget *parent)
+: QStyledItemDelegate(parent), treeWidget(parent)
+{
+    connect(parent, &QTreeWidget::itemChanged, this, &AgendaEntryDelegate::updateColumnWidth, Qt::QueuedConnection);
+    connect(parent->header(), &QHeaderView::sectionResized, this, &AgendaEntryDelegate::onSectionResized);
+    QTimer::singleShot(0, this, &AgendaEntryDelegate::updateColumnWidth);
+}
+
+
+
+void
+AgendaEntryDelegate::paint
 (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    if (column < 0) {
+        column = index.column();
+    }
     CalendarEntry entry = index.data(EntryRole).value<CalendarEntry>();
-    bool hover = index.data(HoverFlagRole).toBool();
 
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing);
 
     QStyleOptionViewItem opt = option;
     initStyleOption(&opt, index);
+    bool hover = opt.state & QStyle::State_MouseOver;
+
     opt.state &= ~QStyle::State_Selected;
     opt.state &= ~QStyle::State_HasFocus;
     opt.state &= ~QStyle::State_MouseOver;
@@ -1179,67 +1265,84 @@ CalendarSingleActivityDelegate::paint
     QStyle *style = widget ? widget->style() : QApplication::style();
     style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, widget);
 
-    QFontMetrics entryFM(painter->font());
-    const int horPadding = 4 * dpiXFactor;
-    const int lineSpacing = 2 * dpiYFactor;
-    const int lineHeight = entryFM.height();
+    QFont line1Font = painter->font();
+
+    QFont::Weight primaryWeight = attributes.primaryWeight;
+    QFont::Weight secondaryWeight = attributes.secondaryWeight;
+    QFont::Weight secondaryMetricWeight = attributes.secondaryMetricWeight;
+    if (hover) {
+        primaryWeight = attributes.primaryHoverWeight;
+        secondaryWeight = attributes.secondaryHoverWeight;
+        secondaryMetricWeight = attributes.secondaryMetricHoverWeight;
+    }
+    if (primaryWeight == 0) {
+        primaryWeight = line1Font.weight();
+    }
+    if (secondaryWeight == 0) {
+        secondaryWeight = primaryWeight;
+    }
+    if (secondaryMetricWeight == 0) {
+        secondaryMetricWeight = secondaryWeight;
+    }
+
+    line1Font.setWeight(primaryWeight);
+    QFontMetrics line1FM(line1Font);
+    const int lineSpacing = attributes.lineSpacing * dpiYFactor;
+    const int lineHeight = line1FM.height();
     const int radius = 4 * dpiXFactor;
-    const int iconSpacing = 4 * dpiXFactor;
+    const int iconInnerSpacing = 4 * dpiXFactor;
+    const int iconTextSpacing = attributes.iconTextSpacing * dpiXFactor;
     const int iconWidth = 2 * lineHeight + lineSpacing;
     const QSize pixmapSize(iconWidth, iconWidth);
     QColor textColor = opt.palette.color(QPalette::Active, QPalette::Text);
     QColor iconColor = entry.color;
 
+    const int textX = opt.rect.x() + iconWidth + iconTextSpacing + attributes.padding.left();
+    const int textWidth = opt.rect.width() - iconWidth - iconTextSpacing - attributes.padding.left() - attributes.padding.right();
+
     if (hover) {
-        painter->save();
-        QRect hoverRect;
-        if (entry.type == ENTRY_TYPE_PLANNED_ACTIVITY) {
-            hoverRect = QRect(opt.rect.x() + horPadding + 1, opt.rect.y() + 1, opt.rect.width() - 2 * horPadding - 2, iconWidth - 2);
-        } else {
-            hoverRect = QRect(opt.rect.x() + horPadding + 1, opt.rect.y() + 1, opt.rect.width() - 2 * horPadding - 2, lineHeight - 2);
-        }
         QColor bgColor = opt.palette.color(QPalette::Active, QPalette::Highlight);
         bgColor.setAlphaF(0.2);
         QColor bgBorder = bgColor;
         bgBorder.setAlphaF(0.6);
         iconColor = GCColor::invertColor(GCColor::blendedColor(bgColor, opt.palette.color(QPalette::Active, QPalette::AlternateBase)));
         textColor = iconColor;
-
-        painter->setPen(bgBorder);
-        painter->setBrush(bgColor);
-        painter->drawRoundedRect(hoverRect, radius, radius);
-        painter->restore();
     }
 
-    if (entry.type == ENTRY_TYPE_PLANNED_ACTIVITY) {
-        QPixmap pixmap = svgAsColoredPixmap(entry.iconFile, pixmapSize, iconSpacing, iconColor);
-        painter->drawPixmap(opt.rect.x() + horPadding, opt.rect.y(), pixmap);
-    } else {
-        QPixmap pixmap = svgOnBackground(entry.iconFile, QSize(lineHeight, lineHeight), iconSpacing, entry.color, radius);
-        painter->drawPixmap(opt.rect.x() + horPadding + lineHeight / 2, opt.rect.y(), pixmap);
-    }
+    QPixmap pixmap = svgAsColoredPixmap(entry.iconFile, pixmapSize, iconInnerSpacing, iconColor);
+    painter->drawPixmap(opt.rect.x() + attributes.padding.left(), opt.rect.y() + attributes.padding.top(), pixmap);
 
     painter->setPen(textColor);
-    QRect textRect(opt.rect.x() + iconWidth + iconSpacing + horPadding, opt.rect.y(), opt.rect.width() - iconWidth - iconSpacing - 2 * horPadding, lineHeight);
+    QRect textRect(textX, opt.rect.y() + attributes.padding.top(), textWidth, lineHeight);
 
-    const QFontMetrics fm(painter->font());
     QString primary(entry.primary);
-    QRect boundingRect = fm.boundingRect(primary);
+    QRect boundingRect = line1FM.boundingRect(primary);
     if (boundingRect.width() > textRect.width()) {
-        primary = fm.elidedText(primary, Qt::ElideRight, textRect.width());
+        primary = line1FM.elidedText(primary, Qt::ElideRight, textRect.width());
     }
 
+    painter->save();
+    painter->setFont(line1Font);
     painter->drawText(textRect, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip, primary);
+    painter->restore();
     if (! entry.secondary.isEmpty()) {
         textRect.translate(0, lineHeight + lineSpacing);
-        QString secondary = entry.secondary;
-        if (! entry.secondaryMetric.isEmpty()) {
-            secondary += " (" + entry.secondaryMetric + ")";
+        paintMetric(painter, textRect, secondaryWeight, secondaryMetricWeight, entry.secondary, entry.secondaryMetric);
+    }
+    if (! entry.tertiary.isEmpty()) {
+        painter->save();
+        painter->setPen(GCColor::inactiveColor(painter->pen().color(), attributes.tertiaryDimLevel));
+        int y = opt.rect.y() + attributes.padding.top() + pixmapSize.height() + 2 * lineSpacing;
+        QStringList tertiaryLines;
+        int numLines;
+        int tertiaryHeight;
+        layoutTertiaryText(entry.tertiary, opt.font, textWidth, numLines, tertiaryHeight, &tertiaryLines, true);
+        QRect tertiaryRect(textX, y, textWidth, lineHeight);
+        for (const QString &tertiaryLine : tertiaryLines) {
+            painter->drawText(tertiaryRect, Qt::AlignLeft | Qt::AlignTop, tertiaryLine);
+            tertiaryRect.translate(0, lineHeight);
         }
-        if (fm.boundingRect(secondary).width() > textRect.width()) {
-            secondary = fm.elidedText(secondary, Qt::ElideRight, textRect.width());
-        }
-        painter->drawText(textRect, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip, secondary);
+        painter->restore();
     }
 
     painter->restore();
@@ -1247,22 +1350,286 @@ CalendarSingleActivityDelegate::paint
 
 
 QSize
-CalendarSingleActivityDelegate::sizeHint
+AgendaEntryDelegate::sizeHint
 (const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    if (column < 0) {
+        column = index.column();
+    }
+    QStyleOptionViewItem opt(option);
+    initStyleOption(&opt, index);
+
+    int width = columnWidth;
+    if (width <= 0) {
+        const QTreeWidget *tw = qobject_cast<const QTreeWidget*>(option.widget);
+        if (tw) {
+            width = tw->columnWidth(column);
+            if (width <= 0) {
+                width = tw->viewport()->width() / 2;
+            }
+        } else {
+            width = 200;
+        }
+    }
+
     QVariant data = index.data(EntryRole);
     if (! data.isNull()) {
-        QFontMetrics entryFM(option.font);
-        const int lineSpacing = 2 * dpiYFactor;
-        const int lineHeight = entryFM.height();
+        const int lineSpacing = attributes.lineSpacing * dpiYFactor;
+        const int lineHeight = option.fontMetrics.height();
         CalendarEntry entry = data.value<CalendarEntry>();
-        if (entry.type == ENTRY_TYPE_PLANNED_ACTIVITY) {
-            return QSize(100, 2 * lineHeight + lineSpacing);
-        } else {
-            return QSize(100, lineHeight);
+        int tertiaryHeight = 0;
+        if (! entry.tertiary.isEmpty()) {
+            const int iconWidth = 2 * lineHeight + lineSpacing;
+            int tertiaryWidth = width - iconWidth - attributes.iconTextSpacing * dpiXFactor - attributes.padding.left() - attributes.padding.right();
+            int numLines;
+            int tertiary;
+            layoutTertiaryText(entry.tertiary, option.font, tertiaryWidth, numLines, tertiaryHeight, nullptr, true);
+            tertiaryHeight += 2 * lineSpacing;
         }
-    } else {
-        return QSize(0, 0);
+        return QSize(width, 2 * lineHeight + lineSpacing + attributes.padding.top() + attributes.padding.bottom() + tertiaryHeight);
+    }
+    return QSize(width, attributes.padding.top() + attributes.padding.bottom());
+}
+
+
+AgendaEntryDelegate::Attributes
+AgendaEntryDelegate::getAttributes
+() const
+{
+    return attributes;
+}
+
+
+void
+AgendaEntryDelegate::setAttributes
+(const Attributes &attributes)
+{
+    this->attributes = attributes;
+}
+
+
+bool
+AgendaEntryDelegate::hasToolTip
+(const QModelIndex &index, QString *toolTipText) const
+{
+    if (! index.isValid()) {
+        return false;
+    }
+    CalendarEntry entry = index.data(EntryRole).value<CalendarEntry>();
+    QString text(entry.tertiary.trimmed());
+    if (text.isEmpty()) {
+        return false;
+    }
+    QStyleOptionViewItem opt;
+    initStyleOption(&opt, index);
+    const int lineSpacing = attributes.lineSpacing * dpiYFactor;
+    const int lineHeight = opt.fontMetrics.height();
+    const int iconTextSpacing = attributes.iconTextSpacing * dpiXFactor;
+    const int iconWidth = 2 * lineHeight + lineSpacing;
+    int availableWidth = columnWidth - iconWidth - iconTextSpacing - attributes.padding.left() - attributes.padding.right();
+    int numLines;
+    int height;
+    layoutTertiaryText(entry.tertiary, opt.font, availableWidth, numLines, height, nullptr, false);
+    bool show = numLines > attributes.maxTertiaryLines;
+    if (show) {
+        QStringList ttlines = entry.tertiary.split('\n');
+        *toolTipText = QString("<h4>%1</h4>").arg(entry.primary.trimmed());
+        for (const QString &line : ttlines) {
+            *toolTipText += QString("<div style='max-width: %1px; white-space: normal;'>%2</div>")
+                                   .arg(600 * dpiXFactor)
+                                   .arg(line);
+        }
+    }
+
+    return show;
+}
+
+
+void
+AgendaEntryDelegate::initStyleOption
+(QStyleOptionViewItem *option, const QModelIndex &index) const
+{
+    QStyledItemDelegate::initStyleOption(option, index);
+
+    if (AgendaTree *tree = qobject_cast<AgendaTree*>(parent())) {
+        if (tree->isRowHovered(index)) {
+            option->state |= QStyle::State_MouseOver;
+        } else {
+            option->state &= ~QStyle::State_MouseOver;
+        }
+    }
+}
+
+
+AgendaEntryDelegate::LayoutResult
+AgendaEntryDelegate::processLayoutText(const QString &text, const QFont &font, int availableWidth, bool limitHeight, bool needLines) const
+{
+    LayoutResult result;
+    if (text.isEmpty() || availableWidth <= 0) {
+        return result;
+    }
+
+    if (needLines) {
+        result.lines.reserve(limitHeight ? attributes.maxTertiaryLines : 20);
+    }
+
+    QStringList paragraphs = text.split('\n');
+
+    int calcHeight = 0;
+    int calcLines = 0;
+    QFontMetrics fm(font);
+    const int lineHeight = fm.height();
+
+    for (int p = 0; p < paragraphs.size(); ++p) {
+        const QString &paragraph = paragraphs[p];
+
+        if (paragraph.isEmpty()) {
+            ++calcLines;
+            if (needLines) {
+                result.lines.append(QString());
+            }
+            if (! limitHeight || calcLines <= attributes.maxTertiaryLines) {
+                calcHeight += lineHeight;
+            }
+            if (limitHeight && calcLines >= attributes.maxTertiaryLines) {
+                result.numLines = calcLines;
+                result.height = calcHeight;
+                return result;
+            }
+            continue;
+        }
+
+        QTextLayout layout(paragraph, font);
+        layout.setCacheEnabled(true);
+        layout.beginLayout();
+
+        while (true) {
+            QTextLine line = layout.createLine();
+            if (! line.isValid()) {
+                break;
+            }
+            line.setLineWidth(availableWidth);
+            ++calcLines;
+
+            bool isLastDisplayLine = limitHeight && calcLines >= attributes.maxTertiaryLines;
+            if (isLastDisplayLine && needLines) {
+                bool hasMoreLinesInParagraph = (line.textStart() + line.textLength() < paragraph.length());
+                bool hasMoreParagraphs = (p < paragraphs.size() - 1);
+                bool hasMoreText = hasMoreLinesInParagraph || hasMoreParagraphs;
+                if (hasMoreText) {
+                    const QString ellipsis = "…";
+                    const int ellipsisWidth = fm.horizontalAdvance(ellipsis);
+                    QString lineText = paragraph.mid(line.textStart(), line.textLength());
+
+                    int fullWidth = fm.horizontalAdvance(lineText);
+                    if (fullWidth + ellipsisWidth <= availableWidth) {
+                        result.lines.append(lineText + ellipsis);
+                    } else {
+                        int left = 0;
+                        int right = lineText.length();
+                        while (left < right) {
+                            int mid = (left + right + 1) / 2;
+                            QString testText = lineText.left(mid);
+                            if (fm.horizontalAdvance(testText + ellipsis) <= availableWidth) {
+                                left = mid;
+                            } else {
+                                right = mid - 1;
+                            }
+                        }
+                        QString truncatedText = lineText.left(left).trimmed();
+
+                        int wordBoundary = -1;
+                        for (int i = truncatedText.length() - 1; i >= 0; --i) {
+                            if (truncatedText[i].isSpace()) {
+                                wordBoundary = i;
+                                break;
+                            }
+                        }
+
+                        if (wordBoundary > 0 && wordBoundary >= truncatedText.length() * 0.8) {
+                            QString wordBrokenText = truncatedText.left(wordBoundary).trimmed();
+                            if (fm.horizontalAdvance(wordBrokenText + ellipsis) <= availableWidth) {
+                                truncatedText = wordBrokenText;
+                            }
+                        }
+                        result.lines.append(truncatedText + ellipsis);
+                    }
+                    calcHeight += line.height();
+                    layout.endLayout();
+                    result.numLines = calcLines;
+                    result.height = calcHeight;
+                    return result;
+                } else {
+                    result.lines.append(paragraph.mid(line.textStart(), line.textLength()));
+                    calcHeight += line.height();
+                    layout.endLayout();
+                    result.numLines = calcLines;
+                    result.height = calcHeight;
+                    return result;
+                }
+            }
+
+            if (needLines) {
+                result.lines.append(paragraph.mid(line.textStart(), line.textLength()));
+            }
+
+            if (! limitHeight || calcLines <= attributes.maxTertiaryLines) {
+                calcHeight += line.height();
+            }
+
+            if (isLastDisplayLine) {
+                layout.endLayout();
+                result.numLines = calcLines;
+                result.height = calcHeight;
+                return result;
+            }
+        }
+        layout.endLayout();
+    }
+    result.numLines = calcLines;
+    result.height = calcHeight;
+
+    return result;
+}
+
+
+void
+AgendaEntryDelegate::layoutTertiaryText
+(const QString &text, const QFont &font, int availableWidth, int &numLines, int &height, QStringList *lines, bool limitHeight) const
+{
+    LayoutResult result = processLayoutText(text, font, availableWidth, limitHeight, lines != nullptr);
+    numLines = result.numLines;
+    height = result.height;
+    if (lines) {
+        *lines = result.lines;
+    }
+}
+
+
+void
+AgendaEntryDelegate::updateColumnWidth
+()
+{
+    if (column >= 0) {
+        int newWidth = treeWidget->columnWidth(column);
+        if (newWidth > 50 && newWidth != columnWidth) {
+            columnWidth = newWidth;
+            treeWidget->setItemDelegateForColumn(column, nullptr);
+            treeWidget->setItemDelegateForColumn(column, this);
+        }
+    }
+}
+
+
+void
+AgendaEntryDelegate::onSectionResized
+(int logicalIndex, int oldSize, int newSize)
+{
+    Q_UNUSED(oldSize)
+    Q_UNUSED(newSize)
+
+    if (column >= 0 && column <= logicalIndex) {
+        QTimer::singleShot(100, this, &AgendaEntryDelegate::updateColumnWidth);
     }
 }
 
@@ -1363,6 +1730,7 @@ paintHeadline
     CalendarDay calendarDay = index.data(CalendarHeadlineDelegate::DayRole).value<CalendarDay>();
     QColor dayColor;
     bool isToday = (calendarDay.date == QDate::currentDate());
+    bool selected = false;
     QLocale locale;
     QString dateText = locale.toString(calendarDay.date, dateFormat);
 
@@ -1393,6 +1761,7 @@ paintHeadline
     } else {
         dayColor = opt.palette.color((calendarDay.isDimmed == DayDimLevel::Full || calendarDay.isDimmed == DayDimLevel::Partial) ? QPalette::Disabled : QPalette::Active, QPalette::Text);
     }
+    selected = pressedEntryIdx < 0 && opt.state & QStyle::State_Selected;
 
     painter->setFont(dayFont);
     painter->setPen(dayColor);
@@ -1405,11 +1774,34 @@ paintHeadline
         if (x < dayRect.x() + dayRect.width() + lineSpacing) {
             break;
         }
-        QPixmap pixmap = svgOnBackground(calEntry.iconFile, QSize(lineHeight, lineHeight), 0, calEntry.color, radius);
+        QPixmap pixmap = svgAsColoredPixmap(calEntry.iconFile, QSize(lineHeight, lineHeight), 0, selected ? dayColor : calEntry.color);
         QRect headlineEntryRect(x, opt.rect.y() + topMargin, lineHeight, lineHeight);
         painter->drawPixmap(x, opt.rect.y() + topMargin, pixmap);
         headlineTester.append(index, headlineEntryRect);
     }
 
     return dayRect;
+}
+
+
+static void
+paintMetric
+(QPainter *painter, const QRect &rect, const QFont::Weight &valueWeight, const QFont::Weight &labelWeight, const QString &value, const QString &label)
+{
+    painter->save();
+    QFont font = painter->font();
+    font.setWeight(valueWeight);
+    painter->setFont(font);
+    QFontMetrics valueFM(font);
+    int valueWidth = valueFM.horizontalAdvance(value);
+    painter->drawText(rect, Qt::AlignLeft | Qt::AlignTop, value);
+    if (! label.isEmpty()) {
+        QRect labelRect(rect);
+        labelRect.setX(rect.x() + valueWidth + valueFM.horizontalAdvance(" "));
+        font.setWeight(labelWeight);
+        QFontMetrics labelFM(font);
+        painter->setFont(font);
+        painter->drawText(labelRect, Qt::AlignLeft | Qt::AlignTop, label);
+    }
+    painter->restore();
 }

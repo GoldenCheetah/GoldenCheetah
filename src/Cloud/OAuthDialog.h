@@ -27,8 +27,6 @@
 #include <QStackedLayout>
 #include <QUrl>
 #include <QSslSocket>
-
-// QUrl split into QUrlQuerty in QT5
 #include <QUrlQuery>
 
 #include <QWebEngineHistory>

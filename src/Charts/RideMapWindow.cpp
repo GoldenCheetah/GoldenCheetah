@@ -1708,7 +1708,7 @@ MapWebBridge::drawOverlays()
             QString wNameEx = tr("Selection #");
             if (wNameItr.contains(wNameEx, Qt::CaseSensitive))
             {
-                int wSelCount = wNameItr.count() - wNameEx.count();
+                int wSelCount = wNameItr.length() - wNameEx.length();
                 wNameSelectionIndexList.append(wNameItr.right(wSelCount).toInt());
             }
         }

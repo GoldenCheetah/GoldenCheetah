@@ -96,7 +96,7 @@ $ git checkout V3.7
 $ ls
 
 The following walkthrough is based on latest master, if you want to build v3.7 please
-see the travis scripts in the repository.
+see the AppVeyor scripts in the repository.
 
 1.5 Install HomeBrew
 --------------------

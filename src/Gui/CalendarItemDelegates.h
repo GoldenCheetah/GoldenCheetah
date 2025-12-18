@@ -20,6 +20,7 @@
 #define CALENDARITEMDELEGATES_H
 
 #include <QStyledItemDelegate>
+#include <QTreeWidget>
 
 
 class HitTester {
@@ -192,37 +193,93 @@ private:
 class AgendaMultiDelegate : public QStyledItemDelegate {
 public:
     enum Roles {
-        // Qt::DisplayRole // [QString] The default text to display
-        // Qt::FontRole    // [QFont] The default font to use for text
-        HoverFlagRole = Qt::UserRole, // [bool] Hover flag. True if the item is hovered. If not set or invalid, treated as false
-        HoverTextRole,                // [QString] Hover text to display when the hover flag is true. If empty, the normal DisplayRole text is used
-        HoverFontRole,                // [QFont] Hover font to use when the hover flag is true. If default-constructed, the normal font is used
-        TypeRole,                     // [int] 0: Text
-                                      //       1: Spacer (Qt::UserRole + 4: Height)
-                                      //       2: Separator
-        MarginTopRole,                // [int] Margin above (Type Spacer + Separator only)
-        MarginBottomRole              // [int] Margin below (Type Separator only)
+        // Qt::DisplayRole            // [QString] The default text to display
+        // Qt::FontRole               // [QFont] The default font to use for text
+        HoverTextRole = Qt::UserRole, // [QString] Hover text to display when hovered. If empty, the normal DisplayRole text is used
+        HoverFontRole,                // [QFont] Hover font to use when hovered. If default-constructed, the normal font is used
+        SecondaryDisplayRole,         // [QString] The default text to display in the second row
+        SecondaryHoverTextRole,       // [QString] Hover text for the secondary row. Only used when SecondaryTextRole is filled
+        SecondaryFontRole,            // [QFont] Font to be use for the secondary row. Use Qt::FontRole if not filled
+        SecondaryHoverFontRole,       // [QFont] Hover font for secondary row to use when hovered. If unset, HoverFontRole is used
+        TypeRole                      // [int] 0: Dual line text
+                                      //       1: Headline
     };
+
+    struct Attributes {
+        QMargins paddingDL;  // Padding of the element (TypeRole == 0)
+        QMargins paddingHL;  // Padding of the element (TypeRole == 1)
+        int lineSpacing = 2; // Vertical spacing between primary and secondary row (dpiYFactor not applied)
+    };
+
 
     explicit AgendaMultiDelegate(QObject *parent = nullptr);
 
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+
+    Attributes getAttributes() const;
+    void setAttributes(const Attributes &attributes);
+
+protected:
+    void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override;
+
+private:
+    Attributes attributes;
 };
 
 
-class CalendarSingleActivityDelegate : public QStyledItemDelegate {
+class AgendaEntryDelegate : public QStyledItemDelegate {
 public:
     enum Roles {
         EntryRole = Qt::UserRole, // [CalendarEntry] Entry to be displayed
-        HoverFlagRole,            // [bool] Hover flag. True if the item is hovered. If not set or invalid, treated as false
         EntryDateRole             // [bool] Date of the CalendarEntry
     };
 
-    explicit CalendarSingleActivityDelegate(QObject *parent = nullptr);
+    struct Attributes {
+        QMargins padding;                                         // Padding of the element
+        QFont::Weight primaryWeight = QFont::Medium;              // Primary row
+        QFont::Weight primaryHoverWeight = QFont::DemiBold;       // Primary row (hovered)
+        QFont::Weight secondaryWeight = QFont::Light;             // Secondary row
+        QFont::Weight secondaryHoverWeight = QFont::DemiBold;     // Secondary row (hovered)
+        QFont::Weight secondaryMetricWeight = QFont::ExtraLight;  // Metric in the secondary row
+        QFont::Weight secondaryMetricHoverWeight = QFont::Normal; // Metric in the secondary row (hovered)
+        int lineSpacing = 2;                                      // Vertical spacing between primary and secondary row (dpiYFactor not applied)
+        int iconTextSpacing = 10;                                 // Horizontal spacing between icon and text (dpiXFactor not applied)
+        float tertiaryDimLevel = 0.5;                             // Dimming amount for tertiary row
+        int maxTertiaryLines = 3;                                 // Max number of displayed lines of tertiary text. Show a tooltip if exceeded
+    };
+
+    explicit AgendaEntryDelegate(QTreeWidget *parent = nullptr);
 
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+
+    Attributes getAttributes() const;
+    void setAttributes(const Attributes &attributes);
+
+    bool hasToolTip(const QModelIndex &index, QString *toolTipText = nullptr) const;
+
+protected:
+    void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override;
+
+private:
+    Attributes attributes;
+    QTreeWidget *treeWidget;
+    mutable int column = -1;
+    int columnWidth = -1;
+
+    void layoutTertiaryText(const QString &text, const QFont &font, int availableWidth, int &numLines, int &height, QStringList *lines, bool limitHeight) const;
+
+    struct LayoutResult {
+        int numLines;
+        int height;
+        QStringList lines;
+    };
+    LayoutResult processLayoutText(const QString &text, const QFont &font, int availableWidth, bool limitHeight, bool needLines) const;
+
+private slots:
+    void updateColumnWidth();
+    void onSectionResized(int logicalIndex, int oldSize, int newSize);
 };
 
 #endif

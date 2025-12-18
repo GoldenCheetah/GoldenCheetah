@@ -43,7 +43,7 @@ class OverviewWindow : public GcChartWindow
 
     public:
 
-        OverviewWindow(Context *context, int scope=OverviewScope::ANALYSIS, bool blank=false);
+        OverviewWindow(Context *context, OverviewScope scope, bool blank=false);
 
         // used by children
         Context *context;
@@ -70,7 +70,7 @@ class OverviewWindow : public GcChartWindow
         // gui setup
         ChartSpace *space;
         bool configured;
-        int scope;
+        OverviewScope scope;
         bool blank;
 
         QSpinBox *mincolsEdit;

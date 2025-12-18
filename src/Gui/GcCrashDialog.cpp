@@ -278,9 +278,7 @@ QString GcCrashDialog::versionHTML()
             .arg(usbxpress)
             .arg(libusb)
             .arg(vlc)
-#if defined GC_VIDEO_QT5
-            .arg("qt5")
-#elif defined GC_VIDEO_QT6
+#if defined GC_VIDEO_QT6
             .arg("qt6")
 #elif defined GC_VIDEO_VLC
             .arg("vlc")
@@ -459,9 +457,6 @@ GcCrashDialog::saveAs()
     QFile file(fileName);
     file.resize(0);
     QTextStream out(&file);
-#if QT_VERSION < 0x060000
-    out.setCodec("UTF-8");
-#endif
 
     if (file.open(QIODevice::WriteOnly)) {
         // write the texts

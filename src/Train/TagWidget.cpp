@@ -47,7 +47,7 @@ TagWidget::TagWidget
 
     delButton = new QPushButton("✖");
     delButton->setFlat(true);
-    connect(delButton, &QPushButton::clicked, [=] { deleteScheduled = true; deleteAnimation(); });
+    connect(delButton, &QPushButton::clicked, this, [this] { deleteScheduled = true; deleteAnimation(); });
 
     setColor(color);
 

@@ -54,11 +54,7 @@ class GcPane : public QWidget
         virtual void mousePressEvent(QMouseEvent *) override;
         virtual void mouseReleaseEvent(QMouseEvent *) override;
         virtual void mouseMoveEvent(QMouseEvent *) override;
-#if QT_VERSION >= 0x060000
         virtual void enterEvent(QEnterEvent *) override;
-#else
-        virtual void enterEvent(QEvent *) override;
-#endif
         virtual void leaveEvent(QEvent *) override;
         virtual bool eventFilter(QObject *object, QEvent *e) override;
         virtual void resizeEvent (QResizeEvent * e) override;

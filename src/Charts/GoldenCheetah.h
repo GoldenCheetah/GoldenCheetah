@@ -41,17 +41,16 @@ class Perspective;
 #include <QMetaType>
 #include <QFrame>
 #include <QtGui>
+#include <QObject>
 
 #include "GcWindowRegistry.h"
 #include "TimeUtils.h"
 class RideItem;
 
-#if QT_VERSION >= 0x060000
 // For RideItem and Perspective properties, this is required.
 // A normal include would lead to a circular dependency here.
 Q_MOC_INCLUDE("RideItem.h");
 Q_MOC_INCLUDE("Perspective.h");
-#endif
 
 class GcOverlayWidget;
 class Perspective;
@@ -121,10 +120,10 @@ private:
     int oWidth, oHeight, oX, oY, mX, mY;
     double oHeightFactor, oWidthFactor;
 
-public slots:
+public Q_SLOTS:
     void _closeWindow();
 
-signals:
+Q_SIGNALS:
     void controlsChanged(QWidget*);
     void titleChanged(QString);
     void subtitleChanged(QString);
@@ -227,11 +226,7 @@ public:
     void mousePressEvent(QMouseEvent *) override;
     void mouseReleaseEvent(QMouseEvent *) override;
     void mouseMoveEvent(QMouseEvent *) override;
-#if QT_VERSION >= 0x060000
     void enterEvent(QEnterEvent *) override;
-#else
-    void enterEvent(QEvent *) override;
-#endif
     void leaveEvent(QEvent *) override;
     void setDragState(DragState);
     void setCursorShape(DragState);
@@ -302,7 +297,7 @@ public:
     void setControls(QWidget *x);
     void addHelper(QString name, QWidget *widget); // add to the overlay widget
 
-public slots:
+public Q_SLOTS:
     void hideRevealControls();
     void saveImage();
     void saveChart();

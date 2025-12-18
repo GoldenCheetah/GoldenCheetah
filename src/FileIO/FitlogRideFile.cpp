@@ -239,9 +239,6 @@ FitlogFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &f
     if (!file.open(QIODevice::WriteOnly)) return(false);
     file.resize(0);
     QTextStream out(&file);
-#if QT_VERSION < 0x060000
-    out.setCodec("UTF-8");
-#endif
     out.setGenerateByteOrderMark(true);
     out << xml;
     out.flush();

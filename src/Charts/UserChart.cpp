@@ -567,9 +567,7 @@ UserChart::settings() const
     QString returning;
 
     QTextStream out(&returning);
-#if QT_VERSION < 0x060000
-    out.setCodec("UTF-8");
-#endif
+
     out << "{ ";
 
     // chartinfo
@@ -683,7 +681,7 @@ UserChart::applySettings(QString x)
             delete static_cast<UserChartData*>(series.user1);
 
     seriesinfo.clear();
-    foreach(QJsonValue it, obj["SERIES"].toArray()) {
+    for(const QJsonValue &it : obj["SERIES"].toArray()) {
 
         // should be an array of objects
         QJsonObject series=it.toObject();
@@ -715,7 +713,7 @@ UserChart::applySettings(QString x)
 
     // array of axes
     axisinfo.clear();
-    foreach(QJsonValue it, obj["AXES"].toArray()) {
+    for(const QJsonValue &it : obj["AXES"].toArray()) {
 
         // should be an array of objects
         QJsonObject axis=it.toObject();

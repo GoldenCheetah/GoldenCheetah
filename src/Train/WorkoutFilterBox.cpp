@@ -31,10 +31,10 @@ WorkoutFilterBox::WorkoutFilterBox(QWidget *parent, Context *context) : FilterEd
     QIcon workoutFilterClearIcon = QPixmap::fromImage(QImage(":images/toolbar/clear.png"));
     QAction *workoutFilterClearAction = this->addAction(workoutFilterClearIcon, FilterEditor::TrailingPosition);
     workoutFilterClearAction->setVisible(! text().isEmpty());
-    connect(this, &FilterEditor::textChanged, this, [=](const QString &text) {
+    connect(this, &FilterEditor::textChanged, this, [workoutFilterClearAction](const QString &text) {
         workoutFilterClearAction->setVisible(! text.isEmpty());
     });
-    connect(workoutFilterClearAction, &QAction::triggered, this, [=]() {
+    connect(workoutFilterClearAction, &QAction::triggered, this, [this]() {
         setText("");
     });
 

@@ -188,11 +188,7 @@ RideMetric::userMetricFingerprint(QList<UserMetricSettings> these)
     foreach(UserMetricSettings x, these)
         fingers += x.fingerprint.toLocal8Bit();
 
-#if QT_VERSION < 0x060000
-    return qChecksum(fingers.constData(), fingers.size());
-#else
     return qChecksum(fingers);
-#endif
 }
 
 QHash<QString,RideMetricPtr>
