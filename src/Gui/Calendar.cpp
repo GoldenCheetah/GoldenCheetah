@@ -32,9 +32,6 @@
 #include <QDrag>
 #include <QMimeData>
 #include <QDebug>
-#if QT_VERSION < 0x060000
-#include <QAbstractItemDelegate>
-#endif
 
 #include "Colors.h"
 #include "Settings.h"
@@ -97,11 +94,7 @@ CalendarOverview::fillEntries
 
 void
 CalendarOverview::paintCell
-#if QT_VERSION < 0x060000
-(QPainter *painter, const QRect &rect, const QDate &date) const
-#else
 (QPainter *painter, const QRect &rect, QDate date) const
-#endif
 {
     QCalendarWidget::paintCell(painter, rect, date);
 
@@ -591,11 +584,7 @@ void
 CalendarDayTable::dragMoveEvent
 (QDragMoveEvent *event)
 {
-#if QT_VERSION < 0x060000
-    QPoint pos = event->pos();
-#else
     QPoint pos = event->position().toPoint();
-#endif
     QModelIndex hoverIndex = indexAt(pos);
     if (   hoverIndex.isValid()
         && hoverIndex.column() > 0
@@ -667,11 +656,7 @@ CalendarDayTable::dropEvent
             if (srcIndex.isValid() && entryIdx >= 0) {
                 CalendarDay srcDay = srcIndex.data(CalendarDetailedDayDelegate::DayRole).value<CalendarDay>();
                 if (entryIdx < srcDay.entries.count()) {
-#if QT_VERSION < 0x060000
-                    QPoint pos = event->pos();
-#else
                     QPoint pos = event->position().toPoint();
-#endif
                     QModelIndex destIndex = indexAt(pos);
                     QTime time = timeScaleData.timeFromYInTable(pos.y(), visualRect(destIndex));
                     CalendarDay destDay = destIndex.data(CalendarDetailedDayDelegate::DayRole).value<CalendarDay>();
@@ -1258,11 +1243,7 @@ void
 CalendarMonthTable::dragMoveEvent
 (QDragMoveEvent *event)
 {
-#if QT_VERSION < 0x060000
-    QModelIndex hoverIndex = indexAt(event->pos());
-#else
     QModelIndex hoverIndex = indexAt(event->position().toPoint());
-#endif
     if (   hoverIndex.isValid()
         && hoverIndex.column() < 7
         && hoverIndex != pressedIndex) {
@@ -1317,11 +1298,7 @@ CalendarMonthTable::dropEvent
             if (srcIndex.isValid() && entryIdx >= 0) {
                 CalendarDay srcDay = srcIndex.data(CalendarCompactDayDelegate::DayRole).value<CalendarDay>();
                 if (entryIdx < srcDay.entries.count()) {
-#if QT_VERSION < 0x060000
-                    QModelIndex destIndex = indexAt(event->pos());
-#else
                     QModelIndex destIndex = indexAt(event->position().toPoint());
-#endif
                     CalendarDay destDay = destIndex.data(CalendarCompactDayDelegate::DayRole).value<CalendarDay>();
                     emit entryMoved(srcDay.entries[entryIdx], srcDay.date, destDay.date, srcDay.entries[entryIdx].start);
                 }
@@ -1329,16 +1306,6 @@ CalendarMonthTable::dropEvent
         }
     }
 }
-
-
-#if QT_VERSION < 0x060000
-QAbstractItemDelegate*
-CalendarMonthTable::itemDelegateForIndex
-(const QModelIndex &index) const
-{
-    return itemDelegateForColumn(index.column());
-}
-#endif
 
 
 void

@@ -57,11 +57,7 @@ class ChartTableWidget : public QTableWidget
         ChartTableWidget(QWidget *parent) : QTableWidget(parent) {}
 
         virtual QStringList mimeTypes() const override;
-#if QT_VERSION < 0x060000
-        virtual QMimeData *mimeData (const QList<QTableWidgetItem *> items) const override;
-#else
         virtual QMimeData *mimeData (const QList<QTableWidgetItem *> &items) const override;
-#endif
 };
 
 class PerspectiveDialog : public QDialog

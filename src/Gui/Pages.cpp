@@ -134,7 +134,10 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     garminHWMarkedit->setSuffix(" " + tr("s"));
     garminHWMarkedit->setValue(garminHWMark.toInt());
 
-    connect(garminSmartRecord, &QCheckBox::stateChanged, this, [this](int state) { garminHWMarkedit->setEnabled(state); });
+    connect(garminSmartRecord, 
+            &QCheckBox::stateChanged,
+            this, [this](int state) { garminHWMarkedit->setEnabled(state); });
+
     garminSmartRecord->setCheckState(! (isGarminSmartRecording.toInt() > 0) ? Qt::Checked : Qt::Unchecked);
     garminSmartRecord->setCheckState(isGarminSmartRecording.toInt() > 0 ? Qt::Checked : Qt::Unchecked);
 
@@ -193,7 +196,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     //XXrBrowseButton->setFixedWidth(120);
 
     connect(rBrowseButton, SIGNAL(clicked()), this, SLOT(browseRDir()));
-    connect(embedR, &QCheckBox::stateChanged, this, [this](int state) { rDirectorySel->setEnabled(state); });
+    connect(embedR,
+            &QCheckBox::stateChanged,
+            this, [this](int state) { rDirectorySel->setEnabled(state); });
 
     embedR->setChecked(! appsettings->value(NULL, GC_EMBED_R, true).toBool());
     embedR->setChecked(appsettings->value(NULL, GC_EMBED_R, true).toBool());
@@ -216,7 +221,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     pythonDirectoryLayout->addWidget(pythonBrowseButton);
 
     connect(pythonBrowseButton, SIGNAL(clicked()), this, SLOT(browsePythonDir()));
-    connect(embedPython, &QCheckBox::stateChanged, this, [this](int state) { pythonDirectorySel->setEnabled(state); });
+    connect(embedPython,
+            &QCheckBox::stateChanged,
+            this, [this](int state) { pythonDirectorySel->setEnabled(state); });
 
     embedPython->setChecked(! appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool());
     embedPython->setChecked(appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool());
@@ -2553,17 +2560,9 @@ IconsPage::eventFilterSportTreeViewport
     if (event->type() == QEvent::MouseButtonPress) {
         QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
         if (mouseEvent->button() == Qt::LeftButton) {
-#if QT_VERSION >= 0x060000
             QTreeWidgetItem *item = sportTree->itemAt(mouseEvent->position().toPoint());
-#else
-            QTreeWidgetItem *item = sportTree->itemAt(mouseEvent->pos());
-#endif
             if (item && ! item->data(0, Qt::UserRole + 2).toString().isEmpty()) {
-#if QT_VERSION >= 0x060000
                 sportTreeDragStartPos = mouseEvent->position().toPoint();
-#else
-                sportTreeDragStartPos = mouseEvent->pos();
-#endif
                 sportTreeDragWatch = true;
             } else {
                 sportTreeDragWatch = false;
@@ -2574,19 +2573,11 @@ IconsPage::eventFilterSportTreeViewport
         QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
         if (   ! (mouseEvent->buttons() & Qt::LeftButton)
             || ! sportTreeDragWatch
-#if QT_VERSION >= 0x060000
             || (mouseEvent->position().toPoint() - sportTreeDragStartPos).manhattanLength() < QApplication::startDragDistance()) {
-#else
-            || (mouseEvent->pos() - sportTreeDragStartPos).manhattanLength() < QApplication::startDragDistance()) {
-#endif
             return true;
         }
         sportTreeDragWatch = false;
-#if QT_VERSION >= 0x060000
         QTreeWidgetItem *item = sportTree->itemAt(mouseEvent->position().toPoint());
-#else
-        QTreeWidgetItem *item = sportTree->itemAt(mouseEvent->pos());
-#endif
         if (! item) {
             return true;
         }
@@ -2699,17 +2690,9 @@ IconsPage::eventFilterIconListViewport
     } else if (event->type() == QEvent::MouseButtonPress) {
         QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
         if (mouseEvent->button() == Qt::LeftButton) {
-#if QT_VERSION >= 0x060000
             QListWidgetItem *item = iconList->itemAt(mouseEvent->position().toPoint());
-#else
-            QListWidgetItem *item = iconList->itemAt(mouseEvent->pos());
-#endif
             if (item) {
-#if QT_VERSION >= 0x060000
                 iconListDragStartPos = mouseEvent->position().toPoint();
-#else
-                iconListDragStartPos = mouseEvent->pos();
-#endif
                 iconListDragWatch = true;
             } else {
                 iconListDragWatch = false;
@@ -2720,19 +2703,11 @@ IconsPage::eventFilterIconListViewport
         QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
         if (   ! (mouseEvent->buttons() & Qt::LeftButton)
             || ! iconListDragWatch
-#if QT_VERSION >= 0x060000
             || (mouseEvent->position().toPoint() - iconListDragStartPos).manhattanLength() < QApplication::startDragDistance()) {
-#else
-            || (mouseEvent->pos() - iconListDragStartPos).manhattanLength() < QApplication::startDragDistance()) {
-#endif
             return true;
         }
         iconListDragWatch = false;
-#if QT_VERSION >= 0x060000
         QListWidgetItem *item = iconList->itemAt(mouseEvent->position().toPoint());
-#else
-        QListWidgetItem *item = iconList->itemAt(mouseEvent->pos());
-#endif
         if (! item) {
             return true;
         }
@@ -2800,9 +2775,6 @@ IconsPage::initSportTree
             }
         }
     }
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    sportTree->viewport()->update();
-#endif
 }
 
 

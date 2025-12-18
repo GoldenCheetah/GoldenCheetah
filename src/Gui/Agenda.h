@@ -49,11 +49,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
     void leaveEvent(QEvent *event) override;
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    void enterEvent(QEvent *event) override;
-#else
     void enterEvent(QEnterEvent *event) override;
-#endif
     void contextMenuEvent(QContextMenuEvent *event) override;
     void changeEvent(QEvent *event) override;
     bool viewportEvent(QEvent *event) override;

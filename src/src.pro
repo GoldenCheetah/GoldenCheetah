@@ -5,7 +5,7 @@
 #                                                                             #
 ###############################################################################
 
-!versionAtLeast(QT_VERSION, 5.15):error("Use at least Qt version 5.15")
+!versionAtLeast(QT_VERSION, 6.5.3):error("Use at least Qt version 6.5.3")
 
 ###==========================
 ### IMPORT USER CONFIGURATION
@@ -32,18 +32,13 @@ CONFIG(debug, debug|release) { QMAKE_CXXFLAGS += -DGC_DEBUG }
 
 
 ###========================================================================
-### QT5.14.2 officially supported which mandates c++11 support in toolchain
+### QT6.5.3 officially supported which mandates c++17 support in toolchain
 ###========================================================================
 
 # always
 QT += xml sql network svg  widgets concurrent serialport multimedia multimediawidgets \
-      webenginecore webenginewidgets webchannel positioning
-greaterThan(QT_MAJOR_VERSION, 5) {
-    QT += webenginequick core5compat
-} else {
-    QT += webengine
-}
-CONFIG += c++11
+      webenginecore webenginewidgets webchannel positioning webenginequick core5compat
+CONFIG += c++17
 
 ###==========================
 ### PRECOMPILED HEADER
@@ -155,7 +150,6 @@ macx {
     # on mac we use native buttons and video, but have native fullscreen support
     LIBS    += -lobjc -framework IOKit -framework AppKit
 
-    # GC_VIDEO_QT5 will enable Qt5 video support,
     # GC_VIDEO_QT6 will enable Qt6 video support,
     # GC_VIDEO_VLC will enable VLC video support,
     # otherwise we have a blank videowindow, it will do nothing
@@ -236,7 +230,7 @@ RESOURCES = $${PWD}/Resources/application.qrc
 ### OPTIONAL => Embed Python
 ###=========================
 
-notsupported = "INFO: Embedded Python requires version QT >= 5.8, no support for"
+notsupported = "INFO: Embedded Python requires version QT >= 6.5.3, no support for"
 notsupported += $${QT_VERSION}
 
 contains(DEFINES, "GC_WANT_PYTHON") {
@@ -498,11 +492,11 @@ SOURCES +=  $$HTPATH/httpglobal.cpp \
 ### OPTIONAL => CLOUD DB [Google App Engine Integration]
 ###=====================================================
 
-##----------------------------------------------##
-## CloudDB is only supported on QT5.5 or higher ##
-##----------------------------------------------##
+##------------------------------------------------##
+## CloudDB is only supported on QT6.5.3 or higher ##
+##------------------------------------------------##
 
-notsupported = "INFO: CloudDB requires version QT >= 5.5, no support for"
+notsupported = "INFO: CloudDB requires version QT >= 6.5.3, no support for"
 notsupported += $${QT_VERSION}
 
 equals(CloudDB, active) {
@@ -528,13 +522,6 @@ equals(CloudDB, active) {
 #                                                                             #
 ###############################################################################
 
-
-
-###===========================================
-### FEATURES ENABLED WHEN HAVE QT5 [or higher]
-###===========================================
-
-# Features that only work with QT5 or higher
 SOURCES += Cloud/Dropbox.cpp
 HEADERS += Cloud/Dropbox.h
 SOURCES += Cloud/OpenData.cpp
@@ -671,7 +658,7 @@ HEADERS += Gui/AboutDialog.h Gui/AddIntervalDialog.h Gui/AnalysisSidebar.h Gui/C
            Gui/PerspectiveDialog.h Gui/SplashScreen.h Gui/StyledItemDelegates.h Gui/MetadataDialog.h Gui/ActionButtonBox.h \
            Gui/MetricOverrideDialog.h Gui/RepeatScheduleWizard.h \
            Gui/Calendar.h Gui/Agenda.h Gui/CalendarData.h Gui/CalendarItemDelegates.h \
-           Gui/IconManager.h Gui/Qt5Compatibility.h
+           Gui/IconManager.h
 
 # metrics and models
 HEADERS += Metrics/Banister.h Metrics/CPSolver.h Metrics/Estimator.h Metrics/ExtendedCriticalPower.h Metrics/HrZones.h Metrics/PaceZones.h \

@@ -1219,7 +1219,7 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     pmaxDelegate.setShowSuffixOnEdit(true);
     pmaxDelegate.setShowSuffixOnDisplay(true);
 
-    ranges = new TreeWidget6();
+    ranges = new QTreeWidget();
     ranges->headerItem()->setText(CPPAGE_RANGES_COL_RNUM, "_rnum");
     ranges->headerItem()->setText(CPPAGE_RANGES_COL_STARTDATE, tr("Start Date"));
     ranges->headerItem()->setText(CPPAGE_RANGES_COL_CP, tr("Critical Power"));
@@ -1314,13 +1314,8 @@ void
 CPPage::initializeRanges
 (int selectIndex)
 {
-#if QT_VERSION < 0x060000
-    disconnect(ranges->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)),
-               this, SLOT(rangeChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)));
-#else
     disconnect(ranges->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QList<int>&)),
                this, SLOT(rangeChanged(const QModelIndex&, const QModelIndex&, const QList<int>&)));
-#endif
 
     ranges->blockSignals(true);
     ranges->clear();
@@ -1391,13 +1386,8 @@ CPPage::initializeRanges
 
     newZoneRequired->setVisible(needsNewRange());
 
-#if QT_VERSION < 0x060000
-    connect(ranges->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)),
-            this, SLOT(rangeChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)));
-#else
     connect(ranges->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QList<int>&)),
             this, SLOT(rangeChanged(const QModelIndex&, const QModelIndex&, const QList<int>&)));
-#endif
 }
 
 
@@ -1415,11 +1405,7 @@ CPPage::reInitializeRanges
 
 void
 CPPage::rangeChanged
-#if QT_VERSION < 0x060000
-(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
-#else
 (const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)
-#endif
 {
     Q_UNUSED(bottomRight)
 
@@ -3206,13 +3192,8 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     connect(defaultButton, SIGNAL(clicked()), this, SLOT(defaultClicked()));
 
     connect(ranges, SIGNAL(itemSelectionChanged()), this, SLOT(rangeSelectionChanged()));
-#if QT_VERSION < 0x060000
-    connect(ranges->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)),
-            this, SLOT(rangeChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)));
-#else
     connect(ranges->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QList<int>&)),
             this, SLOT(rangeChanged(const QModelIndex&, const QModelIndex&, const QList<int>&)));
-#endif
     connect(zones, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(zonesChanged()));
 
     if (ranges->invisibleRootItem()->childCount() > 0) {
@@ -3370,11 +3351,7 @@ CVPage::defaultClicked()
 
 void
 CVPage::rangeChanged
-#if QT_VERSION < 0x060000
-(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
-#else
 (const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)
-#endif
 {
     Q_UNUSED(bottomRight)
 

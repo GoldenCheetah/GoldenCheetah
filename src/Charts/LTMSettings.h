@@ -226,10 +226,6 @@ class LTMSettings {
     public:
 
         LTMSettings() {
-#if QT_VERSION < 0x060000
-            // we need to register the stream operators
-            qRegisterMetaTypeStreamOperators<LTMSettings>("LTMSettings");
-#endif
             bests = NULL;
             ltmTool = NULL;
         }

@@ -52,7 +52,6 @@
 #include "RemoteControl.h"
 #include "Measures.h"
 #include "StyledItemDelegates.h"
-#include "Qt5Compatibility.h"
 
 class MeasuresPage : public QWidget
 {
@@ -275,11 +274,7 @@ class CPPage : public QWidget
         void reInitializeRanges();
 
     private slots:
-#if QT_VERSION < 0x060000
-        void rangeChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
-#else
         void rangeChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles = QList<int>());
-#endif
 
         void review();
 
@@ -299,7 +294,7 @@ class CPPage : public QWidget
         Context *context;
         Zones *zones_;
         SchemePage *schemePage;
-        TreeWidget6 *ranges;
+        QTreeWidget *ranges;
         QTreeWidget *zones;
         QPushButton *reviewButton;
         QPushButton *defaultButton;
@@ -483,11 +478,7 @@ class CVPage : public QWidget
         void addClicked();
         void deleteClicked();
         void defaultClicked();
-#if QT_VERSION < 0x060000
-        void rangeChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
-#else
         void rangeChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles = QList<int>());
-#endif
         void rangeSelectionChanged();
         void addZoneClicked();
         void deleteZoneClicked();

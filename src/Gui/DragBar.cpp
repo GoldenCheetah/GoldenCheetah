@@ -27,8 +27,8 @@ DragBar::DragBar(QWidget*parent) : QTabBar(parent)
 void
 DragBar::dragEnterEvent(QDragEnterEvent*event)
 {
-    if (tabAt(event->pos()) != -1 && tabAt(event->pos()) != currentIndex()) {
-        setCurrentIndex(tabAt(event->pos()));
+    if (tabAt(event->position().toPoint()) != -1 && tabAt(event->position().toPoint()) != currentIndex()) {
+        setCurrentIndex(tabAt(event->position().toPoint()));
     }
 }
 
@@ -38,8 +38,8 @@ DragBar::dragLeaveEvent(QDragLeaveEvent*) {}
 void
 DragBar::dragMoveEvent(QDragMoveEvent *event) // we don't get these without accepting dragevent
 {                                             // and that would be a bad idea
-    if (tabAt(event->pos()) != -1 && tabAt(event->pos()) != currentIndex()) {
-        setCurrentIndex(tabAt(event->pos()));
+    if (tabAt(event->position().toPoint()) != -1 && tabAt(event->position().toPoint()) != currentIndex()) {
+        setCurrentIndex(tabAt(event->position().toPoint()));
     }
 }
 

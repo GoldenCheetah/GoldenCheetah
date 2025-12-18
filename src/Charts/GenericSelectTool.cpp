@@ -701,6 +701,7 @@ GenericSelectTool::moved(QPointF pos)
 
                 // pointsVector
                 if (series->type() == QAbstractSeries::SeriesTypeLine || series->type() == QAbstractSeries::SeriesTypeArea) {
+
                     QXYSeries *line = series->type() == QAbstractSeries::SeriesTypeLine ? static_cast<QXYSeries*>(series) :
                                                                               static_cast<QAreaSeries*>(series)->upperSeries();
                     // value we want
@@ -721,7 +722,6 @@ GenericSelectTool::moved(QPointF pos)
                         if (p.x() != 0 && (nearestx == -9999 || (std::fabs(p.x()-xvalue)) < std::fabs((nearestx-xvalue)))) nearestx = p.x();
                     }
                 }
-
             }
 
             // run over what we found, updating paint points and signal (for legend)
@@ -1009,10 +1009,8 @@ GenericSelectTool::updateScene()
                         selection->setName(QString("%1_select").arg(line->name()));
 
                         // all of this curve cloning should be in a new method xxx todo
-#if QT_VERSION < 0x060400
-                        selection->setUseOpenGL(line->useOpenGL());
-#endif
                         selection->setPen(line->pen());
+
                         if (line->useOpenGL())
                             selection->setColor(Qt::gray); // use opengl ignores changing colors
                         else {
@@ -1087,9 +1085,7 @@ GenericSelectTool::updateScene()
 
                         // all of this curve cloning should be in a new method xxx todo
                         host->qchart->addSeries(selection); // before adding data and axis
-#if QT_VERSION < 0x060400
-                        selection->setUseOpenGL(scatter->useOpenGL());
-#endif
+
                         if (selection->useOpenGL())
                             selection->setColor(Qt::gray); // use opengl ignores changing colors
                         else {

@@ -662,12 +662,7 @@ SeasonTreeView::mimeTypes() const
 }
 
 QMimeData *
-SeasonTreeView::mimeData
-#if QT_VERSION < 0x060000
-(const QList<QTreeWidgetItem *> items) const
-#else
-(const QList<QTreeWidgetItem *> &items) const
-#endif
+SeasonTreeView::mimeData(const QList<QTreeWidgetItem *> &items) const
 {
     QMimeData *returning = new QMimeData;
 

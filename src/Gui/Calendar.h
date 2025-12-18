@@ -50,11 +50,7 @@ public:
     void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries);
 
 protected:
-#if QT_VERSION < 0x060000
-    void paintCell(QPainter *painter, const QRect &rect, const QDate &date) const override;
-#else
     void paintCell(QPainter *painter, const QRect &rect, QDate date) const override;
-#endif
 
 private:
     QHash<QDate, QList<CalendarEntry>> activityEntries;
@@ -117,9 +113,6 @@ protected:
     void dragMoveEvent(QDragMoveEvent *event) override;
     void dragLeaveEvent(QDragLeaveEvent *event) override;
     void dropEvent(QDropEvent *event) override;
-#if QT_VERSION < 0x060000
-    QAbstractItemDelegate *itemDelegateForIndex(const QModelIndex &index) const;
-#endif
 
 private slots:
     void showContextMenu(const QPoint &pos);
@@ -206,9 +199,6 @@ protected:
     void dragMoveEvent(QDragMoveEvent *event) override;
     void dragLeaveEvent(QDragLeaveEvent *event) override;
     void dropEvent(QDropEvent *event) override;
-#if QT_VERSION < 0x060000
-    QAbstractItemDelegate *itemDelegateForIndex(const QModelIndex &index) const;
-#endif
 
 private slots:
     void showContextMenu(const QPoint &pos);

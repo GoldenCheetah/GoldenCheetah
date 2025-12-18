@@ -81,7 +81,7 @@ RatingWidget::mouseMoveEvent
         s.append(QChar(STAR_FILLED));
         QRect starRect = fontMetrics.boundingRect(s);
         int ratingWidth = starRect.width() + leftOffset;
-        if (event->localPos().x() < ratingWidth) {
+        if (event->position().x() < ratingWidth) {
             mouseOverRating = i;
             break;
         }

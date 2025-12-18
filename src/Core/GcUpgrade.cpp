@@ -1074,9 +1074,6 @@ GcUpgradeLogDialog::saveAs()
     QFile file(fileName);
     file.resize(0);
     QTextStream out(&file);
-#if QT_VERSION < 0x060000
-    out.setCodec("UTF-8");
-#endif
 
     if (file.open(QIODevice::WriteOnly)) {
 

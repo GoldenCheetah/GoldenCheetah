@@ -22,8 +22,14 @@
 
 // Minimal iterator to traverse QXYSeries points without copying
 // Required to use std::lower_bound on QXYSeries data in-place
-class SeriesIterator : public std::iterator<std::random_access_iterator_tag, QPointF> {
+class SeriesIterator {
 public:
+    typedef std::random_access_iterator_tag iterator_category;
+    typedef QPointF value_type;
+    typedef ptrdiff_t difference_type;
+    typedef QPointF* pointer;
+    typedef QPointF& reference;
+
     SeriesIterator(QXYSeries *series, int index) : m_series(series), m_index(index) {}
 
     QPointF operator*() const { return m_series->at(m_index); }

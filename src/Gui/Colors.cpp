@@ -87,11 +87,7 @@ unsigned long Colors::fingerprint(const Colors *set)
         ba.append(set->color.name().toUtf8());
         set++;
     }
-#if QT_VERSION < 0x060000
-    return qChecksum(ba, ba.length());
-#else
     return qChecksum(ba);
-#endif
 }
 
 #ifdef Q_OS_WIN

@@ -412,13 +412,13 @@ badconfig:
 
         QVector<int> widths;
         QJsonArray w = root["widths"].toArray();
-        foreach(const QJsonValue width, w) widths << width.toInt();
+        for(const QJsonValue &width : w) widths << width.toInt();
         space->setColumnWidths(widths);
     }
 
     // cards
     QJsonArray CHARTS = root["CHARTS"].toArray();
-    foreach(const QJsonValue val, CHARTS) {
+    for(const QJsonValue &val : CHARTS) {
 
         // convert so we can inspect
         QJsonObject obj = val.toObject();
@@ -733,9 +733,6 @@ OverviewConfigDialog::exportChart()
     // truncate and start a stream
     outfile.resize(0);
     QTextStream out(&outfile);
-#if QT_VERSION < 0x060000
-    out.setCodec ("UTF-8");
-#endif
 
     QString viewName;
     int chartId = GcWindowTypes::None;

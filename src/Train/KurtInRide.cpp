@@ -160,6 +160,7 @@ void inride_BTDeviceInfoToSystemID(const QBluetoothDeviceInfo &devinfo, uint8_t 
 
         quint128 be_uuid128 = uuid.toUInt128();
 
+// GC minimum Qt required for v3.8 is Qt6.5.3
 #if QT_VERSION < 0x060600
         addr64 = *(uint64_t*)be_uuid128.data;
 #else

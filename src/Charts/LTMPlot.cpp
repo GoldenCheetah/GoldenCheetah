@@ -280,11 +280,7 @@ LTMPlot::setData(LTMSettings *set)
     setAxisVisible(QwtAxis::XTop, false);
 
     // wipe existing curves/axes details
-#if QT_VERSION >= 0x060000
     QMultiHashIterator<QString, QwtPlotCurve*> c(curves);
-#else
-    QHashIterator<QString, QwtPlotCurve*> c(curves);
-#endif
     while (c.hasNext()) {
         c.next();
         QString symbol = c.key();
@@ -1360,11 +1356,7 @@ LTMPlot::setData(LTMSettings *set)
         refreshZoneLabels(QwtAxisId(-1,-1)); // turn em off
     }
 
-#if QT_VERSION >= 0x060000
     QMultiHashIterator<QString, QwtPlotCurve*> p(curves);
-#else
-    QHashIterator<QString, QwtPlotCurve*> p(curves);
-#endif
     while (p.hasNext()) {
         p.next();
 
@@ -1415,11 +1407,7 @@ LTMPlot::setCompareData(LTMSettings *set)
     //qDebug()<<"Starting.."<<timer.elapsed();
 
     // wipe existing curves/axes details
-#if QT_VERSION >= 0x060000
     QMultiHashIterator<QString, QwtPlotCurve*> c(curves);
-#else
-    QHashIterator<QString, QwtPlotCurve*> c(curves);
-#endif
     while (c.hasNext()) {
         c.next();
         QString symbol = c.key();
@@ -2504,11 +2492,7 @@ LTMPlot::setCompareData(LTMSettings *set)
     if (settings->legend == false) this->legend()->hide();
     else this->legend()->show();
 
-#if QT_VERSION >= 0x060000
     QMultiHashIterator<QString, QwtPlotCurve*> p(curves);
-#else
-    QHashIterator<QString, QwtPlotCurve*> p(curves);
-#endif
     while (p.hasNext()) {
         p.next();
 
@@ -4049,11 +4033,7 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
 
         // we reference the metric definitions of name and
         // units to decide on the level of precision required
-#if QT_VERSION >= 0x060000
         QMultiHashIterator<QString, QwtPlotCurve*> c(curves);
-#else
-        QHashIterator<QString, QwtPlotCurve*> c(curves);
-#endif
         while (c.hasNext()) {
             c.next();
             if (c.value() == curve) {

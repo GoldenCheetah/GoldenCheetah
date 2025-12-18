@@ -430,17 +430,6 @@ AgendaWindow::mkControls
     controlsTabs->addTab(activityScroller, tr("Activities"));
     controlsTabs->addTab(eventScroller, tr("Events"));
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    connect(agendaPastDaysSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &AgendaWindow::setAgendaPastDays);
-    connect(agendaFutureDaysSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &AgendaWindow::setAgendaFutureDays);
-    connect(primaryMainCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &AgendaWindow::updateActivities);
-    connect(primaryFallbackCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &AgendaWindow::updateActivities);
-    connect(secondaryCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &AgendaWindow::updateActivities);
-    connect(showTertiaryForCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &AgendaWindow::updateActivities);
-    connect(tertiaryCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &AgendaWindow::updateActivities);
-    connect(activityMaxTertiaryLinesSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &AgendaWindow::setActivityMaxTertiaryLines);
-    connect(eventMaxTertiaryLinesSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &AgendaWindow::setEventMaxTertiaryLines);
-#else
     connect(agendaPastDaysSpin, &QSpinBox::valueChanged, this, &AgendaWindow::setAgendaPastDays);
     connect(agendaFutureDaysSpin, &QSpinBox::valueChanged, this, &AgendaWindow::setAgendaFutureDays);
     connect(primaryMainCombo, &QComboBox::currentIndexChanged, this, &AgendaWindow::updateActivities);
@@ -450,7 +439,6 @@ AgendaWindow::mkControls
     connect(tertiaryCombo, &QComboBox::currentIndexChanged, this, &AgendaWindow::updateActivities);
     connect(activityMaxTertiaryLinesSpin, &QSpinBox::valueChanged, this, &AgendaWindow::setActivityMaxTertiaryLines);
     connect(eventMaxTertiaryLinesSpin, &QSpinBox::valueChanged, this, &AgendaWindow::setEventMaxTertiaryLines);
-#endif
     connect(showSecondaryLabelCheck, &QCheckBox::toggled, this, &AgendaWindow::updateActivities);
 
     setControls(controlsTabs);
@@ -678,11 +666,8 @@ AgendaWindow::getPhases
     std::sort(futurePhases.begin(), futurePhases.end(), [](const CalendarEntry &a, const CalendarEntry &b) {
         return a.spanStart < b.spanStart;
     });
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    return std::pair<QList<CalendarEntry>, QList<CalendarEntry>>(ongoingPhases, futurePhases);
-#else
+
     return std::pair(ongoingPhases, futurePhases);
-#endif
 }
 
 

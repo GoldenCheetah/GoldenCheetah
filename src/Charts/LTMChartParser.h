@@ -62,11 +62,7 @@ class ChartTreeView : public QTreeWidget
 
         // for drag/drop
         QStringList mimeTypes () const override;
-#if QT_VERSION < 0x060000
-        QMimeData *mimeData(const QList<QTreeWidgetItem *> items) const override;
-#else
         QMimeData *mimeData(const QList<QTreeWidgetItem *> &items) const override;
-#endif
 
     signals:
         void itemMoved(QTreeWidgetItem* item, int previous, int actual);
