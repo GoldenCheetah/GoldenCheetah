@@ -514,7 +514,7 @@ void ZipReaderPrivate::scanFiles()
     int num_dir_entries = 0;
     EndOfDirectory eod;
     while (start_of_directory == -1) {
-        int pos = device->size() - sizeof(EndOfDirectory) - i;
+        size_t pos = device->size() - sizeof(EndOfDirectory) - i;
         if (pos < 0 || i > 65535) {
             qWarning() << "QZip: EndOfDirectory not found";
             return;
@@ -755,7 +755,7 @@ ZipReader::ZipReader(const QString &archive, QIODevice::OpenMode mode)
             status = FileError;
     }
 
-    d = new ZipReaderPrivate(&(*f), /*ownDevice=*/true);
+    d = new ZipReaderPrivate(&(*f.release()), /*ownDevice=*/true);
     d->status = status;
 }
 
@@ -1039,7 +1039,7 @@ ZipWriter::ZipWriter(const QString &fileName, QIODevice::OpenMode mode)
             status = ZipWriter::FileError;
     }
 
-    d = new ZipWriterPrivate(&(*f), /*ownDevice=*/true);
+    d = new ZipWriterPrivate(&(*f.release()), /*ownDevice=*/true);
     d->status = status;
 }
 
