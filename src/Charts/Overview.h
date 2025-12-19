@@ -65,6 +65,11 @@ class OverviewWindow : public GcChartWindow
         // config item requested
         void configItem(ChartSpaceItem *, QPoint);
 
+    protected:
+
+        // the chart displays information related to the selected ride
+        bool selectedRideInfo() const override { return (scope & OverviewScope::ANALYSIS); }
+
     private:
 
         // gui setup

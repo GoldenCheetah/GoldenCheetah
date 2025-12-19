@@ -117,6 +117,9 @@ class PfPvWindow : public GcChartWindow
 
     protected:
 
+        // the chart displays information related to the selected ride
+        bool selectedRideInfo() const override { return true; }
+
         Context *context;
         PfPvPlot *pfPvPlot;
         QwtPlotZoomer *pfpvZoomer;

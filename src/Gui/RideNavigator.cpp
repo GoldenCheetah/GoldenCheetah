@@ -199,6 +199,9 @@ RideNavigator::configChanged(qint32 state)
     if (state & CONFIG_FIELDS) resetView();
 
     refresh();
+
+    // reapply the current activites highlight, as it gets lost when the configuration changes
+    cursorRide();
 }
 
 void
@@ -362,6 +365,10 @@ void RideNavigator::searchStrings(QStringList list)
 {
     searchFilter->setStrings(list);
     setWidth(geometry().width());
+
+    // attempt to reapply the current activites highlight, as its gets lost when a filter/search is applied,
+    // this will have no effect when there are no results, or the selected activity is not within the results.
+    cursorRide();
 }
 
 void RideNavigator::clearSearch()
@@ -369,6 +376,9 @@ void RideNavigator::clearSearch()
     searchFilter->clearStrings();
     QApplication::processEvents(); // repaint/resize list view - scrollbar..
     setWidth(geometry().width());  // before we update column sizes!
+
+    // reapply the current activites highlight, as it gets lost when a filter/search is removed
+    cursorRide();
 }
 
 void RideNavigator::setWidth(int x)
@@ -958,27 +968,8 @@ RideNavigator::setRide(RideItem*rideItem)
     // if we have a selection and its this one just ignore.
     if (rideItem == NULL || (currentItem == rideItem && tableView->selectionModel()->selectedRows().count() != 0)) return;
 
-    for (int i=0; i<tableView->model()->rowCount(); i++) {
-
-        QModelIndex group = tableView->model()->index(i,0,QModelIndex());
-        for (int j=0; j<tableView->model()->rowCount(group); j++) {
-
-            QString fileName = tableView->model()->data(tableView->model()->index(j,3, group), Qt::DisplayRole).toString();
-            if (fileName == rideItem->fileName) {
-                // we set current index to column 2 (date/time) since we can be guaranteed it is always show (all others are removable)
-                QItemSelection row(tableView->model()->index(j,0,group),
-                tableView->model()->index(j,tableView->model()->columnCount()-1, group));
-                tableView->selectionModel()->select(row, QItemSelectionModel::Rows | QItemSelectionModel::ClearAndSelect);
-                tableView->selectionModel()->setCurrentIndex(tableView->model()->index(j,0,group), QItemSelectionModel::NoUpdate);
-                tableView->scrollTo(tableView->model()->index(j,3,group), QAbstractItemView::PositionAtCenter);
-
-                currentItem = rideItem;
-                repaint();
-                active = false;
-                return;
-            }
-        }
-    }
+    currentItem = rideItem;
+    cursorRide();
 }
 
 void
@@ -1028,10 +1019,16 @@ RideNavigator::cursorRide()
 
         QModelIndex group = tableView->model()->index(i,0,QModelIndex());
         for (int j=0; j<tableView->model()->rowCount(group); j++) {
-            QString fileName = tableView->model()->data(tableView->model()->index(j,2, group), Qt::UserRole+1).toString();
+            QString fileName = tableView->model()->data(tableView->model()->index(j,3, group), Qt::DisplayRole).toString();
             if (fileName == currentItem->fileName) {
                 // we set current index to column 2 (date/time) since we can be guaranteed it is always show (all others are removable)
-                tableView->scrollTo(tableView->model()->index(j,3,group));
+                QItemSelection row(tableView->model()->index(j,0,group),
+                tableView->model()->index(j,tableView->model()->columnCount()-1, group));
+                tableView->selectionModel()->select(row, QItemSelectionModel::Rows | QItemSelectionModel::ClearAndSelect);
+                tableView->selectionModel()->setCurrentIndex(tableView->model()->index(j,0,group), QItemSelectionModel::NoUpdate);
+                tableView->scrollTo(tableView->model()->index(j,3,group), QAbstractItemView::PositionAtCenter);
+
+                repaint();
                 return;
             }
         }

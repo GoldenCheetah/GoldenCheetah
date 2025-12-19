@@ -33,6 +33,7 @@ class Perspective;
 #include <QMenu>
 #include <QPushButton>
 #include <QToolButton>
+#include <QLabel>
 #include <QWidget>
 #include <QStackedLayout>
 #include <QObject>
@@ -240,6 +241,8 @@ public:
     QList<QAction*>actions;
 };
 
+enum class SFWinBlankingType { NO_BLANKING, NO_RESULTS, ACTIVITY_NOT_IN_RESULTS };
+
 class GcChartWindow : public GcWindow
 {
 private:
@@ -251,11 +254,11 @@ private:
     QVBoxLayout *_defaultBlankLayout;
 
     QLayout *_chartLayout,
-            *_revealLayout,
-            *_blankLayout;
+            *_revealLayout;
 
     QWidget *_mainWidget;
     QWidget *_blank;
+    QLabel *_blankLabel;
     QWidget *_chart;
 
     // reveal controls
@@ -263,7 +266,17 @@ private:
     QPropertyAnimation *_revealAnim,
                        *_unrevealAnim;
     QTimer *_unrevealTimer;
+    bool _windowBlank;
+    SFWinBlankingType _searchFilterBlanking;
     Context *context;
+
+    void updateSearchFilterBlanking();
+    void updateWindowBlanking();
+
+protected:
+
+    // the default is the chart doesn't display information related to the selected ride
+    bool virtual selectedRideInfo() const { return false; }
 
 public:
 
@@ -292,7 +305,6 @@ public:
 
     void setChartLayout(QLayout *layout);
     void setRevealLayout(QLayout *layout);
-    void setBlankLayout(QLayout *layout);
     void setIsBlank(bool value);
     void setControls(QWidget *x);
     void addHelper(QString name, QWidget *widget); // add to the overlay widget
