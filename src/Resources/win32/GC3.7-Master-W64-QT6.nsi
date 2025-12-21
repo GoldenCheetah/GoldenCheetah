@@ -310,7 +310,7 @@ Section /o "Visual C++ Redistributable" Sec2
 SectionEnd
 
 LangString DESC_Sec1 ${LANG_ENGLISH} "Golden Cheetah for Windows - 64Bit"
-LangString DESC_Sec2 ${LANG_ENGLISH} "Microsoft Visual C++ 2015-2019 Redistributable (x64) is required to run Golden Cheetah for Windows"
+LangString DESC_Sec2 ${LANG_ENGLISH} "Microsoft Visual C++ 2015-2022 Redistributable (x64) is required to run Golden Cheetah for Windows"
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${Sec1} $(DESC_Sec1)

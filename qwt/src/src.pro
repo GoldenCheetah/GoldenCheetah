@@ -16,6 +16,7 @@ include( $${QWT_ROOT}/qwtfunctions.pri )
 
 # Fix for parallel build race condition where moc_predefs.h is missing
 compiler_moc_header_make_all.depends += compiler_moc_predefs_make_all
+compiler_moc_source_make_all.depends += compiler_moc_predefs_make_all
 
 QWT_OUT_ROOT = $${OUT_PWD}/..
 
