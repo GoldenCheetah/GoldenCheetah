@@ -514,7 +514,7 @@ void ZipReaderPrivate::scanFiles()
     int num_dir_entries = 0;
     EndOfDirectory eod;
     while (start_of_directory == -1) {
-        size_t pos = device->size() - sizeof(EndOfDirectory) - i;
+        qint64 pos = device->size() - sizeof(EndOfDirectory) - i;
         if (pos < 0 || i > 65535) {
             qWarning() << "QZip: EndOfDirectory not found";
             return;
