@@ -6,11 +6,16 @@ branches:
     - master
 
 image:
-  - macos-monterey
+  # TMP will revert!
+  - Visual Studio 2022
+  - macos-sonoma
   - Ubuntu2204
-  - Visual Studio 2019
 
 environment:
+  VS_VERSION: 2022
+  VS_EDITION: Community
+  XCODE_VERSION: 15.2.0
+  QT_VER_MAC: 6.6
   APPVEYOR_SAVE_CACHE_ON_ERROR: true
   GC_GOOGLE_CALENDAR_CLIENT_SECRET:
     secure: hwjHTrSAMEbKd9PA+5x/zI4x5Uk4KQm1hdfZzkwiu8k=
@@ -55,11 +60,11 @@ init:
 
 # Windows
 # Setup QT 6.8 - 64Bit
-- cmd: set QTDIR=C:\Qt\6.8\msvc2022_64
+- cmd: set QTDIR=C:\Qt\6.8\msvc%VS_VERSION%_64
 - cmd: set PATH=%QTDIR%\bin;%PATH%
 - cmd: qmake --version
-# Setup MSVC - VS 2019
-- cmd: call c:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\VC\Auxiliary\Build\vcvarsall.bat amd64
+# Setup MSVC
+- cmd: call c:\"Program Files"\"Microsoft Visual Studio"\%VS_VERSION%\%VS_EDITION%\VC\Auxiliary\Build\vcvarsall.bat amd64
 # Setup NSIS
 - cmd: set PATH=%PATH%;C:\"Program Files (x86)"\NSIS
 # install Python 3.7
@@ -81,12 +86,12 @@ init:
       qmake --version
     else
       export OS_NAME=macos
-      # Setup QT 6.5
-      export QTDIR=$HOME/Qt/6.5/macos
+      # Setup QT
+      export QTDIR=$HOME/Qt/$QT_VER_MAC/macos
       export PATH=$QTDIR/bin:$PATH
       qmake --version
-      # Setup Xcode 14.2
-      sudo xcode-select -s /Applications/Xcode-14.2.0.app
+      # Setup Xcode
+      sudo xcode-select -s /Applications/Xcode-$XCODE_VERSION.app
     fi
 
 cache:
@@ -223,12 +228,12 @@ build_script:
 
 # Windows
 - cmd: qmake.exe build.pro -r -spec win32-msvc
-- cmd: if not exist qwt\lib\qwt.lib jom -j1 sub-qwt
+- cmd: if not exist qwt\lib\qwt.lib jom -j2 sub-qwt
 - cmd: jom -j2 sub-src
 
 # Linux / macOS
 - sh: qmake build.pro -r QMAKE_CXXFLAGS_WARN_ON+="-Wno-unused-private-field -Wno-c++11-narrowing -Wno-deprecated-declarations -Wno-deprecated-register -Wno-nullability-completeness -Wno-sign-compare -Wno-inconsistent-missing-override" QMAKE_CFLAGS_WARN_ON+="-Wno-deprecated-declarations -Wno-sign-compare"
-- sh: if test ! -f qwt/lib/libqwt.a; then make sub-qwt; fi
+- sh: if test ! -f qwt/lib/libqwt.a; then make -j2 sub-qwt; fi
 - sh: make -j2 sub-src
 
 after_build:
