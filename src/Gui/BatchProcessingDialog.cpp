@@ -277,8 +277,8 @@ processed(0), fails(0), numFilesToProcess(0), metadataCompleter(nullptr) {
 
         connect(static_cast<QCheckBox*>(files->itemWidget(current, 0)),
 #if QT_VERSION < QT_VERSION_CHECK(6,7,0)
-            &QCheckBox::stateChanged,
-            this, [=](int) { this->fileSelected(current); });
+            QOverload<int>::of(&QCheckBox::stateChanged), this,
+            [=](int) { this->fileSelected(current); });
 #else
             QOverload<Qt::CheckState>::of(&QCheckBox::checkStateChanged),
             this, [=](Qt::CheckState) { this->fileSelected(current); });
