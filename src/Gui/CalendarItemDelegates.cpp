@@ -1302,9 +1302,9 @@ AgendaEntryDelegate::paint
 
     if (hover) {
         QColor bgColor = opt.palette.color(QPalette::Active, QPalette::Highlight);
-        bgColor.setAlphaF(0.2);
+        bgColor.setAlphaF(0.2f);
         QColor bgBorder = bgColor;
-        bgBorder.setAlphaF(0.6);
+        bgBorder.setAlphaF(0.6f);
         iconColor = GCColor::invertColor(GCColor::blendedColor(bgColor, opt.palette.color(QPalette::Active, QPalette::AlternateBase)));
         textColor = iconColor;
     }
