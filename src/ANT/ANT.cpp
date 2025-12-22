@@ -1302,7 +1302,7 @@ int ANT::rawWrite(uint8_t *bytes, int size) // unix!!
 
 }
 
-int ANT::rawRead(uint8_t bytes[], int size)
+int ANT::rawRead([[maybe_unused]] uint8_t bytes[], [[maybe_unused]] int size)
 {
 #ifdef WIN32
 #ifdef GC_HAVE_LIBUSB

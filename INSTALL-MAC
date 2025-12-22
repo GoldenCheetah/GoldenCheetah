@@ -115,8 +115,8 @@ $ brew install Qt6
 Follow the instructions to add Qt to PATH and test using:
 $ qmake --version
 
-You can also install Qt5 this way currently, but if you want to install other specific
-Qt version you need to download and install the Qt SDK from http://qt-project.org/
+If you want to install other specific Qt version you need to download and install
+the Qt SDK from http://qt-project.org/
 You can use a browser to download and run the interactive installer and select
 a Qt version, including at least the following modules:
 - Desktop macOS
@@ -124,7 +124,7 @@ a Qt version, including at least the following modules:
 - Qt WebEngine under Extensions
 Once this step is completed add the bin directory to PATH and test qmake is ok:
 $ qmake --version
-For v3.7 we are using both Qt 5.15.2 and Qt 6.8.3 LTS versions.
+For v3.7 and later we recommend Qt 6.8.3 LTS version.
 
 1.6 Install GSL and Bison
 -------------------------

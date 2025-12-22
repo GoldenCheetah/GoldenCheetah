@@ -6,9 +6,9 @@ branches:
     - master
 
 image:
-  - macos-monterey
+  - Visual Studio 2022
   - Ubuntu2204
-  - Visual Studio 2019
+  - macos-sonoma
 
 environment:
   APPVEYOR_SAVE_CACHE_ON_ERROR: true
@@ -58,8 +58,8 @@ init:
 - cmd: set QTDIR=C:\Qt\6.8\msvc2022_64
 - cmd: set PATH=%QTDIR%\bin;%PATH%
 - cmd: qmake --version
-# Setup MSVC - VS 2019
-- cmd: call c:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\VC\Auxiliary\Build\vcvarsall.bat amd64
+# Setup MSVC - VS 2022
+- cmd: call c:\"Program Files"\"Microsoft Visual Studio"\2022\Community\VC\Auxiliary\Build\vcvarsall.bat amd64
 # Setup NSIS
 - cmd: set PATH=%PATH%;C:\"Program Files (x86)"\NSIS
 # install Python 3.7
@@ -81,12 +81,12 @@ init:
       qmake --version
     else
       export OS_NAME=macos
-      # Setup QT 6.5
-      export QTDIR=$HOME/Qt/6.5/macos
+      # Setup QT 6.6
+      export QTDIR=$HOME/Qt/6.6/macos
       export PATH=$QTDIR/bin:$PATH
       qmake --version
-      # Setup Xcode 14.2
-      sudo xcode-select -s /Applications/Xcode-14.2.0.app
+      # Setup Xcode 15.2
+      sudo xcode-select -s /Applications/Xcode-15.2.0.app
     fi
 
 cache:
@@ -223,12 +223,12 @@ build_script:
 
 # Windows
 - cmd: qmake.exe build.pro -r -spec win32-msvc
-- cmd: if not exist qwt\lib\qwt.lib jom -j1 sub-qwt
+- cmd: if not exist qwt\lib\qwt.lib jom -j2 sub-qwt
 - cmd: jom -j2 sub-src
 
 # Linux / macOS
 - sh: qmake build.pro -r QMAKE_CXXFLAGS_WARN_ON+="-Wno-unused-private-field -Wno-c++11-narrowing -Wno-deprecated-declarations -Wno-deprecated-register -Wno-nullability-completeness -Wno-sign-compare -Wno-inconsistent-missing-override" QMAKE_CFLAGS_WARN_ON+="-Wno-deprecated-declarations -Wno-sign-compare"
-- sh: if test ! -f qwt/lib/libqwt.a; then make sub-qwt; fi
+- sh: if test ! -f qwt/lib/libqwt.a; then make -j2 sub-qwt; fi
 - sh: make -j2 sub-src
 
 after_build:
