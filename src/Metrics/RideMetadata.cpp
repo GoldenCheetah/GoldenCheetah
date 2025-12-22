@@ -82,13 +82,23 @@ RideMetadata::RideMetadata(Context *context, bool singlecolumn) :
         // Extra tab is expensive to update so we only update if it
         // is visible. In this case we need to trigger refresh when the
         // tab is selected -or- when the ride changes. Below is for tab.
-        (void)connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(setExtraTab()));
-        (void)connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+        if (!connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(setExtraTab()))) {
+            qFatal("Failed to connect tabs currentChanged signal in RideMetadata");
+        }
+        if (!connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)))) {
+            qFatal("Failed to connect context configChanged signal in RideMetadata");
+        }
 
         // watch interval changes since interval metadata needs to be refreshed
-        (void)connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
-        (void)connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
-        (void)connect(context, SIGNAL(intervalsUpdate(RideItem*)), this, SLOT(intervalsChanged()));
+        if (!connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()))) {
+            qFatal("Failed to connect context intervalSelected signal in RideMetadata");
+        }
+        if (!connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()))) {
+            qFatal("Failed to connect context intervalsChanged signal in RideMetadata");
+        }
+        if (!connect(context, SIGNAL(intervalsUpdate(RideItem*)), this, SLOT(intervalsChanged()))) {
+            qFatal("Failed to connect context intervalsUpdate signal in RideMetadata");
+        }
 
     } else {
 
@@ -111,7 +121,9 @@ RideMetadata::setRideItem(RideItem *ride)
     _connected=_ride=ride;
 
     if (ride) {
-        (void)connect (_connected, SIGNAL(rideMetadataChanged()), this, SLOT(metadataChanged()));
+        if (!connect (_connected, SIGNAL(rideMetadataChanged()), this, SLOT(metadataChanged()))) {
+            qFatal("Failed to connect rideMetadataChanged signal in RideMetadata");
+        }
 
         // tell the forms (setting interval)
         QMapIterator<QString, Form*> d(tabList);
@@ -710,8 +722,12 @@ Form::initialise()
     setWidgetResizable(true);
     setWidget(contents);
 
-    (void)connect(left, SIGNAL(clicked()), this, SLOT(intervalLeft()));
-    (void)connect(right, SIGNAL(clicked()), this, SLOT(intervalRight()));
+    if (!connect(left, SIGNAL(clicked()), this, SLOT(intervalLeft()))) {
+        qFatal("Failed to connect left clicked signal in Form");
+    }
+    if (!connect(right, SIGNAL(clicked()), this, SLOT(intervalRight()))) {
+        qFatal("Failed to connect right clicked signal in Form");
+    }
 }
 
 void

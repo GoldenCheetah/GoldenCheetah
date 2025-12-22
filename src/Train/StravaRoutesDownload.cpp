@@ -27,7 +27,9 @@ StravaRoutesDownload::StravaRoutesDownload(Context *context) : QDialog(context->
 {
 
     nam = new QNetworkAccessManager(this);
-    (void)connect(nam, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
+    if (!connect(nam, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )))) {
+        qFatal("Failed to connect sslErrors signal in StravaRoutesDownload");
+    }
 
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
@@ -95,10 +97,18 @@ StravaRoutesDownload::StravaRoutesDownload(Context *context) : QDialog(context->
     layout->addLayout(bottomLine);
 
     // connect signals and slots up..
-    (void)connect(download, SIGNAL(clicked()), this, SLOT(downloadClicked()));
-    (void)connect(all, SIGNAL(stateChanged(int)), this, SLOT(allClicked()));
-    (void)connect(close, SIGNAL(clicked()), this, SLOT(cancelClicked()));
-    (void)connect(refreshButton, SIGNAL(clicked()), this, SLOT(refreshClicked()));
+    if (!connect(download, SIGNAL(clicked()), this, SLOT(downloadClicked()))) {
+        qFatal("Failed to connect download clicked signal in StravaRoutesDownload");
+    }
+    if (!connect(all, SIGNAL(stateChanged(int)), this, SLOT(allClicked()))) {
+        qFatal("Failed to connect all stateChanged signal in StravaRoutesDownload");
+    }
+    if (!connect(close, SIGNAL(clicked()), this, SLOT(cancelClicked()))) {
+        qFatal("Failed to connect close clicked signal in StravaRoutesDownload");
+    }
+    if (!connect(refreshButton, SIGNAL(clicked()), this, SLOT(refreshClicked()))) {
+        qFatal("Failed to connect refreshButton clicked signal in StravaRoutesDownload");
+    }
 
     // fill the data
     refreshClicked();
@@ -241,8 +251,17 @@ StravaRoutesDownload::downloadFiles()
             QString tmp = context->athlete->home->temp().absolutePath() + "/" + file_basename;
 
             QFile ufile(tmp); // look at uncompressed version mot the source
-            (void)ufile.open(QFile::ReadWrite);
-            (void)ufile.write(content);
+            if (!ufile.open(QFile::ReadWrite)) {
+                current->setText(3, tr("Error opening temp file")); QApplication::processEvents();
+                fails++;
+                continue;
+            }
+            if (ufile.write(content) == -1) {
+                current->setText(3, tr("Error writing temp file")); QApplication::processEvents();
+                ufile.close();
+                fails++;
+                continue;
+            }
             ufile.close();
 
             ErgFile *p = new ErgFile(tmp, ErgFileFormat::crs, context);
@@ -320,7 +339,9 @@ StravaRoutesDownload::getAthleteId(QString token)
 
     // blocking request
     QEventLoop loop;
-    (void)connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    if (!connect(reply, SIGNAL(finished()), &loop, SLOT(quit()))) {
+        qFatal("Failed to connect reply finished signal in StravaRoutesDownload::getAthleteId");
+    }
     loop.exec();
 
     if (reply->error() != QNetworkReply::NoError) {
@@ -384,7 +405,9 @@ StravaRoutesDownload::getFileList(QString &error)
 
         // blocking request
         QEventLoop loop;
-        (void)connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+        if (!connect(reply, SIGNAL(finished()), &loop, SLOT(quit()))) {
+            qFatal("Failed to connect reply finished signal in StravaRoutesDownload::getFileList");
+        }
         loop.exec();
 
         if (reply->error() != QNetworkReply::NoError) {
@@ -459,7 +482,9 @@ StravaRoutesDownload::readFile(QByteArray *data, int routeId)
 
     // blocking request
     QEventLoop loop;
-    (void)connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    if (!connect(reply, SIGNAL(finished()), &loop, SLOT(quit()))) {
+        qFatal("Failed to connect reply finished signal in StravaRoutesDownload::readFile");
+    }
     loop.exec();
 
     if (reply->error() != QNetworkReply::NoError) {

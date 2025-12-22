@@ -28,10 +28,18 @@ Ergofit::Ergofit(QObject *parent,  QString devname) : QObject(parent),
     m_isErgofitConnectionAlive(true)
 {
     m_ergofitConnection.setSerialPort(devname);
-    (void)connect(&m_ergofitConnection, SIGNAL(power(quint32)), this, SLOT(newPower(quint32)), Qt::QueuedConnection);
-    (void)connect(&m_ergofitConnection, SIGNAL(cadence(quint32)), this, SLOT(newCadence(quint32)), Qt::QueuedConnection);
-    (void)connect(&m_ergofitConnection, SIGNAL(pulse(quint32)), this, SLOT(newHeartRate(quint32)), Qt::QueuedConnection);
-    (void)connect(&m_ergofitConnection, SIGNAL(finished()), this, SLOT(onErgofitConnectionFinished()), Qt::QueuedConnection);
+    if (!connect(&m_ergofitConnection, SIGNAL(power(quint32)), this, SLOT(newPower(quint32)), Qt::QueuedConnection)) {
+        qFatal("Failed to connect power signal in Ergofit");
+    }
+    if (!connect(&m_ergofitConnection, SIGNAL(cadence(quint32)), this, SLOT(newCadence(quint32)), Qt::QueuedConnection)) {
+        qFatal("Failed to connect cadence signal in Ergofit");
+    }
+    if (!connect(&m_ergofitConnection, SIGNAL(pulse(quint32)), this, SLOT(newHeartRate(quint32)), Qt::QueuedConnection)) {
+        qFatal("Failed to connect pulse signal in Ergofit");
+    }
+    if (!connect(&m_ergofitConnection, SIGNAL(finished()), this, SLOT(onErgofitConnectionFinished()), Qt::QueuedConnection)) {
+        qFatal("Failed to connect finished signal in Ergofit");
+    }
 }
 
 Ergofit::~Ergofit()
@@ -88,7 +96,10 @@ bool Ergofit::discover(QString portName)
         QByteArray discover_data = sp.readAll();
 
         // Check if bike is there
-        (void)sp.write("\x10\x56\x03\x38\x34\x17");
+        if (sp.write("\x10\x56\x03\x38\x34\x17") == -1) {
+             qWarning("Failed to write to serial port during discovery in Ergofit");
+             return found;
+        }
         if (!sp.waitForBytesWritten(500)) {
             qWarning("Discover send string timed out");
             return found;

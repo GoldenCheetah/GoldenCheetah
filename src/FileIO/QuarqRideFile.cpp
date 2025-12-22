@@ -109,7 +109,6 @@ static int antFileReaderRegistered = quarqInterpreterInstalled()
 
 RideFile *QuarqFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
 {
-    (void) errors;
     RideFile *rideFile = new RideFile();
     rideFile->setDeviceType("Quarq Qollector");
     rideFile->setFileFormat("Quarq ANT+ Files (qla)");
@@ -127,7 +126,13 @@ RideFile *QuarqFileReader::openRideFile(QFile &file, QStringList &errors, QList<
 
     // this could done be a loop to "save memory."
     file.open(QIODevice::ReadOnly);
-    (void)antProcess->write(file.readAll());
+    if (antProcess->write(file.readAll()) == -1) {
+        errors << "Failed to write to Quarq interpreter process.";
+        antProcess->closeWriteChannel();
+        antProcess->terminate(); // or wait? terminate seems safer if it's stuck
+        delete antProcess;
+        return NULL;
+    }
     antProcess->closeWriteChannel();
     antProcess->waitForFinished(-1);
 

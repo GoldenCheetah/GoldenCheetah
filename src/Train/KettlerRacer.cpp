@@ -29,11 +29,21 @@ KettlerRacer::KettlerRacer(QObject *parent,  QString devname) : QObject(parent),
 {
     m_kettlerRacerConnection = new KettlerRacerConnection;
     m_kettlerRacerConnection->setSerialPort(devname);
-    (void)connect(m_kettlerRacerConnection, SIGNAL(power(quint32)), this, SLOT(newPower(quint32)), Qt::QueuedConnection);
-    (void)connect(m_kettlerRacerConnection, SIGNAL(cadence(quint32)), this, SLOT(newCadence(quint32)), Qt::QueuedConnection);
-    (void)connect(m_kettlerRacerConnection, SIGNAL(pulse(quint32)), this, SLOT(newHeartRate(quint32)), Qt::QueuedConnection);
-    (void)connect(m_kettlerRacerConnection, SIGNAL(speed(double)), this, SLOT(newSpeed(double)), Qt::QueuedConnection);
-    (void)connect(m_kettlerRacerConnection, SIGNAL(finished()), this, SLOT(onKettlerRacerConnectionFinished()), Qt::QueuedConnection);
+    if (!connect(m_kettlerRacerConnection, SIGNAL(power(quint32)), this, SLOT(newPower(quint32)), Qt::QueuedConnection)) {
+        qFatal("Failed to connect power signal in KettlerRacer");
+    }
+    if (!connect(m_kettlerRacerConnection, SIGNAL(cadence(quint32)), this, SLOT(newCadence(quint32)), Qt::QueuedConnection)) {
+        qFatal("Failed to connect cadence signal in KettlerRacer");
+    }
+    if (!connect(m_kettlerRacerConnection, SIGNAL(pulse(quint32)), this, SLOT(newHeartRate(quint32)), Qt::QueuedConnection)) {
+        qFatal("Failed to connect pulse signal in KettlerRacer");
+    }
+    if (!connect(m_kettlerRacerConnection, SIGNAL(speed(double)), this, SLOT(newSpeed(double)), Qt::QueuedConnection)) {
+        qFatal("Failed to connect speed signal in KettlerRacer");
+    }
+    if (!connect(m_kettlerRacerConnection, SIGNAL(finished()), this, SLOT(onKettlerRacerConnectionFinished()), Qt::QueuedConnection)) {
+        qFatal("Failed to connect finished signal in KettlerRacer");
+    }
 }
 
 KettlerRacer::~KettlerRacer(){
@@ -105,7 +115,10 @@ bool KettlerRacer::discover(QString portName)
 
             // Read id from bike
             reply.clear();
-            (void)sp.write("KI\r\n");
+            if (sp.write("KI\r\n") == -1) {
+                // handle write error? In discovery loop, maybe just continue or log?
+                qWarning("Failed to write to serial port during discovery in KettlerRacer");
+            }
             if (sp.waitForBytesWritten(500))
             {}
             for(int i=0; i<15; i++)

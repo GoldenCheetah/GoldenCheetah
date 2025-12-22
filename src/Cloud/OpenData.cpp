@@ -110,7 +110,9 @@ OpenData::run()
     printd("posting thread started\n");
 
     QNetworkAccessManager *nam = new QNetworkAccessManager(NULL);
-    (void)connect(nam, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
+    if (!connect(nam, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )))) {
+        qFatal("Failed to connect sslErrors signal in OpenData");
+    }
 
     // ----------------------------------------------------------------
     // STEP ONE: Get Servers List
@@ -126,7 +128,9 @@ OpenData::run()
 
     // blocking request
     QEventLoop loop;
-    (void)connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    if (!connect(reply, SIGNAL(finished()), &loop, SLOT(quit()))) {
+        qFatal("Failed to connect reply finished signal in OpenData::run step 1");
+    }
     loop.exec();
 
     if (reply->error() != QNetworkReply::NoError) {
@@ -180,7 +184,9 @@ OpenData::run()
             QNetworkReply *reply = nam->get(tryserver);
 
             // blocking request
-            (void)connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+            if (!connect(reply, SIGNAL(finished()), &loop, SLOT(quit()))) {
+                qFatal("Failed to connect reply finished signal in OpenData::run step 2");
+            }
             loop.exec();
 
             // responded?
@@ -219,15 +225,30 @@ OpenData::run()
 
     // write OPENDATA to JSON
     QTemporaryFile tempfile;
-    (void)tempfile.open();
+    if (!tempfile.open()) {
+        emit progress(step, 0, tr("Failed to open temp file for opendata"));
+        printd("Failed to open temp file for opendata\n");
+        delete nam;
+        return;
+    }
     tempfile.close();
     context->athlete->rideCache->save(true, tempfile.fileName());
 
     // Read JSON into MEMORY and write to ZIP
     QFile jsonFile(tempfile.fileName());
-    jsonFile.open(QFile::ReadOnly);
+    if (!jsonFile.open(QFile::ReadOnly)) {
+        emit progress(step, 0, tr("Failed to open json file for reading"));
+        printd("Failed to open json file for reading\\n");
+        delete nam;
+        return;
+    }
     QTemporaryFile zipFile;
-    (void)zipFile.open();
+    if (!zipFile.open()) {
+        emit progress(step, 0, tr("Failed to open temp zip file for opendata"));
+        printd("Failed to open temp zip file for opendata\n");
+        delete nam;
+        return;
+    }
     zipFile.close();
     ZipWriter writer(zipFile.fileName());
     QString zipname = context->athlete->id.toString() + ".json";
@@ -275,7 +296,12 @@ OpenData::run()
 
     // read the ZIP into MEMORY
     QFile zip(zipFile.fileName());
-    (void)zip.open(QFile::ReadOnly);
+    if (!zip.open(QFile::ReadOnly)) {
+        emit progress(step, 0, tr("Failed to open zip file for reading"));
+        printd("Failed to open zip file for reading\n");    
+        delete nam;
+        return;
+    }
     postingdata = zip.readAll();
     zip.close();
 
@@ -318,7 +344,9 @@ OpenData::run()
     printd("Posting to server...");
 
     // blocking request
-    (void)connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    if (!connect(reply, SIGNAL(finished()), &loop, SLOT(quit()))) {
+        qFatal("Failed to connect reply finished signal in OpenData::run step 4");
+    }
     loop.exec();
 
     // success?
@@ -416,10 +444,14 @@ OpenDataDialog::OpenDataDialog(Context *context) : context(context)
 
     proceedButton = new QPushButton(tr("Yes, I want to share"), this);
     proceedButton->setEnabled(true);
-    (void)connect(proceedButton, SIGNAL(clicked()), this, SLOT(acceptConditions()));
+    if (!connect(proceedButton, SIGNAL(clicked()), this, SLOT(acceptConditions()))) {
+        qFatal("Failed to connect proceedButton clicked signal in OpenDataDialog");
+    }
     abortButton = new QPushButton(tr("No thanks"), this);
     abortButton->setDefault(true);
-    (void)connect(abortButton, SIGNAL(clicked()), this, SLOT(rejectConditions()));
+    if (!connect(abortButton, SIGNAL(clicked()), this, SLOT(rejectConditions()))) {
+        qFatal("Failed to connect abortButton clicked signal in OpenDataDialog");
+    }
 
     lastRow->addWidget(abortButton);
     lastRow->addStretch();

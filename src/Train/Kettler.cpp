@@ -28,11 +28,21 @@ Kettler::Kettler(QObject *parent,  QString devname) : QObject(parent),
     m_isKettlerConnectionAlive(true)
 {
     m_kettlerConnection.setSerialPort(devname);
-    (void)connect(&m_kettlerConnection, SIGNAL(power(quint32)), this, SLOT(newPower(quint32)), Qt::QueuedConnection);
-    (void)connect(&m_kettlerConnection, SIGNAL(cadence(quint32)), this, SLOT(newCadence(quint32)), Qt::QueuedConnection);
-    (void)connect(&m_kettlerConnection, SIGNAL(pulse(quint32)), this, SLOT(newHeartRate(quint32)), Qt::QueuedConnection);
-    (void)connect(&m_kettlerConnection, SIGNAL(speed(double)), this, SLOT(newSpeed(double)), Qt::QueuedConnection);
-    (void)connect(&m_kettlerConnection, SIGNAL(finished()), this, SLOT(onKettlerConnectionFinished()), Qt::QueuedConnection);
+    if (!connect(&m_kettlerConnection, SIGNAL(power(quint32)), this, SLOT(newPower(quint32)), Qt::QueuedConnection)) {
+        qFatal("Failed to connect power signal in Kettler");
+    }
+    if (!connect(&m_kettlerConnection, SIGNAL(cadence(quint32)), this, SLOT(newCadence(quint32)), Qt::QueuedConnection)) {
+        qFatal("Failed to connect cadence signal in Kettler");
+    }
+    if (!connect(&m_kettlerConnection, SIGNAL(pulse(quint32)), this, SLOT(newHeartRate(quint32)), Qt::QueuedConnection)) {
+        qFatal("Failed to connect pulse signal in Kettler");
+    }
+    if (!connect(&m_kettlerConnection, SIGNAL(speed(double)), this, SLOT(newSpeed(double)), Qt::QueuedConnection)) {
+        qFatal("Failed to connect speed signal in Kettler");
+    }
+    if (!connect(&m_kettlerConnection, SIGNAL(finished()), this, SLOT(onKettlerConnectionFinished()), Qt::QueuedConnection)) {
+        qFatal("Failed to connect finished signal in Kettler");
+    }
 }
 
 Kettler::~Kettler()
@@ -94,7 +104,9 @@ bool Kettler::discover(QString portName)
         QByteArray data = sp.readAll();
 
         // Read id from bike
-        (void)sp.write("ID\r\n");
+        if (sp.write("ID\r\n") == -1) {
+             qWarning("Failed to write to serial port during discovery in Kettler");
+        }
         sp.waitForBytesWritten(500);
 
         QByteArray reply = sp.readAll();
