@@ -127,7 +127,7 @@ RideFile *QuarqFileReader::openRideFile(QFile &file, QStringList &errors, QList<
 
     // this could done be a loop to "save memory."
     file.open(QIODevice::ReadOnly);
-    antProcess->write(file.readAll());
+    (void)antProcess->write(file.readAll());
     antProcess->closeWriteChannel();
     antProcess->waitForFinished(-1);
 

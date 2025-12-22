@@ -66,7 +66,7 @@ bool Daum::discover(QString dev) {
     QByteArray data;
     data.append(0x11);
 
-    s.write(data);
+    (void)s.write(data);
     if (!s.waitForBytesWritten(1000)) {
         return false;
     }
@@ -155,8 +155,8 @@ void Daum::run() {
         if (timer_ == nullptr) {
             timer_ = new QTimer();
 
-            connect(this, SIGNAL(finished()), timer_, SLOT(stop()), Qt::DirectConnection);
-            connect(timer_, SIGNAL(timeout()), this, SLOT(requestRealtimeData()), Qt::DirectConnection);
+            (void)connect(this, SIGNAL(finished()), timer_, SLOT(stop()), Qt::DirectConnection);
+            (void)connect(timer_, SIGNAL(timeout()), this, SLOT(requestRealtimeData()), Qt::DirectConnection);
         }
 
         // discard prev. read data
@@ -499,7 +499,7 @@ QByteArray Daum::WriteDataAndGetAnswer(QByteArray const& dat, int response_bytes
     }
 
     QThread::msleep(serialWriteDelay_);
-    s.write(dat);
+    (void)s.write(dat);
     if(!s.waitForBytesWritten(1000)) {
         qWarning() << "failed to write data to daum cockpit";
         exit(-1);

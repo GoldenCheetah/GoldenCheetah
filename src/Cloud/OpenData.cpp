@@ -110,7 +110,7 @@ OpenData::run()
     printd("posting thread started\n");
 
     QNetworkAccessManager *nam = new QNetworkAccessManager(NULL);
-    connect(nam, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
+    (void)connect(nam, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
 
     // ----------------------------------------------------------------
     // STEP ONE: Get Servers List
@@ -126,7 +126,7 @@ OpenData::run()
 
     // blocking request
     QEventLoop loop;
-    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    (void)connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
     loop.exec();
 
     if (reply->error() != QNetworkReply::NoError) {
@@ -180,7 +180,7 @@ OpenData::run()
             QNetworkReply *reply = nam->get(tryserver);
 
             // blocking request
-            connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+            (void)connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
             loop.exec();
 
             // responded?
@@ -219,7 +219,7 @@ OpenData::run()
 
     // write OPENDATA to JSON
     QTemporaryFile tempfile;
-    tempfile.open();
+    (void)tempfile.open();
     tempfile.close();
     context->athlete->rideCache->save(true, tempfile.fileName());
 
@@ -227,7 +227,7 @@ OpenData::run()
     QFile jsonFile(tempfile.fileName());
     jsonFile.open(QFile::ReadOnly);
     QTemporaryFile zipFile;
-    zipFile.open();
+    (void)zipFile.open();
     zipFile.close();
     ZipWriter writer(zipFile.fileName());
     QString zipname = context->athlete->id.toString() + ".json";
@@ -275,7 +275,7 @@ OpenData::run()
 
     // read the ZIP into MEMORY
     QFile zip(zipFile.fileName());
-    zip.open(QFile::ReadOnly);
+    (void)zip.open(QFile::ReadOnly);
     postingdata = zip.readAll();
     zip.close();
 
@@ -318,7 +318,7 @@ OpenData::run()
     printd("Posting to server...");
 
     // blocking request
-    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    (void)connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
     loop.exec();
 
     // success?
@@ -416,10 +416,10 @@ OpenDataDialog::OpenDataDialog(Context *context) : context(context)
 
     proceedButton = new QPushButton(tr("Yes, I want to share"), this);
     proceedButton->setEnabled(true);
-    connect(proceedButton, SIGNAL(clicked()), this, SLOT(acceptConditions()));
+    (void)connect(proceedButton, SIGNAL(clicked()), this, SLOT(acceptConditions()));
     abortButton = new QPushButton(tr("No thanks"), this);
     abortButton->setDefault(true);
-    connect(abortButton, SIGNAL(clicked()), this, SLOT(rejectConditions()));
+    (void)connect(abortButton, SIGNAL(clicked()), this, SLOT(rejectConditions()));
 
     lastRow->addWidget(abortButton);
     lastRow->addStretch();

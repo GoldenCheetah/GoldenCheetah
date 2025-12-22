@@ -29,11 +29,11 @@ KettlerRacer::KettlerRacer(QObject *parent,  QString devname) : QObject(parent),
 {
     m_kettlerRacerConnection = new KettlerRacerConnection;
     m_kettlerRacerConnection->setSerialPort(devname);
-    connect(m_kettlerRacerConnection, SIGNAL(power(quint32)), this, SLOT(newPower(quint32)), Qt::QueuedConnection);
-    connect(m_kettlerRacerConnection, SIGNAL(cadence(quint32)), this, SLOT(newCadence(quint32)), Qt::QueuedConnection);
-    connect(m_kettlerRacerConnection, SIGNAL(pulse(quint32)), this, SLOT(newHeartRate(quint32)), Qt::QueuedConnection);
-    connect(m_kettlerRacerConnection, SIGNAL(speed(double)), this, SLOT(newSpeed(double)), Qt::QueuedConnection);
-    connect(m_kettlerRacerConnection, SIGNAL(finished()), this, SLOT(onKettlerRacerConnectionFinished()), Qt::QueuedConnection);
+    (void)connect(m_kettlerRacerConnection, SIGNAL(power(quint32)), this, SLOT(newPower(quint32)), Qt::QueuedConnection);
+    (void)connect(m_kettlerRacerConnection, SIGNAL(cadence(quint32)), this, SLOT(newCadence(quint32)), Qt::QueuedConnection);
+    (void)connect(m_kettlerRacerConnection, SIGNAL(pulse(quint32)), this, SLOT(newHeartRate(quint32)), Qt::QueuedConnection);
+    (void)connect(m_kettlerRacerConnection, SIGNAL(speed(double)), this, SLOT(newSpeed(double)), Qt::QueuedConnection);
+    (void)connect(m_kettlerRacerConnection, SIGNAL(finished()), this, SLOT(onKettlerRacerConnectionFinished()), Qt::QueuedConnection);
 }
 
 KettlerRacer::~KettlerRacer(){
@@ -105,7 +105,7 @@ bool KettlerRacer::discover(QString portName)
 
             // Read id from bike
             reply.clear();
-            sp.write("KI\r\n");
+            (void)sp.write("KI\r\n");
             if (sp.waitForBytesWritten(500))
             {}
             for(int i=0; i<15; i++)

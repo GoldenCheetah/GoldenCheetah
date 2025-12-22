@@ -28,10 +28,10 @@ Ergofit::Ergofit(QObject *parent,  QString devname) : QObject(parent),
     m_isErgofitConnectionAlive(true)
 {
     m_ergofitConnection.setSerialPort(devname);
-    connect(&m_ergofitConnection, SIGNAL(power(quint32)), this, SLOT(newPower(quint32)), Qt::QueuedConnection);
-    connect(&m_ergofitConnection, SIGNAL(cadence(quint32)), this, SLOT(newCadence(quint32)), Qt::QueuedConnection);
-    connect(&m_ergofitConnection, SIGNAL(pulse(quint32)), this, SLOT(newHeartRate(quint32)), Qt::QueuedConnection);
-    connect(&m_ergofitConnection, SIGNAL(finished()), this, SLOT(onErgofitConnectionFinished()), Qt::QueuedConnection);
+    (void)connect(&m_ergofitConnection, SIGNAL(power(quint32)), this, SLOT(newPower(quint32)), Qt::QueuedConnection);
+    (void)connect(&m_ergofitConnection, SIGNAL(cadence(quint32)), this, SLOT(newCadence(quint32)), Qt::QueuedConnection);
+    (void)connect(&m_ergofitConnection, SIGNAL(pulse(quint32)), this, SLOT(newHeartRate(quint32)), Qt::QueuedConnection);
+    (void)connect(&m_ergofitConnection, SIGNAL(finished()), this, SLOT(onErgofitConnectionFinished()), Qt::QueuedConnection);
 }
 
 Ergofit::~Ergofit()
@@ -88,7 +88,7 @@ bool Ergofit::discover(QString portName)
         QByteArray discover_data = sp.readAll();
 
         // Check if bike is there
-        sp.write("\x10\x56\x03\x38\x34\x17");
+        (void)sp.write("\x10\x56\x03\x38\x34\x17");
         if (!sp.waitForBytesWritten(500)) {
             qWarning("Discover send string timed out");
             return found;

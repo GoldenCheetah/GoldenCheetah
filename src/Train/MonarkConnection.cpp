@@ -111,10 +111,10 @@ void MonarkConnection::run()
         QByteArray data = m_serial->readAll();
 
         // Set up polling
-        connect(m_timer, SIGNAL(timeout()), this, SLOT(requestAll()),Qt::DirectConnection);
+        (void)connect(m_timer, SIGNAL(timeout()), this, SLOT(requestAll()),Qt::DirectConnection);
 
         // Set up initial model detection
-        connect(startupTimer, SIGNAL(timeout()), this, SLOT(identifyModel()),Qt::DirectConnection);
+        (void)connect(startupTimer, SIGNAL(timeout()), this, SLOT(identifyModel()),Qt::DirectConnection);
     }
 
     m_timer->setInterval(1000);
@@ -145,7 +145,7 @@ void MonarkConnection::requestAll()
     if ((m_loadToWrite != m_load) && m_mode == MONARK_MODE_WATT && canDoLoad())
     {
         QString cmd = QString("power %1\r").arg(m_loadToWrite);
-        m_serial->write(cmd.toStdString().c_str());
+        (void)m_serial->write(cmd.toStdString().c_str());
         if (!m_serial->waitForBytesWritten(500))
         {
             // failure to write to device, bail out
@@ -158,7 +158,7 @@ void MonarkConnection::requestAll()
     if ((m_kpToWrite != m_kp) && m_mode == MONARK_MODE_KP && canDoKp())
     {
         QString cmd = QString("kp %1\r").arg(QString::number(m_kpToWrite, 'f', 1 ));
-        m_serial->write(cmd.toStdString().c_str());
+        (void)m_serial->write(cmd.toStdString().c_str());
         if (!m_serial->waitForBytesWritten(500))
         {
             // failure to write to device, bail out
@@ -175,7 +175,7 @@ void MonarkConnection::requestAll()
         unsigned int load = (m_kpToWrite * m_cadence) * 0.98;
 
         QString cmd = QString("power %1\r").arg(load);
-        m_serial->write(cmd.toStdString().c_str());
+        (void)m_serial->write(cmd.toStdString().c_str());
         if (!m_serial->waitForBytesWritten(500))
         {
             // failure to write to device, bail out
@@ -192,7 +192,7 @@ void MonarkConnection::requestPower()
     // Discard any existing data
     m_serial->readAll();
 
-    m_serial->write("power\r");
+    (void)m_serial->write("power\r");
     if (!m_serial->waitForBytesWritten(500))
     {
         // failure to write to device, bail out
@@ -210,7 +210,7 @@ void MonarkConnection::requestPulse()
     // Discard any existing data
     m_serial->readAll();
 
-    m_serial->write("pulse\r");
+    (void)m_serial->write("pulse\r");
     if (!m_serial->waitForBytesWritten(500))
     {
         // failure to write to device, bail out
@@ -228,7 +228,7 @@ void MonarkConnection::requestCadence()
     // Discard any existing data
     m_serial->readAll();
 
-    m_serial->write("pedal\r");
+    (void)m_serial->write("pedal\r");
     if (!m_serial->waitForBytesWritten(500))
     {
         // failure to write to device, bail out
@@ -246,7 +246,7 @@ int MonarkConnection::readConfiguredLoad()
     // Discard any existing data
     m_serial->readAll();
 
-    m_serial->write("B\r");
+    (void)m_serial->write("B\r");
     if (!m_serial->waitForBytesWritten(500))
     {
         // failure to write to device, bail out
@@ -265,7 +265,7 @@ void MonarkConnection::identifyModel()
 
     QString servo = "";
 
-    m_serial->write("id\r");
+    (void)m_serial->write("id\r");
     if (!m_serial->waitForBytesWritten(500))
     {
         // failure to write to device, bail out
@@ -275,7 +275,7 @@ void MonarkConnection::identifyModel()
 
     if (m_id.toLower().startsWith("novo"))
     {
-        m_serial->write("servo\r");
+        (void)m_serial->write("servo\r");
         if (!m_serial->waitForBytesWritten(500))
         {
             // failure to write to device, bail out
@@ -337,7 +337,7 @@ void MonarkConnection::configurePort(QSerialPort *serialPort)
 
     // Send empty \r after configuring port, otherwise first command might not
     // be interpreted correctly
-    serialPort->write("\r");
+    (void)serialPort->write("\r");
 }
 
 bool MonarkConnection::canDoLoad()
@@ -399,7 +399,7 @@ bool MonarkConnection::discover(QString portName)
         QByteArray data = sp.readAll();
 
         // Read id from bike
-        sp.write("id\r");
+        (void)sp.write("id\r");
         sp.waitForBytesWritten(-1);
 
         QByteArray id;

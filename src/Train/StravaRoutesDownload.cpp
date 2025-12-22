@@ -27,7 +27,7 @@ StravaRoutesDownload::StravaRoutesDownload(Context *context) : QDialog(context->
 {
 
     nam = new QNetworkAccessManager(this);
-    connect(nam, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
+    (void)connect(nam, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
 
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
@@ -95,10 +95,10 @@ StravaRoutesDownload::StravaRoutesDownload(Context *context) : QDialog(context->
     layout->addLayout(bottomLine);
 
     // connect signals and slots up..
-    connect(download, SIGNAL(clicked()), this, SLOT(downloadClicked()));
-    connect(all, SIGNAL(stateChanged(int)), this, SLOT(allClicked()));
-    connect(close, SIGNAL(clicked()), this, SLOT(cancelClicked()));
-    connect(refreshButton, SIGNAL(clicked()), this, SLOT(refreshClicked()));
+    (void)connect(download, SIGNAL(clicked()), this, SLOT(downloadClicked()));
+    (void)connect(all, SIGNAL(stateChanged(int)), this, SLOT(allClicked()));
+    (void)connect(close, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+    (void)connect(refreshButton, SIGNAL(clicked()), this, SLOT(refreshClicked()));
 
     // fill the data
     refreshClicked();
@@ -241,8 +241,8 @@ StravaRoutesDownload::downloadFiles()
             QString tmp = context->athlete->home->temp().absolutePath() + "/" + file_basename;
 
             QFile ufile(tmp); // look at uncompressed version mot the source
-            ufile.open(QFile::ReadWrite);
-            ufile.write(content);
+            (void)ufile.open(QFile::ReadWrite);
+            (void)ufile.write(content);
             ufile.close();
 
             ErgFile *p = new ErgFile(tmp, ErgFileFormat::crs, context);
@@ -320,7 +320,7 @@ StravaRoutesDownload::getAthleteId(QString token)
 
     // blocking request
     QEventLoop loop;
-    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    (void)connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
     loop.exec();
 
     if (reply->error() != QNetworkReply::NoError) {
@@ -384,7 +384,7 @@ StravaRoutesDownload::getFileList(QString &error)
 
         // blocking request
         QEventLoop loop;
-        connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+        (void)connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
         loop.exec();
 
         if (reply->error() != QNetworkReply::NoError) {
@@ -459,7 +459,7 @@ StravaRoutesDownload::readFile(QByteArray *data, int routeId)
 
     // blocking request
     QEventLoop loop;
-    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    (void)connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
     loop.exec();
 
     if (reply->error() != QNetworkReply::NoError) {

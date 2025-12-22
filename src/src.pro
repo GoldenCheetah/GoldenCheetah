@@ -123,6 +123,9 @@ win32-msvc* {
 
         # Linux Flex compiler grumbles about unsigned comparisons
         QMAKE_CXXFLAGS += -Wno-sign-compare
+
+        # Treat nodiscard warnings as errors
+        QMAKE_CXXFLAGS += -Werror=unused-result
     }
 }
 

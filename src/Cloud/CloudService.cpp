@@ -176,7 +176,7 @@ CloudService::compressRide(RideFile*ride, QByteArray &data, QString name)
 {
     // compress via a temporary file
     QTemporaryFile tempfile;
-    tempfile.open();
+    (void)tempfile.open();
     tempfile.close();
 
     // write as file type requested
@@ -209,7 +209,7 @@ CloudService::compressRide(RideFile*ride, QByteArray &data, QString name)
         if (uploadCompression == zip) {
             // create a temp zip file
             QTemporaryFile zipFile;
-            zipFile.open();
+            (void)zipFile.open();
             zipFile.close();
 
             // add files using zip writer
@@ -251,8 +251,8 @@ CloudService::uncompressRide(QByteArray *data, QString name, QStringList &errors
     if (name.endsWith(".zip")) {
         // write out to a zip file first
         QTemporaryFile zipfile;
-        zipfile.open();
-        zipfile.write(*data);
+        (void)zipfile.open();
+        (void)zipfile.write(*data);
         zipfile.close();
 
         // open zip
@@ -274,8 +274,8 @@ CloudService::uncompressRide(QByteArray *data, QString name, QStringList &errors
 
     // uncompress and write a file
     QFile file(tmp);
-    file.open(QFile::WriteOnly);
-    file.write(jsonData);
+    (void)file.open(QFile::WriteOnly);
+    (void)file.write(jsonData);
     file.close();
 
     // read the file in using the correct ridefile reader
@@ -406,7 +406,7 @@ CloudServiceUploadDialog::CloudServiceUploadDialog(QWidget *parent, Context *con
     }
 
     // get notification when done
-    connect(store, SIGNAL(writeComplete(QString,QString)), this, SLOT(completed(QString,QString)));
+    (void)connect(store, SIGNAL(writeComplete(QString,QString)), this, SLOT(completed(QString,QString)));
 
 }
 
@@ -427,7 +427,7 @@ CloudServiceUploadDialog::completed(QString file, QString message)
     progress->setMaximum(1);
     progress->setValue(1);
     okcancel->setText(tr("OK"));
-    connect(okcancel, SIGNAL(clicked()), this, SLOT(accept()));
+    (void)connect(okcancel, SIGNAL(clicked()), this, SLOT(accept()));
 }
 
 CloudServiceDialog::CloudServiceDialog(QWidget *parent, CloudService *store, QString title, QString pathname, bool dironly) :
@@ -481,12 +481,12 @@ CloudServiceDialog::CloudServiceDialog(QWidget *parent, CloudService *store, QSt
     layout->addLayout(buttons);
 
     // want selection or not ?
-    connect(create, SIGNAL(clicked()), this, SLOT(createFolderClicked()));
-    connect(cancel, SIGNAL(clicked()), this, SLOT(reject()));
-    connect(open, SIGNAL(clicked()), this, SLOT(accept()));
-    connect(pathEdit, SIGNAL(returnPressed()), this, SLOT(returnPressed()));
-    connect(folders, SIGNAL(itemSelectionChanged()), this, SLOT(folderSelectionChanged()));
-    connect(files, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), this, SLOT(fileDoubleClicked(QTreeWidgetItem*,int)));
+    (void)connect(create, SIGNAL(clicked()), this, SLOT(createFolderClicked()));
+    (void)connect(cancel, SIGNAL(clicked()), this, SLOT(reject()));
+    (void)connect(open, SIGNAL(clicked()), this, SLOT(accept()));
+    (void)connect(pathEdit, SIGNAL(returnPressed()), this, SLOT(returnPressed()));
+    (void)connect(folders, SIGNAL(itemSelectionChanged()), this, SLOT(folderSelectionChanged()));
+    (void)connect(files, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), this, SLOT(fileDoubleClicked(QTreeWidgetItem*,int)));
 
     // trap return key pressed for a file dialog
     installEventFilter(this);
@@ -701,8 +701,8 @@ FolderNameDialog::FolderNameDialog(QWidget *parent) : QDialog(parent)
     buttons->addWidget(create);
     layout->addLayout(buttons);
 
-    connect(cancel, SIGNAL(clicked()), this, SLOT(reject()));
-    connect(create, SIGNAL(clicked()), this, SLOT(accept()));
+    (void)connect(cancel, SIGNAL(clicked()), this, SLOT(reject()));
+    (void)connect(create, SIGNAL(clicked()), this, SLOT(accept()));
 }
 
 CloudServiceSyncDialog::CloudServiceSyncDialog(Context *context, CloudService *store)
@@ -745,8 +745,8 @@ CloudServiceSyncDialog::CloudServiceSyncDialog(Context *context, CloudService *s
     QVBoxLayout *syncLayout = new QVBoxLayout(sync);
 
     // notification when upload/download completes
-    connect (store, SIGNAL(writeComplete(QString,QString)), this, SLOT(completedWrite(QString,QString)));
-    connect (store, SIGNAL(readComplete(QByteArray*,QString,QString)), this, SLOT(completedRead(QByteArray*,QString,QString)));
+    (void)connect (store, SIGNAL(writeComplete(QString,QString)), this, SLOT(completedWrite(QString,QString)));
+    (void)connect (store, SIGNAL(readComplete(QByteArray*,QString,QString)), this, SLOT(completedRead(QByteArray*,QString,QString)));
 
     // combo box
     athleteCombo = new QComboBox(this);

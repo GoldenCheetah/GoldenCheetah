@@ -82,13 +82,13 @@ RideMetadata::RideMetadata(Context *context, bool singlecolumn) :
         // Extra tab is expensive to update so we only update if it
         // is visible. In this case we need to trigger refresh when the
         // tab is selected -or- when the ride changes. Below is for tab.
-        connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(setExtraTab()));
-        connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+        (void)connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(setExtraTab()));
+        (void)connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
         // watch interval changes since interval metadata needs to be refreshed
-        connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
-        connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
-        connect(context, SIGNAL(intervalsUpdate(RideItem*)), this, SLOT(intervalsChanged()));
+        (void)connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
+        (void)connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
+        (void)connect(context, SIGNAL(intervalsUpdate(RideItem*)), this, SLOT(intervalsChanged()));
 
     } else {
 
@@ -111,7 +111,7 @@ RideMetadata::setRideItem(RideItem *ride)
     _connected=_ride=ride;
 
     if (ride) {
-        connect (_connected, SIGNAL(rideMetadataChanged()), this, SLOT(metadataChanged()));
+        (void)connect (_connected, SIGNAL(rideMetadataChanged()), this, SLOT(metadataChanged()));
 
         // tell the forms (setting interval)
         QMapIterator<QString, Form*> d(tabList);
@@ -450,7 +450,7 @@ RideMetadata::configChanged(qint32)
                delete d.value();
         }
         tabList.clear();
-        formFields.empty();
+        formFields.clear();
 
         // remove editor if it exists
         if (tabs->count() > 0) tabs->removeTab(tabs->count()-1);
@@ -710,8 +710,8 @@ Form::initialise()
     setWidgetResizable(true);
     setWidget(contents);
 
-    connect(left, SIGNAL(clicked()), this, SLOT(intervalLeft()));
-    connect(right, SIGNAL(clicked()), this, SLOT(intervalRight()));
+    (void)connect(left, SIGNAL(clicked()), this, SLOT(intervalLeft()));
+    (void)connect(right, SIGNAL(clicked()), this, SLOT(intervalRight()));
 }
 
 void

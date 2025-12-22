@@ -143,7 +143,7 @@ void HttpRequest::readBody(QTcpSocket* socket) {
             wDebug("HttpRequest: receiving multipart body");
         #endif
         if (!tempFile.isOpen()) {
-            tempFile.open();
+            (void)tempFile.open();
         }
         // Transfer data in 64kb blocks
         int fileSize=tempFile.size();
@@ -405,7 +405,7 @@ void HttpRequest::parseMultiPartFile() {
                     // this is a file
                     if (!uploadedFile) {
                         uploadedFile=new QTemporaryFile();
-                        uploadedFile->open();
+                        (void)uploadedFile->open();
                     }
                     uploadedFile->write(line);
                     if (uploadedFile->error()) {
