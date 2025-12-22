@@ -220,8 +220,8 @@ void PMCData::refresh()
     //
     // STEP TWO What are the seedings and ride values
     //
-    const double lte = (double)exp(-1.0/ltsDays_);
-    const double ste = (double)exp(-1.0/stsDays_);
+    // const double lte = (double)exp(-1.0/ltsDays_);
+    // const double ste = (double)exp(-1.0/stsDays_);
 
     // clear what's there
     stress_.fill(0);

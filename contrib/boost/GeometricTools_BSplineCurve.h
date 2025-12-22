@@ -1018,8 +1018,7 @@ namespace gte
 
             for (int i = 1; i <= input.numUniqueKnots - 2; ++i)
             {
-                int mult = mUniqueKnots[i].multiplicity;
-                LogAssert(mult >= 1 && mult <= mDegree + 1, "Invalid interior multiplicity.");
+                LogAssert(mUniqueKnots[i].multiplicity >= 1 && mUniqueKnots[i].multiplicity <= mDegree + 1, "Invalid interior multiplicity.");
             }
 
             mOpen = (mult0 == mult1 && mult0 == mDegree + 1);
