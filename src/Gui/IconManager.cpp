@@ -208,8 +208,8 @@ bool
 IconManager::importBundle
 (const QString &filename)
 {
-    QFile zipFile(filename);
-    return importBundle(&zipFile);
+    auto qfile = std::make_unique<QFile>(filename);
+    return importBundle(std::move(qfile));
 }
 
 
@@ -218,19 +218,19 @@ IconManager::importBundle
 (const QUrl &url)
 {
     QByteArray zipData = downloadUrl(url);
-    QBuffer buffer;
-    buffer.setData(zipData);
-    buffer.open(QIODevice::ReadOnly);
+    auto buffer = std::make_unique<QBuffer>();
+    buffer->setData(zipData);
+    buffer->open(QIODevice::ReadOnly);
 
-    return importBundle(&buffer);
+    return importBundle(std::move(buffer));
 }
 
 
 bool
 IconManager::importBundle
-(QIODevice *device)
+(std::unique_ptr<QIODevice> device)
 {
-    ZipReader reader(device);
+    ZipReader reader(std::move(device));
     for (ZipReader::FileInfo info : reader.fileInfoList()) {
         if (info.isFile) {
             QByteArray data = reader.fileData(info.filePath);
