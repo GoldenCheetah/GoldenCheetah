@@ -301,11 +301,11 @@ AgendaTree::drawRow
     if (! isTopLevel && type == 0 && hover) {
         painter->save();
         QColor bgColor = option.palette.color(QPalette::Active, QPalette::Highlight);
-        bgColor.setAlphaF(0.2);
+        bgColor.setAlphaF(0.2f);
         QRect hoverRect(option.rect);
         hoverRect.setX(hoverRect.x() + 4 * dpiXFactor);
         painter->fillRect(hoverRect, bgColor);
-        bgColor.setAlphaF(0.6);
+        bgColor.setAlphaF(0.6f);
         QRect markerRect(option.rect);
         markerRect.setWidth(4 * dpiXFactor);
         painter->fillRect(markerRect, bgColor);

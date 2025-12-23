@@ -4895,7 +4895,7 @@ void write_float32(QByteArray* array, float f, bool is_big_endian) {
 
 // Zero pad string to length of field (len)
 void write_string(QByteArray* array, const char* str, int len) {
-    int slen = strlen(str);
+    size_t slen = strlen(str);
     array->append(str, slen);
     array->append(len - slen, 0);
 }

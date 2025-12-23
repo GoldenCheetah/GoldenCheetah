@@ -28,12 +28,11 @@ void QwtPlotGappedCurve::drawSeries(QPainter *painter, const QwtScaleMap &xMap,
     if ( !painter || dataSize() <= 0 )
         return;
 
-    if (to < 0)
-        to = dataSize();
+    size_t samples = (to < 0) ? dataSize() : to;
 
     int i = from;
     double last = 0;
-    while (i < to)
+    while (i < samples)
     {
         // First non-missed point will be the start of curve section.
         double x = sample(i).x();

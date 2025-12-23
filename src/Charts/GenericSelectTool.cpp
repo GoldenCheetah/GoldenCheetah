@@ -61,7 +61,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
         QRectF fr = host->axisRect.value(hoveraxis, QRectF());
         if (fr != QRectF()) {
             QColor color = GColor(CPLOTMARKER);
-            color.setAlphaF(0.2); // almost hidden if not moving/sizing
+            color.setAlphaF(0.2f); // almost hidden if not moving/sizing
             painter->fillRect(mapRectFromScene(fr),QBrush(color));
         }
 
