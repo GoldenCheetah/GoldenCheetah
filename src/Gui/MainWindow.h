@@ -27,6 +27,7 @@
 #include <QtGui>
 #include <QMainWindow>
 #include <QStackedWidget>
+#include <QNetworkReply>
 #include "RideItem.h"
 #include "TimeUtils.h"
 #include "DragBar.h"
@@ -121,6 +122,8 @@ class MainWindow : public QMainWindow
         virtual void closeEvent(QCloseEvent*);
         virtual void dragEnterEvent(QDragEnterEvent *);
         virtual void dropEvent(QDropEvent *);
+
+        void gcVersionCheck();
 
         // working with splash screens
         SplashScreen *splash;
@@ -293,6 +296,10 @@ class MainWindow : public QMainWindow
 
         void configChanged(qint32);
 
+    protected slots:
+
+        void gcVersionResponse(QNetworkReply*);
+
     private:
 
         // when loading athlete
@@ -350,6 +357,9 @@ class MainWindow : public QMainWindow
 
         QAction *shareAction;
         QAction *checkAction;
+
+        // Latest version checking
+        QNetworkAccessManager networkAccessMngr;
 
         // Miscellany
         QSignalMapper *toolMapper = nullptr;
