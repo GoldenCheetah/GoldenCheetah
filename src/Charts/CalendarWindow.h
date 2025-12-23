@@ -121,12 +121,18 @@ class CalendarWindow : public GcChartWindow
         QHash<QDate, QList<CalendarEntry>> getActivities(const QDate &firstDay, const QDate &lastDay) const;
         QList<CalendarSummary> getSummaries(const QDate &firstDay, const QDate &lastDay, int timeBucketSize = 7) const;
         QHash<QDate, QList<CalendarEntry>> getPhasesEvents(const Season &season, const QDate &firstDay, const QDate &lastDay) const;
+        RideItem *getRideItem(const CalendarEntry &entry, bool linked = false);
+        QString getPrimary(RideItem const * const rideItem) const;
+        bool proceedDialog(const RideCache::OperationPreCheck &check);
 
     private slots:
         void updateActivities();
         void updateActivitiesIfInRange(RideItem *rideItem);
         void updateSeason(Season const *season, bool allowKeepMonth = false);
-        bool movePlannedActivity(RideItem *rideItem, const QDate &destDay, const QTime &destTime = QTime());
+        void movePlannedActivity(RideItem *rideItem, const QDate &destDay, const QTime &destTime = QTime());
+        void shiftPlannedActivities(const QDate &destDay, int offset);
+        void linkActivities(const CalendarEntry &entry);
+        void unlinkActivities(const CalendarEntry &entry);
         void addEvent(const QDate &date);
         void editEvent(const CalendarEntry &entry);
         void delEvent(const CalendarEntry &entry);

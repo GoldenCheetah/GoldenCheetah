@@ -771,17 +771,46 @@ CalendarDayTable::makeActivityMenu
         CalendarEntry calEntry = day.entries[entryIdx];
         switch (calEntry.type) {
         case ENTRY_TYPE_ACTIVITY:
+            if (calEntry.linkedReference.isEmpty()) {
+                contextMenu->addAction(tr("Link with planned activity"), this, [this, calEntry]() {
+                    emit linkActivity(calEntry);
+                });
+            } else {
+                contextMenu->addAction(tr("Unlink from planned activity"), this, [this, calEntry]() {
+                    emit unlinkActivity(calEntry);
+                });
+                contextMenu->addAction(tr("View planned activity..."), this, [this, calEntry]() {
+                    emit viewLinkedActivity(calEntry);
+                });
+            }
             contextMenu->addAction(tr("View activity..."), this, [this, calEntry]() {
                 emit viewActivity(calEntry);
             });
             contextMenu->addAction(tr("Delete activity"), this, [this, calEntry]() {
                 emit delActivity(calEntry);
             });
+            if (calEntry.dirty) {
+                contextMenu->addAction(tr("Save activity"), this, [this, calEntry]() {
+                    emit saveActivity(calEntry);
+                });
+            }
             break;
         case ENTRY_TYPE_PLANNED_ACTIVITY:
             if (calEntry.hasTrainMode) {
                 contextMenu->addAction(tr("Show in train node..."), this, [this, calEntry]() {
                     emit showInTrainMode(calEntry);
+                });
+            }
+            if (calEntry.linkedReference.isEmpty()) {
+                contextMenu->addAction(tr("Link with completed activity"), this, [this, calEntry]() {
+                    emit linkActivity(calEntry);
+                });
+            } else {
+                contextMenu->addAction(tr("Unlink from completed activity"), this, [this, calEntry]() {
+                    emit unlinkActivity(calEntry);
+                });
+                contextMenu->addAction(tr("View completed activity..."), this, [this, calEntry]() {
+                    emit viewLinkedActivity(calEntry);
                 });
             }
             contextMenu->addAction(tr("View planned activity..."), this, [this, calEntry]() {
@@ -790,6 +819,11 @@ CalendarDayTable::makeActivityMenu
             contextMenu->addAction(tr("Delete planned activity"), this, [this, calEntry]() {
                 emit delActivity(calEntry);
             });
+            if (calEntry.dirty) {
+                contextMenu->addAction(tr("Save activity"), this, [this, calEntry]() {
+                    emit saveActivity(calEntry);
+                });
+            }
             break;
         default:
             break;
@@ -1337,17 +1371,46 @@ CalendarMonthTable::showContextMenu
         CalendarEntry calEntry = day.entries[entryIdx];
         switch (calEntry.type) {
         case ENTRY_TYPE_ACTIVITY:
+            if (calEntry.linkedReference.isEmpty()) {
+                contextMenu.addAction(tr("Link with planned activity"), this, [this, calEntry]() {
+                    emit linkActivity(calEntry);
+                });
+            } else {
+                contextMenu.addAction(tr("Unlink from planned activity"), this, [this, calEntry]() {
+                    emit unlinkActivity(calEntry);
+                });
+                contextMenu.addAction(tr("View planned activity..."), this, [this, calEntry]() {
+                    emit viewLinkedActivity(calEntry);
+                });
+            }
             contextMenu.addAction(tr("View activity..."), this, [this, calEntry]() {
                 emit viewActivity(calEntry);
             });
             contextMenu.addAction(tr("Delete activity"), this, [this, calEntry]() {
                 emit delActivity(calEntry);
             });
+            if (calEntry.dirty) {
+                contextMenu.addAction(tr("Save activity"), this, [this, calEntry]() {
+                    emit saveActivity(calEntry);
+                });
+            }
             break;
         case ENTRY_TYPE_PLANNED_ACTIVITY:
             if (calEntry.hasTrainMode) {
                 contextMenu.addAction(tr("Show in train mode..."), this, [this, calEntry]() {
                     emit showInTrainMode(calEntry);
+                });
+            }
+            if (calEntry.linkedReference.isEmpty()) {
+                contextMenu.addAction(tr("Link with completed activity"), this, [this, calEntry]() {
+                    emit linkActivity(calEntry);
+                });
+            } else {
+                contextMenu.addAction(tr("Unlink from completed activity"), this, [this, calEntry]() {
+                    emit unlinkActivity(calEntry);
+                });
+                contextMenu.addAction(tr("View completed activity..."), this, [this, calEntry]() {
+                    emit viewLinkedActivity(calEntry);
                 });
             }
             contextMenu.addAction(tr("View planned activity..."), this, [this, calEntry]() {
@@ -1356,6 +1419,11 @@ CalendarMonthTable::showContextMenu
             contextMenu.addAction(tr("Delete planned activity"), this, [this, calEntry]() {
                 emit delActivity(calEntry);
             });
+            if (calEntry.dirty) {
+                contextMenu.addAction(tr("Save activity"), this, [this, calEntry]() {
+                    emit saveActivity(calEntry);
+                });
+            }
             break;
         default:
             break;
@@ -1476,10 +1544,14 @@ CalendarDayView::CalendarDayView
         dayDateSelector->setSelectedDate(date);
         emit dayChanged(date);
     });
+    connect(dayTable, &CalendarDayTable::linkActivity, this, &CalendarDayView::linkActivity);
+    connect(dayTable, &CalendarDayTable::unlinkActivity, this, &CalendarDayView::unlinkActivity);
     connect(dayTable, &CalendarDayTable::viewActivity, this, &CalendarDayView::viewActivity);
+    connect(dayTable, &CalendarDayTable::viewLinkedActivity, this, &CalendarDayView::viewLinkedActivity);
     connect(dayTable, &CalendarDayTable::addActivity, this, &CalendarDayView::addActivity);
     connect(dayTable, &CalendarDayTable::showInTrainMode, this, &CalendarDayView::showInTrainMode);
     connect(dayTable, &CalendarDayTable::delActivity, this, &CalendarDayView::delActivity);
+    connect(dayTable, &CalendarDayTable::saveActivity, this, &CalendarDayView::saveActivity);
     connect(dayTable, &CalendarDayTable::entryMoved, this, &CalendarDayView::entryMoved);
     connect(dayTable, &CalendarDayTable::addPhase, this, &CalendarDayView::addPhase);
     connect(dayTable, &CalendarDayTable::editPhase, this, &CalendarDayView::editPhase);
@@ -1766,10 +1838,14 @@ CalendarWeekView::CalendarWeekView
     weekLayout->addWidget(weekTable);
 
     connect(weekTable, &CalendarDayTable::dayChanged, this, &CalendarWeekView::dayChanged);
+    connect(weekTable, &CalendarDayTable::linkActivity, this, &CalendarWeekView::linkActivity);
+    connect(weekTable, &CalendarDayTable::unlinkActivity, this, &CalendarWeekView::unlinkActivity);
     connect(weekTable, &CalendarDayTable::viewActivity, this, &CalendarWeekView::viewActivity);
+    connect(weekTable, &CalendarDayTable::viewLinkedActivity, this, &CalendarWeekView::viewLinkedActivity);
     connect(weekTable, &CalendarDayTable::addActivity, this, &CalendarWeekView::addActivity);
     connect(weekTable, &CalendarDayTable::showInTrainMode, this, &CalendarWeekView::showInTrainMode);
     connect(weekTable, &CalendarDayTable::delActivity, this, &CalendarWeekView::delActivity);
+    connect(weekTable, &CalendarDayTable::saveActivity, this, &CalendarWeekView::saveActivity);
     connect(weekTable, &CalendarDayTable::entryMoved, this, &CalendarWeekView::entryMoved);
     connect(weekTable, &CalendarDayTable::addPhase, this, &CalendarWeekView::addPhase);
     connect(weekTable, &CalendarDayTable::editPhase, this, &CalendarWeekView::editPhase);
@@ -1954,10 +2030,14 @@ Calendar::Calendar
             setNavButtonState();
         }
     });
+    connect(dayView, &CalendarDayView::linkActivity, this, &Calendar::linkActivity);
+    connect(dayView, &CalendarDayView::unlinkActivity, this, &Calendar::unlinkActivity);
     connect(dayView, &CalendarDayView::viewActivity, this, &Calendar::viewActivity);
+    connect(dayView, &CalendarDayView::viewLinkedActivity, this, &Calendar::viewLinkedActivity);
     connect(dayView, &CalendarDayView::addActivity, this, &Calendar::addActivity);
     connect(dayView, &CalendarDayView::showInTrainMode, this, &Calendar::showInTrainMode);
     connect(dayView, &CalendarDayView::delActivity, this, &Calendar::delActivity);
+    connect(dayView, &CalendarDayView::saveActivity, this, &Calendar::saveActivity);
     connect(dayView, &CalendarDayView::entryMoved, this, &Calendar::moveActivity);
     connect(dayView, &CalendarDayView::addPhase, this, &Calendar::addPhase);
     connect(dayView, &CalendarDayView::editPhase, this, &Calendar::editPhase);
@@ -1973,10 +2053,14 @@ Calendar::Calendar
             setNavButtonState();
         }
     });
+    connect(weekView, &CalendarWeekView::linkActivity, this, &Calendar::linkActivity);
+    connect(weekView, &CalendarWeekView::unlinkActivity, this, &Calendar::unlinkActivity);
     connect(weekView, &CalendarWeekView::viewActivity, this, &Calendar::viewActivity);
+    connect(weekView, &CalendarWeekView::viewLinkedActivity, this, &Calendar::viewLinkedActivity);
     connect(weekView, &CalendarWeekView::addActivity, this, &Calendar::addActivity);
     connect(weekView, &CalendarWeekView::showInTrainMode, this, &Calendar::showInTrainMode);
     connect(weekView, &CalendarWeekView::delActivity, this, &Calendar::delActivity);
+    connect(weekView, &CalendarWeekView::saveActivity, this, &Calendar::saveActivity);
     connect(weekView, &CalendarWeekView::entryMoved, this, &Calendar::moveActivity);
     connect(weekView, &CalendarWeekView::addPhase, this, &Calendar::addPhase);
     connect(weekView, &CalendarWeekView::editPhase, this, &Calendar::editPhase);
@@ -1998,10 +2082,14 @@ Calendar::Calendar
         setView(CalendarView::Day);
     });
     connect(monthView, &CalendarMonthTable::showInTrainMode, this, &Calendar::showInTrainMode);
+    connect(monthView, &CalendarMonthTable::linkActivity, this, &Calendar::linkActivity);
+    connect(monthView, &CalendarMonthTable::unlinkActivity, this, &Calendar::unlinkActivity);
     connect(monthView, &CalendarMonthTable::viewActivity, this, &Calendar::viewActivity);
+    connect(monthView, &CalendarMonthTable::viewLinkedActivity, this, &Calendar::viewLinkedActivity);
     connect(monthView, &CalendarMonthTable::addActivity, this, &Calendar::addActivity);
     connect(monthView, &CalendarMonthTable::repeatSchedule, this, &Calendar::repeatSchedule);
     connect(monthView, &CalendarMonthTable::delActivity, this, &Calendar::delActivity);
+    connect(monthView, &CalendarMonthTable::saveActivity, this, &Calendar::saveActivity);
     connect(monthView, &CalendarMonthTable::entryMoved, this, &Calendar::moveActivity);
     connect(monthView, &CalendarMonthTable::addPhase, this, &Calendar::addPhase);
     connect(monthView, &CalendarMonthTable::editPhase, this, &Calendar::editPhase);

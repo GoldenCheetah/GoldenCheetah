@@ -59,6 +59,8 @@ AgendaWindow::AgendaWindow(Context *context)
     setChartLayout(mainLayout);
     mainLayout->addWidget(agendaView);
 
+    connect(context->athlete->rideCache, QOverload<RideItem*>::of(&RideCache::itemChanged), this, &AgendaWindow::updateActivitiesIfInRange);
+    connect(context->athlete->rideCache, &RideCache::itemSaved, this, &AgendaWindow::updateActivitiesIfInRange);
     connect(context->athlete->seasons, &Seasons::seasonsChanged, this, &AgendaWindow::updateActivities);
     connect(context, &Context::seasonSelected, this, &AgendaWindow::updateActivities);
     connect(context, &Context::filterChanged, this, &AgendaWindow::updateActivities);
@@ -533,7 +535,8 @@ AgendaWindow::getActivities
     for (RideItem *rideItem : context->athlete->rideCache->rides()) {
         if (   rideItem == nullptr
             || rideItem->dateTime.date() < firstDay
-            || rideItem->dateTime.date() > lastDay) {
+            || rideItem->dateTime.date() > lastDay
+            || rideItem->hasLinkedActivity()) {
             continue;
         }
         if (   (context->isfiltered && ! context->filters.contains(rideItem->fileName))
