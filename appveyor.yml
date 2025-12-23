@@ -75,10 +75,9 @@ init:
       qmake --version
     else
       export OS_NAME=macos
-      # Setup QT 6.5
-      export QTDIR=$HOME/Qt/6.5/macos
+      # Setup Qt 6.8.3 to be downloaded by install script
+      export QTDIR=$HOME/Qt/6.8.3/macos
       export PATH=$QTDIR/bin:$PATH
-      qmake --version
       # Setup Xcode 14.2
       sudo xcode-select -s /Applications/Xcode-14.2.0.app
     fi
