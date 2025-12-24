@@ -818,7 +818,7 @@ TrainDB::getWorkoutModel
 
     query.exec();
     QSqlQueryModel *model = new QSqlQueryModel();
-    model->setQuery(query);
+    model->setQuery(std::move(query));
     while (model->canFetchMore(QModelIndex())) {
         model->fetchMore(QModelIndex());
     }
