@@ -9,4 +9,4 @@ TEMPLATE = app
 
 include(../../unittests.pri)
 
-SOURCES += main.cpp
+SOURCES += main.cpp testPatternDetection.cpp  testSignalSafety.cpp  testTreeSafety.cpp

@@ -65,6 +65,8 @@ doc/contrib/WASP Packet Protocol.pdf
 unittests/Core/season/season
 unittests/Core/seasonOffset/seasonOffset
 unittests/Core/seasonParser/seasonParser
+unittests/Core/signalSafety/testSignalSafety
+unittests/Core/signalSafety/testSignalSafety
 unittests/Core/units/units
 unittests/Gui/calendarData/calendarData
 
