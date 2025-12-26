@@ -93,9 +93,13 @@ signals:
     void entryMoved(const CalendarEntry &activity, const QDate &srcDay, const QDate &destDay, const QTime &destTime);
     void dayChanged(const QDate &date);
     void showInTrainMode(const CalendarEntry &activity);
+    void linkActivity(const CalendarEntry &activity);
+    void unlinkActivity(const CalendarEntry &activity);
     void viewActivity(const CalendarEntry &activity);
+    void viewLinkedActivity(const CalendarEntry &activity);
     void addActivity(bool plan, const QDate &day, const QTime &time);
     void delActivity(const CalendarEntry &activity);
+    void saveActivity(const CalendarEntry &activity);
     void addEvent(const QDate &date);
     void editEvent(const CalendarEntry &entry);
     void delEvent(const CalendarEntry &entry);
@@ -176,9 +180,13 @@ signals:
     void summaryRightClicked(const QModelIndex &index);
     void monthChanged(const QDate &month, const QDate &firstVisible, const QDate &lastVisible);
     void showInTrainMode(const CalendarEntry &activity);
+    void linkActivity(const CalendarEntry &activity);
+    void unlinkActivity(const CalendarEntry &activity);
     void viewActivity(const CalendarEntry &activity);
+    void viewLinkedActivity(const CalendarEntry &activity);
     void addActivity(bool plan, const QDate &day, const QTime &time);
     void delActivity(const CalendarEntry &activity);
+    void saveActivity(const CalendarEntry &activity);
     void repeatSchedule(const QDate &day);
     void insertRestday(const QDate &day);
     void delRestday(const QDate &day);
@@ -246,9 +254,13 @@ public:
 
 signals:
     void showInTrainMode(const CalendarEntry &activity);
+    void linkActivity(const CalendarEntry &activity);
+    void unlinkActivity(const CalendarEntry &activity);
     void viewActivity(const CalendarEntry &activity);
+    void viewLinkedActivity(const CalendarEntry &activity);
     void addActivity(bool plan, const QDate &day, const QTime &time);
     void delActivity(const CalendarEntry &activity);
+    void saveActivity(const CalendarEntry &activity);
     void entryMoved(const CalendarEntry &activity, const QDate &srcDay, const QDate &destDay, const QTime &destTime);
     void dayChanged(const QDate &date);
     void addEvent(const QDate &date);
@@ -290,9 +302,13 @@ public:
 
 signals:
     void showInTrainMode(const CalendarEntry &activity);
+    void linkActivity(const CalendarEntry &activity);
+    void unlinkActivity(const CalendarEntry &activity);
     void viewActivity(const CalendarEntry &activity);
+    void viewLinkedActivity(const CalendarEntry &activity);
     void addActivity(bool plan, const QDate &day, const QTime &time);
     void delActivity(const CalendarEntry &activity);
+    void saveActivity(const CalendarEntry &activity);
     void entryMoved(const CalendarEntry &activity, const QDate &srcDay, const QDate &destDay, const QTime &destTime);
     void dayChanged(const QDate &date);
     void addEvent(const QDate &date);
@@ -348,9 +364,13 @@ signals:
     void monthChanged(const QDate &month, const QDate &firstVisible, const QDate &lastVisible);
     void dateRangeActivated(const QString &name);
     void showInTrainMode(const CalendarEntry &activity);
+    void linkActivity(const CalendarEntry &activity);
+    void unlinkActivity(const CalendarEntry &activity);
     void viewActivity(const CalendarEntry &activity);
+    void viewLinkedActivity(const CalendarEntry &activity);
     void addActivity(bool plan, const QDate &day, const QTime &time);
     void delActivity(const CalendarEntry &activity);
+    void saveActivity(const CalendarEntry &activity);
     void repeatSchedule(const QDate &day);
     void moveActivity(const CalendarEntry &activity, const QDate &srcDay, const QDate &destDay, const QTime &destTime);
     void insertRestday(const QDate &day);

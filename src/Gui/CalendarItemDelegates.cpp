@@ -409,6 +409,11 @@ CalendarDetailedDayDelegate::paint
         entryTester.set(index, l.entryIdx, entryRect);
         QColor entryBG = bgColor;
         QColor entryFrame = entry.color;
+        if (entry.dirty) {
+            QFont font = painter->font();
+            font.setItalic(true);
+            painter->setFont(font);
+        }
         if (pressed) {
             entryBG = option.palette.highlight().color();
             entryFrame = entryBG;
@@ -449,6 +454,22 @@ CalendarDetailedDayDelegate::paint
                 pixmap = svgOnBackground(entry.iconFile, pixmapSize, iconSpacing, pixmapColor, radius);
             }
             painter->drawPixmap(left, top, pixmap);
+            if (! pressed && ! entry.linkedReference.isEmpty()) {
+                QRect rect(left + columnWidth - 2 * painter->pen().width(), top, radius, height);
+                QPainterPath path;
+                path.moveTo(rect.left(), rect.top());
+                path.lineTo(rect.right() - radius, rect.top());
+                path.arcTo(rect.right() - radius * 2, rect.top(), radius * 2, radius * 2, 90, -90);
+                path.lineTo(rect.right(), rect.bottom() - radius);
+                path.arcTo(rect.right() - radius * 2, rect.bottom() - radius * 2, radius * 2, radius * 2, 0, -90);
+                path.lineTo(rect.left(), rect.bottom());
+                path.closeSubpath();
+
+                painter->save();
+                painter->setRenderHint(QPainter::Antialiasing);
+                painter->fillPath(path, pixmapColor);
+                painter->restore();
+            }
         }
         if (numLines > 0) {
             painter->save();
@@ -845,13 +866,13 @@ CalendarCompactDayDelegate::paint
             painter->setPen(GCColor::invertColor(selColor));
         }
         QPixmap pixmap;
+        QColor pixmapColor(calEntry.color);
+        if (   i == pressedEntryIdx
+            || (   opt.state & QStyle::State_Selected
+                && pressedEntryIdx < 0)) {
+            pixmapColor = GCColor::invertColor(selColor);
+        }
         if (calEntry.type == ENTRY_TYPE_PLANNED_ACTIVITY) {
-            QColor pixmapColor(calEntry.color);
-            if (   i == pressedEntryIdx
-                || (   opt.state & QStyle::State_Selected
-                    && pressedEntryIdx < 0)) {
-                pixmapColor = GCColor::invertColor(selColor);
-            }
             pixmap = svgAsColoredPixmap(calEntry.iconFile, pixmapSize, lineSpacing, pixmapColor);
         } else {
             pixmap = svgOnBackground(calEntry.iconFile, pixmapSize, lineSpacing, calEntry.color, radius);
@@ -859,6 +880,33 @@ CalendarCompactDayDelegate::paint
         painter->drawPixmap(opt.rect.x() + leftMargin,
                             entryStartY + i * (entryHeight + lineSpacing),
                             pixmap);
+        if (i != pressedEntryIdx && ! calEntry.linkedReference.isEmpty()) {
+            int left = titleRect.x() + titleRect.width() - radius - 1 * dpiXFactor;
+            int columnWidth = radius;
+            int top = titleRect.y();
+            int height = pixmapSize.height();
+            QRect rect(left + columnWidth - 2 * painter->pen().width(), top, radius, height);
+            QPainterPath path;
+            path.moveTo(rect.left(), rect.top());
+            path.lineTo(rect.right() - radius, rect.top());
+            path.arcTo(rect.right() - radius * 2, rect.top(), radius * 2, radius * 2, 90, -90);
+            path.lineTo(rect.right(), rect.bottom() - radius);
+            path.arcTo(rect.right() - radius * 2, rect.bottom() - radius * 2, radius * 2, radius * 2, 0, -90);
+            path.lineTo(rect.left(), rect.bottom());
+            path.closeSubpath();
+
+            painter->save();
+            painter->setRenderHint(QPainter::Antialiasing);
+            painter->fillPath(path, pixmapColor);
+            painter->restore();
+
+            titleRect.setWidth(titleRect.width() - radius - 1 * dpiXFactor);
+        }
+        if (calEntry.dirty) {
+            QFont font = painter->font();
+            font.setItalic(true);
+            painter->setFont(font);
+        }
         painter->drawText(titleRect, Qt::AlignLeft | Qt::AlignTop, calEntry.primary);
         if (multiLine && ! calEntry.secondary.isEmpty()) {
             QRect subRect(titleRect.x(),
@@ -1674,20 +1722,23 @@ toolTipDayEntry(const QPoint &pos, QAbstractItemView *view, const CalendarDay &d
     if (idx >= 0 && idx < day.entries.size()) {
         CalendarEntry calEntry = day.entries[idx];
         QString tooltip = "<center><b>" + calEntry.primary + "</b>";
-        tooltip += "<br/>";
+        tooltip += "<br/>[";
         switch (calEntry.type) {
         case ENTRY_TYPE_ACTIVITY:
-            tooltip += "[completed]";
+            tooltip += QObject::tr("completed");
             break;
         case ENTRY_TYPE_PLANNED_ACTIVITY:
-            tooltip += "[planned]";
+            tooltip += QObject::tr("planned");
             break;
         case ENTRY_TYPE_OTHER:
         default:
-            tooltip += "[other]";
+            tooltip += QObject::tr("other");
             break;
         }
-        tooltip += "<br/>";
+        if (calEntry.dirty) {
+            tooltip += QObject::tr(", modified");
+        }
+        tooltip += "]<br/>";
         if (! calEntry.secondary.isEmpty()) {
             tooltip += calEntry.secondaryMetric + ": " + calEntry.secondary;
             tooltip += "<br/>";

@@ -1125,6 +1125,17 @@ RideImportWizard::abortClicked()
                     tableWidget->item(i,STATUS_COLUMN)->setText(tr("File Saved"));
                     // and correct the path locally stored in Ride Item
                     context->ride->setFileName(homeActivities.canonicalPath(), activitiesTarget);
+
+                    // try autolinking to planned activity
+                    RideItem *other = context->athlete->rideCache->findSuggestion(context->ride);
+                    RideCache::OperationPreCheck check = context->athlete->rideCache->checkLinkActivities(context->ride, other);
+                    if (check.canProceed && ! check.requiresUserDecision) {
+                        RideCache::OperationResult result = context->athlete->rideCache->linkActivities(context->ride, other);
+                        if (result.success) {
+                            QString error;
+                            context->athlete->rideCache->saveActivities(check.affectedItems, error);
+                        }
+                    }
                 }  else {
                     tableWidget->item(i,STATUS_COLUMN)->setText(tr("Error - Moving %1 to activities folder").arg(activitiesTarget));
                 }

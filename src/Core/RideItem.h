@@ -216,6 +216,12 @@ class RideItem : public QObject
         bool checkStale(); // check if we need to refresh
         bool isStale() { return isstale; }
 
+        // Activity linking methods
+        QString getLinkedFileName() const;
+        void setLinkedFileName(const QString &fileName);
+        void clearLinkedFileName();
+        bool hasLinkedActivity() const;
+
         // refresh when stale
         void refresh();
 

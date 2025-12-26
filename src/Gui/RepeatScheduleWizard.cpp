@@ -79,19 +79,14 @@ RepeatScheduleWizard::done
         QList<std::pair<RideItem*, QDate>> scheduleList = summaryPage->getScheduleList();
         context->tab->setNoSwitch(true);
         for (RideItem *rideItem : deletionList) {
+            // FIXME This can create unsaved linked activities, currently no pre-check available
             context->athlete->rideCache->removeRide(rideItem->fileName);
         }
-        for (std::pair<RideItem*, QDate> entry : scheduleList) {
-            RideItem *rideItem = entry.first;
-            QDate targetDate = entry.second;
-            RideFile *rideFile = rideItem->ride();
-            QDateTime rideDateTime(targetDate, rideFile->startTime().time());
-            rideFile->setStartTime(rideDateTime);
-            QString basename = rideDateTime.toString("yyyy_MM_dd_HH_mm_ss");
-            QString filename = context->athlete->home->planned().canonicalPath() + "/" + basename + ".json";
-            QFile out(filename);
-            if (RideFileFactory::instance().writeRideFile(context, rideFile, out, "json")) {
-                context->athlete->addRide(basename + ".json", true, true, false, rideItem->planned);
+        RideCache::OperationPreCheck check = context->athlete->rideCache->checkCopyPlannedActivitiesBatch(scheduleList);
+        if (check.canProceed) {
+            RideCache::OperationResult result = context->athlete->rideCache->copyPlannedActivitiesBatch(scheduleList);
+            if (! result.success) {
+                QMessageBox::warning(this, "Failed", result.error);
             }
         }
         context->tab->setNoSwitch(false);

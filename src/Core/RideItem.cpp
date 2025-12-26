@@ -547,6 +547,41 @@ RideItem::checkStale()
     return isstale;
 }
 
+
+QString RideItem::getLinkedFileName() const
+{
+    return metadata_.value("Linked Filename", "");
+}
+
+void RideItem::setLinkedFileName(const QString &fileName)
+{
+    RideFile *r = ride(true);
+    if (! r) {
+        return;
+    }
+    r->setTag("Linked Filename", fileName);
+    metadata_.insert("Linked Filename", fileName);
+    setDirty(true);
+    notifyRideMetadataChanged();
+}
+
+void RideItem::clearLinkedFileName()
+{
+    RideFile *r = ride(true);
+    if (! r) {
+        return;
+    }
+    r->removeTag("Linked Filename");
+    metadata_.remove("Linked Filename");
+    setDirty(true);
+    notifyRideMetadataChanged();
+}
+
+bool RideItem::hasLinkedActivity() const
+{
+    return ! getLinkedFileName().isEmpty();
+}
+
 void
 RideItem::refresh()
 {

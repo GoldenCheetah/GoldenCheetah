@@ -43,11 +43,13 @@ struct CalendarEntry {
     QString iconFile;
     QColor color;
     QString reference;
+    QString linkedReference;
     QTime start;
     int durationSecs = 0;
     int type = 0;
     bool isRelocatable = false;
     bool hasTrainMode = false;
+    bool dirty = false;
     QDate spanStart = QDate();
     QDate spanEnd = QDate();
 };
