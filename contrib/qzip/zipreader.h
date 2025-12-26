@@ -67,8 +67,8 @@ class ZipReader
 {
 public:
     ZipReader(const QString &fileName, QIODevice::OpenMode mode = QIODevice::ReadOnly );
+    explicit ZipReader(std::unique_ptr<QIODevice> device);
 
-    explicit ZipReader(QIODevice *device);
     ~ZipReader();
 
     QIODevice* device() const;
@@ -114,8 +114,7 @@ public:
     void close();
 
 private:
-    ZipReaderPrivate *d;
-    Q_DISABLE_COPY(ZipReader)
+    std::unique_ptr<ZipReaderPrivate> d;
 };
 
 QT_END_NAMESPACE
