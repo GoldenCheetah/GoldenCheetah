@@ -40,14 +40,6 @@ QT += xml sql network svg  widgets concurrent serialport multimedia multimediawi
       webenginecore webenginewidgets webchannel positioning webenginequick core5compat
 CONFIG += c++17
 
-###==========================
-### PRECOMPILED HEADER
-###==========================
-PRECOMPILED_HEADER = stable.h
-CONFIG += precompile_header
-
-
-
 ###=======================================================================
 ### Directory Structure - Split into subdirs to be more manageable
 ###=======================================================================
@@ -104,15 +96,11 @@ LIBS += $${GSL_LIBS}
 
 # Microsoft Visual Studion toolchain dependencies
 win32-msvc* {
-
     # we need windows kit 8.2 or higher with MSVC, offer default location
     isEmpty(WINKIT_INSTALL) WINKIT_INSTALL= "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64"
     LIBS += -L$${WINKIT_INSTALL} -lGdi32 -lUser32
     CONFIG += force_debug_info
-
-
 } else {
-
     # gnu toolchain wants math libs
     LIBS += -lm
 
@@ -155,13 +143,7 @@ macx {
     # otherwise we have a blank videowindow, it will do nothing
     HEADERS += Train/VideoWindow.h
     SOURCES += Train/VideoWindow.cpp
-
-    # PCH crashes clang if we have multiple -arch flags (universal binary)
-    message("Disabling Precompiled Headers on macOS to avoid multi-arch Clang errors.")
-    CONFIG -= precompile_header
-
 } else {
-
     # not on mac we need our own full screen support and segment control button
     HEADERS += Gui/QTFullScreen.h
     SOURCES += Gui/QTFullScreen.cpp
@@ -239,23 +221,23 @@ contains(DEFINES, "GC_WANT_PYTHON") {
             INCLUDEPATH += ./Python
 
             DEFINES += SIP_STATIC_MODULE
-            !isEmpty(PYTHONINCLUDES) QMAKE_CXXFLAGS += $${PYTHONINCLUDES}
+            !isEmpty(PYTHONINCLUDES) {
+                QMAKE_CXXFLAGS += $${PYTHONINCLUDES}
+                QMAKE_CFLAGS += $${PYTHONINCLUDES}
+            }
             LIBS += $${PYTHONLIBS}
+
+            # Link against the separate SIP static library
+            LIBS += -L$$PWD/Python/SIP/ -lsip_lib
 
             ## Python integration
             HEADERS += Python/PythonEmbed.h Charts/PythonChart.h Python/PythonSyntax.h
             SOURCES += Python/PythonEmbed.cpp Charts/PythonChart.cpp Python/PythonSyntax.cpp
 
-            ## Python SIP generated module
-            SOURCES += Python/SIP/sipgoldencheetahBindings.cpp Python/SIP/sipgoldencheetahcmodule.cpp
-            SOURCES += Python/SIP/Bindings.cpp
-
-            ## SIP type conversion
-            SOURCES += Python/SIP/sipgoldencheetahQString.cpp
-            SOURCES += Python/SIP/sipgoldencheetahQStringList.cpp
-            SOURCES += Python/SIP/sipgoldencheetahPythonDataSeries.cpp \
-                       Python/SIP/sipgoldencheetahPythonXDataSeries.cpp
             DEFINES += GC_HAVE_PYTHON
+
+            ## Python data processors
+
 
             ## Python data processors
             HEADERS += FileIO/FixPyScriptsDialog.h FileIO/FixPySettings.h FileIO/FixPyRunner.h \
@@ -263,7 +245,6 @@ contains(DEFINES, "GC_WANT_PYTHON") {
 
             SOURCES += FileIO/FixPyScriptsDialog.cpp FileIO/FixPySettings.cpp FileIO/FixPyRunner.cpp \
                        FileIO/FixPyDataProcessor.cpp
-
 }
 
 ###====================
@@ -837,6 +818,18 @@ DEFERRES += Core/RouteWindow.h Core/RouteWindow.cpp Core/RouteItem.h Core/RouteI
 OTHER_FILES +=   Resources/python/library.py Python/SIP/goldencheetah.sip
 
 
+###==========================
+### PRECOMPILED HEADER
+###==========================   
+PRECOMPILED_HEADER = stable.h
+!isEmpty(GC_USE_PCH) {
+    message("Enabling precompile_header")
+    CONFIG += precompile_header
+} else {
+    message("Disabling precompile_header (default)")
+    CONFIG -= precompile_header
+}
+
 ###============================================================================
 ### FIX: Disable Precompiled Header for C files
 ### The PCH contains C++ specific headers (Qt, STL) which causes compilation errors
@@ -848,5 +841,3 @@ for(src, SOURCES) {
         eval($${src}.CONFIG -= precompile_header)
     }
 }
-
-
