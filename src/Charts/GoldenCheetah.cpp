@@ -769,9 +769,9 @@ GcChartWindow::GcChartWindow(Context *context) : GcWindow(context), context(cont
     overlayWidget = NULL;
 
     // update the search/filter blanking on changes
-    connect(context, &Context::filterChanged, [&](void) { this->updateSearchFilterBlanking(); } );
-    connect(context, &Context::rideSelected, [&](RideItem*) { this->updateSearchFilterBlanking(); } );
-    connect(context, &Context::viewChanged, [&](int) { this->updateSearchFilterBlanking(); } );
+    connect(context, &Context::filterChanged, this, [&](void) { this->updateSearchFilterBlanking(); } );
+    connect(context, &Context::rideSelected, this, [&](RideItem*) { this->updateSearchFilterBlanking(); } );
+    connect(context, &Context::viewChanged, this, [&](int) { this->updateSearchFilterBlanking(); } );
 }
 
 void
