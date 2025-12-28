@@ -416,8 +416,8 @@ GcWindow::spotHotSpot(QMouseEvent *e)
     int borderWidth = 3;
 
     // account for offset by mapping to GcWindow geom
-    int _y = e->y();
-    int _x = e->x();
+    int _y = e->position().y();
+    int _x = e->position().x();
     int _height = height();
     int _width = width();
 
@@ -647,11 +647,7 @@ GcWindow::setCursorShape(DragState d)
 }
 
 void
-#if QT_VERSION >= 0x060000
 GcWindow::enterEvent(QEnterEvent *)
-#else
-GcWindow::enterEvent(QEvent *)
-#endif
 {
     if (_noevents) return;
 
@@ -992,10 +988,6 @@ GcChartWindow::saveChart()
 
     // lets go to it
     QTextStream out(&outfile);
-#if QT_VERSION < 0x060000
-    out.setCodec ("UTF-8");
-#endif
-
     serializeChartToQTextStream(out);
 
     // all done
@@ -1057,10 +1049,8 @@ GcChartWindow::chartPropertiesFromFile(QString filename)
 
         // read in the whole thing
         QTextStream in(&file);
+
         // GC .JSON is stored in UTF-8 with BOM(Byte order mark) for identification
-#if QT_VERSION < 0x060000
-        in.setCodec ("UTF-8");
-#endif
         contents = in.readAll();
         file.close();
     }
@@ -1077,7 +1067,7 @@ GcChartWindow::chartPropertiesFromString(QString contents) {
 
     QList<QMap<QString,QString> > returning;
 
-    // parse via MVJson to avoid QT5 dependency
+    // parse via MVJson
     MVJSONReader json(string(contents.toStdString()));
 
     if (json.root && json.root->hasField("CHART")) {
@@ -1143,9 +1133,6 @@ GcChartWindow::exportChartToCloudDB()
     chart.Header.GcVersion =  QString::number(version);
     // get the gchart - definition json
     QTextStream out(&chart.ChartDef);
-#if QT_VERSION < 0x060000
-    out.setCodec ("UTF-8");
-#endif
     serializeChartToQTextStream(out);
     out.flush();
     // get Type and View from properties

@@ -42,14 +42,13 @@ class CalendarWindow : public GcChartWindow
     Q_PROPERTY(int firstDayOfWeek READ getFirstDayOfWeek WRITE setFirstDayOfWeek USER true)
     Q_PROPERTY(int startHour READ getStartHour WRITE setStartHour USER true)
     Q_PROPERTY(int endHour READ getEndHour WRITE setEndHour USER true)
-    Q_PROPERTY(int agendaPastDays READ getAgendaPastDays WRITE setAgendaPastDays USER true)
-    Q_PROPERTY(int agendaFutureDays READ getAgendaFutureDays WRITE setAgendaFutureDays USER true)
     Q_PROPERTY(bool summaryVisibleDay READ isSummaryVisibleDay WRITE setSummaryVisibleDay USER true)
     Q_PROPERTY(bool summaryVisibleWeek READ isSummaryVisibleWeek WRITE setSummaryVisibleWeek USER true)
     Q_PROPERTY(bool summaryVisibleMonth READ isSummaryVisibleMonth WRITE setSummaryVisibleMonth USER true)
     Q_PROPERTY(QString primaryMainField READ getPrimaryMainField WRITE setPrimaryMainField USER true)
     Q_PROPERTY(QString primaryFallbackField READ getPrimaryFallbackField WRITE setPrimaryFallbackField USER true)
     Q_PROPERTY(QString secondaryMetric READ getSecondaryMetric WRITE setSecondaryMetric USER true)
+    Q_PROPERTY(bool showSecondaryLabel READ isShowSecondaryLabel WRITE setShowSecondaryLabel USER true)
     Q_PROPERTY(QString tertiaryField READ getTertiaryField WRITE setTertiaryField USER true)
     Q_PROPERTY(QString summaryMetrics READ getSummaryMetrics WRITE setSummaryMetrics USER true)
 
@@ -60,8 +59,6 @@ class CalendarWindow : public GcChartWindow
         int getFirstDayOfWeek() const;
         int getStartHour() const;
         int getEndHour() const;
-        int getAgendaPastDays() const;
-        int getAgendaFutureDays() const;
         bool isSummaryVisibleDay() const;
         bool isSummaryVisibleWeek() const;
         bool isSummaryVisibleMonth() const;
@@ -71,6 +68,7 @@ class CalendarWindow : public GcChartWindow
         QString getPrimaryMainField() const;
         QString getPrimaryFallbackField() const;
         QString getSecondaryMetric() const;
+        bool isShowSecondaryLabel() const;
         QString getTertiaryField() const;
         QString getSummaryMetrics() const;
         QStringList getSummaryMetricsList() const;
@@ -80,35 +78,38 @@ class CalendarWindow : public GcChartWindow
         void setFirstDayOfWeek(int fdw);
         void setStartHour(int hour);
         void setEndHour(int hour);
-        void setAgendaPastDays(int days);
-        void setAgendaFutureDays(int days);
         void setSummaryVisibleDay(bool visible);
         void setSummaryVisibleWeek(bool visible);
         void setSummaryVisibleMonth(bool svm);
         void setPrimaryMainField(const QString &name);
         void setPrimaryFallbackField(const QString &name);
         void setSecondaryMetric(const QString &name);
+        void setShowSecondaryLabel(bool showSecondaryLabel);
         void setTertiaryField(const QString &name);
         void setSummaryMetrics(const QString &summaryMetrics);
         void setSummaryMetrics(const QStringList &summaryMetrics);
         void configChanged(qint32);
 
+    protected:
+
+        void showEvent(QShowEvent*) override;
+
     private:
         Context *context;
         bool first = true;
 
+        QPalette palette;
         QComboBox *defaultViewCombo;
         QComboBox *firstDayOfWeekCombo;
         QSpinBox *startHourSpin;
         QSpinBox *endHourSpin;
-        QSpinBox *agendaPastDaysSpin;
-        QSpinBox *agendaFutureDaysSpin;
         QCheckBox *summaryDayCheck;
         QCheckBox *summaryWeekCheck;
         QCheckBox *summaryMonthCheck;
         QComboBox *primaryMainCombo;
         QComboBox *primaryFallbackCombo;
         QComboBox *secondaryCombo;
+        QCheckBox *showSecondaryLabelCheck;
         QComboBox *tertiaryCombo;
         MultiMetricSelector *multiMetricSelector;
         Calendar *calendar = nullptr;
@@ -126,6 +127,12 @@ class CalendarWindow : public GcChartWindow
         void updateActivitiesIfInRange(RideItem *rideItem);
         void updateSeason(Season const *season, bool allowKeepMonth = false);
         bool movePlannedActivity(RideItem *rideItem, const QDate &destDay, const QTime &destTime = QTime());
+        void addEvent(const QDate &date);
+        void editEvent(const CalendarEntry &entry);
+        void delEvent(const CalendarEntry &entry);
+        void addPhase(const QDate &date);
+        void editPhase(const CalendarEntry &entry);
+        void delPhase(const CalendarEntry &entry);
 };
 
 #endif

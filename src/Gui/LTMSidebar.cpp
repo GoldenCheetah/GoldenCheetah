@@ -221,6 +221,14 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 
     splitter->prepare(context->athlete->cyclist, "LTM");
 
+    // set the initial chartWidget visibility
+    QString hidesetting = GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/LTM/hide/4");
+    QVariant hidden = appsettings->cvalue(context->athlete->cyclist, hidesetting);
+    chartsWidgetVisible = !((hidden != QVariant()) && (hidden.toBool()));
+
+    // track changes to the chartWidget visibility
+    connect(chartsWidget->controlAction, SIGNAL(triggered(void)), this, SLOT(chartVisibilityChanged()));
+
     // our date ranges
     connect(dateRangeTree,SIGNAL(itemSelectionChanged()), this, SLOT(dateRangeTreeWidgetSelectionChanged()));
     connect(dateRangeTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(dateRangePopup(const QPoint &)));
@@ -246,6 +254,30 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 
     // setup colors
     configChanged(CONFIG_APPEARANCE);
+}
+
+void
+LTMSidebar::chartVisibilityChanged()
+{
+    chartsWidgetVisible = chartsWidget->isVisible();
+}
+
+void
+LTMSidebar::updatePresetChartsOnShow(int viewType)
+{
+    bool trendsView(viewType == VIEW_TRENDS);
+
+    // show/hide the splitter toolbar icon
+    chartsWidget->controlAction->setVisible(trendsView);
+
+    if (trendsView) {
+        // if it is trends view and charts were previously visible
+        if (chartsWidgetVisible) chartsWidget->show();
+    } else {
+        // if it is not trends view, then the LTMSidebar doesn't display
+        // the preset charts, so hide the charts
+        chartsWidget->hide();
+    }
 }
 
 void
@@ -307,9 +339,6 @@ LTMSidebar::configChanged(qint32)
 
     // set or reset the autofilter widgets
     autoFilterChanged();
-
-    // forget what we just used...
-    from = to = QDate();
 
     // let everyone know what date range we are starting with
     dateRangeTreeWidgetSelectionChanged();
@@ -431,6 +460,11 @@ LTMSidebar::resetSeasons()
     // delete it and its children
     dateRangeTree->clear();
 
+    // clear events - we need to add for currently selected season
+    for (int i = allEvents->childCount(); i > 0; i--) {
+        delete allEvents->takeChild(0);
+    }
+
     // by default choose last 3 months not first one, since the first one is all dates
     // and that means aggregating all data when first starting...
     QString id = appsettings->cvalue(context->athlete->cyclist, GC_LTM_LAST_DATE_RANGE, "{00000000-0000-0000-0000-000000000012}").toString();
@@ -456,6 +490,22 @@ LTMSidebar::resetSeasons()
             }
             addPhase->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
             addPhase->setText(0, phase.getName());
+        }
+
+        // Events
+        if (context->currentSeason() != nullptr && context->currentSeason()->id() == season.id()) {
+            // add this seasons events
+            for (int j = 0; j < season.events.count(); j++) {
+                SeasonEvent event = season.events.at(j);
+                QTreeWidgetItem *add = new QTreeWidgetItem(allEvents);
+                add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+                add->setText(0, event.name);
+                add->setText(1, event.date.toString("MMM d, yyyy"));
+                add->setText(2, SeasonEvent::priorityList().at(event.priority));
+            }
+
+            // make sure they fit
+            eventTree->header()->resizeSections(QHeaderView::ResizeToContents);
         }
     }
 
@@ -765,8 +815,6 @@ LTMSidebar::setAutoFilterMenu()
             GcSplitterItem *item = filterSplitter->removeItem(action->text());
             if (item) delete item; // will be removed from splitter too
 
-            // if you crash on this line compile with QT5.3 or higher
-            // or at least avoid the 5.3 RC1 release (see QTBUG-38685)
             autoFilterMenu->addAction(action);
             autoFilterState << false;
         }

@@ -134,7 +134,15 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     garminHWMarkedit->setSuffix(" " + tr("s"));
     garminHWMarkedit->setValue(garminHWMark.toInt());
 
-    connect(garminSmartRecord, &QCheckBox::stateChanged, [=](int state) { garminHWMarkedit->setEnabled(state); });
+    connect(garminSmartRecord,
+#if QT_VERSION < QT_VERSION_CHECK(6,7,0)
+            &QCheckBox::stateChanged,
+            this, [this](int state) { garminHWMarkedit->setEnabled(state); });
+#else
+            QOverload<Qt::CheckState>::of(&QCheckBox::checkStateChanged),
+            this, [this](Qt::CheckState state) { garminHWMarkedit->setEnabled(state); });
+#endif
+
     garminSmartRecord->setCheckState(! (isGarminSmartRecording.toInt() > 0) ? Qt::Checked : Qt::Unchecked);
     garminSmartRecord->setCheckState(isGarminSmartRecording.toInt() > 0 ? Qt::Checked : Qt::Unchecked);
 
@@ -193,7 +201,14 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     //XXrBrowseButton->setFixedWidth(120);
 
     connect(rBrowseButton, SIGNAL(clicked()), this, SLOT(browseRDir()));
-    connect(embedR, &QCheckBox::stateChanged, [=](int state) { rDirectorySel->setEnabled(state); });
+    connect(embedR,
+#if QT_VERSION < QT_VERSION_CHECK(6,7,0)
+            &QCheckBox::stateChanged,
+            this, [this](int state) { rDirectorySel->setEnabled(state); });
+#else
+            QOverload<Qt::CheckState>::of(&QCheckBox::checkStateChanged),
+            this, [this](Qt::CheckState state) { rDirectorySel->setEnabled(state); });
+#endif
 
     embedR->setChecked(! appsettings->value(NULL, GC_EMBED_R, true).toBool());
     embedR->setChecked(appsettings->value(NULL, GC_EMBED_R, true).toBool());
@@ -216,7 +231,14 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     pythonDirectoryLayout->addWidget(pythonBrowseButton);
 
     connect(pythonBrowseButton, SIGNAL(clicked()), this, SLOT(browsePythonDir()));
-    connect(embedPython, &QCheckBox::stateChanged, [=](int state) { pythonDirectorySel->setEnabled(state); });
+    connect(embedPython,
+#if QT_VERSION < QT_VERSION_CHECK(6,7,0)
+            &QCheckBox::stateChanged,
+            this, [this](int state) { pythonDirectorySel->setEnabled(state); });
+#else
+            QOverload<Qt::CheckState>::of(&QCheckBox::checkStateChanged),
+            this, [this](Qt::CheckState state) { pythonDirectorySel->setEnabled(state); });
+#endif
 
     embedPython->setChecked(! appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool());
     embedPython->setChecked(appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool());
@@ -246,11 +268,11 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     startupView = new QComboBox();
     startupView->addItem(tr("Trends"));
     startupView->addItem(tr("Analysis"));
+    startupView->addItem(tr("Plan"));
     startupView->addItem(tr("Train"));
 
-    // map view indexes to combo box values, given that plan/diary is not available
+    // map view indexes to combo box values
     int startView = appsettings->value(NULL, GC_STARTUP_VIEW, "1").toInt();
-    if (startView == 3) startView = 2;
     startupView->setCurrentIndex(startView);
 
     QFormLayout *form = newQFormLayout();
@@ -316,9 +338,8 @@ GeneralPage::saveClicked()
     };
     appsettings->setValue(GC_LANG, langs[langCombo->currentIndex()]);
 
-    // map combo box values to view indexes, given that plan/diary is not available
+    // map combo box values to view indexes
     int startView = startupView->currentIndex();
-    if (startView == 2) startView = 3;
     appsettings->setValue(GC_STARTUP_VIEW, startView);
 
     // Garmin and cranks
@@ -842,7 +863,8 @@ RemotePage::RemotePage(QWidget *parent, Context *context) : QWidget(parent), con
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(fields, 0, Qt::Alignment());
 
-    fields->setCurrentItem(fields->invisibleRootItem()->child(0));
+    if (fields->invisibleRootItem()->childCount() > 0)
+        fields->setCurrentItem(fields->invisibleRootItem()->child(0));
 }
 
 qint32
@@ -852,7 +874,8 @@ RemotePage::saveClicked()
     QList<CmdMap> cmdMaps = remote->getMappings(); // Load the remote control mappings
 
     for (int i = 0; i < cmdMaps.size(); i++) {
-        int cmdIndex = fields->invisibleRootItem()->child(i)->data(1, Qt::DisplayRole).toInt();
+        QTreeWidgetItem *item = fields->invisibleRootItem()->child(i);
+        int cmdIndex = item ? item->data(1, Qt::DisplayRole).toInt() : -1;
         if (cmdIndex) {
             cmdMaps[i].setAntCmdId(antCmds[cmdIndex - 1].getCmdId());
         } else {
@@ -1144,7 +1167,8 @@ WorkoutTagManagerPage::WorkoutTagManagerPage
     connect(tw->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)), this, SLOT(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)));
     connect(dynamic_cast<QObject*>(tagStore), SIGNAL(tagsChanged(int, int, int)), this, SLOT(tagStoreChanged(int, int, int)));
 
-    tw->setCurrentItem(tw->invisibleRootItem()->child(0));
+    if (tw->invisibleRootItem()->childCount() > 0)
+        tw->setCurrentItem(tw->invisibleRootItem()->child(0));
 }
 
 
@@ -1443,7 +1467,8 @@ ColorsPage::searchFilter(QString text)
     for(int i=0; i<colors->invisibleRootItem()->childCount(); i++) {
         if (empty) colors->setRowHidden(i, colors->rootIndex(), false);
         else {
-            QString text = colors->invisibleRootItem()->child(i)->text(1);
+            QTreeWidgetItem *item = colors->invisibleRootItem()->child(i);
+            QString text = item ? item->text(1) : "";
             bool found=false;
             foreach(QString tok, toks) {
                 if (text.contains(tok, Qt::CaseInsensitive)) {
@@ -1551,6 +1576,7 @@ ColorsPage::saveClicked()
     // run down and get the current colors and save
     for (int i=0; colorSet[i].name != ""; i++) {
         QTreeWidgetItem *current = colors->invisibleRootItem()->child(i);
+        if (!current) continue;
         QColor newColor = ((ColorButton*)colors->itemWidget(current, 2))->getColor();
         QString colorstring = QString("%1:%2:%3").arg(newColor.red())
                                                  .arg(newColor.green())
@@ -1608,7 +1634,7 @@ FavouriteMetricsPage::FavouriteMetricsPage(QWidget *parent) :
     QHBoxLayout *hlayout = new QHBoxLayout(this);
     hlayout->addWidget(multiMetricSelector);
 
-    connect(multiMetricSelector, &MultiMetricSelector::selectedChanged, [=]() { changed = true; });
+    connect(multiMetricSelector, &MultiMetricSelector::selectedChanged, this, [this]() { changed = true; });
 }
 
 qint32
@@ -1675,7 +1701,7 @@ CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
     layout->addWidget(actionButtons);
 
     connect(table, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(doubleClicked(QTreeWidgetItem*, int)));
-    connect(table, &QTreeWidget::currentItemChanged, [=] (QTreeWidgetItem*) {
+    connect(table, &QTreeWidget::currentItemChanged, this, [this, actionButtons] (QTreeWidgetItem*) {
             bool selected = table->currentItem() != nullptr;
             actionButtons->setButtonEnabled(ActionButtonBox::Edit, selected);
             exportButton->setEnabled(selected);
@@ -2166,7 +2192,8 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
         });
     });
 
-    keywords->setCurrentItem(keywords->invisibleRootItem()->child(0));
+    if (keywords->invisibleRootItem()->childCount() > 0)
+        keywords->setCurrentItem(keywords->invisibleRootItem()->child(0));
 }
 
 void
@@ -2287,6 +2314,7 @@ KeywordsPage::getDefinitions(QList<KeywordDefinition> &keywordList)
     for (int idx =0; idx < keywords->invisibleRootItem()->childCount(); idx++) {
         KeywordDefinition add;
         QTreeWidgetItem *item = keywords->invisibleRootItem()->child(idx);
+        if (!item) continue;
 
         add.name = item->text(0);
         add.color = ((ColorButton*)keywords->itemWidget(item, 1))->getColor();
@@ -2371,7 +2399,7 @@ IconsPage::IconsPage
     mainLayout->addLayout(contentLayout);
     mainLayout->addLayout(actionLayout);
 
-    connect(downloadButton, &QPushButton::clicked, [=]() {
+    connect(downloadButton, &QPushButton::clicked, this, [this]() {
         QUrl url(QString("%1/icons.zip").arg(VERSION_CONFIG_PREFIX));
         if (IconManager::instance().importBundle(url)) {
             initSportTree();
@@ -2380,7 +2408,7 @@ IconsPage::IconsPage
             QMessageBox::warning(nullptr, tr("Icon Bundle"), tr("Bundle file %1 cannot be imported.").arg(url.toString()));
         }
     });
-    connect(importButton, &QPushButton::clicked, [=]() {
+    connect(importButton, &QPushButton::clicked, this, [this]() {
         QString zipFile = QFileDialog::getOpenFileName(this, tr("Import Icons"), "", tr("Zip Files (*.zip)"));
         if (! zipFile.isEmpty() && IconManager::instance().importBundle(zipFile)) {
             initSportTree();
@@ -2389,7 +2417,7 @@ IconsPage::IconsPage
             QMessageBox::warning(nullptr, tr("Icon Bundle"), tr("Bundle file %1 cannot be imported.").arg(zipFile));
         }
     });
-    connect(exportButton, &QPushButton::clicked, [=]() {
+    connect(exportButton, &QPushButton::clicked, this, [this]() {
         QString zipFile = QFileDialog::getSaveFileName(this, tr("Export Icons"), "", tr("Zip Files (*.zip)"));
         if (zipFile.isEmpty() || ! IconManager::instance().exportBundle(zipFile)) {
             QMessageBox::warning(nullptr, tr("Icon Bundle"), tr("Bundle file %1 cannot be created.").arg(zipFile));
@@ -2547,17 +2575,9 @@ IconsPage::eventFilterSportTreeViewport
     if (event->type() == QEvent::MouseButtonPress) {
         QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
         if (mouseEvent->button() == Qt::LeftButton) {
-#if QT_VERSION >= 0x060000
             QTreeWidgetItem *item = sportTree->itemAt(mouseEvent->position().toPoint());
-#else
-            QTreeWidgetItem *item = sportTree->itemAt(mouseEvent->pos());
-#endif
             if (item && ! item->data(0, Qt::UserRole + 2).toString().isEmpty()) {
-#if QT_VERSION >= 0x060000
                 sportTreeDragStartPos = mouseEvent->position().toPoint();
-#else
-                sportTreeDragStartPos = mouseEvent->pos();
-#endif
                 sportTreeDragWatch = true;
             } else {
                 sportTreeDragWatch = false;
@@ -2568,19 +2588,11 @@ IconsPage::eventFilterSportTreeViewport
         QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
         if (   ! (mouseEvent->buttons() & Qt::LeftButton)
             || ! sportTreeDragWatch
-#if QT_VERSION >= 0x060000
             || (mouseEvent->position().toPoint() - sportTreeDragStartPos).manhattanLength() < QApplication::startDragDistance()) {
-#else
-            || (mouseEvent->pos() - sportTreeDragStartPos).manhattanLength() < QApplication::startDragDistance()) {
-#endif
             return true;
         }
         sportTreeDragWatch = false;
-#if QT_VERSION >= 0x060000
         QTreeWidgetItem *item = sportTree->itemAt(mouseEvent->position().toPoint());
-#else
-        QTreeWidgetItem *item = sportTree->itemAt(mouseEvent->pos());
-#endif
         if (! item) {
             return true;
         }
@@ -2693,17 +2705,9 @@ IconsPage::eventFilterIconListViewport
     } else if (event->type() == QEvent::MouseButtonPress) {
         QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
         if (mouseEvent->button() == Qt::LeftButton) {
-#if QT_VERSION >= 0x060000
             QListWidgetItem *item = iconList->itemAt(mouseEvent->position().toPoint());
-#else
-            QListWidgetItem *item = iconList->itemAt(mouseEvent->pos());
-#endif
             if (item) {
-#if QT_VERSION >= 0x060000
                 iconListDragStartPos = mouseEvent->position().toPoint();
-#else
-                iconListDragStartPos = mouseEvent->pos();
-#endif
                 iconListDragWatch = true;
             } else {
                 iconListDragWatch = false;
@@ -2714,19 +2718,11 @@ IconsPage::eventFilterIconListViewport
         QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
         if (   ! (mouseEvent->buttons() & Qt::LeftButton)
             || ! iconListDragWatch
-#if QT_VERSION >= 0x060000
             || (mouseEvent->position().toPoint() - iconListDragStartPos).manhattanLength() < QApplication::startDragDistance()) {
-#else
-            || (mouseEvent->pos() - iconListDragStartPos).manhattanLength() < QApplication::startDragDistance()) {
-#endif
             return true;
         }
         iconListDragWatch = false;
-#if QT_VERSION >= 0x060000
         QListWidgetItem *item = iconList->itemAt(mouseEvent->position().toPoint());
-#else
-        QListWidgetItem *item = iconList->itemAt(mouseEvent->pos());
-#endif
         if (! item) {
             return true;
         }
@@ -2794,9 +2790,6 @@ IconsPage::initSportTree
             }
         }
     }
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    sportTree->viewport()->update();
-#endif
 }
 
 
@@ -2901,7 +2894,8 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
         });
     });
 
-    fields->setCurrentItem(fields->invisibleRootItem()->child(0));
+    if (fields->invisibleRootItem()->childCount() > 0)
+        fields->setCurrentItem(fields->invisibleRootItem()->child(0));
 }
 
 void
@@ -3000,6 +2994,7 @@ FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
 
         FieldDefinition add;
         QTreeWidgetItem *item = fields->invisibleRootItem()->child(idx);
+        if (!item) continue;
 
         // silently ignore duplicates
         if (checkdups.contains(item->text(1))) continue;
@@ -3105,6 +3100,7 @@ ProcessorPage::saveClicked()
     // write away separately
     for (int i = 0; i < processorTree->invisibleRootItem()->childCount(); i++) {
         QTreeWidgetItem *item = processorTree->invisibleRootItem()->child(i);
+        if (!item) continue;
         QString id = item->data(PROCESSORTREE_COL_ID, Qt::DisplayRole).toString();
 
         if (dps.contains(id)) {
@@ -3267,6 +3263,7 @@ ProcessorPage::reload
     QTreeWidgetItem *selItem = nullptr;
     for (int i = 0; i < processorTree->invisibleRootItem()->childCount(); ++i) {
         QTreeWidgetItem *nextItem = processorTree->invisibleRootItem()->child(i);
+        if (!nextItem) continue;
         if (! nextItem->isHidden()) {
             selItem = nextItem;
         }
@@ -3286,6 +3283,7 @@ ProcessorPage::reload
     QTreeWidgetItem *selItem = nullptr;
     for (int i = 0; i <= selectRow && i < processorTree->invisibleRootItem()->childCount(); ++i) {
         QTreeWidgetItem *nextItem = processorTree->invisibleRootItem()->child(i);
+        if (!nextItem) continue;
         if (! nextItem->isHidden()) {
             selItem = nextItem;
         }
@@ -3368,6 +3366,7 @@ ProcessorPage::toggleCoreProcessors
     QTreeWidgetItem *firstVisible = nullptr;
     for (int i = 0; i < processorTree->invisibleRootItem()->childCount(); ++i) {
         QTreeWidgetItem *item = processorTree->invisibleRootItem()->child(i);
+        if (!item) continue;
         bool isCore = item->data(PROCESSORTREE_COL_CORE, Qt::DisplayRole).toBool();
         item->setHidden(checked && (! checked || isCore));
         if (firstVisible == nullptr && ! item->isHidden()) {
@@ -3491,7 +3490,8 @@ DefaultsPage::DefaultsPage
     connect(actionButtons, &ActionButtonBox::addRequested, this, &DefaultsPage::addClicked);
     connect(actionButtons, &ActionButtonBox::deleteRequested, this, &DefaultsPage::deleteClicked);
 
-    defaults->setCurrentItem(defaults->invisibleRootItem()->child(0));
+    if (defaults->invisibleRootItem()->childCount() > 0)
+        defaults->setCurrentItem(defaults->invisibleRootItem()->child(0));
 }
 
 void
@@ -3562,6 +3562,7 @@ DefaultsPage::getDefinitions(QList<DefaultDefinition> &defaultList)
 
         DefaultDefinition add;
         QTreeWidgetItem *item = defaults->invisibleRootItem()->child(idx);
+        if (!item) continue;
 
         add.field = sp.internalName(item->text(0));
         add.value = item->text(1);

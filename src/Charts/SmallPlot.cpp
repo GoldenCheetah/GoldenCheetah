@@ -56,7 +56,7 @@ SmallPlotPicker::trackerText(const QPoint &point) const
     QwtPlotItemList plotItems = plot()->itemList(QwtPlotItem::Rtti_PlotCurve);
     foreach (QwtPlotItem *plotItem, plotItems) {
         QwtPlotCurve *plotCurve = static_cast<QwtPlotCurve *>(plotItem);
-        int idx = 0;
+        size_t idx = 0;
         size_t size = plotCurve->data()->size();
         double dist = 100000;
         for (size_t i = 0; i < size; ++i) {

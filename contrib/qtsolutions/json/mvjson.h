@@ -98,7 +98,7 @@ public:
     bool getFieldBool(string name);         ///< get value of bool field of VALUE OBJECT (objValue)
 
     inline MVJSONValue* at(unsigned int i){ return arrayValue.at(i); }
-    inline int size() { if (valueType == MVJSON_TYPE_ARRAY) return arrayValue.size(); else return 1; }
+    inline size_t size() { if (valueType == MVJSON_TYPE_ARRAY) return arrayValue.size(); else return 1; }
 private:
     void init(MVJSON_TYPE valueType);
 };

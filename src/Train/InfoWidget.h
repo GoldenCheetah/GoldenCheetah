@@ -40,7 +40,7 @@ class InfoWidget : public QFrame
     Q_OBJECT
 
     public:
-        InfoWidget(QList<QColor> powerZoneColors, QList<QString> powerZoneNames, bool showRating = true, bool showTags = true, QWidget *parent = nullptr);
+        InfoWidget(const QList<QColor> &powerZoneColors, const QList<QString> &powerZoneShortNames, const QList<QString> &powerZoneNames, bool showRating = true, bool showTags = true, QWidget *parent = nullptr);
         ~InfoWidget();
 
         void setContent(const ErgFileBase &ergFileBase, int rating, qlonglong lastRun);
@@ -49,8 +49,8 @@ class InfoWidget : public QFrame
 
     public slots:
         void ergFileSelected(ErgFileBase *ergFileBase);
-        void setPowerZoneColors(QList<QColor> colors);
-        void setPowerZoneNames(QList<QString> names);
+        void setPowerZoneColors(const QList<QColor> &colors);
+        void setPowerZoneNames(const QList<QString> &shortNames, const QList<QString> &names);
 
     signals:
         void relayErgFileSelected(ErgFileBase *ergFileBase);

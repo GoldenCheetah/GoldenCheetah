@@ -29,7 +29,7 @@ UserChartOverviewItem::UserChartOverviewItem(ChartSpace *parent, QString name, Q
     deep = 30;
 
     // create the chart and place on scene
-    chart = new UserChart(NULL, parent->context, parent->scope == OverviewScope::TRENDS ? true : false, StandardColor(CCARDBACKGROUND).name());
+    chart = new UserChart(NULL, parent->context, parent->scope & (OverviewScope::TRENDS | OverviewScope::PLAN), StandardColor(CCARDBACKGROUND).name());
     chart->hide();
     proxy = parent->getScene()->addWidget(chart);
     proxy->setParent(this);

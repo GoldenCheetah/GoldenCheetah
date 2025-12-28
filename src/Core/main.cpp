@@ -57,9 +57,7 @@
 #include <gsl/gsl_errno.h>
 
 #ifdef Q_OS_WIN
-#if QT_VERSION > 0x060500
 #include <QStyleFactory>
-#endif
 #endif
 
 //
@@ -224,9 +222,6 @@ main(int argc, char *argv[])
         freopen("CONOUT$", "w", stderr);
         freopen("CONOUT$", "w", stdout);
     }
-#if QT_VERSION < 0x060000
-    bool angle=true;
-#endif
 #endif
 
     //
@@ -301,11 +296,6 @@ main(int argc, char *argv[])
 #ifdef GC_WANT_R
             fprintf(stderr, "--no-r              to disable R startup\n");
 #endif
-#ifdef Q_OS_WIN
-#if QT_VERSION < 0x060000
-            fprintf(stderr, "--no-angle          to disable ANGLE rendering\n");
-#endif
-#endif
             fprintf (stderr, "\nSpecify the folder and/or athlete to open on startup\n");
             fprintf(stderr, "If no parameters are passed it will reopen the last athlete.\n\n");
 
@@ -360,12 +350,6 @@ main(int argc, char *argv[])
 #else
             fprintf(stderr, "CloudDB support not compiled in, exiting.\n");
             exit(1);
-#endif
-#ifdef Q_OS_WIN
-#if QT_VERSION < 0x060000
-        } else if (arg == "--no-angle") {
-            angle = false;
-#endif
 #endif
         } else {
 
@@ -422,26 +406,14 @@ main(int argc, char *argv[])
     // what to do. We may add our own error handler later.
     gsl_set_error_handler_off();
 
-#ifdef Q_OS_WIN
-#if QT_VERSION < 0x060000
-    if (angle) {
-        // windows we use ANGLE for opengl on top of DirectX/Direct3D
-        // it avoids issues with bad graphics drivers
-        QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
-    }
-#endif
-#endif
-
     // create the application -- only ever ONE regardless of restarts
     application = new QApplication(argc, argv);
 
 #ifdef Q_OS_WIN
-#if QT_VERSION > 0x060500
     if (application->style()->name() == "windows11") {
         application->setStyle(QStyleFactory::create("Windows"));
         qDebug()<<"Replacing windows11 by Windows style to avoid a Qt bug";
     }
-#endif
 #endif
 
     //XXXIdleEventFilter idleFilter;

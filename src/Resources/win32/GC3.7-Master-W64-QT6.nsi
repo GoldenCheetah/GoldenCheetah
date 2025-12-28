@@ -127,7 +127,6 @@ Section "Golden Cheetah (required)" Sec1
   SetOutPath "$INSTDIR\platforms"
   File "platforms\qwindows.dll"
   SetOutPath "$INSTDIR"
-  File "opengl32sw.dll"
   File "OpenSSL License.txt"
   SetOutPath "$INSTDIR\position"
   File "position\qtposition_nmea.dll"
@@ -218,10 +217,8 @@ Section "Golden Cheetah (required)" Sec1
   File "sqldrivers\qsqlpsql.dll"
   SetOutPath "$INSTDIR\styles"
   File "styles\qmodernwindowsstyle.dll"
-  File "styles\qwindowsvistastyle.dll"
   SetOutPath "$INSTDIR\tls"
   File "tls\qcertonlybackend.dll"
-  File "tls\qopensslbackend.dll"
   File "tls\qschannelbackend.dll"
   SetOutPath "$INSTDIR\translations\qtwebengine_locales"
   File "translations\qtwebengine_locales\am.pak"
@@ -313,7 +310,7 @@ Section /o "Visual C++ Redistributable" Sec2
 SectionEnd
 
 LangString DESC_Sec1 ${LANG_ENGLISH} "Golden Cheetah for Windows - 64Bit"
-LangString DESC_Sec2 ${LANG_ENGLISH} "Microsoft Visual C++ 2015-2019 Redistributable (x64) is required to run Golden Cheetah for Windows"
+LangString DESC_Sec2 ${LANG_ENGLISH} "Microsoft Visual C++ 2015-2022 Redistributable (x64) is required to run Golden Cheetah for Windows"
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${Sec1} $(DESC_Sec1)
@@ -369,7 +366,6 @@ Section Uninstall
   Delete "$INSTDIR\license.txt"
   Delete "$INSTDIR\multimedia\ffmpegmediaplugin.dll"
   Delete "$INSTDIR\multimedia\windowsmediaplugin.dll"
-  Delete "$INSTDIR\opengl32sw.dll"
   Delete "$INSTDIR\OpenSSL License.txt"
   Delete "$INSTDIR\networkinformation\qnetworklistmanager.dll"
   Delete "$INSTDIR\platforms\qwindows.dll"
@@ -454,9 +450,7 @@ Section Uninstall
   Delete "$INSTDIR\sqldrivers\qsqlodbc.dll"
   Delete "$INSTDIR\sqldrivers\qsqlpsql.dll"
   Delete "$INSTDIR\styles\qmodernwindowsstyle.dll"
-  Delete "$INSTDIR\styles\qwindowsvistastyle.dll"
   Delete "$INSTDIR\tls\qcertonlybackend.dll"
-  Delete "$INSTDIR\tls\qopensslbackend.dll"
   Delete "$INSTDIR\tls\qschannelbackend.dll"
   Delete "$INSTDIR\translations\qtwebengine_locales\am.pak"
   Delete "$INSTDIR\translations\qtwebengine_locales\ar.pak"

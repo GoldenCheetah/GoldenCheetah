@@ -352,12 +352,12 @@ MacroPacket::data()
 bool
 MacroPacket::write(CommPortPtr dev, QString &err)
 {
-    const char *msg = cEscape(data(), payload.count()+2).toLatin1().constData();
+    const char *msg = cEscape(data(), payload.size()+2).toLatin1().constData();
 
     if (MACRO_DEBUG) printf("writing '%s' to device\n", msg);
 
-    int n = dev->write(data(), payload.count()+2, err);
-    if (n != payload.count()+2) {
+    int n = dev->write(data(), payload.size()+2, err);
+    if (n != payload.size()+2) {
         if (n < 0) {
             if (MACRO_DEBUG) printf("failed to write %s to device: %s\n", msg, err.toLatin1().constData());
             err = QString(tr("failed to write to device: %1")).arg(err);

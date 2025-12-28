@@ -61,6 +61,27 @@ build.pro.user
 build.pro.user.*
 doc/contrib/WASP Packet Protocol.pdf
 
+# unittests
+unittests/Core/season/season
+unittests/Core/seasonOffset/seasonOffset
+unittests/Core/seasonParser/seasonParser
+unittests/Core/signalSafety/testSignalSafety
+unittests/Core/signalSafety/testSignalSafety
+unittests/Core/units/units
+unittests/Gui/calendarData/calendarData
 
 # Qt testlib
 target_wrapper.sh
+
+# Precompiled Headers
+*.gch
+*.pch
+*.gch/
+_pch/
+
+# Generated Source Files
+*_lex.cpp
+*_yacc.cpp
+*_yacc.h
+qrc_*.cpp
+

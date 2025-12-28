@@ -32,9 +32,6 @@
 #include <QDrag>
 #include <QMimeData>
 #include <QDebug>
-#if QT_VERSION < 0x060000
-#include <QAbstractItemDelegate>
-#endif
 
 #include "Colors.h"
 #include "Settings.h"
@@ -97,11 +94,7 @@ CalendarOverview::fillEntries
 
 void
 CalendarOverview::paintCell
-#if QT_VERSION < 0x060000
-(QPainter *painter, const QRect &rect, const QDate &date) const
-#else
 (QPainter *painter, const QRect &rect, QDate date) const
-#endif
 {
     QCalendarWidget::paintCell(painter, rect, date);
 
@@ -356,11 +349,12 @@ CalendarDayTable::fillEntries
 
 void
 CalendarDayTable::limitDateRange
-(const DateRange &dr)
+(const DateRange &dr, bool canHavePhasesOrEvents)
 {
     if (dr.from.isValid() && dr.to.isValid() && dr.from > dr.to) {
         return;
     }
+    this->canHavePhasesOrEvents = canHavePhasesOrEvents;
     this->dr = dr;
     if (! dr.pass(selectedDate())) {
         if (dr.pass(lastVisibleDay())) {
@@ -590,11 +584,7 @@ void
 CalendarDayTable::dragMoveEvent
 (QDragMoveEvent *event)
 {
-#if QT_VERSION < 0x060000
-    QPoint pos = event->pos();
-#else
     QPoint pos = event->position().toPoint();
-#endif
     QModelIndex hoverIndex = indexAt(pos);
     if (   hoverIndex.isValid()
         && hoverIndex.column() > 0
@@ -666,11 +656,7 @@ CalendarDayTable::dropEvent
             if (srcIndex.isValid() && entryIdx >= 0) {
                 CalendarDay srcDay = srcIndex.data(CalendarDetailedDayDelegate::DayRole).value<CalendarDay>();
                 if (entryIdx < srcDay.entries.count()) {
-#if QT_VERSION < 0x060000
-                    QPoint pos = event->pos();
-#else
                     QPoint pos = event->position().toPoint();
-#endif
                     QModelIndex destIndex = indexAt(pos);
                     QTime time = timeScaleData.timeFromYInTable(pos.y(), visualRect(destIndex));
                     CalendarDay destDay = destIndex.data(CalendarDetailedDayDelegate::DayRole).value<CalendarDay>();
@@ -687,72 +673,32 @@ CalendarDayTable::showContextMenu
 (const QPoint &pos)
 {
     QModelIndex index = indexAt(pos);
+    if (! index.isValid()) {
+        return;
+    }
     int row = index.row();
     int column = index.column();
-    if (   ! index.isValid()
-        || row != 1
-        || column == 0) {
+    if (pressedIndex.isValid() && (row != 1 || column == 0)) {
+        QTableWidgetItem *item = this->item(pressedIndex.row(), pressedIndex.column());
+        if (item != nullptr) {
+            item->setData(CalendarDetailedDayDelegate::PressedEntryRole, QVariant());
+        }
+    }
+
+    QMenu *contextMenu = nullptr;
+    if (row == 0 && column > 0) {
+        contextMenu = makeHeaderMenu(index, pos);
+    } else if (row == 1 && column > 0) {
+        contextMenu = makeActivityMenu(index, pos);
+    }
+    if (contextMenu != nullptr) {
+        contextMenu->exec(viewport()->mapToGlobal(pos));
+        delete contextMenu;
         if (pressedIndex.isValid()) {
             QTableWidgetItem *item = this->item(pressedIndex.row(), pressedIndex.column());
             if (item != nullptr) {
                 item->setData(CalendarDetailedDayDelegate::PressedEntryRole, QVariant());
             }
-        }
-        return;
-    }
-    ColumnDelegatingItemDelegate *delegatingDelegate = static_cast<ColumnDelegatingItemDelegate*>(itemDelegateForRow(row));
-    CalendarDetailedDayDelegate *delegate = static_cast<CalendarDetailedDayDelegate*>(delegatingDelegate->getDelegate(column));
-    int entryIdx = delegate->entryTester.hitTest(index, pos);
-    CalendarDay day = index.data(CalendarDetailedDayDelegate::DayRole).value<CalendarDay>();
-
-    QMenu contextMenu(this);
-    if (entryIdx >= 0) {
-        CalendarEntry calEntry = day.entries[entryIdx];
-        switch (calEntry.type) {
-        case ENTRY_TYPE_ACTIVITY:
-            contextMenu.addAction(tr("View activity..."), this, [=]() {
-                emit viewActivity(calEntry);
-            });
-            contextMenu.addAction(tr("Delete activity"), this, [=]() {
-                emit delActivity(calEntry);
-            });
-            break;
-        case ENTRY_TYPE_PLANNED_ACTIVITY:
-            if (calEntry.hasTrainMode) {
-                contextMenu.addAction(tr("Show in train node..."), this, [=]() {
-                    emit showInTrainMode(calEntry);
-                });
-            }
-            contextMenu.addAction(tr("View planned activity..."), this, [=]() {
-                emit viewActivity(calEntry);
-            });
-            contextMenu.addAction(tr("Delete planned activity"), this, [=]() {
-                emit delActivity(calEntry);
-            });
-            break;
-        case ENTRY_TYPE_OTHER:
-        default:
-            break;
-        }
-    } else {
-        QTime time = timeScaleData.timeFromYInTable(pos.y(), visualRect(index));
-        if (   day.date < QDate::currentDate()
-            || (   day.date == QDate::currentDate()
-                && time < QTime::currentTime())) {
-            contextMenu.addAction(tr("Add activity..."), this, [=]() {
-                emit addActivity(false, day.date, time);
-            });
-        } else {
-            contextMenu.addAction(tr("Add planned activity..."), this, [=]() {
-                emit addActivity(true, day.date, time);
-            });
-        }
-    }
-    contextMenu.exec(viewport()->mapToGlobal(pos));
-    if (pressedIndex.isValid()) {
-        QTableWidgetItem *item = this->item(pressedIndex.row(), pressedIndex.column());
-        if (item != nullptr) {
-            item->setData(CalendarDetailedDayDelegate::PressedEntryRole, QVariant());
         }
     }
 }
@@ -765,6 +711,110 @@ CalendarDayTable::setDropIndicator
     QTableWidgetItem *scaleItem = item(1, 0);
     scaleItem->setData(CalendarTimeScaleDelegate::CurrentYRole, y);
     scaleItem->setData(CalendarTimeScaleDelegate::BlockRole, static_cast<int>(block));
+}
+
+
+QMenu*
+CalendarDayTable::makeHeaderMenu
+(const QModelIndex &index, const QPoint &pos)
+{
+    CalendarHeadlineDelegate *delegate = static_cast<CalendarHeadlineDelegate*>(itemDelegateForRow(index.row()));
+    int entryIdx = delegate->headlineTester.hitTest(index, pos);
+    CalendarDay day = index.data(CalendarHeadlineDelegate::DayRole).value<CalendarDay>();
+    QMenu *contextMenu = new QMenu(this);
+    if (entryIdx >= 0) {
+        const CalendarEntry &entry = day.headlineEntries[entryIdx];
+        switch (entry.type) {
+        case ENTRY_TYPE_EVENT: {
+            QAction *editEventAction = contextMenu->addAction(tr("Edit event..."), this, [this, entry]() { emit editEvent(entry); });
+            QAction *delEventAction = contextMenu->addAction(tr("Delete event"), this, [this, entry]() { emit delEvent(entry); });
+            if (! isInDateRange(day.date) || ! canHavePhasesOrEvents) {
+                editEventAction->setEnabled(false);
+                delEventAction->setEnabled(false);
+            }
+            break;
+        }
+        case ENTRY_TYPE_PHASE: {
+            QAction *editPhaseAction = contextMenu->addAction(tr("Edit phase..."), this, [this, entry]() { emit editPhase(entry); });
+            QAction *delPhaseAction = contextMenu->addAction(tr("Delete phase..."), this, [this, entry]() { emit delPhase(entry); });
+            if (! isInDateRange(day.date) || ! canHavePhasesOrEvents) {
+                editPhaseAction->setEnabled(false);
+                delPhaseAction->setEnabled(false);
+            }
+            break;
+        }
+        default:
+            break;
+        }
+    } else {
+        QAction *addPhaseAction = contextMenu->addAction(tr("Add phase..."), this, [this, day]() { emit addPhase(day.date); });
+        QAction *addEventAction = contextMenu->addAction(tr("Add event..."), this, [this, day]() { emit addEvent(day.date); });
+        if (! isInDateRange(day.date) || ! canHavePhasesOrEvents) {
+            addPhaseAction->setEnabled(false);
+            addEventAction->setEnabled(false);
+        }
+    }
+    return contextMenu;
+}
+
+
+QMenu*
+CalendarDayTable::makeActivityMenu
+(const QModelIndex &index, const QPoint &pos)
+{
+    ColumnDelegatingItemDelegate *delegatingDelegate = static_cast<ColumnDelegatingItemDelegate*>(itemDelegateForRow(index.row()));
+    CalendarDetailedDayDelegate *delegate = static_cast<CalendarDetailedDayDelegate*>(delegatingDelegate->getDelegate(index.column()));
+    int entryIdx = delegate->entryTester.hitTest(index, pos);
+    CalendarDay day = index.data(CalendarDetailedDayDelegate::DayRole).value<CalendarDay>();
+    QMenu *contextMenu = new QMenu(this);
+    if (entryIdx >= 0) {
+        CalendarEntry calEntry = day.entries[entryIdx];
+        switch (calEntry.type) {
+        case ENTRY_TYPE_ACTIVITY:
+            contextMenu->addAction(tr("View activity..."), this, [this, calEntry]() {
+                emit viewActivity(calEntry);
+            });
+            contextMenu->addAction(tr("Delete activity"), this, [this, calEntry]() {
+                emit delActivity(calEntry);
+            });
+            break;
+        case ENTRY_TYPE_PLANNED_ACTIVITY:
+            if (calEntry.hasTrainMode) {
+                contextMenu->addAction(tr("Show in train node..."), this, [this, calEntry]() {
+                    emit showInTrainMode(calEntry);
+                });
+            }
+            contextMenu->addAction(tr("View planned activity..."), this, [this, calEntry]() {
+                emit viewActivity(calEntry);
+            });
+            contextMenu->addAction(tr("Delete planned activity"), this, [this, calEntry]() {
+                emit delActivity(calEntry);
+            });
+            break;
+        default:
+            break;
+        }
+    } else {
+        QTime time = timeScaleData.timeFromYInTable(pos.y(), visualRect(index));
+        if (   day.date < QDate::currentDate()
+            || (   day.date == QDate::currentDate()
+                && time < QTime::currentTime())) {
+            contextMenu->addAction(tr("Add activity..."), this, [this, day, time]() {
+                emit addActivity(false, day.date, time);
+            });
+        } else {
+            contextMenu->addAction(tr("Add planned activity..."), this, [this, day, time]() {
+                emit addActivity(true, day.date, time);
+            });
+        }
+        QAction *addPhaseAction = contextMenu->addAction(tr("Add phase..."), this, [this, day]() { emit addPhase(day.date); });
+        QAction *addEventAction = contextMenu->addAction(tr("Add event..."), this, [this, day]() { emit addEvent(day.date); });
+        if (! isInDateRange(day.date) || ! canHavePhasesOrEvents) {
+            addPhaseAction->setEnabled(false);
+            addEventAction->setEnabled(false);
+        }
+    }
+    return contextMenu;
 }
 
 
@@ -793,7 +843,7 @@ CalendarMonthTable::CalendarMonthTable
 
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, &CalendarMonthTable::customContextMenuRequested, this, &CalendarMonthTable::showContextMenu);
-    connect(this, &QTableWidget::itemSelectionChanged, [=]() {
+    connect(this, &QTableWidget::itemSelectionChanged, this, [this]() {
         QList<QTableWidgetItem*> selection = selectedItems();
         if (selection.count() > 0) {
             QTableWidgetItem *item = selection[0];
@@ -958,12 +1008,13 @@ CalendarMonthTable::selectedDate
 
 void
 CalendarMonthTable::limitDateRange
-(const DateRange &dr, bool allowKeepMonth)
+(const DateRange &dr, bool allowKeepMonth, bool canHavePhasesOrEvents)
 {
     if (dr.from.isValid() && dr.to.isValid() && dr.from > dr.to) {
         return;
     }
     this->dr = dr;
+    this->canHavePhasesOrEvents = canHavePhasesOrEvents;
     if (currentItem() != nullptr && isInDateRange(currentItem()->data(DateRole).toDate())) {
         setMonth(currentItem()->data(DateRole).toDate());
     } else if (isInDateRange(QDate::currentDate())) {
@@ -1192,11 +1243,7 @@ void
 CalendarMonthTable::dragMoveEvent
 (QDragMoveEvent *event)
 {
-#if QT_VERSION < 0x060000
-    QModelIndex hoverIndex = indexAt(event->pos());
-#else
     QModelIndex hoverIndex = indexAt(event->position().toPoint());
-#endif
     if (   hoverIndex.isValid()
         && hoverIndex.column() < 7
         && hoverIndex != pressedIndex) {
@@ -1251,11 +1298,7 @@ CalendarMonthTable::dropEvent
             if (srcIndex.isValid() && entryIdx >= 0) {
                 CalendarDay srcDay = srcIndex.data(CalendarCompactDayDelegate::DayRole).value<CalendarDay>();
                 if (entryIdx < srcDay.entries.count()) {
-#if QT_VERSION < 0x060000
-                    QModelIndex destIndex = indexAt(event->pos());
-#else
                     QModelIndex destIndex = indexAt(event->position().toPoint());
-#endif
                     CalendarDay destDay = destIndex.data(CalendarCompactDayDelegate::DayRole).value<CalendarDay>();
                     emit entryMoved(srcDay.entries[entryIdx], srcDay.date, destDay.date, srcDay.entries[entryIdx].start);
                 }
@@ -1263,16 +1306,6 @@ CalendarMonthTable::dropEvent
         }
     }
 }
-
-
-#if QT_VERSION < 0x060000
-QAbstractItemDelegate*
-CalendarMonthTable::itemDelegateForIndex
-(const QModelIndex &index) const
-{
-    return itemDelegateForColumn(index.column());
-}
-#endif
 
 
 void
@@ -1296,6 +1329,7 @@ CalendarMonthTable::showContextMenu
         return;
     }
     int entryIdx = delegate->entryTester.hitTest(index, pos);
+    int headlineEntryIdx = delegate->headlineTester.hitTest(index, pos);
     CalendarDay day = index.data(CalendarCompactDayDelegate::DayRole).value<CalendarDay>();
 
     QMenu contextMenu(this);
@@ -1303,33 +1337,56 @@ CalendarMonthTable::showContextMenu
         CalendarEntry calEntry = day.entries[entryIdx];
         switch (calEntry.type) {
         case ENTRY_TYPE_ACTIVITY:
-            contextMenu.addAction(tr("View activity..."), this, [=]() {
+            contextMenu.addAction(tr("View activity..."), this, [this, calEntry]() {
                 emit viewActivity(calEntry);
             });
-            contextMenu.addAction(tr("Delete activity"), this, [=]() {
+            contextMenu.addAction(tr("Delete activity"), this, [this, calEntry]() {
                 emit delActivity(calEntry);
             });
             break;
         case ENTRY_TYPE_PLANNED_ACTIVITY:
             if (calEntry.hasTrainMode) {
-                contextMenu.addAction(tr("Show in train mode..."), this, [=]() {
+                contextMenu.addAction(tr("Show in train mode..."), this, [this, calEntry]() {
                     emit showInTrainMode(calEntry);
                 });
             }
-            contextMenu.addAction(tr("View planned activity..."), this, [=]() {
+            contextMenu.addAction(tr("View planned activity..."), this, [this, calEntry]() {
                 emit viewActivity(calEntry);
             });
-            contextMenu.addAction(tr("Delete planned activity"), this, [=]() {
+            contextMenu.addAction(tr("Delete planned activity"), this, [this, calEntry]() {
                 emit delActivity(calEntry);
             });
             break;
-        case ENTRY_TYPE_OTHER:
+        default:
+            break;
+        }
+    } else if (headlineEntryIdx >= 0) {
+        const CalendarEntry &entry = day.headlineEntries[headlineEntryIdx];
+        switch (entry.type) {
+        case ENTRY_TYPE_EVENT: {
+            QAction *editEventAction = contextMenu.addAction(tr("Edit event..."), this, [this, entry]() { emit editEvent(entry); });
+            QAction *delEventAction = contextMenu.addAction(tr("Delete event"), this, [this, entry]() { emit delEvent(entry); });
+            if (! isInDateRange(day.date) || ! canHavePhasesOrEvents) {
+                editEventAction->setEnabled(false);
+                delEventAction->setEnabled(false);
+            }
+            break;
+        }
+        case ENTRY_TYPE_PHASE: {
+            QAction *editPhaseAction = contextMenu.addAction(tr("Edit phase..."), this, [this, entry]() { emit editPhase(entry); });
+            QAction *delPhaseAction = contextMenu.addAction(tr("Delete phase"), this, [this, entry]() { emit delPhase(entry); });
+            if (! isInDateRange(day.date) || ! canHavePhasesOrEvents) {
+                editPhaseAction->setEnabled(false);
+                delPhaseAction->setEnabled(false);
+            }
+            break;
+        }
         default:
             break;
         }
     } else {
         if (day.date <= QDate::currentDate()) {
-            contextMenu.addAction(tr("Add activity..."), this, [=]() {
+            contextMenu.addAction(tr("Add activity..."), this, [this, day]() {
                 QTime time = QTime::currentTime();
                 if (day.date == QDate::currentDate()) {
                     time = time.addSecs(std::max(-4 * 3600, time.secsTo(QTime(0, 0))));
@@ -1338,14 +1395,23 @@ CalendarMonthTable::showContextMenu
             });
         }
         if (day.date >= QDate::currentDate()) {
-            contextMenu.addAction(tr("Add planned activity..."), this, [=]() {
+            contextMenu.addAction(tr("Add planned activity..."), this, [this, day]() {
                 QTime time = QTime::currentTime();
                 if (day.date == QDate::currentDate()) {
                     time = time.addSecs(std::min(4 * 3600, time.secsTo(QTime(23, 59, 59))));
                 }
                 emit addActivity(true, day.date, time);
             });
-            contextMenu.addAction(tr("Repeat schedule..."), this, [=]() {
+        }
+        QAction *addPhaseAction = contextMenu.addAction(tr("Add phase..."), this, [this, day]() { emit addPhase(day.date); });
+        QAction *addEventAction = contextMenu.addAction(tr("Add event..."), this, [this, day]() { emit addEvent(day.date); });
+        if (! isInDateRange(day.date) || ! canHavePhasesOrEvents) {
+            addPhaseAction->setEnabled(false);
+            addEventAction->setEnabled(false);
+        }
+        if (day.date >= QDate::currentDate()) {
+            contextMenu.addSeparator();
+            contextMenu.addAction(tr("Repeat schedule..."), this, [this, day]() {
                 emit repeatSchedule(day.date);
             });
             bool hasPlannedActivity = false;
@@ -1356,11 +1422,11 @@ CalendarMonthTable::showContextMenu
                 }
             }
             if (hasPlannedActivity) {
-                contextMenu.addAction(tr("Insert restday"), this, [=]() {
+                contextMenu.addAction(tr("Insert restday"), this, [this, day]() {
                     emit insertRestday(day.date);
                 });
             } else {
-                contextMenu.addAction(tr("Delete restday"), this, [=]() {
+                contextMenu.addAction(tr("Delete restday"), this, [this, day]() {
                     emit delRestday(day.date);
                 });
             }
@@ -1401,12 +1467,12 @@ CalendarDayView::CalendarDayView
     dayLayout->addWidget(dayLeftPane);
     dayLayout->addWidget(dayTable);
 
-    connect(dayDateSelector, &QCalendarWidget::selectionChanged, [=]() {
+    connect(dayDateSelector, &QCalendarWidget::selectionChanged, this, [this]() {
         if (dayTable->selectedDate() != dayDateSelector->selectedDate()) {
             setDay(dayDateSelector->selectedDate());
         }
     });
-    connect(dayTable, &CalendarDayTable::dayChanged, [=](const QDate &date) {
+    connect(dayTable, &CalendarDayTable::dayChanged, this, [this](const QDate &date) {
         dayDateSelector->setSelectedDate(date);
         emit dayChanged(date);
     });
@@ -1415,6 +1481,12 @@ CalendarDayView::CalendarDayView
     connect(dayTable, &CalendarDayTable::showInTrainMode, this, &CalendarDayView::showInTrainMode);
     connect(dayTable, &CalendarDayTable::delActivity, this, &CalendarDayView::delActivity);
     connect(dayTable, &CalendarDayTable::entryMoved, this, &CalendarDayView::entryMoved);
+    connect(dayTable, &CalendarDayTable::addPhase, this, &CalendarDayView::addPhase);
+    connect(dayTable, &CalendarDayTable::editPhase, this, &CalendarDayView::editPhase);
+    connect(dayTable, &CalendarDayTable::delPhase, this, &CalendarDayView::delPhase);
+    connect(dayTable, &CalendarDayTable::addEvent, this, &CalendarDayView::addEvent);
+    connect(dayTable, &CalendarDayTable::editEvent, this, &CalendarDayView::editEvent);
+    connect(dayTable, &CalendarDayTable::delEvent, this, &CalendarDayView::delEvent);
 }
 
 
@@ -1470,9 +1542,10 @@ CalendarDayView::fillEntries
 
 void
 CalendarDayView::limitDateRange
-(const DateRange &dr)
+(const DateRange &dr, bool canHavePhasesOrEvents)
 {
     dayDateSelector->limitDateRange(dr);
+    dayTable->limitDateRange(dr, canHavePhasesOrEvents);
 }
 
 
@@ -1575,9 +1648,9 @@ CalendarDayView::updateMeasures
         }
         if (buttonType == 0) {
             QPushButton *addButton = new QPushButton(tr("Add Measure"));
-            connect(addButton, &QPushButton::clicked, [=]() {
+            connect(addButton, &QPushButton::clicked, this, [this, date, measuresGroup]() {
                 if (measureDialog(QDateTime(date, QTime::currentTime()), measuresGroup, false)) {
-                    QTimer::singleShot(0, this, [=]() {
+                    QTimer::singleShot(0, this, [this, date]() {
                         updateMeasures(date);
                     });
                 }
@@ -1585,9 +1658,9 @@ CalendarDayView::updateMeasures
             measureLayout->addWidget(addButton);
         } else {
             QPushButton *editButton = new QPushButton(tr("Edit Measure"));
-            connect(editButton, &QPushButton::clicked, [=]() {
+            connect(editButton, &QPushButton::clicked, this, [this, date, measure, measuresGroup]() {
                 if (measureDialog(measure.when, measuresGroup, true)) {
-                    QTimer::singleShot(0, this, [=]() {
+                    QTimer::singleShot(0, this, [this, date]() {
                         updateMeasures(date);
                     });
                 }
@@ -1698,6 +1771,12 @@ CalendarWeekView::CalendarWeekView
     connect(weekTable, &CalendarDayTable::showInTrainMode, this, &CalendarWeekView::showInTrainMode);
     connect(weekTable, &CalendarDayTable::delActivity, this, &CalendarWeekView::delActivity);
     connect(weekTable, &CalendarDayTable::entryMoved, this, &CalendarWeekView::entryMoved);
+    connect(weekTable, &CalendarDayTable::addPhase, this, &CalendarWeekView::addPhase);
+    connect(weekTable, &CalendarDayTable::editPhase, this, &CalendarWeekView::editPhase);
+    connect(weekTable, &CalendarDayTable::delPhase, this, &CalendarWeekView::delPhase);
+    connect(weekTable, &CalendarDayTable::addEvent, this, &CalendarWeekView::addEvent);
+    connect(weekTable, &CalendarDayTable::editEvent, this, &CalendarWeekView::editEvent);
+    connect(weekTable, &CalendarDayTable::delEvent, this, &CalendarWeekView::delEvent);
 
     setDay(date);
 }
@@ -1753,9 +1832,9 @@ CalendarWeekView::fillEntries
 
 void
 CalendarWeekView::limitDateRange
-(const DateRange &dr)
+(const DateRange &dr, bool canHavePhasesOrEvents)
 {
-    weekTable->limitDateRange(dr);
+    weekTable->limitDateRange(dr, canHavePhasesOrEvents);
 }
 
 
@@ -1800,511 +1879,6 @@ CalendarWeekView::selectedDate
 
 
 //////////////////////////////////////////////////////////////////////////////
-// CalendarAgendaView
-
-CalendarAgendaView::CalendarAgendaView
-(QWidget *parent)
-: QWidget(parent)
-{
-    QLabel *headline = new QLabel(tr("Your Training Agenda"));
-    headline->setAlignment(Qt::AlignCenter);
-    QFont font = headline->font();
-    font.setPointSize(20);
-    font.setBold(true);
-    headline->setFont(font);
-    agendaTree = new TreeWidget6();
-    agendaTree->setColumnCount(3);
-    agendaTree->setUniformRowHeights(false);
-    agendaTree->setItemsExpandable(false);
-    agendaTree->setRootIsDecorated(false);
-    agendaTree->setIndentation(0);
-    agendaTree->setContextMenuPolicy(Qt::CustomContextMenu);
-    agendaTree->setItemDelegateForColumn(0, new AgendaMultiDelegate(this));
-    agendaTree->setItemDelegateForColumn(1, new AgendaMultiDelegate(this));
-    agendaTree->setItemDelegateForColumn(2, new CalendarSingleActivityDelegate(this));
-    agendaTree->header()->setVisible(false);
-    agendaTree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-    agendaTree->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-    agendaTree->header()->setSectionResizeMode(2, QHeaderView::Stretch);
-    agendaTree->viewport()->installEventFilter(this);
-    agendaTree->viewport()->setAttribute(Qt::WA_Hover, true);
-
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->addWidget(headline);
-    layout->addSpacing(20 * dpiYFactor);
-    layout->addLayout(centerWidgetInLayout(agendaTree));
-
-    connect(agendaTree, &QTreeWidget::itemDoubleClicked, [=](QTreeWidgetItem *item, int column) {
-        if (column == 2) {
-            QVariant data = item->data(2, CalendarSingleActivityDelegate::EntryRole);
-            if (! data.isNull()) {
-                CalendarEntry entry = data.value<CalendarEntry>();
-                if (entry.type == ENTRY_TYPE_PLANNED_ACTIVITY) {
-                    emit viewActivity(entry);
-                }
-            }
-        }
-    });
-    connect(agendaTree, &QTreeWidget::customContextMenuRequested, this, &CalendarAgendaView::showContextMenu);
-}
-
-
-void
-CalendarAgendaView::updateDate
-()
-{
-    currentDate = QDate::currentDate();
-    emit dayChanged(currentDate);
-}
-
-
-void
-CalendarAgendaView::setDateRange
-(const DateRange &dateRange)
-{
-    this->dateRange = dateRange;
-}
-
-
-void
-CalendarAgendaView::setPastDays
-(int days)
-{
-    pastDays = days;
-    emit dayChanged(currentDate);
-}
-
-
-void
-CalendarAgendaView::setFutureDays
-(int days)
-{
-    futureDays = days;
-    emit dayChanged(currentDate);
-}
-
-
-void
-CalendarAgendaView::fillEntries
-(const QHash<QDate, QList<CalendarEntry>> &activityEntries, const QList<CalendarSummary> &summaries, const QHash<QDate, QList<CalendarEntry>> &headlineEntries)
-{
-    Q_UNUSED(summaries)
-
-    QDate today = currentDate;
-    QDate pastFirst = firstVisibleDay();
-    QDate futureLast = lastVisibleDay();
-    bool todayHasPlanned = false;
-    QList<QDate> missedDays;
-    QList<QDate> upcomingDays;
-    QHash<QDate, QList<CalendarEntry>> missedEntries;
-    QList<CalendarEntry> todayEntries;
-    QHash<QDate, QList<CalendarEntry>> upcomingEntries;
-    for (QDate date = pastFirst; date <= futureLast; date = date.addDays(1)) {
-        QList<CalendarEntry> dateEntries;
-        if (date >= today) {
-            dateEntries = headlineEntries.value(date) + activityEntries.value(date);
-        } else {
-            dateEntries = activityEntries.value(date);
-        }
-        for (const CalendarEntry &entry : dateEntries) {
-            if (   entry.type == ENTRY_TYPE_PLANNED_ACTIVITY
-                || entry.type == ENTRY_TYPE_EVENT
-                || entry.type == ENTRY_TYPE_PHASE) {
-                if (date < today) {
-                    if (! missedDays.contains(date)) {
-                        missedDays << date;
-                    }
-                    missedEntries[date].append(entry);
-                } else if (date > today) {
-                    if (! upcomingDays.contains(date)) {
-                        upcomingDays << date;
-                    }
-                    upcomingEntries[date].append(entry);
-                } else {
-                    todayHasPlanned = true;
-                    todayEntries.append(entry);
-                }
-            }
-        }
-    }
-    std::sort(missedDays.begin(), missedDays.end());
-    std::sort(upcomingDays.begin(), upcomingDays.end());
-
-    lastHoveredItem = nullptr;
-    lastHoveredColumn = -1;
-    agendaTree->clear();
-    QString label;
-
-    CalendarAgendaStyles cas;
-    fillStyles(cas);
-
-    addSpacer(nullptr, cas.sectionEntrySpacerHeight);
-    if (pastDays > 0) {
-        QTreeWidgetItem *pastItem = new QTreeWidgetItem();
-        agendaTree->addTopLevelItem(pastItem);
-        QFont hlFont(cas.headlineDefaultFont);
-        if (missedDays.count() > 0) {
-            addSpacer(pastItem, cas.sectionEntrySpacerHeight);
-            label = tr("Missed Planned Activities");
-            bool firstDay = true;
-            for (const QDate &date : missedDays) {
-                if (! firstDay) {
-                    addSpacer(pastItem, cas.daySpacerHeight);
-                }
-                addEntries(today, date, missedEntries[date], pastItem, cas);
-                firstDay = false;
-            }
-        } else {
-            hlFont = cas.headlineSmallEmptyFont;
-            label = tr("No missed planned activities");
-        }
-        if (pastDays > 1) {
-            label += " " + tr("(Past %1 days)").arg(pastDays);
-        } else {
-            label += " " + tr("(Yesterday)");
-        }
-        pastItem->setData(0, Qt::DisplayRole, label);
-        pastItem->setData(0, Qt::FontRole, hlFont);
-        pastItem->setFirstColumnSpanned(true);
-        addSeparator(pastItem, cas.sectionSpacerHeight, cas.entrySpacerHeight);
-    }
-
-    QTreeWidgetItem *todayItem = new QTreeWidgetItem();
-    agendaTree->addTopLevelItem(todayItem);
-    QFont hlFont(cas.headlineTodayFont);
-    if (todayHasPlanned) {
-        label = tr("Today’s Planned Activities, Phases and Events");
-        addEntries(today, today, todayEntries, todayItem, cas);
-    } else {
-        hlFont = cas.headlineEmptyFont;
-        label = tr("No planned activities, phases, or events for today");
-    }
-    todayItem->setData(0, Qt::DisplayRole, label);
-    todayItem->setData(0, Qt::FontRole, hlFont);
-    todayItem->setFirstColumnSpanned(true);
-
-    if (futureDays > 0) {
-        addSeparator(nullptr, cas.sectionSpacerHeight, cas.entrySpacerHeight);
-        QTreeWidgetItem *futureItem = new QTreeWidgetItem();
-        agendaTree->addTopLevelItem(futureItem);
-        QFont hlFont(cas.headlineDefaultFont);
-        if (upcomingDays.count() > 0) {
-            addSpacer(futureItem, cas.sectionEntrySpacerHeight);
-            label = tr("Upcoming Planned Activities, Phases and Events");
-            bool firstDay = true;
-            for (const QDate &date : upcomingDays) {
-                if (! firstDay) {
-                    addSpacer(futureItem, cas.daySpacerHeight);
-                }
-                addEntries(today, date, upcomingEntries[date], futureItem, cas);
-                firstDay = false;
-            }
-        } else {
-            hlFont = cas.headlineSmallEmptyFont;
-            label = tr("No upcoming planned activities, phases or events");
-        }
-        if (futureDays > 1) {
-            label += " " + tr("(Next %1 days)").arg(futureDays);
-        } else {
-            label += " " + tr("(Tomorrow)");
-        }
-        futureItem->setData(0, Qt::DisplayRole, label);
-        futureItem->setData(0, Qt::FontRole, hlFont);
-        futureItem->setFirstColumnSpanned(true);
-        addSpacer(futureItem, cas.sectionEntrySpacerHeight);
-    }
-
-    agendaTree->expandAll();
-}
-
-
-QDate
-CalendarAgendaView::firstVisibleDay
-() const
-{
-    return currentDate.addDays(-pastDays);
-}
-
-
-QDate
-CalendarAgendaView::lastVisibleDay
-() const
-{
-    return currentDate.addDays(futureDays);
-}
-
-
-QDate
-CalendarAgendaView::selectedDate
-() const
-{
-    return currentDate;
-}
-
-
-bool
-CalendarAgendaView::eventFilter
-(QObject *watched, QEvent *event)
-{
-    if (watched == agendaTree->viewport()) {
-        switch (event->type()) {
-        case QEvent::HoverMove: {
-            QHoverEvent *hoverEvent = static_cast<QHoverEvent*>(event);
-
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-            QPoint pos = hoverEvent->position().toPoint();
-#else
-            QPoint pos = hoverEvent->pos();
-#endif
-
-            QTreeWidgetItem *item = agendaTree->itemAt(pos);
-            int column = agendaTree->columnAt(pos.x());
-
-            if (item != nullptr && column == 2) {
-                if (item != lastHoveredItem || column != lastHoveredColumn) {
-                    clearHover();
-                    lastHoveredItem = item;
-                    lastHoveredColumn = column;
-                    lastHoveredItem->setData(0, AgendaMultiDelegate::HoverFlagRole, true);
-                    lastHoveredItem->setData(1, AgendaMultiDelegate::HoverFlagRole, true);
-                    lastHoveredItem->setData(2, CalendarSingleActivityDelegate::HoverFlagRole, true);
-                }
-            } else {
-                clearHover();
-            }
-            break;
-        }
-        case QEvent::HoverLeave:
-            clearHover();
-            break;
-        case QEvent::Wheel:
-        case QEvent::Scroll:
-        case QEvent::Paint: {
-            QPoint pos = agendaTree->viewport()->mapFromGlobal(QCursor::pos());
-            if (agendaTree->viewport()->rect().contains(pos)) {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-                QHoverEvent fakeHover(QEvent::HoverMove, pos, QCursor::pos(), pos);
-#else
-                QHoverEvent fakeHover(QEvent::HoverMove, pos, pos);
-#endif
-                QApplication::sendEvent(agendaTree->viewport(), &fakeHover);
-            }
-            break;
-        }
-        default:
-            break;
-        }
-    }
-
-    return QObject::eventFilter(watched, event);
-}
-
-
-void
-CalendarAgendaView::changeEvent
-(QEvent *event)
-{
-    if (event->type() == QEvent::PaletteChange) {
-        QTimer::singleShot(0, this, [this]() {
-            const QPalette pal = palette();
-            const QColor base = pal.color(QPalette::AlternateBase);
-            const QColor text = pal.color(QPalette::Text);
-            const QColor sel  = pal.color(QPalette::Highlight);
-            const QColor selText = pal.color(QPalette::HighlightedText);
-            const QString style = QStringLiteral(
-                "QTreeWidget { "
-                "background: %1; "
-                "color: %2; "
-                "selection-background-color: %3; "
-                "selection-color: %4; "
-                "}"
-            ).arg(base.name(), text.name(), sel.name(), selText.name());
-            agendaTree->setStyleSheet(style);
-            agendaTree->setPalette(pal);
-            agendaTree->viewport()->setPalette(pal);
-        });
-    }
-    QWidget::changeEvent(event);
-}
-
-
-void
-CalendarAgendaView::clearHover
-()
-{
-    if (lastHoveredItem != nullptr && lastHoveredColumn >= 0) {
-        lastHoveredItem->setData(0, AgendaMultiDelegate::HoverFlagRole, false);
-        lastHoveredItem->setData(1, AgendaMultiDelegate::HoverFlagRole, false);
-        lastHoveredItem->setData(2, CalendarSingleActivityDelegate::HoverFlagRole, false);
-    }
-    lastHoveredItem = nullptr;
-    lastHoveredColumn = -1;
-}
-
-
-void
-CalendarAgendaView::addEntries
-(const QDate &today, const QDate &date, const QList<CalendarEntry> &entries, QTreeWidgetItem *parent, const CalendarAgendaStyles &cas)
-{
-    int entryIdx = 0;
-    for (const CalendarEntry &entry : entries) {
-        QTreeWidgetItem *entryItem = new QTreeWidgetItem();
-        QString diffStr;
-        int diff = date.daysTo(today);
-        if (diff > 1) {
-            diffStr = tr("%1 days ago").arg(diff);
-        } else if (diff == 1) {
-            diffStr = tr("Yesterday");
-        } else if (diff == 0) {
-            diffStr = tr("Today");
-        } else if (diff == -1) {
-            diffStr = tr("Tomorrow");
-        } else {
-            diffStr = tr("in %1 days").arg(std::abs(diff));
-        }
-        if (entryIdx == 0) {
-            entryItem->setData(0, Qt::DisplayRole, date.toString(tr("ddd, d.M.")));
-            entryItem->setData(0, Qt::FontRole, cas.defaultFont);
-            entryItem->setData(1, Qt::DisplayRole, diffStr);
-            entryItem->setData(1, Qt::FontRole, cas.relativeFont);
-        } else {
-            addSpacer(parent, cas.entrySpacerHeight);
-        }
-        entryItem->setData(0, AgendaMultiDelegate::HoverFlagRole, false);
-        entryItem->setData(0, AgendaMultiDelegate::HoverTextRole, date.toString(tr("ddd, d.M.")));
-        entryItem->setData(0, AgendaMultiDelegate::HoverFontRole, cas.hoverFont);
-        entryItem->setData(1, AgendaMultiDelegate::HoverFlagRole, false);
-        entryItem->setData(1, AgendaMultiDelegate::HoverTextRole, diffStr);
-        entryItem->setData(1, AgendaMultiDelegate::HoverFontRole, cas.hoverFont);
-        entryItem->setData(2, CalendarSingleActivityDelegate::EntryRole, QVariant::fromValue(entry));
-        entryItem->setData(2, CalendarSingleActivityDelegate::HoverFlagRole, false);
-        entryItem->setData(2, CalendarSingleActivityDelegate::EntryDateRole, date);
-        parent->addChild(entryItem);
-        ++entryIdx;
-    }
-}
-
-
-void
-CalendarAgendaView::addSpacer
-(QTreeWidgetItem *parent, int height)
-{
-    QTreeWidgetItem *item = new QTreeWidgetItem();
-    item->setData(0, AgendaMultiDelegate::TypeRole, 1);
-    item->setData(0, AgendaMultiDelegate::MarginTopRole, height);
-    item->setData(1, AgendaMultiDelegate::TypeRole, 1);
-    item->setData(1, AgendaMultiDelegate::MarginTopRole, height);
-    if (parent != nullptr) {
-        parent->addChild(item);
-    } else {
-        agendaTree->addTopLevelItem(item);
-    }
-    item->setFirstColumnSpanned(true);
-}
-
-
-void
-CalendarAgendaView::addSeparator
-(QTreeWidgetItem *parent, int top, int bottom)
-{
-    QTreeWidgetItem *item = new QTreeWidgetItem();
-    item->setData(0, AgendaMultiDelegate::TypeRole, 2);
-    item->setData(0, AgendaMultiDelegate::MarginTopRole, top);
-    item->setData(0, AgendaMultiDelegate::MarginBottomRole, bottom);
-    item->setData(1, AgendaMultiDelegate::TypeRole, 2);
-    item->setData(1, AgendaMultiDelegate::MarginTopRole, top);
-    item->setData(1, AgendaMultiDelegate::MarginBottomRole, bottom);
-    if (parent != nullptr) {
-        parent->addChild(item);
-    } else {
-        agendaTree->addTopLevelItem(item);
-    }
-    item->setFirstColumnSpanned(true);
-}
-
-
-void
-CalendarAgendaView::fillStyles
-(CalendarAgendaStyles &cas) const
-{
-    cas.defaultFont = agendaTree->font();
-    cas.relativeFont = agendaTree->font();
-    cas.relativeFont.setWeight(QFont::ExtraLight);
-    cas.hoverFont = agendaTree->font();
-    cas.hoverFont.setWeight(QFont::DemiBold);
-    cas.headlineDefaultFont = agendaTree->font();
-    cas.headlineTodayFont = agendaTree->font();
-    cas.headlineEmptyFont = agendaTree->font();
-    cas.headlineSmallEmptyFont = agendaTree->font();
-    if (cas.headlineDefaultFont.pointSizeF() > 0) {
-        cas.headlineDefaultFont.setPointSizeF(cas.headlineDefaultFont.pointSizeF() * 1.3);
-        cas.headlineTodayFont.setPointSizeF(cas.headlineTodayFont.pointSizeF() * 1.35);
-        cas.headlineEmptyFont.setPointSizeF(cas.headlineEmptyFont.pointSizeF() * 1.3);
-        cas.headlineSmallEmptyFont.setPointSizeF(cas.headlineSmallEmptyFont.pointSizeF() * 1.1);
-    } else {
-        cas.headlineDefaultFont.setPixelSize(cas.headlineDefaultFont.pixelSize() * 1.3);
-        cas.headlineTodayFont.setPixelSize(cas.headlineTodayFont.pixelSize() * 1.35);
-        cas.headlineEmptyFont.setPixelSize(cas.headlineEmptyFont.pixelSize() * 1.3);
-        cas.headlineSmallEmptyFont.setPixelSize(cas.headlineSmallEmptyFont.pixelSize() * 1.1);
-    }
-    cas.headlineTodayFont.setWeight(QFont::DemiBold);
-    cas.headlineDefaultFont.setWeight(QFont::DemiBold);
-    cas.headlineEmptyFont.setWeight(QFont::DemiBold);
-    cas.headlineEmptyFont.setItalic(true);
-    cas.headlineSmallEmptyFont.setWeight(QFont::DemiBold);
-    cas.headlineSmallEmptyFont.setItalic(true);
-
-    cas.sectionSpacerHeight = 35 * dpiYFactor;
-    cas.sectionEntrySpacerHeight = 14 * dpiYFactor;
-    cas.entrySpacerHeight = 14 * dpiYFactor;
-    cas.daySpacerHeight = 20 * dpiYFactor;
-}
-
-
-void
-CalendarAgendaView::showContextMenu
-(const QPoint &pos)
-{
-    QModelIndex index = agendaTree->indexAt(pos);
-    int column = index.column();
-    if (   ! index.isValid()
-        || column != 2) {
-        return;
-    }
-    QTreeWidgetItem *item = agendaTree->itemFromIndex(index);
-    if (! item) {
-        return;
-    }
-    QVariant entryData = item->data(2, CalendarSingleActivityDelegate::EntryRole);
-    if (entryData.isNull()) {
-        return;
-    }
-    CalendarEntry entry = entryData.value<CalendarEntry>();
-    if (entry.type != ENTRY_TYPE_PLANNED_ACTIVITY) {
-        return;
-    }
-    QMenu contextMenu(this);
-    if (entry.hasTrainMode) {
-        contextMenu.addAction(tr("Show in train mode..."), this, [=]() {
-            emit showInTrainMode(entry);
-        });
-    }
-    contextMenu.addAction(tr("View planned activity..."), this, [=]() {
-        emit viewActivity(entry);
-    });
-    QDate entryDate = item->data(2, CalendarSingleActivityDelegate::EntryDateRole).value<QDate>();
-    QAction *calendarAction = contextMenu.addAction(tr("Show in month view"), this, [=]() {
-        if (entryDate.isValid() && dateRange.pass(entryDate)) {
-            emit showInMonthView(entryDate);
-        }
-    });
-    calendarAction->setEnabled(entryDate.isValid() && dateRange.pass(entryDate));
-
-    contextMenu.exec(agendaTree->viewport()->mapToGlobal(pos));
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
 // Calendar
 
 Calendar::Calendar
@@ -2317,13 +1891,11 @@ Calendar::Calendar
     dayView = new CalendarDayView(dateInMonth, athleteMeasures);
     weekView = new CalendarWeekView(dateInMonth);
     monthView = new CalendarMonthTable(dateInMonth, firstDayOfWeek);
-    agendaView = new CalendarAgendaView();
 
     viewStack = new QStackedWidget();
     viewStack->addWidget(dayView);
     viewStack->addWidget(weekView);
     viewStack->addWidget(monthView);
-    viewStack->addWidget(agendaView);
 
     toolbar = new QToolBar();
 
@@ -2361,26 +1933,21 @@ Calendar::Calendar
     dayAction->setCheckable(true);
     dayAction->setActionGroup(viewGroup);
 
-    connect(dayAction, &QAction::triggered, [=]() { setView(CalendarView::Day); });
+    connect(dayAction, &QAction::triggered, this, [this]() { setView(CalendarView::Day); });
 
     weekAction = toolbar->addAction(tr("Week"));
     weekAction->setCheckable(true);
     weekAction->setActionGroup(viewGroup);
-    connect(weekAction, &QAction::triggered, [=]() { setView(CalendarView::Week); });
+    connect(weekAction, &QAction::triggered, this, [this]() { setView(CalendarView::Week); });
 
     monthAction = toolbar->addAction(tr("Month"));
     monthAction->setCheckable(true);
     monthAction->setActionGroup(viewGroup);
-    connect(monthAction, &QAction::triggered, [=]() { setView(CalendarView::Month); });
-
-    agendaAction = toolbar->addAction(tr("Agenda"));
-    agendaAction->setCheckable(true);
-    agendaAction->setActionGroup(viewGroup);
-    connect(agendaAction, &QAction::triggered, [=]() { setView(CalendarView::Agenda); });
+    connect(monthAction, &QAction::triggered, this, [this]() { setView(CalendarView::Month); });
 
     applyNavIcons();
 
-    connect(dayView, &CalendarDayView::dayChanged, [=](const QDate &date) {
+    connect(dayView, &CalendarDayView::dayChanged, this, [this](const QDate &date) {
         if (currentView() == CalendarView::Day) {
             emit dayChanged(date);
             updateHeader();
@@ -2392,8 +1959,14 @@ Calendar::Calendar
     connect(dayView, &CalendarDayView::showInTrainMode, this, &Calendar::showInTrainMode);
     connect(dayView, &CalendarDayView::delActivity, this, &Calendar::delActivity);
     connect(dayView, &CalendarDayView::entryMoved, this, &Calendar::moveActivity);
+    connect(dayView, &CalendarDayView::addPhase, this, &Calendar::addPhase);
+    connect(dayView, &CalendarDayView::editPhase, this, &Calendar::editPhase);
+    connect(dayView, &CalendarDayView::delPhase, this, &Calendar::delPhase);
+    connect(dayView, &CalendarDayView::addEvent, this, &Calendar::addEvent);
+    connect(dayView, &CalendarDayView::editEvent, this, &Calendar::editEvent);
+    connect(dayView, &CalendarDayView::delEvent, this, &Calendar::delEvent);
 
-    connect(weekView, &CalendarWeekView::dayChanged, [=](const QDate &date) {
+    connect(weekView, &CalendarWeekView::dayChanged, this, [this](const QDate &date) {
         if (currentView() == CalendarView::Week) {
             emit dayChanged(date);
             updateHeader();
@@ -2405,17 +1978,23 @@ Calendar::Calendar
     connect(weekView, &CalendarWeekView::showInTrainMode, this, &Calendar::showInTrainMode);
     connect(weekView, &CalendarWeekView::delActivity, this, &Calendar::delActivity);
     connect(weekView, &CalendarWeekView::entryMoved, this, &Calendar::moveActivity);
+    connect(weekView, &CalendarWeekView::addPhase, this, &Calendar::addPhase);
+    connect(weekView, &CalendarWeekView::editPhase, this, &Calendar::editPhase);
+    connect(weekView, &CalendarWeekView::delPhase, this, &Calendar::delPhase);
+    connect(weekView, &CalendarWeekView::addEvent, this, &Calendar::addEvent);
+    connect(weekView, &CalendarWeekView::editEvent, this, &Calendar::editEvent);
+    connect(weekView, &CalendarWeekView::delEvent, this, &Calendar::delEvent);
 
-    connect(monthView, &CalendarMonthTable::entryDblClicked, [=](const CalendarDay &day, int entryIdx) {
+    connect(monthView, &CalendarMonthTable::entryDblClicked, this, [this](const CalendarDay &day, int entryIdx) {
         viewActivity(day.entries[entryIdx]);
     });
-    connect(monthView, &CalendarMonthTable::daySelected, [=](const CalendarDay &day) {
+    connect(monthView, &CalendarMonthTable::daySelected, this, [this](const CalendarDay &day) {
         emit daySelected(day.date);
     });
-    connect(monthView, &CalendarMonthTable::moreClicked, [=]() {
+    connect(monthView, &CalendarMonthTable::moreClicked, this, [this]() {
         setView(CalendarView::Day);
     });
-    connect(monthView, &CalendarMonthTable::dayDblClicked, [=]() {
+    connect(monthView, &CalendarMonthTable::dayDblClicked, this, [this]() {
         setView(CalendarView::Day);
     });
     connect(monthView, &CalendarMonthTable::showInTrainMode, this, &Calendar::showInTrainMode);
@@ -2424,9 +2003,15 @@ Calendar::Calendar
     connect(monthView, &CalendarMonthTable::repeatSchedule, this, &Calendar::repeatSchedule);
     connect(monthView, &CalendarMonthTable::delActivity, this, &Calendar::delActivity);
     connect(monthView, &CalendarMonthTable::entryMoved, this, &Calendar::moveActivity);
+    connect(monthView, &CalendarMonthTable::addPhase, this, &Calendar::addPhase);
+    connect(monthView, &CalendarMonthTable::editPhase, this, &Calendar::editPhase);
+    connect(monthView, &CalendarMonthTable::delPhase, this, &Calendar::delPhase);
+    connect(monthView, &CalendarMonthTable::addEvent, this, &Calendar::addEvent);
+    connect(monthView, &CalendarMonthTable::editEvent, this, &Calendar::editEvent);
+    connect(monthView, &CalendarMonthTable::delEvent, this, &Calendar::delEvent);
     connect(monthView, &CalendarMonthTable::insertRestday, this, &Calendar::insertRestday);
     connect(monthView, &CalendarMonthTable::delRestday, this, &Calendar::delRestday);
-    connect(monthView, &CalendarMonthTable::monthChanged, [=](const QDate &month, const QDate &firstVisible, const QDate &lastVisible) {
+    connect(monthView, &CalendarMonthTable::monthChanged, this, [this](const QDate &month, const QDate &firstVisible, const QDate &lastVisible) {
         if (currentView() == CalendarView::Month) {
             emit monthChanged(month, firstVisible, lastVisible);
             updateHeader();
@@ -2434,25 +2019,9 @@ Calendar::Calendar
         }
     });
 
-    connect(agendaView, &CalendarAgendaView::dayChanged, [=](const QDate &date) {
-        if (currentView() == CalendarView::Agenda) {
-            emit dayChanged(date);
-            updateHeader();
-            setNavButtonState();
-        }
-    });
-    connect(agendaView, &CalendarAgendaView::viewActivity, this, &Calendar::viewActivity);
-    connect(agendaView, &CalendarAgendaView::showInTrainMode, this, &Calendar::showInTrainMode);
-    connect(agendaView, &CalendarAgendaView::showInMonthView, [=](const QDate &date) {
-        if (date.isValid() && dateRange.pass(date)) {
-            setView(CalendarView::Month);
-            setDate(date);
-        }
-    });
-
-    connect(prevAction, &QAction::triggered, [=]() { goNext(-1); });
-    connect(nextAction, &QAction::triggered, [=]() { goNext(1); });
-    connect(todayAction, &QAction::triggered, [=]() { setDate(QDate::currentDate()); });
+    connect(prevAction, &QAction::triggered, this, [this]() { goNext(-1); });
+    connect(nextAction, &QAction::triggered, this, [this]() { goNext(1); });
+    connect(todayAction, &QAction::triggered, this, [this]() { setDate(QDate::currentDate()); });
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(toolbar);
@@ -2479,9 +2048,6 @@ Calendar::setDate
         if (monthView->isInDateRange(date)) {
             monthView->setMonth(date, allowKeepMonth);
         }
-    } else if (currentView() == CalendarView::Agenda) {
-        agendaView->updateDate();
-        agendaView->setDateRange(dateRange);
     }
 }
 
@@ -2496,8 +2062,6 @@ Calendar::fillEntries
         weekView->fillEntries(activityEntries, summaries, headlineEntries);
     } else if (currentView() == CalendarView::Month) {
         monthView->fillEntries(activityEntries, summaries, headlineEntries);
-    } else if (currentView() == CalendarView::Agenda) {
-        agendaView->fillEntries(activityEntries, summaries, headlineEntries);
     }
     filterSpacerAction->setVisible(isFiltered);
     filterLabelAction->setVisible(isFiltered);
@@ -2522,8 +2086,6 @@ Calendar::firstVisibleDay
         return weekView->firstVisibleDay();
     } else if (currentView() == CalendarView::Month) {
         return monthView->firstVisibleDay();
-    } else if (currentView() == CalendarView::Agenda) {
-        return agendaView->firstVisibleDay();
     }
     return QDate();
 }
@@ -2539,8 +2101,6 @@ Calendar::lastVisibleDay
         return weekView->lastVisibleDay();
     } else if (currentView() == CalendarView::Month) {
         return monthView->lastVisibleDay();
-    } else if (currentView() == CalendarView::Agenda) {
-        return agendaView->lastVisibleDay();
     }
     return QDate();
 }
@@ -2556,8 +2116,6 @@ Calendar::selectedDate
         return weekView->selectedDate();
     } else if (currentView() == CalendarView::Month) {
         return monthView->selectedDate();
-    } else if (currentView() == CalendarView::Agenda) {
-        return agendaView->selectedDate();
     }
     return QDate();
 }
@@ -2590,8 +2148,6 @@ Calendar::goNext
         if ((ret = newDate.isValid())) {
             setDate(newDate);
         }
-    } else if (currentView() == CalendarView::Agenda) {
-        ret = false;
     }
     return ret;
 }
@@ -2636,8 +2192,6 @@ Calendar::canGoNext
         fom = fom.addMonths(amount);
         lom = lom.addMonths(amount);
         return isInDateRange(fom) || isInDateRange(lom);
-    } else if (currentView() == CalendarView::Agenda) {
-        return false;
     }
     return false;
 }
@@ -2661,30 +2215,23 @@ bool
 Calendar::isInDateRange
 (const QDate &date) const
 {
-    if (currentView() != CalendarView::Agenda) {
-        return date.isValid() && dateRange.pass(date);
-    } else {
-        return false;
-    }
+    return date.isValid() && dateRange.pass(date);
 }
 
 
 void
 Calendar::activateDateRange
-(const DateRange &dr, bool allowKeepMonth)
+(const DateRange &dr, bool allowKeepMonth, bool canHavePhasesOrEvents)
 {
     QDate currentDate = selectedDate();
     dateRange = dr;
-    monthView->limitDateRange(dr, allowKeepMonth);
-    weekView->limitDateRange(dr);
-    dayView->limitDateRange(dr);
+    monthView->limitDateRange(dr, allowKeepMonth, canHavePhasesOrEvents);
+    weekView->limitDateRange(dr, canHavePhasesOrEvents);
+    dayView->limitDateRange(dr, canHavePhasesOrEvents);
     if (currentView() == CalendarView::Day || currentView() == CalendarView::Week) {
         setDate(currentDate, false);
     } else if (currentView() == CalendarView::Month) {
         setDate(fitToMonth(currentDate, false), true);
-    } else if (currentView() == CalendarView::Agenda) {
-        agendaView->updateDate(); // AgendaView always uses today
-        agendaView->setDateRange(dateRange); // AgendaView needs daterange for "Show in month view"
     }
     seasonLabel->setText(tr("Season: %1").arg(dateRange.name));
     emit dateRangeActivated(dr.name);
@@ -2723,22 +2270,6 @@ Calendar::setEndHour
 {
     weekView->setEndHour(hour);
     dayView->setEndHour(hour);
-}
-
-
-void
-Calendar::setAgendaPastDays
-(int days)
-{
-    agendaView->setPastDays(days);
-}
-
-
-void
-Calendar::setAgendaFutureDays
-(int days)
-{
-    agendaView->setFutureDays(days);
 }
 
 
@@ -2808,13 +2339,6 @@ Calendar::updateHeader
         separator->setVisible(true);
         dateNavigatorAction->setVisible(true);
         seasonLabelAction->setVisible(false);
-    } else if (currentView() == CalendarView::Agenda) {
-        prevAction->setVisible(false);
-        nextAction->setVisible(false);
-        todayAction->setVisible(false);
-        separator->setVisible(false);
-        dateNavigatorAction->setVisible(false);
-        seasonLabelAction->setVisible(true);
     }
 }
 
@@ -2855,26 +2379,15 @@ Calendar::setView
     int oldIdx = viewStack->currentIndex();
     if (idx != oldIdx) {
         QDate useDate = selectedDate();
-        if (lastNonAgendaDate.isValid()) {
-            useDate = lastNonAgendaDate;
-        }
         if (view == CalendarView::Day) {
             dayAction->setChecked(true);
             dayView->setDay(useDate);
-            lastNonAgendaDate = QDate();
         } else if (view == CalendarView::Week) {
             weekAction->setChecked(true);
             weekView->setDay(useDate);
-            lastNonAgendaDate = QDate();
         } else if (view == CalendarView::Month) {
             monthAction->setChecked(true);
             monthView->setMonth(fitToMonth(selectedDate(), false), true);
-            lastNonAgendaDate = QDate();
-        } else if (view == CalendarView::Agenda) {
-            lastNonAgendaDate = selectedDate();
-            agendaAction->setChecked(true);
-            agendaView->updateDate();
-            agendaView->setDateRange(dateRange);
         }
         viewStack->setCurrentIndex(idx);
         emit viewChanged(view, static_cast<CalendarView>(oldIdx));
@@ -2918,7 +2431,7 @@ Calendar::populateDateMenu
                     }
                 }
                 if (actualDate.month() == date.month()) {
-                    connect(action, &QAction::triggered, [=]() {
+                    connect(action, &QAction::triggered, this, [this, actualDate]() {
                         setDate(actualDate);
                     });
                 }
@@ -2940,7 +2453,7 @@ Calendar::populateDateMenu
                         date = dateRange.to;
                     }
                 }
-                connect(action, &QAction::triggered, [=]() {
+                connect(action, &QAction::triggered, this, [this, date]() {
                     setDate(date);
                 });
             }

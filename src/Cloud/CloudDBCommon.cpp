@@ -145,9 +145,9 @@ void CloudDBAcceptConditionsDialog::rejectConditions() {
 
 // Initialize static members of CloudDBCommon
 
-QString CloudDBCommon::cloudDBBaseURL = QString("https://%1.appspot.com/v1/").arg(GC_CLOUD_DB_APP_NAME);
+QString CloudDBCommon::cloudDBBaseURL = QString("https://%1.appspot.com/v1/").arg(QT_STRINGIFY(GC_CLOUD_DB_APP_NAME));
 QVariant  CloudDBCommon::cloudDBContentType = QVariant("application/json");
-QByteArray CloudDBCommon::cloudDBBasicAuth = "Basic " + QByteArray(GC_CLOUD_DB_BASIC_AUTH) ;
+QByteArray CloudDBCommon::cloudDBBasicAuth = "Basic " + QByteArray(QT_STRINGIFY(GC_CLOUD_DB_BASIC_AUTH));
 
 QList<QString> CloudDBCommon::cloudDBLangsIds = QList<QString>() << "en" << "fr" << "ja" << "pt-br" << "it" << "de" << "ru" << "cs" << "es" << "pt" << "zh-cn" << "zh-tw" << "nl" << "sv" << "xx";
 

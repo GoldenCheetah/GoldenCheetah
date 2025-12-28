@@ -30,6 +30,7 @@
 #include "RepeatScheduleWizard.h"
 #include "WorkoutFilter.h"
 #include "IconManager.h"
+#include "SeasonDialogs.h"
 
 #define HLO "<h4>"
 #define HLC "</h4>"
@@ -44,17 +45,16 @@ CalendarWindow::CalendarWindow(Context *context)
 
     setStartHour(8);
     setEndHour(21);
-    setAgendaPastDays(7);
-    setAgendaFutureDays(7);
+    setShowSecondaryLabel(true);
 
     QVBoxLayout *mainLayout = new QVBoxLayout();
     setChartLayout(mainLayout);
     mainLayout->addWidget(calendar);
 
-    connect(context->athlete->seasons, &Seasons::seasonsChanged, [=]() {
-        updateSeason(context->currentSeason(), true);
+    connect(context->athlete->seasons, &Seasons::seasonsChanged, this, [this]() {
+        updateSeason(this->context->currentSeason(), true);
     });
-    connect(context, &Context::seasonSelected, [=](Season const *season, bool changed) {
+    connect(context, &Context::seasonSelected, this, [this](Season const *season, bool changed) {
         if (changed || first) {
             first = false;
             updateSeason(season, false);
@@ -66,59 +66,59 @@ CalendarWindow::CalendarWindow(Context *context)
     connect(context, &Context::rideDeleted, this, &CalendarWindow::updateActivitiesIfInRange);
     connect(context, &Context::rideChanged, this, &CalendarWindow::updateActivitiesIfInRange);
     connect(context, &Context::configChanged, this, &CalendarWindow::configChanged);
-    connect(calendar, &Calendar::showInTrainMode, [=](CalendarEntry activity) {
-        for (RideItem *rideItem : context->athlete->rideCache->rides()) {
+    connect(calendar, &Calendar::showInTrainMode, this, [this](CalendarEntry activity) {
+        for (RideItem *rideItem : this->context->athlete->rideCache->rides()) {
             if (rideItem != nullptr && rideItem->fileName == activity.reference) {
                 QString filter = buildWorkoutFilter(rideItem);
                 if (! filter.isEmpty()) {
-                    context->mainWindow->fillinWorkoutFilterBox(filter);
-                    context->mainWindow->selectTrain();
-                    context->notifySelectWorkout(0);
+                    this->context->mainWindow->fillinWorkoutFilterBox(filter);
+                    this->context->mainWindow->selectTrain();
+                    this->context->notifySelectWorkout(0);
                 }
                 break;
             }
         }
     });
-    connect(calendar, &Calendar::viewActivity, [=](CalendarEntry activity) {
-        for (RideItem *rideItem : context->athlete->rideCache->rides()) {
+    connect(calendar, &Calendar::viewActivity, this, [this](CalendarEntry activity) {
+        for (RideItem *rideItem : this->context->athlete->rideCache->rides()) {
             if (rideItem != nullptr && rideItem->fileName == activity.reference) {
-                context->notifyRideSelected(rideItem);
-                context->mainWindow->selectAnalysis();
+                this->context->notifyRideSelected(rideItem);
+                this->context->mainWindow->selectAnalysis();
                 break;
             }
         }
     });
-    connect(calendar, &Calendar::addActivity, [=](bool plan, const QDate &day, const QTime &time) {
-        context->tab->setNoSwitch(true);
-        ManualActivityWizard wizard(context, plan, QDateTime(day, time));
+    connect(calendar, &Calendar::addActivity, this, [this](bool plan, const QDate &day, const QTime &time) {
+        this->context->tab->setNoSwitch(true);
+        ManualActivityWizard wizard(this->context, plan, QDateTime(day, time));
         wizard.exec();
-        context->tab->setNoSwitch(false);
+        this->context->tab->setNoSwitch(false);
     });
-    connect(calendar, &Calendar::repeatSchedule, [=](const QDate &day) {
-        context->tab->setNoSwitch(true);
-        RepeatScheduleWizard wizard(context, day);
+    connect(calendar, &Calendar::repeatSchedule, this, [this](const QDate &day) {
+        this->context->tab->setNoSwitch(true);
+        RepeatScheduleWizard wizard(this->context, day);
         if (wizard.exec() == QDialog::Accepted) {
             // Context::rideDeleted is not always emitted, therefore forcing the update
             updateActivities();
         }
-        context->tab->setNoSwitch(false);
+        this->context->tab->setNoSwitch(false);
     });
-    connect(calendar, &Calendar::delActivity, [=](CalendarEntry activity) {
+    connect(calendar, &Calendar::delActivity, this, [this](CalendarEntry activity) {
         QMessageBox::StandardButton res = QMessageBox::question(this, tr("Delete Activity"), tr("Are you sure you want to delete %1?").arg(activity.reference));
         if (res == QMessageBox::Yes) {
-            context->tab->setNoSwitch(true);
-            context->athlete->rideCache->removeRide(activity.reference);
-            context->tab->setNoSwitch(false);
+            this->context->tab->setNoSwitch(true);
+            this->context->athlete->rideCache->removeRide(activity.reference);
+            this->context->tab->setNoSwitch(false);
 
             // Context::rideDeleted is not always emitted, therefore forcing the update
             updateActivities();
         }
     });
-    connect(calendar, &Calendar::moveActivity, [=](CalendarEntry activity, const QDate &srcDay, const QDate &destDay, const QTime &destTime) {
+    connect(calendar, &Calendar::moveActivity, this, [this](CalendarEntry activity, const QDate &srcDay, const QDate &destDay, const QTime &destTime) {
         Q_UNUSED(srcDay)
 
         QApplication::setOverrideCursor(Qt::WaitCursor);
-        for (RideItem *rideItem : context->athlete->rideCache->rides()) {
+        for (RideItem *rideItem : this->context->athlete->rideCache->rides()) {
             if (rideItem != nullptr && rideItem->fileName == activity.reference) {
                 movePlannedActivity(rideItem, destDay, destTime);
                 break;
@@ -126,10 +126,10 @@ CalendarWindow::CalendarWindow(Context *context)
         }
         QApplication::restoreOverrideCursor();
     });
-    connect(calendar, &Calendar::insertRestday, [=](const QDate &day) {
+    connect(calendar, &Calendar::insertRestday, this, [this](const QDate &day) {
         QApplication::setOverrideCursor(Qt::WaitCursor);
         QList<RideItem*> plannedRides;
-        for (RideItem *rideItem : context->athlete->rideCache->rides()) {
+        for (RideItem *rideItem : this->context->athlete->rideCache->rides()) {
             if (rideItem != nullptr && rideItem->planned && rideItem->dateTime.date() >= day) {
                 plannedRides << rideItem;
             }
@@ -141,10 +141,10 @@ CalendarWindow::CalendarWindow(Context *context)
         updateActivities();
         QApplication::restoreOverrideCursor();
     });
-    connect(calendar, &Calendar::delRestday, [=](const QDate &day) {
+    connect(calendar, &Calendar::delRestday, this, [this](const QDate &day) {
         QApplication::setOverrideCursor(Qt::WaitCursor);
         QList<RideItem*> plannedRides;
-        for (RideItem *rideItem : context->athlete->rideCache->rides()) {
+        for (RideItem *rideItem : this->context->athlete->rideCache->rides()) {
             if (rideItem != nullptr && rideItem->planned && rideItem->dateTime.date() >= day) {
                 QDate destDay = rideItem->dateTime.date().addDays(-1);
                 movePlannedActivity(rideItem, destDay, rideItem->dateTime.time());
@@ -155,10 +155,26 @@ CalendarWindow::CalendarWindow(Context *context)
     connect(calendar, &Calendar::dayChanged, this, &CalendarWindow::updateActivities);
     connect(calendar, &Calendar::monthChanged, this, &CalendarWindow::updateActivities);
     connect(calendar, &Calendar::viewChanged, this, &CalendarWindow::updateActivities);
+    connect(calendar, &Calendar::addEvent, this, &CalendarWindow::addEvent);
+    connect(calendar, &Calendar::editEvent, this, &CalendarWindow::editEvent);
+    connect(calendar, &Calendar::delEvent, this, &CalendarWindow::delEvent);
+    connect(calendar, &Calendar::addPhase, this, &CalendarWindow::addPhase);
+    connect(calendar, &Calendar::editPhase, this, &CalendarWindow::editPhase);
+    connect(calendar, &Calendar::delPhase, this, &CalendarWindow::delPhase);
 
     QTimer::singleShot(0, this, [this]() {
         configChanged(CONFIG_APPEARANCE);
     });
+}
+
+
+void
+CalendarWindow::showEvent(QShowEvent*)
+{
+    // When the chart is added to the Perspective's QStackedWidget, the Perspective's style sheets
+    // can conflict with the local calendar palette settings causing the appearance to be lost.
+    // Therefore re-apply the palette upon showEvent to ensure correct calendar appearance.
+    PaletteApplier::setPaletteRecursively(this, palette, true);
 }
 
 
@@ -233,46 +249,6 @@ CalendarWindow::setEndHour
     startHourSpin->setMaximum(hour - 1);
     if (calendar != nullptr) {
         calendar->setEndHour(hour);
-        updateActivities();
-    }
-}
-
-
-int
-CalendarWindow::getAgendaPastDays
-() const
-{
-    return agendaPastDaysSpin->value();
-}
-
-
-void
-CalendarWindow::setAgendaPastDays
-(int days)
-{
-    agendaPastDaysSpin->setValue(days);
-    if (calendar != nullptr) {
-        calendar->setAgendaPastDays(days);
-        updateActivities();
-    }
-}
-
-
-int
-CalendarWindow::getAgendaFutureDays
-() const
-{
-    return agendaFutureDaysSpin->value();
-}
-
-
-void
-CalendarWindow::setAgendaFutureDays
-(int days)
-{
-    agendaFutureDaysSpin->setValue(days);
-    if (calendar != nullptr) {
-        calendar->setAgendaFutureDays(days);
         updateActivities();
     }
 }
@@ -377,6 +353,14 @@ CalendarWindow::getSecondaryMetric
 }
 
 
+bool
+CalendarWindow::isShowSecondaryLabel
+() const
+{
+    return showSecondaryLabelCheck->isChecked();
+}
+
+
 QString
 CalendarWindow::getTertiaryField
 () const
@@ -418,6 +402,14 @@ CalendarWindow::setSecondaryMetric
 
 
 void
+CalendarWindow::setShowSecondaryLabel
+(bool showSecondaryLabel)
+{
+    showSecondaryLabelCheck->setChecked(showSecondaryLabel);
+}
+
+
+void
 CalendarWindow::setSummaryMetrics
 (const QString &summaryMetrics)
 {
@@ -442,6 +434,7 @@ CalendarWindow::configChanged
         || (what & CONFIG_USERMETRICS)) {
         updatePrimaryConfigCombos();
         updateSecondaryConfigCombo();
+        updateTertiaryConfigCombo();
         multiMetricSelector->updateMetrics();
     }
     if (what & CONFIG_ATHLETE) {
@@ -467,7 +460,6 @@ CalendarWindow::configChanged
             inactiveText = GCColor::inactiveColor(activeText, 2.5);
         }
 
-        QPalette palette;
         palette.setColor(QPalette::Active, QPalette::Window, activeWindow);
         palette.setColor(QPalette::Active, QPalette::WindowText, activeText);
         palette.setColor(QPalette::Active, QPalette::Base, activeBase);
@@ -518,7 +510,6 @@ CalendarWindow::mkControls
     defaultViewCombo->addItem(tr("Day"));
     defaultViewCombo->addItem(tr("Week"));
     defaultViewCombo->addItem(tr("Month"));
-    defaultViewCombo->addItem(tr("Agenda"));
     defaultViewCombo->setCurrentIndex(static_cast<int>(CalendarView::Month));
     firstDayOfWeekCombo = new QComboBox();
     for (int i = Qt::Monday; i <= Qt::Sunday; ++i) {
@@ -531,12 +522,6 @@ CalendarWindow::mkControls
     endHourSpin = new QSpinBox();
     endHourSpin->setSuffix(":00");
     endHourSpin->setMaximum(24);
-    agendaPastDaysSpin = new QSpinBox();
-    agendaPastDaysSpin->setMaximum(31);
-    agendaPastDaysSpin->setSuffix(" " + tr("day(s)"));
-    agendaFutureDaysSpin = new QSpinBox();
-    agendaFutureDaysSpin->setMaximum(31);
-    agendaFutureDaysSpin->setSuffix(" " + tr("day(s)"));
     summaryDayCheck = new QCheckBox(tr("Day View"));
     summaryDayCheck->setChecked(true);
     summaryWeekCheck = new QCheckBox(tr("Week View"));
@@ -546,6 +531,7 @@ CalendarWindow::mkControls
     primaryMainCombo = new QComboBox();
     primaryFallbackCombo = new QComboBox();
     secondaryCombo = new QComboBox();
+    showSecondaryLabelCheck = new QCheckBox(tr("Show Label"));
     tertiaryCombo = new QComboBox();
     updatePrimaryConfigCombos();
     updateSecondaryConfigCombo();
@@ -564,54 +550,49 @@ CalendarWindow::mkControls
 
     QFormLayout *generalForm = newQFormLayout();
     generalForm->setContentsMargins(0, 10 * dpiYFactor, 0, 10 * dpiYFactor);
+    generalForm->addRow(new QLabel(HLO + tr("Calendar Basics") + HLC));
     generalForm->addRow(tr("Startup View"), defaultViewCombo);
     generalForm->addRow(tr("First Day of Week"), firstDayOfWeekCombo);
+    generalForm->addItem(new QSpacerItem(0, 20 * dpiYFactor));
+    generalForm->addRow(new QLabel(HLO + tr("Default Times") + HLC));
     generalForm->addRow(tr("Default Start Time"), startHourSpin);
     generalForm->addRow(tr("Default End Time"), endHourSpin);
-    generalForm->addRow(tr("Agenda: Look Back"), agendaPastDaysSpin);
-    generalForm->addRow(tr("Agenda: Look Forward"), agendaFutureDaysSpin);
+    generalForm->addItem(new QSpacerItem(0, 20 * dpiYFactor));
+    generalForm->addRow(new QLabel(HLO + tr("Summary Options") + HLC));
     generalForm->addRow(tr("Show Summary In"), summaryDayCheck);
     generalForm->addRow("", summaryWeekCheck);
     generalForm->addRow("", summaryMonthCheck);
 
     QFormLayout *entriesForm = newQFormLayout();
     entriesForm->setContentsMargins(0, 10 * dpiYFactor, 0, 10 * dpiYFactor);
-    entriesForm->addRow(tr("Field for Primary Line"), primaryMainCombo);
-    entriesForm->addRow(tr("Fallback Field for Primary Line"), primaryFallbackCombo);
-    entriesForm->addRow(tr("Metric for Secondary Line"), secondaryCombo);
-    entriesForm->addRow(tr("Field for Tertiary Line (Day and Week View)"), tertiaryCombo);
+    entriesForm->addRow(new QLabel(HLO + tr("Main Line") + HLC));
+    entriesForm->addRow(tr("Field"), primaryMainCombo);
+    entriesForm->addRow(tr("Fallback Field"), primaryFallbackCombo);
+    entriesForm->addItem(new QSpacerItem(0, 20 * dpiYFactor));
+    entriesForm->addRow(new QLabel(HLO + tr("Metric Line") + HLC));
+    entriesForm->addRow(tr("Metric"), secondaryCombo);
+    entriesForm->addRow("", showSecondaryLabelCheck);
+    entriesForm->addItem(new QSpacerItem(0, 20 * dpiYFactor));
+    entriesForm->addRow(new QLabel(HLO + tr("Detail Line (Day and Week View only)") + HLC));
+    entriesForm->addRow(tr("Field"), tertiaryCombo);
 
     QTabWidget *controlsTabs = new QTabWidget();
     controlsTabs->addTab(centerLayoutInWidget(generalForm, false), tr("General"));
     controlsTabs->addTab(centerLayoutInWidget(entriesForm, false), tr("Calendar Entries"));
     controlsTabs->addTab(multiMetricSelector, tr("Summary"));
 
-#if QT_VERSION < 0x060000
-    connect(startHourSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &CalendarWindow::setStartHour);
-    connect(endHourSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &CalendarWindow::setEndHour);
-    connect(agendaPastDaysSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &CalendarWindow::setAgendaPastDays);
-    connect(agendaFutureDaysSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &CalendarWindow::setAgendaFutureDays);
-    connect(defaultViewCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CalendarWindow::setDefaultView);
-    connect(firstDayOfWeekCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int idx) { setFirstDayOfWeek(idx + 1); });
-    connect(primaryMainCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CalendarWindow::updateActivities);
-    connect(primaryFallbackCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CalendarWindow::updateActivities);
-    connect(secondaryCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CalendarWindow::updateActivities);
-    connect(tertiaryCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CalendarWindow::updateActivities);
-#else
     connect(startHourSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setStartHour);
     connect(endHourSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setEndHour);
-    connect(agendaPastDaysSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setAgendaPastDays);
-    connect(agendaFutureDaysSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setAgendaFutureDays);
     connect(defaultViewCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::setDefaultView);
-    connect(firstDayOfWeekCombo, &QComboBox::currentIndexChanged, [=](int idx) { setFirstDayOfWeek(idx + 1); });
+    connect(firstDayOfWeekCombo, &QComboBox::currentIndexChanged, this, [this](int idx) { setFirstDayOfWeek(idx + 1); });
     connect(primaryMainCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::updateActivities);
     connect(primaryFallbackCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::updateActivities);
     connect(secondaryCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::updateActivities);
     connect(tertiaryCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::updateActivities);
-#endif
     connect(summaryDayCheck, &QCheckBox::toggled, this, &CalendarWindow::setSummaryVisibleDay);
     connect(summaryWeekCheck, &QCheckBox::toggled, this, &CalendarWindow::setSummaryVisibleWeek);
     connect(summaryMonthCheck, &QCheckBox::toggled, this, &CalendarWindow::setSummaryVisibleMonth);
+    connect(showSecondaryLabelCheck, &QCheckBox::toggled, this, &CalendarWindow::updateActivities);
     connect(multiMetricSelector, &MultiMetricSelector::selectedChanged, this, &CalendarWindow::updateActivities);
 
     setControls(controlsTabs);
@@ -734,7 +715,9 @@ CalendarWindow::getActivities
             if (! rideMetricUnit.isEmpty()) {
                 activity.secondary += " " + rideMetricUnit;
             }
-            activity.secondaryMetric = rideMetricName;
+            if (isShowSecondaryLabel()) {
+                activity.secondaryMetric = rideMetricName;
+            }
         } else {
             activity.secondary = "";
             activity.secondaryMetric = "";
@@ -848,7 +831,11 @@ CalendarWindow::getPhasesEvents
                     entry.iconFile = ":images/breeze/task-process-0.svg";
                 }
                 entry.color = GColor(CCALEVENT);
-                entry.reference = event.id;
+                if (event.id.isEmpty()) {
+                    entry.reference = QString("0x%1").arg(reinterpret_cast<quintptr>(&event), 0, 16);
+                } else {
+                    entry.reference = event.id;
+                }
                 entry.start = QTime(0, 0, 0);
                 entry.durationSecs = 0;
                 entry.type = ENTRY_TYPE_EVENT;
@@ -934,10 +921,10 @@ CalendarWindow::updateSeason
 {
     if (season == nullptr) {
         DateRange dr(QDate(), QDate(), "");
-        calendar->activateDateRange(dr, allowKeepMonth);
+        calendar->activateDateRange(dr, allowKeepMonth, false);
     } else {
         DateRange dr(DateRange(season->getStart(), season->getEnd(), season->getName()));
-        calendar->activateDateRange(dr, allowKeepMonth);
+        calendar->activateDateRange(dr, allowKeepMonth, season->canHavePhasesOrEvents());
     }
 }
 
@@ -974,4 +961,210 @@ CalendarWindow::movePlannedActivity
         oops.exec();
     }
     return ret;
+}
+
+
+void
+CalendarWindow::addEvent
+(const QDate &date)
+{
+    Season const *currentSeason = context->currentSeason();
+    if (currentSeason == nullptr) {
+        return;
+    }
+    if (! currentSeason->canHavePhasesOrEvents()) {
+        return;
+    }
+    Season *season = nullptr;
+    for (Season &s : context->athlete->seasons->seasons) {
+        if (&s == currentSeason) {
+            season = &s;
+            break;
+        }
+    }
+    if (season == nullptr) {
+        return;
+    }
+
+    SeasonEvent myevent("", date);
+    EditSeasonEventDialog dialog(context, &myevent, *season);
+    if (dialog.exec()) {
+        season->events.append(myevent);
+        context->athlete->seasons->writeSeasons();
+    }
+}
+
+
+void
+CalendarWindow::editEvent
+(const CalendarEntry &entry)
+{
+    if (entry.type != ENTRY_TYPE_EVENT) {
+        return;
+    }
+    Season *season = nullptr;
+    SeasonEvent *seasonEvent = nullptr;
+    for (Season &s : context->athlete->seasons->seasons) {
+        for (SeasonEvent &event : s.events) {
+            QString evId = event.id;
+            if (evId.isEmpty()) {
+                evId = QString("0x%1").arg(reinterpret_cast<quintptr>(&event), 0, 16);
+            }
+            if (entry.reference == evId) {
+                season = &s;
+                seasonEvent = &event;
+                break;
+            }
+        }
+        if (seasonEvent != nullptr) {
+            break;
+        }
+    }
+    if (seasonEvent == nullptr) {
+        return;
+    }
+    EditSeasonEventDialog dialog(context, seasonEvent, *season);
+    if (dialog.exec()) {
+        context->athlete->seasons->writeSeasons();
+    }
+}
+
+
+void
+CalendarWindow::delEvent
+(const CalendarEntry &entry)
+{
+    if (entry.type != ENTRY_TYPE_EVENT) {
+        return;
+    }
+    bool done = false;
+    for (Season &s : context->athlete->seasons->seasons) {
+        int idx = 0;
+        for (SeasonEvent &event : s.events) {
+            QString evId = event.id;
+            if (evId.isEmpty()) {
+                evId = QString("0x%1").arg(reinterpret_cast<quintptr>(&event), 0, 16);
+            }
+            if (entry.reference == evId) {
+                s.events.removeAt(idx);
+                context->athlete->seasons->writeSeasons();
+                done = true;
+                break;
+            }
+            ++idx;
+        }
+        if (done) {
+            break;
+        }
+    }
+}
+
+
+void
+CalendarWindow::addPhase
+(const QDate &date)
+{
+    Season const *currentSeason = context->currentSeason();
+    if (currentSeason == nullptr) {
+        return;
+    }
+    if (! currentSeason->canHavePhasesOrEvents()) {
+        return;
+    }
+    Season *phaseSeason = nullptr;
+    for (Season &s : context->athlete->seasons->seasons) {
+        if (s.id() == currentSeason->id()) {
+            phaseSeason = &s;
+            break;
+        }
+    }
+    if (phaseSeason == nullptr) {
+        return;
+    }
+    QDate seasonStart = phaseSeason->getStart();
+    QDate seasonEnd = phaseSeason->getEnd();
+    if (seasonStart == seasonEnd) {
+        return;
+    }
+    qint64 daysBefore = std::min(static_cast<qint64>(6), seasonStart.daysTo(date));
+    qint64 daysAfter = std::min(static_cast<qint64>(6), date.daysTo(seasonEnd));
+    QDate start(date);
+    QDate end(date);
+    if (daysAfter > 0) {
+        end = end.addDays(daysAfter);
+    } else {
+        start = start.addDays(-daysBefore);
+    }
+    Phase myphase("", start, end);
+    EditPhaseDialog dialog(context, &myphase, *phaseSeason);
+    if (dialog.exec()) {
+        phaseSeason->phases.append(myphase);
+        context->athlete->seasons->writeSeasons();
+    }
+}
+
+
+void
+CalendarWindow::editPhase
+(const CalendarEntry &entry)
+{
+    if (entry.type != ENTRY_TYPE_PHASE) {
+        return;
+    }
+    Season const *currentSeason = context->currentSeason();
+    if (currentSeason == nullptr) {
+        return;
+    }
+    Season *phaseSeason = nullptr;
+    for (Season &s : context->athlete->seasons->seasons) {
+        if (s.id() == currentSeason->id()) {
+            phaseSeason = &s;
+            break;
+        }
+    }
+    if (phaseSeason == nullptr) {
+        return;
+    }
+    for (Phase &editPhase : phaseSeason->phases) {
+        if (entry.reference == editPhase.id().toString()) {
+            EditPhaseDialog dialog(context, &editPhase, *phaseSeason);
+            if (dialog.exec()) {
+                context->athlete->seasons->writeSeasons();
+            }
+            break;
+        }
+    }
+}
+
+
+void
+CalendarWindow::delPhase
+(const CalendarEntry &entry)
+{
+    if (entry.type != ENTRY_TYPE_PHASE) {
+        return;
+    }
+    Season const *currentSeason = context->currentSeason();
+    if (currentSeason == nullptr) {
+        return;
+    }
+    Season *phaseSeason = nullptr;
+    for (Season &s : context->athlete->seasons->seasons) {
+        if (s.id() == currentSeason->id()) {
+            phaseSeason = &s;
+            break;
+        }
+    }
+    if (phaseSeason == nullptr) {
+        return;
+    }
+    int idx = 0;
+    for (Phase &editPhase : phaseSeason->phases) {
+        if (entry.reference == editPhase.id().toString()) {
+            phaseSeason->phases.removeAt(idx);
+            context->athlete->seasons->writeSeasons();
+            break;
+        }
+        ++idx;
+    }
 }

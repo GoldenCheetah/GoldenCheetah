@@ -641,11 +641,11 @@ RideNavigator::setColumnWidth(int x, bool resized, int logicalIndex, int oldWidt
 
     active = true;
 
-#if !defined (Q_OS_MAC) // on QT5 the scrollbars have no width
+#if !defined (Q_OS_MAC)
     if (tableView->verticalScrollBar()->isVisible())
         x -= tableView->verticalScrollBar()->width()
                 + 0 ; // !! no longer account for content margins of 3,3,3,3 was + 6
-#else // we're on a mac with QT5 .. so dodgy way of spotting preferences for scrollbars...
+#else // we're on a mac.. so dodgy way of spotting preferences for scrollbars...
     // this is a nasty hack, to see if the 'always on' preference for scrollbars is set we
     // look at the scrollbar width which is 15 in this case (it is 16 when they 'appear' when
     // needed. No doubt this will change over time and need to be fixed by referencing the
@@ -1113,7 +1113,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     if ((m=rideNavigator->columnMetrics.value(columnName, NULL)) != NULL) {
 
         // get double from model, special case QTime to avoid default .000 msecs
-        if ((QMetaType::Type)index.model()->data(index, Qt::DisplayRole).type() == QMetaType::QTime)
+        if (index.model()->data(index, Qt::DisplayRole).metaType().id() == QMetaType::QTime)
             value = index.model()->data(index, Qt::DisplayRole).toTime().toString("hh:mm:ss");
         else
             value = index.model()->data(index, Qt::DisplayRole).toString();
@@ -1241,7 +1241,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             painter->drawText(myOption.rect, Qt::AlignLeft | Qt::TextWordWrap, calendarText);
             painter->setPen(isColor);
 
-#if defined (Q_OS_MAC) // on QT5 the scrollbars have no width
+#if defined (Q_OS_MAC)
             if (!selected && !rideBG && high.x()+12 > rideNavigator->geometry().width() && !isnormal) {
 #else
             if (!selected && !rideBG && high.x()+32 > rideNavigator->geometry().width() && !isnormal) {
@@ -1398,7 +1398,7 @@ bool RideNavigatorSortProxyModel::lessThan(const QModelIndex &left,
     QVariant leftData = sourceModel()->data(left);
     QVariant rightData = sourceModel()->data(right);
 
-    if (leftData.type() == QVariant::DateTime) {
+    if (leftData.metaType().id() == QMetaType::QDateTime) {
         return leftData.toDateTime() < rightData.toDateTime();
     }
     QString leftString = leftData.toString();

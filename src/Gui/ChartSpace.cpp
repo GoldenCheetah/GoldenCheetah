@@ -25,10 +25,6 @@
 
 #include <cmath>
 #include <QGraphicsSceneMouseEvent>
-#if QT_VERSION < 0x060000
-#include <QGLWidget>
-#endif
-
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -43,7 +39,7 @@ static QIcon grayEdit, whiteEdit, accentEdit;
 
 ChartSpaceItemRegistry *ChartSpaceItemRegistry::_instance;
 
-ChartSpace::ChartSpace(Context *context, int scope, GcWindow *window) :
+ChartSpace::ChartSpace(Context *context, OverviewScope scope, GcWindow *window) :
     state(NONE), context(context), scope(scope), mincols(5), window(window), group(NULL), fixedZoom(0), _viewY(0),
     yresizecursor(false), xresizecursor(false), block(false), scrolling(false),
     setscrollbar(false), lasty(-1)
@@ -57,25 +53,6 @@ ChartSpace::ChartSpace(Context *context, int scope, GcWindow *window) :
     // add a view and scene and centre
     scene = new QGraphicsScene(this);
     view = new GGraphicsView(context, this);
-
-    // hardware acceleration is important for this widget
-#if QT_VERSION < 0x060000
-#if defined(Q_OS_LINUX)
-    // if we have OpenGL and its 2.0 or higher, lets use it.
-    // this is pretty much any GPU since 2004 and keeps Qt happy.
-    // we only do this on Linux
-    //if (gl_major >= 2.0)  view->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers | QGL::DirectRendering)));
-    if (gl_major >= 2.0)  view->setViewport(new QGLWidget());
-#endif
-#if defined(Q_OS_WIN)
-    // on windows we always use OpenGL since we have forced
-    // ANGLE in main.cpp to implement opengl on top of directx
-    view->setViewport(new QGLWidget());
-#endif
-#if defined (Q_OS_MACOS)
-    // we have no options right now, it sucks
-#endif
-#endif
 
     view->viewport()->setAttribute(Qt::WA_AcceptTouchEvents, false); // stops it stealing focus on mouseover
     scrollbar = new QScrollBar(Qt::Vertical, this);
@@ -134,7 +111,7 @@ ChartSpace::addItem(int order, int column, int span, int deep, ChartSpaceItem *i
     item->deep = deep;
     items.append(item);
     if (scope&OverviewScope::ANALYSIS && currentRideItem) item->setData(currentRideItem);
-    if (scope&OverviewScope::TRENDS) item->setDateRange(currentDateRange);
+    if (scope&(OverviewScope::TRENDS | OverviewScope::PLAN)) item->setDateRange(currentDateRange);
 }
 
 void
@@ -194,8 +171,8 @@ void
 ChartSpace::refresh()
 {
     stale = true;
-    if (scope == TRENDS) dateRangeChanged(currentDateRange);
-    else if (scope == ANALYSIS) rideSelected(currentRideItem);
+    if (scope & (OverviewScope::TRENDS | OverviewScope::PLAN)) dateRangeChanged(currentDateRange);
+    else if (scope & OverviewScope::ANALYSIS) rideSelected(currentRideItem);
 }
 
 void

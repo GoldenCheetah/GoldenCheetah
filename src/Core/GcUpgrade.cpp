@@ -129,10 +129,6 @@ GcUpgrade::upgrade(const QDir &home)
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/analysis/hide/1"), true);
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/analysis/hide/2"), false);
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/analysis/hide/3"), true);
-            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/diary/hide"), true);
-            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/diary/hide/0"), false);
-            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/diary/hide/1"), false);
-            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/diary/hide/2"), true);
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/train/hide"), !defaults.sidetrain);
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/train/hide/0"), false);
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/train/hide/1"), false);
@@ -1078,9 +1074,6 @@ GcUpgradeLogDialog::saveAs()
     QFile file(fileName);
     file.resize(0);
     QTextStream out(&file);
-#if QT_VERSION < 0x060000
-    out.setCodec("UTF-8");
-#endif
 
     if (file.open(QIODevice::WriteOnly)) {
 
