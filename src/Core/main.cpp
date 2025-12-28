@@ -165,13 +165,22 @@ void nostderr(QString file)
     // On Windows, stderr is not connected to fd_stderr = 2
     // freopen seems the only function available to redirect stderr
     qDebug() << "GoldenCheetah: redirecting log messages (stderr) to file " << file;
+#if defined(Q_OS_WIN)
+    errno_t err = freopen_s(&fp, file.toLocal8Bit(), "w", stderr);
+    if (err != 0) {
+#else
     fp = freopen(file.toLocal8Bit(), "w", stderr);
     if (fp == NULL) {
+#endif
         qDebug() << "GoldenCheetah: cannot redirect stderr, unable to open file " << file;
         return;
     }
 
-    fd = fileno(stderr); 
+#if defined(Q_OS_WIN)
+    fd = _fileno(stderr);
+#else
+    fd = fileno(stderr);
+#endif
     if (fd < 0) {
         qDebug() << "GoldenCheetah: invalid handle obtained from stderr " << fd;
         return;
@@ -180,7 +189,11 @@ void nostderr(QString file)
     // We redirect fd_stderr to this new file with dup2(), in case some libraries write fd_stderr.
     // Normally we would close fd right after it is duplicated, but not in this case.
     // Indeed stderr still uses fd. Both fd and fd_stderr may be used interchangeably after dup2().
+#if defined(Q_OS_WIN)
+    int ret = _dup2(fd, fd_stderr);
+#else
     int ret = dup2(fd, fd_stderr);
+#endif
     if (ret < 0) {
         qDebug() << "Goldencheetah: cannot redirect STDERR_FILENO, dup2 failed with return value " << ret;
         return;
@@ -219,8 +232,11 @@ main(int argc, char *argv[])
     // and redirect stderr and stdout on success, to have a more Unix-like
     // behavior when launched from cmd or PowerShell.
     if (_fileno(stderr) == -2 && AttachConsole(ATTACH_PARENT_PROCESS )) {
-        freopen("CONOUT$", "w", stderr);
-        freopen("CONOUT$", "w", stdout);
+
+        FILE* fpstdout = nullptr;
+        FILE* fpstderr = nullptr;
+        freopen_s(&fpstdout, "CONOUT$", "w", stdout);
+        freopen_s(&fpstderr, "CONOUT$", "w", stderr);
     }
 #endif
 
@@ -563,7 +579,7 @@ main(int argc, char *argv[])
 
         // install QT Translator to enable QT Dialogs translation
         QTranslator qtTranslator;
-        if (!qtTranslator.load("qt_" + lang.toString(), QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
+        if (!qtTranslator.load("qt_" + lang.toString(), QLibraryInfo::path(QLibraryInfo::TranslationsPath)))
             qDebug()<<"Failed to load Qt translator for "<<lang.toString();
         application->installTranslator(&qtTranslator);
 

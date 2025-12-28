@@ -24,10 +24,8 @@
 
 #ifdef Q_OS_WIN
 #include <io.h>
-#define DUP(fd) _dup(fd)
 #else
 #include <unistd.h>
-#define DUP(fd) dup(fd)
 #endif
 
 static int rawFileReaderRegistered =
@@ -150,10 +148,15 @@ pt_read_raw(FILE *in, void *context,
     unsigned hr;
     struct tm time;
     time_t since_epoch;
-    char ebuf[256];
+    static constexpr size_t EBUF_SIZE = 256;
+    char ebuf[EBUF_SIZE];
     bool bIsVer81 = false;
 
+#ifdef Q_OS_WIN
+    while ((n = fscanf_s(in, "%x %x %x %x %x %x\n",
+#else
     while ((n = fscanf(in, "%x %x %x %x %x %x\n",
+#endif
             sbuf, sbuf+1, sbuf+2, sbuf+3, sbuf+4, sbuf+5)) == 6) {
         ++row;
         for (i = 0; i < 6; ++i) {
@@ -172,12 +175,12 @@ pt_read_raw(FILE *in, void *context,
             double new_rec_int_secs = 0.0;
             if (PowerTapUtil::unpack_config(buf, &interval, &last_interval,
                                         &new_rec_int_secs, &wheel_sz_mm, bIsVer81) < 0) {
-                sprintf(ebuf, "Couldn't unpack config record.");
+                snprintf(ebuf, EBUF_SIZE, "%s", "Couldn't unpack config record.");
                 if (error_cb) error_cb(ebuf, context);
                 return;
             }
             if ((rec_int_secs != 0.0) && (rec_int_secs != new_rec_int_secs)) {
-                sprintf(ebuf, "Ride has multiple recording intervals, which "
+                snprintf(ebuf, EBUF_SIZE, "Ride has multiple recording intervals, which "
                         "is not yet supported.<br>(Recording interval changes "
                         "from %0.2f to %0.2f after %0.2f minutes of ride data.)\n",
                         rec_int_secs, new_rec_int_secs, secs / 60.0);
@@ -195,8 +198,8 @@ pt_read_raw(FILE *in, void *context,
             else if (since_epoch - start_secs > secs)
                 secs = since_epoch - start_secs;
             else {
-                sprintf(ebuf, "Warning: %0.3f minutes into the ride, "
-                        "time jumps backwards by %0.3f minutes; ignoring it.",
+                snprintf(ebuf, EBUF_SIZE, "Warning: %0.3f minutes into the ride, \
+                        time jumps backwards by %0.3f minutes; ignoring it.",
                         secs / 60.0, (secs - since_epoch + start_secs) / 60.0);
                 if (error_cb) error_cb(ebuf, context);
                 ignore = true;
@@ -205,7 +208,7 @@ pt_read_raw(FILE *in, void *context,
         }
         else if (PowerTapUtil::is_data(buf, bIsVer81)) {
             if (wheel_sz_mm == 0) {
-                sprintf(ebuf, "Read data row before wheel size set.");
+                snprintf(ebuf, EBUF_SIZE, "%s", "Read data row before wheel size set.");
                 if (error_cb) error_cb(ebuf, context);
                 return;
             }
@@ -217,13 +220,13 @@ pt_read_raw(FILE *in, void *context,
                         hr, interval, context);
         }
         else {
-            sprintf(ebuf, "Unknown record type 0x%x on row %d.", buf[0], row);
+            snprintf(ebuf, EBUF_SIZE, "Unknown record type 0x%x on row %d.", buf[0], row);
             if (error_cb) error_cb(ebuf, context);
             return;
         }
     }
     if (n != -1) {
-        sprintf(ebuf, "Parse error on row %d.", row);
+        snprintf(ebuf, EBUF_SIZE, "Parse error on row %d.", row);
         if (error_cb) error_cb(ebuf, context);
         return;
     }
@@ -238,8 +241,13 @@ RideFile *RawFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         delete rideFile;
         return NULL;
     }
-    // DUP added to avoid ocational crashs due to fclose on closed fd
-    FILE *f = fdopen(DUP(file.handle()), "r");
+
+    // 'dup' added to avoid occasional crashes due to fclose on closed fd
+#ifdef Q_OS_WIN
+    FILE *f = _fdopen(_dup(file.handle()), "r");
+#else
+    FILE *f = fdopen(dup(file.handle()), "r");
+#endif
 
     // failed to associate a stream!
     if (f==NULL) {

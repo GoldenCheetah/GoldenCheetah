@@ -209,7 +209,9 @@ public:
     uint8_t spinScan[24];
 
 private:
-    char name[64];
+
+    static constexpr size_t NAME_SIZE = 64;
+    char name[NAME_SIZE];
 
     // realtime telemetry
     double hr, watts, altWatts, altDistance, speed, wheelRpm, load, slope, lrbalance;

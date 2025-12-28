@@ -67,7 +67,7 @@ extern Leaf *DataFilterroot; // root node for parsed statement
    Leaf *leaf;
    QList<Leaf*> *comp;
    int op;
-   char function[32];
+   char function[FUNCTION_STRING_SIZE];
    char* string;
 }
 

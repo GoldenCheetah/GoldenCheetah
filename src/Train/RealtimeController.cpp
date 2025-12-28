@@ -708,8 +708,9 @@ int VirtualPowerTrainerManager::PushCustomVirtualPowerTrainer(const QString& str
         // VirtualPowerTrainer and freed by manager when manager is destroyed.
 
         std::string name = namePiece.toStdString();
-        char* pNameCopy = new char[name.size() + 1];
-        strcpy(pNameCopy, name.c_str());
+        size_t nameSize = name.size() + 1;
+        char* pNameCopy = new char[nameSize];
+        snprintf(pNameCopy, nameSize, "%s", name.c_str());
 
         VirtualPowerTrainer* p = new VirtualPowerTrainer();
 

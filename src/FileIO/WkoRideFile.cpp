@@ -198,6 +198,7 @@ WkoParser::WkoParser(QFile &file, QStringList &errors, QList<RideFile*>*rides)
     }
 }
 
+static constexpr int GRAPH_TEXT_SIZE = 32;
 
 /***************************************************************************************
  * PROCESS THE RAW DATA
@@ -226,7 +227,7 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
 
     int WKO_graphbits[32];            // number of bits for each GRAPH
     WKO_ULONG WKO_nullval[32];    // null value for each graph
-    char GRAPHDATA[32][32];           // formatted values for each sample
+    char GRAPHDATA[32][GRAPH_TEXT_SIZE];           // formatted values for each sample
 
     // setup decoding controls -- xormasks
     for (i=1; i<32; i++) {
@@ -346,7 +347,7 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
                         }
                         svalp = sval;
                         temp = sval;
-                        sprintf(GRAPHDATA[i], "%8ld", svalp);
+                        snprintf(GRAPHDATA[i], GRAPH_TEXT_SIZE, "%8ld", svalp);
                         break;
                     case '^' : /* Slope */
                         if (get_bit(thelot, bit-1)) { /* is negative */
@@ -375,13 +376,13 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
                     case 'T' : /* Torque */
                         if (imperialflag && WKO_GRAPHS[i]=='S') val = long((double)val * KMTOMI);
                         valp=val;
-                        sprintf(GRAPHDATA[i], "%6ld.%1ld", valp/10, valp%10);
+                        snprintf(GRAPHDATA[i], GRAPH_TEXT_SIZE, "%6ld.%1ld", valp/10, valp%10);
                         nm = val; nm /=10;
                         break;
                     case 'S' : /* Speed */
                         if (imperialflag && WKO_GRAPHS[i]=='S') val = long((double)val * KMTOMI);
                         valp=val;
-                        sprintf(GRAPHDATA[i], "%6ld.%1ld", valp/10, valp%10);
+                        snprintf(GRAPHDATA[i], GRAPH_TEXT_SIZE, "%6ld.%1ld", valp/10, valp%10);
                         kph = val; kph/= 10;
 
                         // distance is not available so we need to calculate it
@@ -402,7 +403,7 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
                             xf = modf(distance,&xi);
                             f = floor(xf*1000+0.5)/1000.0;
 
-                            sprintf(GRAPHDATA[i], "%g", xi+f);
+                            snprintf(GRAPHDATA[i], GRAPH_TEXT_SIZE, "%g", xi+f);
                             km = xi+f;
                         }
                         break;
@@ -425,7 +426,7 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
                         xf = modf(distance,&xi);
                         f = floor(xf*1000+0.5)/1000.0;
 
-                        sprintf(GRAPHDATA[i], "%g", xi+f);
+                        snprintf(GRAPHDATA[i], GRAPH_TEXT_SIZE, "%g", xi+f);
                         km = xi+f;
 
 
@@ -452,29 +453,29 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
                             llat=round(lat); llon=round(lon);
                             if (llat == 180 && llon == 180) lat=lon=0;
 
-                            sprintf(slon, "%-3.9g", lon);
-                            sprintf(slat, "%-3.9g", lat);
+                            snprintf(slon, 20, "%-3.9g", lon);
+                            snprintf(slat, 20, "%-3.9g", lat);
 
-                            sprintf(GRAPHDATA[i], "%13s %13s", slat,slon);
+                            snprintf(GRAPHDATA[i], GRAPH_TEXT_SIZE, "%13s %13s", slat,slon);
 
                         }
                         break;
                     case 'P' :
                         watts = val;
                         valp=val;
-                        sprintf(GRAPHDATA[i], "%8lu", valp); // just output as numeric
+                        snprintf(GRAPHDATA[i], GRAPH_TEXT_SIZE, "%8lu", valp); // just output as numeric
                         break;
 
                     case 'H' :
                         hr = val;
                         valp=val;
-                        sprintf(GRAPHDATA[i], "%8lu", valp); // just output as numeric
+                        snprintf(GRAPHDATA[i], GRAPH_TEXT_SIZE, "%8lu", valp); // just output as numeric
                         break;
 
                     case 'C' :
                         cad = val;
 			            valp = val;
-                        sprintf(GRAPHDATA[i], "%8lu", valp); // just output as numeric
+                        snprintf(GRAPHDATA[i], GRAPH_TEXT_SIZE, "%8lu", valp); // just output as numeric
                         break;
                     }
                 }
@@ -577,7 +578,7 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
     notes = p; p += dotext(p, &txtbuf[0]); /* 5: notes */
 
     p += dotext(p, &txtbuf[0]); /* 6: graphs */
-    strcpy(reinterpret_cast<char *>(WKO_GRAPHS), reinterpret_cast<char *>(&txtbuf[0])); // save those graphs away
+    snprintf(reinterpret_cast<char *>(WKO_GRAPHS), 32, "%s", reinterpret_cast<char *>(&txtbuf[0])); // save those graphs away
 
     if (version != 1) { //!!! Version 1 beta support
         p += donumber(p, &sport); /* 7: sport */
@@ -832,7 +833,7 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
 
             // Config Type
             p += doshort(p, &us); // got here...
-            strncpy (reinterpret_cast<char *>(buf), reinterpret_cast<char *>(p), us); buf[us]=0;
+            snprintf(reinterpret_cast<char *>(buf), us+1, "%s", reinterpret_cast<char *>(p));
             p += us;
 
             /* What type? */
@@ -1501,14 +1502,12 @@ WkoParser::dotext(WKO_UCHAR *p, WKO_UCHAR *buf)
             *buf = '\0';
             return 1;
     } else if (*p < 255) {
-        strncpy(reinterpret_cast<char *>(buf), reinterpret_cast<char *>(p+1), *p);
-        buf[*p]=0;
+        snprintf(reinterpret_cast<char *>(buf), (*p)+1, "%s", reinterpret_cast<char *>(p+1));
         return (*p)+1;
     } else {
         p += 1;
         p += doshort(p, &us);
-        strncpy(reinterpret_cast<char *>(buf), reinterpret_cast<char *>(p), us);
-        buf[us]=0;
+        snprintf(reinterpret_cast<char *>(buf), us+1, "%s", reinterpret_cast<char *>(p));
         return (us)+3;
     }
 }

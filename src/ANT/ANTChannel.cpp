@@ -91,9 +91,9 @@ ANTChannel::init()
 void ANTChannel::setId()
 {
     if (channel_type==CHANNEL_TYPE_UNUSED) {
-        strcpy(id, "none");
+        snprintf(id, ID_SIZE, "%s", "none");
     } else {
-        snprintf(id, 10, "%d%c", device_number, parent->ant_sensor_types[channel_type].suffix);
+        snprintf(id, ID_SIZE, "%d%c", device_number, parent->ant_sensor_types[channel_type].suffix);
     }
 }
 

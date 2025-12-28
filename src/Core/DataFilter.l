@@ -79,10 +79,10 @@ int DataFiltercolumn = 1;
 
                                             /* functions identified by name in the lexer is probably
                                               going to limit us in the future */
-[Bb][Ee][Ss][Tt]                            strcpy(DataFilterlval.function, "best"); return BEST;
-[Tt][Ii][Zz]                                strcpy(DataFilterlval.function, "tiz"); return TIZ;
-[Cc][Oo][Nn][Ff][Ii][Gg]                    strcpy(DataFilterlval.function, "config"); return CONFIG;
-[Cc][Oo][Nn][Ss][Tt]                        strcpy(DataFilterlval.function, "const"); return CONST_;
+[Bb][Ee][Ss][Tt]                            snprintf(DataFilterlval.function, FUNCTION_STRING_SIZE, "%s", "best"); return BEST;
+[Tt][Ii][Zz]                                snprintf(DataFilterlval.function, FUNCTION_STRING_SIZE, "%s", "tiz"); return TIZ;
+[Cc][Oo][Nn][Ff][Ii][Gg]                    snprintf(DataFilterlval.function, FUNCTION_STRING_SIZE, "%s", "config"); return CONFIG;
+[Cc][Oo][Nn][Ss][Tt]                        snprintf(DataFilterlval.function, FUNCTION_STRING_SIZE, "%s", "const"); return CONST_;
 
 "&&"                                        DataFilterlval.op = AND; return AND;
 [Aa][nN][Dd]                                DataFilterlval.op = AND; return AND;

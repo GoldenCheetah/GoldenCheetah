@@ -1267,8 +1267,9 @@ AddVirtualPower::myCreateCustomPowerCurve() {
     QStringList namePieces = virtualPowerNameEdit->text().split("|");
 
     // No point being fancy, simply take the name before the '|'.
-    char* pNameCopy = new char[strlen(namePieces.at(0).toStdString().c_str()) + 1];
-    strcpy(pNameCopy, namePieces.at(0).toStdString().c_str());
+    size_t nameSize = strlen(namePieces.at(0).toStdString().c_str()) + 1;
+    char* pNameCopy = new char[nameSize];
+    snprintf(pNameCopy, nameSize, "%s", namePieces.at(0).toStdString().c_str());
 
     p->m_pName = pNameCopy; // freed by manager when manager is destroyed.
     p->m_pf = pf;

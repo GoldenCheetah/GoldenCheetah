@@ -457,15 +457,16 @@ hasNewline(const char *buf, int len)
 static QString
 cEscape(const char *buf, int len)
 {
-    char *result = new char[4 * len + 1];
+    int resultSize = 4 * len + 1;
+    char *result = new char[resultSize];
     char *tmp = result;
     for (int i = 0; i < len; ++i) {
         if (buf[i] == '"')
-            tmp += sprintf(tmp, "\\\"");
+            tmp += snprintf(tmp, resultSize-(tmp-result), "%s", "\\\"");
         else if (isprint(buf[i]))
             *(tmp++) = buf[i];
         else
-            tmp += sprintf(tmp, "\\x%02x", 0xff & (unsigned) buf[i]);
+            tmp += snprintf(tmp, resultSize-(tmp-result), "\\x%02x", 0xff & (unsigned) buf[i]);
     }
     return result;
 }

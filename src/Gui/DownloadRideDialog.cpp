@@ -410,11 +410,17 @@ DownloadRideDialog::downloadClicked()
         if (rename(QFile::encodeName(files.at(i).name),
             QFile::encodeName(filepath)) < 0) {
 
+            char errBuffer[128];
+#ifdef Q_CC_MSVC
+            strerror_s(errBuffer, 128, errno);
+#else
+            strerror_r(errno, errBuffer, 128);
+#endif
             QMessageBox::critical(this, tr("Error"),
                 tr("Failed to rename %1 to %2: %3")
                     .arg(files.at(i).name)
                     .arg(filepath)
-                    .arg(strerror(errno)) );
+                    .arg(errBuffer) );
                 updateStatus(tr("Failed to rename %1 to %2")
                     .arg( files.at(i).name )
                     .arg( filename ));

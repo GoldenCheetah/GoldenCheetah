@@ -51,7 +51,7 @@ RealtimeData::RealtimeData()
 
 void RealtimeData::setName(char *name)
 {
-    strcpy(this->name, name);
+    snprintf(this->name, NAME_SIZE, "%s", name);
 }
 void RealtimeData::setAltWatts(double watts)
 {

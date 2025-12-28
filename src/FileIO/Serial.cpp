@@ -452,8 +452,9 @@ find_devices(char *result[], int capacity)
 
         // If success then add to the list
         if (bSuccess) {
-            result[count] = (char*) malloc(shortCOM.length() + 1); // include '\0' terminator
-            strcpy(result[count], shortCOM.toLatin1().constData());
+            size_t comSize = shortCOM.length() + 1; // include '\0' terminator
+            result[count] = (char*) malloc(comSize);
+            snprintf(result[count], comSize, shortCOM.toLatin1().constData());
             count++;
         }
     }

@@ -40,6 +40,9 @@ class FieldDefinition;
 class DataFilter;
 class DataFilterRuntime;
 
+// Defines for auto generated code
+static constexpr size_t FUNCTION_STRING_SIZE = 32;
+
 class Result {
     public:
 

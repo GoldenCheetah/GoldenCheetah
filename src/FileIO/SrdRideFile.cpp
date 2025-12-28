@@ -32,6 +32,10 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+// the longest known error message is 94 characters, so use 128,
+// strerror_r & strerror_s safely truncate if exceeded
+static constexpr size_t ERRBUF_SIZE = 128;
+
 static int srdFileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "srd", "Polar SRD files", new SrdFileReader());
@@ -251,7 +255,7 @@ static void read_preamble ( workout_t * w, unsigned char * buf )
   if ( w->exercise_number > 0 && w->exercise_number <= 5 ) {
     extract_label(&buf[3],&w->exercise_label,7);
   } else {
-    strcpy(w->exercise_label,"<empty>");
+    snprintf(w->exercise_label, 8, "%s", "<empty>");
   }
 }
 
@@ -711,8 +715,15 @@ static workout_t * extract_workout ( unsigned char *  buf,
   int         ok = 1;
 
   if ( (w = (workout_t*)calloc(1,sizeof(workout_t))) == NULL ) {
+
+    char errBuffer[ERRBUF_SIZE];
+#ifdef Q_CC_MSVC
+    strerror_s(errBuffer, ERRBUF_SIZE, errno);
+#else
+    strerror_r(errno, errBuffer, ERRBUF_SIZE);
+#endif
     fprintf(stderr,"extract_workout: calloc(%ld): %s\n",
-	    (long)sizeof(workout_t),strerror(errno));
+	    (long)sizeof(workout_t),errBuffer);
     return NULL;
   }
 
@@ -849,7 +860,7 @@ static workout_t * read_workout ( char *filename, S710_Filter filter, S710_HRM_T
 
   if ( stat(filename,&sb) != -1 ) {
 #if Q_CC_MSVC
-    if ( (fd = _open(filename,O_RDONLY)) != -1 ) {
+    if ( (_sopen_s(&fd, filename, _O_RDONLY, _SH_DENYWR, _S_IREAD)) == 0 ) {
       if ( sb.st_size < (int)sizeof(buf) ) {
     if ( _read(fd,buf,sb.st_size) == sb.st_size ) {
 	  if ( buf[0] + (buf[1]<<8) == sb.st_size ) {
@@ -882,8 +893,14 @@ static workout_t * read_workout ( char *filename, S710_Filter filter, S710_HRM_T
 		    filename,buf[0],buf[1],(long)sb.st_size);
 	  }
 	} else {
+      char errBuffer[ERRBUF_SIZE];
+#ifdef Q_CC_MSVC
+      strerror_s(errBuffer, ERRBUF_SIZE, errno);
+#else
+      strerror_r(errno, errBuffer, ERRBUF_SIZE);
+#endif
 	  fprintf(stderr,"%s: read(%ld): %s\n",
-		  filename,(long)sb.st_size,strerror(errno));
+		  filename,(long)sb.st_size,errBuffer);
 	}
       } else {
 	fprintf(stderr,"%s: file size of %ld bytes is too big!\n",
@@ -895,10 +912,22 @@ static workout_t * read_workout ( char *filename, S710_Filter filter, S710_HRM_T
       close(fd);
 #endif
     } else {
-      fprintf(stderr,"open(%s): %s\n",filename,strerror(errno));
+      char errBuffer[ERRBUF_SIZE];
+#ifdef Q_CC_MSVC
+      strerror_s(errBuffer, ERRBUF_SIZE, errno);
+#else
+      strerror_r(errno, errBuffer, ERRBUF_SIZE);
+#endif
+      fprintf(stderr,"open(%s): %s\n",filename,errBuffer);
     }
   } else {
-    fprintf(stderr,"stat(%s): %s\n",filename,strerror(errno));
+    char errBuffer[ERRBUF_SIZE];
+#ifdef Q_CC_MSVC
+    strerror_s(errBuffer, ERRBUF_SIZE, errno);
+#else
+    strerror_r(errno, errBuffer, ERRBUF_SIZE);
+#endif
+    fprintf(stderr,"stat(%s): %s\n",filename,errBuffer);
   }
 
   return w;
@@ -964,13 +993,26 @@ static int bytes_per_sample ( unsigned char bt )
 static int allocate_sample_space ( workout_t * w )
 {
   int ok = 1;
+  char errBuffer[ERRBUF_SIZE];
+
+#ifdef Q_CC_MSVC
 
 #define  MAKEBUF(a,b)				                \
   if ( (w->a = (b *)calloc(w->samples,sizeof(b))) == NULL ) {	\
+    strerror_s(errBuffer, ERRBUF_SIZE, errno); \
     fprintf(stderr,"%s: calloc(%d,%ld): %s\n",			\
-	    #a,w->samples,(long)sizeof(b),strerror(errno));	\
+	    #a,w->samples,(long)sizeof(b),errBuffer);	\
     ok = 0;							\
   }
+#else
+#define  MAKEBUF(a,b)				                \
+  if ( (w->a = (b *)calloc(w->samples,sizeof(b))) == NULL ) {	\
+    strerror_r(errno, errBuffer, ERRBUF_SIZE); \
+    fprintf(stderr,"%s: calloc(%d,%ld): %s\n",			\
+	    #a,w->samples,(long)sizeof(b),errBuffer);	\
+    ok = 0;                         \
+  }
+#endif
 
   MAKEBUF(hr_data,S710_Heart_Rate);
   if ( S710_HAS_ALTITUDE(w->mode) ) MAKEBUF(alt_data, S710_Altitude);

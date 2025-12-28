@@ -108,7 +108,8 @@ class ANTChannel : public QObject {
 
         double blanking_timestamp;
         int blanked;
-        char id[10]; // short identifier
+        static constexpr size_t ID_SIZE = 10;
+        char id[ID_SIZE]; // short identifier
         ANTChannelInitialisation mi;
 
         bool sc_speed_active, sc_cadence_active; // for S&C sensor with single magnet
