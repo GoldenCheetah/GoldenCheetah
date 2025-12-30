@@ -395,8 +395,8 @@ WPrime::setWatts(Context *context, QVector<int>&wattsArray, int CP, int WPRIME)
 
         // input array contains the actual W' expenditure
         // and will also contain non-zero values
-        double totalBelowCP=0;
-        double countBelowCP=0;
+        // double totalBelowCP=0;
+        // double countBelowCP=0;
         QVector<int> powerValues(last+1);
         EXP = 0;
         for (int i=0; i<last; i++) {
@@ -407,8 +407,8 @@ WPrime::setWatts(Context *context, QVector<int>&wattsArray, int CP, int WPRIME)
             powerValues[i] = value > CP ? value-CP : 0;
 
             if (value < CP) {
-                totalBelowCP += value;
-                countBelowCP++;
+                // totalBelowCP += value;
+                // countBelowCP++;
             } else EXP += value; // total expenditure above CP
         }
 
@@ -513,8 +513,8 @@ WPrime::setErg(ErgFile *input)
 
         // input array contains the actual W' expenditure
         // and will also contain non-zero values
-        double totalBelowCP=0;
-        double countBelowCP=0;
+        // double totalBelowCP=0;
+        // double countBelowCP=0;
         QVector<int> powerValues(last+1);
         EXP = 0;
         for (int i=0; i<last; i++) {
@@ -526,8 +526,8 @@ WPrime::setErg(ErgFile *input)
             powerValues[i] = value > CP ? value-CP : 0;
 
             if (value < CP) {
-                totalBelowCP += value;
-                countBelowCP++;
+                // totalBelowCP += value;
+                // countBelowCP++;
             } else EXP += value; // total expenditure above CP
         }
 

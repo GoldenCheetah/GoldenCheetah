@@ -301,7 +301,7 @@ ManualActivityPageBasics::ManualActivityPageBasics
     woTypeEdit->setCurrentIndex(1);
     if (plan) {
 
-        connect(woTypeEdit, &QComboBox::currentIndexChanged, this, [this, sportEdit](int index) {
+        connect(woTypeEdit, &QComboBox::currentIndexChanged, this, [sportEdit](int index) {
 
             sportEdit->setEnabled(index != 0);
             if (index == 0) {

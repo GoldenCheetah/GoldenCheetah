@@ -50,10 +50,12 @@ class MetricOverrideDialog : public QDialog
 
         enum class DialogMetricType { DATE, SECS_TIME, MINS_TIME, DOUBLE };
 
-        QPoint pos_;
-        QString fieldName_;
-        DialogMetricType dlgMetricType_ = DialogMetricType::DOUBLE;
         Context* context_ = nullptr;
+
+        QString fieldName_;
+        QPoint pos_;
+
+        DialogMetricType dlgMetricType_ = DialogMetricType::DOUBLE;
 
         QLabel* metricLabel_ = nullptr;
         QWidget* metricEdit_ = nullptr;

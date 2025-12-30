@@ -49,8 +49,8 @@ static double CTEMP_BASE = 36.5;
 static double CTEMP_DEFAULT_MAX = 38.0;
 static double STEMP_BASE = 32.0;
 static double STEMP_DEFAULT_MAX = 38.0;
-static double HRPWR_DEFAULT_MAX = 40;
-static double HRPWR_MAX_LIMIT = 60;
+// static double HRPWR_DEFAULT_MAX = 40;
+// static double HRPWR_MAX_LIMIT = 60;
 static double CTEMP_MAX_LIMIT = 39.5;
 
 

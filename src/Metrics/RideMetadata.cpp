@@ -729,7 +729,7 @@ Form::arrange()
 {
     QGridLayout *here;
 
-    int x=0;
+    // int x=0;
     int y=0;
 
     // ok, so we are managing interval metadata
@@ -758,7 +758,7 @@ Form::arrange()
 
     for (int i=0; i<fields.count(); i++) {
         if (y >= rows && meta->singlecolumn==false) {
-            x+=1;
+            // x+=1;
             y=0;
 
             vlayout2 = new QVBoxLayout;
@@ -900,7 +900,7 @@ Form::metadataChanged()
 /*----------------------------------------------------------------------
  * Form fields
  *--------------------------------------------------------------------*/
-FormField::FormField(Form *form, FieldDefinition field, RideMetadata *meta) : form(form), definition(field), meta(meta), active(true)
+FormField::FormField(Form *form, FieldDefinition field, RideMetadata *meta) : definition(field), form(form), meta(meta), active(true)
 {
     QString units;
     enabled = NULL;
@@ -1019,6 +1019,8 @@ FormField::FormField(Form *form, FieldDefinition field, RideMetadata *meta) : fo
         //widget->setFixedHeight(18);
         connect(widget, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
         break;
+
+    default: break;
     }
 
     widget->setPalette(meta->palette);
@@ -1100,6 +1102,7 @@ FormField::metadataFlush()
         break;
     case GcFieldType::FIELD_DATE : text = ((QDateEdit*)widget)->date().toString("dd/MM/yyyy"); break;
     case GcFieldType::FIELD_TIME : text = ((QTimeEdit*)widget)->time().toString("hh:mm:ss.zzz"); break;
+    default: break;
     }
 
     // Update special field
@@ -1239,6 +1242,7 @@ FormField::editFinished()
                         break;
     case GcFieldType::FIELD_DATE : text = ((QDateEdit*)widget)->date().toString("dd/MM/yyyy"); break;
     case GcFieldType::FIELD_TIME : text = ((QTimeEdit*)widget)->time().toString("hh:mm:ss.zzz"); break;
+    default: break;
     }
 
     meta->active = active = true;
@@ -1570,6 +1574,8 @@ FormField::metadataChanged()
             {
             ((QCheckBox*)widget)->setChecked((value == "1") ? true : false);
             }
+            break;
+        default:
             break;
         }
     }

@@ -783,7 +783,7 @@ void ErgFile::parseFromRideFileFactory()
     // TTS File Gradient Should be smoothly interpolated from Altitude.
     strictGradient(false);
 
-    static double km = 0;
+    // static double km = 0;
 
     QFile gpxFile(filename());
 

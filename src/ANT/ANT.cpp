@@ -1188,7 +1188,7 @@ int ANT::openPort()
 #else
     // LINUX AND MAC USES TERMIO / IOCTL / STDIO
 
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
     int ldisc=TTYDISC;
 #else
     int ldisc=N_TTY; // LINUX
@@ -1227,7 +1227,7 @@ int ANT::openPort()
     deviceSettings.c_iflag= IGNPAR;
     deviceSettings.c_oflag=0;
     deviceSettings.c_cflag &= (~CSIZE & ~CSTOPB);
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
     deviceSettings.c_cflag |= (CS8 | CREAD | HUPCL | CCTS_OFLOW | CRTS_IFLOW);
 #else
     deviceSettings.c_cflag |= (CS8 | CREAD | HUPCL | CRTSCTS);

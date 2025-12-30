@@ -67,7 +67,7 @@ AgendaWindow::AgendaWindow(Context *context)
     connect(context, &Context::rideDeleted, this, &AgendaWindow::updateActivitiesIfInRange);
     connect(context, &Context::rideChanged, this, &AgendaWindow::updateActivitiesIfInRange);
     connect(context, &Context::configChanged, this, &AgendaWindow::configChanged);
-    connect(agendaView, &AgendaView::showInTrainMode, this, [this, context](const CalendarEntry &activity) {
+    connect(agendaView, &AgendaView::showInTrainMode, this, [context](const CalendarEntry &activity) {
         for (RideItem *rideItem : context->athlete->rideCache->rides()) {
             if (rideItem != nullptr && rideItem->fileName == activity.reference) {
                 QString filter = buildWorkoutFilter(rideItem);
@@ -80,7 +80,7 @@ AgendaWindow::AgendaWindow(Context *context)
             }
         }
     });
-    connect(agendaView, &AgendaView::viewActivity, this, [this, context](const CalendarEntry &activity) {
+    connect(agendaView, &AgendaView::viewActivity, this, [context](const CalendarEntry &activity) {
         for (RideItem *rideItem : context->athlete->rideCache->rides()) {
             if (rideItem != nullptr && rideItem->fileName == activity.reference) {
                 context->notifyRideSelected(rideItem);

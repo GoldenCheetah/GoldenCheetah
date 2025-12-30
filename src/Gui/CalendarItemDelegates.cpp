@@ -775,7 +775,7 @@ CalendarCompactDayDelegate::paint
     CalendarDay calendarDay = index.data(DayRole).value<CalendarDay>();
     QColor bgColor;
     QColor selColor = opt.palette.highlight().color();
-    QColor dayColor;
+    // QColor dayColor;
     QColor entryColor;
 
     bool ok;

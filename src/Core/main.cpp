@@ -507,7 +507,7 @@ main(int argc, char *argv[])
         QString oldLibraryPath=QDir::home().canonicalPath()+"/Library/GoldenCheetah";
 
         //these are the new platform-dependent library paths
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
         QString libraryPath="Library/GoldenCheetah";
 #elif defined(Q_OS_WIN)
         QStringList paths=QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation);

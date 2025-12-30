@@ -358,7 +358,7 @@ void VideoSyncFile::parseFromRideFileFactory()
     format(VideoSyncFileFormat::rlv);
     Points.clear();
 
-    static double km = 0;
+    // static double km = 0;
 
     QFile rideFile(filename());
 

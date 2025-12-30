@@ -29,12 +29,13 @@ class GenericPlot;
 extern double qtchartaxismin(QAbstractAxis *axis);
 extern double qtchartaxismax(QAbstractAxis *axis);
 
-// base class for a chart annotation- you have one job
+// abstract base class for a chart annotation- you have one job
 class GenericAnnotation
 {
     public:
         // annotation controller calls this to paint
         virtual void paint(QPainter*, const QStyleOptionGraphicsItem *, QWidget*)=0;
+        virtual ~GenericAnnotation() = default;
 };
 
 // gets attached to the chart and is used to register

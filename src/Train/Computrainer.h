@@ -138,7 +138,7 @@ public:
     bool isCADConnected();
     void getTelemetry(double &Power, double &HeartRate, double &Cadence, double &Speed,
                         double &RRC, bool &calibration, int &Buttons, uint8_t *ss, int &Status);
-    void getSpinScan(double spinData[]);
+    // void getSpinScan(double spinData[]);
     int getMode();
     double getGradient();
     double getLoad();

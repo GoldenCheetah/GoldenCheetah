@@ -116,6 +116,8 @@ GenericLegendItem::eventFilter(QObject *obj, QEvent *e)
         // hover indicator show/hide as mouse hovers over the item
         update();
         break;
+    default:
+        break;
     }
     return false;
 }

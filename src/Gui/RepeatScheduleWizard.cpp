@@ -183,7 +183,7 @@ RepeatSchedulePageSetup::RepeatSchedulePageSetup
     all->addWidget(scrollArea);
     setLayout(all);
 
-    connect(seasonTree, &QTreeWidget::currentItemChanged, this, [this, startDate, endDate, when](QTreeWidgetItem *current) {
+    connect(seasonTree, &QTreeWidget::currentItemChanged, this, [startDate, endDate, when](QTreeWidgetItem *current) {
         if (current != nullptr) {
             QDate seasonStart(current->data(0, Qt::UserRole).toDate());
             QDate seasonEnd(current->data(0, Qt::UserRole + 1).toDate());
@@ -197,10 +197,10 @@ RepeatSchedulePageSetup::RepeatSchedulePageSetup
             endDate->setDate(seasonEnd);
         }
     });
-    connect(startDate, &QDateEdit::dateChanged, this, [this, endDate](QDate date) {
+    connect(startDate, &QDateEdit::dateChanged, this, [endDate](QDate date) {
         endDate->setMinimumDate(date);
     });
-    connect(endDate, &QDateEdit::dateChanged, this, [this, startDate](QDate date) {
+    connect(endDate, &QDateEdit::dateChanged, this, [startDate](QDate date) {
         startDate->setMaximumDate(date);
     });
 
