@@ -210,7 +210,7 @@ FilterEditor::updateCompleterModel
         }
     }
     QStringList completerCmds;
-    for (const auto &origCmd : qAsConst(_origCmds)) {
+    for (const auto &origCmd : std::as_const(_origCmds)) {
         if (! cmds.contains(origCmd, Qt::CaseInsensitive)) {
             completerCmds << origCmd;
         }

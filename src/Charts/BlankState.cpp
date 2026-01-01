@@ -205,15 +205,15 @@ BlankStateHomePage::BlankStateHomePage(Context *context) : BlankStatePage(contex
 }
 
 //
-// Replace diary window when no ride
+// Replace plan window when no ride
 //
-BlankStateDiaryPage::BlankStateDiaryPage(Context *context) : BlankStatePage(context)
+BlankStatePlanPage::BlankStatePlanPage(Context *context) : BlankStatePage(context)
 {
-    dontShow->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_BLANK_DIARY, false).toBool());
-    welcomeTitle->setText(tr("Diary"));
+    dontShow->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_BLANK_PLAN, false).toBool());
+    welcomeTitle->setText(tr("Plan"));
     welcomeText->setText(tr("No ride ?\nLet's start with some data."));
 
-    img->setIcon(QPixmap(":images/diary.png"));
+    img->setIcon(QPixmap(":images/plan.png"));
     img->setIconSize(QSize(800,330));
 
     ShortCut scImport;
@@ -230,7 +230,7 @@ BlankStateDiaryPage::BlankStateDiaryPage(Context *context) : BlankStatePage(cont
     QPushButton *downloadButton = addToShortCuts(scDownload);
     connect(downloadButton, SIGNAL(clicked()), context->mainWindow, SLOT(downloadRide()));
 
-    canShow_ = !appsettings->cvalue(context->athlete->cyclist, GC_BLANK_DIARY).toBool();
+    canShow_ = !appsettings->cvalue(context->athlete->cyclist, GC_BLANK_PLAN).toBool();
 }
 
 //
@@ -279,9 +279,9 @@ BlankStateAnalysisPage::saveState()
     appsettings->setCValue(context->athlete->cyclist, GC_BLANK_ANALYSIS, dontShow->isChecked());
 }
 void
-BlankStateDiaryPage::saveState()
+BlankStatePlanPage::saveState()
 {
-    appsettings->setCValue(context->athlete->cyclist, GC_BLANK_DIARY, dontShow->isChecked());
+    appsettings->setCValue(context->athlete->cyclist, GC_BLANK_PLAN, dontShow->isChecked());
 }
 void
 BlankStateHomePage::saveState()

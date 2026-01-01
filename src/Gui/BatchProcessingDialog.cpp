@@ -276,8 +276,13 @@ processed(0), fails(0), numFilesToProcess(0), metadataCompleter(nullptr) {
         QTreeWidgetItem* current = files->invisibleRootItem()->child(i);
 
         connect(static_cast<QCheckBox*>(files->itemWidget(current, 0)),
-            QOverload<int>::of(&QCheckBox::stateChanged),
+#if QT_VERSION < QT_VERSION_CHECK(6,7,0)
+            QOverload<int>::of(&QCheckBox::stateChanged), this,
             [=](int) { this->fileSelected(current); });
+#else
+            QOverload<Qt::CheckState>::of(&QCheckBox::checkStateChanged),
+            this, [=](Qt::CheckState) { this->fileSelected(current); });
+#endif
     }
 
     // Data processor signals
@@ -294,7 +299,11 @@ processed(0), fails(0), numFilesToProcess(0), metadataCompleter(nullptr) {
     // radio buttons
     connect(radioGroup, SIGNAL(idClicked(int)), this, SLOT(radioClicked(int)));
 
+#if QT_VERSION < QT_VERSION_CHECK(6,7,0)
     connect(all, SIGNAL(stateChanged(int)), this, SLOT(allClicked()));
+#else
+    connect(all, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(allClicked()));
+#endif
     connect(ok, SIGNAL(clicked()), this, SLOT(okClicked()));
     connect(cancel, SIGNAL(clicked()), this, SLOT(cancelClicked()));
 

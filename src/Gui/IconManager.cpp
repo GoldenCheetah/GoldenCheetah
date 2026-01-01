@@ -117,10 +117,12 @@ void
 IconManager::assignIcon
 (const QString &field, const QString &value, const QString &filename)
 {
+    // Normalize Sport values
+    QString normValue = field == "Sport" ? RideFile::sportTag(value) : value;
     if (! filename.isEmpty()) {
-        icons[field][value] = filename;
+        icons[field][normValue] = filename;
     } else if (icons.contains(field)) {
-        icons[field].remove(value);
+        icons[field].remove(normValue);
     }
     saveConfig();
 }
@@ -206,8 +208,8 @@ bool
 IconManager::importBundle
 (const QString &filename)
 {
-    QFile zipFile(filename);
-    return importBundle(&zipFile);
+    auto qfile = std::make_unique<QFile>(filename);
+    return importBundle(std::move(qfile));
 }
 
 
@@ -216,19 +218,19 @@ IconManager::importBundle
 (const QUrl &url)
 {
     QByteArray zipData = downloadUrl(url);
-    QBuffer buffer;
-    buffer.setData(zipData);
-    buffer.open(QIODevice::ReadOnly);
+    auto buffer = std::make_unique<QBuffer>();
+    buffer->setData(zipData);
+    buffer->open(QIODevice::ReadOnly);
 
-    return importBundle(&buffer);
+    return importBundle(std::move(buffer));
 }
 
 
 bool
 IconManager::importBundle
-(QIODevice *device)
+(std::unique_ptr<QIODevice> device)
 {
-    ZipReader reader(device);
+    ZipReader reader(std::move(device));
     for (ZipReader::FileInfo info : reader.fileInfoList()) {
         if (info.isFile) {
             QByteArray data = reader.fileData(info.filePath);
@@ -340,16 +342,13 @@ IconManager::downloadUrl
 {
     QNetworkAccessManager manager;
     QNetworkRequest request(url);
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
-#endif
     QNetworkReply *reply = manager.get(request);
 
     QTimer timeoutTimer;
     timeoutTimer.setSingleShot(true);
     QEventLoop loop;
     QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-    QObject::connect(&timeoutTimer, &QTimer::timeout, [&]() {
+    QObject::connect(&timeoutTimer, &QTimer::timeout, &loop, [&]() {
         reply->abort();
         loop.quit();
     });

@@ -117,9 +117,21 @@ ManualActivityWizard::done
         field2TagString(rideFile, "workoutCode", "Workout Code");
         field2TagInt(rideFile, "rpe", "RPE");
         field2TagString(rideFile, "objective", "Objective");
-        field2TagString(rideFile, "notes", "Notes");
         field2TagString(rideFile, "woFilename", "WorkoutFilename");
         field2TagString(rideFile, "woTitle", "Route");
+
+        // Special case notes: Combine notes and workout description (if available)
+        QString notesCombined = field("notes").toString().trimmed();
+        QString description = field("woDescription").toString().trimmed();
+        if (! description.isEmpty()) {
+            if (! notesCombined.isEmpty()) {
+                notesCombined += "\n";
+            }
+            notesCombined += description;
+        }
+        if (! notesCombined.isEmpty()) {
+        }
+        rideFile.setTag("Notes", notesCombined);
 
         if ((sport == "Run" || sport == "Swim") && field("paceIntervals").toBool()) {
             QList<RideFilePoint*> points = field("laps").value<QList<RideFilePoint*>>();
@@ -289,11 +301,8 @@ ManualActivityPageBasics::ManualActivityPageBasics
     woTypeEdit->setCurrentIndex(1);
     if (plan) {
 
-#if QT_VERSION >= 0x060000
-        connect(woTypeEdit, &QComboBox::currentIndexChanged, [=](int index) {
-#else
-        connect(woTypeEdit, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
-#endif
+        connect(woTypeEdit, &QComboBox::currentIndexChanged, this, [this, sportEdit](int index) {
+
             sportEdit->setEnabled(index != 0);
             if (index == 0) {
                 sportEdit->setText("Bike");
@@ -498,7 +507,7 @@ ManualActivityPageWorkout::ManualActivityPageWorkout
             zoneColors << zoneColor(j, numZones);
         }
     }
-    infoWidget = new InfoWidget(zoneColors, context->athlete->zones("Bike")->getZoneDescriptions(zonerange), false, false);
+    infoWidget = new InfoWidget(zoneColors, context->athlete->zones("Bike")->getZoneNames(zonerange), context->athlete->zones("Bike")->getZoneDescriptions(zonerange), false, false);
 
     QWidget *detailsWrapperWidget = new QWidget();
     QHBoxLayout *detailsWrapperLayout = new QHBoxLayout(detailsWrapperWidget);
@@ -534,6 +543,7 @@ ManualActivityPageWorkout::ManualActivityPageWorkout
     QLineEdit *woFilename = new QLineEdit();
     QLineEdit *woTitle = new QLineEdit();
     QLineEdit *woFileType = new QLineEdit();
+    QTextEdit *woDescription = new QTextEdit();
     QSpinBox *woElevationGain = new QSpinBox();
     woElevationGain->setMaximum(10000);
     QSpinBox *woIsoPower = new QSpinBox();
@@ -544,14 +554,15 @@ ManualActivityPageWorkout::ManualActivityPageWorkout
     registerField("woFilename*", woFilename);
     registerField("woTitle*", woTitle);
     registerField("woFileType*", woFileType);
+    registerField("woDescription", woDescription, "plainText", SIGNAL(textChanged()));
     registerField("woElevationGain", woElevationGain);
     registerField("woIsoPower", woIsoPower);
     registerField("woXPower", woXPower);
 
-    connect(workoutFilterBox, &WorkoutFilterBox::workoutFiltersChanged, [=](QList<ModelFilter*> &f) {
+    connect(workoutFilterBox, &WorkoutFilterBox::workoutFiltersChanged, this, [this](QList<ModelFilter*> &f) {
         sortModel->setFilters(f);
     });
-    connect(workoutFilterBox, &WorkoutFilterBox::workoutFiltersRemoved, [=]() {
+    connect(workoutFilterBox, &WorkoutFilterBox::workoutFiltersRemoved, this, [this]() {
         sortModel->removeFilters();
     });
     connect(workoutTree->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ManualActivityPageWorkout::selectionChanged);
@@ -570,6 +581,7 @@ ManualActivityPageWorkout::ManualActivityPageWorkout
     hiddenLayout->addWidget(woFilename);
     hiddenLayout->addWidget(woTitle);
     hiddenLayout->addWidget(woFileType);
+    hiddenLayout->addWidget(woDescription);
     hiddenLayout->addWidget(woElevationGain);
     hiddenLayout->addWidget(woIsoPower);
     hiddenLayout->addWidget(woXPower);
@@ -630,6 +642,7 @@ ManualActivityPageWorkout::resetFields
     setField("woFilename", QString());
     setField("woTitle", QString());
     setField("woFileType", QString());
+    setField("woDescription", QString());
     setField("woElevationGain", 0);
     setField("woIsoPower", 0);
     setField("woXPower", 0);
@@ -662,6 +675,7 @@ ManualActivityPageWorkout::selectionChanged
     QString filename = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::filepath), Qt::DisplayRole).toString();
     QString title = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::displayname), Qt::DisplayRole).toString();
     QString type = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::type), Qt::DisplayRole).toString();
+    QString description = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::description), Qt::DisplayRole).toString();
     int avgPower = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::avgPower), Qt::DisplayRole).toInt();
     int bikeStress = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::bikestress), Qt::DisplayRole).toInt();
     int bikeScore = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::bs), Qt::DisplayRole).toInt();
@@ -671,6 +685,7 @@ ManualActivityPageWorkout::selectionChanged
     setField("woFilename", filename);
     setField("woTitle", title);
     setField("woFileType", type);
+    setField("woDescription", description);
     setField("woElevationGain", elevationGain);
     setField("woIsoPower", isoPower);
     setField("woXPower", xPower);
@@ -855,15 +870,9 @@ ManualActivityPageMetrics::ManualActivityPageMetrics
     connect(swimDistanceEdit, &QDoubleSpinBox::editingFinished, this, &ManualActivityPageMetrics::updateEstimates);
     connect(paceIntervals, &QCheckBox::toggled, this, &ManualActivityPageMetrics::updateVisibility);
     connect(lapsEditor, &LapsEditorWidget::editingFinished, this, &ManualActivityPageMetrics::updateEstimates);
-#if QT_VERSION >= 0x060000
     connect(estimateByEdit, &QComboBox::currentIndexChanged, this, &ManualActivityPageMetrics::updateVisibility);
     connect(estimateByEdit, &QComboBox::currentIndexChanged, this, &ManualActivityPageMetrics::updateEstimates);
     connect(estimationDaysEdit, &QSpinBox::valueChanged, this, &ManualActivityPageMetrics::updateEstimates);
-#else
-    connect(estimateByEdit, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ManualActivityPageMetrics::updateVisibility);
-    connect(estimateByEdit, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ManualActivityPageMetrics::updateEstimates);
-    connect(estimationDaysEdit, QOverload<int>::of(&QSpinBox::valueChanged), this, &ManualActivityPageMetrics::updateEstimates);
-#endif
 
     registerField("averageHr", averageHrEdit);
     registerField("averagePower", averagePowerEdit);
@@ -1396,6 +1405,7 @@ ManualActivityPageSummary::initializePage
     }
     addRowString(tr("Objective"), "objective");
     addRowString(tr("Notes"), "notes");
+    addRowString(tr("Workout Description"), "woDescription");
     bool hasActMetricsSection = false;
     QLabel *actMetricsHL = new QLabel(HLO + tr("Activity Metrics") + HLC);
     form->addRow(actMetricsHL);

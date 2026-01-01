@@ -75,7 +75,7 @@ int QxtStringSpinBoxPrivate::startsWith(const QString& start, QString& string) c
  */
 QxtStringSpinBox::QxtStringSpinBox(QWidget* pParent) : QSpinBox(pParent)
 {
-#if (!defined Q_OS_MAC) && (QT_VERSION >= 0x050000)
+#if (!defined Q_OS_MAC)
     setStyle(QStyleFactory::create("fusion"));
 #endif
     setRange(0, 0);

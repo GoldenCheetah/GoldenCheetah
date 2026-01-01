@@ -73,8 +73,8 @@ Nolio::~Nolio() {
     if (context) delete nam;
 }
 
-void Nolio::onSslErrors(QNetworkReply *reply, const QList<QSslError>&){
-    reply->ignoreSslErrors();
+void Nolio::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors){
+    sslErrors(context->mainWindow, reply, errors);
 }
 
 bool Nolio::open(QStringList &errors){
@@ -342,7 +342,7 @@ QByteArray* Nolio::prepareResponse(QByteArray* data){
         if (laps.size() > 0){
             double start = 0.0;
             double end = 0.0;
-            foreach (QJsonValue value, laps) {
+            for (const QJsonValue &value : laps) {
                 QJsonObject lap = value.toObject();
                 double duration = lap["duration"].toDouble();
                 if (start > 0.0){

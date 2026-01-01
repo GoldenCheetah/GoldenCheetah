@@ -62,8 +62,6 @@ public:
     static void processReplyStatusCodes(QNetworkReply *reply);
     static bool replyReceivedAndOk(QNetworkReply *reply);
 
-    static void sslErrors(QNetworkReply* reply ,QList<QSslError> errors);
-
     static bool unmarshallAPIHeaderV1(QByteArray , QList<CommonAPIHeaderV1>* );
     static void unmarshallAPIHeaderV1Object(QJsonObject* , CommonAPIHeaderV1* chart);
     static void marshallAPIHeaderV1Object(QJsonObject&, CommonAPIHeaderV1 &header);

@@ -39,12 +39,7 @@
 #include <QInputEvent>
 #include <QKeyEvent>
 #include <QMutexLocker>
-
-#if QT_VERSION >= 0x060000
 #include <QSoundEffect>
-#else
-#include <QSound>
-#endif
 
 // Three current realtime device types supported are:
 #include "RealtimeController.h"
@@ -292,7 +287,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
             zoneColors << zoneColor(i, numZones);
         }
     }
-    workoutInfo = new InfoWidget(zoneColors, context->athlete->zones("Bike")->getZoneDescriptions(zonerange));
+    workoutInfo = new InfoWidget(zoneColors, context->athlete->zones("Bike")->getZoneNames(zonerange), context->athlete->zones("Bike")->getZoneDescriptions(zonerange));
     workoutInfo->setFrameStyle(QFrame::NoFrame);
     workoutInfo->setStyleSheet(GCColor::stylesheet(true));
     connect(context, SIGNAL(ergFileSelected(ErgFileBase*)), workoutInfo, SLOT(ergFileSelected(ErgFileBase*)));
@@ -713,7 +708,7 @@ TrainSidebar::configChanged(qint32 why)
         }
     }
     workoutInfo->setPowerZoneColors(zoneColors);
-    workoutInfo->setPowerZoneNames(context->athlete->zones("Bike")->getZoneDescriptions(zonerange));
+    workoutInfo->setPowerZoneNames(context->athlete->zones("Bike")->getZoneNames(zonerange), context->athlete->zones("Bike")->getZoneDescriptions(zonerange));
 
     // DEVICES
 
@@ -915,6 +910,19 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
         mode = ergFile->mode();
 
         if (ergFile->isValid()) {
+            // Update shown zone names (short and description) as configChanged
+            // is not triggered when only zones are renamed (name and description
+            // are not considered in Zones::getFingerPrint)
+            int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
+            QList<QColor> zoneColors;
+            if (zonerange != -1) {
+                int numZones = context->athlete->zones("Bike")->numZones(zonerange);
+                for (int i = 0; i < numZones; ++i) {
+                    zoneColors << zoneColor(i, numZones);
+                }
+            }
+            workoutInfo->setPowerZoneColors(zoneColors);
+            workoutInfo->setPowerZoneNames(context->athlete->zones("Bike")->getZoneNames(zonerange), context->athlete->zones("Bike")->getZoneDescriptions(zonerange));
 
             setStatusFlags(RT_WORKOUT);
 
@@ -2088,13 +2096,9 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
                     if (fPlayAudio) {
                         lapAudioThisLap = false;
-#if QT_VERSION >= 0x060000
                         static QSoundEffect effect;
                         effect.setSource(QUrl::fromLocalFile(":audio/lap.wav"));
                         effect.play();
-#else
-                        QSound::play(":audio/lap.wav");
-#endif
                     }
                 }
 

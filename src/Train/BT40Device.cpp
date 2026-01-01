@@ -58,11 +58,7 @@ BT40Device::BT40Device(QObject *parent, QBluetoothDeviceInfo devinfo) : parent(p
 {
     m_control = QLowEnergyController::createCentral(m_currentDevice, this);
     connect(m_control, SIGNAL(connected()), this, SLOT(deviceConnected()), Qt::QueuedConnection);
-#if QT_VERSION < 0x060000
-    connect(m_control, SIGNAL(error(QLowEnergyController::Error)), this, SLOT(controllerError(QLowEnergyController::Error)));
-#else
     connect(m_control, SIGNAL(errorOccurred(QLowEnergyController::Error)), this, SLOT(controllerError(QLowEnergyController::Error)));
-#endif
     connect(m_control, SIGNAL(disconnected()), this, SLOT(deviceDisconnected()), Qt::QueuedConnection);
     connect(m_control, SIGNAL(serviceDiscovered(QBluetoothUuid)), this, SLOT(serviceDiscovered(QBluetoothUuid)), Qt::QueuedConnection);
     connect(m_control, SIGNAL(discoveryFinished()), this, SLOT(serviceScanDone()), Qt::QueuedConnection);
@@ -296,7 +292,7 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
 {
     qDebug() << "service state changed " << s << "for device" << m_currentDevice.name() << " " << m_currentDevice.deviceUuid();
 
-    if (s == QLowEnergyService::ServiceDiscovered) {
+    if (s == QLowEnergyService::RemoteServiceDiscovered) {
 
         foreach (QLowEnergyService* const &service, m_services) {
 

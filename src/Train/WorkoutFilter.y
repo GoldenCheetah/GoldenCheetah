@@ -124,37 +124,37 @@ duration: DURATION minuteValue                          { $$ = new ModelNumberEq
     |     DURATION minuteValue RANGESYMBOL              { $$ = new ModelNumberRangeFilter(TdbWorkoutModelIdx::duration, $2 * 60000); }
     ;
 
-intensity: INTENSITY mixedNumValue                            { $$ = new ModelFloatEqualFilter(TdbWorkoutModelIdx::intensity, $2, 0.05); }
+intensity: INTENSITY mixedNumValue                            { $$ = new ModelFloatEqualFilter(TdbWorkoutModelIdx::intensity, $2, 0.05f); }
     |      INTENSITY mixedNumValue RANGESYMBOL mixedNumValue  { $$ = new ModelFloatRangeFilter(TdbWorkoutModelIdx::intensity, $2, $4); }
     |      INTENSITY RANGESYMBOL mixedNumValue                { $$ = new ModelFloatRangeFilter(TdbWorkoutModelIdx::intensity, 0, $3); }
     |      INTENSITY mixedNumValue RANGESYMBOL                { $$ = new ModelFloatRangeFilter(TdbWorkoutModelIdx::intensity, $2); }
     ;
 
-vi:   VI mixedNumValue                            { $$ = new ModelFloatEqualFilter(TdbWorkoutModelIdx::vi, $2, 0.05); }
+vi:   VI mixedNumValue                            { $$ = new ModelFloatEqualFilter(TdbWorkoutModelIdx::vi, $2, 0.05f); }
     | VI mixedNumValue RANGESYMBOL mixedNumValue  { $$ = new ModelFloatRangeFilter(TdbWorkoutModelIdx::vi, $2, $4); }
     | VI RANGESYMBOL mixedNumValue                { $$ = new ModelFloatRangeFilter(TdbWorkoutModelIdx::vi, 0, $3); }
     | VI mixedNumValue RANGESYMBOL                { $$ = new ModelFloatRangeFilter(TdbWorkoutModelIdx::vi, $2); }
     ;
 
-xpower: XPOWER mixedNumValue                            { $$ = new ModelFloatEqualFilter(TdbWorkoutModelIdx::xp, $2, 0.05); }
+xpower: XPOWER mixedNumValue                            { $$ = new ModelFloatEqualFilter(TdbWorkoutModelIdx::xp, $2, 0.05f); }
     |   XPOWER mixedNumValue RANGESYMBOL mixedNumValue  { $$ = new ModelFloatRangeFilter(TdbWorkoutModelIdx::xp, $2, $4); }
     |   XPOWER RANGESYMBOL mixedNumValue                { $$ = new ModelFloatRangeFilter(TdbWorkoutModelIdx::xp, 0, $3); }
     |   XPOWER mixedNumValue RANGESYMBOL                { $$ = new ModelFloatRangeFilter(TdbWorkoutModelIdx::xp, $2); }
     ;
 
-ri:   RI mixedNumValue                            { $$ = new ModelFloatEqualFilter(TdbWorkoutModelIdx::ri, $2, 0.05); }
+ri:   RI mixedNumValue                            { $$ = new ModelFloatEqualFilter(TdbWorkoutModelIdx::ri, $2, 0.05f); }
     | RI mixedNumValue RANGESYMBOL mixedNumValue  { $$ = new ModelFloatRangeFilter(TdbWorkoutModelIdx::ri, $2, $4); }
     | RI RANGESYMBOL mixedNumValue                { $$ = new ModelFloatRangeFilter(TdbWorkoutModelIdx::ri, 0, $3); }
     | RI mixedNumValue RANGESYMBOL                { $$ = new ModelFloatRangeFilter(TdbWorkoutModelIdx::ri, $2); }
     ;
 
-bikescore: BIKESCORE mixedNumValue                            { $$ = new ModelFloatEqualFilter(TdbWorkoutModelIdx::bs, $2, 0.05); }
+bikescore: BIKESCORE mixedNumValue                            { $$ = new ModelFloatEqualFilter(TdbWorkoutModelIdx::bs, $2, 0.05f); }
     |      BIKESCORE mixedNumValue RANGESYMBOL mixedNumValue  { $$ = new ModelFloatRangeFilter(TdbWorkoutModelIdx::bs, $2, $4); }
     |      BIKESCORE RANGESYMBOL mixedNumValue                { $$ = new ModelFloatRangeFilter(TdbWorkoutModelIdx::bs, 0, $3); }
     |      BIKESCORE mixedNumValue RANGESYMBOL                { $$ = new ModelFloatRangeFilter(TdbWorkoutModelIdx::bs, $2); }
     ;
 
-svi:  SVI mixedNumValue                            { $$ = new ModelFloatEqualFilter(TdbWorkoutModelIdx::svi, $2, 0.05); }
+svi:  SVI mixedNumValue                            { $$ = new ModelFloatEqualFilter(TdbWorkoutModelIdx::svi, $2, 0.05f); }
     | SVI mixedNumValue RANGESYMBOL mixedNumValue  { $$ = new ModelFloatRangeFilter(TdbWorkoutModelIdx::svi, $2, $4); }
     | SVI RANGESYMBOL mixedNumValue                { $$ = new ModelFloatRangeFilter(TdbWorkoutModelIdx::svi, 0, $3); }
     | SVI mixedNumValue RANGESYMBOL                { $$ = new ModelFloatRangeFilter(TdbWorkoutModelIdx::svi, $2); }

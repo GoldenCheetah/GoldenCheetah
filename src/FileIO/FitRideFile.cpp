@@ -58,7 +58,7 @@ static int fitFileReaderRegistered =
         "fit", "Garmin FIT", new FitFileReader());
 
 // 1989-12-31 00:00:00 UTC
-static const QDateTime qbase_time(QDate(1989, 12, 31), QTime(0, 0, 0), Qt::UTC);
+static const QDateTime qbase_time(QDate(1989, 12, 31), QTime(0, 0, 0), QTimeZone::UTC);
 
 
 //
@@ -223,7 +223,7 @@ static void loadMetadata()
 
         if (!root.contains("PRODUCTS")) goto badconfig;
         QJsonArray PRODUCTS = root["PRODUCTS"].toArray();
-        foreach(const QJsonValue val, PRODUCTS) {
+        for(const QJsonValue &val : PRODUCTS) {
 
             // convert so we can inspect
             QJsonObject obj = val.toObject();
@@ -240,7 +240,7 @@ static void loadMetadata()
 
         if (!root.contains("MANUFACTURERS")) goto badconfig;
         QJsonArray MANUFACTURERS = root["MANUFACTURERS"].toArray();
-        foreach(const QJsonValue val, MANUFACTURERS) {
+        for(const QJsonValue &val : MANUFACTURERS) {
 
             // convert so we can inspect
             QJsonObject obj = val.toObject();
@@ -256,7 +256,7 @@ static void loadMetadata()
 
         if (!root.contains("FIELDS")) goto badconfig;
         QJsonArray FIELDS = root["FIELDS"].toArray();
-        foreach(const QJsonValue val, FIELDS) {
+        for(const QJsonValue &val : FIELDS) {
 
             // Message:FieldNum lists
             //
@@ -310,7 +310,7 @@ static void loadMetadata()
 
         if (!root.contains("MESSAGES")) goto badconfig;
         QJsonArray MESSAGES = root["MESSAGES"].toArray();
-        foreach(const QJsonValue val, MESSAGES) {
+        for(const QJsonValue &val : MESSAGES) {
 
             // convert so we can inspect
             QJsonObject obj = val.toObject();
@@ -1774,7 +1774,7 @@ struct FitFileParser
             }
 
             // adjust the start time
-            rf->setStartTime(QDateTime::fromSecsSinceEpoch(start, Qt::UTC));
+            rf->setStartTime(QDateTime::fromSecsSinceEpoch(start, QTimeZone::UTC));
 
             int idx_start = rideFile->timeIndex(start - start_time);
             int idx_stop = rideFile->timeIndex(stop - start_time);
@@ -1914,7 +1914,7 @@ struct FitFileParser
         // before being added to the XDATA
         XDataPoint *add= new XDataPoint();
 
-        foreach(const FitField &field, def.fields) {
+        for(const FitField &field : def.fields) {
 
             QString name;
             double value=0;
@@ -2021,7 +2021,7 @@ genericnext:
                       const std::vector<FitValue>& values) {
         int i = 0;
         int manu = -1, prod = -1;
-        foreach(const FitField &field, def.fields) {
+        for(const FitField &field : def.fields) {
             fit_value_t value = values[i++].v;
 
             if( value == NA_VALUE )
@@ -2052,7 +2052,7 @@ genericnext:
                                     const std::vector<FitValue>& values) {
         int i = 0;
 
-        foreach(const FitField &field, def.fields) {
+        for(const FitField &field : def.fields) {
             fit_value_t value = values[i++].v;
 
 
@@ -2123,7 +2123,7 @@ genericnext:
         QString prevSport = rideFile->getTag("Sport", "");
         double pool_length = 0.0;
 
-        foreach(const FitField &field, def.fields) {
+        for(const FitField &field : def.fields) {
             fit_value_t value = values[i++].v;
 
             if( value == NA_VALUE )
@@ -2286,7 +2286,7 @@ genericnext:
 
         QString deviceInfo;
 
-        foreach(const FitField &field, def.fields) {
+        for(const FitField &field : def.fields) {
             FitValue value = values[i++];
 
             //qDebug() << field.num << field.type << value.v;
@@ -2361,7 +2361,7 @@ genericnext:
         const int delta = qbase_time.toSecsSinceEpoch();
         int event = -1, event_type = -1, local_timestamp = -1, timestamp = -1;
 
-        foreach(const FitField &field, def.fields) {
+        for(const FitField &field : def.fields) {
             fit_value_t value = values[i++].v;
 
             if (value == NA_VALUE)
@@ -2438,7 +2438,7 @@ genericnext:
         qint16 data16 = -1;
         qint32 data32 = -1;
         int i = 0;
-        foreach(const FitField &field, def.fields) {
+        for(const FitField &field : def.fields) {
             fit_value_t value = values[i++].v;
 
             if( value == NA_VALUE )
@@ -2606,7 +2606,7 @@ genericnext:
         if (n>0)
             hrv_time = hrvXdata->datapoints[n-1]->secs;
 
-        foreach(const FitField &field, def.fields) {
+        for(const FitField &field : def.fields) {
             FitValue value = values[i++];
             if ( value.type == ListValue && field.num == 0){
                 for (int j=0; j<value.list.size(); j++)
@@ -2655,7 +2655,7 @@ genericnext:
             fprintf(stderr, " FIT decode lap \n");
         }
 
-        foreach(const FitField &field, def.fields) {
+        for(const FitField &field : def.fields) {
             const FitValue& value = values[i++];
 
             if( value.v == NA_VALUE )
@@ -2806,7 +2806,7 @@ genericnext:
 
         fit_value_t lati = NA_VALUE, lngi = NA_VALUE;
         int i = 0;
-        foreach(const FitField &field, def.fields) {
+        for(const FitField &field : def.fields) {
             FitValue _values = values[i];
             fit_value_t value = values[i].v;
             QList<fit_value_t> valueList = values[i++].list;
@@ -3354,7 +3354,7 @@ genericnext:
         double length_duration = 0.0;
 
         int i = 0;
-        foreach(const FitField &field, def.fields) {
+        for(const FitField &field : def.fields) {
             fit_value_t value = values[i++].v;
 
             if( value == NA_VALUE )
@@ -3443,7 +3443,7 @@ genericnext:
         double windHeading = 0.0, windSpeed = 0.0, temp = 0.0, humidity = 0.0;
 
         int i = 0;
-        foreach(const FitField &field, def.fields) {
+        for(const FitField &field : def.fields) {
             fit_value_t value = values[i++].v;
 
             if( value == NA_VALUE )
@@ -3506,7 +3506,7 @@ genericnext:
 
         int a = 0;
         int j = 0;
-        foreach(const FitField &field, def.fields) {
+        for(const FitField &field : def.fields) {
             FitValue value = values[a++];
 
             if( value.type == SingleValue && value.v == NA_VALUE )
@@ -3610,7 +3610,7 @@ genericnext:
                       const std::vector<FitValue>& values) {
         Q_UNUSED(time_offset);
         int i = 0;
-        foreach(const FitField &field, def.fields) {
+        for(const FitField &field : def.fields) {
             fit_value_t value = values[i++].v;
 
             if( value == NA_VALUE )
@@ -3646,7 +3646,7 @@ genericnext:
         QString segment_name;
         bool fail = false;
 
-        foreach(const FitField &field, def.fields) {
+        for(const FitField &field : def.fields) {
             const FitValue& value = values[i++];
 
             if( value.type != StringValue && value.v == NA_VALUE )
@@ -3791,7 +3791,7 @@ genericnext:
                       const std::vector<FitValue>& values) {
         Q_UNUSED(time_offset);
         int i = 0;
-        foreach(const FitField &field, def.fields) {
+        for(const FitField &field : def.fields) {
             fit_value_t value = values[i++].v;
 
             if( value == NA_VALUE )
@@ -3821,7 +3821,7 @@ genericnext:
         // 4	application_version	uint32
 
         int i = 0;
-        foreach(const FitField &field, def.fields) {
+        for(const FitField &field : def.fields) {
             FitValue value = values[i++];
 
             if (FIT_DEBUG && FIT_DEBUG_LEVEL>2)
@@ -3917,7 +3917,7 @@ genericnext:
         fieldDef.native = -1;
         int native_mesg_num = RECORD_MSG_NUM; // just in case it is missing, for backward compatibility
 
-        foreach(const FitField &field, def.fields) {
+        for(const FitField &field : def.fields) {
             FitValue value = values[i++];
 
             switch (field.num) {
@@ -4260,7 +4260,7 @@ genericnext:
             // now we just work through the definition and extract the field values
             // from the file directly
             std::vector<FitValue> values;
-            foreach(const FitField &field, def.fields) {
+            for(const FitField &field : def.fields) {
 
                 // we store the value into a struct that has members
                 // for all the fit base types- so floats are in 'f' and
@@ -4895,7 +4895,7 @@ void write_float32(QByteArray* array, float f, bool is_big_endian) {
 
 // Zero pad string to length of field (len)
 void write_string(QByteArray* array, const char* str, int len) {
-    int slen = strlen(str);
+    size_t slen = strlen(str);
     array->append(str, slen);
     array->append(len - slen, 0);
 }

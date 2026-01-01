@@ -18,11 +18,7 @@
 #include "httprequesthandler.h"
 
 /** Alias type definition, for compatibility to different Qt versions */
-#if QT_VERSION >= 0x050000
-    typedef qintptr tSocketDescriptor;
-#else
-    typedef int tSocketDescriptor;
-#endif
+typedef qintptr tSocketDescriptor;
 
 /** Alias for QSslConfiguration if OpenSSL is not supported */
 #ifdef QT_NO_OPENSSL

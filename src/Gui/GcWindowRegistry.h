@@ -78,7 +78,11 @@ enum gcwinid {
         OverviewAnalysisBlank=49,
         OverviewTrendsBlank=50,
         ElevationChart=51,
-        Calendar=52
+        Calendar=52,
+        Agenda=53,
+        UserPlan=54,
+        OverviewPlan=55,
+        OverviewPlanBlank = 56
 };
 };
 typedef enum GcWindowTypes::gcwinid GcWinID;
@@ -87,7 +91,7 @@ Q_DECLARE_METATYPE(GcWinID)
 // when declaring a window, what view is it relevant for?
 #define VIEW_TRAIN    0x01
 #define VIEW_ANALYSIS 0x02
-#define VIEW_DIARY    0x04
+#define VIEW_PLAN 0x04
 #define VIEW_TRENDS   0x08
 
 class GcChartWindow;

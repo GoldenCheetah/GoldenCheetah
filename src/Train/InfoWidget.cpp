@@ -33,7 +33,7 @@
 
 
 InfoWidget::InfoWidget
-(QList<QColor> powerZoneColors, QList<QString> powerZoneNames, bool showRating, bool showTags, QWidget *parent)
+(const QList<QColor> &powerZoneColors, const QList<QString> &powerZoneShortNames, const QList<QString> &powerZoneNames, bool showRating, bool showTags, QWidget *parent)
 : QFrame(parent)
 {
     QGridLayout *l = new QGridLayout(this);
@@ -71,7 +71,7 @@ InfoWidget::InfoWidget
     l->addWidget(powerInfoWidget, row, 0, 1, -1);
     ++row;
 
-    powerZonesWidget = new PowerZonesWidget(powerZoneColors, powerZoneNames);
+    powerZonesWidget = new PowerZonesWidget(powerZoneColors, powerZoneShortNames, powerZoneNames);
     powerZonesWidget->setContentsMargins(0, 5, 0, 10);
     l->addWidget(powerZonesWidget, row, 0, 1, -1);
     ++row;
@@ -235,7 +235,7 @@ InfoWidget::ergFileSelected
 
 void
 InfoWidget::setPowerZoneColors
-(QList<QColor> colors)
+(const QList<QColor> &colors)
 {
     powerZonesWidget->setColors(colors);
 }
@@ -243,9 +243,9 @@ InfoWidget::setPowerZoneColors
 
 void
 InfoWidget::setPowerZoneNames
-(QList<QString> names)
+(const QList<QString> &shortNames, const QList<QString> &names)
 {
-    powerZonesWidget->setNames(names);
+    powerZonesWidget->setNames(shortNames, names);
 }
 
 

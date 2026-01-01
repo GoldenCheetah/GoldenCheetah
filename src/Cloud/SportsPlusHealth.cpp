@@ -75,9 +75,9 @@ SportsPlusHealth::~SportsPlusHealth() {
 }
 
 void
-SportsPlusHealth::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
+SportsPlusHealth::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    reply->ignoreSslErrors();
+    sslErrors(context->mainWindow, reply, errors);
 }
 
 bool

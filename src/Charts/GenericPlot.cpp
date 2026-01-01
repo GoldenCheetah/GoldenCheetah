@@ -618,9 +618,6 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
 
             // hardware support?
             chartview->setRenderHint(QPainter::Antialiasing);
-#if QT_VERSION < 0x060400
-            add->setUseOpenGL(opengl); // for scatter or line only apparently
-#endif
             qchart->setDropShadowEnabled(false);
 
             // no line, we are invisible
@@ -697,9 +694,6 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
 
                 // hardware support?
                 chartview->setRenderHint(QPainter::Antialiasing);
-#if QT_VERSION < 0x060400
-                dec->setUseOpenGL(opengl); // for scatter or line only apparently
-#endif
                 qchart->setDropShadowEnabled(false);
 
                 // chart
@@ -764,9 +758,6 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
 
             // hardware support?
             chartview->setRenderHint(QPainter::Antialiasing);
-#if QT_VERSION < 0x060400
-            add->setUseOpenGL(opengl); // for scatter or line only apparently
-#endif
             qchart->setDropShadowEnabled(false);
 
             // chart
@@ -796,9 +787,6 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
 
                 // hardware support?
                 chartview->setRenderHint(QPainter::Antialiasing);
-#if QT_VERSION < 0x060400
-                dec->setUseOpenGL(opengl); // for scatter or line only apparently
-#endif
                 qchart->setDropShadowEnabled(false);
 
                 // chart
@@ -1280,7 +1268,9 @@ GenericPlot::configureAxis(QString name, bool visible, int align, double min, do
             if (series->type() == QAbstractSeries::SeriesType::SeriesTypeScatter ||
                 series->type() == QAbstractSeries::SeriesType::SeriesTypeBar ||
                 series->type() == QAbstractSeries::SeriesType::SeriesTypeLine) {
-                foreach(QPointF point, static_cast<QXYSeries*>(series)->pointsVector()) {
+                QXYSeries *s = static_cast<QXYSeries*>(series);
+                for(int i=0; i<s->count(); i++) {
+                    QPointF point = s->at(i);
                     if (usey) {
                         if (setmin && point.y() < min) min=point.y();
                         else if (!setmin) { min=point.y(); setmin=true; }
@@ -1309,7 +1299,9 @@ GenericPlot::configureAxis(QString name, bool visible, int align, double min, do
                 if (series->type() == QAbstractSeries::SeriesType::SeriesTypeScatter ||
                     series->type() == QAbstractSeries::SeriesType::SeriesTypeBar ||
                     series->type() == QAbstractSeries::SeriesType::SeriesTypeLine) {
-                    foreach(QPointF point, static_cast<QXYSeries*>(series)->pointsVector()) {
+                    QXYSeries *s = static_cast<QXYSeries*>(series);
+                    for(int i=0; i<s->count(); i++) {
+                        QPointF point = s->at(i);
                         if (usey) {
                             if (setmax && point.y() > max) max=point.y();
                             else if (!setmax) { max=point.y(); setmax=true; }
@@ -1503,9 +1495,9 @@ GenericPlot::plotAnnotations(GenericSeriesInfo &seriesinfo)
                 if ((annotation.type == GenericAnnotationInfo::VLine && axis->name == seriesinfo.xname) ||
                     (annotation.type == GenericAnnotationInfo::HLine && axis->name == seriesinfo.yname)) {
                     // TIME values are seconds from midnight
-                    QDateTime midnight(QDate::currentDate(), QTime(0,0,0), Qt::LocalTime); // we always use LocalTime due to qt-bug 62285
+                    QDateTime midnight(QDate::currentDate(), QTime(0,0,0), QTimeZone::LocalTime); // we always use LocalTime due to qt-bug 62285
                     // DATERANGE values are days from 01-01-1900
-                    QDateTime earliest(QDate(1900,01,01), QTime(0,0,0), Qt::LocalTime);
+                    QDateTime earliest(QDate(1900,01,01), QTime(0,0,0), QTimeZone::LocalTime);
                     switch (axis->type) {
                         case GenericAxisInfo::TIME:
                             line->setValue(midnight.addSecs(annotation.value).toMSecsSinceEpoch());

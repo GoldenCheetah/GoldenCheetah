@@ -23,7 +23,6 @@
 #pragma GCC diagnostic ignored "-Wparentheses"
 #endif
 
-// QFunctionPointer typedef introduced in QT5
 #include <QtGlobal>
 #include <QCoreApplication>
 #include <QStringList>

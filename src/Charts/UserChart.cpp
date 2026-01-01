@@ -272,7 +272,7 @@ UserChart::refresh()
             foreach (GenericAxisInfo axis, axisinfo) {
                 if (series.xname == axis.name) {
                     // DATERANGE values are days from 01-01-1900
-                    QDateTime earliest(QDate(1900,01,01), QTime(0,0,0), Qt::LocalTime);
+                    QDateTime earliest(QDate(1900,01,01), QTime(0,0,0), QTimeZone::LocalTime);
                     switch (axis.type) {
                         case GenericAxisInfo::TIME:
                             for(int i=0; i<ucd->x.asNumeric().count(); i++) series.labels << time_to_string(ucd->x.asNumeric()[i], true);
@@ -324,7 +324,7 @@ UserChart::refresh()
         // to the x series values.
         if ((chartinfo.type == GC_CHART_BAR || chartinfo.type == GC_CHART_STACK || chartinfo.type == GC_CHART_PERCENT) && axis.orientation == Qt::Horizontal) {
             // DATERANGE values are days from 01-01-1900
-            QDateTime earliest(QDate(1900,01,01), QTime(0,0,0), Qt::LocalTime);
+            QDateTime earliest(QDate(1900,01,01), QTime(0,0,0), QTimeZone::LocalTime);
 
             // find the first series for axis.name
             foreach(GenericSeriesInfo s, seriesinfo) {
@@ -567,9 +567,7 @@ UserChart::settings() const
     QString returning;
 
     QTextStream out(&returning);
-#if QT_VERSION < 0x060000
-    out.setCodec("UTF-8");
-#endif
+
     out << "{ ";
 
     // chartinfo
@@ -683,7 +681,7 @@ UserChart::applySettings(QString x)
             delete static_cast<UserChartData*>(series.user1);
 
     seriesinfo.clear();
-    foreach(QJsonValue it, obj["SERIES"].toArray()) {
+    for(const QJsonValue &it : obj["SERIES"].toArray()) {
 
         // should be an array of objects
         QJsonObject series=it.toObject();
@@ -715,7 +713,7 @@ UserChart::applySettings(QString x)
 
     // array of axes
     axisinfo.clear();
-    foreach(QJsonValue it, obj["AXES"].toArray()) {
+    for(const QJsonValue &it : obj["AXES"].toArray()) {
 
         // should be an array of objects
         QJsonObject axis=it.toObject();

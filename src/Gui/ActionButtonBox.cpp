@@ -189,14 +189,14 @@ void
 ActionButtonBox::defaultConnect
 (StandardButtonGroup group, QAbstractItemView *view)
 {
-    connect(view->selectionModel(), &QItemSelectionModel::currentChanged, [=]() {
+    connect(view->selectionModel(), &QItemSelectionModel::currentChanged, this, [this, group, view]() {
         updateButtonState(group, view);
     });
-    // Also listen for rowsRemoved as currentItemChanged fires to early (count of tree not yet reduced)
-    connect(view->model(), &QAbstractItemModel::rowsRemoved, [=]() {
+    // Also listen for rowsRemoved as currentItemChanged fires too early (count of tree not yet reduced)
+    connect(view->model(), &QAbstractItemModel::rowsRemoved, this, [this, group, view]() {
         updateButtonState(group, view);
     });
-    connect(view->model(), &QAbstractItemModel::rowsInserted, [=]() {
+    connect(view->model(), &QAbstractItemModel::rowsInserted, this, [this, group, view]() {
         updateButtonState(group, view);
     });
     updateButtonState(group, view);

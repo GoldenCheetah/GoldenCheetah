@@ -526,7 +526,9 @@ RideMetadata::configChanged(qint32)
                                                     "padding-top:  0px; padding-bottom: 0px; }"
                                       "QPushButton:hover { background-color: %3; }"
                                       "QPushButton:hover:pressed { background-color: %3; }"
-                                    ).arg(GColor(CPLOTBACKGROUND).name()).arg(3 * dpiXFactor).arg(GColor(CHOVER).name());
+                                      "QLabel { color: %4; background-color: %1; }"
+                                    ).arg(GColor(CPLOTBACKGROUND).name()).arg(3 * dpiXFactor).arg(GColor(CHOVER).name())
+                                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()); // 4 label text color
 
         QFont df;
         QFontMetrics fm(df);
@@ -536,6 +538,7 @@ RideMetadata::configChanged(qint32)
             i.next();
             i.value()->left->setStyleSheet(buttonstyle);
             i.value()->right->setStyleSheet(buttonstyle);
+            i.value()->intervalname->setStyleSheet(buttonstyle);
             i.value()->intervalname->setFixedWidth(namewidth);
         }
 
@@ -1587,11 +1590,7 @@ FieldDefinition::fingerprint(QList<FieldDefinition> list)
         ba.append(def.values.join("").toUtf8());
     }
 
-#if QT_VERSION < 0x060000
-    return qChecksum(ba, ba.length());
-#else
     return qChecksum(ba);
-#endif
 }
 
 QCompleter *
@@ -1658,11 +1657,7 @@ KeywordDefinition::fingerprint(QList<KeywordDefinition> list)
         ba.append(def.tokens.join("").toUtf8());
     }
 
-#if QT_VERSION < 0x060000
-    return qChecksum(ba, ba.length());
-#else
     return qChecksum(ba);
-#endif
 }
 
 /*----------------------------------------------------------------------
@@ -1684,9 +1679,6 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
     };
     file.resize(0);
     QTextStream out(&file);
-#if QT_VERSION < 0x060000
-    out.setCodec("UTF-8");
-#endif
 
     // begin document
     out << "<metadata>\n";

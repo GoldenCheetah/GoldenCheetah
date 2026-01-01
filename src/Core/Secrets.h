@@ -25,10 +25,10 @@
 // not made public. If you want to build with these services enabled
 // you will need to request a token from the provider and add a line
 // to your gcconfig.pri file off the form:
-//      DEFINES += GC_TWITTER_CONSUMER_SECRET="xxxxxxx"
+//      DEFINES += GC_STRAVA_CLIENT_SECRET="__XXXX_SECRET__"
 //
-// This file is modified by the travis build scripts to replace the
-// __XXXX_SECRET__ token with the secret gem held within the travis
+// This file is modified by the AppVeyor build scripts to replace the
+// __XXXX_SECRET__ token with the secret gem held within the AppVeyor
 // build environment.
 //
 // ********* DO NOT MODIFY THIS FILE EXCEPT TO ADD NEW ************

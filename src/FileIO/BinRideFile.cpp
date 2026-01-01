@@ -279,7 +279,7 @@ struct BinFileReaderState
         if (sum)
             *sum += (0xff & c1) + (0xff & c2) + (0xff & c3) + (0xff & c4) + (0xff & c5) + (0xff & c6) + (0xff & c7);
 
-        QDateTime dateTime(QDate((0xff & c1)*256+(0xff & c2), (0xff & c3), (0xff & c4)), QTime((0xff & c5), (0xff & c6), (0xff & c7)), Qt::LocalTime);
+        QDateTime dateTime(QDate((0xff & c1)*256+(0xff & c2), (0xff & c3), (0xff & c4)), QTime((0xff & c5), (0xff & c6), (0xff & c7)), QTimeZone::LocalTime);
 
         return dateTime.toSecsSinceEpoch();
     }
@@ -290,7 +290,7 @@ struct BinFileReaderState
         QString deviceInfo = "";
         QDateTime t;
 
-        foreach(const BinField &field, def.fields) {
+        for(const BinField &field : def.fields) {
             if (!global_format_identifiers.contains(field.id)) {
                 unknown_format_identifiers.insert(field.id);
             } else {
@@ -408,7 +408,7 @@ struct BinFileReaderState
         double temperature = RideFile::NA;
         double lrbalance = RideFile::NA;
 
-        foreach(const BinField &field, def.fields) {
+        for(const BinField &field : def.fields) {
             if (!global_format_identifiers.contains(field.id)) {
                 unknown_format_identifiers.insert(field.id);
             } else {
@@ -498,7 +498,7 @@ struct BinFileReaderState
         int temperature_count = 0;
         double temperature = 0.0;
 
-        foreach(const BinField &field, def.fields) {
+        for(const BinField &field : def.fields) {
             if (!global_format_identifiers.contains(field.id)) {
                 unknown_format_identifiers.insert(field.id);
             } else {
@@ -528,7 +528,7 @@ struct BinFileReaderState
         int i = 0;
         double secs = 0;
 
-        foreach(const BinField &field, def.fields) {
+        for(const BinField &field : def.fields) {
             if (!global_format_identifiers.contains(field.id)) {
                 unknown_format_identifiers.insert(field.id);
             } else {
@@ -555,7 +555,7 @@ struct BinFileReaderState
 
     void decodeDataError(const BinDefinition &def, const std::vector<int> values) {
         int i = 0;
-        foreach(const BinField &field, def.fields) {
+        for(const BinField &field : def.fields) {
             if (!global_format_identifiers.contains(field.id)) {
                 unknown_format_identifiers.insert(field.id);
             } else {
@@ -592,15 +592,12 @@ struct BinFileReaderState
 
     void decodeHistoryData(const BinDefinition &def, const std::vector<int> /*values*/) {
         //int i = 0;
-        foreach(const BinField &field, def.fields) {
+        for(const BinField &field : def.fields) {
             if (!global_format_identifiers.contains(field.id)) {
                 unknown_format_identifiers.insert(field.id);
             } else {
                 //int value = values[i++];
-                switch (field.id) {
-                    default:
-                        unexpected_format_identifiers_for_record_types[def.format_identifier].insert(field.id);
-                }
+                unexpected_format_identifiers_for_record_types[def.format_identifier].insert(field.id);
             }
         }
     }
@@ -670,7 +667,7 @@ struct BinFileReaderState
                 const BinDefinition &def = local_format_identifiers[format_identifier];
                 //printf("- fields type : %d\n", def.format_identifier);
                 std::vector<int> values;
-                foreach(const BinField &field, def.fields) {
+                for(const BinField &field : def.fields) {
                     //printf("- field : %d \n", field.id);
                     int v;
                     switch (field.size) {

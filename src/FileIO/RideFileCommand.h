@@ -79,10 +79,10 @@ class RideFileCommand : public QObject
         int undoCount();
         int redoCount();
 
-    public slots:
+    public Q_SLOTS:
         void clearHistory();
 
-    signals:
+    Q_SIGNALS:
         void beginCommand(bool undo, RideCommand *cmd);
         void endCommand(bool undo, RideCommand *cmd);
 

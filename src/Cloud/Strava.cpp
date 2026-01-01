@@ -81,9 +81,9 @@ QImage Strava::logo() const
 }
 
 void
-Strava::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
+Strava::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    reply->ignoreSslErrors();
+    sslErrors(context->mainWindow, reply, errors);
 }
 
 bool
@@ -966,7 +966,7 @@ Strava::prepareResponse(QByteArray* data)
                 QJsonArray laps = each["laps"].toArray();
 
                 double last_lap = 0.0;
-                foreach (QJsonValue value, laps) {
+                for (const QJsonValue &value : laps) {
                     QJsonObject lap = value.toObject();
 
                     double start = starttime.secsTo(QDateTime::fromString(lap["start_date_local"].toString(), Qt::ISODate));

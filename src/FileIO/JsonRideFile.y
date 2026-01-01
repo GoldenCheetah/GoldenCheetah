@@ -158,7 +158,7 @@ rideelement: starttime
  */
 starttime: STARTTIME ':' string         {
                                           QDateTime aslocal = QDateTime::fromString(jc->JsonString, DATETIME_FORMAT);
-                                          QDateTime asUTC = QDateTime(aslocal.date(), aslocal.time(), Qt::UTC);
+                                          QDateTime asUTC = QDateTime(aslocal.date(), aslocal.time(), QTimeZone::UTC);
                                           jc->JsonRide->setStartTime(asUTC.toLocalTime());
                                         }
 recordint: RECINTSECS ':' number        { jc->JsonRide->setRecIntSecs(jc->JsonNumber); }
@@ -208,7 +208,7 @@ interval_test:
                 ;
 
 interval_color:
-                | ',' COLOR ':' string      { jc->JsonInterval.color.setNamedColor(jc->JsonString); }
+                | ',' COLOR ':' string      { jc->JsonInterval.color.fromString(jc->JsonString); }
                 ;
 
 interval: '{' NAME ':' string ','       { jc->JsonInterval.name = jc->JsonString; }
@@ -403,10 +403,8 @@ JsonFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*
 
         // read in the whole thing
         QTextStream in(&file);
+
         // GC .JSON is stored in UTF-8 with BOM(Byte order mark) for identification
-#if QT_VERSION < 0x060000
-        in.setCodec ("UTF-8");
-#endif
         contents = in.readAll();
         file.close();
 
@@ -415,11 +413,7 @@ JsonFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*
         if (contents.contains(QChar::ReplacementCharacter)) {
            if (file.exists() && file.open(QFile::ReadOnly | QFile::Text)) {
              QTextStream in(&file);
-#if QT_VERSION < 0x060000
-             in.setCodec ("ISO 8859-1");
-#else
              in.setEncoding (QStringConverter::Latin1);
-#endif
              contents = in.readAll();
              file.close();
            }
@@ -799,10 +793,8 @@ JsonFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &fil
 
     // setup streamer
     QTextStream out(&file);
+
     // unified codepage and BOM for identification on all platforms
-#if QT_VERSION < 0x060000
-    out.setCodec("UTF-8");
-#endif
     out.setGenerateByteOrderMark(true);
 
     out << xml;

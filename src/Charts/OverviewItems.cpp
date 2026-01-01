@@ -55,19 +55,19 @@ OverviewItemConfig::registerItems()
     ChartSpaceItemRegistry &registry = ChartSpaceItemRegistry::instance();
 
     // Register      TYPE                          SHORT                      DESCRIPTION                                        SCOPE            CREATOR
-    registry.addItem(OverviewItemType::USERCHART,  QObject::tr("User Chart"), QObject::tr("User defined interactive chart"),     OverviewScope::ANALYSIS|OverviewScope::TRENDS, UserChartOverviewItem::create);
-    registry.addItem(OverviewItemType::METRIC,     QObject::tr("Metric"),     QObject::tr("Metric and Sparkline"),               OverviewScope::ANALYSIS|OverviewScope::TRENDS, MetricOverviewItem::create);
-    registry.addItem(OverviewItemType::KPI,        QObject::tr("KPI"),        QObject::tr("KPI calculation and progress bar"),   OverviewScope::ANALYSIS|OverviewScope::TRENDS, KPIOverviewItem::create);
-    registry.addItem(OverviewItemType::DATATABLE,  QObject::tr("Table"),      QObject::tr("Table of data"),                      OverviewScope::ANALYSIS|OverviewScope::TRENDS, DataOverviewItem::create);
-    registry.addItem(OverviewItemType::TOPN,       QObject::tr("Bests"),      QObject::tr("Ranked list of bests"),               OverviewScope::TRENDS,                         TopNOverviewItem::create);
-    registry.addItem(OverviewItemType::META,       QObject::tr("Metadata"),   QObject::tr("Metadata and Sparkline"),             OverviewScope::ANALYSIS,                       MetaOverviewItem::create);
-    registry.addItem(OverviewItemType::ZONE,       QObject::tr("Zones"),      QObject::tr("Zone Histogram"),                     OverviewScope::ANALYSIS|OverviewScope::TRENDS, ZoneOverviewItem::create);
-    registry.addItem(OverviewItemType::RPE,        QObject::tr("RPE"),        QObject::tr("RPE Widget"),                         OverviewScope::ANALYSIS,                       RPEOverviewItem::create);
-    registry.addItem(OverviewItemType::INTERVAL,   QObject::tr("Intervals"),  QObject::tr("Interval Bubble Chart"),              OverviewScope::ANALYSIS,                       IntervalOverviewItem::createInterval);
-    registry.addItem(OverviewItemType::ACTIVITIES, QObject::tr("Activities"), QObject::tr("Activities Bubble Chart"),            OverviewScope::TRENDS,                         IntervalOverviewItem::createActivities);
-    registry.addItem(OverviewItemType::PMC,        QObject::tr("PMC"),        QObject::tr("PMC Status Summary"),                 OverviewScope::ANALYSIS,                       PMCOverviewItem::create);
-    registry.addItem(OverviewItemType::ROUTE,      QObject::tr("Route"),      QObject::tr("Route Summary"),                      OverviewScope::ANALYSIS,                       RouteOverviewItem::create);
-    registry.addItem(OverviewItemType::DONUT,      QObject::tr("Donut"),      QObject::tr("Metric breakdown by category"),       OverviewScope::TRENDS,                         DonutOverviewItem::create);
+    registry.addItem(OverviewItemType::USERCHART,  QObject::tr("User Chart"), QObject::tr("User defined interactive chart"),     OverviewScope::ANALYSIS|OverviewScope::TRENDS|OverviewScope::PLAN, UserChartOverviewItem::create);
+    registry.addItem(OverviewItemType::METRIC,     QObject::tr("Metric"),     QObject::tr("Metric and Sparkline"),               OverviewScope::ANALYSIS|OverviewScope::TRENDS|OverviewScope::PLAN, MetricOverviewItem::create);
+    registry.addItem(OverviewItemType::KPI,        QObject::tr("KPI"),        QObject::tr("KPI calculation and progress bar"),   OverviewScope::ANALYSIS|OverviewScope::TRENDS|OverviewScope::PLAN, KPIOverviewItem::create);
+    registry.addItem(OverviewItemType::DATATABLE,  QObject::tr("Table"),      QObject::tr("Table of data"),                      OverviewScope::ANALYSIS|OverviewScope::TRENDS|OverviewScope::PLAN, DataOverviewItem::create);
+    registry.addItem(OverviewItemType::TOPN,       QObject::tr("Bests"),      QObject::tr("Ranked list of bests"),               OverviewScope::TRENDS|OverviewScope::PLAN,                         TopNOverviewItem::create);
+    registry.addItem(OverviewItemType::META,       QObject::tr("Metadata"),   QObject::tr("Metadata and Sparkline"),             OverviewScope::ANALYSIS,                                           MetaOverviewItem::create);
+    registry.addItem(OverviewItemType::ZONE,       QObject::tr("Zones"),      QObject::tr("Zone Histogram"),                     OverviewScope::ANALYSIS|OverviewScope::TRENDS|OverviewScope::PLAN, ZoneOverviewItem::create);
+    registry.addItem(OverviewItemType::RPE,        QObject::tr("RPE"),        QObject::tr("RPE Widget"),                         OverviewScope::ANALYSIS,                                           RPEOverviewItem::create);
+    registry.addItem(OverviewItemType::INTERVAL,   QObject::tr("Intervals"),  QObject::tr("Interval Bubble Chart"),              OverviewScope::ANALYSIS,                                           IntervalOverviewItem::createInterval);
+    registry.addItem(OverviewItemType::ACTIVITIES, QObject::tr("Activities"), QObject::tr("Activities Bubble Chart"),            OverviewScope::TRENDS|OverviewScope::PLAN,                         IntervalOverviewItem::createActivities);
+    registry.addItem(OverviewItemType::PMC,        QObject::tr("PMC"),        QObject::tr("PMC Status Summary"),                 OverviewScope::ANALYSIS,                                           PMCOverviewItem::create);
+    registry.addItem(OverviewItemType::ROUTE,      QObject::tr("Route"),      QObject::tr("Route Summary"),                      OverviewScope::ANALYSIS,                                           RouteOverviewItem::create);
+    registry.addItem(OverviewItemType::DONUT,      QObject::tr("Donut"),      QObject::tr("Metric breakdown by category"),       OverviewScope::TRENDS|OverviewScope::PLAN,                         DonutOverviewItem::create);
 
     return true;
 }
@@ -75,7 +75,7 @@ OverviewItemConfig::registerItems()
 static void setFilter(ChartSpaceItem *item, Specification &spec)
 {
     // trends view filter
-    if (item->parent->scope & OverviewScope::TRENDS) {
+    if (item->parent->scope & (OverviewScope::TRENDS | OverviewScope::PLAN)) {
 
         // general filters
         FilterSet fs;
@@ -567,7 +567,7 @@ DataOverviewItem::create(ChartSpace *parent) {
     // temporary - bit expensive, but creation is expensive anyway
     DataFilter df(parent, parent->context);
 
-    if (parent->scope == ANALYSIS) return new DataOverviewItem(parent, "Totals", getLegacyProgram(DATA_TABLE_TOTALS, df.rt, false));
+    if (parent->scope == OverviewScope::ANALYSIS) return new DataOverviewItem(parent, "Totals", getLegacyProgram(DATA_TABLE_TOTALS, df.rt, false));
     else return new DataOverviewItem(parent, "Activities", getLegacyProgram(DATA_TABLE_TRENDS, df.rt, true));
 }
 
@@ -760,7 +760,6 @@ ZoneOverviewItem::configChanged(qint32)
     barseries->append(barset);
     chart->addSeries(barseries);
 
-
     // x-axis labels etc
     barcategoryaxis = new QBarCategoryAxis(this);
     barcategoryaxis->setLabelsFont(parent->midfont);
@@ -772,15 +771,24 @@ ZoneOverviewItem::configChanged(qint32)
     QPen axisPen(GColor(CCARDBACKGROUND));
     axisPen.setWidth(1); // almost invisible
     chart->createDefaultAxes();
-    chart->setAxisX(barcategoryaxis, barseries);
+
+    // add x axis to chart and attach to the series
+    chart->addAxis(barcategoryaxis, Qt::AlignBottom);
+    barseries->attachAxis(barcategoryaxis);
     barcategoryaxis->setLinePen(axisPen);
     barcategoryaxis->setLineVisible(false);
-    chart->axisY(barseries)->setLinePen(axisPen);
-    chart->axisY(barseries)->setLineVisible(false);
-    chart->axisY(barseries)->setLabelsVisible(false);
-    chart->axisY(barseries)->setRange(0,100);
-    chart->axisY(barseries)->setGridLineVisible(false);
 
+    // setup y axis
+    QList<QAbstractAxis*> verticalAxes = chart->axes(Qt::Vertical, barseries);
+    if (verticalAxes.size() == 1) {
+        verticalAxes.first()->setLinePen(axisPen);
+        verticalAxes.first()->setLineVisible(false);
+        verticalAxes.first()->setLabelsVisible(false);
+        verticalAxes.first()->setRange(0,100);
+        verticalAxes.first()->setGridLineVisible(false);
+    } else {
+        qDebug() << "Expecting one vertical axis: " << verticalAxes.size();
+    }
 }
 
 ZoneOverviewItem::~ZoneOverviewItem()
@@ -830,7 +838,7 @@ MetricOverviewItem::MetricOverviewItem(ChartSpace *parent, QString name, QString
     bronze = colouredPixmapFromPNG(":/images/medal.png", QColor(184,115,51)).scaledToWidth(ROWHEIGHT*2);
 
     // we may plot the metric sparkline if the tile is big enough
-    bool bigdot = parent->scope == ANALYSIS ? true : false;
+    bool bigdot = parent->scope == OverviewScope::ANALYSIS ? true : false;
     sparkline = new Sparkline(this, name, bigdot);
 
     configwidget = new OverviewItemConfig(this);
@@ -1018,8 +1026,8 @@ MetaOverviewItem::~MetaOverviewItem()
 
 IntervalOverviewItem::IntervalOverviewItem(ChartSpace *parent, QString name, QString xsymbol, QString ysymbol, QString zsymbol) : ChartSpaceItem(parent, name)
 {
-    if (parent->scope == OverviewScope::ANALYSIS) this->type = OverviewItemType::INTERVAL;
-    if (parent->scope == OverviewScope::TRENDS) this->type = OverviewItemType::ACTIVITIES;
+    if (parent->scope & OverviewScope::ANALYSIS) this->type = OverviewItemType::INTERVAL;
+    if (parent->scope & (OverviewScope::TRENDS | OverviewScope::PLAN)) this->type = OverviewItemType::ACTIVITIES;
 
     this->xsymbol = xsymbol;
     this->ysymbol = ysymbol;
@@ -2955,9 +2963,6 @@ DataOverviewItem::exportData()
     // stream, output without a BOM, unlikely to be expected (?)
     QTextStream out(&file);
     // unified codepage and BOM for identification on all platforms
-#if QT_VERSION < 0x060000
-    out.setCodec("UTF-8");
-#endif
     //out.setGenerateByteOrderMark(true);
 
     // headers- taking care to protect for csv output
@@ -3394,7 +3399,7 @@ MetricOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem 
                    bl.y() - trect.height(), trect.height()*0.66f, trect.height());
 
     // activity show if current one is up or down on trend for last 30 days..
-    if (parent->scope == ANALYSIS && metric && !metric->isDate()) {
+    if (parent->scope == OverviewScope::ANALYSIS && metric && !metric->isDate()) {
 
         // trend triangle
         QPainterPath triangle;
@@ -3838,7 +3843,7 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), it
     }
 
     // trends view always has a filter
-    if (item->parent->scope & OverviewScope::TRENDS) {
+    if (item->parent->scope & (OverviewScope::TRENDS | OverviewScope::PLAN)) {
         filterEditor = new SearchFilterBox(this, item->parent->context);
         layout->addRow(tr("Filter"), filterEditor);
         connect(filterEditor->searchbox, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
@@ -3966,7 +3971,7 @@ OverviewItemConfig::setProgram(int index)
         index = legacySelector->itemData(index).toInt();
         // for metric lookup
         DataFilter df(item->parent, item->parent->context);
-        editor->setText(DataOverviewItem::getLegacyProgram(index, df.rt, item->parent->scope == OverviewScope::TRENDS));
+        editor->setText(DataOverviewItem::getLegacyProgram(index, df.rt, item->parent->scope & (OverviewScope::TRENDS | OverviewScope::PLAN)));
     }
 }
 
@@ -3982,7 +3987,7 @@ OverviewItemConfig::~OverviewItemConfig() {
     if (item->type != OverviewItemType::PMC)  delete name ;
 
     // trends view always has a filter
-    if (item->parent->scope & OverviewScope::TRENDS)  delete filterEditor;
+    if (item->parent->scope & (OverviewScope::TRENDS | OverviewScope::PLAN))  delete filterEditor;
 
     // single metric names
     if (item->type == OverviewItemType::TOPN || item->type == OverviewItemType::METRIC  ||
@@ -4030,7 +4035,7 @@ OverviewItemConfig::setWidgets()
     block = true;
 
     // always have a filter on trends view
-    if (item->parent->scope & OverviewScope::TRENDS)  filterEditor->setFilter(item->datafilter);
+    if (item->parent->scope & (OverviewScope::TRENDS | OverviewScope::PLAN))  filterEditor->setFilter(item->datafilter);
 
     // set the widget values from the item
     switch(item->type) {
@@ -4141,7 +4146,7 @@ OverviewItemConfig::dataChanged()
     if (block) return;
 
     // get filter
-    if (item->parent->scope & OverviewScope::TRENDS)  item->datafilter = filterEditor->filter();
+    if (item->parent->scope & (OverviewScope::TRENDS | OverviewScope::PLAN))  item->datafilter = filterEditor->filter();
 
     // set the widget values from the item
     switch(item->type) {
@@ -4727,7 +4732,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 
     // run through each point
     double area = 10000; // max size
-    if (parent->parent->scope == OverviewScope::TRENDS) area /= 2; // smaller on trends so many to see
+    if (parent->parent->scope & (OverviewScope::TRENDS | OverviewScope::PLAN)) area /= 2; // smaller on trends so many to see
 
     // remember the one we are nearest
     BPointF nearest;
@@ -4755,7 +4760,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
             // resize if transitioning
             QPointF center(plotarea.left() + (xratio * point.x), plotarea.bottom() - (yratio * point.y));
             int alpha = 200;
-            if (parent->parent->scope == OverviewScope::TRENDS) alpha /= 2;
+            if (parent->parent->scope & (OverviewScope::TRENDS | OverviewScope::PLAN)) alpha /= 2;
 
             double size = (point.z / mean) * area;
             if (size > area * 6) size=area*6;
@@ -4779,7 +4784,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 
                 } else {
                     // just make it appear
-                    alpha = ((parent->parent->scope == OverviewScope::TRENDS ? 100 : 200.0f)/255.0f) * transition;
+                    alpha = (((parent->parent->scope & (OverviewScope::TRENDS | OverviewScope::PLAN)) ? 100 : 200.0f)/255.0f) * transition;
                 }
             }
 
@@ -4815,7 +4820,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 
             // fade out
             QColor color = oldpoints[index].fill;
-            double alpha = ((parent->parent->scope == OverviewScope::TRENDS ? 100 : 200.0f)/255.0f) * transition;
+            double alpha = (((parent->parent->scope & (OverviewScope::TRENDS | OverviewScope::PLAN)) ? 100 : 200.0f)/255.0f) * transition;
             color.setAlpha(alpha);
             painter->setBrush(color);
             painter->setPen(Qt::NoPen);

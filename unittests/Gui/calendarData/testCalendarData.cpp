@@ -10,9 +10,7 @@ class TestCalendarData: public QObject
 private slots:
 
     void layoutCalendarEntry() {
-#if QT_VERSION < 0x060000
-        QSKIP("Skipping test with Qt5");
-#else
+
         QList<CalendarEntry> entries = {
             { "", "", "", "", "", Qt::red, "", QTime(9, 0), 3600 },
             { "", "", "", "", "", Qt::red, "", QTime(9, 30), 3600 },
@@ -34,7 +32,6 @@ private slots:
         QCOMPARE(layout[3].columnCount, 2);
         QCOMPARE(layout[4].columnIndex, 1);
         QCOMPARE(layout[4].columnCount, 2);
-#endif
     }
 };
 

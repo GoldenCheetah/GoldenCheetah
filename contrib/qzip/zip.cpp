@@ -397,21 +397,22 @@ bool ZipReader::FileInfo::isValid() const
 class QZipPrivate
 {
 public:
-    QZipPrivate(QIODevice *device, bool ownDev)
-        : device(device), ownDevice(ownDev), dirtyFileTree(true), start_of_directory(0)
+    QZipPrivate(QIODevice *device)
+        : device(device), dirtyFileTree(true), start_of_directory(0)
     {
     }
 
-    ~QZipPrivate()
+    QZipPrivate(std::unique_ptr<QIODevice> dev)
+        : device(dev.get()), ownedDevice(std::move(dev)), dirtyFileTree(true), start_of_directory(0)
     {
-        if (ownDevice)
-            delete device;
     }
+
+    virtual ~QZipPrivate() = default;
 
     void fillFileInfo(int index, ZipReader::FileInfo &fileInfo) const;
 
     QIODevice *device;
-    bool ownDevice;
+    std::unique_ptr<QIODevice> ownedDevice;
     bool dirtyFileTree;
     QList<FileHeader> fileHeaders;
     QByteArray comment;
@@ -439,8 +440,13 @@ void QZipPrivate::fillFileInfo(int index, ZipReader::FileInfo &fileInfo) const
 class ZipReaderPrivate : public QZipPrivate
 {
 public:
-    ZipReaderPrivate(QIODevice *device, bool ownDev)
-        : QZipPrivate(device, ownDev), status(ZipReader::NoError)
+    ZipReaderPrivate(QIODevice *device)
+        : QZipPrivate(device), status(ZipReader::NoError)
+    {
+    }
+
+    ZipReaderPrivate(std::unique_ptr<QIODevice> device)
+        : QZipPrivate(std::move(device)), status(ZipReader::NoError)
     {
     }
 
@@ -452,8 +458,16 @@ public:
 class ZipWriterPrivate : public QZipPrivate
 {
 public:
-    ZipWriterPrivate(QIODevice *device, bool ownDev)
-        : QZipPrivate(device, ownDev),
+    ZipWriterPrivate(QIODevice *device)
+        : QZipPrivate(device),
+        status(ZipWriter::NoError),
+        permissions(QFile::ReadOwner | QFile::WriteOwner),
+        compressionPolicy(ZipWriter::AlwaysCompress)
+    {
+    }
+
+    ZipWriterPrivate(std::unique_ptr<QIODevice> device)
+        : QZipPrivate(std::move(device)),
         status(ZipWriter::NoError),
         permissions(QFile::ReadOwner | QFile::WriteOwner),
         compressionPolicy(ZipWriter::AlwaysCompress)
@@ -514,7 +528,7 @@ void ZipReaderPrivate::scanFiles()
     int num_dir_entries = 0;
     EndOfDirectory eod;
     while (start_of_directory == -1) {
-        int pos = device->size() - sizeof(EndOfDirectory) - i;
+        qint64 pos = device->size() - sizeof(EndOfDirectory) - i;
         if (pos < 0 || i > 65535) {
             qWarning() << "QZip: EndOfDirectory not found";
             return;
@@ -739,7 +753,7 @@ void ZipWriterPrivate::addEntry(EntryType type, const QString &fileName, const Q
 */
 ZipReader::ZipReader(const QString &archive, QIODevice::OpenMode mode)
 {
-    QScopedPointer<QFile> f(new QFile(archive));
+    std::unique_ptr<QFile> f = std::make_unique<QFile>(archive);
     f->open(mode);
     ZipReader::Status status;
     if (f->error() == QFile::NoError)
@@ -755,20 +769,14 @@ ZipReader::ZipReader(const QString &archive, QIODevice::OpenMode mode)
             status = FileError;
     }
 
-    d = new ZipReaderPrivate(f.data(), /*ownDevice=*/true);
-    f.take();
+    d = std::make_unique<ZipReaderPrivate>(std::move(f));
     d->status = status;
 }
 
-/*!
-    Create a new zip archive that operates on the archive found in \a device.
-    You have to open the device previous to calling the constructor and only a
-    device that is readable will be scanned for zip filecontent.
- */
-ZipReader::ZipReader(QIODevice *device)
-    : d(new ZipReaderPrivate(device, /*ownDevice=*/false))
+ZipReader::ZipReader(std::unique_ptr<QIODevice> device)
+    : d(std::make_unique<ZipReaderPrivate>(std::move(device)))
 {
-    Q_ASSERT(device);
+    Q_ASSERT(d->device);
 }
 
 /*!
@@ -777,7 +785,6 @@ ZipReader::ZipReader(QIODevice *device)
 ZipReader::~ZipReader()
 {
     close();
-    delete d;
 }
 
 /*!
@@ -1024,7 +1031,7 @@ void ZipReader::close()
 */
 ZipWriter::ZipWriter(const QString &fileName, QIODevice::OpenMode mode)
 {
-    QScopedPointer<QFile> f(new QFile(fileName));
+    std::unique_ptr<QFile> f = std::make_unique<QFile>(fileName);
     f->open(mode);
     ZipWriter::Status status;
     if (f->error() == QFile::NoError)
@@ -1040,26 +1047,13 @@ ZipWriter::ZipWriter(const QString &fileName, QIODevice::OpenMode mode)
             status = ZipWriter::FileError;
     }
 
-    d = new ZipWriterPrivate(f.data(), /*ownDevice=*/true);
-    f.take();
+    d = std::make_unique<ZipWriterPrivate>(std::move(f));
     d->status = status;
-}
-
-/*!
-    Create a new zip archive that operates on the archive found in \a device.
-    You have to open the device previous to calling the constructor and
-    only a device that is readable will be scanned for zip filecontent.
- */
-ZipWriter::ZipWriter(QIODevice *device)
-    : d(new ZipWriterPrivate(device, /*ownDevice=*/false))
-{
-    Q_ASSERT(device);
 }
 
 ZipWriter::~ZipWriter()
 {
     close();
-    delete d;
 }
 
 /*!
