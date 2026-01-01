@@ -166,7 +166,7 @@ QDateTime convertToLocalTime(QString timestamp)
 
         // Z at end indicates the time is in fact UTC
         QDateTime datetime = QDateTime::fromString(timestamp, Qt::ISODate);
-        datetime.setTimeSpec(Qt::UTC);
+        datetime.setTimeZone(QTimeZone::UTC);
         datetime=datetime.toLocalTime();
         return datetime;
 

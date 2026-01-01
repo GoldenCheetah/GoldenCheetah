@@ -1495,9 +1495,9 @@ GenericPlot::plotAnnotations(GenericSeriesInfo &seriesinfo)
                 if ((annotation.type == GenericAnnotationInfo::VLine && axis->name == seriesinfo.xname) ||
                     (annotation.type == GenericAnnotationInfo::HLine && axis->name == seriesinfo.yname)) {
                     // TIME values are seconds from midnight
-                    QDateTime midnight(QDate::currentDate(), QTime(0,0,0), Qt::LocalTime); // we always use LocalTime due to qt-bug 62285
+                    QDateTime midnight(QDate::currentDate(), QTime(0,0,0), QTimeZone::LocalTime); // we always use LocalTime due to qt-bug 62285
                     // DATERANGE values are days from 01-01-1900
-                    QDateTime earliest(QDate(1900,01,01), QTime(0,0,0), Qt::LocalTime);
+                    QDateTime earliest(QDate(1900,01,01), QTime(0,0,0), QTimeZone::LocalTime);
                     switch (axis->type) {
                         case GenericAxisInfo::TIME:
                             line->setValue(midnight.addSecs(annotation.value).toMSecsSinceEpoch());

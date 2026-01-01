@@ -563,7 +563,7 @@ main(int argc, char *argv[])
 
         // install QT Translator to enable QT Dialogs translation
         QTranslator qtTranslator;
-        if (!qtTranslator.load("qt_" + lang.toString(), QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
+        if (!qtTranslator.load("qt_" + lang.toString(), QLibraryInfo::path(QLibraryInfo::TranslationsPath)))
             qDebug()<<"Failed to load Qt translator for "<<lang.toString();
         application->installTranslator(&qtTranslator);
 

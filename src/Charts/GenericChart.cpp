@@ -180,8 +180,8 @@ GenericChart::preprocessData()
     // any series on an axis that is time based
     // will need to have the values scaled from
     // seconds to MSSinceEpoch
-    QDateTime midnight(QDate::currentDate(), QTime(0,0,0), Qt::LocalTime); // we always use LocalTime due to qt-bug 62285
-    QDateTime earliest(QDate(1900,01,01), QTime(0,0,0), Qt::LocalTime);
+    QDateTime midnight(QDate::currentDate(), QTime(0,0,0), QTimeZone::LocalTime); // we always use LocalTime due to qt-bug 62285
+    QDateTime earliest(QDate(1900,01,01), QTime(0,0,0), QTimeZone::LocalTime);
 
     for(int ai=0; ai<newAxes.count(); ai++) {
         GenericAxisInfo &axis=newAxes[ai];

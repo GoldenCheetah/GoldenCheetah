@@ -158,7 +158,7 @@ ride_tuple: string ':' string                                   {
                                                                      else if ($1 == "pacezonerange") jc->item.paceZoneRange = $3.toInt();
                                                                      else if ($1 == "date") {
                                                                          QDateTime aslocal = QDateTime::fromString($3, DATETIME_FORMAT);
-                                                                         QDateTime asUTC = QDateTime(aslocal.date(), aslocal.time(), Qt::UTC);
+                                                                         QDateTime asUTC = QDateTime(aslocal.date(), aslocal.time(), QTimeZone::UTC);
                                                                          jc->item.dateTime = asUTC.toLocalTime();
                                                                      }
                                                                 }
