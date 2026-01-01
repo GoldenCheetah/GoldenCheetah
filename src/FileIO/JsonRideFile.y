@@ -158,7 +158,7 @@ rideelement: starttime
  */
 starttime: STARTTIME ':' string         {
                                           QDateTime aslocal = QDateTime::fromString(jc->JsonString, DATETIME_FORMAT);
-                                          QDateTime asUTC = QDateTime(aslocal.date(), aslocal.time(), Qt::UTC);
+                                          QDateTime asUTC = QDateTime(aslocal.date(), aslocal.time(), QTimeZone::UTC);
                                           jc->JsonRide->setStartTime(asUTC.toLocalTime());
                                         }
 recordint: RECINTSECS ':' number        { jc->JsonRide->setRecIntSecs(jc->JsonNumber); }
@@ -208,7 +208,7 @@ interval_test:
                 ;
 
 interval_color:
-                | ',' COLOR ':' string      { jc->JsonInterval.color.setNamedColor(jc->JsonString); }
+                | ',' COLOR ':' string      { jc->JsonInterval.color.fromString(jc->JsonString); }
                 ;
 
 interval: '{' NAME ':' string ','       { jc->JsonInterval.name = jc->JsonString; }

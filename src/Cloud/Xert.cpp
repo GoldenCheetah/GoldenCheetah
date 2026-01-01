@@ -235,7 +235,7 @@ Xert::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
                 // }
 
                 QDateTime startDate = QDateTime::fromString(activity["start_date"].toObject()["date"].toString(), Qt::ISODate);
-                startDate.setTimeSpec(Qt::UTC);
+                startDate.setTimeZone(QTimeZone::UTC);
                 startDate = startDate.toLocalTime();
 
                 add->name = startDate.toString("yyyy_MM_dd_HH_mm_ss")+".json";
@@ -395,7 +395,7 @@ Xert::readFileCompleted()
 
         QJsonObject ride = document.object();
         QDateTime starttime = QDateTime::fromString(ride["start_date"].toString(), Qt::ISODate);
-        starttime.setTimeSpec(Qt::UTC);
+        starttime.setTimeZone(QTimeZone::UTC);
         starttime = starttime.toLocalTime();
 
         // 1s samples with start time as UTC

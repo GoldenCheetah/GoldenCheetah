@@ -513,7 +513,7 @@ AllPlotObject::parseZoneString(QString zstring)
         double lim=toks[0].toDouble(&ok);
         if (!ok) continue;
         QColor col;
-        col.setNamedColor(toks[1]);
+        col.fromString(toks[1]);
         if (!col.isValid()) continue;
 
         // well that worked!

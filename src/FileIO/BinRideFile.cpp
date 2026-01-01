@@ -279,7 +279,7 @@ struct BinFileReaderState
         if (sum)
             *sum += (0xff & c1) + (0xff & c2) + (0xff & c3) + (0xff & c4) + (0xff & c5) + (0xff & c6) + (0xff & c7);
 
-        QDateTime dateTime(QDate((0xff & c1)*256+(0xff & c2), (0xff & c3), (0xff & c4)), QTime((0xff & c5), (0xff & c6), (0xff & c7)), Qt::LocalTime);
+        QDateTime dateTime(QDate((0xff & c1)*256+(0xff & c2), (0xff & c3), (0xff & c4)), QTime((0xff & c5), (0xff & c6), (0xff & c7)), QTimeZone::LocalTime);
 
         return dateTime.toSecsSinceEpoch();
     }

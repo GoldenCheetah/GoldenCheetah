@@ -760,7 +760,6 @@ ZoneOverviewItem::configChanged(qint32)
     barseries->append(barset);
     chart->addSeries(barseries);
 
-
     // x-axis labels etc
     barcategoryaxis = new QBarCategoryAxis(this);
     barcategoryaxis->setLabelsFont(parent->midfont);
@@ -772,15 +771,24 @@ ZoneOverviewItem::configChanged(qint32)
     QPen axisPen(GColor(CCARDBACKGROUND));
     axisPen.setWidth(1); // almost invisible
     chart->createDefaultAxes();
-    chart->setAxisX(barcategoryaxis, barseries);
+
+    // add x axis to chart and attach to the series
+    chart->addAxis(barcategoryaxis, Qt::AlignBottom);
+    barseries->attachAxis(barcategoryaxis);
     barcategoryaxis->setLinePen(axisPen);
     barcategoryaxis->setLineVisible(false);
-    chart->axisY(barseries)->setLinePen(axisPen);
-    chart->axisY(barseries)->setLineVisible(false);
-    chart->axisY(barseries)->setLabelsVisible(false);
-    chart->axisY(barseries)->setRange(0,100);
-    chart->axisY(barseries)->setGridLineVisible(false);
 
+    // setup y axis
+    QList<QAbstractAxis*> verticalAxes = chart->axes(Qt::Vertical, barseries);
+    if (verticalAxes.size() == 1) {
+        verticalAxes.first()->setLinePen(axisPen);
+        verticalAxes.first()->setLineVisible(false);
+        verticalAxes.first()->setLabelsVisible(false);
+        verticalAxes.first()->setRange(0,100);
+        verticalAxes.first()->setGridLineVisible(false);
+    } else {
+        qDebug() << "Expecting one vertical axis: " << verticalAxes.size();
+    }
 }
 
 ZoneOverviewItem::~ZoneOverviewItem()

@@ -19,6 +19,8 @@
 #ifndef _GC_IconManager_h
 #define _GC_IconManager_h
 
+#include <memory>
+
 #include <QString>
 #include <QHash>
 #include <QDir>
@@ -52,7 +54,7 @@ public:
     bool exportBundle(const QString &filepath);
     bool importBundle(const QString &filepath);
     bool importBundle(const QUrl &url);
-    bool importBundle(QIODevice *device);
+    bool importBundle(std::unique_ptr<QIODevice> device);
 
     bool saveConfig() const;
 

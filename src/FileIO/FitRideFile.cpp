@@ -58,7 +58,7 @@ static int fitFileReaderRegistered =
         "fit", "Garmin FIT", new FitFileReader());
 
 // 1989-12-31 00:00:00 UTC
-static const QDateTime qbase_time(QDate(1989, 12, 31), QTime(0, 0, 0), Qt::UTC);
+static const QDateTime qbase_time(QDate(1989, 12, 31), QTime(0, 0, 0), QTimeZone::UTC);
 
 
 //
@@ -1774,7 +1774,7 @@ struct FitFileParser
             }
 
             // adjust the start time
-            rf->setStartTime(QDateTime::fromSecsSinceEpoch(start, Qt::UTC));
+            rf->setStartTime(QDateTime::fromSecsSinceEpoch(start, QTimeZone::UTC));
 
             int idx_start = rideFile->timeIndex(start - start_time);
             int idx_stop = rideFile->timeIndex(stop - start_time);
