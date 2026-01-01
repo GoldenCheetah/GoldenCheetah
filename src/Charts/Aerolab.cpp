@@ -334,7 +334,6 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
       }
 
       // Fill the virtual elevation profile with data from the ride data:
-      // double t = 0.0;
       double vlast = 0.0;
       double e     = 0.0;
       arrayLength = 0;
@@ -387,7 +386,6 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
       double de  = s * v * dt * (GlobalContext::context()->useMetricUnits ? 1 : FEET_PER_METER);
 
       e += de;
-      // t += dt;
 
       veArray[arrayLength] = e;
 

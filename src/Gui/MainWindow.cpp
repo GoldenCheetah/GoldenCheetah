@@ -1232,6 +1232,7 @@ MainWindow::sidebarClicked(GcSideBarBtnId id)
     switch (id) {
     case GcSideBarBtnId::SYNC_BTN: checkCloud(); break; // sync quick link
     case GcSideBarBtnId::OPTIONS_BTN: showOptions(); break; // prefs
+
     default: break;
     }
 }
@@ -1247,6 +1248,7 @@ MainWindow::sidebarSelected(GcSideBarBtnId id)
     case GcSideBarBtnId::REFLECT_BTN: break; // reflect not written yet
     case GcSideBarBtnId::TRAIN_BTN: selectTrain(); break;
     case GcSideBarBtnId::APPS_BTN: break;// apps not written yet
+
     default: break;
     }
 }

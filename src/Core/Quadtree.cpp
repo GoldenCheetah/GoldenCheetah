@@ -71,10 +71,6 @@ QuadtreeNode::candidates(QRectF rect, QList<GPointF> &here)
     }
 }
 
-// infitesmal amount to make quadtrees have slightly
-// tiny differences on boundaries
-// static double tiny = 0.000000001;
-
 // split leaf into nodes (when to many entries)
 void
 QuadtreeNode::split(Quadtree *root)

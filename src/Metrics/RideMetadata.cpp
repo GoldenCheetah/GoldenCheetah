@@ -729,7 +729,6 @@ Form::arrange()
 {
     QGridLayout *here;
 
-    // int x=0;
     int y=0;
 
     // ok, so we are managing interval metadata
@@ -758,7 +757,6 @@ Form::arrange()
 
     for (int i=0; i<fields.count(); i++) {
         if (y >= rows && meta->singlecolumn==false) {
-            // x+=1;
             y=0;
 
             vlayout2 = new QVBoxLayout;
@@ -788,9 +786,6 @@ Form::arrange()
             override->addWidget(fields[i]->widget);
             here->addLayout(override, y, 1, alignment);
 
-        //} else  if (fields[i]->definition.type == GcFieldType::FIELD_TEXTBOX) {
-        //    here->addWidget(fields[i]->widget, ++y, 0, 2, 2, alignment);
-        //    y++;
         } else {
             here->addWidget(fields[i]->widget, y, 1, alignment);
         }
@@ -1102,6 +1097,7 @@ FormField::metadataFlush()
         break;
     case GcFieldType::FIELD_DATE : text = ((QDateEdit*)widget)->date().toString("dd/MM/yyyy"); break;
     case GcFieldType::FIELD_TIME : text = ((QTimeEdit*)widget)->time().toString("hh:mm:ss.zzz"); break;
+
     default: break;
     }
 
@@ -1242,6 +1238,7 @@ FormField::editFinished()
                         break;
     case GcFieldType::FIELD_DATE : text = ((QDateEdit*)widget)->date().toString("dd/MM/yyyy"); break;
     case GcFieldType::FIELD_TIME : text = ((QTimeEdit*)widget)->time().toString("hh:mm:ss.zzz"); break;
+
     default: break;
     }
 
@@ -1575,8 +1572,8 @@ FormField::metadataChanged()
             ((QCheckBox*)widget)->setChecked((value == "1") ? true : false);
             }
             break;
-        default:
-            break;
+
+        default: break;
         }
     }
     active = false;

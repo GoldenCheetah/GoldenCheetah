@@ -2419,10 +2419,6 @@ RTool::activity(SEXP datetime, SEXP pCompare, SEXP pSplit, SEXP pJoin)
 
         if (compare && rtool->context->isCompareIntervals) {
 
-            // how many to return?
-            // int count=0;
-            // foreach(CompareInterval p, rtool->context->compareIntervals) if (p.isChecked()) count++;
-
             // cool we can return a list of intervals to compare
             QList<SEXP> f;
 

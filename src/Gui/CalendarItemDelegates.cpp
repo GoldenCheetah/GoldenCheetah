@@ -432,7 +432,6 @@ CalendarDetailedDayDelegate::paint
         int iconWidth = 0;
         if (height >= lineHeight && columnWidth >= lineHeight) {
             QColor pixmapColor(entry.color);
-            // int headlineOffset = 0;
             if (height >= 2 * lineHeight + priSecSpacing && columnWidth >= 2 * lineHeight + priSecSpacing) {
                 iconWidth = 2 * lineHeight + priSecSpacing;
             } else {
@@ -775,7 +774,6 @@ CalendarCompactDayDelegate::paint
     CalendarDay calendarDay = index.data(DayRole).value<CalendarDay>();
     QColor bgColor;
     QColor selColor = opt.palette.highlight().color();
-    // QColor dayColor;
     QColor entryColor;
 
     bool ok;
@@ -1382,7 +1380,6 @@ AgendaEntryDelegate::sizeHint
             const int iconWidth = 2 * lineHeight + lineSpacing;
             int tertiaryWidth = width - iconWidth - attributes.iconTextSpacing * dpiXFactor - attributes.padding.left() - attributes.padding.right();
             int numLines;
-            // int tertiary;
             layoutTertiaryText(entry.tertiary, option.font, tertiaryWidth, numLines, tertiaryHeight, nullptr, true);
             tertiaryHeight += 2 * lineSpacing;
         }

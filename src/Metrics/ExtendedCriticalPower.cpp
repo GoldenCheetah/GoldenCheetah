@@ -2477,8 +2477,6 @@ ExtendedCriticalPower::getPlotCurveForDerived(RideFileCache *bests, RideFile::Se
     QVector<double> smoothed;
     QVector<double> time;
 
-    // double total = 0.0;
-
     int l = 10;
     int d = 5;
     for (int i = 1; i < 1 + d; i++) {
@@ -2486,7 +2484,6 @@ ExtendedCriticalPower::getPlotCurveForDerived(RideFileCache *bests, RideFile::Se
 
         yValues.append(newvalue);
         xValues.append((i)/60.0f);
-        // total += newvalue;
     }
 
     for (int i=1; i < count - d; i++) {
@@ -2494,10 +2491,8 @@ ExtendedCriticalPower::getPlotCurveForDerived(RideFileCache *bests, RideFile::Se
 
         yValues.append(newvalue);
         xValues.append((i+d)/60.0f);
-        // total += newvalue;
 
         if (yValues.count() > l) {
-            // total -= yValues.at(0);
             xValues.remove(0);
             yValues.remove(0);
         }

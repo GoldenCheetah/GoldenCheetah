@@ -792,8 +792,8 @@ void DialWindow::seriesChanged()
     case RealtimeData::HeatLoad:
            foreground = GColor(CHEATLOAD);
            break;
-    default:
-            break;
+
+    default: break;
     }
 
     valueLabel->setStrategy(appsettings->value(this, TRAIN_TELEMETRY_FONT_SCALING, 0).toInt() == 0 ? ScalingLabelStrategy::HeightOnly : ScalingLabelStrategy::Linear);
