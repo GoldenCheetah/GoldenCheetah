@@ -61,7 +61,7 @@ GcFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) 
             // by default QDateTime is localtime - the source however is UTC
             QDateTime aslocal = QDateTime::fromString(value, DATETIME_FORMAT);
             // construct in UTC so we can honour the conversion to localtime
-            QDateTime asUTC = QDateTime(aslocal.date(), aslocal.time(), Qt::UTC);
+            QDateTime asUTC = QDateTime(aslocal.date(), aslocal.time(), QTimeZone::UTC);
             // now set in localtime
             rideFile->setStartTime(asUTC.toLocalTime());
         }

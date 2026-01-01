@@ -292,7 +292,7 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
 {
     qDebug() << "service state changed " << s << "for device" << m_currentDevice.name() << " " << m_currentDevice.deviceUuid();
 
-    if (s == QLowEnergyService::ServiceDiscovered) {
+    if (s == QLowEnergyService::RemoteServiceDiscovered) {
 
         foreach (QLowEnergyService* const &service, m_services) {
 
