@@ -123,7 +123,7 @@ void HttpConnectionHandlerPool::loadSslConfig() {
             sslConfiguration->setLocalCertificate(certificate);
             sslConfiguration->setPrivateKey(sslKey);
             sslConfiguration->setPeerVerifyMode(QSslSocket::VerifyNone);
-            sslConfiguration->setProtocol(QSsl::TlsV1_0);
+            sslConfiguration->setProtocol(QSsl::TlsV1_2OrLater);
 
             wDebug("HttpConnectionHandlerPool: SSL settings loaded");
          #endif
