@@ -352,6 +352,10 @@ CalendarDetailedDayDelegate::paint
     if (! ok) {
         pressedEntryIdx = -2;
     }
+    int relatedEntryIdx = index.data(RelatedEntryRole).toInt(&ok);
+    if (! ok) {
+        relatedEntryIdx = -2;
+    }
     CalendarDay calendarDay = index.data(DayRole).value<CalendarDay>();
     QList<CalendarEntryLayout> layout = index.data(LayoutRole).value<QList<CalendarEntryLayout>>();
     entryTester.resize(index, layout.count());
@@ -394,6 +398,7 @@ CalendarDetailedDayDelegate::paint
             continue;
         }
         bool pressed = (l.entryIdx == pressedEntryIdx);
+        bool related = (l.entryIdx == relatedEntryIdx);
         const CalendarEntry &entry = calendarDay.entries[l.entryIdx];
         int startMinute = entry.start.hour() * 60 + entry.start.minute();
         int endMinute = startMinute + entry.durationSecs / 60;
@@ -417,6 +422,12 @@ CalendarDetailedDayDelegate::paint
         if (pressed) {
             entryBG = option.palette.highlight().color();
             entryFrame = entryBG;
+        } else if (related) {
+            QColor relColor = opt.palette.highlight().color();
+            relColor.setAlpha(40);
+            relColor = GCColor::blendedColor(relColor, bgColor);
+            entryBG = relColor;
+            entryFrame = relColor;
         } else if (entry.type == ENTRY_TYPE_ACTIVITY) {
             QColor overlayBG = entry.color;
             overlayBG = entry.color;
@@ -437,7 +448,6 @@ CalendarDetailedDayDelegate::paint
         int iconWidth = 0;
         if (height >= lineHeight && columnWidth >= lineHeight) {
             QColor pixmapColor(entry.color);
-            // int headlineOffset = 0;
             if (height >= 2 * lineHeight + priSecSpacing && columnWidth >= 2 * lineHeight + priSecSpacing) {
                 iconWidth = 2 * lineHeight + priSecSpacing;
             } else {
@@ -446,7 +456,7 @@ CalendarDetailedDayDelegate::paint
             QSize pixmapSize(iconWidth, iconWidth);
             QPixmap pixmap;
             if (entry.type == ENTRY_TYPE_PLANNED_ACTIVITY) {
-                if (pressed) {
+                if (pressed || related) {
                     pixmapColor = GCColor::invertColor(entryBG);
                 }
                 pixmap = svgAsColoredPixmap(entry.iconFile, pixmapSize, iconSpacing, pixmapColor);
@@ -454,7 +464,7 @@ CalendarDetailedDayDelegate::paint
                 pixmap = svgOnBackground(entry.iconFile, pixmapSize, iconSpacing, pixmapColor, radius);
             }
             painter->drawPixmap(left, top, pixmap);
-            if (! pressed && ! entry.linkedReference.isEmpty()) {
+            if (! pressed && ! related && ! entry.linkedReference.isEmpty()) {
                 QRect rect(left + columnWidth - 2 * painter->pen().width(), top, radius, height);
                 QPainterPath path;
                 path.moveTo(rect.left(), rect.top());
@@ -804,6 +814,10 @@ CalendarCompactDayDelegate::paint
     if (! ok) {
         pressedEntryIdx = -2;
     }
+    int relatedEntryIdx = index.data(RelatedEntryRole).toInt(&ok);
+    if (! ok) {
+        relatedEntryIdx = -2;
+    }
 
     if (pressedEntryIdx < 0 && opt.state & QStyle::State_Selected) {
         bgColor = opt.palette.color(calendarDay.isDimmed == DayDimLevel::Full ? QPalette::Disabled : QPalette::Active, QPalette::Highlight);
@@ -813,6 +827,9 @@ CalendarCompactDayDelegate::paint
         bgColor = opt.palette.base().color();
     }
     entryColor = GCColor::invertColor(bgColor);
+    QColor relColor = opt.palette.highlight().color();
+    relColor.setAlpha(40);
+    relColor = GCColor::blendedColor(relColor, bgColor);
 
     painter->fillRect(opt.rect, bgColor);
 
@@ -864,6 +881,11 @@ CalendarCompactDayDelegate::paint
             painter->setPen(selColor);
             painter->drawRoundedRect(entryRect, radius, radius);
             painter->setPen(GCColor::invertColor(selColor));
+        } else if (i == relatedEntryIdx) {
+            painter->setBrush(relColor);
+            painter->setPen(relColor);
+            painter->drawRoundedRect(entryRect, radius, radius);
+            painter->setPen(GCColor::invertColor(relColor));
         }
         QPixmap pixmap;
         QColor pixmapColor(calEntry.color);
@@ -871,6 +893,8 @@ CalendarCompactDayDelegate::paint
             || (   opt.state & QStyle::State_Selected
                 && pressedEntryIdx < 0)) {
             pixmapColor = GCColor::invertColor(selColor);
+        } else if (i == relatedEntryIdx) {
+            pixmapColor = GCColor::invertColor(relColor);
         }
         if (calEntry.type == ENTRY_TYPE_PLANNED_ACTIVITY) {
             pixmap = svgAsColoredPixmap(calEntry.iconFile, pixmapSize, lineSpacing, pixmapColor);
@@ -880,7 +904,7 @@ CalendarCompactDayDelegate::paint
         painter->drawPixmap(opt.rect.x() + leftMargin,
                             entryStartY + i * (entryHeight + lineSpacing),
                             pixmap);
-        if (i != pressedEntryIdx && ! calEntry.linkedReference.isEmpty()) {
+        if (i != pressedEntryIdx && i != relatedEntryIdx && ! calEntry.linkedReference.isEmpty()) {
             int left = titleRect.x() + titleRect.width() - radius - 1 * dpiXFactor;
             int columnWidth = radius;
             int top = titleRect.y();
@@ -1721,35 +1745,50 @@ toolTipDayEntry(const QPoint &pos, QAbstractItemView *view, const CalendarDay &d
 {
     if (idx >= 0 && idx < day.entries.size()) {
         CalendarEntry calEntry = day.entries[idx];
-        QString tooltip = "<center><b>" + calEntry.primary + "</b>";
-        tooltip += "<br/>[";
-        switch (calEntry.type) {
-        case ENTRY_TYPE_ACTIVITY:
-            tooltip += QObject::tr("completed");
-            break;
-        case ENTRY_TYPE_PLANNED_ACTIVITY:
-            tooltip += QObject::tr("planned");
-            break;
-        case ENTRY_TYPE_OTHER:
-        default:
-            tooltip += QObject::tr("other");
-            break;
+        QString status;
+        if (calEntry.type == ENTRY_TYPE_ACTIVITY) {
+            status = QObject::tr("completed");
+        } else {
+            status = QObject::tr("planned");
         }
         if (calEntry.dirty) {
-            tooltip += QObject::tr(", modified");
+            status += ", " + QObject::tr("modified");
         }
-        tooltip += "]<br/>";
+
+        QString tooltip = QString("<div style='padding: %1px;'>").arg(4 * dpiXFactor);
+        tooltip += QString("<div style='font-weight: bold; font-size: 110%; margin-bottom: %1px;'>%2</div>").arg(8 * dpiYFactor).arg(calEntry.primary);
+        tooltip += QString("<div style='font-style: italic; color: gray; margin-bottom: %1px;'>%2</div>").arg(6 * dpiYFactor).arg(status);
+        tooltip += "<table>";
         if (! calEntry.secondary.isEmpty()) {
-            tooltip += calEntry.secondaryMetric + ": " + calEntry.secondary;
-            tooltip += "<br/>";
+            tooltip += QString("<tr><td><b>%1:</b></td><td>%2</td></tr>").arg(calEntry.secondaryMetric).arg(calEntry.secondary);
         }
         if (calEntry.start.isValid()) {
-            tooltip += calEntry.start.toString();
+            QString time = calEntry.start.toString();
             if (calEntry.durationSecs > 0) {
-                tooltip += " - " + calEntry.start.addSecs(calEntry.durationSecs).toString();
+                time += " - " + calEntry.start.addSecs(calEntry.durationSecs).toString();
+            }
+            tooltip += QString("<tr><td><b>%1:</b></td><td>%2</td></tr>").arg(QObject::tr("When")).arg(time);
+        }
+        if (! calEntry.linkedReference.isEmpty()) {
+            QString countertype;
+            if (calEntry.type == ENTRY_TYPE_PLANNED_ACTIVITY) {
+                countertype = QObject::tr("Completed by");
+            } else {
+                countertype = QObject::tr("Planned as");
+            }
+            tooltip += QString("<tr><td style='padding-top: %1px'><b>%2:</b></td><td style='padding-top: %1px'>%3</td></tr>").arg(6 * dpiYFactor).arg(countertype).arg(calEntry.linkedPrimary);
+            if (calEntry.linkedStartDT.isValid()) {
+                QString linkedWhen;
+                QLocale locale;
+                if (calEntry.linkedStartDT.date() == day.date) {
+                    linkedWhen = locale.toString(calEntry.linkedStartDT.time(), QLocale::NarrowFormat);
+                } else {
+                    linkedWhen = locale.toString(calEntry.linkedStartDT, QLocale::NarrowFormat);
+                }
+                tooltip += QString("<tr><td><b>%1:</b></td><td>%2</td></tr>").arg(QObject::tr("On")).arg(linkedWhen);
             }
         }
-        tooltip += "</center>";
+        tooltip += "</table>";
         QToolTip::showText(pos, tooltip, view);
         return true;
     }

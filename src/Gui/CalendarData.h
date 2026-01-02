@@ -43,7 +43,6 @@ struct CalendarEntry {
     QString iconFile;
     QColor color;
     QString reference;
-    QString linkedReference;
     QTime start;
     int durationSecs = 0;
     int type = 0;
@@ -52,6 +51,10 @@ struct CalendarEntry {
     bool dirty = false;
     QDate spanStart = QDate();
     QDate spanEnd = QDate();
+
+    QString linkedReference = QString();
+    QString linkedPrimary = QString();
+    QDateTime linkedStartDT = QDateTime();
 };
 
 struct CalendarEntryLayout {

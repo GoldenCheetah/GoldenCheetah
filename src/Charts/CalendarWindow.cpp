@@ -31,6 +31,7 @@
 #include "WorkoutFilter.h"
 #include "IconManager.h"
 #include "SeasonDialogs.h"
+#include "SaveDialogs.h"
 
 #define HLO "<h4>"
 #define HLC "</h4>"
@@ -68,6 +69,9 @@ CalendarWindow::CalendarWindow(Context *context)
     connect(context, &Context::rideAdded, this, &CalendarWindow::updateActivitiesIfInRange);
     connect(context, &Context::rideDeleted, this, &CalendarWindow::updateActivitiesIfInRange);
     connect(context, &Context::rideChanged, this, &CalendarWindow::updateActivitiesIfInRange);
+    connect(context, &Context::rideSaved, this, &CalendarWindow::updateActivitiesIfInRange);
+    connect(context, &Context::rideDirty, this, &CalendarWindow::updateActivitiesIfInRange);
+    connect(context, &Context::rideClean, this, &CalendarWindow::updateActivitiesIfInRange);
     connect(context, &Context::configChanged, this, &CalendarWindow::configChanged);
     connect(calendar, &Calendar::showInTrainMode, this, [this](CalendarEntry activity) {
         RideItem *rideItem = getRideItem(activity);
@@ -114,10 +118,11 @@ CalendarWindow::CalendarWindow(Context *context)
     connect(calendar, &Calendar::delActivity, this, [this](CalendarEntry activity) {
         QMessageBox::StandardButton res = QMessageBox::question(this, tr("Delete Activity"), tr("Are you sure you want to delete %1?").arg(activity.reference));
         if (res == QMessageBox::Yes) {
-            this->context->tab->setNoSwitch(true);
-            unlinkActivities(activity);
-            this->context->athlete->rideCache->removeRide(activity.reference);
-            this->context->tab->setNoSwitch(false);
+            if (unlinkActivities(activity)) {
+                this->context->tab->setNoSwitch(true);
+                this->context->athlete->rideCache->removeRide(activity.reference);
+                this->context->tab->setNoSwitch(false);
+            }
 
             // Context::rideDeleted is not always emitted, therefore forcing the update
             updateActivities();
@@ -155,11 +160,13 @@ CalendarWindow::CalendarWindow(Context *context)
     connect(calendar, &Calendar::editPhase, this, &CalendarWindow::editPhase);
     connect(calendar, &Calendar::delPhase, this, &CalendarWindow::delPhase);
     connect(calendar, &Calendar::saveActivity, this, [this](const CalendarEntry &entry) {
-    void saveActivity(const CalendarEntry &activity);
         RideItem *item = getRideItem(entry, false);
         if (item != nullptr) {
-            this->context->mainWindow->saveSilent(this->context, item);
-            updateActivities();
+            QString error;
+            QList<RideItem*> activities;
+            activities << item;
+            relinkRideItems(this->context, item, activities);
+            this->context->athlete->rideCache->saveActivities(activities, error);
         }
     });
 
@@ -724,13 +731,20 @@ CalendarWindow::getActivities
             activity.color = rideItem->color;
         }
         activity.reference = rideItem->fileName;
-        activity.linkedReference = rideItem->getLinkedFileName();
         activity.start = rideItem->dateTime.time();
         activity.durationSecs = rideItem->getForSymbol("workout_time", GlobalContext::context()->useMetricUnits);
         activity.type = rideItem->planned ? ENTRY_TYPE_PLANNED_ACTIVITY : ENTRY_TYPE_ACTIVITY;
         activity.isRelocatable = rideItem->planned;
         activity.hasTrainMode = rideItem->planned && sport == "Bike" && ! buildWorkoutFilter(rideItem).isEmpty();
         activity.dirty = rideItem->isDirty();
+
+        RideItem *linkedRide = context->athlete->rideCache->getLinkedActivity(rideItem);
+        if (linkedRide != nullptr) {
+            activity.linkedReference = linkedRide->fileName;
+            activity.linkedPrimary = getPrimary(linkedRide);
+            activity.linkedStartDT = linkedRide->dateTime;
+        }
+
         activities[rideItem->dateTime.date()] << activity;
     }
     for (auto dayIt = activities.begin(); dayIt != activities.end(); ++dayIt) {
@@ -909,33 +923,6 @@ CalendarWindow::getPrimary
 }
 
 
-bool
-CalendarWindow::proceedDialog
-(const RideCache::OperationPreCheck &check)
-{
-    if (check.requiresUserDecision) {
-        QMessageBox msgBox(QMessageBox::Question,
-                           tr("Modified activities"),
-                           check.warningMessage,
-                           QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
-                           this);
-        int action = msgBox.exec();
-        if (action == QMessageBox::Cancel) {
-            return false;
-        } else if (action == QMessageBox::Save) {
-            QString error;
-            context->athlete->rideCache->saveActivities(check.dirtyItems, error);
-        } else if (action == QMessageBox::Discard) {
-            for (RideItem *item : check.dirtyItems) {
-                item->close();
-                item->ride();
-            }
-        }
-    }
-    return true;
-}
-
-
 void
 CalendarWindow::updateActivities
 ()
@@ -994,14 +981,14 @@ CalendarWindow::movePlannedActivity
 (RideItem *rideItem, const QDate &destDay, const QTime &destTime)
 {
     RideCache::OperationPreCheck check = context->athlete->rideCache->checkMoveActivity(rideItem, QDateTime(destDay, destTime));
-    if (check.canProceed && proceedDialog(check)) {
+    if (check.canProceed && proceedDialog(context, check)) {
         context->tab->setNoSwitch(true);
         RideCache::OperationResult result = context->athlete->rideCache->moveActivity(rideItem, QDateTime(destDay, destTime));
         if (result.success) {
             QString error;
             context->athlete->rideCache->saveActivities(check.affectedItems, error);
         } else {
-            QMessageBox::warning(this, "Failed", result.error);
+            QMessageBox::warning(this, tr("Failed"), result.error);
         }
         context->tab->setNoSwitch(false);
     }
@@ -1013,14 +1000,14 @@ CalendarWindow::shiftPlannedActivities
 (const QDate &destDay, int offset)
 {
     RideCache::OperationPreCheck check = context->athlete->rideCache->checkShiftPlannedActivities(destDay, offset);
-    if (check.canProceed && proceedDialog(check)) {
+    if (check.canProceed && proceedDialog(context, check)) {
         context->tab->setNoSwitch(true);
         RideCache::OperationResult result = context->athlete->rideCache->shiftPlannedActivities(destDay, offset);
         if (result.success) {
             QString error;
             context->athlete->rideCache->saveActivities(check.affectedItems, error);
         } else {
-            QMessageBox::warning(this, "Failed", result.error);
+            QMessageBox::warning(this, tr("Failed"), result.error);
         }
         context->tab->setNoSwitch(false);
     }
@@ -1033,38 +1020,48 @@ CalendarWindow::linkActivities
 {
     RideItem *rideItem = getRideItem(entry);
     RideItem *other = context->athlete->rideCache->findSuggestion(rideItem);
-    RideCache::OperationPreCheck check = context->athlete->rideCache->checkLinkActivities(rideItem, other);
-    if (check.canProceed && proceedDialog(check)) {
-        context->tab->setNoSwitch(true);
-        RideCache::OperationResult result = context->athlete->rideCache->linkActivities(rideItem, other);
-        if (result.success) {
-            QString error;
-            context->athlete->rideCache->saveActivities(check.affectedItems, error);
-        } else {
-            QMessageBox::warning(this, "Failed", result.error);
+    if (rideItem != nullptr && other != nullptr) {
+        RideCache::OperationPreCheck check = context->athlete->rideCache->checkLinkActivities(rideItem, other);
+        if (check.canProceed && proceedDialog(context, check)) {
+            context->tab->setNoSwitch(true);
+            RideCache::OperationResult result = context->athlete->rideCache->linkActivities(rideItem, other);
+            if (result.success) {
+                QString error;
+                context->athlete->rideCache->saveActivities(check.affectedItems, error);
+            } else {
+                QMessageBox::warning(this, tr("Failed"), result.error);
+            }
+            context->tab->setNoSwitch(false);
         }
-        context->tab->setNoSwitch(false);
+    } else {
+        QMessageBox::warning(this, tr("Failed"), tr("No matching activity found"));
     }
 }
 
 
-void
+bool
 CalendarWindow::unlinkActivities
 (const CalendarEntry &entry)
 {
+    bool ret = false;
     RideItem *item = context->athlete->rideCache->getRide(entry.reference, entry.type == ENTRY_TYPE_PLANNED_ACTIVITY);
+    if (item->getLinkedFileName().isEmpty()) {
+        return true;
+    }
     RideCache::OperationPreCheck check = context->athlete->rideCache->checkUnlinkActivity(item);
-    if (check.canProceed && proceedDialog(check)) {
+    if (check.canProceed && proceedDialog(context, check)) {
         context->tab->setNoSwitch(true);
         RideCache::OperationResult result = context->athlete->rideCache->unlinkActivity(item);
         if (result.success) {
             QString error;
             context->athlete->rideCache->saveActivities(check.affectedItems, error);
+            ret = true;
         } else {
-            QMessageBox::warning(this, "Failed", result.error);
+            QMessageBox::warning(this, tr("Failed"), result.error);
         }
         context->tab->setNoSwitch(false);
     }
+    return ret;
 }
 
 

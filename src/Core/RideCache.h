@@ -129,14 +129,17 @@ class RideCache : public QObject
         OperationPreCheck checkUnlinkActivity(RideItem *item);
         OperationResult unlinkActivity(RideItem *item);
 
+        OperationPreCheck checkUnlinkActivities(const QList<RideItem*> &items);
+        OperationResult unlinkActivities(const QList<RideItem*> &items);
+
         OperationPreCheck checkMoveActivity(RideItem *item, const QDateTime &newDateTime);
         OperationResult moveActivity(RideItem *item, const QDateTime &newDateTime);
 
         OperationPreCheck checkCopyPlannedActivity(RideItem *sourceItem, const QDate &newDate);
         OperationResult copyPlannedActivity(RideItem *sourceItem, const QDate &newDate);
 
-        OperationPreCheck checkCopyPlannedActivitiesBatch(const QList<std::pair<RideItem*, QDate>> &sourceItemsAndTargets);
-        OperationResult copyPlannedActivitiesBatch(const QList<std::pair<RideItem*, QDate>> &sourceItemsAndTargets);
+        OperationPreCheck checkCopyPlannedActivities(const QList<std::pair<RideItem*, QDate>> &sourceItemsAndTargets);
+        OperationResult copyPlannedActivities(const QList<std::pair<RideItem*, QDate>> &sourceItemsAndTargets);
 
         OperationPreCheck checkShiftPlannedActivities(const QDate &fromDate, int dayOffset);
         OperationResult shiftPlannedActivities(const QDate &fromDate, int dayOffset);

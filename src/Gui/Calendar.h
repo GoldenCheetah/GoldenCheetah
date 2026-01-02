@@ -139,6 +139,8 @@ private:
     void setDropIndicator(int y, BlockIndicator block);
     QMenu *makeHeaderMenu(const QModelIndex &index, const QPoint &pos);
     QMenu *makeActivityMenu(const QModelIndex &index, const QPoint &pos);
+    void setRelated(const QString &linkedReference);
+    void clearRelated();
 };
 
 
@@ -224,6 +226,9 @@ private:
     QPoint pressedPos;
     QModelIndex pressedIndex;
     bool isDraggable = false;
+
+    void setRelated(const QString &linkedReference);
+    void clearRelated();
 };
 
 

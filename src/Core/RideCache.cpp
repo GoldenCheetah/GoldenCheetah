@@ -372,7 +372,8 @@ RideCache::removeRide(const QString& filenameToDelete) {
         RideItem *linkedItem = getLinkedActivity(todelete);
         if (linkedItem) {
             linkedItem->clearLinkedFileName();
-            emit itemChanged(linkedItem);
+            QString error;
+            saveActivity(linkedItem, error);
         }
     }
 
@@ -1037,6 +1038,84 @@ RideCache::unlinkActivity
 
 
 RideCache::OperationPreCheck
+RideCache::checkUnlinkActivities
+(const QList<RideItem*> &items)
+{
+    OperationPreCheck batchCheck;
+
+    if (items.isEmpty()) {
+        batchCheck.canProceed = false;
+        batchCheck.blockingReason = tr("No activities given");
+        return batchCheck;
+    }
+
+    QSet<RideItem*> processedItems;
+    for (RideItem *item : items) {
+        if (! item || processedItems.contains(item)) {
+            continue;
+        }
+        OperationPreCheck itemCheck = checkUnlinkActivity(item);
+        if (! itemCheck.canProceed) {
+            continue;
+        }
+        batchCheck.affectedItems.append(itemCheck.affectedItems);
+        batchCheck.dirtyItems.append(itemCheck.dirtyItems);
+        for (RideItem *affectedItem : itemCheck.affectedItems) {
+            processedItems.insert(affectedItem);
+        }
+    }
+    if (batchCheck.affectedItems.isEmpty()) {
+        batchCheck.canProceed = false;
+        batchCheck.blockingReason = tr("No valid linked activities to unlink");
+        return batchCheck;
+    }
+    if (! batchCheck.dirtyItems.isEmpty()) {
+        batchCheck.requiresUserDecision = true;
+        QStringList dirtyNames;
+        for (RideItem *item : batchCheck.dirtyItems) {
+            dirtyNames << item->fileName;
+        }
+        batchCheck.warningMessage = tr(
+            "The following activities have unsaved changes:\n%1\n\n"
+            "Unlinking will modify these activities. You must save or discard changes first.")
+            .arg(dirtyNames.join("\n"));
+    }
+
+    return batchCheck;
+}
+
+
+RideCache::OperationResult
+RideCache::unlinkActivities
+(const QList<RideItem*> &items)
+{
+    OperationResult batchResult;
+    QSet<RideItem*> processedItems;
+
+    for (RideItem *item : items) {
+        if (! item || processedItems.contains(item)) {
+            continue;
+        }
+        RideItem *linkedItem = getLinkedActivity(item);
+        if (! linkedItem) {
+            continue;
+        }
+        if (processedItems.contains(linkedItem)) {
+            continue;
+        }
+        OperationResult itemResult = unlinkActivity(item);
+        if (itemResult.success) {
+            batchResult.affectedCount += itemResult.affectedCount;
+            processedItems.insert(item);
+            processedItems.insert(linkedItem);
+        }
+    }
+    batchResult.success = (batchResult.affectedCount > 0);
+    return batchResult;
+}
+
+
+RideCache::OperationPreCheck
 RideCache::checkMoveActivity
 (RideItem *item, const QDateTime &newDateTime)
 {
@@ -1219,7 +1298,7 @@ RideCache::copyPlannedActivity
 
 
 RideCache::OperationPreCheck
-RideCache::checkCopyPlannedActivitiesBatch
+RideCache::checkCopyPlannedActivities
 (const QList<std::pair<RideItem*, QDate>> &sourceItemsAndTargets)
 {
     OperationPreCheck check;
@@ -1267,7 +1346,7 @@ RideCache::checkCopyPlannedActivitiesBatch
 
 
 RideCache::OperationResult
-RideCache::copyPlannedActivitiesBatch
+RideCache::copyPlannedActivities
 (const QList<std::pair<RideItem*, QDate>> &sourceItemsAndTargets)
 {
     OperationResult result;

@@ -105,6 +105,8 @@ class MainWindow : public QMainWindow
 
         bool isStarting() const;
 
+        bool filenameWillChange(RideItem *rideItem, QString *newName = nullptr) const;
+
     protected:
 
         // used by ChooseCyclistDialog to see which athletes

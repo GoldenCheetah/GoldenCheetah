@@ -26,6 +26,7 @@
 #include "AthleteTab.h"
 #include "Seasons.h"
 #include "Colors.h"
+#include "SaveDialogs.h"
 
 #define ICON_COLOR QColor("#F79130")
 #ifdef Q_OS_MAC
@@ -77,19 +78,42 @@ RepeatScheduleWizard::done
         RepeatSchedulePageSummary *summaryPage = qobject_cast<RepeatSchedulePageSummary*>(page(PageSummary));
         QList<RideItem*> deletionList = summaryPage->getDeletionList();
         QList<std::pair<RideItem*, QDate>> scheduleList = summaryPage->getScheduleList();
+
         context->tab->setNoSwitch(true);
-        for (RideItem *rideItem : deletionList) {
-            // FIXME This can create unsaved linked activities, currently no pre-check available
-            context->athlete->rideCache->removeRide(rideItem->fileName);
-        }
-        RideCache::OperationPreCheck check = context->athlete->rideCache->checkCopyPlannedActivitiesBatch(scheduleList);
-        if (check.canProceed) {
-            RideCache::OperationResult result = context->athlete->rideCache->copyPlannedActivitiesBatch(scheduleList);
-            if (! result.success) {
-                QMessageBox::warning(this, "Failed", result.error);
+        RideCache::OperationPreCheck unlinkCheck = context->athlete->rideCache->checkUnlinkActivities(deletionList);
+        context->tab->setNoSwitch(false);
+        bool nextStep = true;
+        if (nextStep && unlinkCheck.canProceed) {
+             if (proceedDialog(context, unlinkCheck)) {
+                context->tab->setNoSwitch(true);
+                RideCache::OperationResult result = context->athlete->rideCache->unlinkActivities(deletionList);
+                context->tab->setNoSwitch(false);
+                if (result.success) {
+                    QString error;
+                    context->athlete->rideCache->saveActivities(unlinkCheck.affectedItems, error);
+                } else {
+                    QMessageBox::warning(this, "Failed", result.error);
+                    nextStep = false;
+                }
+            } else {
+                nextStep = false;
             }
         }
-        context->tab->setNoSwitch(false);
+        if (nextStep) {
+            context->tab->setNoSwitch(true);
+            for (RideItem *rideItem : deletionList) {
+                context->athlete->rideCache->removeRide(rideItem->fileName);
+            }
+            context->tab->setNoSwitch(false);
+            RideCache::OperationPreCheck check = context->athlete->rideCache->checkCopyPlannedActivities(scheduleList);
+            if (check.canProceed) {
+                RideCache::OperationResult result = context->athlete->rideCache->copyPlannedActivities(scheduleList);
+                if (! result.success) {
+                    QMessageBox::warning(this, "Failed", result.error);
+                }
+            }
+            context->tab->setNoSwitch(false);
+        }
         QApplication::restoreOverrideCursor();
     }
 

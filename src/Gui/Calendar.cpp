@@ -468,6 +468,7 @@ CalendarDayTable::mousePressEvent
         CalendarDay day = pressedIndex.data(CalendarDetailedDayDelegate::DayRole).value<CalendarDay>();
         if (entryIdx >= 0) {
             CalendarEntry calEntry = day.entries[entryIdx];
+            setRelated(day.entries[entryIdx].linkedReference);
             isDraggable = day.entries[entryIdx].isRelocatable;
             if (event->button() == Qt::LeftButton && isDraggable) {
                 dragTimer.start(QApplication::startDragTime());
@@ -517,6 +518,7 @@ CalendarDayTable::mouseReleaseEvent
         }
         pressedPos = QPoint();
         pressedIndex = QModelIndex();
+        clearRelated();
     }
 }
 
@@ -567,6 +569,7 @@ CalendarDayTable::mouseMoveEvent
     item->setData(CalendarDetailedDayDelegate::PressedEntryRole, QVariant());
     pressedPos = QPoint();
     pressedIndex = QModelIndex();
+    clearRelated();
 }
 
 
@@ -701,6 +704,7 @@ CalendarDayTable::showContextMenu
             }
         }
     }
+    clearRelated();
 }
 
 
@@ -849,6 +853,40 @@ CalendarDayTable::makeActivityMenu
         }
     }
     return contextMenu;
+}
+
+
+void
+CalendarDayTable::setRelated
+(const QString &linkedReference)
+{
+    if (! linkedReference.isEmpty()) {
+        for (int col = 1; col < columnCount(); ++col) {
+            QTableWidgetItem *item = this->item(1, col);
+            if (item) {
+                CalendarDay day = item->data(CalendarDetailedDayDelegate::DayRole).value<CalendarDay>();
+                for (int idx = 0; idx < day.entries.count(); ++idx) {
+                    if (day.entries[idx].reference == linkedReference) {
+                        item->setData(CalendarDetailedDayDelegate::RelatedEntryRole, idx);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+void
+CalendarDayTable::clearRelated
+()
+{
+    for (int col = 1; col < columnCount(); ++col) {
+        QTableWidgetItem *item = this->item(1, col);
+        if (item) {
+            item->setData(CalendarDetailedDayDelegate::RelatedEntryRole, QVariant());
+        }
+    }
 }
 
 
@@ -1151,6 +1189,7 @@ CalendarMonthTable::mousePressEvent
             CalendarDay day = pressedIndex.data(CalendarCompactDayDelegate::DayRole).value<CalendarDay>();
             if (entryIdx >= 0) {
                 CalendarEntry calEntry = day.entries[entryIdx];
+                setRelated(day.entries[entryIdx].linkedReference);
                 isDraggable = day.entries[entryIdx].isRelocatable;
                 if (event->button() == Qt::LeftButton && isDraggable) {
                     dragTimer.start(QApplication::startDragTime());
@@ -1211,6 +1250,7 @@ CalendarMonthTable::mouseReleaseEvent
         }
         pressedPos = QPoint();
         pressedIndex = QModelIndex();
+        clearRelated();
     }
     QTableWidget::mouseReleaseEvent(event);
 }
@@ -1260,6 +1300,7 @@ CalendarMonthTable::mouseMoveEvent
     }
     pressedPos = QPoint();
     pressedIndex = QModelIndex();
+    clearRelated();
 }
 
 
@@ -1337,6 +1378,45 @@ CalendarMonthTable::dropEvent
                     emit entryMoved(srcDay.entries[entryIdx], srcDay.date, destDay.date, srcDay.entries[entryIdx].start);
                 }
             }
+        }
+    }
+}
+
+
+void
+CalendarMonthTable::setRelated
+(const QString &linkedReference)
+{
+    if (! linkedReference.isEmpty()) {
+        for (int row = 0; row < rowCount() - 1; ++row) {
+            for (int col = 0; col < 7; ++col) {
+                QTableWidgetItem *item = this->item(row, col);
+                if (item) {
+                    CalendarDay day = item->data(CalendarCompactDayDelegate::DayRole).value<CalendarDay>();
+                    for (int idx = 0; idx < day.entries.count(); ++idx) {
+                        if (day.entries[idx].reference == linkedReference) {
+                            item->setData(CalendarCompactDayDelegate::RelatedEntryRole, idx);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+void
+CalendarMonthTable::clearRelated
+()
+{
+    for (int row = 0; row < rowCount() - 1; ++row) {
+        for (int col = 0; col < 7; ++col) {
+            QTableWidgetItem *item = this->item(row, col);
+            if (! item) {
+                continue;
+            }
+            item->setData(CalendarCompactDayDelegate::RelatedEntryRole, QVariant());
         }
     }
 }
@@ -1507,6 +1587,7 @@ CalendarMonthTable::showContextMenu
             item->setData(CalendarCompactDayDelegate::PressedEntryRole, QVariant());
         }
     }
+    clearRelated();
 }
 
 
