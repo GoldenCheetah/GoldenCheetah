@@ -470,8 +470,8 @@ static void qwtDrawTube(
         }
         else
         {
-            QwtPainter::drawPolyline( painter, points, size );
-            QwtPainter::drawPolyline( painter, points + size, size );
+            QwtPainter::drawPolyline( painter, points, static_cast<int>( size ) );
+            QwtPainter::drawPolyline( painter, points + size, static_cast<int>( size ) );
         }
     }
 
@@ -758,7 +758,7 @@ void QwtPlotIntervalCurve::drawSeries( QPainter* painter,
     const QRectF& canvasRect, int from, int to ) const
 {
     if ( to < 0 )
-        to = dataSize() - 1;
+        to = static_cast<int>( dataSize() - 1 );
 
     if ( from < 0 )
         from = 0;

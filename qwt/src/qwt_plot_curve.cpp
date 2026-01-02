@@ -387,7 +387,7 @@ void QwtPlotCurve::drawSeries( QPainter* painter,
     const QwtScaleMap& xMap, const QwtScaleMap& yMap,
     const QRectF& canvasRect, int from, int to ) const
 {
-    const size_t numSamples = dataSize();
+    const int numSamples = static_cast<int>( dataSize() );
 
     if ( !painter || numSamples <= 0 )
         return;
@@ -443,7 +443,7 @@ void QwtPlotCurve::drawCurve( QPainter* painter, int style,
                 // we always need the complete
                 // curve for fitting
                 from = 0;
-                to = dataSize() - 1;
+                to = static_cast<int>( dataSize() - 1 );
             }
             drawLines( painter, xMap, yMap, canvasRect, from, to );
             break;
@@ -1206,7 +1206,7 @@ qreal QwtPlotCurve::interpolatedValueAt( Qt::Orientation orientation, double val
 
         if ( index == -1 )
         {
-            const QPointF last = sample( dataSize() - 1 );
+            const QPointF last = sample( static_cast<int>( dataSize() - 1 ) );
 
             if ( value != last.x() )
                 return qQNaN();
@@ -1228,7 +1228,7 @@ qreal QwtPlotCurve::interpolatedValueAt( Qt::Orientation orientation, double val
 
         if ( index == -1 )
         {
-            const QPointF last = sample( dataSize() - 1 );
+            const QPointF last = sample( static_cast<int>( dataSize() - 1 ) );
 
             if ( value != last.y() )
                 return qQNaN();

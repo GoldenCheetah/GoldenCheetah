@@ -225,7 +225,7 @@ void QwtPlotBarChart::drawSeries( QPainter* painter,
     const QRectF& canvasRect, int from, int to ) const
 {
     if ( to < 0 )
-        to = dataSize() - 1;
+        to = static_cast<int>(dataSize() - 1);
 
     if ( from < 0 )
         from = 0;
@@ -419,10 +419,10 @@ QList< QwtLegendData > QwtPlotBarChart::legendData() const
 
     if ( m_data->legendMode == LegendBarTitles )
     {
-        const size_t numSamples = dataSize();
+        const int numSamples = static_cast<int>(dataSize());
         list.reserve( numSamples );
 
-        for ( size_t i = 0; i < numSamples; i++ )
+        for ( int i = 0; i < numSamples; i++ )
         {
             QwtLegendData data;
 

@@ -127,7 +127,7 @@ QPointF QwtSyntheticPointData::sample( size_t index ) const
     if ( index >= m_size )
         return QPointF( 0, 0 );
 
-    const double xValue = x( index );
+    const double xValue = x( static_cast<uint>( index ) );
     const double yValue = y( xValue );
 
     return QPointF( xValue, yValue );

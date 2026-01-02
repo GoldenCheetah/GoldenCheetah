@@ -389,7 +389,7 @@ void QwtPlotTradingCurve::drawSeries( QPainter* painter,
     const QRectF& canvasRect, int from, int to ) const
 {
     if ( to < 0 )
-        to = dataSize() - 1;
+        to = static_cast<int>( dataSize() - 1 );
 
     if ( from < 0 )
         from = 0;
