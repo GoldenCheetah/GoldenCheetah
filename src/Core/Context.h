@@ -181,6 +181,8 @@ class Context : public QObject
         void notifyAthleteClose(QString folder, Context *context) { emit athleteClose(folder,context); }
         void notifyLoadDone(QString folder, Context *context) { emit loadDone(folder, context); } // MainWindow finished
 
+        void notifyAutoImportCompleted() { emit autoImportCompleted(); }
+
         // preset charts
         void notifyPresetsChanged() { emit presetsChanged(); }
         void notifyPresetSelected(int n) { emit presetSelected(n); }
@@ -284,6 +286,8 @@ class Context : public QObject
         void loadCompleted(QString, Context*);
         void loadDone(QString, Context*);
         void athleteClose(QString, Context*);
+
+        void autoImportCompleted();
 
         // global filter changed
         void filterChanged();
