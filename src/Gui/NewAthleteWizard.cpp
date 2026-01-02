@@ -172,10 +172,10 @@ NewAthleteWizard::done
                     }
                 }
             } else {
-                QMessageBox::critical(0, tr("Fatal Error"), tr("Can't create new directory ") + home.canonicalPath() + "/" + name, "OK");
+                QMessageBox::critical(this, tr("Fatal Error"), tr("Can't create new directory ") + home.canonicalPath() + "/" + name);
             }
         } else {
-            QMessageBox::critical(0, tr("Fatal Error"), tr("Athlete already exists ")  + name, "OK");
+            QMessageBox::critical(this, tr("Fatal Error"), tr("Athlete already exists ")  + name);
         }
     }
     QWizard::done(result);
