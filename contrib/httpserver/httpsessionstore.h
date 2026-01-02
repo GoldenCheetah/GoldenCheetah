@@ -99,7 +99,7 @@ private:
 private slots:
 
     /** Called every minute to cleanup expired sessions. */
-    void timerEvent();
+    void cleanupTimerEvent();
 };
 
 #endif // HTTPSESSIONSTORE_H
