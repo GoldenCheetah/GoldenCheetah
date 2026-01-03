@@ -25,6 +25,9 @@
 #include <QDialog>
 #include <QColor>
 
+// color chooser that also supports the standard colors (CPLOTMARKER, CPOWER)
+// and returns them as a QColor(1,1,1,<int>) where <int> is the color number
+// .e.g CPOWER is 18, see below for full list
 class ColorButton : public QPushButton
 {
     Q_OBJECT
