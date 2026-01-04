@@ -23,6 +23,11 @@
 #include <cmath>
 #include <errno.h>
 
+#ifdef Q_OS_WIN
+// 'sprintf': This function or variable may be unsafe.
+#pragma warning(disable:4996)
+#endif
+
 #define MACRO_DEBUG false
 
 #define UNKNOWN 0x00

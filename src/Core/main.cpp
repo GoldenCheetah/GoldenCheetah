@@ -60,6 +60,13 @@
 #include <QStyleFactory>
 #endif
 
+#ifdef Q_OS_WIN
+// 'freopen': This function or variable may be unsafe.
+// 'fileno': The POSIX name for this item is deprecated.
+// 'dup2': The POSIX name for this item is deprecated.
+#pragma warning(disable:4996)
+#endif
+
 //
 // bootstrap state
 //

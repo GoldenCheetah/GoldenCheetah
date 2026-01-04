@@ -21,6 +21,11 @@
 #include "RealtimeData.h"
 #include "Units.h"
 
+#ifdef Q_OS_WIN
+// 'strcpy': This function or variable may be unsafe.
+#pragma warning(disable:4996)
+#endif
+
 void VirtualPowerTrainer::to_string(std::string& s) const {
     // poly|wheelrpm|name
     s.clear();

@@ -26,6 +26,11 @@
 #include <errno.h>
 #include <string.h>
 
+#ifdef Q_OS_WIN
+// 'sprintf': This function or variable may be unsafe.
+#pragma warning(disable:4996)
+#endif
+
 static bool moxyRegistered =
     Devices::addType("Moxy Muscle Oxygen Monitor", DevicesPtr(new MoxyDevices()) );
 

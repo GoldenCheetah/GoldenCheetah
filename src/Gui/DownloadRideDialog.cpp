@@ -31,6 +31,11 @@
 #include <errno.h>
 #include <QtGui>
 
+#ifdef Q_OS_WIN
+// 'strerror': This function or variable may be unsafe.
+#pragma warning(disable:4996)
+#endif
+
 DownloadRideDialog::DownloadRideDialog(Context *context, bool embedded) :
     context(context), cancelled(false),
     action(actionIdle), embedded(embedded)

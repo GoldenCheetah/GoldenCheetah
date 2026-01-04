@@ -30,6 +30,13 @@
 #define DUP(fd) dup(fd)
 #endif
 
+#ifdef Q_OS_WIN
+// 'fscanf': This function or variable may be unsafe.
+// 'sprintf': This function or variable may be unsafe.
+// 'fdopen': The POSIX name for this item is deprecated.
+#pragma warning(disable:4996)
+#endif
+
 static int rawFileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "raw", "GoldenCheetah Raw PowerTap Format", new RawFileReader());

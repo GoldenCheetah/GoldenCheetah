@@ -1,4 +1,4 @@
-/*
+﻿/*
 * Copyright (c) 2019 Eric Christoffersen (impolexg@outlook.com)
 *
 * This program is free software; you can redistribute it and/or modify it
@@ -29,7 +29,7 @@ const PolyFit<double>* GetAltitudeFit(unsigned maxOrder) {
 
 #if 1
     // Data from : Prediction of Critical Powerand W? in Hypoxia : Application to Work - Balance Modelling
-    //             by Nathan E.Townsend1, David S.Nichols, Philip F.Skiba, Sebastien Racinais and Julien D.P�riard
+    //             by Nathan E.Townsend1, David S.Nichols, Philip F.Skiba, Sebastien Racinais and Julien D.Périard
     //
     // Data in paper doesn't exceed 4250m. Cubic equation in paper decreases slope after 5000m, which doesn't
     // make sense, so using best fit 3rd order rational instead. Our equation continues at constant slope from

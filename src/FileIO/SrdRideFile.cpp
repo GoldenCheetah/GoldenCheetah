@@ -32,6 +32,13 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#ifdef Q_OS_WIN
+// '_open': This function or variable may be unsafe.
+// 'strcpy': This function or variable may be unsafe.
+// 'strerror': This function or variable may be unsafe.
+#pragma warning(disable:4996)
+#endif
+
 static int srdFileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "srd", "Polar SRD files", new SrdFileReader());

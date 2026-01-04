@@ -24,6 +24,10 @@
 #include <stdint.h>
 #include <cmath>
 
+#ifdef Q_OS_WIN
+// 'sprintf': This function or variable may be unsafe.
+#pragma warning(disable:4996)
+#endif
 
 static int syncFileReaderRegistered =
     RideFileFactory::instance().registerReader(

@@ -24,6 +24,11 @@
 #include <errno.h>
 //#include <termios.h>
 
+#ifdef Q_OS_WIN
+// 'sprintf': This function or variable may be unsafe.
+#pragma warning(disable:4996)
+#endif
+
 #define JOULE_DEBUG false // debug traces
 
 // Start pattern

@@ -21,6 +21,11 @@
 #include <cmath>
 #include "assert.h"
 
+#ifdef Q_OS_WIN
+// 'sprintf': This function or variable may be unsafe.
+#pragma warning(disable:4996)
+#endif
+
 #define PT_DEBUG false
 
 static bool powerTapRegistered =
