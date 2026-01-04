@@ -16,9 +16,9 @@ HEADERS += \
     qwt_clipper.h \
     qwt_color_map.h \
     qwt_column_symbol.h \
-    qwt_date.h \
-    qwt_date_scale_draw.h \
-    qwt_date_scale_engine.h \
+#    qwt_date.h \              Not used by GC and just raises warnings
+#    qwt_date_scale_draw.h \   Not used by GC and just raises warnings
+#    qwt_date_scale_engine.h \ Not used by GC and just raises warnings
     qwt_dyngrid_layout.h \
     qwt_global.h \
     qwt_graphic.h \
@@ -63,9 +63,9 @@ SOURCES += \
     qwt_clipper.cpp \
     qwt_color_map.cpp \
     qwt_column_symbol.cpp \
-    qwt_date.cpp \
-    qwt_date_scale_draw.cpp \
-    qwt_date_scale_engine.cpp \
+#    qwt_date.cpp \              Not used by GC and just raises warnings
+#    qwt_date_scale_draw.cpp \   Not used by GC and just raises warnings
+#    qwt_date_scale_engine.cpp \ Not used by GC and just raises warnings
     qwt_dyngrid_layout.cpp \
     qwt_event_pattern.cpp \
     qwt_graphic.cpp \
