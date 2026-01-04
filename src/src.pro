@@ -610,7 +610,7 @@ HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPl
 HEADERS += Cloud/CalendarDownload.h Cloud/CloudService.h \
            Cloud/LocalFileStore.h Cloud/OAuthDialog.h \
            Cloud/WithingsDownload.h Cloud/Strava.h Cloud/CyclingAnalytics.h Cloud/RideWithGPS.h \
-           Cloud/TrainingsTageBuch.h Cloud/Selfloops.h Cloud/Velohero.h Cloud/SportsPlusHealth.h \
+           Cloud/TrainingsTageBuch.h Cloud/Selfloops.h Cloud/SportsPlusHealth.h \
            Cloud/AddCloudWizard.h Cloud/Withings.h Cloud/MeasuresDownload.h Cloud/Xert.h \
            Cloud/Azum.h
 
@@ -720,7 +720,7 @@ SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts
 SOURCES += Cloud/CalendarDownload.cpp Cloud/CloudService.cpp \
            Cloud/LocalFileStore.cpp Cloud/OAuthDialog.cpp \
            Cloud/WithingsDownload.cpp Cloud/Strava.cpp Cloud/CyclingAnalytics.cpp Cloud/RideWithGPS.cpp \
-           Cloud/TrainingsTageBuch.cpp Cloud/Selfloops.cpp Cloud/Velohero.cpp Cloud/SportsPlusHealth.cpp \
+           Cloud/TrainingsTageBuch.cpp Cloud/Selfloops.cpp Cloud/SportsPlusHealth.cpp \
            Cloud/AddCloudWizard.cpp Cloud/Withings.cpp Cloud/MeasuresDownload.cpp Cloud/Xert.cpp \
            Cloud/Azum.cpp
 
