@@ -287,7 +287,7 @@ class ChartSpace : public QWidget
         void configChanged(qint32);
 
         // scale on first show
-        void showEvent(QShowEvent *) { updateView(); }
+        void showEvent(QShowEvent *) override;
         void resizeEvent(QResizeEvent *) { updateView(); }
 
         // scrolling

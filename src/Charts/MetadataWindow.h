@@ -40,6 +40,9 @@ class MetadataWindow : public GcChartWindow
 
     protected:
 
+        // the chart displays information related to the selected ride
+        bool selectedRideInfo() const override { return true; }
+
         Context *context;
         RideMetadata *rideMetadata;
 };
