@@ -472,8 +472,6 @@ HEADERS +=  $$HTPATH/httpglobal.h \
             $$HTPATH/httpresponse.h \
             $$HTPATH/httpcookie.h \
             $$HTPATH/httprequesthandler.h \
-            $$HTPATH/httpsession.h \
-            $$HTPATH/httpsessionstore.h \
             $$HTPATH/staticfilecontroller.h
 SOURCES +=  $$HTPATH/httpglobal.cpp \
             $$HTPATH/httplistener.cpp \
@@ -483,8 +481,6 @@ SOURCES +=  $$HTPATH/httpglobal.cpp \
             $$HTPATH/httpresponse.cpp \
             $$HTPATH/httpcookie.cpp \
             $$HTPATH/httprequesthandler.cpp \
-            $$HTPATH/httpsession.cpp \
-            $$HTPATH/httpsessionstore.cpp \
             $$HTPATH/staticfilecontroller.cpp
 
 
