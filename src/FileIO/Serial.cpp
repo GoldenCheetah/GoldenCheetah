@@ -43,7 +43,7 @@
 #include <unistd.h>
 #endif
 
-#ifdef Q_OS_WIN
+#ifdef Q_CC_MSVC
 // 'strcpy': This function or variable may be unsafe.
 #pragma warning(disable:4996)
 #endif

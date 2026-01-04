@@ -30,7 +30,7 @@
 #define DUP(fd) dup(fd)
 #endif
 
-#ifdef Q_OS_WIN
+#ifdef Q_CC_MSVC
 // 'fscanf': This function or variable may be unsafe.
 // 'sprintf': This function or variable may be unsafe.
 // 'fdopen': The POSIX name for this item is deprecated.

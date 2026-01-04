@@ -32,7 +32,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#ifdef Q_OS_WIN
+#ifdef Q_CC_MSVC
 // '_open': This function or variable may be unsafe.
 // 'strcpy': This function or variable may be unsafe.
 // 'strerror': This function or variable may be unsafe.

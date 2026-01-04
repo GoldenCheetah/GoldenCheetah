@@ -26,7 +26,7 @@
 #include <errno.h>
 #include <string.h>
 
-#ifdef Q_OS_WIN
+#ifdef Q_CC_MSVC
 // 'sprintf': This function or variable may be unsafe.
 #pragma warning(disable:4996)
 #endif

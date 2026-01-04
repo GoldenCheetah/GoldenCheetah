@@ -26,7 +26,7 @@
 #include <algorithm> // for std::sort
 #include "cmath"
 
-#ifdef Q_OS_WIN
+#ifdef Q_CC_MSVC
 // 'sprintf': This function or variable may be unsafe.
 // 'strcpy': This function or variable may be unsafe.
 // 'strncpy': This function or variable may be unsafe.
