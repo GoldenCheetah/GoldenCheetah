@@ -1798,7 +1798,10 @@ LTMSidebar::resetPreset()
 
     // we should have content now !
     QFile chartsxml(context->athlete->home->config().canonicalPath() + "/charts.xml");
-    chartsxml.open(QIODevice::WriteOnly);
+    if (!chartsxml.open(QIODevice::WriteOnly)) {
+        qWarning() << "Failed to open charts.xml for writing";
+        return;
+    }
     QTextStream out(&chartsxml);
     out << content;
     chartsxml.close();
