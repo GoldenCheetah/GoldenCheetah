@@ -60,13 +60,44 @@ private:
 };
 
 
+class CalendarBaseTable : public QTableWidget {
+    Q_OBJECT
+
+public:
+    explicit CalendarBaseTable(QWidget *parent = nullptr);
+
+signals:
+    void showInTrainMode(CalendarEntry ctivity);
+    void linkActivity(CalendarEntry activity, bool autoLink);
+    void unlinkActivity(CalendarEntry activity);
+    void viewActivity(CalendarEntry activity);
+    void viewLinkedActivity(CalendarEntry activity);
+    void addActivity(bool plan, QDate day, QTime time);
+    void delActivity(CalendarEntry activity);
+    void saveChanges(CalendarEntry activity);
+    void discardChanges(CalendarEntry activity);
+    void repeatSchedule(QDate day);
+    void insertRestday(QDate day);
+    void delRestday(QDate day);
+    void addEvent(QDate date);
+    void editEvent(CalendarEntry entry);
+    void delEvent(CalendarEntry entry);
+    void addPhase(QDate date);
+    void editPhase(CalendarEntry entry);
+    void delPhase(CalendarEntry entry);
+
+protected:
+    QMenu *buildContextMenu(const CalendarDay &day, CalendarEntry const * const entryPtr, const QTime &time, bool canHavePhasesEvents);
+};
+
+
 enum class CalendarDayTableType {
     Day,
     Week
 };
 
 
-class CalendarDayTable : public QTableWidget {
+class CalendarDayTable : public CalendarBaseTable {
     Q_OBJECT
 
 public:
@@ -86,22 +117,12 @@ public:
     void setEndHour(int hour);
 
 signals:
-    void dayClicked(const CalendarDay &day, const QTime &time);
-    void dayRightClicked(const CalendarDay &day, const QTime &time);
-    void entryClicked(const CalendarDay &day, int entryIdx);
-    void entryRightClicked(const CalendarDay &day, int entryIdx);
-    void entryMoved(const CalendarEntry &activity, const QDate &srcDay, const QDate &destDay, const QTime &destTime);
-    void dayChanged(const QDate &date);
-    void showInTrainMode(const CalendarEntry &activity);
-    void viewActivity(const CalendarEntry &activity);
-    void addActivity(bool plan, const QDate &day, const QTime &time);
-    void delActivity(const CalendarEntry &activity);
-    void addEvent(const QDate &date);
-    void editEvent(const CalendarEntry &entry);
-    void delEvent(const CalendarEntry &entry);
-    void addPhase(const QDate &date);
-    void editPhase(const CalendarEntry &entry);
-    void delPhase(const CalendarEntry &entry);
+    void dayClicked(CalendarDay day, QTime time);
+    void dayRightClicked(CalendarDay day, QTime time);
+    void entryClicked(CalendarDay day, int entryIdx);
+    void entryRightClicked(CalendarDay day, int entryIdx);
+    void entryMoved(CalendarEntry activity, QDate srcDay, QDate destDay, QTime destTime);
+    void dayChanged(QDate date);
 
 protected:
     void changeEvent(QEvent *event) override;
@@ -135,10 +156,12 @@ private:
     void setDropIndicator(int y, BlockIndicator block);
     QMenu *makeHeaderMenu(const QModelIndex &index, const QPoint &pos);
     QMenu *makeActivityMenu(const QModelIndex &index, const QPoint &pos);
+    void setRelated(const QString &linkedReference);
+    void clearRelated();
 };
 
 
-class CalendarMonthTable : public QTableWidget {
+class CalendarMonthTable : public CalendarBaseTable {
     Q_OBJECT
 
 public:
@@ -161,33 +184,20 @@ public:
     void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
 
 signals:
-    void daySelected(const CalendarDay &day);
-    void dayClicked(const CalendarDay &day);
-    void dayDblClicked(const CalendarDay &day);
-    void moreClicked(const CalendarDay &day);
-    void moreDblClicked(const CalendarDay &day);
-    void dayRightClicked(const CalendarDay &day);
-    void entryClicked(const CalendarDay &day, int entryIdx);
-    void entryDblClicked(const CalendarDay &day, int entryIdx);
-    void entryRightClicked(const CalendarDay &day, int entryIdx);
-    void entryMoved(const CalendarEntry &activity, const QDate &srcDay, const QDate &destDay, const QTime &destTime);
-    void summaryClicked(const QModelIndex &index);
-    void summaryDblClicked(const QModelIndex &index);
-    void summaryRightClicked(const QModelIndex &index);
-    void monthChanged(const QDate &month, const QDate &firstVisible, const QDate &lastVisible);
-    void showInTrainMode(const CalendarEntry &activity);
-    void viewActivity(const CalendarEntry &activity);
-    void addActivity(bool plan, const QDate &day, const QTime &time);
-    void delActivity(const CalendarEntry &activity);
-    void repeatSchedule(const QDate &day);
-    void insertRestday(const QDate &day);
-    void delRestday(const QDate &day);
-    void addEvent(const QDate &date);
-    void editEvent(const CalendarEntry &entry);
-    void delEvent(const CalendarEntry &entry);
-    void addPhase(const QDate &date);
-    void editPhase(const CalendarEntry &entry);
-    void delPhase(const CalendarEntry &entry);
+    void daySelected(CalendarDay day);
+    void dayClicked(CalendarDay day);
+    void dayDblClicked(CalendarDay day);
+    void moreClicked(CalendarDay day);
+    void moreDblClicked(CalendarDay day);
+    void dayRightClicked(CalendarDay day);
+    void entryClicked(CalendarDay day, int entryIdx);
+    void entryDblClicked(CalendarDay day, int entryIdx);
+    void entryRightClicked(CalendarDay day, int entryIdx);
+    void entryMoved(CalendarEntry activity, QDate srcDay, QDate destDay, QTime destTime);
+    void summaryClicked(QModelIndex index);
+    void summaryDblClicked(QModelIndex index);
+    void summaryRightClicked(QModelIndex index);
+    void monthChanged(QDate month, QDate firstVisible, QDate lastVisible);
 
 protected:
     void changeEvent(QEvent *event) override;
@@ -216,6 +226,9 @@ private:
     QPoint pressedPos;
     QModelIndex pressedIndex;
     bool isDraggable = false;
+
+    void setRelated(const QString &linkedReference);
+    void clearRelated();
 };
 
 
@@ -245,18 +258,27 @@ public:
     void updateMeasures();
 
 signals:
-    void showInTrainMode(const CalendarEntry &activity);
-    void viewActivity(const CalendarEntry &activity);
-    void addActivity(bool plan, const QDate &day, const QTime &time);
-    void delActivity(const CalendarEntry &activity);
-    void entryMoved(const CalendarEntry &activity, const QDate &srcDay, const QDate &destDay, const QTime &destTime);
-    void dayChanged(const QDate &date);
-    void addEvent(const QDate &date);
-    void editEvent(const CalendarEntry &entry);
-    void delEvent(const CalendarEntry &entry);
-    void addPhase(const QDate &date);
-    void editPhase(const CalendarEntry &entry);
-    void delPhase(const CalendarEntry &entry);
+    void entryMoved(CalendarEntry activity, QDate srcDay, QDate destDay, QTime destTime);
+    void dayChanged(QDate date);
+
+    void showInTrainMode(CalendarEntry activity);
+    void linkActivity(CalendarEntry activity, bool autoLink);
+    void unlinkActivity(CalendarEntry activity);
+    void viewActivity(CalendarEntry activity);
+    void viewLinkedActivity(CalendarEntry activity);
+    void addActivity(bool plan, QDate day, QTime time);
+    void delActivity(CalendarEntry activity);
+    void saveChanges(CalendarEntry activity);
+    void discardChanges(CalendarEntry activity);
+    void repeatSchedule(QDate day);
+    void insertRestday(QDate day);
+    void delRestday(QDate day);
+    void addEvent(QDate date);
+    void editEvent(CalendarEntry entry);
+    void delEvent(CalendarEntry entry);
+    void addPhase(QDate date);
+    void editPhase(CalendarEntry entry);
+    void delPhase(CalendarEntry entry);
 
 private:
     Measures * const athleteMeasures;
@@ -289,18 +311,27 @@ public:
     QDate selectedDate() const;
 
 signals:
-    void showInTrainMode(const CalendarEntry &activity);
-    void viewActivity(const CalendarEntry &activity);
-    void addActivity(bool plan, const QDate &day, const QTime &time);
-    void delActivity(const CalendarEntry &activity);
-    void entryMoved(const CalendarEntry &activity, const QDate &srcDay, const QDate &destDay, const QTime &destTime);
-    void dayChanged(const QDate &date);
-    void addEvent(const QDate &date);
-    void editEvent(const CalendarEntry &entry);
-    void delEvent(const CalendarEntry &entry);
-    void addPhase(const QDate &date);
-    void editPhase(const CalendarEntry &entry);
-    void delPhase(const CalendarEntry &entry);
+    void entryMoved(CalendarEntry activity, QDate srcDay, QDate destDay, QTime destTime);
+    void dayChanged(QDate date);
+
+    void showInTrainMode(CalendarEntry activity);
+    void linkActivity(CalendarEntry activity, bool autoLink);
+    void unlinkActivity(CalendarEntry activity);
+    void viewActivity(CalendarEntry activity);
+    void viewLinkedActivity(CalendarEntry activity);
+    void addActivity(bool plan, QDate day, QTime time);
+    void delActivity(CalendarEntry activity);
+    void saveChanges(CalendarEntry activity);
+    void discardChanges(CalendarEntry activity);
+    void repeatSchedule(QDate day);
+    void insertRestday(QDate day);
+    void delRestday(QDate day);
+    void addEvent(QDate date);
+    void editEvent(CalendarEntry entry);
+    void delEvent(CalendarEntry entry);
+    void addPhase(QDate date);
+    void editPhase(CalendarEntry entry);
+    void delPhase(CalendarEntry entry);
 
 private:
     CalendarDayTable *weekTable;
@@ -341,26 +372,32 @@ public slots:
 
 signals:
     void viewChanged(CalendarView newView, CalendarView oldView);
-    void daySelected(const QDate &date);
-    void dayClicked(const QDate &date);
-    void summaryClicked(const QDate &date);
-    void dayChanged(const QDate &date);
-    void monthChanged(const QDate &month, const QDate &firstVisible, const QDate &lastVisible);
-    void dateRangeActivated(const QString &name);
-    void showInTrainMode(const CalendarEntry &activity);
-    void viewActivity(const CalendarEntry &activity);
-    void addActivity(bool plan, const QDate &day, const QTime &time);
-    void delActivity(const CalendarEntry &activity);
-    void repeatSchedule(const QDate &day);
-    void moveActivity(const CalendarEntry &activity, const QDate &srcDay, const QDate &destDay, const QTime &destTime);
-    void insertRestday(const QDate &day);
-    void delRestday(const QDate &day);
-    void addEvent(const QDate &date);
-    void editEvent(const CalendarEntry &entry);
-    void delEvent(const CalendarEntry &entry);
-    void addPhase(const QDate &date);
-    void editPhase(const CalendarEntry &entry);
-    void delPhase(const CalendarEntry &entry);
+    void daySelected(QDate date);
+    void dayClicked(QDate date);
+    void summaryClicked(QDate date);
+    void dayChanged(QDate date);
+    void monthChanged(QDate month, QDate firstVisible, QDate lastVisible);
+    void dateRangeActivated(QString name);
+    void moveActivity(CalendarEntry activity, QDate srcDay, QDate destDay, QTime destTime);
+
+    void showInTrainMode(CalendarEntry activity);
+    void linkActivity(CalendarEntry activity, bool autoLink);
+    void unlinkActivity(CalendarEntry activity);
+    void viewActivity(CalendarEntry activity);
+    void viewLinkedActivity(CalendarEntry activity);
+    void addActivity(bool plan, QDate day, QTime time);
+    void delActivity(CalendarEntry activity);
+    void saveChanges(CalendarEntry activity);
+    void discardChanges(CalendarEntry activity);
+    void repeatSchedule(QDate day);
+    void insertRestday(QDate day);
+    void delRestday(QDate day);
+    void addEvent(QDate date);
+    void editEvent(CalendarEntry entry);
+    void delEvent(CalendarEntry entry);
+    void addPhase(QDate date);
+    void editPhase(CalendarEntry entry);
+    void delPhase(CalendarEntry entry);
 
 private:
     QToolBar *toolbar;

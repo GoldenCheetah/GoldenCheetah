@@ -19,6 +19,7 @@
 #include "CalendarWindow.h"
 
 #include <QComboBox>
+#include <QDialogButtonBox>
 
 #include "MainWindow.h"
 #include "AthleteTab.h"
@@ -31,10 +32,259 @@
 #include "WorkoutFilter.h"
 #include "IconManager.h"
 #include "SeasonDialogs.h"
+#include "SaveDialogs.h"
 
 #define HLO "<h4>"
 #define HLC "</h4>"
 
+
+//////////////////////////////////////////////////////////////////////////////
+// LinkDialog
+
+LinkDialog::LinkDialog
+(const LinkEntry &entry, QList<LinkEntry> &candidates, QWidget *parent)
+: QDialog(parent), entry(entry), candidates(candidates)
+{
+    setModal(true);
+    setWindowTitle(tr("Link Activity"));
+    setMinimumSize(720 * dpiXFactor, 550 * dpiYFactor);
+    resize(720 * dpiXFactor, 550 * dpiYFactor);
+    QLocale locale;
+
+    QLabel *introLabel = new QLabel();
+    if (entry.planned) {
+        introLabel->setText(tr("Find a completed activity for:"));
+    } else {
+        introLabel->setText(tr("Find a planned activity for:"));
+    }
+
+    QLabel *primaryLabel = new QLabel(entry.primary);
+    QFont primaryFont = primaryLabel->font();
+    primaryFont.setPointSize(primaryFont.pointSize() * 1.2);
+    primaryFont.setWeight(QFont::Bold);
+    primaryLabel->setFont(primaryFont);
+
+    QLabel *secondaryLabel = new QLabel();
+    if (entry.secondary.isEmpty() || entry.secondaryMetric.isEmpty()) {
+        secondaryLabel->setText(QString("%1 • %2")
+                                       .arg(locale.toString(entry.date, QLocale::NarrowFormat))
+                                       .arg(locale.toString(entry.time, QLocale::NarrowFormat)));
+    } else {
+        secondaryLabel->setText(QString("%1 • %2 • %3 <font style='font-weight: 250'>%4</font>")
+                                       .arg(locale.toString(entry.date, QLocale::NarrowFormat))
+                                       .arg(locale.toString(entry.time, QLocale::NarrowFormat))
+                                       .arg(entry.secondary)
+                                       .arg(entry.secondaryMetric));
+    }
+
+    QVBoxLayout *entryLabelLayout = new QVBoxLayout();
+    entryLabelLayout->addWidget(primaryLabel);
+    entryLabelLayout->addWidget(secondaryLabel);
+
+    int entryHeight = primaryLabel->sizeHint().height() + secondaryLabel->sizeHint().height() + std::max(0, entryLabelLayout->spacing());
+    QPixmap pixmap;
+    if (entry.planned) {
+        pixmap = svgAsColoredPixmap(entry.iconFile, QSize(entryHeight, entryHeight), 0, entry.iconColor);
+    } else {
+        pixmap = svgOnBackground(entry.iconFile, QSize(entryHeight, entryHeight), 3 * dpiXFactor, entry.iconColor, 5 * dpiXFactor);
+    }
+
+    QLabel *iconLabel = new QLabel();
+    iconLabel->setPixmap(pixmap);
+    iconLabel->setFixedSize(pixmap.size());
+    iconLabel->setAlignment(Qt::AlignCenter);
+
+    QFrame *entryFrame = new QFrame();
+    entryFrame->setFrameShape(QFrame::StyledPanel);
+    QPalette palette = entryFrame->palette();
+    QColor tint = entry.iconColor;
+    tint.setAlpha(25);
+    QColor entryBG = GCColor::blendedColor(tint, palette.window().color());
+    entryFrame->setStyleSheet(QString("QFrame { background-color: %1; }").arg(entryBG.name()));
+
+    QHBoxLayout *entryLayout = new QHBoxLayout(entryFrame);
+    entryLayout->setContentsMargins(8 * dpiXFactor, 8 * dpiYFactor, 8 * dpiXFactor, 8 * dpiYFactor);
+    entryLayout->addWidget(iconLabel);
+    entryLayout->addSpacing(10 * dpiXFactor);
+    entryLayout->addLayout(entryLabelLayout);
+    entryLayout->addStretch();
+
+    QLabel *rangeLabel = new QLabel();
+    if (entry.planned) {
+        rangeLabel->setText(tr("Show <b>completed %2</b> activities").arg(entry.sport));
+    } else {
+        rangeLabel->setText(tr("Show <b>planned %2</b> activities").arg(entry.sport));
+    }
+
+    QComboBox *rangeCombo = new QComboBox();
+    rangeCombo->addItem(tr("14 days backward"));
+    rangeCombo->addItem(tr("7 days backward"));
+    rangeCombo->addItem(tr("±7 days"));
+    rangeCombo->addItem(tr("7 days forward"));
+    rangeCombo->addItem(tr("14 days forward"));
+
+    QHBoxLayout *rangeLayout = new QHBoxLayout();
+    rangeLayout->addWidget(rangeLabel);
+    rangeLayout->addWidget(rangeCombo);
+    rangeLayout->addStretch();
+
+    QFrame *emptyFrame = new QFrame();
+    emptyFrame->setFrameShape(QFrame::StyledPanel);
+    emptyFrame->setStyleSheet(QString("QFrame { background-color: %1; }").arg(palette.base().color().name()));
+
+
+    QString emptyHeadline = tr("No matching activities found");
+    QString emptyInfoline;
+    if (entry.planned) {
+        emptyInfoline = tr("There are no unlinked completed %1 activities in the selected date range.").arg(entry.sport);
+    } else {
+        emptyInfoline = tr("There are no unlinked planned %1 activities in the selected date range.").arg(entry.sport);
+    }
+    QString emptyActionline = tr("Try adjusting the date range filter or create a new activity.");
+    QString emptyMsg = QString("<h3>%1</h3>%2<br/>%3").arg(emptyHeadline).arg(emptyInfoline).arg(emptyActionline);
+    QLabel *emptyLabel = new QLabel(emptyMsg);
+    emptyLabel->setAlignment(Qt::AlignCenter);
+    emptyLabel->setWordWrap(true);
+
+    QVBoxLayout *emptyLayout = new QVBoxLayout(emptyFrame);
+    emptyLayout->setContentsMargins(8 * dpiXFactor, 8 * dpiYFactor, 8 * dpiXFactor, 8 * dpiYFactor);
+    emptyLayout->addWidget(emptyLabel);
+
+    QStringList columnLabels = {
+        "",
+        tr("Activity"),
+        tr("Date"),
+        tr("Days"),
+        tr("Time"),
+        entry.secondaryMetric
+    };
+
+    candidateTree = new QTreeWidget();
+    candidateTree->setColumnCount(6);
+    candidateTree->setHeaderLabels(columnLabels);
+    candidateTree->setRootIsDecorated(false);
+    candidateTree->setAlternatingRowColors(true);
+    candidateTree->setSelectionMode(QTreeWidget::SingleSelection);
+    candidateTree->setStyleSheet(QString("QTreeView::item { padding: %1px; }").arg(4 * dpiYFactor));
+    candidateTree->header()->setStretchLastSection(false);
+    candidateTree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    candidateTree->header()->setSectionResizeMode(1, QHeaderView::Stretch);
+    candidateTree->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    candidateTree->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+    candidateTree->header()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
+    candidateTree->header()->setSectionResizeMode(5, QHeaderView::ResizeToContents);
+
+    candidateStack = new QStackedWidget();
+    candidateStack->addWidget(emptyFrame);
+    candidateStack->addWidget(candidateTree);
+
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    acceptButton = buttonBox->button(QDialogButtonBox::Ok);
+    acceptButton->setText(tr("Link"));
+    acceptButton->setEnabled(false);
+
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->addWidget(introLabel);
+    mainLayout->addSpacing(5 * dpiYFactor);
+    mainLayout->addWidget(entryFrame);
+    mainLayout->addSpacing(18 * dpiYFactor);
+    mainLayout->addLayout(rangeLayout);
+    mainLayout->addSpacing(12 * dpiYFactor);
+    mainLayout->addWidget(candidateStack, 1);
+    mainLayout->addSpacing(20 * dpiYFactor);
+    mainLayout->addWidget(buttonBox);
+
+    connect(rangeCombo, &QComboBox::currentIndexChanged, this, &LinkDialog::updateCandidates);
+    connect(candidateTree, &QTreeWidget::itemSelectionChanged, this, [this]() {
+        acceptButton->setEnabled(! candidateTree->selectedItems().isEmpty());
+    });
+    connect(candidateTree, &QTreeWidget::itemDoubleClicked, this, [this]() {
+        accept();
+    });
+
+    rangeCombo->setCurrentIndex(2);
+}
+
+
+QString
+LinkDialog::getSelectedReference
+() const
+{
+    QList<QTreeWidgetItem*> selectedItems = candidateTree->selectedItems();
+    if (! selectedItems.isEmpty()) {
+        return selectedItems.first()->data(0, Qt::UserRole).toString();
+    }
+    return QString();
+}
+
+
+void
+LinkDialog::updateCandidates
+(int range)
+{
+    int from[5] = {-14, -7, -7, 0, 0};
+    int to[5] = {0, 0, 7, 7, 14};
+    QDate minDate = entry.date.addDays(from[range]);
+    QDate maxDate = entry.date.addDays(to[range]);
+    candidateTree->clear();
+    int stackIdx = 0;
+    int selectRow = 0;
+    int i = 0;
+    double selectScore = 1;
+    QLocale locale;
+    for (const LinkEntry &candidate : candidates) {
+        if (candidate.date >= minDate && candidate.date <= maxDate) {
+            stackIdx = 1;
+            QString quality;
+            if (candidate.matchScore <= 0.2) {
+                quality = "★★★";
+            } else if (candidate.matchScore <= 0.45) {
+                quality = "★★☆";
+            } else {
+                quality = "★☆☆";
+            }
+            if (candidate.matchScore < selectScore) {
+                selectRow = i;
+                selectScore = candidate.matchScore;
+            }
+            QString days;
+            int dayDiff = entry.date.daysTo(candidate.date);
+            if (dayDiff < -1) {
+                days = tr("%1 days before").arg(-dayDiff);
+            } else if (dayDiff == -1) {
+                days = tr("1 day before");
+            } else if (dayDiff == 0) {
+                days = tr("same day");
+            } else if (dayDiff == 1) {
+                days = tr("1 day after");
+            } else if (dayDiff > 1) {
+                days = tr("%1 days after").arg(dayDiff);
+            }
+            QTreeWidgetItem *item = new QTreeWidgetItem(candidateTree);
+            item->setText(0, quality);
+            item->setData(0, Qt::UserRole, candidate.reference);
+            item->setText(1, candidate.primary);
+            item->setText(2, locale.toString(candidate.date, QLocale::NarrowFormat));
+            item->setText(3, days);
+            item->setText(4, locale.toString(candidate.time, QLocale::NarrowFormat));
+            item->setText(5, candidate.secondary);
+
+            ++i;
+        }
+    }
+    QTreeWidgetItem *item = candidateTree->topLevelItem(selectRow);
+    if (item != nullptr) {
+        candidateTree->setCurrentItem(item);
+    }
+    candidateStack->setCurrentIndex(stackIdx);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// CalendarWindow
 
 CalendarWindow::CalendarWindow(Context *context)
 : GcChartWindow(context), context(context)
@@ -51,6 +301,8 @@ CalendarWindow::CalendarWindow(Context *context)
     setChartLayout(mainLayout);
     mainLayout->addWidget(calendar);
 
+    connect(context->athlete->rideCache, QOverload<RideItem*>::of(&RideCache::itemChanged), this, &CalendarWindow::updateActivitiesIfInRange);
+    connect(context->athlete->rideCache, &RideCache::itemSaved, this, &CalendarWindow::updateActivitiesIfInRange);
     connect(context->athlete->seasons, &Seasons::seasonsChanged, this, [this]() {
         updateSeason(this->context->currentSeason(), true);
     });
@@ -66,27 +318,35 @@ CalendarWindow::CalendarWindow(Context *context)
     connect(context, &Context::rideAdded, this, &CalendarWindow::updateActivitiesIfInRange);
     connect(context, &Context::rideDeleted, this, &CalendarWindow::updateActivitiesIfInRange);
     connect(context, &Context::rideChanged, this, &CalendarWindow::updateActivitiesIfInRange);
+    connect(context, &Context::rideSaved, this, &CalendarWindow::updateActivitiesIfInRange);
+    connect(context, &Context::rideDirty, this, &CalendarWindow::updateActivitiesIfInRange);
+    connect(context, &Context::rideClean, this, &CalendarWindow::updateActivitiesIfInRange);
     connect(context, &Context::configChanged, this, &CalendarWindow::configChanged);
     connect(calendar, &Calendar::showInTrainMode, this, [this](CalendarEntry activity) {
-        for (RideItem *rideItem : this->context->athlete->rideCache->rides()) {
-            if (rideItem != nullptr && rideItem->fileName == activity.reference) {
-                QString filter = buildWorkoutFilter(rideItem);
-                if (! filter.isEmpty()) {
-                    this->context->mainWindow->fillinWorkoutFilterBox(filter);
-                    this->context->mainWindow->selectTrain();
-                    this->context->notifySelectWorkout(0);
-                }
-                break;
+        RideItem *rideItem = getRideItem(activity);
+        if (rideItem != nullptr) {
+            QString filter = buildWorkoutFilter(rideItem);
+            if (! filter.isEmpty()) {
+                this->context->mainWindow->fillinWorkoutFilterBox(filter);
+                this->context->mainWindow->selectTrain();
+                this->context->notifySelectWorkout(0);
             }
         }
     });
+    connect(calendar, &Calendar::linkActivity, this, &CalendarWindow::linkActivities);
+    connect(calendar, &Calendar::unlinkActivity, this, &CalendarWindow::unlinkActivities);
     connect(calendar, &Calendar::viewActivity, this, [this](CalendarEntry activity) {
-        for (RideItem *rideItem : this->context->athlete->rideCache->rides()) {
-            if (rideItem != nullptr && rideItem->fileName == activity.reference) {
-                this->context->notifyRideSelected(rideItem);
-                this->context->mainWindow->selectAnalysis();
-                break;
-            }
+        RideItem *rideItem = getRideItem(activity);
+        if (rideItem != nullptr) {
+            this->context->notifyRideSelected(rideItem);
+            this->context->mainWindow->selectAnalysis();
+        }
+    });
+    connect(calendar, &Calendar::viewLinkedActivity, this, [this](CalendarEntry entry) {
+        RideItem *rideItem = getRideItem(entry, true);
+        if (rideItem != nullptr) {
+            this->context->notifyRideSelected(rideItem);
+            this->context->mainWindow->selectAnalysis();
         }
     });
     connect(calendar, &Calendar::addActivity, this, [this](bool plan, const QDate &day, const QTime &time) {
@@ -107,9 +367,11 @@ CalendarWindow::CalendarWindow(Context *context)
     connect(calendar, &Calendar::delActivity, this, [this](CalendarEntry activity) {
         QMessageBox::StandardButton res = QMessageBox::question(this, tr("Delete Activity"), tr("Are you sure you want to delete %1?").arg(activity.reference));
         if (res == QMessageBox::Yes) {
-            this->context->tab->setNoSwitch(true);
-            this->context->athlete->rideCache->removeRide(activity.reference);
-            this->context->tab->setNoSwitch(false);
+            if (unlinkActivities(activity)) {
+                this->context->tab->setNoSwitch(true);
+                this->context->athlete->rideCache->removeRide(activity.reference);
+                this->context->tab->setNoSwitch(false);
+            }
 
             // Context::rideDeleted is not always emitted, therefore forcing the update
             updateActivities();
@@ -119,38 +381,22 @@ CalendarWindow::CalendarWindow(Context *context)
         Q_UNUSED(srcDay)
 
         QApplication::setOverrideCursor(Qt::WaitCursor);
-        for (RideItem *rideItem : this->context->athlete->rideCache->rides()) {
-            if (rideItem != nullptr && rideItem->fileName == activity.reference) {
-                movePlannedActivity(rideItem, destDay, destTime);
-                break;
-            }
+        RideItem *rideItem = getRideItem(activity);
+        if (rideItem != nullptr) {
+            movePlannedActivity(rideItem, destDay, destTime);
         }
         QApplication::restoreOverrideCursor();
     });
     connect(calendar, &Calendar::insertRestday, this, [this](const QDate &day) {
         QApplication::setOverrideCursor(Qt::WaitCursor);
-        QList<RideItem*> plannedRides;
-        for (RideItem *rideItem : this->context->athlete->rideCache->rides()) {
-            if (rideItem != nullptr && rideItem->planned && rideItem->dateTime.date() >= day) {
-                plannedRides << rideItem;
-            }
-        }
-        for (int i = plannedRides.size() - 1; i >= 0; --i) {
-            QDate destDay = plannedRides[i]->dateTime.date().addDays(1);
-            movePlannedActivity(plannedRides[i], destDay, plannedRides[i]->dateTime.time());
-        }
+        shiftPlannedActivities(day, 1);
         updateActivities();
         QApplication::restoreOverrideCursor();
     });
     connect(calendar, &Calendar::delRestday, this, [this](const QDate &day) {
         QApplication::setOverrideCursor(Qt::WaitCursor);
-        QList<RideItem*> plannedRides;
-        for (RideItem *rideItem : this->context->athlete->rideCache->rides()) {
-            if (rideItem != nullptr && rideItem->planned && rideItem->dateTime.date() >= day) {
-                QDate destDay = rideItem->dateTime.date().addDays(-1);
-                movePlannedActivity(rideItem, destDay, rideItem->dateTime.time());
-            }
-        }
+        shiftPlannedActivities(day, -1);
+        updateActivities();
         QApplication::restoreOverrideCursor();
     });
     connect(calendar, &Calendar::dayChanged, this, &CalendarWindow::updateActivities);
@@ -162,6 +408,24 @@ CalendarWindow::CalendarWindow(Context *context)
     connect(calendar, &Calendar::addPhase, this, &CalendarWindow::addPhase);
     connect(calendar, &Calendar::editPhase, this, &CalendarWindow::editPhase);
     connect(calendar, &Calendar::delPhase, this, &CalendarWindow::delPhase);
+    connect(calendar, &Calendar::saveChanges, this, [this](const CalendarEntry &entry) {
+        RideItem *item = getRideItem(entry, false);
+        if (item != nullptr) {
+            QString error;
+            QList<RideItem*> activities;
+            activities << item;
+            relinkRideItems(this->context, item, activities);
+            this->context->athlete->rideCache->saveActivities(activities, error);
+        }
+    });
+    connect(calendar, &Calendar::discardChanges, this, [this](const CalendarEntry &entry) {
+        RideItem *item = getRideItem(entry, false);
+        if (item != nullptr) {
+            item->close();
+            item->ride();
+            item->setStartTime(item->ride()->startTime());
+        }
+    });
 
     QTimer::singleShot(0, this, [this]() {
         configChanged(CONFIG_APPEARANCE);
@@ -698,19 +962,7 @@ CalendarWindow::getActivities
         QString sport = rideItem->sport;
         CalendarEntry activity;
 
-        QString primaryMain = rideItem->getText(getPrimaryMainField(), "").trimmed();
-        if (! primaryMain.isEmpty()) {
-            activity.primary = primaryMain;
-        } else {
-            QString primaryFallback = rideItem->getText(getPrimaryFallbackField(), "").trimmed();
-            if (! primaryFallback.isEmpty()) {
-                activity.primary = primaryFallback;
-            } else if (! sport.isEmpty()) {
-                activity.primary = tr("Unnamed %1").arg(sport);
-            } else {
-                activity.primary = tr("<unknown>");
-            }
-        }
+        activity.primary = getPrimary(rideItem);
         if (rideMetric != nullptr && rideMetric->isRelevantForRide(rideItem)) {
             activity.secondary = rideItem->getStringForSymbol(getSecondaryMetric(), GlobalContext::context()->useMetricUnits);
             if (! rideMetricUnit.isEmpty()) {
@@ -741,6 +993,15 @@ CalendarWindow::getActivities
         activity.type = rideItem->planned ? ENTRY_TYPE_PLANNED_ACTIVITY : ENTRY_TYPE_ACTIVITY;
         activity.isRelocatable = rideItem->planned;
         activity.hasTrainMode = rideItem->planned && sport == "Bike" && ! buildWorkoutFilter(rideItem).isEmpty();
+        activity.dirty = rideItem->isDirty();
+
+        RideItem *linkedRide = context->athlete->rideCache->getLinkedActivity(rideItem);
+        if (linkedRide != nullptr) {
+            activity.linkedReference = linkedRide->fileName;
+            activity.linkedPrimary = getPrimary(linkedRide);
+            activity.linkedStartDT = linkedRide->dateTime;
+        }
+
         activities[rideItem->dateTime.date()] << activity;
     }
     for (auto dayIt = activities.begin(); dayIt != activities.end(); ++dayIt) {
@@ -877,6 +1138,48 @@ CalendarWindow::getPhasesEvents
 }
 
 
+RideItem*
+CalendarWindow::getRideItem
+(const CalendarEntry &entry, bool linked)
+{
+    bool thisIsPlanned = (entry.type == ENTRY_TYPE_PLANNED_ACTIVITY);
+    for (RideItem *rideItem : this->context->athlete->rideCache->rides()) {
+        if (rideItem == nullptr || rideItem->fileName.isEmpty()) {
+            continue;
+        }
+        if (   (   linked
+                && rideItem->fileName == entry.linkedReference
+                && rideItem->planned != thisIsPlanned)
+            || (   ! linked
+                && rideItem->fileName == entry.reference
+                && rideItem->planned == thisIsPlanned)) {
+            return rideItem;
+        }
+    }
+    return nullptr;
+}
+
+
+QString
+CalendarWindow::getPrimary
+(RideItem const * const rideItem) const
+{
+    QString primary = rideItem->getText(getPrimaryMainField(), "").trimmed();
+    if (primary.isEmpty()) {
+        primary = rideItem->getText(getPrimaryFallbackField(), "").trimmed();
+        if (primary.isEmpty()) {
+            QString sport = rideItem->sport;
+            if (! sport.isEmpty()) {
+                primary = tr("Unnamed %1").arg(sport);
+            } else {
+                primary = tr("<unknown>");
+            }
+        }
+    }
+    return primary;
+}
+
+
 void
 CalendarWindow::updateActivities
 ()
@@ -930,36 +1233,163 @@ CalendarWindow::updateSeason
 }
 
 
-bool
+void
 CalendarWindow::movePlannedActivity
 (RideItem *rideItem, const QDate &destDay, const QTime &destTime)
 {
-    bool ret = false;
-    RideFile *rideFile = rideItem->ride();
-
-    QDateTime rideDateTime(destDay, destTime);
-    rideFile->setStartTime(rideDateTime);
-    QString basename = rideDateTime.toString("yyyy_MM_dd_HH_mm_ss");
-
-    QString filename;
-    if (rideItem->planned) {
-        filename = context->athlete->home->planned().canonicalPath() + "/" + basename + ".json";
-    } else {
-        filename = context->athlete->home->activities().canonicalPath() + "/" + basename + ".json";
-    }
-    QFile out(filename);
-    if (   ! out.exists()
-        && RideFileFactory::instance().writeRideFile(context, rideFile, out, "json")) {
+    RideCache::OperationPreCheck check = context->athlete->rideCache->checkMoveActivity(rideItem, QDateTime(destDay, destTime));
+    if (check.canProceed && proceedDialog(context, check)) {
         context->tab->setNoSwitch(true);
-        context->athlete->rideCache->removeRide(rideItem->fileName);
-        context->athlete->addRide(basename + ".json", true, true, false, rideItem->planned);
+        RideCache::OperationResult result = context->athlete->rideCache->moveActivity(rideItem, QDateTime(destDay, destTime));
+        if (result.success) {
+            QString error;
+            context->athlete->rideCache->saveActivities(check.affectedItems, error);
+        } else {
+            QMessageBox::warning(this, tr("Failed"), result.error);
+        }
         context->tab->setNoSwitch(false);
-        ret = true;
+    }
+}
+
+
+void
+CalendarWindow::shiftPlannedActivities
+(const QDate &destDay, int offset)
+{
+    RideCache::OperationPreCheck check = context->athlete->rideCache->checkShiftPlannedActivities(destDay, offset);
+    if (check.canProceed && proceedDialog(context, check)) {
+        context->tab->setNoSwitch(true);
+        RideCache::OperationResult result = context->athlete->rideCache->shiftPlannedActivities(destDay, offset);
+        if (result.success) {
+            QString error;
+            context->athlete->rideCache->saveActivities(check.affectedItems, error);
+        } else {
+            QMessageBox::warning(this, tr("Failed"), result.error);
+        }
+        context->tab->setNoSwitch(false);
+    }
+}
+
+
+void
+CalendarWindow::linkActivities
+(const CalendarEntry &entry, bool autoLink)
+{
+    RideItem *rideItem = getRideItem(entry);
+    if (rideItem == nullptr) {
+        return;
+    }
+    RideItem *other = nullptr;
+    if (autoLink) {
+        if ((other = context->athlete->rideCache->findSuggestion(rideItem)) == nullptr) {
+            QMessageBox::warning(this, tr("Failed"), tr("No matching activity found"));
+        }
     } else {
-        QMessageBox oops(QMessageBox::Critical,
-                         tr("Unable to save"),
-                         tr("There is already an activity with the same start time or you do not have permissions to save a file."));
-        oops.exec();
+        LinkEntry linkEntry;
+        linkEntry.reference = entry.reference;
+        linkEntry.planned = entry.type == ENTRY_TYPE_PLANNED_ACTIVITY;
+        linkEntry.sport = rideItem->sport;
+        linkEntry.iconFile = entry.iconFile;
+        linkEntry.iconColor = entry.color;
+        linkEntry.primary = entry.primary;
+        linkEntry.secondary = entry.secondary;
+        linkEntry.secondaryMetric = entry.secondaryMetric;
+        linkEntry.date = rideItem->dateTime.date();
+        linkEntry.time = entry.start;
+        linkEntry.matchScore = 1;
+
+        QDate minDate = linkEntry.date.addDays(-14);
+        QDate maxDate = linkEntry.date.addDays(14);
+
+        const RideMetricFactory &factory = RideMetricFactory::instance();
+        const RideMetric *rideMetric = factory.rideMetric(getSecondaryMetric());
+        QString rideMetricName;
+        QString rideMetricUnit;
+        if (rideMetric != nullptr) {
+            rideMetricName = rideMetric->name();
+            if (   ! rideMetric->isTime()
+                && ! rideMetric->isDate()) {
+                rideMetricUnit = rideMetric->units(GlobalContext::context()->useMetricUnits);
+            }
+        }
+        double rideMetricValue = rideItem->getForSymbol(getSecondaryMetric(), GlobalContext::context()->useMetricUnits);
+        QList<LinkEntry> candidates;
+        for (RideItem *candidateItem : context->athlete->rideCache->rides()) {
+            if (   candidateItem->dateTime.date() >= minDate
+                && candidateItem->dateTime.date() <= maxDate
+                && candidateItem->planned != linkEntry.planned
+                && candidateItem->sport == rideItem->sport
+                && candidateItem->getLinkedFileName().isEmpty()) {
+                LinkEntry candidate;
+                candidate.reference = candidateItem->fileName;
+                candidate.planned = candidateItem->planned;
+                candidate.primary = getPrimary(candidateItem);
+                candidate.secondary = candidateItem->getStringForSymbol(getSecondaryMetric(), GlobalContext::context()->useMetricUnits);
+                if (! rideMetricUnit.isEmpty()) {
+                    candidate.secondary += " " + rideMetricUnit;
+                }
+                candidate.secondaryMetric = rideMetricName;
+                candidate.date = candidateItem->dateTime.date();
+                candidate.time = candidateItem->dateTime.time();
+
+                double candidateMetricValue = candidateItem->getForSymbol(getSecondaryMetric(), GlobalContext::context()->useMetricUnits);
+                double dayScore = std::min(std::abs(linkEntry.date.daysTo(candidate.date)) / 7.0, 1.0);
+                double metricScore = 1.0;
+                if (rideMetricValue > 0 && candidateMetricValue > 0) {
+                    double maxMetric = std::max(rideMetricValue, candidateMetricValue);
+                    double metricDiff = std::abs(rideMetricValue - candidateMetricValue) / maxMetric;
+                    metricScore = std::min(metricDiff, 1.0);
+                }
+
+                candidate.matchScore = (0.2 * dayScore) + (0.8 * metricScore);
+                candidates << candidate;
+            }
+        }
+
+        LinkDialog linkDialog(linkEntry, candidates, this);
+        if (linkDialog.exec() == QDialog::Accepted) {
+            other = context->athlete->rideCache->getRide(linkDialog.getSelectedReference(), ! linkEntry.planned);
+        }
+    }
+
+    if (rideItem != nullptr && other != nullptr) {
+        RideCache::OperationPreCheck check = context->athlete->rideCache->checkLinkActivities(rideItem, other);
+        if (check.canProceed && proceedDialog(context, check)) {
+            context->tab->setNoSwitch(true);
+            RideCache::OperationResult result = context->athlete->rideCache->linkActivities(rideItem, other);
+            if (result.success) {
+                QString error;
+                context->athlete->rideCache->saveActivities(check.affectedItems, error);
+            } else {
+                QMessageBox::warning(this, tr("Failed"), result.error);
+            }
+            context->tab->setNoSwitch(false);
+        }
+    }
+}
+
+
+bool
+CalendarWindow::unlinkActivities
+(const CalendarEntry &entry)
+{
+    bool ret = false;
+    RideItem *item = context->athlete->rideCache->getRide(entry.reference, entry.type == ENTRY_TYPE_PLANNED_ACTIVITY);
+    if (item->getLinkedFileName().isEmpty()) {
+        return true;
+    }
+    RideCache::OperationPreCheck check = context->athlete->rideCache->checkUnlinkActivity(item);
+    if (check.canProceed && proceedDialog(context, check)) {
+        context->tab->setNoSwitch(true);
+        RideCache::OperationResult result = context->athlete->rideCache->unlinkActivity(item);
+        if (result.success) {
+            QString error;
+            context->athlete->rideCache->saveActivities(check.affectedItems, error);
+            ret = true;
+        } else {
+            QMessageBox::warning(this, tr("Failed"), result.error);
+        }
+        context->tab->setNoSwitch(false);
     }
     return ret;
 }

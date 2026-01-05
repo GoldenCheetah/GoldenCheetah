@@ -70,9 +70,9 @@ ManualActivityWizard::ManualActivityWizard
 : QWizard(parent), context(context), plan(plan)
 {
     if (plan) {
-        setWindowTitle(tr("Add a Planned Activity"));
+        setWindowTitle(tr("Plan Activity"));
     } else {
-        setWindowTitle(tr("Add a Completed Activity"));
+        setWindowTitle(tr("Log Activity"));
     }
     setMinimumSize(800 * dpiXFactor, 650 * dpiYFactor);
     setModal(true);

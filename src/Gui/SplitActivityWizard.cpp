@@ -777,6 +777,9 @@ SplitConfirm::createRideFile(long start, long stop)
     // lets keep the metadata too
     const_cast<QMap<QString,QString>&>(returning->tags()) = QMap<QString,QString>(ride->tags());
 
+    // but clear linked activities
+    returning->removeTag("Linked Filename");
+
     // now the dataPoints, check in bounds too!
     for(long i=start; i<stop && i<ride->dataPoints().count(); i++) {
         RideFilePoint *p = ride->dataPoints().at(i);

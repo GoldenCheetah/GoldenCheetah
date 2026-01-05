@@ -98,6 +98,8 @@ public:
     enum Roles {
         DayRole = Qt::UserRole + 1, // [CalendarDay] Calendar day
         PressedEntryRole,           // [int] Index of the currently pressed CalendarDay (see DayRole >> entries)
+        RelatedEntryRole,           // [int] Index of the entry related to the currently active one (see
+                                    //       PressedEntryRole, DayRole >> entries)
         LayoutRole                  // [QList<CalendarEntryLayout>] Layout of the activities in one column
     };
 
@@ -158,7 +160,9 @@ class CalendarCompactDayDelegate : public QStyledItemDelegate {
 public:
     enum Roles {
         DayRole = Qt::UserRole + 1, // [CalendarDay] Calendar day
-        PressedEntryRole            // [int] Index of the currently pressed CalendarDay (see DayRole >> entries)
+        PressedEntryRole,           // [int] Index of the currently pressed CalendarDay (see DayRole >> entries)
+        RelatedEntryRole            // [int] Index of the entry related to the currently active one (see
+                                    //       PressedEntryRole, DayRole >> entries)
     };
 
     explicit CalendarCompactDayDelegate(QObject *parent = nullptr);

@@ -56,6 +56,7 @@ class RideCache : public QObject
         // query the cache
         int count() const { return rides_.count(); }
         RideItem *getRide(QString filename);
+        RideItem *getRide(const QString &filename, bool planned);
         RideItem *getRide(QDateTime dateTime);
 	    QList<QDateTime> getAllDates();
         QStringList getAllFilenames();
@@ -103,6 +104,52 @@ class RideCache : public QObject
         void refresh();
         double progress() { return progress_; }
 
+        struct OperationPreCheck {
+            bool canProceed = true;
+            QString blockingReason;
+            QList<RideItem*> affectedItems; // All items that would be modified
+            QList<RideItem*> dirtyItems; // Affected items that are already dirty
+            bool requiresUserDecision = false;
+            QString warningMessage;
+        };
+
+        struct OperationResult {
+            bool success = false;
+            QString error;
+            int affectedCount = 0;
+        };
+
+        // Split validations out of the action-methods to allow user interaction if dependent
+        // activities need to be saved or reverted.
+        // (!) The action-methods don't repeat the input-validation, check is always required upfront
+
+        OperationPreCheck checkLinkActivities(RideItem *item1, RideItem *item2);
+        OperationResult linkActivities(RideItem *item1, RideItem *item2);
+
+        OperationPreCheck checkUnlinkActivity(RideItem *item);
+        OperationResult unlinkActivity(RideItem *item);
+
+        OperationPreCheck checkUnlinkActivities(const QList<RideItem*> &items);
+        OperationResult unlinkActivities(const QList<RideItem*> &items);
+
+        OperationPreCheck checkMoveActivity(RideItem *item, const QDateTime &newDateTime);
+        OperationResult moveActivity(RideItem *item, const QDateTime &newDateTime);
+
+        OperationPreCheck checkCopyPlannedActivity(RideItem *sourceItem, const QDate &newDate);
+        OperationResult copyPlannedActivity(RideItem *sourceItem, const QDate &newDate);
+
+        OperationPreCheck checkCopyPlannedActivities(const QList<std::pair<RideItem*, QDate>> &sourceItemsAndTargets);
+        OperationResult copyPlannedActivities(const QList<std::pair<RideItem*, QDate>> &sourceItemsAndTargets);
+
+        OperationPreCheck checkShiftPlannedActivities(const QDate &fromDate, int dayOffset);
+        OperationResult shiftPlannedActivities(const QDate &fromDate, int dayOffset);
+
+        bool saveActivity(RideItem *item, QString &error);
+        bool saveActivities(QList<RideItem*> items, QString &error);
+
+        RideItem *getLinkedActivity(RideItem *item);
+        RideItem *findSuggestion(RideItem *rideItem);
+
     public slots:
 
         // restore / dump cache to disk (json)
@@ -138,6 +185,7 @@ class RideCache : public QObject
 
         // us telling the world the item changed
         void itemChanged(RideItem*);
+        void itemSaved(RideItem *item);
 
     protected:
 
@@ -165,6 +213,11 @@ class RideCache : public QObject
 
         Estimator *estimator;
         bool first; // updated when estimates are marked stale
+
+    private:
+        bool renameRideFiles(const QString& oldFileName, const QString& newFileName, bool isPlanned, QString &error);
+        bool isValidLink(RideItem *item1, RideItem *item2, QString &error);
+        RideItem* copyPlannedRideFile(RideItem *sourceItem, const QDate &newDate, QString &error);
 };
 
 class AthleteBest

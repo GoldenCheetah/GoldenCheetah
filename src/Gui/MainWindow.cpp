@@ -77,6 +77,7 @@
 #include "AddCloudWizard.h"
 #include "LocalFileStore.h"
 #include "CloudService.h"
+#include "SaveDialogs.h"
 
 // GUI Widgets
 #include "AthleteTab.h"
@@ -1336,6 +1337,27 @@ MainWindow::isStarting
 }
 
 
+bool
+MainWindow::filenameWillChange(RideItem *rideItem, QString *newName) const
+{
+    QFileInfo currentFI(rideItem->fileName);
+    QDateTime ridedatetime = rideItem->ride()->startTime();
+    QChar zero = QLatin1Char('0');
+    QString targetnosuffix = QString("%1_%2_%3_%4_%5_%6")
+                                    .arg(ridedatetime.date().year(), 4, 10, zero)
+                                    .arg(ridedatetime.date().month(), 2, 10, zero)
+                                    .arg(ridedatetime.date().day(), 2, 10, zero)
+                                    .arg(ridedatetime.time().hour(), 2, 10, zero)
+                                    .arg(ridedatetime.time().minute(), 2, 10, zero)
+                                    .arg(ridedatetime.time().second(), 2, 10, zero);
+    if (newName != nullptr) {
+        *newName = targetnosuffix + "." + currentFI.suffix();
+    }
+
+    return currentFI.baseName() != targetnosuffix;
+}
+
+
 void
 MainWindow::setToolButtons()
 {
@@ -1890,8 +1912,29 @@ MainWindow::deleteRide()
     msgBox.setDefaultButton(QMessageBox::Cancel);
     msgBox.setIcon(QMessageBox::Critical);
     msgBox.exec();
-    if(msgBox.clickedButton() == deleteButton)
-        currentAthleteTab->context->athlete->removeCurrentRide();
+    if (msgBox.clickedButton() == deleteButton) {
+        RideCache::OperationPreCheck check = currentAthleteTab->context->athlete->rideCache->checkUnlinkActivity(item);
+        bool nextStep = true;
+        if (nextStep && check.canProceed) {
+            if (proceedDialog(currentAthleteTab->context, check)) {
+                currentAthleteTab->context->tab->setNoSwitch(true);
+                RideCache::OperationResult result = currentAthleteTab->context->athlete->rideCache->unlinkActivity(item);
+                currentAthleteTab->context->tab->setNoSwitch(false);
+                if (result.success) {
+                    QString error;
+                    currentAthleteTab->context->athlete->rideCache->saveActivities(check.affectedItems, error);
+                } else {
+                    QMessageBox::warning(this, "Failed", result.error);
+                    nextStep = false;
+                }
+            } else {
+                nextStep = false;
+            }
+        }
+        if (nextStep) {
+            currentAthleteTab->context->athlete->removeCurrentRide();
+        }
+    }
 }
 
 /*----------------------------------------------------------------------
