@@ -378,8 +378,8 @@ DownloadRideDialog::downloadClicked()
                         "been downloaded.  Do you want to overwrite the "
                         "previous download?")
                         .arg(files.at(i).startTime.toString()),
-                    tr("&Overwrite"), tr("&Skip"),
-                    QString(), 1, 1) == 1) {
+                    QMessageBox::Yes | QMessageBox::No,
+                    QMessageBox::No) == QMessageBox::Yes) {
                 QFile::remove(files.at(i).name);
                 updateStatus(tr("skipped file %1")
                     .arg( files.at(i).name ));

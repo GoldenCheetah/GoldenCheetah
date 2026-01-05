@@ -139,10 +139,6 @@ win32 {
 }
 
 macx {
-    lessThan(QT_MAJOR_VERSION, 6) {
-        # Mac native widget support
-        QT += macextras
-    }
 
     # we have our own plist
     QMAKE_INFO_PLIST = ./Resources/mac/Info.plist.app
@@ -472,8 +468,6 @@ HEADERS +=  $$HTPATH/httpglobal.h \
             $$HTPATH/httpresponse.h \
             $$HTPATH/httpcookie.h \
             $$HTPATH/httprequesthandler.h \
-            $$HTPATH/httpsession.h \
-            $$HTPATH/httpsessionstore.h \
             $$HTPATH/staticfilecontroller.h
 SOURCES +=  $$HTPATH/httpglobal.cpp \
             $$HTPATH/httplistener.cpp \
@@ -483,8 +477,6 @@ SOURCES +=  $$HTPATH/httpglobal.cpp \
             $$HTPATH/httpresponse.cpp \
             $$HTPATH/httpcookie.cpp \
             $$HTPATH/httprequesthandler.cpp \
-            $$HTPATH/httpsession.cpp \
-            $$HTPATH/httpsessionstore.cpp \
             $$HTPATH/staticfilecontroller.cpp
 
 
@@ -618,7 +610,7 @@ HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPl
 HEADERS += Cloud/CalendarDownload.h Cloud/CloudService.h \
            Cloud/LocalFileStore.h Cloud/OAuthDialog.h \
            Cloud/WithingsDownload.h Cloud/Strava.h Cloud/CyclingAnalytics.h Cloud/RideWithGPS.h \
-           Cloud/TrainingsTageBuch.h Cloud/Selfloops.h Cloud/Velohero.h Cloud/SportsPlusHealth.h \
+           Cloud/TrainingsTageBuch.h Cloud/Selfloops.h Cloud/SportsPlusHealth.h \
            Cloud/AddCloudWizard.h Cloud/Withings.h Cloud/MeasuresDownload.h Cloud/Xert.h \
            Cloud/Azum.h
 
@@ -728,7 +720,7 @@ SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts
 SOURCES += Cloud/CalendarDownload.cpp Cloud/CloudService.cpp \
            Cloud/LocalFileStore.cpp Cloud/OAuthDialog.cpp \
            Cloud/WithingsDownload.cpp Cloud/Strava.cpp Cloud/CyclingAnalytics.cpp Cloud/RideWithGPS.cpp \
-           Cloud/TrainingsTageBuch.cpp Cloud/Selfloops.cpp Cloud/Velohero.cpp Cloud/SportsPlusHealth.cpp \
+           Cloud/TrainingsTageBuch.cpp Cloud/Selfloops.cpp Cloud/SportsPlusHealth.cpp \
            Cloud/AddCloudWizard.cpp Cloud/Withings.cpp Cloud/MeasuresDownload.cpp Cloud/Xert.cpp \
            Cloud/Azum.cpp
 

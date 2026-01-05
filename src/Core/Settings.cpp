@@ -720,8 +720,6 @@ GSettings::upgradeAthlete(QString athlete) {
     // --- private --- //
     migrateCValue(athlete, GC_RWGPSUSER);
     migrateCValue(athlete, GC_RWGPSPASS);
-    migrateCValue(athlete, GC_VELOHEROUSER);
-    migrateCValue(athlete, GC_VELOHEROPASS);
     migrateCValue(athlete, GC_WIURL);
     migrateCValue(athlete, GC_WIUSER);
     migrateCValue(athlete, GC_WIKEY);

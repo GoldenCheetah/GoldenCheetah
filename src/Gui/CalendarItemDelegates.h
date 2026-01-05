@@ -117,6 +117,7 @@ private:
 
 
 class CalendarHeadlineDelegate : public QStyledItemDelegate {
+    Q_OBJECT
 public:
     enum Roles {
         DayRole = Qt::UserRole + 1 // [CalendarDay] Calendar day
@@ -155,6 +156,7 @@ private:
 
 
 class CalendarCompactDayDelegate : public QStyledItemDelegate {
+    Q_OBJECT
 public:
     enum Roles {
         DayRole = Qt::UserRole + 1, // [CalendarDay] Calendar day
@@ -195,6 +197,7 @@ private:
 
 
 class AgendaMultiDelegate : public QStyledItemDelegate {
+    Q_OBJECT
 public:
     enum Roles {
         // Qt::DisplayRole            // [QString] The default text to display
@@ -233,6 +236,7 @@ private:
 
 
 class AgendaEntryDelegate : public QStyledItemDelegate {
+    Q_OBJECT
 public:
     enum Roles {
         EntryRole = Qt::UserRole, // [CalendarEntry] Entry to be displayed

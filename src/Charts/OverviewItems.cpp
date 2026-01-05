@@ -773,6 +773,13 @@ ZoneOverviewItem::configChanged(qint32)
     chart->createDefaultAxes();
 
     // add x axis to chart and attach to the series
+    // previously removing default one to simulte setAxisX
+    QList<QAbstractAxis*> horizontalAxes = chart->axes(Qt::Horizontal, barseries);
+    if (horizontalAxes.size() == 1) {
+        chart->removeAxis(horizontalAxes.first());
+    } else {
+        qDebug() << "Expecting one horizontal axis: " << horizontalAxes.size();
+    }
     chart->addAxis(barcategoryaxis, Qt::AlignBottom);
     barseries->attachAxis(barcategoryaxis);
     barcategoryaxis->setLinePen(axisPen);
