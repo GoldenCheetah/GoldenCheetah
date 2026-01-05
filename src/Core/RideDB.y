@@ -42,12 +42,12 @@ void RideDBerror(void*jc, const char *error) // used by parser aka yyerror()
 
 %}
 
-%pure-parser
+%define api.pure
 %lex-param { void *scanner }
 %parse-param { struct RideDBContext *jc }
 
 %token STRING
-%token VERSION RIDES METRICS TAGS XDATA INTERVALS
+%token VERSION RIDES INFO METRICS TAGS XDATA INTERVALS
 
 %start document
 %%
@@ -119,7 +119,7 @@ ride: '{' rideelement_list '}'                                  {
 rideelement_list: rideelement_list ',' rideelement              
                 | rideelement                                   ;
 
-rideelement: ride_tuple
+rideelement: info
             | metrics
             | tags
             | xdata
@@ -130,7 +130,10 @@ rideelement: ride_tuple
  * RIDES
  */
                                                                 /* RideItem state data */
-ride_tuple: string ':' string                                   { 
+
+info: INFO ':' '{' info_list '}'                                ;
+info_list: info_data | info_list ',' info_data                   ;
+info_data: string ':' string   { 
                                                                      if ($1 == "filename") jc->item.fileName = $3;
                                                                      else if ($1 == "fingerprint") jc->item.fingerprint = $3.toULongLong();
                                                                      else if ($1 == "crc") jc->item.crc = $3.toULongLong();
@@ -298,7 +301,7 @@ tag_value : string                                              { jc->value = jc
  * XDATA definitions
  */
 
-xdata: XDATA ':' '{' xdata_list '}'
+xdata: XDATA ':' '{' xdata_list '}'                             ;
 xdata_list: xdata | xdata_list ',' xdata ;
 xdata: xdata_name ':' '[' xdata_values ']'                      { jc->item.xdata().insert(jc->key,jc->JsonStringList);
                                                                   jc->key = ""; jc->JsonStringList.clear(); }
@@ -523,34 +526,42 @@ void RideCache::save(bool opendata, QString filename)
             if (!firstRide) stream << ",\n";
             firstRide = false;
 
-            // basic ride information
-            stream << "\t{\n";
-            stream << "\t\t\"date\":\"" <<item->dateTime.toUTC().toString(DATETIME_FORMAT) << "\",\n";
-
             if (!opendata) {
-                // we don't send this info when sharing as opendata
-                stream << "\t\t\"filename\":\"" <<item->fileName <<"\",\n";
-                stream << "\t\t\"fingerprint\":\"" <<item->fingerprint <<"\",\n";
-                stream << "\t\t\"crc\":\"" <<item->crc <<"\",\n";
-                stream << "\t\t\"metacrc\":\"" <<item->metacrc <<"\",\n";
-                stream << "\t\t\"timestamp\":\"" <<item->timestamp <<"\",\n";
-                stream << "\t\t\"dbversion\":\"" <<item->dbversion <<"\",\n";
-                stream << "\t\t\"udbversion\":\"" <<item->udbversion <<"\",\n";
-                stream << "\t\t\"color\":\"" <<item->color.name() <<"\",\n";
-                stream << "\t\t\"present\":\"" <<item->present <<"\",\n";
-                stream << "\t\t\"sport\":\"" <<item->sport <<"\",\n";
-                stream << "\t\t\"aero\":\"" << (item->isAero ? "1" : "0") <<"\",\n";
-                stream << "\t\t\"weight\":\"" <<item->weight <<"\",\n";
+                stream << "\t{\n";
+                stream << "\t\t\"INFO\":{\n";
+                stream << "\t\t\t\"date\":\"" <<item->dateTime.toUTC().toString(DATETIME_FORMAT) << "\",\n";
 
-                if (item->zoneRange >= 0) stream << "\t\t\"zonerange\":\"" <<item->zoneRange <<"\",\n";
-                if (item->hrZoneRange >= 0) stream << "\t\t\"hrzonerange\":\"" <<item->hrZoneRange <<"\",\n";
-                if (item->paceZoneRange >= 0) stream << "\t\t\"pacezonerange\":\"" <<item->paceZoneRange <<"\",\n";
+                // we don't send this info when sharing as opendata
+                stream << "\t\t\t\"filename\":\"" <<item->fileName <<"\",\n";
+                stream << "\t\t\t\"fingerprint\":\"" <<item->fingerprint <<"\",\n";
+                stream << "\t\t\t\"crc\":\"" <<item->crc <<"\",\n";
+                stream << "\t\t\t\"metacrc\":\"" <<item->metacrc <<"\",\n";
+                stream << "\t\t\t\"timestamp\":\"" <<item->timestamp <<"\",\n";
+                stream << "\t\t\t\"dbversion\":\"" <<item->dbversion <<"\",\n";
+                stream << "\t\t\t\"udbversion\":\"" <<item->udbversion <<"\",\n";
+                stream << "\t\t\t\"color\":\"" <<item->color.name() <<"\",\n";
+                stream << "\t\t\t\"present\":\"" <<item->present <<"\",\n";
+                stream << "\t\t\t\"sport\":\"" <<item->sport <<"\",\n";
+                stream << "\t\t\t\"aero\":\"" << (item->isAero ? "1" : "0") <<"\",\n";
+                stream << "\t\t\t\"weight\":\"" <<item->weight <<"\",\n";
+
+                if (item->zoneRange >= 0) stream << "\t\t\t\"zonerange\":\"" <<item->zoneRange <<"\",\n";
+                if (item->hrZoneRange >= 0) stream << "\t\t\t\"hrzonerange\":\"" <<item->hrZoneRange <<"\",\n";
+                if (item->paceZoneRange >= 0) stream << "\t\t\t\"pacezonerange\":\"" <<item->paceZoneRange <<"\",\n";
 
                 // if there are overrides, do share them
-                if (item->overrides_.count()) stream << "\t\t\"overrides\":\"" <<item->overrides_.join(",") <<"\",\n";
+                if (item->overrides_.count()) stream << "\t\t\t\"overrides\":\"" <<item->overrides_.join(",") <<"\",\n";
 
-                stream << "\t\t\"samples\":\"" <<(item->samples ? "1" : "0") <<"\",\n";
+                stream << "\t\t\t\"samples\":\"" <<(item->samples ? "1" : "0") <<"\"\n";
+
+                // end of the info
+                stream << "\t\t},";
+
             } else {
+
+                // basic ride information
+                stream << "\t{\n";
+                stream << "\t\t\"date\":\"" <<item->dateTime.toUTC().toString(DATETIME_FORMAT) << "\",\n";
 
                 // need to know what data was collected
                 stream << "\t\t\"data\":\"" <<item->getText("Data","") <<"\",\n";

@@ -126,6 +126,7 @@ void RideDBfree (void * ptr , yyscan_t /*scanner*/)
 
 %%
 \"RIDES\"                       return RIDES;
+\"INFO\"                        return INFO;
 \"METRICS\"                     return METRICS;
 \"TAGS\"                        return TAGS;
 \"XDATA\"                       return XDATA;
