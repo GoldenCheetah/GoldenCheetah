@@ -19,6 +19,7 @@
 #include "CalendarWindow.h"
 
 #include <QComboBox>
+#include <QDialogButtonBox>
 
 #include "MainWindow.h"
 #include "AthleteTab.h"
