@@ -34,6 +34,43 @@
 #include "CalendarData.h"
 
 
+struct LinkEntry {
+    QString reference;
+    bool planned;
+    QString sport;
+    QString iconFile;
+    QColor iconColor;
+    QString primary;
+    QString secondary;
+    QString secondaryMetric;
+    QDate date;
+    QTime time;
+    double matchScore;
+};
+
+
+class LinkDialog : public QDialog
+{
+    Q_OBJECT
+
+    public:
+        explicit LinkDialog(const LinkEntry &entry, QList<LinkEntry> &candidates, QWidget *parent = nullptr);
+
+        QString getSelectedReference() const;
+
+    private:
+        QStackedWidget *candidateStack;
+        QTreeWidget *candidateTree;
+        QPushButton *acceptButton;
+
+        LinkEntry entry;
+        QList<LinkEntry> candidates;
+
+    private slots:
+        void updateCandidates(int range);
+};
+
+
 class CalendarWindow : public GcChartWindow
 {
     Q_OBJECT
@@ -91,7 +128,6 @@ class CalendarWindow : public GcChartWindow
         void configChanged(qint32);
 
     protected:
-
         void showEvent(QShowEvent*) override;
 
     private:
@@ -130,7 +166,7 @@ class CalendarWindow : public GcChartWindow
         void updateSeason(Season const *season, bool allowKeepMonth = false);
         void movePlannedActivity(RideItem *rideItem, const QDate &destDay, const QTime &destTime = QTime());
         void shiftPlannedActivities(const QDate &destDay, int offset);
-        void linkActivities(const CalendarEntry &entry);
+        void linkActivities(const CalendarEntry &entry, bool autoLink);
         bool unlinkActivities(const CalendarEntry &entry);
         void addEvent(const QDate &date);
         void editEvent(const CalendarEntry &entry);

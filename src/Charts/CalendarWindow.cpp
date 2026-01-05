@@ -37,6 +37,254 @@
 #define HLC "</h4>"
 
 
+//////////////////////////////////////////////////////////////////////////////
+// LinkDialog
+
+LinkDialog::LinkDialog
+(const LinkEntry &entry, QList<LinkEntry> &candidates, QWidget *parent)
+: QDialog(parent), entry(entry), candidates(candidates)
+{
+    setModal(true);
+    setWindowTitle(tr("Link Activity"));
+    setMinimumSize(720 * dpiXFactor, 550 * dpiYFactor);
+    resize(720 * dpiXFactor, 550 * dpiYFactor);
+    QLocale locale;
+
+    QLabel *introLabel = new QLabel();
+    if (entry.planned) {
+        introLabel->setText(tr("Find a completed activity for:"));
+    } else {
+        introLabel->setText(tr("Find a planned activity for:"));
+    }
+
+    QLabel *primaryLabel = new QLabel(entry.primary);
+    QFont primaryFont = primaryLabel->font();
+    primaryFont.setPointSize(primaryFont.pointSize() * 1.2);
+    primaryFont.setWeight(QFont::Bold);
+    primaryLabel->setFont(primaryFont);
+
+    QLabel *secondaryLabel = new QLabel();
+    if (entry.secondary.isEmpty() || entry.secondaryMetric.isEmpty()) {
+        secondaryLabel->setText(QString("%1 • %2")
+                                       .arg(locale.toString(entry.date, QLocale::NarrowFormat))
+                                       .arg(locale.toString(entry.time, QLocale::NarrowFormat)));
+    } else {
+        secondaryLabel->setText(QString("%1 • %2 • %3 <font style='font-weight: 250'>%4</font>")
+                                       .arg(locale.toString(entry.date, QLocale::NarrowFormat))
+                                       .arg(locale.toString(entry.time, QLocale::NarrowFormat))
+                                       .arg(entry.secondary)
+                                       .arg(entry.secondaryMetric));
+    }
+
+    QVBoxLayout *entryLabelLayout = new QVBoxLayout();
+    entryLabelLayout->addWidget(primaryLabel);
+    entryLabelLayout->addWidget(secondaryLabel);
+
+    int entryHeight = primaryLabel->sizeHint().height() + secondaryLabel->sizeHint().height() + std::max(0, entryLabelLayout->spacing());
+    QPixmap pixmap;
+    if (entry.planned) {
+        pixmap = svgAsColoredPixmap(entry.iconFile, QSize(entryHeight, entryHeight), 0, entry.iconColor);
+    } else {
+        pixmap = svgOnBackground(entry.iconFile, QSize(entryHeight, entryHeight), 3 * dpiXFactor, entry.iconColor, 5 * dpiXFactor);
+    }
+
+    QLabel *iconLabel = new QLabel();
+    iconLabel->setPixmap(pixmap);
+    iconLabel->setFixedSize(pixmap.size());
+    iconLabel->setAlignment(Qt::AlignCenter);
+
+    QFrame *entryFrame = new QFrame();
+    entryFrame->setFrameShape(QFrame::StyledPanel);
+    QPalette palette = entryFrame->palette();
+    QColor tint = entry.iconColor;
+    tint.setAlpha(25);
+    QColor entryBG = GCColor::blendedColor(tint, palette.window().color());
+    entryFrame->setStyleSheet(QString("QFrame { background-color: %1; }").arg(entryBG.name()));
+
+    QHBoxLayout *entryLayout = new QHBoxLayout(entryFrame);
+    entryLayout->setContentsMargins(8 * dpiXFactor, 8 * dpiYFactor, 8 * dpiXFactor, 8 * dpiYFactor);
+    entryLayout->addWidget(iconLabel);
+    entryLayout->addSpacing(10 * dpiXFactor);
+    entryLayout->addLayout(entryLabelLayout);
+    entryLayout->addStretch();
+
+    QLabel *rangeLabel = new QLabel();
+    if (entry.planned) {
+        rangeLabel->setText(tr("Show <b>completed %2</b> activities").arg(entry.sport));
+    } else {
+        rangeLabel->setText(tr("Show <b>planned %2</b> activities").arg(entry.sport));
+    }
+
+    QComboBox *rangeCombo = new QComboBox();
+    rangeCombo->addItem(tr("14 days backward"));
+    rangeCombo->addItem(tr("7 days backward"));
+    rangeCombo->addItem(tr("±7 days"));
+    rangeCombo->addItem(tr("7 days forward"));
+    rangeCombo->addItem(tr("14 days forward"));
+
+    QHBoxLayout *rangeLayout = new QHBoxLayout();
+    rangeLayout->addWidget(rangeLabel);
+    rangeLayout->addWidget(rangeCombo);
+    rangeLayout->addStretch();
+
+    QFrame *emptyFrame = new QFrame();
+    emptyFrame->setFrameShape(QFrame::StyledPanel);
+    emptyFrame->setStyleSheet(QString("QFrame { background-color: %1; }").arg(palette.base().color().name()));
+
+
+    QString emptyHeadline = tr("No matching activities found");
+    QString emptyInfoline;
+    if (entry.planned) {
+        emptyInfoline = tr("There are no unlinked completed %1 activities in the selected date range.").arg(entry.sport);
+    } else {
+        emptyInfoline = tr("There are no unlinked planned %1 activities in the selected date range.").arg(entry.sport);
+    }
+    QString emptyActionline = tr("Try adjusting the date range filter or create a new activity.");
+    QString emptyMsg = QString("<h3>%1</h3>%2<br/>%3").arg(emptyHeadline).arg(emptyInfoline).arg(emptyActionline);
+    QLabel *emptyLabel = new QLabel(emptyMsg);
+    emptyLabel->setAlignment(Qt::AlignCenter);
+    emptyLabel->setWordWrap(true);
+
+    QVBoxLayout *emptyLayout = new QVBoxLayout(emptyFrame);
+    emptyLayout->setContentsMargins(8 * dpiXFactor, 8 * dpiYFactor, 8 * dpiXFactor, 8 * dpiYFactor);
+    emptyLayout->addWidget(emptyLabel);
+
+    QStringList columnLabels = {
+        "",
+        tr("Activity"),
+        tr("Date"),
+        tr("Days"),
+        tr("Time"),
+        entry.secondaryMetric
+    };
+
+    candidateTree = new QTreeWidget();
+    candidateTree->setColumnCount(6);
+    candidateTree->setHeaderLabels(columnLabels);
+    candidateTree->setRootIsDecorated(false);
+    candidateTree->setAlternatingRowColors(true);
+    candidateTree->setSelectionMode(QTreeWidget::SingleSelection);
+    candidateTree->setStyleSheet(QString("QTreeView::item { padding: %1px; }").arg(4 * dpiYFactor));
+    candidateTree->header()->setStretchLastSection(false);
+    candidateTree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    candidateTree->header()->setSectionResizeMode(1, QHeaderView::Stretch);
+    candidateTree->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    candidateTree->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+    candidateTree->header()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
+    candidateTree->header()->setSectionResizeMode(5, QHeaderView::ResizeToContents);
+
+    candidateStack = new QStackedWidget();
+    candidateStack->addWidget(emptyFrame);
+    candidateStack->addWidget(candidateTree);
+
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    acceptButton = buttonBox->button(QDialogButtonBox::Ok);
+    acceptButton->setText(tr("Link"));
+    acceptButton->setEnabled(false);
+
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->addWidget(introLabel);
+    mainLayout->addSpacing(5 * dpiYFactor);
+    mainLayout->addWidget(entryFrame);
+    mainLayout->addSpacing(18 * dpiYFactor);
+    mainLayout->addLayout(rangeLayout);
+    mainLayout->addSpacing(12 * dpiYFactor);
+    mainLayout->addWidget(candidateStack, 1);
+    mainLayout->addSpacing(20 * dpiYFactor);
+    mainLayout->addWidget(buttonBox);
+
+    connect(rangeCombo, &QComboBox::currentIndexChanged, this, &LinkDialog::updateCandidates);
+    connect(candidateTree, &QTreeWidget::itemSelectionChanged, this, [this]() {
+        acceptButton->setEnabled(! candidateTree->selectedItems().isEmpty());
+    });
+    connect(candidateTree, &QTreeWidget::itemDoubleClicked, this, [this]() {
+        accept();
+    });
+
+    rangeCombo->setCurrentIndex(2);
+}
+
+
+QString
+LinkDialog::getSelectedReference
+() const
+{
+    QList<QTreeWidgetItem*> selectedItems = candidateTree->selectedItems();
+    if (! selectedItems.isEmpty()) {
+        return selectedItems.first()->data(0, Qt::UserRole).toString();
+    }
+    return QString();
+}
+
+
+void
+LinkDialog::updateCandidates
+(int range)
+{
+    int from[5] = {-14, -7, -7, 0, 0};
+    int to[5] = {0, 0, 7, 7, 14};
+    QDate minDate = entry.date.addDays(from[range]);
+    QDate maxDate = entry.date.addDays(to[range]);
+    candidateTree->clear();
+    int stackIdx = 0;
+    int selectRow = 0;
+    int i = 0;
+    double selectScore = 1;
+    QLocale locale;
+    for (const LinkEntry &candidate : candidates) {
+        if (candidate.date >= minDate && candidate.date <= maxDate) {
+            stackIdx = 1;
+            QString quality;
+            if (candidate.matchScore <= 0.2) {
+                quality = "★★★";
+            } else if (candidate.matchScore <= 0.45) {
+                quality = "★★☆";
+            } else {
+                quality = "★☆☆";
+            }
+            if (candidate.matchScore < selectScore) {
+                selectRow = i;
+                selectScore = candidate.matchScore;
+            }
+            QString days;
+            int dayDiff = entry.date.daysTo(candidate.date);
+            if (dayDiff < -1) {
+                days = tr("%1 days before").arg(-dayDiff);
+            } else if (dayDiff == -1) {
+                days = tr("1 day before");
+            } else if (dayDiff == 0) {
+                days = tr("same day");
+            } else if (dayDiff == 1) {
+                days = tr("1 day after");
+            } else if (dayDiff > 1) {
+                days = tr("%1 days after").arg(dayDiff);
+            }
+            QTreeWidgetItem *item = new QTreeWidgetItem(candidateTree);
+            item->setText(0, quality);
+            item->setData(0, Qt::UserRole, candidate.reference);
+            item->setText(1, candidate.primary);
+            item->setText(2, locale.toString(candidate.date, QLocale::NarrowFormat));
+            item->setText(3, days);
+            item->setText(4, locale.toString(candidate.time, QLocale::NarrowFormat));
+            item->setText(5, candidate.secondary);
+
+            ++i;
+        }
+    }
+    QTreeWidgetItem *item = candidateTree->topLevelItem(selectRow);
+    if (item != nullptr) {
+        candidateTree->setCurrentItem(item);
+    }
+    candidateStack->setCurrentIndex(stackIdx);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// CalendarWindow
+
 CalendarWindow::CalendarWindow(Context *context)
 : GcChartWindow(context), context(context)
 {
@@ -159,7 +407,7 @@ CalendarWindow::CalendarWindow(Context *context)
     connect(calendar, &Calendar::addPhase, this, &CalendarWindow::addPhase);
     connect(calendar, &Calendar::editPhase, this, &CalendarWindow::editPhase);
     connect(calendar, &Calendar::delPhase, this, &CalendarWindow::delPhase);
-    connect(calendar, &Calendar::saveActivity, this, [this](const CalendarEntry &entry) {
+    connect(calendar, &Calendar::saveChanges, this, [this](const CalendarEntry &entry) {
         RideItem *item = getRideItem(entry, false);
         if (item != nullptr) {
             QString error;
@@ -167,6 +415,14 @@ CalendarWindow::CalendarWindow(Context *context)
             activities << item;
             relinkRideItems(this->context, item, activities);
             this->context->athlete->rideCache->saveActivities(activities, error);
+        }
+    });
+    connect(calendar, &Calendar::discardChanges, this, [this](const CalendarEntry &entry) {
+        RideItem *item = getRideItem(entry, false);
+        if (item != nullptr) {
+            item->close();
+            item->ride();
+            item->setStartTime(item->ride()->startTime());
         }
     });
 
@@ -1016,10 +1272,85 @@ CalendarWindow::shiftPlannedActivities
 
 void
 CalendarWindow::linkActivities
-(const CalendarEntry &entry)
+(const CalendarEntry &entry, bool autoLink)
 {
     RideItem *rideItem = getRideItem(entry);
-    RideItem *other = context->athlete->rideCache->findSuggestion(rideItem);
+    if (rideItem == nullptr) {
+        return;
+    }
+    RideItem *other = nullptr;
+    if (autoLink) {
+        if ((other = context->athlete->rideCache->findSuggestion(rideItem)) == nullptr) {
+            QMessageBox::warning(this, tr("Failed"), tr("No matching activity found"));
+        }
+    } else {
+        LinkEntry linkEntry;
+        linkEntry.reference = entry.reference;
+        linkEntry.planned = entry.type == ENTRY_TYPE_PLANNED_ACTIVITY;
+        linkEntry.sport = rideItem->sport;
+        linkEntry.iconFile = entry.iconFile;
+        linkEntry.iconColor = entry.color;
+        linkEntry.primary = entry.primary;
+        linkEntry.secondary = entry.secondary;
+        linkEntry.secondaryMetric = entry.secondaryMetric;
+        linkEntry.date = rideItem->dateTime.date();
+        linkEntry.time = entry.start;
+        linkEntry.matchScore = 1;
+
+        QDate minDate = linkEntry.date.addDays(-14);
+        QDate maxDate = linkEntry.date.addDays(14);
+
+        const RideMetricFactory &factory = RideMetricFactory::instance();
+        const RideMetric *rideMetric = factory.rideMetric(getSecondaryMetric());
+        QString rideMetricName;
+        QString rideMetricUnit;
+        if (rideMetric != nullptr) {
+            rideMetricName = rideMetric->name();
+            if (   ! rideMetric->isTime()
+                && ! rideMetric->isDate()) {
+                rideMetricUnit = rideMetric->units(GlobalContext::context()->useMetricUnits);
+            }
+        }
+        double rideMetricValue = rideItem->getForSymbol(getSecondaryMetric(), GlobalContext::context()->useMetricUnits);
+        QList<LinkEntry> candidates;
+        for (RideItem *candidateItem : context->athlete->rideCache->rides()) {
+            if (   candidateItem->dateTime.date() >= minDate
+                && candidateItem->dateTime.date() <= maxDate
+                && candidateItem->planned != linkEntry.planned
+                && candidateItem->sport == rideItem->sport
+                && candidateItem->getLinkedFileName().isEmpty()) {
+                LinkEntry candidate;
+                candidate.reference = candidateItem->fileName;
+                candidate.planned = candidateItem->planned;
+                candidate.primary = getPrimary(candidateItem);
+                candidate.secondary = candidateItem->getStringForSymbol(getSecondaryMetric(), GlobalContext::context()->useMetricUnits);
+                if (! rideMetricUnit.isEmpty()) {
+                    candidate.secondary += " " + rideMetricUnit;
+                }
+                candidate.secondaryMetric = rideMetricName;
+                candidate.date = candidateItem->dateTime.date();
+                candidate.time = candidateItem->dateTime.time();
+
+                double candidateMetricValue = candidateItem->getForSymbol(getSecondaryMetric(), GlobalContext::context()->useMetricUnits);
+                double dayScore = std::min(std::abs(linkEntry.date.daysTo(candidate.date)) / 7.0, 1.0);
+                double metricScore = 1.0;
+                if (rideMetricValue > 0 && candidateMetricValue > 0) {
+                    double maxMetric = std::max(rideMetricValue, candidateMetricValue);
+                    double metricDiff = std::abs(rideMetricValue - candidateMetricValue) / maxMetric;
+                    metricScore = std::min(metricDiff, 1.0);
+                }
+
+                candidate.matchScore = (0.2 * dayScore) + (0.8 * metricScore);
+                candidates << candidate;
+            }
+        }
+
+        LinkDialog linkDialog(linkEntry, candidates, this);
+        if (linkDialog.exec() == QDialog::Accepted) {
+            other = context->athlete->rideCache->getRide(linkDialog.getSelectedReference(), ! linkEntry.planned);
+        }
+    }
+
     if (rideItem != nullptr && other != nullptr) {
         RideCache::OperationPreCheck check = context->athlete->rideCache->checkLinkActivities(rideItem, other);
         if (check.canProceed && proceedDialog(context, check)) {
@@ -1033,8 +1364,6 @@ CalendarWindow::linkActivities
             }
             context->tab->setNoSwitch(false);
         }
-    } else {
-        QMessageBox::warning(this, tr("Failed"), tr("No matching activity found"));
     }
 }
 

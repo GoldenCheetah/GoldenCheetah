@@ -149,9 +149,150 @@ CalendarOverview::drawEntries
 //////////////////////////////////////////////////////////////////////////////
 // CalendarDayTable
 
+CalendarBaseTable::CalendarBaseTable
+(QWidget *parent)
+: QTableWidget(parent)
+{
+}
+
+
+QMenu*
+CalendarBaseTable::buildContextMenu
+(const CalendarDay &day, CalendarEntry const * const entryPtr, const QTime &time, bool canHavePhasesEvents)
+{
+    QMenu *contextMenu = new QMenu(this);
+    if (entryPtr != nullptr) {
+        CalendarEntry entry = *entryPtr; // Prevent dereferencing of dangling pointer in lambdas
+        switch (entry.type) {
+        case ENTRY_TYPE_ACTIVITY:
+            if (entry.dirty) {
+                contextMenu->addAction(tr("Save changes"), this, [this, entry]() { emit saveChanges(entry); });
+                contextMenu->addAction(tr("Discard changes"), this, [this, entry]() { emit discardChanges(entry); });
+                contextMenu->addSeparator();
+            }
+            if (! entry.linkedReference.isEmpty()) {
+                contextMenu->addAction(tr("View planned activity..."), this, [this, entry]() {
+                    emit viewLinkedActivity(entry);
+                });
+            }
+            contextMenu->addAction(tr("View completed activity..."), this, [this, entry]() { emit viewActivity(entry); });
+            contextMenu->addSeparator();
+            if (entry.linkedReference.isEmpty()) {
+                contextMenu->addAction(tr("Link to planned activity"), this, [this, entry]() { emit linkActivity(entry, true); });
+                contextMenu->addAction(tr("Link to planned activity..."), this, [this, entry]() { emit linkActivity(entry, false); });
+            } else {
+                contextMenu->addAction(tr("Unlink from planned activity"), this, [this, entry]() { emit unlinkActivity(entry); });
+            }
+            contextMenu->addSeparator();
+            contextMenu->addAction(tr("Delete completed activity"), this, [this, entry]() { emit delActivity(entry); });
+            break;
+        case ENTRY_TYPE_PLANNED_ACTIVITY:
+            if (entry.dirty) {
+                contextMenu->addAction(tr("Save changes"), this, [this, entry]() { emit saveChanges(entry); });
+                contextMenu->addAction(tr("Discard changes"), this, [this, entry]() { emit discardChanges(entry); });
+                contextMenu->addSeparator();
+            }
+            if (! entry.linkedReference.isEmpty()) {
+                contextMenu->addAction(tr("View completed activity..."), this, [this, entry]() { emit viewLinkedActivity(entry); });
+            }
+            contextMenu->addAction(tr("View planned activity..."), this, [this, entry]() { emit viewActivity(entry); });
+            contextMenu->addSeparator();
+            if (entry.linkedReference.isEmpty()) {
+                contextMenu->addAction(tr("Mark as completed"), this, [this, entry]() { emit linkActivity(entry, true); });
+                contextMenu->addAction(tr("Mark as completed..."), this, [this, entry]() { emit linkActivity(entry, false); });
+            } else {
+                contextMenu->addAction(tr("Mark as incomplete"), this, [this, entry]() { emit unlinkActivity(entry); });
+            }
+            if (entry.hasTrainMode) {
+                contextMenu->addSeparator();
+                contextMenu->addAction(tr("Show in train node..."), this, [this, entry]() { emit showInTrainMode(entry); });
+            }
+            contextMenu->addSeparator();
+            contextMenu->addAction(tr("Delete planned activity"), this, [this, entry]() { emit delActivity(entry); });
+            break;
+        case ENTRY_TYPE_EVENT:
+            if (canHavePhasesEvents) {
+                contextMenu->addAction(tr("Edit event..."), this, [this, entry]() { emit editEvent(entry); });
+                contextMenu->addAction(tr("Delete event"), this, [this, entry]() { emit delEvent(entry); });
+            }
+            break;
+        case ENTRY_TYPE_PHASE:
+            if (canHavePhasesEvents) {
+                contextMenu->addAction(tr("Edit phase..."), this, [this, entry]() { emit editPhase(entry); });
+                contextMenu->addAction(tr("Delete phase..."), this, [this, entry]() { emit delPhase(entry); });
+            }
+            break;
+        default:
+            break;
+        }
+    } else {
+        bool canAddActivity;
+        bool canAddPlanned;
+        if (time.isValid()) {
+            canAddActivity =    day.date < QDate::currentDate()
+                             || (   day.date == QDate::currentDate()
+                                 && time < QTime::currentTime());
+            canAddPlanned = ! canAddActivity;
+        } else {
+            canAddActivity = day.date <= QDate::currentDate();
+            canAddPlanned = day.date >= QDate::currentDate();
+        }
+        if (canAddActivity) {
+            contextMenu->addAction(tr("Log activity..."), this, [this, day, time]() {
+                QTime activityTime(time);
+                if (! activityTime.isValid()) {
+                    activityTime = QTime::currentTime();
+                    if (day.date == QDate::currentDate()) {
+                        activityTime = activityTime.addSecs(std::max(-4 * 3600, activityTime.secsTo(QTime(0, 0))));
+                    }
+                }
+                emit addActivity(false, day.date, activityTime);
+            });
+        }
+        if (canAddPlanned) {
+            contextMenu->addAction(tr("Plan activity..."), this, [this, day, time]() {
+                QTime activityTime(time);
+                if (! activityTime.isValid()) {
+                    activityTime = QTime::currentTime();
+                    if (day.date == QDate::currentDate()) {
+                        activityTime = activityTime.addSecs(std::min(4 * 3600, activityTime.secsTo(QTime(23, 59, 59))));
+                    }
+                }
+                emit addActivity(true, day.date, activityTime);
+            });
+        }
+        if (canHavePhasesEvents) {
+            contextMenu->addSeparator();
+            contextMenu->addAction(tr("Add phase..."), this, [this, day]() { emit addPhase(day.date); });
+            contextMenu->addAction(tr("Add event..."), this, [this, day]() { emit addEvent(day.date); });
+        }
+        if (day.date >= QDate::currentDate()) {
+            contextMenu->addSeparator();
+            contextMenu->addAction(tr("Repeat schedule..."), this, [this, day]() { emit repeatSchedule(day.date); });
+            bool hasPlannedActivity = false;
+            for (const CalendarEntry &dayEntry : day.entries) {
+                if (dayEntry.type == ENTRY_TYPE_PLANNED_ACTIVITY) {
+                    hasPlannedActivity = true;
+                    break;
+                }
+            }
+            if (hasPlannedActivity) {
+                contextMenu->addAction(tr("Insert rest day"), this, [this, day]() { emit insertRestday(day.date); });
+            } else {
+                contextMenu->addAction(tr("Delete rest day"), this, [this, day]() { emit delRestday(day.date); });
+            }
+        }
+    }
+    return contextMenu;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// CalendarDayTable
+
 CalendarDayTable::CalendarDayTable
 (const QDate &date, CalendarDayTableType type, Qt::DayOfWeek firstDayOfWeek, QWidget *parent)
-: QTableWidget(parent), type(type)
+: CalendarBaseTable(parent), type(type)
 {
     int numDays = type == CalendarDayTableType::Day ? 1 : 7;
     dragTimer.setSingleShot(true);
@@ -725,40 +866,11 @@ CalendarDayTable::makeHeaderMenu
     CalendarHeadlineDelegate *delegate = static_cast<CalendarHeadlineDelegate*>(itemDelegateForRow(index.row()));
     int entryIdx = delegate->headlineTester.hitTest(index, pos);
     CalendarDay day = index.data(CalendarHeadlineDelegate::DayRole).value<CalendarDay>();
-    QMenu *contextMenu = new QMenu(this);
+    CalendarEntry *entry = nullptr;
     if (entryIdx >= 0) {
-        const CalendarEntry &entry = day.headlineEntries[entryIdx];
-        switch (entry.type) {
-        case ENTRY_TYPE_EVENT: {
-            QAction *editEventAction = contextMenu->addAction(tr("Edit event..."), this, [this, entry]() { emit editEvent(entry); });
-            QAction *delEventAction = contextMenu->addAction(tr("Delete event"), this, [this, entry]() { emit delEvent(entry); });
-            if (! isInDateRange(day.date) || ! canHavePhasesOrEvents) {
-                editEventAction->setEnabled(false);
-                delEventAction->setEnabled(false);
-            }
-            break;
-        }
-        case ENTRY_TYPE_PHASE: {
-            QAction *editPhaseAction = contextMenu->addAction(tr("Edit phase..."), this, [this, entry]() { emit editPhase(entry); });
-            QAction *delPhaseAction = contextMenu->addAction(tr("Delete phase..."), this, [this, entry]() { emit delPhase(entry); });
-            if (! isInDateRange(day.date) || ! canHavePhasesOrEvents) {
-                editPhaseAction->setEnabled(false);
-                delPhaseAction->setEnabled(false);
-            }
-            break;
-        }
-        default:
-            break;
-        }
-    } else {
-        QAction *addPhaseAction = contextMenu->addAction(tr("Add phase..."), this, [this, day]() { emit addPhase(day.date); });
-        QAction *addEventAction = contextMenu->addAction(tr("Add event..."), this, [this, day]() { emit addEvent(day.date); });
-        if (! isInDateRange(day.date) || ! canHavePhasesOrEvents) {
-            addPhaseAction->setEnabled(false);
-            addEventAction->setEnabled(false);
-        }
+        entry = &day.headlineEntries[entryIdx];
     }
-    return contextMenu;
+    return buildContextMenu(day, entry, QTime(), isInDateRange(day.date) && canHavePhasesOrEvents);
 }
 
 
@@ -770,89 +882,13 @@ CalendarDayTable::makeActivityMenu
     CalendarDetailedDayDelegate *delegate = static_cast<CalendarDetailedDayDelegate*>(delegatingDelegate->getDelegate(index.column()));
     int entryIdx = delegate->entryTester.hitTest(index, pos);
     CalendarDay day = index.data(CalendarDetailedDayDelegate::DayRole).value<CalendarDay>();
-    QMenu *contextMenu = new QMenu(this);
+
+    QTime time = timeScaleData.timeFromYInTable(pos.y(), visualRect(index));
+    CalendarEntry *entry = nullptr;
     if (entryIdx >= 0) {
-        CalendarEntry calEntry = day.entries[entryIdx];
-        switch (calEntry.type) {
-        case ENTRY_TYPE_ACTIVITY:
-            if (calEntry.linkedReference.isEmpty()) {
-                contextMenu->addAction(tr("Link with planned activity"), this, [this, calEntry]() {
-                    emit linkActivity(calEntry);
-                });
-            } else {
-                contextMenu->addAction(tr("Unlink from planned activity"), this, [this, calEntry]() {
-                    emit unlinkActivity(calEntry);
-                });
-                contextMenu->addAction(tr("View planned activity..."), this, [this, calEntry]() {
-                    emit viewLinkedActivity(calEntry);
-                });
-            }
-            contextMenu->addAction(tr("View activity..."), this, [this, calEntry]() {
-                emit viewActivity(calEntry);
-            });
-            contextMenu->addAction(tr("Delete activity"), this, [this, calEntry]() {
-                emit delActivity(calEntry);
-            });
-            if (calEntry.dirty) {
-                contextMenu->addAction(tr("Save activity"), this, [this, calEntry]() {
-                    emit saveActivity(calEntry);
-                });
-            }
-            break;
-        case ENTRY_TYPE_PLANNED_ACTIVITY:
-            if (calEntry.hasTrainMode) {
-                contextMenu->addAction(tr("Show in train node..."), this, [this, calEntry]() {
-                    emit showInTrainMode(calEntry);
-                });
-            }
-            if (calEntry.linkedReference.isEmpty()) {
-                contextMenu->addAction(tr("Link with completed activity"), this, [this, calEntry]() {
-                    emit linkActivity(calEntry);
-                });
-            } else {
-                contextMenu->addAction(tr("Unlink from completed activity"), this, [this, calEntry]() {
-                    emit unlinkActivity(calEntry);
-                });
-                contextMenu->addAction(tr("View completed activity..."), this, [this, calEntry]() {
-                    emit viewLinkedActivity(calEntry);
-                });
-            }
-            contextMenu->addAction(tr("View planned activity..."), this, [this, calEntry]() {
-                emit viewActivity(calEntry);
-            });
-            contextMenu->addAction(tr("Delete planned activity"), this, [this, calEntry]() {
-                emit delActivity(calEntry);
-            });
-            if (calEntry.dirty) {
-                contextMenu->addAction(tr("Save activity"), this, [this, calEntry]() {
-                    emit saveActivity(calEntry);
-                });
-            }
-            break;
-        default:
-            break;
-        }
-    } else {
-        QTime time = timeScaleData.timeFromYInTable(pos.y(), visualRect(index));
-        if (   day.date < QDate::currentDate()
-            || (   day.date == QDate::currentDate()
-                && time < QTime::currentTime())) {
-            contextMenu->addAction(tr("Add activity..."), this, [this, day, time]() {
-                emit addActivity(false, day.date, time);
-            });
-        } else {
-            contextMenu->addAction(tr("Add planned activity..."), this, [this, day, time]() {
-                emit addActivity(true, day.date, time);
-            });
-        }
-        QAction *addPhaseAction = contextMenu->addAction(tr("Add phase..."), this, [this, day]() { emit addPhase(day.date); });
-        QAction *addEventAction = contextMenu->addAction(tr("Add event..."), this, [this, day]() { emit addEvent(day.date); });
-        if (! isInDateRange(day.date) || ! canHavePhasesOrEvents) {
-            addPhaseAction->setEnabled(false);
-            addEventAction->setEnabled(false);
-        }
+        entry = &day.entries[entryIdx];
     }
-    return contextMenu;
+    return buildContextMenu(day, entry, time, isInDateRange(day.date) && canHavePhasesOrEvents);
 }
 
 
@@ -902,7 +938,7 @@ CalendarMonthTable::CalendarMonthTable
 
 CalendarMonthTable::CalendarMonthTable
 (const QDate &dateInMonth, Qt::DayOfWeek firstDayOfWeek, QWidget *parent)
-: QTableWidget(parent)
+: CalendarBaseTable(parent)
 {
     dragTimer.setSingleShot(true);
     setAcceptDrops(true);
@@ -1446,141 +1482,15 @@ CalendarMonthTable::showContextMenu
     int headlineEntryIdx = delegate->headlineTester.hitTest(index, pos);
     CalendarDay day = index.data(CalendarCompactDayDelegate::DayRole).value<CalendarDay>();
 
-    QMenu contextMenu(this);
+    CalendarEntry *entry = nullptr;
     if (entryIdx >= 0) {
-        CalendarEntry calEntry = day.entries[entryIdx];
-        switch (calEntry.type) {
-        case ENTRY_TYPE_ACTIVITY:
-            if (calEntry.linkedReference.isEmpty()) {
-                contextMenu.addAction(tr("Link with planned activity"), this, [this, calEntry]() {
-                    emit linkActivity(calEntry);
-                });
-            } else {
-                contextMenu.addAction(tr("Unlink from planned activity"), this, [this, calEntry]() {
-                    emit unlinkActivity(calEntry);
-                });
-                contextMenu.addAction(tr("View planned activity..."), this, [this, calEntry]() {
-                    emit viewLinkedActivity(calEntry);
-                });
-            }
-            contextMenu.addAction(tr("View activity..."), this, [this, calEntry]() {
-                emit viewActivity(calEntry);
-            });
-            contextMenu.addAction(tr("Delete activity"), this, [this, calEntry]() {
-                emit delActivity(calEntry);
-            });
-            if (calEntry.dirty) {
-                contextMenu.addAction(tr("Save activity"), this, [this, calEntry]() {
-                    emit saveActivity(calEntry);
-                });
-            }
-            break;
-        case ENTRY_TYPE_PLANNED_ACTIVITY:
-            if (calEntry.hasTrainMode) {
-                contextMenu.addAction(tr("Show in train mode..."), this, [this, calEntry]() {
-                    emit showInTrainMode(calEntry);
-                });
-            }
-            if (calEntry.linkedReference.isEmpty()) {
-                contextMenu.addAction(tr("Link with completed activity"), this, [this, calEntry]() {
-                    emit linkActivity(calEntry);
-                });
-            } else {
-                contextMenu.addAction(tr("Unlink from completed activity"), this, [this, calEntry]() {
-                    emit unlinkActivity(calEntry);
-                });
-                contextMenu.addAction(tr("View completed activity..."), this, [this, calEntry]() {
-                    emit viewLinkedActivity(calEntry);
-                });
-            }
-            contextMenu.addAction(tr("View planned activity..."), this, [this, calEntry]() {
-                emit viewActivity(calEntry);
-            });
-            contextMenu.addAction(tr("Delete planned activity"), this, [this, calEntry]() {
-                emit delActivity(calEntry);
-            });
-            if (calEntry.dirty) {
-                contextMenu.addAction(tr("Save activity"), this, [this, calEntry]() {
-                    emit saveActivity(calEntry);
-                });
-            }
-            break;
-        default:
-            break;
-        }
+        entry = &day.entries[entryIdx];
     } else if (headlineEntryIdx >= 0) {
-        const CalendarEntry &entry = day.headlineEntries[headlineEntryIdx];
-        switch (entry.type) {
-        case ENTRY_TYPE_EVENT: {
-            QAction *editEventAction = contextMenu.addAction(tr("Edit event..."), this, [this, entry]() { emit editEvent(entry); });
-            QAction *delEventAction = contextMenu.addAction(tr("Delete event"), this, [this, entry]() { emit delEvent(entry); });
-            if (! isInDateRange(day.date) || ! canHavePhasesOrEvents) {
-                editEventAction->setEnabled(false);
-                delEventAction->setEnabled(false);
-            }
-            break;
-        }
-        case ENTRY_TYPE_PHASE: {
-            QAction *editPhaseAction = contextMenu.addAction(tr("Edit phase..."), this, [this, entry]() { emit editPhase(entry); });
-            QAction *delPhaseAction = contextMenu.addAction(tr("Delete phase"), this, [this, entry]() { emit delPhase(entry); });
-            if (! isInDateRange(day.date) || ! canHavePhasesOrEvents) {
-                editPhaseAction->setEnabled(false);
-                delPhaseAction->setEnabled(false);
-            }
-            break;
-        }
-        default:
-            break;
-        }
-    } else {
-        if (day.date <= QDate::currentDate()) {
-            contextMenu.addAction(tr("Add activity..."), this, [this, day]() {
-                QTime time = QTime::currentTime();
-                if (day.date == QDate::currentDate()) {
-                    time = time.addSecs(std::max(-4 * 3600, time.secsTo(QTime(0, 0))));
-                }
-                emit addActivity(false, day.date, time);
-            });
-        }
-        if (day.date >= QDate::currentDate()) {
-            contextMenu.addAction(tr("Add planned activity..."), this, [this, day]() {
-                QTime time = QTime::currentTime();
-                if (day.date == QDate::currentDate()) {
-                    time = time.addSecs(std::min(4 * 3600, time.secsTo(QTime(23, 59, 59))));
-                }
-                emit addActivity(true, day.date, time);
-            });
-        }
-        QAction *addPhaseAction = contextMenu.addAction(tr("Add phase..."), this, [this, day]() { emit addPhase(day.date); });
-        QAction *addEventAction = contextMenu.addAction(tr("Add event..."), this, [this, day]() { emit addEvent(day.date); });
-        if (! isInDateRange(day.date) || ! canHavePhasesOrEvents) {
-            addPhaseAction->setEnabled(false);
-            addEventAction->setEnabled(false);
-        }
-        if (day.date >= QDate::currentDate()) {
-            contextMenu.addSeparator();
-            contextMenu.addAction(tr("Repeat schedule..."), this, [this, day]() {
-                emit repeatSchedule(day.date);
-            });
-            bool hasPlannedActivity = false;
-            for (const CalendarEntry &calEntry : day.entries) {
-                if (calEntry.type == ENTRY_TYPE_PLANNED_ACTIVITY) {
-                    hasPlannedActivity = true;
-                    break;
-                }
-            }
-            if (hasPlannedActivity) {
-                contextMenu.addAction(tr("Insert restday"), this, [this, day]() {
-                    emit insertRestday(day.date);
-                });
-            } else {
-                contextMenu.addAction(tr("Delete restday"), this, [this, day]() {
-                    emit delRestday(day.date);
-                });
-            }
-        }
+        entry = &day.headlineEntries[headlineEntryIdx];
     }
-    contextMenu.exec(viewport()->mapToGlobal(pos));
+    QMenu *contextMenu = buildContextMenu(day, entry, QTime(), isInDateRange(day.date) && canHavePhasesOrEvents);
+    contextMenu->exec(viewport()->mapToGlobal(pos));
+    delete contextMenu;
     if (pressedIndex.isValid()) {
         QTableWidgetItem *item = this->item(pressedIndex.row(), pressedIndex.column());
         if (item != nullptr) {
@@ -1625,6 +1535,8 @@ CalendarDayView::CalendarDayView
         dayDateSelector->setSelectedDate(date);
         emit dayChanged(date);
     });
+    connect(dayTable, &CalendarDayTable::entryMoved, this, &CalendarDayView::entryMoved);
+
     connect(dayTable, &CalendarDayTable::linkActivity, this, &CalendarDayView::linkActivity);
     connect(dayTable, &CalendarDayTable::unlinkActivity, this, &CalendarDayView::unlinkActivity);
     connect(dayTable, &CalendarDayTable::viewActivity, this, &CalendarDayView::viewActivity);
@@ -1632,8 +1544,11 @@ CalendarDayView::CalendarDayView
     connect(dayTable, &CalendarDayTable::addActivity, this, &CalendarDayView::addActivity);
     connect(dayTable, &CalendarDayTable::showInTrainMode, this, &CalendarDayView::showInTrainMode);
     connect(dayTable, &CalendarDayTable::delActivity, this, &CalendarDayView::delActivity);
-    connect(dayTable, &CalendarDayTable::saveActivity, this, &CalendarDayView::saveActivity);
-    connect(dayTable, &CalendarDayTable::entryMoved, this, &CalendarDayView::entryMoved);
+    connect(dayTable, &CalendarDayTable::saveChanges, this, &CalendarDayView::saveChanges);
+    connect(dayTable, &CalendarDayTable::discardChanges, this, &CalendarDayView::discardChanges);
+    connect(dayTable, &CalendarDayTable::repeatSchedule, this, &CalendarDayView::repeatSchedule);
+    connect(dayTable, &CalendarDayTable::insertRestday, this, &CalendarDayView::insertRestday);
+    connect(dayTable, &CalendarDayTable::delRestday, this, &CalendarDayView::delRestday);
     connect(dayTable, &CalendarDayTable::addPhase, this, &CalendarDayView::addPhase);
     connect(dayTable, &CalendarDayTable::editPhase, this, &CalendarDayView::editPhase);
     connect(dayTable, &CalendarDayTable::delPhase, this, &CalendarDayView::delPhase);
@@ -1918,6 +1833,8 @@ CalendarWeekView::CalendarWeekView
     QHBoxLayout *weekLayout = new QHBoxLayout(this);
     weekLayout->addWidget(weekTable);
 
+    connect(weekTable, &CalendarDayTable::entryMoved, this, &CalendarWeekView::entryMoved);
+
     connect(weekTable, &CalendarDayTable::dayChanged, this, &CalendarWeekView::dayChanged);
     connect(weekTable, &CalendarDayTable::linkActivity, this, &CalendarWeekView::linkActivity);
     connect(weekTable, &CalendarDayTable::unlinkActivity, this, &CalendarWeekView::unlinkActivity);
@@ -1926,8 +1843,11 @@ CalendarWeekView::CalendarWeekView
     connect(weekTable, &CalendarDayTable::addActivity, this, &CalendarWeekView::addActivity);
     connect(weekTable, &CalendarDayTable::showInTrainMode, this, &CalendarWeekView::showInTrainMode);
     connect(weekTable, &CalendarDayTable::delActivity, this, &CalendarWeekView::delActivity);
-    connect(weekTable, &CalendarDayTable::saveActivity, this, &CalendarWeekView::saveActivity);
-    connect(weekTable, &CalendarDayTable::entryMoved, this, &CalendarWeekView::entryMoved);
+    connect(weekTable, &CalendarDayTable::saveChanges, this, &CalendarWeekView::saveChanges);
+    connect(weekTable, &CalendarDayTable::discardChanges, this, &CalendarWeekView::discardChanges);
+    connect(weekTable, &CalendarDayTable::repeatSchedule, this, &CalendarWeekView::repeatSchedule);
+    connect(weekTable, &CalendarDayTable::insertRestday, this, &CalendarWeekView::insertRestday);
+    connect(weekTable, &CalendarDayTable::delRestday, this, &CalendarWeekView::delRestday);
     connect(weekTable, &CalendarDayTable::addPhase, this, &CalendarWeekView::addPhase);
     connect(weekTable, &CalendarDayTable::editPhase, this, &CalendarWeekView::editPhase);
     connect(weekTable, &CalendarDayTable::delPhase, this, &CalendarWeekView::delPhase);
@@ -2111,6 +2031,8 @@ Calendar::Calendar
             setNavButtonState();
         }
     });
+    connect(dayView, &CalendarDayView::entryMoved, this, &Calendar::moveActivity);
+
     connect(dayView, &CalendarDayView::linkActivity, this, &Calendar::linkActivity);
     connect(dayView, &CalendarDayView::unlinkActivity, this, &Calendar::unlinkActivity);
     connect(dayView, &CalendarDayView::viewActivity, this, &Calendar::viewActivity);
@@ -2118,8 +2040,11 @@ Calendar::Calendar
     connect(dayView, &CalendarDayView::addActivity, this, &Calendar::addActivity);
     connect(dayView, &CalendarDayView::showInTrainMode, this, &Calendar::showInTrainMode);
     connect(dayView, &CalendarDayView::delActivity, this, &Calendar::delActivity);
-    connect(dayView, &CalendarDayView::saveActivity, this, &Calendar::saveActivity);
-    connect(dayView, &CalendarDayView::entryMoved, this, &Calendar::moveActivity);
+    connect(dayView, &CalendarDayView::saveChanges, this, &Calendar::saveChanges);
+    connect(dayView, &CalendarDayView::discardChanges, this, &Calendar::discardChanges);
+    connect(dayView, &CalendarDayView::repeatSchedule, this, &Calendar::repeatSchedule);
+    connect(dayView, &CalendarDayView::insertRestday, this, &Calendar::insertRestday);
+    connect(dayView, &CalendarDayView::delRestday, this, &Calendar::delRestday);
     connect(dayView, &CalendarDayView::addPhase, this, &Calendar::addPhase);
     connect(dayView, &CalendarDayView::editPhase, this, &Calendar::editPhase);
     connect(dayView, &CalendarDayView::delPhase, this, &Calendar::delPhase);
@@ -2134,6 +2059,8 @@ Calendar::Calendar
             setNavButtonState();
         }
     });
+    connect(weekView, &CalendarWeekView::entryMoved, this, &Calendar::moveActivity);
+
     connect(weekView, &CalendarWeekView::linkActivity, this, &Calendar::linkActivity);
     connect(weekView, &CalendarWeekView::unlinkActivity, this, &Calendar::unlinkActivity);
     connect(weekView, &CalendarWeekView::viewActivity, this, &Calendar::viewActivity);
@@ -2141,8 +2068,11 @@ Calendar::Calendar
     connect(weekView, &CalendarWeekView::addActivity, this, &Calendar::addActivity);
     connect(weekView, &CalendarWeekView::showInTrainMode, this, &Calendar::showInTrainMode);
     connect(weekView, &CalendarWeekView::delActivity, this, &Calendar::delActivity);
-    connect(weekView, &CalendarWeekView::saveActivity, this, &Calendar::saveActivity);
-    connect(weekView, &CalendarWeekView::entryMoved, this, &Calendar::moveActivity);
+    connect(weekView, &CalendarWeekView::saveChanges, this, &Calendar::saveChanges);
+    connect(weekView, &CalendarWeekView::discardChanges, this, &Calendar::discardChanges);
+    connect(weekView, &CalendarWeekView::repeatSchedule, this, &Calendar::repeatSchedule);
+    connect(weekView, &CalendarWeekView::insertRestday, this, &Calendar::insertRestday);
+    connect(weekView, &CalendarWeekView::delRestday, this, &Calendar::delRestday);
     connect(weekView, &CalendarWeekView::addPhase, this, &Calendar::addPhase);
     connect(weekView, &CalendarWeekView::editPhase, this, &Calendar::editPhase);
     connect(weekView, &CalendarWeekView::delPhase, this, &Calendar::delPhase);
@@ -2169,8 +2099,11 @@ Calendar::Calendar
     connect(monthView, &CalendarMonthTable::viewLinkedActivity, this, &Calendar::viewLinkedActivity);
     connect(monthView, &CalendarMonthTable::addActivity, this, &Calendar::addActivity);
     connect(monthView, &CalendarMonthTable::repeatSchedule, this, &Calendar::repeatSchedule);
+    connect(monthView, &CalendarMonthTable::insertRestday, this, &Calendar::insertRestday);
+    connect(monthView, &CalendarMonthTable::delRestday, this, &Calendar::delRestday);
     connect(monthView, &CalendarMonthTable::delActivity, this, &Calendar::delActivity);
-    connect(monthView, &CalendarMonthTable::saveActivity, this, &Calendar::saveActivity);
+    connect(monthView, &CalendarMonthTable::saveChanges, this, &Calendar::saveChanges);
+    connect(monthView, &CalendarMonthTable::discardChanges, this, &Calendar::discardChanges);
     connect(monthView, &CalendarMonthTable::entryMoved, this, &Calendar::moveActivity);
     connect(monthView, &CalendarMonthTable::addPhase, this, &Calendar::addPhase);
     connect(monthView, &CalendarMonthTable::editPhase, this, &Calendar::editPhase);
@@ -2178,8 +2111,6 @@ Calendar::Calendar
     connect(monthView, &CalendarMonthTable::addEvent, this, &Calendar::addEvent);
     connect(monthView, &CalendarMonthTable::editEvent, this, &Calendar::editEvent);
     connect(monthView, &CalendarMonthTable::delEvent, this, &Calendar::delEvent);
-    connect(monthView, &CalendarMonthTable::insertRestday, this, &Calendar::insertRestday);
-    connect(monthView, &CalendarMonthTable::delRestday, this, &Calendar::delRestday);
     connect(monthView, &CalendarMonthTable::monthChanged, this, [this](const QDate &month, const QDate &firstVisible, const QDate &lastVisible) {
         if (currentView() == CalendarView::Month) {
             emit monthChanged(month, firstVisible, lastVisible);
