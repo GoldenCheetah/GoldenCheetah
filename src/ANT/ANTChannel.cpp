@@ -22,6 +22,11 @@
 #include <QDebug>
 #include <QTime>
 
+#ifdef Q_CC_MSVC
+// 'strcpy': This function or variable may be unsafe.
+#pragma warning(disable:4996)
+#endif
+
 static float timeout_blanking=2.0;  // time before reporting stale data, seconds
 static float timeout_drop=2.0; // time before reporting dropped message
 static float timeout_scan=10.0; // time to do initial scan
