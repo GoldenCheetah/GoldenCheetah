@@ -268,10 +268,11 @@ void ConfigDialog::saveClicked()
 
         // we want our own buttons...
         msgBox.addButton(tr("No, Keep current"), QMessageBox::RejectRole);
-        msgBox.addButton(tr("Yes, Apply and Restart"), QMessageBox::AcceptRole);
+        QAbstractButton *acceptButton = msgBox.addButton(tr("Yes, Apply and Restart"), QMessageBox::AcceptRole);
         msgBox.setDefaultButton(QMessageBox::Abort);
+        msgBox.exec();
 
-        if (msgBox.exec() == 1) { // accept!
+        if (msgBox.clickedButton() == acceptButton) {
 
             // lets restart
             restarting = true;
