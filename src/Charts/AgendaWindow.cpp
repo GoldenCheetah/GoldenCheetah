@@ -48,7 +48,6 @@ AgendaWindow::AgendaWindow(Context *context)
     setAgendaFutureDays(7);
     setPrimaryMainField("Route");
     setPrimaryFallbackField("Workout Code");
-    setSecondaryMetric("workout_time");
     setShowSecondaryLabel(true);
     setTertiaryField("Notes");
     setShowTertiaryFor(0);
@@ -69,7 +68,7 @@ AgendaWindow::AgendaWindow(Context *context)
     connect(context, &Context::rideDeleted, this, &AgendaWindow::updateActivitiesIfInRange);
     connect(context, &Context::rideChanged, this, &AgendaWindow::updateActivitiesIfInRange);
     connect(context, &Context::configChanged, this, &AgendaWindow::configChanged);
-    connect(agendaView, &AgendaView::showInTrainMode, this, [context](const CalendarEntry &activity) {
+    connect(agendaView, &AgendaView::showInTrainMode, this, [context](const AgendaEntry &activity) {
         for (RideItem *rideItem : context->athlete->rideCache->rides()) {
             if (rideItem != nullptr && rideItem->fileName == activity.reference) {
                 QString filter = buildWorkoutFilter(rideItem);
@@ -82,7 +81,7 @@ AgendaWindow::AgendaWindow(Context *context)
             }
         }
     });
-    connect(agendaView, &AgendaView::viewActivity, this, [context](const CalendarEntry &activity) {
+    connect(agendaView, &AgendaView::viewActivity, this, [context](const AgendaEntry &activity) {
         for (RideItem *rideItem : context->athlete->rideCache->rides()) {
             if (rideItem != nullptr && rideItem->fileName == activity.reference) {
                 context->notifyRideSelected(rideItem);
@@ -181,18 +180,34 @@ AgendaWindow::setPrimaryFallbackField
 
 
 void
-AgendaWindow::setSecondaryMetric
-(const QString &name)
+AgendaWindow::setSecondaryMetrics
+(const QString &metrics)
 {
-    secondaryCombo->setCurrentIndex(std::max(0, secondaryCombo->findData(name)));
+    multiMetricSelector->setSymbols(metrics.split(',', Qt::SkipEmptyParts));
+}
+
+
+void
+AgendaWindow::setSecondaryMetrics
+(const QStringList &metrics)
+{
+    multiMetricSelector->setSymbols(metrics);
 }
 
 
 QString
-AgendaWindow::getSecondaryMetric
+AgendaWindow::getSecondaryMetrics
 () const
 {
-    return secondaryCombo->currentData(Qt::UserRole).toString();
+    return multiMetricSelector->getSymbols().join(',');
+}
+
+
+QStringList
+AgendaWindow::getSecondaryMetricsList
+() const
+{
+    return multiMetricSelector->getSymbols();
 }
 
 
@@ -290,7 +305,7 @@ AgendaWindow::configChanged
     if (   (what & CONFIG_FIELDS)
         || (what & CONFIG_USERMETRICS)) {
         updatePrimaryConfigCombos();
-        updateSecondaryConfigCombo();
+        multiMetricSelector->updateMetrics();
         updateTertiaryConfigCombo();
     }
     if (what & CONFIG_APPEARANCE) {
@@ -370,27 +385,31 @@ AgendaWindow::mkControls
     agendaPastDaysSpin = new QSpinBox();
     agendaPastDaysSpin->setMaximum(31);
     agendaPastDaysSpin->setSuffix(" " + tr("day(s)"));
+
     agendaFutureDaysSpin = new QSpinBox();
     agendaFutureDaysSpin->setMaximum(31);
     agendaFutureDaysSpin->setSuffix(" " + tr("day(s)"));
+
     primaryMainCombo = new QComboBox();
     primaryFallbackCombo = new QComboBox();
-    secondaryCombo = new QComboBox();
-    showSecondaryLabelCheck = new QCheckBox(tr("Show Label"));
+
+    QStringList summaryMetrics { "workout_time", "triscore" };
+    multiMetricSelector = new MultiMetricSelector(tr("Available Metrics"), tr("Selected Metrics"), summaryMetrics);
+    multiMetricSelector->setContentsMargins(10 * dpiXFactor, 10 * dpiYFactor, 10 * dpiXFactor, 10 * dpiYFactor);
+    multiMetricSelector->setMinimumHeight(300 * dpiYFactor);
+
+    QPushButton *gotoMetrics = new QPushButton(tr("Configure Metrics"));
+
+    showSecondaryLabelCheck = new QCheckBox(tr("Show Names of Metrics"));
     showTertiaryForCombo = new QComboBox();
     tertiaryCombo = new QComboBox();
     updatePrimaryConfigCombos();
-    updateSecondaryConfigCombo();
     showTertiaryForCombo->addItem(tr("all dates"));
     showTertiaryForCombo->addItem(tr("today"));
     showTertiaryForCombo->addItem(tr("no dates"));
     updateTertiaryConfigCombo();
     primaryMainCombo->setCurrentText("Route");
     primaryFallbackCombo->setCurrentText("Workout Code");
-    int secondaryIndex = secondaryCombo->findData("workout_time");
-    if (secondaryIndex >= 0) {
-        secondaryCombo->setCurrentIndex(secondaryIndex);
-    }
     activityMaxTertiaryLinesSpin = new QSpinBox();
     activityMaxTertiaryLinesSpin->setRange(1, 5);
     eventMaxTertiaryLinesSpin = new QSpinBox();
@@ -407,7 +426,7 @@ AgendaWindow::mkControls
     activityForm->addRow(tr("Fallback Field"), primaryFallbackCombo);
     activityForm->addItem(new QSpacerItem(0, 20 * dpiYFactor));
     activityForm->addRow(new QLabel(HLO + tr("Metric Line") + HLC));
-    activityForm->addRow(tr("Metric"), secondaryCombo);
+    activityForm->addRow("", gotoMetrics);
     activityForm->addRow("", showSecondaryLabelCheck);
     activityForm->addItem(new QSpacerItem(0, 20 * dpiYFactor));
     activityForm->addRow(new QLabel(HLO + tr("Detail Line") + HLC));
@@ -430,13 +449,15 @@ AgendaWindow::mkControls
 
     QTabWidget *controlsTabs = new QTabWidget();
     controlsTabs->addTab(activityScroller, tr("Activities"));
+    controlsTabs->addTab(multiMetricSelector, tr("Metrics"));
     controlsTabs->addTab(eventScroller, tr("Events"));
 
     connect(agendaPastDaysSpin, &QSpinBox::valueChanged, this, &AgendaWindow::setAgendaPastDays);
     connect(agendaFutureDaysSpin, &QSpinBox::valueChanged, this, &AgendaWindow::setAgendaFutureDays);
     connect(primaryMainCombo, &QComboBox::currentIndexChanged, this, &AgendaWindow::updateActivities);
     connect(primaryFallbackCombo, &QComboBox::currentIndexChanged, this, &AgendaWindow::updateActivities);
-    connect(secondaryCombo, &QComboBox::currentIndexChanged, this, &AgendaWindow::updateActivities);
+    connect(multiMetricSelector, &MultiMetricSelector::selectedChanged, this, &AgendaWindow::updateActivities);
+    connect(gotoMetrics, &QPushButton::clicked, this, [controlsTabs]() { controlsTabs->setCurrentIndex(1); });
     connect(showTertiaryForCombo, &QComboBox::currentIndexChanged, this, &AgendaWindow::updateActivities);
     connect(tertiaryCombo, &QComboBox::currentIndexChanged, this, &AgendaWindow::updateActivities);
     connect(activityMaxTertiaryLinesSpin, &QSpinBox::valueChanged, this, &AgendaWindow::setActivityMaxTertiaryLines);
@@ -474,27 +495,6 @@ AgendaWindow::updatePrimaryConfigCombos
 
 
 void
-AgendaWindow::updateSecondaryConfigCombo
-()
-{
-    QString symbol = getSecondaryMetric();
-
-    secondaryCombo->blockSignals(true);
-    secondaryCombo->clear();
-    const RideMetricFactory &factory = RideMetricFactory::instance();
-    for (const QString &metricSymbol : factory.allMetrics()) {
-        if (metricSymbol.startsWith("compatibility_")) {
-            continue;
-        }
-        secondaryCombo->addItem(Utils::unprotect(factory.rideMetric(metricSymbol)->name()), metricSymbol);
-    }
-
-    secondaryCombo->blockSignals(false);
-    setSecondaryMetric(symbol);
-}
-
-
-void
 AgendaWindow::updateTertiaryConfigCombo
 ()
 {
@@ -514,26 +514,33 @@ AgendaWindow::updateTertiaryConfigCombo
 }
 
 
-QHash<QDate, QList<CalendarEntry>>
+QHash<QDate, QList<AgendaEntry>>
 AgendaWindow::getActivities
 (const QDate &firstDay, const QDate &today, const QDate &lastDay) const
 {
-    QHash<QDate, QList<CalendarEntry>> activities;
+    QHash<QDate, QList<AgendaEntry>> activities;
     const RideMetricFactory &factory = RideMetricFactory::instance();
-    const RideMetric *rideMetric = factory.rideMetric(getSecondaryMetric());
-    QString rideMetricName;
-    QString rideMetricUnit;
-    if (rideMetric != nullptr) {
-        rideMetricName = rideMetric->name();
-        if (   ! rideMetric->isTime()
-            && ! rideMetric->isDate()) {
-            rideMetricUnit = rideMetric->units(GlobalContext::context()->useMetricUnits);
+    QList<RideMetric const *> rideMetrics;
+    QStringList rideMetricNames;
+    QStringList rideMetricUnits;
+    for (const QString &metric : getSecondaryMetricsList()) {
+        RideMetric const *rideMetric = factory.rideMetric(metric);
+        if (rideMetric != nullptr) {
+            rideMetrics << rideMetric;
+            rideMetricNames << rideMetric->name();
+            if (   ! rideMetric->isTime()
+                && ! rideMetric->isDate()) {
+                rideMetricUnits << rideMetric->units(GlobalContext::context()->useMetricUnits);
+            } else {
+                rideMetricUnits << "";
+            }
         }
     }
 
     int showTertiaryFor = getShowTertiaryFor();
     for (RideItem *rideItem : context->athlete->rideCache->rides()) {
         if (   rideItem == nullptr
+            || ! rideItem->planned
             || rideItem->dateTime.date() < firstDay
             || rideItem->dateTime.date() > lastDay
             || rideItem->hasLinkedActivity()) {
@@ -545,7 +552,7 @@ AgendaWindow::getActivities
         }
 
         QString sport = rideItem->sport;
-        CalendarEntry activity;
+        AgendaEntry activity;
 
         QString primaryMain = rideItem->getText(getPrimaryMainField(), "").trimmed();
         if (! primaryMain.isEmpty()) {
@@ -560,42 +567,41 @@ AgendaWindow::getActivities
                 activity.primary = tr("<unknown>");
             }
         }
-        if (rideMetric != nullptr && rideMetric->isRelevantForRide(rideItem)) {
-            activity.secondary = rideItem->getStringForSymbol(getSecondaryMetric(), GlobalContext::context()->useMetricUnits);
-            if (! rideMetricUnit.isEmpty()) {
-                activity.secondary += " " + rideMetricUnit;
+        for (int i = 0; i < rideMetrics.count(); ++i) {
+            RideMetric const *rideMetric = rideMetrics[i];
+            if (rideMetric->isRelevantForRide(rideItem)) {
+                QString value = rideItem->getStringForSymbol(rideMetric->symbol(), GlobalContext::context()->useMetricUnits);
+                if (! rideMetricUnits.value(i, "").isEmpty()) {
+                    value.append(" " + rideMetricUnits.value(i, ""));
+                }
+                activity.secondaryValues << Utils::unprotect(value);
+                if (isShowSecondaryLabel()) {
+                    activity.secondaryLabels << Utils::unprotect(rideMetricNames.value(i, ""));
+                } else {
+                    activity.secondaryLabels << "";
+                }
             }
-            if (isShowSecondaryLabel()) {
-                activity.secondaryMetric = rideMetricName;
-            }
-        } else {
-            activity.secondary = tr("N/A");
-            activity.secondaryMetric = "";
+        }
+        if (activity.secondaryValues.count() == 0) {
+            activity.secondaryValues << tr("N/A");
+            activity.secondaryLabels << "";
         }
         if (showTertiaryFor == 0 || (showTertiaryFor == 1 && rideItem->dateTime.date() == today)) {
             activity.tertiary = rideItem->getText(getTertiaryField(), "").trimmed();
             activity.tertiary = Utils::unprotect(activity.tertiary);
         }
         activity.primary = Utils::unprotect(activity.primary);
-        activity.secondary = Utils::unprotect(activity.secondary);
-        activity.secondaryMetric = Utils::unprotect(activity.secondaryMetric);
 
         activity.iconFile = IconManager::instance().getFilepath(rideItem);
-        if (rideItem->color.alpha() < 255 || rideItem->planned) {
-            activity.color = GColor(CCALPLANNED);
-        } else {
-            activity.color = rideItem->color;
-        }
+        activity.color = GColor(CCALPLANNED);
         activity.reference = rideItem->fileName;
         activity.start = rideItem->dateTime.time();
-        activity.durationSecs = rideItem->getForSymbol("workout_time", GlobalContext::context()->useMetricUnits);
-        activity.type = rideItem->planned ? ENTRY_TYPE_PLANNED_ACTIVITY : ENTRY_TYPE_ACTIVITY;
-        activity.isRelocatable = rideItem->planned;
-        activity.hasTrainMode = rideItem->planned && sport == "Bike" && ! buildWorkoutFilter(rideItem).isEmpty();
+        activity.type = ENTRY_TYPE_PLANNED_ACTIVITY;
+        activity.hasTrainMode = sport == "Bike" && ! buildWorkoutFilter(rideItem).isEmpty();
         activities[rideItem->dateTime.date()] << activity;
     }
     for (auto dayIt = activities.begin(); dayIt != activities.end(); ++dayIt) {
-        std::sort(dayIt.value().begin(), dayIt.value().end(), [](const CalendarEntry &a, const CalendarEntry &b) {
+        std::sort(dayIt.value().begin(), dayIt.value().end(), [](const AgendaEntry &a, const AgendaEntry &b) {
             if (a.start == b.start) {
                 return a.primary < b.primary;
             } else {
@@ -607,12 +613,12 @@ AgendaWindow::getActivities
 }
 
 
-std::pair<QList<CalendarEntry>, QList<CalendarEntry>>
+std::pair<QList<AgendaEntry>, QList<AgendaEntry>>
 AgendaWindow::getPhases
 (const Season &season, const QDate &firstDay) const
 {
-    QList<CalendarEntry> ongoingPhases;
-    QList<CalendarEntry> futurePhases;
+    QList<AgendaEntry> ongoingPhases;
+    QList<AgendaEntry> futurePhases;
     for (const Phase &phase : season.phases) {
         if (phase.getAbsoluteStart().isValid() && phase.getAbsoluteEnd().isValid()) {
             QString phaseType;
@@ -623,37 +629,36 @@ AgendaWindow::getPhases
             default:
                 phaseType = Phase::types[static_cast<int>(phase.getType()) - static_cast<int>(Phase::phase)];
             }
-            CalendarEntry entry;
+            AgendaEntry entry;
             entry.primary = phase.getName();
             entry.iconFile = ":images/breeze/network-mobile-100.svg";
             entry.color = GColor(CCALPHASE);
             entry.reference = phase.id().toString();
             entry.start = QTime(0, 0, 1);
             entry.type = ENTRY_TYPE_PHASE;
-            entry.isRelocatable = false;
             entry.spanStart = phase.getAbsoluteStart();
             entry.spanEnd = phase.getAbsoluteEnd();
             int duration = entry.spanStart.daysTo(entry.spanEnd);
             ShowDaysAsUnit unit = showDaysAs(duration);
             if (unit == ShowDaysAsUnit::Days) {
                 if (duration > 1) {
-                    entry.secondary = tr("%1 • %2 days").arg(phaseType).arg(duration);
+                    entry.secondaryValues << tr("%1 • %2 days").arg(phaseType).arg(duration);
                 } else {
-                    entry.secondary = tr("%1 • %2 day").arg(phaseType).arg(duration);
+                    entry.secondaryValues << tr("%1 • %2 day").arg(phaseType).arg(duration);
                 }
             } else if (unit == ShowDaysAsUnit::Weeks) {
                 duration = daysToWeeks(duration);
                 if (duration > 1) {
-                    entry.secondary = tr("%1 • %2 weeks").arg(phaseType).arg(duration);
+                    entry.secondaryValues << tr("%1 • %2 weeks").arg(phaseType).arg(duration);
                 } else {
-                    entry.secondary = tr("%1 • %2 week").arg(phaseType).arg(duration);
+                    entry.secondaryValues << tr("%1 • %2 week").arg(phaseType).arg(duration);
                 }
             } else {
                 duration = daysToMonths(duration);
                 if (duration > 1) {
-                    entry.secondary = tr("%1 • %2 months").arg(phaseType).arg(duration);
+                    entry.secondaryValues << tr("%1 • %2 months").arg(phaseType).arg(duration);
                 } else {
-                    entry.secondary = tr("%1 • %2 month").arg(phaseType).arg(duration);
+                    entry.secondaryValues << tr("%1 • %2 month").arg(phaseType).arg(duration);
                 }
             }
             if (phase.getAbsoluteStart() <= firstDay && phase.getAbsoluteEnd() >= firstDay) {
@@ -663,10 +668,10 @@ AgendaWindow::getPhases
             }
         }
     }
-    std::sort(ongoingPhases.begin(), ongoingPhases.end(), [](const CalendarEntry &a, const CalendarEntry &b) {
+    std::sort(ongoingPhases.begin(), ongoingPhases.end(), [](const AgendaEntry &a, const AgendaEntry &b) {
         return a.spanEnd < b.spanEnd;
     });
-    std::sort(futurePhases.begin(), futurePhases.end(), [](const CalendarEntry &a, const CalendarEntry &b) {
+    std::sort(futurePhases.begin(), futurePhases.end(), [](const AgendaEntry &a, const AgendaEntry &b) {
         return a.spanStart < b.spanStart;
     });
 
@@ -674,11 +679,11 @@ AgendaWindow::getPhases
 }
 
 
-QHash<QDate, QList<CalendarEntry>>
+QHash<QDate, QList<AgendaEntry>>
 AgendaWindow::getEvents
 (const QDate &firstDay) const
 {
-    QHash<QDate, QList<CalendarEntry>> events;
+    QHash<QDate, QList<AgendaEntry>> events;
     QList<Season> tmpSeasons = context->athlete->seasons->seasons;
     std::sort(tmpSeasons.begin(), tmpSeasons.end(), Season::LessThanForStarts);
     for (const Season &s : tmpSeasons) {
@@ -686,36 +691,34 @@ AgendaWindow::getEvents
             if (   (   (   firstDay.isValid()
                         && event.date >= firstDay)
                     || ! firstDay.isValid())) {
-                CalendarEntry entry;
+                AgendaEntry entry;
                 entry.primary = event.name;
                 if (event.priority == 0) {
                     entry.iconFile = ":images/breeze/task-process-4.svg";
-                    entry.secondary = tr("Uncategorized");
+                    entry.secondaryValues << tr("Uncategorized");
                 } else if (event.priority == 1) {
                     entry.iconFile = ":images/breeze/task-process-4.svg";
-                    entry.secondary = tr("Category A");
+                    entry.secondaryValues << tr("Category A");
                 } else if (event.priority == 2) {
                     entry.iconFile = ":images/breeze/task-process-3.svg";
-                    entry.secondary = tr("Category B");
+                    entry.secondaryValues << tr("Category B");
                 } else if (event.priority == 3) {
                     entry.iconFile = ":images/breeze/task-process-2.svg";
-                    entry.secondary = tr("Category C");
+                    entry.secondaryValues << tr("Category C");
                 } else if (event.priority == 4) {
                     entry.iconFile = ":images/breeze/task-process-1.svg";
-                    entry.secondary = tr("Category D");
+                    entry.secondaryValues << tr("Category D");
                 } else {
                     entry.iconFile = ":images/breeze/task-process-0.svg";
-                    entry.secondary = tr("Category E");
+                    entry.secondaryValues << tr("Category E");
                 }
                 entry.tertiary = event.description.trimmed();
                 entry.color = GColor(CCALEVENT);
                 entry.reference = event.id;
                 entry.start = QTime(0, 0, 0);
-                entry.durationSecs = 0;
                 entry.type = ENTRY_TYPE_EVENT;
                 entry.spanStart = event.date;
                 entry.spanEnd = event.date;
-                entry.isRelocatable = false;
                 events[event.date] << entry;
             }
         }
@@ -733,9 +736,9 @@ AgendaWindow::updateActivities
         agendaView->updateDate();
         return;
     }
-    QHash<QDate, QList<CalendarEntry>> activities = getActivities(agendaView->firstVisibleDay(), agendaView->selectedDate(), agendaView->lastVisibleDay());
-    std::pair<QList<CalendarEntry>, QList<CalendarEntry>> phases;
-    QHash<QDate, QList<CalendarEntry>> events;
+    QHash<QDate, QList<AgendaEntry>> activities = getActivities(agendaView->firstVisibleDay(), agendaView->selectedDate(), agendaView->lastVisibleDay());
+    std::pair<QList<AgendaEntry>, QList<AgendaEntry>> phases;
+    QHash<QDate, QList<AgendaEntry>> events;
     QString seasonName;
 
     tertiaryCombo->setEnabled(getShowTertiaryFor() != 2);
@@ -765,7 +768,7 @@ AgendaWindow::updateActivitiesIfInRange
 
 void
 AgendaWindow::editPhaseEntry
-(const CalendarEntry &entry)
+(const AgendaEntry &entry)
 {
     if (entry.type != ENTRY_TYPE_PHASE) {
         return;
@@ -799,7 +802,7 @@ AgendaWindow::editPhaseEntry
 
 void
 AgendaWindow::editEventEntry
-(const CalendarEntry &entry)
+(const AgendaEntry &entry)
 {
     if (entry.type != ENTRY_TYPE_EVENT) {
         return;
@@ -810,13 +813,14 @@ AgendaWindow::editEventEntry
         for (SeasonEvent &event : s.events) {
             // FIXME: Ugly comparison required because SeasonEvent::id is not populated
             if (   event.name == entry.primary
-                && (   (event.priority == 0 && entry.secondary == tr("Uncategorized"))
-                    || (event.priority == 1 && entry.secondary == tr("Category A"))
-                    || (event.priority == 2 && entry.secondary == tr("Category B"))
-                    || (event.priority == 3 && entry.secondary == tr("Category C"))
-                    || (event.priority == 4 && entry.secondary == tr("Category D"))
+                && entry.secondaryValues.count() == 1
+                && (   (event.priority == 0 && entry.secondaryValues[0] == tr("Uncategorized"))
+                    || (event.priority == 1 && entry.secondaryValues[0] == tr("Category A"))
+                    || (event.priority == 2 && entry.secondaryValues[0] == tr("Category B"))
+                    || (event.priority == 3 && entry.secondaryValues[0] == tr("Category C"))
+                    || (event.priority == 4 && entry.secondaryValues[0] == tr("Category D"))
                     || (   (event.priority < 0 || event.priority > 4)
-                        && entry.secondary == tr("Category E")))
+                        && entry.secondaryValues[0] == tr("Category E")))
                 && event.description.trimmed() == entry.tertiary
                 && event.id == entry.reference
                 && event.date == entry.spanStart

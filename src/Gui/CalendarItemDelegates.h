@@ -239,18 +239,18 @@ class AgendaEntryDelegate : public QStyledItemDelegate {
     Q_OBJECT
 public:
     enum Roles {
-        EntryRole = Qt::UserRole, // [CalendarEntry] Entry to be displayed
-        EntryDateRole             // [bool] Date of the CalendarEntry
+        EntryRole = Qt::UserRole, // [AgendaEntry] Entry to be displayed
+        EntryDateRole             // [bool] Date of the AgendaEntry
     };
 
     struct Attributes {
         QMargins padding;                                         // Padding of the element
         QFont::Weight primaryWeight = QFont::Medium;              // Primary row
-        QFont::Weight primaryHoverWeight = QFont::DemiBold;       // Primary row (hovered)
-        QFont::Weight secondaryWeight = QFont::Light;             // Secondary row
-        QFont::Weight secondaryHoverWeight = QFont::DemiBold;     // Secondary row (hovered)
+        QFont::Weight primaryHoverWeight = QFont::Medium;         // Primary row (hovered)
+        QFont::Weight secondaryWeight = QFont::Medium;            // Secondary row
+        QFont::Weight secondaryHoverWeight = QFont::Medium;       // Secondary row (hovered)
         QFont::Weight secondaryMetricWeight = QFont::ExtraLight;  // Metric in the secondary row
-        QFont::Weight secondaryMetricHoverWeight = QFont::Normal; // Metric in the secondary row (hovered)
+        QFont::Weight secondaryMetricHoverWeight = QFont::ExtraLight; // Metric in the secondary row (hovered)
         int lineSpacing = 2;                                      // Vertical spacing between primary and secondary row (dpiYFactor not applied)
         int iconTextSpacing = 10;                                 // Horizontal spacing between icon and text (dpiXFactor not applied)
         float tertiaryDimLevel = 0.5;                             // Dimming amount for tertiary row

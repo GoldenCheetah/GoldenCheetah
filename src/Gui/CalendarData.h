@@ -35,6 +35,22 @@
 #define ENTRY_TYPE_OTHER 99
 
 
+struct AgendaEntry {
+    QString primary;
+    QStringList secondaryValues;
+    QStringList secondaryLabels;
+    QString tertiary;
+    QString iconFile;
+    QColor color;
+    QString reference;
+    QTime start;
+    int type = 0;
+    bool hasTrainMode = false;
+    QDate spanStart = QDate();
+    QDate spanEnd = QDate();
+};
+
+
 struct CalendarEntry {
     QString primary;
     QString secondary;
@@ -80,6 +96,7 @@ struct CalendarSummary {
     QList<std::pair<QString, QString>> keyValues;
 };
 
+Q_DECLARE_METATYPE(AgendaEntry)
 Q_DECLARE_METATYPE(CalendarEntry)
 Q_DECLARE_METATYPE(CalendarEntryLayout)
 Q_DECLARE_METATYPE(CalendarDay)

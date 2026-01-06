@@ -92,13 +92,13 @@ public:
 
     void setPastDays(int days);
     void setFutureDays(int days);
-    void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activities);
+    void fillEntries(const QHash<QDate, QList<AgendaEntry>> &activities);
     QDate firstVisibleDay() const;
     QDate lastVisibleDay() const;
 
 signals:
-    void showInTrainMode(const CalendarEntry &activity);
-    void viewActivity(const CalendarEntry &activity);
+    void showInTrainMode(const AgendaEntry &activity);
+    void viewActivity(const AgendaEntry &activity);
 
 protected:
     QMenu *createContextMenu(const QModelIndex &index) override;
@@ -107,7 +107,7 @@ private:
     int pastDays = 7;
     int futureDays = 7;
 
-    void addEntries(const QDate &today, const QDate &date, const QList<CalendarEntry> &activities, QTreeWidgetItem *parent, const Fonts &fonts);
+    void addEntries(const QDate &today, const QDate &date, const QList<AgendaEntry> &activities, QTreeWidgetItem *parent, const Fonts &fonts);
 };
 
 
@@ -115,16 +115,16 @@ class PhaseTree : public AgendaTree {
     Q_OBJECT
 
 public:
-    void fillEntries(const std::pair<QList<CalendarEntry>, QList<CalendarEntry>> &phases);
+    void fillEntries(const std::pair<QList<AgendaEntry>, QList<AgendaEntry>> &phases);
 
 signals:
-    void editPhaseEntry(const CalendarEntry &entry);
+    void editPhaseEntry(const AgendaEntry &entry);
 
 protected:
     QMenu *createContextMenu(const QModelIndex &index) override;
 
 private:
-    void addEntries(const QDate &today, const QList<CalendarEntry> &phases, QTreeWidgetItem *parent, const Fonts &fonts);
+    void addEntries(const QDate &today, const QList<AgendaEntry> &phases, QTreeWidgetItem *parent, const Fonts &fonts);
 };
 
 
@@ -132,16 +132,16 @@ class EventTree : public AgendaTree {
     Q_OBJECT
 
 public:
-    void fillEntries(const QHash<QDate, QList<CalendarEntry>> &events);
+    void fillEntries(const QHash<QDate, QList<AgendaEntry>> &events);
 
 signals:
-    void editEventEntry(const CalendarEntry &entry);
+    void editEventEntry(const AgendaEntry &entry);
 
 protected:
     virtual QMenu *createContextMenu(const QModelIndex &index);
 
 private:
-    void addEntries(const QDate &today, const QList<CalendarEntry> &phases, QTreeWidgetItem *parent, const Fonts &fonts);
+    void addEntries(const QDate &today, const QList<AgendaEntry> &phases, QTreeWidgetItem *parent, const Fonts &fonts);
 };
 
 
@@ -155,7 +155,7 @@ public:
     void setDateRange(const DateRange &dateRange);
     void setPastDays(int days);
     void setFutureDays(int days);
-    void fillEntries(const QHash<QDate, QList<CalendarEntry>> &activities, std::pair<QList<CalendarEntry>, QList<CalendarEntry>> &phases, const QHash<QDate, QList<CalendarEntry>> &events, const QString &seasonName, bool isFiltered);
+    void fillEntries(const QHash<QDate, QList<AgendaEntry>> &activities, std::pair<QList<AgendaEntry>, QList<AgendaEntry>> &phases, const QHash<QDate, QList<AgendaEntry>> &events, const QString &seasonName, bool isFiltered);
 
     QDate firstVisibleDay() const;
     QDate lastVisibleDay() const;
@@ -166,10 +166,10 @@ public slots:
     void setEventMaxTertiaryLines(int maxTertiaryLines);
 
 signals:
-    void showInTrainMode(const CalendarEntry &activity);
-    void viewActivity(const CalendarEntry &activity);
-    void editPhaseEntry(const CalendarEntry &entry);
-    void editEventEntry(const CalendarEntry &entry);
+    void showInTrainMode(const AgendaEntry &activity);
+    void viewActivity(const AgendaEntry &activity);
+    void editPhaseEntry(const AgendaEntry &entry);
+    void editEventEntry(const AgendaEntry &entry);
     void dayChanged(const QDate &date);
 
 protected:

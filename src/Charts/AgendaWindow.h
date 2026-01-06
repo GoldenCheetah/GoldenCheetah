@@ -42,7 +42,9 @@ class AgendaWindow : public GcChartWindow
     Q_PROPERTY(int agendaFutureDays READ getAgendaFutureDays WRITE setAgendaFutureDays USER true)
     Q_PROPERTY(QString primaryMainField READ getPrimaryMainField WRITE setPrimaryMainField USER true)
     Q_PROPERTY(QString primaryFallbackField READ getPrimaryFallbackField WRITE setPrimaryFallbackField USER true)
-    Q_PROPERTY(QString secondaryMetric READ getSecondaryMetric WRITE setSecondaryMetric USER true)
+
+    Q_PROPERTY(QString secondaryMetrics READ getSecondaryMetrics WRITE setSecondaryMetrics USER true)
+
     Q_PROPERTY(bool showSecondaryLabel READ isShowSecondaryLabel WRITE setShowSecondaryLabel USER true)
     Q_PROPERTY(int showTertiaryFor READ getShowTertiaryFor WRITE setShowTertiaryFor USER true)
     Q_PROPERTY(QString tertiaryField READ getTertiaryField WRITE setTertiaryField USER true)
@@ -59,7 +61,8 @@ class AgendaWindow : public GcChartWindow
 
         QString getPrimaryMainField() const;
         QString getPrimaryFallbackField() const;
-        QString getSecondaryMetric() const;
+        QString getSecondaryMetrics() const;
+        QStringList getSecondaryMetricsList() const;
         bool isShowSecondaryLabel() const;
         int getShowTertiaryFor() const;
         QString getTertiaryField() const;
@@ -71,7 +74,8 @@ class AgendaWindow : public GcChartWindow
         void setAgendaFutureDays(int days);
         void setPrimaryMainField(const QString &name);
         void setPrimaryFallbackField(const QString &name);
-        void setSecondaryMetric(const QString &name);
+        void setSecondaryMetrics(const QString &metrics);
+        void setSecondaryMetrics(const QStringList &metrics);
         void setShowSecondaryLabel(bool showSecondaryLabel);
         void setShowTertiaryFor(int showFor);
         void setTertiaryField(const QString &name);
@@ -90,7 +94,7 @@ class AgendaWindow : public GcChartWindow
         QSpinBox *agendaFutureDaysSpin;
         QComboBox *primaryMainCombo;
         QComboBox *primaryFallbackCombo;
-        QComboBox *secondaryCombo;
+        MultiMetricSelector *multiMetricSelector;
         QCheckBox *showSecondaryLabelCheck;
         QComboBox *showTertiaryForCombo;
         QComboBox *tertiaryCombo;
@@ -100,17 +104,16 @@ class AgendaWindow : public GcChartWindow
 
         void mkControls();
         void updatePrimaryConfigCombos();
-        void updateSecondaryConfigCombo();
         void updateTertiaryConfigCombo();
-        QHash<QDate, QList<CalendarEntry>> getActivities(const QDate &firstDay, const QDate &today, const QDate &lastDay) const;
-        std::pair<QList<CalendarEntry>, QList<CalendarEntry>> getPhases(const Season &season, const QDate &firstDay) const;
-        QHash<QDate, QList<CalendarEntry>> getEvents(const QDate &firstDay) const;
+        QHash<QDate, QList<AgendaEntry>> getActivities(const QDate &firstDay, const QDate &today, const QDate &lastDay) const;
+        std::pair<QList<AgendaEntry>, QList<AgendaEntry>> getPhases(const Season &season, const QDate &firstDay) const;
+        QHash<QDate, QList<AgendaEntry>> getEvents(const QDate &firstDay) const;
 
     private slots:
         void updateActivities();
         void updateActivitiesIfInRange(RideItem *rideItem);
-        void editPhaseEntry(const CalendarEntry &entry);
-        void editEventEntry(const CalendarEntry &entry);
+        void editPhaseEntry(const AgendaEntry &entry);
+        void editEventEntry(const AgendaEntry &entry);
 };
 
 #endif

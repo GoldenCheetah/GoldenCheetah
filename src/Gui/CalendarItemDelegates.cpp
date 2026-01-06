@@ -36,7 +36,7 @@ static bool toolTipHeadlineEntry(const QPoint &pos, QAbstractItemView *view, con
 static bool toolTipDayEntry(const QPoint &pos, QAbstractItemView *view, const CalendarDay &day, int idx);
 static bool toolTipMore(const QPoint &pos, QAbstractItemView *view, const CalendarDay &day);
 static QRect paintHeadline(QPainter *painter, const QStyleOptionViewItem &opt, const QModelIndex &index, HitTester &headlineTester, const QString &dateFormat, int pressedEntryIdx, int leftMargin, int rightMargin, int topMargin, int lineSpacing, int radius);
-static void paintMetric(QPainter *painter, const QRect &rect, const QFont::Weight &valueWeight, const QFont::Weight &labelWeight, const QString &value, const QString &label);
+static int paintMetric(QPainter *painter, const QRect &rect, const QFont::Weight &valueWeight, const QFont::Weight &labelWeight, const QString &value, const QString &label, bool first = true);
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1318,7 +1318,7 @@ AgendaEntryDelegate::paint
     if (column < 0) {
         column = index.column();
     }
-    CalendarEntry entry = index.data(EntryRole).value<CalendarEntry>();
+    AgendaEntry entry = index.data(EntryRole).value<AgendaEntry>();
 
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing);
@@ -1360,7 +1360,6 @@ AgendaEntryDelegate::paint
     QFontMetrics line1FM(line1Font);
     const int lineSpacing = attributes.lineSpacing * dpiYFactor;
     const int lineHeight = line1FM.height();
-    // const int radius = 4 * dpiXFactor;
     const int iconInnerSpacing = 4 * dpiXFactor;
     const int iconTextSpacing = attributes.iconTextSpacing * dpiXFactor;
     const int iconWidth = 2 * lineHeight + lineSpacing;
@@ -1396,9 +1395,16 @@ AgendaEntryDelegate::paint
     painter->setFont(line1Font);
     painter->drawText(textRect, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip, primary);
     painter->restore();
-    if (! entry.secondary.isEmpty()) {
-        textRect.translate(0, lineHeight + lineSpacing);
-        paintMetric(painter, textRect, secondaryWeight, secondaryMetricWeight, entry.secondary, entry.secondaryMetric);
+    textRect.translate(0, lineHeight + lineSpacing);
+    int advance = 0;
+    for (int i = 0; i < entry.secondaryValues.count(); ++i) {
+        QString value = entry.secondaryValues[i];
+        QString label = entry.secondaryLabels.value(i, "");
+        textRect.setLeft(textRect.left() + advance);
+        if (textRect.width() <= 20 * dpiXFactor) {
+            break;
+        }
+        advance = paintMetric(painter, textRect, secondaryWeight, secondaryMetricWeight, value, label, i == 0);
     }
     if (! entry.tertiary.isEmpty()) {
         painter->save();
@@ -1447,7 +1453,7 @@ AgendaEntryDelegate::sizeHint
     if (! data.isNull()) {
         const int lineSpacing = attributes.lineSpacing * dpiYFactor;
         const int lineHeight = option.fontMetrics.height();
-        CalendarEntry entry = data.value<CalendarEntry>();
+        AgendaEntry entry = data.value<AgendaEntry>();
         int tertiaryHeight = 0;
         if (! entry.tertiary.isEmpty()) {
             const int iconWidth = 2 * lineHeight + lineSpacing;
@@ -1485,7 +1491,7 @@ AgendaEntryDelegate::hasToolTip
     if (! index.isValid()) {
         return false;
     }
-    CalendarEntry entry = index.data(EntryRole).value<CalendarEntry>();
+    AgendaEntry entry = index.data(EntryRole).value<AgendaEntry>();
     QString text(entry.tertiary.trimmed());
     if (text.isEmpty()) {
         return false;
@@ -1872,24 +1878,41 @@ paintHeadline
 }
 
 
-static void
+static int
 paintMetric
-(QPainter *painter, const QRect &rect, const QFont::Weight &valueWeight, const QFont::Weight &labelWeight, const QString &value, const QString &label)
+(QPainter *painter, const QRect &rect, const QFont::Weight &valueWeight, const QFont::Weight &labelWeight, const QString &value, const QString &label, bool first)
 {
+    int advance = 0;
     painter->save();
     QFont font = painter->font();
     font.setWeight(valueWeight);
     painter->setFont(font);
     QFontMetrics valueFM(font);
-    int valueWidth = valueFM.horizontalAdvance(value);
-    painter->drawText(rect, Qt::AlignLeft | Qt::AlignTop, value);
+    QString fullValue(value);
+    if (! first) {
+        fullValue.prepend(" • ");
+    }
+    int valueWidth = valueFM.horizontalAdvance(fullValue);
+    advance += valueWidth;
+    painter->drawText(rect, Qt::AlignLeft | Qt::AlignTop, fullValue);
     if (! label.isEmpty()) {
         QRect labelRect(rect);
-        labelRect.setX(rect.x() + valueWidth + valueFM.horizontalAdvance(" "));
+        int spaceAdvance = valueFM.horizontalAdvance(" ");
+        advance += spaceAdvance;
+        labelRect.setX(rect.x() + valueWidth + spaceAdvance);
         font.setWeight(labelWeight);
         QFontMetrics labelFM(font);
+        int labelWidth;
         painter->setFont(font);
+        if (labelWeight <= QFont::Light) {
+            QRect labelBounds = painter->boundingRect(labelRect, Qt::AlignLeft | Qt::AlignTop, label);
+            labelWidth = labelBounds.width();
+        } else {
+            labelWidth = labelFM.horizontalAdvance(label);
+        }
         painter->drawText(labelRect, Qt::AlignLeft | Qt::AlignTop, label);
+        advance += labelWidth;
     }
     painter->restore();
+    return advance;
 }
