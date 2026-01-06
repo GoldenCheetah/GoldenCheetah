@@ -98,9 +98,10 @@ RideItem::setFrom(RideItem&here, bool temp) // used when loading cache/rideDB.js
 
     // don't update the interval pointers if this is a 
     // temporary "fake" rideitem.
-    if (!temp)
+    if (!temp) {
         foreach(IntervalItem *p, intervals_)
             p->rideItem_ = this;
+    }
 
     context = here.context;
     isdirty = here.isdirty;

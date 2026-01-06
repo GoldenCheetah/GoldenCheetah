@@ -1798,6 +1798,8 @@ void Leaf::clear(Leaf *leaf)
                            break;
     case Leaf::Float :
     case Leaf::Integer :   break;
+
+    default: break;
     }
 
 }

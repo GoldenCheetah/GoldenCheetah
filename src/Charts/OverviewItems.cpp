@@ -1267,7 +1267,7 @@ DataOverviewItem::sort(int column, Qt::SortOrder order)
     if (column >= names.count()) return; // out of bounds
 
     // step 1: infer the type for column
-    int isdate=0, istime=0, isnumber=0, isstring=0;
+    int isstring=0;
 
     int rows = values.count() / names.count();
 
@@ -1282,9 +1282,9 @@ DataOverviewItem::sort(int column, Qt::SortOrder order)
         QString &val = values[i];
 
         // check, the order here is important
-        if (renumber.exactMatch(val)) isnumber++; // numbers + .
-        else if (retime.exactMatch(val)) istime++; // numbers + :
-        else if (redate.exactMatch(val)) isdate++; // numbers + date
+        if (renumber.exactMatch(val)) continue; // numbers + .
+        else if (retime.exactMatch(val)) continue; // numbers + :
+        else if (redate.exactMatch(val)) continue; // numbers + date
         else isstring++; // all bets are off
     }
     // step 2: generate an argsort index as strings or numbers
@@ -3593,8 +3593,6 @@ MetaOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
             // long texts need to be formatted into a smaller font an word wrapped
             painter->setPen(QColor(150,150,150));
             painter->setFont(parent->smallfont);
-
-            QRectF rect = QFontMetrics(parent->bigfont, parent->device()).boundingRect(value);
 
             // draw text and wrap / truncate to bounding rectangle
             painter->drawText(QRectF(ROWHEIGHT, ROWHEIGHT*2.5, geometry().width()-(ROWHEIGHT*2),

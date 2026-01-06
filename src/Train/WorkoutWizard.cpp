@@ -161,8 +161,6 @@ void WorkoutEditorGradient::insertDataRow(int row)
 
 void WorkoutMetricsSummary::updateMetrics(QStringList &order, QHash<QString,RideMetricPtr>  &metrics)
 {
-    int row = 0;
-
     foreach(QString name, order)
     {
         RideMetricPtr rmp = metrics[name];
@@ -189,14 +187,12 @@ void WorkoutMetricsSummary::updateMetrics(QStringList &order, QHash<QString,Ride
             lcd->setText(QString::number(rmp->value(true),'f',rmp->precision()) + " " + (rmp->units(true)) );
         }
         //qDebug() << name << ":" << (int)rmp->value(true);
-        row++;
     }
 }
 
 void WorkoutMetricsSummary::updateMetrics(QMap<QString, QString> &map)
 {
     QMap<QString, QString>::iterator i = map.begin();
-    int row = 0;
     while(i != map.end())
     {
         if(!metricMap.contains(i.key()))
@@ -209,7 +205,6 @@ void WorkoutMetricsSummary::updateMetrics(QMap<QString, QString> &map)
         }
         QLabel *value = metricMap[i.key()].second;
         value->setText(i.value());
-        row++;
         ++i;
     }
 }
@@ -578,7 +573,7 @@ void GradientPage::updateMetrics()
 
     int totalDistance = 0;
     double gain = 0;
-    int elevation = 0;
+
     // create rideFile
     QSharedPointer<RideFile> workout(new RideFile());
     workout->setRecIntSecs(1);
@@ -589,7 +584,6 @@ void GradientPage::updateMetrics()
         double grade = data[i].second.toDouble();
         double delta = distance  * (metricUnits ? 1000 : 5120) * grade /100;
         gain += (delta > 0) ? delta : 0;
-        elevation += delta;
         totalDistance += distance;
     }
     QMap<QString,QString> metricSummaryMap;

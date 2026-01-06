@@ -2035,7 +2035,7 @@ CPPage::mkReviewRow
 
         connect(
             accept, &QCheckBox::toggled, this,
-            [this, current, estimate](bool checked) {
+            [current, estimate](bool checked) {
                 current->setEnabled(! checked);
                 estimate->setEnabled(checked);
             }
@@ -2061,7 +2061,7 @@ CPPage::connectReviewDialogApplyButton
             hasChecked |= checkboxes[i]->isChecked();
             connect(
                 checkboxes[i], &QCheckBox::toggled, this,
-                [this, checkboxes, applyButton](bool checked) {
+                [checkboxes, applyButton](bool checked) {
                     bool anyChecked = checked;
                     int j = 0;
                     while (! anyChecked && j < checkboxes.size()) {

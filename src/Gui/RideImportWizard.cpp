@@ -875,7 +875,6 @@ RideImportWizard::todayClicked(int index)
 
     // Only apply to selected date - set time to current time - ride duration
     // pretty daft but at least it sets it to something, anything is gonna be random
-    int countselected = 0;
     int totalduration = 0;
     for (int i=0; i< filenames.count(); i++) {
         if (tableWidget->item(i,FILENAME_COLUMN)->isSelected() ||
@@ -884,7 +883,6 @@ RideImportWizard::todayClicked(int index)
             tableWidget->item(i,DURATION_COLUMN)->isSelected() ||
             tableWidget->item(i,DISTANCE_COLUMN)->isSelected() ||
             tableWidget->item(i,STATUS_COLUMN)->isSelected()) {
-            countselected++;
 
             QTime duration = QTime().fromString(tableWidget->item(i,DURATION_COLUMN)->text(), "hh:mm:ss");
             totalduration += duration.hour() * 3600 +

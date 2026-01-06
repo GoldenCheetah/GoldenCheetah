@@ -189,7 +189,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
 
     // We go fixed width to ensure a consistent layout for
     // tabs, sub-tabs and internal widgets and lists
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     setWindowTitle(tr("Preferences"));
 #else
     setWindowTitle(tr("Options"));

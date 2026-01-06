@@ -29,7 +29,7 @@
 #include "MeterWidget.h"
 
 VideoLayoutParser::VideoLayoutParser (QList<MeterWidget*>* metersWidget, QList<QString>* layoutNames, QWidget* VideoContainer, Context* context)
-    : metersWidget(metersWidget), layoutNames(layoutNames), VideoContainer(VideoContainer), context(context)
+    : context(context), metersWidget(metersWidget), layoutNames(layoutNames), VideoContainer(VideoContainer)
 {
     nonameindex = 0;
     skipLayout = false;

@@ -67,7 +67,7 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
     strNokiaRefreshToken = appsettings->cvalue(context->athlete->cyclist, GC_NOKIA_REFRESH_TOKEN).toString();
 
     if(strNokiaRefreshToken.isEmpty() || strNokiaRefreshToken == "" || strNokiaRefreshToken == "0" ) {
-        #ifdef Q_OS_MACX
+        #ifdef Q_OS_MACOS
         #define GC_PREF tr("Golden Cheetah->Preferences")
         #else
         #define GC_PREF tr("Tools->Options")

@@ -530,8 +530,8 @@ MainWindow::MainWindow(const QDir &home)
     rideMenu->addAction(tr("&Import from file..."), QKeySequence("Ctrl+I"), this, SLOT (importFile()));
     rideMenu->addAction(tr("&Manual entry..."), QKeySequence("Ctrl+M"), this, SLOT(manualRide()));
     QAction *actionPlan = new QAction(tr("&Plan activity..."));
-    connect(context, &Context::start, this, [this, actionPlan]() { actionPlan->setEnabled(false); }); // The dialog can change the contexts workout
-    connect(context, &Context::stop, this, [this, actionPlan]() { actionPlan->setEnabled(true); });   // temporarily which might cause unwanted effects
+    connect(context, &Context::start, this, [actionPlan]() { actionPlan->setEnabled(false); }); // The dialog can change the contexts workout
+    connect(context, &Context::stop, this, [actionPlan]() { actionPlan->setEnabled(true); });   // temporarily which might cause unwanted effects
     connect(actionPlan, &QAction::triggered, this, [this]() { planActivity(); });
     rideMenu->addAction(actionPlan);
     rideMenu->addSeparator ();
@@ -1233,6 +1233,8 @@ MainWindow::sidebarClicked(GcSideBarBtnId id)
     switch (id) {
     case GcSideBarBtnId::SYNC_BTN: checkCloud(); break; // sync quick link
     case GcSideBarBtnId::OPTIONS_BTN: showOptions(); break; // prefs
+
+    default: break;
     }
 }
 
@@ -1247,6 +1249,8 @@ MainWindow::sidebarSelected(GcSideBarBtnId id)
     case GcSideBarBtnId::REFLECT_BTN: break; // reflect not written yet
     case GcSideBarBtnId::TRAIN_BTN: selectTrain(); break;
     case GcSideBarBtnId::APPS_BTN: break;// apps not written yet
+
+    default: break;
     }
 }
 

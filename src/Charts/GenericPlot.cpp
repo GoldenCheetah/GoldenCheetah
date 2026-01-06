@@ -1518,6 +1518,8 @@ GenericPlot::plotAnnotations(GenericSeriesInfo &seriesinfo)
             annotations << line;
         }
         break;
+
+        default: break;
         }
     }
 }
