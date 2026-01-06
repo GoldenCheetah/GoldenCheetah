@@ -40,8 +40,3 @@ echo GSL_LIBS = -lgsl -lgslcblas -lm >> src/gcconfig.pri
 # TrainerDay Query API
 echo DEFINES += GC_WANT_TRAINERDAY_API >> src/gcconfig.pri
 echo DEFINES += GC_TRAINERDAY_API_PAGESIZE=25 >> src/gcconfig.pri
-cat src/gcconfig.pri
-
-# update translations
-lupdate src/src.pro
-exit
