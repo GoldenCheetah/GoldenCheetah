@@ -199,6 +199,7 @@ MultiMetricSelector::MultiMetricSelector
 : QWidget(parent)
 {
     filterEdit = new QLineEdit();
+    filterEdit->setClearButtonEnabled(true);
     filterEdit->setPlaceholderText(tr("Filter..."));
 
     availList = new QListWidget();
