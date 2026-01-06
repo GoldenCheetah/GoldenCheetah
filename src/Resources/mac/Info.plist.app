@@ -9,9 +9,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.7.1</string>
+	<string>3.8.0</string>
 	<key>CFBundleVersion</key>
-	<string>3.7.1</string>
+	<string>3.8.0</string>
 	<key>CFBundleSignature</key>
 	<string>@TYPEINFO@</string>
 	<key>CFBundleExecutable</key>

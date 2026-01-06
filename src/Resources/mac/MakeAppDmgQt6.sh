@@ -30,7 +30,7 @@ macdeployqt GoldenCheetah.app -verbose=2 -executable=GoldenCheetah.app/Contents/
 macdeployqt GoldenCheetah.app -verbose=2 -fs=hfs+ -dmg
 
 echo "Renaming dmg file to branch and build number ready for deploy"
-export FINAL_NAME=GoldenCheetah_v3.7_x64Qt6.dmg
+export FINAL_NAME=GoldenCheetah_v3.8_x64Qt6.dmg
 mv GoldenCheetah.dmg $FINAL_NAME
 ls -l $FINAL_NAME
 

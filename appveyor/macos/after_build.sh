@@ -28,6 +28,6 @@ cp -R ../site-packages GoldenCheetah.app/Contents/Frameworks/Python.framework/Ve
 macdeployqt GoldenCheetah.app -verbose=2 -executable=GoldenCheetah.app/Contents/MacOS/GoldenCheetah -fs=hfs+ -dmg
 
 echo "Renaming dmg file to branch and build number ready for deploy"
-mv GoldenCheetah.dmg ../GoldenCheetah_v3.7_x64.dmg
+mv GoldenCheetah.dmg ../GoldenCheetah_v3.8_x64.dmg
 
 exit

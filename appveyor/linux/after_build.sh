@@ -67,6 +67,6 @@ then echo "AppImage not generated, check the errors"; exit 1
 fi
 
 echo "Renaming AppImage file to version number ready for deploy"
-mv GoldenCheetah*.AppImage ../GoldenCheetah_v3.7_x64.AppImage
+mv GoldenCheetah*.AppImage ../GoldenCheetah_v3.8_x64.AppImage
 
 exit

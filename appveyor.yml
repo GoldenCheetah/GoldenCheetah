@@ -258,11 +258,11 @@ after_build:
 - cmd: copy ..\Resources\win32\gc.ico
 
 # Installer script
-- cmd: copy ..\Resources\win32\GC3.7-Master-W64-QT6.nsi
+- cmd: copy ..\Resources\win32\GC3.8-Master-W64-QT6.nsi
 
 # Build the installer
-- cmd: makensis GC3.7-Master-W64-QT6.nsi
-- cmd: move GoldenCheetah_v3.7.1_64bit_Windows.exe ..\..\GoldenCheetah_v3.7_x64.exe
+- cmd: makensis GC3.8-Master-W64-QT6.nsi
+- cmd: move GoldenCheetah_v3.8_64bit_Windows.exe ..\..\GoldenCheetah_v3.8_x64.exe
 - cmd: cd ..\..
 
 # Linux / macOS
@@ -273,36 +273,36 @@ test_script:
 # Windows
 - cmd: src\release\GoldenCheetah --version 2>GCversionWindows.txt
 - cmd: git log -1 >> GCversionWindows.txt
-- ps: if ($isWindows) { CertUtil -hashfile GoldenCheetah_v3.7_x64.exe sha256 | Select-Object -First 2 | Add-Content GCversionWindows.txt }
+- ps: if ($isWindows) { CertUtil -hashfile GoldenCheetah_v3.8_x64.exe sha256 | Select-Object -First 2 | Add-Content GCversionWindows.txt }
 - cmd: type GCversionWindows.txt
 
 # Linux / macOS
 - sh: >-
     if $CI_LINUX; then
-      ./GoldenCheetah_v3.7_x64.AppImage --version 2>GCversionLinux.txt
+      ./GoldenCheetah_v3.8_x64.AppImage --version 2>GCversionLinux.txt
       git log -1 >> GCversionLinux.txt
-      shasum -a 256 GoldenCheetah_v3.7_x64.AppImage | cut -f 1 -d ' '  >> GCversionLinux.txt
+      shasum -a 256 GoldenCheetah_v3.8_x64.AppImage | cut -f 1 -d ' '  >> GCversionLinux.txt
       cat GCversionLinux.txt
     else
       src/GoldenCheetah.app/Contents/MacOS/GoldenCheetah --version 2>GCversionMacOS.txt
       git log -1 >> GCversionMacOS.txt
-      shasum -a 256 GoldenCheetah_v3.7_x64.dmg | cut -f 1 -d ' ' >> GCversionMacOS.txt
+      shasum -a 256 GoldenCheetah_v3.8_x64.dmg | cut -f 1 -d ' ' >> GCversionMacOS.txt
       cat GCversionMacOS.txt
     fi
 
 artifacts:
 # Windows
-- path: GoldenCheetah_v3.7_x64.exe
+- path: GoldenCheetah_v3.8_x64.exe
   name: GCwindowsInstaller
 - path: GCversionWindows.txt
   name: GCversionWindows
 # macOS
-- path: GoldenCheetah_v3.7_x64.dmg
+- path: GoldenCheetah_v3.8_x64.dmg
   name: GCmacOSpackage
 - path: GCversionMacOS.txt
   name: GCversionMacOS
 # Linux
-- path: GoldenCheetah_v3.7_x64.AppImage
+- path: GoldenCheetah_v3.8_x64.AppImage
   name: GClinuxAppImage
 - path: GCversionLinux.txt
   name: GCversionLinux
