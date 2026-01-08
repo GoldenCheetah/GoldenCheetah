@@ -819,17 +819,17 @@ void RideCache::save(bool opendata, QString filename)
 
                                 if (interval->stdmeans().value(index, 0.0f) || interval->stdvariances().value(index, 0.0f)) {
 
-                                    stream << "\t\t\t\t\"" << name << "\": [ \"" << QString("%1").arg(interval->metrics()[index], 0, 'f', 5) <<"\",\""
+                                    stream << "\t\t\t\t\t\"" << name << "\": [ \"" << QString("%1").arg(interval->metrics()[index], 0, 'f', 5) <<"\",\""
                                                                                << QString("%1").arg(interval->counts()[index], 0, 'f', 5) << "\",\""
                                                                                << QString("%1").arg(interval->stdmeans().value(index, 0.0f), 0, 'f', 5) << "\",\""
                                                                                << QString("%1").arg(interval->stdvariances().value(index, 0.0f), 0, 'f', 5) <<"\"]";
 
                                 // if count is 0 don't write it
                                 } else if (interval->counts()[index] == 0) {
-                                    stream << ConstructNameNumberString(QString("\t\t\t\""), name,
+                                    stream << ConstructNameNumberString(QString("\t\t\t\t\""), name,
                                         QString("\":\""), interval->metrics()[index], QString("\""));
                                 } else {
-                                    stream << ConstructNameNumberNumberString(QString("\t\t\t\""), name,
+                                    stream << ConstructNameNumberNumberString(QString("\t\t\t\t\""), name,
                                         QString("\":[\""), interval->metrics()[index], QString("\",\""), interval->counts()[index], QString("\"]"));
                                 }
                             }
