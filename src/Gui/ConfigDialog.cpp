@@ -236,7 +236,7 @@ void ConfigDialog::closeClicked()
 //   ! new mode: change the CP associated with the present mode
 void ConfigDialog::saveClicked()
 {
-    // if a refresh is happenning stop it, whilst we 
+    // if a refresh is happening stop it, whilst we
     // update all the configuration settings!
     context->athlete->rideCache->cancel();
 
