@@ -284,29 +284,24 @@ $ make
 Python Embedding
 ----------------
 
-Install Python 3.7
+Install Python 3.11+
 
 sudo add-apt-repository ppa:deadsnakes/ppa
 sudo apt-get update
-sudo apt-get install python3.7-dev
-python3.7 --version
+sudo apt-get install python3.11 python3.11-dev
+python3.11 --version
 
-Install SIP 4.19.8:
-cd ~/Projects
-wget https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.tar.gz
-tar xf sip-4.19.8.tar.gz
-cd sip-4.19.8
-python3.7 configure.py
-make
-sudo make install
+Install SIP and other dependencies
+pip install -r src/Python/requirements.txt
 
 $ cd ~/Projects/GoldenCheetah/src
 $ vi gcconfig.pri
 
-Uncomment or add the following lines:
+Uncomment or change the following line(s):
 DEFINES += GC_WANT_PYTHON
-PYTHONINCLUDES = -I/usr/include/python3.7/
-PYTHONLIBS = -L/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu -lpython3.7m
+Optionally configure includes & libraries, we try to auto configure them
+#PYTHONINCLUDES = -I/usr/include/python3.11/
+#PYTHONLIBS = -L/usr/lib/python3.11/config-3.11m-x86_64-linux-gnu -lpython3.11m
 
 $ make clean
 $ qmake
