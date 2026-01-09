@@ -133,17 +133,17 @@ AthleteTab::close()
  * MainWindow integration with Tab / TabView (mostly pass through)
  *****************************************************************************/
 
-bool AthleteTab::hasBottom() { return view(currentView())->hasBottom(); }
-bool AthleteTab::isBottomRequested() { return view(currentView())->isBottomRequested(); }
-void AthleteTab::setBottomRequested(bool x) { view(currentView())->setBottomRequested(x); }
-void AthleteTab::setSidebarEnabled(bool x) { view(currentView())->setSidebarEnabled(x); }
-bool AthleteTab::isSidebarEnabled() { return view(currentView())->sidebarEnabled(); }
-void AthleteTab::toggleSidebar() { view(currentView())->setSidebarEnabled(!view(currentView())->sidebarEnabled()); }
-void AthleteTab::setTiled(bool x) { view(currentView())->setTiled(x); }
-bool AthleteTab::isTiled() { return view(currentView())->isTiled(); }
-void AthleteTab::toggleTile() { view(currentView())->setTiled(!view(currentView())->isTiled()); }
-void AthleteTab::resetLayout(QComboBox *perspectiveSelector) { view(currentView())->resetLayout(perspectiveSelector); }
-void AthleteTab::addChart(GcWinID i) { view(currentView())->addChart(i); }
+bool AthleteTab::hasBottom() { return currentView()->hasBottom(); }
+bool AthleteTab::isBottomRequested() { return currentView()->isBottomRequested(); }
+void AthleteTab::setBottomRequested(bool x) { currentView()->setBottomRequested(x); }
+void AthleteTab::setSidebarEnabled(bool x) { currentView()->setSidebarEnabled(x); }
+bool AthleteTab::isSidebarEnabled() { return currentView()->sidebarEnabled(); }
+void AthleteTab::toggleSidebar() { currentView()->setSidebarEnabled(!currentView()->sidebarEnabled()); }
+void AthleteTab::setTiled(bool x) { currentView()->setTiled(x); }
+bool AthleteTab::isTiled() { return currentView()->isTiled(); }
+void AthleteTab::toggleTile() { currentView()->setTiled(!currentView()->isTiled()); }
+void AthleteTab::resetLayout(QComboBox *perspectiveSelector) { currentView()->resetLayout(perspectiveSelector); }
+void AthleteTab::addChart(GcWinID i) { currentView()->addChart(i); }
 void AthleteTab::addIntervals() { analysisView->addIntervals(); }
 
 void AthleteTab::setRide(RideItem*ride)
@@ -155,39 +155,87 @@ void AthleteTab::setRide(RideItem*ride)
 }
 
 AbstractView *
-AthleteTab::view(int index)
+AthleteTab::view(GcViewType viewType) const
 {
-    switch(index) {
-        case 0 : return homeView;
-        default:
-        case 1 : return analysisView;
-        case 2 : return planView;
-        case 3 : return trainView;
+    switch(viewType) {
+        case GcViewType::VIEW_TRENDS : return homeView;
+        case GcViewType::VIEW_ANALYSIS : return analysisView;
+        case GcViewType::VIEW_PLAN : return planView;
+        case GcViewType::VIEW_TRAIN : return trainView;
+        default: {
+            qCritical() << "Unhandled view type in AthleteTab, returning analysisView !";
+            return analysisView;
+        } break;
+    }
+}
+
+AbstractView *
+AthleteTab::currentView() const
+{
+    return view(currentViewType());
+}
+
+GcViewType
+AthleteTab::currentViewType() const
+{
+    // map from AthleteTab's internal qt stack index to view type
+    return indexToViewType(views->currentIndex());
+}
+
+GcViewType
+AthleteTab::indexToViewType(int index) const
+{
+    // map from AthleteTab's internal qt stack index to GcViewType
+    switch (index) {
+        case 0: return GcViewType::VIEW_TRENDS;
+        case 1: return GcViewType::VIEW_ANALYSIS;
+        case 2: return GcViewType::VIEW_PLAN;
+        case 3: return GcViewType::VIEW_TRAIN;
+        default: {
+            qCritical() << "Unhandled view index in AthleteTab, returning VIEW_ANALYSIS !";
+            return GcViewType::VIEW_ANALYSIS;
+        } break;
+    }
+}
+
+int
+AthleteTab::viewTypeToIndex(GcViewType viewType) const
+{
+    // map from GcViewType to AthleteTab's internal qt stack index
+    switch (viewType) {
+        case GcViewType::VIEW_TRENDS: return 0;
+        case GcViewType::VIEW_ANALYSIS: return 1;
+        case GcViewType::VIEW_PLAN: return 2;
+        case GcViewType::VIEW_TRAIN: return 3;
+        default: {
+            qCritical() << "Unhandled view type in AthleteTab, returning index 1 (aka Analysis view)!";
+            return 1;
+        } break;
     }
 }
 
 void
-AthleteTab::selectView(int index)
+AthleteTab::selectView(GcViewType viewType)
 {
     // ensure an initial viewChanged() event occurs for the navigation model, otherwise if the
     // startup view is trends (value zero) the guard rejects the selection as views->currentIndex() is zero
-    if (startupViewChangeSent && views->currentIndex() == index) return; // not changing
+    if (startupViewChangeSent && views->currentIndex() == viewTypeToIndex(viewType)) return; // not changing
     startupViewChangeSent = true;
 
     // suspend screen updates while the view is changed.
     views->setUpdatesEnabled(false);
 
-    emit viewChanged(index);
+    emit viewChanged(viewType);
 
-    // first we deselect the current
-    view(views->currentIndex())->setSelected(false);
+    // first we deselect the current view
+    currentView()->setSelected(false);
 
     // now select the real one
-    views->setCurrentIndex(index);
-    view(index)->setSelected(true);
-    masterControls->setCurrentIndex(index);
-    context->setIndex(index);
-    context->mainWindow->resetPerspective(index); // set perspective for this view
+    views->setCurrentIndex(viewTypeToIndex(viewType));
+    view(viewType)->setSelected(true);
+    masterControls->setCurrentIndex(viewTypeToIndex(viewType));
+    context->setViewType(viewType);
+    context->mainWindow->resetPerspective(viewType); // set perspective for this view
 
     // enable screen updates to render the view without flickering
     views->setUpdatesEnabled(true);
@@ -213,7 +261,7 @@ AthleteTab::rideSelected(RideItem*)
         // when the view is selected by the user and no earlier
         if (analysisView->page() != NULL) {
             context->mainWindow->newSidebar()->setItemSelected(GcSideBarBtnId::ACTIVITIES_BTN, true);
-            selectView(1);
+            selectView(GcViewType::VIEW_ANALYSIS);
         }
     }
 

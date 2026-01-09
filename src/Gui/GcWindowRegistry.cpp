@@ -67,64 +67,65 @@ GcWindowRegistry::initialize()
 {
   static GcWindowRegistry GcWindowsInit[] = {
     // name                     GcWinID
-    { VIEW_TRENDS, tr("Season Overview"),GcWindowTypes::OverviewTrends },
-    { VIEW_TRENDS, tr("Blank Overview "),GcWindowTypes::OverviewTrendsBlank },
-    { VIEW_PLAN, tr("Plan Overview"),GcWindowTypes::OverviewPlan },
-    { VIEW_PLAN, tr("Blank Overview "),GcWindowTypes::OverviewPlanBlank },
-    { VIEW_TRENDS, tr("User Chart"),GcWindowTypes::UserTrends },
-    { VIEW_PLAN, tr("User Chart"),GcWindowTypes::UserPlan },
-    { VIEW_TRENDS|VIEW_PLAN, tr("Trends"),GcWindowTypes::LTM },
-    { VIEW_TRENDS|VIEW_PLAN, tr("TreeMap"),GcWindowTypes::TreeMap },
-    //{ VIEW_TRENDS, tr("Weekly Summary"),GcWindowTypes::WeeklySummary },// DEPRECATED
-    { VIEW_TRENDS|VIEW_PLAN,  tr("Power Duration "),GcWindowTypes::CriticalPowerSummary },
-    //{ VIEW_TRENDS,  tr("Training Plan"),GcWindowTypes::SeasonPlan },
-    //{ VIEW_TRENDS|VIEW_DIARY,  tr("Performance Manager"),GcWindowTypes::PerformanceManager },
-    { VIEW_ANALYSIS, tr("Activity Overview"),GcWindowTypes::Overview },
-    { VIEW_ANALYSIS, tr("Blank Overview"),GcWindowTypes::OverviewAnalysisBlank },
-    { VIEW_ANALYSIS, tr("User Chart "),GcWindowTypes::UserAnalysis },
-    //{ VIEW_ANALYSIS, tr("Summary"),GcWindowTypes::RideSummary }, // DEPRECATED IN V3.6
-    { VIEW_ANALYSIS, tr("Data"),GcWindowTypes::MetadataWindow },
-    //{ VIEW_ANALYSIS, tr("Summary and Details"),GcWindowTypes::Summary },
-    //{ VIEW_ANALYSIS, tr("Editor"),GcWindowTypes::RideEditor },
-    { VIEW_ANALYSIS, tr("Performance"),GcWindowTypes::AllPlot },
-    { VIEW_ANALYSIS, tr("Power Duration"),GcWindowTypes::CriticalPower },
-    { VIEW_ANALYSIS, tr("Histogram"),GcWindowTypes::Histogram },
-    { VIEW_TRENDS|VIEW_PLAN, tr("Distribution"),GcWindowTypes::Distribution },
-    { VIEW_ANALYSIS, tr("Pedal Force vs Velocity"),GcWindowTypes::PfPv },
-    { VIEW_ANALYSIS, tr("Heartrate vs Power"),GcWindowTypes::HrPw },
-    { VIEW_ANALYSIS, tr("Map"),GcWindowTypes::RideMapWindow },
-    { VIEW_ANALYSIS, tr("R Chart"),GcWindowTypes::RConsole },
-    { VIEW_TRENDS|VIEW_PLAN, tr("R Chart "),GcWindowTypes::RConsoleSeason },
-    { VIEW_ANALYSIS, tr("Python Chart"),GcWindowTypes::Python },
-    { VIEW_TRENDS|VIEW_PLAN, tr("Python Chart "),GcWindowTypes::PythonSeason },
-    //{ VIEW_ANALYSIS, tr("Bing Map"),GcWindowTypes::BingMap },
-    { VIEW_ANALYSIS, tr("Scatter"),GcWindowTypes::Scatter },
-    { VIEW_ANALYSIS, tr("Aerolab"),GcWindowTypes::Aerolab },
-    //{ VIEW_TRENDS|VIEW_DIARY, tr("Calendar"),GcWindowTypes::Diary },
-    { VIEW_TRENDS|VIEW_PLAN, tr("Navigator"), GcWindowTypes::ActivityNavigator },
-    //{ VIEW_DIARY|VIEW_TRENDS, tr("Summary "), GcWindowTypes::DateRangeSummary }, // DEPRECATED IN V3.6
-    { VIEW_TRAIN, tr("Telemetry"),GcWindowTypes::DialWindow },
-    { VIEW_TRAIN, tr("Workout"),GcWindowTypes::WorkoutPlot },
-    { VIEW_TRAIN, tr("Realtime"),GcWindowTypes::RealtimePlot },
-    { VIEW_TRAIN, tr("Pedal Stroke"),GcWindowTypes::SpinScanPlot },
-    { VIEW_TRAIN, tr("Video Player"),GcWindowTypes::VideoPlayer },
-    { VIEW_TRAIN, tr("Workout Editor"),GcWindowTypes::WorkoutWindow },
-    { VIEW_TRAIN, tr("Live Map"),GcWindowTypes::LiveMapWebPageWindow },
-    { VIEW_TRAIN, tr("Elevation Chart"),GcWindowTypes::ElevationChart },
-    { VIEW_ANALYSIS|VIEW_TRENDS|VIEW_TRAIN, tr("Web page"),GcWindowTypes::WebPageWindow },
-    { VIEW_TRENDS|VIEW_PLAN, tr("Calendar"),GcWindowTypes::Calendar },
-    { VIEW_TRENDS|VIEW_PLAN, tr("Agenda"),GcWindowTypes::Agenda },
-    { 0, "", GcWindowTypes::None }};
+    { GcViewType::VIEW_TRENDS, tr("Season Overview"),GcWindowTypes::OverviewTrends },
+    { GcViewType::VIEW_TRENDS, tr("Blank Overview "),GcWindowTypes::OverviewTrendsBlank },
+    { GcViewType::VIEW_PLAN, tr("Plan Overview"),GcWindowTypes::OverviewPlan },
+    { GcViewType::VIEW_PLAN, tr("Blank Overview "),GcWindowTypes::OverviewPlanBlank },
+    { GcViewType::VIEW_TRENDS, tr("User Chart"),GcWindowTypes::UserTrends },
+    { GcViewType::VIEW_PLAN, tr("User Chart"),GcWindowTypes::UserPlan },
+    { GcViewType::VIEW_TRENDS|GcViewType::VIEW_PLAN, tr("Trends"),GcWindowTypes::LTM },
+    { GcViewType::VIEW_TRENDS|GcViewType::VIEW_PLAN, tr("TreeMap"),GcWindowTypes::TreeMap },
+    //{ GcViewType::VIEW_TRENDS, tr("Weekly Summary"),GcWindowTypes::WeeklySummary },// DEPRECATED
+    { GcViewType::VIEW_TRENDS|GcViewType::VIEW_PLAN,  tr("Power Duration "),GcWindowTypes::CriticalPowerSummary },
+    //{ GcViewType::VIEW_TRENDS,  tr("Training Plan"),GcWindowTypes::SeasonPlan },
+    //{ GcViewType::VIEW_TRENDS|GcViewType::VIEW_PLAN,  tr("Performance Manager"),GcWindowTypes::PerformanceManager },
+    { GcViewType::VIEW_ANALYSIS, tr("Activity Overview"),GcWindowTypes::Overview },
+    { GcViewType::VIEW_ANALYSIS, tr("Blank Overview"),GcWindowTypes::OverviewAnalysisBlank },
+    { GcViewType::VIEW_ANALYSIS, tr("User Chart "),GcWindowTypes::UserAnalysis },
+    //{ GcViewType::VIEW_ANALYSIS, tr("Summary"),GcWindowTypes::RideSummary }, // DEPRECATED IN V3.6
+    { GcViewType::VIEW_ANALYSIS, tr("Data"),GcWindowTypes::MetadataWindow },
+    //{ GcViewType::VIEW_ANALYSIS, tr("Summary and Details"),GcWindowTypes::Summary },
+    //{ GcViewType::VIEW_ANALYSIS, tr("Editor"),GcWindowTypes::RideEditor },
+    { GcViewType::VIEW_ANALYSIS, tr("Performance"),GcWindowTypes::AllPlot },
+    { GcViewType::VIEW_ANALYSIS, tr("Power Duration"),GcWindowTypes::CriticalPower },
+    { GcViewType::VIEW_ANALYSIS, tr("Histogram"),GcWindowTypes::Histogram },
+    { GcViewType::VIEW_TRENDS|GcViewType::VIEW_PLAN, tr("Distribution"),GcWindowTypes::Distribution },
+    { GcViewType::VIEW_ANALYSIS, tr("Pedal Force vs Velocity"),GcWindowTypes::PfPv },
+    { GcViewType::VIEW_ANALYSIS, tr("Heartrate vs Power"),GcWindowTypes::HrPw },
+    { GcViewType::VIEW_ANALYSIS, tr("Map"),GcWindowTypes::RideMapWindow },
+    { GcViewType::VIEW_ANALYSIS, tr("R Chart"),GcWindowTypes::RConsole },
+    { GcViewType::VIEW_TRENDS|GcViewType::VIEW_PLAN, tr("R Chart "),GcWindowTypes::RConsoleSeason },
+    { GcViewType::VIEW_ANALYSIS, tr("Python Chart"),GcWindowTypes::Python },
+    { GcViewType::VIEW_TRENDS|GcViewType::VIEW_PLAN, tr("Python Chart "),GcWindowTypes::PythonSeason },
+    //{ GcViewType::VIEW_ANALYSIS, tr("Bing Map"),GcWindowTypes::BingMap },
+    { GcViewType::VIEW_ANALYSIS, tr("Scatter"),GcWindowTypes::Scatter },
+    { GcViewType::VIEW_ANALYSIS, tr("Aerolab"),GcWindowTypes::Aerolab },
+    //{ GcViewType::VIEW_TRENDS|GcViewType::VIEW_PLAN, tr("Calendar"),GcWindowTypes::Diary },
+    { GcViewType::VIEW_TRENDS|GcViewType::VIEW_PLAN, tr("Navigator"), GcWindowTypes::ActivityNavigator },
+    //{ GcViewType::VIEW_PLAN|GcViewType::VIEW_TRENDS, tr("Summary "), GcWindowTypes::DateRangeSummary }, // DEPRECATED IN V3.6
+    { GcViewType::VIEW_TRAIN, tr("Telemetry"),GcWindowTypes::DialWindow },
+    { GcViewType::VIEW_TRAIN, tr("Workout"),GcWindowTypes::WorkoutPlot },
+    { GcViewType::VIEW_TRAIN, tr("Realtime"),GcWindowTypes::RealtimePlot },
+    { GcViewType::VIEW_TRAIN, tr("Pedal Stroke"),GcWindowTypes::SpinScanPlot },
+    { GcViewType::VIEW_TRAIN, tr("Video Player"),GcWindowTypes::VideoPlayer },
+    { GcViewType::VIEW_TRAIN, tr("Workout Editor"),GcWindowTypes::WorkoutWindow },
+    { GcViewType::VIEW_TRAIN, tr("Live Map"),GcWindowTypes::LiveMapWebPageWindow },
+    { GcViewType::VIEW_TRAIN, tr("Elevation Chart"),GcWindowTypes::ElevationChart },
+    { GcViewType::VIEW_ANALYSIS|GcViewType::VIEW_TRENDS|GcViewType::VIEW_TRAIN, tr("Web page"),GcWindowTypes::WebPageWindow },
+    { GcViewType::VIEW_TRENDS|GcViewType::VIEW_PLAN, tr("Calendar"),GcWindowTypes::Calendar },
+    { GcViewType::VIEW_TRENDS|GcViewType::VIEW_PLAN, tr("Agenda"),GcWindowTypes::Agenda },
+    { GcViewType::NO_VIEW_SET, "", GcWindowTypes::None }};
   // initialize the global registry
   GcWindows = GcWindowsInit;
 }
 
-QStringList windowsForType(int type)
+QStringList
+GcWindowRegistry::windowsForType(GcViewType type)
 {
     QStringList returning;
 
-    for(int i=0; GcWindows[i].relevance; i++) {
-        if (GcWindows[i].relevance & type) 
+    for(int i=0; GcWindows[i].relevance != GcViewType::NO_VIEW_SET; i++) {
+        if (GcWindows[i].relevance & type)
             returning << GcWindows[i].name;
     }
     return returning;
@@ -133,18 +134,19 @@ QStringList windowsForType(int type)
 QString
 GcWindowRegistry::title(GcWinID id)
 {
-    for(int i=0; GcWindows[i].relevance; i++) {
-        if (GcWindows[i].relevance && GcWindows[i].id == id)
+    for(int i=0; GcWindows[i].relevance != GcViewType::NO_VIEW_SET; i++) {
+        if (GcWindows[i].id == id)
             return GcWindows[i].name;
     }
     return QString("unknown");
 }
 
-QList<GcWinID> idsForType(int type)
+QList<GcWinID>
+GcWindowRegistry::idsForType(GcViewType type)
 {
     QList<GcWinID> returning;
 
-    for(int i=0; GcWindows[i].relevance; i++) {
+    for(int i=0; GcWindows[i].relevance != GcViewType::NO_VIEW_SET; i++) {
         if (GcWindows[i].relevance & type) 
             returning << GcWindows[i].id;
     }

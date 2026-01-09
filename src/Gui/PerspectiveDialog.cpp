@@ -48,12 +48,12 @@ PerspectiveDialog::PerspectiveDialog(QWidget *parent, AbstractView *tabView) : Q
 #endif
 
     QString typedesc;
-    switch (tabView->type) {
-    case VIEW_PLAN:
-    case VIEW_TRENDS: typedesc=tr("Activities filter"); break;
-    case VIEW_ANALYSIS: typedesc=tr("Switch expression"); break;
-    case VIEW_TRAIN: typedesc=tr("Switch for"); break;
-    default: qDebug() << "Unknown view type in PerspectiveDialog:" << tabView->type; break;
+    switch (tabView->viewType()) {
+    case GcViewType::VIEW_PLAN:
+    case GcViewType::VIEW_TRENDS: typedesc=tr("Activities filter"); break;
+    case GcViewType::VIEW_ANALYSIS: typedesc=tr("Switch expression"); break;
+    case GcViewType::VIEW_TRAIN: typedesc=tr("Switch for"); break;
+    default: qDebug() << "Unhandled view type in PerspectiveDialog:" << static_cast<unsigned int>(tabView->viewType()); break;
     }
 
     perspectiveTable->setColumnCount(2);
@@ -151,11 +151,11 @@ void PerspectiveDialog::setTables()
         perspectiveTable->setItem(perspectiverow, 0, add);
 
         QString description;
-        switch (tabView->type) {
-        case VIEW_TRENDS:
-        case VIEW_ANALYSIS:
-        case VIEW_PLAN: description = perspective->expression(); break;
-        case VIEW_TRAIN: {
+        switch (tabView->viewType()) {
+        case GcViewType::VIEW_TRENDS:
+        case GcViewType::VIEW_ANALYSIS:
+        case GcViewType::VIEW_PLAN: description = perspective->expression(); break;
+        case GcViewType::VIEW_TRAIN: {
             switch (perspective->trainswitch) {
             case Perspective::None: description=tr("Don't switch"); break;
             case Perspective::Erg: description=tr("Erg Workout"); break;
@@ -164,7 +164,7 @@ void PerspectiveDialog::setTables()
             case Perspective::Map: description=tr("Map Workout"); break;
             default: qDebug() << "Unknown train switch value in PerspectiveDialog:" << perspective->trainswitch; break;
         } break;
-        default: qDebug() << "Unknown view type in PerspectiveDialog:" << tabView->type; break;
+        default: qDebug() << "Unhandled view type in PerspectiveDialog:" << static_cast<unsigned int>(tabView->viewType()); break;
         }
         }
 
@@ -244,7 +244,7 @@ PerspectiveDialog::editPerspectiveClicked()
 
         Perspective *editing = tabView->perspectives_[index];
         QString expression=editing->expression();
-        AddPerspectiveDialog *dialog= new AddPerspectiveDialog(this, tabView->context, editing->title_, expression, tabView->type, editing->trainswitch, true);
+        AddPerspectiveDialog *dialog= new AddPerspectiveDialog(this, tabView->context, editing->title_, expression, tabView->viewType(), editing->trainswitch, true);
         int ret= dialog->exec();
         delete dialog;
         if (ret == QDialog::Accepted) {
@@ -261,7 +261,7 @@ PerspectiveDialog::addPerspectiveClicked()
     QString name;
     QString expression;
     Perspective::switchenum trainswitch = Perspective::None;
-    AddPerspectiveDialog *dialog= new AddPerspectiveDialog(this, tabView->context, name, expression, tabView->type, trainswitch);
+    AddPerspectiveDialog *dialog= new AddPerspectiveDialog(this, tabView->context, name, expression, tabView->viewType(), trainswitch);
     int ret= dialog->exec();
     delete dialog;
     if (ret == QDialog::Accepted && name != "") {
@@ -269,12 +269,12 @@ PerspectiveDialog::addPerspectiveClicked()
          // add...
         Perspective *newone =tabView->addPerspective(name);
 
-        switch (tabView->type) {
-        case VIEW_TRENDS:
-        case VIEW_ANALYSIS:
-        case VIEW_PLAN: newone->setExpression(expression); break;
-        case VIEW_TRAIN: newone->setTrainSwitch(trainswitch); break;
-        default: qDebug() << "Unknown view type in PerspectiveDialog:" << tabView->type; break;
+        switch (tabView->viewType()) {
+        case GcViewType::VIEW_TRENDS:
+        case GcViewType::VIEW_ANALYSIS:
+        case GcViewType::VIEW_PLAN: newone->setExpression(expression); break;
+        case GcViewType::VIEW_TRAIN: newone->setTrainSwitch(trainswitch); break;
+        default: qDebug() << "Unhandled view type in PerspectiveDialog:" << static_cast<std::underlying_type_t<GcViewType>>(tabView->viewType()); break;
         }
 
     emit perspectivesChanged();
@@ -291,19 +291,10 @@ PerspectiveDialog::exportPerspectiveClicked()
     // wipe it - tabView will worry about bounds and switching if we delete the currently selected one
     Perspective *current = tabView->perspectives_[index];
 
-    QString typedesc;
-    switch (tabView->type) {
-    case VIEW_TRENDS: typedesc="Trends"; break;
-    case VIEW_ANALYSIS: typedesc="Analysis"; break;
-    case VIEW_PLAN: typedesc="Plan"; break;
-    case VIEW_TRAIN: typedesc="Train"; break;
-    default: qDebug() << "Unknown view type in PerspectiveDialog:" << tabView->type; break;
-    }
-
     // export the current perspective to a file
     QString suffix;
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export Perspective"),
-                       QDir::homePath()+"/"+ typedesc + " " + current->title() + ".gchartset",
+                       QDir::homePath()+"/"+ tabView->viewTypeDesc() + " " + current->title() + ".gchartset",
                        ("*.gchartset;;"), &suffix, QFileDialog::DontUseNativeDialog); // native dialog hangs when threads in use (!)
 
     if (fileName.isEmpty()) {
