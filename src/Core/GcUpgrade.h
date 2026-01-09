@@ -127,14 +127,14 @@
 #define VERSION36_BUILD   5000 // released 5/8/23
 #define VERSION37_BUILD   5005 // released 28/3/25
 #define VERSION37_SP1     5006 // released 20/11/25
-#define VERSION38_DEV2601 5010 // (Jan 2026) - latest snapshot 6/1/26
+#define VERSION38_DEV2601 5010 // (Jan 2026) - latest snapshot 8/1/26
 
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG
 
 // the next two will with each build/release
 #define VERSION_LATEST 5010
-#define VERSION_STRING "V3.8"
+#define VERSION_STRING "V3.8-DEV2601"
 #define GC_VERSION VERSION_STRING // To force version string on non-tagged ci builds
 
 // default config for this release cycle
