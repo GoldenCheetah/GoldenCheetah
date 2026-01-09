@@ -626,7 +626,7 @@ MainWindow::MainWindow(const QDir &home)
 
 
     editMenu = menuBar()->addMenu(tr("&Edit"));
-    connect(editMenu, SIGNAL(aboutToShow()), this, SLOT(onEditMenuAboutToShow()));
+    populateEditMenu();
 
     HelpWhatsThis *editMenuHelp = new HelpWhatsThis(editMenu);
     editMenu->setWhatsThis(editMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Edit));
@@ -2649,13 +2649,8 @@ MainWindow::ridesAutoImport() {
 
 }
 
-void MainWindow::onEditMenuAboutToShow()
+void MainWindow::populateEditMenu()
 {
-    editMenu->clear();
-    if (toolMapper != nullptr) {
-        delete toolMapper;
-    }
-
     // Add all the data processors to the tools menu
     const DataProcessorFactory &factory = DataProcessorFactory::instance();
     QList<DataProcessor*> processors = factory.getProcessorsSorted();

@@ -277,8 +277,6 @@ class MainWindow : public QMainWindow
         // autoload rides from athlete specific directory (preferences)
         void ridesAutoImport();
 
-        void onEditMenuAboutToShow();
-
 #ifdef GC_HAS_CLOUD_DB
         // CloudDB actions
         void cloudDBuserEditChart();
@@ -294,6 +292,7 @@ class MainWindow : public QMainWindow
         void restoreGCState(Context *);
 
         void configChanged(qint32);
+        void populateEditMenu();
 
     private:
 
