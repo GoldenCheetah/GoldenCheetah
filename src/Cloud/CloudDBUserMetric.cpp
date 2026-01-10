@@ -43,10 +43,10 @@ CloudDBUserMetricClient::CloudDBUserMetricClient()
     g_nam = new QNetworkAccessManager(this);
     QDir cacheDir(QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation).at(0));
     cacheDir.cdUp();
-    g_cacheDir = QString(cacheDir.absolutePath()+"/GoldenCheetahCloudDB");
+    g_cacheDir = QString(cacheDir.absolutePath()+"/GoldenCheetahCloudDB/" + QString(QT_STRINGIFY(GC_CLOUD_DB_APP_NAME)));
     QDir newCacheDir(g_cacheDir);
     if (!newCacheDir.exists()) {
-        cacheDir.mkdir("GoldenCheetahCloudDB");
+        newCacheDir.mkpath(g_cacheDir);
     }
 
     // general handling for sslErrors
