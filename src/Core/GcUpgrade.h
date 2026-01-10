@@ -135,7 +135,7 @@
 // the next two will with each build/release
 #define VERSION_LATEST 5010
 #define VERSION_STRING "V3.8-DEV2601"
-#define GC_VERSION VERSION_STRING // To force version string on non-tagged ci builds
+//#define GC_VERSION VERSION_STRING // To force version string on non-tagged ci builds
 
 // default config for this release cycle
 #define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/3.8"
