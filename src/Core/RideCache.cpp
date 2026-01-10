@@ -31,6 +31,8 @@
 #include "HrZones.h"
 #include "PaceZones.h"
 
+#include "ErgFile.h"
+
 #include "JsonRideFile.h" // for DATETIME_FORMAT
 
 #ifdef SLOW_REFRESH
@@ -1225,6 +1227,10 @@ RideCache::moveActivity
         result.affectedCount = 1;
     }
 
+    if (item->planned) {
+        updateFromWorkout(item, false);
+    }
+
     item->refresh();
     context->notifyRideChanged(item);
     if (context->ride == item) {
@@ -1540,6 +1546,7 @@ RideCache::shiftPlannedActivities
             continue;
         }
         item->setFileName(plannedDirectory.canonicalPath(), newFileName);
+        updateFromWorkout(item, true);
         item->isstale = true;
 
         RideItem *linkedItem = getLinkedActivity(item);
@@ -1684,6 +1691,99 @@ RideCache::findSuggestion
 
 
 bool
+RideCache::updateFromWorkout
+(RideItem *item, bool autoSave)
+{
+    if (item == nullptr || ! item->planned) {
+        return false;
+    }
+    QString workoutFilename = item->getText("WorkoutFilename", item->ride()->getTag("WorkoutFilename", "")).trimmed();
+    if (workoutFilename.isEmpty()) {
+        return false;
+    }
+    ErgFile ergFile(workoutFilename, ErgFileFormat::unknown, context, item->dateTime.date());
+    if (! ergFile.hasRelativeWatts()) {
+        return false;
+    }
+    bool changed = false;
+    for (const QString &name : item->overrides_) {
+        int value = static_cast<int>(item->getForSymbol(name));
+        // Operate only on the values overridden by ManualActivityWizard
+        if (name == "average_power") {
+            if (value != std::round(ergFile.AP())) {
+                QMap<QString, QString> values;
+                values.insert("value", QString::number(std::round(ergFile.AP())));
+                item->ride()->metricOverrides.insert(name, values);
+                changed = true;
+            }
+        } else if (name == "coggan_np") {
+            if (value != std::round(ergFile.IsoPower())) {
+                QMap<QString, QString> values;
+                values.insert("value", QString::number(std::round(ergFile.IsoPower())));
+                item->ride()->metricOverrides.insert(name, values);
+                changed = true;
+            }
+        } else if (name == "coggan_tss") {
+            if (value != std::round(ergFile.bikeStress())) {
+                QMap<QString, QString> values;
+                values.insert("value", QString::number(std::round(ergFile.bikeStress())));
+                item->ride()->metricOverrides.insert(name, values);
+                changed = true;
+            }
+        } else if (name == "skiba_bike_score") {
+            if (value != std::round(ergFile.BS())) {
+                QMap<QString, QString> values;
+                values.insert("value", QString::number(std::round(ergFile.BS())));
+                item->ride()->metricOverrides.insert(name, values);
+                changed = true;
+            }
+        } else if (name == "skiba_xpower") {
+            if (value != std::round(ergFile.XP())) {
+                QMap<QString, QString> values;
+                values.insert("value", QString::number(std::round(ergFile.XP())));
+                item->ride()->metricOverrides.insert(name, values);
+                changed = true;
+            }
+        }
+    }
+    if (changed) {
+        item->setDirty(true);
+        item->isstale = true;
+        if (autoSave) {
+            QString error;
+            saveActivity(item, error);
+        }
+    }
+    return changed;
+}
+
+
+bool
+RideCache::updateFromWorkoutAfter
+(const QDate &when, bool autoSave)
+{
+    QList<RideItem*> changedItems;
+    for (RideItem *item : context->athlete->rideCache->rides()) {
+        if (item->planned && item->dateTime.date() >= when) {
+            if (context->athlete->rideCache->updateFromWorkout(item, false)) {
+                changedItems << item;
+            }
+        }
+    }
+    if (changedItems.count() > 0) {
+        if (autoSave) {
+            QString error;
+            saveActivities(changedItems, error);
+        }
+        cancel();
+        refresh();
+        estimator->refresh();
+    }
+    return changedItems.count() > 0;
+}
+
+
+bool
 RideCache::isValidLink
 (RideItem *item1, RideItem *item2, QString &error)
 {
@@ -1747,6 +1847,7 @@ RideCache::copyPlannedRideFile
     delete newRide;
 
     RideItem *newItem = new RideItem(plannedDirectory.canonicalPath(), newFileName, newDateTime, context, true);
+    updateFromWorkout(newItem, true);
     newItem->isstale = true;
 
     return newItem;
