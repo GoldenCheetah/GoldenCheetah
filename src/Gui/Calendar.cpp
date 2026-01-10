@@ -205,7 +205,7 @@ CalendarBaseTable::buildContextMenu
             }
             if (entry.hasTrainMode) {
                 contextMenu->addSeparator();
-                contextMenu->addAction(tr("Show in train node..."), this, [this, entry]() { emit showInTrainMode(entry); });
+                contextMenu->addAction(tr("Show in train mode..."), this, [this, entry]() { emit showInTrainMode(entry); });
             }
             contextMenu->addSeparator();
             contextMenu->addAction(tr("Delete planned activity"), this, [this, entry]() { emit delActivity(entry); });

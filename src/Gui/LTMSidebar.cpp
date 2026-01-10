@@ -26,6 +26,7 @@
 #include "Colors.h"
 #include "Units.h"
 #include "HelpWhatsThis.h"
+#include "ErgFile.h"
 
 #include "GcWindowRegistry.h" // for GcWinID types
 #include "Perspective.h" // for GcWindowDialog
@@ -329,7 +330,7 @@ LTMSidebar::presetSelectionChanged()
 }
 
 void
-LTMSidebar::configChanged(qint32)
+LTMSidebar::configChanged(qint32 why)
 {
     seasonsWidget->setStyleSheet(GCColor::stylesheet());
     eventsWidget->setStyleSheet(GCColor::stylesheet());
@@ -343,6 +344,9 @@ LTMSidebar::configChanged(qint32)
     // let everyone know what date range we are starting with
     dateRangeTreeWidgetSelectionChanged();
 
+    if (why & CONFIG_ZONES) {
+        context->athlete->rideCache->updateFromWorkoutAfter(QDate::currentDate(), true);
+    }
 }
 
 /*----------------------------------------------------------------------

@@ -118,8 +118,8 @@ class ErgFileLap
 class ErgFile : public ErgFileBase
 {
     public:
-        ErgFile(QString, ErgFileFormat, Context *context);       // constructor uses filename
-        ErgFile(Context *context); // no filename, going to use a string
+        ErgFile(QString, ErgFileFormat, Context *context, QDate when = QDate());       // constructor uses filename
+        ErgFile(Context *context, QDate when = QDate()); // no filename, going to use a string
 
         ~ErgFile();             // delete the contents
 
@@ -128,8 +128,8 @@ class ErgFile : public ErgFileBase
         void setFrom(ErgFile *f); // clone an existing workout
         bool save(QStringList &errors); // save back, with changes
 
-        static ErgFile *fromContent(QString, Context *); // read from memory *.erg
-        static ErgFile *fromContent2(QString, Context *); // read from memory *.erg2
+        static ErgFile *fromContent(QString, Context *, QDate when = QDate()); // read from memory *.erg
+        static ErgFile *fromContent2(QString, Context *, QDate when = QDate()); // read from memory *.erg2
 
         static bool isWorkout(QString);  // is this a supported workout?
 
@@ -149,6 +149,8 @@ private:
         void sortTexts() const;
 
         bool coalescedSections = false;
+
+        QDate when;
 
 public:
         void coalesceSections();

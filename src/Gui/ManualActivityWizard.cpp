@@ -676,12 +676,33 @@ ManualActivityPageWorkout::selectionChanged
     QString title = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::displayname), Qt::DisplayRole).toString();
     QString type = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::type), Qt::DisplayRole).toString();
     QString description = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::description), Qt::DisplayRole).toString();
-    int avgPower = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::avgPower), Qt::DisplayRole).toInt();
-    int bikeStress = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::bikestress), Qt::DisplayRole).toInt();
-    int bikeScore = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::bs), Qt::DisplayRole).toInt();
+    if (ergFile != nullptr) {
+        delete ergFile;
+        ergFile = nullptr;
+    }
+    if (type != "code") {
+        QDate when = field("activityDate").toDate();
+        ergFile = new ErgFile(filename, ErgFileFormat::unknown, context, when);
+        if (! ergFile->isValid()) {
+            delete ergFile;
+            ergFile = nullptr;
+        }
+    }
+
+    int avgPower = 0;
+    int bikeStress = 0;
+    int bikeScore = 0;
+    int isoPower = 0;
+    int xPower = 0;
+    if (ergFile != nullptr && type == "erg") {
+        avgPower = static_cast<int>(ergFile->AP());
+        bikeStress = static_cast<int>(ergFile->bikeStress());
+        bikeScore = static_cast<int>(ergFile->BS());
+        isoPower = static_cast<int>(ergFile->IsoPower());
+        xPower = static_cast<int>(ergFile->XP());
+    }
+
     int elevationGain = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::elevation), Qt::DisplayRole).toInt();
-    int isoPower = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::isoPower), Qt::DisplayRole).toInt();
-    int xPower = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::xp), Qt::DisplayRole).toInt();
     setField("woFilename", filename);
     setField("woTitle", title);
     setField("woFileType", type);
@@ -703,18 +724,6 @@ ManualActivityPageWorkout::selectionChanged
         setField("distance", distanceKM * (useMetricUnits ? 1.0 : MILES_PER_KM));
     }
 
-    if (ergFile != nullptr) {
-        delete ergFile;
-        ergFile = nullptr;
-    }
-
-    if (type != "code") {
-        ergFile = new ErgFile(filename, ErgFileFormat::unknown, context);
-        if (! ergFile->isValid()) {
-            delete ergFile;
-            ergFile = nullptr;
-        }
-    }
     contentStack->setCurrentIndex(ergFile != nullptr ? 1 : 2);
     context->workout = ergFile;
     ergFilePlot->setData(ergFile);
