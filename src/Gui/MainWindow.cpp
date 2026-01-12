@@ -626,7 +626,9 @@ MainWindow::MainWindow(const QDir &home)
 
 
     editMenu = menuBar()->addMenu(tr("&Edit"));
-    connect(editMenu, SIGNAL(aboutToShow()), this, SLOT(onEditMenuAboutToShow()));
+    // Force the signal to emit, without this on MacOS the edit menu disappears if we have translation enabled.
+    onEditMenuAboutToShow();
+    connect(editMenu, &QMenu::aboutToShow, this, &MainWindow::onEditMenuAboutToShow);
 
     HelpWhatsThis *editMenuHelp = new HelpWhatsThis(editMenu);
     editMenu->setWhatsThis(editMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Edit));
@@ -756,8 +758,6 @@ MainWindow::MainWindow(const QDir &home)
 
     versionClient = new CloudDBVersionClient();
     versionClient->informUserAboutLatestVersions();
-
-
 
 #endif
 
@@ -2651,24 +2651,23 @@ MainWindow::ridesAutoImport() {
 
 void MainWindow::onEditMenuAboutToShow()
 {
+    // On MacOS the clear here is dangerous because it's a system menu so we can't do this via aboutToShow.
     editMenu->clear();
     if (toolMapper != nullptr) {
-        delete toolMapper;
+      toolMapper.reset();
     }
-
     // Add all the data processors to the tools menu
     const DataProcessorFactory &factory = DataProcessorFactory::instance();
     QList<DataProcessor*> processors = factory.getProcessorsSorted();
-    toolMapper = new QSignalMapper(this); // maps each option
-    connect(toolMapper, &QSignalMapper::mappedString, this, &MainWindow::manualProcess);
-
-    for (QList<DataProcessor*>::iterator iter = processors.begin(); iter != processors.end(); ++iter) {
-        if (! (*iter)->isAutomatedOnly()) {
+    toolMapper = std::make_unique<QSignalMapper>(); // maps each option
+    connect(toolMapper.get(), &QSignalMapper::mappedString, this, &MainWindow::manualProcess);
+    for (const auto& iter : processors) {
+        if (!iter->isAutomatedOnly()) {
             // The localized processor name is shown in menu
-            QAction *action = new QAction(QString("%1...").arg((*iter)->name()), this);
+            auto* action = new QAction(QString("%1...").arg(iter->name()), toolMapper.get());
+            connect(action, &QAction::triggered, toolMapper.get(), static_cast<void(QSignalMapper::*)()>(&QSignalMapper::map));
+            toolMapper->setMapping(action, iter->id());
             editMenu->addAction(action);
-            connect(action, SIGNAL(triggered()), toolMapper, SLOT(map()));
-            toolMapper->setMapping(action, (*iter)->id());
         }
     }
 }
