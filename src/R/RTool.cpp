@@ -2567,7 +2567,7 @@ RTool::dfForDateRangeMeanmax(bool all, DateRange range, SEXP filter)
     UNPROTECT(1);
 
     // apply perspective filter if trends view and filtered
-    if (rtool->perspective && rtool->perspective->type() == GcViewType::VIEW_TRENDS && rtool->perspective->isFiltered()) {
+    if (rtool->perspective && rtool->perspective->viewType() == GcViewType::VIEW_TRENDS && rtool->perspective->isFiltered()) {
         filt = true;
         filelist << rtool->perspective->filterlist(DateRange(range));
     }
