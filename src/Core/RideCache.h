@@ -150,6 +150,9 @@ class RideCache : public QObject
         RideItem *getLinkedActivity(RideItem *item);
         RideItem *findSuggestion(RideItem *rideItem);
 
+        bool updateFromWorkout(RideItem *item, bool autoSave = false);
+        bool updateFromWorkoutAfter(const QDate &when, bool autoSave = false);
+
     public slots:
 
         // restore / dump cache to disk (json)
