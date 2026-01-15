@@ -132,7 +132,7 @@ RideCacheModel::itemChanged(RideItem *item)
         emit dataChanged(createIndex(row,0), createIndex(row,columns_-1));
     }
     //XXX hack to get the navigator to redraw
-    context->tab->view(1)->sidebar()->update();
+    context->tab->view(GcViewType::VIEW_ANALYSIS)->sidebar()->update();
 }
 
 void RideCacheModel::beginReset() { beginResetModel(); }

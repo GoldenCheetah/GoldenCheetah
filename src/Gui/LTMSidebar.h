@@ -50,7 +50,7 @@ class LTMSidebar : public QWidget
         int newSeason(QString, QDate, QDate, int);
         void updateSeason(int, QString, QDate, QDate, int);
 
-        void updatePresetChartsOnShow(int viewType);
+        void updatePresetChartsOnShow(GcViewType viewType);
 
     signals:
         void dateRangeChanged(DateRange);

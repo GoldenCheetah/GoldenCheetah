@@ -35,7 +35,7 @@ public:
     // about changing views, dates and ride selections
     enum NavigationEventType { VIEW=0, RIDE, DATERANGE } type;
 
-    NavigationEvent(NavigationEventType t, int v) : type(t) { after.setValue(v); }
+    NavigationEvent(NavigationEventType t, GcViewType v) : type(t) { after.setValue(v); }
     NavigationEvent(NavigationEventType t, DateRange v) : type(t) { after.setValue(v); }
     NavigationEvent(NavigationEventType t, RideItem* v) : type(t) { after.setValue(v); }
     NavigationEvent(NavigationEventType t, QString v) : type(t) { after.setValue(v); }
@@ -64,7 +64,7 @@ public:
 
 public slots:
 
-    void viewChanged(int);
+    void viewChanged(GcViewType);
     void rideChanged(RideItem*);
     void dateChanged(DateRange dr);
 
@@ -80,7 +80,7 @@ private:
     bool block;
 
     // current state, before an event arrives
-    int view; // which view is selected
+    GcViewType view; // which view is selected
     DateRange dr;
     RideItem *item;
 
