@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=GoldenCheetah
+GenericName=Cycling Power Analysis
+Comment=Performance software for cyclists and triathletes
+Exec=GoldenCheetah %f
+Icon=org.goldencheetah.GoldenCheetah
+Categories=Science;Sports;DataVisualization;
+Keywords=cycling;training;power;analysis;triathlon;fitness;
+StartupNotify=true

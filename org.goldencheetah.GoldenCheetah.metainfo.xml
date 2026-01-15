@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>org.goldencheetah.GoldenCheetah</id>
+
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-2.0-only</project_license>
+
+  <name>GoldenCheetah</name>
+  <summary>Cycling and triathlon performance analysis software</summary>
+
+  <developer id="org.goldencheetah">
+    <name>GoldenCheetah Team</name>
+  </developer>
+
+  <description>
+    <p>
+      GoldenCheetah is a powerful desktop application for cyclists, triathletes,
+      and coaches to analyze training data and optimize performance.
+    </p>
+    <p>Key features include:</p>
+    <ul>
+      <li>Analyze rides using summary metrics like BikeStress, TRIMP, and RPE</li>
+      <li>Extract insights via models like Critical Power and W'bal</li>
+      <li>Track and predict performance using Banister and PMC models</li>
+      <li>Optimize aerodynamics using Virtual Elevation</li>
+      <li>Train indoors with ANT+ and Bluetooth smart trainers</li>
+      <li>Upload and download from cloud services including Strava and Withings</li>
+      <li>Import and export data from a wide range of bike computers and file formats</li>
+    </ul>
+    <p>
+      GoldenCheetah provides tools for users to develop their own metrics, models,
+      and charts using a powerful built-in scripting language, embedded Python, or R.
+    </p>
+  </description>
+
+  <url type="homepage">https://www.goldencheetah.org/</url>
+  <url type="bugtracker">https://github.com/GoldenCheetah/GoldenCheetah/issues</url>
+  <url type="help">https://github.com/GoldenCheetah/GoldenCheetah/wiki</url>
+  <url type="donation">https://www.goldencheetah.org/#section-donate</url>
+  <url type="vcs-browser">https://github.com/GoldenCheetah/GoldenCheetah</url>
+
+  <launchable type="desktop-id">org.goldencheetah.GoldenCheetah.desktop</launchable>
+
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/GoldenCheetah/GoldenCheetah/067696aafdad21c702672b2c9c41da03c076451c/doc/wiki/GoldenCheetah-Screenshot.png</image>
+      <caption>GoldenCheetah main analysis view with power data visualization</caption>
+    </screenshot>
+  </screenshots>
+
+  <branding>
+    <color type="primary" scheme_preference="light">#f79130</color>
+    <color type="primary" scheme_preference="dark">#f8b44c</color>
+  </branding>
+
+  <content_rating type="oars-1.1" />
+
+  <releases>
+    <release version="3.7-SP1" date="2025-11-21">
+      <url type="details">https://github.com/GoldenCheetah/GoldenCheetah/releases/tag/v3.7-SP1</url>
+      <description>
+        <p>Service Pack 1 for version 3.7 including security fixes and new features:</p>
+        <ul>
+          <li>Corrections to fix a potential vulnerability when accessing Web Services with SSL connectivity</li>
+          <li>New Calendar Chart feature</li>
+        </ul>
+      </description>
+    </release>
+    <release version="3.7" date="2025-03-28">
+      <url type="details">https://github.com/GoldenCheetah/GoldenCheetah/releases/tag/V3.7</url>
+      <description>
+        <p>Major release with Qt6 support and numerous improvements including enhanced cloud service integration and updated metrics.</p>
+      </description>
+    </release>
+  </releases>
+
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+  </supports>
+
+  <requires>
+    <display_length compare="ge">768</display_length>
+  </requires>
+
+  <keywords>
+    <keyword>cycling</keyword>
+    <keyword>training</keyword>
+    <keyword>power</keyword>
+    <keyword>analysis</keyword>
+    <keyword>triathlon</keyword>
+    <keyword>fitness</keyword>
+    <keyword>performance</keyword>
+    <keyword>bike</keyword>
+  </keywords>
+</component>
