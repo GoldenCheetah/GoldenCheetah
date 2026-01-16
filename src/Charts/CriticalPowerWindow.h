@@ -320,6 +320,9 @@ class CriticalPowerWindow : public GcChartWindow
 
         bool event(QEvent *event);
 
+        // the chart displays information related to the selected ride
+        bool selectedRideInfo() const override { return !rangemode; }
+
         CPPlot *cpPlot;
         Context *context;
         QLabel *cpintTimeValue;

@@ -119,7 +119,8 @@ GcWindowRegistry::initialize()
   GcWindows = GcWindowsInit;
 }
 
-QStringList windowsForType(int type)
+QStringList
+GcWindowRegistry::windowsForType(int type)
 {
     QStringList returning;
 
@@ -140,7 +141,8 @@ GcWindowRegistry::title(GcWinID id)
     return QString("unknown");
 }
 
-QList<GcWinID> idsForType(int type)
+QList<GcWinID>
+GcWindowRegistry::idsForType(int type)
 {
     QList<GcWinID> returning;
 
@@ -223,7 +225,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
 
     case GcWindowTypes::RideMapWindow: returning = new RideMapWindow(context, RideMapWindow::OSM); break; // Deprecated Bing, default to OSM
 
-    case GcWindowTypes::ActivityNavigator: returning = new RideNavigator(context); break;
+    case GcWindowTypes::ActivityNavigator: returning = new RideNavigator(context, true); break;
     case GcWindowTypes::WorkoutWindow: returning = new WorkoutWindow(context); break;
 
     case GcWindowTypes::WebPageWindow: returning = new WebPageWindow(context); break;
