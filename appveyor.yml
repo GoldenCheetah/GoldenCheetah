@@ -110,10 +110,6 @@ install:
 # GSL
 - cmd: vcpkg install gsl:x64-windows
 
-# Get config
-- cmd: copy qwt\qwtconfig.pri.in qwt\qwtconfig.pri
-- cmd: copy c:\libs\gcconfig64Qt6-Release.appveyor.pri src\gcconfig.pri
-
 # Get jom
 - cmd: if not exist jom_1_1_3.zip appveyor DownloadFile "https://download.qt.io/official_releases/jom/jom_1_1_3.zip"
 - cmd: 7z x -y jom_1_1_3.zip -oc:\jom\
@@ -130,7 +126,6 @@ install:
     }
 - cmd: set PATH=%PATH%;c:\R\bin\;
 - cmd: R --version
-- cmd: echo DEFINES+=GC_WANT_R >> src\gcconfig.pri
 
 # Get Python embeddable and install packages
 - ps: >-
@@ -156,45 +151,25 @@ install:
     }
 - cmd: cd sip-4.19.8 & nmake install & cd ..
 
-# Add Python (avoiding collision between GC Context.h and Python context.h)
-- cmd: echo DEFINES+=GC_WANT_PYTHON >> src\gcconfig.pri
-- cmd: echo PYTHONINCLUDES=-ICore -I\"c:\python37-x64\include\" >> src\gcconfig.pri
-- cmd: echo PYTHONLIBS=-L\"c:\python37-x64\libs\" -lpython37 >> src\gcconfig.pri
-
-# GSL
-- cmd: echo GSL_INCLUDES=c:\tools\vcpkg\installed\x64-windows\include >> src\gcconfig.pri
-- cmd: echo GSL_LIBS=-Lc:\tools\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas >> src\gcconfig.pri
-
 # Linux / macOS
 - sh: bash appveyor/$OS_NAME/install.sh
 
 before_build:
 
-# Windows
-# Define GC version string, only for tagged builds
-- cmd: if %APPVEYOR_REPO_TAG%==true echo DEFINES+=GC_VERSION=VERSION_STRING >> src\gcconfig.pri
-
-# Enable CloudDB
-- cmd: echo CloudDB=active >> src\gcconfig.pri
-
-# Add Train Robot
-- cmd: echo DEFINES+=GC_WANT_ROBOT >> src\gcconfig.pri
-
-# Enable TrainerDay Query API; pagesize depends on the keys remote configuration
-- cmd: echo DEFINES+=GC_WANT_TRAINERDAY_API >> src\gcconfig.pri
-- cmd: echo DEFINES+=GC_TRAINERDAY_API_PAGESIZE=25 >> src\gcconfig.pri
-
-# Avoid macro redefinition warnings
-- cmd: echo DEFINES+=_MATH_DEFINES_DEFINED >> src\gcconfig.pri
-
-# Avoid conflicts between Windows.h min/max macros and limits.h
-- cmd: echo DEFINES+=NOMINMAX >> src\gcconfig.pri
-
-
-# Linux / macOS
+# Configure src/gcconfig.pri
+ # Windows
+- ps: if ($isWindows) { appveyor\windows\before_build.ps1 }
+ # Linux / macOS
 - sh: bash appveyor/$OS_NAME/before_build.sh
-# Define GC version string, only for tagged builds
-- sh: if $APPVEYOR_REPO_TAG; then echo DEFINES+=GC_VERSION=VERSION_STRING >> src/gcconfig.pri; fi
+
+# For tagged builds, define GC version string
+- ps: if ($env:APPVEYOR_REPO_TAG -eq "true") { Add-Content src/gcconfig.pri "DEFINES += GC_VERSION=VERSION_STRING" }
+# Show config.
+- ps: Get-Content src/gcconfig.pri
+# update translations
+- ps: lupdate src/src.pro
+
+- ps: throw "Stopping build for testing"
 
 # Patch Secrets.h (Windows / Linux / macOS)
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_GOOGLE_CALENDAR_CLIENT_SECRET__', $env:GC_GOOGLE_CALENDAR_CLIENT_SECRET | Set-Content src\Core\Secrets.h
