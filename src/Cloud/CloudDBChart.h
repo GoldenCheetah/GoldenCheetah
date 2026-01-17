@@ -63,7 +63,6 @@ public:
     bool curateChartByID(qint64 id, bool newStatus);
     void incrementDownloadCounterByID(qint64 id);
     bool getAllChartHeader(QList<CommonAPIHeaderV1>* header);
-    bool clearAllCache();
 
     bool sslLibMissing() { return noSSLlib; }
 
@@ -134,7 +133,6 @@ private slots:
     void resetToStartClicked();
     void nextSetClicked();
     void prevSetClicked();
-    void clearCacheClicked();
     void ownChartsToggled(bool);
     void toggleTextFilterApply();
     void curationStateFilterChanged(int);
@@ -174,7 +172,6 @@ private:
     QPushButton *resetToStart;
     QPushButton *nextSet;
     QPushButton *prevSet;
-    QPushButton *clearCacheButton;
     QCheckBox *ownChartsOnly;
     QComboBox *curationStateCombo;
     QComboBox *langCombo;

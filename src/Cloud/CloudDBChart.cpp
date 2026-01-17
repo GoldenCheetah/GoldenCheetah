@@ -50,10 +50,10 @@ CloudDBChartClient::CloudDBChartClient()
     g_nam = new QNetworkAccessManager(this);
     QDir cacheDir(QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation).at(0));
     cacheDir.cdUp();
-    g_cacheDir = QString(cacheDir.absolutePath()+"/GoldenCheetahCloudDB/" + QString(QT_STRINGIFY(GC_CLOUD_DB_APP_NAME)));
+    g_cacheDir = QString(cacheDir.absolutePath()+"/GoldenCheetahCloudDB");
     QDir newCacheDir(g_cacheDir);
     if (!newCacheDir.exists()) {
-        newCacheDir.mkpath(g_cacheDir);
+        cacheDir.mkdir("GoldenCheetahCloudDB");
     }
 
     // general handling for sslErrors
@@ -235,15 +235,6 @@ CloudDBChartClient::getAllChartHeader(QList<CommonAPIHeaderV1>* header) {
         cleanChartCache(header);
     }
     return request_ok;
-}
-
-bool
-CloudDBChartClient::clearAllCache() {
-    QDir cacheDir(g_cacheDir);
-    if (cacheDir.exists()) {
-        return cacheDir.removeRecursively();
-    }
-    return true;
 }
 
 
@@ -458,24 +449,20 @@ CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
    showing = new QLabel;
    showingTextTemplate = tr("Showing %1 to %2 of %3 charts for %4 / Total uploaded %5");
    resetToStart = new QPushButton(tr("First"));
-   clearCacheButton = new QPushButton(tr("Clear Cache"));
    nextSet = new QPushButton(tr("Next %1").arg(QString::number(const_stepSize)));
    prevSet = new QPushButton(tr("Prev %1").arg(QString::number(const_stepSize)));
    resetToStart->setEnabled(true);
    nextSet->setDefault(true);
-   clearCacheButton->setEnabled(true);
    nextSet->setEnabled(true);
    prevSet->setEnabled(true);
 
    connect(resetToStart, SIGNAL(clicked()), this, SLOT(resetToStartClicked()));
    connect(nextSet, SIGNAL(clicked()), this, SLOT(nextSetClicked()));
    connect(prevSet, SIGNAL(clicked()), this, SLOT(prevSetClicked()));
-   connect(clearCacheButton, &QPushButton::clicked, this, &CloudDBChartListDialog::clearCacheClicked);
 
    showingLayout = new QHBoxLayout;
    showingLayout->addWidget(showing);
    showingLayout->addStretch();
-   showingLayout->addWidget(clearCacheButton);
    showingLayout->addWidget(resetToStart);
    showingLayout->addWidget(prevSet);
    showingLayout->addWidget(nextSet);
@@ -672,7 +659,6 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
     prevSet->setEnabled(false);
     closeUserGetButton->setEnabled(false);
     addAndCloseUserGetButton->setEnabled(false);
-    clearCacheButton->setEnabled(false);
     curationStateCombo->setEnabled(false);
     ownChartsOnly->setEnabled(false);
     textFilterApply->setEnabled(false);
@@ -769,10 +755,8 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
     resetToStart->setEnabled(true);
     nextSet->setEnabled(true);
     prevSet->setEnabled(true);
-    clearCacheButton->setEnabled(true);
     closeUserGetButton->setEnabled(true);
     addAndCloseUserGetButton->setEnabled(true);
-    clearCacheButton->setEnabled(true);
     curationStateCombo->setEnabled(true);
     ownChartsOnly->setEnabled(true);
     textFilterApply->setEnabled(true);
@@ -791,23 +775,6 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
         ownChartsOnly->setEnabled(false);
     }
 
-}
-
-void
-CloudDBChartListDialog::clearCacheClicked() {
-    // clear the physical cache
-    g_client->clearAllCache();
-
-    // force a refresh from Network
-    CloudDBHeader::setChartHeaderStale(true);
-
-    // reset UI
-    g_currentIndex = 0;
-    if (CloudDBHeader::isStaleChartHeader()) {
-        if (!refreshStaleChartHeader()) return;
-        CloudDBHeader::setChartHeaderStale(false);
-    }
-    applyAllFilters();
 }
 
 void
