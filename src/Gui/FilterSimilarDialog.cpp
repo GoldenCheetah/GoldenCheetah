@@ -19,6 +19,7 @@
 #include "FilterSimilarDialog.h"
 
 #include <QDialogButtonBox>
+#include <QHeaderView>
 
 #include "RideMetadata.h"
 #include "Utils.h"
