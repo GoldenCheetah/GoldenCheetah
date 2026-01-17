@@ -81,8 +81,8 @@ init:
       qmake --version
     else
       export OS_NAME=macos
-      # Setup QT 6.6
-      export QTDIR=$HOME/Qt/6.6/macos
+      # Setup QT 6.5
+      export QTDIR=$HOME/Qt/6.5/macos
       export PATH=$QTDIR/bin:$PATH
       qmake --version
       # Setup Xcode 15.2

@@ -5,7 +5,7 @@
 #                                                                             #
 ###############################################################################
 
-!versionAtLeast(QT_VERSION, 6.6.1):error("Use at least Qt version 6.6.1")
+!versionAtLeast(QT_VERSION, 6.5.3):error("Use at least Qt version 6.5.3")
 
 ###==========================
 ### IMPORT USER CONFIGURATION
