@@ -1134,6 +1134,20 @@ void MainWindow::setFilter(QStringList f) { currentAthleteTab->context->setFilte
 void MainWindow::clearFilter() { currentAthleteTab->context->clearFilter(); }
 
 void
+MainWindow::fillinFilter(const QString &filterText)
+{
+    searchBox->setMode(SearchBox::Filter);
+    searchBox->setText(filterText);
+}
+
+void
+MainWindow::fillinSearch(const QString &filterText)
+{
+    searchBox->setMode(SearchBox::Search);
+    searchBox->setText(filterText);
+}
+
+void
 MainWindow::aboutDialog()
 {
     AboutDialog *ad = new AboutDialog(currentAthleteTab->context);

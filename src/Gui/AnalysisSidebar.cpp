@@ -42,6 +42,9 @@
 // Show in Train Mode
 #include "WorkoutFilter.h"
 
+// Filter for similar activities
+#include "FilterSimilarDialog.h"
+
 AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow), context(context)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -411,6 +414,16 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
         QAction *actFindBest = new QAction(tr("Find Intervals..."), intervalItem);
         connect(actFindBest, SIGNAL(triggered(void)), this, SLOT(addIntervals(void)));
         menu.addAction(actFindBest);
+
+        QAction *filterSimilar = new QAction(tr("Filter similar activities..."), rideNavigator);
+        connect(filterSimilar, &QAction::triggered, this, [this]() {
+            if (context->ride != nullptr) {
+                FilterSimilarDialog dlg(context, context->ride, this);
+                dlg.exec();
+            }
+        });
+        menu.addAction(filterSimilar);
+
 
         if (rideItem->planned && rideItem->sport == "Bike") {
             QString filter = buildWorkoutFilter(rideItem);

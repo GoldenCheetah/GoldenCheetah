@@ -184,6 +184,8 @@ CalendarBaseTable::buildContextMenu
                 contextMenu->addAction(tr("Unlink from planned activity"), this, [this, entry]() { emit unlinkActivity(entry); });
             }
             contextMenu->addSeparator();
+            contextMenu->addAction(tr("Filter similar activities..."), this, [this, entry]() { emit filterSimilar(entry); });
+            contextMenu->addSeparator();
             contextMenu->addAction(tr("Delete completed activity"), this, [this, entry]() { emit delActivity(entry); });
             break;
         case ENTRY_TYPE_PLANNED_ACTIVITY:
@@ -203,10 +205,11 @@ CalendarBaseTable::buildContextMenu
             } else {
                 contextMenu->addAction(tr("Mark as incomplete"), this, [this, entry]() { emit unlinkActivity(entry); });
             }
+            contextMenu->addSeparator();
             if (entry.hasTrainMode) {
-                contextMenu->addSeparator();
                 contextMenu->addAction(tr("Show in train mode..."), this, [this, entry]() { emit showInTrainMode(entry); });
             }
+            contextMenu->addAction(tr("Filter similar activities..."), this, [this, entry]() { emit filterSimilar(entry); });
             contextMenu->addSeparator();
             contextMenu->addAction(tr("Delete planned activity"), this, [this, entry]() { emit delActivity(entry); });
             break;
@@ -1543,6 +1546,7 @@ CalendarDayView::CalendarDayView
     connect(dayTable, &CalendarDayTable::viewLinkedActivity, this, &CalendarDayView::viewLinkedActivity);
     connect(dayTable, &CalendarDayTable::addActivity, this, &CalendarDayView::addActivity);
     connect(dayTable, &CalendarDayTable::showInTrainMode, this, &CalendarDayView::showInTrainMode);
+    connect(dayTable, &CalendarDayTable::filterSimilar, this, &CalendarDayView::filterSimilar);
     connect(dayTable, &CalendarDayTable::delActivity, this, &CalendarDayView::delActivity);
     connect(dayTable, &CalendarDayTable::saveChanges, this, &CalendarDayView::saveChanges);
     connect(dayTable, &CalendarDayTable::discardChanges, this, &CalendarDayView::discardChanges);
@@ -1842,6 +1846,7 @@ CalendarWeekView::CalendarWeekView
     connect(weekTable, &CalendarDayTable::viewLinkedActivity, this, &CalendarWeekView::viewLinkedActivity);
     connect(weekTable, &CalendarDayTable::addActivity, this, &CalendarWeekView::addActivity);
     connect(weekTable, &CalendarDayTable::showInTrainMode, this, &CalendarWeekView::showInTrainMode);
+    connect(weekTable, &CalendarDayTable::filterSimilar, this, &CalendarWeekView::filterSimilar);
     connect(weekTable, &CalendarDayTable::delActivity, this, &CalendarWeekView::delActivity);
     connect(weekTable, &CalendarDayTable::saveChanges, this, &CalendarWeekView::saveChanges);
     connect(weekTable, &CalendarDayTable::discardChanges, this, &CalendarWeekView::discardChanges);
@@ -2039,6 +2044,7 @@ Calendar::Calendar
     connect(dayView, &CalendarDayView::viewLinkedActivity, this, &Calendar::viewLinkedActivity);
     connect(dayView, &CalendarDayView::addActivity, this, &Calendar::addActivity);
     connect(dayView, &CalendarDayView::showInTrainMode, this, &Calendar::showInTrainMode);
+    connect(dayView, &CalendarDayView::filterSimilar, this, &Calendar::filterSimilar);
     connect(dayView, &CalendarDayView::delActivity, this, &Calendar::delActivity);
     connect(dayView, &CalendarDayView::saveChanges, this, &Calendar::saveChanges);
     connect(dayView, &CalendarDayView::discardChanges, this, &Calendar::discardChanges);
@@ -2067,6 +2073,7 @@ Calendar::Calendar
     connect(weekView, &CalendarWeekView::viewLinkedActivity, this, &Calendar::viewLinkedActivity);
     connect(weekView, &CalendarWeekView::addActivity, this, &Calendar::addActivity);
     connect(weekView, &CalendarWeekView::showInTrainMode, this, &Calendar::showInTrainMode);
+    connect(weekView, &CalendarWeekView::filterSimilar, this, &Calendar::filterSimilar);
     connect(weekView, &CalendarWeekView::delActivity, this, &Calendar::delActivity);
     connect(weekView, &CalendarWeekView::saveChanges, this, &Calendar::saveChanges);
     connect(weekView, &CalendarWeekView::discardChanges, this, &Calendar::discardChanges);
@@ -2093,6 +2100,7 @@ Calendar::Calendar
         setView(CalendarView::Day);
     });
     connect(monthView, &CalendarMonthTable::showInTrainMode, this, &Calendar::showInTrainMode);
+    connect(monthView, &CalendarMonthTable::filterSimilar, this, &Calendar::filterSimilar);
     connect(monthView, &CalendarMonthTable::linkActivity, this, &Calendar::linkActivity);
     connect(monthView, &CalendarMonthTable::unlinkActivity, this, &Calendar::unlinkActivity);
     connect(monthView, &CalendarMonthTable::viewActivity, this, &Calendar::viewActivity);

@@ -197,6 +197,8 @@ class MainWindow : public QMainWindow
         // Search / Filter
         void setFilter(QStringList);
         void clearFilter();
+        void fillinFilter(const QString &filterText);
+        void fillinSearch(const QString &searchText);
 
         void selectAthlete();
         void selectTrends();

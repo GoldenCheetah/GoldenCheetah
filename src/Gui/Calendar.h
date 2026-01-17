@@ -68,6 +68,7 @@ public:
 
 signals:
     void showInTrainMode(CalendarEntry ctivity);
+    void filterSimilar(CalendarEntry activity);
     void linkActivity(CalendarEntry activity, bool autoLink);
     void unlinkActivity(CalendarEntry activity);
     void viewActivity(CalendarEntry activity);
@@ -262,6 +263,7 @@ signals:
     void dayChanged(QDate date);
 
     void showInTrainMode(CalendarEntry activity);
+    void filterSimilar(CalendarEntry activity);
     void linkActivity(CalendarEntry activity, bool autoLink);
     void unlinkActivity(CalendarEntry activity);
     void viewActivity(CalendarEntry activity);
@@ -315,6 +317,7 @@ signals:
     void dayChanged(QDate date);
 
     void showInTrainMode(CalendarEntry activity);
+    void filterSimilar(CalendarEntry activity);
     void linkActivity(CalendarEntry activity, bool autoLink);
     void unlinkActivity(CalendarEntry activity);
     void viewActivity(CalendarEntry activity);
@@ -381,6 +384,7 @@ signals:
     void moveActivity(CalendarEntry activity, QDate srcDay, QDate destDay, QTime destTime);
 
     void showInTrainMode(CalendarEntry activity);
+    void filterSimilar(CalendarEntry activity);
     void linkActivity(CalendarEntry activity, bool autoLink);
     void unlinkActivity(CalendarEntry activity);
     void viewActivity(CalendarEntry activity);

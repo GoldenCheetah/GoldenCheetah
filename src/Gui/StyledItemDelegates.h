@@ -118,19 +118,26 @@ class ComboBoxDelegate: public QStyledItemDelegate
 public:
     ComboBoxDelegate(QObject *parent = nullptr);
 
-    virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-    virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
-    virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
-    virtual QString displayText(const QVariant &value, const QLocale &locale) const override;
-    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
     void addItems(const QStringList &texts);
+    void addItemsForType(int type, const QStringList &texts);
+    void setRoleForType(int role);
+    int roleForType() const;
+
+protected:
+    void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override;
 
 private slots:
     void commitAndCloseEditor();
 
 private:
     QStringList texts;
+    QMap<int, QStringList> textsForType;
+    int _roleForType = -1;
     QSize _sizeHint;
 
     void fillSizeHint();
