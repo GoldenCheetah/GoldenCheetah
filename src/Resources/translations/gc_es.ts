@@ -1733,17 +1733,17 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="420"/>
         <source>Agenda Basics</source>
-        <translation type="unfinished"></translation>
+        <translation>Intervalo temporal</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="421"/>
         <source>Back to Include</source>
-        <translation type="unfinished"></translation>
+        <translation>Incluir hacia atrás</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="422"/>
         <source>Ahead to Include</source>
-        <translation type="unfinished"></translation>
+        <translation>Incluir hacia delante</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="424"/>
@@ -1764,7 +1764,7 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="428"/>
         <source>Metric Line</source>
-        <translation type="unfinished"></translation>
+        <translation>Métricas</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="397"/>
@@ -1790,12 +1790,12 @@ Presione siguiente para continuar
         <location filename="../../Charts/AgendaWindow.cpp" line="432"/>
         <location filename="../../Charts/AgendaWindow.cpp" line="443"/>
         <source>Detail Line</source>
-        <translation type="unfinished"></translation>
+        <translation>Línea de detalles</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="433"/>
         <source>Show Line for</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar línea para</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="435"/>
@@ -6774,12 +6774,12 @@ ddd, dd MMM yyyy</source>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="818"/>
         <source>Calendar Basics</source>
-        <translation type="unfinished"></translation>
+        <translation>Intervalo temporal</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="819"/>
         <source>Startup View</source>
-        <translation type="unfinished"></translation>
+        <translation>Modo de vista</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="820"/>
@@ -6789,7 +6789,7 @@ ddd, dd MMM yyyy</source>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="822"/>
         <source>Default Times</source>
-        <translation type="unfinished"></translation>
+        <translation>Horas</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="823"/>
@@ -6809,12 +6809,12 @@ ddd, dd MMM yyyy</source>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="827"/>
         <source>Show Summary In</source>
-        <translation type="unfinished"></translation>
+        <translation>Ver resumen en</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="833"/>
         <source>Main Line</source>
-        <translation type="unfinished"></translation>
+        <translation>Línea principal</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="834"/>
@@ -6830,7 +6830,7 @@ ddd, dd MMM yyyy</source>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="837"/>
         <source>Metric Line</source>
-        <translation type="unfinished"></translation>
+        <translation>Línea de métrica</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="838"/>
@@ -6840,7 +6840,7 @@ ddd, dd MMM yyyy</source>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="841"/>
         <source>Detail Line (Day and Week View only)</source>
-        <translation type="unfinished"></translation>
+        <translation>Línea de detalle (sólo disponible para los modos de vista semanal y diario)</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="845"/>
@@ -14995,7 +14995,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Pages.cpp" line="270"/>
         <source>Analysis</source>
-        <translation>Análisis</translation>
+        <translation>Actividades</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="271"/>
@@ -15123,7 +15123,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Pages.cpp" line="287"/>
         <source>Startup View</source>
-        <translation type="unfinished"></translation>
+        <translation>Vista al inicio</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="293"/>
