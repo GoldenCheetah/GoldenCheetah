@@ -9,6 +9,7 @@ equals(GC_UNITTESTS, active) {
 			   Core/season \
 			   Core/seasonParser \
 			   Core/units \
+			   Core/utils \
 			   Core/signalSafety \
 			   Core/splineCrash \
 			   Gui/calendarData

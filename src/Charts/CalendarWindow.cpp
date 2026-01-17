@@ -31,6 +31,7 @@
 #include "RepeatScheduleWizard.h"
 #include "WorkoutFilter.h"
 #include "IconManager.h"
+#include "FilterSimilarDialog.h"
 #include "SeasonDialogs.h"
 #include "SaveDialogs.h"
 
@@ -330,6 +331,15 @@ CalendarWindow::CalendarWindow(Context *context)
                 this->context->mainWindow->fillinWorkoutFilterBox(filter);
                 this->context->mainWindow->selectTrain();
                 this->context->notifySelectWorkout(0);
+            }
+        }
+    });
+    connect(calendar, &Calendar::filterSimilar, this, [this](CalendarEntry activity) {
+        for (RideItem *rideItem : this->context->athlete->rideCache->rides()) {
+            if (rideItem != nullptr && rideItem->fileName == activity.reference) {
+                FilterSimilarDialog dlg(this->context, rideItem, this);
+                dlg.exec();
+                break;
             }
         }
     });
