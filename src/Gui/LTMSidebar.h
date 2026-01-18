@@ -142,6 +142,8 @@ class LTMSidebar : public QWidget
         bool isqueryfilter, isautofilter;
         QStringList autoFilterFiles, queryFilterFiles;
 
+        void buildDateRangeMenu(QMenu &menu, QTreeWidgetItem *item, bool asGlobal) const;
+
 };
 
 #endif // _GC_LTMSidebar_h
