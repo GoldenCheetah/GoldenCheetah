@@ -120,6 +120,10 @@ public:
             }
         }
         %End
+    PyObject* __iter__();
+        %MethodCode
+        sipRes = PySeqIter_New(sipSelf);
+        %End
 };
 
 //
@@ -322,6 +326,10 @@ public:
                 PyErr_SetString(PyExc_RuntimeError, "XData series does not exist");
             }
         }
+        %End
+    PyObject* __iter__();
+        %MethodCode
+        sipRes = PySeqIter_New(sipSelf);
         %End
 };
 

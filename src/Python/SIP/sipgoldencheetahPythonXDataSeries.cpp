@@ -6,7 +6,7 @@
 
 #include "sipAPIgoldencheetah.h"
 
-#line 244 "goldencheetah.sip"
+#line 248 "goldencheetah.sip"
 #include "Bindings.h"
 #line 12 "./sipgoldencheetahPythonXDataSeries.cpp"
 
@@ -28,7 +28,7 @@ static PyObject *meth_PythonXDataSeries_append(PyObject *sipSelf, PyObject *sipA
         {
             sipErrorState sipError = sipErrorNone;
 
-#line 306 "goldencheetah.sip"
+#line 310 "goldencheetah.sip"
         if (sipCpp->readOnly) {
             PyErr_SetString(PyExc_AttributeError, "Object is read-only");
             sipError = sipErrorFail;
@@ -72,7 +72,7 @@ static PyObject *meth_PythonXDataSeries_remove(PyObject *sipSelf, PyObject *sipA
         {
             sipErrorState sipError = sipErrorNone;
 
-#line 317 "goldencheetah.sip"
+#line 321 "goldencheetah.sip"
         if (sipCpp->readOnly) {
             PyErr_SetString(PyExc_AttributeError, "Object is read-only");
             sipError = sipErrorFail;
@@ -103,6 +103,31 @@ static PyObject *meth_PythonXDataSeries_remove(PyObject *sipSelf, PyObject *sipA
 }
 
 
+extern "C" {static PyObject *slot_PythonXDataSeries___iter__(PyObject *);}
+static PyObject *slot_PythonXDataSeries___iter__(PyObject *sipSelf)
+{
+     ::PythonXDataSeries *sipCpp = reinterpret_cast< ::PythonXDataSeries *>(sipGetCppPtr((sipSimpleWrapper *)sipSelf,sipType_PythonXDataSeries));
+
+    if (!sipCpp)
+        return 0;
+
+
+    {
+        {
+            PyObject * sipRes = 0;
+
+#line 332 "goldencheetah.sip"
+        sipRes = PySeqIter_New(sipSelf);
+#line 122 "./sipgoldencheetahPythonXDataSeries.cpp"
+
+            return sipRes;
+        }
+    }
+
+    return 0;
+}
+
+
 extern "C" {static int slot_PythonXDataSeries___setitem__(PyObject *,PyObject *);}
 static int slot_PythonXDataSeries___setitem__(PyObject *sipSelf,PyObject *sipArgs)
 {
@@ -121,7 +146,7 @@ static int slot_PythonXDataSeries___setitem__(PyObject *sipSelf,PyObject *sipArg
         {
             sipErrorState sipError = sipErrorNone;
 
-#line 289 "goldencheetah.sip"
+#line 293 "goldencheetah.sip"
         if (sipCpp->readOnly) {
             PyErr_SetString(PyExc_AttributeError, "Object is read-only");
             sipError = sipErrorFail;
@@ -136,7 +161,7 @@ static int slot_PythonXDataSeries___setitem__(PyObject *sipSelf,PyObject *sipArg
                 sipError = sipErrorFail;
             }
         }
-#line 140 "./sipgoldencheetahPythonXDataSeries.cpp"
+#line 165 "./sipgoldencheetahPythonXDataSeries.cpp"
 
             if (sipError == sipErrorFail)
                 return -1;
@@ -175,7 +200,7 @@ static PyObject *slot_PythonXDataSeries___getitem__(PyObject *sipSelf,PyObject *
             double sipRes = 0;
             sipErrorState sipError = sipErrorNone;
 
-#line 279 "goldencheetah.sip"
+#line 283 "goldencheetah.sip"
         if (a0 < 0) a0 += sipCpp->count();
         if (a0 >= 0 && a0 < sipCpp->count()) {
             sipRes = sipCpp->get(a0);
@@ -183,7 +208,7 @@ static PyObject *slot_PythonXDataSeries___getitem__(PyObject *sipSelf,PyObject *
             PyErr_SetString(PyExc_IndexError, "Index out of range");
             sipError = sipErrorFail;
         }
-#line 187 "./sipgoldencheetahPythonXDataSeries.cpp"
+#line 212 "./sipgoldencheetahPythonXDataSeries.cpp"
 
             if (sipError == sipErrorFail)
                 return 0;
@@ -217,9 +242,9 @@ static SIP_SSIZE_T slot_PythonXDataSeries___len__(PyObject *sipSelf)
         {
             SIP_SSIZE_T sipRes = 0;
 
-#line 275 "goldencheetah.sip"
+#line 279 "goldencheetah.sip"
         sipRes = sipCpp->count();
-#line 223 "./sipgoldencheetahPythonXDataSeries.cpp"
+#line 248 "./sipgoldencheetahPythonXDataSeries.cpp"
 
             return sipRes;
         }
@@ -242,9 +267,9 @@ static PyObject *slot_PythonXDataSeries___str__(PyObject *sipSelf)
         {
              ::QString*sipRes = 0;
 
-#line 271 "goldencheetah.sip"
+#line 275 "goldencheetah.sip"
         sipRes = new QString(sipCpp->name());
-#line 248 "./sipgoldencheetahPythonXDataSeries.cpp"
+#line 273 "./sipgoldencheetahPythonXDataSeries.cpp"
 
             return sipConvertFromNewType(sipRes,sipType_QString,NULL);
         }
@@ -269,7 +294,7 @@ static int getbuffer_PythonXDataSeries(PyObject *sipSelf, void *sipCppV, Py_buff
      ::PythonXDataSeries *sipCpp = reinterpret_cast< ::PythonXDataSeries *>(sipCppV);
     int sipRes;
 
-#line 248 "goldencheetah.sip"
+#line 252 "goldencheetah.sip"
     sipBuffer->obj = sipSelf;
     sipBuffer->buf = sipCpp->rawDataPtr();
     sipBuffer->len = sipCpp->count() * sizeof(double);
@@ -284,7 +309,7 @@ static int getbuffer_PythonXDataSeries(PyObject *sipSelf, void *sipCppV, Py_buff
 
     Py_INCREF(sipSelf);  // need to increase the reference count
     sipRes = 0;
-#line 288 "./sipgoldencheetahPythonXDataSeries.cpp"
+#line 313 "./sipgoldencheetahPythonXDataSeries.cpp"
 
     return sipRes;
 }
@@ -295,9 +320,9 @@ static int getbuffer_PythonXDataSeries(PyObject *sipSelf, void *sipCppV, Py_buff
 extern "C" {static void releasebuffer_PythonXDataSeries(PyObject *, void *, Py_buffer *);}
 static void releasebuffer_PythonXDataSeries(PyObject *, void *, Py_buffer *)
 {
-#line 265 "goldencheetah.sip"
+#line 269 "goldencheetah.sip"
     // we do not require any special release function
-#line 301 "./sipgoldencheetahPythonXDataSeries.cpp"
+#line 326 "./sipgoldencheetahPythonXDataSeries.cpp"
 }
 #endif
 
@@ -364,6 +389,7 @@ static void *init_type_PythonXDataSeries(sipSimpleWrapper *, PyObject *sipArgs, 
 
 /* Define this type's Python slots. */
 static sipPySlotDef slots_PythonXDataSeries[] = {
+    {(void *)slot_PythonXDataSeries___iter__, iter_slot},
     {(void *)slot_PythonXDataSeries___setitem__, setitem_slot},
     {(void *)slot_PythonXDataSeries___getitem__, getitem_slot},
     {(void *)slot_PythonXDataSeries___len__, len_slot},

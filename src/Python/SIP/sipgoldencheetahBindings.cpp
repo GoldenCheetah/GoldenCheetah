@@ -6,20 +6,20 @@
 
 #include "sipAPIgoldencheetah.h"
 
-#line 334 "goldencheetah.sip"
+#line 342 "goldencheetah.sip"
 //#include "Bindings.h"
 #line 12 "./sipgoldencheetahBindings.cpp"
 
 #line 28 "goldencheetah.sip"
 #include <qstring.h>
 #line 16 "./sipgoldencheetahBindings.cpp"
-#line 134 "goldencheetah.sip"
+#line 138 "goldencheetah.sip"
 #include <qstringlist.h>
 #line 19 "./sipgoldencheetahBindings.cpp"
 #line 59 "goldencheetah.sip"
 #include "Bindings.h"
 #line 22 "./sipgoldencheetahBindings.cpp"
-#line 244 "goldencheetah.sip"
+#line 248 "goldencheetah.sip"
 #include "Bindings.h"
 #line 25 "./sipgoldencheetahBindings.cpp"
 

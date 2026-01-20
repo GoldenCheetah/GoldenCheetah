@@ -15,6 +15,31 @@
 #line 16 "./sipgoldencheetahPythonDataSeries.cpp"
 
 
+extern "C" {static PyObject *slot_PythonDataSeries___iter__(PyObject *);}
+static PyObject *slot_PythonDataSeries___iter__(PyObject *sipSelf)
+{
+     ::PythonDataSeries *sipCpp = reinterpret_cast< ::PythonDataSeries *>(sipGetCppPtr((sipSimpleWrapper *)sipSelf,sipType_PythonDataSeries));
+
+    if (!sipCpp)
+        return 0;
+
+
+    {
+        {
+            PyObject * sipRes = 0;
+
+#line 125 "goldencheetah.sip"
+        sipRes = PySeqIter_New(sipSelf);
+#line 34 "./sipgoldencheetahPythonDataSeries.cpp"
+
+            return sipRes;
+        }
+    }
+
+    return 0;
+}
+
+
 extern "C" {static int slot_PythonDataSeries___setitem__(PyObject *,PyObject *);}
 static int slot_PythonDataSeries___setitem__(PyObject *sipSelf,PyObject *sipArgs)
 {
@@ -52,7 +77,7 @@ static int slot_PythonDataSeries___setitem__(PyObject *sipSelf,PyObject *sipArgs
                 sipError = sipErrorFail;
             }
         }
-#line 56 "./sipgoldencheetahPythonDataSeries.cpp"
+#line 81 "./sipgoldencheetahPythonDataSeries.cpp"
 
             if (sipError == sipErrorFail)
                 return -1;
@@ -99,7 +124,7 @@ static PyObject *slot_PythonDataSeries___getitem__(PyObject *sipSelf,PyObject *s
             PyErr_SetString(PyExc_IndexError, "Index out of range");
             sipError = sipErrorFail;
         }
-#line 103 "./sipgoldencheetahPythonDataSeries.cpp"
+#line 128 "./sipgoldencheetahPythonDataSeries.cpp"
 
             if (sipError == sipErrorFail)
                 return 0;
@@ -135,7 +160,7 @@ static SIP_SSIZE_T slot_PythonDataSeries___len__(PyObject *sipSelf)
 
 #line 90 "goldencheetah.sip"
         sipRes = sipCpp->count;
-#line 139 "./sipgoldencheetahPythonDataSeries.cpp"
+#line 164 "./sipgoldencheetahPythonDataSeries.cpp"
 
             return sipRes;
         }
@@ -160,7 +185,7 @@ static PyObject *slot_PythonDataSeries___str__(PyObject *sipSelf)
 
 #line 86 "goldencheetah.sip"
         sipRes = new QString(sipCpp->name);
-#line 164 "./sipgoldencheetahPythonDataSeries.cpp"
+#line 189 "./sipgoldencheetahPythonDataSeries.cpp"
 
             return sipConvertFromNewType(sipRes,sipType_QString,NULL);
         }
@@ -200,7 +225,7 @@ static int getbuffer_PythonDataSeries(PyObject *sipSelf, void *sipCppV, Py_buffe
 
     Py_INCREF(sipSelf);  // need to increase the reference count
     sipRes = 0;
-#line 204 "./sipgoldencheetahPythonDataSeries.cpp"
+#line 229 "./sipgoldencheetahPythonDataSeries.cpp"
 
     return sipRes;
 }
@@ -213,7 +238,7 @@ static void releasebuffer_PythonDataSeries(PyObject *, void *, Py_buffer *)
 {
 #line 80 "goldencheetah.sip"
     // we do not require any special release function
-#line 217 "./sipgoldencheetahPythonDataSeries.cpp"
+#line 242 "./sipgoldencheetahPythonDataSeries.cpp"
 }
 #endif
 
@@ -280,6 +305,7 @@ static void *init_type_PythonDataSeries(sipSimpleWrapper *, PyObject *sipArgs, P
 
 /* Define this type's Python slots. */
 static sipPySlotDef slots_PythonDataSeries[] = {
+    {(void *)slot_PythonDataSeries___iter__, iter_slot},
     {(void *)slot_PythonDataSeries___setitem__, setitem_slot},
     {(void *)slot_PythonDataSeries___getitem__, getitem_slot},
     {(void *)slot_PythonDataSeries___len__, len_slot},

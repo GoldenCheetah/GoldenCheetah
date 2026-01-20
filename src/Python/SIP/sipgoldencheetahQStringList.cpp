@@ -6,7 +6,7 @@
 
 #include "sipAPIgoldencheetah.h"
 
-#line 134 "goldencheetah.sip"
+#line 138 "goldencheetah.sip"
 #include <qstringlist.h>
 #line 12 "./sipgoldencheetahQStringList.cpp"
 
@@ -47,7 +47,7 @@ static int convertTo_QStringList(PyObject *sipPy,void **sipCppPtrV,int *sipIsErr
 {
      ::QStringList **sipCppPtr = reinterpret_cast< ::QStringList **>(sipCppPtrV);
 
-#line 164 "goldencheetah.sip"
+#line 168 "goldencheetah.sip"
     PyObject *iter = PyObject_GetIter(sipPy);
 
     if (!sipIsErr)
@@ -128,7 +128,7 @@ static PyObject *convertFrom_QStringList(void *sipCppV, PyObject *sipTransferObj
 {
     ::QStringList *sipCpp = reinterpret_cast< ::QStringList *>(sipCppV);
 
-#line 138 "goldencheetah.sip"
+#line 142 "goldencheetah.sip"
     PyObject *l = PyList_New(sipCpp->size());
 
     if (!l)
