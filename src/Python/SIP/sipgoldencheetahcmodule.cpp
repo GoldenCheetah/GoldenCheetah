@@ -11,10 +11,10 @@
 #line 59 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/goldencheetah.sip"
 #include "Bindings.h"
 #line 12 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/build/goldencheetah/sipgoldencheetahcmodule.cpp"
-#line 244 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/goldencheetah.sip"
+#line 248 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/goldencheetah.sip"
 #include "Bindings.h"
 #line 15 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/build/goldencheetah/sipgoldencheetahcmodule.cpp"
-#line 334 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/goldencheetah.sip"
+#line 342 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/goldencheetah.sip"
 //#include "Bindings.h"
 #line 18 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/build/goldencheetah/sipgoldencheetahcmodule.cpp"
 
@@ -62,6 +62,7 @@ const char sipStrings_goldencheetah[] = {
     'p', 'r', 'o', 'c', 'e', 's', 's', 'o', 'r', 0,
     's', 'e', 'a', 's', 'o', 'n', 'P', 'm', 'c', 0,
     'B', 'i', 'n', 'd', 'i', 'n', 'g', 's', 0,
+    '_', '_', 'i', 't', 'e', 'r', '_', '_', 0,
     'a', 'c', 't', 'i', 'v', 'i', 't', 'y', 0,
     'd', 'u', 'r', 'a', 't', 'i', 'o', 'n', 0,
     's', 'e', 't', 'C', 'u', 'r', 'v', 'e', 0,

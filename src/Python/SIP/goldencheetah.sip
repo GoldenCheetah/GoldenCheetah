@@ -120,6 +120,10 @@ public:
             }
         }
         %End
+    PyObject* __iter__();
+        %MethodCode
+        sipRes = PySeqIter_New(sipSelf);
+        %End
 };
 
 //
@@ -183,7 +187,7 @@ public:
     }
 
     QStringList *ql = new QStringList;
- 
+
     for (Py_ssize_t i = 0; ; ++i)
     {
         PyErr_Clear();
@@ -226,11 +230,11 @@ public:
         sipReleaseType(t, sipType_QString, state);
         Py_DECREF(itm);
     }
- 
+
     Py_DECREF(iter);
 
     *sipCppPtr = ql;
- 
+
     return sipGetState(sipTransferObj);
 %End
 };
@@ -322,6 +326,10 @@ public:
                 PyErr_SetString(PyExc_RuntimeError, "XData series does not exist");
             }
         }
+        %End
+    PyObject* __iter__();
+        %MethodCode
+        sipRes = PySeqIter_New(sipSelf);
         %End
 };
 

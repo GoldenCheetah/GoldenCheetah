@@ -8,7 +8,7 @@
 #include "sipAPIgoldencheetah.h"
 #define slots Q_SLOTS
 
-#line 134 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/goldencheetah.sip"
+#line 138 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/goldencheetah.sip"
 #include <qstringlist.h>
 #line 12 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/build/goldencheetah/sipgoldencheetahQStringList.cpp"
 
@@ -50,7 +50,7 @@ static int convertTo_QStringList(PyObject *sipPy, void **sipCppPtrV, int *sipIsE
 {
     ::QStringList **sipCppPtr = reinterpret_cast< ::QStringList **>(sipCppPtrV);
 
-#line 164 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/goldencheetah.sip"
+#line 168 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/goldencheetah.sip"
     PyObject *iter = PyObject_GetIter(sipPy);
 
     if (!sipIsErr)
@@ -131,7 +131,7 @@ static PyObject *convertFrom_QStringList(void *sipCppV, PyObject *sipTransferObj
 {
     ::QStringList *sipCpp = reinterpret_cast< ::QStringList *>(sipCppV);
 
-#line 138 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/goldencheetah.sip"
+#line 142 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/goldencheetah.sip"
     PyObject *l = PyList_New(sipCpp->size());
 
     if (!l)

@@ -17,6 +17,31 @@
 #line 16 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/build/goldencheetah/sipgoldencheetahPythonDataSeries.cpp"
 
 
+extern "C" {static PyObject *slot_PythonDataSeries___iter__(PyObject *);}
+static PyObject *slot_PythonDataSeries___iter__(PyObject *sipSelf)
+{
+    ::PythonDataSeries *sipCpp = reinterpret_cast< ::PythonDataSeries *>(sipGetCppPtr((sipSimpleWrapper *)sipSelf, sipType_PythonDataSeries));
+
+    if (!sipCpp)
+        return SIP_NULLPTR;
+
+
+    {
+        {
+            PyObject * sipRes = SIP_NULLPTR;
+
+#line 125 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/goldencheetah.sip"
+        sipRes = PySeqIter_New(sipSelf);
+#line 34 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/build/goldencheetah/sipgoldencheetahPythonDataSeries.cpp"
+
+            return sipRes;
+        }
+    }
+
+    return 0;
+}
+
+
 extern "C" {static int slot_PythonDataSeries___setitem__(PyObject *, PyObject *);}
 static int slot_PythonDataSeries___setitem__(PyObject *sipSelf, PyObject *sipArgs)
 {
@@ -54,7 +79,7 @@ static int slot_PythonDataSeries___setitem__(PyObject *sipSelf, PyObject *sipArg
                 sipError = sipErrorFail;
             }
         }
-#line 56 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/build/goldencheetah/sipgoldencheetahPythonDataSeries.cpp"
+#line 81 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/build/goldencheetah/sipgoldencheetahPythonDataSeries.cpp"
 
             if (sipError == sipErrorFail)
                 return -1;
@@ -100,7 +125,7 @@ static PyObject *slot_PythonDataSeries___getitem__(PyObject *sipSelf, PyObject *
             PyErr_SetString(PyExc_IndexError, "Index out of range");
             sipError = sipErrorFail;
         }
-#line 102 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/build/goldencheetah/sipgoldencheetahPythonDataSeries.cpp"
+#line 127 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/build/goldencheetah/sipgoldencheetahPythonDataSeries.cpp"
 
             if (sipError == sipErrorFail)
                 return 0;
@@ -135,7 +160,7 @@ static Py_ssize_t slot_PythonDataSeries___len__(PyObject *sipSelf)
 
 #line 90 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/goldencheetah.sip"
         sipRes = sipCpp->count;
-#line 137 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/build/goldencheetah/sipgoldencheetahPythonDataSeries.cpp"
+#line 162 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/build/goldencheetah/sipgoldencheetahPythonDataSeries.cpp"
 
             return sipRes;
         }
@@ -160,7 +185,7 @@ static PyObject *slot_PythonDataSeries___str__(PyObject *sipSelf)
 
 #line 86 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/goldencheetah.sip"
         sipRes = new QString(sipCpp->name);
-#line 162 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/build/goldencheetah/sipgoldencheetahPythonDataSeries.cpp"
+#line 187 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/build/goldencheetah/sipgoldencheetahPythonDataSeries.cpp"
 
             return sipConvertFromNewType(sipRes, sipType_QString, SIP_NULLPTR);
         }
@@ -199,7 +224,7 @@ static int getbuffer_PythonDataSeries(PyObject *sipSelf, void *sipCppV, Py_buffe
 
     Py_INCREF(sipSelf);  // need to increase the reference count
     sipRes = 0;
-#line 201 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/build/goldencheetah/sipgoldencheetahPythonDataSeries.cpp"
+#line 226 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/build/goldencheetah/sipgoldencheetahPythonDataSeries.cpp"
 
     return sipRes;
 }
@@ -210,7 +235,7 @@ static void releasebuffer_PythonDataSeries(PyObject *, void *, Py_buffer *)
 {
 #line 80 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/goldencheetah.sip"
     // we do not require any special release function
-#line 212 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/build/goldencheetah/sipgoldencheetahPythonDataSeries.cpp"
+#line 237 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/build/goldencheetah/sipgoldencheetahPythonDataSeries.cpp"
 }
 
 
@@ -283,6 +308,7 @@ static void *init_type_PythonDataSeries(sipSimpleWrapper *, PyObject *sipArgs, P
 
 /* Define this type's Python slots. */
 static sipPySlotDef slots_PythonDataSeries[] = {
+    {(void *)slot_PythonDataSeries___iter__, iter_slot},
     {(void *)slot_PythonDataSeries___setitem__, setitem_slot},
     {(void *)slot_PythonDataSeries___getitem__, getitem_slot},
     {(void *)slot_PythonDataSeries___len__, len_slot},

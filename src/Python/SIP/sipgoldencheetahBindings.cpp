@@ -8,20 +8,20 @@
 #include "sipAPIgoldencheetah.h"
 #define slots Q_SLOTS
 
-#line 334 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/goldencheetah.sip"
+#line 342 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/goldencheetah.sip"
 //#include "Bindings.h"
 #line 12 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/build/goldencheetah/sipgoldencheetahBindings.cpp"
 
 #line 28 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/goldencheetah.sip"
 #include <qstring.h>
 #line 16 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/build/goldencheetah/sipgoldencheetahBindings.cpp"
-#line 134 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/goldencheetah.sip"
+#line 138 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/goldencheetah.sip"
 #include <qstringlist.h>
 #line 19 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/build/goldencheetah/sipgoldencheetahBindings.cpp"
 #line 59 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/goldencheetah.sip"
 #include "Bindings.h"
 #line 22 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/build/goldencheetah/sipgoldencheetahBindings.cpp"
-#line 244 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/goldencheetah.sip"
+#line 248 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/goldencheetah.sip"
 #include "Bindings.h"
 #line 25 "/Users/magnusgille/Documents/kod/gc/src/Python/SIP/build/goldencheetah/sipgoldencheetahBindings.cpp"
 
