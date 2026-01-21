@@ -303,6 +303,8 @@
 #define GC_NAVGROUPBY                   "<athlete-preferences>navigator/groupby"
 #define GC_SORTBY                       "<athlete-preferences>navigator/sortby"
 #define GC_SORTBYORDER                  "<athlete-preferences>navigator/sortbyorder"
+#define GC_NAVDISPLAYFILTER             "<athlete-preferences>navigator/displayfilter"
+
 // Calendar sync
 #define GC_WEBCAL_URL                   "<athlete-preferences>webcal_url"
 

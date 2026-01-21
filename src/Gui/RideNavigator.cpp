@@ -371,6 +371,13 @@ void RideNavigator::clearSearch()
     setWidth(geometry().width());  // before we update column sizes!
 }
 
+void
+RideNavigator::setDisplayFilter(RideNavFilter filter)
+{
+    searchFilter->setDisplayFilter(filter);
+    QApplication::processEvents(); // repaint/resize list view - scrollbar..
+}
+
 void RideNavigator::setWidth(int x)
 {
     // use helper function

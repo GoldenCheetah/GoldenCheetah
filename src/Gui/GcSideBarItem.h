@@ -109,6 +109,8 @@ public:
     void addAction(QAction *action);
     void addActions(QList<QAction*> actions);
 
+    QHBoxLayout* getTitleLayout() { return titleLayout; }
+
 protected:
     void paintEvent(QPaintEvent *);
     GcSubSplitter *gcSplitter;

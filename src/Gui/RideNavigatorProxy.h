@@ -629,7 +629,7 @@ class SearchFilter : public QSortFilterProxyModel
 
     public:
 
-    SearchFilter(QWidget *p) : QSortFilterProxyModel(p), searchActive(false) {}
+    SearchFilter(QWidget *p) : QSortFilterProxyModel(p), searchActive(false), rideNavFilter(RideNavFilter::ALL) {}
 
     void setSourceModel(QAbstractItemModel *model) {
         QAbstractProxyModel::setSourceModel(model);
@@ -637,10 +637,14 @@ class SearchFilter : public QSortFilterProxyModel
 
         // find the filename column
         fileIndex = -1;
+        plannedIndex = -1;
         for(int i=0; i<model->columnCount(); i++) {
             if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "filename"
                 || model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == tr("File")) {
                 fileIndex = i;
+            }
+            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "planned") {
+                plannedIndex = i;
             }
         }
 
@@ -654,17 +658,44 @@ class SearchFilter : public QSortFilterProxyModel
 
     bool filterAcceptsRow (int source_row, const QModelIndex &source_parent) const {
 
-        if (fileIndex == -1 || searchActive == false) return true; // nothing to do
+        if (fileIndex == -1 || plannedIndex == -1) return true; // nothing to do
+
+        bool keyFound = true;
+        bool display = true;
+
+        // lets get the ride nav display filter first
+        QModelIndex planned_index = model->index(source_row, plannedIndex, source_parent);
+
+        if (planned_index.isValid()) {
+            if (model->data(planned_index, Qt::DisplayRole).toBool()) {
+                if (rideNavFilter == RideNavFilter::COMPLETED) display = false; // planned row, hide if completed only
+            } else {
+                if (rideNavFilter == RideNavFilter::PLANNED) display = false; // completed activity, hide if planned only
+            }
+        }
 
         // lets get the filename
-        QModelIndex source_index = model->index(source_row, fileIndex, source_parent);
-        if (!source_index.isValid()) return true;
+        if (searchActive) {
 
-        QString key = model->data(source_index, Qt::DisplayRole).toString();
-        return strings.contains(key);
+            QModelIndex source_index = model->index(source_row, fileIndex, source_parent);
+
+            if (source_index.isValid()) {
+                QString key = model->data(source_index, Qt::DisplayRole).toString();
+                keyFound = strings.contains(key);
+            }
+        }
+
+        // combine the two filters
+        return keyFound && display;
     }
 
     public slots:
+
+    void setDisplayFilter(RideNavFilter filter) {
+        beginResetModel();
+        rideNavFilter = filter;
+        endResetModel();
+    }
 
     void setStrings(QStringList list) {
         beginResetModel();
@@ -684,6 +715,8 @@ class SearchFilter : public QSortFilterProxyModel
         QAbstractItemModel *model;
         QStringList strings;
         int fileIndex;
+        int plannedIndex;
         bool searchActive;
+        RideNavFilter rideNavFilter;
 };
 #endif
