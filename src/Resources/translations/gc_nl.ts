@@ -24445,7 +24445,7 @@ Geen ritten gevonden om te importeren.
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1322"/>
-        <source>Average Power without zero values, it gives inflated values when frecuent coasting is present</source>
+        <source>Average Power without zero values, it gives inflated values when frequent coasting is present</source>
         <translation>Gemiddelde Vermogen zonder nul-waarden, wat resulteert in hogere waarde als regelmatig gefreewheeld wordt</translation>
     </message>
 </context>

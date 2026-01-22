@@ -24867,7 +24867,7 @@ No se han encontrado actividades para importar.
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1322"/>
-        <source>Average Power without zero values, it gives inflated values when frecuent coasting is present</source>
+        <source>Average Power without zero values, it gives inflated values when frequent coasting is present</source>
         <translation>Potencia media sin considerar los ceros. Da valores artificialmente inflados cuando hay períodos frecuentes sin pedalear</translation>
     </message>
 </context>

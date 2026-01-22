@@ -24974,7 +24974,7 @@ Pas d&apos;activité trouvée à importer.
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1322"/>
-        <source>Average Power without zero values, it gives inflated values when frecuent coasting is present</source>
+        <source>Average Power without zero values, it gives inflated values when frequent coasting is present</source>
         <translation>Puissance moyenne sans valeur zéro, cela donne des valeurs gonflées en cas de fréquentes &quot;roue libre&quot;</translation>
     </message>
 </context>

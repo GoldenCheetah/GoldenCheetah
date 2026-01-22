@@ -24955,7 +24955,7 @@ Keine Aktivitäten zum Importieren gefunden.
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1322"/>
-        <source>Average Power without zero values, it gives inflated values when frecuent coasting is present</source>
+        <source>Average Power without zero values, it gives inflated values when frequent coasting is present</source>
         <translation>Durchschnittliche Leistung ohne Nullwerte. Der Wert ist groß, wenn regelmäßige Rollstrecken (ohne Leistung) vorhanden sind</translation>
     </message>
 </context>

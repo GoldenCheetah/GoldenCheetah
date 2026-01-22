@@ -24534,7 +24534,7 @@ Inga Aktiviteter att importera.
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1322"/>
-        <source>Average Power without zero values, it gives inflated values when frecuent coasting is present</source>
+        <source>Average Power without zero values, it gives inflated values when frequent coasting is present</source>
         <translation>Medeleffekt där alla värden som är noll har tagits bort, visar tex högre värden än vanliga medeleffekten om det förekommer mycket frihjulande</translation>
     </message>
 </context>

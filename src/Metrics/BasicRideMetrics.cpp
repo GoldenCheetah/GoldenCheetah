@@ -1319,7 +1319,7 @@ struct NonZeroPower : public RideMetric {
         setMetricUnits(tr("watts"));
         setImperialUnits(tr("watts"));
         setType(RideMetric::Average);
-        setDescription(tr("Average Power without zero values, it gives inflated values when frecuent coasting is present"));
+        setDescription(tr("Average Power without zero values, it gives inflated values when frequent coasting is present"));
     }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {

@@ -24393,7 +24393,7 @@ No rides found to import.
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1322"/>
-        <source>Average Power without zero values, it gives inflated values when frecuent coasting is present</source>
+        <source>Average Power without zero values, it gives inflated values when frequent coasting is present</source>
         <translation>不含零值之平均功率，若經常無踩踏滑行，其數值會偏高</translation>
     </message>
 </context>
