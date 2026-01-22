@@ -154,7 +154,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     // create the ride navs display filter
     activityFilter = new QComboBox(this);
     activityFilter->addItem(tr("All"), static_cast<int>(RideNavFilter::ALL));
-    activityFilter->addItem(tr("Completed"), static_cast<int>(RideNavFilter::COMPLETED));
+    activityFilter->addItem(tr("Actual"), static_cast<int>(RideNavFilter::COMPLETED));
     activityFilter->addItem(tr("Planned"), static_cast<int>(RideNavFilter::PLANNED));
     int index = appsettings->cvalue(context->athlete->cyclist, GC_NAVDISPLAYFILTER, "0").toInt();
     activityFilter->setCurrentIndex(index);
