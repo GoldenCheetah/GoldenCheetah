@@ -74,6 +74,7 @@ private slots:
     void confirmedCharacteristicWrite(const QLowEnergyCharacteristic &c, 
                                       const QByteArray &value);
     void serviceError(QLowEnergyService::ServiceError e);
+    void attemptReconnect();
 
 signals:
     void setNotification(QString msg, int timeout);
@@ -112,6 +113,8 @@ private:
     FtmsDeviceInformation ftmsDeviceInfo;
 
     bool connected;
+    QTimer *reconnectTimer;
+    int reconnectAttempts;
     void getCadence(QDataStream& ds);
     void getWheelRpm(QDataStream& ds);
     void setLoadErg(double);
