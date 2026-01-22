@@ -151,6 +151,21 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     splitter->addWidget(activityItem);
     splitter->addWidget(intervalItem);
 
+    // create the ride navs display filter
+    activityFilter = new QComboBox(this);
+    activityFilter->addItem(tr("All"), static_cast<int>(RideNavFilter::ALL));
+    activityFilter->addItem(tr("Actual"), static_cast<int>(RideNavFilter::COMPLETED));
+    activityFilter->addItem(tr("Planned"), static_cast<int>(RideNavFilter::PLANNED));
+    int index = appsettings->cvalue(context->athlete->cyclist, GC_NAVDISPLAYFILTER, "0").toInt();
+    activityFilter->setCurrentIndex(index);
+    setDisplayFilter(index);
+
+    // add ride navs display filter to splitter's banner
+    QHBoxLayout* splitterBanner = activityItem->splitterHandle->getTitleLayout();
+    splitterBanner->insertStretch(2);
+    splitterBanner->insertWidget(2, activityFilter);
+    splitterBanner->insertStretch(2);
+
     splitter->prepare(context->athlete->cyclist, "analysis");
 
     // GC signal
@@ -164,9 +179,17 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     connect(intervalTree,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), this, SLOT(clickZoomInterval(QTreeWidgetItem*)));
     connect(intervalTree,SIGNAL(itemSelectionChanged()), this, SLOT(itemSelectionChanged()));
 
+    connect(activityFilter, &QComboBox::currentIndexChanged, this, &AnalysisSidebar::setDisplayFilter);
     connect (context, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
 
     configChanged(CONFIG_APPEARANCE);
+}
+
+void
+AnalysisSidebar::setDisplayFilter(int index)
+{
+    appsettings->setCValue(context->athlete->cyclist, GC_NAVDISPLAYFILTER, index);
+    rideNavigator->setDisplayFilter(static_cast<RideNavFilter>(index));
 }
 
 void
@@ -332,6 +355,15 @@ AnalysisSidebar::configChanged(qint32)
     //intervalSummaryWindow->setStyleSheet(GCColor::stylesheet());
 
     splitter->setPalette(GCColor::palette());
+
+    // mimic the perspective selector colors for the activity filter
+    QColor selected;
+    if (GCColor::invertColor(GColor(CTOOLBAR)) == Qt::white) selected = QColor(Qt::lightGray);
+    else selected = QColor(Qt::darkGray);
+    activityFilter->setStyleSheet(
+        QString("QComboBox { background: %1; color: %2; border: 1px solid rgba(127,127,127,127); border-radius: 3; }")
+                .arg(GColor(CTOOLBAR).name()).arg(selected.name()));
+
     activityHistory->setStyleSheet(QString("background: %1;").arg(GColor(CPLOTBACKGROUND).name()));
     rideNavigator->tableView->viewport()->setPalette(GCColor::palette());
     rideNavigator->tableView->viewport()->setStyleSheet(QString("background: %1;").arg(GColor(CPLOTBACKGROUND).name()));

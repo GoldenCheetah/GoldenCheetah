@@ -51,6 +51,9 @@ class EditUserSeriesDialog;
 class OverviewItemConfig;
 class RideMetric;
 
+// Ride Navigator activity list display filter options 
+enum class RideNavFilter { ALL=0, COMPLETED, PLANNED };
+
 //
 // The RideNavigator
 //
@@ -157,6 +160,8 @@ class RideNavigator : public GcChartWindow
         void setWidths (QString x="") { _widths = x; resetView(); } // only reset once widths are set, witdths="" resets to default columns
 
         void resetView(); // when columns/width changes
+
+        void setDisplayFilter(RideNavFilter filter);
 
         void searchStrings(QStringList);
         void clearSearch();
