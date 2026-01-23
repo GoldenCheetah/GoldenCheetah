@@ -83,6 +83,11 @@ BT40Device::BT40Device(QObject *parent, QBluetoothDeviceInfo devinfo) : parent(p
     wheelSize = 2100;
     has_power = false;
     has_controllable_service = false;
+    
+    reconnectTimer = new QTimer(this);
+    reconnectTimer->setInterval(5000); // 5 seconds
+    connect(reconnectTimer, SIGNAL(timeout()), this, SLOT(attemptReconnect()));
+    reconnectAttempts = 0;
 }
 
 BT40Device::~BT40Device()
@@ -105,6 +110,8 @@ BT40Device::disconnectDevice()
 {
     qDebug() << "Disconnecting from device" << m_currentDevice.name() << " " << m_currentDevice.deviceUuid();
     connected = false;
+    reconnectTimer->stop();
+    reconnectAttempts = 0;
     m_control->disconnectFromDevice();
 }
 
@@ -112,6 +119,14 @@ void
 BT40Device::deviceConnected()
 {
     qDebug() << "Connected to device" << m_currentDevice.name() << " " << m_currentDevice.deviceUuid();
+    
+    // Stop reconnection timer if it's running
+    if (reconnectTimer->isActive()) {
+        reconnectTimer->stop();
+        reconnectAttempts = 0;
+        emit setNotification(tr("Reconnected to %1").arg(m_currentDevice.name()), 3);
+    }
+    
     m_control->discoverServices();
 }
 
@@ -168,7 +183,10 @@ BT40Device::deviceDisconnected()
 
     // Try to reconnect if the connection was lost inadvertently
     if (connected) {
-        this->connectDevice();
+        reconnectAttempts = 0;
+        emit setNotification(tr("Lost connection to %1, attempting to reconnect...").arg(m_currentDevice.name()), 3);
+        reconnectTimer->start();
+        attemptReconnect(); // Try immediately first
     }
 }
 
@@ -890,6 +908,23 @@ BT40Device::serviceError(QLowEnergyService::ServiceError e)
         }
         break;
     }
+}
+
+void
+BT40Device::attemptReconnect()
+{
+    if (!connected) {
+        // User manually disconnected, stop trying
+        reconnectTimer->stop();
+        reconnectAttempts = 0;
+        return;
+    }
+    
+    reconnectAttempts++;
+    qDebug() << "Reconnection attempt" << reconnectAttempts << "for device" << m_currentDevice.name();
+    emit setNotification(tr("Reconnecting to %1 (attempt %2)...").arg(m_currentDevice.name()).arg(reconnectAttempts), 3);
+    
+    this->connectDevice();
 }
 
 void
