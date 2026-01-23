@@ -23,6 +23,7 @@
 #include <QLowEnergyController>
 #include <QLowEnergyService>
 #include <QQueue>
+#include <QTimer>
 
 #include "CalibrationData.h"
 #include "Ftms.h"
