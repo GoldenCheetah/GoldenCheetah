@@ -18,6 +18,7 @@
 
 #include "BT40Device.h"
 #include <QDebug>
+#include <QTimer>
 #include "BT40Controller.h"
 #include "VMProWidget.h"
 
