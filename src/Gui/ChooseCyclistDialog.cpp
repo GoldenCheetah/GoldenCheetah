@@ -110,10 +110,13 @@ ChooseCyclistDialog::getList()
 
         QListWidgetItem *newone = new QListWidgetItem(name, listWidget);
 
-        // get avatar image if it exists
+        // get avatar image if it exists, otherwise default to noavatar.png
         QString iconpath = home.absolutePath() + "/" + name + "/config/avatar.png";
         if (QFile(iconpath).exists()) {
             QPixmap px(iconpath);
+            newone->setIcon(QIcon(px.scaled(64 *dpiXFactor,64 *dpiYFactor)));
+        } else {
+            QPixmap px(":images/noavatar.png");
             newone->setIcon(QIcon(px.scaled(64 *dpiXFactor,64 *dpiYFactor)));
         }
 
@@ -219,6 +222,9 @@ ChooseCyclistDialog::newClicked()
         QString iconpath = home.absolutePath() + "/" + name + "/config/avatar.png";
         if (QFile(iconpath).exists()) {
             QPixmap px(iconpath);
+            newone->setIcon(QIcon(px.scaled(64 *dpiXFactor,64 *dpiYFactor)));
+        } else {
+            QPixmap px(":images/noavatar.png");
             newone->setIcon(QIcon(px.scaled(64 *dpiXFactor,64 *dpiYFactor)));
         }
 
