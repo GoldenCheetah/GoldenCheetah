@@ -274,7 +274,7 @@ class MainWindow : public QMainWindow
         void mergeRide();
         void deleteRide();
         void saveRide();                        // save current ride menu item
-        void saveAllUnsavedRides();
+        void saveAllUnsavedRides(Context *);
         void revertRide();
         bool saveRideExitDialog(Context *);              // save dirty rides on exit dialog
 

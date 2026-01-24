@@ -512,7 +512,10 @@ MainWindow::MainWindow(const QDir &home)
     fileMenu->addSeparator();
     fileMenu->addAction(tr("Settings..."), this, SLOT(athleteSettings()));
     fileMenu->addSeparator();
-    fileMenu->addAction(tr("Save all modified activities"), this, SLOT(saveAllUnsavedRides()));
+    fileMenu->addAction(tr("Save all modified activities"), this, [this] () {
+        saveAllUnsavedRides(this->currentAthleteTab->context);
+    });
+
     fileMenu->addSeparator();
     QAction *actionQuit = new QAction(tr("&Quit"), fileMenu);
     actionQuit->setShortcuts(QKeySequence::Quit);
@@ -1860,15 +1863,17 @@ MainWindow::athleteSettings()
 }
 
 void
-MainWindow::saveAllUnsavedRides()
+MainWindow::saveAllUnsavedRides(Context* context)
 {
+    if (context == nullptr) return;
+
     // flush in-flight changes
-    currentAthleteTab->context->notifyMetadataFlush();
-    currentAthleteTab->context->ride->notifyRideMetadataChanged();
+    context->notifyMetadataFlush();
+    context->ride->notifyRideMetadataChanged();
 
     // save
-    if (currentAthleteTab->context->ride) {
-        saveAllFilesSilent(currentAthleteTab->context); // will signal save to everyone
+    if (context->ride) {
+        saveAllFilesSilent(context); // will signal save to everyone
     }
 }
 
@@ -2368,6 +2373,7 @@ MainWindow::switchAthleteTab(int index)
 
     setWindowTitle(currentAthleteTab->context->athlete->home->root().dirName());
 
+    athleteView->currentAthlete(currentAthleteTab->context->athlete->home->root().dirName());
 
     setUpdatesEnabled(true);
 }
