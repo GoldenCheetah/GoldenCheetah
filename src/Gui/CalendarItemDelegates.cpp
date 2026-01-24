@@ -428,7 +428,7 @@ CalendarDetailedDayDelegate::paint
             relColor = GCColor::blendedColor(relColor, bgColor);
             entryBG = relColor;
             entryFrame = relColor;
-        } else if (entry.type == ENTRY_TYPE_ACTIVITY) {
+        } else if (entry.type == ENTRY_TYPE_ACTUAL_ACTIVITY) {
             QColor overlayBG = entry.color;
             overlayBG = entry.color;
             if (GCColor::isPaletteDark(option.palette)) {
@@ -1750,8 +1750,8 @@ toolTipDayEntry(const QPoint &pos, QAbstractItemView *view, const CalendarDay &d
     if (idx >= 0 && idx < day.entries.size()) {
         CalendarEntry calEntry = day.entries[idx];
         QString status;
-        if (calEntry.type == ENTRY_TYPE_ACTIVITY) {
-            status = QObject::tr("completed");
+        if (calEntry.type == ENTRY_TYPE_ACTUAL_ACTIVITY) {
+            status = QObject::tr("actual");
         } else {
             status = QObject::tr("planned");
         }
@@ -1775,11 +1775,7 @@ toolTipDayEntry(const QPoint &pos, QAbstractItemView *view, const CalendarDay &d
         }
         if (! calEntry.linkedReference.isEmpty()) {
             QString countertype;
-            if (calEntry.type == ENTRY_TYPE_PLANNED_ACTIVITY) {
-                countertype = QObject::tr("Completed by");
-            } else {
-                countertype = QObject::tr("Planned as");
-            }
+            countertype = QObject::tr("Linked");
             tooltip += QString("<tr><td style='padding-top: %1px'><b>%2:</b></td><td style='padding-top: %1px'>%3</td></tr>").arg(6 * dpiYFactor).arg(countertype).arg(calEntry.linkedPrimary);
             if (calEntry.linkedStartDT.isValid()) {
                 QString linkedWhen;

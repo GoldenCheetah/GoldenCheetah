@@ -28,7 +28,7 @@
 #include <QColor>
 #include <utility>
 
-#define ENTRY_TYPE_ACTIVITY 0
+#define ENTRY_TYPE_ACTUAL_ACTIVITY 0
 #define ENTRY_TYPE_PLANNED_ACTIVITY 1
 #define ENTRY_TYPE_EVENT 10
 #define ENTRY_TYPE_PHASE 11

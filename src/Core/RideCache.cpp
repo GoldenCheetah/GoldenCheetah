@@ -1443,20 +1443,20 @@ RideCache::checkShiftPlannedActivities
         check.requiresUserDecision = true;
 
         QStringList plannedDirty;
-        QStringList completedDirty;
+        QStringList actualDirty;
         for (RideItem *item : check.dirtyItems) {
             if (item->planned) {
                 plannedDirty << item->fileName;
             } else {
-                completedDirty << item->fileName;
+                actualDirty << item->fileName;
             }
         }
         QString msg = tr("This operation will shift %1 planned activities.\n\n").arg(itemsToShift.count());
         if (! plannedDirty.isEmpty()) {
             msg += tr("Planned activities with unsaved changes:\n%1\n\n").arg(plannedDirty.join("\n"));
         }
-        if (! completedDirty.isEmpty()) {
-            msg += tr("Linked completed activities with unsaved changes:\n%1\n\n").arg(completedDirty.join("\n"));
+        if (! actualDirty.isEmpty()) {
+            msg += tr("Linked actual activities with unsaved changes:\n%1\n\n").arg(actualDirty.join("\n"));
         }
 
         msg += tr("All affected activities must be saved or changes discarded before shifting.");
@@ -1797,7 +1797,7 @@ RideCache::isValidLink
         return false;
     }
     if (item1->planned == item2->planned) {
-        error = tr("Cannot link two activities of the same type. One must be planned, one completed.");
+        error = tr("Cannot link two activities of the same type. One must be planned, one actual.");
         return false;
     }
     return true;

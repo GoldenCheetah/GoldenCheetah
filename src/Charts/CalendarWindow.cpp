@@ -54,7 +54,7 @@ LinkDialog::LinkDialog
 
     QLabel *introLabel = new QLabel();
     if (entry.planned) {
-        introLabel->setText(tr("Find a completed activity for:"));
+        introLabel->setText(tr("Find an actual activity for:"));
     } else {
         introLabel->setText(tr("Find a planned activity for:"));
     }
@@ -112,7 +112,7 @@ LinkDialog::LinkDialog
 
     QLabel *rangeLabel = new QLabel();
     if (entry.planned) {
-        rangeLabel->setText(tr("Show <b>completed %2</b> activities").arg(entry.sport));
+        rangeLabel->setText(tr("Show <b>actual %2</b> activities").arg(entry.sport));
     } else {
         rangeLabel->setText(tr("Show <b>planned %2</b> activities").arg(entry.sport));
     }
@@ -137,7 +137,7 @@ LinkDialog::LinkDialog
     QString emptyHeadline = tr("No matching activities found");
     QString emptyInfoline;
     if (entry.planned) {
-        emptyInfoline = tr("There are no unlinked completed %1 activities in the selected date range.").arg(entry.sport);
+        emptyInfoline = tr("There are no unlinked actual %1 activities in the selected date range.").arg(entry.sport);
     } else {
         emptyInfoline = tr("There are no unlinked planned %1 activities in the selected date range.").arg(entry.sport);
     }
@@ -1000,7 +1000,7 @@ CalendarWindow::getActivities
         activity.reference = rideItem->fileName;
         activity.start = rideItem->dateTime.time();
         activity.durationSecs = rideItem->getForSymbol("workout_time", GlobalContext::context()->useMetricUnits);
-        activity.type = rideItem->planned ? ENTRY_TYPE_PLANNED_ACTIVITY : ENTRY_TYPE_ACTIVITY;
+        activity.type = rideItem->planned ? ENTRY_TYPE_PLANNED_ACTIVITY : ENTRY_TYPE_ACTUAL_ACTIVITY;
         activity.isRelocatable = rideItem->planned;
         activity.hasTrainMode = rideItem->planned && sport == "Bike" && ! buildWorkoutFilter(rideItem).isEmpty();
         activity.dirty = rideItem->isDirty();
