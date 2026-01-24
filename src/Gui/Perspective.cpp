@@ -1889,7 +1889,7 @@ AddPerspectiveDialog::AddPerspectiveDialog(QWidget *parent, Context *context, QS
     layout->addLayout(form);
 
     if (viewType == GcViewType::VIEW_ANALYSIS || viewType == GcViewType::VIEW_TRENDS) {
-        filterEdit = new SearchBox(context, this);
+        filterEdit = new SearchBox(this, context);
         filterEdit->setFixedMode(true);
         filterEdit->setMode(SearchBox::Filter);
         filterEdit->setText(expression);

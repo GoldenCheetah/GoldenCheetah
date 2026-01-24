@@ -68,11 +68,11 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context, int position) :
     setAutoFillBackground(true);
 
     // set up the models we support
-    models << new CP2Model(context);
-    models << new CP3Model(context);
-    models << new MultiModel(context);
-    models << new ExtendedModel(context);
-    models << new WSModel(context);
+    models << new CP2Model();
+    models << new CP3Model();
+    models << new MultiModel();
+    models << new ExtendedModel();
+    models << new WSModel();
 
     // setup my axes
     // for now we limit to 4 on left and 4 on right

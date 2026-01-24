@@ -34,7 +34,7 @@ SearchFilterBox::SearchFilterBox(QWidget *parent, Context *context, bool nochoos
     contents->setContentsMargins(0,0,0,0);
 
     // no column chooser if my parent widget is a modal widget
-    searchbox = new SearchBox(context, this, nochooser);
+    searchbox = new SearchBox(this, context, nochooser);
     searchbox->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
     contents->addWidget(searchbox);
 
@@ -55,6 +55,16 @@ SearchFilterBox::SearchFilterBox(QWidget *parent, Context *context, bool nochoos
     // syntax check
     connect(datafilter, SIGNAL(parseGood()), searchbox, SLOT(setGood()));
     connect(datafilter, SIGNAL(parseBad(QStringList)), searchbox, SLOT(setBad(QStringList)));
+}
+
+void
+SearchFilterBox::setContext(Context *con)
+{
+    if (context != con) {
+        context = con;
+        searchbox->setContext(con);
+        datafilter->setContext(con);
+    }
 }
 
 // static utility function to get list of files that match a filter

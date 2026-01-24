@@ -70,7 +70,7 @@ class PDModel : public QObject, public QwtSyntheticPointData
                        LinearRegression=2         // using slope and intercept of linear regression
                      } fit;
 
-        PDModel(Context *context);
+        PDModel();
 
         // set which variant of the model to use (if the model
         // supports such a thing it needs to reimplement)
@@ -156,7 +156,6 @@ class PDModel : public QObject, public QwtSyntheticPointData
 
     protected:
 
-        Context *context;
         int model;
 
         // intervals to search for best points
@@ -210,7 +209,7 @@ class CP2Model : public PDModel
     Q_OBJECT
 
     public:
-        CP2Model(Context *context);
+        CP2Model();
 
         // synthetic data for a curve
         virtual double y(double t) const;
@@ -255,7 +254,7 @@ class CP3Model : public PDModel
     Q_OBJECT
 
     public:
-        CP3Model(Context *context);
+        CP3Model();
 
         bool modelDecay;    // should we apply CP + W' decay constants?
 
@@ -306,7 +305,7 @@ class WSModel : public PDModel // ward-smith
     Q_OBJECT
 
     public:
-        WSModel(Context *context);
+        WSModel();
 
         // synthetic data for a curve
         virtual double y(double t) const;
@@ -340,7 +339,7 @@ class MultiModel : public PDModel
     Q_OBJECT
 
     public:
-        MultiModel(Context *context);
+        MultiModel();
         void setVariant(int); // which variant to use
 
         // synthetic data for a curve
@@ -380,7 +379,7 @@ class ExtendedModel : public PDModel
     Q_OBJECT
 
     public:
-        ExtendedModel(Context *context);
+        ExtendedModel();
 
         // synthetic data for a curve
         virtual double y(double t) const;

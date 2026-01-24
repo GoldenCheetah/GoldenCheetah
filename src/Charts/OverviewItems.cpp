@@ -5363,7 +5363,7 @@ ProgressBar::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 
 }
 
-Button::Button(QGraphicsItem*parent, QString text) : QGraphicsItem(parent), text(text), state(None)
+Button::Button(QGraphicsItem*parent, QString text) : QGraphicsItem(parent), text(text), state(None), bkgdColor(GColor(CCARDBACKGROUND))
 {
     // not much really
     setZValue(11);
@@ -5386,7 +5386,7 @@ Button::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     painter->setRenderHint(QPainter::Antialiasing);
 
     // button background
-    QColor pc = GCColor::invertColor(GColor(CCARDBACKGROUND));
+    QColor pc = GCColor::invertColor(bkgdColor);
     pc.setAlpha(64);
     QPen line(pc,gl_border, Qt::SolidLine);
     line.setJoinStyle(Qt::RoundJoin);
@@ -5397,7 +5397,7 @@ Button::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         if (state==Clicked) hover.setAlpha(200);
         else hover.setAlpha(100);
         painter->setBrush(QBrush(hover));
-    } else painter->setBrush(QBrush(GColor(CCARDBACKGROUND)));
+    } else painter->setBrush(QBrush(bkgdColor));
     painter->drawRoundedRect(pos.x()+gl_border, pos.y()+gl_border, geom.width()-(gl_border*2), geom.height()-(gl_border*2), gl_radius, gl_radius);
 
     // text using large font clipped
@@ -5406,7 +5406,7 @@ Button::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         tc.setAlpha(200);
         painter->setPen(tc);
     } else {
-        QColor tc = GCColor::invertColor(GColor(CCARDBACKGROUND));
+        QColor tc = GCColor::invertColor(bkgdColor);
         tc.setAlpha(200);
         painter->setPen(tc);
     }
