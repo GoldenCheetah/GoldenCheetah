@@ -161,32 +161,33 @@ CalendarBaseTable::buildContextMenu
 (const CalendarDay &day, CalendarEntry const * const entryPtr, const QTime &time, bool canHavePhasesEvents)
 {
     QMenu *contextMenu = new QMenu(this);
+    const QString ellipsis = QStringLiteral("...");
     if (entryPtr != nullptr) {
         CalendarEntry entry = *entryPtr; // Prevent dereferencing of dangling pointer in lambdas
         switch (entry.type) {
-        case ENTRY_TYPE_ACTIVITY:
+        case ENTRY_TYPE_ACTUAL_ACTIVITY:
             if (entry.dirty) {
                 contextMenu->addAction(tr("Save changes"), this, [this, entry]() { emit saveChanges(entry); });
                 contextMenu->addAction(tr("Discard changes"), this, [this, entry]() { emit discardChanges(entry); });
                 contextMenu->addSeparator();
             }
             if (! entry.linkedReference.isEmpty()) {
-                contextMenu->addAction(tr("View planned activity..."), this, [this, entry]() {
+                contextMenu->addAction(tr("View planned activity") % ellipsis, this, [this, entry]() {
                     emit viewLinkedActivity(entry);
                 });
             }
-            contextMenu->addAction(tr("View completed activity..."), this, [this, entry]() { emit viewActivity(entry); });
+            contextMenu->addAction(tr("View actual activity") % ellipsis, this, [this, entry]() { emit viewActivity(entry); });
             contextMenu->addSeparator();
             if (entry.linkedReference.isEmpty()) {
                 contextMenu->addAction(tr("Link to planned activity"), this, [this, entry]() { emit linkActivity(entry, true); });
-                contextMenu->addAction(tr("Link to planned activity..."), this, [this, entry]() { emit linkActivity(entry, false); });
+                contextMenu->addAction(tr("Link to planned activity") % ellipsis, this, [this, entry]() { emit linkActivity(entry, false); });
             } else {
                 contextMenu->addAction(tr("Unlink from planned activity"), this, [this, entry]() { emit unlinkActivity(entry); });
             }
             contextMenu->addSeparator();
-            contextMenu->addAction(tr("Filter similar activities..."), this, [this, entry]() { emit filterSimilar(entry); });
+            contextMenu->addAction(tr("Filter similar activities") % ellipsis, this, [this, entry]() { emit filterSimilar(entry); });
             contextMenu->addSeparator();
-            contextMenu->addAction(tr("Delete completed activity"), this, [this, entry]() { emit delActivity(entry); });
+            contextMenu->addAction(tr("Delete actual activity"), this, [this, entry]() { emit delActivity(entry); });
             break;
         case ENTRY_TYPE_PLANNED_ACTIVITY:
             if (entry.dirty) {
@@ -195,34 +196,34 @@ CalendarBaseTable::buildContextMenu
                 contextMenu->addSeparator();
             }
             if (! entry.linkedReference.isEmpty()) {
-                contextMenu->addAction(tr("View completed activity..."), this, [this, entry]() { emit viewLinkedActivity(entry); });
+                contextMenu->addAction(tr("View actual activity") % ellipsis, this, [this, entry]() { emit viewLinkedActivity(entry); });
             }
-            contextMenu->addAction(tr("View planned activity..."), this, [this, entry]() { emit viewActivity(entry); });
+            contextMenu->addAction(tr("View planned activity") % ellipsis, this, [this, entry]() { emit viewActivity(entry); });
             contextMenu->addSeparator();
             if (entry.linkedReference.isEmpty()) {
-                contextMenu->addAction(tr("Mark as completed"), this, [this, entry]() { emit linkActivity(entry, true); });
-                contextMenu->addAction(tr("Mark as completed..."), this, [this, entry]() { emit linkActivity(entry, false); });
+                contextMenu->addAction(tr("Link to actual activity"), this, [this, entry]() { emit linkActivity(entry, true); });
+                contextMenu->addAction(tr("Link to actual activity") % ellipsis, this, [this, entry]() { emit linkActivity(entry, false); });
             } else {
-                contextMenu->addAction(tr("Mark as incomplete"), this, [this, entry]() { emit unlinkActivity(entry); });
+                contextMenu->addAction(tr("Unlink from actual activity"), this, [this, entry]() { emit unlinkActivity(entry); });
             }
             contextMenu->addSeparator();
             if (entry.hasTrainMode) {
-                contextMenu->addAction(tr("Show in train mode..."), this, [this, entry]() { emit showInTrainMode(entry); });
+                contextMenu->addAction(tr("Show in train mode") % ellipsis, this, [this, entry]() { emit showInTrainMode(entry); });
             }
-            contextMenu->addAction(tr("Filter similar activities..."), this, [this, entry]() { emit filterSimilar(entry); });
+            contextMenu->addAction(tr("Filter similar activities") % ellipsis, this, [this, entry]() { emit filterSimilar(entry); });
             contextMenu->addSeparator();
             contextMenu->addAction(tr("Delete planned activity"), this, [this, entry]() { emit delActivity(entry); });
             break;
         case ENTRY_TYPE_EVENT:
             if (canHavePhasesEvents) {
-                contextMenu->addAction(tr("Edit event..."), this, [this, entry]() { emit editEvent(entry); });
+                contextMenu->addAction(tr("Edit event") % ellipsis, this, [this, entry]() { emit editEvent(entry); });
                 contextMenu->addAction(tr("Delete event"), this, [this, entry]() { emit delEvent(entry); });
             }
             break;
         case ENTRY_TYPE_PHASE:
             if (canHavePhasesEvents) {
-                contextMenu->addAction(tr("Edit phase..."), this, [this, entry]() { emit editPhase(entry); });
-                contextMenu->addAction(tr("Delete phase..."), this, [this, entry]() { emit delPhase(entry); });
+                contextMenu->addAction(tr("Edit phase") % ellipsis, this, [this, entry]() { emit editPhase(entry); });
+                contextMenu->addAction(tr("Delete phase") % ellipsis, this, [this, entry]() { emit delPhase(entry); });
             }
             break;
         default:
@@ -241,7 +242,7 @@ CalendarBaseTable::buildContextMenu
             canAddPlanned = day.date >= QDate::currentDate();
         }
         if (canAddActivity) {
-            contextMenu->addAction(tr("Log activity..."), this, [this, day, time]() {
+            contextMenu->addAction(tr("Log activity") % ellipsis, this, [this, day, time]() {
                 QTime activityTime(time);
                 if (! activityTime.isValid()) {
                     activityTime = QTime::currentTime();
@@ -253,7 +254,7 @@ CalendarBaseTable::buildContextMenu
             });
         }
         if (canAddPlanned) {
-            contextMenu->addAction(tr("Plan activity..."), this, [this, day, time]() {
+            contextMenu->addAction(tr("Plan activity") % ellipsis, this, [this, day, time]() {
                 QTime activityTime(time);
                 if (! activityTime.isValid()) {
                     activityTime = QTime::currentTime();
@@ -266,12 +267,12 @@ CalendarBaseTable::buildContextMenu
         }
         if (canHavePhasesEvents) {
             contextMenu->addSeparator();
-            contextMenu->addAction(tr("Add phase..."), this, [this, day]() { emit addPhase(day.date); });
-            contextMenu->addAction(tr("Add event..."), this, [this, day]() { emit addEvent(day.date); });
+            contextMenu->addAction(tr("Add phase") % ellipsis, this, [this, day]() { emit addPhase(day.date); });
+            contextMenu->addAction(tr("Add event") % ellipsis, this, [this, day]() { emit addEvent(day.date); });
         }
         if (day.date >= QDate::currentDate()) {
             contextMenu->addSeparator();
-            contextMenu->addAction(tr("Repeat schedule..."), this, [this, day]() { emit repeatSchedule(day.date); });
+            contextMenu->addAction(tr("Repeat schedule") % ellipsis, this, [this, day]() { emit repeatSchedule(day.date); });
             bool hasPlannedActivity = false;
             for (const CalendarEntry &dayEntry : day.entries) {
                 if (dayEntry.type == ENTRY_TYPE_PLANNED_ACTIVITY) {
