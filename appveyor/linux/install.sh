@@ -38,12 +38,6 @@ cd ..
 # LIBUSB
 sudo apt-get install -qq libusb-1.0-0-dev libudev-dev
 
-# Add Python 3 with dev headers for embedding
-sudo add-apt-repository -y ppa:deadsnakes/ppa
-sudo apt-get update -qq
-sudo apt-get install -qq python3 python3-dev python3-pip
-python3 --version
-
 # GSL
 sudo apt-get -qq install libgsl-dev
 
