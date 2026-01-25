@@ -155,9 +155,8 @@ install:
 
 # Upgrade pip to ensure you have the latest version
 - cmd: python -m pip install --upgrade pip
-- sh: if ! $CI_LINUX; then export PATH="/usr/local/opt/python@${MACOS_PYTHON_VERSION}/bin:$PATH"; fi && python3 -m pip install --upgrade pip
+- sh: if ! $CI_LINUX; then export PATH="/usr/local/opt/python@${MACOS_PYTHON_VERSION}/bin:$PATH" && python3 -m pip install --upgrade pip; else export PATH=$PATH:$(python3.11-config --exec-prefix)/bin; fi
 # Install your project's dependencies from a requirements.txt file
-- sh: export PATH=$PATH:$(python3-config --exec-prefix)/bin
 - cmd: "python -m pip install --only-binary :all: -r src/Python/requirements.txt -t C:/Python/lib/site-packages"
 - sh: if ! $CI_LINUX; then export PATH="/usr/local/opt/python@${MACOS_PYTHON_VERSION}/bin:$PATH"; fi && python3 -m pip install -r src/Python/requirements.txt
 
