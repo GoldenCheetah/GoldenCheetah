@@ -158,7 +158,7 @@ install:
 - sh: if ! $CI_LINUX; then export PATH="/usr/local/opt/python@${MACOS_PYTHON_VERSION}/bin:$PATH"; fi && python3 -m pip install --upgrade pip
 # Install your project's dependencies from a requirements.txt file
 - sh: export PATH=$PATH:$(python3-config --exec-prefix)/bin
-- cmd: python -m pip install --only-binary :all: -r src\Python\requirements.txt -t C:\Python\lib\site-packages
+- cmd: "python -m pip install --only-binary :all: -r src/Python/requirements.txt -t C:/Python/lib/site-packages"
 - sh: if ! $CI_LINUX; then export PATH="/usr/local/opt/python@${MACOS_PYTHON_VERSION}/bin:$PATH"; fi && python3 -m pip install -r src/Python/requirements.txt
 
 before_build:
