@@ -131,10 +131,11 @@ install:
 
 # Get Python and add to config
 - ps: >-
-    if ($isWindows -And -not (Test-Path 'C:\Python3\python.exe')) {
+    if ($isWindows -And -not (Test-Path 'C:\Python')) {
       $pyurl = "https://www.python.org/ftp/python/3.11.9/python-3.11.9-embed-amd64.zip"
       Start-FileDownload $pyurl "python-embed.zip"
       Expand-Archive -Path python-embed.zip -DestinationPath C:\Python -Force
+      mkdir C:\Python\lib\site-packages
       # Enable pip in embedded Python
       (Get-Content C:\Python\python311._pth) -replace '#import site', 'import site' | Set-Content C:\Python\python311._pth
       Start-FileDownload "https://bootstrap.pypa.io/get-pip.py" "get-pip.py"
@@ -157,7 +158,7 @@ install:
 - sh: if ! $CI_LINUX; then export PATH="/usr/local/opt/python@${MACOS_PYTHON_VERSION}/bin:$PATH"; fi && python3 -m pip install --upgrade pip
 # Install your project's dependencies from a requirements.txt file
 - sh: export PATH=$PATH:$(python3-config --exec-prefix)/bin
-- cmd: "python -m pip install --only-binary :all: -r src/Python/requirements.txt"
+- cmd: "python -m pip install --only-binary :all: -r src/Python/requirements.txt -t C:\Python\lib\site-packages"
 - sh: if ! $CI_LINUX; then export PATH="/usr/local/opt/python@${MACOS_PYTHON_VERSION}/bin:$PATH"; fi && python3 -m pip install -r src/Python/requirements.txt
 
 before_build:
