@@ -46,9 +46,6 @@ sudo add-apt-repository -y ppa:deadsnakes/ppa
 sudo apt-get update -qq
 sudo apt-get install -qq python3.11 python3.11-dev python3.11-venv
 python3.11 --version
-sudo ln -f -s /usr/bin/python3.11 /usr/bin/python3
-sudo ln -f -s /usr/bin/python3.11-config /usr/bin/python3-config
-
 
 # Install fuse2 required to run older AppImages, and patchelf to fix QtWebEngineProcess
 sudo add-apt-repository -y universe
