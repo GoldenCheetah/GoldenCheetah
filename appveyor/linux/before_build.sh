@@ -33,6 +33,7 @@ sed -i "s|#\(SAMPLERATE_INSTALL =\).*|\1 /usr|" src/gcconfig.pri
 sed -i "s|#\(SRMIO_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
 # Python
 sed -i "s|#\(DEFINES += GC_WANT_PYTHON\).*|\1|" src/gcconfig.pri
+sed -i "s|python3-config|python3.11-config|" src/gcconfig.pri
 # GSL
 sed -i "s|#GSL_LIBS =.*|GSL_LIBS = -lgsl -lgslcblas -lm|" src/gcconfig.pri
 
