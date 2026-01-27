@@ -278,6 +278,7 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
  #ifdef Q_OS_LINUX
                                      "import os\n"
                                      "sys.setdlopenflags(os.RTLD_NOW | os.RTLD_DEEPBIND)\n"
+                                     "sys.path.append(sys.prefix+'/lib/python3.'+str(sys.version_info.minor)+'/site-packages')\n"
  #endif
                                      "class CatchOutErr:\n"
                                      "    def __init__(self):\n"
