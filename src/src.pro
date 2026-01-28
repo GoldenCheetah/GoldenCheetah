@@ -40,14 +40,6 @@ QT += xml sql network svg  widgets concurrent serialport multimedia multimediawi
       webenginecore webenginewidgets webchannel positioning webenginequick core5compat
 CONFIG += c++17
 
-###==========================
-### PRECOMPILED HEADER
-###==========================
-PRECOMPILED_HEADER = stable.h
-CONFIG += precompile_header
-
-
-
 ###=======================================================================
 ### Directory Structure - Split into subdirs to be more manageable
 ###=======================================================================
@@ -104,15 +96,11 @@ LIBS += $${GSL_LIBS}
 
 # Microsoft Visual Studion toolchain dependencies
 win32-msvc* {
-
     # we need windows kit 8.2 or higher with MSVC, offer default location
     isEmpty(WINKIT_INSTALL) WINKIT_INSTALL= "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64"
     LIBS += -L$${WINKIT_INSTALL} -lGdi32 -lUser32
     CONFIG += force_debug_info
-
-
 } else {
-
     # gnu toolchain wants math libs
     LIBS += -lm
 
@@ -151,13 +139,7 @@ macx {
     # otherwise we have a blank videowindow, it will do nothing
     HEADERS += Train/VideoWindow.h
     SOURCES += Train/VideoWindow.cpp
-
-    # PCH crashes clang if we have multiple -arch flags (universal binary)
-    message("Disabling Precompiled Headers on macOS to avoid multi-arch Clang errors.")
-    CONFIG -= precompile_header
-
 } else {
-
     # not on mac we need our own full screen support and segment control button
     HEADERS += Gui/QTFullScreen.h
     SOURCES += Gui/QTFullScreen.cpp
@@ -226,40 +208,29 @@ RESOURCES = $${PWD}/Resources/application.qrc
 ### OPTIONAL => Embed Python
 ###=========================
 
-notsupported = "INFO: Embedded Python requires version QT >= 6.5.3, no support for"
-notsupported += $${QT_VERSION}
-
 contains(DEFINES, "GC_WANT_PYTHON") {
+    message("Enabling Python support")
+    INCLUDEPATH += $$replace(PYTHONINCLUDES, ^-I, )
+    LIBS += $${PYTHONLIBS}
 
-            # add Python subdirectory to include path
-            INCLUDEPATH += ./Python
+    # add Python subdirectory to include path
+    INCLUDEPATH += ./Python
+    DEFINES += SIP_STATIC_MODULE
 
-            DEFINES += SIP_STATIC_MODULE
-            !isEmpty(PYTHONINCLUDES) QMAKE_CXXFLAGS += $${PYTHONINCLUDES}
-            LIBS += $${PYTHONLIBS}
+    ## Python integration & SIP files
+    HEADERS += $$files(Python/SIP/sip*.h) Python/SIP/Bindings.h
+    SOURCES += $$files(Python/SIP/sip*.c)
+    SOURCES += $$files(Python/SIP/sip*.cpp) Python/SIP/Bindings.cpp
 
-            ## Python integration
-            HEADERS += Python/PythonEmbed.h Charts/PythonChart.h Python/PythonSyntax.h
-            SOURCES += Python/PythonEmbed.cpp Charts/PythonChart.cpp Python/PythonSyntax.cpp
+    ## Python Embedding & Charts
+    HEADERS += Python/PythonEmbed.h Python/PythonSyntax.h Charts/PythonChart.h
+    SOURCES += Python/PythonEmbed.cpp Python/PythonSyntax.cpp Charts/PythonChart.cpp
 
-            ## Python SIP generated module
-            SOURCES += Python/SIP/sipgoldencheetahBindings.cpp Python/SIP/sipgoldencheetahcmodule.cpp
-            SOURCES += Python/SIP/Bindings.cpp
-
-            ## SIP type conversion
-            SOURCES += Python/SIP/sipgoldencheetahQString.cpp
-            SOURCES += Python/SIP/sipgoldencheetahQStringList.cpp
-            SOURCES += Python/SIP/sipgoldencheetahPythonDataSeries.cpp \
-                       Python/SIP/sipgoldencheetahPythonXDataSeries.cpp
-            DEFINES += GC_HAVE_PYTHON
-
-            ## Python data processors
-            HEADERS += FileIO/FixPyScriptsDialog.h FileIO/FixPySettings.h FileIO/FixPyRunner.h \
-                       FileIO/FixPyScript.h FileIO/FixPyDataProcessor.h
-
-            SOURCES += FileIO/FixPyScriptsDialog.cpp FileIO/FixPySettings.cpp FileIO/FixPyRunner.cpp \
-                       FileIO/FixPyDataProcessor.cpp
-
+    ## Python data processors
+    HEADERS += FileIO/FixPyScriptsDialog.h FileIO/FixPySettings.h FileIO/FixPyRunner.h \
+                FileIO/FixPyScript.h FileIO/FixPyDataProcessor.h
+    SOURCES += FileIO/FixPyScriptsDialog.cpp FileIO/FixPySettings.cpp FileIO/FixPyRunner.cpp \
+                FileIO/FixPyDataProcessor.cpp
 }
 
 ###====================
@@ -614,7 +585,7 @@ HEADERS += Cloud/CalendarDownload.h Cloud/CloudService.h \
            Cloud/AddCloudWizard.h Cloud/Withings.h Cloud/MeasuresDownload.h Cloud/Xert.h \
            Cloud/Azum.h
 
-# core data 
+# core data
 HEADERS += Core/Athlete.h Core/Context.h Core/DataFilter.h Core/FreeSearch.h Core/GcCalendarModel.h Core/GcUpgrade.h \
            Core/IdleTimer.h Core/IntervalItem.h Core/NamedSearch.h Core/RideCache.h Core/RideCacheModel.h Core/RideDB.h \
            Core/RideItem.h Core/Route.h Core/RouteParser.h Core/Season.h Core/SeasonDialogs.h Core/Seasons.h Core/Secrets.h Core/Settings.h \
@@ -829,8 +800,19 @@ DEFERRES += Core/RouteWindow.h Core/RouteWindow.cpp Core/RouteItem.h Core/RouteI
 OTHER_FILES +=   Resources/python/library.py Python/SIP/goldencheetah.sip
 
 
+###==========================
+### PRECOMPILED HEADER
+###==========================
+macx {
+    message("Disabling Precompiled Headers on macOS to avoid multi-arch Clang errors.")
+} else {
+    message("Enabling precompile_header")
+    PRECOMPILED_HEADER = stable.h
+    CONFIG += precompile_header
+}
+
 ###============================================================================
-### FIX: Disable Precompiled Header for C files
+### Disable Precompiled Header for C files
 ### The PCH contains C++ specific headers (Qt, STL) which causes compilation errors
 ### when the PCH is forced upon C files by gcc.
 ###============================================================================
@@ -840,5 +822,3 @@ for(src, SOURCES) {
         eval($${src}.CONFIG -= precompile_header)
     }
 }
-
-

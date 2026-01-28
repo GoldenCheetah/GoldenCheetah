@@ -61,7 +61,6 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
 {
     QStringList names; names << QString("python3.%1").arg(PYTHON3_VERSION) << QString("bin/python3.%1").arg(PYTHON3_VERSION) << "python3" << "bin/python3" << "python" << "bin/python";
     QString pythonbinary;
-
     if (PYTHONHOME=="") {
 
         // where to check
@@ -127,6 +126,16 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
                     "quit()\n").arg(PATHSEP);
     py.setArguments(args);
     py.setProcessChannelMode(QProcess::ForwardedErrorChannel);
+
+    // If checking a specific PYTHONHOME (e.g. bundled), ensure the process uses it
+    // and doesn't get confused by local user environment variables.
+    if (!PYTHONHOME.isEmpty()) {
+        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+        env.insert("PYTHONHOME", PYTHONHOME);
+        env.remove("PYTHONPATH"); // Ensure isolation from user's python libs
+        py.setProcessEnvironment(env);
+    }
+
     py.start();
 
     // failed to start python
@@ -154,6 +163,7 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
 
     // scan output
     QRegExp contents("^ZZ(.*)ZZ.*ZZ(.*)ZZ.*ZZ(.*)ZZ.*$");
+    printd("Output: %s\n", output.toStdString().c_str());
     if (contents.exactMatch(output)) {
         QString vmajor=contents.cap(1);
         QString vminor=contents.cap(2);
@@ -161,7 +171,8 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
 
         // check its Python 3 matching the version used for build
         if (vmajor.toInt() != 3 || vminor.toInt() != PYTHON3_VERSION) {
-            printd( "%s is not version 3.%d, it's version %d.%d\n", pythonbinary.toStdString().c_str(), PYTHON3_VERSION, vmajor.toInt(), vminor.toInt());
+            fprintf(stderr, "Python version mismatch: GoldenCheetah was built with Python 3.%d, but found Python %d.%d at %s\n",
+                    PYTHON3_VERSION, vmajor.toInt(), vminor.toInt(), pythonbinary.toStdString().c_str());
             return false;
         }
 
@@ -267,6 +278,7 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
  #ifdef Q_OS_LINUX
                                      "import os\n"
                                      "sys.setdlopenflags(os.RTLD_NOW | os.RTLD_DEEPBIND)\n"
+                                     "sys.path.append(sys.prefix+'/lib/python3.'+str(sys.version_info.minor)+'/site-packages')\n"
  #endif
                                      "class CatchOutErr:\n"
                                      "    def __init__(self):\n"
@@ -314,13 +326,15 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
     } // pythonInstalled == true
 
     // if we get here loading failed
-    printd("Embedding failed\n");
-    // Only inform the user if Python embedding is enabled
-    if (appsettings->value(NULL, GC_EMBED_PYTHON, false).toBool()) {
-        QMessageBox msg(QMessageBox::Information, QObject::tr("Python not installed or in path"), QObject::tr("Python v3.%1 is required for Python embedding.\nPython disabled in preferences.").arg(PYTHON3_VERSION));
-        msg.exec();
-    }
-    appsettings->setValue(GC_EMBED_PYTHON, false);
+    fprintf(stderr, "Python embedding failed. GoldenCheetah requires Python 3.%d installed and in PATH.\n", PYTHON3_VERSION);
+    // Notify user of the problem (they can disable Python in preferences if they don't want to see this)
+    // Note: We don't permanently disable Python here - the user might fix the issue (install Python,
+    // fix PYTHONHOME, etc.) and we should try again on next startup.
+    QMessageBox msg(QMessageBox::Warning, QObject::tr("Python not available"),
+                    QObject::tr("GoldenCheetah was built with Python 3.%1 but could not initialize Python.\n\n"
+                                "Please ensure Python 3.%1 is installed and in your PATH.\n"
+                                "You can disable Python in Options > General if you don't need it.").arg(PYTHON3_VERSION));
+    msg.exec();
     loaded=false;
     return;
 }
