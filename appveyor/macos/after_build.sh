@@ -3,7 +3,7 @@ set -ev
 cd src
 
 # Ensure we use the correct Python binary
-PYTHON_VER=${MACOS_PYTHON_VERSION}
+PYTHON_VER=${PYTHON_VERSION}
 # Homebrew install location
 BREW_PYTHON_ROOT=`brew --prefix python@${PYTHON_VER}`
 export PATH="${BREW_PYTHON_ROOT}/bin:$PATH"

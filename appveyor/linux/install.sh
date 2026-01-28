@@ -41,11 +41,11 @@ sudo apt-get install -qq libusb-1.0-0-dev libudev-dev
 # GSL
 sudo apt-get -qq install libgsl-dev
 
-# Python 3.11 for embedding
+# Python ${PYTHON_VERSION} for embedding
 sudo add-apt-repository -y ppa:deadsnakes/ppa
 sudo apt-get update -qq
-sudo apt-get install -qq python3.11 python3.11-dev python3.11-venv
-python3.11 --version
+sudo apt-get install -qq python{$PYTHON_VERSION} python{$PYTHON_VERSION}-dev python{$PYTHON_VERSION}-venv
+python{$PYTHON_VERSION} --version
 
 # Install fuse2 required to run older AppImages, and patchelf to fix QtWebEngineProcess
 sudo add-apt-repository -y universe

@@ -44,9 +44,9 @@ if [ -z "$(ls -A D2XX)" ]; then
 fi
 sudo cp D2XX/libftd2xx.1.4.24.dylib /usr/local/lib
 
-# Python ${MACOS_PYTHON_VERSION} for embedding (system Python is too old for sip-tools)
-brew install python@${MACOS_PYTHON_VERSION}
-export PATH="/usr/local/opt/python@${MACOS_PYTHON_VERSION}/bin:$PATH"
+# Python ${PYTHON_VERSION} for embedding (system Python is too old for sip-tools)
+brew install python@${PYTHON_VERSION}
+export PATH="/usr/local/opt/python@${PYTHON_VERSION}/bin:$PATH"
 python3 --version
 
 # Note: Python packages are installed in appveyor.yml via pip install -r requirements.txt
