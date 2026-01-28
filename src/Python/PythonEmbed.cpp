@@ -278,7 +278,6 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
  #ifdef Q_OS_LINUX
                                      "import os\n"
                                      "sys.setdlopenflags(os.RTLD_NOW | os.RTLD_DEEPBIND)\n"
-                                     "sys.path.append(sys.prefix+'/lib/python3.'+str(sys.version_info.minor)+'/site-packages')\n"
  #endif
                                      "class CatchOutErr:\n"
                                      "    def __init__(self):\n"
@@ -295,6 +294,15 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
 
             printd("Install stdio catcher\n");
             PyRun_SimpleString(stdOutErr.c_str()); //invoke code to redirect
+
+ #ifdef Q_OS_LINUX
+            // ensure site-packages is in path when using deployed Python on Linux
+            if (PYTHONHOME == deployedPython) {
+                std::string ensureSitePackages = ("import sys\n"
+                                                  "sys.path.append(sys.prefix+'/lib/python3.'+str(sys.version_info.minor)+'/site-packages')\n");
+                PyRun_SimpleString(ensureSitePackages.c_str()); //invoke code
+            }
+ #endif
 
             // now load the library
             printd("Load library.py\n");
