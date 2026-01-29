@@ -22,6 +22,8 @@
 #include "GoldenCheetah.h"
 #include "NewSideBar.h"
 
+#include <memory>
+
 #include <QDir>
 #include <QSqlDatabase>
 #include <QtGui>
@@ -104,6 +106,8 @@ class MainWindow : public QMainWindow
         void switchPerspective(int index);
 
         bool isStarting() const;
+
+        bool filenameWillChange(RideItem *rideItem, QString *newName = nullptr) const;
 
     protected:
 
@@ -193,6 +197,8 @@ class MainWindow : public QMainWindow
         // Search / Filter
         void setFilter(QStringList);
         void clearFilter();
+        void fillinFilter(const QString &filterText);
+        void fillinSearch(const QString &searchText);
 
         void selectAthlete();
         void selectTrends();
@@ -275,8 +281,6 @@ class MainWindow : public QMainWindow
         // autoload rides from athlete specific directory (preferences)
         void ridesAutoImport();
 
-        void onEditMenuAboutToShow();
-
 #ifdef GC_HAS_CLOUD_DB
         // CloudDB actions
         void cloudDBuserEditChart();
@@ -292,6 +296,7 @@ class MainWindow : public QMainWindow
         void restoreGCState(Context *);
 
         void configChanged(qint32);
+        void onEditMenuAboutToShow();
 
     private:
 
@@ -352,8 +357,7 @@ class MainWindow : public QMainWindow
         QAction *checkAction;
 
         // Miscellany
-        QSignalMapper *toolMapper = nullptr;
-
+        std::unique_ptr<QSignalMapper> toolMapper;
 #ifdef GC_HAS_CLOUD_DB
         CloudDBVersionClient *versionClient;
         CloudDBTelemetryClient *telemetryClient;

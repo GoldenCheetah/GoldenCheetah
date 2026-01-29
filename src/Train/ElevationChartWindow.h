@@ -21,7 +21,7 @@ namespace elevationChart {
 
     public:
         explicit BubbleWidget(double deltaSeconds_, QWidget *parent = nullptr) :
-            deltaSeconds(deltaSeconds_), QWidget(parent), m_rtData(nullptr), m_ergFileAdapter(nullptr)
+            QWidget(parent), deltaSeconds(deltaSeconds_), m_rtData(nullptr), m_ergFileAdapter(nullptr)
         {
             // Set a size policy to allow resizing
             setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -32,9 +32,9 @@ namespace elevationChart {
         void setErgFileAdapter(ErgFileQueryAdapter *ergFileAdapter) { m_ergFileAdapter = ergFileAdapter; }
 
     private:
+        double deltaSeconds;
         RealtimeData *m_rtData;
         ErgFileQueryAdapter *m_ergFileAdapter;
-        double deltaSeconds;
 
     protected:
         void paintEvent(QPaintEvent *event) override;

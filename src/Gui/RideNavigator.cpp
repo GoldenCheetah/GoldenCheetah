@@ -371,6 +371,13 @@ void RideNavigator::clearSearch()
     setWidth(geometry().width());  // before we update column sizes!
 }
 
+void
+RideNavigator::setDisplayFilter(RideNavFilter filter)
+{
+    searchFilter->setDisplayFilter(filter);
+    QApplication::processEvents(); // repaint/resize list view - scrollbar..
+}
+
 void RideNavigator::setWidth(int x)
 {
     // use helper function
@@ -658,11 +665,9 @@ RideNavigator::setColumnWidth(int x, bool resized, int logicalIndex, int oldWidt
 
     // is it narrower than the headings?
     int headwidth=0;
-    int n=0;
     for (int i=1; i<tableView->header()->count(); i++)
         if (tableView->header()->isSectionHidden(i) == false) {
             headwidth += tableView->columnWidth(i);
-            n++;
         }
 
     if (!resized) {

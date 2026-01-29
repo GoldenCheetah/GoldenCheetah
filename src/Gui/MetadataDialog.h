@@ -59,9 +59,11 @@ class MetadataDialog : public QDialog
 
     private:
 
+        Context *context_ = nullptr;
+
         bool isTime = false; // when we edit metrics but they are really times
         QPoint pos_;
-        Context *context_ = nullptr;
+
         FieldDefinition field_;
         QCompleter* completer_ = nullptr;
 

@@ -31,6 +31,8 @@
 #include "HrZones.h"
 #include "PaceZones.h"
 
+#include "ErgFile.h"
+
 #include "JsonRideFile.h" // for DATETIME_FORMAT
 
 #ifdef SLOW_REFRESH
@@ -364,6 +366,17 @@ RideCache::removeRide(const QString& filenameToDelete) {
     if (!todelete) {
         qDebug()<<"ERROR: delete not found.";
         return false;
+    }
+
+    // If this activity is linked, unlink it first
+    if (todelete->hasLinkedActivity()) {
+        QString linkedFileName = todelete->getLinkedFileName();
+        RideItem *linkedItem = getLinkedActivity(todelete);
+        if (linkedItem) {
+            linkedItem->clearLinkedFileName();
+            QString error;
+            saveActivity(linkedItem, error);
+        }
     }
 
     // dataprocessor runs on "save" which is a short
@@ -776,6 +789,20 @@ RideCache::getRide(QString filename)
     return NULL;
 }
 
+
+RideItem*
+RideCache::getRide
+(const QString &filename, bool planned)
+{
+    for (RideItem *rideItem : rides()) {
+        if (rideItem != nullptr && rideItem->planned == planned && rideItem->fileName == filename) {
+            return rideItem;
+        }
+    }
+    return nullptr;
+}
+
+
 RideItem *
 RideCache::getRide(QDateTime dateTime)
 {
@@ -879,6 +906,953 @@ RideCache::isMetricRelevantForRides(Specification specification,
 
     return false;
 }
+
+
+RideCache::OperationPreCheck
+RideCache::checkLinkActivities
+(RideItem *item1, RideItem *item2)
+{
+    OperationPreCheck check;
+
+    if (! isValidLink(item1, item2, check.blockingReason)) {
+        check.canProceed = false;
+        return check;
+    }
+    if (item1->hasLinkedActivity()) {
+        check.canProceed = false;
+        check.blockingReason = tr("%1 is already linked to %2").arg(item1->fileName).arg(item1->getLinkedFileName());
+        return check;
+    }
+    if (item2->hasLinkedActivity()) {
+        check.canProceed = false;
+        check.blockingReason = tr("%1 is already linked to %2").arg(item2->fileName).arg(item2->getLinkedFileName());
+        return check;
+    }
+
+    check.affectedItems << item1 << item2;
+    if (item1->isDirty()) {
+        check.dirtyItems << item1;
+    }
+    if (item2->isDirty()) {
+        check.dirtyItems << item2;
+    }
+    if (! check.dirtyItems.isEmpty()) {
+        check.requiresUserDecision = true;
+        QStringList dirtyNames;
+        for (RideItem *item : check.dirtyItems) {
+            dirtyNames << item->fileName;
+        }
+        check.warningMessage = tr(
+            "The following activities have unsaved changes:\n%1\n\n"
+            "Linking will modify both activities. You must save or discard changes first.")
+            .arg(dirtyNames.join("\n"));
+    }
+
+    return check;
+}
+
+
+RideCache::OperationResult
+RideCache::linkActivities
+(RideItem *item1, RideItem *item2)
+{
+    OperationResult result;
+
+    item1->setLinkedFileName(item2->fileName);
+    item2->setLinkedFileName(item1->fileName);
+
+    result.success = true;
+    result.affectedCount = 2;
+
+    emit itemChanged(item1);
+    emit itemChanged(item2);
+
+    return result;
+}
+
+
+RideCache::OperationPreCheck
+RideCache::checkUnlinkActivity
+(RideItem *item)
+{
+    OperationPreCheck check;
+
+    if (! item) {
+        check.canProceed = false;
+        check.blockingReason = tr("No activity given");
+        return check;
+    }
+    QString linkedFileName = item->getLinkedFileName();
+    if (linkedFileName.isEmpty()) {
+        check.canProceed = false;
+        check.blockingReason = tr("Activity is not linked");
+        return check;
+    }
+    RideItem *linkedItem = getLinkedActivity(item);
+    if (! linkedItem) {
+        check.canProceed = false;
+        check.blockingReason = tr("Linked activity not found: %1").arg(linkedFileName);
+        return check;
+    }
+
+    check.affectedItems << item << linkedItem;
+    if (item->isDirty()) {
+        check.dirtyItems << item;
+    }
+    if (linkedItem->isDirty()) {
+        check.dirtyItems << linkedItem;
+    }
+    if (! check.dirtyItems.isEmpty()) {
+        check.requiresUserDecision = true;
+        QStringList dirtyNames;
+        for (RideItem *item : check.dirtyItems) {
+            dirtyNames << item->fileName;
+        }
+        check.warningMessage = tr(
+            "The following activities have unsaved changes:\n%1\n\n"
+            "Unlinking will modify both activities. You must save or discard changes first.")
+            .arg(dirtyNames.join("\n"));
+    }
+
+    return check;
+}
+
+
+RideCache::OperationResult
+RideCache::unlinkActivity
+(RideItem *item)
+{
+    OperationResult result;
+
+    RideItem *linkedItem = getLinkedActivity(item);
+
+    linkedItem->clearLinkedFileName();
+    item->clearLinkedFileName();
+
+    result.success = true;
+    result.affectedCount = 2;
+
+    emit itemChanged(item);
+    emit itemChanged(linkedItem);
+
+    return result;
+}
+
+
+RideCache::OperationPreCheck
+RideCache::checkUnlinkActivities
+(const QList<RideItem*> &items)
+{
+    OperationPreCheck batchCheck;
+
+    if (items.isEmpty()) {
+        batchCheck.canProceed = false;
+        batchCheck.blockingReason = tr("No activities given");
+        return batchCheck;
+    }
+
+    QSet<RideItem*> processedItems;
+    for (RideItem *item : items) {
+        if (! item || processedItems.contains(item)) {
+            continue;
+        }
+        OperationPreCheck itemCheck = checkUnlinkActivity(item);
+        if (! itemCheck.canProceed) {
+            continue;
+        }
+        batchCheck.affectedItems.append(itemCheck.affectedItems);
+        batchCheck.dirtyItems.append(itemCheck.dirtyItems);
+        for (RideItem *affectedItem : itemCheck.affectedItems) {
+            processedItems.insert(affectedItem);
+        }
+    }
+    if (batchCheck.affectedItems.isEmpty()) {
+        batchCheck.canProceed = false;
+        batchCheck.blockingReason = tr("No valid linked activities to unlink");
+        return batchCheck;
+    }
+    if (! batchCheck.dirtyItems.isEmpty()) {
+        batchCheck.requiresUserDecision = true;
+        QStringList dirtyNames;
+        for (RideItem *item : batchCheck.dirtyItems) {
+            dirtyNames << item->fileName;
+        }
+        batchCheck.warningMessage = tr(
+            "The following activities have unsaved changes:\n%1\n\n"
+            "Unlinking will modify these activities. You must save or discard changes first.")
+            .arg(dirtyNames.join("\n"));
+    }
+
+    return batchCheck;
+}
+
+
+RideCache::OperationResult
+RideCache::unlinkActivities
+(const QList<RideItem*> &items)
+{
+    OperationResult batchResult;
+    QSet<RideItem*> processedItems;
+
+    for (RideItem *item : items) {
+        if (! item || processedItems.contains(item)) {
+            continue;
+        }
+        RideItem *linkedItem = getLinkedActivity(item);
+        if (! linkedItem) {
+            continue;
+        }
+        if (processedItems.contains(linkedItem)) {
+            continue;
+        }
+        OperationResult itemResult = unlinkActivity(item);
+        if (itemResult.success) {
+            batchResult.affectedCount += itemResult.affectedCount;
+            processedItems.insert(item);
+            processedItems.insert(linkedItem);
+        }
+    }
+    batchResult.success = (batchResult.affectedCount > 0);
+    return batchResult;
+}
+
+
+RideCache::OperationPreCheck
+RideCache::checkMoveActivity
+(RideItem *item, const QDateTime &newDateTime)
+{
+    OperationPreCheck check;
+
+    if (! item) {
+        check.canProceed = false;
+        check.blockingReason = tr("No activity given");
+        return check;
+    }
+    if (! newDateTime.isValid()) {
+        check.canProceed = false;
+        check.blockingReason = tr("Invalid date/time specified");
+        return check;
+    }
+
+    QFileInfo oldInfo(item->fileName);
+    QString newFileName = newDateTime.toString("yyyy_MM_dd_HH_mm_ss") + "." + oldInfo.suffix();
+    QString newPath = (item->planned ? plannedDirectory : directory).canonicalPath() + "/" + newFileName;
+    if (QFile::exists(newPath)) {
+        check.canProceed = false;
+        check.blockingReason = tr("Target file already exists: %1").arg(newFileName);
+        return check;
+    }
+    check.affectedItems << item;
+    if (item->isDirty()) {
+        check.dirtyItems << item;
+    }
+
+    RideItem *linkedItem = getLinkedActivity(item);
+    if (linkedItem) {
+        check.affectedItems << linkedItem;
+        if (linkedItem->isDirty()) {
+            check.dirtyItems << linkedItem;
+        }
+    }
+    if (! check.dirtyItems.isEmpty()) {
+        check.requiresUserDecision = true;
+        QStringList dirtyNames;
+        for (RideItem *dirtyItem : check.dirtyItems) {
+            dirtyNames << dirtyItem->fileName;
+        }
+        check.warningMessage = tr(
+            "The following activities have unsaved changes:\n%1\n\n"
+            "Moving will update the link reference. You must save or discard changes first.")
+            .arg(dirtyNames.join("\n"));
+    }
+    return check;
+}
+
+
+RideCache::OperationResult
+RideCache::moveActivity
+(RideItem *item, const QDateTime &newDateTime)
+{
+    OperationResult result;
+
+    QString oldFileName = item->fileName;
+    QDateTime oldDateTime = item->dateTime;
+
+    QFileInfo oldInfo(oldFileName);
+    QString newFileName = newDateTime.toString("yyyy_MM_dd_HH_mm_ss") + "." + oldInfo.suffix();
+
+    RideFile *ride = item->ride(true);
+    if (! ride) {
+        result.error = tr("Failed to open activity file");
+        return result;
+    }
+
+    item->setStartTime(newDateTime);
+    ride->setTag("Year", newDateTime.toString("yyyy"));
+    ride->setTag("Month", newDateTime.toString("MMMM"));
+    ride->setTag("Weekday", newDateTime.toString("ddd"));
+    item->metadata_.insert("Calendar Text", GlobalContext::context()->rideMetadata->calendarText(item));
+    item->close();
+
+    QString renameError;
+    if (! renameRideFiles(oldFileName, newFileName, item->planned, renameError)) {
+        item->dateTime = oldDateTime;
+        item->fileName = oldFileName;
+        result.error = tr("Failed to rename files: %1").arg(renameError);
+        return result;
+    }
+
+    int index = rides_.indexOf(item);
+    if (index >= 0) {
+        model_->startRemove(index);
+        rides_.remove(index, 1);
+        model_->endRemove(index);
+    }
+
+    item->setFileName((item->planned ? plannedDirectory : directory).canonicalPath(), newFileName);
+
+    model_->beginReset();
+    rides_ << item;
+    std::sort(rides_.begin(), rides_.end(), rideCacheLessThan);
+    model_->endReset();
+
+    item->isstale = true;
+
+    RideItem *linkedItem = getLinkedActivity(item);
+    if (linkedItem) {
+        linkedItem->setLinkedFileName(newFileName);
+        emit itemChanged(linkedItem);
+        result.affectedCount = 2;
+    } else {
+        result.affectedCount = 1;
+    }
+
+    if (item->planned) {
+        updateFromWorkout(item, false);
+    }
+
+    item->refresh();
+    context->notifyRideChanged(item);
+    if (context->ride == item) {
+        context->notifyRideSelected(item);
+    }
+    estimator->refresh();
+
+    result.success = true;
+
+    return result;
+}
+
+
+RideCache::OperationPreCheck
+RideCache::checkCopyPlannedActivity
+(RideItem *sourceItem, const QDate &newDate)
+{
+    OperationPreCheck check;
+
+    if (! sourceItem) {
+        check.canProceed = false;
+        check.blockingReason = tr("No activity given");
+        return check;
+    }
+    if (! newDate.isValid()) {
+        check.canProceed = false;
+        check.blockingReason = tr("Invalid date specified");
+        return check;
+    }
+
+    QDateTime newDateTime(newDate, sourceItem->dateTime.time());
+    QFileInfo oldInfo(sourceItem->fileName);
+    QString newFileName = newDateTime.toString("yyyy_MM_dd_HH_mm_ss") + "." + oldInfo.suffix();
+    QString newPath = plannedDirectory.canonicalPath() + "/" + newFileName;
+    if (QFile::exists(newPath)) {
+        check.canProceed = false;
+        check.blockingReason = tr("Target file already exists: %1").arg(newFileName);
+        return check;
+    }
+
+    return check;
+}
+
+
+RideCache::OperationResult
+RideCache::copyPlannedActivity
+(RideItem *sourceItem, const QDate &newDate)
+{
+    OperationResult result;
+
+    QString error;
+    RideItem *newItem = copyPlannedRideFile(sourceItem, newDate, error);
+
+    if (! newItem) {
+        result.error = error;
+        return result;
+    }
+
+    model_->beginReset();
+    rides_ << newItem;
+    std::sort(rides_.begin(), rides_.end(), rideCacheLessThan);
+    model_->endReset();
+
+    newItem->refresh();
+
+    result.success = true;
+    result.affectedCount = 1;
+
+    return result;
+}
+
+
+RideCache::OperationPreCheck
+RideCache::checkCopyPlannedActivities
+(const QList<std::pair<RideItem*, QDate>> &sourceItemsAndTargets)
+{
+    OperationPreCheck check;
+
+    if (sourceItemsAndTargets.isEmpty()) {
+        check.canProceed = false;
+        check.blockingReason = tr("No items specified");
+        return check;
+    }
+
+    for (const std::pair<RideItem*, QDate> &pair : sourceItemsAndTargets) {
+        RideItem *sourceItem = pair.first;
+        QDate targetDate = pair.second;
+
+        if (! sourceItem) {
+            check.canProceed = false;
+            check.blockingReason = tr("Invalid source item");
+            return check;
+        }
+        if (! sourceItem->planned) {
+            check.canProceed = false;
+            check.blockingReason = tr("Source item is not a planned activity: %1").arg(sourceItem->fileName);
+            return check;
+        }
+        if (! targetDate.isValid()) {
+            check.canProceed = false;
+            check.blockingReason = tr("Invalid target date for: %1").arg(sourceItem->fileName);
+            return check;
+        }
+
+        QDateTime newDateTime(targetDate, sourceItem->dateTime.time());
+        QFileInfo oldInfo(sourceItem->fileName);
+        QString newFileName = newDateTime.toString("yyyy_MM_dd_HH_mm_ss") + "." + oldInfo.suffix();
+        QString newPath = plannedDirectory.canonicalPath() + "/" + newFileName;
+
+        if (QFile::exists(newPath)) {
+            check.canProceed = false;
+            check.blockingReason = tr("Target file already exists: %1").arg(newFileName);
+            return check;
+        }
+    }
+
+    return check;
+}
+
+
+RideCache::OperationResult
+RideCache::copyPlannedActivities
+(const QList<std::pair<RideItem*, QDate>> &sourceItemsAndTargets)
+{
+    OperationResult result;
+
+    if (sourceItemsAndTargets.isEmpty()) {
+        result.error = tr("No files specified");
+        return result;
+    }
+
+    QList<RideItem*> newItems;
+    QStringList failedFiles;
+    for (const std::pair<RideItem*, QDate> &pair : sourceItemsAndTargets) {
+        QString error;
+        RideItem *newItem = copyPlannedRideFile(pair.first, pair.second, error);
+        if (newItem) {
+            newItems << newItem;
+        } else {
+            failedFiles << pair.first->fileName;
+        }
+    }
+
+    if (! newItems.isEmpty()) {
+        model_->beginReset();
+        rides_ << newItems;
+        std::sort(rides_.begin(), rides_.end(), rideCacheLessThan);
+        model_->endReset();
+        foreach(RideItem *item, newItems) {
+            item->refresh();
+        }
+        refresh();
+        estimator->refresh();
+    }
+    if (! failedFiles.isEmpty()) {
+        result.error = tr("Failed to copy %1 of %2 activities: %3")
+                         .arg(failedFiles.count())
+                         .arg(sourceItemsAndTargets.count())
+                         .arg(failedFiles.join(", "));
+    }
+
+    result.success = !newItems.isEmpty();
+    result.affectedCount = newItems.count();
+
+    return result;
+}
+
+
+RideCache::OperationPreCheck
+RideCache::checkShiftPlannedActivities
+(const QDate &fromDate, int dayOffset)
+{
+    OperationPreCheck check;
+
+    if (! fromDate.isValid()) {
+        check.canProceed = false;
+        check.blockingReason = tr("Invalid from date specified");
+        return check;
+    }
+    if (dayOffset == 0) {
+        check.canProceed = true;
+        return check;
+    }
+
+    QList<RideItem*> itemsToShift;
+    for (RideItem *item : rides_) {
+        if (item->planned && item->dateTime.date() >= fromDate) {
+            itemsToShift.append(item);
+            check.affectedItems << item;
+        }
+    }
+    if (itemsToShift.isEmpty()) {
+        check.canProceed = true;
+        return check;
+    }
+
+    for (RideItem *item : itemsToShift) {
+        RideItem *linkedItem = getLinkedActivity(item);
+        if (linkedItem && ! linkedItem->planned) {
+            check.affectedItems << linkedItem;
+        }
+    }
+    for (RideItem *item : check.affectedItems) {
+        if (item->isDirty()) {
+            check.dirtyItems << item;
+        }
+    }
+
+    if (! check.dirtyItems.isEmpty()) {
+        check.requiresUserDecision = true;
+
+        QStringList plannedDirty;
+        QStringList actualDirty;
+        for (RideItem *item : check.dirtyItems) {
+            if (item->planned) {
+                plannedDirty << item->fileName;
+            } else {
+                actualDirty << item->fileName;
+            }
+        }
+        QString msg = tr("This operation will shift %1 planned activities.\n\n").arg(itemsToShift.count());
+        if (! plannedDirty.isEmpty()) {
+            msg += tr("Planned activities with unsaved changes:\n%1\n\n").arg(plannedDirty.join("\n"));
+        }
+        if (! actualDirty.isEmpty()) {
+            msg += tr("Linked actual activities with unsaved changes:\n%1\n\n").arg(actualDirty.join("\n"));
+        }
+
+        msg += tr("All affected activities must be saved or changes discarded before shifting.");
+        check.warningMessage = msg;
+    }
+
+    return check;
+}
+
+
+RideCache::OperationResult
+RideCache::shiftPlannedActivities
+(const QDate &fromDate, int dayOffset)
+{
+    OperationResult result;
+
+    if (dayOffset == 0) {
+        result.success = true;
+        result.affectedCount = 0;
+        return result;
+    }
+    QList<RideItem*> itemsToShift;
+    for (RideItem *item : rides_) {
+        if (item->planned && item->dateTime.date() >= fromDate) {
+            itemsToShift.append(item);
+        }
+    }
+    if (itemsToShift.isEmpty()) {
+        result.success = true;
+        result.affectedCount = 0;
+        return result;
+    }
+
+    // prevent shifting any activity to before fromDate
+    int effectiveOffset = dayOffset;
+    if (dayOffset < 0) {
+        QDate earliestDate = itemsToShift[0]->dateTime.date();
+        for (RideItem *item : itemsToShift) {
+            if (item->dateTime.date() < earliestDate) {
+                earliestDate = item->dateTime.date();
+            }
+        }
+        int maxBackwardShift = fromDate.daysTo(earliestDate);
+        if (-dayOffset > maxBackwardShift) {
+            effectiveOffset = -maxBackwardShift;
+        }
+        if (effectiveOffset == 0) {
+            result.success = true;
+            result.affectedCount = 0;
+            return result;
+        }
+    }
+
+    // avoid filename collisions: copy forward / backward, depending on offset
+    if (effectiveOffset > 0) {
+        std::sort(itemsToShift.begin(), itemsToShift.end(), [](RideItem *a, RideItem *b) { return a->dateTime > b->dateTime; });
+    } else {
+        std::sort(itemsToShift.begin(), itemsToShift.end(), [](RideItem *a, RideItem *b) { return a->dateTime < b->dateTime; });
+    }
+
+    QStringList failedFiles;
+    int successCount = 0;
+    for (RideItem *item : itemsToShift) {
+        QString oldFileName = item->fileName;
+        QDate newDate = item->dateTime.date().addDays(effectiveOffset);
+        QDateTime newDateTime(newDate, item->dateTime.time());
+
+        QFileInfo oldInfo(oldFileName);
+        QString newFileName = newDateTime.toString("yyyy_MM_dd_HH_mm_ss") + "." + oldInfo.suffix();
+
+        RideFile *ride = item->ride(true);
+        if (! ride) {
+            failedFiles << oldFileName;
+            continue;
+        }
+
+        item->setStartTime(newDateTime);
+        ride->setTag("Year", newDateTime.toString("yyyy"));
+        ride->setTag("Month", newDateTime.toString("MMMM"));
+        ride->setTag("Weekday", newDateTime.toString("ddd"));
+        item->metadata_.insert("Calendar Text", GlobalContext::context()->rideMetadata->calendarText(item));
+        item->close();
+
+        QString renameError;
+        if (! renameRideFiles(oldFileName, newFileName, true, renameError)) {
+            failedFiles << oldFileName;
+            continue;
+        }
+        item->setFileName(plannedDirectory.canonicalPath(), newFileName);
+        updateFromWorkout(item, true);
+        item->isstale = true;
+
+        RideItem *linkedItem = getLinkedActivity(item);
+        if (linkedItem) {
+            linkedItem->setLinkedFileName(item->fileName);
+            emit itemChanged(linkedItem);
+        }
+
+        successCount++;
+    }
+
+    if (successCount > 0) {
+        model_->beginReset();
+        std::sort(rides_.begin(), rides_.end(), rideCacheLessThan);
+        model_->endReset();
+
+        refresh();
+        estimator->refresh();
+    }
+
+    if (! failedFiles.isEmpty()) {
+        result.error = tr("Failed to shift %1 of %2 activities: %3")
+                         .arg(failedFiles.count())
+                         .arg(itemsToShift.count())
+                         .arg(failedFiles.join(", "));
+    }
+
+    result.success = true;
+    result.affectedCount = successCount;
+
+    return result;
+}
+
+
+bool
+RideCache::saveActivity
+(RideItem *item, QString &error)
+{
+    error = "";
+    if (! item) {
+        error = tr("No activity given");
+        return false;
+    }
+    if (item->isDirty()) {
+        context->mainWindow->saveSilent(context, item);
+        item->setDirty(false);
+        emit itemSaved(item);
+    }
+    return true;
+}
+
+
+bool
+RideCache::saveActivities
+(QList<RideItem*> items, QString &error)
+{
+    QStringList failed;
+
+    for (RideItem *item : items) {
+        QString itemError;
+        if (! saveActivity(item, itemError)) {
+            failed << item->fileName;
+        }
+    }
+    if (! failed.isEmpty()) {
+        error = tr("Failed to save: %1").arg(failed.join(", "));
+        return false;
+    }
+
+    return true;
+}
+
+
+bool
+RideCache::renameRideFiles
+(const QString &oldFileName, const QString &newFileName, bool isPlanned, QString &error)
+{
+    QFileInfo oldInfo(oldFileName);
+    QFileInfo newInfo(newFileName);
+
+    QDir activeDir = isPlanned ? plannedDirectory : directory;
+
+    QString oldPath = activeDir.canonicalPath() + "/" + oldFileName;
+    QString newPath = activeDir.canonicalPath() + "/" + newFileName;
+
+    if (! QFile::rename(oldPath, newPath)) {
+        error = tr("Failed to rename activity file from %1 to %2").arg(oldFileName).arg(newFileName);
+        return false;
+    }
+
+    QStringList extensions;
+    extensions << "notes" << "cpi" << "cpx";
+    for (const QString &ext : extensions) {
+        QString oldExtPath = context->athlete->home->cache().canonicalPath() + "/" + oldInfo.baseName() + "." + ext;
+        QString newExtPath = context->athlete->home->cache().canonicalPath() + "/" + newInfo.baseName() + "." + ext;
+        if (QFile::exists(oldExtPath)) {
+            QFile::rename(oldExtPath, newExtPath);
+        }
+    }
+
+    return true;
+}
+
+
+RideItem*
+RideCache::getLinkedActivity
+(RideItem *item)
+{
+    if (! item) {
+        return nullptr;
+    }
+    QString linkedFileName = item->getLinkedFileName();
+    if (linkedFileName.isEmpty()) {
+        return nullptr;
+    }
+    return getRide(linkedFileName, ! item->planned);
+}
+
+
+RideItem*
+RideCache::findSuggestion
+(RideItem *rideItem)
+{
+    RideItem *closest = nullptr;
+    for (RideItem *o: this->context->athlete->rideCache->rides()) {
+        if (   o != nullptr
+            && o->planned == ! rideItem->planned
+            && o->dateTime.date() == rideItem->dateTime.date()
+            && o->sport == rideItem->sport) {
+            if (closest == nullptr) {
+                closest = o;
+            } else if (std::abs(rideItem->dateTime.time().secsTo(o->dateTime.time())) < std::abs(rideItem->dateTime.time().secsTo(closest->dateTime.time()))) {
+                closest = o;
+            }
+        }
+        if (o->dateTime.date() > rideItem->dateTime.date()) {
+            break;
+        }
+    }
+    return closest;
+}
+
+
+bool
+RideCache::updateFromWorkout
+(RideItem *item, bool autoSave)
+{
+    if (item == nullptr || ! item->planned) {
+        return false;
+    }
+    QString workoutFilename = item->getText("WorkoutFilename", item->ride()->getTag("WorkoutFilename", "")).trimmed();
+    if (workoutFilename.isEmpty()) {
+        return false;
+    }
+    ErgFile ergFile(workoutFilename, ErgFileFormat::unknown, context, item->dateTime.date());
+    if (! ergFile.hasRelativeWatts()) {
+        return false;
+    }
+    bool changed = false;
+    for (const QString &name : item->overrides_) {
+        int value = static_cast<int>(item->getForSymbol(name));
+        // Operate only on the values overridden by ManualActivityWizard
+        if (name == "average_power") {
+            if (value != std::round(ergFile.AP())) {
+                QMap<QString, QString> values;
+                values.insert("value", QString::number(std::round(ergFile.AP())));
+                item->ride()->metricOverrides.insert(name, values);
+                changed = true;
+            }
+        } else if (name == "coggan_np") {
+            if (value != std::round(ergFile.IsoPower())) {
+                QMap<QString, QString> values;
+                values.insert("value", QString::number(std::round(ergFile.IsoPower())));
+                item->ride()->metricOverrides.insert(name, values);
+                changed = true;
+            }
+        } else if (name == "coggan_tss") {
+            if (value != std::round(ergFile.bikeStress())) {
+                QMap<QString, QString> values;
+                values.insert("value", QString::number(std::round(ergFile.bikeStress())));
+                item->ride()->metricOverrides.insert(name, values);
+                changed = true;
+            }
+        } else if (name == "skiba_bike_score") {
+            if (value != std::round(ergFile.BS())) {
+                QMap<QString, QString> values;
+                values.insert("value", QString::number(std::round(ergFile.BS())));
+                item->ride()->metricOverrides.insert(name, values);
+                changed = true;
+            }
+        } else if (name == "skiba_xpower") {
+            if (value != std::round(ergFile.XP())) {
+                QMap<QString, QString> values;
+                values.insert("value", QString::number(std::round(ergFile.XP())));
+                item->ride()->metricOverrides.insert(name, values);
+                changed = true;
+            }
+        }
+    }
+    if (changed) {
+        item->setDirty(true);
+        item->isstale = true;
+        if (autoSave) {
+            QString error;
+            saveActivity(item, error);
+        }
+    }
+    return changed;
+}
+
+
+bool
+RideCache::updateFromWorkoutAfter
+(const QDate &when, bool autoSave)
+{
+    QList<RideItem*> changedItems;
+    for (RideItem *item : context->athlete->rideCache->rides()) {
+        if (item->planned && item->dateTime.date() >= when) {
+            if (context->athlete->rideCache->updateFromWorkout(item, false)) {
+                changedItems << item;
+            }
+        }
+    }
+    if (changedItems.count() > 0) {
+        if (autoSave) {
+            QString error;
+            saveActivities(changedItems, error);
+        }
+        cancel();
+        refresh();
+        estimator->refresh();
+    }
+    return changedItems.count() > 0;
+}
+
+
+bool
+RideCache::isValidLink
+(RideItem *item1, RideItem *item2, QString &error)
+{
+    error = "";
+    if (! item1 || ! item2) {
+        error = tr("Invalid activities for linking");
+        return false;
+    }
+    if (item1 == item2) {
+        error = tr("Can't link to self");
+        return false;
+    }
+    if (item1->planned == item2->planned) {
+        error = tr("Cannot link two activities of the same type. One must be planned, one actual.");
+        return false;
+    }
+    return true;
+}
+
+
+RideItem*
+RideCache::copyPlannedRideFile
+(RideItem *sourceItem, const QDate &newDate, QString &error)
+{
+    QDateTime newDateTime(newDate, sourceItem->dateTime.time());
+    QFileInfo oldInfo(sourceItem->fileName);
+    QString newFileName = newDateTime.toString("yyyy_MM_dd_HH_mm_ss") + "." + oldInfo.suffix();
+    QString newPath = plannedDirectory.canonicalPath() + "/" + newFileName;
+    QString sourcePath = plannedDirectory.canonicalPath() + "/" + sourceItem->fileName;
+
+    if (! QFile::copy(sourcePath, newPath)) {
+        error = tr("Failed to copy file");
+        return nullptr;
+    }
+
+    QFile file(newPath);
+    QStringList errors;
+    RideFile *newRide = RideFileFactory::instance().openRideFile(context, file, errors);
+    if (! newRide) {
+        QFile::remove(newPath);
+        error = tr("Failed to open copied file");
+        return nullptr;
+    }
+
+    newRide->setStartTime(QDateTime(newDate, sourceItem->dateTime.time()));
+    newRide->setTag("Year", newDateTime.toString("yyyy"));
+    newRide->setTag("Month", newDateTime.toString("MMMM"));
+    newRide->setTag("Weekday", newDateTime.toString("ddd"));
+
+    if (! newRide->getTag("Linked Filename", "").isEmpty()) {
+        newRide->removeTag("Linked Filename");
+    }
+
+    QFile outFile(newPath);
+    if (! RideFileFactory::instance().writeRideFile(context, newRide, outFile, oldInfo.suffix())) {
+        error = tr("Failed to write modified file");
+        delete newRide;
+        QFile::remove(newPath);
+        return nullptr;
+    }
+    delete newRide;
+
+    RideItem *newItem = new RideItem(plannedDirectory.canonicalPath(), newFileName, newDateTime, context, true);
+    updateFromWorkout(newItem, true);
+    newItem->isstale = true;
+
+    return newItem;
+}
+
 
 // refresh metrics
 void RideCacheRefreshThread::run()

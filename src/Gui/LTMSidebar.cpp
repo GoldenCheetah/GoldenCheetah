@@ -26,6 +26,7 @@
 #include "Colors.h"
 #include "Units.h"
 #include "HelpWhatsThis.h"
+#include "ErgFile.h"
 
 #include "GcWindowRegistry.h" // for GcWinID types
 #include "Perspective.h" // for GcWindowDialog
@@ -329,7 +330,7 @@ LTMSidebar::presetSelectionChanged()
 }
 
 void
-LTMSidebar::configChanged(qint32)
+LTMSidebar::configChanged(qint32 why)
 {
     seasonsWidget->setStyleSheet(GCColor::stylesheet());
     eventsWidget->setStyleSheet(GCColor::stylesheet());
@@ -343,6 +344,9 @@ LTMSidebar::configChanged(qint32)
     // let everyone know what date range we are starting with
     dateRangeTreeWidgetSelectionChanged();
 
+    if (why & CONFIG_ZONES) {
+        context->athlete->rideCache->updateFromWorkoutAfter(QDate::currentDate(), true);
+    }
 }
 
 /*----------------------------------------------------------------------
@@ -534,173 +538,79 @@ void
 LTMSidebar::dateRangePopup(QPoint pos)
 {
     QTreeWidgetItem *item = dateRangeTree->itemAt(pos);
-    if (item != NULL) {
-
-        // out of bounds or not user defined
-        int seasonIdx = -1;
-        int phaseIdx = -1;
-
-        if (item->type() >= Season::season && item->type() < Phase::phase) {
-            seasonIdx = allDateRanges->indexOfChild(item);
-        } else if (item->type() >= Phase::phase) {
-            seasonIdx = allDateRanges->indexOfChild(item->parent());
-            phaseIdx = item->parent()->indexOfChild(item);
-        }
-
-        if (phaseIdx == -1 &&
-                (seasonIdx == -1 || seasonIdx >= seasons->seasons.count() ||
-                 seasons->seasons[seasonIdx].getType() == Season::temporary)) {
-            // on system date we just offer to add a Season, since its
-            // the only way of doing it when no seasons are defined!!
-
-            // create context menu
-            QMenu menu(dateRangeTree);
-            QAction *add = new QAction(tr("Add season"), dateRangeTree);
-            menu.addAction(add);
-
-            // connect menu to functions
-            connect(add, SIGNAL(triggered(void)), this, SLOT(addRange(void)));
-
-            // execute the menu
-            menu.exec(dateRangeTree->mapToGlobal(pos));
-
-        } else if (phaseIdx > -1) {
-
-            // create context menu
-            QMenu menu(dateRangeTree);
-
-            QAction *edit = new QAction(tr("Edit phase"), dateRangeTree);
-            QAction *del = new QAction(tr("Delete phase"), dateRangeTree);
-            QAction *season = new QAction(tr("Add season"), dateRangeTree);
-            QAction *event = new QAction(tr("Add Event"), dateRangeTree);
-            QAction *phase = new QAction(tr("Add Phase"), dateRangeTree);
-
-            menu.addAction(edit);
-            menu.addAction(del);
-            menu.addSeparator();
-            menu.addAction(season);
-            menu.addAction(event);
-            menu.addAction(phase);
-
-            // connect menu to functions
-            connect(edit, SIGNAL(triggered(void)), this, SLOT(editRange(void)));
-            connect(del, SIGNAL(triggered(void)), this, SLOT(deleteRange(void)));
-            connect(season, SIGNAL(triggered(void)), this, SLOT(addRange(void)));
-            connect(event, SIGNAL(triggered(void)), this, SLOT(addEvent(void)));
-            connect(phase, SIGNAL(triggered(void)), this, SLOT(addPhase(void)));
-
-            // execute the menu
-            menu.exec(dateRangeTree->mapToGlobal(pos));
-        } else {
-
-            // create context menu
-            QMenu menu(dateRangeTree);
-
-            QAction *edit = new QAction(tr("Edit season"), dateRangeTree);
-            QAction *del = new QAction(tr("Delete season"), dateRangeTree);
-            QAction *season = new QAction(tr("Add season"), dateRangeTree);
-            QAction *event = new QAction(tr("Add Event"), dateRangeTree);
-            QAction *phase = new QAction(tr("Add Phase"), dateRangeTree);
-
-            if (! seasons->seasons[seasonIdx].isAbsolute()) {
-                event->setEnabled(false);
-                phase->setEnabled(false);
-            }
-
-            menu.addAction(edit);
-            menu.addAction(del);
-            menu.addSeparator();
-            menu.addAction(season);
-            menu.addAction(event);
-            menu.addAction(phase);
-
-            // connect menu to functions
-            connect(edit, SIGNAL(triggered(void)), this, SLOT(editRange(void)));
-            connect(del, SIGNAL(triggered(void)), this, SLOT(deleteRange(void)));
-            connect(season, SIGNAL(triggered(void)), this, SLOT(addRange(void)));
-            connect(event, SIGNAL(triggered(void)), this, SLOT(addEvent(void)));
-            connect(phase, SIGNAL(triggered(void)), this, SLOT(addPhase(void)));
-
-            // execute the menu
-            menu.exec(dateRangeTree->mapToGlobal(pos));
-        }
-    }
+    QMenu menu;
+    buildDateRangeMenu(menu, item, false);
+    menu.exec(dateRangeTree->mapToGlobal(pos));
 }
 
 void
 LTMSidebar::dateRangePopup()
 {
-    // no current season selected
-    if (dateRangeTree->selectedItems().isEmpty()) return;
-
-    QTreeWidgetItem *item = dateRangeTree->selectedItems().at(0);
-    int seasonIdx = -1;
-    int phaseIdx = -1;
-
-    if (item->type() >= Season::season && item->type() < Phase::phase) {
-        seasonIdx = allDateRanges->indexOfChild(item);
-    } else if (item->type() >= Phase::phase) {
-        seasonIdx = allDateRanges->indexOfChild(item->parent());
-        phaseIdx = item->parent()->indexOfChild(item);
+    QTreeWidgetItem *item = nullptr;
+    if (! dateRangeTree->selectedItems().isEmpty()) {
+        item = dateRangeTree->selectedItems().at(0);
     }
-
-    // OK - we are working with a specific event..
-    QMenu menu(dateRangeTree);
-
-    if (phaseIdx == -1 &&
-            (seasonIdx == -1 || seasonIdx >= seasons->seasons.count() ||
-             seasons->seasons[seasonIdx].getType() == Season::temporary)) {
-        QAction *season = new QAction(tr("Add season"), dateRangeTree);
-
-        menu.addAction(season);
-
-        // connect menu to functions
-        connect(season, SIGNAL(triggered(void)), this, SLOT(addRange(void)));
-    } else if (phaseIdx > -1) {
-        QAction *edit = new QAction(tr("Edit phase"), dateRangeTree);
-        QAction *del = new QAction(tr("Delete phase"), dateRangeTree);
-        QAction *season = new QAction(tr("Add season"), dateRangeTree);
-        QAction *event = new QAction(tr("Add Event"), dateRangeTree);
-        QAction *phase = new QAction(tr("Add Phase"), dateRangeTree);
-
-        menu.addAction(edit);
-        menu.addAction(del);
-        menu.addSeparator();
-        menu.addAction(season);
-        menu.addAction(event);
-        menu.addAction(phase);
-
-        // connect menu to functions
-        connect(edit, SIGNAL(triggered(void)), this, SLOT(editRange(void)));
-        connect(del, SIGNAL(triggered(void)), this, SLOT(deleteRange(void)));
-        connect(season, SIGNAL(triggered(void)), this, SLOT(addRange(void)));
-        connect(event, SIGNAL(triggered(void)), this, SLOT(addEvent(void)));
-        connect(phase, SIGNAL(triggered(void)), this, SLOT(addPhase(void)));
-    } else {
-        QAction *edit = new QAction(tr("Edit season"), dateRangeTree);
-        QAction *del = new QAction(tr("Delete season"), dateRangeTree);
-        QAction *season = new QAction(tr("Add season"), dateRangeTree);
-        QAction *event = new QAction(tr("Add Event"), dateRangeTree);
-        QAction *phase = new QAction(tr("Add Phase"), dateRangeTree);
-
-        menu.addAction(edit);
-        menu.addAction(del);
-        menu.addSeparator();
-        menu.addAction(season);
-        menu.addAction(event);
-        menu.addAction(phase);
-
-        // connect menu to functions
-        connect(edit, SIGNAL(triggered(void)), this, SLOT(editRange(void)));
-        connect(del, SIGNAL(triggered(void)), this, SLOT(deleteRange(void)));
-        connect(season, SIGNAL(triggered(void)), this, SLOT(addRange(void)));
-        connect(event, SIGNAL(triggered(void)), this, SLOT(addEvent(void)));
-        connect(phase, SIGNAL(triggered(void)), this, SLOT(addPhase(void)));
-    }
-    // execute the menu
-    menu.exec(splitter->mapToGlobal(QPoint(seasonsWidget->pos().x()+seasonsWidget->width()-20,
-                                           seasonsWidget->pos().y())));
+    QMenu menu;
+    buildDateRangeMenu(menu, item, true);
+    menu.exec(splitter->mapToGlobal(QPoint(seasonsWidget->pos().x() + seasonsWidget->width() - 20, seasonsWidget->pos().y())));
 }
+
+
+void
+LTMSidebar::buildDateRangeMenu
+(QMenu &menu, QTreeWidgetItem *item, bool asGlobal) const
+{
+    bool isAbsUserSeason = false;
+    bool isRelUserSeason = false;
+    bool isSystemSeason = false;
+    bool isPhase = false;
+    bool isNone = true;
+    Season *season = nullptr;
+    Season *phase = nullptr;
+    if (item != nullptr) {
+        if (item->type() >= Season::season && item->type() < Phase::phase) {
+            season = &seasons->seasons[allDateRanges->indexOfChild(item)];
+            if (season != nullptr) {
+                isSystemSeason = (season->getType() == Season::temporary);
+                isAbsUserSeason = season->isAbsolute() && ! isSystemSeason;
+                isRelUserSeason = ! season->isAbsolute() && ! isSystemSeason;
+                isNone = false;
+            }
+        } else if (item->type() >= Phase::phase) {
+            season = &seasons->seasons[allDateRanges->indexOfChild(item->parent())];
+            phase = &seasons->seasons[item->parent()->indexOfChild(item)];
+            if (season != nullptr && phase != nullptr) {
+                isPhase = true;
+                isNone = false;
+            }
+        }
+    }
+    const QString ellipsis = QStringLiteral("...");
+    if (isNone) {
+        menu.addAction(tr("Add season") % ellipsis, this, &LTMSidebar::addRange);
+    } else if (isPhase) {
+        QString seasonName = season->getName();
+        const int maxLength = 30;
+        menu.addAction(tr("Edit phase") % ellipsis, this, &LTMSidebar::editRange);
+        menu.addAction(tr("Delete phase"), this, &LTMSidebar::deleteRange);
+        menu.addSeparator();
+        menu.addAction(tr(R"(Add phase to "%1")").arg(season->getName()) % ellipsis, this, &LTMSidebar::addPhase);
+        menu.addAction(tr(R"(Add event to "%1")").arg(season->getName()) % ellipsis, this, &LTMSidebar::addEvent);
+        if (asGlobal) {
+            menu.addSeparator();
+            menu.addAction(tr("Add season") % ellipsis, this, &LTMSidebar::addRange);
+        }
+    } else {
+        menu.addAction(tr("Edit season") % ellipsis, this, &LTMSidebar::editRange)->setEnabled(isAbsUserSeason || isRelUserSeason);
+        menu.addAction(tr("Delete season"), this, &LTMSidebar::deleteRange)->setEnabled(isAbsUserSeason || isRelUserSeason);
+        menu.addSeparator();
+        menu.addAction(tr("Add phase") % ellipsis, this, &LTMSidebar::addPhase)->setEnabled(isAbsUserSeason);
+        menu.addAction(tr("Add event") % ellipsis, this, &LTMSidebar::addEvent)->setEnabled(isAbsUserSeason);
+        menu.addSeparator();
+        menu.addAction(tr("Add season") % ellipsis, this, &LTMSidebar::addRange);
+    }
+}
+
 
 void
 LTMSidebar::eventPopup(QPoint pos)

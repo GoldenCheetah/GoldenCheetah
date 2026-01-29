@@ -249,6 +249,32 @@ ComboBoxDelegate::addItems
 
 
 void
+ComboBoxDelegate::addItemsForType
+(int type, const QStringList &texts)
+{
+
+    textsForType[type] = texts;
+    fillSizeHint();
+}
+
+
+void
+ComboBoxDelegate::setRoleForType
+(int role)
+{
+    _roleForType = role;
+}
+
+
+int
+ComboBoxDelegate::roleForType
+() const
+{
+    return _roleForType;
+}
+
+
+void
 ComboBoxDelegate::commitAndCloseEditor
 ()
 {
@@ -266,7 +292,22 @@ ComboBoxDelegate::createEditor
     Q_UNUSED(index)
 
     QComboBox *combobox = new QComboBox(parent);
-    combobox->addItems(texts);
+
+    bool filled = false;
+    if (_roleForType != -1) {
+        QVariant typeVar = index.data(_roleForType);
+        if (typeVar.isValid() && ! typeVar.isNull() && typeVar.canConvert<int>()) {
+            int type = typeVar.toInt();
+            if (textsForType.contains(type)) {
+                combobox->addItems(textsForType[type]);
+                filled = true;
+            }
+        }
+    }
+
+    if (! filled) {
+        combobox->addItems(texts);
+    }
 
     connect(combobox, SIGNAL(activated(int)), this, SLOT(commitAndCloseEditor()));
 
@@ -295,17 +336,28 @@ ComboBoxDelegate::setModelData
 }
 
 
-QString
-ComboBoxDelegate::displayText
-(const QVariant &value, const QLocale &locale) const
+void
+ComboBoxDelegate::initStyleOption
+(QStyleOptionViewItem *option, const QModelIndex &index) const
 {
-    Q_UNUSED(locale);
-
-    int index = value.toInt();
-    if (index >= 0 && index < texts.length()) {
-        return texts[index];
+    QStyledItemDelegate::initStyleOption(option, index);
+    int idx = index.data(Qt::DisplayRole).toInt();
+    if (_roleForType != -1) {
+        QVariant typeVar = index.data(_roleForType);
+        if (typeVar.isValid() && ! typeVar.isNull() && typeVar.canConvert<int>()) {
+            int type = typeVar.toInt();
+            if (textsForType.contains(type) && idx >= 0 && idx < textsForType[type].length()) {
+                option->text = textsForType[type][idx];
+            } else {
+                option->text = QString("INDEX OUT OF RANGE: %1 with %2 texts for type %3").arg(idx).arg(textsForType[type].length(), type);
+            }
+        } else {
+            option->text = "";
+        }
+    } else if (idx >= 0 && idx < texts.length()) {
+        option->text = texts[idx];
     } else {
-        return QString("INDEX OUT OF RANGE: %1 with %2 texts").arg(index).arg(texts.length());
+        option->text = QString("INDEX OUT OF RANGE: %1 with %2 texts").arg(idx).arg(texts.length());
     }
 }
 
@@ -327,6 +379,9 @@ ComboBoxDelegate::fillSizeHint
 {
     QComboBox widget;
     widget.addItems(texts);
+    for (const QStringList &list : textsForType) {
+        widget.addItems(list);
+    }
     _sizeHint = widget.sizeHint();
 }
 
@@ -815,8 +870,9 @@ QWidget*
 ListEditDelegate::createEditor
 ([[maybe_unused]] QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    Q_UNUSED(parent)
     Q_UNUSED(option)
-    Q_UNUSED(index)
+
     emit requestListEdit(index);
     return nullptr;
 }

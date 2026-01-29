@@ -26,6 +26,7 @@
 #include "AthleteTab.h"
 #include "Seasons.h"
 #include "Colors.h"
+#include "SaveDialogs.h"
 
 #define ICON_COLOR QColor("#F79130")
 #ifdef Q_OS_MAC
@@ -77,24 +78,42 @@ RepeatScheduleWizard::done
         RepeatSchedulePageSummary *summaryPage = qobject_cast<RepeatSchedulePageSummary*>(page(PageSummary));
         QList<RideItem*> deletionList = summaryPage->getDeletionList();
         QList<std::pair<RideItem*, QDate>> scheduleList = summaryPage->getScheduleList();
+
         context->tab->setNoSwitch(true);
-        for (RideItem *rideItem : deletionList) {
-            context->athlete->rideCache->removeRide(rideItem->fileName);
-        }
-        for (std::pair<RideItem*, QDate> entry : scheduleList) {
-            RideItem *rideItem = entry.first;
-            QDate targetDate = entry.second;
-            RideFile *rideFile = rideItem->ride();
-            QDateTime rideDateTime(targetDate, rideFile->startTime().time());
-            rideFile->setStartTime(rideDateTime);
-            QString basename = rideDateTime.toString("yyyy_MM_dd_HH_mm_ss");
-            QString filename = context->athlete->home->planned().canonicalPath() + "/" + basename + ".json";
-            QFile out(filename);
-            if (RideFileFactory::instance().writeRideFile(context, rideFile, out, "json")) {
-                context->athlete->addRide(basename + ".json", true, true, false, rideItem->planned);
+        RideCache::OperationPreCheck unlinkCheck = context->athlete->rideCache->checkUnlinkActivities(deletionList);
+        context->tab->setNoSwitch(false);
+        bool nextStep = true;
+        if (nextStep && unlinkCheck.canProceed) {
+             if (proceedDialog(context, unlinkCheck)) {
+                context->tab->setNoSwitch(true);
+                RideCache::OperationResult result = context->athlete->rideCache->unlinkActivities(deletionList);
+                context->tab->setNoSwitch(false);
+                if (result.success) {
+                    QString error;
+                    context->athlete->rideCache->saveActivities(unlinkCheck.affectedItems, error);
+                } else {
+                    QMessageBox::warning(this, "Failed", result.error);
+                    nextStep = false;
+                }
+            } else {
+                nextStep = false;
             }
         }
-        context->tab->setNoSwitch(false);
+        if (nextStep) {
+            context->tab->setNoSwitch(true);
+            for (RideItem *rideItem : deletionList) {
+                context->athlete->rideCache->removeRide(rideItem->fileName);
+            }
+            context->tab->setNoSwitch(false);
+            RideCache::OperationPreCheck check = context->athlete->rideCache->checkCopyPlannedActivities(scheduleList);
+            if (check.canProceed) {
+                RideCache::OperationResult result = context->athlete->rideCache->copyPlannedActivities(scheduleList);
+                if (! result.success) {
+                    QMessageBox::warning(this, "Failed", result.error);
+                }
+            }
+            context->tab->setNoSwitch(false);
+        }
         QApplication::restoreOverrideCursor();
     }
 
@@ -183,7 +202,7 @@ RepeatSchedulePageSetup::RepeatSchedulePageSetup
     all->addWidget(scrollArea);
     setLayout(all);
 
-    connect(seasonTree, &QTreeWidget::currentItemChanged, this, [this, startDate, endDate, when](QTreeWidgetItem *current) {
+    connect(seasonTree, &QTreeWidget::currentItemChanged, this, [startDate, endDate, when](QTreeWidgetItem *current) {
         if (current != nullptr) {
             QDate seasonStart(current->data(0, Qt::UserRole).toDate());
             QDate seasonEnd(current->data(0, Qt::UserRole + 1).toDate());
@@ -197,10 +216,10 @@ RepeatSchedulePageSetup::RepeatSchedulePageSetup
             endDate->setDate(seasonEnd);
         }
     });
-    connect(startDate, &QDateEdit::dateChanged, this, [this, endDate](QDate date) {
+    connect(startDate, &QDateEdit::dateChanged, this, [endDate](QDate date) {
         endDate->setMinimumDate(date);
     });
-    connect(endDate, &QDateEdit::dateChanged, this, [this, startDate](QDate date) {
+    connect(endDate, &QDateEdit::dateChanged, this, [startDate](QDate date) {
         startDate->setMaximumDate(date);
     });
 

@@ -385,7 +385,7 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     trainerPart.setHeader(QNetworkRequest::ContentDispositionHeader,
                           QVariant("form-data; name=\"trainer\""));
     trainerPart.setBody((ride->getTag("Trainer", "0").toInt() ||
-                         ride->xdata("TRAIN") && !ride->isDataPresent(RideFile::lat)) ? "1" : "0");
+                         (ride->xdata("TRAIN") && !ride->isDataPresent(RideFile::lat))) ? "1" : "0");
     multiPart->append(trainerPart);
 
     if (manual) {

@@ -36,7 +36,7 @@ static bool toolTipHeadlineEntry(const QPoint &pos, QAbstractItemView *view, con
 static bool toolTipDayEntry(const QPoint &pos, QAbstractItemView *view, const CalendarDay &day, int idx);
 static bool toolTipMore(const QPoint &pos, QAbstractItemView *view, const CalendarDay &day);
 static QRect paintHeadline(QPainter *painter, const QStyleOptionViewItem &opt, const QModelIndex &index, HitTester &headlineTester, const QString &dateFormat, int pressedEntryIdx, int leftMargin, int rightMargin, int topMargin, int lineSpacing, int radius);
-static void paintMetric(QPainter *painter, const QRect &rect, const QFont::Weight &valueWeight, const QFont::Weight &labelWeight, const QString &value, const QString &label);
+static int paintMetric(QPainter *painter, const QRect &rect, const QFont::Weight &valueWeight, const QFont::Weight &labelWeight, const QString &value, const QString &label, bool first = true);
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -352,6 +352,10 @@ CalendarDetailedDayDelegate::paint
     if (! ok) {
         pressedEntryIdx = -2;
     }
+    int relatedEntryIdx = index.data(RelatedEntryRole).toInt(&ok);
+    if (! ok) {
+        relatedEntryIdx = -2;
+    }
     CalendarDay calendarDay = index.data(DayRole).value<CalendarDay>();
     QList<CalendarEntryLayout> layout = index.data(LayoutRole).value<QList<CalendarEntryLayout>>();
     entryTester.resize(index, layout.count());
@@ -394,6 +398,7 @@ CalendarDetailedDayDelegate::paint
             continue;
         }
         bool pressed = (l.entryIdx == pressedEntryIdx);
+        bool related = (l.entryIdx == relatedEntryIdx);
         const CalendarEntry &entry = calendarDay.entries[l.entryIdx];
         int startMinute = entry.start.hour() * 60 + entry.start.minute();
         int endMinute = startMinute + entry.durationSecs / 60;
@@ -409,10 +414,21 @@ CalendarDetailedDayDelegate::paint
         entryTester.set(index, l.entryIdx, entryRect);
         QColor entryBG = bgColor;
         QColor entryFrame = entry.color;
+        if (entry.dirty) {
+            QFont font = painter->font();
+            font.setItalic(true);
+            painter->setFont(font);
+        }
         if (pressed) {
             entryBG = option.palette.highlight().color();
             entryFrame = entryBG;
-        } else if (entry.type == ENTRY_TYPE_ACTIVITY) {
+        } else if (related) {
+            QColor relColor = opt.palette.highlight().color();
+            relColor.setAlpha(40);
+            relColor = GCColor::blendedColor(relColor, bgColor);
+            entryBG = relColor;
+            entryFrame = relColor;
+        } else if (entry.type == ENTRY_TYPE_ACTUAL_ACTIVITY) {
             QColor overlayBG = entry.color;
             overlayBG = entry.color;
             if (GCColor::isPaletteDark(option.palette)) {
@@ -432,7 +448,6 @@ CalendarDetailedDayDelegate::paint
         int iconWidth = 0;
         if (height >= lineHeight && columnWidth >= lineHeight) {
             QColor pixmapColor(entry.color);
-            // int headlineOffset = 0;
             if (height >= 2 * lineHeight + priSecSpacing && columnWidth >= 2 * lineHeight + priSecSpacing) {
                 iconWidth = 2 * lineHeight + priSecSpacing;
             } else {
@@ -441,7 +456,7 @@ CalendarDetailedDayDelegate::paint
             QSize pixmapSize(iconWidth, iconWidth);
             QPixmap pixmap;
             if (entry.type == ENTRY_TYPE_PLANNED_ACTIVITY) {
-                if (pressed) {
+                if (pressed || related) {
                     pixmapColor = GCColor::invertColor(entryBG);
                 }
                 pixmap = svgAsColoredPixmap(entry.iconFile, pixmapSize, iconSpacing, pixmapColor);
@@ -449,6 +464,22 @@ CalendarDetailedDayDelegate::paint
                 pixmap = svgOnBackground(entry.iconFile, pixmapSize, iconSpacing, pixmapColor, radius);
             }
             painter->drawPixmap(left, top, pixmap);
+            if (! pressed && ! related && ! entry.linkedReference.isEmpty()) {
+                QRect rect(left + columnWidth - 2 * painter->pen().width(), top, radius, height);
+                QPainterPath path;
+                path.moveTo(rect.left(), rect.top());
+                path.lineTo(rect.right() - radius, rect.top());
+                path.arcTo(rect.right() - radius * 2, rect.top(), radius * 2, radius * 2, 90, -90);
+                path.lineTo(rect.right(), rect.bottom() - radius);
+                path.arcTo(rect.right() - radius * 2, rect.bottom() - radius * 2, radius * 2, radius * 2, 0, -90);
+                path.lineTo(rect.left(), rect.bottom());
+                path.closeSubpath();
+
+                painter->save();
+                painter->setRenderHint(QPainter::Antialiasing);
+                painter->fillPath(path, pixmapColor);
+                painter->restore();
+            }
         }
         if (numLines > 0) {
             painter->save();
@@ -775,13 +806,16 @@ CalendarCompactDayDelegate::paint
     CalendarDay calendarDay = index.data(DayRole).value<CalendarDay>();
     QColor bgColor;
     QColor selColor = opt.palette.highlight().color();
-    QColor dayColor;
     QColor entryColor;
 
     bool ok;
     int pressedEntryIdx = index.data(PressedEntryRole).toInt(&ok);
     if (! ok) {
         pressedEntryIdx = -2;
+    }
+    int relatedEntryIdx = index.data(RelatedEntryRole).toInt(&ok);
+    if (! ok) {
+        relatedEntryIdx = -2;
     }
 
     if (pressedEntryIdx < 0 && opt.state & QStyle::State_Selected) {
@@ -792,6 +826,9 @@ CalendarCompactDayDelegate::paint
         bgColor = opt.palette.base().color();
     }
     entryColor = GCColor::invertColor(bgColor);
+    QColor relColor = opt.palette.highlight().color();
+    relColor.setAlpha(40);
+    relColor = GCColor::blendedColor(relColor, bgColor);
 
     painter->fillRect(opt.rect, bgColor);
 
@@ -843,15 +880,22 @@ CalendarCompactDayDelegate::paint
             painter->setPen(selColor);
             painter->drawRoundedRect(entryRect, radius, radius);
             painter->setPen(GCColor::invertColor(selColor));
+        } else if (i == relatedEntryIdx) {
+            painter->setBrush(relColor);
+            painter->setPen(relColor);
+            painter->drawRoundedRect(entryRect, radius, radius);
+            painter->setPen(GCColor::invertColor(relColor));
         }
         QPixmap pixmap;
+        QColor pixmapColor(calEntry.color);
+        if (   i == pressedEntryIdx
+            || (   opt.state & QStyle::State_Selected
+                && pressedEntryIdx < 0)) {
+            pixmapColor = GCColor::invertColor(selColor);
+        } else if (i == relatedEntryIdx) {
+            pixmapColor = GCColor::invertColor(relColor);
+        }
         if (calEntry.type == ENTRY_TYPE_PLANNED_ACTIVITY) {
-            QColor pixmapColor(calEntry.color);
-            if (   i == pressedEntryIdx
-                || (   opt.state & QStyle::State_Selected
-                    && pressedEntryIdx < 0)) {
-                pixmapColor = GCColor::invertColor(selColor);
-            }
             pixmap = svgAsColoredPixmap(calEntry.iconFile, pixmapSize, lineSpacing, pixmapColor);
         } else {
             pixmap = svgOnBackground(calEntry.iconFile, pixmapSize, lineSpacing, calEntry.color, radius);
@@ -859,6 +903,33 @@ CalendarCompactDayDelegate::paint
         painter->drawPixmap(opt.rect.x() + leftMargin,
                             entryStartY + i * (entryHeight + lineSpacing),
                             pixmap);
+        if (i != pressedEntryIdx && i != relatedEntryIdx && ! calEntry.linkedReference.isEmpty()) {
+            int left = titleRect.x() + titleRect.width() - radius - 1 * dpiXFactor;
+            int columnWidth = radius;
+            int top = titleRect.y();
+            int height = pixmapSize.height();
+            QRect rect(left + columnWidth - 2 * painter->pen().width(), top, radius, height);
+            QPainterPath path;
+            path.moveTo(rect.left(), rect.top());
+            path.lineTo(rect.right() - radius, rect.top());
+            path.arcTo(rect.right() - radius * 2, rect.top(), radius * 2, radius * 2, 90, -90);
+            path.lineTo(rect.right(), rect.bottom() - radius);
+            path.arcTo(rect.right() - radius * 2, rect.bottom() - radius * 2, radius * 2, radius * 2, 0, -90);
+            path.lineTo(rect.left(), rect.bottom());
+            path.closeSubpath();
+
+            painter->save();
+            painter->setRenderHint(QPainter::Antialiasing);
+            painter->fillPath(path, pixmapColor);
+            painter->restore();
+
+            titleRect.setWidth(titleRect.width() - radius - 1 * dpiXFactor);
+        }
+        if (calEntry.dirty) {
+            QFont font = painter->font();
+            font.setItalic(true);
+            painter->setFont(font);
+        }
         painter->drawText(titleRect, Qt::AlignLeft | Qt::AlignTop, calEntry.primary);
         if (multiLine && ! calEntry.secondary.isEmpty()) {
             QRect subRect(titleRect.x(),
@@ -1247,7 +1318,7 @@ AgendaEntryDelegate::paint
     if (column < 0) {
         column = index.column();
     }
-    CalendarEntry entry = index.data(EntryRole).value<CalendarEntry>();
+    AgendaEntry entry = index.data(EntryRole).value<AgendaEntry>();
 
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing);
@@ -1289,7 +1360,6 @@ AgendaEntryDelegate::paint
     QFontMetrics line1FM(line1Font);
     const int lineSpacing = attributes.lineSpacing * dpiYFactor;
     const int lineHeight = line1FM.height();
-    // const int radius = 4 * dpiXFactor;
     const int iconInnerSpacing = 4 * dpiXFactor;
     const int iconTextSpacing = attributes.iconTextSpacing * dpiXFactor;
     const int iconWidth = 2 * lineHeight + lineSpacing;
@@ -1325,9 +1395,16 @@ AgendaEntryDelegate::paint
     painter->setFont(line1Font);
     painter->drawText(textRect, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip, primary);
     painter->restore();
-    if (! entry.secondary.isEmpty()) {
-        textRect.translate(0, lineHeight + lineSpacing);
-        paintMetric(painter, textRect, secondaryWeight, secondaryMetricWeight, entry.secondary, entry.secondaryMetric);
+    textRect.translate(0, lineHeight + lineSpacing);
+    int advance = 0;
+    for (int i = 0; i < entry.secondaryValues.count(); ++i) {
+        QString value = entry.secondaryValues[i];
+        QString label = entry.secondaryLabels.value(i, "");
+        textRect.setLeft(textRect.left() + advance);
+        if (textRect.width() <= 20 * dpiXFactor) {
+            break;
+        }
+        advance = paintMetric(painter, textRect, secondaryWeight, secondaryMetricWeight, value, label, i == 0);
     }
     if (! entry.tertiary.isEmpty()) {
         painter->save();
@@ -1376,13 +1453,12 @@ AgendaEntryDelegate::sizeHint
     if (! data.isNull()) {
         const int lineSpacing = attributes.lineSpacing * dpiYFactor;
         const int lineHeight = option.fontMetrics.height();
-        CalendarEntry entry = data.value<CalendarEntry>();
+        AgendaEntry entry = data.value<AgendaEntry>();
         int tertiaryHeight = 0;
         if (! entry.tertiary.isEmpty()) {
             const int iconWidth = 2 * lineHeight + lineSpacing;
             int tertiaryWidth = width - iconWidth - attributes.iconTextSpacing * dpiXFactor - attributes.padding.left() - attributes.padding.right();
             int numLines;
-            // int tertiary;
             layoutTertiaryText(entry.tertiary, option.font, tertiaryWidth, numLines, tertiaryHeight, nullptr, true);
             tertiaryHeight += 2 * lineSpacing;
         }
@@ -1415,7 +1491,7 @@ AgendaEntryDelegate::hasToolTip
     if (! index.isValid()) {
         return false;
     }
-    CalendarEntry entry = index.data(EntryRole).value<CalendarEntry>();
+    AgendaEntry entry = index.data(EntryRole).value<AgendaEntry>();
     QString text(entry.tertiary.trimmed());
     if (text.isEmpty()) {
         return false;
@@ -1673,32 +1749,46 @@ toolTipDayEntry(const QPoint &pos, QAbstractItemView *view, const CalendarDay &d
 {
     if (idx >= 0 && idx < day.entries.size()) {
         CalendarEntry calEntry = day.entries[idx];
-        QString tooltip = "<center><b>" + calEntry.primary + "</b>";
-        tooltip += "<br/>";
-        switch (calEntry.type) {
-        case ENTRY_TYPE_ACTIVITY:
-            tooltip += "[completed]";
-            break;
-        case ENTRY_TYPE_PLANNED_ACTIVITY:
-            tooltip += "[planned]";
-            break;
-        case ENTRY_TYPE_OTHER:
-        default:
-            tooltip += "[other]";
-            break;
+        QString status;
+        if (calEntry.type == ENTRY_TYPE_ACTUAL_ACTIVITY) {
+            status = QObject::tr("actual");
+        } else {
+            status = QObject::tr("planned");
         }
-        tooltip += "<br/>";
+        if (calEntry.dirty) {
+            status += ", " + QObject::tr("modified");
+        }
+
+        QString tooltip = QString("<div style='padding: %1px;'>").arg(4 * dpiXFactor);
+        tooltip += QString("<div style='font-weight: bold; font-size: 110%; margin-bottom: %1px;'>%2</div>").arg(8 * dpiYFactor).arg(calEntry.primary);
+        tooltip += QString("<div style='font-style: italic; color: gray; margin-bottom: %1px;'>%2</div>").arg(6 * dpiYFactor).arg(status);
+        tooltip += "<table>";
         if (! calEntry.secondary.isEmpty()) {
-            tooltip += calEntry.secondaryMetric + ": " + calEntry.secondary;
-            tooltip += "<br/>";
+            tooltip += QString("<tr><td><b>%1:</b></td><td>%2</td></tr>").arg(calEntry.secondaryMetric).arg(calEntry.secondary);
         }
         if (calEntry.start.isValid()) {
-            tooltip += calEntry.start.toString();
+            QString time = calEntry.start.toString();
             if (calEntry.durationSecs > 0) {
-                tooltip += " - " + calEntry.start.addSecs(calEntry.durationSecs).toString();
+                time += " - " + calEntry.start.addSecs(calEntry.durationSecs).toString();
+            }
+            tooltip += QString("<tr><td><b>%1:</b></td><td>%2</td></tr>").arg(QObject::tr("When")).arg(time);
+        }
+        if (! calEntry.linkedReference.isEmpty()) {
+            QString countertype;
+            countertype = QObject::tr("Linked");
+            tooltip += QString("<tr><td style='padding-top: %1px'><b>%2:</b></td><td style='padding-top: %1px'>%3</td></tr>").arg(6 * dpiYFactor).arg(countertype).arg(calEntry.linkedPrimary);
+            if (calEntry.linkedStartDT.isValid()) {
+                QString linkedWhen;
+                QLocale locale;
+                if (calEntry.linkedStartDT.date() == day.date) {
+                    linkedWhen = locale.toString(calEntry.linkedStartDT.time(), QLocale::NarrowFormat);
+                } else {
+                    linkedWhen = locale.toString(calEntry.linkedStartDT, QLocale::NarrowFormat);
+                }
+                tooltip += QString("<tr><td><b>%1:</b></td><td>%2</td></tr>").arg(QObject::tr("On")).arg(linkedWhen);
             }
         }
-        tooltip += "</center>";
+        tooltip += "</table>";
         QToolTip::showText(pos, tooltip, view);
         return true;
     }
@@ -1784,24 +1874,41 @@ paintHeadline
 }
 
 
-static void
+static int
 paintMetric
-(QPainter *painter, const QRect &rect, const QFont::Weight &valueWeight, const QFont::Weight &labelWeight, const QString &value, const QString &label)
+(QPainter *painter, const QRect &rect, const QFont::Weight &valueWeight, const QFont::Weight &labelWeight, const QString &value, const QString &label, bool first)
 {
+    int advance = 0;
     painter->save();
     QFont font = painter->font();
     font.setWeight(valueWeight);
     painter->setFont(font);
     QFontMetrics valueFM(font);
-    int valueWidth = valueFM.horizontalAdvance(value);
-    painter->drawText(rect, Qt::AlignLeft | Qt::AlignTop, value);
+    QString fullValue(value);
+    if (! first) {
+        fullValue.prepend(" • ");
+    }
+    int valueWidth = valueFM.horizontalAdvance(fullValue);
+    advance += valueWidth;
+    painter->drawText(rect, Qt::AlignLeft | Qt::AlignTop, fullValue);
     if (! label.isEmpty()) {
         QRect labelRect(rect);
-        labelRect.setX(rect.x() + valueWidth + valueFM.horizontalAdvance(" "));
+        int spaceAdvance = valueFM.horizontalAdvance(" ");
+        advance += spaceAdvance;
+        labelRect.setX(rect.x() + valueWidth + spaceAdvance);
         font.setWeight(labelWeight);
         QFontMetrics labelFM(font);
+        int labelWidth;
         painter->setFont(font);
+        if (labelWeight <= QFont::Light) {
+            QRect labelBounds = painter->boundingRect(labelRect, Qt::AlignLeft | Qt::AlignTop, label);
+            labelWidth = labelBounds.width();
+        } else {
+            labelWidth = labelFM.horizontalAdvance(label);
+        }
         painter->drawText(labelRect, Qt::AlignLeft | Qt::AlignTop, label);
+        advance += labelWidth;
     }
     painter->restore();
+    return advance;
 }

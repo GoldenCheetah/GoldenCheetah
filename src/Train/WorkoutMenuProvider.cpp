@@ -318,10 +318,10 @@ WorkoutMenuProvider::addTagDialog
     layout->addWidget(matchMode);
     layout->addWidget(buttonBox);
 
-    connect(filterEdit, &WorkoutFilterBox::textChanged, this, [this, filterModel](const QString &text) {
+    connect(filterEdit, &WorkoutFilterBox::textChanged, this, [filterModel](const QString &text) {
         filterModel->setContains(text.trimmed());
     });
-    connect(tagList->selectionModel(), &QItemSelectionModel::selectionChanged, this, [this, buttonBox, tagList]() {
+    connect(tagList->selectionModel(), &QItemSelectionModel::selectionChanged, this, [buttonBox, tagList]() {
         buttonBox->button(QDialogButtonBox::Ok)->setEnabled(tagList->selectionModel()->hasSelection());
     });
     connect(buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
@@ -407,7 +407,7 @@ WorkoutMenuProvider::manageFiltersDialog
     connect(actionButtons, &ActionButtonBox::addRequested, this, [this, filterTree]() { manageAdd(filterTree); });
     connect(actionButtons, &ActionButtonBox::deleteRequested, this, [this, filterTree]() { manageDelete(filterTree->currentItem()); });
     connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::accept);
-    QMetaObject::Connection updateEnabledConn = connect(editor, &WorkoutFilterBox::textChanged, this, [this, update](const QString &text) {
+    QMetaObject::Connection updateEnabledConn = connect(editor, &WorkoutFilterBox::textChanged, this, [update](const QString &text) {
         update->setEnabled(! text.trimmed().isEmpty());
     });
 
@@ -441,7 +441,7 @@ WorkoutMenuProvider::addFilterDialog
 
     connect(buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
     connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
-    connect(nameEdit, &QLineEdit::textChanged, this, [this, buttonBox](const QString &text) {
+    connect(nameEdit, &QLineEdit::textChanged, this, [buttonBox](const QString &text) {
         buttonBox->button(QDialogButtonBox::Ok)->setEnabled(! text.trimmed().isEmpty());
     });
     nameEdit->setClearButtonEnabled(true);

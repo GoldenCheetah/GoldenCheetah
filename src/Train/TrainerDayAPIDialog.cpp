@@ -424,7 +424,6 @@ TrainerDayAPIDialog::groupBoxClicked
 {
     int checked = 0;
     int unchecked = 0;
-    int uncheckable = 0;
     for (QGroupBox *box : groupBoxes) {
         if (box->isCheckable()) {
             if (box->isChecked()) {
@@ -432,8 +431,6 @@ TrainerDayAPIDialog::groupBoxClicked
             } else {
                 ++unchecked;
             }
-        } else {
-            ++uncheckable;
         }
     }
     selectAll->setEnabled(checked + unchecked > 0);

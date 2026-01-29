@@ -60,6 +60,13 @@
 #include <QStyleFactory>
 #endif
 
+#ifdef Q_CC_MSVC
+// 'freopen': This function or variable may be unsafe.
+// 'fileno': The POSIX name for this item is deprecated.
+// 'dup2': The POSIX name for this item is deprecated.
+#pragma warning(disable:4996)
+#endif
+
 //
 // bootstrap state
 //
@@ -507,7 +514,7 @@ main(int argc, char *argv[])
         QString oldLibraryPath=QDir::home().canonicalPath()+"/Library/GoldenCheetah";
 
         //these are the new platform-dependent library paths
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
         QString libraryPath="Library/GoldenCheetah";
 #elif defined(Q_OS_WIN)
         QStringList paths=QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation);

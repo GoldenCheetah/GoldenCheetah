@@ -77,6 +77,7 @@
 #include "AddCloudWizard.h"
 #include "LocalFileStore.h"
 #include "CloudService.h"
+#include "SaveDialogs.h"
 
 // GUI Widgets
 #include "AthleteTab.h"
@@ -529,8 +530,8 @@ MainWindow::MainWindow(const QDir &home)
     rideMenu->addAction(tr("&Import from file..."), QKeySequence("Ctrl+I"), this, SLOT (importFile()));
     rideMenu->addAction(tr("&Manual entry..."), QKeySequence("Ctrl+M"), this, SLOT(manualRide()));
     QAction *actionPlan = new QAction(tr("&Plan activity..."));
-    connect(context, &Context::start, this, [this, actionPlan]() { actionPlan->setEnabled(false); }); // The dialog can change the contexts workout
-    connect(context, &Context::stop, this, [this, actionPlan]() { actionPlan->setEnabled(true); });   // temporarily which might cause unwanted effects
+    connect(context, &Context::start, this, [actionPlan]() { actionPlan->setEnabled(false); }); // The dialog can change the contexts workout
+    connect(context, &Context::stop, this, [actionPlan]() { actionPlan->setEnabled(true); });   // temporarily which might cause unwanted effects
     connect(actionPlan, &QAction::triggered, this, [this]() { planActivity(); });
     rideMenu->addAction(actionPlan);
     rideMenu->addSeparator ();
@@ -625,7 +626,9 @@ MainWindow::MainWindow(const QDir &home)
 
 
     editMenu = menuBar()->addMenu(tr("&Edit"));
-    connect(editMenu, SIGNAL(aboutToShow()), this, SLOT(onEditMenuAboutToShow()));
+    // Force the signal to emit, without this on MacOS the edit menu disappears if we have translation enabled.
+    onEditMenuAboutToShow();
+    connect(editMenu, &QMenu::aboutToShow, this, &MainWindow::onEditMenuAboutToShow);
 
     HelpWhatsThis *editMenuHelp = new HelpWhatsThis(editMenu);
     editMenu->setWhatsThis(editMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Edit));
@@ -755,8 +758,6 @@ MainWindow::MainWindow(const QDir &home)
 
     versionClient = new CloudDBVersionClient();
     versionClient->informUserAboutLatestVersions();
-
-
 
 #endif
 
@@ -1133,6 +1134,20 @@ void MainWindow::setFilter(QStringList f) { currentAthleteTab->context->setFilte
 void MainWindow::clearFilter() { currentAthleteTab->context->clearFilter(); }
 
 void
+MainWindow::fillinFilter(const QString &filterText)
+{
+    searchBox->setMode(SearchBox::Filter);
+    searchBox->setText(filterText);
+}
+
+void
+MainWindow::fillinSearch(const QString &filterText)
+{
+    searchBox->setMode(SearchBox::Search);
+    searchBox->setText(filterText);
+}
+
+void
 MainWindow::aboutDialog()
 {
     AboutDialog *ad = new AboutDialog(currentAthleteTab->context);
@@ -1232,6 +1247,8 @@ MainWindow::sidebarClicked(GcSideBarBtnId id)
     switch (id) {
     case GcSideBarBtnId::SYNC_BTN: checkCloud(); break; // sync quick link
     case GcSideBarBtnId::OPTIONS_BTN: showOptions(); break; // prefs
+
+    default: break;
     }
 }
 
@@ -1246,6 +1263,8 @@ MainWindow::sidebarSelected(GcSideBarBtnId id)
     case GcSideBarBtnId::REFLECT_BTN: break; // reflect not written yet
     case GcSideBarBtnId::TRAIN_BTN: selectTrain(); break;
     case GcSideBarBtnId::APPS_BTN: break;// apps not written yet
+
+    default: break;
     }
 }
 
@@ -1333,6 +1352,27 @@ MainWindow::isStarting
 () const
 {
     return splash != nullptr;
+}
+
+
+bool
+MainWindow::filenameWillChange(RideItem *rideItem, QString *newName) const
+{
+    QFileInfo currentFI(rideItem->fileName);
+    QDateTime ridedatetime = rideItem->ride()->startTime();
+    QChar zero = QLatin1Char('0');
+    QString targetnosuffix = QString("%1_%2_%3_%4_%5_%6")
+                                    .arg(ridedatetime.date().year(), 4, 10, zero)
+                                    .arg(ridedatetime.date().month(), 2, 10, zero)
+                                    .arg(ridedatetime.date().day(), 2, 10, zero)
+                                    .arg(ridedatetime.time().hour(), 2, 10, zero)
+                                    .arg(ridedatetime.time().minute(), 2, 10, zero)
+                                    .arg(ridedatetime.time().second(), 2, 10, zero);
+    if (newName != nullptr) {
+        *newName = targetnosuffix + "." + currentFI.suffix();
+    }
+
+    return currentFI.baseName() != targetnosuffix;
 }
 
 
@@ -1890,8 +1930,29 @@ MainWindow::deleteRide()
     msgBox.setDefaultButton(QMessageBox::Cancel);
     msgBox.setIcon(QMessageBox::Critical);
     msgBox.exec();
-    if(msgBox.clickedButton() == deleteButton)
-        currentAthleteTab->context->athlete->removeCurrentRide();
+    if (msgBox.clickedButton() == deleteButton) {
+        RideCache::OperationPreCheck check = currentAthleteTab->context->athlete->rideCache->checkUnlinkActivity(item);
+        bool nextStep = true;
+        if (nextStep && check.canProceed) {
+            if (proceedDialog(currentAthleteTab->context, check)) {
+                currentAthleteTab->context->tab->setNoSwitch(true);
+                RideCache::OperationResult result = currentAthleteTab->context->athlete->rideCache->unlinkActivity(item);
+                currentAthleteTab->context->tab->setNoSwitch(false);
+                if (result.success) {
+                    QString error;
+                    currentAthleteTab->context->athlete->rideCache->saveActivities(check.affectedItems, error);
+                } else {
+                    QMessageBox::warning(this, "Failed", result.error);
+                    nextStep = false;
+                }
+            } else {
+                nextStep = false;
+            }
+        }
+        if (nextStep) {
+            currentAthleteTab->context->athlete->removeCurrentRide();
+        }
+    }
 }
 
 /*----------------------------------------------------------------------
@@ -2604,24 +2665,23 @@ MainWindow::ridesAutoImport() {
 
 void MainWindow::onEditMenuAboutToShow()
 {
+    // On MacOS the clear here is dangerous because it's a system menu so we can't do this via aboutToShow.
     editMenu->clear();
     if (toolMapper != nullptr) {
-        delete toolMapper;
+      toolMapper.reset();
     }
-
     // Add all the data processors to the tools menu
     const DataProcessorFactory &factory = DataProcessorFactory::instance();
     QList<DataProcessor*> processors = factory.getProcessorsSorted();
-    toolMapper = new QSignalMapper(this); // maps each option
-    connect(toolMapper, &QSignalMapper::mappedString, this, &MainWindow::manualProcess);
-
-    for (QList<DataProcessor*>::iterator iter = processors.begin(); iter != processors.end(); ++iter) {
-        if (! (*iter)->isAutomatedOnly()) {
+    toolMapper = std::make_unique<QSignalMapper>(); // maps each option
+    connect(toolMapper.get(), &QSignalMapper::mappedString, this, &MainWindow::manualProcess);
+    for (const auto& iter : processors) {
+        if (!iter->isAutomatedOnly()) {
             // The localized processor name is shown in menu
-            QAction *action = new QAction(QString("%1...").arg((*iter)->name()), this);
+            auto* action = new QAction(QString("%1...").arg(iter->name()), toolMapper.get());
+            connect(action, &QAction::triggered, toolMapper.get(), static_cast<void(QSignalMapper::*)()>(&QSignalMapper::map));
+            toolMapper->setMapping(action, iter->id());
             editMenu->addAction(action);
-            connect(action, SIGNAL(triggered()), toolMapper, SLOT(map()));
-            toolMapper->setMapping(action, (*iter)->id());
         }
     }
 }

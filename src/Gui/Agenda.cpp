@@ -377,7 +377,7 @@ ActivityTree::ActivityTree
 
         QVariant data = item->data(1, AgendaEntryDelegate::EntryRole);
         if (! data.isNull()) {
-            CalendarEntry entry = data.value<CalendarEntry>();
+            AgendaEntry entry = data.value<AgendaEntry>();
             if (entry.type == ENTRY_TYPE_PLANNED_ACTIVITY) {
                 emit viewActivity(entry);
             }
@@ -406,7 +406,7 @@ ActivityTree::setFutureDays
 
 void
 ActivityTree::fillEntries
-(const QHash<QDate, QList<CalendarEntry>> &activities)
+(const QHash<QDate, QList<AgendaEntry>> &activities)
 {
     QDate today = selectedDate();
     QDate pastFirst = today.addDays(-pastDays);
@@ -417,13 +417,13 @@ ActivityTree::fillEntries
     bool todayHasPlanned = false;
     QList<QDate> missedDays;
     QList<QDate> upcomingDays;
-    QHash<QDate, QList<CalendarEntry>> missedEntries;
-    QList<CalendarEntry> todayEntries;
-    QHash<QDate, QList<CalendarEntry>> upcomingEntries;
+    QHash<QDate, QList<AgendaEntry>> missedEntries;
+    QList<AgendaEntry> todayEntries;
+    QHash<QDate, QList<AgendaEntry>> upcomingEntries;
     for (QDate date = pastFirst; date <= futureLast; date = date.addDays(1)) {
-        QList<CalendarEntry> dateEntries;
+        QList<AgendaEntry> dateEntries;
         dateEntries = activities.value(date);
-        for (const CalendarEntry &entry : dateEntries) {
+        for (const AgendaEntry &entry : dateEntries) {
             if (entry.type == ENTRY_TYPE_PLANNED_ACTIVITY) {
                 if (date < today) {
                     if (! missedDays.contains(date)) {
@@ -547,29 +547,30 @@ ActivityTree::createContextMenu
     if (entryData.isNull()) {
         return nullptr;
     }
-    CalendarEntry entry = entryData.value<CalendarEntry>();
+    AgendaEntry entry = entryData.value<AgendaEntry>();
     if (entry.type != ENTRY_TYPE_PLANNED_ACTIVITY) {
         return nullptr;
     }
     QMenu *contextMenu = new QMenu(this);
+    contextMenu->addAction(tr("View planned activity..."), this, [this, entry]() {
+        emit viewActivity(entry);
+    });
     if (entry.hasTrainMode) {
+        contextMenu->addSeparator();
         contextMenu->addAction(tr("Show in train mode..."), this, [this, entry]() {
             emit showInTrainMode(entry);
         });
     }
-    contextMenu->addAction(tr("View planned activity..."), this, [this, entry]() {
-        emit viewActivity(entry);
-    });
     return contextMenu;
 }
 
 
 void
 ActivityTree::addEntries
-(const QDate &today, const QDate &date, const QList<CalendarEntry> &activities, QTreeWidgetItem *parent, const Fonts &fonts)
+(const QDate &today, const QDate &date, const QList<AgendaEntry> &activities, QTreeWidgetItem *parent, const Fonts &fonts)
 {
     int activityIdx = 0;
-    for (const CalendarEntry &activity : activities) {
+    for (const AgendaEntry &activity : activities) {
         QTreeWidgetItem *entryItem = new QTreeWidgetItem();
         QString diffStr;
         int diff = date.daysTo(today);
@@ -607,7 +608,7 @@ ActivityTree::addEntries
 
 void
 PhaseTree::fillEntries
-(const std::pair<QList<CalendarEntry>, QList<CalendarEntry>> &phases)
+(const std::pair<QList<AgendaEntry>, QList<AgendaEntry>> &phases)
 {
     QDate today = selectedDate();
     if (! today.isValid()) {
@@ -665,7 +666,7 @@ PhaseTree::createContextMenu
     if (entryData.isNull()) {
         return nullptr;
     }
-    CalendarEntry entry = entryData.value<CalendarEntry>();
+    AgendaEntry entry = entryData.value<AgendaEntry>();
     if (entry.type != ENTRY_TYPE_PHASE) {
         return nullptr;
     }
@@ -679,9 +680,9 @@ PhaseTree::createContextMenu
 
 void
 PhaseTree::addEntries
-(const QDate &today, const QList<CalendarEntry> &phases, QTreeWidgetItem *parent, const Fonts &fonts)
+(const QDate &today, const QList<AgendaEntry> &phases, QTreeWidgetItem *parent, const Fonts &fonts)
 {
-    for (const CalendarEntry &phase : phases) {
+    for (const AgendaEntry &phase : phases) {
         QTreeWidgetItem *entryItem = new QTreeWidgetItem();
         QString diffStr;
         int diffStart = today.daysTo(phase.spanStart);
@@ -760,7 +761,7 @@ PhaseTree::addEntries
 
 void
 EventTree::fillEntries
-(const QHash<QDate, QList<CalendarEntry>> &events)
+(const QHash<QDate, QList<AgendaEntry>> &events)
 {
     QDate today = selectedDate();
     if (! today.isValid()) {
@@ -807,7 +808,7 @@ EventTree::createContextMenu
     if (entryData.isNull()) {
         return nullptr;
     }
-    CalendarEntry entry = entryData.value<CalendarEntry>();
+    AgendaEntry entry = entryData.value<AgendaEntry>();
     if (entry.type != ENTRY_TYPE_EVENT) {
         return nullptr;
     }
@@ -821,10 +822,10 @@ EventTree::createContextMenu
 
 void
 EventTree::addEntries
-(const QDate &today, const QList<CalendarEntry> &events, QTreeWidgetItem *parent, const Fonts &fonts)
+(const QDate &today, const QList<AgendaEntry> &events, QTreeWidgetItem *parent, const Fonts &fonts)
 {
     bool firstEntry = true;
-    for (const CalendarEntry &event : events) {
+    for (const AgendaEntry &event : events) {
         QTreeWidgetItem *entryItem = new QTreeWidgetItem();
         int diffStart = today.daysTo(event.spanStart);
         QString diffStr;
@@ -899,16 +900,16 @@ AgendaView::AgendaView
 
     activityTree = new ActivityTree();
     connect(activityTree, &ActivityTree::dayChanged, this, [this](const QDate &date) { emit dayChanged(date); });
-    connect(activityTree, &ActivityTree::showInTrainMode, this, [this](const CalendarEntry &activity) { emit showInTrainMode(activity); });
-    connect(activityTree, &ActivityTree::viewActivity, this, [this](const CalendarEntry &activity) { emit viewActivity(activity); });
+    connect(activityTree, &ActivityTree::showInTrainMode, this, [this](const AgendaEntry &activity) { emit showInTrainMode(activity); });
+    connect(activityTree, &ActivityTree::viewActivity, this, [this](const AgendaEntry &activity) { emit viewActivity(activity); });
 
     phaseTree = new PhaseTree();
     connect(phaseTree, &PhaseTree::dayChanged, this, [this](const QDate &date) { emit dayChanged(date); });
-    connect(phaseTree, &PhaseTree::editPhaseEntry, this, [this](const CalendarEntry &phase) { emit editPhaseEntry(phase); });
+    connect(phaseTree, &PhaseTree::editPhaseEntry, this, [this](const AgendaEntry &phase) { emit editPhaseEntry(phase); });
 
     eventTree = new EventTree();
     connect(eventTree, &EventTree::dayChanged, this, [this](const QDate &date) { emit dayChanged(date); });
-    connect(eventTree, &EventTree::editEventEntry, this, [this](const CalendarEntry &event) { emit editEventEntry(event); });
+    connect(eventTree, &EventTree::editEventEntry, this, [this](const AgendaEntry &event) { emit editEventEntry(event); });
 
     QGridLayout* headLayout = new QGridLayout();
     headLayout->setColumnStretch(0, 1);
@@ -965,7 +966,7 @@ AgendaView::setFutureDays
 
 void
 AgendaView::fillEntries
-(const QHash<QDate, QList<CalendarEntry>> &activities, std::pair<QList<CalendarEntry>, QList<CalendarEntry>> &phases , const QHash<QDate, QList<CalendarEntry>> &events, const QString &seasonName, bool isFiltered)
+(const QHash<QDate, QList<AgendaEntry>> &activities, std::pair<QList<AgendaEntry>, QList<AgendaEntry>> &phases , const QHash<QDate, QList<AgendaEntry>> &events, const QString &seasonName, bool isFiltered)
 {
     if (! seasonName.isNull()) {
         seasonLabel->setText(tr("Season: %1").arg(seasonName));

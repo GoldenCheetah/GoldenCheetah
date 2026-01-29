@@ -309,7 +309,6 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
     // if we failed to startup embedded R properly
     // then disable the PythonConsole altogether.
     if (python) {
-
         showCon = new QCheckBox(tr("Show Console"), this);
         showCon->setChecked(true);
         clv->addWidget(showCon);
@@ -396,9 +395,7 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
         installEventFilter(console);
         installEventFilter(splitter);
         installEventFilter(canvas);
-
     } else {
-
         // not starting
         noPython = new QLabel(tr("Warning: Python is disabled"), this);
         clv->addWidget(noPython);

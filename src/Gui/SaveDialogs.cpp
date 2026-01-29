@@ -80,8 +80,11 @@ MainWindow::saveRideSingleDialog(Context *context, RideItem *rideItem)
         dialog.exec();
         return true;
     } else {
-        // go for it, the user doesn't want warnings!
-        saveSilent(context, rideItem);
+        QString error;
+        QList<RideItem*> activities;
+        activities << rideItem;
+        relinkRideItems(context, rideItem, activities);
+        context->athlete->rideCache->saveActivities(activities, error);
         return true;
     }
 }
@@ -211,17 +214,9 @@ MainWindow::saveSilent(Context *context, RideItem *rideItem)
 void
 MainWindow::saveAllFilesSilent(Context *context)
 {
-    QList<RideItem*> dirtyList;
-
-    // get a list of rides to save
-    foreach (RideItem *rideItem, context->athlete->rideCache->rides())
-        if (rideItem->isDirty() == true)
-            dirtyList.append(rideItem);
-
-    // we have some files to save...
-    if (dirtyList.count() > 0) {
-        for (int i=0; i<dirtyList.count(); i++) {
-            this->saveRideSingleDialog(context, dirtyList.at(i));
+    for (RideItem *rideItem : context->athlete->rideCache->rides()) {
+        if (rideItem->isDirty()) {
+            this->saveRideSingleDialog(context, rideItem);
         }
     }
 }
@@ -389,4 +384,54 @@ void
 SaveOnExitDialogWidget::warnSettingClicked()
 {
     setWarnExit(exitWarnCheckBox->isChecked());
+}
+
+
+bool
+proceedDialog
+(Context *context, const RideCache::OperationPreCheck &check)
+{
+    if (check.requiresUserDecision) {
+        QMessageBox msgBox(QMessageBox::Question,
+                           QObject::tr("Modified activities"),
+                           check.warningMessage,
+                           QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+                           context->mainWindow);
+        int action = msgBox.exec();
+        if (action == QMessageBox::Cancel) {
+            return false;
+        } else if (action == QMessageBox::Save) {
+            QString error;
+            context->athlete->rideCache->saveActivities(check.dirtyItems, error);
+        } else if (action == QMessageBox::Discard) {
+            for (RideItem *item : check.dirtyItems) {
+                item->close();
+                item->ride();
+            }
+        }
+    }
+    return true;
+}
+
+
+void
+relinkRideItems
+(Context *context, RideItem *rideItem, QList<RideItem*> &activities)
+{
+    QString newFilename;
+    bool hasNewFilename = context->mainWindow->filenameWillChange(rideItem, &newFilename);
+    RideItem *linkedItem = context->athlete->rideCache->getLinkedActivity(rideItem);
+    if (linkedItem != nullptr) {
+        QString linkedNewFilename;
+        bool hasLinkedNewFilename = context->mainWindow->filenameWillChange(linkedItem, &linkedNewFilename);
+        if (hasNewFilename) {
+            linkedItem->setLinkedFileName(newFilename);
+            linkedItem->setDirty(true);
+            activities << linkedItem;
+        }
+        if (hasLinkedNewFilename) {
+            rideItem->setLinkedFileName(linkedNewFilename);
+            rideItem->setDirty(true);
+        }
+    }
 }

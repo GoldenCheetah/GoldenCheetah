@@ -26,7 +26,7 @@
 #include <QFormLayout>
 
 MetadataDialog::MetadataDialog(Context* context, const QString& fieldName, const QString& value, QPoint pos) :
-    QDialog(context->mainWindow), context_(context), completer_(nullptr), pos_(pos)
+    QDialog(context->mainWindow), context_(context), pos_(pos), completer_(nullptr)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("Metadata Editor"));

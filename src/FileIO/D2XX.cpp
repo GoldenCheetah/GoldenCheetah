@@ -167,7 +167,7 @@ D2XX::read(void *buf, size_t nbyte, QString &err)
     if (nbyte > rxbytes)
         lib->set_timeouts(ftHandle, 5000, 5000);
     DWORD n;
-    ftStatus = lib->read(ftHandle, buf, nbyte, &n);
+    ftStatus = lib->read(ftHandle, buf, static_cast<DWORD>(nbyte), &n);
     if (ftStatus == FT_OK)
         return n;
     err = QString("FT_Read: %1").arg(ftStatus);
@@ -178,7 +178,7 @@ int
 D2XX::write(void *buf, size_t nbyte, QString &err)
 {
     DWORD n;
-    FT_STATUS ftStatus = lib->write(ftHandle, buf, nbyte, &n);
+    FT_STATUS ftStatus = lib->write(ftHandle, buf, static_cast<DWORD>(nbyte), &n);
     if (ftStatus == FT_OK)
         return n;
     err = QString("FT_Write: %1").arg(ftStatus);

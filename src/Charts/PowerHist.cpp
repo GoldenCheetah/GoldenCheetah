@@ -1191,10 +1191,6 @@ PowerHist::binData(HistData &standard, QVector<double>&x, // x-axis for data
         sx.resize(selectedArray->size() * 4);
         sy.resize(selectedArray->size() * 4);
 
-        // so we can calculate percentage for the labels
-        double total=0;
-        for (int i=0; i<array->size(); i++) total += dt * (double)(*array)[i];
-
         // samples to time
         for (int i=0, offset=0; i<array->size(); i++) {
 

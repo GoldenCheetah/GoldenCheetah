@@ -31,7 +31,7 @@ bool USBXpress::find()
 
     // any USBXpress devices connected?
     SI_GetNumDevices(&numDevices);
-    if (numDevices == 0) return -1;
+    if (numDevices == 0) return false;
 
     // lets see if one of them is a GARMIN USB1 stick and open it
     for (unsigned int i=0; i<numDevices; i++) {

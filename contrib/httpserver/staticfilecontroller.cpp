@@ -31,7 +31,7 @@ StaticFileController::StaticFileController(QSettings* settings, QObject* parent)
     maxCachedFileSize=settings->value("maxCachedFileSize","65536").toInt();
     cache.setMaxCost(settings->value("cacheSize","1000000").toInt());
     cacheTimeout=settings->value("cacheTime","60000").toInt();
-    wDebug("StaticFileController: cache timeout=%i, size=%i",cacheTimeout,cache.maxCost());
+    wDebug("StaticFileController: cache timeout=%i, size=%lld",cacheTimeout,cache.maxCost());
 }
 
 

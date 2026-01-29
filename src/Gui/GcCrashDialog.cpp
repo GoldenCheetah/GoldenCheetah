@@ -292,7 +292,7 @@ QString GcCrashDialog::versionHTML()
 #else
             .arg("none")
 #endif
-#ifdef GC_HAVE_PYTHON
+#ifdef GC_WANT_PYTHON
             .arg(QString("%1 [%2]").arg(python ? python->version.split(" ").at(0) : QString("none")).arg(PythonEmbed::buildVersion()))
 #else
             .arg("none")

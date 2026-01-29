@@ -162,6 +162,31 @@ QString xmlprotect(const QString &string)
     return s;
 }
 
+QString quoteEscape(const QString &string)
+{
+    QString out;
+    out.reserve(string.size() * 2);
+    int backslashes = 0;
+    for (QChar c : string) {
+        if (c == '\\') {
+            backslashes++;
+            out += c;
+        } else if (c == '"') {
+            if (backslashes % 2 == 0) {
+                out += "\\\"";
+            } else {
+                out += '"';
+            }
+            backslashes = 0;
+        } else {
+            out += c;
+            backslashes = 0;
+        }
+    }
+    out.squeeze();
+    return out;
+}
+
 QString unescape(const QString &string)
 {
     // just unescape common \ characters

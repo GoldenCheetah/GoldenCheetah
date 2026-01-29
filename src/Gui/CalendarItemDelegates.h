@@ -98,6 +98,8 @@ public:
     enum Roles {
         DayRole = Qt::UserRole + 1, // [CalendarDay] Calendar day
         PressedEntryRole,           // [int] Index of the currently pressed CalendarDay (see DayRole >> entries)
+        RelatedEntryRole,           // [int] Index of the entry related to the currently active one (see
+                                    //       PressedEntryRole, DayRole >> entries)
         LayoutRole                  // [QList<CalendarEntryLayout>] Layout of the activities in one column
     };
 
@@ -115,6 +117,7 @@ private:
 
 
 class CalendarHeadlineDelegate : public QStyledItemDelegate {
+    Q_OBJECT
 public:
     enum Roles {
         DayRole = Qt::UserRole + 1 // [CalendarDay] Calendar day
@@ -153,10 +156,13 @@ private:
 
 
 class CalendarCompactDayDelegate : public QStyledItemDelegate {
+    Q_OBJECT
 public:
     enum Roles {
         DayRole = Qt::UserRole + 1, // [CalendarDay] Calendar day
-        PressedEntryRole            // [int] Index of the currently pressed CalendarDay (see DayRole >> entries)
+        PressedEntryRole,           // [int] Index of the currently pressed CalendarDay (see DayRole >> entries)
+        RelatedEntryRole            // [int] Index of the entry related to the currently active one (see
+                                    //       PressedEntryRole, DayRole >> entries)
     };
 
     explicit CalendarCompactDayDelegate(QObject *parent = nullptr);
@@ -191,6 +197,7 @@ private:
 
 
 class AgendaMultiDelegate : public QStyledItemDelegate {
+    Q_OBJECT
 public:
     enum Roles {
         // Qt::DisplayRole            // [QString] The default text to display
@@ -229,20 +236,21 @@ private:
 
 
 class AgendaEntryDelegate : public QStyledItemDelegate {
+    Q_OBJECT
 public:
     enum Roles {
-        EntryRole = Qt::UserRole, // [CalendarEntry] Entry to be displayed
-        EntryDateRole             // [bool] Date of the CalendarEntry
+        EntryRole = Qt::UserRole, // [AgendaEntry] Entry to be displayed
+        EntryDateRole             // [bool] Date of the AgendaEntry
     };
 
     struct Attributes {
         QMargins padding;                                         // Padding of the element
         QFont::Weight primaryWeight = QFont::Medium;              // Primary row
-        QFont::Weight primaryHoverWeight = QFont::DemiBold;       // Primary row (hovered)
-        QFont::Weight secondaryWeight = QFont::Light;             // Secondary row
-        QFont::Weight secondaryHoverWeight = QFont::DemiBold;     // Secondary row (hovered)
+        QFont::Weight primaryHoverWeight = QFont::Medium;         // Primary row (hovered)
+        QFont::Weight secondaryWeight = QFont::Medium;            // Secondary row
+        QFont::Weight secondaryHoverWeight = QFont::Medium;       // Secondary row (hovered)
         QFont::Weight secondaryMetricWeight = QFont::ExtraLight;  // Metric in the secondary row
-        QFont::Weight secondaryMetricHoverWeight = QFont::Normal; // Metric in the secondary row (hovered)
+        QFont::Weight secondaryMetricHoverWeight = QFont::ExtraLight; // Metric in the secondary row (hovered)
         int lineSpacing = 2;                                      // Vertical spacing between primary and secondary row (dpiYFactor not applied)
         int iconTextSpacing = 10;                                 // Horizontal spacing between icon and text (dpiXFactor not applied)
         float tertiaryDimLevel = 0.5;                             // Dimming amount for tertiary row

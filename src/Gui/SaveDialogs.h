@@ -27,6 +27,7 @@
 #include <QTableWidget>
 #include <QHeaderView>
 
+#include "RideCache.h"
 #include "RideItem.h"
 #include "Context.h"
 
@@ -82,5 +83,10 @@ class SaveOnExitDialogWidget : public QDialog
 
         QTableWidget *dirtyFiles;
 };
+
+
+extern bool proceedDialog(Context *context, const RideCache::OperationPreCheck &check);
+extern void relinkRideItems(Context *context, RideItem *rideItem, QList<RideItem*> &activities);
+
 
 #endif // _GC_SaveDialogs_h

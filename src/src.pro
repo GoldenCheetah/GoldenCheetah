@@ -5,7 +5,7 @@
 #                                                                             #
 ###############################################################################
 
-!versionAtLeast(QT_VERSION, 6.6.1):error("Use at least Qt version 6.6.1")
+!versionAtLeast(QT_VERSION, 6.5.3):error("Use at least Qt version 6.5.3")
 
 ###==========================
 ### IMPORT USER CONFIGURATION
@@ -39,14 +39,6 @@ CONFIG(debug, debug|release) { QMAKE_CXXFLAGS += -DGC_DEBUG }
 QT += xml sql network svg  widgets concurrent serialport multimedia multimediawidgets \
       webenginecore webenginewidgets webchannel positioning webenginequick core5compat
 CONFIG += c++17
-
-###==========================
-### PRECOMPILED HEADER
-###==========================
-PRECOMPILED_HEADER = stable.h
-CONFIG += precompile_header
-
-
 
 ###=======================================================================
 ### Directory Structure - Split into subdirs to be more manageable
@@ -104,15 +96,11 @@ LIBS += $${GSL_LIBS}
 
 # Microsoft Visual Studion toolchain dependencies
 win32-msvc* {
-
     # we need windows kit 8.2 or higher with MSVC, offer default location
     isEmpty(WINKIT_INSTALL) WINKIT_INSTALL= "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64"
     LIBS += -L$${WINKIT_INSTALL} -lGdi32 -lUser32
     CONFIG += force_debug_info
-
-
 } else {
-
     # gnu toolchain wants math libs
     LIBS += -lm
 
@@ -139,10 +127,6 @@ win32 {
 }
 
 macx {
-    lessThan(QT_MAJOR_VERSION, 6) {
-        # Mac native widget support
-        QT += macextras
-    }
 
     # we have our own plist
     QMAKE_INFO_PLIST = ./Resources/mac/Info.plist.app
@@ -155,13 +139,7 @@ macx {
     # otherwise we have a blank videowindow, it will do nothing
     HEADERS += Train/VideoWindow.h
     SOURCES += Train/VideoWindow.cpp
-
-    # PCH crashes clang if we have multiple -arch flags (universal binary)
-    message("Disabling Precompiled Headers on macOS to avoid multi-arch Clang errors.")
-    CONFIG -= precompile_header
-
 } else {
-
     # not on mac we need our own full screen support and segment control button
     HEADERS += Gui/QTFullScreen.h
     SOURCES += Gui/QTFullScreen.cpp
@@ -230,40 +208,29 @@ RESOURCES = $${PWD}/Resources/application.qrc
 ### OPTIONAL => Embed Python
 ###=========================
 
-notsupported = "INFO: Embedded Python requires version QT >= 6.5.3, no support for"
-notsupported += $${QT_VERSION}
-
 contains(DEFINES, "GC_WANT_PYTHON") {
+    message("Enabling Python support")
+    INCLUDEPATH += $$replace(PYTHONINCLUDES, ^-I, )
+    LIBS += $${PYTHONLIBS}
 
-            # add Python subdirectory to include path
-            INCLUDEPATH += ./Python
+    # add Python subdirectory to include path
+    INCLUDEPATH += ./Python
+    DEFINES += SIP_STATIC_MODULE
 
-            DEFINES += SIP_STATIC_MODULE
-            !isEmpty(PYTHONINCLUDES) QMAKE_CXXFLAGS += $${PYTHONINCLUDES}
-            LIBS += $${PYTHONLIBS}
+    ## Python integration & SIP files
+    HEADERS += $$files(Python/SIP/sip*.h) Python/SIP/Bindings.h
+    SOURCES += $$files(Python/SIP/sip*.c)
+    SOURCES += $$files(Python/SIP/sip*.cpp) Python/SIP/Bindings.cpp
 
-            ## Python integration
-            HEADERS += Python/PythonEmbed.h Charts/PythonChart.h Python/PythonSyntax.h
-            SOURCES += Python/PythonEmbed.cpp Charts/PythonChart.cpp Python/PythonSyntax.cpp
+    ## Python Embedding & Charts
+    HEADERS += Python/PythonEmbed.h Python/PythonSyntax.h Charts/PythonChart.h
+    SOURCES += Python/PythonEmbed.cpp Python/PythonSyntax.cpp Charts/PythonChart.cpp
 
-            ## Python SIP generated module
-            SOURCES += Python/SIP/sipgoldencheetahBindings.cpp Python/SIP/sipgoldencheetahcmodule.cpp
-            SOURCES += Python/SIP/Bindings.cpp
-
-            ## SIP type conversion
-            SOURCES += Python/SIP/sipgoldencheetahQString.cpp
-            SOURCES += Python/SIP/sipgoldencheetahQStringList.cpp
-            SOURCES += Python/SIP/sipgoldencheetahPythonDataSeries.cpp \
-                       Python/SIP/sipgoldencheetahPythonXDataSeries.cpp
-            DEFINES += GC_HAVE_PYTHON
-
-            ## Python data processors
-            HEADERS += FileIO/FixPyScriptsDialog.h FileIO/FixPySettings.h FileIO/FixPyRunner.h \
-                       FileIO/FixPyScript.h FileIO/FixPyDataProcessor.h
-
-            SOURCES += FileIO/FixPyScriptsDialog.cpp FileIO/FixPySettings.cpp FileIO/FixPyRunner.cpp \
-                       FileIO/FixPyDataProcessor.cpp
-
+    ## Python data processors
+    HEADERS += FileIO/FixPyScriptsDialog.h FileIO/FixPySettings.h FileIO/FixPyRunner.h \
+                FileIO/FixPyScript.h FileIO/FixPyDataProcessor.h
+    SOURCES += FileIO/FixPyScriptsDialog.cpp FileIO/FixPySettings.cpp FileIO/FixPyRunner.cpp \
+                FileIO/FixPyDataProcessor.cpp
 }
 
 ###====================
@@ -472,8 +439,6 @@ HEADERS +=  $$HTPATH/httpglobal.h \
             $$HTPATH/httpresponse.h \
             $$HTPATH/httpcookie.h \
             $$HTPATH/httprequesthandler.h \
-            $$HTPATH/httpsession.h \
-            $$HTPATH/httpsessionstore.h \
             $$HTPATH/staticfilecontroller.h
 SOURCES +=  $$HTPATH/httpglobal.cpp \
             $$HTPATH/httplistener.cpp \
@@ -483,8 +448,6 @@ SOURCES +=  $$HTPATH/httpglobal.cpp \
             $$HTPATH/httpresponse.cpp \
             $$HTPATH/httpcookie.cpp \
             $$HTPATH/httprequesthandler.cpp \
-            $$HTPATH/httpsession.cpp \
-            $$HTPATH/httpsessionstore.cpp \
             $$HTPATH/staticfilecontroller.cpp
 
 
@@ -618,11 +581,11 @@ HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPl
 HEADERS += Cloud/CalendarDownload.h Cloud/CloudService.h \
            Cloud/LocalFileStore.h Cloud/OAuthDialog.h \
            Cloud/WithingsDownload.h Cloud/Strava.h Cloud/CyclingAnalytics.h Cloud/RideWithGPS.h \
-           Cloud/TrainingsTageBuch.h Cloud/Selfloops.h Cloud/Velohero.h Cloud/SportsPlusHealth.h \
+           Cloud/TrainingsTageBuch.h Cloud/Selfloops.h Cloud/SportsPlusHealth.h \
            Cloud/AddCloudWizard.h Cloud/Withings.h Cloud/MeasuresDownload.h Cloud/Xert.h \
            Cloud/Azum.h
 
-# core data 
+# core data
 HEADERS += Core/Athlete.h Core/Context.h Core/DataFilter.h Core/FreeSearch.h Core/GcCalendarModel.h Core/GcUpgrade.h \
            Core/IdleTimer.h Core/IntervalItem.h Core/NamedSearch.h Core/RideCache.h Core/RideCacheModel.h Core/RideDB.h \
            Core/RideItem.h Core/Route.h Core/RouteParser.h Core/Season.h Core/SeasonDialogs.h Core/Seasons.h Core/Secrets.h Core/Settings.h \
@@ -658,7 +621,7 @@ HEADERS += Gui/AboutDialog.h Gui/AddIntervalDialog.h Gui/AnalysisSidebar.h Gui/C
            Gui/PerspectiveDialog.h Gui/SplashScreen.h Gui/StyledItemDelegates.h Gui/MetadataDialog.h Gui/ActionButtonBox.h \
            Gui/MetricOverrideDialog.h Gui/RepeatScheduleWizard.h \
            Gui/Calendar.h Gui/Agenda.h Gui/CalendarData.h Gui/CalendarItemDelegates.h \
-           Gui/IconManager.h
+           Gui/IconManager.h Gui/FilterSimilarDialog.h
 
 # metrics and models
 HEADERS += Metrics/Banister.h Metrics/CPSolver.h Metrics/Estimator.h Metrics/ExtendedCriticalPower.h Metrics/HrZones.h Metrics/PaceZones.h \
@@ -728,7 +691,7 @@ SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts
 SOURCES += Cloud/CalendarDownload.cpp Cloud/CloudService.cpp \
            Cloud/LocalFileStore.cpp Cloud/OAuthDialog.cpp \
            Cloud/WithingsDownload.cpp Cloud/Strava.cpp Cloud/CyclingAnalytics.cpp Cloud/RideWithGPS.cpp \
-           Cloud/TrainingsTageBuch.cpp Cloud/Selfloops.cpp Cloud/Velohero.cpp Cloud/SportsPlusHealth.cpp \
+           Cloud/TrainingsTageBuch.cpp Cloud/Selfloops.cpp Cloud/SportsPlusHealth.cpp \
            Cloud/AddCloudWizard.cpp Cloud/Withings.cpp Cloud/MeasuresDownload.cpp Cloud/Xert.cpp \
            Cloud/Azum.cpp
 
@@ -771,7 +734,7 @@ SOURCES += Gui/AboutDialog.cpp Gui/AddIntervalDialog.cpp Gui/AnalysisSidebar.cpp
            Gui/PerspectiveDialog.cpp Gui/SplashScreen.cpp Gui/StyledItemDelegates.cpp Gui/MetadataDialog.cpp Gui/ActionButtonBox.cpp \
            Gui/MetricOverrideDialog.cpp Gui/RepeatScheduleWizard.cpp \
            Gui/Calendar.cpp Gui/Agenda.cpp Gui/CalendarData.cpp Gui/CalendarItemDelegates.cpp \
-           Gui/IconManager.cpp
+           Gui/IconManager.cpp Gui/FilterSimilarDialog.cpp
 
 ## Models and Metrics
 SOURCES += Metrics/aBikeScore.cpp Metrics/aCoggan.cpp Metrics/AerobicDecoupling.cpp Metrics/Banister.cpp Metrics/BasicRideMetrics.cpp \
@@ -837,8 +800,19 @@ DEFERRES += Core/RouteWindow.h Core/RouteWindow.cpp Core/RouteItem.h Core/RouteI
 OTHER_FILES +=   Resources/python/library.py Python/SIP/goldencheetah.sip
 
 
+###==========================
+### PRECOMPILED HEADER
+###==========================
+macx {
+    message("Disabling Precompiled Headers on macOS to avoid multi-arch Clang errors.")
+} else {
+    message("Enabling precompile_header")
+    PRECOMPILED_HEADER = stable.h
+    CONFIG += precompile_header
+}
+
 ###============================================================================
-### FIX: Disable Precompiled Header for C files
+### Disable Precompiled Header for C files
 ### The PCH contains C++ specific headers (Qt, STL) which causes compilation errors
 ### when the PCH is forced upon C files by gcc.
 ###============================================================================
@@ -848,5 +822,3 @@ for(src, SOURCES) {
         eval($${src}.CONFIG -= precompile_header)
     }
 }
-
-

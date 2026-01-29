@@ -28,11 +28,27 @@
 #include <QColor>
 #include <utility>
 
-#define ENTRY_TYPE_ACTIVITY 0
+#define ENTRY_TYPE_ACTUAL_ACTIVITY 0
 #define ENTRY_TYPE_PLANNED_ACTIVITY 1
 #define ENTRY_TYPE_EVENT 10
 #define ENTRY_TYPE_PHASE 11
 #define ENTRY_TYPE_OTHER 99
+
+
+struct AgendaEntry {
+    QString primary;
+    QStringList secondaryValues;
+    QStringList secondaryLabels;
+    QString tertiary;
+    QString iconFile;
+    QColor color;
+    QString reference;
+    QTime start;
+    int type = 0;
+    bool hasTrainMode = false;
+    QDate spanStart = QDate();
+    QDate spanEnd = QDate();
+};
 
 
 struct CalendarEntry {
@@ -48,8 +64,13 @@ struct CalendarEntry {
     int type = 0;
     bool isRelocatable = false;
     bool hasTrainMode = false;
+    bool dirty = false;
     QDate spanStart = QDate();
     QDate spanEnd = QDate();
+
+    QString linkedReference = QString();
+    QString linkedPrimary = QString();
+    QDateTime linkedStartDT = QDateTime();
 };
 
 struct CalendarEntryLayout {
@@ -75,6 +96,7 @@ struct CalendarSummary {
     QList<std::pair<QString, QString>> keyValues;
 };
 
+Q_DECLARE_METATYPE(AgendaEntry)
 Q_DECLARE_METATYPE(CalendarEntry)
 Q_DECLARE_METATYPE(CalendarEntryLayout)
 Q_DECLARE_METATYPE(CalendarDay)

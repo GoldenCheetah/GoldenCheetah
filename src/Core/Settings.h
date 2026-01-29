@@ -303,6 +303,8 @@
 #define GC_NAVGROUPBY                   "<athlete-preferences>navigator/groupby"
 #define GC_SORTBY                       "<athlete-preferences>navigator/sortby"
 #define GC_SORTBYORDER                  "<athlete-preferences>navigator/sortbyorder"
+#define GC_NAVDISPLAYFILTER             "<athlete-preferences>navigator/displayfilter"
+
 // Calendar sync
 #define GC_WEBCAL_URL                   "<athlete-preferences>webcal_url"
 
@@ -355,8 +357,6 @@
 #define GC_RWGPS_AUTH_TOKEN             "<athlete-private>rwgps/auth_token"
 #define GC_TTBUSER                      "<athlete-private>ttb/user"
 #define GC_TTBPASS                      "<athlete-private>ttb/pass"
-#define GC_VELOHEROUSER                 "<athlete-private>velohero/user"
-#define GC_VELOHEROPASS                 "<athlete-private>velohero/pass"
 #define GC_SPORTPLUSHEALTHUSER          "<athlete-private>sph/user"
 #define GC_SPORTPLUSHEALTHPASS          "<athlete-private>sph/pass"
 #define GC_SELUSER                      "<athlete-private>sel/user"

@@ -175,9 +175,6 @@ void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeri
 
   RideFilePoint *p;
 
-  int lineno = 1;
-
-
   double next_interval=0;
   double hrv_time=0;
   QList<double> intervals;
@@ -219,7 +216,6 @@ void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeri
     QStringList lines = linesIn.split('\r');
     // workaround for empty lines
     if(lines.size() == 0) {
-      lineno++;
       continue;
     }
     for (int li = 0; li < lines.size(); ++li) {
@@ -467,8 +463,6 @@ void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeri
 	  seconds += recInterval;
 	}
       }
-
-      ++lineno;
     }
   }
 

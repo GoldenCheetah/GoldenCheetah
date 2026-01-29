@@ -41,16 +41,11 @@ cd ${TRAVIS_BUILD_DIR}
 sudo apt-get install -qq libusb-1.0-0-dev libudev-dev
 
 # Add Python 3.7 and SIP
-sudo add-apt-repository -y ppa:deadsnakes/ppa
-sudo apt-get update -qq
-sudo apt-get install -qq python3.7-dev python3.7-distutils
-python3.7 --version
-wget --no-verbose https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.tar.gz
-tar xf sip-4.19.8.tar.gz
-cd sip-4.19.8
-python3.7 configure.py --incdir=/usr/include/python3.7
-make
-sudo make install
+sudo apt-get install python3
+sudo apt-get install python3-pip
+pip install --upgrade pip
+pip install -r src/Python/requirements.txt
+
 cd ${TRAVIS_BUILD_DIR}
 
 # GSL

@@ -62,28 +62,38 @@ bool ErgFile::isWorkout(QString name)
     return false;
 }
 
-ErgFile::ErgFile(QString filename, ErgFileFormat mode, Context *context)
+ErgFile::ErgFile(QString filename, ErgFileFormat mode, Context *context, QDate when)
 : context(context)
 {
+    if (when.isValid()) {
+        this->when = when;
+    } else {
+        this->when = QDate::currentDate();
+    }
     this->filename(filename);
     this->mode(mode);
     strictGradient(true);
     fHasGPS(false);
     if (context->athlete->zones("Bike")) {
-        int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
+        int zonerange = context->athlete->zones("Bike")->whichRange(this->when);
         if (zonerange >= 0) CP(context->athlete->zones("Bike")->getCP(zonerange));
     }
     reload();
 }
 
-ErgFile::ErgFile(Context *context)
+ErgFile::ErgFile(Context *context, QDate when)
 : context(context)
 {
+    if (when.isValid()) {
+        this->when = when;
+    } else {
+        this->when = QDate::currentDate();
+    }
     mode(ErgFileFormat::unknown);
     strictGradient(true);
     fHasGPS(false);
     if (context->athlete->zones("Bike")) {
-        int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
+        int zonerange = context->athlete->zones("Bike")->whichRange(this->when);
         if (zonerange >= 0) CP(context->athlete->zones("Bike")->getCP(zonerange));
     } else {
         CP(300);
@@ -107,9 +117,9 @@ ErgFile::setFrom(ErgFile *f)
 }
 
 ErgFile *
-ErgFile::fromContent(QString contents, Context *context)
+ErgFile::fromContent(QString contents, Context *context, QDate when)
 {
-    ErgFile *p = new ErgFile(context);
+    ErgFile *p = new ErgFile(context, when);
 
     p->parseComputrainer(contents);
     p->finalize();
@@ -118,9 +128,9 @@ ErgFile::fromContent(QString contents, Context *context)
 }
 
 ErgFile *
-ErgFile::fromContent2(QString contents, Context *context)
+ErgFile::fromContent2(QString contents, Context *context, QDate when)
 {
-    ErgFile *p = new ErgFile(context);
+    ErgFile *p = new ErgFile(context, when);
 
     p->parseErg2(contents);
     p->finalize();
@@ -783,7 +793,7 @@ void ErgFile::parseFromRideFileFactory()
     // TTS File Gradient Should be smoothly interpolated from Altitude.
     strictGradient(false);
 
-    static double km = 0;
+    // static double km = 0;
 
     QFile gpxFile(filename());
 
@@ -1235,7 +1245,7 @@ ErgFile::ZoneSections()
     QList<ErgFileZoneSection> ret;
 
     const Zones *zones = context->athlete->zones("Bike");
-    int zoneRange = zones->whichRange(QDate::currentDate());
+    int zoneRange = zones->whichRange(when);
     QList<QString> zoneNames = zones->getZoneNames(zoneRange);
     if (hasWatts() && duration() > 0) {
         for (int i = 0; i < Points.size() - 1; ++i) {
@@ -1302,7 +1312,7 @@ ErgFile::save(QStringList &errors)
     // get CP so we can scale back etc
     int lCP=0;
     if (context->athlete->zones("Bike")) {
-        int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
+        int zonerange = context->athlete->zones("Bike")->whichRange(when);
         if (zonerange >= 0) lCP = context->athlete->zones("Bike")->getCP(zonerange);
     }
 
@@ -1934,7 +1944,7 @@ ErgFile::calculateMetrics()
         bool first = true;
 
         // CP
-        int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
+        int zonerange = context->athlete->zones("Bike")->whichRange(when);
         if (context->athlete->zones("Bike")) {
             if (zonerange >= 0) CP(context->athlete->zones("Bike")->getCP(zonerange));
         }

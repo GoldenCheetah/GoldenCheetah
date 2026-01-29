@@ -43,6 +43,7 @@ class AnalysisSidebar : public QWidget
         AnalysisSidebar(Context *context);
         void close();
         void setWidth(int x) { rideNavigator->setWidth(x); }
+
         RideNavigator *rideNavigator;
 
     signals:
@@ -89,6 +90,10 @@ class AnalysisSidebar : public QWidget
         void perfTestIntervalSelected();
         void createPerfTestIntervalSelected();
 
+    protected slots:
+
+        void setDisplayFilter(int index);
+
     private:
 
         Context *context;
@@ -97,6 +102,7 @@ class AnalysisSidebar : public QWidget
         QWidget *activityHistory;
         GcSplitterItem *activityItem;
         QSignalMapper *groupByMapper;
+        QComboBox* activityFilter;
 
         GcSplitterItem *calendarItem;
         GcMultiCalendar *calendarWidget;
