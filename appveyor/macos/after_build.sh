@@ -17,7 +17,7 @@ cp `brew --prefix icu4c`/lib/libicudata.*.dylib GoldenCheetah.app/Contents/Frame
 
 # Copy python framework and change permissions to fix paths
 # Note: The framework already contains site-packages with numpy, sip, etc.
-# because appveyor.yml runs "pip install -r requirements.txt" which installs
+# because install.sh runs "pip install -r requirements.txt" which installs
 # packages into the brew Python's framework site-packages.
 echo "Copying Python Framework from ${BREW_PYTHON_FRAMEWORK}"
 # Remove any old attempts to avoid link confusion

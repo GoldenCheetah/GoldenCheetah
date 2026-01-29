@@ -1,6 +1,8 @@
 #!/bin/bash
 set -ev
 
+export PATH="/usr/local/opt/python@${PYTHON_VERSION}/bin:$PATH"
+
 # Get config
 cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
 cp src/gcconfig.pri.in src/gcconfig.pri

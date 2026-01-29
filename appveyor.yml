@@ -146,19 +146,16 @@ install:
 - cmd: echo DEFINES+=GC_WANT_PYTHON >> src\gcconfig.pri
 - cmd: echo PYTHONINCLUDES=Core c:\Python311-x64\include >> src\gcconfig.pri
 - cmd: echo PYTHONLIBS=-L\"c:\Python311-x64\libs\" -lpython311 >> src\gcconfig.pri
+# Upgrade pip to ensure you have the latest version
+- cmd: python -m pip install --upgrade pip
+# Install your project's dependencies from a requirements.txt file
+- cmd: "python -m pip install --only-binary :all: -r src/Python/requirements.txt -t C:/Python/lib/site-packages"
 # GSL
 - cmd: echo GSL_INCLUDES=c:\tools\vcpkg\installed\x64-windows\include >> src\gcconfig.pri
 - cmd: echo GSL_LIBS=-Lc:\tools\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas >> src\gcconfig.pri
 
 # Linux / macOS - install dependencies first (including Python 3.11)
 - sh: bash appveyor/$OS_NAME/install.sh
-
-# Upgrade pip to ensure you have the latest version
-- cmd: python -m pip install --upgrade pip
-- sh: if ! $CI_LINUX; then export PATH="/usr/local/opt/python@${PYTHON_VERSION}/bin:$PATH" && python3 -m pip install --upgrade pip; fi
-# Install your project's dependencies from a requirements.txt file for Windows and macOS, for Linux it happens in after_build script.
-- cmd: "python -m pip install --only-binary :all: -r src/Python/requirements.txt -t C:/Python/lib/site-packages"
-- sh: if ! $CI_LINUX; then export PATH="/usr/local/opt/python@${PYTHON_VERSION}/bin:$PATH" && python3 -m pip install -r src/Python/requirements.txt; fi
 
 before_build:
 
