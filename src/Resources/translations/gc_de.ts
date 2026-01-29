@@ -393,87 +393,87 @@ Sie müssen diesen möglicherweise manuell deaktivieren.</translation>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="460"/>
         <source>Missed Planned Activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Verpasste geplante Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="466"/>
         <source>No missed planned activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine geplanten Aktivitäten verpasst</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="469"/>
         <source>(Past %1 days)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Letzte %1 Tage)</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="471"/>
         <source>(Yesterday)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Gestern)</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="483"/>
         <source>Today’s Planned Activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Heute geplante Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="487"/>
         <source>No planned activities for today</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine geplanten Aktivitäten für heute</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="499"/>
         <source>Upcoming Planned Activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommende geplanten Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="505"/>
         <source>No upcoming planned activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine kommende geplanten Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="508"/>
         <source>(Next %1 days)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Nächste %1 Tage)</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="510"/>
         <source>(Tomorrow)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Morgen)</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="560"/>
         <source>Show in train mode...</source>
-        <translation type="unfinished"></translation>
+        <translation>Im Trainingsmodus anzeigen...</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="555"/>
         <source>View planned activity...</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplante Aktivität anzeigen...</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="578"/>
         <source>%1 days ago</source>
-        <translation type="unfinished">vor %1 Tagen</translation>
+        <translation>vor %1 Tagen</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="580"/>
         <source>yesterday</source>
-        <translation type="unfinished">gestern</translation>
+        <translation>gestern</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="582"/>
         <source>today</source>
-        <translation type="unfinished">heute</translation>
+        <translation>heute</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="584"/>
         <source>tomorrow</source>
-        <translation type="unfinished"></translation>
+        <translation>morgen</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="586"/>
         <source>in %1 days</source>
-        <translation type="unfinished"></translation>
+        <translation>in %1 Tagen</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="589"/>
@@ -1678,7 +1678,7 @@ Gerät gefunden.
     <message>
         <location filename="../../Charts/AerolabWindow.cpp" line="321"/>
         <source>Eoffset (ft)</source>
-        <translation type="unfinished"></translation>
+        <translation>Eoffset (ft)</translation>
     </message>
     <message>
         <location filename="../../Charts/AerolabWindow.cpp" line="639"/>
@@ -1691,22 +1691,22 @@ Gerät gefunden.
     <message>
         <location filename="../../Gui/Agenda.cpp" line="881"/>
         <source>Your Training Agenda</source>
-        <translation type="unfinished"></translation>
+        <translation>Trainingsagenda</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="888"/>
         <source>Filters applied</source>
-        <translation type="unfinished"></translation>
+        <translation>Filter angewandt</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="972"/>
         <source>Season: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Saison: %1</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="974"/>
         <source>No season selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Saison ausgewählt</translation>
     </message>
 </context>
 <context>
@@ -1715,191 +1715,191 @@ Gerät gefunden.
         <location filename="../../Charts/AgendaWindow.cpp" line="387"/>
         <location filename="../../Charts/AgendaWindow.cpp" line="391"/>
         <source>day(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tage(e)</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="407"/>
         <source>all dates</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Daten</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="408"/>
         <source>today</source>
-        <translation type="unfinished">heute</translation>
+        <translation>heute</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="409"/>
         <source>no dates</source>
-        <translation type="unfinished"></translation>
+        <translation>keine Termine</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="420"/>
         <source>Agenda Basics</source>
-        <translation type="unfinished"></translation>
+        <translation>Grundlagen der Agenda</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="421"/>
         <source>Back to Include</source>
-        <translation type="unfinished"></translation>
+        <translation>Einbeziehen der vergangen</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="422"/>
         <source>Ahead to Include</source>
-        <translation type="unfinished"></translation>
+        <translation>Einbeziehen der kommenden</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="424"/>
         <source>Main Line</source>
-        <translation type="unfinished"></translation>
+        <translation>Hauptzeile</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="425"/>
         <location filename="../../Charts/AgendaWindow.cpp" line="434"/>
         <source>Field</source>
-        <translation type="unfinished">Feld</translation>
+        <translation>Feld</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="426"/>
         <source>Fallback Field</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausweichfeld</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="428"/>
         <source>Metric Line</source>
-        <translation type="unfinished"></translation>
+        <translation>Metrikzeile</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="397"/>
         <source>Available Metrics</source>
-        <translation type="unfinished">Vorhandene Metriken</translation>
+        <translation>Vorhandene Metriken</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="397"/>
         <source>Selected Metrics</source>
-        <translation type="unfinished"></translation>
+        <translation>Metriken ausgewählen</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="401"/>
         <source>Configure Metrics</source>
-        <translation type="unfinished"></translation>
+        <translation>Metriken konfigurieren</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="403"/>
         <source>Show Names of Metrics</source>
-        <translation type="unfinished"></translation>
+        <translation>Namen der Metriken anzeigen</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="432"/>
         <location filename="../../Charts/AgendaWindow.cpp" line="443"/>
         <source>Detail Line</source>
-        <translation type="unfinished"></translation>
+        <translation>Detailzeile</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="433"/>
         <source>Show Line for</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeile anzeigen für</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="435"/>
         <location filename="../../Charts/AgendaWindow.cpp" line="444"/>
         <source>Visible Lines</source>
-        <translation type="unfinished"></translation>
+        <translation>Sichtbare Zeile</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="451"/>
         <source>Activities</source>
-        <translation type="unfinished">Aktivitäten</translation>
+        <translation>Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="452"/>
         <source>Metrics</source>
-        <translation type="unfinished">Metriken</translation>
+        <translation>Metriken</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="453"/>
         <source>Events</source>
-        <translation type="unfinished">Events</translation>
+        <translation>Events</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="565"/>
         <source>Unnamed %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Unbenannt %1</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="567"/>
         <source>&lt;unknown&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;unbekannt&gt;</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="586"/>
         <source>N/A</source>
-        <translation type="unfinished"></translation>
+        <translation>N.V.</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="645"/>
         <source>%1 • %2 days</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 • %2 Tage</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="647"/>
         <source>%1 • %2 day</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 • %2 Tag</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="652"/>
         <source>%1 • %2 weeks</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 • %2 Wochen</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="654"/>
         <source>%1 • %2 week</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 • %2 Woche</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="659"/>
         <source>%1 • %2 months</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 • %2 Monate</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="661"/>
         <source>%1 • %2 month</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 • %2 Monat</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="698"/>
         <location filename="../../Charts/AgendaWindow.cpp" line="817"/>
         <source>Uncategorized</source>
-        <translation type="unfinished"></translation>
+        <translation>Unkategorisiert</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="701"/>
         <location filename="../../Charts/AgendaWindow.cpp" line="818"/>
         <source>Category A</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategorie A</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="704"/>
         <location filename="../../Charts/AgendaWindow.cpp" line="819"/>
         <source>Category B</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategorie B</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="707"/>
         <location filename="../../Charts/AgendaWindow.cpp" line="820"/>
         <source>Category C</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategorie C</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="710"/>
         <location filename="../../Charts/AgendaWindow.cpp" line="821"/>
         <source>Category D</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategorie D</translation>
     </message>
     <message>
         <location filename="../../Charts/AgendaWindow.cpp" line="713"/>
         <location filename="../../Charts/AgendaWindow.cpp" line="823"/>
         <source>Category E</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategorie E</translation>
     </message>
 </context>
 <context>
@@ -3010,17 +3010,17 @@ Gerät gefunden.
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="156"/>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="157"/>
         <source>Actual</source>
-        <translation type="unfinished"></translation>
+        <translation>Beendet</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="158"/>
         <source>Planned</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplant</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="426"/>
@@ -3045,12 +3045,12 @@ Gerät gefunden.
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="450"/>
         <source>Filter similar activities...</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtern nach ähnlichen Aktivitäten...</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="463"/>
         <source>Show in Train Mode...</source>
-        <translation type="unfinished"></translation>
+        <translation>Im Trainingsmodus anzeigen...</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="476"/>
@@ -4568,12 +4568,12 @@ gespeichert</translation>
     <message>
         <location filename="../../Train/BT40Device.cpp" line="127"/>
         <source>Reconnected to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederverbunden mit %1</translation>
     </message>
     <message>
         <location filename="../../Train/BT40Device.cpp" line="187"/>
         <source>Lost connection to %1, attempting to reconnect...</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbindung zu %1 unterbrochen, versuche erneut eine Verbindung herzustellen...</translation>
     </message>
     <message>
         <location filename="../../Train/BT40Device.cpp" line="322"/>
@@ -4614,7 +4614,7 @@ gespeichert</translation>
     <message>
         <location filename="../../Train/BT40Device.cpp" line="925"/>
         <source>Reconnecting to %1 (attempt %2)...</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederverbindung zu %1 (Versuch %2)...</translation>
     </message>
     <message>
         <location filename="../../Train/BT40Device.cpp" line="1055"/>
@@ -5467,34 +5467,34 @@ Starte mit dem Laden einiger Aktivitäten.</translation>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="213"/>
         <source>Plan</source>
-        <translation type="unfinished"></translation>
+        <translation>Planung</translation>
     </message>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="214"/>
         <source>No ride ?
 Let&apos;s start with some data.</source>
-        <translation type="unfinished">Keine Aktivitäten?
-Starte mit dem Laden einiger Aktivitäten.</translation>
+        <translation>Keine Fahrt?
+Beginnen wir mit einigen Daten.</translation>
     </message>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="220"/>
         <source>Import files from your disk or usb device</source>
-        <translation type="unfinished">Dateien von Festplatte oder USB-Gerät importieren</translation>
+        <translation>Dateien von Festplatte oder USB-Gerät importieren</translation>
     </message>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="221"/>
         <source>Import data</source>
-        <translation type="unfinished">Importieren</translation>
+        <translation>Importieren</translation>
     </message>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="227"/>
         <source>Download from serial device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Von einem seriellen Gerät herunterladen.</translation>
     </message>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="228"/>
         <source>Download from device</source>
-        <translation type="unfinished">Von Gerät herunterladen</translation>
+        <translation>Von Gerät herunterladen</translation>
     </message>
 </context>
 <context>
@@ -6473,48 +6473,48 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="1985"/>
         <source>Previous Month</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorheriger Monat</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="1986"/>
         <source>Next Month</source>
-        <translation type="unfinished"></translation>
+        <translation>Nächster Monat</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="1987"/>
         <source>Today</source>
-        <translation type="unfinished">Heute</translation>
+        <translation>Heute</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="2007"/>
         <source>Filters applied</source>
-        <translation type="unfinished"></translation>
+        <translation>Filter angewandt</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="2015"/>
         <source>Day</source>
-        <translation type="unfinished">Tag</translation>
+        <translation>Tag</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="2021"/>
         <source>Week</source>
-        <translation type="unfinished">Woche</translation>
+        <translation>Woche</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="2026"/>
         <source>Month</source>
-        <translation type="unfinished">Monat</translation>
+        <translation>Monat</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="2345"/>
         <location filename="../../Gui/Calendar.cpp" line="2514"/>
         <source>Season: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Saison: %1</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="2433"/>
         <source>Week %1 (%2 - %3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Woche %1 (%2 - %3)</translation>
     </message>
 </context>
 <context>
@@ -6523,123 +6523,123 @@ ddd, dd.MMM yyyy</translation>
         <location filename="../../Gui/Calendar.cpp" line="170"/>
         <location filename="../../Gui/Calendar.cpp" line="194"/>
         <source>Save changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Änderungen speichern</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="171"/>
         <location filename="../../Gui/Calendar.cpp" line="195"/>
         <source>Discard changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Änderungen verwerfen</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="175"/>
         <location filename="../../Gui/Calendar.cpp" line="201"/>
         <source>View planned activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplante Aktivität anzeigen</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="179"/>
         <location filename="../../Gui/Calendar.cpp" line="199"/>
         <source>View actual activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Beendete Aktivität anzeigen</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="188"/>
         <location filename="../../Gui/Calendar.cpp" line="213"/>
         <source>Filter similar activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtern nach ähnlichen Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="190"/>
         <source>Delete actual activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Beendete Aktivität löschen</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="204"/>
         <location filename="../../Gui/Calendar.cpp" line="205"/>
         <source>Link to actual activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Verknüpfen zur beendete Aktivität</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="207"/>
         <source>Unlink from actual activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Verknüpfen zur beendete Aktivität trennen</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="211"/>
         <source>Show in train mode</source>
-        <translation type="unfinished"></translation>
+        <translation>In Trainingsmodus anzeigen</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="219"/>
         <source>Edit event</source>
-        <translation type="unfinished"></translation>
+        <translation>Event bearbeiten</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="225"/>
         <source>Edit phase</source>
-        <translation type="unfinished">Phase bearbeiten</translation>
+        <translation>Phase bearbeiten</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="226"/>
         <source>Delete phase</source>
-        <translation type="unfinished">Phase löschen</translation>
+        <translation>Phase löschen</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="245"/>
         <source>Log activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivität eintragen</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="257"/>
         <source>Plan activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivität planen</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="270"/>
         <source>Add phase</source>
-        <translation type="unfinished"></translation>
+        <translation>Phase hinzufügen</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="271"/>
         <source>Add event</source>
-        <translation type="unfinished">Event hinzufügen</translation>
+        <translation>Event hinzufügen</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="275"/>
         <source>Repeat schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeitplan wiederholen</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="182"/>
         <location filename="../../Gui/Calendar.cpp" line="183"/>
         <source>Link to planned activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Verknüpfen zur geplanten Aktivität</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="185"/>
         <source>Unlink from planned activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Verknüpfen zur geplanten Aktivität trennen</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="215"/>
         <source>Delete planned activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplante Aktivität löschen</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="220"/>
         <source>Delete event</source>
-        <translation type="unfinished">Event löschen</translation>
+        <translation>Event löschen</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="284"/>
         <source>Insert rest day</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruhetag einfügen</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="286"/>
         <source>Delete rest day</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruhetag löschen</translation>
     </message>
 </context>
 <context>
@@ -6652,7 +6652,7 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="947"/>
         <source>%1 more...</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 mehr...</translation>
     </message>
 </context>
 <context>
@@ -6668,45 +6668,47 @@ ddd, dd.MMM yyyy</translation>
         <location filename="../../Gui/Calendar.cpp" line="1700"/>
         <source>
 (%1 days earlier)</source>
-        <translation type="unfinished"></translation>
+        <translation>
+(%1 Tage efrüher)</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="1702"/>
         <source>
 (%1 day earlier)</source>
-        <translation type="unfinished"></translation>
+        <translation>
+(%1 Tag efrüher)</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="1704"/>
         <source>Valid since</source>
-        <translation type="unfinished"></translation>
+        <translation>Gültig seit</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="1716"/>
         <source>No measure available</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Messwerte verfügbar</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="1723"/>
         <location filename="../../Gui/Calendar.cpp" line="1758"/>
         <source>Add Measure</source>
-        <translation type="unfinished"></translation>
+        <translation>Messwerte hinzufügen</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="1733"/>
         <location filename="../../Gui/Calendar.cpp" line="1758"/>
         <source>Edit Measure</source>
-        <translation type="unfinished"></translation>
+        <translation>Messwerte bearbeiten</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="1767"/>
         <source>Start Date</source>
-        <translation type="unfinished">Startdatum</translation>
+        <translation>Startdatum</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="1793"/>
         <source>Comment</source>
-        <translation type="unfinished">Kommentar</translation>
+        <translation>Kommentar</translation>
     </message>
 </context>
 <context>
@@ -6745,7 +6747,7 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="1159"/>
         <source>Summary</source>
-        <translation type="unfinished">Zusammenfassung</translation>
+        <translation>Zusammenfassung</translation>
     </message>
     <message>
         <source>Delete event</source>
@@ -6761,153 +6763,153 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="378"/>
         <source>Delete Activity</source>
-        <translation type="unfinished">Aktivität löschen</translation>
+        <translation>Aktivität löschen</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="378"/>
         <source>Are you sure you want to delete %1?</source>
-        <translation type="unfinished">Soll %1 wirklich gelöscht werden?</translation>
+        <translation>Soll %1 wirklich gelöscht werden?</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="785"/>
         <source>Day</source>
-        <translation type="unfinished">Tag</translation>
+        <translation>Tag</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="786"/>
         <source>Week</source>
-        <translation type="unfinished">Woche</translation>
+        <translation>Woche</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="787"/>
         <source>Month</source>
-        <translation type="unfinished">Monat</translation>
+        <translation>Monat</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="800"/>
         <source>Day View</source>
-        <translation type="unfinished"></translation>
+        <translation>Tagesansicht</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="802"/>
         <source>Week View</source>
-        <translation type="unfinished"></translation>
+        <translation>Wochenansicht</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="804"/>
         <source>Month View</source>
-        <translation type="unfinished"></translation>
+        <translation>Monatsansicht</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="809"/>
         <source>Show Label</source>
-        <translation type="unfinished"></translation>
+        <translation>Label anzeigen</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="822"/>
         <source>Available Metrics</source>
-        <translation type="unfinished">Vorhandene Metriken</translation>
+        <translation>Vorhandene Metriken</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="822"/>
         <source>Selected Metrics</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausgewählte Metriks</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="828"/>
         <source>Calendar Basics</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalender-Grundlagen</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="829"/>
         <source>Startup View</source>
-        <translation type="unfinished"></translation>
+        <translation>Startansicht</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="830"/>
         <source>First Day of Week</source>
-        <translation type="unfinished"></translation>
+        <translation>Erster Tag der Woche</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="832"/>
         <source>Default Times</source>
-        <translation type="unfinished"></translation>
+        <translation>Standardzeiten</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="833"/>
         <source>Default Start Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard-Startzeit</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="834"/>
         <source>Default End Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard-Endzeit</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="836"/>
         <source>Summary Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Zusammenfassung Optionen</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="837"/>
         <source>Show Summary In</source>
-        <translation type="unfinished"></translation>
+        <translation>Zusammenfassung anzeigen in:</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="843"/>
         <source>Main Line</source>
-        <translation type="unfinished"></translation>
+        <translation>Hauptzeile</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="844"/>
         <location filename="../../Charts/CalendarWindow.cpp" line="852"/>
         <source>Field</source>
-        <translation type="unfinished">Feld</translation>
+        <translation>Feld</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="845"/>
         <source>Fallback Field</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausweichfeld</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="847"/>
         <source>Metric Line</source>
-        <translation type="unfinished"></translation>
+        <translation>Metrikzeile</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="848"/>
         <source>Metric</source>
-        <translation type="unfinished"></translation>
+        <translation>Metrik</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="851"/>
         <source>Detail Line (Day and Week View only)</source>
-        <translation type="unfinished"></translation>
+        <translation>Detailzeile (nur Tages- und Wochenansicht)</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="855"/>
         <source>General</source>
-        <translation type="unfinished">Allgemein</translation>
+        <translation>Allgemein</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="856"/>
         <source>Calendar Entries</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalendereinträge</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="857"/>
         <source>Summary</source>
-        <translation type="unfinished">Zusammenfassung</translation>
+        <translation>Zusammenfassung</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="1183"/>
         <source>Unnamed %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Unbenannt %1</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="1185"/>
         <source>&lt;unknown&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;unbekannt&gt;</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="1258"/>
@@ -6916,12 +6918,12 @@ ddd, dd.MMM yyyy</translation>
         <location filename="../../Charts/CalendarWindow.cpp" line="1374"/>
         <location filename="../../Charts/CalendarWindow.cpp" line="1400"/>
         <source>Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehlgeschlagen</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="1295"/>
         <source>No matching activity found</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine passende Aktivität gefunden</translation>
     </message>
     <message>
         <source>Unable to save</source>
@@ -7238,7 +7240,7 @@ Sind sie sicher?</translation>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="715"/>
         <source>Plan</source>
-        <translation type="unfinished"></translation>
+        <translation>Planung</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="741"/>
@@ -7720,12 +7722,12 @@ Sind sie sicher?</translation>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="300"/>
         <source>HTTP</source>
-        <translation type="unfinished">HTTP</translation>
+        <translation>HTTP</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="300"/>
         <source>SSL error(s) has occurred: %1</source>
-        <translation type="unfinished">Folgende SSL-Fehler sind aufgetreten: %1</translation>
+        <translation>Folgende SSL-Fehler sind aufgetreten: %1</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.h" line="91"/>
@@ -10056,42 +10058,42 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1872"/>
         <source>Planned Short Term Stress (Planned STS/ATL)</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplante Kurzzeitbelastung (Geplante STS/ATL)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1873"/>
         <source>Planned Long Term Stress  (Planned LTS/CTL)</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplante Langzeitbelastung (Geplante LTS/CTL)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1874"/>
         <source>Planned Stress Balance    (Planned SB/TSB)</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplante Belastungsbilanz (Geplante SB/TSB)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1875"/>
         <source>Planned Stress Ramp Rate  (Planned RR)</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplante Belastungssteigerungsrate (Geplante RR)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1876"/>
         <source>Expected Short Term Stress (Expected STS/ATL)</source>
-        <translation type="unfinished"></translation>
+        <translation>Voraussichtlich Kurzzeitbelastung (Voraussichtlich STS/ATL)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1877"/>
         <source>Expected Long Term Stress  (Expected LTS/CTL)</source>
-        <translation type="unfinished"></translation>
+        <translation>Voraussichtlich Langzeitbelastung (Voraussichtlich LTS/CTL)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1878"/>
         <source>Expected Stress Balance    (Expected SB/TSB)</source>
-        <translation type="unfinished"></translation>
+        <translation>Voraussichtlich Belastungsbilanz (Voraussichtlich SB/TSB)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1879"/>
         <source>Expected Stress Ramp Rate  (Expected RR)</source>
-        <translation type="unfinished"></translation>
+        <translation>Voraussichtlich Belastungssteigerungsrate (Voraussichtlich RR)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1887"/>
@@ -10416,7 +10418,7 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="595"/>
         <source>Season</source>
-        <translation type="unfinished">Saison</translation>
+        <translation>Saison</translation>
     </message>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="596"/>
@@ -10651,7 +10653,7 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="502"/>
         <source>Season</source>
-        <translation type="unfinished">Saison</translation>
+        <translation>Saison</translation>
     </message>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="503"/>
@@ -11609,52 +11611,52 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="780"/>
         <source>Upcoming Events</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommende Events</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="788"/>
         <source>No upcoming events</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine kommende Events</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="816"/>
         <source>Edit event...</source>
-        <translation type="unfinished"></translation>
+        <translation>Event bearbeiten...</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="833"/>
         <source>today</source>
-        <translation type="unfinished">heute</translation>
+        <translation>heute</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="835"/>
         <source>tomorrow</source>
-        <translation type="unfinished"></translation>
+        <translation>morgen</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="839"/>
         <source>in %1 days</source>
-        <translation type="unfinished"></translation>
+        <translation>in %1 Tagen</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="842"/>
         <source>in %1 weeks</source>
-        <translation type="unfinished"></translation>
+        <translation>in %1 Wochen</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="844"/>
         <source>in %1 week</source>
-        <translation type="unfinished"></translation>
+        <translation>in %1 Woche</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="848"/>
         <source>in %1 months</source>
-        <translation type="unfinished"></translation>
+        <translation>in %1 Monate</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="850"/>
         <source>in %1 month</source>
-        <translation type="unfinished"></translation>
+        <translation>in %1 Monat</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="855"/>
@@ -11958,42 +11960,42 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../Gui/FilterSimilarDialog.cpp" line="35"/>
         <source>Filter for similar activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtern nach ähnlichen Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/FilterSimilarDialog.cpp" line="39"/>
         <source>Hide zeroed fields and metrics</source>
-        <translation type="unfinished"></translation>
+        <translation>Leere Felder und Metriken ausblenden</translation>
     </message>
     <message>
         <location filename="../../Gui/FilterSimilarDialog.cpp" line="44"/>
         <source>Find fields and metrics by name...</source>
-        <translation type="unfinished"></translation>
+        <translation>Felder und Metriken nach Namen suchen...</translation>
     </message>
     <message>
         <location filename="../../Gui/FilterSimilarDialog.cpp" line="49"/>
         <source>equals</source>
-        <translation type="unfinished"></translation>
+        <translation>gleich</translation>
     </message>
     <message>
         <location filename="../../Gui/FilterSimilarDialog.cpp" line="49"/>
         <source>contains</source>
-        <translation type="unfinished"></translation>
+        <translation>enthält</translation>
     </message>
     <message>
         <location filename="../../Gui/FilterSimilarDialog.cpp" line="118"/>
         <source>Generated Filter:</source>
-        <translation type="unfinished"></translation>
+        <translation>Generierter Filter:</translation>
     </message>
     <message>
         <location filename="../../Gui/FilterSimilarDialog.cpp" line="238"/>
         <source>Fields</source>
-        <translation type="unfinished">Felder</translation>
+        <translation>Felder</translation>
     </message>
     <message>
         <location filename="../../Gui/FilterSimilarDialog.cpp" line="288"/>
         <source>Metrics</source>
-        <translation type="unfinished">Metriken</translation>
+        <translation>Metriken</translation>
     </message>
 </context>
 <context>
@@ -14021,12 +14023,12 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/Colors.cpp" line="183"/>
         <source>Calendar Phase</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalender: Phase</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="184"/>
         <source>Calendar Event</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalender: Event</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="214"/>
@@ -14072,17 +14074,17 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/Colors.cpp" line="233"/>
         <source>Skin Temp</source>
-        <translation type="unfinished"></translation>
+        <translation>Hauttemperatur</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="234"/>
         <source>Heat Strain</source>
-        <translation type="unfinished"></translation>
+        <translation>Hitzestress</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="235"/>
         <source>Heat Load</source>
-        <translation type="unfinished"></translation>
+        <translation>Hitzebelastung</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="182"/>
@@ -14859,7 +14861,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="72"/>
         <source>Plan Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>Planung Übersicht</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="74"/>
@@ -14956,7 +14958,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="116"/>
         <source>Agenda</source>
-        <translation type="unfinished"></translation>
+        <translation>Agenda</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="95"/>
@@ -15079,22 +15081,22 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/Pages.cpp" line="269"/>
         <source>Trends</source>
-        <translation type="unfinished">Trends</translation>
+        <translation>Trends</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="270"/>
         <source>Analysis</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="271"/>
         <source>Plan</source>
-        <translation type="unfinished"></translation>
+        <translation>Planung</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="272"/>
         <source>Train</source>
-        <translation type="unfinished"></translation>
+        <translation>Trainieren</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="279"/>
@@ -15207,7 +15209,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/Pages.cpp" line="287"/>
         <source>Startup View</source>
-        <translation type="unfinished"></translation>
+        <translation>Startansicht</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="293"/>
@@ -15792,7 +15794,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="75"/>
         <source>Plan future activities, analyse completed activities against planned</source>
-        <translation type="unfinished"></translation>
+        <translation>Planen Sie zukünftige Aktivitäten, analysieren Sie abgeschlossene Aktivitäten im Vergleich zu geplanten Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="83"/>
@@ -17845,82 +17847,83 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/Pages.cpp" line="2350"/>
         <source>Field</source>
-        <translation type="unfinished">Feld</translation>
+        <translation>Feld</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2350"/>
         <source>Value</source>
-        <translation type="unfinished">Wert</translation>
+        <translation>Wert</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2350"/>
         <source>Icon</source>
-        <translation type="unfinished"></translation>
+        <translation>Symbol</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2383"/>
         <source>Download Default</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard herunterladen</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2384"/>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Importieren</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2385"/>
         <source>Export</source>
-        <translation type="unfinished">Exportieren</translation>
+        <translation>Exportieren</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2408"/>
         <location filename="../../Gui/Pages.cpp" line="2417"/>
         <location filename="../../Gui/Pages.cpp" line="2423"/>
         <source>Icon Bundle</source>
-        <translation type="unfinished"></translation>
+        <translation>Symbolpaket</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2408"/>
         <location filename="../../Gui/Pages.cpp" line="2417"/>
         <source>Bundle file %1 cannot be imported.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Paket-Datei %1 kann nicht importiert werden.</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2412"/>
         <source>Import Icons</source>
-        <translation type="unfinished"></translation>
+        <translation>Symbole importieren</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2412"/>
         <location filename="../../Gui/Pages.cpp" line="2421"/>
         <source>Zip Files (*.zip)</source>
-        <translation type="unfinished"></translation>
+        <translation>Zip Datei (*.zip)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2421"/>
         <source>Export Icons</source>
-        <translation type="unfinished"></translation>
+        <translation>Symbole exportieren</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2423"/>
         <source>Bundle file %1 cannot be created.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Paket-Datei %1 kann nicht erstellt werden.</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2553"/>
         <source>Complex Icon</source>
-        <translation type="unfinished"></translation>
+        <translation>Komplexes Symbol</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2553"/>
         <source>The selected icon %1 appears to be complex and could impact performance. Are you sure you want to use this icon?</source>
-        <translation type="unfinished"></translation>
+        <translation>Das ausgewählte Symbol %1 scheint komplex zu sein und könnte die Leistung beeinträchtigen. Möchten Sie dieses Symbol wirklich verwenden?</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2701"/>
         <source>No icons available.
 Drag and drop .svg files here to add icons.</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Symbole verfügbar.
+Ziehen Sie .svg-Dateien hierher, um Symbole hinzuzufügen.</translation>
     </message>
 </context>
 <context>
@@ -17966,7 +17969,7 @@ Drag and drop .svg files here to add icons.</source>
         <location filename="../../Gui/Perspective.cpp" line="1846"/>
         <location filename="../../Gui/Perspective.cpp" line="1858"/>
         <source>Plan</source>
-        <translation type="unfinished"></translation>
+        <translation>Planung</translation>
     </message>
     <message>
         <source>Diary</source>
@@ -19023,17 +19026,17 @@ Drag and drop .svg files here to add icons.</source>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="597"/>
         <source>Add phase to &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Phase zu „%1“ hinzufügen</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="598"/>
         <source>Add event to &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Event zu „%1“ hinzufügen</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="607"/>
         <source>Add phase</source>
-        <translation type="unfinished"></translation>
+        <translation>Phase hinzufügen</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="608"/>
@@ -19579,17 +19582,17 @@ Drag and drop .svg files here to add icons.</source>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1053"/>
         <source>Coggan Planned Chronic Training Load</source>
-        <translation type="unfinished"></translation>
+        <translation>Coggan geplante Langzeit-Trainingsbelastung (CTL)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1068"/>
         <source>Coggan Planned Acute Training Load</source>
-        <translation type="unfinished"></translation>
+        <translation>Coggan geplante Kurzzeit-Trainingsbelastung (ATL)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1083"/>
         <source>Coggan Planned Training Stress Balance</source>
-        <translation type="unfinished"></translation>
+        <translation>Coggan geplante Trainingsbelastungsbilanz (SB)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1099"/>
@@ -20089,51 +20092,51 @@ Drag and drop .svg files here to add icons.</source>
     <message>
         <location filename="../../FileIO/LapsEditor.cpp" line="50"/>
         <source>Repetitions</source>
-        <translation type="unfinished">Wiederholungen</translation>
+        <translation>Wiederholungen</translation>
     </message>
     <message>
         <location filename="../../FileIO/LapsEditor.cpp" line="51"/>
         <source>Work Distance</source>
-        <translation type="unfinished">Belastungsdistanz</translation>
+        <translation>Belastungsdistanz</translation>
     </message>
     <message>
         <location filename="../../FileIO/LapsEditor.cpp" line="52"/>
         <source>Work Duration</source>
-        <translation type="unfinished">Belastungsdauer</translation>
+        <translation>Belastungsdauer</translation>
     </message>
     <message>
         <location filename="../../FileIO/LapsEditor.cpp" line="53"/>
         <source>Rest Distance</source>
-        <translation type="unfinished">Erholungsentfernung</translation>
+        <translation>Erholungsentfernung</translation>
     </message>
     <message>
         <location filename="../../FileIO/LapsEditor.cpp" line="54"/>
         <source>Rest Duration</source>
-        <translation type="unfinished">Erholungsdauer</translation>
+        <translation>Erholungsdauer</translation>
     </message>
     <message>
         <location filename="../../FileIO/LapsEditor.cpp" line="101"/>
         <location filename="../../FileIO/LapsEditor.cpp" line="104"/>
         <source>m</source>
-        <translation type="unfinished">m</translation>
+        <translation>m</translation>
     </message>
     <message>
         <location filename="../../FileIO/LapsEditor.cpp" line="101"/>
         <location filename="../../FileIO/LapsEditor.cpp" line="104"/>
         <source>yd</source>
-        <translation type="unfinished">yd</translation>
+        <translation>yd</translation>
     </message>
     <message>
         <location filename="../../FileIO/LapsEditor.cpp" line="109"/>
         <location filename="../../FileIO/LapsEditor.cpp" line="112"/>
         <source>km</source>
-        <translation type="unfinished">km</translation>
+        <translation>km</translation>
     </message>
     <message>
         <location filename="../../FileIO/LapsEditor.cpp" line="109"/>
         <location filename="../../FileIO/LapsEditor.cpp" line="112"/>
         <source>mi</source>
-        <translation type="unfinished">mi</translation>
+        <translation>mi</translation>
     </message>
 </context>
 <context>
@@ -20434,18 +20437,18 @@ Drag and drop .svg files here to add icons.</source>
         <location filename="../../Core/DataFilter.cpp" line="2891"/>
         <location filename="../../Core/DataFilter.cpp" line="2918"/>
         <source>pmc(metric, stress|lts|sts|sb|rr|date [,actual|planned|expected}), need to specify a metric and series.</source>
-        <translation type="unfinished"></translation>
+        <translation>pmc(metric, stress|lts|sts|sb|rr|date [,actual|planned|expected}), Metrik und Serie müssen festgelegt werden.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2908"/>
         <location filename="../../Core/DataFilter.cpp" line="2929"/>
         <source>invalid PMC type &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>ungültige PMC-Type &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="3127"/>
         <source>linked() has no parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>linked() hat keine Parameter</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="3885"/>
@@ -20505,7 +20508,7 @@ Drag and drop .svg files here to add icons.</source>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="3896"/>
         <source>Linked File Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Verknüpfter Dateiname</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2421"/>
@@ -20996,122 +20999,122 @@ Drag and drop .svg files here to add icons.</source>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="50"/>
         <source>Link Activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Verknüpfte Aktivität</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="59"/>
         <source>Find a planned activity for:</source>
-        <translation type="unfinished"></translation>
+        <translation>Finden eine geplante Aktivität für:</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="117"/>
         <source>Show &lt;b&gt;planned %2&lt;/b&gt; activities</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;geplante %2&lt;/b&gt; Aktivitäten anzeigen</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="121"/>
         <source>14 days backward</source>
-        <translation type="unfinished"></translation>
+        <translation>14 Tage zurück</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="122"/>
         <source>7 days backward</source>
-        <translation type="unfinished"></translation>
+        <translation>7 Tage zurück</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="123"/>
         <source>±7 days</source>
-        <translation type="unfinished"></translation>
+        <translation>±7 Tage</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="124"/>
         <source>7 days forward</source>
-        <translation type="unfinished"></translation>
+        <translation>7 Tage vorwärts</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="125"/>
         <source>14 days forward</source>
-        <translation type="unfinished"></translation>
+        <translation>14 Tage vorwärts</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="137"/>
         <source>No matching activities found</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine passenden Aktivitäten gefunden</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="57"/>
         <source>Find an actual activity for:</source>
-        <translation type="unfinished"></translation>
+        <translation>Eine beendete Aktivität finden für:</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="115"/>
         <source>Show &lt;b&gt;actual %2&lt;/b&gt; activities</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;beendete %2&lt;/b&gt; Aktivitäten anzeigen</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="140"/>
         <source>There are no unlinked actual %1 activities in the selected date range.</source>
-        <translation type="unfinished"></translation>
+        <translation>Es gibt keine nicht verknüpften beendete %1-Aktivitäten im ausgewählten Datumsbereich.</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="142"/>
         <source>There are no unlinked planned %1 activities in the selected date range.</source>
-        <translation type="unfinished"></translation>
+        <translation>Es gibt keine nicht verknüpften geplante %1-Aktivitäten im ausgewählten Datumsbereich.</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="144"/>
         <source>Try adjusting the date range filter or create a new activity.</source>
-        <translation type="unfinished"></translation>
+        <translation>Versuchen Sie, den Datumsbereichsfilter anzupassen, oder erstellen Sie eine neue Aktivität.</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="156"/>
         <source>Activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivität</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="157"/>
         <source>Date</source>
-        <translation type="unfinished">Datum</translation>
+        <translation>Datum</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="158"/>
         <source>Days</source>
-        <translation type="unfinished">Tage</translation>
+        <translation>Tage</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="159"/>
         <source>Time</source>
-        <translation type="unfinished">Zeit</translation>
+        <translation>Zeit</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="184"/>
         <source>Link</source>
-        <translation type="unfinished"></translation>
+        <translation>Verknüpfen</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="257"/>
         <source>%1 days before</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Tage zuvor</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="259"/>
         <source>1 day before</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Tage zuvor</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="261"/>
         <source>same day</source>
-        <translation type="unfinished"></translation>
+        <translation>gleicher Tag</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="263"/>
         <source>1 day after</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Tag nach</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="265"/>
         <source>%1 days after</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Tage nach</translation>
     </message>
 </context>
 <context>
@@ -21416,12 +21419,12 @@ on and that its display says, &quot;PC Link&quot;</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="942"/>
         <source>Select Perspective file to import</source>
-        <translation type="unfinished">Perspektivdatei für das Importieren auswählen</translation>
+        <translation>Perspektivdatei für das Importieren auswählen</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1311"/>
         <source>Workout Control Pane</source>
-        <translation type="unfinished"></translation>
+        <translation>Workout-Kontrolle-Fenster</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1629"/>
@@ -21607,7 +21610,7 @@ Sie sind dabei, alle Diagramme auf die Voreinstellungen zurückzusetzen</transla
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="658"/>
         <source>Plan</source>
-        <translation type="unfinished"></translation>
+        <translation>Planung</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="660"/>
@@ -21858,7 +21861,7 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="532"/>
         <source>&amp;Plan activity...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Aktivität planen...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="539"/>
@@ -22139,7 +22142,7 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="240"/>
         <source>General Information</source>
-        <translation type="unfinished">Allgemeine Informationen</translation>
+        <translation>Allgemeine Informationen</translation>
     </message>
     <message>
         <source>Some fields will appear only when relevant to the selected sport. Whenever possible, uploading a recording of your activity is preferred over creating it manually.</source>
@@ -22200,127 +22203,127 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="357"/>
         <source>Date</source>
-        <translation type="unfinished">Datum</translation>
+        <translation>Datum</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="358"/>
         <source>Time</source>
-        <translation type="unfinished">Zeit</translation>
+        <translation>Zeit</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="361"/>
         <source>Sport</source>
-        <translation type="unfinished">Sport</translation>
+        <translation>Sport</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="270"/>
         <source>Sub Sport</source>
-        <translation type="unfinished">Sportart</translation>
+        <translation>Sportart</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="242"/>
         <source>Plan your upcoming activity by entering the basic details for this session. On the next pages, you can either manually log your performance metrics or select a workout for train mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Planen Sie Ihre bevorstehende Aktivität, indem Sie die grundlegenden Details für diese Einheit eingeben. Auf den nächsten Seiten können Sie entweder Ihre Leistungsdaten manuell protokollieren oder ein Training für den Trainingsmodus auswählen.</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="244"/>
         <source>Log your activity by entering the basic details of the session. Once finished, you can add your performance metrics on the next page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Protokollieren Sie Ihre Aktivität, indem Sie die grundlegenden Details der Einheit eingeben. Sobald Sie fertig sind, können Sie auf der nächsten Seite Ihre Leistungsmetriken hinzufügen.</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="263"/>
         <source>An activity already exists for this date and time. Continuing will overwrite the existing activity.</source>
-        <translation type="unfinished"></translation>
+        <translation>Für dieses Datum und diese Uhrzeit ist bereits eine Aktivität vorhanden. Wenn Sie fortfahren, wird die vorhandene Aktivität überschrieben.</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="273"/>
         <source>Workout Code</source>
-        <translation type="unfinished">Workout-Code</translation>
+        <translation>Workout-Code</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="276"/>
         <source>RPE</source>
-        <translation type="unfinished">RPE</translation>
+        <translation>RPE</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="278"/>
         <source>Rest</source>
-        <translation type="unfinished">Erholung</translation>
+        <translation>Erholung</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="279"/>
         <source>Very, very easy</source>
-        <translation type="unfinished">Sehr leicht</translation>
+        <translation>Sehr leicht</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="280"/>
         <source>Easy</source>
-        <translation type="unfinished">Leicht</translation>
+        <translation>Leicht</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="281"/>
         <source>Moderate</source>
-        <translation type="unfinished">Moderat</translation>
+        <translation>Moderat</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="282"/>
         <source>Somewhat hard</source>
-        <translation type="unfinished">Schon härter</translation>
+        <translation>Schon härter</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="283"/>
         <source>Hard</source>
-        <translation type="unfinished">Hart</translation>
+        <translation>Hart</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="284"/>
         <source>Hard+</source>
-        <translation type="unfinished">Hart+</translation>
+        <translation>Hart+</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="285"/>
         <source>Very hard</source>
-        <translation type="unfinished">Sehr hart</translation>
+        <translation>Sehr hart</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="286"/>
         <source>Very hard+</source>
-        <translation type="unfinished">Sehr hart+</translation>
+        <translation>Sehr hart+</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="287"/>
         <source>Very hard++</source>
-        <translation type="unfinished">Sehr hart++</translation>
+        <translation>Sehr hart++</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="288"/>
         <source>Maximum</source>
-        <translation type="unfinished">Maximal</translation>
+        <translation>Maximal</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="292"/>
         <source>Notes</source>
-        <translation type="unfinished">Bemerkungen</translation>
+        <translation>Bemerkungen</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="297"/>
         <source>Type</source>
-        <translation type="unfinished">Typ</translation>
+        <translation>Typ</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="299"/>
         <source>Workout (Train mode)</source>
-        <translation type="unfinished"></translation>
+        <translation>Workout (Trainingsmodus)</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="300"/>
         <source>Manual Entry</source>
-        <translation type="unfinished">Aktivität erfassen</translation>
+        <translation>Aktivität erfassen</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="314"/>
         <source>Objective</source>
-        <translation type="unfinished">Ziel</translation>
+        <translation>Ziel</translation>
     </message>
     <message>
         <source>Average Heartrate</source>
@@ -22332,151 +22335,151 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="767"/>
         <source>Activity Metrics</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivitäts-Metriken</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="775"/>
         <source>bpm</source>
-        <translation type="unfinished">1/min</translation>
+        <translation>1/min</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="777"/>
         <source>Average Power</source>
-        <translation type="unfinished">ø Leistung</translation>
+        <translation>ø Leistung</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="781"/>
         <source>W</source>
-        <translation type="unfinished">W</translation>
+        <translation>W</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="783"/>
         <source>Pace intervals</source>
-        <translation type="unfinished">Tempointervalle</translation>
+        <translation>Tempointervalle</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="789"/>
         <source>Average Cadence</source>
-        <translation type="unfinished">ø Trittfrequenz</translation>
+        <translation>ø Trittfrequenz</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="793"/>
         <source>rpm</source>
-        <translation type="unfinished">1/min</translation>
+        <translation>1/min</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="795"/>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="817"/>
         <source>Distance</source>
-        <translation type="unfinished">Distanz</translation>
+        <translation>Distanz</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="800"/>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1075"/>
         <source>km</source>
-        <translation type="unfinished">km</translation>
+        <translation>km</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="800"/>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1075"/>
         <source>mi</source>
-        <translation type="unfinished">mi</translation>
+        <translation>mi</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="802"/>
         <source>Swim Distance</source>
-        <translation type="unfinished">Distanz Schwimmen</translation>
+        <translation>Distanz Schwimmen</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="806"/>
         <source>m</source>
-        <translation type="unfinished">m</translation>
+        <translation>m</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="806"/>
         <source>yd</source>
-        <translation type="unfinished">yd</translation>
+        <translation>yd</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="808"/>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="816"/>
         <source>Duration</source>
-        <translation type="unfinished">Dauer</translation>
+        <translation>Dauer</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="812"/>
         <source>Stress &amp; Workload</source>
-        <translation type="unfinished"></translation>
+        <translation>Stress &amp; Auslastung</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="814"/>
         <source>Estimate by</source>
-        <translation type="unfinished">Schätzung nach</translation>
+        <translation>Schätzung nach</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="818"/>
         <source>Manually</source>
-        <translation type="unfinished">Manuell</translation>
+        <translation>Manuell</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="828"/>
         <source>Estimate Stress Days</source>
-        <translation type="unfinished">Belastungstage für Schätzung</translation>
+        <translation>Belastungstage für Schätzung</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="835"/>
         <source>Work</source>
-        <translation type="unfinished">Arbeit</translation>
+        <translation>Arbeit</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="837"/>
         <source>kJ</source>
-        <translation type="unfinished">kJ</translation>
+        <translation>kJ</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="842"/>
         <source>BikeStress</source>
-        <translation type="unfinished">BikeStress</translation>
+        <translation>BikeStress</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="848"/>
         <source>BikeScore</source>
-        <translation type="unfinished">BikeScore</translation>
+        <translation>BikeScore</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="854"/>
         <source>SwimScore</source>
-        <translation type="unfinished"></translation>
+        <translation>SwimScore</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="860"/>
         <source>TriScore</source>
-        <translation type="unfinished"></translation>
+        <translation>TriScore</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="905"/>
         <source>Core Training Metrics</source>
-        <translation type="unfinished"></translation>
+        <translation>Kern Tranings-Metriken</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="906"/>
         <source>Average Heartrate</source>
-        <translation type="unfinished">ø Herzfrequenz</translation>
+        <translation>ø Herzfrequenz</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="962"/>
         <source>Add more details for your upcoming activity by entering the expected values to track your planned performance.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fügen Sie weitere Details zu Ihrer bevorstehenden Aktivität hinzu, indem Sie die erwarteten Werte eingeben, um Ihre geplante Leistung zu verfolgen.</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="964"/>
         <source>Plan the key details for your upcoming activity based on the selected sport. Enter the expected values to track your performance goals.</source>
-        <translation type="unfinished"></translation>
+        <translation>Planen Sie die wichtigsten Details für Ihre bevorstehende Aktivität auf der Grundlage der ausgewählten Sportart. Geben Sie die erwarteten Werte ein, um Ihre Leistungsziele zu verfolgen.</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="967"/>
         <source>Record the key details of your activity based on the selected sport. Enter the relevant data to track your performance.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeichnen Sie die wichtigsten Details Ihrer Aktivität basierend auf der ausgewählten Sportart auf. Geben Sie die relevanten Daten ein, um Ihre Leistung zu verfolgen.</translation>
     </message>
 </context>
 <context>
@@ -22531,52 +22534,52 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1304"/>
         <source>Summary</source>
-        <translation type="unfinished">Zusammenfassung</translation>
+        <translation>Zusammenfassung</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1306"/>
         <source>Summary of your upcoming activity. Review the plan to ensure everything is set for your session.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zusammenfassung Ihrer bevorstehenden Aktivität. Überprüfen Sie den Plan, um sicherzustellen, dass alles für Ihre Einheit vorbereitet ist.</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1308"/>
         <source>Summary of your activity. Review the data to ensure it accurately reflects the session.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zusammenfassung Ihrer Aktivität. Bitte überprüfen Sie die Daten, um sicherzustellen, dass die Einheit korrekt erfasst wurde.</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1366"/>
         <source>General Information</source>
-        <translation type="unfinished">Allgemeine Informationen</translation>
+        <translation>Allgemeine Informationen</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1368"/>
         <source>Scheduled for</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplant für</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1370"/>
         <source>Date</source>
-        <translation type="unfinished">Datum</translation>
+        <translation>Datum</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1372"/>
         <source>Sport</source>
-        <translation type="unfinished">Sport</translation>
+        <translation>Sport</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1373"/>
         <source>SubSport</source>
-        <translation type="unfinished">Sportart</translation>
+        <translation>Sportart</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1374"/>
         <source>Workout Code</source>
-        <translation type="unfinished">Workout-Code</translation>
+        <translation>Workout-Code</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1375"/>
         <source>Workout Title</source>
-        <translation type="unfinished">Workout-Titel</translation>
+        <translation>Workout-Titel</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1379"/>
@@ -22591,140 +22594,140 @@ Please check your preference settings.</source>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1406"/>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1409"/>
         <source>RPE</source>
-        <translation type="unfinished">RPE</translation>
+        <translation>RPE</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1379"/>
         <source>Rest</source>
-        <translation type="unfinished">Erholung</translation>
+        <translation>Erholung</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1382"/>
         <source>Very, very easy</source>
-        <translation type="unfinished">Sehr leicht</translation>
+        <translation>Sehr leicht</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1385"/>
         <source>Easy</source>
-        <translation type="unfinished">Leicht</translation>
+        <translation>Leicht</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1388"/>
         <source>Moderate</source>
-        <translation type="unfinished">Moderat</translation>
+        <translation>Moderat</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1391"/>
         <source>Somewhat hard</source>
-        <translation type="unfinished">Schon härter</translation>
+        <translation>Schon härter</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1394"/>
         <source>Hard</source>
-        <translation type="unfinished">Hart</translation>
+        <translation>Hart</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1397"/>
         <source>Hard+</source>
-        <translation type="unfinished">Hart+</translation>
+        <translation>Hart+</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1400"/>
         <source>Very hard</source>
-        <translation type="unfinished">Sehr hart</translation>
+        <translation>Sehr hart</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1403"/>
         <source>Very hard+</source>
-        <translation type="unfinished">Sehr hart+</translation>
+        <translation>Sehr hart+</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1406"/>
         <source>Very hard++</source>
-        <translation type="unfinished">Sehr hart++</translation>
+        <translation>Sehr hart++</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1409"/>
         <source>Maximum</source>
-        <translation type="unfinished">Maximal</translation>
+        <translation>Maximal</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1415"/>
         <source>Objective</source>
-        <translation type="unfinished">Ziel</translation>
+        <translation>Ziel</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1416"/>
         <source>Notes</source>
-        <translation type="unfinished">Bemerkungen</translation>
+        <translation>Bemerkungen</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1417"/>
         <source>Workout Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Beschreibung Workout</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1419"/>
         <source>Activity Metrics</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivitäts-Metriken</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1422"/>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1424"/>
         <source>Distance</source>
-        <translation type="unfinished">Distanz</translation>
+        <translation>Distanz</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1422"/>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1434"/>
         <source>m</source>
-        <translation type="unfinished">m</translation>
+        <translation>m</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1422"/>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1434"/>
         <source>yd</source>
-        <translation type="unfinished">yd</translation>
+        <translation>yd</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1424"/>
         <source>km</source>
-        <translation type="unfinished">km</translation>
+        <translation>km</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1424"/>
         <source>mi</source>
-        <translation type="unfinished">mi</translation>
+        <translation>mi</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1429"/>
         <source>Duration</source>
-        <translation type="unfinished">Dauer</translation>
+        <translation>Dauer</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1431"/>
         <source>Average Heartrate</source>
-        <translation type="unfinished">ø Herzfrequenz</translation>
+        <translation>ø Herzfrequenz</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1431"/>
         <source>bpm</source>
-        <translation type="unfinished">1/min</translation>
+        <translation>1/min</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1432"/>
         <source>Average Cadence</source>
-        <translation type="unfinished">ø Trittfrequenz</translation>
+        <translation>ø Trittfrequenz</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1432"/>
         <source>rpm</source>
-        <translation type="unfinished">1/min</translation>
+        <translation>1/min</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1433"/>
         <source>Average Power</source>
-        <translation type="unfinished">ø Leistung</translation>
+        <translation>ø Leistung</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1433"/>
@@ -22732,47 +22735,47 @@ Please check your preference settings.</source>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1436"/>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1437"/>
         <source>W</source>
-        <translation type="unfinished">W</translation>
+        <translation>W</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1434"/>
         <source>Elevation Gain</source>
-        <translation type="unfinished">Höhengewinn</translation>
+        <translation>Höhengewinn</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1435"/>
         <source>IsoPower</source>
-        <translation type="unfinished">IsoPower</translation>
+        <translation>IsoPower</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1436"/>
         <source>xPower</source>
-        <translation type="unfinished">xPower</translation>
+        <translation>xPower</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1437"/>
         <source>Work</source>
-        <translation type="unfinished">Arbeit</translation>
+        <translation>Arbeit</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1438"/>
         <source>BikeStress</source>
-        <translation type="unfinished">BikeStress</translation>
+        <translation>BikeStress</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1439"/>
         <source>BikeScore</source>
-        <translation type="unfinished">BikeScore</translation>
+        <translation>BikeScore</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1440"/>
         <source>SwimScore</source>
-        <translation type="unfinished"></translation>
+        <translation>SwimScore</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="1441"/>
         <source>TriScore</source>
-        <translation type="unfinished"></translation>
+        <translation>TriScore</translation>
     </message>
 </context>
 <context>
@@ -22780,32 +22783,32 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="447"/>
         <source>Workout for Train Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Workout für den Trainingsmodus</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="448"/>
         <source>Browse and filter workouts based on your goals and preferences. Choose the one that best suits your needs to guide your upcoming session.</source>
-        <translation type="unfinished"></translation>
+        <translation>Durchsuchen und filtern Sie Workouts nach Ihren Zielen und Vorlieben. Wählen Sie das passende Training für Ihre nächste Einheit aus.</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="526"/>
         <source>Metrics</source>
-        <translation type="unfinished">Metriken</translation>
+        <translation>Metriken</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="527"/>
         <source>Chart</source>
-        <translation type="unfinished">Diagramm</translation>
+        <translation>Diagramm</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="529"/>
         <source>Select a workout to view its details and continue to the next page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wählen Sie ein Training aus, um dessen Details anzuzeigen und zur nächsten Seite zu gelangen.</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="533"/>
         <source>No details are available for this workout.</source>
-        <translation type="unfinished"></translation>
+        <translation>Für dieses Workout sind keine Details verfügbar.</translation>
     </message>
 </context>
 <context>
@@ -22817,22 +22820,22 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="73"/>
         <source>Plan Activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivität planen</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="75"/>
         <source>Log Activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivität eintragen</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="176"/>
         <source>Unable to save</source>
-        <translation type="unfinished">Fehler beim Speichern</translation>
+        <translation>Fehler beim Speichern</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualActivityWizard.cpp" line="177"/>
         <source>There is already an activity with the same start time or you do not have permissions to save a file.</source>
-        <translation type="unfinished">Es gibt bereits eine Aktivität mit derselben Startzeit oder Sie haben keine Berechtigung die Datei zu speichern.</translation>
+        <translation>Es gibt bereits eine Aktivität mit derselben Startzeit oder Sie haben keine Berechtigung die Datei zu speichern.</translation>
     </message>
 </context>
 <context>
@@ -24142,7 +24145,7 @@ Vor dem Zusammenführen haben Sie die Möglichkeit Aktivitäten zu importieren o
     <message>
         <location filename="../../Gui/Pages.cpp" line="2067"/>
         <source>Icons</source>
-        <translation type="unfinished"></translation>
+        <translation>Symbole</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2068"/>
@@ -24177,42 +24180,42 @@ Vor dem Zusammenführen haben Sie die Möglichkeit Aktivitäten zu importieren o
     <message>
         <location filename="../../Gui/MetricOverrideDialog.cpp" line="39"/>
         <source>Metric Override Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Überschreibungseditor für Metrik</translation>
     </message>
     <message>
         <location filename="../../Gui/MetricOverrideDialog.cpp" line="46"/>
         <source>seconds</source>
-        <translation type="unfinished">Sekunden</translation>
+        <translation>Sekunden</translation>
     </message>
     <message>
         <location filename="../../Gui/MetricOverrideDialog.cpp" line="48"/>
         <source>minutes</source>
-        <translation type="unfinished">Minuten</translation>
+        <translation>Minuten</translation>
     </message>
     <message>
         <location filename="../../Gui/MetricOverrideDialog.cpp" line="58"/>
         <source> (kg)</source>
-        <translation type="unfinished"> (kg)</translation>
+        <translation> (kg)</translation>
     </message>
     <message>
         <location filename="../../Gui/MetricOverrideDialog.cpp" line="58"/>
         <source> (lbs)</source>
-        <translation type="unfinished"> (lbs)</translation>
+        <translation> (lbs)</translation>
     </message>
     <message>
         <location filename="../../Gui/MetricOverrideDialog.cpp" line="106"/>
         <source>Cancel</source>
-        <translation type="unfinished">Abbrechen</translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <location filename="../../Gui/MetricOverrideDialog.cpp" line="107"/>
         <source>Clear</source>
-        <translation type="unfinished"></translation>
+        <translation>Löschen</translation>
     </message>
     <message>
         <location filename="../../Gui/MetricOverrideDialog.cpp" line="108"/>
         <source>Set</source>
-        <translation type="unfinished"></translation>
+        <translation>Setzen</translation>
     </message>
 </context>
 <context>
@@ -24512,7 +24515,7 @@ Keine Aktivitäten zum Importieren gefunden.
     <message>
         <location filename="../../Gui/MetricSelect.cpp" line="203"/>
         <source>Filter...</source>
-        <translation type="unfinished">Filtern...</translation>
+        <translation>Filtern...</translation>
     </message>
 </context>
 <context>
@@ -24528,12 +24531,12 @@ Keine Aktivitäten zum Importieren gefunden.
     <message>
         <location filename="../../Core/NamedSearch.cpp" line="93"/>
         <source>Planned</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplant</translation>
     </message>
     <message>
         <location filename="../../Core/NamedSearch.cpp" line="96"/>
         <source>Actual</source>
-        <translation type="unfinished"></translation>
+        <translation>Beendet</translation>
     </message>
     <message>
         <location filename="../../Core/NamedSearch.cpp" line="99"/>
@@ -27982,22 +27985,22 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../../Gui/PerspectiveDialog.cpp" line="53"/>
         <source>Activities filter</source>
-        <translation type="unfinished">Filter für Aktivitäten</translation>
+        <translation>Filter für Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/PerspectiveDialog.cpp" line="54"/>
         <source>Switch expression</source>
-        <translation type="unfinished">Ausdruck wechseln</translation>
+        <translation>Ausdruck wechseln</translation>
     </message>
     <message>
         <location filename="../../Gui/PerspectiveDialog.cpp" line="55"/>
         <source>Switch for</source>
-        <translation type="unfinished">Schalter für</translation>
+        <translation>Schalter für</translation>
     </message>
     <message>
         <location filename="../../Gui/PerspectiveDialog.cpp" line="60"/>
         <source> Name </source>
-        <translation type="unfinished"></translation>
+        <translation> Name </translation>
     </message>
     <message>
         <location filename="../../Gui/PerspectiveDialog.cpp" line="77"/>
@@ -28007,27 +28010,27 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../../Gui/PerspectiveDialog.cpp" line="160"/>
         <source>Don&apos;t switch</source>
-        <translation type="unfinished">Nicht wechseln</translation>
+        <translation>Nicht wechseln</translation>
     </message>
     <message>
         <location filename="../../Gui/PerspectiveDialog.cpp" line="161"/>
         <source>Erg Workout</source>
-        <translation type="unfinished">Workout Erg</translation>
+        <translation>Workout Erg</translation>
     </message>
     <message>
         <location filename="../../Gui/PerspectiveDialog.cpp" line="162"/>
         <source>Slope Workout</source>
-        <translation type="unfinished">Workout-Steigung</translation>
+        <translation>Workout-Steigung</translation>
     </message>
     <message>
         <location filename="../../Gui/PerspectiveDialog.cpp" line="163"/>
         <source>Video Workout</source>
-        <translation type="unfinished">Workout-Video</translation>
+        <translation>Workout-Video</translation>
     </message>
     <message>
         <location filename="../../Gui/PerspectiveDialog.cpp" line="164"/>
         <source>Map Workout</source>
-        <translation type="unfinished">Workout-Karte</translation>
+        <translation>Workout-Karte</translation>
     </message>
     <message>
         <source>Edit</source>
@@ -28164,97 +28167,97 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="627"/>
         <source>Ongoing Phases</source>
-        <translation type="unfinished"></translation>
+        <translation>Laufende Phasen</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="631"/>
         <source>No ongoing phases</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine laufenden Phasen</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="642"/>
         <source>Upcoming Phases</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommende Phasen</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="646"/>
         <source>No upcoming phases</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine kommende Phasen</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="674"/>
         <source>Edit phase...</source>
-        <translation type="unfinished"></translation>
+        <translation>Phase bearbeiten...</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="692"/>
         <source>begins today</source>
-        <translation type="unfinished"></translation>
+        <translation>beginnt heute</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="694"/>
         <source>begins tomorrow</source>
-        <translation type="unfinished"></translation>
+        <translation>beginnt morgen</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="698"/>
         <source>begins in %1 days</source>
-        <translation type="unfinished"></translation>
+        <translation>beginnt in %1 Tagen</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="702"/>
         <source>begins in %1 weeks</source>
-        <translation type="unfinished"></translation>
+        <translation>beginnt in %1 Wochen</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="704"/>
         <source>begins in %1 week</source>
-        <translation type="unfinished"></translation>
+        <translation>beginnt in %1 Woche</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="709"/>
         <source>begins in %1 months</source>
-        <translation type="unfinished"></translation>
+        <translation>beginnt in %1 Monate</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="711"/>
         <source>begins in %1 month</source>
-        <translation type="unfinished"></translation>
+        <translation>beginnt in %1 Monat</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="717"/>
         <source>ends today</source>
-        <translation type="unfinished"></translation>
+        <translation>endet heute</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="719"/>
         <source>ends tomorrow</source>
-        <translation type="unfinished"></translation>
+        <translation>endet morgen</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="723"/>
         <source>ends in %1 days</source>
-        <translation type="unfinished"></translation>
+        <translation>endet in %1 Tagen</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="727"/>
         <source>ends in %1 weeks</source>
-        <translation type="unfinished"></translation>
+        <translation>endet in %1 Wochen</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="729"/>
         <source>ends in %1 week</source>
-        <translation type="unfinished"></translation>
+        <translation>endet in %1 Woche</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="734"/>
         <source>ends in %1 months</source>
-        <translation type="unfinished"></translation>
+        <translation>endet in %1 Monate</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="736"/>
         <source>ends in %1 month</source>
-        <translation type="unfinished"></translation>
+        <translation>endet in %1 Monat</translation>
     </message>
     <message>
         <location filename="../../Gui/Agenda.cpp" line="742"/>
@@ -28268,7 +28271,7 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../../Gui/Views.cpp" line="250"/>
         <source>Plan future activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Zukünftige Aktivitäten planen</translation>
     </message>
 </context>
 <context>
@@ -29262,42 +29265,42 @@ Python wird in den Einstellungen deaktiviert.</translation>
     <message>
         <location filename="../../Gui/RepeatScheduleWizard.cpp" line="581"/>
         <source>&lt;unnamed&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;unbenannt&gt;</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1754"/>
         <source>actual</source>
-        <translation type="unfinished"></translation>
+        <translation>beendet</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1756"/>
         <source>planned</source>
-        <translation type="unfinished"></translation>
+        <translation>geplant</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1759"/>
         <source>modified</source>
-        <translation type="unfinished"></translation>
+        <translation>modifiziert</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1774"/>
         <source>When</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1778"/>
         <source>Linked</source>
-        <translation type="unfinished"></translation>
+        <translation>Verknüpft</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1788"/>
         <source>On</source>
-        <translation type="unfinished"></translation>
+        <translation>Auf</translation>
     </message>
     <message>
         <location filename="../../Gui/SaveDialogs.cpp" line="396"/>
         <source>Modified activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Geänderte Aktivitäten</translation>
     </message>
 </context>
 <context>
@@ -29703,22 +29706,22 @@ Python wird in den Einstellungen deaktiviert.</translation>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="818"/>
         <source>Core Temp</source>
-        <translation type="unfinished"></translation>
+        <translation>KernTemp</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="820"/>
         <source>Skin Temp</source>
-        <translation type="unfinished"></translation>
+        <translation>Hauttemperatur</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="822"/>
         <source>Heat Strain</source>
-        <translation type="unfinished"></translation>
+        <translation>Hitzestress</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="824"/>
         <source>Estimated Heat Load</source>
-        <translation type="unfinished"></translation>
+        <translation>Geschätzte Hitzebelastung</translation>
     </message>
     <message>
         <source>CoreTemp</source>
@@ -29983,17 +29986,17 @@ Python wird in den Einstellungen deaktiviert.</translation>
     <message>
         <location filename="../../Gui/RepeatScheduleWizard.cpp" line="250"/>
         <source>Repeat Schedule Activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeitplan wiederholen: Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/RepeatScheduleWizard.cpp" line="251"/>
         <source>Review and choose the activities you wish to add to your schedule.</source>
-        <translation type="unfinished"></translation>
+        <translation>Überprüfen Sie die Aktivitäten und wählen Sie diejenigen aus, die Sie Ihrem Zeitplan hinzufügen möchten.</translation>
     </message>
     <message>
         <location filename="../../Gui/RepeatScheduleWizard.cpp" line="262"/>
         <source>Activities for your new schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Auswahl der Aktivitäten für Ihren neuen Zeitplan</translation>
     </message>
 </context>
 <context>
@@ -30001,42 +30004,42 @@ Python wird in den Einstellungen deaktiviert.</translation>
     <message>
         <location filename="../../Gui/RepeatScheduleWizard.cpp" line="131"/>
         <source>Repeat Schedule Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeitplan wiederholen: Einrichten</translation>
     </message>
     <message>
         <location filename="../../Gui/RepeatScheduleWizard.cpp" line="132"/>
         <source>Specify the time range and strategy for repeating the schedule. All planned activities within this range will be copied. You can optionally select a season or phase to prefill the start and end dates.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geben Sie den Zeitbereich und die Strategie für die Wiederholung des Zeitplans an. Alle geplanten Aktivitäten innerhalb dieses Bereichs werden kopiert. Optional können Sie eine Saison oder Phase auswählen, um das Start- und Enddatum vorab auszufüllen.</translation>
     </message>
     <message>
         <location filename="../../Gui/RepeatScheduleWizard.cpp" line="162"/>
         <source>active days</source>
-        <translation type="unfinished"></translation>
+        <translation>aktive Tage</translation>
     </message>
     <message>
         <location filename="../../Gui/RepeatScheduleWizard.cpp" line="177"/>
         <source>Copy same-day activities to consecutive days</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivitäten desselben Tages auf aufeinanderfolgende Tage kopieren</translation>
     </message>
     <message>
         <location filename="../../Gui/RepeatScheduleWizard.cpp" line="187"/>
         <source>Start Date</source>
-        <translation type="unfinished">Startdatum</translation>
+        <translation>Startdatum</translation>
     </message>
     <message>
         <location filename="../../Gui/RepeatScheduleWizard.cpp" line="188"/>
         <source>End Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Enddatum</translation>
     </message>
     <message>
         <location filename="../../Gui/RepeatScheduleWizard.cpp" line="189"/>
         <source>Insert rest day after</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruhetag einfügen nach</translation>
     </message>
     <message>
         <location filename="../../Gui/RepeatScheduleWizard.cpp" line="191"/>
         <source>Conflict Handling</source>
-        <translation type="unfinished"></translation>
+        <translation>Behandlung von Konflikten</translation>
     </message>
 </context>
 <context>
@@ -30044,32 +30047,32 @@ Python wird in den Einstellungen deaktiviert.</translation>
     <message>
         <location filename="../../Gui/RepeatScheduleWizard.cpp" line="360"/>
         <source>Repeat Schedule Summary</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeitplan wiederholen: Zusammenfassung</translation>
     </message>
     <message>
         <location filename="../../Gui/RepeatScheduleWizard.cpp" line="361"/>
         <source>Preview the schedule updates, including planned additions and deletions. No changes will be made until you continue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Überprüfen Sie die Aktualisierungen des Zeitplans, einschließlich geplanter Ergänzungen und Löschungen. Es werden keine Änderungen vorgenommen, bis Sie den Vorgang abschließen.</translation>
     </message>
     <message>
         <location filename="../../Gui/RepeatScheduleWizard.cpp" line="366"/>
         <source>Unable to create a new schedule due to conflicts</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufgrund von Konflikten kann kein neuer Zeitplan erstellt werden</translation>
     </message>
     <message>
         <location filename="../../Gui/RepeatScheduleWizard.cpp" line="368"/>
         <source>Adjust conflict handling on the first page to proceed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Passen Sie die Konfliktbehandlung auf der ersten Seite an, um fortzufahren.</translation>
     </message>
     <message>
         <location filename="../../Gui/RepeatScheduleWizard.cpp" line="372"/>
         <source>New Schedule Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>Übersicht über den neuen Zeitplan</translation>
     </message>
     <message>
         <location filename="../../Gui/RepeatScheduleWizard.cpp" line="378"/>
         <source>Planned Activities Marked for Deletion</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplante Aktivitäten zum Löschen markiert</translation>
     </message>
 </context>
 <context>
@@ -30077,7 +30080,7 @@ Python wird in den Einstellungen deaktiviert.</translation>
     <message>
         <location filename="../../Gui/RepeatScheduleWizard.cpp" line="53"/>
         <source>Repeat Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeitplan wiederholen</translation>
     </message>
 </context>
 <context>
@@ -30167,7 +30170,7 @@ Python wird in den Einstellungen deaktiviert.</translation>
         <location filename="../../Core/RideCache.cpp" line="923"/>
         <location filename="../../Core/RideCache.cpp" line="928"/>
         <source>%1 is already linked to %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 is already linked to %2</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="945"/>
@@ -30175,7 +30178,10 @@ Python wird in den Einstellungen deaktiviert.</translation>
 %1
 
 Linking will modify both activities. You must save or discard changes first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die folgenden Aktivitäten weisen ungespeicherte Änderungen auf:
+%1
+
+Durch das Verknüpfen werden beide Aktivitäten geändert. Sie müssen die Änderungen zuerst speichern oder verwerfen.</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="982"/>
@@ -30183,17 +30189,17 @@ Linking will modify both activities. You must save or discard changes first.</so
         <location filename="../../Core/RideCache.cpp" line="1255"/>
         <location filename="../../Core/RideCache.cpp" line="1590"/>
         <source>No activity given</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Aktivität angegeben</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="988"/>
         <source>Activity is not linked</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivität ist nicht verknüpft</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="994"/>
         <source>Linked activity not found: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Verknüpfte Aktivität nicht gefunden: %1</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1011"/>
@@ -30201,17 +30207,20 @@ Linking will modify both activities. You must save or discard changes first.</so
 %1
 
 Unlinking will modify both activities. You must save or discard changes first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die folgenden Aktivitäten weisen ungespeicherte Änderungen auf:
+%1
+
+Durch das Aufheben der Verknüpfung werden beide Aktivitäten geändert. Sie müssen zunächst die Änderungen speichern oder verwerfen.</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1050"/>
         <source>No activities given</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Aktivitäten angegeben</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1071"/>
         <source>No valid linked activities to unlink</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine gültigen verknüpften Aktivitäten zum Entkoppeln</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1080"/>
@@ -30219,19 +30228,23 @@ Unlinking will modify both activities. You must save or discard changes first.</
 %1
 
 Unlinking will modify these activities. You must save or discard changes first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die folgenden Aktivitäten weisen ungespeicherte Änderungen auf:
+%1
+
+Durch das Aufheben der Verknüpfung werden diese Aktivitäten geändert. Sie müssen die Änderungen zuerst speichern oder verwerfen.</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1133"/>
         <source>Invalid date/time specified</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Ungültiges Datum/Ungültige Uhrzeit angegeben</translatorcomment>
+        <translation>Ungültiges Datum/Ungültige Uhrzeit angegeben</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1142"/>
         <location filename="../../Core/RideCache.cpp" line="1270"/>
         <location filename="../../Core/RideCache.cpp" line="1345"/>
         <source>Target file already exists: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Zieldatei existiert bereits: %1</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1163"/>
@@ -30239,64 +30252,69 @@ Unlinking will modify these activities. You must save or discard changes first.<
 %1
 
 Moving will update the link reference. You must save or discard changes first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die folgenden Aktivitäten weisen ungespeicherte Änderungen auf:
+%1
+
+Durch das Verschieben wird die Linkreferenz aktualisiert. Sie müssen zuerst die Änderungen speichern oder verwerfen.</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1186"/>
         <source>Failed to open activity file</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivitätsdatei konnte nicht geöffnet werden</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1201"/>
         <source>Failed to rename files: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Umbenennung der Dateien fehlgeschlagen: %1</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1260"/>
         <source>Invalid date specified</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungültiges Datum angegeben</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1314"/>
         <source>No items specified</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Artikel angegeben</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1324"/>
         <source>Invalid source item</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungültiges Quellelement</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1329"/>
         <source>Source item is not a planned activity: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Quellelement ist keine geplante Aktivität: %1</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1334"/>
         <source>Invalid target date for: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungültiges Zieldatum für: %1</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1361"/>
         <source>No files specified</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Dateien angegeben</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1389"/>
         <source>Failed to copy %1 of %2 activities: %3</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopieren von %1 von %2 Aktivitäten fehlgeschlagen: %3</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1410"/>
         <source>Invalid from date specified</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungültig ab angegebenem Datum</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1454"/>
         <source>This operation will shift %1 planned activities.
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Durch diesen Vorgang werden %1 der geplanten Aktivitäten verschoben.
+
+</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1456"/>
@@ -30304,7 +30322,10 @@ Moving will update the link reference. You must save or discard changes first.</
 %1
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Geplante Aktivitäten mit nicht gespeicherten Änderungen:
+%1
+
+</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1459"/>
@@ -30312,57 +30333,61 @@ Moving will update the link reference. You must save or discard changes first.</
 %1
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Verbundene beendete Aktivitäten mit nicht gespeicherten Änderungen:
+
+%1
+
+</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1800"/>
         <source>Cannot link two activities of the same type. One must be planned, one actual.</source>
-        <translation type="unfinished"></translation>
+        <translation>Es können nicht zwei Aktivitäten desselben Typs miteinander verknüpft werden. Eine muss geplant sein, die andere muss eine beedete sein.</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1462"/>
         <source>All affected activities must be saved or changes discarded before shifting.</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle betroffenen Aktivitäten müssen vor dem Wechsel gespeichert oder Änderungen verworfen werden.</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1571"/>
         <source>Failed to shift %1 of %2 activities: %3</source>
-        <translation type="unfinished"></translation>
+        <translation>Das Verschieben von %1 von %2 Aktivitäten ist fehlgeschlagen: %3</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1615"/>
         <source>Failed to save: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Speichern fehlgeschlagen: %1</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1636"/>
         <source>Failed to rename activity file from %1 to %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Umbenennung der Aktivitätsdatei von %1 in %2 ist fehlgeschlagen</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1792"/>
         <source>Invalid activities for linking</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungültige Aktivitäten für die Verknüpfung</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1796"/>
         <source>Can&apos;t link to self</source>
-        <translation type="unfinished"></translation>
+        <translation>Kann nicht auf sich selbst verlinken</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1818"/>
         <source>Failed to copy file</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopieren der Datei fehlgeschlagen</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1827"/>
         <source>Failed to open copied file</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopierte Datei konnte nicht geöffnet werden</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1842"/>
         <source>Failed to write modified file</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -37932,7 +37957,7 @@ F3 drücken, wenn fertig.</translation>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="100"/>
         <source>Add a Row above the highlighted row</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeile über der markierten Zeile einfügen</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="105"/>
@@ -38091,52 +38116,52 @@ Sie können die Referenzen in der Bibliothek über die Optionen im Kontektmenu l
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="170"/>
         <source>Common settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Allgemeine Einstellungen</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="172"/>
         <source>Show notifications and textcues in title</source>
-        <translation type="unfinished"></translation>
+        <translation>Benachrichtigungen und Textzeilen im Titel anzeigen</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="174"/>
         <source>Plot line width</source>
-        <translation type="unfinished"></translation>
+        <translation>Linienstärke der Kurvenlinie</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="176"/>
         <source>Show Curve</source>
-        <translation type="unfinished"></translation>
+        <translation>Kurve anzeigen</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="177"/>
         <source>W&apos;bal Prediction</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorhersage von W&apos;-Bilanz</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="178"/>
         <source>W&apos;bal</source>
-        <translation type="unfinished">W&apos;-Bilanz</translation>
+        <translation>W&apos;-Bilanz</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="179"/>
         <source>Power</source>
-        <translation type="unfinished">Leistung</translation>
+        <translation>Leistung</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="180"/>
         <source>Heartrate</source>
-        <translation type="unfinished">Herzfrequenz</translation>
+        <translation>Herzfrequenz</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="181"/>
         <source>Cadence</source>
-        <translation type="unfinished">Trittfrequenz</translation>
+        <translation>Trittfrequenz</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="182"/>
         <source>Speed</source>
-        <translation type="unfinished">Geschwindigkeit</translation>
+        <translation>Geschwindigkeit</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="184"/>
@@ -38168,7 +38193,7 @@ Sie können die Referenzen in der Bibliothek über die Optionen im Kontektmenu l
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="190"/>
         <source>Power zones transparency (when active)</source>
-        <translation type="unfinished"></translation>
+        <translation>Transparenz der Leistungszonen (wenn aktiv)</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="192"/>
@@ -38325,17 +38350,17 @@ Sie können die Referenzen in der Bibliothek über die Optionen im Kontektmenu l
     <message>
         <location filename="../../Train/WorkoutWindow.cpp" line="118"/>
         <source>Show Core Temp</source>
-        <translation type="unfinished"></translation>
+        <translation>Kernetemperatur anzeigen</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWindow.cpp" line="120"/>
         <source>Show Skin Temp</source>
-        <translation type="unfinished"></translation>
+        <translation>Hauttemperatur anzeigen</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWindow.cpp" line="122"/>
         <source>Show Heat Strain Index</source>
-        <translation type="unfinished"></translation>
+        <translation>Hitzestress-Index anzeigen</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWindow.cpp" line="189"/>
