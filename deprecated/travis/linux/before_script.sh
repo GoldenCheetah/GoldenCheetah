@@ -35,10 +35,9 @@ sed -i "s|#\(SAMPLERATE_INSTALL =\).*|\1 /usr|" src/gcconfig.pri
 # SRMIO
 sed -i "s|#\(SRMIO_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
 # Python
-echo DEFINES += GC_WANT_PYTHON >> src/gcconfig.pri
-echo PYTHONINCLUDES = -I/usr/include/python3.7 >> src/gcconfig.pri
-echo PYTHONLIBS = -L/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu -lpython3.7m >> src/gcconfig.pri
+sed -i "s/|#GC_WANT_PYTHON.=.*|GC_WANT_PYTHON=true|" src/gcconfig.pri
 # GSL
+sed -i "s|#GSL_INCLUDES =.*|GSL_INCLUDES = /usr/include|" src/gcconfig.pri
 echo GSL_LIBS = -lgsl -lgslcblas -lm >> src/gcconfig.pri
 # TrainerDay Query API
 echo DEFINES += GC_WANT_TRAINERDAY_API >> src/gcconfig.pri
@@ -63,6 +62,7 @@ sed -i "s/__GC_SPORTTRACKS_CLIENT_SECRET__/"$GC_SPORTTRACKS_CLIENT_SECRET"/" src
 sed -i "s/OPENDATA_DISABLE/OPENDATA_ENABLE/" src/Core/Secrets.h
 sed -i "s/__GC_CLOUD_OPENDATA_SECRET__/"$GC_CLOUD_OPENDATA_SECRET"/" src/Core/Secrets.h
 sed -i "s/__GC_RWGPS_API_KEY__/"$GC_RWGPS_API_KEY"/" src/Core/Secrets.h
+sed -i "s/__GC_POLARFLOW_CLIENT_SECRET__/"$GC_POLARFLOW_CLIENT_SECRET"/" src/Core/Secrets.h
 sed -i "s/__GC_NOLIO_CLIENT_ID__/"$GC_NOLIO_CLIENT_ID"/" src/Core/Secrets.h
 sed -i "s/__GC_NOLIO_SECRET__/"$GC_NOLIO_SECRET"/" src/Core/Secrets.h
 sed -i "s/__GC_XERT_CLIENT_SECRET__/"$GC_XERT_CLIENT_SECRET"/" src/Core/Secrets.h

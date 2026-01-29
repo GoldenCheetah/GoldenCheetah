@@ -210,7 +210,6 @@ GeneralPage::GeneralPage(Context *context) : context(context)
             this, [this](Qt::CheckState state) { rDirectorySel->setEnabled(state); });
 #endif
 
-    embedR->setChecked(! appsettings->value(NULL, GC_EMBED_R, true).toBool());
     embedR->setChecked(appsettings->value(NULL, GC_EMBED_R, true).toBool());
 #endif
 
@@ -240,7 +239,6 @@ GeneralPage::GeneralPage(Context *context) : context(context)
             this, [this](Qt::CheckState state) { pythonDirectorySel->setEnabled(state); });
 #endif
 
-    embedPython->setChecked(! appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool());
     embedPython->setChecked(appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool());
 #endif
 
