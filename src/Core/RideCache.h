@@ -135,8 +135,8 @@ class RideCache : public QObject
         OperationPreCheck checkMoveActivity(RideItem *item, const QDateTime &newDateTime);
         OperationResult moveActivity(RideItem *item, const QDateTime &newDateTime);
 
-        OperationPreCheck checkCopyPlannedActivity(RideItem *sourceItem, const QDate &newDate);
-        OperationResult copyPlannedActivity(RideItem *sourceItem, const QDate &newDate);
+        OperationPreCheck checkCopyPlannedActivity(RideItem *sourceItem, const QDate &newDate, QTime newTime = QTime());
+        OperationResult copyPlannedActivity(RideItem *sourceItem, const QDate &newDate, QTime newTime = QTime());
 
         OperationPreCheck checkCopyPlannedActivities(const QList<std::pair<RideItem*, QDate>> &sourceItemsAndTargets);
         OperationResult copyPlannedActivities(const QList<std::pair<RideItem*, QDate>> &sourceItemsAndTargets);
@@ -220,7 +220,7 @@ class RideCache : public QObject
     private:
         bool renameRideFiles(const QString& oldFileName, const QString& newFileName, bool isPlanned, QString &error);
         bool isValidLink(RideItem *item1, RideItem *item2, QString &error);
-        RideItem* copyPlannedRideFile(RideItem *sourceItem, const QDate &newDate, QString &error);
+        RideItem* copyPlannedRideFile(RideItem *sourceItem, const QDate &newDate, const QTime &newTime, QString &error);
 };
 
 class AthleteBest

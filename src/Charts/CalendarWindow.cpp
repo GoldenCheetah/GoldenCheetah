@@ -359,6 +359,8 @@ CalendarWindow::CalendarWindow(Context *context)
             this->context->mainWindow->selectAnalysis();
         }
     });
+    connect(calendar, &Calendar::copyPlannedActivity, this, &CalendarWindow::copyPlannedActivity);
+    connect(calendar, &Calendar::pastePlannedActivity, this, &CalendarWindow::pastePlannedActivity);
     connect(calendar, &Calendar::addActivity, this, [this](bool plan, const QDate &day, const QTime &time) {
         this->context->tab->setNoSwitch(true);
         ManualActivityWizard wizard(this->context, plan, QDateTime(day, time));
@@ -1190,6 +1192,142 @@ CalendarWindow::getPrimary
 }
 
 
+QTime
+CalendarWindow::findFreeSlot
+(RideItem *sourceItem, QDate newDate, QTime targetTime)
+{
+    if (sourceItem == nullptr) {
+        return QTime();
+    }
+    QList<std::pair<QTime, int>> busySlots;
+    busySlots.append(std::make_pair(QTime(0, 0), getStartHour() * 60 * 60));
+    for (RideItem *rideItem : context->athlete->rideCache->rides()) {
+        if (rideItem != nullptr && rideItem->planned == sourceItem->planned && rideItem->dateTime.date() == newDate) {
+            busySlots.append(std::make_pair(rideItem->dateTime.time(), static_cast<int>(rideItem->getForSymbol("workout_time"))));
+        }
+    }
+    busySlots.append(std::make_pair(QTime(getEndHour(), 0), (24 - getEndHour()) * 60 * 60 - 1));
+    if (! targetTime.isValid()) {
+        targetTime = sourceItem->dateTime.time();
+    }
+    QTime newTime = findFreeSlot(busySlots, targetTime, static_cast<int>(sourceItem->getForSymbol("workout_time")));
+    return newTime;
+}
+
+
+QTime
+CalendarWindow::findFreeSlot
+(QList<std::pair<QTime, int>> busySlots, QTime targetTime, int requiredDurationSeconds) const
+{
+    std::sort(busySlots.begin(), busySlots.end(), [](const std::pair<QTime, int> &a, const std::pair<QTime, int> &b) {
+        return a.first < b.first;
+    });
+    QSet<QTime> forbiddenTimes;
+    for (const std::pair<QTime, int> &busySlot : busySlots) {
+        forbiddenTimes.insert(busySlot.first);
+    }
+    QTime bestSlot;
+    int bestDistance = 24 * 60 * 60;
+    bool foundFullSlot = false;
+    QTime dayStart = QTime(0, 0, 0);
+    QTime dayEnd = QTime(23, 59, 59);
+    QList<std::pair<QTime, QTime>> busyPeriods;
+    for (const std::pair<QTime, int> &busySlot : busySlots) {
+        QTime start = busySlot.first;
+        QTime end = busySlot.first.addSecs(busySlot.second);
+        if (busyPeriods.isEmpty()) {
+            busyPeriods.append({start, end});
+        } else {
+            std::pair<QTime, QTime> &last = busyPeriods.last();
+            if (start <= last.second) {
+                last.second = std::max(last.second, end);
+            } else {
+                busyPeriods.append({start, end});
+            }
+        }
+    }
+    QList<std::pair<QTime, QTime>> freeIntervals;
+    if (busyPeriods.isEmpty()) {
+        freeIntervals.append({dayStart, dayEnd});
+    } else {
+        if (busyPeriods.first().first > dayStart) {
+            freeIntervals.append({dayStart, busyPeriods.first().first.addSecs(-1)});
+        }
+        for (int i = 0; i < busyPeriods.size() - 1; ++i) {
+            QTime currentEnd = busyPeriods[i].second;
+            QTime nextStart = busyPeriods[i + 1].first;
+            if (currentEnd < nextStart) {
+                freeIntervals.append({currentEnd, nextStart.addSecs(-1)});
+            }
+        }
+        QTime lastEnd = busyPeriods.last().second;
+        if (lastEnd <= dayEnd) {
+            freeIntervals.append({lastEnd, dayEnd});
+        }
+    }
+    for (const std::pair<QTime, QTime> &freeInterval : freeIntervals) {
+        QTime intervalStart = freeInterval.first;
+        QTime intervalEnd = freeInterval.second;
+        int intervalDuration = intervalStart.secsTo(intervalEnd) + 1;
+        if (intervalDuration >= requiredDurationSeconds) {
+            QTime candidate = intervalStart;
+            if (! forbiddenTimes.contains(candidate)) {
+                int distance = qAbs(candidate.secsTo(targetTime));
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    bestSlot = candidate;
+                    foundFullSlot = true;
+                }
+            }
+            if (targetTime >= intervalStart && targetTime <= intervalEnd) {
+                if (targetTime.secsTo(intervalEnd) + 1 >= requiredDurationSeconds) {
+                    if (! forbiddenTimes.contains(targetTime)) {
+                        bestSlot = targetTime;
+                        foundFullSlot = true;
+                        break;
+                    }
+                }
+            }
+            candidate = intervalEnd.addSecs(-(requiredDurationSeconds - 1));
+            if (candidate >= intervalStart && ! forbiddenTimes.contains(candidate)) {
+                int distance = std::abs(candidate.secsTo(targetTime));
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    bestSlot = candidate;
+                    foundFullSlot = true;
+                }
+            }
+        }
+    }
+    if (foundFullSlot) {
+        return bestSlot;
+    }
+    if (! forbiddenTimes.contains(targetTime)) {
+        return targetTime;
+    }
+    const int increment = 15 * 60;
+    int targetSecs = QTime(0, 0, 0).secsTo(targetTime);
+    int maxSecs = QTime(0, 0, 0).secsTo(QTime(23, 59, 59));
+    int maxSteps = (maxSecs / increment) + 1;
+    for (int step = 1; step <= maxSteps; ++step) {
+        int offset = step * increment;
+        if (targetSecs + offset <= maxSecs) {
+            QTime candidate = QTime(0, 0, 0).addSecs(targetSecs + offset);
+            if (! forbiddenTimes.contains(candidate)) {
+                return candidate;
+            }
+        }
+        if (targetSecs - offset >= 0) {
+            QTime candidate = QTime(0, 0, 0).addSecs(targetSecs - offset);
+            if (! forbiddenTimes.contains(candidate)) {
+                return candidate;
+            }
+        }
+    }
+    return QTime();
+}
+
+
 void
 CalendarWindow::updateActivities
 ()
@@ -1402,6 +1540,66 @@ CalendarWindow::unlinkActivities
         context->tab->setNoSwitch(false);
     }
     return ret;
+}
+
+
+void
+CalendarWindow::copyPlannedActivity
+(CalendarEntry activity)
+{
+    RideItem *rideItem = getRideItem(activity);
+    if (rideItem != nullptr) {
+        QClipboard *clipboard = QGuiApplication::clipboard();
+        QByteArray data;
+        QDataStream stream(&data, QIODevice::WriteOnly);
+        stream << activity.primary << activity.reference;
+        QMimeData *mimeData = new QMimeData();
+        mimeData->setData(PLANNED_MIME_TYPE, data);
+        clipboard->setMimeData(mimeData);
+    }
+}
+
+
+void
+CalendarWindow::pastePlannedActivity
+(QDate day, QTime time)
+{
+    QClipboard *clipboard = QGuiApplication::clipboard();
+    const QMimeData *mimeData = clipboard->mimeData();
+    if (mimeData && mimeData->hasFormat(PLANNED_MIME_TYPE)) {
+        QByteArray data = mimeData->data(PLANNED_MIME_TYPE);
+        QDataStream stream(data);
+        QString primary;
+        QString reference;
+        stream >> primary >> reference;
+
+        RideItem *sourceItem = nullptr;
+        for (RideItem *rideItem : context->athlete->rideCache->rides()) {
+            if (rideItem != nullptr && rideItem->planned && rideItem->fileName == reference) {
+                sourceItem = rideItem;
+                break;
+            }
+        }
+        time = findFreeSlot(sourceItem, day, time);
+        RideCache::OperationPreCheck check = context->athlete->rideCache->checkCopyPlannedActivity(sourceItem, day, time);
+        if (check.canProceed) {
+            if (proceedDialog(context, check)) {
+                context->tab->setNoSwitch(true);
+                RideCache::OperationResult result = context->athlete->rideCache->copyPlannedActivity(sourceItem, day, time);
+                if (result.success) {
+                    QString error;
+                    context->athlete->rideCache->saveActivities(check.affectedItems, error);
+                    // Context::rideDeleted is not always emitted, therefore forcing the update
+                    updateActivities();
+                } else {
+                    QMessageBox::warning(this, tr("Paste failed: %1").arg(primary), result.error);
+                }
+                context->tab->setNoSwitch(false);
+            }
+        } else {
+            QMessageBox::warning(this, tr("Paste failed: %1").arg(primary), check.blockingReason);
+        }
+    }
 }
 
 

@@ -72,6 +72,8 @@ signals:
     void linkActivity(CalendarEntry activity, bool autoLink);
     void unlinkActivity(CalendarEntry activity);
     void viewActivity(CalendarEntry activity);
+    void copyPlannedActivity(CalendarEntry activity);
+    void pastePlannedActivity(QDate day, QTime time);
     void viewLinkedActivity(CalendarEntry activity);
     void addActivity(bool plan, QDate day, QTime time);
     void delActivity(CalendarEntry activity);
@@ -268,6 +270,8 @@ signals:
     void unlinkActivity(CalendarEntry activity);
     void viewActivity(CalendarEntry activity);
     void viewLinkedActivity(CalendarEntry activity);
+    void copyPlannedActivity(CalendarEntry activity);
+    void pastePlannedActivity(QDate day, QTime time);
     void addActivity(bool plan, QDate day, QTime time);
     void delActivity(CalendarEntry activity);
     void saveChanges(CalendarEntry activity);
@@ -322,6 +326,8 @@ signals:
     void unlinkActivity(CalendarEntry activity);
     void viewActivity(CalendarEntry activity);
     void viewLinkedActivity(CalendarEntry activity);
+    void copyPlannedActivity(CalendarEntry activity);
+    void pastePlannedActivity(QDate day, QTime time);
     void addActivity(bool plan, QDate day, QTime time);
     void delActivity(CalendarEntry activity);
     void saveChanges(CalendarEntry activity);
@@ -389,6 +395,8 @@ signals:
     void unlinkActivity(CalendarEntry activity);
     void viewActivity(CalendarEntry activity);
     void viewLinkedActivity(CalendarEntry activity);
+    void copyPlannedActivity(CalendarEntry activity);
+    void pastePlannedActivity(QDate day, QTime time);
     void addActivity(bool plan, QDate day, QTime time);
     void delActivity(CalendarEntry activity);
     void saveChanges(CalendarEntry activity);

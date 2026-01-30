@@ -1246,7 +1246,7 @@ RideCache::moveActivity
 
 RideCache::OperationPreCheck
 RideCache::checkCopyPlannedActivity
-(RideItem *sourceItem, const QDate &newDate)
+(RideItem *sourceItem, const QDate &newDate, QTime newTime)
 {
     OperationPreCheck check;
 
@@ -1260,8 +1260,12 @@ RideCache::checkCopyPlannedActivity
         check.blockingReason = tr("Invalid date specified");
         return check;
     }
+    QTime time(sourceItem->dateTime.time());
+    if (newTime.isValid()) {
+        time = newTime;
+    }
 
-    QDateTime newDateTime(newDate, sourceItem->dateTime.time());
+    QDateTime newDateTime(newDate, time);
     QFileInfo oldInfo(sourceItem->fileName);
     QString newFileName = newDateTime.toString("yyyy_MM_dd_HH_mm_ss") + "." + oldInfo.suffix();
     QString newPath = plannedDirectory.canonicalPath() + "/" + newFileName;
@@ -1277,12 +1281,16 @@ RideCache::checkCopyPlannedActivity
 
 RideCache::OperationResult
 RideCache::copyPlannedActivity
-(RideItem *sourceItem, const QDate &newDate)
+(RideItem *sourceItem, const QDate &newDate, QTime newTime)
 {
     OperationResult result;
 
     QString error;
-    RideItem *newItem = copyPlannedRideFile(sourceItem, newDate, error);
+    QTime time(sourceItem->dateTime.time());
+    if (newTime.isValid()) {
+        time = newTime;
+    }
+    RideItem *newItem = copyPlannedRideFile(sourceItem, newDate, time, error);
 
     if (! newItem) {
         result.error = error;
@@ -1366,7 +1374,7 @@ RideCache::copyPlannedActivities
     QStringList failedFiles;
     for (const std::pair<RideItem*, QDate> &pair : sourceItemsAndTargets) {
         QString error;
-        RideItem *newItem = copyPlannedRideFile(pair.first, pair.second, error);
+        RideItem *newItem = copyPlannedRideFile(pair.first, pair.second, QTime(), error);
         if (newItem) {
             newItems << newItem;
         } else {
@@ -1806,9 +1814,9 @@ RideCache::isValidLink
 
 RideItem*
 RideCache::copyPlannedRideFile
-(RideItem *sourceItem, const QDate &newDate, QString &error)
+(RideItem *sourceItem, const QDate &newDate, const QTime &newTime, QString &error)
 {
-    QDateTime newDateTime(newDate, sourceItem->dateTime.time());
+    QDateTime newDateTime(newDate, newTime);
     QFileInfo oldInfo(sourceItem->fileName);
     QString newFileName = newDateTime.toString("yyyy_MM_dd_HH_mm_ss") + "." + oldInfo.suffix();
     QString newPath = plannedDirectory.canonicalPath() + "/" + newFileName;
