@@ -34,6 +34,8 @@
 #define ENTRY_TYPE_PHASE 11
 #define ENTRY_TYPE_OTHER 99
 
+#define PLANNED_MIME_TYPE "application/x-goldencheetah-planned-activity"
+
 
 struct AgendaEntry {
     QString primary;
