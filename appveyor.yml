@@ -94,7 +94,6 @@ cache:
 - qwt -> qwt/qwtconfig.pri.in, appveyor.yml
 - srmio -> appveyor.yml
 - D2XX
-- site-packages
 - src\Python\SIP\release\sip_lib.lib -> src\Python\SIP\goldencheetah.sip
 - src\Python\SIP\libsip_lib.a -> src\Python\SIP\goldencheetah.sip
 
@@ -160,9 +159,6 @@ install:
 before_build:
 
 # Windows
-# Define GC version string, only for tagged builds
-- cmd: if %APPVEYOR_REPO_TAG%==true echo DEFINES+=GC_VERSION=VERSION_STRING >> src\gcconfig.pri
-
 # Enable CloudDB
 - cmd: echo CloudDB=active >> src\gcconfig.pri
 
@@ -179,11 +175,18 @@ before_build:
 # Avoid conflicts between Windows.h min/max macros and limits.h
 - cmd: echo DEFINES+=NOMINMAX >> src\gcconfig.pri
 
-
 # Linux / macOS
 - sh: bash appveyor/$OS_NAME/before_build.sh
-# Define GC version string, only for tagged builds
-- sh: if $APPVEYOR_REPO_TAG; then echo DEFINES+=GC_VERSION=VERSION_STRING >> src/gcconfig.pri; fi
+
+# For tagged builds, define GC version string
+- ps: if ($env:APPVEYOR_REPO_TAG -eq "true") { Add-Content src/gcconfig.pri "DEFINES += GC_VERSION=VERSION_STRING" }
+
+# Show config.
+- ps: Get-Content src/gcconfig.pri
+
+# update translations
+- cmd: lupdate src\src.pro
+- sh: lupdate src/src.pro
 
 # Patch Secrets.h (Windows / Linux / macOS)
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_GOOGLE_CALENDAR_CLIENT_SECRET__', $env:GC_GOOGLE_CALENDAR_CLIENT_SECRET | Set-Content src\Core\Secrets.h
