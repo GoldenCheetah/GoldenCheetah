@@ -72,8 +72,8 @@ Replace-InFile $gcconfig "#DEFINES \+= GC_WANT_R" "DEFINES += GC_WANT_R"
 
 # 14. Python Support
 Replace-InFile $gcconfig "#DEFINES \+= GC_WANT_PYTHON" "DEFINES += GC_WANT_PYTHON"
-Replace-InFile $gcconfig "#PYTHONINCLUDES = -I`"C:\\Program Files\\Python36\\include`"" "PYTHONINCLUDES = -ICore -I`"c:\python37-x64\include`""
-Replace-InFile $gcconfig "#PYTHONLIBS = -L`"C:\\Program Files\\Python36\\libs`"" "PYTHONLIBS = -L`"c:\python37-x64\libs`" -lpython37"
+Replace-InFile $gcconfig "#PYTHONINCLUDES =" "PYTHONINCLUDES = -ICore -I`"c:\python311-x64\include`""
+Replace-InFile $gcconfig "#PYTHONLIBS =" "PYTHONLIBS = -L`"c:\python311-x64\libs`" -lpython311"
 
 # 15. GSL Support
 Replace-InFile $gcconfig "#GSL_INCLUDES = c:\\vcpkg\\installed\\x64-windows\\include" "GSL_INCLUDES = c:\tools\vcpkg\installed\x64-windows\include"
