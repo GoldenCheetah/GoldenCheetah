@@ -111,7 +111,7 @@ install:
 - cmd: 7z x -y jom_1_1_3.zip -oc:\jom\
 - cmd: set PATH=%PATH%;c:\jom\;
 
-# Get R and add to config
+# Get R
 - ps: >-
     if ($isWindows -And -not (Test-Path 'C:\R')) {
       # Lets use 4.1 until 4.2 issues are fixed
@@ -123,7 +123,7 @@ install:
 - cmd: set PATH=%PATH%;c:\R\bin\;
 - cmd: R --version
 
-# Get Python and add to config
+# Get Python
 - ps: >-
     if ($isWindows -And -not (Test-Path 'C:\Python')) {
       $pyurl = "https://www.python.org/ftp/python/3.11.9/python-3.11.9-embed-amd64.zip"
@@ -137,16 +137,10 @@ install:
     }
 - cmd: set PATH=C:\Python311-x64\Scripts\;C:\Python311-x64\;%PATH%
 - cmd: python --version
-- cmd: echo DEFINES+=GC_WANT_PYTHON >> src\gcconfig.pri
-- cmd: echo PYTHONINCLUDES=Core c:\Python311-x64\include >> src\gcconfig.pri
-- cmd: echo PYTHONLIBS=-L\"c:\Python311-x64\libs\" -lpython311 >> src\gcconfig.pri
 # Upgrade pip to ensure you have the latest version
 - cmd: python -m pip install --upgrade pip
 # Install your project's dependencies from a requirements.txt file
 - cmd: "python -m pip install --only-binary :all: -r src/Python/requirements.txt -t C:/Python/lib/site-packages"
-# GSL
-- cmd: echo GSL_INCLUDES=c:\tools\vcpkg\installed\x64-windows\include >> src\gcconfig.pri
-- cmd: echo GSL_LIBS=-Lc:\tools\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas >> src\gcconfig.pri
 
 # Linux / macOS - install dependencies first (including Python 3.11)
 - sh: bash appveyor/$OS_NAME/install.sh
