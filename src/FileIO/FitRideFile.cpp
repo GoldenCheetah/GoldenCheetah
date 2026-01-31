@@ -3003,6 +3003,7 @@ genericnext:
                              rightPedalCenterOffset = value;
                              break;
                     case 69: // ? Left Power Phase ?
+                             if (valueList.size() < 2) break; // Don't crash on malformed files
                              leftTopDeathCenter = round(valueList.at(0) * 360.0/256);
                              leftBottomDeathCenter = round(valueList.at(1) * 360.0/256);
 
@@ -3014,6 +3015,7 @@ genericnext:
                              }
                              break;
                     case 70: // ? Left Peak Phase  ?
+                             if (valueList.size() < 2) break; // Don't crash on malformed files
                              leftTopPeakPowerPhase = round(valueList.at(0) * 360.0/256);
                              leftBottomPeakPowerPhase = round(valueList.at(1) * 360.0/256);
 
@@ -3025,6 +3027,7 @@ genericnext:
                              }
                              break;
                     case 71: // ? Right Power Phase ?
+                             if (valueList.size() < 2) break; // Don't crash on malformed files
                              rightTopDeathCenter = round(valueList.at(0) * 360.0/256);
                              rightBottomDeathCenter = round(valueList.at(1) * 360.0/256);
 
@@ -3036,6 +3039,7 @@ genericnext:
                              }
                              break;
                     case 72: // ? Right Peak Phase  ?
+                             if (valueList.size() < 2) break; // Don't crash on malformed files
                              rightTopPeakPowerPhase = round(valueList.at(0) * 360.0/256);
                              rightBottomPeakPowerPhase = round(valueList.at(1) * 360.0/256);
 

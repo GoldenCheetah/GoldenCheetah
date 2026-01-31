@@ -94,7 +94,6 @@ cache:
 - qwt -> qwt/qwtconfig.pri.in, appveyor.yml
 - srmio -> appveyor.yml
 - D2XX
-- site-packages
 - src\Python\SIP\release\sip_lib.lib -> src\Python\SIP\goldencheetah.sip
 - src\Python\SIP\libsip_lib.a -> src\Python\SIP\goldencheetah.sip
 
@@ -162,10 +161,13 @@ before_build:
 
 # For tagged builds, define GC version string
 - ps: if ($env:APPVEYOR_REPO_TAG -eq "true") { Add-Content src/gcconfig.pri "DEFINES += GC_VERSION=VERSION_STRING" }
+
 # Show config.
 - ps: Get-Content src/gcconfig.pri
+
 # update translations
-- ps: lupdate src/src.pro
+- cmd: lupdate src\src.pro
+- sh: lupdate src/src.pro
 
 - ps: throw "Stopping build for testing"
 

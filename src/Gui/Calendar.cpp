@@ -199,6 +199,7 @@ CalendarBaseTable::buildContextMenu
                 contextMenu->addAction(tr("View actual activity") % ellipsis, this, [this, entry]() { emit viewLinkedActivity(entry); });
             }
             contextMenu->addAction(tr("View planned activity") % ellipsis, this, [this, entry]() { emit viewActivity(entry); });
+            contextMenu->addAction(tr("Copy planned activity"), this, [this, entry]() { emit copyPlannedActivity(entry); });
             contextMenu->addSeparator();
             if (entry.linkedReference.isEmpty()) {
                 contextMenu->addAction(tr("Link to actual activity"), this, [this, entry]() { emit linkActivity(entry, true); });
@@ -264,6 +265,13 @@ CalendarBaseTable::buildContextMenu
                 }
                 emit addActivity(true, day.date, activityTime);
             });
+            QClipboard *clipboard = QGuiApplication::clipboard();
+            const QMimeData *mimeData = clipboard->mimeData();
+            if (mimeData && mimeData->hasFormat(PLANNED_MIME_TYPE)) {
+                contextMenu->addAction(tr("Paste planned activity"), this, [this, day, time]() {
+                    emit pastePlannedActivity(day.date, time);
+                });
+            }
         }
         if (canHavePhasesEvents) {
             contextMenu->addSeparator();
@@ -1545,6 +1553,8 @@ CalendarDayView::CalendarDayView
     connect(dayTable, &CalendarDayTable::unlinkActivity, this, &CalendarDayView::unlinkActivity);
     connect(dayTable, &CalendarDayTable::viewActivity, this, &CalendarDayView::viewActivity);
     connect(dayTable, &CalendarDayTable::viewLinkedActivity, this, &CalendarDayView::viewLinkedActivity);
+    connect(dayTable, &CalendarDayTable::copyPlannedActivity, this, &CalendarDayView::copyPlannedActivity);
+    connect(dayTable, &CalendarDayTable::pastePlannedActivity, this, &CalendarDayView::pastePlannedActivity);
     connect(dayTable, &CalendarDayTable::addActivity, this, &CalendarDayView::addActivity);
     connect(dayTable, &CalendarDayTable::showInTrainMode, this, &CalendarDayView::showInTrainMode);
     connect(dayTable, &CalendarDayTable::filterSimilar, this, &CalendarDayView::filterSimilar);
@@ -1845,6 +1855,8 @@ CalendarWeekView::CalendarWeekView
     connect(weekTable, &CalendarDayTable::unlinkActivity, this, &CalendarWeekView::unlinkActivity);
     connect(weekTable, &CalendarDayTable::viewActivity, this, &CalendarWeekView::viewActivity);
     connect(weekTable, &CalendarDayTable::viewLinkedActivity, this, &CalendarWeekView::viewLinkedActivity);
+    connect(weekTable, &CalendarDayTable::copyPlannedActivity, this, &CalendarWeekView::copyPlannedActivity);
+    connect(weekTable, &CalendarDayTable::pastePlannedActivity, this, &CalendarWeekView::pastePlannedActivity);
     connect(weekTable, &CalendarDayTable::addActivity, this, &CalendarWeekView::addActivity);
     connect(weekTable, &CalendarDayTable::showInTrainMode, this, &CalendarWeekView::showInTrainMode);
     connect(weekTable, &CalendarDayTable::filterSimilar, this, &CalendarWeekView::filterSimilar);
@@ -2043,6 +2055,8 @@ Calendar::Calendar
     connect(dayView, &CalendarDayView::unlinkActivity, this, &Calendar::unlinkActivity);
     connect(dayView, &CalendarDayView::viewActivity, this, &Calendar::viewActivity);
     connect(dayView, &CalendarDayView::viewLinkedActivity, this, &Calendar::viewLinkedActivity);
+    connect(dayView, &CalendarDayView::copyPlannedActivity, this, &Calendar::copyPlannedActivity);
+    connect(dayView, &CalendarDayView::pastePlannedActivity, this, &Calendar::pastePlannedActivity);
     connect(dayView, &CalendarDayView::addActivity, this, &Calendar::addActivity);
     connect(dayView, &CalendarDayView::showInTrainMode, this, &Calendar::showInTrainMode);
     connect(dayView, &CalendarDayView::filterSimilar, this, &Calendar::filterSimilar);
@@ -2072,6 +2086,8 @@ Calendar::Calendar
     connect(weekView, &CalendarWeekView::unlinkActivity, this, &Calendar::unlinkActivity);
     connect(weekView, &CalendarWeekView::viewActivity, this, &Calendar::viewActivity);
     connect(weekView, &CalendarWeekView::viewLinkedActivity, this, &Calendar::viewLinkedActivity);
+    connect(weekView, &CalendarWeekView::copyPlannedActivity, this, &Calendar::copyPlannedActivity);
+    connect(weekView, &CalendarWeekView::pastePlannedActivity, this, &Calendar::pastePlannedActivity);
     connect(weekView, &CalendarWeekView::addActivity, this, &Calendar::addActivity);
     connect(weekView, &CalendarWeekView::showInTrainMode, this, &Calendar::showInTrainMode);
     connect(weekView, &CalendarWeekView::filterSimilar, this, &Calendar::filterSimilar);
@@ -2106,6 +2122,8 @@ Calendar::Calendar
     connect(monthView, &CalendarMonthTable::unlinkActivity, this, &Calendar::unlinkActivity);
     connect(monthView, &CalendarMonthTable::viewActivity, this, &Calendar::viewActivity);
     connect(monthView, &CalendarMonthTable::viewLinkedActivity, this, &Calendar::viewLinkedActivity);
+    connect(monthView, &CalendarMonthTable::copyPlannedActivity, this, &Calendar::copyPlannedActivity);
+    connect(monthView, &CalendarMonthTable::pastePlannedActivity, this, &Calendar::pastePlannedActivity);
     connect(monthView, &CalendarMonthTable::addActivity, this, &Calendar::addActivity);
     connect(monthView, &CalendarMonthTable::repeatSchedule, this, &Calendar::repeatSchedule);
     connect(monthView, &CalendarMonthTable::insertRestday, this, &Calendar::insertRestday);
