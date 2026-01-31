@@ -76,8 +76,8 @@ Replace-InFile $gcconfig "#PYTHONINCLUDES =" "PYTHONINCLUDES = -ICore -I`"c:\pyt
 Replace-InFile $gcconfig "#PYTHONLIBS =" "PYTHONLIBS = -L`"c:\python311-x64\libs`" -lpython311"
 
 # 15. GSL Support
-Replace-InFile $gcconfig "#GSL_INCLUDES = c:\\vcpkg\\installed\\x64-windows\\include" "GSL_INCLUDES = c:\tools\vcpkg\installed\x64-windows\include"
-Replace-InFile $gcconfig "#GSL_LIBS = -LC:\\vcpkg\\installed\\x64-windows\\lib -lgsl -lgslcblas" "GSL_LIBS = -Lc:\tools\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas"
+Replace-InFile $gcconfig "#  GSL_INCLUDES = c:\\vcpkg\\installed\\x64-windows\\include" "GSL_INCLUDES = c:\tools\vcpkg\installed\x64-windows\include"
+Replace-InFile $gcconfig "#  GSL_LIBS = -LC:\\vcpkg\\installed\\x64-windows\\lib -lgsl -lgslcblas" "GSL_LIBS = -Lc:\tools\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas"
 
 # 16. GC Version (Tagged builds only)
 if ($env:APPVEYOR_REPO_TAG -eq "true") {
