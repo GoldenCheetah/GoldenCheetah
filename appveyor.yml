@@ -163,8 +163,6 @@ before_build:
 - cmd: lupdate src\src.pro
 - sh: lupdate src/src.pro
 
-- ps: throw "Stopping build for testing"
-
 # Patch Secrets.h (Windows / Linux / macOS)
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_GOOGLE_CALENDAR_CLIENT_SECRET__', $env:GC_GOOGLE_CALENDAR_CLIENT_SECRET | Set-Content src\Core\Secrets.h
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_GOOGLE_DRIVE_CLIENT_ID__', $env:GC_GOOGLE_DRIVE_CLIENT_ID | Set-Content src\Core\Secrets.h
