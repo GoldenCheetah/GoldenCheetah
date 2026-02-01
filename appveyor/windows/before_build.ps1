@@ -57,8 +57,8 @@ Replace-InFile $gcconfig "#LIBUSB_LIBS    =" "LIBUSB_LIBS = -Lc:\libs\10_Precomp
 
 # 10. SAMPLERATE
 Replace-InFile $gcconfig "#SAMPLERATE_INSTALL = /usr/local" "SAMPLERATE_INSTALL = c:\libs\10_Precompiled_DLL\libsamplerate64"
-Replace-InFile $gcconfig "#SAMPLERATE_INCLUDE =" "SAMPLERATE_INCLUDE = c:\libs\10_Precompiled_DLL\libsamplerate64\include"
-Replace-InFile $gcconfig "#SAMPLERATE_LIBS =" "SAMPLERATE_LIBS = -Lc:\libs\10_Precompiled_DLL\libsamplerate64\lib -llibsamplerate-0"
+Replace-InFile $gcconfig "#SAMPLERATE_INCLUDE = /usr/local/include" "SAMPLERATE_INCLUDE = c:\libs\10_Precompiled_DLL\libsamplerate64\include"
+Replace-InFile $gcconfig "#SAMPLERATE_LIBS = /usr/local/lib/libsamplerate.a" "SAMPLERATE_LIBS = -Lc:\libs\10_Precompiled_DLL\libsamplerate64\lib -llibsamplerate-0"
 
 # 11. HTPATH
 Replace-InFile $gcconfig "#HTPATH = ../httpserver" "HTPATH = ../httpserver"
@@ -79,22 +79,17 @@ Replace-InFile $gcconfig "#PYTHONLIBS =" "PYTHONLIBS = -L`"c:\python311-x64\libs
 Replace-InFile $gcconfig "#  GSL_INCLUDES = c:\\vcpkg\\installed\\x64-windows\\include" "GSL_INCLUDES = c:\tools\vcpkg\installed\x64-windows\include"
 Replace-InFile $gcconfig "#  GSL_LIBS = -LC:\\vcpkg\\installed\\x64-windows\\lib -lgsl -lgslcblas" "GSL_LIBS = -Lc:\tools\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas"
 
-# 16. GC Version (Tagged builds only)
-if ($env:APPVEYOR_REPO_TAG -eq "true") {
-    Add-Content $gcconfig "DEFINES += GC_VERSION=VERSION_STRING"
-}
-
-# 17. CloudDB
+# 16. CloudDB
 Replace-InFile $gcconfig "#CloudDB = active" "CloudDB = active"
 
-# 18. Train Robot
+# 17. Train Robot
 Replace-InFile $gcconfig "#DEFINES \+= GC_WANT_ROBOT" "DEFINES += GC_WANT_ROBOT"
 
-# 19. TrainerDay
+# 18. TrainerDay
 Replace-InFile $gcconfig "#DEFINES \+= GC_WANT_TRAINERDAY_API" "DEFINES += GC_WANT_TRAINERDAY_API"
 Replace-InFile $gcconfig "#DEFINES \+= GC_TRAINERDAY_API_PAGESIZE=25" "DEFINES += GC_TRAINERDAY_API_PAGESIZE=25"
 
-# 20. Math Defines and Nominmax
+# 19. Math Defines and Nominmax
 Add-Content $gcconfig "DEFINES += _MATH_DEFINES_DEFINED"
 Replace-InFile $gcconfig "#DEFINES \+= NOMINMAX" "DEFINES += NOMINMAX"
 
