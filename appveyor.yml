@@ -106,16 +106,12 @@ install:
 # GSL
 - cmd: vcpkg install gsl:x64-windows
 
-# Get config
-- cmd: copy qwt\qwtconfig.pri.in qwt\qwtconfig.pri
-- cmd: copy c:\libs\gcconfig64Qt6-Release.appveyor.pri src\gcconfig.pri
-
 # Get jom
 - cmd: if not exist jom_1_1_3.zip appveyor DownloadFile "https://download.qt.io/official_releases/jom/jom_1_1_3.zip"
 - cmd: 7z x -y jom_1_1_3.zip -oc:\jom\
 - cmd: set PATH=%PATH%;c:\jom\;
 
-# Get R and add to config
+# Get R
 - ps: >-
     if ($isWindows -And -not (Test-Path 'C:\R')) {
       # Lets use 4.1 until 4.2 issues are fixed
@@ -126,9 +122,8 @@ install:
     }
 - cmd: set PATH=%PATH%;c:\R\bin\;
 - cmd: R --version
-- cmd: echo DEFINES+=GC_WANT_R >> src\gcconfig.pri
 
-# Get Python and add to config
+# Get Python
 - ps: >-
     if ($isWindows -And -not (Test-Path 'C:\Python')) {
       $pyurl = "https://www.python.org/ftp/python/3.11.9/python-3.11.9-embed-amd64.zip"
@@ -142,40 +137,20 @@ install:
     }
 - cmd: set PATH=C:\Python311-x64\Scripts\;C:\Python311-x64\;%PATH%
 - cmd: python --version
-- cmd: echo DEFINES+=GC_WANT_PYTHON >> src\gcconfig.pri
-- cmd: echo PYTHONINCLUDES=Core c:\Python311-x64\include >> src\gcconfig.pri
-- cmd: echo PYTHONLIBS=-L\"c:\Python311-x64\libs\" -lpython311 >> src\gcconfig.pri
 # Upgrade pip to ensure you have the latest version
 - cmd: python -m pip install --upgrade pip
 # Install your project's dependencies from a requirements.txt file
 - cmd: "python -m pip install --only-binary :all: -r src/Python/requirements.txt -t C:/Python/lib/site-packages"
-# GSL
-- cmd: echo GSL_INCLUDES=c:\tools\vcpkg\installed\x64-windows\include >> src\gcconfig.pri
-- cmd: echo GSL_LIBS=-Lc:\tools\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas >> src\gcconfig.pri
 
 # Linux / macOS - install dependencies first (including Python 3.11)
 - sh: bash appveyor/$OS_NAME/install.sh
 
 before_build:
 
-# Windows
-# Enable CloudDB
-- cmd: echo CloudDB=active >> src\gcconfig.pri
-
-# Add Train Robot
-- cmd: echo DEFINES+=GC_WANT_ROBOT >> src\gcconfig.pri
-
-# Enable TrainerDay Query API; pagesize depends on the keys remote configuration
-- cmd: echo DEFINES+=GC_WANT_TRAINERDAY_API >> src\gcconfig.pri
-- cmd: echo DEFINES+=GC_TRAINERDAY_API_PAGESIZE=25 >> src\gcconfig.pri
-
-# Avoid macro redefinition warnings
-- cmd: echo DEFINES+=_MATH_DEFINES_DEFINED >> src\gcconfig.pri
-
-# Avoid conflicts between Windows.h min/max macros and limits.h
-- cmd: echo DEFINES+=NOMINMAX >> src\gcconfig.pri
-
-# Linux / macOS
+# Configure src/gcconfig.pri
+ # Windows
+- ps: if ($isWindows) { appveyor\windows\before_build.ps1 }
+ # Linux / macOS
 - sh: bash appveyor/$OS_NAME/before_build.sh
 
 # For tagged builds, define GC version string
