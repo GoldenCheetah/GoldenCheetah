@@ -63,6 +63,13 @@ init:
 - cmd: call c:\"Program Files"\"Microsoft Visual Studio"\2022\Community\VC\Auxiliary\Build\vcvarsall.bat amd64
 # Setup NSIS
 - cmd: set PATH=%PATH%;C:\"Program Files (x86)"\NSIS
+# Setup Python
+- cmd: set PATH=C:\Python311-x64\Scripts\;C:\Python311-x64\;%PATH%
+- cmd: python --version
+# Setup JOM
+- cmd: set PATH=%PATH%;C:\JOM\;
+# Setup R
+- cmd: set PATH=%PATH%;C:\R\bin\;
 
 # Linux / macOS
 - sh: >-
@@ -86,10 +93,10 @@ init:
     fi
 
 cache:
-- gc-ci-libs.zip -> appveyor.yml
-- jom_1_1_3.zip
-- C:\R
-- C:\Python -> src\Python\requirements.txt
+- C:\LIBS -> appveyor.yml
+- C:\JOM
+- C:\R -> appveyor.yml
+- C:\Python -> src\Python\requirements.txt, appveyor.yml
 - c:\tools\vcpkg\installed\
 - qwt -> qwt/qwtconfig.pri.in, appveyor.yml
 - srmio -> appveyor.yml
@@ -99,50 +106,10 @@ cache:
 
 install:
 
-# Windows
-# Get the libraries
-- cmd: if not exist gc-ci-libs.zip appveyor DownloadFile "https://github.com/GoldenCheetah/WindowsSDK/releases/download/v0.1.1/gc-ci-libs.zip"
-- cmd: 7z x -y gc-ci-libs.zip -oC:\libs
-# GSL
-- cmd: vcpkg install gsl:x64-windows
-
-# Get jom
-- cmd: if not exist jom_1_1_3.zip appveyor DownloadFile "https://download.qt.io/official_releases/jom/jom_1_1_3.zip"
-- cmd: 7z x -y jom_1_1_3.zip -oc:\jom\
-- cmd: set PATH=%PATH%;c:\jom\;
-
-# Get R
-- ps: >-
-    if ($isWindows -And -not (Test-Path 'C:\R')) {
-      # Lets use 4.1 until 4.2 issues are fixed
-      #$rurl = $(ConvertFrom-JSON $(Invoke-WebRequest https://rversions.r-pkg.org/r-release-win).Content).URL
-      $rurl = "https://cran.r-project.org/bin/windows/base/old/4.1.3/R-4.1.3-win.exe"
-      Start-FileDownload $rurl "R-win.exe"
-      Start-Process -FilePath .\R-win.exe -ArgumentList "/VERYSILENT /DIR=C:\R" -NoNewWindow -Wait
-    }
-- cmd: set PATH=%PATH%;c:\R\bin\;
-- cmd: R --version
-
-# Get Python
-- ps: >-
-    if ($isWindows -And -not (Test-Path 'C:\Python')) {
-      $pyurl = "https://www.python.org/ftp/python/3.11.9/python-3.11.9-embed-amd64.zip"
-      Start-FileDownload $pyurl "python-embed.zip"
-      Expand-Archive -Path python-embed.zip -DestinationPath C:\Python -Force
-      mkdir C:\Python\lib\site-packages
-      # Enable pip in embedded Python
-      (Get-Content C:\Python\python311._pth) -replace '#import site', 'import site' | Set-Content C:\Python\python311._pth
-      Start-FileDownload "https://bootstrap.pypa.io/get-pip.py" "get-pip.py"
-      C:\Python\python.exe get-pip.py --no-warn-script-location
-    }
-- cmd: set PATH=C:\Python311-x64\Scripts\;C:\Python311-x64\;%PATH%
-- cmd: python --version
-# Upgrade pip to ensure you have the latest version
-- cmd: python -m pip install --upgrade pip
-# Install your project's dependencies from a requirements.txt file
-- cmd: "python -m pip install --only-binary :all: -r src/Python/requirements.txt -t C:/Python/lib/site-packages"
-
-# Linux / macOS - install dependencies first (including Python 3.11)
+# Install dependencies first
+ # Windows
+- ps: if ($isWindows) { ./appveyor/windows/install.ps1 }
+ # Linux / macOS
 - sh: bash appveyor/$OS_NAME/install.sh
 
 before_build:
@@ -205,32 +172,7 @@ after_build:
 - ps: if ($env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED -Match "\[publish binaries\]") { Set-AppveyorBuildVariable -Name 'PUBLISH_BINARIES' -Value true }
 
 # Windows
-- cmd: cd src\release
-
-# copy dependencies
-- cmd: windeployqt --release GoldenCheetah.exe
-- cmd: copy c:\libs\10_Precompiled_DLL\usbexpress_3.5.1\USBXpress\USBXpress_API\Host\x64\SiUSBXp.dll
-- cmd: copy c:\libs\10_Precompiled_DLL\libsamplerate64\lib\libsamplerate-0.dll
-- cmd: copy c:\OpenSSL-Win64\bin\lib*.dll
-- cmd: copy c:\OpenSSL-Win64\license.txt "OpenSSL License.txt"
-- cmd: xcopy /s /i /e /q C:\Python .
-- cmd: copy C:\Python\LICENSE.txt "PYTHON LICENSE.txt"
-- cmd: copy c:\tools\vcpkg\installed\x64-windows\bin\gsl*.dll
-
-# ReadMe, license and icon files
-- cmd: copy ..\Resources\win32\ReadMe.txt
-- cmd: echo GoldenCheetah is licensed under the GNU General Public License v2 > license.txt
-- cmd: echo. >> license.txt
-- cmd: type ..\..\COPYING >> license.txt
-- cmd: copy ..\Resources\win32\gc.ico
-
-# Installer script
-- cmd: copy ..\Resources\win32\GC3.8-Master-W64-QT6.nsi
-
-# Build the installer
-- cmd: makensis GC3.8-Master-W64-QT6.nsi
-- cmd: move GoldenCheetah_v3.8_64bit_Windows.exe ..\..\GoldenCheetah_v3.8_x64.exe
-- cmd: cd ..\..
+- ps: if ($isWindows) { ./appveyor/windows/after_build.ps1 }
 
 # Linux / macOS
 - sh: bash appveyor/$OS_NAME/after_build.sh
