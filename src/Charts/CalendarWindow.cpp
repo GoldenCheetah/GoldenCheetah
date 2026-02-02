@@ -1006,12 +1006,18 @@ CalendarWindow::getActivities
         activity.isRelocatable = rideItem->planned;
         activity.hasTrainMode = rideItem->planned && sport == "Bike" && ! buildWorkoutFilter(rideItem).isEmpty();
         activity.dirty = rideItem->isDirty();
+        if (rideItem->planned) {
+            activity.originalPlanLabel = buildOriginalLabel(rideItem);
+        }
 
         RideItem *linkedRide = context->athlete->rideCache->getLinkedActivity(rideItem);
         if (linkedRide != nullptr) {
             activity.linkedReference = linkedRide->fileName;
             activity.linkedPrimary = getPrimary(linkedRide);
             activity.linkedStartDT = linkedRide->dateTime;
+            if (linkedRide->planned) {
+                activity.originalPlanLabel = buildOriginalLabel(linkedRide);
+            }
         }
 
         activities[rideItem->dateTime.date()] << activity;
@@ -1325,6 +1331,51 @@ CalendarWindow::findFreeSlot
         }
     }
     return QTime();
+}
+
+
+QString
+CalendarWindow::buildOriginalLabel
+(RideItem const * const item) const
+{
+    QDate originalPlan = QDate::fromString(item->getText("Original Date", ""), "yyyy/MM/dd");
+    if (! originalPlan.isValid() || originalPlan == item->dateTime.date()) {
+        return "";
+    }
+
+    QLocale locale;
+    QString unitLabel;
+    int days = originalPlan.daysTo(item->dateTime.date());
+    QChar sign = days > 0 ? '+' : '-';
+    ShowDaysAsUnit unit = showDaysAs(days);
+    int c = 0;
+    if (unit == ShowDaysAsUnit::Days) {
+        c = std::abs(days);
+        if (c == 1) {
+            unitLabel = tr("day");
+        } else {
+            unitLabel = tr("days");
+        }
+    } else if (unit == ShowDaysAsUnit::Weeks) {
+        c = daysToWeeks(days);
+        if (c == 1) {
+            unitLabel = tr("week");
+        } else {
+            unitLabel = tr("weeks");
+        }
+    } else if (unit == ShowDaysAsUnit::Months) {
+        c = daysToMonths(days);
+        if (c == 1) {
+            unitLabel = tr("month");
+        } else {
+            unitLabel = tr("months");
+        }
+    }
+    return QString("%1 (%2%3 %4)")
+                  .arg(locale.toString(originalPlan, QLocale::NarrowFormat))
+                  .arg(sign)
+                  .arg(c)
+                  .arg(unitLabel);
 }
 
 

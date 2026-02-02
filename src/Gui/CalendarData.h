@@ -70,6 +70,8 @@ struct CalendarEntry {
     QDate spanStart = QDate();
     QDate spanEnd = QDate();
 
+    QString originalPlanLabel = QString();
+
     QString linkedReference = QString();
     QString linkedPrimary = QString();
     QDateTime linkedStartDT = QDateTime();

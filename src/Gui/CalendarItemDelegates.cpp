@@ -1773,10 +1773,18 @@ toolTipDayEntry(const QPoint &pos, QAbstractItemView *view, const CalendarDay &d
             }
             tooltip += QString("<tr><td><b>%1:</b></td><td>%2</td></tr>").arg(QObject::tr("When")).arg(time);
         }
+        if (calEntry.type == ENTRY_TYPE_PLANNED_ACTIVITY && ! calEntry.originalPlanLabel.isEmpty()) {
+            tooltip += QString("<tr><td><b>%1:</b></td><td>%2</td></tr>")
+                              .arg(QObject::tr("Originally"))
+                              .arg(calEntry.originalPlanLabel);
+        }
         if (! calEntry.linkedReference.isEmpty()) {
             QString countertype;
             countertype = QObject::tr("Linked");
-            tooltip += QString("<tr><td style='padding-top: %1px'><b>%2:</b></td><td style='padding-top: %1px'>%3</td></tr>").arg(6 * dpiYFactor).arg(countertype).arg(calEntry.linkedPrimary);
+            tooltip += QString("<tr><td style='padding-top: %1px'><b>%2:</b></td><td style='padding-top: %1px'>%3</td></tr>")
+                              .arg(6 * dpiYFactor)
+                              .arg(countertype)
+                              .arg(calEntry.linkedPrimary);
             if (calEntry.linkedStartDT.isValid()) {
                 QString linkedWhen;
                 QLocale locale;
@@ -1786,6 +1794,11 @@ toolTipDayEntry(const QPoint &pos, QAbstractItemView *view, const CalendarDay &d
                     linkedWhen = locale.toString(calEntry.linkedStartDT, QLocale::NarrowFormat);
                 }
                 tooltip += QString("<tr><td><b>%1:</b></td><td>%2</td></tr>").arg(QObject::tr("On")).arg(linkedWhen);
+                if (calEntry.type == ENTRY_TYPE_ACTUAL_ACTIVITY && ! calEntry.originalPlanLabel.isEmpty()) {
+                    tooltip += QString("<tr><td><b>%1:</b></td><td>%2</td></tr>")
+                                      .arg(QObject::tr("Originally"))
+                                      .arg(calEntry.originalPlanLabel);
+                }
             }
         }
         tooltip += "</table>";

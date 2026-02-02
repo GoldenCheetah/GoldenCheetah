@@ -161,6 +161,7 @@ class CalendarWindow : public GcChartWindow
         QString getPrimary(RideItem const * const rideItem) const;
         QTime findFreeSlot(RideItem *sourceItem, QDate newDate, QTime time);
         QTime findFreeSlot(QList<std::pair<QTime, int>> busySlots, QTime targetTime, int requiredDurationSeconds) const;
+        QString buildOriginalLabel(RideItem const * const item) const;
 
     private slots:
         void updateActivities();
