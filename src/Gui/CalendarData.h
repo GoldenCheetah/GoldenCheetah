@@ -69,7 +69,6 @@ struct CalendarEntry {
     bool dirty = false;
     QDate spanStart = QDate();
     QDate spanEnd = QDate();
-
     QString originalPlanLabel = QString();
 
     QString linkedReference = QString();
