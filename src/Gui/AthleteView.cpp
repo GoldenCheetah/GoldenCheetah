@@ -36,7 +36,6 @@ static bool registered = _registerItems();
 
 static const int gl_athletes_per_row = 5;
 static const int gl_athletes_deep = 15;
-static const float gl_locked_width = 1.5;
 static const int gl_avatar_width = 5;
 static const int gl_progress_width = ROWHEIGHT/2;
 static const int gl_button_height = ROWHEIGHT*1.5;
@@ -61,6 +60,8 @@ AthleteView::AthleteView(Context *context) : ChartSpace(context, OverviewScope::
         newAthlete(name);
     }
 
+    setCurrentAthlete(context->athlete->cyclist);
+
     // set colors
     configChanged(0);
 
@@ -70,6 +71,8 @@ AthleteView::AthleteView(Context *context) : ChartSpace(context, OverviewScope::
     connect(context->mainWindow, &MainWindow::newAthlete, this, &AthleteView::newAthlete);
     // delete athlete
     connect(context->mainWindow, &MainWindow::deletedAthlete, this, &AthleteView::deleteAthlete);
+    // opening athlete
+    connect(context->mainWindow, &MainWindow::openingAthlete, this, &AthleteView::openingAthlete);
 }
 
 void
@@ -101,7 +104,7 @@ AthleteView::newAthlete(QString name)
     }
 
     // add a card for each athlete
-    AthleteCard *ath = new AthleteCard(this, name);
+    AthleteCard *ath = new AthleteCard(this, name, context->athlete->cyclist == name);
     addItem(row,col,1,gl_athletes_deep,ath);
 
     // setup geometry
@@ -122,10 +125,30 @@ AthleteView::deleteAthlete(QString name)
 }
 
 void
-AthleteView::currentAthlete(const QString& name)
+AthleteView::openingAthlete(QString name, Context *context)
 {
     foreach(ChartSpaceItem* item, allItems()) {
-        static_cast<AthleteCard*>(item)->currentAthlete(item->name == name);
+        if (item->name == name) {
+            static_cast<AthleteCard*>(item)->openingAthlete(name, context);
+        }
+    }
+}
+
+uint32_t
+AthleteView::openAthletes()
+{
+    uint32_t openAthletes=0;
+    foreach(ChartSpaceItem* item, allItems()) {
+        if (static_cast<AthleteCard*>(item)->isAthleteClosed() == false) openAthletes++;
+    }
+    return openAthletes;
+}
+
+void
+AthleteView::setCurrentAthlete(const QString& name)
+{
+    foreach(ChartSpaceItem* item, allItems()) {
+        static_cast<AthleteCard*>(item)->setCurrentAthlete(item->name == name);
     }
 }
 
@@ -144,16 +167,12 @@ AthleteView::configItem(ChartSpaceItem *item, QPoint)
 }
 
 
-AthleteCard::AthleteCard(ChartSpace *parent, QString name) :
-    ChartSpaceItem(parent, name), refresh(false), actualActivities(0),
-    plannedActivities(0), unsavedActivities(0), lastActivity(QDateTime()),
-    anchor(parent->context->athlete->cyclist == name) 
+AthleteCard::AthleteCard(ChartSpace *parent, QString name, bool currentAthlete) :
+    ChartSpaceItem(parent, name),loadProgress_(0), context_(NULL), refresh(false), actualActivities(0),
+    plannedActivities(0), unsavedActivities(0), lastActivity(QDateTime()), currentAthlete_(currentAthlete) 
 {
     // no edit icon thanks
     setShowEdit(false);
-
-    // anchor's locked image
-    locked = QImage(":/images/toolbar/passwords.png");
 
     // avatar
     QRectF img(ROWHEIGHT,ROWHEIGHT*2,ROWHEIGHT* gl_avatar_width, ROWHEIGHT* gl_avatar_width);
@@ -187,7 +206,7 @@ AthleteCard::AthleteCard(ChartSpace *parent, QString name) :
     saveAllUnsavedRidesButton->setGeometry(geometry().width()-(gl_button_width+(2*ROWHEIGHT)), 4*ROWHEIGHT,
                         gl_button_width, gl_button_height);
     saveAllUnsavedRidesButton->hide();
-    connect(saveAllUnsavedRidesButton, &Button::clicked, this, [parent, this] () {
+    connect(saveAllUnsavedRidesButton, &Button::clicked, this, [this, parent] () {
         parent->context->mainWindow->saveAllUnsavedRides(this->context_);
     });
 
@@ -208,14 +227,12 @@ AthleteCard::AthleteCard(ChartSpace *parent, QString name) :
     connect(openCloseButton, &Button::clicked, this, &AthleteCard::openCloseAthlete);
 
     // context and signals for the anchor athlete
-    // note: opening() and loadDone() are not called for the anchor athlete
-    if (anchor) {
+    // note: opening() and loadDone() are not called for the current athlete
+    if (currentAthlete_) {
         context_ = parent->context;
 
-        // the anchor athlete is loaded by default
-        loadprogress = 100;
-        openCloseButton->setText(tr("Close"));
-        openCloseButton->hide();
+        // the current athlete is loaded by default
+         loadProgress_=100;
         deleteButton->hide();
 
         // watch metric updates
@@ -223,26 +240,31 @@ AthleteCard::AthleteCard(ChartSpace *parent, QString name) :
         connect(context_, &Context::refreshEnd, this, &AthleteCard::refreshEnd);
         connect(context_, &Context::refreshUpdate, this, &AthleteCard::refreshUpdate); // we might miss 1st one
 
-        // watch activity changes
-        connect(context_, &Context::rideAdded, this, &AthleteCard::refreshStats);
-        connect(context_, &Context::rideDeleted, this, &AthleteCard::refreshStats);
-        connect(context_, &Context::rideChanged, this, &AthleteCard::refreshStats);
-        connect(context_, &Context::rideSaved, this, &AthleteCard::refreshStats);
+        connect(context_, &Context::athleteClose, this, &AthleteCard::closing);
 
-    } else {
-        context_ = NULL;
-        loadprogress = 0;
+        // watch activity changes
+        registerRideEvents(true);
+
     }
 
-    setShowConfig(anchor);
-    currentAthlete(anchor);
+    // config icon for loaded athletes
+    setShowConfig(currentAthlete_);
 
-    // register for athlete change events
-    connect(parent->context->mainWindow, &MainWindow::openingAthlete, this, &AthleteCard::opening);
-    connect(parent->context, &Context::athleteClose, this, &AthleteCard::closing);
+    refreshStats();
+    update();
+}
 
-    // need to fetch by looking at file names, rideDB parse is too expensive here
-    if (loadprogress == 0) {
+void
+AthleteCard::refreshStats(RideItem * /* item = nullptr */ )
+{
+    actualActivities=0;
+    plannedActivities=0;
+    lastActivity=QDateTime();
+
+    // need to fetch by looking at file names if no context
+    if (context_ == NULL) {
+
+        unsavedActivities=0;
 
         // unloaded athletes we just say when last activity was
         QDir dir(gcroot + "/" + name + "/activities");
@@ -263,55 +285,52 @@ AthleteCard::AthleteCard(ChartSpace *parent, QString name) :
 
     } else {
 
-        // use ridecache
-        refreshStats();
-    }
-    update();
-}
+        int preUnsavedActivities = unsavedActivities;
+        unsavedActivities=0;
 
-void
-AthleteCard::refreshStats(RideItem * /* item = nullptr */ )
-{
-    if (context_ == NULL) return;
+        foreach(RideItem *item, context_->athlete->rideCache->rides()) {
 
-    unsavedActivities=0;
-    actualActivities=0;
-    plannedActivities=0;
-    lastActivity=QDateTime();
-
-    foreach(RideItem *item, context_->athlete->rideCache->rides()) {
-
-        if (item->planned) {
-            plannedActivities++;
-        } else {
-            actualActivities++;
-            // last actual activity date?
-            if (lastActivity==QDateTime() || item->dateTime > lastActivity) lastActivity = item->dateTime;
+            if (item->planned) {
+                plannedActivities++;
+            } else {
+                actualActivities++;
+                // last actual activity date?
+                if (lastActivity==QDateTime() || item->dateTime > lastActivity) lastActivity = item->dateTime;
+            }
+            if (item->isDirty()) unsavedActivities++;
         }
-        if (item->isDirty()) unsavedActivities++;
+
+        // update buttons related to unsave activities (if required)
+        if (unsavedActivities != preUnsavedActivities) setCurrentAthlete(currentAthlete_);
     }
 }
 
 void
-AthleteCard::currentAthlete(bool status)
+AthleteCard::setCurrentAthlete(bool status)
 {
     // update card & button background colours
-    selectedAthlete = status;
+    currentAthlete_ = status;
 
-    QColor cardBkgdColor = selectedAthlete ? GCColor::selectedColor(GColor(CTOOLBAR)) : GColor(CCARDBACKGROUND);
+    QColor cardBkgdColor = currentAthlete_ ? GCColor::selectedColor(GColor(CTOOLBAR)) : GColor(CCARDBACKGROUND);
     bgcolor = cardBkgdColor.name();
 
     openCloseButton->setBkgdColor(cardBkgdColor);
     backupButton->setBkgdColor(cardBkgdColor);
-    
-    update();
+
+    if ((currentAthlete_) && (static_cast<AthleteView*>(parent)->openAthletes() == 1)) {  // current athlete must be loaded
+        openCloseButton->setText((unsavedActivities != 0) ? tr("Shutdown...") : tr("Shutdown"));
+    } else if (loadProgress_ == 0) {
+        openCloseButton->setText(tr("Open"));
+    } else {
+        openCloseButton->setText((unsavedActivities != 0) ? tr("Close...") : tr("Close"));
+    }
 }
 
 void
 AthleteCard::configChanged(qint32)
 {
     // refresh card & button background colours
-    QColor cardBkgdColor = selectedAthlete ? GCColor::selectedColor(GColor(CTOOLBAR)) : GColor(CCARDBACKGROUND);
+    QColor cardBkgdColor = currentAthlete_ ? GCColor::selectedColor(GColor(CTOOLBAR)) : GColor(CCARDBACKGROUND);
     bgcolor = cardBkgdColor.name();
 
     openCloseButton->setBkgdColor(cardBkgdColor);
@@ -322,6 +341,8 @@ AthleteCard::configChanged(qint32)
 void
 AthleteCard::configAthlete()
 {
+    if (context_ == NULL) return;
+
     AthleteConfigDialog *dialog = new AthleteConfigDialog(context_->athlete->home->root(), context_);
     dialog->exec();
 }
@@ -329,30 +350,36 @@ AthleteCard::configAthlete()
 void
 AthleteCard::openCloseAthlete()
 {
-    if (loadprogress==100) {
-        // closing athlete, the card buttons updated in closing() as this could be called via the main window's athlete menu
+    if (loadProgress_ == 100) {
+        // athlete is open, so close the athlete
         parent->context->mainWindow->closeAthleteTab(name);
-    } else {
-        // opening athlete, the card buttons updated in opening() as this could be called via the main window's athlete menu
+        return;
+    }
+
+    if (loadProgress_ == 0) {
+        // athlete is closed, so open the athlete
         parent->context->mainWindow->openAthleteTab(name);
+        return;
     }
 }
 
 void
-AthleteCard::opening(QString name, Context *context)
+AthleteCard::openingAthlete(QString name, Context *context)
 {
     // are we being opened?
     if (name == this->name) {
+
+        // store new athlete context
         context_ = context;
-        loadprogress = 100;
+
         openCloseButton->setText(tr("Close"));
         openCloseButton->hide();
         deleteButton->hide();
 
         // register for athlete change events
+        loadProgress_=100;
         connect(context_, &Context::loadProgress, this, &AthleteCard::loadProgress);
         connect(context_, &Context::loadDone, this, &AthleteCard::loadDone);
-        connect(context_, &Context::athleteClose, this, &AthleteCard::closing);
 
         // refresh updates
         connect(context_, &Context::refreshStart, this, &AthleteCard::refreshStart);
@@ -366,7 +393,8 @@ void AthleteCard::refreshStart() { refresh = true; update(); }
 void AthleteCard::refreshEnd() { refresh = false; update(); }
 void AthleteCard::refreshUpdate(QDate) { refresh = true; update();  }
 
-void AthleteCard::itemGeometryChanged()
+void
+AthleteCard::itemGeometryChanged()
 {
     openCloseButton->setGeometry(geometry().width()-(gl_button_width+ROWHEIGHT), geometry().height()-(gl_button_height+ROWHEIGHT),
                         gl_button_width, gl_button_height);
@@ -381,29 +409,55 @@ void AthleteCard::itemGeometryChanged()
                         gl_button_width, gl_button_height);
 }
 
-void AthleteCard::loadDone(QString name, Context *)
+void
+AthleteCard::loadDone(QString name, Context *)
 {
     // are we loaded?
     if (name == this->name) {
 
+        setShowConfig(true);
+        loadProgress_=100;
+
+        if (!drag) openCloseButton->show();
+
+        refreshStats();
+        update();
+
+        // refresh updates
+        disconnect(context_, &Context::refreshStart, this, &AthleteCard::refreshStart);
+        disconnect(context_, &Context::refreshEnd, this, &AthleteCard::refreshEnd);
+        disconnect(context_, &Context::refreshUpdate, this, &AthleteCard::refreshUpdate);
+
+        disconnect(context_, &Context::loadProgress, this, &AthleteCard::loadProgress);
+        disconnect(context_, &Context::loadDone, this, &AthleteCard::loadDone);
+
+        connect(context_, &Context::athleteClose, this, &AthleteCard::closing);
+
         // watch activity changes
+        registerRideEvents(true);
+    }
+}
+
+void
+AthleteCard::registerRideEvents(bool enable)
+{
+    if (enable) {
         connect(context_, &Context::rideAdded, this, &AthleteCard::refreshStats);
         connect(context_, &Context::rideDeleted, this, &AthleteCard::refreshStats);
         connect(context_, &Context::rideChanged, this, &AthleteCard::refreshStats);
         connect(context_, &Context::rideSaved, this, &AthleteCard::refreshStats);
-
-        setShowConfig(true);
-        loadprogress = 100;
-        if (!anchor) openCloseButton->show();
-
-        refreshStats();
-        update();
+    } else {
+        disconnect(context_, &Context::rideAdded, this, &AthleteCard::refreshStats);
+        disconnect(context_, &Context::rideDeleted, this, &AthleteCard::refreshStats);
+        disconnect(context_, &Context::rideChanged, this, &AthleteCard::refreshStats);
+        disconnect(context_, &Context::rideSaved, this, &AthleteCard::refreshStats);
     }
 }
 
-void AthleteCard::dragChanged(bool drag)
+void
+AthleteCard::dragChanged(bool drag)
 {
-    if (drag || (loadprogress != 100 && loadprogress != 0)) {
+    if (drag) {
         // drag started, hide all the buttons for the duration of the drag
         openCloseButton->hide();
         backupButton->hide();
@@ -412,10 +466,12 @@ void AthleteCard::dragChanged(bool drag)
     } else {
         // drag finished, restore buttons depending on the card state.
         backupButton->show();
-        if ((loadprogress != 0) && (unsavedActivities != 0)) saveAllUnsavedRidesButton->show();
-        if (!anchor) {
-            openCloseButton->show();
-            if (loadprogress == 0) deleteButton->show();
+        openCloseButton->show();
+        if (loadProgress_ == 100) {
+            if (unsavedActivities != 0) saveAllUnsavedRidesButton->show();
+        } else {
+            deleteButton->show();
+
         }
     }
 }
@@ -423,11 +479,13 @@ void AthleteCard::dragChanged(bool drag)
 void
 AthleteCard::closing(QString name, Context *)
 {
-    // are we being closed?
+    // are we closing?
     if (name == this->name) {
+
+        loadProgress_=0;
         setShowConfig(false);
+        registerRideEvents(false); // stop watching activity changes
         context_ = NULL;
-        loadprogress = 0;
         openCloseButton->setText(tr("Open"));
         deleteButton->show();
         unsavedActivities=0;
@@ -439,7 +497,7 @@ AthleteCard::closing(QString name, Context *)
 void
 AthleteCard::loadProgress(QString, double prog)
 {
-    loadprogress = prog > 100 ? 100 : prog;
+    loadProgress_ = prog > 100 ? 100 : prog;
     update();
 }
 
@@ -450,14 +508,7 @@ AthleteCard::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
     QRectF img(ROWHEIGHT,ROWHEIGHT*2,ROWHEIGHT* gl_avatar_width, ROWHEIGHT* gl_avatar_width);
     painter->drawImage(img, avatar);
 
-    // paint the anchor athlete's lock symbol
-    if (anchor) {
-        QRectF lockedImg(((geometry().width()/2)-(ROWHEIGHT* gl_locked_width/2)),
-                        geometry().height()-(ROWHEIGHT*2.5), ROWHEIGHT* gl_locked_width, ROWHEIGHT* gl_locked_width);
-        painter->drawImage(lockedImg, locked);
-    }
-
-    // the selected athlete's background will be different, so need to invert
+    // the current athlete's background will be different, so need to invert
     // each color to get the correct foreground colour to maintain contrast.
     QColor tc = GCColor::invertColor(bgcolor);
     tc.setAlpha(200);
@@ -465,17 +516,17 @@ AthleteCard::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
     painter->setFont(parent->midfont);
 
     QString message = (actualActivities != 0 || plannedActivities != 0) ? 
-            tr("%1 workouts, %2 planned").arg(actualActivities).arg(plannedActivities) : tr("No Workouts");
+            tr("%1 activities, %2 planned").arg(actualActivities).arg(plannedActivities) : tr("No activities");
     QRectF rectf = QRectF(ROWHEIGHT,geometry().height()-(ROWHEIGHT*6), geometry().width()-(ROWHEIGHT*2), ROWHEIGHT*1.5);
     painter->drawText(rectf, message, Qt::AlignHCenter | Qt::AlignVCenter);
 
     if (lastActivity != QDateTime()) {
         QRectF rectf = QRectF(ROWHEIGHT,geometry().height()-(ROWHEIGHT*4.5), geometry().width()-(ROWHEIGHT*2), ROWHEIGHT*1.5);
-        message = QString(tr("Last workout %1 days ago")).arg(lastActivity.daysTo(QDateTime::currentDateTime()));
+        message = QString(tr("Last activity %1 days ago")).arg(lastActivity.daysTo(QDateTime::currentDateTime()));
         painter->drawText(rectf, message, Qt::AlignHCenter | Qt::AlignVCenter);
     }
 
-    if ((loadprogress != 0) && (unsavedActivities != 0)) {
+    if ((context_) && (unsavedActivities != 0)) {
         saveAllUnsavedRidesButton->show();
         saveAllUnsavedRidesButton->setText(tr("Unsaved:")+QString::number(unsavedActivities));
     } else {
@@ -483,7 +534,7 @@ AthleteCard::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
     }
 
     // load status
-    QRectF progressbar(0, geometry().height()-gl_progress_width, geometry().width() * (loadprogress/100), gl_progress_width);
+    QRectF progressbar(0, geometry().height()-gl_progress_width, geometry().width() * (loadProgress_/100), gl_progress_width);
     painter->fillRect(progressbar, QBrush(GColor(CPLOTMARKER)));
 
     // refresh status

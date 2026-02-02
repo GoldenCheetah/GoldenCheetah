@@ -2082,10 +2082,15 @@ MainWindow::closeTabClicked(int index)
 bool
 MainWindow::closeAthleteTab(QString name)
 {
-    for(int i=0; i<tabbar->count(); i++) {
-        if (name == tabbar->tabText(i)) {
-            closeTabClicked(i);
-            return true;
+    // if its the last athlete tab we close GoldenCheetah
+    if (tabbar->count() == 1) {
+        closeWindow();
+    } else {
+        for(int i=0; i<tabbar->count(); i++) {
+            if (name == tabbar->tabText(i)) {
+                closeTabClicked(i);
+                return true;
+            }
         }
     }
     return false;
@@ -2373,7 +2378,7 @@ MainWindow::switchAthleteTab(int index)
 
     setWindowTitle(currentAthleteTab->context->athlete->home->root().dirName());
 
-    athleteView->currentAthlete(currentAthleteTab->context->athlete->home->root().dirName());
+    athleteView->setCurrentAthlete(currentAthleteTab->context->athlete->home->root().dirName());
 
     setUpdatesEnabled(true);
 }

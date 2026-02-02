@@ -28,14 +28,18 @@ class AthleteView : public ChartSpace
 public:
     AthleteView(Context *context);
 
-    void currentAthlete(const QString& name);
+    uint32_t openAthletes();
+    void setCurrentAthlete(const QString& name);
 
 protected slots:
     void configChanged(qint32);
     void configItem(ChartSpaceItem*, QPoint);
     void newAthlete(QString);
     void deleteAthlete(QString);
+    void openingAthlete(QString, Context*);
 };
+
+enum class AthleteState { Closed = 0, Loading, Open };
 
 // the athlete display
 class AthleteCard : public ChartSpaceItem
@@ -44,7 +48,7 @@ class AthleteCard : public ChartSpaceItem
 
     public:
 
-        AthleteCard(ChartSpace *parent, QString name);
+        AthleteCard(ChartSpace *parent, QString name, bool currentAthlete);
 
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void dragChanged(bool) override;
@@ -55,15 +59,16 @@ class AthleteCard : public ChartSpaceItem
         QWidget *config() { return new OverviewItemConfig(this); }
 
         // create and config
-        static ChartSpaceItem *create(ChartSpace *parent) { return new AthleteCard(parent, ""); }
+        static ChartSpaceItem *create(ChartSpace *parent) { return new AthleteCard(parent, "", false); }
 
-        void currentAthlete(bool status);
         void configAthlete();
+        void openingAthlete(QString, Context*);
+
+        void setCurrentAthlete(bool status);
+        bool isAthleteClosed() const { return loadProgress_ == 0; }
 
     protected slots:
 
-        // opening/closing etc
-        void opening(QString, Context*);
         void closing(QString, Context*);
         void loadProgress(QString, double);
         void loadDone(QString, Context*);
@@ -79,10 +84,9 @@ class AthleteCard : public ChartSpaceItem
         void openCloseAthlete();
 
     private:
-        double loadprogress;
+        double loadProgress_; // 0=closed, 100=open, otherwise loading
         Context *context_;
         QImage avatar;
-        inline static QImage locked;
 
         Button *openCloseButton;
         Button *deleteButton;
@@ -95,8 +99,8 @@ class AthleteCard : public ChartSpaceItem
         int unsavedActivities; // number of unsaved activities
         QDateTime lastActivity; // date of last activity recorded
 
-        bool selectedAthlete;
-        const bool anchor; // holds app context so not allowed to close it
+        bool currentAthlete_;
 
+        void registerRideEvents(bool enable);
 };
 
