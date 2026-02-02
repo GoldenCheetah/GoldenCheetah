@@ -17,9 +17,13 @@
 
 #include <qpainter.h>
 #include <qpainterpath.h>
-#include <qthread.h>
-#include <qfuture.h>
+#include <QThread>
+#include <QFuture>
+#if QT_VERSION >= 0x060000
+#include <QtConcurrent/qtconcurrentrun.h>
+#else
 #include <qtconcurrentrun.h>
+#endif
 #include <qnumeric.h>
 
 class QwtPolarSpectrogram::TileInfo

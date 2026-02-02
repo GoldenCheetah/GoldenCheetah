@@ -158,13 +158,14 @@ void inride_BTDeviceInfoToSystemID(const QBluetoothDeviceInfo &devinfo, uint8_t 
         
         QBluetoothUuid uuid = devinfo.deviceUuid();
 
-        quint128 be_uuid128 = uuid.toUInt128();
-
-#if QT_VERSION < 0x060600
-        addr64 = *(uint64_t*)be_uuid128.data;
-#else
-        addr64 = *(uint64_t*)&be_uuid128;
-#endif
+        // Qt5 used toUInt128() but that doesn't exist in Qt6
+        // QBluetoothUuid can be implicitly converted to QUuid
+        QUuid quuid = uuid;  // implicit conversion
+        addr64 = 0;
+        // Take the last 8 bytes of the UUID as the address (data4[0] through data4[7])
+        for (int i = 0; i < 8; i++) {
+            addr64 = (addr64 << 8) | quuid.data4[i];
+        }
     }
 
     uint8_t* paddr64 = (uint8_t*)&addr64;

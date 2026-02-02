@@ -31,6 +31,7 @@
 class  RideFile;
 class  Routes;
 struct RoutePoint;
+struct RouteRide;
 
 class RouteSegment // represents a segment we match against
 {
@@ -45,6 +46,7 @@ class RouteSegment // represents a segment we match against
         QUuid id() const { return _id; }
         QList<RoutePoint> getPoints();
         void setId(QUuid x) { _id = x; }
+        QList<RouteRide> getRides() const { return rides; }
 
         double getMinLat();
         void setMinLat(double);
@@ -69,6 +71,7 @@ class RouteSegment // represents a segment we match against
 
         QString name; // name, typically users name them by year e.g. "Col de Saxel"
         QList<RoutePoint> points;
+        QList<RouteRide> rides;
 
         double minLat, maxLat;
         double minLon, maxLon;
@@ -109,12 +112,28 @@ class Routes : public QObject { // top-level object with API and map of segments
         // find in a ride
         void search(RideItem*, RideFile* ride, QList<IntervalItem*>&here);
 
-    protected:
+        // public access to routes list
         QList<RouteSegment> routes;
+
+    protected:
 
     private:
         QDir home;
         Context *context;
+};
+
+struct RouteRide { // represents a section of a ride that matches a segment
+
+    RouteRide() {}
+    RouteRide(QString filename, QDateTime startTime, double start, double stop, double precision) :
+              filename(filename), startTime(startTime), start(start), stop(stop), precision(precision) {}
+
+
+    QString filename;
+    QDateTime startTime;
+    double start, stop;
+    double precision;
+
 };
 
 #endif // ROUTE_H

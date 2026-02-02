@@ -18,9 +18,9 @@ static bool registered = _registerItems();
 static const int gl_athletes_per_row = 5;
 static const int gl_athletes_deep = 15;
 static const int gl_avatar_width = 5;
-static const int gl_progress_width = ROWHEIGHT/2;
-static const int gl_button_height = ROWHEIGHT*1.5;
-static const int gl_button_width = ROWHEIGHT*5;
+static const int gl_progress_width = GC_ROWHEIGHT/2;
+static const int gl_button_height = GC_ROWHEIGHT*1.5;
+static const int gl_button_width = GC_ROWHEIGHT*5;
 
 AthleteView::AthleteView(Context *context) : ChartSpace(context, OverviewScope::ATHLETES, NULL)
 {
@@ -106,7 +106,7 @@ AthleteCard::AthleteCard(ChartSpace *parent, QString path) : ChartSpaceItem(pare
     setShowEdit(false);
 
     // avatar
-    QRectF img(ROWHEIGHT,ROWHEIGHT*2,ROWHEIGHT* gl_avatar_width, ROWHEIGHT* gl_avatar_width);
+    QRectF img(GC_ROWHEIGHT,GC_ROWHEIGHT*2,GC_ROWHEIGHT* gl_avatar_width, GC_ROWHEIGHT* gl_avatar_width);
 
     QString filename = gcroot + "/" + path + "/config/avatar.png";
     // athletes created using old versions may not have avatar
@@ -124,7 +124,7 @@ AthleteCard::AthleteCard(ChartSpace *parent, QString path) : ChartSpaceItem(pare
     // open close button
     button = new Button(this, tr("Open"));
     button->setFont(parent->midfont);
-    button->setGeometry(geometry().width()-(gl_button_width+ROWHEIGHT), geometry().height()-(gl_button_height+ROWHEIGHT),
+    button->setGeometry(geometry().width()-(gl_button_width+GC_ROWHEIGHT), geometry().height()-(gl_button_height+GC_ROWHEIGHT),
                         gl_button_width, gl_button_height);
     connect(button, SIGNAL(clicked()), this, SLOT(clicked()));
 
@@ -241,7 +241,7 @@ void AthleteCard::refreshUpdate(QDate) { refresh = true; update();  }
 
 void AthleteCard::itemGeometryChanged()
 {
-    button->setGeometry(geometry().width()-(gl_button_width+ROWHEIGHT), geometry().height()-(gl_button_height+ROWHEIGHT),
+    button->setGeometry(geometry().width()-(gl_button_width+GC_ROWHEIGHT), geometry().height()-(gl_button_height+GC_ROWHEIGHT),
                         gl_button_width, gl_button_height);
 }
 
@@ -285,12 +285,12 @@ void
 AthleteCard::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     // lets paint the image
-    QRectF img(ROWHEIGHT,ROWHEIGHT*2,ROWHEIGHT* gl_avatar_width, ROWHEIGHT* gl_avatar_width);
+    QRectF img(GC_ROWHEIGHT,GC_ROWHEIGHT*2,GC_ROWHEIGHT* gl_avatar_width, GC_ROWHEIGHT* gl_avatar_width);
     painter->drawImage(img, avatar);
 
     // last workout if nothing recent
     if (/*maxy == 0 && */last != QDateTime() || count == 0) {
-        QRectF rectf = QRectF(ROWHEIGHT,geometry().height()-(ROWHEIGHT*5), geometry().width()-(ROWHEIGHT*2), ROWHEIGHT*1.5);
+        QRectF rectf = QRectF(GC_ROWHEIGHT,geometry().height()-(GC_ROWHEIGHT*5), geometry().width()-(GC_ROWHEIGHT*2), GC_ROWHEIGHT*1.5);
         QString message;
         if (count == 0) message = tr("No activities.");
         else message = QString(tr("Last workout %1 days ago")).arg(last.daysTo(QDateTime::currentDateTime()));

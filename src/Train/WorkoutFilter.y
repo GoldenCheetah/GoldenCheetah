@@ -39,15 +39,15 @@ extern QString workoutModelErrorMsg;
     float floatValue;
     int numValue;
     char *word;
-    QStringList *wordList;
-    ModelFilter *filter;
-    std::pair<ModelFilter*, ModelFilter*> *filterPair;
+    void *wordList;
+    void *filter;
+    void *filterPair;
 }
 
 
-%destructor { qDebug() << "Deleting " << $$->toString(); delete $$; } <filter>
-%destructor { qDebug() << "Deleting wordList"; delete $$; } <wordList>
-%destructor { qDebug() << "Deleting filterPair"; delete $$; } <filterPair>
+%destructor { qDebug() << "Deleting " << static_cast<ModelFilter*>($$)->toString(); delete static_cast<ModelFilter*>($$); } <filter>
+%destructor { qDebug() << "Deleting wordList"; delete static_cast<QStringList*>($$); } <wordList>
+%destructor { qDebug() << "Deleting filterPair"; delete static_cast<std::pair<ModelFilter*, ModelFilter*>*>($$); } <filterPair>
 
 %token DOMINANTZONE
 %token DURATION
@@ -77,28 +77,28 @@ statements: statement ',' statements
     |       statement
     ;
 
-statement:  dominantzone  { workoutModelFilters << $1; }
-    |       zone          { workoutModelFilters << $1; }
-    |       duration      { workoutModelFilters << $1; }
-    |       intensity     { workoutModelFilters << $1; }
-    |       vi            { workoutModelFilters << $1; }
-    |       xpower        { workoutModelFilters << $1; }
-    |       ri            { workoutModelFilters << $1; }
-    |       bikescore     { workoutModelFilters << $1; }
-    |       svi           { workoutModelFilters << $1; }
-    |       stress        { workoutModelFilters << $1; }
-    |       rating        { workoutModelFilters << $1; }
-    |       minpower      { workoutModelFilters << $1; }
-    |       maxpower      { workoutModelFilters << $1; }
-    |       avgpower      { workoutModelFilters << $1; }
-    |       isopower      { workoutModelFilters << $1; }
-    |       power         { workoutModelFilters << $1->first << $1->second; }
-    |       lastrun       { workoutModelFilters << $1; }
-    |       created       { workoutModelFilters << $1; }
-    |       distance      { workoutModelFilters << $1; }
-    |       elevation     { workoutModelFilters << $1; }
-    |       grade         { workoutModelFilters << $1; }
-    |       words         { workoutModelFilters << new ModelStringContainsFilter(TdbWorkoutModelIdx::fulltext, *$1); }
+statement:  dominantzone  { workoutModelFilters << static_cast<ModelFilter*>($1); }
+    |       zone          { workoutModelFilters << static_cast<ModelFilter*>($1); }
+    |       duration      { workoutModelFilters << static_cast<ModelFilter*>($1); }
+    |       intensity     { workoutModelFilters << static_cast<ModelFilter*>($1); }
+    |       vi            { workoutModelFilters << static_cast<ModelFilter*>($1); }
+    |       xpower        { workoutModelFilters << static_cast<ModelFilter*>($1); }
+    |       ri            { workoutModelFilters << static_cast<ModelFilter*>($1); }
+    |       bikescore     { workoutModelFilters << static_cast<ModelFilter*>($1); }
+    |       svi           { workoutModelFilters << static_cast<ModelFilter*>($1); }
+    |       stress        { workoutModelFilters << static_cast<ModelFilter*>($1); }
+    |       rating        { workoutModelFilters << static_cast<ModelFilter*>($1); }
+    |       minpower      { workoutModelFilters << static_cast<ModelFilter*>($1); }
+    |       maxpower      { workoutModelFilters << static_cast<ModelFilter*>($1); }
+    |       avgpower      { workoutModelFilters << static_cast<ModelFilter*>($1); }
+    |       isopower      { workoutModelFilters << static_cast<ModelFilter*>($1); }
+    |       power         { auto pair = static_cast<std::pair<ModelFilter*, ModelFilter*>*>($1); workoutModelFilters << pair->first << pair->second; }
+    |       lastrun       { workoutModelFilters << static_cast<ModelFilter*>($1); }
+    |       created       { workoutModelFilters << static_cast<ModelFilter*>($1); }
+    |       distance      { workoutModelFilters << static_cast<ModelFilter*>($1); }
+    |       elevation     { workoutModelFilters << static_cast<ModelFilter*>($1); }
+    |       grade         { workoutModelFilters << static_cast<ModelFilter*>($1); }
+    |       words         { workoutModelFilters << new ModelStringContainsFilter(TdbWorkoutModelIdx::fulltext, *static_cast<QStringList*>($1)); }
     ;
 
 dominantzone: DOMINANTZONE ZONE                   { $$ = new ModelNumberEqualFilter(TdbWorkoutModelIdx::dominantZone, $2); }
@@ -236,7 +236,7 @@ grade: GRADE PERCENT                      { $$ = new ModelNumberEqualFilter(TdbW
     |  GRADE PERCENT RANGESYMBOL          { $$ = new ModelNumberRangeFilter(TdbWorkoutModelIdx::avgGrade, $2); }
     ;
 
-words: word words  { *$1 << *$2; delete $2; $$ = $1; }
+words: word words  { auto w1 = static_cast<QStringList*>($1); auto w2 = static_cast<QStringList*>($2); *w1 << *w2; delete w2; $$ = w1; }
     |  word        { $$ = $1; }
     ;
 

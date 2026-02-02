@@ -42,8 +42,8 @@
 #include <QPoint>
 
 // geometry basics
-#define SPACING 80
-#define ROWHEIGHT 80
+#define GC_SPACING 80
+#define GC_ROWHEIGHT 80
 
 extern double gl_major;
 

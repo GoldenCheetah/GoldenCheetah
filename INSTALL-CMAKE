@@ -1,0 +1,199 @@
+                                  +++++++++++++++++++++++
+                                  CMAKE BUILD WALKTHROUGH
+                                  +++++++++++++++++++++++
+
+                                      GoldenCheetah Team
+                                         Jan 2026
+                                       Version 3.7
+
+A walkthrough of building GoldenCheetah using CMake build system.
+This is the modern alternative to the qmake-based build system.
+
+CONTENTS
+
+1. PREREQUISITES
+2. BASIC CMAKE BUILD
+3. USING VCPKG FOR DEPENDENCY MANAGEMENT
+4. PLATFORM-SPECIFIC INSTRUCTIONS
+5. OPTIONAL FEATURES
+6. TROUBLESHOOTING
+
+===============================================================================
+1. PREREQUISITES
+===============================================================================
+
+Required Tools:
+- CMake 3.16 or higher
+- C++17 compatible compiler:
+  * GCC 7+ (Linux)
+  * Clang 5+ (macOS/Linux)
+  * MSVC 2017+ (Windows)
+- Qt 5.15+ or Qt 6.x
+- Ninja (recommended) or Make
+
+Required Libraries:
+- Qt modules: Core, Widgets, Xml, Sql, Network, Svg, Concurrent, SerialPort,
+  Multimedia, MultimediaWidgets, WebEngineCore, WebEngineWidgets, WebChannel,
+  Positioning, Bluetooth, Charts, OpenGL
+- GNU Scientific Library (GSL)
+- zlib
+
+Optional Libraries:
+- Python 3.7+ (for Python scripting)
+- R (for R statistical computing)
+- libusb (for USB device support)
+- libical (for calendar integration)
+- VLC (for video playback)
+- libsamplerate (for sample rate conversion)
+
+===============================================================================
+2. BASIC CMAKE BUILD
+===============================================================================
+
+Clone the repository:
+$ git clone https://github.com/GoldenCheetah/GoldenCheetah.git
+$ cd GoldenCheetah
+
+Configure the build:
+$ cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+
+Build:
+$ cmake --build build --parallel
+
+Install (optional):
+$ cmake --install build --prefix /usr/local
+
+Run:
+$ ./build/src/GoldenCheetah
+
+===============================================================================
+3. USING VCPKG FOR DEPENDENCY MANAGEMENT
+===============================================================================
+
+vcpkg simplifies dependency management across platforms.
+
+Install vcpkg:
+$ git clone https://github.com/Microsoft/vcpkg.git
+$ cd vcpkg
+$ ./bootstrap-vcpkg.sh  # Linux/macOS
+$ .\bootstrap-vcpkg.bat  # Windows
+
+Set environment variable:
+$ export VCPKG_ROOT=/path/to/vcpkg  # Linux/macOS
+$ set VCPKG_ROOT=C:\path\to\vcpkg   # Windows
+
+Configure with vcpkg:
+$ cmake -B build -S . --preset vcpkg
+
+Build:
+$ cmake --build build --parallel
+
+===============================================================================
+4. PLATFORM-SPECIFIC INSTRUCTIONS
+===============================================================================
+
+Linux (Ubuntu/Debian):
+----------------------
+Install system dependencies:
+$ sudo apt-get update
+$ sudo apt-get install cmake ninja-build gcc g++ libgsl-dev
+
+Install Qt:
+$ sudo apt-get install qt6-base-dev qt6-webengine-dev qt6-multimedia-dev \
+  qt6-serialport-dev qt6-positioning-dev qt6-charts-dev
+
+Build:
+$ cmake -B build -S . --preset linux
+$ cmake --build build --parallel
+
+macOS:
+------
+Install Homebrew dependencies:
+$ brew install cmake ninja gsl qt@6
+
+Build:
+$ cmake -B build -S . --preset macos \
+  -DCMAKE_PREFIX_PATH=/opt/homebrew/opt/qt@6
+$ cmake --build build --parallel
+
+Windows (MSVC):
+---------------
+Install dependencies via vcpkg (recommended):
+$ vcpkg install qt5:x64-windows gsl:x64-windows
+
+Build:
+$ cmake -B build -S . --preset windows \
+  -DCMAKE_TOOLCHAIN_FILE=%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake
+$ cmake --build build --config Release --parallel
+
+===============================================================================
+5. OPTIONAL FEATURES
+===============================================================================
+
+Enable Python support:
+$ cmake -B build -S . -DENABLE_PYTHON=ON \
+  -DPYTHON_EXECUTABLE=/usr/bin/python3
+
+Enable R support:
+$ cmake -B build -S . -DENABLE_R=ON
+
+Enable unit tests:
+$ cmake -B build -S . -DBUILD_TESTS=ON
+$ cmake --build build --target test
+
+Enable debug build with sanitizers:
+$ cmake -B build -S . --preset debug
+$ cmake --build build
+
+===============================================================================
+6. TROUBLESHOOTING
+===============================================================================
+
+Qt not found:
+-------------
+Specify Qt installation path:
+$ cmake -B build -S . -DCMAKE_PREFIX_PATH=/path/to/qt
+
+GSL not found:
+--------------
+Install GSL development package:
+$ sudo apt-get install libgsl-dev  # Debian/Ubuntu
+$ brew install gsl                  # macOS
+$ vcpkg install gsl                 # Windows
+
+Build errors:
+-------------
+Clean build directory:
+$ rm -rf build
+$ cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+
+View detailed build output:
+$ cmake --build build --verbose
+
+Check compiler version:
+$ gcc --version  # Should be 7.0 or higher
+$ clang --version  # Should be 5.0 or higher
+
+===============================================================================
+MIGRATION FROM QMAKE
+===============================================================================
+
+The CMake build system is designed to coexist with the existing qmake system.
+Both build systems are maintained and supported.
+
+Key differences:
+- CMake uses CMakeLists.txt instead of .pro files
+- Dependencies are managed via find_package() or vcpkg
+- Configuration is done via CMake cache variables instead of .pri files
+- Out-of-source builds are standard practice
+
+To continue using qmake, see INSTALL-LINUX, INSTALL-MAC, or INSTALL-WIN32.
+
+===============================================================================
+ADDITIONAL RESOURCES
+===============================================================================
+
+- CMake documentation: https://cmake.org/documentation/
+- vcpkg documentation: https://vcpkg.io/
+- Qt CMake documentation: https://doc.qt.io/qt-6/cmake-manual.html
+- GoldenCheetah wiki: https://github.com/GoldenCheetah/GoldenCheetah/wiki

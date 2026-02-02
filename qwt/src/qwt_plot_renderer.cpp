@@ -20,10 +20,15 @@
 #include "qwt_math.h"
 
 #include <qpainter.h>
-#include <qpainterpath.h>
-#include <qtransform.h>
+#include <QPainterPath>
+#include <QTransform>
+#if QT_VERSION >= 0x060000
+#include <QPageSize>
+#include <QPdfWriter>
+#else
 #include <qprinter.h>
-#include <qfiledialog.h>
+#endif
+#include <QFileDialog>
 #include <qfileinfo.h>
 #include <qimagewriter.h>
 #include <qvariant.h>

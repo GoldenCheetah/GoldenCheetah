@@ -23,7 +23,11 @@ class QPainter;
 class QPaintDevice;
 
 #ifndef QT_NO_PRINTER
+#if QT_VERSION >= 0x060000
+#include <QPrinter>
+#else
 class QPrinter;
+#endif
 #endif
 
 #ifndef QWT_NO_SVG

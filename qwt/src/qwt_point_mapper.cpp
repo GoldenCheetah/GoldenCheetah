@@ -18,9 +18,13 @@
 #include <qpen.h>
 #include <qpainter.h>
 
-#include <qthread.h>
-#include <qfuture.h>
+#include <QThread>
+#include <QFuture>
+#if QT_VERSION >= 0x060000
+#include <QtConcurrent/qtconcurrentrun.h>
+#else
 #include <qtconcurrentrun.h>
+#endif
 
 #if !defined( QT_NO_QFUTURE )
 #define QWT_USE_THREADS 1

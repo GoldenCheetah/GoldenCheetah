@@ -1,0 +1,148 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Release-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "qwt",
+					"jsonFile" : "directory-qwt-Release-e374bb68e1e147eee9fc.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "qwt",
+					"targetIndexes" : 
+					[
+						4,
+						5,
+						6
+					]
+				},
+				{
+					"build" : "src",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-src-Release-ef6b76655db94b70fb5c.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "src",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3
+					]
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2
+					],
+					"name" : "GoldenCheetah",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 2,
+					"id" : "GoldenCheetah::@145eef247bfb46b6828c",
+					"jsonFile" : "target-GoldenCheetah-Release-58b5c6312ace1fad54bc.json",
+					"name" : "GoldenCheetah",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "GoldenCheetah_autogen::@145eef247bfb46b6828c",
+					"jsonFile" : "target-GoldenCheetah_autogen-Release-8e848f6a6217010ce262.json",
+					"name" : "GoldenCheetah_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "GoldenCheetah_autogen_timestamp_deps::@145eef247bfb46b6828c",
+					"jsonFile" : "target-GoldenCheetah_autogen_timestamp_deps-Release-5a0d59ccb7eceda34f7b.json",
+					"name" : "GoldenCheetah_autogen_timestamp_deps",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "ParserGeneration::@145eef247bfb46b6828c",
+					"jsonFile" : "target-ParserGeneration-Release-131222afcf36fcc6f62d.json",
+					"name" : "ParserGeneration",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "qwt::@e8696eb485b041de3f4d",
+					"jsonFile" : "target-qwt-Release-de9e4ce95c6ee84dc0f8.json",
+					"name" : "qwt",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "qwt_autogen::@e8696eb485b041de3f4d",
+					"jsonFile" : "target-qwt_autogen-Release-6caaeb25e400bc863658.json",
+					"name" : "qwt_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "qwt_autogen_timestamp_deps::@e8696eb485b041de3f4d",
+					"jsonFile" : "target-qwt_autogen_timestamp_deps-Release-949722b97acdc8b38099.json",
+					"name" : "qwt_autogen_timestamp_deps",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build",
+		"source" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

@@ -5,7 +5,8 @@
 #                                                                             #
 ###############################################################################
 
-!versionAtLeast(QT_VERSION, 5.15):error("Use at least Qt version 5.15")
+# Support both Qt5 (5.15+) and Qt6
+!versionAtLeast(QT_VERSION, 5.15):error("Use at least Qt version 5.15 or Qt 6.0+")
 
 ###==========================
 ### IMPORT USER CONFIGURATION
@@ -32,18 +33,21 @@ CONFIG(debug, debug|release) { QMAKE_CXXFLAGS += -DGC_DEBUG }
 
 
 ###========================================================================
-### QT5.14.2 officially supported which mandates c++11 support in toolchain
+### Qt 5.15+ and Qt6 supported - C++17 standard required
 ###========================================================================
 
 # always
-QT += xml sql network svg  widgets concurrent serialport multimedia multimediawidgets \
+QT += xml sql network svg widgets concurrent serialport multimedia multimediawidgets \
       webenginecore webenginewidgets webchannel positioning
 greaterThan(QT_MAJOR_VERSION, 5) {
     QT += webenginequick core5compat
 } else {
     QT += webengine
 }
-CONFIG += c++11
+CONFIG += c++17
+
+# Enable modern C++ features
+QMAKE_CXXFLAGS += -std=c++17
 
 
 ###=======================================================================
@@ -100,7 +104,7 @@ LIBS += $${GSL_LIBS}
 ### PLATFORM SPECIFIC DEPENDENCIES
 ###===============================
 
-# Microsoft Visual Studion toolchain dependencies
+# Microsoft Visual Studio toolchain dependencies
 win32-msvc* {
 
     # we need windows kit 8.2 or higher with MSVC, offer default location
@@ -108,6 +112,9 @@ win32-msvc* {
     LIBS += -L$${WINKIT_INSTALL} -lGdi32 -lUser32
     CONFIG += force_debug_info
 
+    # Security hardening for MSVC
+    QMAKE_CXXFLAGS += /GS /sdl
+    DEFINES += _FORTIFY_SOURCE=2
 
 } else {
 
@@ -121,6 +128,15 @@ win32-msvc* {
 
         # Linux Flex compiler grumbles about unsigned comparisons
         QMAKE_CXXFLAGS += -Wno-sign-compare
+
+        # Security hardening for GCC/Clang
+        QMAKE_CXXFLAGS += -fstack-protector-strong -D_FORTIFY_SOURCE=2
+        QMAKE_LFLAGS += -Wl,-z,relro,-z,now
+    }
+    
+    macx {
+        # Security hardening for macOS
+        QMAKE_CXXFLAGS += -fstack-protector-strong
     }
 }
 
@@ -199,7 +215,7 @@ isEmpty(TS_DIR):TS_DIR = $${PWD}/Resources/translations
 TSQM.name = lrelease ${QMAKE_FILE_IN}
 TSQM.input = TRANSLATIONS
 TSQM.output = $$TS_DIR/${QMAKE_FILE_BASE}.qm
-TSQM.commands = $$QMAKE_LRELEASE ${QMAKE_FILE_IN} -qm $$TS_DIR/${QMAKE_FILE_BASE}.qm
+TSQM.commands = $$QMAKE_LRELEASE ${QMAKE_FILE_IN} -qm \"$$TS_DIR/${QMAKE_FILE_BASE}.qm\"
 TSQM.CONFIG = no_link target_predeps
 QMAKE_EXTRA_COMPILERS += TSQM
 

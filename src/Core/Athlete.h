@@ -118,6 +118,9 @@ class Athlete : public QObject
         double getWeight(QDate date, RideFile *ride=NULL);
         double getHeight(RideFile *ride=NULL);
 
+        // interval items access (stub for RouteWindow compatibility)
+        QTreeWidgetItem* allIntervalItems() { return NULL; }
+
         // athlete's calendar
         CalendarDownload *calendarDownload;
 #ifdef GC_HAVE_ICAL

@@ -16,9 +16,13 @@
 
 #include <qpainter.h>
 #include <qpaintengine.h>
-#include <qthread.h>
-#include <qfuture.h>
+#include <QThread>
+#include <QFuture>
+#if QT_VERSION >= 0x060000
+#include <QtConcurrent/qtconcurrentrun.h>
+#else
 #include <qtconcurrentrun.h>
+#endif
 
 #include <limits>
 

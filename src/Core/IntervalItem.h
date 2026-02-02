@@ -49,6 +49,7 @@ class IntervalItem
 
         // is this interval currently selected ?
         bool selected;
+        bool isSelected() const { return selected; }
 
         // access the metric value
         double getForSymbol(QString name, bool useMetricUnits=true);

@@ -1,0 +1,27 @@
+{
+	"backtrace" : 0,
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : 
+		[
+			"qwt/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			}
+		]
+	},
+	"id" : "qwt_autogen_timestamp_deps::@e8696eb485b041de3f4d",
+	"isGeneratorProvided" : true,
+	"name" : "qwt_autogen_timestamp_deps",
+	"paths" : 
+	{
+		"build" : "qwt",
+		"source" : "qwt"
+	},
+	"sources" : [],
+	"type" : "UTILITY"
+}

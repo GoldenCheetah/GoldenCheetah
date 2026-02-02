@@ -1,0 +1,1580 @@
+{
+	"BUILD_DIR" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/qwt/qwt_autogen",
+	"CMAKE_BINARY_DIR" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build",
+	"CMAKE_CURRENT_BINARY_DIR" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/qwt",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt",
+	"CMAKE_EXECUTABLE" : "/usr/bin/cmake",
+	"CMAKE_LIST_FILES" : 
+	[
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/CMakeLists.txt",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigVersionImpl.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6Config.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigExtras.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeVersionHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtInstallPaths.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6Targets.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6VersionlessAliasTargets.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtFeature.cmake",
+		"/usr/share/cmake-3.31/Modules/CheckCXXCompilerFlag.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtFeatureCommon.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicAppleHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeVersionHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicDependencyHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicExternalProjectHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicFinalizerHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicFindPackageHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicGitHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicPluginHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomAttributionHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomCpeHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomDepHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomFileHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomGenerationHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomLicenseHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomOpsHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomPurlHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomPythonHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomSystemDepHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicTargetHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicTestHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicToolHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicWalkLibsHelpers.cmake",
+		"/usr/share/cmake-3.31/Modules/CMakeFindDependencyMacro.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6Dependencies.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigVersionImpl.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6Config.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigExtras.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeVersionHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtInstallPaths.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6Targets.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6VersionlessAliasTargets.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtFeature.cmake",
+		"/usr/share/cmake-3.31/Modules/CheckCXXCompilerFlag.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtFeatureCommon.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicAppleHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeVersionHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicDependencyHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicExternalProjectHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicFinalizerHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicFindPackageHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicGitHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicPluginHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomAttributionHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomCpeHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomDepHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomFileHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomGenerationHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomLicenseHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomOpsHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomPurlHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomPythonHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomSystemDepHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicTargetHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicTestHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicToolHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicWalkLibsHelpers.cmake",
+		"/usr/share/cmake-3.31/Modules/CMakeFindDependencyMacro.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6Dependencies.cmake"
+	],
+	"CMAKE_SOURCE_DIR" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah",
+	"CROSS_CONFIG" : false,
+	"DEP_FILE" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/qwt/qwt_autogen/deps",
+	"DEP_FILE_RULE_NAME" : "qwt_autogen/timestamp",
+	"HEADERS" : 
+	[
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_abstract_legend.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_abstract_legend.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_abstract_scale.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_abstract_scale.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_abstract_scale_draw.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_abstract_scale_draw.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_abstract_slider.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_abstract_slider.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_analog_clock.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_analog_clock.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_arrow_button.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_arrow_button.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_axis.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_axis.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_axis_id.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_axis_id.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_bezier.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_bezier.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_clipper.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_clipper.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_color_map.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_color_map.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_column_symbol.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_column_symbol.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_compass.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_compass.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_compass_rose.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_compass_rose.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_counter.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_counter.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_curve_fitter.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_curve_fitter.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_date.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_date.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_date_scale_draw.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_date_scale_draw.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_date_scale_engine.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_date_scale_engine.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_dial.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_dial.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_dial_needle.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_dial_needle.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_dyngrid_layout.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_dyngrid_layout.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_event_pattern.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_event_pattern.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_global.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_global.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_graphic.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_graphic.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_interval.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_interval.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_interval_symbol.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_interval_symbol.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_knob.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_knob.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_legend.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_legend.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_legend_data.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_legend_data.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_legend_label.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_legend_label.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_magnifier.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_magnifier.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_math.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_math.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_matrix_raster_data.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_matrix_raster_data.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_null_paintdevice.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_null_paintdevice.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_painter.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_painter.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_painter_command.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_painter_command.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_panner.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_panner.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_picker.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_picker.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_picker_machine.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_picker_machine.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_pixel_matrix.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_pixel_matrix.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_abstract_barchart.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_abstract_barchart.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_abstract_canvas.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_abstract_canvas.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_barchart.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_barchart.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_canvas.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_canvas.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_curve.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_curve.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_dict.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_dict.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_directpainter.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_directpainter.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_graphicitem.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_graphicitem.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_grid.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_grid.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_histogram.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_histogram.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_intervalcurve.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_intervalcurve.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_item.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_item.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_layout.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_layout.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_legenditem.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_legenditem.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_magnifier.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_magnifier.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_marker.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_marker.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_multi_barchart.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_multi_barchart.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_opengl_canvas.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_opengl_canvas.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_panner.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_panner.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_picker.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_picker.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_rasteritem.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_rasteritem.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_renderer.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_renderer.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_rescaler.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_rescaler.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_scaleitem.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_scaleitem.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_seriesitem.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_seriesitem.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_shapeitem.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_shapeitem.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_spectrocurve.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_spectrocurve.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_spectrogram.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_spectrogram.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_svgitem.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_svgitem.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_textlabel.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_textlabel.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_tradingcurve.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_tradingcurve.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_vectorfield.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_vectorfield.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_zoneitem.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_zoneitem.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_zoomer.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_plot_zoomer.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_point_3d.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_point_3d.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_point_data.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_point_data.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_point_mapper.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_point_mapper.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_point_polar.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_point_polar.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_polar.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_canvas.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_polar_canvas.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_curve.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_polar_curve.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_fitter.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_polar_fitter.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_grid.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_polar_grid.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_item.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_polar_item.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_itemdict.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_polar_itemdict.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_layout.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_polar_layout.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_magnifier.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_polar_magnifier.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_marker.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_polar_marker.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_panner.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_polar_panner.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_picker.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_polar_picker.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_plot.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_polar_plot.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_renderer.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_polar_renderer.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_spectrogram.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_polar_spectrogram.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_raster_data.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_raster_data.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_round_scale_draw.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_round_scale_draw.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_samples.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_samples.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_sampling_thread.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_sampling_thread.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_scale_div.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_scale_div.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_scale_draw.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_scale_draw.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_scale_engine.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_scale_engine.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_scale_map.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_scale_map.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_scale_map_table.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_scale_map_table.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_scale_widget.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_scale_widget.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_series_data.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_series_data.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_series_store.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_series_store.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_slider.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_slider.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_spline.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_spline.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_spline_basis.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_spline_basis.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_spline_cubic.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_spline_cubic.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_spline_curve_fitter.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_spline_curve_fitter.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_spline_local.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_spline_local.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_spline_parametrization.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_spline_parametrization.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_spline_pleasing.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_spline_pleasing.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_spline_polynomial.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_spline_polynomial.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_symbol.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_symbol.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_system_clock.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_system_clock.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_text.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_text.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_text_engine.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_text_engine.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_text_label.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_text_label.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_thermo.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_thermo.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_transform.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_transform.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_vectorfield_symbol.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_vectorfield_symbol.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_weeding_curve_fitter.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_weeding_curve_fitter.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_wheel.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_wheel.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_widget_overlay.h",
+			"MU",
+			"UVLADIE3JM/moc_qwt_widget_overlay.cpp",
+			null
+		]
+	],
+	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
+	"INCLUDE_DIR" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/qwt/qwt_autogen/include",
+	"MOC_COMPILATION_FILE" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/qwt/qwt_autogen/mocs_compilation.cpp",
+	"MOC_DEFINITIONS" : 
+	[
+		"QT_CORE_LIB",
+		"QT_GUI_LIB",
+		"QT_NO_DEBUG",
+		"QT_OPENGLWIDGETS_LIB",
+		"QT_OPENGL_LIB",
+		"QT_PRINTSUPPORT_LIB",
+		"QT_SVG_LIB",
+		"QT_WIDGETS_LIB",
+		"_FORTIFY_SOURCE=2",
+		"qwt_EXPORTS"
+	],
+	"MOC_DEPEND_FILTERS" : 
+	[
+		[
+			"Q_PLUGIN_METADATA",
+			"[\n][ \t]*Q_PLUGIN_METADATA[ \t]*\\([^\\)]*FILE[ \t]*\"([^\"]+)\""
+		]
+	],
+	"MOC_INCLUDES" : 
+	[
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/ANT",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Planning",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qxt/src",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qtsolutions/json",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qtsolutions/qwtcurve",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qtsolutions/flowlayout",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qtsolutions/codeeditor",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/lmfit",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/boost",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/kmeans",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/voronoi",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qzip",
+		"/usr/include/x86_64-linux-gnu/qt6/QtCore",
+		"/usr/include/x86_64-linux-gnu/qt6",
+		"/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++",
+		"/usr/include/x86_64-linux-gnu/qt6/QtWidgets",
+		"/usr/include/x86_64-linux-gnu/qt6/QtGui",
+		"/usr/include/x86_64-linux-gnu/qt6/QtSvg",
+		"/usr/include/x86_64-linux-gnu/qt6/QtOpenGL",
+		"/usr/include/x86_64-linux-gnu/qt6/QtOpenGLWidgets",
+		"/usr/include/x86_64-linux-gnu/qt6/QtPrintSupport",
+		"/usr/include",
+		"/usr/include/c++/14",
+		"/usr/include/x86_64-linux-gnu/c++/14",
+		"/usr/include/c++/14/backward",
+		"/usr/lib/gcc/x86_64-linux-gnu/14/include",
+		"/usr/local/include",
+		"/usr/include/x86_64-linux-gnu"
+	],
+	"MOC_MACRO_NAMES" : 
+	[
+		"Q_OBJECT",
+		"Q_GADGET",
+		"Q_NAMESPACE",
+		"Q_NAMESPACE_EXPORT",
+		"Q_GADGET_EXPORT",
+		"Q_ENUM_NS"
+	],
+	"MOC_OPTIONS" : [],
+	"MOC_PATH_PREFIX" : false,
+	"MOC_PREDEFS_CMD" : 
+	[
+		"/usr/bin/c++",
+		"-std=c++17",
+		"-dM",
+		"-E",
+		"-c",
+		"/usr/share/cmake-3.31/Modules/CMakeCXXCompilerABI.cpp"
+	],
+	"MOC_PREDEFS_FILE" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/qwt/qwt_autogen/moc_predefs.h",
+	"MOC_RELAXED_MODE" : false,
+	"MOC_SKIP" : [],
+	"MULTI_CONFIG" : false,
+	"PARALLEL" : 4,
+	"PARSE_CACHE_FILE" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/qwt/CMakeFiles/qwt_autogen.dir/ParseCache.txt",
+	"QT_MOC_EXECUTABLE" : "/usr/lib/qt6/libexec/moc",
+	"QT_UIC_EXECUTABLE" : "/usr/lib/qt6/libexec/uic",
+	"QT_VERSION_MAJOR" : 6,
+	"QT_VERSION_MINOR" : 8,
+	"SETTINGS_FILE" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/qwt/CMakeFiles/qwt_autogen.dir/AutogenUsed.txt",
+	"SOURCES" : 
+	[
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_abstract_legend.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_abstract_scale.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_abstract_scale_draw.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_abstract_slider.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_analog_clock.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_arrow_button.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_axis_id.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_bezier.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_clipper.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_color_map.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_column_symbol.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_compass.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_compass_rose.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_counter.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_curve_fitter.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_date.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_date_scale_draw.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_date_scale_engine.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_dial.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_dial_needle.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_dyngrid_layout.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_event_pattern.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_graphic.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_interval.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_interval_symbol.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_knob.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_legend.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_legend_data.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_legend_label.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_magnifier.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_math.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_matrix_raster_data.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_null_paintdevice.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_painter.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_painter_command.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_panner.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_picker.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_picker_machine.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_pixel_matrix.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_abstract_barchart.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_abstract_canvas.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_axis.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_barchart.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_canvas.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_curve.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_dict.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_directpainter.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_graphicitem.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_grid.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_histogram.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_intervalcurve.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_item.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_layout.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_legenditem.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_magnifier.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_marker.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_multi_barchart.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_opengl_canvas.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_panner.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_picker.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_rasteritem.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_renderer.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_rescaler.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_scaleitem.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_seriesitem.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_shapeitem.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_spectrocurve.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_spectrogram.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_svgitem.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_textlabel.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_tradingcurve.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_vectorfield.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_zoneitem.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_plot_zoomer.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_point_3d.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_point_data.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_point_mapper.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_point_polar.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_canvas.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_curve.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_fitter.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_grid.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_item.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_itemdict.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_layout.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_magnifier.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_marker.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_panner.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_picker.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_plot.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_renderer.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_polar_spectrogram.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_raster_data.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_round_scale_draw.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_sampling_thread.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_scale_div.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_scale_draw.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_scale_engine.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_scale_map.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_scale_widget.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_series_data.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_slider.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_spline.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_spline_basis.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_spline_cubic.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_spline_curve_fitter.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_spline_local.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_spline_parametrization.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_spline_pleasing.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_spline_polynomial.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_symbol.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_system_clock.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_text.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_text_engine.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_text_label.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_thermo.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_transform.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_vectorfield_symbol.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_weeding_curve_fitter.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_wheel.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src/qwt_widget_overlay.cpp",
+			"MU",
+			null
+		]
+	],
+	"UIC_OPTIONS" : [],
+	"UIC_SEARCH_PATHS" : [],
+	"UIC_SKIP" : [],
+	"UIC_UI_FILES" : [],
+	"USE_BETTER_GRAPH" : true,
+	"VERBOSITY" : 0
+}

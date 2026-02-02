@@ -24,8 +24,11 @@
 #include "Route.h"
 #include "RouteItem.h"
 
-#include <QtWebKit>
-#include <QWebView>
+#if QT_VERSION >= 0x060000
+#include <QtWebEngineWidgets/QWebEngineView>
+#else
+#include <QtWebKit/QWebView>
+#endif
 #include <QTableWidget>
 #include <iostream>
 #include <sstream>
@@ -85,7 +88,7 @@ class RouteWindow : public GcChartWindow
         std::string CreateMapToolTipJavaScript();
 
         QVBoxLayout *layout;
-        QWebView *view;
+        QWebEngineView *view;
         WebBridgeForRoute *webBridge;
         QTreeWidget *treeWidget;
         QTableWidget* rideTable;

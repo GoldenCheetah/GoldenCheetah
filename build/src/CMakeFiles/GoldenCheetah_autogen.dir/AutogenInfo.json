@@ -1,0 +1,4660 @@
+{
+	"BUILD_DIR" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/src/GoldenCheetah_autogen",
+	"CMAKE_BINARY_DIR" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build",
+	"CMAKE_CURRENT_BINARY_DIR" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/src",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src",
+	"CMAKE_EXECUTABLE" : "/usr/bin/cmake",
+	"CMAKE_LIST_FILES" : 
+	[
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/CMakeLists.txt",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigVersionImpl.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6Config.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigExtras.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeVersionHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtInstallPaths.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6Targets.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6VersionlessAliasTargets.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtFeature.cmake",
+		"/usr/share/cmake-3.31/Modules/CheckCXXCompilerFlag.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtFeatureCommon.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicAppleHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeVersionHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicDependencyHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicExternalProjectHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicFinalizerHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicFindPackageHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicGitHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicPluginHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomAttributionHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomCpeHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomDepHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomFileHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomGenerationHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomLicenseHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomOpsHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomPurlHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomPythonHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomSystemDepHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicTargetHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicTestHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicToolHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicWalkLibsHelpers.cmake",
+		"/usr/share/cmake-3.31/Modules/CMakeFindDependencyMacro.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6Dependencies.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigVersionImpl.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6Config.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigExtras.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeVersionHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtInstallPaths.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6Targets.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6VersionlessAliasTargets.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtFeature.cmake",
+		"/usr/share/cmake-3.31/Modules/CheckCXXCompilerFlag.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtFeatureCommon.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicAppleHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeVersionHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicDependencyHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicExternalProjectHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicFinalizerHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicFindPackageHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicGitHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicPluginHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomAttributionHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomCpeHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomDepHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomFileHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomGenerationHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomLicenseHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomOpsHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomPurlHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomPythonHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomSystemDepHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicTargetHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicTestHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicToolHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicWalkLibsHelpers.cmake",
+		"/usr/share/cmake-3.31/Modules/CMakeFindDependencyMacro.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6Dependencies.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigVersionImpl.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6Config.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigExtras.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeVersionHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtInstallPaths.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6Targets.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6VersionlessAliasTargets.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtFeature.cmake",
+		"/usr/share/cmake-3.31/Modules/CheckCXXCompilerFlag.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtFeatureCommon.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicAppleHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeVersionHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicDependencyHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicExternalProjectHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicFinalizerHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicFindPackageHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicGitHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicPluginHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomAttributionHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomCpeHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomDepHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomFileHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomGenerationHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomLicenseHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomOpsHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomPurlHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomPythonHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicSbomSystemDepHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicTargetHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicTestHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicToolHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicWalkLibsHelpers.cmake",
+		"/usr/share/cmake-3.31/Modules/CMakeFindDependencyMacro.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6Dependencies.cmake",
+		"/usr/share/cmake-3.31/Modules/FindGSL.cmake",
+		"/usr/share/cmake-3.31/Modules/FindPackageHandleStandardArgs.cmake",
+		"/usr/share/cmake-3.31/Modules/FindPackageMessage.cmake",
+		"/usr/share/cmake-3.31/Modules/FindZLIB.cmake",
+		"/usr/share/cmake-3.31/Modules/FindPackageHandleStandardArgs.cmake",
+		"/usr/share/cmake-3.31/Modules/FindPackageMessage.cmake",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Resources/application.qrc"
+	],
+	"CMAKE_SOURCE_DIR" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah",
+	"CROSS_CONFIG" : false,
+	"DEP_FILE" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/src/GoldenCheetah_autogen/deps",
+	"DEP_FILE_RULE_NAME" : "GoldenCheetah_autogen/timestamp",
+	"HEADERS" : 
+	[
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/DataFilter_yacc.h",
+			"MU",
+			"IZWCZGADZF/moc_DataFilter_yacc.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/DataFilter_yacc.hpp",
+			"MU",
+			"IZWCZGADZF/moc_DataFilter_yacc_hpp.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/JsonRideFile_yacc.h",
+			"MU",
+			"IZWCZGADZF/moc_JsonRideFile_yacc.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/JsonRideFile_yacc.hpp",
+			"MU",
+			"IZWCZGADZF/moc_JsonRideFile_yacc_hpp.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/RideDB_yacc.h",
+			"MU",
+			"IZWCZGADZF/moc_RideDB_yacc.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/RideDB_yacc.hpp",
+			"MU",
+			"IZWCZGADZF/moc_RideDB_yacc_hpp.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/TrainerDayAPIQuery_yacc.h",
+			"MU",
+			"IZWCZGADZF/moc_TrainerDayAPIQuery_yacc.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/TrainerDayAPIQuery_yacc.hpp",
+			"MU",
+			"IZWCZGADZF/moc_TrainerDayAPIQuery_yacc_hpp.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/WorkoutFilter_yacc.h",
+			"MU",
+			"IZWCZGADZF/moc_WorkoutFilter_yacc.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/WorkoutFilter_yacc.hpp",
+			"MU",
+			"IZWCZGADZF/moc_WorkoutFilter_yacc_hpp.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/boost/GeometricTools_BSplineCurve.h",
+			"MU",
+			"IGNQBF2XLQ/moc_GeometricTools_BSplineCurve.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver/httpconnectionhandler.h",
+			"MU",
+			"QVVYCS2IOB/moc_httpconnectionhandler.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver/httpconnectionhandlerpool.h",
+			"MU",
+			"QVVYCS2IOB/moc_httpconnectionhandlerpool.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver/httpcookie.h",
+			"MU",
+			"QVVYCS2IOB/moc_httpcookie.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver/httpglobal.h",
+			"MU",
+			"QVVYCS2IOB/moc_httpglobal.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver/httplistener.h",
+			"MU",
+			"QVVYCS2IOB/moc_httplistener.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver/httprequest.h",
+			"MU",
+			"QVVYCS2IOB/moc_httprequest.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver/httprequesthandler.h",
+			"MU",
+			"QVVYCS2IOB/moc_httprequesthandler.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver/httpresponse.h",
+			"MU",
+			"QVVYCS2IOB/moc_httpresponse.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver/httpsession.h",
+			"MU",
+			"QVVYCS2IOB/moc_httpsession.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver/httpsessionstore.h",
+			"MU",
+			"QVVYCS2IOB/moc_httpsessionstore.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver/staticfilecontroller.h",
+			"MU",
+			"QVVYCS2IOB/moc_staticfilecontroller.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/kmeans/hamerly_kmeans.h",
+			"MU",
+			"Y2D2WJRZKW/moc_hamerly_kmeans.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/kmeans/kmeans.h",
+			"MU",
+			"Y2D2WJRZKW/moc_kmeans.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/kmeans/kmeans_dataset.h",
+			"MU",
+			"Y2D2WJRZKW/moc_kmeans_dataset.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/kmeans/kmeans_general_functions.h",
+			"MU",
+			"Y2D2WJRZKW/moc_kmeans_general_functions.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/kmeans/original_space_kmeans.h",
+			"MU",
+			"Y2D2WJRZKW/moc_original_space_kmeans.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/kmeans/triangle_inequality_base_kmeans.h",
+			"MU",
+			"Y2D2WJRZKW/moc_triangle_inequality_base_kmeans.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/lmfit/lmcurve.h",
+			"MU",
+			"VV3DBY5CWE/moc_lmcurve.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/lmfit/lmcurve_tyd.h",
+			"MU",
+			"VV3DBY5CWE/moc_lmcurve_tyd.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/lmfit/lmmin.h",
+			"MU",
+			"VV3DBY5CWE/moc_lmmin.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/lmfit/lmstruct.h",
+			"MU",
+			"VV3DBY5CWE/moc_lmstruct.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qtsolutions/codeeditor/codeeditor.h",
+			"MU",
+			"VLCELF4R6N/moc_codeeditor.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qtsolutions/flowlayout/flowlayout.h",
+			"MU",
+			"TBIK35CHSF/moc_flowlayout.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qtsolutions/json/mvjson.h",
+			"MU",
+			"AVTJ3PHHF6/moc_mvjson.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qtsolutions/qwtcurve/qwt_plot_gapped_curve.h",
+			"MU",
+			"T3DTO2CYCE/moc_qwt_plot_gapped_curve.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qxt/src/qxtspanslider.h",
+			"MU",
+			"P4WOMITERK/moc_qxtspanslider.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qxt/src/qxtspanslider_p.h",
+			"MU",
+			"P4WOMITERK/moc_qxtspanslider_p.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qxt/src/qxtstringspinbox.h",
+			"MU",
+			"P4WOMITERK/moc_qxtstringspinbox.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qzip/zipreader.h",
+			"MU",
+			"5EVLUIUAFI/moc_zipreader.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qzip/zipwriter.h",
+			"MU",
+			"5EVLUIUAFI/moc_zipwriter.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/voronoi/Voronoi.h",
+			"MU",
+			"FJI2RHBEG5/moc_Voronoi.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/ANT/ANT.h",
+			"MU",
+			"QQU4ZMSFET/moc_ANT.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/ANT/ANTChannel.h",
+			"MU",
+			"QQU4ZMSFET/moc_ANTChannel.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/ANT/ANTLogger.h",
+			"MU",
+			"QQU4ZMSFET/moc_ANTLogger.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/ANT/ANTMessage.h",
+			"MU",
+			"QQU4ZMSFET/moc_ANTMessage.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/ANT/ANTMessages.h",
+			"MU",
+			"QQU4ZMSFET/moc_ANTMessages.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/ANT/ANTlocalController.h",
+			"MU",
+			"QQU4ZMSFET/moc_ANTlocalController.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/Aerolab.h",
+			"MU",
+			"U3NEJFQSF6/moc_Aerolab.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/AerolabWindow.h",
+			"MU",
+			"U3NEJFQSF6/moc_AerolabWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/AllPlot.h",
+			"MU",
+			"U3NEJFQSF6/moc_AllPlot.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/AllPlotInterval.h",
+			"MU",
+			"U3NEJFQSF6/moc_AllPlotInterval.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/AllPlotSlopeCurve.h",
+			"MU",
+			"U3NEJFQSF6/moc_AllPlotSlopeCurve.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/AllPlotWindow.h",
+			"MU",
+			"U3NEJFQSF6/moc_AllPlotWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/BlankState.h",
+			"MU",
+			"U3NEJFQSF6/moc_BlankState.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/CPPlot.h",
+			"MU",
+			"U3NEJFQSF6/moc_CPPlot.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/ChartBar.h",
+			"MU",
+			"U3NEJFQSF6/moc_ChartBar.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/ChartSettings.h",
+			"MU",
+			"U3NEJFQSF6/moc_ChartSettings.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/CpPlotCurve.h",
+			"MU",
+			"U3NEJFQSF6/moc_CpPlotCurve.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/CriticalPowerWindow.h",
+			"MU",
+			"U3NEJFQSF6/moc_CriticalPowerWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/DaysScaleDraw.h",
+			"MU",
+			"U3NEJFQSF6/moc_DaysScaleDraw.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/DiaryWindow.h",
+			"MU",
+			"U3NEJFQSF6/moc_DiaryWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/ExhaustionDialog.h",
+			"MU",
+			"U3NEJFQSF6/moc_ExhaustionDialog.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/GcOverlayWidget.h",
+			"MU",
+			"U3NEJFQSF6/moc_GcOverlayWidget.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/GcPane.h",
+			"MU",
+			"U3NEJFQSF6/moc_GcPane.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/GenericAnnotations.h",
+			"MU",
+			"U3NEJFQSF6/moc_GenericAnnotations.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/GenericChart.h",
+			"MU",
+			"U3NEJFQSF6/moc_GenericChart.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/GenericLegend.h",
+			"MU",
+			"U3NEJFQSF6/moc_GenericLegend.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/GenericPlot.h",
+			"MU",
+			"U3NEJFQSF6/moc_GenericPlot.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/GenericSelectTool.h",
+			"MU",
+			"U3NEJFQSF6/moc_GenericSelectTool.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/GoldenCheetah.h",
+			"MU",
+			"U3NEJFQSF6/moc_GoldenCheetah.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/HistogramWindow.h",
+			"MU",
+			"U3NEJFQSF6/moc_HistogramWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/HrPwPlot.h",
+			"MU",
+			"U3NEJFQSF6/moc_HrPwPlot.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/HrPwWindow.h",
+			"MU",
+			"U3NEJFQSF6/moc_HrPwWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/IndendPlotMarker.h",
+			"MU",
+			"U3NEJFQSF6/moc_IndendPlotMarker.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/IntervalSummaryWindow.h",
+			"MU",
+			"U3NEJFQSF6/moc_IntervalSummaryWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/LTMCanvasPicker.h",
+			"MU",
+			"U3NEJFQSF6/moc_LTMCanvasPicker.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/LTMChartParser.h",
+			"MU",
+			"U3NEJFQSF6/moc_LTMChartParser.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/LTMOutliers.h",
+			"MU",
+			"U3NEJFQSF6/moc_LTMOutliers.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/LTMPlot.h",
+			"MU",
+			"U3NEJFQSF6/moc_LTMPlot.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/LTMPopup.h",
+			"MU",
+			"U3NEJFQSF6/moc_LTMPopup.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/LTMSettings.h",
+			"MU",
+			"U3NEJFQSF6/moc_LTMSettings.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/LTMTool.h",
+			"MU",
+			"U3NEJFQSF6/moc_LTMTool.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/LTMTrend.h",
+			"MU",
+			"U3NEJFQSF6/moc_LTMTrend.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/LTMTrend2.h",
+			"MU",
+			"U3NEJFQSF6/moc_LTMTrend2.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/LTMWindow.h",
+			"MU",
+			"U3NEJFQSF6/moc_LTMWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/LogTimeScaleDraw.h",
+			"MU",
+			"U3NEJFQSF6/moc_LogTimeScaleDraw.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/MUPlot.h",
+			"MU",
+			"U3NEJFQSF6/moc_MUPlot.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/MUPool.h",
+			"MU",
+			"U3NEJFQSF6/moc_MUPool.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/MUWidget.h",
+			"MU",
+			"U3NEJFQSF6/moc_MUWidget.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/MetadataWindow.h",
+			"MU",
+			"U3NEJFQSF6/moc_MetadataWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/Overview.h",
+			"MU",
+			"U3NEJFQSF6/moc_Overview.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/OverviewItems.h",
+			"MU",
+			"U3NEJFQSF6/moc_OverviewItems.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/PfPvPlot.h",
+			"MU",
+			"U3NEJFQSF6/moc_PfPvPlot.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/PfPvWindow.h",
+			"MU",
+			"U3NEJFQSF6/moc_PfPvWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/PowerHist.h",
+			"MU",
+			"U3NEJFQSF6/moc_PowerHist.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/ReferenceLineDialog.h",
+			"MU",
+			"U3NEJFQSF6/moc_ReferenceLineDialog.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/RideEditor.h",
+			"MU",
+			"U3NEJFQSF6/moc_RideEditor.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/RideMapWindow.h",
+			"MU",
+			"U3NEJFQSF6/moc_RideMapWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/ScatterPlot.h",
+			"MU",
+			"U3NEJFQSF6/moc_ScatterPlot.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/ScatterWindow.h",
+			"MU",
+			"U3NEJFQSF6/moc_ScatterWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/SmallPlot.h",
+			"MU",
+			"U3NEJFQSF6/moc_SmallPlot.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/TreeMapPlot.h",
+			"MU",
+			"U3NEJFQSF6/moc_TreeMapPlot.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/TreeMapWindow.h",
+			"MU",
+			"U3NEJFQSF6/moc_TreeMapWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/UserChart.h",
+			"MU",
+			"U3NEJFQSF6/moc_UserChart.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/UserChartData.h",
+			"MU",
+			"U3NEJFQSF6/moc_UserChartData.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/UserChartOverviewItem.h",
+			"MU",
+			"U3NEJFQSF6/moc_UserChartOverviewItem.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/UserChartWindow.h",
+			"MU",
+			"U3NEJFQSF6/moc_UserChartWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/ZoneScaleDraw.h",
+			"MU",
+			"U3NEJFQSF6/moc_ZoneScaleDraw.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/AddCloudWizard.h",
+			"MU",
+			"XZBZOKNJ5K/moc_AddCloudWizard.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/Azum.h",
+			"MU",
+			"XZBZOKNJ5K/moc_Azum.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/CalendarDownload.h",
+			"MU",
+			"XZBZOKNJ5K/moc_CalendarDownload.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/CloudService.h",
+			"MU",
+			"XZBZOKNJ5K/moc_CloudService.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/CyclingAnalytics.h",
+			"MU",
+			"XZBZOKNJ5K/moc_CyclingAnalytics.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/Dropbox.h",
+			"MU",
+			"XZBZOKNJ5K/moc_Dropbox.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/LocalFileStore.h",
+			"MU",
+			"XZBZOKNJ5K/moc_LocalFileStore.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/MeasuresDownload.h",
+			"MU",
+			"XZBZOKNJ5K/moc_MeasuresDownload.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/Nolio.h",
+			"MU",
+			"XZBZOKNJ5K/moc_Nolio.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/OAuthDialog.h",
+			"MU",
+			"XZBZOKNJ5K/moc_OAuthDialog.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/OpenData.h",
+			"MU",
+			"XZBZOKNJ5K/moc_OpenData.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/PolarFlow.h",
+			"MU",
+			"XZBZOKNJ5K/moc_PolarFlow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/RideWithGPS.h",
+			"MU",
+			"XZBZOKNJ5K/moc_RideWithGPS.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/Selfloops.h",
+			"MU",
+			"XZBZOKNJ5K/moc_Selfloops.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/SixCycle.h",
+			"MU",
+			"XZBZOKNJ5K/moc_SixCycle.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/SportTracks.h",
+			"MU",
+			"XZBZOKNJ5K/moc_SportTracks.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/SportsPlusHealth.h",
+			"MU",
+			"XZBZOKNJ5K/moc_SportsPlusHealth.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/Strava.h",
+			"MU",
+			"XZBZOKNJ5K/moc_Strava.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/TrainingsTageBuch.h",
+			"MU",
+			"XZBZOKNJ5K/moc_TrainingsTageBuch.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/Velohero.h",
+			"MU",
+			"XZBZOKNJ5K/moc_Velohero.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/Withings.h",
+			"MU",
+			"XZBZOKNJ5K/moc_Withings.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/WithingsDownload.h",
+			"MU",
+			"XZBZOKNJ5K/moc_WithingsDownload.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/Xert.h",
+			"MU",
+			"XZBZOKNJ5K/moc_Xert.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/APIWebService.h",
+			"MU",
+			"4VKJKCZPXG/moc_APIWebService.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/Athlete.h",
+			"MU",
+			"4VKJKCZPXG/moc_Athlete.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/Context.h",
+			"MU",
+			"4VKJKCZPXG/moc_Context.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/DataFilter.h",
+			"MU",
+			"4VKJKCZPXG/moc_DataFilter.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/FreeSearch.h",
+			"MU",
+			"4VKJKCZPXG/moc_FreeSearch.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/GcCalendarModel.h",
+			"MU",
+			"4VKJKCZPXG/moc_GcCalendarModel.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/GcUpgrade.h",
+			"MU",
+			"4VKJKCZPXG/moc_GcUpgrade.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/IdleTimer.h",
+			"MU",
+			"4VKJKCZPXG/moc_IdleTimer.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/IntervalItem.h",
+			"MU",
+			"4VKJKCZPXG/moc_IntervalItem.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/Measures.h",
+			"MU",
+			"4VKJKCZPXG/moc_Measures.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/NamedSearch.h",
+			"MU",
+			"4VKJKCZPXG/moc_NamedSearch.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/Quadtree.h",
+			"MU",
+			"4VKJKCZPXG/moc_Quadtree.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/RideCache.h",
+			"MU",
+			"4VKJKCZPXG/moc_RideCache.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/RideCacheModel.h",
+			"MU",
+			"4VKJKCZPXG/moc_RideCacheModel.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/RideDB.h",
+			"MU",
+			"4VKJKCZPXG/moc_RideDB.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/RideItem.h",
+			"MU",
+			"4VKJKCZPXG/moc_RideItem.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/Route.h",
+			"MU",
+			"4VKJKCZPXG/moc_Route.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/RouteParser.h",
+			"MU",
+			"4VKJKCZPXG/moc_RouteParser.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/Season.h",
+			"MU",
+			"4VKJKCZPXG/moc_Season.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/SeasonDialogs.h",
+			"MU",
+			"4VKJKCZPXG/moc_SeasonDialogs.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/Seasons.h",
+			"MU",
+			"4VKJKCZPXG/moc_Seasons.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/Secrets.h",
+			"MU",
+			"4VKJKCZPXG/moc_Secrets.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/Settings.h",
+			"MU",
+			"4VKJKCZPXG/moc_Settings.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/Specification.h",
+			"MU",
+			"4VKJKCZPXG/moc_Specification.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/SplineLookup.h",
+			"MU",
+			"4VKJKCZPXG/moc_SplineLookup.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/TimeUtils.h",
+			"MU",
+			"4VKJKCZPXG/moc_TimeUtils.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/Units.h",
+			"MU",
+			"4VKJKCZPXG/moc_Units.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/UserData.h",
+			"MU",
+			"4VKJKCZPXG/moc_UserData.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/Utils.h",
+			"MU",
+			"4VKJKCZPXG/moc_Utils.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/ArchiveFile.h",
+			"MU",
+			"ZYG32IX256/moc_ArchiveFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/AthleteBackup.h",
+			"MU",
+			"ZYG32IX256/moc_AthleteBackup.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/Bin2RideFile.h",
+			"MU",
+			"ZYG32IX256/moc_Bin2RideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/BinRideFile.h",
+			"MU",
+			"ZYG32IX256/moc_BinRideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/CommPort.h",
+			"MU",
+			"ZYG32IX256/moc_CommPort.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/Computrainer3dpFile.h",
+			"MU",
+			"ZYG32IX256/moc_Computrainer3dpFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/CsvRideFile.h",
+			"MU",
+			"ZYG32IX256/moc_CsvRideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/DataProcessor.h",
+			"MU",
+			"ZYG32IX256/moc_DataProcessor.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/Device.h",
+			"MU",
+			"ZYG32IX256/moc_Device.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/EpmParser.h",
+			"MU",
+			"ZYG32IX256/moc_EpmParser.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/EpmRideFile.h",
+			"MU",
+			"ZYG32IX256/moc_EpmRideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FilterHRV.h",
+			"MU",
+			"ZYG32IX256/moc_FilterHRV.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FitRideFile.h",
+			"MU",
+			"ZYG32IX256/moc_FitRideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FitlogParser.h",
+			"MU",
+			"ZYG32IX256/moc_FitlogParser.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FitlogRideFile.h",
+			"MU",
+			"ZYG32IX256/moc_FitlogRideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/GcRideFile.h",
+			"MU",
+			"ZYG32IX256/moc_GcRideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/GpxParser.h",
+			"MU",
+			"ZYG32IX256/moc_GpxParser.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/GpxRideFile.h",
+			"MU",
+			"ZYG32IX256/moc_GpxRideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/JouleDevice.h",
+			"MU",
+			"ZYG32IX256/moc_JouleDevice.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/JsonRideFile.h",
+			"MU",
+			"ZYG32IX256/moc_JsonRideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/LapsEditor.h",
+			"MU",
+			"ZYG32IX256/moc_LapsEditor.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/LocationInterpolation.h",
+			"MU",
+			"ZYG32IX256/moc_LocationInterpolation.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/MacroDevice.h",
+			"MU",
+			"ZYG32IX256/moc_MacroDevice.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/ManualRideFile.h",
+			"MU",
+			"ZYG32IX256/moc_ManualRideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/MeasuresCsvImport.h",
+			"MU",
+			"ZYG32IX256/moc_MeasuresCsvImport.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/MoxyDevice.h",
+			"MU",
+			"ZYG32IX256/moc_MoxyDevice.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/PolarRideFile.h",
+			"MU",
+			"ZYG32IX256/moc_PolarRideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/PowerTapDevice.h",
+			"MU",
+			"ZYG32IX256/moc_PowerTapDevice.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/PowerTapUtil.h",
+			"MU",
+			"ZYG32IX256/moc_PowerTapUtil.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/PwxRideFile.h",
+			"MU",
+			"ZYG32IX256/moc_PwxRideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/QuarqParser.h",
+			"MU",
+			"ZYG32IX256/moc_QuarqParser.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/QuarqRideFile.h",
+			"MU",
+			"ZYG32IX256/moc_QuarqRideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/RawRideFile.h",
+			"MU",
+			"ZYG32IX256/moc_RawRideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/RideAutoImportConfig.h",
+			"MU",
+			"ZYG32IX256/moc_RideAutoImportConfig.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/RideFile.h",
+			"MU",
+			"ZYG32IX256/moc_RideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/RideFileCache.h",
+			"MU",
+			"ZYG32IX256/moc_RideFileCache.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/RideFileCommand.h",
+			"MU",
+			"ZYG32IX256/moc_RideFileCommand.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/RideFileTableModel.h",
+			"MU",
+			"ZYG32IX256/moc_RideFileTableModel.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/Serial.h",
+			"MU",
+			"ZYG32IX256/moc_Serial.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/SlfParser.h",
+			"MU",
+			"ZYG32IX256/moc_SlfParser.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/SlfRideFile.h",
+			"MU",
+			"ZYG32IX256/moc_SlfRideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/SmfParser.h",
+			"MU",
+			"ZYG32IX256/moc_SmfParser.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/SmfRideFile.h",
+			"MU",
+			"ZYG32IX256/moc_SmfRideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/SmlParser.h",
+			"MU",
+			"ZYG32IX256/moc_SmlParser.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/SmlRideFile.h",
+			"MU",
+			"ZYG32IX256/moc_SmlRideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/SrdRideFile.h",
+			"MU",
+			"ZYG32IX256/moc_SrdRideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/SrmRideFile.h",
+			"MU",
+			"ZYG32IX256/moc_SrmRideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/SyncRideFile.h",
+			"MU",
+			"ZYG32IX256/moc_SyncRideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/TTSReader.h",
+			"MU",
+			"ZYG32IX256/moc_TTSReader.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/TcxParser.h",
+			"MU",
+			"ZYG32IX256/moc_TcxParser.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/TcxRideFile.h",
+			"MU",
+			"ZYG32IX256/moc_TcxRideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/TxtRideFile.h",
+			"MU",
+			"ZYG32IX256/moc_TxtRideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/WkoRideFile.h",
+			"MU",
+			"ZYG32IX256/moc_WkoRideFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/XDataDialog.h",
+			"MU",
+			"ZYG32IX256/moc_XDataDialog.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/XDataTableModel.h",
+			"MU",
+			"ZYG32IX256/moc_XDataTableModel.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/AboutDialog.h",
+			"MU",
+			"EHIEGSSRCT/moc_AboutDialog.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/AbstractView.h",
+			"MU",
+			"EHIEGSSRCT/moc_AbstractView.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/ActionButtonBox.h",
+			"MU",
+			"EHIEGSSRCT/moc_ActionButtonBox.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/AddIntervalDialog.h",
+			"MU",
+			"EHIEGSSRCT/moc_AddIntervalDialog.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/AddTileWizard.h",
+			"MU",
+			"EHIEGSSRCT/moc_AddTileWizard.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/AnalysisSidebar.h",
+			"MU",
+			"EHIEGSSRCT/moc_AnalysisSidebar.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/AthleteConfigDialog.h",
+			"MU",
+			"EHIEGSSRCT/moc_AthleteConfigDialog.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/AthletePages.h",
+			"MU",
+			"EHIEGSSRCT/moc_AthletePages.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/AthleteTab.h",
+			"MU",
+			"EHIEGSSRCT/moc_AthleteTab.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/AthleteView.h",
+			"MU",
+			"EHIEGSSRCT/moc_AthleteView.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/BatchProcessingDialog.h",
+			"MU",
+			"EHIEGSSRCT/moc_BatchProcessingDialog.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/ChartSpace.h",
+			"MU",
+			"EHIEGSSRCT/moc_ChartSpace.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/ChooseCyclistDialog.h",
+			"MU",
+			"EHIEGSSRCT/moc_ChooseCyclistDialog.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/ColorButton.h",
+			"MU",
+			"EHIEGSSRCT/moc_ColorButton.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/Colors.h",
+			"MU",
+			"EHIEGSSRCT/moc_Colors.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/CompareDateRange.h",
+			"MU",
+			"EHIEGSSRCT/moc_CompareDateRange.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/CompareInterval.h",
+			"MU",
+			"EHIEGSSRCT/moc_CompareInterval.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/ComparePane.h",
+			"MU",
+			"EHIEGSSRCT/moc_ComparePane.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/ConfigDialog.h",
+			"MU",
+			"EHIEGSSRCT/moc_ConfigDialog.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/DiarySidebar.h",
+			"MU",
+			"EHIEGSSRCT/moc_DiarySidebar.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/DownloadRideDialog.h",
+			"MU",
+			"EHIEGSSRCT/moc_DownloadRideDialog.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/DragBar.h",
+			"MU",
+			"EHIEGSSRCT/moc_DragBar.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/EstimateCPDialog.h",
+			"MU",
+			"EHIEGSSRCT/moc_EstimateCPDialog.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/GcCrashDialog.h",
+			"MU",
+			"EHIEGSSRCT/moc_GcCrashDialog.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/GcSideBarItem.h",
+			"MU",
+			"EHIEGSSRCT/moc_GcSideBarItem.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/GcToolBar.h",
+			"MU",
+			"EHIEGSSRCT/moc_GcToolBar.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/GcWindowLayout.h",
+			"MU",
+			"EHIEGSSRCT/moc_GcWindowLayout.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/GcWindowRegistry.h",
+			"MU",
+			"EHIEGSSRCT/moc_GcWindowRegistry.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/GenerateHeatMapDialog.h",
+			"MU",
+			"EHIEGSSRCT/moc_GenerateHeatMapDialog.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/HelpWhatsThis.h",
+			"MU",
+			"EHIEGSSRCT/moc_HelpWhatsThis.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/HelpWindow.h",
+			"MU",
+			"EHIEGSSRCT/moc_HelpWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/IntervalTreeView.h",
+			"MU",
+			"EHIEGSSRCT/moc_IntervalTreeView.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/LTMSidebar.h",
+			"MU",
+			"EHIEGSSRCT/moc_LTMSidebar.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/MainWindow.h",
+			"MU",
+			"EHIEGSSRCT/moc_MainWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/ManualActivityWizard.h",
+			"MU",
+			"EHIEGSSRCT/moc_ManualActivityWizard.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/MergeActivityWizard.h",
+			"MU",
+			"EHIEGSSRCT/moc_MergeActivityWizard.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/MetadataDialog.h",
+			"MU",
+			"EHIEGSSRCT/moc_MetadataDialog.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/MetricOverrideDialog.h",
+			"MU",
+			"EHIEGSSRCT/moc_MetricOverrideDialog.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/MetricSelect.h",
+			"MU",
+			"EHIEGSSRCT/moc_MetricSelect.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/NavigationModel.h",
+			"MU",
+			"EHIEGSSRCT/moc_NavigationModel.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/NewAthleteWizard.h",
+			"MU",
+			"EHIEGSSRCT/moc_NewAthleteWizard.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/NewSideBar.h",
+			"MU",
+			"EHIEGSSRCT/moc_NewSideBar.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/Pages.h",
+			"MU",
+			"EHIEGSSRCT/moc_Pages.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/Perspective.h",
+			"MU",
+			"EHIEGSSRCT/moc_Perspective.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/PerspectiveDialog.h",
+			"MU",
+			"EHIEGSSRCT/moc_PerspectiveDialog.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/QTFullScreen.h",
+			"MU",
+			"EHIEGSSRCT/moc_QTFullScreen.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/RideImportWizard.h",
+			"MU",
+			"EHIEGSSRCT/moc_RideImportWizard.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/RideNavigator.h",
+			"MU",
+			"EHIEGSSRCT/moc_RideNavigator.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/RideNavigatorProxy.h",
+			"MU",
+			"EHIEGSSRCT/moc_RideNavigatorProxy.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/SaveDialogs.h",
+			"MU",
+			"EHIEGSSRCT/moc_SaveDialogs.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/SearchBox.h",
+			"MU",
+			"EHIEGSSRCT/moc_SearchBox.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/SearchFilterBox.h",
+			"MU",
+			"EHIEGSSRCT/moc_SearchFilterBox.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/SolveCPDialog.h",
+			"MU",
+			"EHIEGSSRCT/moc_SolveCPDialog.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/SolverDisplay.h",
+			"MU",
+			"EHIEGSSRCT/moc_SolverDisplay.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/SplashScreen.h",
+			"MU",
+			"EHIEGSSRCT/moc_SplashScreen.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/SplitActivityWizard.h",
+			"MU",
+			"EHIEGSSRCT/moc_SplitActivityWizard.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/StyledItemDelegates.h",
+			"MU",
+			"EHIEGSSRCT/moc_StyledItemDelegates.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/ToolsRhoEstimator.h",
+			"MU",
+			"EHIEGSSRCT/moc_ToolsRhoEstimator.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/Views.h",
+			"MU",
+			"EHIEGSSRCT/moc_Views.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/Banister.h",
+			"MU",
+			"PW7VIWQKSG/moc_Banister.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/BlinnSolver.h",
+			"MU",
+			"PW7VIWQKSG/moc_BlinnSolver.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/CPSolver.h",
+			"MU",
+			"PW7VIWQKSG/moc_CPSolver.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/Estimator.h",
+			"MU",
+			"PW7VIWQKSG/moc_Estimator.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/ExtendedCriticalPower.h",
+			"MU",
+			"PW7VIWQKSG/moc_ExtendedCriticalPower.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/FastKmeans.h",
+			"MU",
+			"PW7VIWQKSG/moc_FastKmeans.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/HrZones.h",
+			"MU",
+			"PW7VIWQKSG/moc_HrZones.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/PDModel.h",
+			"MU",
+			"PW7VIWQKSG/moc_PDModel.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/PMCData.h",
+			"MU",
+			"PW7VIWQKSG/moc_PMCData.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/PaceZones.h",
+			"MU",
+			"PW7VIWQKSG/moc_PaceZones.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/PowerProfile.h",
+			"MU",
+			"PW7VIWQKSG/moc_PowerProfile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/RideMetadata.h",
+			"MU",
+			"PW7VIWQKSG/moc_RideMetadata.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/RideMetric.h",
+			"MU",
+			"PW7VIWQKSG/moc_RideMetric.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/SpecialFields.h",
+			"MU",
+			"PW7VIWQKSG/moc_SpecialFields.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/Statistic.h",
+			"MU",
+			"PW7VIWQKSG/moc_Statistic.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/UserMetricParser.h",
+			"MU",
+			"PW7VIWQKSG/moc_UserMetricParser.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/UserMetricSettings.h",
+			"MU",
+			"PW7VIWQKSG/moc_UserMetricSettings.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/VDOTCalculator.h",
+			"MU",
+			"PW7VIWQKSG/moc_VDOTCalculator.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/WPrime.h",
+			"MU",
+			"PW7VIWQKSG/moc_WPrime.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/Zones.h",
+			"MU",
+			"PW7VIWQKSG/moc_Zones.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Planning/PlanningWindow.h",
+			"MU",
+			"WOZW5OFSMU/moc_PlanningWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/AddDeviceWizard.h",
+			"MU",
+			"4GERPJ7XR3/moc_AddDeviceWizard.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/BT40Controller.h",
+			"MU",
+			"4GERPJ7XR3/moc_BT40Controller.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/BT40Device.h",
+			"MU",
+			"4GERPJ7XR3/moc_BT40Device.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/BicycleSim.h",
+			"MU",
+			"4GERPJ7XR3/moc_BicycleSim.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/CalibrationData.h",
+			"MU",
+			"4GERPJ7XR3/moc_CalibrationData.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/Computrainer.h",
+			"MU",
+			"4GERPJ7XR3/moc_Computrainer.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/ComputrainerController.h",
+			"MU",
+			"4GERPJ7XR3/moc_ComputrainerController.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/Daum.h",
+			"MU",
+			"4GERPJ7XR3/moc_Daum.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/DaumController.h",
+			"MU",
+			"4GERPJ7XR3/moc_DaumController.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/DeviceConfiguration.h",
+			"MU",
+			"4GERPJ7XR3/moc_DeviceConfiguration.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/DeviceTypes.h",
+			"MU",
+			"4GERPJ7XR3/moc_DeviceTypes.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/DialWindow.h",
+			"MU",
+			"4GERPJ7XR3/moc_DialWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/ElevationChartWindow.h",
+			"MU",
+			"4GERPJ7XR3/moc_ElevationChartWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/ErgFile.h",
+			"MU",
+			"4GERPJ7XR3/moc_ErgFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/ErgFileBase.h",
+			"MU",
+			"4GERPJ7XR3/moc_ErgFileBase.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/ErgFilePlot.h",
+			"MU",
+			"4GERPJ7XR3/moc_ErgFilePlot.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/ErgOverview.h",
+			"MU",
+			"4GERPJ7XR3/moc_ErgOverview.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/Ergofit.h",
+			"MU",
+			"4GERPJ7XR3/moc_Ergofit.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/ErgofitConnection.h",
+			"MU",
+			"4GERPJ7XR3/moc_ErgofitConnection.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/ErgofitController.h",
+			"MU",
+			"4GERPJ7XR3/moc_ErgofitController.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/FilterEditor.h",
+			"MU",
+			"4GERPJ7XR3/moc_FilterEditor.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/Ftms.h",
+			"MU",
+			"4GERPJ7XR3/moc_Ftms.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/GarminServiceHelper.h",
+			"MU",
+			"4GERPJ7XR3/moc_GarminServiceHelper.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/InfoWidget.h",
+			"MU",
+			"4GERPJ7XR3/moc_InfoWidget.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/Integrator.h",
+			"MU",
+			"4GERPJ7XR3/moc_Integrator.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/Kettler.h",
+			"MU",
+			"4GERPJ7XR3/moc_Kettler.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/KettlerConnection.h",
+			"MU",
+			"4GERPJ7XR3/moc_KettlerConnection.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/KettlerController.h",
+			"MU",
+			"4GERPJ7XR3/moc_KettlerController.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/KettlerRacer.h",
+			"MU",
+			"4GERPJ7XR3/moc_KettlerRacer.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/KettlerRacerConnection.h",
+			"MU",
+			"4GERPJ7XR3/moc_KettlerRacerConnection.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/KettlerRacerController.h",
+			"MU",
+			"4GERPJ7XR3/moc_KettlerRacerController.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/KurtInRide.h",
+			"MU",
+			"4GERPJ7XR3/moc_KurtInRide.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/KurtSmartControl.h",
+			"MU",
+			"4GERPJ7XR3/moc_KurtSmartControl.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/Library.h",
+			"MU",
+			"4GERPJ7XR3/moc_Library.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/LibraryParser.h",
+			"MU",
+			"4GERPJ7XR3/moc_LibraryParser.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/LiveMapWebPageWindow.h",
+			"MU",
+			"4GERPJ7XR3/moc_LiveMapWebPageWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/MenuProvider.h",
+			"MU",
+			"4GERPJ7XR3/moc_MenuProvider.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/MeterWidget.h",
+			"MU",
+			"4GERPJ7XR3/moc_MeterWidget.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/ModelFilter.h",
+			"MU",
+			"4GERPJ7XR3/moc_ModelFilter.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/MonarkConnection.h",
+			"MU",
+			"4GERPJ7XR3/moc_MonarkConnection.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/MonarkController.h",
+			"MU",
+			"4GERPJ7XR3/moc_MonarkController.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/MultiFilterProxyModel.h",
+			"MU",
+			"4GERPJ7XR3/moc_MultiFilterProxyModel.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/MultiRegressionizer.h",
+			"MU",
+			"4GERPJ7XR3/moc_MultiRegressionizer.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/NullController.h",
+			"MU",
+			"4GERPJ7XR3/moc_NullController.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/PhysicsUtility.h",
+			"MU",
+			"4GERPJ7XR3/moc_PhysicsUtility.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/PolynomialRegression.h",
+			"MU",
+			"4GERPJ7XR3/moc_PolynomialRegression.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/PowerInfoWidget.h",
+			"MU",
+			"4GERPJ7XR3/moc_PowerInfoWidget.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/PowerZonesWidget.h",
+			"MU",
+			"4GERPJ7XR3/moc_PowerZonesWidget.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/RatingWidget.h",
+			"MU",
+			"4GERPJ7XR3/moc_RatingWidget.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/RealtimeController.h",
+			"MU",
+			"4GERPJ7XR3/moc_RealtimeController.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/RealtimeData.h",
+			"MU",
+			"4GERPJ7XR3/moc_RealtimeData.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/RealtimePlot.h",
+			"MU",
+			"4GERPJ7XR3/moc_RealtimePlot.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/RealtimePlotWindow.h",
+			"MU",
+			"4GERPJ7XR3/moc_RealtimePlotWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/RemoteControl.h",
+			"MU",
+			"4GERPJ7XR3/moc_RemoteControl.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/ScalingLabel.h",
+			"MU",
+			"4GERPJ7XR3/moc_ScalingLabel.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/Shy.h",
+			"MU",
+			"4GERPJ7XR3/moc_Shy.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/SpinScanPlot.h",
+			"MU",
+			"4GERPJ7XR3/moc_SpinScanPlot.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/SpinScanPlotWindow.h",
+			"MU",
+			"4GERPJ7XR3/moc_SpinScanPlotWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/SpinScanPolarPlot.h",
+			"MU",
+			"4GERPJ7XR3/moc_SpinScanPolarPlot.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/StravaRoutesDownload.h",
+			"MU",
+			"4GERPJ7XR3/moc_StravaRoutesDownload.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/TagBar.h",
+			"MU",
+			"4GERPJ7XR3/moc_TagBar.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/TagStore.h",
+			"MU",
+			"4GERPJ7XR3/moc_TagStore.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/TagWidget.h",
+			"MU",
+			"4GERPJ7XR3/moc_TagWidget.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/Taggable.h",
+			"MU",
+			"4GERPJ7XR3/moc_Taggable.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/TrainBottom.h",
+			"MU",
+			"4GERPJ7XR3/moc_TrainBottom.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/TrainDB.h",
+			"MU",
+			"4GERPJ7XR3/moc_TrainDB.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/TrainSidebar.h",
+			"MU",
+			"4GERPJ7XR3/moc_TrainSidebar.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/TrainerDay.h",
+			"MU",
+			"4GERPJ7XR3/moc_TrainerDay.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/TrainerDayAPIDialog.h",
+			"MU",
+			"4GERPJ7XR3/moc_TrainerDayAPIDialog.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/TrainerDayAPIQuery.h",
+			"MU",
+			"4GERPJ7XR3/moc_TrainerDayAPIQuery.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/TrainerDayDownloadDialog.h",
+			"MU",
+			"4GERPJ7XR3/moc_TrainerDayDownloadDialog.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/VMProConfigurator.h",
+			"MU",
+			"4GERPJ7XR3/moc_VMProConfigurator.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/VMProWidget.h",
+			"MU",
+			"4GERPJ7XR3/moc_VMProWidget.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/VideoLayoutParser.h",
+			"MU",
+			"4GERPJ7XR3/moc_VideoLayoutParser.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/VideoSyncFile.h",
+			"MU",
+			"4GERPJ7XR3/moc_VideoSyncFile.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/VideoSyncFileBase.h",
+			"MU",
+			"4GERPJ7XR3/moc_VideoSyncFileBase.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/VideoWindow.h",
+			"MU",
+			"4GERPJ7XR3/moc_VideoWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/WebPageWindow.h",
+			"MU",
+			"4GERPJ7XR3/moc_WebPageWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/WorkoutFilter.h",
+			"MU",
+			"4GERPJ7XR3/moc_WorkoutFilter.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/WorkoutFilterBox.h",
+			"MU",
+			"4GERPJ7XR3/moc_WorkoutFilterBox.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/WorkoutMenuProvider.h",
+			"MU",
+			"4GERPJ7XR3/moc_WorkoutMenuProvider.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/WorkoutPlotWindow.h",
+			"MU",
+			"4GERPJ7XR3/moc_WorkoutPlotWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/WorkoutTagWrapper.h",
+			"MU",
+			"4GERPJ7XR3/moc_WorkoutTagWrapper.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/WorkoutWidget.h",
+			"MU",
+			"4GERPJ7XR3/moc_WorkoutWidget.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/WorkoutWidgetItems.h",
+			"MU",
+			"4GERPJ7XR3/moc_WorkoutWidgetItems.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/WorkoutWindow.h",
+			"MU",
+			"4GERPJ7XR3/moc_WorkoutWindow.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/WorkoutWizard.h",
+			"MU",
+			"4GERPJ7XR3/moc_WorkoutWizard.cpp",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/ZwoParser.h",
+			"MU",
+			"4GERPJ7XR3/moc_ZwoParser.cpp",
+			null
+		]
+	],
+	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
+	"INCLUDE_DIR" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/src/GoldenCheetah_autogen/include",
+	"MOC_COMPILATION_FILE" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/src/GoldenCheetah_autogen/mocs_compilation.cpp",
+	"MOC_DEFINITIONS" : 
+	[
+		"GC_WANT_HTTP",
+		"QT_BLUETOOTH_LIB",
+		"QT_CHARTS_LIB",
+		"QT_CONCURRENT_LIB",
+		"QT_CORE5COMPAT_LIB",
+		"QT_CORE_LIB",
+		"QT_DBUS_LIB",
+		"QT_GUI_LIB",
+		"QT_MULTIMEDIAWIDGETS_LIB",
+		"QT_MULTIMEDIA_LIB",
+		"QT_NETWORK_LIB",
+		"QT_NO_DEBUG",
+		"QT_OPENGLWIDGETS_LIB",
+		"QT_OPENGL_LIB",
+		"QT_POSITIONING_LIB",
+		"QT_PRINTSUPPORT_LIB",
+		"QT_QMLINTEGRATION_LIB",
+		"QT_QMLMETA_LIB",
+		"QT_QMLMODELS_LIB",
+		"QT_QMLWORKERSCRIPT_LIB",
+		"QT_QML_LIB",
+		"QT_QUICK_LIB",
+		"QT_SERIALPORT_LIB",
+		"QT_SQL_LIB",
+		"QT_SVG_LIB",
+		"QT_WEBCHANNELQUICK_LIB",
+		"QT_WEBCHANNEL_LIB",
+		"QT_WEBENGINECORE_LIB",
+		"QT_WEBENGINEQUICK_LIB",
+		"QT_WEBENGINEWIDGETS_LIB",
+		"QT_WIDGETS_LIB",
+		"QT_XML_LIB",
+		"_FORTIFY_SOURCE=2"
+	],
+	"MOC_DEPEND_FILTERS" : 
+	[
+		[
+			"Q_PLUGIN_METADATA",
+			"[\n][ \t]*Q_PLUGIN_METADATA[ \t]*\\([^\\)]*FILE[ \t]*\"([^\"]+)\""
+		]
+	],
+	"MOC_INCLUDES" : 
+	[
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/ANT",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Planning",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qxt/src",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qtsolutions/json",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qtsolutions/qwtcurve",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qtsolutions/flowlayout",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qtsolutions/codeeditor",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/lmfit",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/boost",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/kmeans",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/voronoi",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qzip",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/qwt/src",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qxt/src",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qtsolutions/json",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qtsolutions/qwtcurve",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qtsolutions/flowlayout",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qtsolutions/codeeditor",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/lmfit",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/boost",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/kmeans",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/voronoi",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qzip",
+		"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build",
+		"/usr/include/x86_64-linux-gnu/qt6/QtCore",
+		"/usr/include/x86_64-linux-gnu/qt6",
+		"/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++",
+		"/usr/include/x86_64-linux-gnu/qt6/QtWidgets",
+		"/usr/include/x86_64-linux-gnu/qt6/QtGui",
+		"/usr/include/x86_64-linux-gnu/qt6/QtXml",
+		"/usr/include/x86_64-linux-gnu/qt6/QtSql",
+		"/usr/include/x86_64-linux-gnu/qt6/QtNetwork",
+		"/usr/include/x86_64-linux-gnu/qt6/QtSvg",
+		"/usr/include/x86_64-linux-gnu/qt6/QtConcurrent",
+		"/usr/include/x86_64-linux-gnu/qt6/QtSerialPort",
+		"/usr/include/x86_64-linux-gnu/qt6/QtMultimedia",
+		"/usr/include/x86_64-linux-gnu/qt6/QtMultimediaWidgets",
+		"/usr/include/x86_64-linux-gnu/qt6/QtWebEngineCore",
+		"/usr/include/x86_64-linux-gnu/qt6/QtQuick",
+		"/usr/include/x86_64-linux-gnu/qt6/QtQml",
+		"/usr/include/x86_64-linux-gnu/qt6/QtQmlIntegration",
+		"/usr/include/x86_64-linux-gnu/qt6/QtQmlMeta",
+		"/usr/include/x86_64-linux-gnu/qt6/QtQmlModels",
+		"/usr/include/x86_64-linux-gnu/qt6/QtQmlWorkerScript",
+		"/usr/include/x86_64-linux-gnu/qt6/QtOpenGL",
+		"/usr/include/x86_64-linux-gnu/qt6/QtWebChannel",
+		"/usr/include/x86_64-linux-gnu/qt6/QtPositioning",
+		"/usr/include/x86_64-linux-gnu/qt6/QtWebEngineWidgets",
+		"/usr/include/x86_64-linux-gnu/qt6/QtPrintSupport",
+		"/usr/include/x86_64-linux-gnu/qt6/QtBluetooth",
+		"/usr/include/x86_64-linux-gnu/qt6/QtDBus",
+		"/usr/include/x86_64-linux-gnu/qt6/QtCharts",
+		"/usr/include/x86_64-linux-gnu/qt6/QtOpenGLWidgets",
+		"/usr/include/x86_64-linux-gnu/qt6/QtWebEngineQuick",
+		"/usr/include/x86_64-linux-gnu/qt6/QtWebChannelQuick",
+		"/usr/include/x86_64-linux-gnu/qt6/QtCore5Compat",
+		"/usr/include",
+		"/usr/include/c++/14",
+		"/usr/include/x86_64-linux-gnu/c++/14",
+		"/usr/include/c++/14/backward",
+		"/usr/lib/gcc/x86_64-linux-gnu/14/include",
+		"/usr/local/include",
+		"/usr/include/x86_64-linux-gnu"
+	],
+	"MOC_MACRO_NAMES" : 
+	[
+		"Q_OBJECT",
+		"Q_GADGET",
+		"Q_NAMESPACE",
+		"Q_NAMESPACE_EXPORT",
+		"Q_GADGET_EXPORT",
+		"Q_ENUM_NS"
+	],
+	"MOC_OPTIONS" : [],
+	"MOC_PATH_PREFIX" : false,
+	"MOC_PREDEFS_CMD" : 
+	[
+		"/usr/bin/c++",
+		"-std=c++17",
+		"-dM",
+		"-E",
+		"-c",
+		"/usr/share/cmake-3.31/Modules/CMakeCXXCompilerABI.cpp"
+	],
+	"MOC_PREDEFS_FILE" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/src/GoldenCheetah_autogen/moc_predefs.h",
+	"MOC_RELAXED_MODE" : false,
+	"MOC_SKIP" : [],
+	"MULTI_CONFIG" : false,
+	"PARALLEL" : 4,
+	"PARSE_CACHE_FILE" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/src/CMakeFiles/GoldenCheetah_autogen.dir/ParseCache.txt",
+	"QT_MOC_EXECUTABLE" : "/usr/lib/qt6/libexec/moc",
+	"QT_UIC_EXECUTABLE" : "/usr/lib/qt6/libexec/uic",
+	"QT_VERSION_MAJOR" : 6,
+	"QT_VERSION_MINOR" : 8,
+	"SETTINGS_FILE" : "/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/src/CMakeFiles/GoldenCheetah_autogen.dir/AutogenUsed.txt",
+	"SOURCES" : 
+	[
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/DataFilter_lex.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/DataFilter_yacc.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/JsonRideFile_lex.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/JsonRideFile_yacc.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/RideDB_lex.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/RideDB_yacc.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/TrainerDayAPIQuery_lex.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/TrainerDayAPIQuery_yacc.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/WorkoutFilter_lex.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/build/WorkoutFilter_yacc.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver/httpconnectionhandler.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver/httpconnectionhandlerpool.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver/httpcookie.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver/httpglobal.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver/httplistener.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver/httprequest.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver/httprequesthandler.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver/httpresponse.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver/httpsession.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver/httpsessionstore.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/httpserver/staticfilecontroller.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/kmeans/hamerly_kmeans.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/kmeans/kmeans.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/kmeans/kmeans_dataset.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/kmeans/kmeans_general_functions.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/kmeans/original_space_kmeans.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/kmeans/triangle_inequality_base_kmeans.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/lmfit/lmcurve.c",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/lmfit/lmmin.c",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qtsolutions/codeeditor/codeeditor.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qtsolutions/flowlayout/flowlayout.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qtsolutions/json/mvjson.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qxt/src/qxtspanslider.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qxt/src/qxtstringspinbox.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/qzip/zip.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/contrib/voronoi/Voronoi.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/ANT/ANT.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/ANT/ANTChannel.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/ANT/ANTLogger.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/ANT/ANTMessage.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/ANT/ANTlocalController.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/Aerolab.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/AerolabWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/AllPlot.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/AllPlotInterval.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/AllPlotSlopeCurve.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/AllPlotWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/BlankState.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/CPPlot.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/ChartBar.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/ChartSettings.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/CpPlotCurve.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/CriticalPowerWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/DiaryWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/ExhaustionDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/GcOverlayWidget.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/GcPane.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/GenericAnnotations.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/GenericChart.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/GenericLegend.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/GenericPlot.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/GenericSelectTool.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/GoldenCheetah.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/HistogramWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/HrPwPlot.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/HrPwWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/IndendPlotMarker.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/IntervalSummaryWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/LTMCanvasPicker.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/LTMChartParser.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/LTMOutliers.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/LTMPlot.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/LTMPopup.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/LTMSettings.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/LTMTool.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/LTMTrend.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/LTMWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/LogTimeScaleDraw.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/MUPlot.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/MUWidget.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/MetadataWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/Overview.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/OverviewItems.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/PfPvPlot.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/PfPvWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/PowerHist.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/ReferenceLineDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/RideEditor.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/RideMapWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/ScatterPlot.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/ScatterWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/SmallPlot.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/TreeMapPlot.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/TreeMapWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/UserChart.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/UserChartData.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/UserChartOverviewItem.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Charts/UserChartWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/AddCloudWizard.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/Azum.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/CalendarDownload.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/CloudService.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/CyclingAnalytics.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/Dropbox.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/LocalFileStore.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/MeasuresDownload.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/Nolio.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/OAuthDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/OpenData.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/PolarFlow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/RideWithGPS.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/Selfloops.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/SixCycle.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/SportTracks.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/SportsPlusHealth.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/Strava.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/TrainingsTageBuch.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/Velohero.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/Withings.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/WithingsDownload.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Cloud/Xert.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/APIWebService.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/Athlete.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/Context.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/DataFilter.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/FreeSearch.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/GcUpgrade.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/IdleTimer.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/IntervalItem.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/Measures.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/NamedSearch.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/Quadtree.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/RideCache.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/RideCacheModel.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/RideItem.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/Route.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/RouteParser.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/Season.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/SeasonDialogs.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/Seasons.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/Settings.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/Specification.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/SplineLookup.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/TimeUtils.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/Units.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/UserData.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/Utils.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Core/main.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/ArchiveFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/AthleteBackup.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/Bin2RideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/BinRideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/CommPort.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/Computrainer3dpFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/CsvRideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/DataProcessor.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/Device.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/EpmParser.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/EpmRideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FilterHRV.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FitRideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FitlogParser.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FitlogRideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FixAeroPod.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FixDeriveDistance.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FixDeriveHeadwind.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FixDerivePower.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FixDeriveTorque.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FixElevation.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FixFreewheeling.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FixGPS.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FixGaps.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FixHRSpikes.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FixLapSwim.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FixMoxy.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FixPower.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FixRunningCadence.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FixRunningPower.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FixSmO2.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FixSpeed.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FixSpikes.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/FixTorque.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/GcRideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/GpxParser.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/GpxRideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/JouleDevice.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/LapsEditor.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/LocationInterpolation.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/MacroDevice.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/ManualRideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/MeasuresCsvImport.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/MoxyDevice.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/PolarRideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/PowerTapDevice.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/PowerTapUtil.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/PwxRideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/QuarqParser.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/QuarqRideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/RawRideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/RideAutoImportConfig.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/RideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/RideFileCache.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/RideFileCommand.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/RideFileTableModel.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/Serial.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/SlfParser.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/SlfRideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/SmfParser.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/SmfRideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/SmlParser.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/SmlRideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/Snippets.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/SrdRideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/SrmRideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/SyncRideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/TTSReader.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/TacxCafRideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/TcxParser.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/TcxRideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/TxtRideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/WkoRideFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/XDataDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/FileIO/XDataTableModel.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/AboutDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/AbstractView.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/ActionButtonBox.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/AddIntervalDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/AddTileWizard.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/AnalysisSidebar.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/AthleteConfigDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/AthletePages.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/AthleteTab.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/AthleteView.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/BatchProcessingDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/ChartSpace.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/ChooseCyclistDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/ColorButton.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/Colors.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/CompareDateRange.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/CompareInterval.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/ComparePane.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/ConfigDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/DiarySidebar.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/DownloadRideDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/DragBar.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/EditUserMetricDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/EstimateCPDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/GcCrashDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/GcSideBarItem.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/GcToolBar.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/GcWindowLayout.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/GcWindowRegistry.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/GenerateHeatMapDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/HelpWhatsThis.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/HelpWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/IntervalTreeView.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/LTMSidebar.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/MainWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/ManualActivityWizard.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/MergeActivityWizard.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/MetadataDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/MetricOverrideDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/MetricSelect.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/NavigationModel.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/NewAthleteWizard.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/NewSideBar.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/Pages.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/Perspective.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/PerspectiveDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/QTFullScreen.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/RideImportWizard.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/RideNavigator.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/SaveDialogs.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/SearchBox.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/SearchFilterBox.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/SolveCPDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/SolverDisplay.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/SplashScreen.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/SplitActivityWizard.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/StyledItemDelegates.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/ToolsRhoEstimator.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Gui/Views.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/AerobicDecoupling.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/Banister.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/BasicRideMetrics.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/BikeScore.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/BlinnSolver.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/CPSolver.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/Coggan.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/DanielsPoints.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/Estimator.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/ExtendedCriticalPower.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/FastKmeans.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/GOVSS.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/HrTimeInZone.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/HrZones.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/HrvMetrics.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/LeftRightBalance.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/PDModel.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/PMCData.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/PaceTimeInZone.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/PaceZones.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/PeakHr.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/PeakPace.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/PeakPower.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/PowerProfile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/RideMetadata.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/RideMetric.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/RowMetrics.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/RunMetrics.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/SpecialFields.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/Statistic.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/SustainMetric.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/SwimMetrics.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/SwimScore.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/TRIMPPoints.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/TimeInZone.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/UserMetric.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/UserMetricParser.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/VDOT.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/VDOTCalculator.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/WPrime.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/WattsPerKilogram.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/Zones.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/aBikeScore.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Metrics/aCoggan.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Planning/PlanningWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/AddDeviceWizard.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/BT40Controller.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/BT40Device.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/BicycleSim.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/CalibrationData.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/Computrainer.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/ComputrainerController.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/Daum.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/DaumController.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/DeviceConfiguration.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/DeviceTypes.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/DialWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/ElevationChartWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/ErgFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/ErgFileBase.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/ErgFilePlot.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/ErgOverview.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/Ergofit.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/ErgofitConnection.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/ErgofitController.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/FilterEditor.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/Ftms.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/GarminServiceHelper.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/InfoWidget.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/Kettler.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/KettlerConnection.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/KettlerController.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/KettlerRacer.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/KettlerRacerConnection.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/KettlerRacerController.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/KurtInRide.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/KurtSmartControl.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/Library.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/LibraryParser.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/LiveMapWebPageWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/MeterWidget.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/ModelFilter.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/MonarkConnection.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/MonarkController.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/MultiFilterProxyModel.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/NullController.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/PhysicsUtility.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/PolynomialRegression.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/PowerInfoWidget.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/PowerZonesWidget.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/RatingWidget.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/RealtimeController.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/RealtimeData.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/RealtimePlot.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/RealtimePlotWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/RemoteControl.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/ScalingLabel.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/Shy.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/SpinScanPlot.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/SpinScanPlotWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/SpinScanPolarPlot.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/StravaRoutesDownload.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/TagBar.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/TagWidget.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/TrainBottom.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/TrainDB.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/TrainSidebar.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/TrainerDay.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/TrainerDayAPIDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/TrainerDayAPIQuery.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/TrainerDayDownloadDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/VMProConfigurator.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/VMProWidget.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/VideoLayoutParser.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/VideoSyncFile.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/VideoSyncFileBase.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/VideoWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/WebPageWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/WorkoutFilter.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/WorkoutFilterBox.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/WorkoutMenuProvider.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/WorkoutPlotWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/WorkoutTagWrapper.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/WorkoutWidget.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/WorkoutWidgetItems.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/WorkoutWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/WorkoutWizard.cpp",
+			"MU",
+			null
+		],
+		[
+			"/media/andy/TOSHIBA EXT/Backup2/Documents/GoldenCheetah/src/Train/ZwoParser.cpp",
+			"MU",
+			null
+		]
+	],
+	"UIC_OPTIONS" : [],
+	"UIC_SEARCH_PATHS" : [],
+	"UIC_SKIP" : [],
+	"UIC_UI_FILES" : [],
+	"USE_BETTER_GRAPH" : true,
+	"VERBOSITY" : 0
+}

@@ -17,13 +17,18 @@
  */
 #include "RouteWindow.h"
 #include "Athlete.h"
-#include "GoogleMapControl.h"
 #include "RideItem.h"
 #include "Route.h"
 #include "RouteItem.h"
 
 #include <QDebug>
 #include <QHeaderView>
+
+#if QT_VERSION >= 0x060000
+#include <QtWebEngineWidgets/QWebEngineView>
+#else
+#include <QtWebKit/QWebView>
+#endif
 
 using namespace std;
 
@@ -35,7 +40,7 @@ RouteWindow::RouteWindow(Context *context) : GcChartWindow(context)
     this->routeItem = NULL;
     this->setTitle("Routes");
 
-    view = new QWebView();
+    view = new QWebEngineView();
 
     QVBoxLayout *layoutV = new QVBoxLayout();
     QHBoxLayout *layoutH = new QHBoxLayout();
@@ -112,7 +117,12 @@ RouteWindow::RouteWindow(Context *context) : GcChartWindow(context)
 
     webBridge = new WebBridgeForRoute(context, this);
 
+#if QT_VERSION < 0x060000
     connect(view->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(updateFrame()));
+#else
+    // Qt6: WebChannel setup would go here if needed
+    // For now, we'll call updateFrame() after page loads
+#endif
 
     loadingPage = false;
 
@@ -135,7 +145,11 @@ void RouteWindow::loadRide()
 {
     qDebug() << "loadRide";
     createHtml();
+#if QT_VERSION < 0x060000
     view->page()->mainFrame()->setHtml(currentPage);
+#else
+    view->page()->setHtml(currentPage);
+#endif
 
     // Fill ride table
     /*
@@ -174,7 +188,12 @@ void RouteWindow::updateFrame()
     delete webBridge;
     webBridge = new WebBridgeForRoute(context, this);
 
+#if QT_VERSION < 0x060000
     view->page()->mainFrame()->addToJavaScriptWindowObject("webBridge", webBridge);
+#else
+    // Qt6: Would need QWebChannel setup here
+    // For now, this is a placeholder for future implementation
+#endif
 }
 
 void RouteWindow::createHtml()
@@ -425,7 +444,11 @@ void RouteWindow::drawShadedRoute()
                     "polyline.setOptions(polyOptions);\n"
                     "}\n").arg(color.name());
 
+#if QT_VERSION < 0x060000
     view->page()->mainFrame()->evaluateJavaScript(code);
+#else
+    view->page()->runJavaScript(code);
+#endif
 }
 
 void
@@ -462,7 +485,7 @@ RouteWindow::resetRoutes()
             }
 
             treeWidget->expandItem(allRides);
-            treeWidget->setFirstItemColumnSpanned (allRides, true);
+            allRides->setFirstColumnSpanned(true);
         }
 
         route = &routes->routes[0];

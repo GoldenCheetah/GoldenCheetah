@@ -1,0 +1,76 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "goldencheetah",
+  "version": "3.7.0",
+  "description": "Performance analysis software for cyclists and triathletes",
+  "homepage": "https://www.goldencheetah.org",
+  "license": "GPL-2.0",
+  "dependencies": [
+    {
+      "name": "qt5",
+      "version>=": "5.15.0",
+      "default-features": false,
+      "features": [
+        "xml",
+        "sql",
+        "network",
+        "svg",
+        "widgets",
+        "concurrent",
+        "serialport",
+        "multimedia",
+        "webengine",
+        "webchannel",
+        "positioning",
+        "bluetooth",
+        "charts",
+        "opengl"
+      ]
+    },
+    {
+      "name": "gsl",
+      "version>=": "2.7"
+    },
+    {
+      "name": "zlib",
+      "version>=": "1.2.11"
+    }
+  ],
+  "features": {
+    "python": {
+      "description": "Enable Python scripting support",
+      "dependencies": [
+        "python3"
+      ]
+    },
+    "r": {
+      "description": "Enable R statistical computing support",
+      "dependencies": []
+    },
+    "libusb": {
+      "description": "Enable USB device support",
+      "dependencies": [
+        "libusb"
+      ]
+    },
+    "libical": {
+      "description": "Enable calendar integration",
+      "dependencies": [
+        "libical"
+      ]
+    },
+    "vlc": {
+      "description": "Enable VLC video playback",
+      "dependencies": [
+        "vlc"
+      ]
+    },
+    "samplerate": {
+      "description": "Enable sample rate conversion",
+      "dependencies": [
+        "libsamplerate"
+      ]
+    }
+  },
+  "overrides": []
+}
