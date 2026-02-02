@@ -96,10 +96,6 @@ LTMChartParser::serialize(QString filename, QList<LTMSettings> charts)
     };
     file.resize(0);
     QTextStream out(&file);
-#if QT_VERSION < 0x060000
-    out.setCodec("UTF-8");
-#endif
-
     serializeToQTextStream(out, charts);
 
     // close file
@@ -110,10 +106,6 @@ void
 LTMChartParser::serializeToQString(QString* string, QList<LTMSettings> charts)
 {
     QTextStream out(string);
-#if QT_VERSION < 0x060000
-    out.setCodec("UTF-8");
-#endif
-
     serializeToQTextStream(out, charts);
 
     // write all to out
@@ -158,7 +150,7 @@ ChartTreeView::ChartTreeView(Context *context) : context(context)
 void
 ChartTreeView::dropEvent(QDropEvent* event)
 {
-    QTreeWidgetItem* target = (QTreeWidgetItem *)itemAt(event->pos());
+    QTreeWidgetItem* target = (QTreeWidgetItem *)itemAt(event->position().toPoint());
     int idxTo = indexFromItem(target).row();
 
     // when dragging to past the last one, we get -1, so lets
@@ -190,10 +182,9 @@ ChartTreeView::dropEvent(QDropEvent* event)
     context->notifyPresetsChanged();
 
     clearSelection();
-    // xxx dgr removed because
-    // select it!
     /*foreach (int idx, idxToList) {
-        invisibleRootItem()->child(idx)->setSelected(true);
+        QTreeWidgetItem *item = invisibleRootItem()->child(idx);
+        if (item) item->setSelected(true);
     }*/
 }
 
@@ -207,12 +198,7 @@ ChartTreeView::mimeTypes() const
 }
 
 QMimeData *
-ChartTreeView::mimeData
-#if QT_VERSION < 0x060000
-(const QList<QTreeWidgetItem *> items) const
-#else
-(const QList<QTreeWidgetItem *> &items) const
-#endif
+ChartTreeView::mimeData(const QList<QTreeWidgetItem *> &items) const
 {
     QMimeData *returning = new QMimeData;
 

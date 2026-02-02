@@ -45,9 +45,6 @@ bool ScanPddFile(QFile &file, QString &hrmFile, QString &hrvFile, QString &gpxFi
       // from a QString
       QString contents;
       QTextStream in(&file);
-#if QT_VERSION < 0x060000
-      in.setCodec("UTF-8");
-#endif
       contents = in.readAll();
       file.close();
       // check if the text string contains the replacement character for UTF-8 encoding
@@ -61,11 +58,7 @@ bool ScanPddFile(QFile &file, QString &hrmFile, QString &hrvFile, QString &gpxFi
   file.open(QFile::ReadOnly);
   QTextStream is(&file);
   if (useISO8859)
-#if QT_VERSION < 0x060000
-      is.setCodec ("ISO 8859-1");
-#else
       is.setEncoding (QStringConverter::Latin1);
-#endif
 
   while (!is.atEnd()) {
     // the readLine() method doesn't handle old Macintosh CR line
@@ -182,9 +175,6 @@ void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeri
 
   RideFilePoint *p;
 
-  int lineno = 1;
-
-
   double next_interval=0;
   double hrv_time=0;
   QList<double> intervals;
@@ -195,9 +185,6 @@ void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeri
       // from a QString
       QString contents;
       QTextStream in(&file);
-#if QT_VERSION < 0x060000
-      in.setCodec("UTF-8");
-#endif
       contents = in.readAll();
       file.close();
       // check if the text string contains the replacement character for UTF-8 encoding
@@ -212,11 +199,8 @@ void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeri
   file.open(QFile::ReadOnly);
   QTextStream is(&file);
   if (useISO8859)
-#if QT_VERSION < 0x060000
-      is.setCodec ("ISO 8859-1");
-#else
       is.setEncoding (QStringConverter::Latin1);
-#endif
+
   QString section = NULL;
 
   if (haveGPX)
@@ -232,7 +216,6 @@ void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeri
     QStringList lines = linesIn.split('\r');
     // workaround for empty lines
     if(lines.size() == 0) {
-      lineno++;
       continue;
     }
     for (int li = 0; li < lines.size(); ++li) {
@@ -480,8 +463,6 @@ void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeri
 	  seconds += recInterval;
 	}
       }
-
-      ++lineno;
     }
   }
 

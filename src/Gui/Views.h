@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2013 Mark Liversedge (liversedge@gmail.com)
+ * LTMSidebarView Copyright (c) 2025 Paul Johnson (paulj49457@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -20,12 +21,50 @@
 #define _GC_Views_h 1
 
 #include "AbstractView.h"
+
 class TrainSidebar;
 class AnalysisSidebar;
+class LTMSidebar;
 class IntervalSidebar;
 class QDialog;
 class RideNavigator;
 class TrainBottom;
+
+// the LTMSidebarView class manages the sharing of the Long Term Metrics (LTM) sidebar
+// between the trends and plan views, each LTMSidebar instance is shared between the
+// views for the same context/athlete.
+class LTMSidebarView : public AbstractView
+{
+    Q_OBJECT
+
+    public:
+
+        static void selectDateRange(Context *sbContext, DateRange dr);
+
+    signals:
+        void dateChanged(DateRange);
+
+    protected slots:
+
+        void justSelected();
+        void dateRangeChanged(DateRange);
+
+    protected:
+
+        LTMSidebarView(Context *context, int type, const QString& view, const QString& heading);
+        virtual ~LTMSidebarView();
+
+        void showEvent(QShowEvent*) override;
+        void hideEvent(QHideEvent*) override;
+
+        LTMSidebar* getLTMSidebar(Context *sbContext);
+        void removeLTMSidebar(Context *sbContext);
+
+    private:
+
+        // each athlete has their own LTMSidebar shared by the plan & trends views.
+        static QMap<Context*, LTMSidebar*> LTMSidebars_;
+};
 
 class AnalysisView : public AbstractView
 {
@@ -34,7 +73,7 @@ class AnalysisView : public AbstractView
     public:
 
         AnalysisView(Context *context, QStackedWidget *controls);
-        ~AnalysisView();
+        virtual ~AnalysisView();
         void close() override;
         void setRide(RideItem*ride) override;
         void addIntervals();
@@ -49,32 +88,27 @@ class AnalysisView : public AbstractView
 
     protected:
 
-        void notifyViewStateRestored() override;
         void notifyViewSidebarChanged() override;
-        void setViewSpecificPerspective() override;
+        int getViewSpecificPerspective() override;
         void notifyViewSplitterMoved() override;
 
+    private:
+
+        int findRidesPerspective(RideItem* ride);
 };
 
-class DiarySidebar;
-class DiaryView : public AbstractView
+class PlanView : public LTMSidebarView
 {
     Q_OBJECT
 
     public:
 
-        DiaryView(Context *context, QStackedWidget *controls);
-        ~DiaryView();
-        void setRide(RideItem*ride) override;
+        PlanView(Context *context, QStackedWidget *controls);
+        virtual ~PlanView();
 
     public slots:
 
         bool isBlank() override;
-        void dateRangeChanged(DateRange);
-
-    private:
-        DiarySidebar *diarySidebar;
-
 };
 
 class TrainView : public AbstractView
@@ -84,7 +118,7 @@ class TrainView : public AbstractView
     public:
 
         TrainView(Context *context, QStackedWidget *controls);
-        ~TrainView();
+        virtual ~TrainView();
         void close() override;
 
     public slots:
@@ -101,32 +135,24 @@ class TrainView : public AbstractView
         TrainSidebar *trainTool;
         TrainBottom *trainBottom;
 
-private slots:
+    private slots:
         void onAutoHideChanged(bool enabled);
 };
 
-class LTMSidebar;
-class TrendsView : public AbstractView
+class TrendsView : public LTMSidebarView
 {
     Q_OBJECT
 
     public:
 
         TrendsView(Context *context, QStackedWidget *controls);
-        ~TrendsView();
-
-        LTMSidebar *sidebar;
+        virtual ~TrendsView();
 
         int countActivities(Perspective *, DateRange dr);
-
-    signals:
-        void dateChanged(DateRange);
 
     public slots:
 
         bool isBlank() override;
-        void justSelected();
-        void dateRangeChanged(DateRange);
         void compareChanged(bool);
 };
 

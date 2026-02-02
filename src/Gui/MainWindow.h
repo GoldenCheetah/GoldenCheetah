@@ -20,6 +20,9 @@
 #ifndef _GC_MainWindow_h
 #define _GC_MainWindow_h 1
 #include "GoldenCheetah.h"
+#include "NewSideBar.h"
+
+#include <memory>
 
 #include <QDir>
 #include <QSqlDatabase>
@@ -104,6 +107,8 @@ class MainWindow : public QMainWindow
 
         bool isStarting() const;
 
+        bool filenameWillChange(RideItem *rideItem, QString *newName = nullptr) const;
+
     protected:
 
         // used by ChooseCyclistDialog to see which athletes
@@ -175,8 +180,8 @@ class MainWindow : public QMainWindow
         void switchAthleteTab(int index); // for switching between one tab and another
 
         // sidebar selecting views and actions
-        void sidebarClicked(int id);
-        void sidebarSelected(int id);
+        void sidebarClicked(GcSideBarBtnId id);
+        void sidebarSelected(GcSideBarBtnId id);
 
         // Athlete Backup
         void setBackupAthleteMenu();
@@ -192,10 +197,12 @@ class MainWindow : public QMainWindow
         // Search / Filter
         void setFilter(QStringList);
         void clearFilter();
+        void fillinFilter(const QString &filterText);
+        void fillinSearch(const QString &searchText);
 
         void selectAthlete();
         void selectTrends();
-        void selectDiary();
+        void selectPlan();
         void selectAnalysis();
         void selectTrain();
 
@@ -237,6 +244,8 @@ class MainWindow : public QMainWindow
         void manageLibrary();
         void showWorkoutWizard();
         void importWorkout();
+        void clearWorkoutFilterBox();
+        void fillinWorkoutFilterBox(const QString &filterText);
 
         // Measures
         void setMeasuresMenu();
@@ -272,8 +281,6 @@ class MainWindow : public QMainWindow
         // autoload rides from athlete specific directory (preferences)
         void ridesAutoImport();
 
-        void onEditMenuAboutToShow();
-
 #ifdef GC_HAS_CLOUD_DB
         // CloudDB actions
         void cloudDBuserEditChart();
@@ -289,6 +296,7 @@ class MainWindow : public QMainWindow
         void restoreGCState(Context *);
 
         void configChanged(qint32);
+        void onEditMenuAboutToShow();
 
     private:
 
@@ -349,8 +357,7 @@ class MainWindow : public QMainWindow
         QAction *checkAction;
 
         // Miscellany
-        QSignalMapper *toolMapper = nullptr;
-
+        std::unique_ptr<QSignalMapper> toolMapper;
 #ifdef GC_HAS_CLOUD_DB
         CloudDBVersionClient *versionClient;
         CloudDBTelemetryClient *telemetryClient;

@@ -399,6 +399,11 @@ static struct {
     { "xdataunits", 1 },  // returns a string vector of all the units in an xdata e.g. xdataunits("SESSION");
     { "xdatavalues", 1 }, // returns a vector of doubles of all vales in an xdata suitable for display in an overview tile
 
+    { "completervalues", 1 }, // get the metadata completer values for the specified field name
+
+    { "linked", 0 },      // linked() - returns a string or vector of strings for a range, can be used
+                          // when plotting on trends chart to enable click thru to activity view
+
     // add new ones above this line
     { "", -1 }
 };
@@ -751,6 +756,11 @@ DataFilter::builtins(Context *context)
 
             // heat
            returning << "normalize(min, max, v)";
+
+        } else if (i == 141) {
+
+            // linked (or vector of names)
+            returning << "linked()";
 
         } else {
 
@@ -1788,6 +1798,8 @@ void Leaf::clear(Leaf *leaf)
                            break;
     case Leaf::Float :
     case Leaf::Integer :   break;
+
+    default: break;
     }
 
 }
@@ -3108,6 +3120,14 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         }
                     }
 
+                } else if (leaf->function == "linked") {
+
+                    if (leaf->fparms.count() != 0) {
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("linked() has no parameters"));
+                    }
+
+
                 } else {
 
                     // normal parm check !
@@ -3527,7 +3547,7 @@ void DataFilter::configChanged(qint32)
                 field.name = sp.internalName((field.name));
 
                 rt.lookupMap.insert(underscored.replace(" ","_"), field.name);
-                rt.lookupType.insert(underscored.replace(" ","_"), (field.type > 2)); // true if is number
+                rt.lookupType.insert(underscored.replace(" ","_"), (field.isNumericField())); // true if is number
             }
     }
 
@@ -3582,8 +3602,8 @@ static int monthsTo(QDate from, QDate to)
 
 Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, RideItem *m, RideFilePoint *p, const QHash<QString,RideMetric*> *c, const  Specification &s, const DateRange &d)
 {
-    // if error state all bets are off
-    //if (inerror) return Result(0);
+    // Avoid crash on NULL leaf
+    if (!leaf) return Result(0);
 
     switch(leaf->type) {
 
@@ -3853,7 +3873,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             QVector<QString> list;
 
-            QRegExp symbols("^(name|start|stop|type|test|color|route|selected|date|time|filename)$");
+            QRegExp symbols("^(name|start|stop|type|test|color|route|selected|date|time|filename|linked)$");
             for(int i=0; i<leaf->fparms.count(); i++) {
 
                 // symbol dereference
@@ -3873,6 +3893,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 else if (wantname  && symbol == "route") list << tr("Route");
                 else if (wantname  && symbol == "selected") list << tr("Selected");
                 else if (wantname  && symbol == "filename") list << tr("File Name");
+                else if (wantname  && symbol == "linked") list << tr("Linked File Name");
                 else if (wantunit && symbols.exactMatch(symbol))
                     list << "";
                 else {
@@ -4952,6 +4973,25 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             return returning;
         }
 
+        if (leaf->function == "completervalues") {
+
+            // get the metadata completer values for the specified field name
+            Result returning("");
+            if (m == NULL) return Result(0.0); // no ride then no context
+
+            QString fieldName = eval(df, leaf->fparms[0],x, it, m, p, c, s, d).string();
+
+            foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
+                if (field.name == fieldName) {
+                    foreach(QString completerVal, field.values) {
+                        returning.asString() << completerVal;
+                    }
+                    return returning;
+                }
+            }
+            return returning;
+        }
+
         // normalize values to between 0 and 1
         // use when generating a heatmap in a data overview table
         // but potentially for other things in the future
@@ -5003,6 +5043,40 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     if (!spec.pass(ride)) continue; // relies upon the daterange being passed to eval...
 
                     returning.asString() << ride->fileName;
+                }
+            }
+            return returning;
+        }
+
+        if (leaf->function == "linked") {
+
+            Result returning("");
+            returning.isNumber = false;
+
+            if (m == NULL) return returning; // no ride then no context
+
+            if (d.from==QDate() && d.to==QDate()) {
+
+                // ride only
+                returning.string() = m->getLinkedFileName();
+
+            } else {
+
+                // vector for a date range
+                FilterSet fs;
+                fs.addFilter(m->context->isfiltered, m->context->filters);
+                fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
+                Specification spec;
+                spec.setFilterSet(fs);
+
+                // date range
+                spec.setDateRange(d);
+                foreach(RideItem *ride, m->context->athlete->rideCache->rides()) {
+
+                    if (!s.pass(ride)) continue; // relies upon the daterange being passed to eval...
+                    if (!spec.pass(ride)) continue; // relies upon the daterange being passed to eval...
+
+                    returning.asString() << ride->getLinkedFileName();
                 }
             }
             return returning;
@@ -5254,6 +5328,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                         if (wantstrings) asstring = ride->dateTime.time().addSecs(ii->start).toString("hh:mm:ss");
                     } else if(symbol == "filename") {
                         asstring = ride->fileName;
+                    } else if(symbol == "linked") {
+                        asstring = ride->getLinkedFileName();
                     } else if(symbol == "name") {
                         asstring = ii->name;
                     } else if(symbol == "start") {

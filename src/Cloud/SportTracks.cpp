@@ -61,9 +61,9 @@ SportTracks::~SportTracks() {
 }
 
 void
-SportTracks::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
+SportTracks::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    reply->ignoreSslErrors();
+    sslErrors(context->mainWindow, reply, errors);
 }
 
 // open by connecting and getting a basic list of folders available

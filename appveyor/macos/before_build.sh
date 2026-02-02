@@ -1,6 +1,8 @@
 #!/bin/bash
 set -ev
 
+export PATH="/usr/local/opt/python@${PYTHON_VERSION}/bin:$PATH"
+
 # Get config
 cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
 cp src/gcconfig.pri.in src/gcconfig.pri
@@ -12,8 +14,9 @@ echo QMAKE_YACC=/usr/local/opt/bison@2.7/bin/bison >> src/gcconfig.pri
 echo LIBZ_LIBS = -lz >> src/gcconfig.pri
 
 # GSL
-echo GSL_INCLUDES = /usr/local/include >> src/gcconfig.pri
-echo GSL_LIBS = -L/usr/local/lib -lgsl -lgslcblas -lm >> src/gcconfig.pri
+GSL_PATH=$(brew --prefix gsl)
+sed -i "" "s|#GSL_INCLUDES =.*|GSL_INCLUDES = ${GSL_PATH}/include|" src/gcconfig.pri
+sed -i "" "s|#GSL_LIBS =.*|GSL_LIBS = -L${GSL_PATH}/lib -lgsl -lgslcblas -lm|" src/gcconfig.pri
 
 # Define GC version string, only for tagged builds
 if [ -n "$TRAVIS_TAG" ]; then echo DEFINES += GC_VERSION=VERSION_STRING >> src/gcconfig.pri; fi
@@ -62,9 +65,7 @@ sed -i "" "s|#\(DEFINES += GC_VIDEO_QT6.*\)|\1 |" src/gcconfig.pri
 sed -i "" "s|#\(DEFINES += GC_WANT_R.*\)|\1 |" src/gcconfig.pri
 
 # Python (avoiding collision between GC Context.h and Python context.h)
-echo DEFINES += GC_WANT_PYTHON >> src/gcconfig.pri
-echo PYTHONINCLUDES = -ICore `python3.7-config --includes` >> src/gcconfig.pri
-echo PYTHONLIBS = `python3.7-config --ldflags` >> src/gcconfig.pri
+sed -i "" "s|#\(DEFINES += GC_WANT_PYTHON\)\.*|\1 |" src/gcconfig.pri
 
 # TrainerDay Query API
 echo DEFINES += GC_WANT_TRAINERDAY_API >> src/gcconfig.pri
@@ -74,10 +75,3 @@ echo DEFINES += GC_TRAINERDAY_API_PAGESIZE=25 >> src/gcconfig.pri
 echo "QMAKE_CXXFLAGS += -mmacosx-version-min=10.7 -arch x86_64" >> src/gcconfig.pri
 echo "QMAKE_CFLAGS_RELEASE += -mmacosx-version-min=10.7 -arch x86_64" >> src/gcconfig.pri
 echo "QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15" >> src/gcconfig.pri
-
-cat src/gcconfig.pri
-
-# update translations
-lupdate src/src.pro
-
-exit

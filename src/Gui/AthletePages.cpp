@@ -258,7 +258,7 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
     dob = new QDateEdit(this);
     dob->setDate(appsettings->cvalue(context->athlete->cyclist, GC_DOB).toDate());
     dob->setCalendarPopup(true);
-    dob->setDisplayFormat(locale.dateFormat(QLocale::ShortFormat));
+    dob->setDisplayFormat(locale.dateFormat(QLocale::LongFormat));
 
     sex = new QComboBox(this);
     sex->addItem(tr("Male"));
@@ -803,6 +803,10 @@ MeasuresPage::addClicked()
     } else {
         rnum = i;
         add = measuresTree->invisibleRootItem()->child(rnum);
+        if (!add) {
+            // Should not happen as rnum is verified to be in range
+            add = new QTreeWidgetItem(measuresTree->invisibleRootItem());
+        }
     }
     measures[rnum].when = dtEdit->dateTime();
     for (k = 0; k < valuesEdit.count(); ++k) {
@@ -816,11 +820,12 @@ MeasuresPage::addClicked()
 void
 MeasuresPage::deleteClicked()
 {
-    if (measuresTree->currentItem()) {
-        int index = measuresTree->invisibleRootItem()->indexOfChild(measuresTree->currentItem());
-        delete measuresTree->invisibleRootItem()->takeChild(index);
-        measures.removeAt(index);
-    }
+        QTreeWidgetItem *item = measuresTree->currentItem();
+        if (item) {
+            int index = measuresTree->invisibleRootItem()->indexOfChild(item);
+            delete measuresTree->invisibleRootItem()->takeChild(index);
+            measures.removeAt(index);
+        }
 }
 
 void
@@ -1067,9 +1072,11 @@ SchemePage::getScheme()
     // read back the details from the table
     for (int i=0; i<scheme->invisibleRootItem()->childCount(); i++) {
         schemeitem add;
-        add.name = scheme->invisibleRootItem()->child(i)->data(0, Qt::DisplayRole).toString();
-        add.desc = scheme->invisibleRootItem()->child(i)->data(1, Qt::DisplayRole).toString();
-        add.lo = scheme->invisibleRootItem()->child(i)->data(2, Qt::DisplayRole).toInt();
+        QTreeWidgetItem *item = scheme->invisibleRootItem()->child(i);
+        if (!item) continue;
+        add.name = item->data(0, Qt::DisplayRole).toString();
+        add.desc = item->data(1, Qt::DisplayRole).toString();
+        add.lo = item->data(2, Qt::DisplayRole).toInt();
         table.append(add);
     }
 
@@ -1212,7 +1219,7 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     pmaxDelegate.setShowSuffixOnEdit(true);
     pmaxDelegate.setShowSuffixOnDisplay(true);
 
-    ranges = new TreeWidget6();
+    ranges = new QTreeWidget();
     ranges->headerItem()->setText(CPPAGE_RANGES_COL_RNUM, "_rnum");
     ranges->headerItem()->setText(CPPAGE_RANGES_COL_STARTDATE, tr("Start Date"));
     ranges->headerItem()->setText(CPPAGE_RANGES_COL_CP, tr("Critical Power"));
@@ -1307,13 +1314,8 @@ void
 CPPage::initializeRanges
 (int selectIndex)
 {
-#if QT_VERSION < 0x060000
-    disconnect(ranges->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)),
-               this, SLOT(rangeChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)));
-#else
     disconnect(ranges->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QList<int>&)),
                this, SLOT(rangeChanged(const QModelIndex&, const QModelIndex&, const QList<int>&)));
-#endif
 
     ranges->blockSignals(true);
     ranges->clear();
@@ -1384,13 +1386,8 @@ CPPage::initializeRanges
 
     newZoneRequired->setVisible(needsNewRange());
 
-#if QT_VERSION < 0x060000
-    connect(ranges->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)),
-            this, SLOT(rangeChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)));
-#else
     connect(ranges->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QList<int>&)),
             this, SLOT(rangeChanged(const QModelIndex&, const QModelIndex&, const QList<int>&)));
-#endif
 }
 
 
@@ -1408,11 +1405,7 @@ CPPage::reInitializeRanges
 
 void
 CPPage::rangeChanged
-#if QT_VERSION < 0x060000
-(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
-#else
 (const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)
-#endif
 {
     Q_UNUSED(bottomRight)
 
@@ -1981,6 +1974,7 @@ CPPage::zonesChanged()
             QList<ZoneInfo> zoneinfos;
             for (int i=0; i< zones->invisibleRootItem()->childCount(); i++) {
                 QTreeWidgetItem *item = zones->invisibleRootItem()->child(i);
+                if (!item) continue;
                 zoneinfos << ZoneInfo(item->data(0, Qt::DisplayRole).toString(),
                                       item->data(1, Qt::DisplayRole).toString(),
                                       item->data(2, Qt::DisplayRole).toInt(),
@@ -2040,8 +2034,8 @@ CPPage::mkReviewRow
         grid->addWidget(estimate, row, 4);
 
         connect(
-            accept, &QCheckBox::toggled,
-            [=](bool checked) {
+            accept, &QCheckBox::toggled, this,
+            [current, estimate](bool checked) {
                 current->setEnabled(! checked);
                 estimate->setEnabled(checked);
             }
@@ -2066,8 +2060,8 @@ CPPage::connectReviewDialogApplyButton
         if (checkboxes[i] != nullptr) {
             hasChecked |= checkboxes[i]->isChecked();
             connect(
-                checkboxes[i], &QCheckBox::toggled,
-                [=](bool checked) {
+                checkboxes[i], &QCheckBox::toggled, this,
+                [checkboxes, applyButton](bool checked) {
                     bool anyChecked = checked;
                     int j = 0;
                     while (! anyChecked && j < checkboxes.size()) {
@@ -2427,10 +2421,12 @@ HrSchemePage::getScheme()
     // read back the details from the table
     for (int i=0; i<scheme->invisibleRootItem()->childCount(); i++) {
         schemeitem add;
-        add.name = scheme->invisibleRootItem()->child(i)->data(0, Qt::DisplayRole).toString();
-        add.desc = scheme->invisibleRootItem()->child(i)->data(1, Qt::DisplayRole).toString();
-        add.lo = scheme->invisibleRootItem()->child(i)->data(2, Qt::DisplayRole).toInt();
-        add.trimp = scheme->invisibleRootItem()->child(i)->data(3, Qt::DisplayRole).toDouble();
+        QTreeWidgetItem *item = scheme->invisibleRootItem()->child(i);
+        if (!item) continue;
+        add.name = item->data(0, Qt::DisplayRole).toString();
+        add.desc = item->data(1, Qt::DisplayRole).toString();
+        add.lo = item->data(2, Qt::DisplayRole).toInt();
+        add.trimp = item->data(3, Qt::DisplayRole).toDouble();
         table.append(add);
     }
 
@@ -2589,7 +2585,8 @@ LTPage::addClicked()
     if (ranges->currentItem()) {
         rnum = ranges->currentItem()->data(5, Qt::DisplayRole).toInt();
     } else if (ranges->invisibleRootItem()->childCount() > 0) {
-        rnum = ranges->invisibleRootItem()->child(0)->data(5, Qt::DisplayRole).toInt();
+        QTreeWidgetItem *item = ranges->invisibleRootItem()->child(0);
+        rnum = item ? item->data(5, Qt::DisplayRole).toInt() : -1;
     }
     if (rnum >= 0) {
         lt = hrZones->getLT(rnum);
@@ -2646,6 +2643,7 @@ LTPage::addClicked()
 
     for (int i = 0; i < ranges->invisibleRootItem()->childCount(); i++) {
         QTreeWidgetItem *item = ranges->invisibleRootItem()->child(i);
+        if (!item) continue;
         int itemRnum = item->data(5, Qt::DisplayRole).toInt();
         if (itemRnum >= rnum) {
             item->setData(5, Qt::DisplayRole, itemRnum + 1);
@@ -2679,6 +2677,7 @@ LTPage::deleteClicked()
 
         for (int i = 0; i < ranges->invisibleRootItem()->childCount(); i++) {
             QTreeWidgetItem *item = ranges->invisibleRootItem()->child(i);
+            if (!item) continue;
             int itemRnum = item->data(5, Qt::DisplayRole).toInt();
             if (itemRnum >= rnum) {
                 item->setData(5, Qt::DisplayRole, itemRnum - 1);
@@ -2868,6 +2867,7 @@ LTPage::zonesChanged()
             QList<HrZoneInfo> zoneinfos;
             for (int i=0; i< zones->invisibleRootItem()->childCount(); i++) {
                 QTreeWidgetItem *item = zones->invisibleRootItem()->child(i);
+                if (!item) continue;
                 zoneinfos << HrZoneInfo(item->data(0, Qt::DisplayRole).toString(),
                                         item->data(1, Qt::DisplayRole).toString(),
                                         item->data(2, Qt::DisplayRole).toInt(),
@@ -3070,9 +3070,11 @@ PaceSchemePage::getScheme()
     // read back the details from the table
     for (int i=0; i<scheme->invisibleRootItem()->childCount(); i++) {
         paceschemeitem add;
-        add.name = scheme->invisibleRootItem()->child(i)->data(0, Qt::DisplayRole).toString();
-        add.desc = scheme->invisibleRootItem()->child(i)->data(1, Qt::DisplayRole).toString();
-        add.lo = scheme->invisibleRootItem()->child(i)->data(2, Qt::DisplayRole).toInt();
+        QTreeWidgetItem *item = scheme->invisibleRootItem()->child(i);
+        if (!item) continue;
+        add.name = item->data(0, Qt::DisplayRole).toString();
+        add.desc = item->data(1, Qt::DisplayRole).toString();
+        add.lo = item->data(2, Qt::DisplayRole).toInt();
         table.append(add);
     }
 
@@ -3190,13 +3192,8 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     connect(defaultButton, SIGNAL(clicked()), this, SLOT(defaultClicked()));
 
     connect(ranges, SIGNAL(itemSelectionChanged()), this, SLOT(rangeSelectionChanged()));
-#if QT_VERSION < 0x060000
-    connect(ranges->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)),
-            this, SLOT(rangeChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)));
-#else
     connect(ranges->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QList<int>&)),
             this, SLOT(rangeChanged(const QModelIndex&, const QModelIndex&, const QList<int>&)));
-#endif
     connect(zones, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(zonesChanged()));
 
     if (ranges->invisibleRootItem()->childCount() > 0) {
@@ -3286,6 +3283,7 @@ CVPage::addClicked()
     int rnum = paceZones->addZoneRange(date, paceZones->kphFromTime(cv, metricPace), paceZones->kphFromTime(aet, metricPace));
     for (int i = 0; i < ranges->invisibleRootItem()->childCount(); i++) {
         QTreeWidgetItem *item = ranges->invisibleRootItem()->child(i);
+        if (!item) continue;
         int itemRnum = item->data(3, Qt::DisplayRole).toInt();
         if (itemRnum >= rnum) {
             item->setData(3, Qt::DisplayRole, itemRnum + 1);
@@ -3316,6 +3314,7 @@ CVPage::deleteClicked()
         paceZones->deleteRange(rnum);
         for (int i = 0; i < ranges->invisibleRootItem()->childCount(); ++i) {
             QTreeWidgetItem *item = ranges->invisibleRootItem()->child(i);
+            if (!item) continue;
             int itemRnum = item->data(3, Qt::DisplayRole).toInt();
             if (itemRnum >= rnum) {
                 item->setData(3, Qt::DisplayRole, itemRnum - 1);
@@ -3352,11 +3351,7 @@ CVPage::defaultClicked()
 
 void
 CVPage::rangeChanged
-#if QT_VERSION < 0x060000
-(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
-#else
 (const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)
-#endif
 {
     Q_UNUSED(bottomRight)
 
@@ -3499,6 +3494,7 @@ CVPage::zonesChanged()
             QList<PaceZoneInfo> zoneinfos;
             for (int i=0; i< zones->invisibleRootItem()->childCount(); i++) {
                 QTreeWidgetItem *item = zones->invisibleRootItem()->child(i);
+                if (!item) continue;
                 QTime time = item->data(2, Qt::DisplayRole).toTime();
                 double kph = time == QTime(0,0,0) ? 0.0 : paceZones->kphFromTime(time, metricPace);
                 zoneinfos << PaceZoneInfo(item->data(0, Qt::DisplayRole).toString(),
@@ -3622,7 +3618,8 @@ SeasonsPage::SeasonsPage(QWidget *parent, Context *context) : QWidget(parent), c
         add->setText(4, season.id().toString());
 
     }
-    seasons->setCurrentItem(seasons->invisibleRootItem()->child(0));
+    if (seasons->invisibleRootItem()->childCount() > 0)
+        seasons->setCurrentItem(seasons->invisibleRootItem()->child(0));
 
     mainLayout->addLayout(editLayout, 0,0);
     mainLayout->addWidget(addButton, 0,1, Qt::AlignTop);
@@ -3740,6 +3737,7 @@ SeasonsPage::saveClicked()
     for(int i=0; i<seasons->invisibleRootItem()->childCount(); i++) {
 
         QTreeWidgetItem *item = seasons->invisibleRootItem()->child(i);
+        if (!item) continue;
 
         array[i].setName(item->text(0));
         array[i].setType(Season::types.indexOf(item->text(1)));
@@ -3788,7 +3786,8 @@ AutoImportPage::AutoImportPage(Context *context) : context(context)
     fields->setEditTriggers(  QAbstractItemView::DoubleClicked
                             | QAbstractItemView::SelectedClicked
                             | QAbstractItemView::AnyKeyPressed);
-    fields->setCurrentItem(fields->invisibleRootItem()->child(0));
+    if (fields->invisibleRootItem()->childCount() > 0)
+        fields->setCurrentItem(fields->invisibleRootItem()->child(0));
 
     mainLayout->addWidget(fields, 0,0);
     mainLayout->addWidget(actionButtons, 1,0);
@@ -3882,8 +3881,10 @@ AutoImportPage::saveClicked()
     rules.clear();
     for(int i = 0; i < fields->invisibleRootItem()->childCount(); i++) {
         RideAutoImportRule rule;
-        rule.setDirectory(fields->invisibleRootItem()->child(i)->data(0, Qt::DisplayRole).toString());
-        rule.setImportRule(fields->invisibleRootItem()->child(i)->data(1, Qt::DisplayRole).toInt());
+        QTreeWidgetItem *item = fields->invisibleRootItem()->child(i);
+        if (!item) continue;
+        rule.setDirectory(item->data(0, Qt::DisplayRole).toString());
+        rule.setImportRule(item->data(1, Qt::DisplayRole).toInt());
         rules.append(rule);
     }
 

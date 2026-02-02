@@ -184,17 +184,11 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     wbalCurvePredict = new QwtPlotCurve("W'bal Predict");
     wbalCurvePredict->attach(this);
     wbalCurvePredict->setYAxis(QwtAxisId(QwtAxis::YRight, 3));
-    QColor predict = GColor(CWBAL).darker();
-    predict.setAlpha(200);
-    QPen wbalPen = QPen(predict, 2.0); // predict darker...
-    wbalCurvePredict->setPen(wbalPen);
     wbalCurvePredict->setVisible(true);
 
     wbalCurve = new QwtPlotCurve("W'bal Actual");
     wbalCurve->attach(this);
     wbalCurve->setYAxis(QwtAxisId(QwtAxis::YRight, 3));
-    QPen wbalPenA = QPen(GColor(CWBAL), 1.0); // actual lighter
-    wbalCurve->setPen(wbalPenA);
     wbalData = new CurveData;
     wbalCurve->setSamples(wbalData->x(), wbalData->y(), wbalData->count());
 
@@ -215,8 +209,6 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 
     // telemetry history
     wattsCurve = new QwtPlotCurve("Power");
-    QPen wattspen = QPen(GColor(CPOWER));
-    wattsCurve->setPen(wattspen);
     wattsCurve->attach(this);
     wattsCurve->setYAxis(QwtAxis::YLeft);
     // dgr wattsCurve->setPaintAttribute(QwtPlotCurve::PaintFiltered);
@@ -225,8 +217,6 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 
     // telemetry history
     hrCurve = new QwtPlotCurve("Heartrate");
-    QPen hrpen = QPen(GColor(CHEARTRATE));
-    hrCurve->setPen(hrpen);
     hrCurve->attach(this);
     hrCurve->setYAxis(QwtAxis::YRight);
     hrData = new CurveData;
@@ -234,8 +224,6 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 
     // telemetry history
     cadCurve = new QwtPlotCurve("Cadence");
-    QPen cadpen = QPen(GColor(CCADENCE));
-    cadCurve->setPen(cadpen);
     cadCurve->attach(this);
     cadCurve->setYAxis(QwtAxis::YRight);
     cadData = new CurveData;
@@ -243,8 +231,6 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 
     // telemetry history
     speedCurve = new QwtPlotCurve("Speed");
-    QPen speedpen = QPen(GColor(CSPEED));
-    speedCurve->setPen(speedpen);
     speedCurve->attach(this);
     speedCurve->setYAxis(QwtAxisId(QwtAxis::YRight,2).id);
     speedData = new CurveData;
@@ -322,7 +308,7 @@ ErgFilePlot::configChanged(qint32)
         CPMarker->show();
     } else CPMarker->hide();
 
-    replot();
+    updateCurves();
 }
 
 
@@ -655,10 +641,75 @@ ErgFilePlot::eventFilter
 (QObject *obj, QEvent *event)
 {
     if (obj == canvas() && event->type() == QEvent::Leave) {
-        highlightSectionCurve(nullptr);
+        if (! workoutActive) {
+            highlightSectionCurve(nullptr);
+        }
         tooltip->setText("");
     }
     return false;
+}
+
+
+void
+ErgFilePlot::setPlotLineWidth
+(double width)
+{
+    _plotLineWidth = width;
+    updateCurves();
+}
+
+
+void
+ErgFilePlot::showWbalCurvePredict
+(bool showCurve)
+{
+    _showWbalCurvePredict = showCurve;
+    updateCurves();
+}
+
+
+void
+ErgFilePlot::showWbalCurve
+(bool showCurve)
+{
+    _showWbalCurve = showCurve;
+    updateCurves();
+}
+
+
+void
+ErgFilePlot::showWattsCurve
+(bool showCurve)
+{
+    _showWattsCurve = showCurve;
+    updateCurves();
+}
+
+
+void
+ErgFilePlot::showHrCurve
+(bool showCurve)
+{
+    _showHrCurve = showCurve;
+    updateCurves();
+}
+
+
+void
+ErgFilePlot::showCadCurve
+(bool showCurve)
+{
+    _showCadCurve = showCurve;
+    updateCurves();
+}
+
+
+void
+ErgFilePlot::showSpeedCurve
+(bool showCurve)
+{
+    _showSpeedCurve = showCurve;
+    updateCurves();
 }
 
 
@@ -693,6 +744,15 @@ ErgFilePlot::setShowTooltip
 {
     _showTooltip = index;
     selectTooltip();
+}
+
+
+void
+ErgFilePlot::setActiveCurveAlpha
+(int alpha)
+{
+    _activeCurveAlpha = alpha;
+    updateSectionCurveAlpha();
 }
 
 
@@ -895,6 +955,7 @@ ErgFilePlot::startWorkout
 ()
 {
     workoutActive = true;
+    updateSectionCurveAlpha();
     selectTooltip();
     selectCurves();
 }
@@ -905,6 +966,7 @@ ErgFilePlot::stopWorkout
 ()
 {
     workoutActive = false;
+    updateSectionCurveAlpha();
     selectCurves();
     selectTooltip();
 }
@@ -918,16 +980,54 @@ ErgFilePlot::selectCurves
                        && ! bydist
                        && (   _showColorZones == 1
                            || (_showColorZones == 2 && ! workoutActive));
-    if (showColored) {
-        LodCurve->hide();
-        for (int i = 0; i < powerSectionCurves.size(); ++i) {
-            powerSectionCurves[i]->show();
-        }
-    } else {
-        LodCurve->show();
-        for (int i = 0; i < powerSectionCurves.size(); ++i) {
-            powerSectionCurves[i]->hide();
-        }
+    LodCurve->setVisible(! showColored);
+    for (int i = 0; i < powerSectionCurves.size(); ++i) {
+        powerSectionCurves[i]->setVisible(showColored);
+    }
+    replot();
+}
+
+
+void
+ErgFilePlot::updateCurves
+()
+{
+    bool antialias = appsettings->value(this, GC_ANTIALIAS, true).toBool();
+    LodCurve->setRenderHint(QwtPlotItem::RenderAntialiased, antialias);
+    QColor predict = GColor(CWBAL).darker();
+    predict.setAlpha(200);
+    wbalCurvePredict->setPen(QPen(predict, _plotLineWidth));
+    wbalCurvePredict->setRenderHint(QwtPlotItem::RenderAntialiased, antialias);
+    wbalCurvePredict->setVisible(_showWbalCurvePredict && ergFile && ergFile->hasWatts());
+    wbalCurve->setPen(QPen(GColor(CWBAL), _plotLineWidth));
+    wbalCurve->setRenderHint(QwtPlotItem::RenderAntialiased, antialias);
+    wbalCurve->setVisible(_showWbalCurve);
+    wattsCurve->setPen(QPen(GColor(CPOWER), _plotLineWidth));
+    wattsCurve->setRenderHint(QwtPlotItem::RenderAntialiased, antialias);
+    wattsCurve->setVisible(_showWattsCurve);
+    hrCurve->setPen(QPen(GColor(CHEARTRATE), _plotLineWidth));
+    hrCurve->setRenderHint(QwtPlotItem::RenderAntialiased, antialias);
+    hrCurve->setVisible(_showHrCurve);
+    cadCurve->setPen(QPen(GColor(CCADENCE), _plotLineWidth));
+    cadCurve->setRenderHint(QwtPlotItem::RenderAntialiased, antialias);
+    cadCurve->setVisible(_showCadCurve);
+    speedCurve->setPen(QPen(GColor(CSPEED), _plotLineWidth));
+    speedCurve->setRenderHint(QwtPlotItem::RenderAntialiased, antialias);
+    speedCurve->setVisible(_showSpeedCurve);
+    replot();
+}
+
+
+void
+ErgFilePlot::updateSectionCurveAlpha
+()
+{
+    for (QwtPlotCurve*& curve : powerSectionCurves) {
+        QBrush brush = curve->brush();
+        QColor color = brush.color();
+        color.setAlpha(workoutActive ? _activeCurveAlpha : sectionAlphaNeutral);
+        brush.setColor(color);
+        curve->setBrush(brush);
     }
     replot();
 }
@@ -1028,7 +1128,7 @@ ErgFilePlot::updateWBalCurvePredict
 
         // and the values ... but avoid sharing!
         wbalCurvePredict->setSamples(calculator.xdata(false), calculator.ydata());
-        wbalCurvePredict->setVisible(true);
+        wbalCurvePredict->setVisible(_showWbalCurvePredict);
     } else {
         wbalCurvePredict->setVisible(false);
     }
@@ -1045,13 +1145,14 @@ ErgFilePlot::createSectionCurve
         }
         powerSectionCurves.clear();
         QList<ErgFileZoneSection> zoneSections = ergFile->ZoneSections();
-        bool antiAlias = appsettings->value(this, GC_ANTIALIAS, false).toBool();
+        bool antialias = appsettings->value(this, GC_ANTIALIAS, true).toBool();
+        int alpha = workoutActive ? _activeCurveAlpha : sectionAlphaNeutral;
         for (int i = 0; i < zoneSections.length(); ++i) {
             QVector<QPointF> sectionData;
             sectionData << QPointF(zoneSections[i].start, zoneSections[i].startValue)
                         << QPointF(zoneSections[i].end, zoneSections[i].endValue);
             QColor color = QColor(zoneColor(zoneSections[i].zone, 0));
-            color.setAlpha(sectionAlphaNeutral);
+            color.setAlpha(alpha);
             QwtPlotCurve *sectionCurve = new QwtPlotCurve("Course Load");
             sectionCurve->setSamples(sectionData);
             sectionCurve->setBaseline(-1000);
@@ -1059,7 +1160,7 @@ ErgFilePlot::createSectionCurve
             sectionCurve->setZ(-100);
             sectionCurve->setPen(QColor(0, 0, 0, 0));
             sectionCurve->setBrush(color);
-            sectionCurve->setRenderHint(QwtPlotItem::RenderAntialiased, antiAlias);
+            sectionCurve->setRenderHint(QwtPlotItem::RenderAntialiased, antialias);
             sectionCurve->attach(this);
             sectionCurve->hide();
             powerSectionCurves.append(sectionCurve);

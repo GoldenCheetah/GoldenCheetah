@@ -31,6 +31,11 @@
 #include <errno.h>
 #include <QtGui>
 
+#ifdef Q_CC_MSVC
+// 'strerror': This function or variable may be unsafe.
+#pragma warning(disable:4996)
+#endif
+
 DownloadRideDialog::DownloadRideDialog(Context *context, bool embedded) :
     context(context), cancelled(false),
     action(actionIdle), embedded(embedded)
@@ -378,8 +383,8 @@ DownloadRideDialog::downloadClicked()
                         "been downloaded.  Do you want to overwrite the "
                         "previous download?")
                         .arg(files.at(i).startTime.toString()),
-                    tr("&Overwrite"), tr("&Skip"),
-                    QString(), 1, 1) == 1) {
+                    QMessageBox::Yes | QMessageBox::No,
+                    QMessageBox::No) == QMessageBox::Yes) {
                 QFile::remove(files.at(i).name);
                 updateStatus(tr("skipped file %1")
                     .arg( files.at(i).name ));

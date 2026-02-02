@@ -706,7 +706,6 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
     int retCode = 0;
     pvars.lock();
     int mode = this->mode;
-    double gradient = this->gradient;
     double load = this->load;
     double weight = this->weight;
     double brakeCalibrationForce_N = this->brakeCalibrationForce_N;

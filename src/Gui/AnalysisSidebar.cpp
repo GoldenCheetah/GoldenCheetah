@@ -39,6 +39,12 @@
 // the ride cache
 #include "RideCache.h"
 
+// Show in Train Mode
+#include "WorkoutFilter.h"
+
+// Filter for similar activities
+#include "FilterSimilarDialog.h"
+
 AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow), context(context)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -145,6 +151,21 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     splitter->addWidget(activityItem);
     splitter->addWidget(intervalItem);
 
+    // create the ride navs display filter
+    activityFilter = new QComboBox(this);
+    activityFilter->addItem(tr("All"), static_cast<int>(RideNavFilter::ALL));
+    activityFilter->addItem(tr("Actual"), static_cast<int>(RideNavFilter::COMPLETED));
+    activityFilter->addItem(tr("Planned"), static_cast<int>(RideNavFilter::PLANNED));
+    int index = appsettings->cvalue(context->athlete->cyclist, GC_NAVDISPLAYFILTER, "0").toInt();
+    activityFilter->setCurrentIndex(index);
+    setDisplayFilter(index);
+
+    // add ride navs display filter to splitter's banner
+    QHBoxLayout* splitterBanner = activityItem->splitterHandle->getTitleLayout();
+    splitterBanner->insertStretch(2);
+    splitterBanner->insertWidget(2, activityFilter);
+    splitterBanner->insertStretch(2);
+
     splitter->prepare(context->athlete->cyclist, "analysis");
 
     // GC signal
@@ -158,9 +179,17 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     connect(intervalTree,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), this, SLOT(clickZoomInterval(QTreeWidgetItem*)));
     connect(intervalTree,SIGNAL(itemSelectionChanged()), this, SLOT(itemSelectionChanged()));
 
+    connect(activityFilter, &QComboBox::currentIndexChanged, this, &AnalysisSidebar::setDisplayFilter);
     connect (context, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
 
     configChanged(CONFIG_APPEARANCE);
+}
+
+void
+AnalysisSidebar::setDisplayFilter(int index)
+{
+    appsettings->setCValue(context->athlete->cyclist, GC_NAVDISPLAYFILTER, index);
+    rideNavigator->setDisplayFilter(static_cast<RideNavFilter>(index));
 }
 
 void
@@ -326,6 +355,15 @@ AnalysisSidebar::configChanged(qint32)
     //intervalSummaryWindow->setStyleSheet(GCColor::stylesheet());
 
     splitter->setPalette(GCColor::palette());
+
+    // mimic the perspective selector colors for the activity filter
+    QColor selected;
+    if (GCColor::invertColor(GColor(CTOOLBAR)) == Qt::white) selected = QColor(Qt::lightGray);
+    else selected = QColor(Qt::darkGray);
+    activityFilter->setStyleSheet(
+        QString("QComboBox { background: %1; color: %2; border: 1px solid rgba(127,127,127,127); border-radius: 3; }")
+                .arg(GColor(CTOOLBAR).name()).arg(selected.name()));
+
     activityHistory->setStyleSheet(QString("background: %1;").arg(GColor(CPLOTBACKGROUND).name()));
     rideNavigator->tableView->viewport()->setPalette(GCColor::palette());
     rideNavigator->tableView->viewport()->setStyleSheet(QString("background: %1;").arg(GColor(CPLOTBACKGROUND).name()));
@@ -408,6 +446,30 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
         QAction *actFindBest = new QAction(tr("Find Intervals..."), intervalItem);
         connect(actFindBest, SIGNAL(triggered(void)), this, SLOT(addIntervals(void)));
         menu.addAction(actFindBest);
+
+        QAction *filterSimilar = new QAction(tr("Filter similar activities..."), rideNavigator);
+        connect(filterSimilar, &QAction::triggered, this, [this]() {
+            if (context->ride != nullptr) {
+                FilterSimilarDialog dlg(context, context->ride, this);
+                dlg.exec();
+            }
+        });
+        menu.addAction(filterSimilar);
+
+
+        if (rideItem->planned && rideItem->sport == "Bike") {
+            QString filter = buildWorkoutFilter(rideItem);
+            if (! filter.isEmpty()) {
+                QAction *actStartWorkout = new QAction(tr("Show in Train Mode..."), rideNavigator);
+                connect(actStartWorkout, &QAction::triggered, this, [this, filter]() {
+                    context->mainWindow->fillinWorkoutFilterBox(filter);
+                    context->mainWindow->selectTrain();
+                    context->notifySelectWorkout(0);
+                });
+                menu.addAction(actStartWorkout);
+            }
+        }
+
         menu.addSeparator();
 
         // ride navigator stuff
@@ -1064,5 +1126,3 @@ AnalysisSidebar::backInterval()
 
 #endif
 }
-
-

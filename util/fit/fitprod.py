@@ -23,7 +23,7 @@ for line in lines:
     match = re.search("FIT_GARMIN_PROD", line)
     if match:
         name = re.search("(FIT_GARMIN_PRODUCT_)([^ \t]*)", line)
-        id = re.search("\(FIT_GARMIN_PRODUCT\)([ 0-9]*)", line)
+        id = re.search(r"\(FIT_GARMIN_PRODUCT, ([ 0-9]*)", line)
         if name and id:
             # extract name
             print(pre+ '{ "manu":1, "prod":' + id.group(1).strip() + ', "name":"' +  name.group(2).strip().replace('_',' ').title() + '" }', end="")
@@ -36,7 +36,7 @@ print("\n    ],\n")
 print('    "MANUFACTURERS":[')
 pre="        "
 for line in lines:
-    match = re.search("FIT_MANUFACTURER_([^ \t]*).*\(\(FIT_MANUFACTURER\)([ 0-9]*)", line)
+    match = re.search(r"MANUFACTURER_([^ \t]*).*\(FIT_MANUFACTURER, ([ 0-9]*)", line)
     if match:
         print(pre+ '{ "manu":' + match.group(2).strip() + ', "name":"' +  match.group(1).strip().replace('_',' ').title() + '" }', end="")
         pre=",\n        "
@@ -54,12 +54,12 @@ for line in fieldlines:
 #
 # Message number description
 #
-# // #define FIT_MESG_NUM_HR_ZONE                                                     ((FIT_MESG_NUM)8)
+# // #define FIT_MESG_NUM_HR_ZONE                                                     (FIT_CAST(FIT_MESG_NUM, 8))
 
 print('    "MESSAGES":[')
 pre="        "
 for line in lines:
-    match = re.search("FIT_MESG_NUM_([^ \t]*).*\(\(FIT_MESG_NUM\)([ 0-9]*)", line)
+    match = re.search(r"FIT_MESG_NUM_([^ \t]*).*\(FIT_MESG_NUM, ([ 0-9]*)", line)
     if match:
         num = int(match.group(2).strip())
         if num > 0:

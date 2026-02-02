@@ -30,7 +30,7 @@ void Kmeans::free() {
 
 
 
-void Kmeans::initialize(Dataset const *aX, unsigned short aK, unsigned short *initialAssignment, int aNumThreads) {
+void Kmeans::initialize(Dataset const *aX, unsigned short aK, unsigned short *initialAssignment, [[maybe_unused]] int aNumThreads) {
     free();
 
     converged = false;
@@ -82,7 +82,7 @@ struct ThreadInfo {
 };
 #endif
 
-void *Kmeans::runner(void *args) {
+void *Kmeans::runner([[maybe_unused]] void *args) {
     #ifdef USE_THREADS
     ThreadInfo *ti = (ThreadInfo *)args;
     ti->numIterations = ti->km->runThread(ti->threadId, ti->maxIterations);
@@ -125,7 +125,7 @@ double Kmeans::getSSE() const {
     return sse;
 }
 
-void Kmeans::verifyAssignment(int iteration, int startNdx, int endNdx) const {
+void Kmeans::verifyAssignment([[maybe_unused]] int iteration, [[maybe_unused]] int startNdx, [[maybe_unused]] int endNdx) const {
     #ifdef VERIFY_ASSIGNMENTS
     for (int i = startNdx; i < endNdx; ++i) {
         // keep track of the squared distance and identity of the closest-seen

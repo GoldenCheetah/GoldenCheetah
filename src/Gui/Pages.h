@@ -49,6 +49,7 @@
 #include "RideAutoImportConfig.h"
 #include "RemoteControl.h"
 #include "Measures.h"
+#include "MetricSelect.h"
 #include "TagStore.h"
 #include "ActionButtonBox.h"
 #include "StyledItemDelegates.h"
@@ -98,6 +99,7 @@ class GeneralPage : public QWidget
         Context *context;
 
         QComboBox *langCombo;
+        QComboBox* startupView;
         QComboBox *wbalForm;
         QCheckBox *garminSmartRecord;
         QCheckBox *warnOnExit;
@@ -373,25 +375,11 @@ class FavouriteMetricsPage : public QWidget
         FavouriteMetricsPage(QWidget *parent = NULL);
 
     public slots:
-        void upClicked();
-        void downClicked();
-        void leftClicked();
-        void rightClicked();
-        void availChanged();
-        void selectedChanged();
         qint32 saveClicked();
 
     protected:
-        bool changed;
-        QListWidget *availList;
-        QListWidget *selectedList;
-#ifndef Q_OS_MAC
-        QToolButton *leftButton;
-        QToolButton *rightButton;
-#else
-        QPushButton *leftButton;
-        QPushButton *rightButton;
-#endif
+        bool changed = false;
+        MultiMetricSelector *multiMetricSelector;
 };
 
 class KeywordsPage : public QWidget
@@ -421,6 +409,40 @@ class KeywordsPage : public QWidget
         ListEditDelegate relatedDelegate;
 
         MetadataPage *parent;
+};
+
+class IconsPage : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        IconsPage(const QList<FieldDefinition> &fieldDefinitions, QWidget *parent = nullptr);
+        qint32 saveClicked();
+
+    public slots:
+
+    protected:
+        bool eventFilter(QObject *watched, QEvent *event) override;
+
+    private:
+        QList<FieldDefinition> fieldDefinitions;
+        QTreeWidget *sportTree;
+        QListWidget *iconList;
+        QLabel *trash;
+        QIcon trashIcon;
+        QPoint sportTreeDragStartPos;
+        bool sportTreeDragWatch = false;
+        QPoint iconListDragStartPos;
+        bool iconListDragWatch = false;
+
+        bool eventFilterTrash(QEvent *event);
+        bool eventFilterSportTree(QEvent *event);
+        bool eventFilterSportTreeViewport(QEvent *event);
+        bool eventFilterIconList(QEvent *event);
+        bool eventFilterIconListViewport(QEvent *event);
+
+        void initSportTree();
+        void updateIconList();
 };
 
 class ColorsPage : public QWidget
@@ -594,6 +616,7 @@ class MetadataPage : public QWidget
 
         QTabWidget *tabs;
         KeywordsPage *keywordsPage;
+        IconsPage *iconsPage;
         FieldsPage *fieldsPage;
         DefaultsPage *defaultsPage;
         ProcessorPage *processorPage;

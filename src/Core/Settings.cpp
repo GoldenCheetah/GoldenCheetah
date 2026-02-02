@@ -684,7 +684,7 @@ GSettings::upgradeAthlete(QString athlete) {
     migrateCValue(athlete, GC_BLANK_ANALYSIS);
     migrateCValue(athlete, GC_BLANK_TRAIN);
     migrateCValue(athlete, GC_BLANK_HOME);
-    migrateCValue(athlete, GC_BLANK_DIARY);
+    migrateCValue(athlete, GC_BLANK_PLAN);
     migrateCValue(athlete, GC_NICKNAME);
     migrateCValue(athlete, GC_DOB);
     migrateCValue(athlete, GC_WEIGHT);
@@ -701,7 +701,6 @@ GSettings::upgradeAthlete(QString athlete) {
     migrateCValue(athlete, GC_NAVGROUPBY);
     migrateCValue(athlete, GC_SORTBY);
     migrateCValue(athlete, GC_WEBCAL_URL);
-    migrateCValue(athlete, GC_DIARY_VIEW);
     migrateCValue(athlete, GC_USE_CP_FOR_FTP);
 
     migrateAndRenameCValue(athlete, "bavigator/headingwidths", GC_NAVHEADINGWIDTHS);
@@ -721,8 +720,6 @@ GSettings::upgradeAthlete(QString athlete) {
     // --- private --- //
     migrateCValue(athlete, GC_RWGPSUSER);
     migrateCValue(athlete, GC_RWGPSPASS);
-    migrateCValue(athlete, GC_VELOHEROUSER);
-    migrateCValue(athlete, GC_VELOHEROPASS);
     migrateCValue(athlete, GC_WIURL);
     migrateCValue(athlete, GC_WIUSER);
     migrateCValue(athlete, GC_WIKEY);
@@ -869,6 +866,7 @@ breakout:
     returning.head = false;
     returning.sideanalysis = false;
     returning.sidetrend = false;
+    returning.sideplan = false;
     returning.sidetrain = true;
 
     // linewidth must be wholly divisible by 0.5

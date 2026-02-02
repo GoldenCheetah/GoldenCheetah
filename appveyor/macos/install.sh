@@ -44,30 +44,13 @@ if [ -z "$(ls -A D2XX)" ]; then
 fi
 sudo cp D2XX/libftd2xx.1.4.24.dylib /usr/local/lib
 
-# Python 3.7.8
-curl -O https://www.python.org/ftp/python/3.7.9/python-3.7.9-macosx10.9.pkg
-sudo installer -pkg python-3.7.9-macosx10.9.pkg -target /
-
-python3.7 --version
-python3.7-config --prefix
-
-# Python mandatory packages - refresh cache if folder is empty
-if [ -z "$(ls -A site-packages)" ]; then
-    mkdir -p site-packages
-    python3.7 -m pip install -q -r src/Python/requirements.txt -t site-packages
-fi
-
-# Python SIP
-if [ -z "$(ls -A sip-4.19.8)" ]; then
-    curl -k -L -O https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.tar.gz
-    tar xf sip-4.19.8.tar.gz
-    cd sip-4.19.8
-    python3.7 configure.py
-    make -j2
-    cd ..
-fi
-cd sip-4.19.8
-sudo make install
-cd ..
+# Python ${PYTHON_VERSION} for embedding (system Python is too old for sip-tools)
+brew install python@${PYTHON_VERSION}
+export PATH="/usr/local/opt/python@${PYTHON_VERSION}/bin:$PATH"
+python3 --version
+# Upgrade pip to ensure you have the latest version
+python3 -m pip install --upgrade pip
+# Install your project's dependencies from a requirements.txt file
+python3 -m pip install -r src/Python/requirements.txt
 
 exit

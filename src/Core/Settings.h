@@ -164,6 +164,7 @@
 #define GC_TELEMETRY_UPDATE_COUNTER     "<global-general>telemetryUpdateCounter"
 #define GC_LAST_VERSION_CHECKED         "<global-general>lastVersionChecked"
 #define GC_LAST_VERSION_CHECK_DATE      "<global-general>lastVersionCheckDate"
+#define GC_STARTUP_VIEW                 "<global-general>startupView"
 
 
 
@@ -267,7 +268,7 @@
 #define GC_BLANK_ANALYSIS               "<athlete-layout>blank/analysis"
 #define GC_BLANK_TRAIN                  "<athlete-layout>blank/train"
 #define GC_BLANK_HOME                   "<athlete-layout>blank/home"
-#define GC_BLANK_DIARY                  "<athlete-layout>blank/diary"
+#define GC_BLANK_PLAN                   "<athlete-layout>blank/plan"
 #define GC_SETTINGS_SPLITTER_SIZES      "<athlete-layout>mainwindow/splitterSizes"
 
 
@@ -281,8 +282,8 @@
 #define GC_AVATAR                       "<athlete-preferences>avatar"
 #define GC_DISCOVERY                    "<athlete-preferences>intervals/discovery"   // intervals to discover
 #define GC_SB_TODAY                     "<athlete-preferences>PMshowSBtoday"
-#define GC_LTS_DAYS                             "<athlete-preferences>LTSdays"
-#define GC_STS_DAYS                             "<athlete-preferences>STSdays"
+#define GC_LTS_DAYS                     "<athlete-preferences>LTSdays"
+#define GC_STS_DAYS                     "<athlete-preferences>STSdays"
 #define GC_CRANKLENGTH                  "<athlete-preferences>crankLength"
 #define GC_WHEELSIZE                    "<athlete-preferences>wheelsize"
 #define GC_USE_CP_FOR_FTP               "<athlete-preferences>cp/useforftp"                       // use CP for FTP
@@ -302,10 +303,10 @@
 #define GC_NAVGROUPBY                   "<athlete-preferences>navigator/groupby"
 #define GC_SORTBY                       "<athlete-preferences>navigator/sortby"
 #define GC_SORTBYORDER                  "<athlete-preferences>navigator/sortbyorder"
+#define GC_NAVDISPLAYFILTER             "<athlete-preferences>navigator/displayfilter"
+
 // Calendar sync
 #define GC_WEBCAL_URL                   "<athlete-preferences>webcal_url"
-// Default view on Diary
-#define GC_DIARY_VIEW                   "<athlete-preferences>diaryview"
 
 // OSM Tileserver
 #define GC_OSM_TS_DEFAULT               "<athlete-preferences>osmts/default"
@@ -356,8 +357,6 @@
 #define GC_RWGPS_AUTH_TOKEN             "<athlete-private>rwgps/auth_token"
 #define GC_TTBUSER                      "<athlete-private>ttb/user"
 #define GC_TTBPASS                      "<athlete-private>ttb/pass"
-#define GC_VELOHEROUSER                 "<athlete-private>velohero/user"
-#define GC_VELOHEROPASS                 "<athlete-private>velohero/pass"
 #define GC_SPORTPLUSHEALTHUSER          "<athlete-private>sph/user"
 #define GC_SPORTPLUSHEALTHPASS          "<athlete-private>sph/pass"
 #define GC_SELUSER                      "<athlete-private>sel/user"
@@ -472,6 +471,7 @@ typedef struct {
     int sidebarwidth; // width of sidebars in pixels
     bool sideanalysis;
     bool sidetrend;
+    bool sideplan;
     bool sidetrain;
     double linewidth; // default line width
 

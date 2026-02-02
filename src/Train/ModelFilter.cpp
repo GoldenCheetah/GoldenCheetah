@@ -86,7 +86,7 @@ bool
 ModelNumberRangeFilter::accept
 (const QVariant &data) const
 {
-    if (! data.canConvert(supportedType())) {
+    if (! data.canConvert(QMetaType(supportedType()))) {
         return false;
     }
     bool ok = false;
@@ -148,7 +148,7 @@ bool
 ModelFloatRangeFilter::accept
 (const QVariant &data) const
 {
-    if (! data.canConvert(supportedType())) {
+    if (! data.canConvert(QMetaType(supportedType()))) {
         return false;
     }
     bool ok = false;
@@ -210,12 +210,12 @@ bool
 ModelStringContainsFilter::accept
 (const QVariant &data) const
 {
-    if (! data.canConvert(supportedType())) {
+    if (! data.canConvert(QMetaType(supportedType()))) {
         return false;
     }
     bool contains = _all;
     QString dataValue = data.toString();
-    for (const auto &item : qAsConst(_values)) {
+    for (const auto &item : std::as_const(_values)) {
         if (_all) {
             contains &= dataValue.contains(item, Qt::CaseInsensitive);
         } else if (dataValue.contains(item, Qt::CaseInsensitive)) {

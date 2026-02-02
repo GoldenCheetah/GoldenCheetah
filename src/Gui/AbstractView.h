@@ -58,15 +58,9 @@ class AbstractView : public QWidget
         virtual ~AbstractView();
         virtual void close() {};
 
-        // add the widgets to the view
-        void setSidebar(QWidget *sidebar);
+        // get the view's widgets
         QWidget *sidebar() { return sidebar_; }
-        void setPages(QStackedWidget *pages);
         Perspective *page() { return perspective_;}
-        void setBlank(BlankStatePage *blank);
-        BlankStatePage *blank() { return blank_; }
-        void setBottom(QWidget *bottom);
-        QWidget *bottom() { return bottom_; }
 
         // sidebar
         static QString ourStyleSheet();
@@ -149,10 +143,10 @@ class AbstractView : public QWidget
     protected:
 
         Context *context;
-        const int type; // used by windowregistry; e.g VIEW_TRAIN VIEW_ANALYSIS VIEW_DIARY VIEW_TRENDS
+        const int type; // used by windowregistry; e.g VIEW_TRAIN VIEW_ANALYSIS VIEW_PLAN VIEW_TRENDS
                         // we don't care what values are pass through to the GcWindowRegistry to decide
                         // what charts are relevant for this view.
-        const QString view; // type of view:  "train", "analysis", "diary", "home"
+        const QString view; // type of view:  "train", "analysis", "plan", "home"
         QString viewCfgPath; // directory path to the view's configuration
 
         // properties
@@ -184,12 +178,20 @@ class AbstractView : public QWidget
 
         bool loaded;
 
+        // add the widgets to the view
+        void setSidebar(QWidget *sidebar);
+        void setPages(QStackedWidget *pages);
+        void setBlank(BlankStatePage *blank);
+        BlankStatePage *blank() { return blank_; }
+        void setBottom(QWidget *bottom);
+        QWidget *bottom() { return bottom_; }
+
         // Support view specific behaviour
-        virtual void notifyViewStateRestored() {}
+        virtual void notifyViewStateRestored();
         virtual void notifyViewPerspectiveAdded(Perspective* page);
         virtual void notifyViewSidebarChanged() {}
-        virtual void setViewSpecificPerspective() {};
-        virtual void notifyViewSplitterMoved() {};
+        virtual int getViewSpecificPerspective() { return 0; }
+        virtual void notifyViewSplitterMoved() {}
 
     private slots:
         void onIdle();
@@ -218,7 +220,7 @@ protected:
     Context *context;
     GcChartWindow *chart;
     Perspective *page; // current
-    int type; // what type of view is this VIEW_{HOME,ANALYSIS,DIARY,TRAIN}
+    int type; // what type of view is this VIEW_{HOME,ANALYSIS,PLAN,TRAIN}
     bool useDefault; // force a reset by using the default layouts
 
 };

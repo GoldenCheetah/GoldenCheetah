@@ -47,9 +47,6 @@ class Result {
         Result (double value) : isNumber(true), string_(""), number_(value) {}
         Result (QVector<double>x) : isNumber(true), string_(""), number_(0), vector(x) { foreach(double n, x) number_ += n; }
         Result (QString value) : isNumber(false), string_(value), number_(0.0f) {}
-#if QT_VERSION < 0x060000
-        Result (QVector<QString> &list) : isNumber(false), string_(""), number_(0.0f), strings(list) {}
-#endif
         Result (QStringList &list) : isNumber(false), string_(""), number_(0.0f) { foreach (QString string, list) strings<<string; }
         Result () : isNumber(true), string_(""), number_(0) {}
 

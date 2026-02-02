@@ -24,6 +24,7 @@
 #include <QByteArray>
 #include <QDir>
 #include <QSvgRenderer>
+#include <cmath>
 #include "Settings.h"
 
 #ifdef Q_OS_WIN
@@ -86,11 +87,7 @@ unsigned long Colors::fingerprint(const Colors *set)
         ba.append(set->color.name().toUtf8());
         set++;
     }
-#if QT_VERSION < 0x060000
-    return qChecksum(ba, ba.length());
-#else
     return qChecksum(ba);
-#endif
 }
 
 #ifdef Q_OS_WIN
@@ -183,11 +180,11 @@ void GCColor::setupColors()
         { tr("Data"), tr("HR Zone 10 Shading"), "HRCOLORZONE10", Qt::gray },
         { tr("Data"), tr("Aerolab Vrtual Elevation"), "COLORAEROVE", Qt::blue },
         { tr("Data"), tr("Aerolab Elevation"), "COLORAEROEL", Qt::green },
-        { tr("Gui"), tr("Calendar background"), "CCALCELL", Qt::white },
-        { tr("Gui"), tr("Calendar heading"), "CCALHEAD", QColor(230,230,230) },
+        { tr("Gui"), tr("Calendar Phase"), "CCALPHASE", QColor(153,151,234) },
+        { tr("Gui"), tr("Calendar Event"), "CCALEVENT", QColor(225,141,158) },
         { tr("Gui"), tr("Calendar Current Selection"), "CCALCURRENT", QColor(255,213,0) },
         { tr("Gui"), tr("Calendar Actual Workout"), "CCALACTUAL", Qt::green },
-        { tr("Gui"), tr("Calendar Planned Workout"), "CCALPLANNED", Qt::yellow },
+        { tr("Gui"), tr("Calendar Planned Workout"), "CCALPLANNED", QColor(247,145,48) },
         { tr("Gui"), tr("Calendar Today"), "CCALTODAY", Qt::cyan },
         { tr("Gui"), tr("Pop Up Windows Background"), "CPOPUP", Qt::lightGray },
         { tr("Gui"), tr("Pop Up Windows Foreground"), "CPOPUPTEXT", Qt::white },
@@ -320,11 +317,11 @@ void GCColor::setupColors()
     LightDefaultColorList[65].color = QColor(160,160,164); // 65:HR Zone 10 Shading
     LightDefaultColorList[66].color = QColor(0,0,255); // 66:Aerolab VE
     LightDefaultColorList[67].color = QColor(0,255,0); // 67:Aerolab Elevation
-    LightDefaultColorList[68].color = QColor(255,255,255); // 68:Calendar background
-    LightDefaultColorList[69].color = QColor(230,230,230); // 69:Calendar heading
+    LightDefaultColorList[68].color = QColor(153,151,234); // 68:Calendar Phase
+    LightDefaultColorList[69].color = QColor(225,141,158); // 69:Calendar Event
     LightDefaultColorList[70].color = QColor(48,140,198); // 70:Calendar Current Selection
     LightDefaultColorList[71].color = QColor(0,255,0); // 71:Calendar Actual Workout
-    LightDefaultColorList[72].color = QColor(255,177,21); // 72:Calendar Planned Workout
+    LightDefaultColorList[72].color = QColor(247,145,48); // 72:Calendar Planned Workout
     LightDefaultColorList[73].color = QColor(0,255,255); // 73:Calendar Today
     LightDefaultColorList[74].color = QColor(255,255,255); // 74:Pop Up Windows Background
     LightDefaultColorList[75].color = QColor(119,119,119); // 75:Pop Up Windows Foreground
@@ -391,6 +388,16 @@ QColor GCColor::alternateColor(QColor bgColor)
         return QColor(Qt::lightGray);
 }
 
+QColor GCColor::inactiveColor(QColor baseColor, double factor)
+{
+    QColor gray = baseColor.lightness() < 128 ? QColor(128, 128, 128) : QColor(200, 200, 200);
+    return QColor::fromRgbF(
+        baseColor.redF() * (1 - factor) + gray.redF() * factor,
+        baseColor.greenF() * (1 - factor) + gray.greenF() * factor,
+        baseColor.blueF()* (1 - factor) + gray.blueF()* factor
+    );
+}
+
 QColor GCColor::selectedColor(QColor bgColor)
 {
      // if foreground is white then we're "dark" if it's
@@ -405,6 +412,25 @@ QColor GCColor::selectedColor(QColor bgColor)
      if (isblack) bg_select = QColor(30, 30, 30);
 
      return bg_select;
+}
+
+QColor GCColor::blendedColor(const QColor &fg, const QColor &bg)
+{
+    double alpha = fg.alphaF();
+    int r = static_cast<int>(std::round(fg.red() * alpha + bg.red() * (1.0 - alpha)));
+    int g = static_cast<int>(std::round(fg.green() * alpha + bg.green() * (1.0 - alpha)));
+    int b = static_cast<int>(std::round(fg.blue() * alpha + bg.blue() * (1.0 - alpha)));
+    return QColor(r, g, b);
+}
+
+bool GCColor::isDark(const QColor &color)
+{
+    return color.lightness() < 127;
+}
+
+bool GCColor::isPaletteDark(const QPalette &palette)
+{
+    return isDark(palette.color(QPalette::Active, QPalette::Base));
 }
 
 const Colors * GCColor::colorSet()
@@ -1080,6 +1106,48 @@ GCColor::applyTheme(int index)
 
 }
 
+
+//
+// PaletteApplier - Helper to force a palette update on all children - use if palette propagation doesn't work
+//
+
+void
+PaletteApplier::setPaletteRecursively
+(QWidget *widget, const QPalette &palette, bool forceOnCustom)
+{
+    widget->setPalette(palette);
+    for (QWidget *child : widget->findChildren<QWidget*>()) {
+        bool hasCustomPalette = child->testAttribute(Qt::WA_SetPalette);
+        if (! hasCustomPalette || forceOnCustom) {
+            child->setPalette(palette);
+        }
+    }
+}
+
+
+void
+PaletteApplier::setPaletteOnList
+(const QList<QWidget*> &widgets, const QPalette &palette)
+{
+    for (QWidget *widget : widgets) {
+        widget->setPalette(palette);
+    }
+}
+
+
+void
+PaletteApplier::setPaletteByType
+(QWidget *root, const QPalette &palette, const QString &typeName)
+{
+    QList<QWidget*> widgets = root->findChildren<QWidget*>();
+    for (QWidget *widget : widgets) {
+        if (widget->metaObject()->className() == typeName) {
+            widget->setPalette(palette);
+        }
+    }
+}
+
+
 //
 // ColorLabel - just paints a swatch of the first 5 colors
 //
@@ -1148,6 +1216,30 @@ svgAsColoredPixmap
 }
 
 
+QPixmap
+svgOnBackground
+(const QString& file, const QSize &size, int margin, const QColor &bg, int radius)
+{
+    QColor fg(GCColor::invertColor(bg));
+    QPixmap svgPixmap = svgAsColoredPixmap(file, size, margin, fg);
+
+    QPixmap pixmap(svgPixmap.size());
+    pixmap.fill(Qt::transparent);
+
+    QPainterPath path;
+    path.addRoundedRect(QRectF(0, 0, size.width(), size.height()), radius, radius);
+
+    QPainter painter(&pixmap);
+    painter.setClipPath(path);
+    painter.fillRect(pixmap.rect(), bg);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+    painter.drawPixmap(0, 0, svgPixmap);
+    painter.end();
+
+    return pixmap;
+}
+
+
 extern void
 basicTreeWidgetStyle
 (QTreeWidget *tree, bool editable)
@@ -1182,6 +1274,21 @@ newQFormLayout
         form->setLabelAlignment(Qt::AlignRight);
     }
     return form;
+}
+
+
+extern QLayout*
+centerWidgetInLayout
+(QWidget *widget, bool margins)
+{
+    QHBoxLayout *centerLayout = new QHBoxLayout();
+    if (! margins) {
+        centerLayout->setContentsMargins(0, 0, 0, 0);
+    }
+    centerLayout->addStretch(1);
+    centerLayout->addWidget(widget, 3);
+    centerLayout->addStretch(1);
+    return centerLayout;
 }
 
 

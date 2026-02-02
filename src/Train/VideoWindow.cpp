@@ -28,7 +28,7 @@
 #include "VideoLayoutParser.h"
 #include "HelpWhatsThis.h"
 
-#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
+#if defined(GC_VIDEO_QT6)
 #include <QMediaMetaData>
 #endif
 
@@ -111,7 +111,7 @@ VideoWindow::VideoWindow(Context *context)  :
     }
 #endif
 
-#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
+#if defined(GC_VIDEO_QT6)
     // USE QT VIDEO PLAYER
     wd = new QVideoWidget(this);
     wd->show();
@@ -209,7 +209,7 @@ VideoWindow::~VideoWindow()
     delete container;
 #endif
 
-#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
+#if defined(GC_VIDEO_QT6)
     // QT MEDIA
     delete mp;
     delete wd;
@@ -231,10 +231,6 @@ bool VideoWindow::hasActiveVideo() const
     default:
         break; // needed for compiler warning
     }
-#endif
-#ifdef GC_VIDEO_QT5
-    if (mp->state() != QMediaPlayer::StoppedState)
-        return true;
 #endif
 #ifdef GC_VIDEO_QT6
     if (mp->playbackState() != QMediaPlayer::StoppedState)
@@ -376,9 +372,6 @@ void VideoWindow::startPlayback()
     m_MediaChanged = false;
 #endif
 
-#ifdef GC_VIDEO_QT5
-    mp->play();
-#endif
 #ifdef GC_VIDEO_QT6
     // open the media object
     float rate = 1.0f;
@@ -439,11 +432,10 @@ void VideoWindow::startPlayback()
             }
         }
 #endif
-#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
+#if defined(GC_VIDEO_QT6)
         double videoSyncFrameRate = currentVideoSyncFile->videoFrameRate();
         if (videoSyncFrameRate > 0.) {
             bool ok=false;
-#ifdef GC_VIDEO_QT6
             auto md = mp->metaData();
             auto rate = md.value(QMediaMetaData::VideoFrameRate);
             
@@ -451,7 +443,6 @@ void VideoWindow::startPlayback()
             if (mediaFrameRate > 0.) {
                 videoSyncTimeAdjustFactor = videoSyncFrameRate / mediaFrameRate;
             }
-#endif
             if (!ok) //fallback to duration
             {
                 // QT5 doesn't expose media frame rate so make due with duration.
@@ -512,7 +503,7 @@ void VideoWindow::stopPlayback()
     vlcDispatch.AsyncCall([capture_mp]{ libvlc_media_player_stop(capture_mp); });
 #endif
 
-#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
+#if defined(GC_VIDEO_QT6)
     mp->stop();
 #endif
 }
@@ -533,7 +524,7 @@ void VideoWindow::pausePlayback()
     vlcDispatch.AsyncCall([capture_mp]{libvlc_media_player_set_pause(capture_mp, true); });
 #endif
 
-#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
+#if defined(GC_VIDEO_QT6)
     mp->pause();
 #endif
 }
@@ -556,7 +547,7 @@ void VideoWindow::resumePlayback()
     }
 #endif
 
-#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
+#if defined(GC_VIDEO_QT6)
     mp->play();
 #endif
 
@@ -877,11 +868,6 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
     }
 #endif
 
-#ifdef GC_VIDEO_QT5
-//TODO
-//    // seek to ms position in current file
-//    mp->setPosition(ms);
-#endif
 }
 
 void VideoWindow::seekPlayback(long ms)
@@ -910,7 +896,7 @@ void VideoWindow::seekPlayback(long ms)
         libvlc_media_player_t* capture_mp = this->mp;
         vlcDispatch.AsyncCall([capture_mp, ms]{ libvlc_media_player_set_time(capture_mp, (libvlc_time_t)ms); });
 #else
-#if defined(GC_VIDEO_QT5)||defined(GC_VIDEO_QT6)
+#if defined(GC_VIDEO_QT6)
         mp->setPosition(ms);
 #else
         Q_UNUSED(ms)
@@ -967,11 +953,6 @@ void VideoWindow::mediaSelected(QString filename)
     }
 #endif
 
-#ifdef GC_VIDEO_QT5
-    // QT MEDIA
-    mc = QMediaContent(QUrl::fromLocalFile(filename));
-    mp->setMedia(mc);
-#endif
 #ifdef GC_VIDEO_QT6
     // QT MEDIA
     if (filename != "")

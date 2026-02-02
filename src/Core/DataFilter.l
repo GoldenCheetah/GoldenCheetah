@@ -26,6 +26,11 @@
 // need to get rid of this and use a string...
 #include <stdio.h>
 
+#ifdef Q_CC_MSVC
+// 'strcpy': This function or variable may be unsafe.
+#pragma warning(disable:4996)
+#endif
+
 #ifdef YY_FLEX_SUBMINOR_VERSION
 # define YY_FLEX_VERSION               \
   (YY_FLEX_MAJOR_VERSION) * 1000000 \

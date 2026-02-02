@@ -119,11 +119,26 @@
         <file>xml/metadata.xml</file>
         <file>xml/train-perspectives.xml</file>
         <file>xml/video-layout.xml</file>
-        <file>xml/diary-perspectives.xml</file>
+        <file>xml/plan-perspectives.xml</file>
         <file>xml/analysis-perspectives.xml</file>
         <file>xml/home-perspectives.xml</file>
         <file>ini/measures.ini</file>
         <file>html/ltm-summary.html</file>
+        <file>images/breeze/trash-empty.svg</file>
+        <file>images/breeze/edit-image-face-add.svg</file>
+        <file>images/breeze/media-playlist-repeat.svg</file>
+        <file>images/breeze/games-highscores.svg</file>
+        <file>images/breeze/network-mobile-0.svg</file>
+        <file>images/breeze/network-mobile-20.svg</file>
+        <file>images/breeze/network-mobile-40.svg</file>
+        <file>images/breeze/network-mobile-60.svg</file>
+        <file>images/breeze/network-mobile-80.svg</file>
+        <file>images/breeze/network-mobile-100.svg</file>
+        <file>images/breeze/task-process-0.svg</file>
+        <file>images/breeze/task-process-1.svg</file>
+        <file>images/breeze/task-process-2.svg</file>
+        <file>images/breeze/task-process-3.svg</file>
+        <file>images/breeze/task-process-4.svg</file>
         <file>images/breeze/light/unknown.svg</file>
         <file>images/breeze/light/offline.svg</file>
         <file>images/breeze/light/online.svg</file>
@@ -138,6 +153,8 @@
         <file>images/breeze/light/up.svg</file>
         <file>images/breeze/light/down.svg</file>
         <file>images/breeze/light/cal.svg</file>
+        <file>images/breeze/light/go-next.svg</file>
+        <file>images/breeze/light/go-previous.svg</file>
         <file>images/breeze/dark/unknown.svg</file>
         <file>images/breeze/dark/offline.svg</file>
         <file>images/breeze/dark/online.svg</file>
@@ -152,6 +169,8 @@
         <file>images/breeze/dark/up.svg</file>
         <file>images/breeze/dark/down.svg</file>
         <file>images/breeze/dark/cal.svg</file>
+        <file>images/breeze/dark/go-next.svg</file>
+        <file>images/breeze/dark/go-previous.svg</file>
         <file>images/toolbar/close-icon.png</file>
         <file>images/toolbar/save.png</file>
         <file>images/toolbar/saveas.png</file>
@@ -188,7 +207,7 @@
         <file>images/mac/right.png</file>
         <file>images/analysis.png</file>
         <file>images/home.png</file>
-        <file>images/diary.png</file>
+        <file>images/plan.png</file>
         <file>images/train.png</file>
         <file>images/sidebar/bookmark.png</file>
         <file>images/sidebar/charts.png</file>
@@ -216,18 +235,9 @@
         <file>images/services/sportplushealth.png</file>
         <file>images/services/strava.png</file>
         <file>images/services/trainingstagebuch.png</file>
-        <file>images/services/velohero.png</file>
         <file>images/services/polarflow.png</file>
         <file>images/services/sporttracks.png</file>
         <file>images/services/nolio.png</file>
-        <file>images/material/summit.svg</file>
-        <file>images/material/bike.svg</file>
-        <file>images/material/run.svg</file>
-        <file>images/material/swim.svg</file>
-        <file>images/material/rowing.svg</file>
-        <file>images/material/ski.svg</file>
-        <file>images/material/weight-lifter.svg</file>
-        <file>images/material/torch.svg</file>
         <file>python/library.py</file>
         <file>images/devices/imagic.png</file>
         <file>data/powerprofile.csv</file>

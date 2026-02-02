@@ -875,7 +875,6 @@ RideImportWizard::todayClicked(int index)
 
     // Only apply to selected date - set time to current time - ride duration
     // pretty daft but at least it sets it to something, anything is gonna be random
-    int countselected = 0;
     int totalduration = 0;
     for (int i=0; i< filenames.count(); i++) {
         if (tableWidget->item(i,FILENAME_COLUMN)->isSelected() ||
@@ -884,7 +883,6 @@ RideImportWizard::todayClicked(int index)
             tableWidget->item(i,DURATION_COLUMN)->isSelected() ||
             tableWidget->item(i,DISTANCE_COLUMN)->isSelected() ||
             tableWidget->item(i,STATUS_COLUMN)->isSelected()) {
-            countselected++;
 
             QTime duration = QTime().fromString(tableWidget->item(i,DURATION_COLUMN)->text(), "hh:mm:ss");
             totalduration += duration.hour() * 3600 +
@@ -1125,6 +1123,17 @@ RideImportWizard::abortClicked()
                     tableWidget->item(i,STATUS_COLUMN)->setText(tr("File Saved"));
                     // and correct the path locally stored in Ride Item
                     context->ride->setFileName(homeActivities.canonicalPath(), activitiesTarget);
+
+                    // try autolinking to planned activity
+                    RideItem *other = context->athlete->rideCache->findSuggestion(context->ride);
+                    RideCache::OperationPreCheck check = context->athlete->rideCache->checkLinkActivities(context->ride, other);
+                    if (check.canProceed && ! check.requiresUserDecision) {
+                        RideCache::OperationResult result = context->athlete->rideCache->linkActivities(context->ride, other);
+                        if (result.success) {
+                            QString error;
+                            context->athlete->rideCache->saveActivities(check.affectedItems, error);
+                        }
+                    }
                 }  else {
                     tableWidget->item(i,STATUS_COLUMN)->setText(tr("Error - Moving %1 to activities folder").arg(activitiesTarget));
                 }
@@ -1160,11 +1169,16 @@ RideImportWizard::abortClicked()
     phaseLabel->setText(donemessage);
     abortButton->setText(tr("Finish"));
     aborted = false;
+
+    // notify everyone that the auto import process is complete
+    context->notifyAutoImportCompleted();
+
     if (autoImportStealth) {
         abortClicked();  // simulate pressing the "Finish" button - even if the window got visible
     } else {
         if (!isActiveWindow()) activateWindow();
     }
+
 }
 
 

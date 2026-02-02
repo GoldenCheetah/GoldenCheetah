@@ -116,6 +116,8 @@ GenericLegendItem::eventFilter(QObject *obj, QEvent *e)
         // hover indicator show/hide as mouse hovers over the item
         update();
         break;
+
+    default: break;
     }
     return false;
 }
@@ -134,7 +136,7 @@ GenericLegendItem::paintEvent(QPaintEvent *)
     // under mouse show
     if (clickable && underMouse()) {
         QColor color = GColor(CPLOTMARKER);
-        color.setAlphaF(0.2); // same as plotarea
+        color.setAlphaF(0.2f); // same as plotarea
         painter.setBrush(color);
         painter.setPen(Qt::NoPen);
         painter.drawRect(hoverrect);

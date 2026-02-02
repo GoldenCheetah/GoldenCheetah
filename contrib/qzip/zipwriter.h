@@ -66,7 +66,6 @@ class ZipWriter
 public:
     ZipWriter(const QString &fileName, QIODevice::OpenMode mode = (QIODevice::WriteOnly | QIODevice::Truncate) );
 
-    explicit ZipWriter(QIODevice *device);
     ~ZipWriter();
 
     QIODevice* device() const;
@@ -105,9 +104,9 @@ public:
     void addSymLink(const QString &fileName, const QString &destination);
 
     void close();
-private:
-    ZipWriterPrivate *d;
-    Q_DISABLE_COPY(ZipWriter)
+
+    private:
+    std::unique_ptr<ZipWriterPrivate> d;
 };
 
 QT_END_NAMESPACE

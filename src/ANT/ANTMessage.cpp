@@ -375,7 +375,7 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
             {
 
                 // page no is first 7 bits, page change toggle is bit 8
-                bool page_toggle = data_page&128;
+                // bool page_toggle = data_page&128;
                 data_page &= 127;
 
                 // Heartrate is fairly simple. Although
@@ -815,7 +815,7 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                         // SDM main format - strides loop at 255 should be x2
                         fpodInstant=false;
                         fpodStrides = message[10];
-                        fpodSpeed = 0;
+                        fpodSpeed = double(message[8]&0x0f) + (double(message[9]/256.00f));
                         fpodCadence = 0;
                     }
                     break;

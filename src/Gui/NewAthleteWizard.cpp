@@ -99,10 +99,6 @@ NewAthleteWizard::done
                 appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/analysis/hide/1"), true);
                 appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/analysis/hide/2"), false);
                 appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/analysis/hide/3"), true);
-                appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/diary/hide"), true);
-                appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/diary/hide/0"), false);
-                appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/diary/hide/1"), false);
-                appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/diary/hide/2"), true);
                 appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/train/hide"), true);
                 appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/train/hide/0"), false);
                 appsettings->setCValue(name, GC_QSETTINGS_ATHLETE_LAYOUT + QString("splitter/train/hide/1"), false);
@@ -176,10 +172,10 @@ NewAthleteWizard::done
                     }
                 }
             } else {
-                QMessageBox::critical(0, tr("Fatal Error"), tr("Can't create new directory ") + home.canonicalPath() + "/" + name, "OK");
+                QMessageBox::critical(this, tr("Fatal Error"), tr("Can't create new directory ") + home.canonicalPath() + "/" + name);
             }
         } else {
-            QMessageBox::critical(0, tr("Fatal Error"), tr("Athlete already exists ")  + name, "OK");
+            QMessageBox::critical(this, tr("Fatal Error"), tr("Athlete already exists ")  + name);
         }
     }
     QWizard::done(result);
@@ -218,7 +214,7 @@ NewAthletePageUser::NewAthletePageUser
 
     dob = new QDateEdit();
     dob->setCalendarPopup(true);
-    dob->setDisplayFormat(locale.dateFormat(QLocale::ShortFormat));
+    dob->setDisplayFormat(locale.dateFormat(QLocale::LongFormat));
     registerField("user.dob", dob);
 
     sex = new QComboBox();

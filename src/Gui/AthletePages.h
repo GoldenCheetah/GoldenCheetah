@@ -245,31 +245,6 @@ class SchemePage : public QWidget
 };
 
 
-// Compatibility helper for Qt5
-// exposes methods that turned public in Qt6 from protected in Qt5
-#if QT_VERSION < 0x060000
-class TreeWidget6 : public QTreeWidget
-{
-    Q_OBJECT
-
-    public:
-        TreeWidget6(QWidget *parent = nullptr): QTreeWidget(parent) {
-        }
-
-        QModelIndex indexFromItem(const QTreeWidgetItem *item, int column = 0) const {
-            return QTreeWidget::indexFromItem(item, column);
-        }
-
-        QTreeWidgetItem* itemFromIndex(const QModelIndex &index) const {
-            return QTreeWidget::itemFromIndex(index);
-        }
-
-};
-#else
-typedef QTreeWidget TreeWidget6;
-#endif
-
-
 class CPPage : public QWidget
 {
     Q_OBJECT
@@ -299,11 +274,7 @@ class CPPage : public QWidget
         void reInitializeRanges();
 
     private slots:
-#if QT_VERSION < 0x060000
-        void rangeChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
-#else
         void rangeChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles = QList<int>());
-#endif
 
         void review();
 
@@ -323,7 +294,7 @@ class CPPage : public QWidget
         Context *context;
         Zones *zones_;
         SchemePage *schemePage;
-        TreeWidget6 *ranges;
+        QTreeWidget *ranges;
         QTreeWidget *zones;
         QPushButton *reviewButton;
         QPushButton *defaultButton;
@@ -507,11 +478,7 @@ class CVPage : public QWidget
         void addClicked();
         void deleteClicked();
         void defaultClicked();
-#if QT_VERSION < 0x060000
-        void rangeChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
-#else
         void rangeChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles = QList<int>());
-#endif
         void rangeSelectionChanged();
         void addZoneClicked();
         void deleteZoneClicked();

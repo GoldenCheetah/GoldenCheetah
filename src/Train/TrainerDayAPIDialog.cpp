@@ -359,7 +359,7 @@ TrainerDayAPIDialog::parseWorkoutResults
                     zoneColors << zoneColor(j, numZones);
                 }
             }
-            PowerZonesWidget *powerZones = new PowerZonesWidget(zoneColors, context->athlete->zones("Bike")->getZoneDescriptions(zonerange));
+            PowerZonesWidget *powerZones = new PowerZonesWidget(zoneColors, context->athlete->zones("Bike")->getZoneNames(zonerange), context->athlete->zones("Bike")->getZoneDescriptions(zonerange));
             powerZones->setPowerZones(ergFile->powerZonesPC(), ergFile->dominantZoneInt(), ergFile->duration());
             powerZones->setContentsMargins(0, 5, 0, 10);
 
@@ -424,7 +424,6 @@ TrainerDayAPIDialog::groupBoxClicked
 {
     int checked = 0;
     int unchecked = 0;
-    int uncheckable = 0;
     for (QGroupBox *box : groupBoxes) {
         if (box->isCheckable()) {
             if (box->isChecked()) {
@@ -432,8 +431,6 @@ TrainerDayAPIDialog::groupBoxClicked
             } else {
                 ++unchecked;
             }
-        } else {
-            ++uncheckable;
         }
     }
     selectAll->setEnabled(checked + unchecked > 0);
@@ -519,35 +516,35 @@ TrainerDayAPIDialog::setBoxState
     QGroupBox *box = groupBoxes[idx];
     switch (state) {
     case TrainerDayAPIDialogState::importNew:
-        groupBoxes[idx]->setChecked(false);
-        groupBoxes[idx]->setCheckable(allowReimport->isChecked());
-        groupBoxes[idx]->setTitle(workoutTitle + " - " + tr("successfully imported"));
-        groupBoxes[idx]->setProperty("imported", 1);
+        box->setChecked(false);
+        box->setCheckable(allowReimport->isChecked());
+        box->setTitle(workoutTitle + " - " + tr("successfully imported"));
+        box->setProperty("imported", 1);
         break;
     case TrainerDayAPIDialogState::importOld:
-        groupBoxes[idx]->setChecked(false);
-        groupBoxes[idx]->setCheckable(allowReimport->isChecked());
-        groupBoxes[idx]->setTitle(workoutTitle + " - " + tr("already imported"));
-        groupBoxes[idx]->setProperty("imported", 1);
+        box->setChecked(false);
+        box->setCheckable(allowReimport->isChecked());
+        box->setTitle(workoutTitle + " - " + tr("already imported"));
+        box->setProperty("imported", 1);
         break;
     case TrainerDayAPIDialogState::importFailed:
-        groupBoxes[idx]->setChecked(true);
-        groupBoxes[idx]->setCheckable(true);
-        groupBoxes[idx]->setTitle(workoutTitle + " - " + tr("import failed"));
-        groupBoxes[idx]->setProperty("imported", 0);
+        box->setChecked(true);
+        box->setCheckable(true);
+        box->setTitle(workoutTitle + " - " + tr("import failed"));
+        box->setProperty("imported", 0);
         break;
     case TrainerDayAPIDialogState::unimportedFile:
-        groupBoxes[idx]->setChecked(false);
-        groupBoxes[idx]->setCheckable(allowReimport->isChecked());
-        groupBoxes[idx]->setTitle(workoutTitle + " - " + tr("available in filesystem but not imported"));
-        groupBoxes[idx]->setProperty("imported", 0);
+        box->setChecked(false);
+        box->setCheckable(allowReimport->isChecked());
+        box->setTitle(workoutTitle + " - " + tr("available in filesystem but not imported"));
+        box->setProperty("imported", 0);
         break;
     case TrainerDayAPIDialogState::readyForImport:
     default:
-        groupBoxes[idx]->setChecked(true);
-        groupBoxes[idx]->setCheckable(true);
-        groupBoxes[idx]->setTitle(workoutTitle);
-        groupBoxes[idx]->setProperty("imported", 0);
+        box->setChecked(true);
+        box->setCheckable(true);
+        box->setTitle(workoutTitle);
+        box->setProperty("imported", 0);
         break;
     }
 }

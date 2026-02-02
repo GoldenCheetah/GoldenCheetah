@@ -42,6 +42,7 @@
 #include "LocalFileStore.h"
 #include "Secrets.h"
 #include "Utils.h"
+#include "IconManager.h"
 #ifdef GC_WANT_PYTHON
 #include "PythonEmbed.h"
 #include "FixPySettings.h"
@@ -133,7 +134,15 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     garminHWMarkedit->setSuffix(" " + tr("s"));
     garminHWMarkedit->setValue(garminHWMark.toInt());
 
-    connect(garminSmartRecord, &QCheckBox::stateChanged, [=](int state) { garminHWMarkedit->setEnabled(state); });
+    connect(garminSmartRecord,
+#if QT_VERSION < QT_VERSION_CHECK(6,7,0)
+            &QCheckBox::stateChanged,
+            this, [this](int state) { garminHWMarkedit->setEnabled(state); });
+#else
+            QOverload<Qt::CheckState>::of(&QCheckBox::checkStateChanged),
+            this, [this](Qt::CheckState state) { garminHWMarkedit->setEnabled(state); });
+#endif
+
     garminSmartRecord->setCheckState(! (isGarminSmartRecording.toInt() > 0) ? Qt::Checked : Qt::Unchecked);
     garminSmartRecord->setCheckState(isGarminSmartRecording.toInt() > 0 ? Qt::Checked : Qt::Unchecked);
 
@@ -192,9 +201,15 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     //XXrBrowseButton->setFixedWidth(120);
 
     connect(rBrowseButton, SIGNAL(clicked()), this, SLOT(browseRDir()));
-    connect(embedR, &QCheckBox::stateChanged, [=](int state) { rDirectorySel->setEnabled(state); });
+    connect(embedR,
+#if QT_VERSION < QT_VERSION_CHECK(6,7,0)
+            &QCheckBox::stateChanged,
+            this, [this](int state) { rDirectorySel->setEnabled(state); });
+#else
+            QOverload<Qt::CheckState>::of(&QCheckBox::checkStateChanged),
+            this, [this](Qt::CheckState state) { rDirectorySel->setEnabled(state); });
+#endif
 
-    embedR->setChecked(! appsettings->value(NULL, GC_EMBED_R, true).toBool());
     embedR->setChecked(appsettings->value(NULL, GC_EMBED_R, true).toBool());
 #endif
 
@@ -215,9 +230,15 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     pythonDirectoryLayout->addWidget(pythonBrowseButton);
 
     connect(pythonBrowseButton, SIGNAL(clicked()), this, SLOT(browsePythonDir()));
-    connect(embedPython, &QCheckBox::stateChanged, [=](int state) { pythonDirectorySel->setEnabled(state); });
+    connect(embedPython,
+#if QT_VERSION < QT_VERSION_CHECK(6,7,0)
+            &QCheckBox::stateChanged,
+            this, [this](int state) { pythonDirectorySel->setEnabled(state); });
+#else
+            QOverload<Qt::CheckState>::of(&QCheckBox::checkStateChanged),
+            this, [this](Qt::CheckState state) { pythonDirectorySel->setEnabled(state); });
+#endif
 
-    embedPython->setChecked(! appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool());
     embedPython->setChecked(appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool());
 #endif
 
@@ -242,6 +263,16 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 
     connect(athleteBrowseButton, SIGNAL(clicked()), this, SLOT(browseAthleteDir()));
 
+    startupView = new QComboBox();
+    startupView->addItem(tr("Trends"));
+    startupView->addItem(tr("Analysis"));
+    startupView->addItem(tr("Plan"));
+    startupView->addItem(tr("Train"));
+
+    // map view indexes to combo box values
+    int startView = appsettings->value(NULL, GC_STARTUP_VIEW, "1").toInt();
+    startupView->setCurrentIndex(startView);
+
     QFormLayout *form = newQFormLayout();
     form->addRow(new QLabel(HLO + tr("Localization") + HLC));
     form->addRow(tr("Language"), langCombo);
@@ -251,6 +282,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     form->addItem(new QSpacerItem(0, 15 * dpiYFactor));
     form->addRow(new QLabel(HLO + tr("Application Behaviour") + HLC));
     form->addRow(tr("Athlete Library"), athleteDirectoryLayout);
+    form->addRow(tr("Startup View"), startupView);
     form->addRow("", warnOnExit);
     form->addRow("", openLastAthlete);
     form->addRow("", opendata);
@@ -303,6 +335,10 @@ GeneralPage::saveClicked()
         "en", "fr", "ja", "pt-br", "it", "de", "ru", "cs", "es", "pt", "zh-cn", "zh-tw", "nl", "sv"
     };
     appsettings->setValue(GC_LANG, langs[langCombo->currentIndex()]);
+
+    // map combo box values to view indexes
+    int startView = startupView->currentIndex();
+    appsettings->setValue(GC_STARTUP_VIEW, startView);
 
     // Garmin and cranks
     appsettings->setValue(GC_GARMIN_HWMARK, garminHWMarkedit->value());
@@ -825,7 +861,8 @@ RemotePage::RemotePage(QWidget *parent, Context *context) : QWidget(parent), con
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(fields, 0, Qt::Alignment());
 
-    fields->setCurrentItem(fields->invisibleRootItem()->child(0));
+    if (fields->invisibleRootItem()->childCount() > 0)
+        fields->setCurrentItem(fields->invisibleRootItem()->child(0));
 }
 
 qint32
@@ -835,7 +872,8 @@ RemotePage::saveClicked()
     QList<CmdMap> cmdMaps = remote->getMappings(); // Load the remote control mappings
 
     for (int i = 0; i < cmdMaps.size(); i++) {
-        int cmdIndex = fields->invisibleRootItem()->child(i)->data(1, Qt::DisplayRole).toInt();
+        QTreeWidgetItem *item = fields->invisibleRootItem()->child(i);
+        int cmdIndex = item ? item->data(1, Qt::DisplayRole).toInt() : -1;
         if (cmdIndex) {
             cmdMaps[i].setAntCmdId(antCmds[cmdIndex - 1].getCmdId());
         } else {
@@ -1127,7 +1165,8 @@ WorkoutTagManagerPage::WorkoutTagManagerPage
     connect(tw->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)), this, SLOT(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)));
     connect(dynamic_cast<QObject*>(tagStore), SIGNAL(tagsChanged(int, int, int)), this, SLOT(tagStoreChanged(int, int, int)));
 
-    tw->setCurrentItem(tw->invisibleRootItem()->child(0));
+    if (tw->invisibleRootItem()->childCount() > 0)
+        tw->setCurrentItem(tw->invisibleRootItem()->child(0));
 }
 
 
@@ -1426,7 +1465,8 @@ ColorsPage::searchFilter(QString text)
     for(int i=0; i<colors->invisibleRootItem()->childCount(); i++) {
         if (empty) colors->setRowHidden(i, colors->rootIndex(), false);
         else {
-            QString text = colors->invisibleRootItem()->child(i)->text(1);
+            QTreeWidgetItem *item = colors->invisibleRootItem()->child(i);
+            QString text = item ? item->text(1) : "";
             bool found=false;
             foreach(QString tok, toks) {
                 if (text.contains(tok, Qt::CaseInsensitive)) {
@@ -1534,6 +1574,7 @@ ColorsPage::saveClicked()
     // run down and get the current colors and save
     for (int i=0; colorSet[i].name != ""; i++) {
         QTreeWidgetItem *current = colors->invisibleRootItem()->child(i);
+        if (!current) continue;
         QColor newColor = ((ColorButton*)colors->itemWidget(current, 2))->getColor();
         QString colorstring = QString("%1:%2:%3").arg(newColor.red())
                                                  .arg(newColor.green())
@@ -1574,61 +1615,10 @@ ColorsPage::saveClicked()
 }
 
 FavouriteMetricsPage::FavouriteMetricsPage(QWidget *parent) :
-    QWidget(parent), changed(false)
+    QWidget(parent)
 {
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Metrics_Favourites));
-
-    availList = new QListWidget;
-    availList->setSortingEnabled(true);
-    availList->setAlternatingRowColors(true);
-    availList->setSelectionMode(QAbstractItemView::SingleSelection);
-
-    QVBoxLayout *availLayout = new QVBoxLayout;
-    availLayout->addWidget(new QLabel(HLO + tr("Available Metrics") + HLC));
-    availLayout->addWidget(availList);
-
-    selectedList = new QListWidget;
-    selectedList->setAlternatingRowColors(true);
-    selectedList->setSelectionMode(QAbstractItemView::SingleSelection);
-
-    ActionButtonBox *actionButtons = new ActionButtonBox(ActionButtonBox::UpDownGroup);
-    actionButtons->defaultConnect(ActionButtonBox::UpDownGroup, selectedList);
-
-    QVBoxLayout *selectedLayout = new QVBoxLayout;
-    selectedLayout->addWidget(new QLabel(HLO + tr("Favourites") + HLC));
-    selectedLayout->addWidget(selectedList);
-    selectedLayout->addWidget(actionButtons);
-
-#ifndef Q_OS_MAC
-    leftButton = new QToolButton(this);
-    leftButton->setArrowType(Qt::LeftArrow);
-    leftButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    rightButton = new QToolButton(this);
-    rightButton->setArrowType(Qt::RightArrow);
-    rightButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    leftButton = new QPushButton("<");
-    rightButton = new QPushButton(">");
-#endif
-    leftButton->setEnabled(false);
-    rightButton->setEnabled(false);
-
-    QHBoxLayout *inexcLayout = new QHBoxLayout;
-    inexcLayout->addStretch();
-    inexcLayout->addWidget(leftButton);
-    inexcLayout->addWidget(rightButton);
-    inexcLayout->addStretch();
-
-    QVBoxLayout *buttonGrid = new QVBoxLayout;
-    buttonGrid->addStretch();
-    buttonGrid->addLayout(inexcLayout);
-    buttonGrid->addStretch();
-
-    QHBoxLayout *hlayout = new QHBoxLayout(this);;
-    hlayout->addLayout(availLayout, 2);
-    hlayout->addLayout(buttonGrid, 1);
-    hlayout->addLayout(selectedLayout, 2);
 
     QString s;
     if (appsettings->contains(GC_SETTINGS_FAVOURITE_METRICS))
@@ -1637,96 +1627,12 @@ FavouriteMetricsPage::FavouriteMetricsPage(QWidget *parent) :
         s = GC_SETTINGS_FAVOURITE_METRICS_DEFAULT;
     QStringList selectedMetrics = s.split(",");
 
-    const RideMetricFactory &factory = RideMetricFactory::instance();
-    for (int i = 0; i < factory.metricCount(); ++i) {
-        QString symbol = factory.metricName(i);
-        if (selectedMetrics.contains(symbol) || symbol.startsWith("compatibility_"))
-            continue;
-        QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
-        item->setData(Qt::UserRole, symbol);
-        item->setToolTip(m->description());
-        availList->addItem(item);
-    }
-    foreach (QString symbol, selectedMetrics) {
-        if (!factory.haveMetric(symbol))
-            continue;
-        QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
-        item->setData(Qt::UserRole, symbol);
-        item->setToolTip(m->description());
-        selectedList->addItem(item);
-    }
+    multiMetricSelector = new MultiMetricSelector(HLO + tr("Available Metrics") + HLC, HLO + tr("Favourites") + HLC, selectedMetrics);
 
-    connect(actionButtons, &ActionButtonBox::upRequested, this, &FavouriteMetricsPage::upClicked);
-    connect(actionButtons, &ActionButtonBox::downRequested, this, &FavouriteMetricsPage::downClicked);
-    connect(leftButton, SIGNAL(clicked()), this, SLOT(leftClicked()));
-    connect(rightButton, SIGNAL(clicked()), this, SLOT(rightClicked()));
-    connect(availList, SIGNAL(itemSelectionChanged()), this, SLOT(availChanged()));
-    connect(selectedList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedChanged()));
-}
+    QHBoxLayout *hlayout = new QHBoxLayout(this);
+    hlayout->addWidget(multiMetricSelector);
 
-void
-FavouriteMetricsPage::upClicked()
-{
-    assert(!selectedList->selectedItems().isEmpty());
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    int row = selectedList->row(item);
-    assert(row > 0);
-    selectedList->takeItem(row);
-    selectedList->insertItem(row - 1, item);
-    selectedList->setCurrentItem(item);
-    changed = true;
-}
-
-void
-FavouriteMetricsPage::downClicked()
-{
-    assert(!selectedList->selectedItems().isEmpty());
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    int row = selectedList->row(item);
-    assert(row < selectedList->count() - 1);
-    selectedList->takeItem(row);
-    selectedList->insertItem(row + 1, item);
-    selectedList->setCurrentItem(item);
-    changed = true;
-}
-
-void
-FavouriteMetricsPage::leftClicked()
-{
-    assert(!selectedList->selectedItems().isEmpty());
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    selectedList->takeItem(selectedList->row(item));
-    availList->addItem(item);
-    changed = true;
-    selectedChanged();
-}
-
-void
-FavouriteMetricsPage::rightClicked()
-{
-    assert(!availList->selectedItems().isEmpty());
-    QListWidgetItem *item = availList->selectedItems().first();
-    availList->takeItem(availList->row(item));
-    selectedList->addItem(item);
-    changed = true;
-}
-
-void
-FavouriteMetricsPage::availChanged()
-{
-    rightButton->setEnabled(!availList->selectedItems().isEmpty());
-}
-
-void
-FavouriteMetricsPage::selectedChanged()
-{
-    if (selectedList->selectedItems().isEmpty()) {
-        leftButton->setEnabled(false);
-        return;
-    }
-    leftButton->setEnabled(true);
+    connect(multiMetricSelector, &MultiMetricSelector::selectedChanged, this, [this]() { changed = true; });
 }
 
 qint32
@@ -1734,10 +1640,7 @@ FavouriteMetricsPage::saveClicked()
 {
     if (!changed) return 0;
 
-    QStringList metrics;
-    for (int i = 0; i < selectedList->count(); ++i)
-        metrics << selectedList->item(i)->data(Qt::UserRole).toString();
-    appsettings->setValue(GC_SETTINGS_FAVOURITE_METRICS, metrics.join(","));
+    appsettings->setValue(GC_SETTINGS_FAVOURITE_METRICS, multiMetricSelector->getSymbols().join(","));
 
     return 0;
 }
@@ -1796,7 +1699,7 @@ CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
     layout->addWidget(actionButtons);
 
     connect(table, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(doubleClicked(QTreeWidgetItem*, int)));
-    connect(table, &QTreeWidget::currentItemChanged, [=] (QTreeWidgetItem*) {
+    connect(table, &QTreeWidget::currentItemChanged, this, [this, actionButtons] (QTreeWidgetItem*) {
             bool selected = table->currentItem() != nullptr;
             actionButtons->setButtonEnabled(ActionButtonBox::Edit, selected);
             exportButton->setEnabled(selected);
@@ -1899,7 +1802,7 @@ CustomMetricsPage::addClicked()
     here.conversionSum = 0.00;
     here.program = R"({
     # only calculate for rides containing power
-    relevant { Data contains P; }
+    relevant { Data contains "P"; }
 
     # initialise aggregating variables
     # does nothing, update as needed
@@ -2152,12 +2055,14 @@ MetadataPage::MetadataPage(Context *context) : context(context)
     // setup maintenance pages using current config
     fieldsPage = new FieldsPage(this, fieldDefinitions);
     keywordsPage = new KeywordsPage(this, keywordDefinitions);
+    iconsPage = new IconsPage(fieldDefinitions, this);
     defaultsPage = new DefaultsPage(this, defaultDefinitions);
     processorPage = new ProcessorPage(context);
 
     tabs = new QTabWidget(this);
     tabs->addTab(fieldsPage, tr("Fields"));
     tabs->addTab(keywordsPage, tr("Colour Keywords"));
+    tabs->addTab(iconsPage, tr("Icons"));
     tabs->addTab(defaultsPage, tr("Defaults"));
     tabs->addTab(processorPage, tr("Processors && Automation"));
 
@@ -2198,6 +2103,8 @@ MetadataPage::saveClicked()
     if (b4.fieldFingerprint != FieldDefinition::fingerprint(fieldDefinitions))
         state += CONFIG_FIELDS;
 
+    state |= iconsPage->saveClicked();
+
     return state;
 }
 
@@ -2210,8 +2117,6 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_DataFields_Notes_Keywords));
-
-    relatedDelegate.setTitle(tr("<h3>Alternative Keywords</h3>Add additional keyword to have the same color"));
 
     QHBoxLayout *field = new QHBoxLayout();
     fieldLabel = new QLabel(tr("Field"),this);
@@ -2271,8 +2176,22 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
     connect(actionButtons, &ActionButtonBox::addRequested, this, &KeywordsPage::addClicked);
     connect(actionButtons, &ActionButtonBox::deleteRequested, this, &KeywordsPage::deleteClicked);
     connect(fieldChooser, SIGNAL(currentIndexChanged(int)), this, SLOT(colorfieldChanged()));
+    QAbstractItemModel *model = keywords->model();
+    connect(&relatedDelegate, &ListEditDelegate::requestListEdit, this, [this, model](const QModelIndex &index) {
+        ListEditWidget *dlg = new ListEditWidget(nullptr);
+        dlg->setAttribute(Qt::WA_DeleteOnClose);
+        dlg->setTitle(tr("<h3>Alternative Keywords</h3>Add additional keyword to have the same color"));
+        dlg->setList(model->data(index, Qt::DisplayRole).toString().split(','));
+        dlg->showDialog(this);
 
-    keywords->setCurrentItem(keywords->invisibleRootItem()->child(0));
+        connect(dlg, &ListEditWidget::editingFinished, this, [model, index, dlg](const QStringList &newList) {
+            model->setData(index, newList.join(','), Qt::EditRole);
+            dlg->deleteLater();
+        });
+    });
+
+    if (keywords->invisibleRootItem()->childCount() > 0)
+        keywords->setCurrentItem(keywords->invisibleRootItem()->child(0));
 }
 
 void
@@ -2293,7 +2212,9 @@ KeywordsPage::pageSelected()
     QList<FieldDefinition> fromFieldsPage;
     parent->fieldsPage->getDefinitions(fromFieldsPage);
     foreach(FieldDefinition x, fromFieldsPage) {
-        if (x.type < 3) fieldChooser->addItem(sp.displayName(x.name));
+        if (x.isTextField()) {
+            fieldChooser->addItem(sp.displayName(x.name));
+        }
     }
     fieldChooser->setCurrentIndex(fieldChooser->findText(sp.displayName(prev)));
 }
@@ -2391,6 +2312,7 @@ KeywordsPage::getDefinitions(QList<KeywordDefinition> &keywordList)
     for (int idx =0; idx < keywords->invisibleRootItem()->childCount(); idx++) {
         KeywordDefinition add;
         QTreeWidgetItem *item = keywords->invisibleRootItem()->child(idx);
+        if (!item) continue;
 
         add.name = item->text(0);
         add.color = ((ColorButton*)keywords->itemWidget(item, 1))->getColor();
@@ -2399,6 +2321,491 @@ KeywordsPage::getDefinitions(QList<KeywordDefinition> &keywordList)
         keywordList.append(add);
     }
 }
+
+
+//
+// Icons page
+//
+
+#define ICONSPAGE_L_W 64 * dpiXFactor
+#define ICONSPAGE_L_H 64 * dpiXFactor
+#define ICONSPAGE_L QSize(ICONSPAGE_L_W, ICONSPAGE_L_H)
+#define ICONSPAGE_L_SPACE QSize(80 * dpiXFactor, 80 * dpiYFactor)
+#define ICONSPAGE_S_W 48 * dpiXFactor
+#define ICONSPAGE_S_H 48 * dpiXFactor
+#define ICONSPAGE_S QSize(ICONSPAGE_S_W, ICONSPAGE_S_H)
+#define ICONSPAGE_MARGIN 2 * dpiXFactor
+
+IconsPage::IconsPage
+(const QList<FieldDefinition> &fieldDefinitions, QWidget *parent)
+: QWidget(parent), fieldDefinitions(fieldDefinitions)
+{
+    QPalette palette;
+
+    sportTree = new QTreeWidget();
+    sportTree->setColumnCount(3);
+    basicTreeWidgetStyle(sportTree);
+    sportTree->setHeaderLabels({ tr("Field"), tr("Value"), tr("Icon") });
+    sportTree->setIconSize(ICONSPAGE_S);
+    sportTree->setAcceptDrops(true);
+    sportTree->installEventFilter(this);
+    sportTree->viewport()->installEventFilter(this);
+    initSportTree();
+
+    iconList = new QListWidget();
+    iconList->setViewMode(QListView::IconMode);
+    iconList->setIconSize(ICONSPAGE_L);
+    iconList->setGridSize(ICONSPAGE_L_SPACE);
+    iconList->setResizeMode(QListView::Adjust);
+    iconList->setWrapping(true);
+    iconList->setFlow(QListView::LeftToRight);
+    iconList->setSpacing(10 * dpiXFactor);
+    iconList->setMovement(QListView::Static);
+    iconList->setUniformItemSizes(true);
+    iconList->setSelectionMode(QAbstractItemView::SingleSelection);
+    iconList->setDragEnabled(false);
+    iconList->setAcceptDrops(true);
+    iconList->installEventFilter(this);
+    iconList->viewport()->installEventFilter(this);
+    updateIconList();
+
+    QPixmap trashPixmap = svgAsColoredPixmap(":images/breeze/trash-empty.svg", ICONSPAGE_L, ICONSPAGE_MARGIN, palette.color(QPalette::WindowText));
+    QPixmap trashPixmapActive = svgAsColoredPixmap(":images/breeze/trash-empty.svg", ICONSPAGE_L, ICONSPAGE_MARGIN, QColor("#F79130"));
+    trashIcon.addPixmap(trashPixmap, QIcon::Normal);
+    trashIcon.addPixmap(trashPixmapActive, QIcon::Active);
+
+    trash = new QLabel();
+    trash->setAcceptDrops(true);
+    trash->setPixmap(trashIcon.pixmap(ICONSPAGE_L, QIcon::Normal));
+    trash->installEventFilter(this);
+    QPushButton *downloadButton = new QPushButton(tr("Download Default"));
+    QPushButton *importButton = new QPushButton(tr("Import"));
+    QPushButton *exportButton = new QPushButton(tr("Export"));
+
+    QHBoxLayout *contentLayout = new QHBoxLayout();
+    contentLayout->addWidget(sportTree);
+    contentLayout->addWidget(iconList);
+
+    QHBoxLayout *actionLayout = new QHBoxLayout();
+    actionLayout->addWidget(trash);
+    actionLayout->addStretch();
+    actionLayout->addWidget(downloadButton);
+    actionLayout->addWidget(importButton);
+    actionLayout->addWidget(exportButton);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->addLayout(contentLayout);
+    mainLayout->addLayout(actionLayout);
+
+    connect(downloadButton, &QPushButton::clicked, this, [this]() {
+        QUrl url(QString("%1/icons.zip").arg(VERSION_CONFIG_PREFIX));
+        if (IconManager::instance().importBundle(url)) {
+            initSportTree();
+            updateIconList();
+        } else {
+            QMessageBox::warning(nullptr, tr("Icon Bundle"), tr("Bundle file %1 cannot be imported.").arg(url.toString()));
+        }
+    });
+    connect(importButton, &QPushButton::clicked, this, [this]() {
+        QString zipFile = QFileDialog::getOpenFileName(this, tr("Import Icons"), "", tr("Zip Files (*.zip)"));
+        if (! zipFile.isEmpty() && IconManager::instance().importBundle(zipFile)) {
+            initSportTree();
+            updateIconList();
+        } else {
+            QMessageBox::warning(nullptr, tr("Icon Bundle"), tr("Bundle file %1 cannot be imported.").arg(zipFile));
+        }
+    });
+    connect(exportButton, &QPushButton::clicked, this, [this]() {
+        QString zipFile = QFileDialog::getSaveFileName(this, tr("Export Icons"), "", tr("Zip Files (*.zip)"));
+        if (zipFile.isEmpty() || ! IconManager::instance().exportBundle(zipFile)) {
+            QMessageBox::warning(nullptr, tr("Icon Bundle"), tr("Bundle file %1 cannot be created.").arg(zipFile));
+        }
+    });
+}
+
+
+qint32
+IconsPage::saveClicked
+()
+{
+    bool changed = false;
+
+    int rowCount = sportTree->topLevelItemCount();
+    for (int i = 0; i < rowCount; ++i) {
+        QTreeWidgetItem *item = sportTree->topLevelItem(i);
+        if (! item) {
+            continue;
+        }
+        QString originalIcon = item->data(0, Qt::UserRole + 1).toString();
+        QString newIcon = item->data(0, Qt::UserRole + 2).toString();
+        if (originalIcon != newIcon) {
+            QString type = item->data(0, Qt::UserRole).toString();
+            QString key = item->data(1, Qt::DisplayRole).toString();
+            IconManager::instance().assignIcon(type, key, newIcon);
+        }
+    }
+
+    if (changed) {
+        return CONFIG_APPEARANCE;
+    } else {
+        return 0;
+    }
+}
+
+
+bool
+IconsPage::eventFilter
+(QObject *watched, QEvent *event)
+{
+    bool handled = false;
+    if (watched == trash) {
+        handled = eventFilterTrash(event);
+    } else if (watched == sportTree) {
+        handled = eventFilterSportTree(event);
+    } else if (watched == sportTree->viewport()) {
+        handled = eventFilterSportTreeViewport(event);
+    } else if (watched == iconList) {
+        handled = eventFilterIconList(event);
+    } else if (watched == iconList->viewport()) {
+        handled = eventFilterIconListViewport(event);
+    }
+    return handled ? true : QObject::eventFilter(watched, event);
+}
+
+
+bool
+IconsPage::eventFilterTrash
+(QEvent *event)
+{
+    if (   event->type() == QEvent::DragEnter
+        || event->type() == QEvent::Drop) {
+        QDropEvent *dropEvent = static_cast<QDropEvent*>(event);
+        if (   dropEvent->mimeData()->hasFormat("application/x-gc-icon")
+            && (dropEvent->possibleActions() & Qt::MoveAction)
+            && (   dropEvent->source() == sportTree
+                || dropEvent->source() == iconList)) {
+            dropEvent->setDropAction(Qt::MoveAction);
+            dropEvent->accept();
+            trash->setPixmap(trashIcon.pixmap(ICONSPAGE_L, event->type() == QEvent::Drop ? QIcon::Normal : QIcon::Active));
+            return true;
+        }
+    } else if (event->type() == QEvent::DragLeave) {
+        trash->setPixmap(trashIcon.pixmap(ICONSPAGE_L, QIcon::Normal));
+        return true;
+    }
+    return false;
+}
+
+
+bool
+IconsPage::eventFilterSportTree
+(QEvent *event)
+{
+    if (event->type() == QEvent::DragEnter) {
+        QDragEnterEvent *dragEnterEvent = static_cast<QDragEnterEvent*>(event);
+        if (   dragEnterEvent->mimeData()->hasFormat("application/x-gc-icon")
+            && (dragEnterEvent->possibleActions() & Qt::LinkAction)
+            && dragEnterEvent->source() == iconList) {
+            sportTree->setStyleSheet("QTreeWidget { border: 2px solid #F79130; border-radius: 8px; }");
+            dragEnterEvent->setDropAction(Qt::LinkAction);
+            dragEnterEvent->accept();
+            return true;
+        }
+    } else if (event->type() == QEvent::DragMove) {
+        QDragMoveEvent *dragMoveEvent = static_cast<QDragMoveEvent*>(event);
+        if (   dragMoveEvent->mimeData()->hasFormat("application/x-gc-icon")
+            && (dragMoveEvent->possibleActions() & Qt::LinkAction)
+            && dragMoveEvent->source() == iconList) {
+            QPoint globalCursor = QCursor::pos();
+            QPoint pos = sportTree->viewport()->mapFromGlobal(globalCursor);
+            QTreeWidgetItem* targetItem = sportTree->itemAt(pos);
+            if (targetItem) {
+                sportTree->setCurrentItem(targetItem);
+                dragMoveEvent->setDropAction(Qt::LinkAction);
+                dragMoveEvent->accept();
+            } else {
+                dragMoveEvent->ignore();
+            }
+            return true;
+        }
+    } else if (event->type() == QEvent::DragLeave) {
+        sportTree->setStyleSheet("");
+        return true;
+    } else if (event->type() == QEvent::Drop) {
+        QDropEvent *dropEvent = static_cast<QDropEvent*>(event);
+        if (   dropEvent->mimeData()->hasFormat("application/x-gc-icon")
+            && (dropEvent->possibleActions() & Qt::LinkAction)
+            && dropEvent->source() == iconList) {
+            QByteArray iconBytes = dropEvent->mimeData()->data("application/x-gc-icon");
+            QString iconFile = QString::fromUtf8(iconBytes);
+            QPoint globalCursor = QCursor::pos();
+            QPoint pos = sportTree->viewport()->mapFromGlobal(globalCursor);
+            QTreeWidgetItem* targetItem = sportTree->itemAt(pos);
+            if (targetItem) {
+                QPalette palette;
+                QElapsedTimer timer;
+                timer.start();
+                QPixmap pixmap = svgAsColoredPixmap(IconManager::instance().toFilepath(iconFile), QSize(1000, 1000), 0, palette.color(QPalette::Text));
+                qint64 elapsed = timer.elapsed();
+                if (   elapsed < 50
+                    || QMessageBox::question(this, tr("Complex Icon"), tr("The selected icon %1 appears to be complex and could impact performance. Are you sure you want to use this icon?").arg(iconFile)) == QMessageBox::Yes) {
+                    QPixmap pixmap = svgAsColoredPixmap(IconManager::instance().toFilepath(iconFile), ICONSPAGE_S, ICONSPAGE_MARGIN, palette.color(QPalette::Text));
+                    targetItem->setData(0, Qt::UserRole + 2, iconFile);
+                    targetItem->setIcon(2, QIcon(pixmap));
+                    dropEvent->setDropAction(Qt::LinkAction);
+                    dropEvent->accept();
+                } else {
+                    dropEvent->ignore();
+                }
+            }
+        }
+        sportTree->setStyleSheet("");
+        return true;
+    }
+    return false;
+}
+
+
+bool
+IconsPage::eventFilterSportTreeViewport
+(QEvent *event)
+{
+    if (event->type() == QEvent::MouseButtonPress) {
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+        if (mouseEvent->button() == Qt::LeftButton) {
+            QTreeWidgetItem *item = sportTree->itemAt(mouseEvent->position().toPoint());
+            if (item && ! item->data(0, Qt::UserRole + 2).toString().isEmpty()) {
+                sportTreeDragStartPos = mouseEvent->position().toPoint();
+                sportTreeDragWatch = true;
+            } else {
+                sportTreeDragWatch = false;
+            }
+        }
+        return true;
+    } else if (event->type() == QEvent::MouseMove) {
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+        if (   ! (mouseEvent->buttons() & Qt::LeftButton)
+            || ! sportTreeDragWatch
+            || (mouseEvent->position().toPoint() - sportTreeDragStartPos).manhattanLength() < QApplication::startDragDistance()) {
+            return true;
+        }
+        sportTreeDragWatch = false;
+        QTreeWidgetItem *item = sportTree->itemAt(mouseEvent->position().toPoint());
+        if (! item) {
+            return true;
+        }
+
+        QByteArray entryBytes = item->data(0, Qt::UserRole).toString().toUtf8();
+        QMimeData *mimeData = new QMimeData();
+        mimeData->setData("application/x-gc-icon", entryBytes);
+
+        QDrag *drag = new QDrag(sportTree);
+        drag->setMimeData(mimeData);
+        drag->setPixmap(item->icon(2).pixmap(ICONSPAGE_S));
+        drag->setHotSpot(QPoint(ICONSPAGE_S_W / 2, ICONSPAGE_S_H / 2));
+        Qt::DropAction dropAction = drag->exec(Qt::MoveAction);
+        if (dropAction == Qt::MoveAction) {
+            QPixmap pixmap(ICONSPAGE_S);
+            pixmap.fill(Qt::transparent);
+            QIcon icon(pixmap);
+            item->setData(0, Qt::UserRole + 2, "");
+            item->setIcon(2, icon);
+        }
+        return true;
+    }
+    return false;
+}
+
+
+bool
+IconsPage::eventFilterIconList
+(QEvent *event)
+{
+    if (event->type() == QEvent::DragEnter) {
+        QDragEnterEvent *dragEnterEvent = static_cast<QDragEnterEvent*>(event);
+        if (   dragEnterEvent->mimeData()->hasFormat("application/x-gc-icon")
+            && (dragEnterEvent->possibleActions() & Qt::MoveAction)
+            && dragEnterEvent->source() == sportTree) {
+            dragEnterEvent->setDropAction(Qt::MoveAction);
+            dragEnterEvent->accept();
+        } else if (   dragEnterEvent->mimeData()->hasUrls()
+                   && (dragEnterEvent->possibleActions() & Qt::CopyAction)) {
+            const QList<QUrl> urls = dragEnterEvent->mimeData()->urls();
+            int svgs = 0;
+            for (const QUrl &url : urls) {
+                QString path = url.toLocalFile();
+                if (path.endsWith(".svg")) {
+                    ++svgs;
+                }
+            }
+            if (svgs > 0) {
+                dragEnterEvent->setDropAction(Qt::CopyAction);
+                dragEnterEvent->accept();
+            }
+        }
+        if (dragEnterEvent->isAccepted()) {
+            iconList->setStyleSheet("QListWidget { border: 2px solid #F79130; border-radius: 8px; }");
+        }
+        return true;
+    } else if (event->type() == QEvent::DragLeave) {
+        iconList->setStyleSheet("");
+        return true;
+    } else if (event->type() == QEvent::Drop) {
+        QDropEvent *dropEvent = static_cast<QDropEvent*>(event);
+        if (   dropEvent->mimeData()->hasFormat("application/x-gc-icon")
+            && (dropEvent->possibleActions() & Qt::MoveAction)
+            && dropEvent->source() == sportTree) {
+            dropEvent->setDropAction(Qt::MoveAction);
+            dropEvent->accept();
+        } else if (   dropEvent->mimeData()->hasUrls()
+                   && (dropEvent->possibleActions() & Qt::CopyAction)) {
+            const QList<QUrl> urls = dropEvent->mimeData()->urls();
+            int added = 0;
+            for (const QUrl &url : urls) {
+                if (IconManager::instance().addIconFile(QFile(url.toLocalFile()))) {
+                    ++added;
+                }
+            }
+            if (added > 0) {
+                dropEvent->setDropAction(Qt::CopyAction);
+                dropEvent->accept();
+                updateIconList();
+            }
+        }
+        iconList->setStyleSheet("");
+        return true;
+    }
+    return false;
+}
+
+
+bool
+IconsPage::eventFilterIconListViewport
+(QEvent *event)
+{
+    if (event->type() == QEvent::Paint) {
+        if (iconList->count() == 0) {
+            QPaintEvent *paintEvent = static_cast<QPaintEvent*>(event);
+            QPainter painter(iconList->viewport());
+            QPalette palette;
+            QColor pixmapColor = palette.color(QPalette::Disabled, QPalette::Text);
+            if (palette.color(QPalette::Base).lightness() < 127) {
+                pixmapColor = pixmapColor.darker(135);
+            } else {
+                pixmapColor = pixmapColor.lighter(135);
+            }
+            QPixmap pixmap = svgAsColoredPixmap(":/images/breeze/edit-image-face-add.svg", QSize(256 * dpiXFactor, 256 * dpiYFactor), 0, pixmapColor);
+            painter.drawPixmap((paintEvent->rect().width() - pixmap.width()) / 2, (paintEvent->rect().height() - pixmap.height()) / 2, pixmap);
+            painter.drawText(paintEvent->rect(), Qt::AlignCenter | Qt::TextWordWrap, tr("No icons available.\nDrag and drop .svg files here to add icons."));
+            return true;
+        }
+        return false;
+    } else if (event->type() == QEvent::MouseButtonPress) {
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+        if (mouseEvent->button() == Qt::LeftButton) {
+            QListWidgetItem *item = iconList->itemAt(mouseEvent->position().toPoint());
+            if (item) {
+                iconListDragStartPos = mouseEvent->position().toPoint();
+                iconListDragWatch = true;
+            } else {
+                iconListDragWatch = false;
+            }
+        }
+        return true;
+    } else if (event->type() == QEvent::MouseMove) {
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+        if (   ! (mouseEvent->buttons() & Qt::LeftButton)
+            || ! iconListDragWatch
+            || (mouseEvent->position().toPoint() - iconListDragStartPos).manhattanLength() < QApplication::startDragDistance()) {
+            return true;
+        }
+        iconListDragWatch = false;
+        QListWidgetItem *item = iconList->itemAt(mouseEvent->position().toPoint());
+        if (! item) {
+            return true;
+        }
+
+        QString iconFile = item->data(Qt::UserRole).toString();
+        QMimeData *mimeData = new QMimeData();
+        mimeData->setData("application/x-gc-icon", iconFile.toUtf8());
+
+        QDrag *drag = new QDrag(iconList);
+        drag->setMimeData(mimeData);
+        drag->setPixmap(item->icon().pixmap(ICONSPAGE_L));
+        drag->setHotSpot(QPoint(ICONSPAGE_L_W / 2, ICONSPAGE_L_H / 2));
+        Qt::DropAction dropAction = drag->exec(Qt::MoveAction | Qt::LinkAction);
+        if (dropAction == Qt::MoveAction) {
+            if (IconManager::instance().deleteIconFile(iconFile)) {
+                updateIconList();
+                int rowCount = sportTree->topLevelItemCount();
+                for (int i = 0; i < rowCount; ++i) {
+                    QTreeWidgetItem *item = sportTree->topLevelItem(i);
+                    if (item && item->data(0, Qt::UserRole + 2).toString() == iconFile) {
+                        QPixmap pixmap(ICONSPAGE_S);
+                        pixmap.fill(Qt::transparent);
+                        item->setData(0, Qt::UserRole + 2, "");
+                        item->setIcon(2, QIcon(pixmap));
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
+
+void
+IconsPage::initSportTree
+()
+{
+    sportTree->clear();
+    QPalette palette;
+    SpecialFields &specials = SpecialFields::getInstance();
+    for (QString field : { "Sport", "SubSport" }) {
+        for (const FieldDefinition &fieldDefinition : fieldDefinitions) {
+            if (fieldDefinition.name == field) {
+                for (const QString &fieldValue : fieldDefinition.values) {
+                    QIcon icon;
+                    QString assignedFile = IconManager::instance().assignedIcon(fieldDefinition.name, fieldValue);
+                    if (! assignedFile.isEmpty()) {
+                        QPixmap pixmap = svgAsColoredPixmap(IconManager::instance().toFilepath(assignedFile), ICONSPAGE_S, ICONSPAGE_MARGIN, palette.color(QPalette::Text));
+                        icon.addPixmap(pixmap);
+                    } else {
+                        QPixmap pixmap(ICONSPAGE_S);
+                        pixmap.fill(Qt::transparent);
+                        icon.addPixmap(pixmap);
+                    }
+                    QTreeWidgetItem *item = new QTreeWidgetItem();
+                    item->setData(0, Qt::DisplayRole, specials.displayName(fieldDefinition.name));
+                    item->setData(0, Qt::UserRole, fieldDefinition.name);
+                    item->setData(0, Qt::UserRole + 1, assignedFile);
+                    item->setData(0, Qt::UserRole + 2, assignedFile);
+                    item->setData(1, Qt::DisplayRole, fieldValue);
+                    item->setIcon(2, icon);
+                    sportTree->addTopLevelItem(item);
+                }
+            }
+        }
+    }
+}
+
+
+void
+IconsPage::updateIconList
+()
+{
+    iconList->clear();
+    QPalette palette;
+    QStringList icons = IconManager::instance().listIconFiles();
+    for (QString icon : icons) {
+        QPixmap pixmap = svgAsColoredPixmap(IconManager::instance().toFilepath(icon), ICONSPAGE_L, ICONSPAGE_MARGIN, palette.color(QPalette::Text));
+        QListWidgetItem *item = new QListWidgetItem(QIcon(pixmap), "");
+        item->setData(Qt::UserRole, icon);
+        iconList->addItem(item);
+    }
+}
+
 
 //
 // Ride metadata page
@@ -2409,12 +2816,7 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_DataFields_Fields));
 
-    valueDelegate.setTitle(tr("<h3>Manage allowed values</h3>"
-                              "If the list is empty, any value is accepted. A list containing "
-                              "<tt>*</tt> as its only entry indicates previous values for the "
-                              "same field will be used to autocomplete input."));
     valueDelegate.setDisplayLength(15, 2);
-
     fields = new QTreeWidget;
     fields->headerItem()->setText(0, tr("Screen Tab"));
     fields->headerItem()->setText(1, tr("Field"));
@@ -2457,7 +2859,7 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
         add->setFlags(add->flags() | Qt::ItemIsEditable);
         add->setText(0, specialTabs.displayName(field.tab)); // tab name
         add->setText(1, specials.displayName(field.name)); // field name
-        add->setData(2, Qt::DisplayRole, field.type);
+        add->setData(2, Qt::DisplayRole, static_cast<int>(field.type));
         add->setText(3, field.values.join(",")); // values
         fields->setItemWidget(add, 4, checkBox);
         fields->setItemWidget(add, 5, checkBoxInt);
@@ -2472,8 +2874,26 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     connect(actionButtons, &ActionButtonBox::downRequested, this, &FieldsPage::downClicked);
     connect(actionButtons, &ActionButtonBox::addRequested, this, &FieldsPage::addClicked);
     connect(actionButtons, &ActionButtonBox::deleteRequested, this, &FieldsPage::deleteClicked);
+    QAbstractItemModel *model = fields->model();
+    connect(&valueDelegate, &ListEditDelegate::requestListEdit, this, [this, model](const QModelIndex &index) {
+        ListEditWidget *dlg = new ListEditWidget(nullptr);
+        dlg->setAttribute(Qt::WA_DeleteOnClose);
+        dlg->setTitle(tr("<h3>Manage allowed values</h3>"
+                         "If the list is empty, any value is accepted. A list containing "
+                         "<tt>*</tt> as its only entry indicates previous values for the "
+                         "same field will be used to autocomplete input."));
 
-    fields->setCurrentItem(fields->invisibleRootItem()->child(0));
+        dlg->setList(model->data(index, Qt::DisplayRole).toString().split(','));
+        dlg->showDialog(this);
+
+        connect(dlg, &ListEditWidget::editingFinished, this, [model, index, dlg](const QStringList &newList) {
+            model->setData(index, newList.join(','), Qt::EditRole);
+            dlg->deleteLater();
+        });
+    });
+
+    if (fields->invisibleRootItem()->childCount() > 0)
+        fields->setCurrentItem(fields->invisibleRootItem()->child(0));
 }
 
 void
@@ -2572,6 +2992,7 @@ FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
 
         FieldDefinition add;
         QTreeWidgetItem *item = fields->invisibleRootItem()->child(idx);
+        if (!item) continue;
 
         // silently ignore duplicates
         if (checkdups.contains(item->text(1))) continue;
@@ -2585,9 +3006,9 @@ FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
         add.expression = item->text(6);
 
         if (sp.isMetric(add.name))
-            add.type = 4;
+            add.type = GcFieldType::FIELD_DOUBLE;
         else
-            add.type = item->data(2, Qt::DisplayRole).toInt();
+            add.type = static_cast<GcFieldType>(item->data(2, Qt::DisplayRole).toInt());
 
         fieldList.append(add);
     }
@@ -2677,6 +3098,7 @@ ProcessorPage::saveClicked()
     // write away separately
     for (int i = 0; i < processorTree->invisibleRootItem()->childCount(); i++) {
         QTreeWidgetItem *item = processorTree->invisibleRootItem()->child(i);
+        if (!item) continue;
         QString id = item->data(PROCESSORTREE_COL_ID, Qt::DisplayRole).toString();
 
         if (dps.contains(id)) {
@@ -2839,6 +3261,7 @@ ProcessorPage::reload
     QTreeWidgetItem *selItem = nullptr;
     for (int i = 0; i < processorTree->invisibleRootItem()->childCount(); ++i) {
         QTreeWidgetItem *nextItem = processorTree->invisibleRootItem()->child(i);
+        if (!nextItem) continue;
         if (! nextItem->isHidden()) {
             selItem = nextItem;
         }
@@ -2858,6 +3281,7 @@ ProcessorPage::reload
     QTreeWidgetItem *selItem = nullptr;
     for (int i = 0; i <= selectRow && i < processorTree->invisibleRootItem()->childCount(); ++i) {
         QTreeWidgetItem *nextItem = processorTree->invisibleRootItem()->child(i);
+        if (!nextItem) continue;
         if (! nextItem->isHidden()) {
             selItem = nextItem;
         }
@@ -2940,6 +3364,7 @@ ProcessorPage::toggleCoreProcessors
     QTreeWidgetItem *firstVisible = nullptr;
     for (int i = 0; i < processorTree->invisibleRootItem()->childCount(); ++i) {
         QTreeWidgetItem *item = processorTree->invisibleRootItem()->child(i);
+        if (!item) continue;
         bool isCore = item->data(PROCESSORTREE_COL_CORE, Qt::DisplayRole).toBool();
         item->setHidden(checked && (! checked || isCore));
         if (firstVisible == nullptr && ! item->isHidden()) {
@@ -3063,7 +3488,8 @@ DefaultsPage::DefaultsPage
     connect(actionButtons, &ActionButtonBox::addRequested, this, &DefaultsPage::addClicked);
     connect(actionButtons, &ActionButtonBox::deleteRequested, this, &DefaultsPage::deleteClicked);
 
-    defaults->setCurrentItem(defaults->invisibleRootItem()->child(0));
+    if (defaults->invisibleRootItem()->childCount() > 0)
+        defaults->setCurrentItem(defaults->invisibleRootItem()->child(0));
 }
 
 void
@@ -3134,6 +3560,7 @@ DefaultsPage::getDefinitions(QList<DefaultDefinition> &defaultList)
 
         DefaultDefinition add;
         QTreeWidgetItem *item = defaults->invisibleRootItem()->child(idx);
+        if (!item) continue;
 
         add.field = sp.internalName(item->text(0));
         add.value = item->text(1);
@@ -3268,6 +3695,18 @@ MeasuresConfigPage::MeasuresConfigPage(QWidget *parent, Context *context) :
     connect(measuresActions, &ActionButtonBox::deleteRequested, this, &MeasuresConfigPage::removeMeasuresClicked);
     connect(measureFieldsActions, &ActionButtonBox::addRequested, this, &MeasuresConfigPage::addMeasuresFieldClicked);
     connect(measureFieldsActions, &ActionButtonBox::deleteRequested, this, &MeasuresConfigPage::removeMeasuresFieldClicked);
+    QAbstractItemModel *model = measuresFieldsTable->model();
+    connect(&meFiHeaderDelegate, &ListEditDelegate::requestListEdit, this, [this, model](const QModelIndex &index) {
+        ListEditWidget *dlg = new ListEditWidget(nullptr);
+        dlg->setAttribute(Qt::WA_DeleteOnClose);
+        dlg->setList(model->data(index, Qt::DisplayRole).toString().split(','));
+        dlg->showDialog(this);
+
+        connect(dlg, &ListEditWidget::editingFinished, this, [model, index, dlg](const QStringList &newList) {
+            model->setData(index, newList.join(','), Qt::EditRole);
+            dlg->deleteLater();
+        });
+    });
 
     refreshMeasuresTable();
 }

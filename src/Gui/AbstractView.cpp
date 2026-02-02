@@ -33,6 +33,8 @@
 #include "GcUpgrade.h"
 #include "LTMWindow.h"
 
+const int SIDEBAR_DEFAULT_WIDTH=200;
+
 AbstractView::AbstractView(Context *context, int type, const QString& view, const QString& heading) :
     QWidget(context->tab), context(context), type(type), view(view),
     _sidebar(true), _tiled(false), _selected(false), lastHeight(130*dpiYFactor), sidewidth(0),
@@ -122,7 +124,7 @@ AbstractView::resizeEvent(QResizeEvent *)
 {
     active = true; // we're mucking about, so ignore in splitterMoved ...
 
-    if (sidewidth < 200) {
+    if (sidewidth < SIDEBAR_DEFAULT_WIDTH) {
         sidewidth = splitter->sizes()[0];
     } else {
 
@@ -148,6 +150,29 @@ AbstractView::resizeEvent(QResizeEvent *)
 }
 
 void
+AbstractView::notifyViewStateRestored()
+{
+    // lets select the first ride if it has not been set,
+    // currently required to use DataFilter in any view.
+    if (context->ride == nullptr) {
+
+        // lets select the first ride
+        QDateTime now = QDateTime::currentDateTime();
+        for (int i = context->athlete->rideCache->rides().count(); i > 0; --i) {
+            if (context->athlete->rideCache->rides()[i - 1]->dateTime <= now) {
+                context->athlete->selectRideFile(context->athlete->rideCache->rides()[i - 1]->fileName);
+                return;
+            }
+        }
+
+       // otherwise just select the latest ride
+       if (context->athlete->rideCache->rides().count() != 0) {
+           context->athlete->selectRideFile(context->athlete->rideCache->rides().last()->fileName);
+       }
+   }
+}
+
+void
 AbstractView::notifyViewPerspectiveAdded(Perspective* page)
 {
     page->styleChanged(0);
@@ -157,7 +182,12 @@ void
 AbstractView::setSidebar(QWidget *sidebar)
 {
     sidebar_ = sidebar;
-    splitter->insertWidget(0, sidebar);
+
+    if (sidebar) {
+        // if the sidebar widget is already attached to another view's splitter,
+        // it is moved to the new position within this view's splitter
+        splitter->insertWidget(0, sidebar);
+    } 
 
     configChanged(CONFIG_APPEARANCE);
 }
@@ -277,9 +307,6 @@ AbstractView::saveState()
     };
     file.resize(0);
     QTextStream out(&file);
-#if QT_VERSION < 0x060000
-    out.setCodec("UTF-8");
-#endif
 
     // is just a collection of layout (aka old HomeWindow name-layout.xml)
     out<<"<layouts>\n";
@@ -353,7 +380,7 @@ AbstractView::restoreState(bool useDefault)
         // except when useDefault is requested
         if (!finfo.exists() && !useDefault) {
             filename = context->athlete->home->config().canonicalPath() + "/" + view + "-layout.xml";
-            legacy = true;
+
             QFile file(filename);
             if (file.open(QIODevice::ReadOnly)) {
                 content = file.readAll();
@@ -362,6 +389,9 @@ AbstractView::restoreState(bool useDefault)
             if (content != "") {
                 // whilst this happens don't show user
                 setUpdatesEnabled(false);
+
+                // Legacy perspective name only applies to -layout.xml files
+                legacy = true;
 
                 // setup the handler
                 QXmlInputSource source;
@@ -412,10 +442,14 @@ AbstractView::restoreState(bool useDefault)
 
         setUpdatesEnabled(true);
     }
-    if (legacy && restored.count() >= 1) restored[0]->title_ = "Legacy";
 
-    // MUST have at least one
-    if (restored.count() == 0)  restored << new Perspective(context, "empty", type);
+    if (restored.count()) {
+        // if we have restored the perspectives from legacy format -layout.xml files
+        if (legacy) restored[0]->title_ = "Legacy";
+
+    } else { // MUST have at least one perspective
+        restored << new Perspective(context, "Empty", type);
+    }
 
     // initialise them
     foreach(Perspective *page, restored) appendPerspective(page);
@@ -546,6 +580,10 @@ AbstractView::setPages(QStackedWidget *pages)
     mainSplitter->setCollapsible(0, false);
     splitter->insertWidget(-1, mainSplitter);
 
+    // prevent the pages being collapsed by the splitter
+    int index = splitter->indexOf(mainSplitter);
+    splitter->setCollapsible(index, false);
+
     // restore sizes
     QString setting = QString("%1/%2").arg(GC_SETTINGS_SPLITTER_SIZES).arg(type);
     QVariant splitterSizes = appsettings->cvalue(context->athlete->cyclist, setting); 
@@ -566,8 +604,8 @@ AbstractView::setPages(QStackedWidget *pages)
             // sensible default as never run before!
             QList<int> sizes;
 
-            sizes.append(200);
-            sizes.append(context->mainWindow->width()-200);
+            sizes.append(SIDEBAR_DEFAULT_WIDTH);
+            sizes.append(context->mainWindow->width()-SIDEBAR_DEFAULT_WIDTH);
             splitter->setSizes(sizes);
             
         }
@@ -622,7 +660,7 @@ AbstractView::setShowBottom(bool x)
         } else {
 
             // need a hide animator to hide on timeout
-            //anim->setDuration(200);
+            //anim->setDuration(SIDEBAR_DEFAULT_WIDTH);
             //anim->setEasingCurve(QEasingCurve(QEasingCurve::Linear));
             //anim->setKeyValueAt(0,mainSplitter->maxhpos()-(lastHeight+22));
             //anim->setKeyValueAt(1,mainSplitter->maxhpos()-22);
@@ -670,14 +708,30 @@ AbstractView::sidebarChanged()
         QVariant splitterSizes = appsettings->cvalue(context->athlete->cyclist, setting);
         if (splitterSizes.toByteArray().size() > 1 ) {
             splitter->restoreState(splitterSizes.toByteArray());
-            splitter->setOpaqueResize(true); // redraw when released, snappier UI
+        } else {
+
+            // use old (v3 or earlier) mechanism
+            QVariant splitterSizes = appsettings->cvalue(context->athlete->cyclist, GC_SETTINGS_SPLITTER_SIZES);
+            if (splitterSizes.toByteArray().size() > 1 ) {
+
+                splitter->restoreState(splitterSizes.toByteArray());
+
+            } else {
+
+                // apply sensible default as no configuration exists!
+                QList<int> sizes;
+
+                sizes.append(SIDEBAR_DEFAULT_WIDTH);
+                sizes.append(context->mainWindow->width()-SIDEBAR_DEFAULT_WIDTH);
+                splitter->setSizes(sizes);
+            }
         }
 
-        // if it was collapsed we need set to at least 200
+        // if it was collapsed we need set to at least SIDEBAR_DEFAULT_WIDTH
         // unless the mainwindow isn't big enough
         if (sidebar_->width()<10) {
-            int size = width() - 200 * dpiXFactor;
-            if (size>(200* dpiXFactor)) size = 200* dpiXFactor;
+            int size = width() - SIDEBAR_DEFAULT_WIDTH * dpiXFactor;
+            if (size>(SIDEBAR_DEFAULT_WIDTH* dpiXFactor)) size = SIDEBAR_DEFAULT_WIDTH* dpiXFactor;
 
             QList<int> sizes;
             sizes.append(size);
@@ -714,11 +768,9 @@ AbstractView::setPerspectives(QComboBox *perspectiveSelector, bool selectChart)
     if (!loaded || selectChart) {
         loaded = true;
 
-        // generally we just go to the first perspective
-        perspectiveSelected(0);
-
-        // allow views to override the default perspective (if required)
-        setViewSpecificPerspective();
+        // generally we just go to the first perspective, but we allow
+        // the views to override the default perspective (if required)
+        perspectiveSelected(getViewSpecificPerspective());
 
         // due to visibility optimisation we need to force the first tab to be selected in tab mode
         if (perspective_->currentStyle == 0 && perspective_->charts.count()) perspective_->tabSelected(0);

@@ -1607,7 +1607,6 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
         // set timeinzone to zero
         wbalTimeInZone.fill(0.0f, 4);
         array.fill(0.0f);
-        int count = 0;
 
         // lets count them first then turn into percentages
         // after we have traversed all the data
@@ -1620,7 +1619,6 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
 
             // increment counts
             array[percent]++;
-            count++;
 
             // and zones in 1s increments
             if (percent <= 25.0f) wbalTimeInZone[0]++;

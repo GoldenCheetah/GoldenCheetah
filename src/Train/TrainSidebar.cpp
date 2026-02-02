@@ -39,12 +39,7 @@
 #include <QInputEvent>
 #include <QKeyEvent>
 #include <QMutexLocker>
-
-#if QT_VERSION >= 0x060000
 #include <QSoundEffect>
-#else
-#include <QSound>
-#endif
 
 // Three current realtime device types supported are:
 #include "RealtimeController.h"
@@ -292,7 +287,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
             zoneColors << zoneColor(i, numZones);
         }
     }
-    workoutInfo = new InfoWidget(zoneColors, context->athlete->zones("Bike")->getZoneDescriptions(zonerange));
+    workoutInfo = new InfoWidget(zoneColors, context->athlete->zones("Bike")->getZoneNames(zonerange), context->athlete->zones("Bike")->getZoneDescriptions(zonerange));
     workoutInfo->setFrameStyle(QFrame::NoFrame);
     workoutInfo->setStyleSheet(GCColor::stylesheet(true));
     connect(context, SIGNAL(ergFileSelected(ErgFileBase*)), workoutInfo, SLOT(ergFileSelected(ErgFileBase*)));
@@ -362,6 +357,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
 #endif //GC_VIDEO_NONE
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(selectWorkout(QString)), this, SLOT(selectWorkout(QString)));
+    connect(context, SIGNAL(selectWorkout(int)), this, SLOT(selectWorkout(int)));
     connect(trainDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
 
     connect(workoutTree->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(workoutTreeWidgetSelectionChanged()));
@@ -712,7 +708,7 @@ TrainSidebar::configChanged(qint32 why)
         }
     }
     workoutInfo->setPowerZoneColors(zoneColors);
-    workoutInfo->setPowerZoneNames(context->athlete->zones("Bike")->getZoneDescriptions(zonerange));
+    workoutInfo->setPowerZoneNames(context->athlete->zones("Bike")->getZoneNames(zonerange), context->athlete->zones("Bike")->getZoneDescriptions(zonerange));
 
     // DEVICES
 
@@ -914,6 +910,19 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
         mode = ergFile->mode();
 
         if (ergFile->isValid()) {
+            // Update shown zone names (short and description) as configChanged
+            // is not triggered when only zones are renamed (name and description
+            // are not considered in Zones::getFingerPrint)
+            int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
+            QList<QColor> zoneColors;
+            if (zonerange != -1) {
+                int numZones = context->athlete->zones("Bike")->numZones(zonerange);
+                for (int i = 0; i < numZones; ++i) {
+                    zoneColors << zoneColor(i, numZones);
+                }
+            }
+            workoutInfo->setPowerZoneColors(zoneColors);
+            workoutInfo->setPowerZoneNames(context->athlete->zones("Bike")->getZoneNames(zonerange), context->athlete->zones("Bike")->getZoneDescriptions(zonerange));
 
             setStatusFlags(RT_WORKOUT);
 
@@ -1310,7 +1319,7 @@ void TrainSidebar::Start()       // when start button is pressed
         // tell the world
         context->notifyUnPause();
 
-        emit setNotification(tr("Resuming.."), 2);
+        context->notifySetNotification(tr("Resuming.."), 2);
 
     } else if (status&RT_RUNNING) {
 
@@ -1337,7 +1346,7 @@ void TrainSidebar::Start()       // when start button is pressed
         // tell the world
         context->notifyPause();
 
-        emit setNotification(tr("Paused.."), 2);
+        context->notifySetNotification(tr("Paused.."), 2);
 
     } else if (status&RT_CONNECTED) {
 
@@ -1348,7 +1357,7 @@ void TrainSidebar::Start()       // when start button is pressed
             secs_to_start--;
         }
         if (secs_to_start > 0) {
-            emit setNotification(tr("Starting in %1").arg(secs_to_start), 1);
+            context->notifySetNotification(tr("Starting in %1").arg(secs_to_start), 1);
             start_timer->start(1000);
             return;
         }
@@ -1466,7 +1475,7 @@ void TrainSidebar::Start()       // when start button is pressed
         }
         gui_timer->start(REFRESHRATE);      // start recording
 
-        emit setNotification(tr("Starting.."), 2);
+        context->notifySetNotification(tr("Starting.."), 2);
     }
 }
 
@@ -1674,7 +1683,7 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     ergFileQueryAdapter.resetQueryState();
     guiUpdate();
 
-    emit setNotification(tr("Stopped.."), 2);
+    context->notifySetNotification(tr("Stopped.."), 2);
 
     return;
 }
@@ -1761,12 +1770,12 @@ void TrainSidebar::Connect()
 
         Devices[dev].controller->start();
         Devices[dev].controller->resetCalibrationState();
-        connect(Devices[dev].controller, &RealtimeController::setNotification, this, &TrainSidebar::setNotification);
+        connect(Devices[dev].controller, &RealtimeController::setNotification, context, &Context::setNotification);
     }
     setStatusFlags(RT_CONNECTED);
     gui_timer->start(REFRESHRATE);
 
-    emit setNotification(tr("Connected.."), 2);
+    context->notifySetNotification(tr("Connected.."), 2);
 }
 
 void TrainSidebar::Disconnect()
@@ -1783,14 +1792,14 @@ void TrainSidebar::Disconnect()
     qDebug() << "disconnecting..";
 
     foreach(int dev, activeDevices) {
-        disconnect(Devices[dev].controller, &RealtimeController::setNotification, this, &TrainSidebar::setNotification);
+        disconnect(Devices[dev].controller, &RealtimeController::setNotification, context, &Context::setNotification);
         Devices[dev].controller->stop();
     }
     clearStatusFlags(RT_CONNECTED);
 
     gui_timer->stop();
 
-    emit setNotification(tr("Disconnected.."), 2);
+    context->notifySetNotification(tr("Disconnected.."), 2);
 }
 
 //----------------------------------------------------------------------
@@ -1880,6 +1889,8 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
             double distanceTick = 0;
 
+            // If any of the active devices is a footpod, simulated speed will not be used, as it is a treadmill
+            bool deviceIsFootpod = false;
             // fetch the right data from each device...
             foreach(int dev, activeDevices) {
 
@@ -1952,12 +1963,15 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     rtData.setTrainerConfigRequired(local.getTrainerConfigRequired());
                     rtData.setTrainerBrakeFault(local.getTrainerBrakeFault());
                 }
+                if (Devices[dev].type == DEV_ANTLOCAL && Devices[dev].deviceProfile.contains("o")) {
+                    deviceIsFootpod = true;
+                }
             }
 
             // If simulated speed is *not* checked then you get speed reported by
             // trainer which in ergo mode will be dictated by your gear and cadence,
             // and in slope mode is whatever the trainer happens to implement.
-            if (useSimulatedSpeed) {
+            if (useSimulatedSpeed && !deviceIsFootpod) {
                 BicycleSimState newState(rtData);
                 SpeedDistance ret = bicycle.SampleSpeed(newState);
 
@@ -2082,13 +2096,9 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
                     if (fPlayAudio) {
                         lapAudioThisLap = false;
-#if QT_VERSION >= 0x060000
                         static QSoundEffect effect;
                         effect.setSource(QUrl::fromLocalFile(":audio/lap.wav"));
                         effect.play();
-#else
-                        QSound::play(":audio/lap.wav");
-#endif
                     }
                 }
 
@@ -2099,7 +2109,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     if (ergFileQueryAdapter.textsInRange(lapPosition, searchRange, rangeStart, rangeEnd)) {
                         for (int idx = rangeStart; idx <= rangeEnd; idx++) {
                             ErgFileText cue = ergFile->Texts.at(idx);
-                            emit setNotification(cue.text, cue.duration);
+                            context->notifySetNotification(cue.text, cue.duration);
                         }
                         textPositionEmitted = lapPosition + searchRange;
                     }
@@ -2206,8 +2216,7 @@ void TrainSidebar::newLap()
         ergFileQueryAdapter.addNewLap(displayWorkoutDistance * 1000.) >= 0) {
 
         context->notifyNewLap();
-
-        emit setNotification(tr("New lap.."), 2);
+        context->notifySetNotification(tr("New lap.."), 2);
     }
 }
 
@@ -2234,7 +2243,7 @@ void TrainSidebar::resetTextAudioEmitTracking()
 void TrainSidebar::steerScroll(int scrollAmount)
 {
     if (scrollAmount == 0)
-        emit setNotification(tr("Recalibrating steering.."), 10);
+        context->notifySetNotification(tr("Recalibrating steering.."), 10);
     else
         context->notifySteerScroll(scrollAmount);
 }
@@ -2490,7 +2499,7 @@ void TrainSidebar::updateCalibration()
 
         // leaving calibration, clear any notification text
         status = QString(tr("Exiting calibration.."));
-        emit setNotification(status,3);
+        context->notifySetNotification(status,3);
 
     } else {
 
@@ -2755,7 +2764,7 @@ void TrainSidebar::updateCalibration()
         lastState = calibrationState;
 
         // set notification text, no timeout
-        emit setNotification(status, 0);
+        context->notifySetNotification(status, 0);
     }
 }
 
@@ -2786,7 +2795,7 @@ void TrainSidebar::FFwd()
 
     maintainLapDistanceState();
 
-    emit setNotification(tr("Fast forward.."), 2);
+    context->notifySetNotification(tr("Fast forward.."), 2);
 }
 
 void TrainSidebar::Rewind()
@@ -2819,7 +2828,7 @@ void TrainSidebar::Rewind()
 
     maintainLapDistanceState();
 
-    emit setNotification(tr("Rewind.."), 2);
+    context->notifySetNotification(tr("Rewind.."), 2);
 }
 
 
@@ -2849,7 +2858,7 @@ void TrainSidebar::FFwdLap()
 
     maintainLapDistanceState();    
 
-    if (lapmarker >= 0) emit setNotification(tr("Next Lap.."), 2);
+    if (lapmarker >= 0) context->notifySetNotification(tr("Next Lap.."), 2);
 }
 
 // jump to next Lap marker (if there is one?)
@@ -2882,7 +2891,7 @@ void TrainSidebar::RewindLap()
 
     maintainLapDistanceState();
 
-    if (lapmarker >= 0) emit setNotification(tr("Back Lap.."), 2);
+    if (lapmarker >= 0) context->notifySetNotification(tr("Back Lap.."), 2);
 }
 
 
@@ -2908,7 +2917,7 @@ void TrainSidebar::Higher()
             foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slope);
     }
 
-    emit setNotification(tr("Increasing intensity.."), 2);
+    context->notifySetNotification(tr("Increasing intensity.."), 2);
 }
 
 // lower load/gradient
@@ -2934,7 +2943,7 @@ void TrainSidebar::Lower()
             foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slope);
     }
 
-    emit setNotification(tr("Decreasing intensity.."), 2);
+    context->notifySetNotification(tr("Decreasing intensity.."), 2);
 }
 
 void TrainSidebar::setLabels()
@@ -3261,6 +3270,12 @@ TrainSidebar::selectWorkout(QString fullpath)
             break;
         }
     }
+}
+
+void
+TrainSidebar::selectWorkout(int idx)
+{
+    workoutTree->setCurrentIndex(workoutTree->model()->index(idx, TdbWorkoutModelIdx::filepath));
 }
 
 // got a remote control command

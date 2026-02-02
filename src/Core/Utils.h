@@ -40,6 +40,7 @@ namespace Utils
 {
     QString xmlprotect(const QString &string);
     QString unprotect(const QString &buffer);
+    QString quoteEscape(const QString &string); // escape quotes (" -> \", \" -> \", \\" -> \\\", ...)
     QString unescape(const QString &string); // simple string unescaping, used in datafilters
     QString jsonprotect(const QString &buffer);
     QString jsonunprotect(const QString &buffer);

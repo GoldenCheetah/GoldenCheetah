@@ -278,9 +278,7 @@ QString GcCrashDialog::versionHTML()
             .arg(usbxpress)
             .arg(libusb)
             .arg(vlc)
-#if defined GC_VIDEO_QT5
-            .arg("qt5")
-#elif defined GC_VIDEO_QT6
+#if defined GC_VIDEO_QT6
             .arg("qt6")
 #elif defined GC_VIDEO_VLC
             .arg("vlc")
@@ -294,7 +292,7 @@ QString GcCrashDialog::versionHTML()
 #else
             .arg("none")
 #endif
-#ifdef GC_HAVE_PYTHON
+#ifdef GC_WANT_PYTHON
             .arg(QString("%1 [%2]").arg(python ? python->version.split(" ").at(0) : QString("none")).arg(PythonEmbed::buildVersion()))
 #else
             .arg("none")
@@ -459,9 +457,6 @@ GcCrashDialog::saveAs()
     QFile file(fileName);
     file.resize(0);
     QTextStream out(&file);
-#if QT_VERSION < 0x060000
-    out.setCodec("UTF-8");
-#endif
 
     if (file.open(QIODevice::WriteOnly)) {
         // write the texts

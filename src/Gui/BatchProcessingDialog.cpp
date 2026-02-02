@@ -276,8 +276,13 @@ processed(0), fails(0), numFilesToProcess(0), metadataCompleter(nullptr) {
         QTreeWidgetItem* current = files->invisibleRootItem()->child(i);
 
         connect(static_cast<QCheckBox*>(files->itemWidget(current, 0)),
-            QOverload<int>::of(&QCheckBox::stateChanged),
+#if QT_VERSION < QT_VERSION_CHECK(6,7,0)
+            QOverload<int>::of(&QCheckBox::stateChanged), this,
             [=](int) { this->fileSelected(current); });
+#else
+            QOverload<Qt::CheckState>::of(&QCheckBox::checkStateChanged),
+            this, [=](Qt::CheckState) { this->fileSelected(current); });
+#endif
     }
 
     // Data processor signals
@@ -294,7 +299,11 @@ processed(0), fails(0), numFilesToProcess(0), metadataCompleter(nullptr) {
     // radio buttons
     connect(radioGroup, SIGNAL(idClicked(int)), this, SLOT(radioClicked(int)));
 
+#if QT_VERSION < QT_VERSION_CHECK(6,7,0)
     connect(all, SIGNAL(stateChanged(int)), this, SLOT(allClicked()));
+#else
+    connect(all, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(allClicked()));
+#endif
     connect(ok, SIGNAL(clicked()), this, SLOT(okClicked()));
     connect(cancel, SIGNAL(clicked()), this, SLOT(cancelClicked()));
 
@@ -500,29 +509,29 @@ BatchProcessingDialog::updateMetadataTypeField() {
     foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
         if (metadataFieldToSet->currentText() == field.name) {
             switch (field.type) {
-                case FIELD_INTEGER: {
+                case GcFieldType::FIELD_INTEGER: {
                     metadataEditField->setText(tr("0"));
                     return;
                 }
-                case FIELD_DOUBLE: {
+                case GcFieldType::FIELD_DOUBLE: {
                     metadataEditField->setText(tr("0.00"));
                     return;
                 }
-                case FIELD_DATE: {
+                case GcFieldType::FIELD_DATE: {
                     metadataEditField->setText(tr("dd/mm/yyyy"));
                     return;
                 }
-                case FIELD_TIME: {
+                case GcFieldType::FIELD_TIME: {
                     metadataEditField->setText(tr("hh:mm:ss"));
                     return;
                 }
-                case FIELD_CHECKBOX: {
+                case GcFieldType::FIELD_CHECKBOX: {
                     metadataEditField->setText(tr("1|0"));
                     return;
                 }
-                case FIELD_TEXT:
-                case FIELD_TEXTBOX:
-                case FIELD_SHORTTEXT:
+                case GcFieldType::FIELD_TEXT:
+                case GcFieldType::FIELD_TEXTBOX:
+                case GcFieldType::FIELD_SHORTTEXT:
                 default: {
                     metadataEditField->setText(tr(""));
                     if (metadataCompleter) delete metadataCompleter;
@@ -781,13 +790,13 @@ BatchProcessingDialog::setMetadataForActivities() {
     foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
         if (metadataFieldName == field.name) {
 
-            if (field.type == FIELD_TIME) {
+            if (field.type == GcFieldType::FIELD_TIME) {
                 metadataValue.simplified().remove(' ');
                 QRegularExpression re("([0-1]?[0-9]|2[0-3]):([0-5]?[0-9]):([0-5]?[0-9])");
                 if (!re.match(metadataValue).hasMatch()) return bpFailureType::timeFormatF;
             }
 
-            if (field.type == FIELD_DATE) {
+            if (field.type == GcFieldType::FIELD_DATE) {
                 metadataValue.simplified().remove(' ');
                 QRegularExpression re("([0]?[1-9]|[1][0-9]|3[0-1])/([0]?[1-9]|[1][0-2])/([0-9]{4})");
                 if (!re.match(metadataValue).hasMatch()) return bpFailureType::dateFormatF;

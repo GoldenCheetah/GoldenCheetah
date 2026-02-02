@@ -10,14 +10,26 @@
 
 # uncomment below and configure the location of the GNU scientific library,
 # this is a mandatory dependency.
+###############################################################################
+# GSL (GNU SCIENTIFIC LIBRARY) CONFIGURATION - REQUIRED
+###############################################################################
+#
+# RECOMMENDED INSTALLATION:
+#  Linux:   sudo apt-get install libgsl-dev
+#  macOS:   brew install gsl
+#  Windows: vcpkg install gsl
 #
 # Linux/Mac - use apt/homebrew to install and edit to your install location
-#GSL_INCLUDES = /usr/include
-#GSL_LIBS = -lgsl -lgslcblas -lm
+#  GSL_INCLUDES = /usr/include
+#  GSL_LIBS = -lgsl -lgslcblas -lm
 #
 # Windows - use vcpkg to install and edit to your install location
-#GSL_INCLUDES = c:\vcpkg\installed\x64-windows\include
-#GSL_LIBS = -LC:\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas
+#  GSL_INCLUDES = c:\vcpkg\installed\x64-windows\include
+#  GSL_LIBS = -LC:\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas
+###############################################################################
+#
+#GSL_INCLUDES = /usr/include
+#GSL_LIBS = -L/usr/lib -lgsl -lgslcblas -lm
 
 # If you have conflicts with min/max macros defined in windows.h
 # then uncomment the following line.
@@ -29,24 +41,57 @@
 # can be run to install these packages; see it for more info.
 #DEFINES += GC_WANT_R
 
-# Uncomment below if you want Python charting / ML etc
-# You will need Python Development tools installed
+###############################################################################
+# PYTHON CONFIGURATION
+###############################################################################
+# To enable Python support, set GC_WANT_PYTHON = true and optionally configure the
+# Python version. The build system will automatically detect your platform
+# and configure the appropriate paths.
 #
-# Libs needed can typically be found by calling e.g
-# python3.6-config --libs
+# REQUIRED SETTING:
+#   DEFINES += GC_WANT_PYTHON             # Enable Python support
 #
-# below 3 lines work well on Linux style OS
+# OPTIONAL SETTINGS:
+#   PYTHONINCLUDES = <custom path>     # Override include path
+#   PYTHONLIBS = <custom libs>         # Override library path
+#
+# You can find the correct library paths by running:
+#   python3.11-config --includes
+#   python3.11-config --libs
+#
+###############################################################################
+
+# Uncomment and configure these lines to enable Python:
 #DEFINES += GC_WANT_PYTHON
-#PYTHONINCLUDES = -I/usr/include/python3.6
-#PYTHONLIBS = -L/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu -lpython3.6m
-# below 3 lines work well on Windows
-#DEFINES += GC_WANT_PYTHON
-#PYTHONINCLUDES = -I\"C:\Program Files\Python36\include\"
-#PYTHONLIBS = -L\"C:\Program Files\Python36\libs\" -lpython36
-#Below work ok on MacOS High Sierra
-#DEFINES += GC_WANT_PYTHON
-#PYTHONINCLUDES = -I/Library/Frameworks/Python.framework/Versions/3.6/include/python3.6m
-#PYTHONLIBS = -L/Library/Frameworks/Python.framework/Versions/3.6/lib -lpython3.6m
+
+# Custom paths (optional - auto-configured if not set):
+#PYTHONINCLUDES =
+#PYTHONLIBS =
+
+###############################################################################
+# AUTOMATIC PYTHON CONFIGURATION (DO NOT EDIT BELOW THIS LINE)
+###############################################################################
+contains(DEFINES, "GC_WANT_PYTHON") {
+    # Auto-configure platform-specific paths if not manually set
+    isEmpty(PYTHONINCLUDES) {
+        PYTHONINCLUDES = $$system("python3-config --includes")
+    }
+    isEmpty(PYTHONLIBS) {
+        PYTHONLIBS = $$system("python3-config --ldflags --embed")
+    }
+    message("Python configuration:")
+    message("  Includes: $$PYTHONINCLUDES")
+    message("  Libs: $$PYTHONLIBS")
+
+    isEmpty(PYTHONINCLUDES) {
+        error("Python include path not found. Please set PYTHONINCLUDES.")
+    }
+    isEmpty(PYTHONLIBS) {
+        error("Python library path not found. Please set PYTHONLIBS.")
+    }
+    # NOTE, we don't manipulate global configs in this file as it is not always
+    # entirely reused in CI, instead we set INCLUDEPATH + LIBS in the .prod files.
+}
 
 # put output into a separate dir
 # to keep main directory clear
@@ -244,7 +289,6 @@ macx {
 
 # What video playback do you want?
 DEFINES += GC_VIDEO_NONE             # dont add any video playback support
-#DEFINES += GC_VIDEO_QT5             # use QT5 qvideowidget if QT > 5.2.1
 #DEFINES += GC_VIDEO_QT6             # qt6 videowidget
 #DEFINES += GC_VIDEO_VLC             # use VideoLan library needs VLC_INSTALL defined above
 

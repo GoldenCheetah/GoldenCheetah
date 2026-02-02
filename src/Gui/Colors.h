@@ -34,6 +34,7 @@
 extern QIcon colouredIconFromPNG(QString filename, QColor color);
 extern QPixmap colouredPixmapFromPNG(QString filename, QColor color);
 extern QPixmap svgAsColoredPixmap(const QString &file, const QSize &size, int margin, const QColor &color);
+extern QPixmap svgOnBackground(const QString& file, const QSize &size, int margin, const QColor &bg, int radius = 10);
 
 // dialog scaling
 extern double dpiXFactor, dpiYFactor;
@@ -42,6 +43,7 @@ extern QFont baseFont;
 // layout and widget styling
 extern void basicTreeWidgetStyle(QTreeWidget *tree, bool editable = true);
 extern QFormLayout *newQFormLayout(QWidget *parent = nullptr);
+extern QLayout *centerWidgetInLayout(QWidget *widget, bool margins = true);
 extern QLayout *centerLayout(QLayout *layout, bool margins = true);
 extern QWidget *centerLayoutInWidget(QLayout *layout, bool margins = true);
 
@@ -137,7 +139,11 @@ class GCColor : public QObject
         static double luminance(QColor color); // return the relative luminance
         static QColor invertColor(QColor); // return the contrasting color
         static QColor alternateColor(QColor); // return the alternate background
+        static QColor inactiveColor(QColor baseColor, double factor = 0.2); // return a dimmed variant
         static QColor selectedColor(QColor); // return the on select background color
+        static QColor blendedColor(const QColor &fg, const QColor &bg); // return a color with alpha blended on a background
+        static bool isDark(const QColor &color);
+        static bool isPaletteDark(const QPalette &palette);
         static QColor htmlCode(QColor x) { return x.name(); } // return the alternate background
         static Themes &themes();
         static void applyTheme(int index);
@@ -155,17 +161,6 @@ class GCColor : public QObject
         // for upgrade/migration of Config
         static QStringList getConfigKeys();
 };
-
-// color chooser that also supports the standard colors (CPLOTMARKER, CPOWER)
-// and returns them as a QColor(1,1,1,<int>) where <int> is the color number
-// .e.g CPOWER is 18, see below for full list
-#if 0
-class GColorDialog : public QDialog
-{
-    GColorDialog(QWidget *parent);
-
-};
-#endif
 
 // return a color for a ride file
 class GlobalContext;
@@ -186,6 +181,13 @@ class ColorEngine : public QObject
     private:
         QMap<QString, QColor> workoutCodes;
         GlobalContext *gc; // bootstrapping
+};
+
+class PaletteApplier {
+    public:
+        static void setPaletteRecursively(QWidget *widget, const QPalette &palette, bool forceOnCustom = false);
+        static void setPaletteOnList(const QList<QWidget*> &widgets, const QPalette &palette);
+        static void setPaletteByType(QWidget *root, const QPalette &palette, const QString &typeName);
 };
 
 
@@ -263,8 +265,8 @@ class ColorEngine : public QObject
 #define CHZONE10              65
 #define CAEROVE               66
 #define CAEROEL               67
-#define CCALCELL              68
-#define CCALHEAD              69
+#define CCALPHASE             68
+#define CCALEVENT             69
 #define CCALCURRENT           70
 #define CCALACTUAL            71
 #define CCALPLANNED           72

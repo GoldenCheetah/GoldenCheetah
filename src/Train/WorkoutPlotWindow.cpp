@@ -21,9 +21,6 @@
 #include "Context.h"
 #include "HelpWhatsThis.h"
 
-#include <QFormLayout>
-#include <QGroupBox>
-
 
 WorkoutPlotWindow::WorkoutPlotWindow(Context *context) :
     GcChartWindow(context), context(context)
@@ -31,35 +28,65 @@ WorkoutPlotWindow::WorkoutPlotWindow(Context *context) :
     HelpWhatsThis *helpContents = new HelpWhatsThis(this);
     this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::ChartTrain_Workout));
 
-    // Chart settings
-    QWidget *settingsWidget = new QWidget(this);
-    settingsWidget->setContentsMargins(0, 0, 0, 0);
+    ctrlsShowNotification = new QCheckBox();
+    connect(ctrlsShowNotification, &QCheckBox::toggled, this, &WorkoutPlotWindow::setShowNotifications);
 
-    QVBoxLayout *commonLayout = new QVBoxLayout(settingsWidget);
+    ctrlsLineWidthLabel = new QLabel();
+    ctrlsLineWidth = new QSlider(Qt::Horizontal);
+    ctrlsLineWidth->setRange(0, 8);
 
-    ctrlsGroupBox = new QGroupBox(tr("Ergmode specific settings"));
-    commonLayout->addWidget(ctrlsGroupBox);
-    commonLayout->addStretch();
+    ctrlsShowCurveLabel = new QLabel();
+    ctrlsShowWbalCurvePredict = new QCheckBox();
+    ctrlsShowWbalCurvePredict->setChecked(true);
+    ctrlsShowWbalCurve = new QCheckBox();
+    ctrlsShowWbalCurve->setChecked(true);
+    ctrlsShowWattsCurve = new QCheckBox();
+    ctrlsShowWattsCurve->setChecked(true);
+    ctrlsShowHrCurve = new QCheckBox();
+    ctrlsShowHrCurve->setChecked(true);
+    ctrlsShowCadCurve = new QCheckBox();
+    ctrlsShowCadCurve->setChecked(true);
+    ctrlsShowSpeedCurve = new QCheckBox();
+    ctrlsShowSpeedCurve->setChecked(true);
 
-    QFormLayout *ergmodeLayout = new QFormLayout(ctrlsGroupBox);
+    ctrlsCommonLabel = new QLabel();
+    ctrlsErgmodeLabel = new QLabel();
 
-    ctrlsSituationLabel = new QLabel(tr("Color power zones"));
+    ctrlsSituationLabel = new QLabel();
     ctrlsSituation = new QComboBox();
-    ctrlsSituation->addItem(tr("Never"));
-    ctrlsSituation->addItem(tr("Always"));
-    ctrlsSituation->addItem(tr("When stopped"));
+    ctrlsSituation->addItem("");
+    ctrlsSituation->addItem("");
+    ctrlsSituation->addItem("");
     connect(ctrlsSituation, SIGNAL(currentIndexChanged(int)), this, SLOT(setShowColorZones(int)));
-    ergmodeLayout->addRow(ctrlsSituationLabel, ctrlsSituation);
 
-    ctrlsShowTooltipLabel = new QLabel(tr("Show tooltip"));
+    ctrlsTransparencyLabel = new QLabel();
+    ctrlsTransparencySlider = new QSlider(Qt::Horizontal);
+    ctrlsTransparencySlider->setRange(0, 100);
+
+    ctrlsShowTooltipLabel = new QLabel();
     ctrlsShowTooltip = new QComboBox();
-    ctrlsShowTooltip->addItem(tr("Never"));
-    ctrlsShowTooltip->addItem(tr("When stopped"));
+    ctrlsShowTooltip->addItem("");
+    ctrlsShowTooltip->addItem("");
     connect(ctrlsShowTooltip, SIGNAL(currentIndexChanged(int)), this, SLOT(setShowTooltip(int)));
-    ergmodeLayout->addRow(ctrlsShowTooltipLabel, ctrlsShowTooltip);
+
+    QFormLayout *settingsLayout = newQFormLayout();
+    settingsLayout->addRow(ctrlsCommonLabel);
+    settingsLayout->addRow("", ctrlsShowNotification);
+    settingsLayout->addRow(ctrlsLineWidthLabel, ctrlsLineWidth);
+    settingsLayout->addRow(ctrlsShowCurveLabel, ctrlsShowWbalCurvePredict);
+    settingsLayout->addRow("", ctrlsShowWbalCurve);
+    settingsLayout->addRow("", ctrlsShowWattsCurve);
+    settingsLayout->addRow("", ctrlsShowHrCurve);
+    settingsLayout->addRow("", ctrlsShowCadCurve);
+    settingsLayout->addRow("", ctrlsShowSpeedCurve);
+    settingsLayout->addItem(new QSpacerItem(0, 15 * dpiYFactor));
+    settingsLayout->addRow(ctrlsErgmodeLabel);
+    settingsLayout->addRow(ctrlsSituationLabel, ctrlsSituation);
+    settingsLayout->addRow(ctrlsTransparencyLabel, ctrlsTransparencySlider);
+    settingsLayout->addRow(ctrlsShowTooltipLabel, ctrlsShowTooltip);
 
     setContentsMargins(0,0,0,0);
-    setControls(settingsWidget);
+    setControls(centerLayoutInWidget(settingsLayout, false));
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 
     QVBoxLayout *layout = new QVBoxLayout;
@@ -69,11 +96,48 @@ WorkoutPlotWindow::WorkoutPlotWindow(Context *context) :
     ergPlot = new ErgFilePlot(context);
     layout->addWidget(ergPlot);
 
+    QTimer *notificationTimer = new QTimer(this);
+
     connect(context, SIGNAL(setNow(long)), this, SLOT(setNow(long)));
     connect(context, SIGNAL(ergFileSelected(ErgFile*)), this, SLOT(ergFileSelected(ErgFile*)));
     connect(context, SIGNAL(telemetryUpdate(RealtimeData)), ergPlot, SLOT(performancePlot(RealtimeData)));
     connect(context, SIGNAL(start()), ergPlot, SLOT(start()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+
+    connect(notificationTimer, &QTimer::timeout, this, [this]() {
+        setProperty("subtitle", title);
+    });
+    connect(context, &Context::setNotification, this, [this, notificationTimer](QString notification, int timeout) {
+        if (! showNotifications()) {
+            return;
+        }
+        if (timeout > 0) {
+            notificationTimer->setInterval(timeout * 1000);
+            notificationTimer->setSingleShot(true);
+            notificationTimer->start();
+        } else {
+            notificationTimer->stop();
+        }
+
+        setProperty("subtitle", notification);
+    });
+    connect(context, &Context::clearNotification, this, [this]() {
+        setProperty("subtitle", title);
+    });
+    connect(ctrlsShowWbalCurvePredict, &QCheckBox::toggled, ergPlot, &ErgFilePlot::showWbalCurvePredict);
+    connect(ctrlsShowWbalCurve, &QCheckBox::toggled, ergPlot, &ErgFilePlot::showWbalCurve);
+    connect(ctrlsShowWattsCurve, &QCheckBox::toggled, ergPlot, &ErgFilePlot::showWattsCurve);
+    connect(ctrlsShowHrCurve, &QCheckBox::toggled, ergPlot, &ErgFilePlot::showHrCurve);
+    connect(ctrlsShowCadCurve, &QCheckBox::toggled, ergPlot, &ErgFilePlot::showCadCurve);
+    connect(ctrlsShowSpeedCurve, &QCheckBox::toggled, ergPlot, &ErgFilePlot::showSpeedCurve);
+    connect(ctrlsLineWidth, &QSlider::valueChanged, this, [this](int value) {
+        ergPlot->setPlotLineWidth(1 + value / 2.0);
+    });
+    connect(ctrlsTransparencySlider, &QSlider::valueChanged, this, [this](int value) {
+        ergPlot->setActiveCurveAlpha(255 - value * 2.5);
+    });
+
+    configChanged(0);
 
     // Initil setup based on currently selected workout
     ergFileSelected(context->currentErgFile());
@@ -83,8 +147,9 @@ void
 WorkoutPlotWindow::ergFileSelected(ErgFile *f)
 {
     // rename window to workout name
-    if (f && f->name() != "") setProperty("subtitle", f->name());
-    else setProperty("subtitle", "");
+    if (f && f->name() != "") title = f->name();
+    else title = "";
+    setProperty("subtitle", title);
 
     ergPlot->setData(f);
     ergPlot->replot();
@@ -102,17 +167,101 @@ WorkoutPlotWindow::configChanged(qint32)
 {
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 
-    ctrlsGroupBox->setTitle(tr("Ergmode specific settings"));
+    ctrlsCommonLabel->setText("<b>" + tr("Common settings") + "</b>");
+
+    ctrlsShowNotification->setText(tr("Show notifications and textcues in title"));
+
+    ctrlsLineWidthLabel->setText(tr("Plot line width"));
+
+    ctrlsShowCurveLabel->setText(tr("Show Curve"));
+    ctrlsShowWbalCurvePredict->setText(tr("W'bal Prediction"));
+    ctrlsShowWbalCurve->setText(tr("W'bal"));
+    ctrlsShowWattsCurve->setText(tr("Power"));
+    ctrlsShowHrCurve->setText(tr("Heartrate"));
+    ctrlsShowCadCurve->setText(tr("Cadence"));
+    ctrlsShowSpeedCurve->setText(tr("Speed"));
+
+    ctrlsErgmodeLabel->setText("<b>" + tr("Ergmode specific settings") + "</b>");
     ctrlsSituationLabel->setText(tr("Color power zones"));
     ctrlsSituation->setItemText(0, tr("Never"));
     ctrlsSituation->setItemText(1, tr("Always"));
     ctrlsSituation->setItemText(2, tr("When stopped"));
+
+    ctrlsTransparencyLabel->setText(tr("Power zones transparency (when active)"));
 
     ctrlsShowTooltipLabel->setText(tr("Show tooltip"));
     ctrlsShowTooltip->setItemText(0, tr("Never"));
     ctrlsShowTooltip->setItemText(1, tr("When stopped"));
 
     repaint();
+}
+
+
+bool
+WorkoutPlotWindow::showNotifications
+() const
+{
+    return ctrlsShowNotification->isChecked();
+}
+
+
+void
+WorkoutPlotWindow::setShowNotifications
+(bool show)
+{
+    if (! show) {
+        setProperty("subtitle", title);
+    }
+    ctrlsShowNotification->setChecked(show);
+}
+
+
+double
+WorkoutPlotWindow::lineWidth
+() const
+{
+    return ctrlsLineWidth->value();
+}
+
+
+void
+WorkoutPlotWindow::setLineWidth
+(double width)
+{
+    ctrlsLineWidth->setValue(width);
+}
+
+
+int
+WorkoutPlotWindow::showCurves
+() const
+{
+    int ret =   (ctrlsShowWbalCurvePredict->isChecked() ? 1 : 0) << 0
+              | (ctrlsShowWbalCurve->isChecked() ? 1 : 0) << 1
+              | (ctrlsShowWattsCurve->isChecked() ? 1 : 0) << 2
+              | (ctrlsShowHrCurve->isChecked() ? 1 : 0) << 3
+              | (ctrlsShowCadCurve->isChecked() ? 1 : 0) << 4
+              | (ctrlsShowSpeedCurve->isChecked() ? 1 : 0) << 5;
+    return ret;
+}
+
+
+void
+WorkoutPlotWindow::setShowCurves
+(int curves)
+{
+    ctrlsShowWbalCurvePredict->setChecked((curves & (1 << 0)) > 0);
+    ctrlsShowWbalCurve->setChecked((curves & (1 << 1)) > 0);
+    ctrlsShowWattsCurve->setChecked((curves & (1 << 2)) > 0);
+    ctrlsShowHrCurve->setChecked((curves & (1 << 3)) > 0);
+    ctrlsShowCadCurve->setChecked((curves & (1 << 4)) > 0);
+    ctrlsShowSpeedCurve->setChecked((curves & (1 << 5)) > 0);
+    ergPlot->showWbalCurvePredict(ctrlsShowWbalCurvePredict->isChecked());
+    ergPlot->showWbalCurve(ctrlsShowWbalCurve->isChecked());
+    ergPlot->showWattsCurve(ctrlsShowWattsCurve->isChecked());
+    ergPlot->showHrCurve(ctrlsShowHrCurve->isChecked());
+    ergPlot->showCadCurve(ctrlsShowCadCurve->isChecked());
+    ergPlot->showSpeedCurve(ctrlsShowSpeedCurve->isChecked());
 }
 
 
@@ -130,6 +279,23 @@ WorkoutPlotWindow::setShowColorZones
 {
     ctrlsSituation->setCurrentIndex(index);
     ergPlot->setShowColorZones(index);
+    ctrlsTransparencySlider->setEnabled(index == 1);
+}
+
+
+int
+WorkoutPlotWindow::colorZonesTransparency
+() const
+{
+    return ctrlsTransparencySlider->value();
+}
+
+
+void
+WorkoutPlotWindow::setColorZonesTransparency
+(int transparency)
+{
+    ctrlsTransparencySlider->setValue(transparency);
 }
 
 

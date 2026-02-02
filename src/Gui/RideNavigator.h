@@ -38,8 +38,6 @@ class NavigatorCellDelegate;
 class GroupByModel;
 class SearchFilter;
 class SearchFilterBox;
-class DiaryWindow;
-class DiarySidebar;
 class QSortFilterProxyModel;
 class RideNavigatorSortProxyModel;
 class DataFilter;
@@ -52,6 +50,9 @@ class EditUserMetricDialog;
 class EditUserSeriesDialog;
 class OverviewItemConfig;
 class RideMetric;
+
+// Ride Navigator activity list display filter options 
+enum class RideNavFilter { ALL=0, COMPLETED, PLANNED };
 
 //
 // The RideNavigator
@@ -73,8 +74,6 @@ class RideNavigator : public GcChartWindow
 
     friend class ::NavigatorCellDelegate;
     friend class ::GroupByModel;
-    friend class ::DiaryWindow;
-    friend class ::DiarySidebar;
     friend class ::GcMiniCalendar;
     friend class ::DataFilter;
     friend class ::SearchBox;
@@ -161,6 +160,8 @@ class RideNavigator : public GcChartWindow
         void setWidths (QString x="") { _widths = x; resetView(); } // only reset once widths are set, witdths="" resets to default columns
 
         void resetView(); // when columns/width changes
+
+        void setDisplayFilter(RideNavFilter filter);
 
         void searchStrings(QStringList);
         void clearSearch();

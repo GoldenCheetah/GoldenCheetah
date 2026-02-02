@@ -158,7 +158,7 @@ ride_tuple: string ':' string                                   {
                                                                      else if ($1 == "pacezonerange") jc->item.paceZoneRange = $3.toInt();
                                                                      else if ($1 == "date") {
                                                                          QDateTime aslocal = QDateTime::fromString($3, DATETIME_FORMAT);
-                                                                         QDateTime asUTC = QDateTime(aslocal.date(), aslocal.time(), Qt::UTC);
+                                                                         QDateTime asUTC = QDateTime(aslocal.date(), aslocal.time(), QTimeZone::UTC);
                                                                          jc->item.dateTime = asUTC.toLocalTime();
                                                                      }
                                                                 }
@@ -491,9 +491,6 @@ void RideCache::save(bool opendata, QString filename)
 
         // ok, lets write out the cache
         QTextStream stream(&rideDB);
-#if QT_VERSION < 0x060000
-        stream.setCodec("UTF-8");
-#endif
 
         // no BOM needed for opendata as it doesn't contain textual data
         if (!opendata) stream.setGenerateByteOrderMark(true);
@@ -992,9 +989,6 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
 
             // ok, lets read it in
             QTextStream stream(&rideDB);
-#if QT_VERSION < 0x060000
-            stream.setCodec("UTF-8");
-#endif
 
             // Read the entire file into a QString -- we avoid using fopen since it
             // doesn't handle foreign characters well. Instead we use QFile and parse

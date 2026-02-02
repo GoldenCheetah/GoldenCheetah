@@ -64,7 +64,7 @@ void HttpConnectionHandlerPool::cleanup() {
             if (++idleCounter > maxIdleHandlers) {
                 pool.removeOne(handler);
                 delete handler;
-                wDebug("HttpConnectionHandlerPool: Removed connection handler (%p), pool size is now %i",handler,pool.size());
+                wDebug("HttpConnectionHandlerPool: Removed connection handler (%p), pool size is now %lld",handler,pool.size());
                 break; // remove only one handler in each interval
             }
         }

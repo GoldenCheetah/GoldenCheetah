@@ -24,6 +24,7 @@
 #include "CompareInterval.h" // what intervals are being compared?
 #include "CompareDateRange.h" // what intervals are being compared?
 #include "RideFile.h"
+#include "Season.h"
 
 #ifdef GC_HAS_CLOUD_DB
 #include "CloudDBChart.h"
@@ -126,6 +127,7 @@ class Context : public QObject
         RideItem *rideItem() const { return ride; }
         const RideItem *currentRideItem() { return ride; }
         DateRange currentDateRange() { return dr_; }
+        Season const *currentSeason() { return season; }
 
         // current selections and widgetry
         MainWindow * const mainWindow;
@@ -134,6 +136,7 @@ class Context : public QObject
         Athlete *athlete;
         RideItem *ride;  // the currently selected ride
         DateRange dr_;
+        Season const *season = nullptr;
         ErgFile *workout; // the currently selected workout file
         VideoSyncFile *videosync; // the currently selected videosync file
         QString videoFilename;
@@ -178,6 +181,8 @@ class Context : public QObject
         void notifyAthleteClose(QString folder, Context *context) { emit athleteClose(folder,context); }
         void notifyLoadDone(QString folder, Context *context) { emit loadDone(folder, context); } // MainWindow finished
 
+        void notifyAutoImportCompleted() { emit autoImportCompleted(); }
+
         // preset charts
         void notifyPresetsChanged() { emit presetsChanged(); }
         void notifyPresetSelected(int n) { emit presetSelected(n); }
@@ -207,6 +212,7 @@ class Context : public QObject
         void notifyMediaSelected( QString x) { videoFilename = x; mediaSelected(x); }
         void notifySelectVideo(QString x) { selectMedia(x); }
         void notifySelectWorkout(QString x) { selectWorkout(x); }
+        void notifySelectWorkout(int idx ) { selectWorkout(idx); }
         void notifySelectVideoSync(QString x) { selectVideoSync(x); }
         void notifySetNow(long x) { now = x; setNow(x); }
         long getNow() { return now; }
@@ -218,10 +224,19 @@ class Context : public QObject
         void notifySeek(long x) { emit seek(x); }
         void notifyIntensityChanged(int intensity) { emit intensityChanged(intensity); };
 
+        void notifySetNotification(const QString &msg, int timeout) { emit setNotification(msg, timeout); };
+        void notifyClearNotification() { emit clearNotification(); };
+
         // date range selection
         void notifyDateRangeChanged(DateRange x) { dr_=x; emit dateRangeSelected(x); }
         void notifyWorkoutsChanged() { emit workoutsChanged(); }
         void notifyVideoSyncChanged() { emit VideoSyncChanged(); }
+
+        void notifySeasonChanged(Season const *season) {
+            bool changed = this->season != season;
+            this->season = season;
+            emit seasonSelected(season, changed);
+        }
 
         void notifyRideSelected(RideItem*x) { ride=x; rideSelected(x); }
         void notifyRideAdded(RideItem *x) { ride=x; rideAdded(x); }
@@ -272,6 +287,8 @@ class Context : public QObject
         void loadDone(QString, Context*);
         void athleteClose(QString, Context*);
 
+        void autoImportCompleted();
+
         // global filter changed
         void filterChanged();
         void homeFilterChanged();
@@ -306,6 +323,8 @@ class Context : public QObject
         void dateRangeSelected(DateRange);
         void rideSelected(RideItem*);
 
+        void seasonSelected(Season const *season, bool changed);
+
         // we added/deleted/changed an item
         void rideAdded(RideItem *);
         void rideDeleted(RideItem *);
@@ -330,6 +349,7 @@ class Context : public QObject
         void videoSyncFileSelected(VideoSyncFile *);
         void mediaSelected(QString);
         void selectWorkout(QString); // ask traintool to select this
+        void selectWorkout(int idx); // ask traintool to select this
         void selectMedia(QString); // ask traintool to select this
         void selectVideoSync(QString); // ask traintool to select this
         void setNow(long);
@@ -340,6 +360,9 @@ class Context : public QObject
         void pause();
         void stop();
         void intensityChanged(int intensity);
+
+        void setNotification(const QString &msg, int timeout);
+        void clearNotification();
 
         // R messages
         void rMessage(QString);

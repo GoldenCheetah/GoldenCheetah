@@ -529,7 +529,7 @@ AddSettings::AddSettings(AddCloudWizard *parent) : QWizardPage(parent), wizard(p
     foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
 
         // only add text fields
-        if (field.type < 3) metaCombo->addItem(field.name, QVariant(field.name));
+        if (field.isTextField()) metaCombo->addItem(field.name, QVariant(field.name));
     }
 
     folderLabel = new QLabel(tr("Folder"));

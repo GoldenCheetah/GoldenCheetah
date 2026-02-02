@@ -25,6 +25,7 @@ moc_*
 qrc_application.cpp
 qrc_RideWindow.cpp
 .qmake.stash
+goldencheetah_plugin_import.cpp
 
 #coverity
 cov-int/*
@@ -58,4 +59,8 @@ tags
 
 #ignore qm
 *.qm
+
+
+# Python SIP generated files
+Python/SIP/build/
 

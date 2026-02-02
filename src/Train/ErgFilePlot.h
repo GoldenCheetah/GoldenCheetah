@@ -160,13 +160,23 @@ class ErgFilePlot : public QwtPlot
         void startWorkout();
         void stopWorkout();
         void selectCurves();
+        void updateCurves();
+        void updateSectionCurveAlpha();
         void selectTooltip();
         void intensityChanged(int intensity);
 
+        void setPlotLineWidth(double width);
+        void showWbalCurvePredict(bool showCurve);
+        void showWbalCurve(bool showCurve);
+        void showWattsCurve(bool showCurve);
+        void showHrCurve(bool showCurve);
+        void showCadCurve(bool showCurve);
+        void showSpeedCurve(bool showCurve);
         int showColorZones() const;
         void setShowColorZones(int index);
         int showTooltip() const;
         void setShowTooltip(int index);
+        void setActiveCurveAlpha(int alpha);
 
     private:
         WPrime calculator;
@@ -175,7 +185,16 @@ class ErgFilePlot : public QwtPlot
         ErgFile *ergFile;
         QwtPlotMarker *CPMarker;
 
+        double _plotLineWidth = 1.0;
+        bool _curveAntialias = true;
+        bool _showWbalCurvePredict = true;
+        bool _showWbalCurve = true;
+        bool _showWattsCurve = true;
+        bool _showHrCurve = true;
+        bool _showCadCurve = true;
+        bool _showSpeedCurve = true;
         int _showColorZones = 0;
+        int _activeCurveAlpha = 255;
         int _showTooltip = 0;
 
         QwtPlotGrid *grid;

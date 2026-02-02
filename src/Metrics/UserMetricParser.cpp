@@ -119,10 +119,6 @@ UserMetricParser::serialize(QString filename, QList<UserMetricSettings> metrics)
 void
 UserMetricParser::serializeToQTextStream(QTextStream& out, QList<UserMetricSettings> metrics)
 {
-#if QT_VERSION < 0x060000
-    out.setCodec("UTF-8");
-#endif
-
     // begin document
     out << QString("<usermetrics version=\"%1\">\n").arg(USER_METRICS_VERSION_NUMBER);
 

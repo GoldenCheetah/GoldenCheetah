@@ -138,8 +138,6 @@ class TrainSidebar : public GcWindow
         void pause();
         void stop();
         void statusChanged(int status);
-        void setNotification(QString msg, int timeout);
-        void clearNotification(void);
 
     private slots:
         void deviceTreeWidgetSelectionChanged();
@@ -161,6 +159,7 @@ class TrainSidebar : public GcWindow
         void selectVideo(QString fullpath);
         void selectVideoSync(QString fullpath);
         void selectWorkout(QString fullpath);
+        void selectWorkout(int idx);
 
         void removeInvalidVideoSync();
         void removeInvalidWorkout();

@@ -147,7 +147,7 @@ void CloudDBAcceptConditionsDialog::rejectConditions() {
 
 QString CloudDBCommon::cloudDBBaseURL = QString("https://%1.appspot.com/v1/").arg(GC_CLOUD_DB_APP_NAME);
 QVariant  CloudDBCommon::cloudDBContentType = QVariant("application/json");
-QByteArray CloudDBCommon::cloudDBBasicAuth = "Basic " + QByteArray(GC_CLOUD_DB_BASIC_AUTH) ;
+QByteArray CloudDBCommon::cloudDBBasicAuth = "Basic " + QByteArray(GC_CLOUD_DB_BASIC_AUTH);
 
 QList<QString> CloudDBCommon::cloudDBLangsIds = QList<QString>() << "en" << "fr" << "ja" << "pt-br" << "it" << "de" << "ru" << "cs" << "es" << "pt" << "zh-cn" << "zh-tw" << "nl" << "sv" << "xx";
 
@@ -290,20 +290,6 @@ CloudDBCommon::unmarshallAPIHeaderV1(QByteArray json, QList<CommonAPIHeaderV1> *
 
     return true;
 }
-
-void
-CloudDBCommon::sslErrors(QNetworkReply* reply ,QList<QSslError> errors)
-{
-    QString errorString = "";
-    foreach (const QSslError e, errors ) {
-        if (!errorString.isEmpty())
-            errorString += ", ";
-        errorString += e.errorString();
-    }
-    QMessageBox::warning(NULL, tr("HTTP"), tr("SSL error(s) has occurred: %1").arg(errorString));
-    reply->ignoreSslErrors();
-}
-
 
 void
 CloudDBCommon::unmarshallAPIHeaderV1Object(QJsonObject* object, CommonAPIHeaderV1* chartHeader) {

@@ -318,7 +318,7 @@ Estimator::run()
                 printd("%s WPK Estimates for %s - %s (%s): CP=%.1f W'=%.1f\n", sport.toStdString().c_str(), add.from.toString().toStdString().c_str(), add.to.toString().toStdString().c_str(), add.model.toStdString().c_str(), add.CP, add.WPrime);
                 est << add;
             } else {
-                printd("%s WPK Estimates for %s - %s (%s): Not available\n", sport.toStdString().c_str(), add.from.toString().toStdString().c_str(), add.to.toString().toStdString().c_str(), add.model.toStdString().c_str(), add.CP, add.WPrime);
+                printd("%s WPK Estimates for %s - %s (%s): Not available\n", sport.toStdString().c_str(), add.from.toString().toStdString().c_str(), add.to.toString().toStdString().c_str(), add.model.toStdString().c_str());
             }
 
         }

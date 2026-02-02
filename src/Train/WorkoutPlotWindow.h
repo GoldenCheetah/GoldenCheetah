@@ -32,16 +32,18 @@
 #include "Settings.h"
 #include "Colors.h"
 
-#include <QGroupBox>
 #include <QLabel>
 #include <QComboBox>
 
 class WorkoutPlotWindow : public GcChartWindow
 {
     Q_OBJECT
-    G_OBJECT
 
+    Q_PROPERTY(int showNotifications READ showNotifications WRITE setShowNotifications USER true)
+    Q_PROPERTY(int lineWidth READ lineWidth WRITE setLineWidth USER true)
+    Q_PROPERTY(int showCurves READ showCurves WRITE setShowCurves USER true)
     Q_PROPERTY(int showColorZones READ showColorZones WRITE setShowColorZones USER true)
+    Q_PROPERTY(int colorZonesTransparency READ colorZonesTransparency WRITE setColorZonesTransparency USER true)
     Q_PROPERTY(int showTooltip READ showTooltip WRITE setShowTooltip USER true)
 
     public:
@@ -55,19 +57,41 @@ class WorkoutPlotWindow : public GcChartWindow
         void ergFileSelected(ErgFile *);
         void configChanged(qint32);
 
+        bool showNotifications() const;
+        void setShowNotifications(bool show);
+        double lineWidth() const;
+        void setLineWidth(double width);
+        int showCurves() const;
+        void setShowCurves(int curves);
         int showColorZones() const;
         void setShowColorZones(int index);
+        int colorZonesTransparency() const;
+        void setColorZonesTransparency(int transparency);
         int showTooltip() const;
         void setShowTooltip(int index);
 
     private:
+        QString title;
 
         Context *context;
         ErgFilePlot *ergPlot;
 
-        QGroupBox *ctrlsGroupBox;
+        QLabel *ctrlsCommonLabel;
+        QCheckBox *ctrlsShowNotification;
+        QLabel *ctrlsLineWidthLabel;
+        QSlider *ctrlsLineWidth;
+        QLabel *ctrlsShowCurveLabel;
+        QCheckBox *ctrlsShowWbalCurvePredict;
+        QCheckBox *ctrlsShowWbalCurve;
+        QCheckBox *ctrlsShowWattsCurve;
+        QCheckBox *ctrlsShowHrCurve;
+        QCheckBox *ctrlsShowCadCurve;
+        QCheckBox *ctrlsShowSpeedCurve;
+        QLabel *ctrlsErgmodeLabel;
         QLabel *ctrlsSituationLabel;
         QComboBox *ctrlsSituation;
+        QLabel *ctrlsTransparencyLabel;
+        QSlider *ctrlsTransparencySlider;
         QLabel *ctrlsShowTooltipLabel;
         QComboBox *ctrlsShowTooltip;
 };

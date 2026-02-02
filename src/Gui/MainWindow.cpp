@@ -77,11 +77,11 @@
 #include "AddCloudWizard.h"
 #include "LocalFileStore.h"
 #include "CloudService.h"
+#include "SaveDialogs.h"
 
 // GUI Widgets
 #include "AthleteTab.h"
 #include "GcToolBar.h"
-#include "NewSideBar.h"
 #include "HelpWindow.h"
 #include "Perspective.h"
 #include "PerspectiveDialog.h"
@@ -115,6 +115,12 @@
 #include "WindowsCrashHandler.cpp"
 #endif
 
+// The order of the GcViewStackIdx values below must match the viewStack widget's tab order, see the MainWindow's constructor below.
+namespace GcViewStackIdx {
+// use constexpr instead of enum class to prevent unecessary casting
+constexpr int SELECT_ATHLETE_VIEW = 0;
+constexpr int ATHLETE_TAB_STACK = 1;
+};
 
 // We keep track of all theopen mainwindows
 QList<MainWindow *> mainwindows;
@@ -207,34 +213,33 @@ MainWindow::MainWindow(const QDir &home)
     HelpWhatsThis *helpNewSideBar = new HelpWhatsThis(sidebar);
     sidebar->setWhatsThis(helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar));
 
-    sidebar->addItem(QImage(":sidebar/athlete.png"), tr("athletes"), 0, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Athletes));
-    sidebar->setItemEnabled(1, false);
+    // The ids of the sidebar buttons below are defined in NewSideBar.h
+    sidebar->addItem(QImage(":sidebar/athlete.png"), tr("athletes"), GcSideBarBtnId::SELECT_ATHLETE_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Athletes));
 
-    sidebar->addItem(QImage(":sidebar/plan.png"), tr("plan"), 1), tr("Feature not implemented yet");
-    sidebar->setItemEnabled(1, false);
+    sidebar->addItem(QImage(":sidebar/plan.png"), tr("plan"), GcSideBarBtnId::PLAN_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Plan));
 
-    sidebar->addItem(QImage(":sidebar/trends.png"), tr("trends"), 2, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Trends));
-    sidebar->addItem(QImage(":sidebar/assess.png"), tr("activities"), 3, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Rides));
-    sidebar->setItemSelected(3, true);
+    sidebar->addItem(QImage(":sidebar/trends.png"), tr("trends"), GcSideBarBtnId::TRENDS_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Trends));
 
-    sidebar->addItem(QImage(":sidebar/reflect.png"), tr("reflect"), 4), tr("Feature not implemented yet");
-    sidebar->setItemEnabled(4, false);
+    sidebar->addItem(QImage(":sidebar/assess.png"), tr("activities"), GcSideBarBtnId::ACTIVITIES_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Rides));
 
-    sidebar->addItem(QImage(":sidebar/train.png"), tr("train"), 5, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Train));
+    sidebar->addItem(QImage(":sidebar/reflect.png"), tr("reflect"), GcSideBarBtnId::REFLECT_BTN, tr("Feature not implemented yet"));
+    sidebar->setItemEnabled(GcSideBarBtnId::REFLECT_BTN, false);
+
+    sidebar->addItem(QImage(":sidebar/train.png"), tr("train"), GcSideBarBtnId::TRAIN_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Train));
 
     sidebar->addStretch();
-    sidebar->addItem(QImage(":sidebar/apps.png"), tr("apps"), 6, tr("Feature not implemented yet"));
-    sidebar->setItemEnabled(6, false);
+    sidebar->addItem(QImage(":sidebar/apps.png"), tr("apps"), GcSideBarBtnId::APPS_BTN, tr("Feature not implemented yet"));
+    sidebar->setItemEnabled(GcSideBarBtnId::APPS_BTN, false);
     sidebar->addStretch();
 
     // we can click on the quick icons, but they aren't selectable views
-    sidebar->addItem(QImage(":sidebar/sync.png"), tr("sync"), 7, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Sync));
-    sidebar->setItemSelectable(7, false);
-    sidebar->addItem(QImage(":sidebar/prefs.png"), tr("options"), 8, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Options));
-    sidebar->setItemSelectable(8, false);
+    sidebar->addItem(QImage(":sidebar/sync.png"), tr("sync"), GcSideBarBtnId::SYNC_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Sync));
+    sidebar->setItemSelectable(GcSideBarBtnId::SYNC_BTN, false);
+    sidebar->addItem(QImage(":sidebar/prefs.png"), tr("options"), GcSideBarBtnId::OPTIONS_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Options));
+    sidebar->setItemSelectable(GcSideBarBtnId::OPTIONS_BTN, false);
 
-    connect(sidebar, SIGNAL(itemClicked(int)), this, SLOT(sidebarClicked(int)));
-    connect(sidebar, SIGNAL(itemSelected(int)), this, SLOT(sidebarSelected(int)));
+    connect(sidebar, SIGNAL(itemClicked(GcSideBarBtnId)), this, SLOT(sidebarClicked(GcSideBarBtnId)));
+    connect(sidebar, SIGNAL(itemSelected(GcSideBarBtnId)), this, SLOT(sidebarSelected(GcSideBarBtnId)));
 
     /*----------------------------------------------------------------------
      * What's this Context Help
@@ -416,6 +421,7 @@ MainWindow::MainWindow(const QDir &home)
     tabbar->setDocumentMode(true);
 #endif
 
+    // Note: The order of the viewStack tabs below, must match the GcViewStackIdx definitions above.
     athleteView = new AthleteView(context);
     viewStack = new QStackedWidget(this);
     viewStack->addWidget(athleteView);
@@ -460,7 +466,6 @@ MainWindow::MainWindow(const QDir &home)
     tablayout->addWidget(viewStack);
     setCentralWidget(central);
 
-#if QT_VERSION >= 0x060000
     /*----------------------------------------------------------------------
      * Hack to avoid a flickering MainWindow when showing a QWebEngineView in a chart, e.g. a Map:
      * Temporarily add a dummy QWebEngineView with some random content before the MainWindow is shown
@@ -471,7 +476,6 @@ MainWindow::MainWindow(const QDir &home)
     mainLayout->addWidget(dummywev);
     mainLayout->removeWidget(dummywev);
     delete dummywev;
-#endif
 
     /*----------------------------------------------------------------------
      * Application Menus
@@ -522,25 +526,25 @@ MainWindow::MainWindow(const QDir &home)
 
     // ACTIVITY MENU
     QMenu *rideMenu = menuBar()->addMenu(tr("A&ctivity"));
-    rideMenu->addAction(tr("&Download from device..."), this, SLOT(downloadRide()), QKeySequence("Ctrl+D"));
-    rideMenu->addAction(tr("&Import from file..."), this, SLOT (importFile()), QKeySequence("Ctrl+I"));
-    rideMenu->addAction(tr("&Manual entry..."), this, SLOT(manualRide()), QKeySequence("Ctrl+M"));
+    rideMenu->addAction(tr("&Download from device..."), QKeySequence("Ctrl+D"), this, SLOT(downloadRide()));
+    rideMenu->addAction(tr("&Import from file..."), QKeySequence("Ctrl+I"), this, SLOT (importFile()));
+    rideMenu->addAction(tr("&Manual entry..."), QKeySequence("Ctrl+M"), this, SLOT(manualRide()));
     QAction *actionPlan = new QAction(tr("&Plan activity..."));
-    connect(context, &Context::start, this, [=]() { actionPlan->setEnabled(false); }); // The dialog can change the contexts workout
-    connect(context, &Context::stop, this, [=]() { actionPlan->setEnabled(true); });   // temporarily which might cause unwanted effects
-    connect(actionPlan, &QAction::triggered, this, [=]() { planActivity(); });
+    connect(context, &Context::start, this, [actionPlan]() { actionPlan->setEnabled(false); }); // The dialog can change the contexts workout
+    connect(context, &Context::stop, this, [actionPlan]() { actionPlan->setEnabled(true); });   // temporarily which might cause unwanted effects
+    connect(actionPlan, &QAction::triggered, this, [this]() { planActivity(); });
     rideMenu->addAction(actionPlan);
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("&Export..."), this, SLOT(exportRide()), QKeySequence("Ctrl+E"));
-    rideMenu->addAction(tr("&Batch Processing..."), this, SLOT(batchProcessing()), QKeySequence("Ctrl+B"));
+    rideMenu->addAction(tr("&Export..."), QKeySequence("Ctrl+E"), this, SLOT(exportRide()));
+    rideMenu->addAction(tr("&Batch Processing..."), QKeySequence("Ctrl+B"), this, SLOT(batchProcessing()));
 
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("&Save activity"), this, SLOT(saveRide()), QKeySequence("Ctrl+S"));
+    rideMenu->addAction(tr("&Save activity"), QKeySequence("Ctrl+S"), this, SLOT(saveRide()));
     rideMenu->addAction(tr("D&elete activity..."), this, SLOT(deleteRide()));
     rideMenu->addAction(tr("Split &activity..."), this, SLOT(splitRide()));
     rideMenu->addAction(tr("Combine activities..."), this, SLOT(mergeRide()));
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("Find intervals..."), this, SLOT(addIntervals()), QKeySequence(""));
+    rideMenu->addAction(tr("Find intervals..."), QKeySequence(""), this, SLOT(addIntervals()));
 
     HelpWhatsThis *helpRideMenu = new HelpWhatsThis(rideMenu);
     rideMenu->setWhatsThis(helpRideMenu->getWhatsThisText(HelpWhatsThis::MenuBar_Activity));
@@ -622,7 +626,9 @@ MainWindow::MainWindow(const QDir &home)
 
 
     editMenu = menuBar()->addMenu(tr("&Edit"));
-    connect(editMenu, SIGNAL(aboutToShow()), this, SLOT(onEditMenuAboutToShow()));
+    // Force the signal to emit, without this on MacOS the edit menu disappears if we have translation enabled.
+    onEditMenuAboutToShow();
+    connect(editMenu, &QMenu::aboutToShow, this, &MainWindow::onEditMenuAboutToShow);
 
     HelpWhatsThis *editMenuHelp = new HelpWhatsThis(editMenu);
     editMenu->setWhatsThis(editMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Edit));
@@ -630,25 +636,26 @@ MainWindow::MainWindow(const QDir &home)
     // VIEW MENU
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
 #ifndef Q_OS_MAC
-    viewMenu->addAction(tr("Toggle Full Screen"), this, SLOT(toggleFullScreen()), QKeySequence("F11"));
+    viewMenu->addAction(tr("Toggle Full Screen"), QKeySequence("F11"), this, SLOT(toggleFullScreen()));
 #endif
-    showhideViewbar = viewMenu->addAction(tr("Show View Sidebar"), this, SLOT(showViewbar(bool)), QKeySequence("F2"));
+    showhideViewbar = viewMenu->addAction(tr("Show View Sidebar"), QKeySequence("F2"), this, SLOT(showViewbar(bool)));
     showhideViewbar->setCheckable(true);
     showhideViewbar->setChecked(true);
-    showhideSidebar = viewMenu->addAction(tr("Show Left Sidebar"), this, SLOT(showSidebar(bool)), QKeySequence("F3"));
+    showhideSidebar = viewMenu->addAction(tr("Show Left Sidebar"), QKeySequence("F3"), this, SLOT(showSidebar(bool)));
     showhideSidebar->setCheckable(true);
     showhideSidebar->setChecked(true);
-    showhideLowbar = viewMenu->addAction(tr("Show Compare Pane"), this, SLOT(showLowbar(bool)), QKeySequence("F4"));
+    showhideLowbar = viewMenu->addAction(tr("Show Compare Pane"), QKeySequence("F4"), this, SLOT(showLowbar(bool)));
     showhideLowbar->setCheckable(true);
     showhideLowbar->setChecked(false);
-    showhideToolbar = viewMenu->addAction(tr("Show Toolbar"), this, SLOT(showToolbar(bool)), QKeySequence("F5"));
+    showhideToolbar = viewMenu->addAction(tr("Show Toolbar"), QKeySequence("F5"), this, SLOT(showToolbar(bool)));
     showhideToolbar->setCheckable(true);
     showhideToolbar->setChecked(true);
-    showhideTabbar = viewMenu->addAction(tr("Show Athlete Tabs"), this, SLOT(showTabbar(bool)), QKeySequence("F6"));
+    showhideTabbar = viewMenu->addAction(tr("Show Athlete Tabs"), QKeySequence("F6"), this, SLOT(showTabbar(bool)));
     showhideTabbar->setCheckable(true);
     showhideTabbar->setChecked(true);
 
     viewMenu->addSeparator();
+    viewMenu->addAction(tr("Plan"), this, SLOT(selectPlan()));
     viewMenu->addAction(tr("Trends"), this, SLOT(selectTrends()));
     viewMenu->addAction(tr("Activities"), this, SLOT(selectAnalysis()));
     viewMenu->addAction(tr("Train"), this, SLOT(selectTrain()));
@@ -701,7 +708,15 @@ MainWindow::MainWindow(const QDir &home)
     //connect(this, SIGNAL(rideClean()), this, SLOT(enableSaveButton()));
 
     saveGCState(currentAthleteTab->context); // set to whatever we started with
-    selectAnalysis();
+
+    // switch to the startup view, default is analysis.
+    switch (appsettings->value(NULL, GC_STARTUP_VIEW, "1").toInt()) {
+        case 0: selectTrends(); break;
+        case 1: selectAnalysis(); break;
+        case 2: selectPlan(); break;
+        case 3: selectTrain(); break;
+        default: selectAnalysis(); qDebug() << "Unknown startup view"; break;
+    }
 
     //grab focus
     currentAthleteTab->setFocus();
@@ -743,8 +758,6 @@ MainWindow::MainWindow(const QDir &home)
 
     versionClient = new CloudDBVersionClient();
     versionClient->informUserAboutLatestVersions();
-
-
 
 #endif
 
@@ -845,7 +858,7 @@ MainWindow::setChartMenu(QMenu *menu)
         case 0 : mask = VIEW_TRENDS; break;
         default:
         case 1 : mask = VIEW_ANALYSIS; break;
-        case 2 : mask = VIEW_DIARY; break;
+        case 2 : mask = VIEW_PLAN; break;
         case 3 : mask = VIEW_TRAIN; break;
     }
 
@@ -879,9 +892,7 @@ MainWindow::importChart()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Select Chart file to import"), "", tr("GoldenCheetah Chart Files (*.gchart)"));
 
-    if (fileName.isEmpty()) {
-        QMessageBox::critical(this, tr("Import Chart"), tr("No chart file selected!"));
-    } else {
+    if (!fileName.isEmpty()) {
         importCharts(QStringList()<<fileName);
     }
 }
@@ -897,7 +908,7 @@ MainWindow::exportPerspective()
     switch (view) {
     case 0:  current = currentAthleteTab->homeView; typedesc = "Trends"; break;
     case 1:  current = currentAthleteTab->analysisView; typedesc = "Analysis"; break;
-    case 2:  current = currentAthleteTab->diaryView; typedesc = "Diary"; break;
+    case 2:  current = currentAthleteTab->planView; typedesc = "Plan"; break;
     case 3:  current = currentAthleteTab->trainView; typedesc = "Train"; break;
     }
 
@@ -923,7 +934,7 @@ MainWindow::importPerspective()
     switch (view) {
     case 0:  current = currentAthleteTab->homeView; break;
     case 1:  current = currentAthleteTab->analysisView; break;
-    case 2:  current = currentAthleteTab->diaryView; break;
+    case 2:  current = currentAthleteTab->planView; break;
     case 3:  current = currentAthleteTab->trainView; break;
     }
 
@@ -1123,6 +1134,20 @@ void MainWindow::setFilter(QStringList f) { currentAthleteTab->context->setFilte
 void MainWindow::clearFilter() { currentAthleteTab->context->clearFilter(); }
 
 void
+MainWindow::fillinFilter(const QString &filterText)
+{
+    searchBox->setMode(SearchBox::Filter);
+    searchBox->setText(filterText);
+}
+
+void
+MainWindow::fillinSearch(const QString &filterText)
+{
+    searchBox->setMode(SearchBox::Search);
+    searchBox->setText(filterText);
+}
+
+void
 MainWindow::aboutDialog()
 {
     AboutDialog *ad = new AboutDialog(currentAthleteTab->context);
@@ -1217,37 +1242,36 @@ MainWindow::support()
 }
 
 void
-MainWindow::sidebarClicked(int id)
+MainWindow::sidebarClicked(GcSideBarBtnId id)
 {
-    // sync quick link
-    if (id == 7) checkCloud();
+    switch (id) {
+    case GcSideBarBtnId::SYNC_BTN: checkCloud(); break; // sync quick link
+    case GcSideBarBtnId::OPTIONS_BTN: showOptions(); break; // prefs
 
-    // prefs
-    if (id == 8) showOptions();
-
+    default: break;
+    }
 }
 
 void
-MainWindow::sidebarSelected(int id)
+MainWindow::sidebarSelected(GcSideBarBtnId id)
 {
     switch (id) {
-    case 0: selectAthlete(); break;
-    case 1: // plan not written yet
-            break;
-    case 2: selectTrends(); break;
-    case 3: selectAnalysis(); break;
-    case 4: // reflect not written yet
-            break;
-    case 5: selectTrain(); break;
-    case 6: // apps not written yet
-            break;
+    case GcSideBarBtnId::SELECT_ATHLETE_BTN: selectAthlete(); break;
+    case GcSideBarBtnId::PLAN_BTN: selectPlan(); break;
+    case GcSideBarBtnId::TRENDS_BTN: selectTrends(); break;
+    case GcSideBarBtnId::ACTIVITIES_BTN: selectAnalysis(); break;
+    case GcSideBarBtnId::REFLECT_BTN: break; // reflect not written yet
+    case GcSideBarBtnId::TRAIN_BTN: selectTrain(); break;
+    case GcSideBarBtnId::APPS_BTN: break;// apps not written yet
+
+    default: break;
     }
 }
 
 void
 MainWindow::selectAthlete()
 {
-    viewStack->setCurrentIndex(0);
+    viewStack->setCurrentIndex(GcViewStackIdx::SELECT_ATHLETE_VIEW);
     back->hide();
     forward->hide();
     perspectiveSelector->hide();
@@ -1259,15 +1283,16 @@ void
 MainWindow::selectAnalysis()
 {
     resetPerspective(1);
-    //currentTab->analysisView->setPerspectives(perspectiveSelector);
-    viewStack->setCurrentIndex(1);
-    sidebar->setItemSelected(3, true);
+    viewStack->setCurrentIndex(GcViewStackIdx::ATHLETE_TAB_STACK);
+    sidebar->setItemSelected(GcSideBarBtnId::ACTIVITIES_BTN, true);
     currentAthleteTab->selectView(1);
     back->show();
     forward->show();
     perspectiveSelector->show();
     searchBox->show();
     workoutFilterBox->hide();
+    showhideLowbar->setText(tr("Show Compare Pane"));
+    showhideLowbar->setVisible(true);
     setToolButtons();
 }
 
@@ -1275,30 +1300,32 @@ void
 MainWindow::selectTrain()
 {
     resetPerspective(3);
-    //currentTab->trainView->setPerspectives(perspectiveSelector);
-    viewStack->setCurrentIndex(1);
-    sidebar->setItemSelected(5, true);
+    viewStack->setCurrentIndex(GcViewStackIdx::ATHLETE_TAB_STACK);
+    sidebar->setItemSelected(GcSideBarBtnId::TRAIN_BTN, true);
     currentAthleteTab->selectView(3);
     back->show();
     forward->show();
     perspectiveSelector->show();
     searchBox->hide();
     workoutFilterBox->show();
+    showhideLowbar->setText(tr("Workout Control Pane"));
+    showhideLowbar->setVisible(true);
     setToolButtons();
 }
 
 void
-MainWindow::selectDiary()
+MainWindow::selectPlan()
 {
     resetPerspective(2);
-    //currentTab->diaryView->setPerspectives(perspectiveSelector);
-    viewStack->setCurrentIndex(1);
+    viewStack->setCurrentIndex(GcViewStackIdx::ATHLETE_TAB_STACK);
+    sidebar->setItemSelected(GcSideBarBtnId::PLAN_BTN, true);
     currentAthleteTab->selectView(2);
     back->show();
     forward->show();
     perspectiveSelector->show();
     searchBox->show();
     workoutFilterBox->hide();
+    showhideLowbar->setVisible(false);
     setToolButtons();
 }
 
@@ -1306,15 +1333,16 @@ void
 MainWindow::selectTrends()
 {
     resetPerspective(0);
-    //currentTab->homeView->setPerspectives(perspectiveSelector);
-    viewStack->setCurrentIndex(1);
-    sidebar->setItemSelected(2, true);
+    viewStack->setCurrentIndex(GcViewStackIdx::ATHLETE_TAB_STACK);
+    sidebar->setItemSelected(GcSideBarBtnId::TRENDS_BTN, true);
     currentAthleteTab->selectView(0);
     back->show();
     forward->show();
     perspectiveSelector->show();
     searchBox->show();
     workoutFilterBox->hide();
+    showhideLowbar->setText(tr("Show Compare Pane"));
+    showhideLowbar->setVisible(true);
     setToolButtons();
 }
 
@@ -1327,46 +1355,41 @@ MainWindow::isStarting
 }
 
 
+bool
+MainWindow::filenameWillChange(RideItem *rideItem, QString *newName) const
+{
+    QFileInfo currentFI(rideItem->fileName);
+    QDateTime ridedatetime = rideItem->ride()->startTime();
+    QChar zero = QLatin1Char('0');
+    QString targetnosuffix = QString("%1_%2_%3_%4_%5_%6")
+                                    .arg(ridedatetime.date().year(), 4, 10, zero)
+                                    .arg(ridedatetime.date().month(), 2, 10, zero)
+                                    .arg(ridedatetime.date().day(), 2, 10, zero)
+                                    .arg(ridedatetime.time().hour(), 2, 10, zero)
+                                    .arg(ridedatetime.time().minute(), 2, 10, zero)
+                                    .arg(ridedatetime.time().second(), 2, 10, zero);
+    if (newName != nullptr) {
+        *newName = targetnosuffix + "." + currentFI.suffix();
+    }
+
+    return currentFI.baseName() != targetnosuffix;
+}
+
+
 void
 MainWindow::setToolButtons()
 {
     int select = currentAthleteTab->isTiled() ? 1 : 0;
     int lowselected = currentAthleteTab->isBottomRequested() ? 1 : 0;
+    int sidebarselected = currentAthleteTab->isSidebarEnabled() ? 1 : 0;
 
     styleAction->setChecked(select);
     showhideLowbar->setChecked(lowselected);
+    showhideSidebar->setChecked(sidebarselected);
 
     //if (styleSelector->isSegmentSelected(select) == false)
         //styleSelector->setSegmentSelected(select, true);
 
-    int index = currentAthleteTab->currentView();
-
-    //XXX WTAF! The index used is fucked up XXX
-    //          hack around this and then come back
-    //          and look at this as a separate fixup
-#ifdef GC_HAVE_ICAL
-    switch (index) {
-    case 0: // home no change
-    case 3: // train no change
-    default:
-        break;
-    case 1:
-        index = 2; // analysis
-        break;
-    case 2:
-        index = 1; // diary
-        break;
-    }
-#else
-    switch (index) {
-    case 0: // home no change
-    case 1:
-    default:
-        break;
-    case 3:
-        index = 2; // train
-    }
-#endif
 #ifdef Q_OS_MAC // bizarre issue with searchbox focus on tab voew change
     searchBox->clearFocus();
 #endif
@@ -1399,7 +1422,7 @@ MainWindow::resetPerspective(int view, bool force)
 
     case 0:  current = currentAthleteTab->homeView; break;
     case 1:  current = currentAthleteTab->analysisView; break;
-    case 2:  current = currentAthleteTab->diaryView; break;
+    case 2:  current = currentAthleteTab->planView; break;
     case 3:  current = currentAthleteTab->trainView; break;
     }
 
@@ -1421,7 +1444,7 @@ MainWindow::perspectiveSelected(int index)
     switch (view) {
     case 0:  current = currentAthleteTab->homeView; break;
     case 1:  current = currentAthleteTab->analysisView; break;
-    case 2:  current = currentAthleteTab->diaryView; break;
+    case 2:  current = currentAthleteTab->planView; break;
     case 3:  current = currentAthleteTab->trainView; break;
     }
 
@@ -1491,7 +1514,7 @@ MainWindow::perspectivesChanged()
     switch (view) {
     case 0:  current = currentAthleteTab->homeView; break;
     case 1:  current = currentAthleteTab->analysisView; break;
-    case 2:  current = currentAthleteTab->diaryView; break;
+    case 2:  current = currentAthleteTab->planView; break;
     case 3:  current = currentAthleteTab->trainView; break;
     }
 
@@ -1907,8 +1930,29 @@ MainWindow::deleteRide()
     msgBox.setDefaultButton(QMessageBox::Cancel);
     msgBox.setIcon(QMessageBox::Critical);
     msgBox.exec();
-    if(msgBox.clickedButton() == deleteButton)
-        currentAthleteTab->context->athlete->removeCurrentRide();
+    if (msgBox.clickedButton() == deleteButton) {
+        RideCache::OperationPreCheck check = currentAthleteTab->context->athlete->rideCache->checkUnlinkActivity(item);
+        bool nextStep = true;
+        if (nextStep && check.canProceed) {
+            if (proceedDialog(currentAthleteTab->context, check)) {
+                currentAthleteTab->context->tab->setNoSwitch(true);
+                RideCache::OperationResult result = currentAthleteTab->context->athlete->rideCache->unlinkActivity(item);
+                currentAthleteTab->context->tab->setNoSwitch(false);
+                if (result.success) {
+                    QString error;
+                    currentAthleteTab->context->athlete->rideCache->saveActivities(check.affectedItems, error);
+                } else {
+                    QMessageBox::warning(this, "Failed", result.error);
+                    nextStep = false;
+                }
+            } else {
+                nextStep = false;
+            }
+        }
+        if (nextStep) {
+            currentAthleteTab->context->athlete->removeCurrentRide();
+        }
+    }
 }
 
 /*----------------------------------------------------------------------
@@ -2161,7 +2205,7 @@ MainWindow::setOpenTabMenu()
 
     // add create new option
     openTabMenu->addSeparator();
-    openTabMenu->addAction(tr("&New Athlete..."), this, SLOT(newCyclistTab()), QKeySequence("Ctrl+N"));
+    openTabMenu->addAction(tr("&New Athlete..."), QKeySequence("Ctrl+N"), this, SLOT(newCyclistTab()));
 }
 
 void
@@ -2269,18 +2313,18 @@ MainWindow::saveGCState(Context *context)
 void
 MainWindow::restoreGCState(Context *context)
 {
-    if (viewStack->currentIndex() != 0) {
+    if (viewStack->currentIndex() != GcViewStackIdx::SELECT_ATHLETE_VIEW) {
 
         // not on athlete view...
         resetPerspective(currentAthleteTab->currentView()); // will lazy load, hence doing it first
 
         // restore window state from the supplied context
             switch(currentAthleteTab->currentView()) {
-            case 0: sidebar->setItemSelected(2,true); break;
-            case 1: sidebar->setItemSelected(3,true); break;
-            case 2: break; // diary not an icon
-            case 3: sidebar->setItemSelected(5, true); break;
-            default: sidebar->setItemSelected(0, true); break;
+            case 0: sidebar->setItemSelected(GcSideBarBtnId::TRENDS_BTN,true); break;
+            case 1: sidebar->setItemSelected(GcSideBarBtnId::ACTIVITIES_BTN,true); break;
+            case 2: sidebar->setItemSelected(GcSideBarBtnId::PLAN_BTN,true); break;
+            case 3: sidebar->setItemSelected(GcSideBarBtnId::TRAIN_BTN, true); break;
+            default: sidebar->setItemSelected(GcSideBarBtnId::SELECT_ATHLETE_BTN, true); break;
         }
     }
 
@@ -2380,6 +2424,19 @@ MainWindow::importWorkout()
         Library::importFiles(currentAthleteTab->context, fileNamesCopy);
     }
 }
+
+void
+MainWindow::clearWorkoutFilterBox()
+{
+    workoutFilterBox->clear();
+}
+
+void
+MainWindow::fillinWorkoutFilterBox(const QString &filterText)
+{
+    workoutFilterBox->setText(filterText);
+}
+
 /*----------------------------------------------------------------------
  * TrainerDay
  *--------------------------------------------------------------------*/
@@ -2608,24 +2665,23 @@ MainWindow::ridesAutoImport() {
 
 void MainWindow::onEditMenuAboutToShow()
 {
+    // On MacOS the clear here is dangerous because it's a system menu so we can't do this via aboutToShow.
     editMenu->clear();
     if (toolMapper != nullptr) {
-        delete toolMapper;
+      toolMapper.reset();
     }
-
     // Add all the data processors to the tools menu
     const DataProcessorFactory &factory = DataProcessorFactory::instance();
     QList<DataProcessor*> processors = factory.getProcessorsSorted();
-    toolMapper = new QSignalMapper(this); // maps each option
-    connect(toolMapper, &QSignalMapper::mappedString, this, &MainWindow::manualProcess);
-
-    for (QList<DataProcessor*>::iterator iter = processors.begin(); iter != processors.end(); ++iter) {
-        if (! (*iter)->isAutomatedOnly()) {
+    toolMapper = std::make_unique<QSignalMapper>(); // maps each option
+    connect(toolMapper.get(), &QSignalMapper::mappedString, this, &MainWindow::manualProcess);
+    for (const auto& iter : processors) {
+        if (!iter->isAutomatedOnly()) {
             // The localized processor name is shown in menu
-            QAction *action = new QAction(QString("%1...").arg((*iter)->name()), this);
+            auto* action = new QAction(QString("%1...").arg(iter->name()), toolMapper.get());
+            connect(action, &QAction::triggered, toolMapper.get(), static_cast<void(QSignalMapper::*)()>(&QSignalMapper::map));
+            toolMapper->setMapping(action, iter->id());
             editMenu->addAction(action);
-            connect(action, SIGNAL(triggered()), toolMapper, SLOT(map()));
-            toolMapper->setMapping(action, (*iter)->id());
         }
     }
 }

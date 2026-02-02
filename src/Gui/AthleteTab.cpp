@@ -30,7 +30,7 @@
 
 #include <QPaintEvent>
 
-AthleteTab::AthleteTab(Context *context) : QWidget(context->mainWindow), context(context), noswitch(true)
+AthleteTab::AthleteTab(Context *context) : QWidget(context->mainWindow), context(context), noswitch(true), startupViewChangeSent(false)
 {
     context->tab = this;
     init = false;
@@ -63,12 +63,12 @@ AthleteTab::AthleteTab(Context *context) : QWidget(context->mainWindow), context
     homeControls->setContentsMargins(0,0,0,0);
     homeView = new TrendsView(context, homeControls);
 
-    // Diary
-    diaryControls = new QStackedWidget(this);
-    diaryControls->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
-    diaryControls->setCurrentIndex(0);
-    diaryControls->setContentsMargins(0,0,0,0);
-    diaryView = new DiaryView(context, diaryControls);
+    // Plan
+    planControls = new QStackedWidget(this);
+    planControls->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
+    planControls->setCurrentIndex(0);
+    planControls->setContentsMargins(0,0,0,0);
+    planView = new PlanView(context, planControls);
 
     // Train
     trainControls = new QStackedWidget(this);
@@ -83,12 +83,12 @@ AthleteTab::AthleteTab(Context *context) : QWidget(context->mainWindow), context
     // when switching views
     views->addWidget(homeView);
     views->addWidget(analysisView);
-    views->addWidget(diaryView);
+    views->addWidget(planView);
     views->addWidget(trainView);
 
     masterControls->addWidget(homeControls);
     masterControls->addWidget(analysisControls);
-    masterControls->addWidget(diaryControls);
+    masterControls->addWidget(planControls);
     masterControls->addWidget(trainControls);
 
     // the dialog box for the chart settings
@@ -115,7 +115,7 @@ AthleteTab::~AthleteTab()
     delete analysisView;
     delete homeView;
     delete trainView;
-    delete diaryView;
+    delete planView;
     delete views;
     delete nav;
 }
@@ -126,7 +126,7 @@ AthleteTab::close()
     analysisView->close();
     homeView->close();
     trainView->close();
-    diaryView->close();
+    planView->close();
 }
 
 /******************************************************************************
@@ -151,7 +151,7 @@ void AthleteTab::setRide(RideItem*ride)
     analysisView->setRide(ride);
     homeView->setRide(ride);
     trainView->setRide(ride);
-    diaryView->setRide(ride);
+    planView->setRide(ride);
 }
 
 AbstractView *
@@ -161,7 +161,7 @@ AthleteTab::view(int index)
         case 0 : return homeView;
         default:
         case 1 : return analysisView;
-        case 2 : return diaryView;
+        case 2 : return planView;
         case 3 : return trainView;
     }
 }
@@ -169,7 +169,13 @@ AthleteTab::view(int index)
 void
 AthleteTab::selectView(int index)
 {
-    if (views->currentIndex() == index) return; // not changing
+    // ensure an initial viewChanged() event occurs for the navigation model, otherwise if the
+    // startup view is trends (value zero) the guard rejects the selection as views->currentIndex() is zero
+    if (startupViewChangeSent && views->currentIndex() == index) return; // not changing
+    startupViewChangeSent = true;
+
+    // suspend screen updates while the view is changed.
+    views->setUpdatesEnabled(false);
 
     emit viewChanged(index);
 
@@ -182,20 +188,15 @@ AthleteTab::selectView(int index)
     masterControls->setCurrentIndex(index);
     context->setIndex(index);
     context->mainWindow->resetPerspective(index); // set perspective for this view
+
+    // enable screen updates to render the view without flickering
+    views->setUpdatesEnabled(true);
 }
 
 void
 AthleteTab::rideSelected(RideItem*)
 {
     emit rideItemSelected(context->ride);
-
-    // update the ride property on all widgets
-    // to let them know they need to replot new
-    // selected ride (now the tree is up to date)
-    setRide(context->ride);
-
-    // notify that the intervals have been cleared too
-    context->notifyIntervalsChanged();
 
     // if we selected a ride we should be on the analysis
     // view-- this is new with the overview and click thru
@@ -211,10 +212,18 @@ AthleteTab::rideSelected(RideItem*)
         // as important to be aware that perspectives are loaded
         // when the view is selected by the user and no earlier
         if (analysisView->page() != NULL) {
-            context->mainWindow->newSidebar()->setItemSelected(3, true);
+            context->mainWindow->newSidebar()->setItemSelected(GcSideBarBtnId::ACTIVITIES_BTN, true);
             selectView(1);
         }
     }
+
+    // update the ride property on all widgets
+    // to let them know they need to replot new
+    // selected ride (now the tree is up to date)
+    setRide(context->ride);
+
+    // notify that the intervals have been cleared too
+    context->notifyIntervalsChanged();
 }
 
 ProgressLine::ProgressLine(QWidget *parent, Context *context) : QWidget(parent), context(context)

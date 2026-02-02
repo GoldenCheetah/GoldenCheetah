@@ -284,7 +284,7 @@ RideNavigator::resetView()
     // add metadata fields...
     SpecialFields& sp = SpecialFields::getInstance(); // all the special fields are in here...
     foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
-        if (!sp.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
+        if (!sp.isMetric(field.name) && (field.type != GcFieldType::FIELD_DATE && field.type != GcFieldType::FIELD_TIME)) {
             nameMap.insert(QString("%1").arg(sp.makeTechName(field.name)), sp.displayName(field.name));
             internalNameMap.insert(field.name, sp.displayName(field.name));
         }
@@ -327,10 +327,11 @@ RideNavigator::resetView()
     // initialise to whatever groupBy we want to start with
     tableView->sortByColumn(sortByIndex(), static_cast<Qt::SortOrder>(sortByOrder()));;
 
-    //tableView->setColumnHidden(0, true);
+    tableView->setColumnHidden(0, true);
     tableView->setColumnWidth(0,0);
 
-    // set the column widths
+    // set the column widths, column zero is the
+    // group by column, so we always set that to zero width.
     int columnnumber=0;
     foreach(QString size, _widths.split("|", Qt::SkipEmptyParts)) {
 
@@ -368,6 +369,13 @@ void RideNavigator::clearSearch()
     searchFilter->clearStrings();
     QApplication::processEvents(); // repaint/resize list view - scrollbar..
     setWidth(geometry().width());  // before we update column sizes!
+}
+
+void
+RideNavigator::setDisplayFilter(RideNavFilter filter)
+{
+    searchFilter->setDisplayFilter(filter);
+    QApplication::processEvents(); // repaint/resize list view - scrollbar..
 }
 
 void RideNavigator::setWidth(int x)
@@ -487,13 +495,15 @@ RideNavigator::eventFilter(QObject *object, QEvent *e)
             break;
         }
 
-        case QEvent::WindowActivate:
+        case QEvent::LayoutRequest:
         {
             active=true;
-            // set the column widths
+            // set the column widths, column zero is the
+            // group by column, so we always set that to zero width.
             int columnnumber=0;
             foreach(QString size, _widths.split("|", Qt::SkipEmptyParts)) {
-                tableView->setColumnWidth(columnnumber, size.toInt());
+                tableView->setColumnWidth(columnnumber, columnnumber ? size.toInt() : 0);
+                columnnumber++;
             }
             active=false;
             setWidth(geometry().width()); // calculate width...
@@ -605,9 +615,10 @@ RideNavigator::calcColumnsChanged(bool resized, int logicalIndex, int oldSize, i
     // correct width and store result
     setColumnWidth(geometry().width(), resized, logicalIndex, oldSize, newSize); // calculate width...
 
-    // get column widths
-    QString widths;
-    for (int i=0; i<tableView->header()->count(); i++) {
+    // get column widths, column zero is the
+    // group by column, so we always set that to zero width.
+    QString widths("0|");
+    for (int i=1; i<tableView->header()->count(); i++) {
         int index = tableView->header()->logicalIndex(i);
         if (tableView->header()->isSectionHidden(index) != true) {
            widths += QString("%1|").arg(tableView->columnWidth(index));
@@ -627,11 +638,11 @@ RideNavigator::setColumnWidth(int x, bool resized, int logicalIndex, int oldWidt
 
     active = true;
 
-#if !defined (Q_OS_MAC) // on QT5 the scrollbars have no width
+#if !defined (Q_OS_MAC)
     if (tableView->verticalScrollBar()->isVisible())
         x -= tableView->verticalScrollBar()->width()
                 + 0 ; // !! no longer account for content margins of 3,3,3,3 was + 6
-#else // we're on a mac with QT5 .. so dodgy way of spotting preferences for scrollbars...
+#else // we're on a mac.. so dodgy way of spotting preferences for scrollbars...
     // this is a nasty hack, to see if the 'always on' preference for scrollbars is set we
     // look at the scrollbar width which is 15 in this case (it is 16 when they 'appear' when
     // needed. No doubt this will change over time and need to be fixed by referencing the
@@ -654,11 +665,9 @@ RideNavigator::setColumnWidth(int x, bool resized, int logicalIndex, int oldWidt
 
     // is it narrower than the headings?
     int headwidth=0;
-    int n=0;
     for (int i=1; i<tableView->header()->count(); i++)
         if (tableView->header()->isSectionHidden(i) == false) {
             headwidth += tableView->columnWidth(i);
-            n++;
         }
 
     if (!resized) {
@@ -1112,7 +1121,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     if ((m=rideNavigator->columnMetrics.value(columnName, NULL)) != NULL) {
 
         // get double from model, special case QTime to avoid default .000 msecs
-        if ((QMetaType::Type)index.model()->data(index, Qt::DisplayRole).type() == QMetaType::QTime)
+        if (index.model()->data(index, Qt::DisplayRole).metaType().id() == QMetaType::QTime)
             value = index.model()->data(index, Qt::DisplayRole).toTime().toString("hh:mm:ss");
         else
             value = index.model()->data(index, Qt::DisplayRole).toString();
@@ -1240,7 +1249,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             painter->drawText(myOption.rect, Qt::AlignLeft | Qt::TextWordWrap, calendarText);
             painter->setPen(isColor);
 
-#if defined (Q_OS_MAC) // on QT5 the scrollbars have no width
+#if defined (Q_OS_MAC)
             if (!selected && !rideBG && high.x()+12 > rideNavigator->geometry().width() && !isnormal) {
 #else
             if (!selected && !rideBG && high.x()+32 > rideNavigator->geometry().width() && !isnormal) {
@@ -1397,7 +1406,7 @@ bool RideNavigatorSortProxyModel::lessThan(const QModelIndex &left,
     QVariant leftData = sourceModel()->data(left);
     QVariant rightData = sourceModel()->data(right);
 
-    if (leftData.type() == QVariant::DateTime) {
+    if (leftData.metaType().id() == QMetaType::QDateTime) {
         return leftData.toDateTime() < rightData.toDateTime();
     }
     QString leftString = leftData.toString();

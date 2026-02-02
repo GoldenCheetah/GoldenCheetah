@@ -189,7 +189,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
 
     // We go fixed width to ensure a consistent layout for
     // tabs, sub-tabs and internal widgets and lists
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     setWindowTitle(tr("Preferences"));
 #else
     setWindowTitle(tr("Options"));
@@ -236,7 +236,7 @@ void ConfigDialog::closeClicked()
 //   ! new mode: change the CP associated with the present mode
 void ConfigDialog::saveClicked()
 {
-    // if a refresh is happenning stop it, whilst we 
+    // if a refresh is happening stop it, whilst we
     // update all the configuration settings!
     context->athlete->rideCache->cancel();
 
@@ -268,10 +268,11 @@ void ConfigDialog::saveClicked()
 
         // we want our own buttons...
         msgBox.addButton(tr("No, Keep current"), QMessageBox::RejectRole);
-        msgBox.addButton(tr("Yes, Apply and Restart"), QMessageBox::AcceptRole);
+        QAbstractButton *acceptButton = msgBox.addButton(tr("Yes, Apply and Restart"), QMessageBox::AcceptRole);
         msgBox.setDefaultButton(QMessageBox::Abort);
+        msgBox.exec();
 
-        if (msgBox.exec() == 1) { // accept!
+        if (msgBox.clickedButton() == acceptButton) {
 
             // lets restart
             restarting = true;

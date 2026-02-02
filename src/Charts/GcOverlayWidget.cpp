@@ -21,8 +21,7 @@
  */
 
 #include "GcOverlayWidget.h"
-#include "DiaryWindow.h"
-#include "DiarySidebar.h"
+#include "MiniCalendar.h"
 #include "Context.h"
 #include "Colors.h"
 
@@ -268,7 +267,7 @@ bool GcOverlayWidget::eventFilter( QObject *obj, QEvent *evt )
  
 void GcOverlayWidget::mousePressEvent(QMouseEvent *e) 
 {
-    position = QPoint(e->globalX()-geometry().x(), e->globalY()-geometry().y());
+    position = QPoint(e->globalPosition().x()-geometry().x(), e->globalPosition().y()-geometry().y());
     if (!m_isEditing) return;
     if (!m_infocus) return;
     //QWidget::mouseMoveEvent(e);
@@ -387,13 +386,13 @@ void GcOverlayWidget::mouseMoveEvent(QMouseEvent *e)
     if (!m_isEditing) return;
     if (!m_infocus) return;
     if (!(e->buttons() & Qt::LeftButton)) {
-        QPoint p = QPoint(e->x()+geometry().x(), e->y()+geometry().y());
+        QPoint p = QPoint(e->position().x()+geometry().x(), e->position().y()+geometry().y());
         setCursorShape(p);
         return;
     }
  
     if (mode == moving && (e->buttons() & Qt::LeftButton)) {
-        QPoint toMove = e->globalPos() - position;
+        QPoint toMove = e->globalPosition().toPoint() - position;
         if (toMove.x() < 0) return;
         if (toMove.y() < 0) return;
         if (toMove.x() > parentWidget()->width()-width()) return;
@@ -405,47 +404,47 @@ void GcOverlayWidget::mouseMoveEvent(QMouseEvent *e)
     if ((mode != moving) && (e->buttons() & Qt::LeftButton)) {
         switch (mode){
             case resizetl: {  //Left-Top
-                int newwidth = e->globalX() - position.x() - geometry().x();
-                int newheight = e->globalY() - position.y() - geometry().y();
-                QPoint toMove = e->globalPos() - position;
+                int newwidth = e->globalPosition().x() - position.x() - geometry().x();
+                int newheight = e->globalPosition().y() - position.y() - geometry().y();
+                QPoint toMove = e->globalPosition().toPoint() - position;
                 resize(geometry().width()-newwidth,geometry().height()-newheight);
                 move(toMove.x(),toMove.y());
                 break;
             }
             case resizetr: {  //Right-Top
-                int newheight = e->globalY() - position.y() - geometry().y();
-                QPoint toMove = e->globalPos() - position;
-                resize(e->x(),geometry().height()-newheight);
+                int newheight = e->globalPosition().y() - position.y() - geometry().y();
+                QPoint toMove = e->globalPosition().toPoint() - position;
+                resize(e->position().x(),geometry().height()-newheight);
                 move(x(),toMove.y());
                 break;
             }
             case resizebl: {  //Left-Bottom
-                int newwidth = e->globalX() - position.x() - geometry().x();
-                QPoint toMove = e->globalPos() - position;
-                resize(geometry().width()-newwidth,e->y());
+                int newwidth = e->globalPosition().x() - position.x() - geometry().x();
+                QPoint toMove = e->globalPosition().toPoint() - position;
+                resize(geometry().width()-newwidth,e->position().y());
                 move(toMove.x(),y());
                 break;
             }
             case resizeb: {   //Bottom
-                resize(width(),e->y()); break;}
+                resize(width(),e->position().y()); break;}
             case resizel:  {  //Left
-                int newwidth = e->globalX() - position.x() - geometry().x();
-                QPoint toMove = e->globalPos() - position;
+                int newwidth = e->globalPosition().x() - position.x() - geometry().x();
+                QPoint toMove = e->globalPosition().toPoint() - position;
                 resize(geometry().width()-newwidth,height());
                 move(toMove.x(),y());
                 break;
             }
             case resizet:  {  //Top
-                int newheight = e->globalY() - position.y() - geometry().y();
-                QPoint toMove = e->globalPos() - position;
+                int newheight = e->globalPosition().y() - position.y() - geometry().y();
+                QPoint toMove = e->globalPosition().toPoint() - position;
                 resize(width(),geometry().height()-newheight);
                 move(x(),toMove.y());
                 break;
             }
             case resizer:  {  //Right
-                resize(e->x(),height()); break;}
+                resize(e->position().x(),height()); break;}
             case resizebr: {  //Right-Bottom
-                resize(e->x(),e->y()); break;}
+                resize(e->globalPosition().x(),e->position().y()); break;}
         }
         parentWidget()->repaint();
     }

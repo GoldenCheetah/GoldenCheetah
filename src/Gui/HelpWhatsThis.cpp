@@ -71,6 +71,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
          return text.arg("ScopeBar_Views").arg(tr("Quick access to main Views and common actions"));
     case ScopeBar_Athletes:
          return text.arg("ScopeBar_Views#athletes").arg(tr("Athletes Status and Configuration"));
+    case ScopeBar_Plan:
+         return text.arg("ScopeBar_Views#plan").arg(tr("Plan future activities, analyse completed activities against planned"));
     case ScopeBar_Trends:
          return text.arg("ScopeBar_Views#trends").arg(tr("Analysis of a number of activities (e.g. a date range ) like PMC, long term metrics view, ... and data summaries"));
     case ScopeBar_Rides:
@@ -310,9 +312,9 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("Side-Bar_Activities-view#activities").arg(tr("Configurable list of activities"));
     case SideBarRidesView_Intervals:
         return text.arg("Side-Bar_Activities-view#intervals").arg(tr("Display the available and add new intervals using simple query methods"));
-    case SideBarDiaryView_Calendar:
+    case SideBarPlanView_Calendar:
         return text.arg("Side%20Bar_Diary%20view#calendar").arg(tr("Calendar"));
-    case SideBarDiaryView_Summary:
+    case SideBarPlanView_Summary:
         return text.arg("Side%20Bar_Diary%20view#summary").arg(tr("Simple summary view"));
 
     case SideBarTrainView_Devices:

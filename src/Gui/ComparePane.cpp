@@ -740,22 +740,11 @@ ComparePane::dropEvent(QDropEvent *event)
                 // add our xdata, with not points yet...
                 add.data->addXData(xi.key(), x);
 
-                // manage offsets
-                bool first = true;
-                double offset = 0.0f, offsetKM = 0.0f;
-
                 foreach(XDataPoint *p, xi.value()->datapoints) {
 
                     if (p->secs > stop) break;
 
                     if (p->secs >= start) {
-
-                        // intervals always start from zero when comparing
-                        if (first) {
-                            first = false;
-                            offset = p->secs;
-                            offsetKM = p->km;
-                        }
 
                         XDataPoint *addp = new XDataPoint();
                         addp->km = p->km - offsetKM;

@@ -81,9 +81,9 @@ QImage Strava::logo() const
 }
 
 void
-Strava::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
+Strava::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    reply->ignoreSslErrors();
+    sslErrors(context->mainWindow, reply, errors);
 }
 
 bool
@@ -385,7 +385,7 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     trainerPart.setHeader(QNetworkRequest::ContentDispositionHeader,
                           QVariant("form-data; name=\"trainer\""));
     trainerPart.setBody((ride->getTag("Trainer", "0").toInt() ||
-                         ride->xdata("TRAIN") && !ride->isDataPresent(RideFile::lat)) ? "1" : "0");
+                         (ride->xdata("TRAIN") && !ride->isDataPresent(RideFile::lat))) ? "1" : "0");
     multiPart->append(trainerPart);
 
     if (manual) {
@@ -966,7 +966,7 @@ Strava::prepareResponse(QByteArray* data)
                 QJsonArray laps = each["laps"].toArray();
 
                 double last_lap = 0.0;
-                foreach (QJsonValue value, laps) {
+                for (const QJsonValue &value : laps) {
                     QJsonObject lap = value.toObject();
 
                     double start = starttime.secsTo(QDateTime::fromString(lap["start_date_local"].toString(), Qt::ISODate));
