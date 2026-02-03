@@ -33,7 +33,7 @@
 #include <QMutex>
 #include <QWebEngineProfile>
 
-// singleton
+
 static QList<Context*> _contexts;
 
 GlobalContext::GlobalContext()
