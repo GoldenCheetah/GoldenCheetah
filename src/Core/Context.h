@@ -82,8 +82,8 @@ class GlobalContext : public QObject
 
     public:
 
-        GlobalContext();
         static GlobalContext *context();
+
         void notifyConfigChanged(qint32);
 
         // metadata etc
@@ -100,6 +100,11 @@ class GlobalContext : public QObject
     signals:
         void configChanged(qint32); // for global widgets that aren't athlete specific
 
+    private:
+        // singleton pattern
+        GlobalContext();
+        GlobalContext(const GlobalContext&) = delete;
+        GlobalContext& operator=(const GlobalContext&) = delete;
 };
 
 class RideNavigator;

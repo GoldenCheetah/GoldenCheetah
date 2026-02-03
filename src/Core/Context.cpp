@@ -33,8 +33,7 @@
 #include <QMutex>
 #include <QWebEngineProfile>
 
-// singleton
-static GlobalContext *globalContext = NULL;
+
 static QList<Context*> _contexts;
 
 GlobalContext::GlobalContext()
@@ -42,6 +41,14 @@ GlobalContext::GlobalContext()
     rideMetadata = NULL;
     colorEngine = NULL;
     readConfig(0); // don't reread user metrics just yet
+}
+
+GlobalContext*
+GlobalContext::context()
+{
+    // Meyer's singleton pattern
+    static GlobalContext globalContext; // Guaranteed thread-safe initialization
+    return &globalContext;
 }
 
 void
@@ -130,11 +137,6 @@ GlobalContext::userMetricsConfigChanged()
     SpecialFields::getInstance().reloadFields();
 }
 
-GlobalContext *GlobalContext::context()
-{
-    if (globalContext == NULL) globalContext = new GlobalContext();
-    return globalContext;
-}
 
 bool Context::isValid(Context *p) { return p != NULL &&_contexts.contains(p); }
 
