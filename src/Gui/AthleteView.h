@@ -21,17 +21,33 @@
 #include "OverviewItems.h"
 #include <QPoint>
 
+class AthleteCard;
+
 class AthleteView : public ChartSpace
 {
     Q_OBJECT
 
+        friend AthleteCard;
+
 public:
+    // only mainWindow is used from the provided context in AthleteView & ChartSpace
     AthleteView(Context *context);
 
-    uint32_t openAthletes();
+    // called once at startup for the bootstrap athlete and sets the 
+    // bootstrap as the current athlete, subsequent calls are ignored.
+    bool setBootStrapAthlete(Context *context);
+
+    // update the current athlete
     void setCurrentAthlete(const QString& name);
 
+protected:
+
+    MainWindow* mainWindow_;
+
+    uint32_t openAthletes();
+
 protected slots:
+
     void configChanged(qint32);
     void configItem(ChartSpaceItem*, QPoint);
     void newAthlete(QString);
@@ -39,16 +55,21 @@ protected slots:
     void openingAthlete(QString, Context*);
 };
 
-enum class AthleteState { Closed = 0, Loading, Open };
-
 // the athlete display
 class AthleteCard : public ChartSpaceItem
 {
     Q_OBJECT
 
+        friend AthleteView;
+
     public:
 
-        AthleteCard(ChartSpace *parent, QString name, bool currentAthlete);
+        AthleteCard(ChartSpace *parent, QString name);
+
+        // create and config
+        static ChartSpaceItem *create(ChartSpace *parent) { return new AthleteCard(parent, ""); }
+
+    protected:
 
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void dragChanged(bool) override;
@@ -58,14 +79,13 @@ class AthleteCard : public ChartSpaceItem
         void configChanged(qint32) override;
         QWidget *config() { return new OverviewItemConfig(this); }
 
-        // create and config
-        static ChartSpaceItem *create(ChartSpace *parent) { return new AthleteCard(parent, "", false); }
-
         void configAthlete();
+        bool isAthleteClosed() const { return loadProgress_ == 0; }
         void openingAthlete(QString, Context*);
 
+        // accessible via AthleteView equivalents
+        bool setBootStrapAthlete(Context *context);
         void setCurrentAthlete(bool status);
-        bool isAthleteClosed() const { return loadProgress_ == 0; }
 
     protected slots:
 
@@ -85,7 +105,7 @@ class AthleteCard : public ChartSpaceItem
 
     private:
         double loadProgress_; // 0=closed, 100=open, otherwise loading
-        Context *context_;
+        Context *context_; // nullptr when the athlete is closed
         QImage avatar;
 
         Button *openCloseButton;
@@ -93,7 +113,7 @@ class AthleteCard : public ChartSpaceItem
         Button *backupButton;
         Button *saveAllUnsavedRidesButton;
 
-        bool refresh;
+        bool refresh_;
         int actualActivities; // total actual activities
         int plannedActivities; // total planned activities
         int unsavedActivities; // number of unsaved activities

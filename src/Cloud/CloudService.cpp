@@ -1987,7 +1987,7 @@ CloudServiceAutoDownload::readComplete(QByteArray*data,QString name,QString)
     delete ride;
 
     // add to the ride list -- but don't select it
-    if ((Context::isValid(context)) context->athlete->addRide(fileinfo.fileName(), true, false);
+    if (Context::isValid(context)) context->athlete->addRide(fileinfo.fileName(), true, false);
 
 }
 

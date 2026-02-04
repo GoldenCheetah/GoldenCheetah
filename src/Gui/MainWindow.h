@@ -170,9 +170,9 @@ class MainWindow : public QMainWindow
 
         void setOpenTabMenu(); // set the Open Tab menu
         void newCyclistTab();  // create a new Cyclist
-        void openAthleteTab(QString name);
+        bool openAthleteTab(QString name);
         void loadCompleted(QString name, Context *context);
-        void closeTabClicked(int index); // user clicked to close tab
+        bool closeTabClicked(int index); // user clicked to close tab
         bool closeAthleteTab(QString name); // close named athlete
         bool closeAthleteTab();       // close current, might not if the user
                                // changes mind if there are unsaved changes.

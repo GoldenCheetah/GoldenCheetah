@@ -154,12 +154,19 @@ MainWindow::MainWindow(const QDir &home)
 
 #endif
 
-    // bootstrap
+    // create the context for the bootstrap (first) athlete loaded at startup, care must be taken
+    // with this bootstrap context as any global class instances may have a lifetime greater than
+    // the athlete, and the context is deleted when the athlete is closed !!
+    // If this context is stored (or signals/events registered) in any global class instances (e.g. searchBox)
+    // then the context in those instances must be updated when the current athlete is changed.
+
     Context *context = new Context(this);
     context->athlete = new Athlete(context, home);
+
     QString temp = const_cast<AthleteDirectoryStructure*>(context->athlete->directoryStructure())->temp().absolutePath();
     context->webEngineProfile->setCachePath(temp);
     context->webEngineProfile->setPersistentStoragePath(temp);
+
     currentAthleteTab = new AthleteTab(context);
 
     setWindowIcon(QIcon(":images/gc.png"));
@@ -167,7 +174,8 @@ MainWindow::MainWindow(const QDir &home)
     setContentsMargins(0,0,0,0);
     setAcceptDrops(true);
 
-    Library::initialise(context->athlete->home->root());
+    Library::initialise(QDir(gcroot));
+
     QNetworkProxyQuery npq(QUrl("http://www.google.com"));
     QList<QNetworkProxy> listOfProxies = QNetworkProxyFactory::systemProxyForQuery(npq);
     if (listOfProxies.count() > 0) {
@@ -181,7 +189,7 @@ MainWindow::MainWindow(const QDir &home)
     // if no workout directory is configured, default to the
     // top level GoldenCheetah directory
     if (appsettings->value(NULL, GC_WORKOUTDIR, "").toString() == ""){
-        appsettings->setValue(GC_WORKOUTDIR, QFileInfo(context->athlete->home->root().canonicalPath()).canonicalPath());
+        appsettings->setValue(GC_WORKOUTDIR, gcroot);
     }
 
     /*----------------------------------------------------------------------
@@ -209,7 +217,7 @@ MainWindow::MainWindow(const QDir &home)
      *--------------------------------------------------------------------*/
     splash->showMessage(tr("Setting up GUI: Scopebar..."));
 
-    sidebar = new NewSideBar(context, this);
+    sidebar = new NewSideBar(this);
     HelpWhatsThis *helpNewSideBar = new HelpWhatsThis(sidebar);
     sidebar->setWhatsThis(helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar));
 
@@ -421,8 +429,12 @@ MainWindow::MainWindow(const QDir &home)
     tabbar->setDocumentMode(true);
 #endif
 
-    // Note: The order of the viewStack tabs below, must match the GcViewStackIdx definitions above.
+    // only mainWindow is used from the provided context in AthleteView & ChartSpace
     athleteView = new AthleteView(context);
+    // the athlete's context is used in AthleteCard, as this represents the athlete
+    athleteView->setBootStrapAthlete(context);
+
+    // Note: The order of the viewStack tabs below, must match the GcViewStackIdx definitions above.
     viewStack = new QStackedWidget(this);
     viewStack->addWidget(athleteView);
 
@@ -533,8 +545,8 @@ MainWindow::MainWindow(const QDir &home)
     rideMenu->addAction(tr("&Import from file..."), QKeySequence("Ctrl+I"), this, SLOT (importFile()));
     rideMenu->addAction(tr("&Manual entry..."), QKeySequence("Ctrl+M"), this, SLOT(manualRide()));
     QAction *actionPlan = new QAction(tr("&Plan activity..."));
-    connect(context, &Context::start, this, [actionPlan]() { actionPlan->setEnabled(false); }); // The dialog can change the contexts workout
-    connect(context, &Context::stop, this, [actionPlan]() { actionPlan->setEnabled(true); });   // temporarily which might cause unwanted effects
+    connect(GlobalContext::context(), &GlobalContext::start, this, [actionPlan]() { actionPlan->setEnabled(false); }); // The dialog can change the contexts workout
+    connect(GlobalContext::context(), &GlobalContext::stop, this, [actionPlan]() { actionPlan->setEnabled(true); });   // temporarily which might cause unwanted effect
     connect(actionPlan, &QAction::triggered, this, [this]() { planActivity(); });
     rideMenu->addAction(actionPlan);
     rideMenu->addSeparator ();
@@ -705,10 +717,6 @@ MainWindow::MainWindow(const QDir &home)
     splash->showMessage(tr("Selecting ride..."));
 
     showTabbar(appsettings->value(NULL, GC_TABBAR, "0").toBool());
-
-    //XXX!!! We really do need a mechanism for showing if a ride needs saving...
-    //connect(this, SIGNAL(rideDirty()), this, SLOT(enableSaveButton()));
-    //connect(this, SIGNAL(rideClean()), this, SLOT(enableSaveButton()));
 
     saveGCState(currentAthleteTab->context); // set to whatever we started with
 
@@ -1086,7 +1094,9 @@ MainWindow::closeEvent(QCloseEvent* event)
             if (tab->context->athlete->autoImport->importInProcess() ) {
                 importrunning = true;
                 QGuiApplication::restoreOverrideCursor();
-                QMessageBox::information(this, tr("Activity Import"), tr("Closing of athlete window not possible while background activity import is in progress..."));
+                QMessageBox::information(this, tr("Activity Import"),
+                        tr("INFO for athlete %1\n\nClosing of athlete window not possible while background activity import is in progress...")
+                            .arg(tab->context->athlete->cyclist));
                 QGuiApplication::setOverrideCursor(Qt::WaitCursor);
             }
         }
@@ -1999,23 +2009,24 @@ MainWindow::closeWindow()
     close();
 }
 
-void
+bool
 MainWindow::openAthleteTab(QString name)
 {
     QDir home(gcroot);
     appsettings->initializeQSettingsGlobal(gcroot);
     home.cd(name);
 
-    if (!home.exists()) return;
+    if (!home.exists()) return false;
     appsettings->initializeQSettingsAthlete(gcroot, name);
 
     GcUpgrade v3;
-    if (!v3.upgradeConfirmedByUser(home)) return;
+    if (!v3.upgradeConfirmedByUser(home)) return false;
 
     // save how we are
     saveGCState(currentAthleteTab->context);
 
     Context *con= new Context(this);
+
     con->athlete = NULL;
     emit openingAthlete(name, con);
 
@@ -2023,6 +2034,8 @@ MainWindow::openAthleteTab(QString name)
 
     // will emit loadCompleted when done
     con->athlete = new Athlete(con, home);
+
+    return true;
 }
 
 void
@@ -2033,6 +2046,11 @@ MainWindow::loadCompleted(QString name, Context *context)
 
     // clear splash - progress whilst loading tab
     //clearSplash();
+
+    // setup the WebEngine paths
+    QString temp = const_cast<AthleteDirectoryStructure*>(context->athlete->directoryStructure())->temp().absolutePath();
+    context->webEngineProfile->setCachePath(temp);
+    context->webEngineProfile->setPersistentStoragePath(temp);
 
     // first tab
     athletetabs.insert(currentAthleteTab->context->athlete->home->root().dirName(), currentAthleteTab);
@@ -2059,24 +2077,27 @@ MainWindow::loadCompleted(QString name, Context *context)
     context->athlete->importFilesWhenOpeningAthlete();
 }
 
-void
+bool
 MainWindow::closeTabClicked(int index)
 {
-
     AthleteTab *tab = tabList[index];
 
     // check for autoimport and let it finalize
     if (tab->context->athlete->autoImport) {
         if (tab->context->athlete->autoImport->importInProcess() ) {
-            QMessageBox::information(this, tr("Activity Import"), tr("Closing of athlete window not possible while background activity import is in progress..."));
-            return;
+            QMessageBox::information(this, tr("Activity Import"),
+                    tr("INFO for athlete %1\n\nClosing of athlete window not possible while background activity import is in progress...")
+                        .arg(tab->context->athlete->cyclist));
+            return false;
         }
     }
 
-    if (saveRideExitDialog(tab->context) == false) return;
+    if (saveRideExitDialog(tab->context) == false) return false;
 
     // lets wipe it
     removeAthleteTab(tab);
+
+    return true;
 }
 
 bool
@@ -2088,8 +2109,7 @@ MainWindow::closeAthleteTab(QString name)
     } else {
         for(int i=0; i<tabbar->count(); i++) {
             if (name == tabbar->tabText(i)) {
-                closeTabClicked(i);
-                return true;
+                return closeTabClicked(i);
             }
         }
     }
@@ -2099,10 +2119,12 @@ MainWindow::closeAthleteTab(QString name)
 bool
 MainWindow::closeAthleteTab()
 {
-  // check for autoimport and let it finalize
+    // check for autoimport and let it finalize
     if (currentAthleteTab->context->athlete->autoImport) {
         if (currentAthleteTab->context->athlete->autoImport->importInProcess() ) {
-            QMessageBox::information(this, tr("Activity Import"), tr("Closing of athlete window not possible while background activity import is in progress..."));
+            QMessageBox::information(this, tr("Activity Import"),
+                    tr("INFO for athlete %1\n\nClosing of athlete window not possible while background activity import is in progress...")
+                        .arg(currentAthleteTab->context->athlete->cyclist));
             return false;
         }
     }
@@ -2111,9 +2133,9 @@ MainWindow::closeAthleteTab()
     if (saveRideExitDialog(currentAthleteTab->context) == false) return false;
 
     // if its the last tab we close the window
-    if (tabList.count() == 1)
+    if (tabList.count() == 1) {
         closeWindow();
-    else {
+    } else {
         removeAthleteTab(currentAthleteTab);
     }
     appsettings->syncQSettings();
@@ -2170,8 +2192,6 @@ MainWindow::removeAthleteTab(AthleteTab *tab)
     delete context;
 
     setUpdatesEnabled(true);
-
-    return;
 }
 
 void
@@ -2323,6 +2343,8 @@ MainWindow::saveGCState(Context *context)
 void
 MainWindow::restoreGCState(Context *context)
 {
+qDebug() << "MainWindow::restoreGCState" << context->athlete->cyclist;
+
     if (viewStack->currentIndex() != GcViewStackIdx::SELECT_ATHLETE_VIEW) {
 
         // not on athlete view...
