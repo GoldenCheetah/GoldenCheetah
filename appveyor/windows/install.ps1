@@ -37,8 +37,8 @@ if (-not (Test-Path 'C:\Python')) {
   (Get-Content C:\Python\python$py_ver._pth) -replace '#import site', 'import site' | Set-Content C:\Python\python$py_ver._pth
   Start-FileDownload "https://bootstrap.pypa.io/get-pip.py" "get-pip.py"
   C:\Python\python.exe get-pip.py --no-warn-script-location
+  # Upgrade pip to ensure you have the latest version
+  python -m pip install --upgrade pip
+  # Install your project's dependencies from a requirements.txt file
+  python -m pip install --only-binary:all: -r src\Python\requirements.txt -t C:\Python\lib\site-packages
 }
-# Upgrade pip to ensure you have the latest version
-python -m pip install --upgrade pip
-# Install your project's dependencies from a requirements.txt file
-python -m pip install --only-binary :all: -r src\Python\requirements.txt -t C:\Python\lib\site-packages
