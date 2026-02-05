@@ -63,7 +63,7 @@ init:
 - cmd: call c:\"Program Files"\"Microsoft Visual Studio"\2022\Community\VC\Auxiliary\Build\vcvarsall.bat amd64
 # Setup NSIS
 - cmd: set PATH=%PATH%;C:\"Program Files (x86)"\NSIS
-# Setup Python for building
+# Setup Python
 - cmd: set PATH=C:\Python311-x64\Scripts\;C:\Python311-x64\;%PATH%
 - cmd: python --version
 # Setup JOM

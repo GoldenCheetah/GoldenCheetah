@@ -31,14 +31,15 @@ if (-not (Test-Path 'C:\Python')) {
   $pyurl = "https://www.python.org/ftp/python/$PYTHON_EMBED_VERSION/python-$PYTHON_EMBED_VERSION-embed-amd64.zip"
   Start-FileDownload $pyurl "python-embed.zip"
   Expand-Archive -Path python-embed.zip -DestinationPath C:\Python -Force
+  # Enable site import
   mkdir C:\Python\lib\site-packages
-  # Enable pip in embedded Python
-  $py_ver = $env:PYTHON_VERSION -replace '.', ''
+  $py_ver = $($env:PYTHON_VERSION -replace '\.', '')
   (Get-Content C:\Python\python$py_ver._pth) -replace '#import site', 'import site' | Set-Content C:\Python\python$py_ver._pth
+  # Enable pip in embedded Python
   Start-FileDownload "https://bootstrap.pypa.io/get-pip.py" "get-pip.py"
   C:\Python\python.exe get-pip.py --no-warn-script-location
   # Upgrade pip to ensure you have the latest version
-  python -m pip install --upgrade pip
+  C:\Python\python -m pip install --upgrade pip
   # Install your project's dependencies from a requirements.txt file
-  python -m pip install --only-binary:all: -r src\Python\requirements.txt -t C:\Python\lib\site-packages
+  C:\Python\python -m pip install --upgrade --only-binary :all: -r src\Python\requirements.txt -t C:\Python\lib\site-packages
 }
