@@ -88,25 +88,37 @@ enum gcwinid {
 typedef enum GcWindowTypes::gcwinid GcWinID;
 Q_DECLARE_METATYPE(GcWinID)
 
-// when declaring a window, what view is it relevant for?
-#define VIEW_TRAIN    0x01
-#define VIEW_ANALYSIS 0x02
-#define VIEW_PLAN 0x04
-#define VIEW_TRENDS   0x08
+// the GcViewType represents both the view type in GC code and due its unique
+// bit values it can be used as for defining a window's view relevance mask.
+enum class GcViewType : unsigned int {
+    NO_VIEW_SET =    0x00,
+    VIEW_TRAIN =     0x01,
+    VIEW_ANALYSIS =  0x02,
+    VIEW_PLAN =      0x04,
+    VIEW_TRENDS =    0x08
+};
+
+// support bitwise "|" and "&" operators for the GcViewType class
+inline constexpr GcViewType operator|(GcViewType Lhs, GcViewType Rhs) {
+    return static_cast<GcViewType>( static_cast<std::underlying_type_t<GcViewType>>(Lhs) | static_cast<std::underlying_type_t<GcViewType>>(Rhs) );
+}
+inline constexpr bool operator&(GcViewType Lhs, GcViewType Rhs) {
+    return static_cast<std::underlying_type_t<GcViewType>>(Lhs) & static_cast<std::underlying_type_t<GcViewType>>(Rhs);
+}
 
 class GcChartWindow;
 class GcWindowRegistry {
     Q_DECLARE_TR_FUNCTIONS(GcWindowRegistry)
     public:
 
-    unsigned int relevance;
+    GcViewType relevance;
     QString name;
     GcWinID id;
 
     static void initialize(); // initialize global registry
     static GcChartWindow *newGcWindow(GcWinID id, Context *context);
-    static QStringList windowsForType(int type);
-    static QList<GcWinID> idsForType(int type);
+    static QStringList windowsForType(GcViewType type);
+    static QList<GcWinID> idsForType(GcViewType type);
     static QString title(GcWinID id);
 };
 

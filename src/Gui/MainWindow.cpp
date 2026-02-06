@@ -710,12 +710,17 @@ MainWindow::MainWindow(const QDir &home)
     saveGCState(currentAthleteTab->context); // set to whatever we started with
 
     // switch to the startup view, default is analysis.
-    switch (appsettings->value(NULL, GC_STARTUP_VIEW, "1").toInt()) {
-        case 0: selectTrends(); break;
-        case 1: selectAnalysis(); break;
-        case 2: selectPlan(); break;
-        case 3: selectTrain(); break;
-        default: selectAnalysis(); qDebug() << "Unknown startup view"; break;
+    GcViewType startupViewType = static_cast<GcViewType>(appsettings->value(NULL, GC_STARTUP_VIEW, QString::number(static_cast<int>(GcViewType::NO_VIEW_SET))).toInt());
+    switch (startupViewType) {
+        case GcViewType::VIEW_TRENDS: selectTrends(); break;
+        case GcViewType::VIEW_ANALYSIS: selectAnalysis(); break;
+        case GcViewType::VIEW_PLAN: selectPlan(); break;
+        case GcViewType::VIEW_TRAIN: selectTrain(); break;
+        default: {
+            qDebug() << "Startup view not specified or unknown value, defaulting to analysis view";
+            appsettings->setValue(GC_STARTUP_VIEW, static_cast<std::underlying_type_t<GcViewType>>(GcViewType::VIEW_ANALYSIS));
+            selectAnalysis();
+        } break;
     }
 
     //grab focus
@@ -850,22 +855,15 @@ MainWindow::setSubChartMenu()
 void
 MainWindow::setChartMenu(QMenu *menu)
 {
-    unsigned int mask=0;
     // called when chart menu about to be shown
-    // setup to only show charts that are relevant
+    // setup only show charts that are relevant
     // to this view
-    switch(currentAthleteTab->currentView()) {
-        case 0 : mask = VIEW_TRENDS; break;
-        default:
-        case 1 : mask = VIEW_ANALYSIS; break;
-        case 2 : mask = VIEW_PLAN; break;
-        case 3 : mask = VIEW_TRAIN; break;
-    }
+    GcViewType mask = currentAthleteTab->currentViewType();
 
     menu->clear();
-    if (!mask) return;
+    if (mask == GcViewType::NO_VIEW_SET) return;
 
-    for(int i=0; GcWindows[i].relevance; i++) {
+    for(int i=0; GcWindows[i].relevance != GcViewType::NO_VIEW_SET; i++) {
         if (GcWindows[i].relevance & mask)
             menu->addAction(GcWindows[i].name);
     }
@@ -877,7 +875,7 @@ MainWindow::addChart(QAction*action)
     // & removed to avoid issues with kde AutoCheckAccelerators
     QString actionText = QString(action->text()).replace("&", "");
     GcWinID id = GcWindowTypes::None;
-    for (int i=0; GcWindows[i].relevance; i++) {
+    for (int i=0; GcWindows[i].relevance != GcViewType::NO_VIEW_SET; i++) {
         if (GcWindows[i].name == actionText) {
             id = GcWindows[i].id;
             break;
@@ -900,22 +898,12 @@ MainWindow::importChart()
 void
 MainWindow::exportPerspective()
 {
-    int view = currentAthleteTab->currentView();
-    AbstractView *current = NULL;
-
-    QString typedesc;
-
-    switch (view) {
-    case 0:  current = currentAthleteTab->homeView; typedesc = "Trends"; break;
-    case 1:  current = currentAthleteTab->analysisView; typedesc = "Analysis"; break;
-    case 2:  current = currentAthleteTab->planView; typedesc = "Plan"; break;
-    case 3:  current = currentAthleteTab->trainView; typedesc = "Train"; break;
-    }
+    AbstractView * current = currentAthleteTab->currentView();
 
     // export the current perspective to a file
     QString suffix;
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export Persepctive"),
-                       QDir::homePath()+"/"+ typedesc + " " + current->perspective_->title() + ".gchartset",
+                       QDir::homePath()+"/"+ current->viewTypeDesc() + " " + current->perspective_->title() + ".gchartset",
                        ("*.gchartset;;"), &suffix, QFileDialog::DontUseNativeDialog); // native dialog hangs when threads in use (!)
 
     if (fileName.isEmpty()) {
@@ -928,16 +916,6 @@ MainWindow::exportPerspective()
 void
 MainWindow::importPerspective()
 {
-    int view = currentAthleteTab->currentView();
-    AbstractView *current = NULL;
-
-    switch (view) {
-    case 0:  current = currentAthleteTab->homeView; break;
-    case 1:  current = currentAthleteTab->analysisView; break;
-    case 2:  current = currentAthleteTab->planView; break;
-    case 3:  current = currentAthleteTab->trainView; break;
-    }
-
     // import a new perspective from a file
     QString fileName = QFileDialog::getOpenFileName(this, tr("Select Perspective file to import"), "", tr("GoldenCheetah Perspective Files (*.gchartset)"));
     if (fileName.isEmpty()) {
@@ -946,10 +924,11 @@ MainWindow::importPerspective()
 
         // import and select it
         pactive = true;
+        AbstractView* current = currentAthleteTab->currentView();
         if (current->importPerspective(fileName)) {
 
             // on success we select the new one
-            resetPerspective(view);
+            resetPerspective(current->viewType());
             //current->setPerspectives(perspectiveSelector);
 
             // and select remember pactive is true, so we do the heavy lifting here
@@ -968,7 +947,7 @@ MainWindow::exportChartToCloudDB()
 {
     // upload the current chart selected to the chart db
     // called from the sidebar menu
-    Perspective *page=currentAthleteTab->view(currentAthleteTab->currentView())->page();
+    Perspective *page=currentAthleteTab->currentView()->page();
     if (page->currentStyle == 0 && page->currentChart())
         page->currentChart()->exportChartToCloudDB();
 }
@@ -988,7 +967,7 @@ MainWindow::addChartFromCloudDB()
         currentAthleteTab->context->cdbChartListDialog = new CloudDBChartListDialog();
     }
 
-    if (currentAthleteTab->context->cdbChartListDialog->prepareData(currentAthleteTab->context->athlete->cyclist, CloudDBCommon::UserImport, currentAthleteTab->currentView())) {
+    if (currentAthleteTab->context->cdbChartListDialog->prepareData(currentAthleteTab->context->athlete->cyclist, CloudDBCommon::UserImport, currentAthleteTab->currentViewType())) {
         if (currentAthleteTab->context->cdbChartListDialog->exec() == QDialog::Accepted) {
 
             // get selected chartDef
@@ -998,7 +977,7 @@ MainWindow::addChartFromCloudDB()
             foreach (QString chartDef, chartDefs) {
                 QList<QMap<QString,QString> > properties = GcChartWindow::chartPropertiesFromString(chartDef);
                 for (int i = 0; i< properties.size(); i++) {
-                    currentAthleteTab->context->mainWindow->athleteTab()->view(currentAthleteTab->currentView())->importChart(properties.at(i), false);
+                    currentAthleteTab->currentView()->importChart(properties.at(i), false);
                 }
             }
         }
@@ -1282,10 +1261,10 @@ MainWindow::selectAthlete()
 void
 MainWindow::selectAnalysis()
 {
-    resetPerspective(1);
+    resetPerspective(GcViewType::VIEW_ANALYSIS);
     viewStack->setCurrentIndex(GcViewStackIdx::ATHLETE_TAB_STACK);
     sidebar->setItemSelected(GcSideBarBtnId::ACTIVITIES_BTN, true);
-    currentAthleteTab->selectView(1);
+    currentAthleteTab->selectView(GcViewType::VIEW_ANALYSIS);
     back->show();
     forward->show();
     perspectiveSelector->show();
@@ -1299,10 +1278,10 @@ MainWindow::selectAnalysis()
 void
 MainWindow::selectTrain()
 {
-    resetPerspective(3);
+    resetPerspective(GcViewType::VIEW_TRAIN);
     viewStack->setCurrentIndex(GcViewStackIdx::ATHLETE_TAB_STACK);
     sidebar->setItemSelected(GcSideBarBtnId::TRAIN_BTN, true);
-    currentAthleteTab->selectView(3);
+    currentAthleteTab->selectView(GcViewType::VIEW_TRAIN);
     back->show();
     forward->show();
     perspectiveSelector->show();
@@ -1316,10 +1295,10 @@ MainWindow::selectTrain()
 void
 MainWindow::selectPlan()
 {
-    resetPerspective(2);
+    resetPerspective(GcViewType::VIEW_PLAN);
     viewStack->setCurrentIndex(GcViewStackIdx::ATHLETE_TAB_STACK);
     sidebar->setItemSelected(GcSideBarBtnId::PLAN_BTN, true);
-    currentAthleteTab->selectView(2);
+    currentAthleteTab->selectView(GcViewType::VIEW_PLAN);
     back->show();
     forward->show();
     perspectiveSelector->show();
@@ -1332,10 +1311,10 @@ MainWindow::selectPlan()
 void
 MainWindow::selectTrends()
 {
-    resetPerspective(0);
+    resetPerspective(GcViewType::VIEW_TRENDS);
     viewStack->setCurrentIndex(GcViewStackIdx::ATHLETE_TAB_STACK);
     sidebar->setItemSelected(GcSideBarBtnId::TRENDS_BTN, true);
-    currentAthleteTab->selectView(0);
+    currentAthleteTab->selectView(GcViewType::VIEW_TRENDS);
     back->show();
     forward->show();
     perspectiveSelector->show();
@@ -1405,26 +1384,19 @@ MainWindow::switchPerspective(int index)
 }
 
 void
-MainWindow::resetPerspective(int view, bool force)
+MainWindow::resetPerspective(GcViewType viewType, bool force)
 {
     static AthleteTab *lastathlete=NULL;
-    static int lastview=-1;
+    static GcViewType lastViewType = GcViewType::NO_VIEW_SET;
 
-    if (!force && lastview == view && lastathlete == currentAthleteTab) return;
+    if (!force && lastViewType == viewType && lastathlete == currentAthleteTab) return;
 
     // remember who last updated it.
     lastathlete = currentAthleteTab;
-    lastview = view;
+    lastViewType = viewType;
 
     // don't argue just reset the perspective for this view
-    AbstractView *current = NULL;
-    switch (view) {
-
-    case 0:  current = currentAthleteTab->homeView; break;
-    case 1:  current = currentAthleteTab->analysisView; break;
-    case 2:  current = currentAthleteTab->planView; break;
-    case 3:  current = currentAthleteTab->trainView; break;
-    }
+    AbstractView *current = currentAthleteTab->view(viewType);
 
     // set the perspective
     pactive=true;
@@ -1439,14 +1411,7 @@ MainWindow::perspectiveSelected(int index)
     if (pactive) return;
 
     // set the perspective for the current view
-    int view = currentAthleteTab->currentView();
-    AbstractView *current = NULL;
-    switch (view) {
-    case 0:  current = currentAthleteTab->homeView; break;
-    case 1:  current = currentAthleteTab->analysisView; break;
-    case 2:  current = currentAthleteTab->planView; break;
-    case 3:  current = currentAthleteTab->trainView; break;
-    }
+    AbstractView *current = currentAthleteTab->currentView();
 
     // which perspective is currently being shown?
     int prior = current->perspectives_.indexOf(current->perspective_);
@@ -1454,12 +1419,7 @@ MainWindow::perspectiveSelected(int index)
     if (index < current->perspectives_.count()) {
 
         // a perspectives was selected
-        switch (view) {
-        case 0:  current->perspectiveSelected(index); break;
-        case 1:  current->perspectiveSelected(index); break;
-        case 2:  current->perspectiveSelected(index); break;
-        case 3:  current->perspectiveSelected(index); break;
-        }
+        current->perspectiveSelected(index);
 
     } else {
 
@@ -1476,7 +1436,7 @@ MainWindow::perspectiveSelected(int index)
                 QString name;
                 QString expression;
                 Perspective::switchenum trainswitch=Perspective::None;
-                AddPerspectiveDialog *dialog= new AddPerspectiveDialog(this, currentAthleteTab->context, name, expression, current->type, trainswitch);
+                AddPerspectiveDialog *dialog= new AddPerspectiveDialog(this, currentAthleteTab->context, name, expression, current->viewType(), trainswitch);
                 int ret= dialog->exec();
                 delete dialog;
                 if (ret == QDialog::Accepted && name != "") {
@@ -1508,15 +1468,7 @@ MainWindow::perspectiveSelected(int index)
 void
 MainWindow::perspectivesChanged()
 {
-    int view = currentAthleteTab->currentView();
-    AbstractView *current = NULL;
-
-    switch (view) {
-    case 0:  current = currentAthleteTab->homeView; break;
-    case 1:  current = currentAthleteTab->analysisView; break;
-    case 2:  current = currentAthleteTab->planView; break;
-    case 3:  current = currentAthleteTab->trainView; break;
-    }
+    AbstractView *current = currentAthleteTab->currentView();
 
     // which perspective is currently being selected (before we go setting the combobox)
     Perspective *prior = current->perspective_;
@@ -1524,7 +1476,7 @@ MainWindow::perspectivesChanged()
     // ok, so reset the combobox and force, since whilst it may have already
     // been set for this athlete+view combination the config was just changed
     // so it needs to be redone.
-    resetPerspective(view, true);
+    resetPerspective(current->viewType(), true);
     //current->setPerspectives(perspectiveSelector);
 
     // is the old selected perspective still available?
@@ -1609,7 +1561,7 @@ MainWindow::dropEvent(QDropEvent *event)
             images << filename;
 
         // Look for Workout files only in Train view
-        } else if (currentAthleteTab->currentView() == 3 && ErgFile::isWorkout(filename)) {
+        } else if (currentAthleteTab->currentViewType() == GcViewType::VIEW_TRAIN && ErgFile::isWorkout(filename)) {
             workouts << filename;
         } else {
             filenames.append(filename);
@@ -1659,7 +1611,7 @@ MainWindow::importImages(QStringList list)
 {
     // we need to be on activities view and with a current
     // ride otherwise we just ignore the list
-    if (currentAthleteTab->currentView() != 1 || currentAthleteTab->context->ride == NULL) {
+    if (currentAthleteTab->currentViewType() != GcViewType::VIEW_ANALYSIS || currentAthleteTab->context->ride == NULL) {
         QMessageBox::critical(this, tr("Import Images Failed"), tr("You can only import images on the activities view with an activity selected."));
         return;
     }
@@ -2316,15 +2268,16 @@ MainWindow::restoreGCState(Context *context)
     if (viewStack->currentIndex() != GcViewStackIdx::SELECT_ATHLETE_VIEW) {
 
         // not on athlete view...
-        resetPerspective(currentAthleteTab->currentView()); // will lazy load, hence doing it first
+        GcViewType viewType = currentAthleteTab->currentViewType();
+        resetPerspective(viewType); // will lazy load, hence doing it first
 
         // restore window state from the supplied context
-            switch(currentAthleteTab->currentView()) {
-            case 0: sidebar->setItemSelected(GcSideBarBtnId::TRENDS_BTN,true); break;
-            case 1: sidebar->setItemSelected(GcSideBarBtnId::ACTIVITIES_BTN,true); break;
-            case 2: sidebar->setItemSelected(GcSideBarBtnId::PLAN_BTN,true); break;
-            case 3: sidebar->setItemSelected(GcSideBarBtnId::TRAIN_BTN, true); break;
-            default: sidebar->setItemSelected(GcSideBarBtnId::SELECT_ATHLETE_BTN, true); break;
+        switch(viewType) {
+        case GcViewType::VIEW_TRENDS: sidebar->setItemSelected(GcSideBarBtnId::TRENDS_BTN,true); break;
+        case GcViewType::VIEW_ANALYSIS: sidebar->setItemSelected(GcSideBarBtnId::ACTIVITIES_BTN,true); break;
+        case GcViewType::VIEW_PLAN: sidebar->setItemSelected(GcSideBarBtnId::PLAN_BTN,true); break;
+        case GcViewType::VIEW_TRAIN: sidebar->setItemSelected(GcSideBarBtnId::TRAIN_BTN, true); break;
+        default: sidebar->setItemSelected(GcSideBarBtnId::SELECT_ATHLETE_BTN, true); break;
         }
     }
 

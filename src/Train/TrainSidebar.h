@@ -164,7 +164,7 @@ class TrainSidebar : public GcWindow
         void removeInvalidVideoSync();
         void removeInvalidWorkout();
 
-        void viewChanged(int index);
+        void viewChanged(GcViewType index);
 
         int  getCalibrationIndex(void);
 
