@@ -111,6 +111,9 @@ ManualActivityWizard::done
         rideFile.setRecIntSecs(0.00);
         rideFile.setDeviceType("Manual");
         rideFile.setFileFormat("GoldenCheetah Json");
+        if (plan) {
+            rideFile.setTag("Original Date", field("activityDate").toDate().toString("yyyy/MM/dd"));
+        }
 
         field2TagString(rideFile, "sport", "Sport");
         field2TagString(rideFile, "subSport", "SubSport");
