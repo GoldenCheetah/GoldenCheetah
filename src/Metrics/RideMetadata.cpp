@@ -450,7 +450,7 @@ RideMetadata::configChanged(qint32)
                delete d.value();
         }
         tabList.clear();
-        formFields.empty();
+        formFields.clear();
 
         // remove editor if it exists
         if (tabs->count() > 0) tabs->removeTab(tabs->count()-1);

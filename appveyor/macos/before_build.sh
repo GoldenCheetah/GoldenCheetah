@@ -75,10 +75,3 @@ echo DEFINES += GC_TRAINERDAY_API_PAGESIZE=25 >> src/gcconfig.pri
 echo "QMAKE_CXXFLAGS += -mmacosx-version-min=10.7 -arch x86_64" >> src/gcconfig.pri
 echo "QMAKE_CFLAGS_RELEASE += -mmacosx-version-min=10.7 -arch x86_64" >> src/gcconfig.pri
 echo "QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15" >> src/gcconfig.pri
-
-cat src/gcconfig.pri
-
-# update translations
-lupdate src/src.pro
-
-exit

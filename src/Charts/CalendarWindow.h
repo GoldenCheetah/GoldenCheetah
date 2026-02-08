@@ -159,6 +159,9 @@ class CalendarWindow : public GcChartWindow
         QHash<QDate, QList<CalendarEntry>> getPhasesEvents(const Season &season, const QDate &firstDay, const QDate &lastDay) const;
         RideItem *getRideItem(const CalendarEntry &entry, bool linked = false);
         QString getPrimary(RideItem const * const rideItem) const;
+        QTime findFreeSlot(RideItem *sourceItem, QDate newDate, QTime time);
+        QTime findFreeSlot(QList<std::pair<QTime, int>> busySlots, QTime targetTime, int requiredDurationSeconds) const;
+        QString buildOriginalLabel(RideItem const * const item) const;
 
     private slots:
         void updateActivities();
@@ -168,6 +171,8 @@ class CalendarWindow : public GcChartWindow
         void shiftPlannedActivities(const QDate &destDay, int offset);
         void linkActivities(const CalendarEntry &entry, bool autoLink);
         bool unlinkActivities(const CalendarEntry &entry);
+        void copyPlannedActivity(CalendarEntry activity);
+        void pastePlannedActivity(QDate day, QTime time);
         void addEvent(const QDate &date);
         void editEvent(const CalendarEntry &entry);
         void delEvent(const CalendarEntry &entry);

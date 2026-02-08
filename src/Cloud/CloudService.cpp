@@ -968,8 +968,8 @@ CloudServiceSyncDialog::cancelClicked()
 void
 CloudServiceSyncDialog::refreshClicked()
 {
-    double distanceFactor = GlobalContext().useMetricUnits ? 1.0 : MILES_PER_KM;
-    QString distanceUnits = GlobalContext().useMetricUnits ? tr("km") : tr("mi");
+    double distanceFactor = GlobalContext::context()->useMetricUnits ? 1.0 : MILES_PER_KM;
+    QString distanceUnits = GlobalContext::context()->useMetricUnits ? tr("km") : tr("mi");
 
     progressLabel->setText(tr(""));
     progressBar->setMinimum(0);

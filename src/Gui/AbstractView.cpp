@@ -35,8 +35,8 @@
 
 const int SIDEBAR_DEFAULT_WIDTH=200;
 
-AbstractView::AbstractView(Context *context, int type, const QString& view, const QString& heading) :
-    QWidget(context->tab), context(context), type(type), view(view),
+AbstractView::AbstractView(Context *context, GcViewType viewType, const QString& viewName, const QString& heading) :
+    QWidget(context->tab), context(context), _viewType(viewType), _viewName(viewName),
     _sidebar(true), _tiled(false), _selected(false), lastHeight(130*dpiYFactor), sidewidth(0),
     active(false), bottomRequested(false), bottomHideOnIdle(false), perspectiveactive(false),
     stack(NULL), splitter(NULL), mainSplitter(NULL), 
@@ -113,7 +113,7 @@ AbstractView::splitterMoved(int pos,int)
     sidewidth = splitter->sizes()[0];
 
     // we now have splitter settings for each view
-    QString setting = QString("%1/%2").arg(GC_SETTINGS_SPLITTER_SIZES).arg(type);
+    QString setting = QString("%1/%2").arg(GC_SETTINGS_SPLITTER_SIZES).arg(static_cast<std::underlying_type_t<GcViewType>>(_viewType));
     appsettings->setCValue(context->athlete->cyclist, setting, splitter->saveState());
 
     notifyViewSplitterMoved();
@@ -294,7 +294,7 @@ AbstractView::saveState()
     // we do not save all the other Qt properties since
     // we're not interested in them
     // NOTE: currently we support QString, int, double and bool types - beware custom types!!
-    QString filename = viewCfgPath + "/" + view + "-perspectives.xml";
+    QString filename = viewCfgPath + "/" + _viewName + "-perspectives.xml";
 
     QFile file(filename);
     if (!file.open(QFile::WriteOnly)) {
@@ -325,7 +325,7 @@ void
 AbstractView::restoreState(bool useDefault)
 {
     // restore window state
-    QString filename = viewCfgPath + "/" + view + "-perspectives.xml";
+    QString filename = viewCfgPath + "/" + _viewName + "-perspectives.xml";
 
     QFileInfo finfo(filename);
 
@@ -344,7 +344,7 @@ AbstractView::restoreState(bool useDefault)
         // fetch from the goldencheetah.org website
         QString request = QString("%1/%2-perspectives.xml")
                              .arg(VERSION_CONFIG_PREFIX)
-                             .arg(view);
+                             .arg(_viewName);
 
         QNetworkReply *reply = nam.get(QNetworkRequest(QUrl(request)));
 
@@ -379,7 +379,7 @@ AbstractView::restoreState(bool useDefault)
         // renamed as "Legacy" and prepended to default perspectives,
         // except when useDefault is requested
         if (!finfo.exists() && !useDefault) {
-            filename = context->athlete->home->config().canonicalPath() + "/" + view + "-layout.xml";
+            filename = context->athlete->home->config().canonicalPath() + "/" + _viewName + "-layout.xml";
 
             QFile file(filename);
             if (file.open(QIODevice::ReadOnly)) {
@@ -397,7 +397,7 @@ AbstractView::restoreState(bool useDefault)
                 QXmlInputSource source;
                 source.setData(content);
                 QXmlSimpleReader xmlReader;
-                ViewParser handler(context, type, useDefault);
+                ViewParser handler(context, _viewType, useDefault);
                 xmlReader.setContentHandler(&handler);
                 xmlReader.setErrorHandler(&handler);
 
@@ -411,7 +411,7 @@ AbstractView::restoreState(bool useDefault)
 
         // drop back to what is baked in
         if (!finfo.exists()) {
-            filename = QString(":xml/%1-perspectives.xml").arg(view);
+            filename = QString(":xml/%1-perspectives.xml").arg(_viewName);
             useDefault = true;
         }
         QFile file(filename);
@@ -432,7 +432,7 @@ AbstractView::restoreState(bool useDefault)
         QXmlInputSource source;
         source.setData(content);
         QXmlSimpleReader xmlReader;
-        ViewParser handler(context, type, useDefault);
+        ViewParser handler(context, _viewType, useDefault);
         xmlReader.setContentHandler(&handler);
         xmlReader.setErrorHandler(&handler);
 
@@ -448,7 +448,7 @@ AbstractView::restoreState(bool useDefault)
         if (legacy) restored[0]->title_ = "Legacy";
 
     } else { // MUST have at least one perspective
-        restored << new Perspective(context, "Empty", type);
+        restored << new Perspective(context, "Empty", _viewType);
     }
 
     // initialise them
@@ -472,7 +472,7 @@ AbstractView::appendPerspective(Perspective *page)
 bool
 AbstractView::importPerspective(QString filename)
 {
-    Perspective *newone = Perspective::fromFile(context, filename, type);
+    Perspective *newone = Perspective::fromFile(context, filename, _viewType);
     if (newone) {
         appendPerspective(newone);
         return true;
@@ -493,7 +493,7 @@ AbstractView::exportPerspective(Perspective *p, QString filename)
 Perspective *
 AbstractView::addPerspective(QString name)
 {
-    Perspective *page = new Perspective(context, name, type);
+    Perspective *page = new Perspective(context, name, _viewType);
 
     notifyViewPerspectiveAdded(page);
 
@@ -585,7 +585,7 @@ AbstractView::setPages(QStackedWidget *pages)
     splitter->setCollapsible(index, false);
 
     // restore sizes
-    QString setting = QString("%1/%2").arg(GC_SETTINGS_SPLITTER_SIZES).arg(type);
+    QString setting = QString("%1/%2").arg(GC_SETTINGS_SPLITTER_SIZES).arg(static_cast<std::underlying_type_t<GcViewType>>(_viewType));
     QVariant splitterSizes = appsettings->cvalue(context->athlete->cyclist, setting); 
 
     // new (3.1) mechanism 
@@ -704,7 +704,7 @@ AbstractView::sidebarChanged()
         sidebar_->show();
 
         // Restore sizes
-        QString setting = QString("%1/%2").arg(GC_SETTINGS_SPLITTER_SIZES).arg(type);
+        QString setting = QString("%1/%2").arg(GC_SETTINGS_SPLITTER_SIZES).arg(static_cast<std::underlying_type_t<GcViewType>>(_viewType));
         QVariant splitterSizes = appsettings->cvalue(context->athlete->cyclist, setting);
         if (splitterSizes.toByteArray().size() > 1 ) {
             splitter->restoreState(splitterSizes.toByteArray());
@@ -971,7 +971,7 @@ bool ViewParser::startElement( const QString&, const QString&, const QString &na
     if (name == "layout") {
 
         QString name="General";
-        int typetouse=type;
+        GcViewType typetouse=GcViewType::NO_VIEW_SET;
         int trainswitch=0;
         QString expression;
         for(int i=0; i<attrs.count(); i++) {
@@ -985,7 +985,7 @@ bool ViewParser::startElement( const QString&, const QString&, const QString &na
                 expression = Utils::unprotect(attrs.value(i));
             }
             if (attrs.qName(i) == "type") {
-                typetouse = Utils::unprotect(attrs.value(i)).toInt();
+                typetouse = static_cast<GcViewType>(Utils::unprotect(attrs.value(i)).toInt());
             }
             if (attrs.qName(i) == "trainswitch") {
                 trainswitch = attrs.value(i).toInt();

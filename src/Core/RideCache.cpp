@@ -439,6 +439,7 @@ RideCache::removeRide(const QString& filenameToDelete) {
         context->notifyRideSelected(context->ride);
     }
 
+    refresh();
     // model estimates (lazy refresh)
     estimator->refresh();
 
@@ -1187,20 +1188,37 @@ RideCache::moveActivity
         return result;
     }
 
+    QDate originalDate = QDate::fromString(ride->getTag("Original Date", ""), "yyyy/MM/dd");
+    if (! originalDate.isValid()) {
+        ride->setTag("Original Date", oldDateTime.date().toString("yyyy/MM/dd"));
+    }
     item->setStartTime(newDateTime);
     ride->setTag("Year", newDateTime.toString("yyyy"));
     ride->setTag("Month", newDateTime.toString("MMMM"));
     ride->setTag("Weekday", newDateTime.toString("ddd"));
+    ride->setTag("Filename", newFileName);
     item->metadata_.insert("Calendar Text", GlobalContext::context()->rideMetadata->calendarText(item));
-    item->close();
 
     QString renameError;
     if (! renameRideFiles(oldFileName, newFileName, item->planned, renameError)) {
         item->dateTime = oldDateTime;
         item->fileName = oldFileName;
         result.error = tr("Failed to rename files: %1").arg(renameError);
+        item->close();
         return result;
     }
+
+    QString newPath = (item->planned ? plannedDirectory : directory).canonicalPath() + "/" + newFileName;
+    QFile outFile(newPath);
+    if (! RideFileFactory::instance().writeRideFile(context, ride, outFile, QFileInfo(newFileName).suffix())) {
+        renameRideFiles(newFileName, oldFileName, item->planned, renameError);
+        item->dateTime = oldDateTime;
+        item->fileName = oldFileName;
+        result.error = tr("Failed to save activity file after rename");
+        item->close();
+        return result;
+    }
+    item->close();
 
     int index = rides_.indexOf(item);
     if (index >= 0) {
@@ -1236,6 +1254,7 @@ RideCache::moveActivity
     if (context->ride == item) {
         context->notifyRideSelected(item);
     }
+    refresh();
     estimator->refresh();
 
     result.success = true;
@@ -1246,7 +1265,7 @@ RideCache::moveActivity
 
 RideCache::OperationPreCheck
 RideCache::checkCopyPlannedActivity
-(RideItem *sourceItem, const QDate &newDate)
+(RideItem *sourceItem, const QDate &newDate, QTime newTime)
 {
     OperationPreCheck check;
 
@@ -1260,8 +1279,12 @@ RideCache::checkCopyPlannedActivity
         check.blockingReason = tr("Invalid date specified");
         return check;
     }
+    QTime time(sourceItem->dateTime.time());
+    if (newTime.isValid()) {
+        time = newTime;
+    }
 
-    QDateTime newDateTime(newDate, sourceItem->dateTime.time());
+    QDateTime newDateTime(newDate, time);
     QFileInfo oldInfo(sourceItem->fileName);
     QString newFileName = newDateTime.toString("yyyy_MM_dd_HH_mm_ss") + "." + oldInfo.suffix();
     QString newPath = plannedDirectory.canonicalPath() + "/" + newFileName;
@@ -1277,12 +1300,16 @@ RideCache::checkCopyPlannedActivity
 
 RideCache::OperationResult
 RideCache::copyPlannedActivity
-(RideItem *sourceItem, const QDate &newDate)
+(RideItem *sourceItem, const QDate &newDate, QTime newTime)
 {
     OperationResult result;
 
     QString error;
-    RideItem *newItem = copyPlannedRideFile(sourceItem, newDate, error);
+    QTime time(sourceItem->dateTime.time());
+    if (newTime.isValid()) {
+        time = newTime;
+    }
+    RideItem *newItem = copyPlannedRideFile(sourceItem, newDate, time, error);
 
     if (! newItem) {
         result.error = error;
@@ -1294,7 +1321,8 @@ RideCache::copyPlannedActivity
     std::sort(rides_.begin(), rides_.end(), rideCacheLessThan);
     model_->endReset();
 
-    newItem->refresh();
+    refresh();
+    estimator->refresh();
 
     result.success = true;
     result.affectedCount = 1;
@@ -1366,7 +1394,7 @@ RideCache::copyPlannedActivities
     QStringList failedFiles;
     for (const std::pair<RideItem*, QDate> &pair : sourceItemsAndTargets) {
         QString error;
-        RideItem *newItem = copyPlannedRideFile(pair.first, pair.second, error);
+        RideItem *newItem = copyPlannedRideFile(pair.first, pair.second, QTime(), error);
         if (newItem) {
             newItems << newItem;
         } else {
@@ -1533,18 +1561,33 @@ RideCache::shiftPlannedActivities
             continue;
         }
 
+        QDate originalDate = QDate::fromString(ride->getTag("Original Date", ""), "yyyy/MM/dd");
+        if (! originalDate.isValid()) {
+            ride->setTag("Original Date", item->dateTime.date().toString("yyyy/MM/dd"));
+        }
         item->setStartTime(newDateTime);
         ride->setTag("Year", newDateTime.toString("yyyy"));
         ride->setTag("Month", newDateTime.toString("MMMM"));
         ride->setTag("Weekday", newDateTime.toString("ddd"));
+        ride->setTag("Filename", newFileName);
         item->metadata_.insert("Calendar Text", GlobalContext::context()->rideMetadata->calendarText(item));
-        item->close();
 
         QString renameError;
         if (! renameRideFiles(oldFileName, newFileName, true, renameError)) {
             failedFiles << oldFileName;
+            item->close();
             continue;
         }
+
+        QString newPath = plannedDirectory.canonicalPath() + "/" + newFileName;
+        QFile outFile(newPath);
+        if (! RideFileFactory::instance().writeRideFile(context, ride, outFile, QFileInfo(newFileName).suffix())) {
+            renameRideFiles(newFileName, oldFileName, true, renameError);
+            failedFiles << oldFileName;
+            item->close();
+            continue;
+        }
+        item->close();
         item->setFileName(plannedDirectory.canonicalPath(), newFileName);
         updateFromWorkout(item, true);
         item->isstale = true;
@@ -1806,9 +1849,9 @@ RideCache::isValidLink
 
 RideItem*
 RideCache::copyPlannedRideFile
-(RideItem *sourceItem, const QDate &newDate, QString &error)
+(RideItem *sourceItem, const QDate &newDate, const QTime &newTime, QString &error)
 {
-    QDateTime newDateTime(newDate, sourceItem->dateTime.time());
+    QDateTime newDateTime(newDate, newTime);
     QFileInfo oldInfo(sourceItem->fileName);
     QString newFileName = newDateTime.toString("yyyy_MM_dd_HH_mm_ss") + "." + oldInfo.suffix();
     QString newPath = plannedDirectory.canonicalPath() + "/" + newFileName;
@@ -1832,6 +1875,7 @@ RideCache::copyPlannedRideFile
     newRide->setTag("Year", newDateTime.toString("yyyy"));
     newRide->setTag("Month", newDateTime.toString("MMMM"));
     newRide->setTag("Weekday", newDateTime.toString("ddd"));
+    newRide->setTag("Original Date", newDateTime.date().toString("yyyy/MM/dd"));
 
     if (! newRide->getTag("Linked Filename", "").isEmpty()) {
         newRide->removeTag("Linked Filename");
