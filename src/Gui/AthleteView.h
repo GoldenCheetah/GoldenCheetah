@@ -37,9 +37,6 @@ public:
     // bootstrap as the current athlete, subsequent calls are ignored.
     bool setBootStrapAthlete(Context *context);
 
-    // update the current athlete
-    void setCurrentAthlete(const QString& name);
-
 protected:
 
     MainWindow* mainWindow_;
@@ -53,6 +50,8 @@ protected slots:
     void newAthlete(QString);
     void deleteAthlete(QString);
     void openingAthlete(QString, Context*);
+    void closingAthlete(QString, Context*);
+    void currentAthlete(QString name);
 };
 
 // the athlete display
@@ -82,6 +81,7 @@ class AthleteCard : public ChartSpaceItem
         void configAthlete();
         bool isAthleteClosed() const { return loadProgress_ == 0; }
         void openingAthlete(QString, Context*);
+        void closingAthlete(QString, Context*);
 
         // accessible via AthleteView equivalents
         bool setBootStrapAthlete(Context *context);
@@ -89,7 +89,6 @@ class AthleteCard : public ChartSpaceItem
 
     protected slots:
 
-        void closing(QString, Context*);
         void loadProgress(QString, double);
         void loadDone(QString, Context*);
 

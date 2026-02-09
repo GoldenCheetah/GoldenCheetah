@@ -133,8 +133,10 @@ class MainWindow : public QMainWindow
         void backClicked();
         void forwardClicked();
         void openingAthlete(QString, Context *);
+        void closingAthlete(QString, Context *);
         void newAthlete(QString);
         void deletedAthlete(QString);
+        void currentAthlete(QString);
 
     public slots:
         bool eventFilter(QObject*,QEvent*);
@@ -174,10 +176,7 @@ class MainWindow : public QMainWindow
         void loadCompleted(QString name, Context *context);
         bool closeTabClicked(int index); // user clicked to close tab
         bool closeAthleteTab(QString name); // close named athlete
-        bool closeAthleteTab();       // close current, might not if the user
-                               // changes mind if there are unsaved changes.
-        void removeAthleteTab(AthleteTab*);  // remove without question
-        void switchAthleteTab(int index); // for switching between one tab and another
+        void tabbarAthleteChange(int index); // blockable tabbar generated athlete switching
 
         // sidebar selecting views and actions
         void sidebarClicked(GcSideBarBtnId id);
@@ -298,6 +297,11 @@ class MainWindow : public QMainWindow
         void configChanged(qint32);
         void onEditMenuAboutToShow();
 
+    protected:
+
+        void switchAthleteTab(int index); // athlete switching for change & athlete closure
+        void removeAthleteTab(AthleteTab*);  // remove without question
+
     private:
 
         // when loading athlete
@@ -362,6 +366,8 @@ class MainWindow : public QMainWindow
         CloudDBVersionClient *versionClient;
         CloudDBTelemetryClient *telemetryClient;
 #endif
+
+        bool blockTabbarUpdates;
 
 };
 

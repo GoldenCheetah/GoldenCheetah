@@ -83,6 +83,10 @@ AthleteView::AthleteView(Context *context) : ChartSpace(context, OverviewScope::
     connect(mainWindow_, &MainWindow::deletedAthlete, this, &AthleteView::deleteAthlete);
     // opening athlete
     connect(mainWindow_, &MainWindow::openingAthlete, this, &AthleteView::openingAthlete);
+    // closing athlete
+    connect(mainWindow_, &MainWindow::closingAthlete, this, &AthleteView::closingAthlete);
+    // current athlete
+    connect(mainWindow_, &MainWindow::currentAthlete, this, &AthleteView::currentAthlete);
 }
 
 void
@@ -144,6 +148,16 @@ AthleteView::openingAthlete(QString name, Context *context)
     }
 }
 
+void
+AthleteView::closingAthlete(QString name, Context *context)
+{
+    foreach(ChartSpaceItem* item, allItems()) {
+        if (item->name == name) {
+            static_cast<AthleteCard*>(item)->closingAthlete(name, context);
+        }    
+    }
+}
+
 uint32_t
 AthleteView::openAthletes()
 {
@@ -155,7 +169,7 @@ AthleteView::openAthletes()
 }
 
 void
-AthleteView::setCurrentAthlete(const QString& name)
+AthleteView::currentAthlete(QString name)
 {
     foreach(ChartSpaceItem* item, allItems()) {
         static_cast<AthleteCard*>(item)->setCurrentAthlete(item->name == name);
@@ -168,7 +182,7 @@ AthleteView::setBootStrapAthlete(Context *context)
     foreach(ChartSpaceItem* item, allItems()) {
         if (item->name == context->athlete->cyclist) {
             if (static_cast<AthleteCard*>(item)->setBootStrapAthlete(context)) {
-                setCurrentAthlete(context->athlete->cyclist);
+                currentAthlete(context->athlete->cyclist);
                 return true;
             }
         }
@@ -275,8 +289,6 @@ AthleteCard::setBootStrapAthlete(Context *context)
         connect(context_, &Context::refreshStart, this, &AthleteCard::refreshStart);
         connect(context_, &Context::refreshEnd, this, &AthleteCard::refreshEnd);
         connect(context_, &Context::refreshUpdate, this, &AthleteCard::refreshUpdate); // we might miss 1st one
-
-        connect(context_, &Context::athleteClose, this, &AthleteCard::closing);
 
         // watch activity changes
         registerRideEvents(true);
@@ -409,28 +421,24 @@ AthleteCard::openCloseAthlete()
 }
 
 void
-AthleteCard::openingAthlete(QString name, Context *context)
+AthleteCard::openingAthlete(QString, Context *context)
 {
-    // are we being opened?
-    if (name == this->name) {
+    // store new athlete context
+    context_ = context;
 
-        // store new athlete context
-        context_ = context;
+    openCloseButton->setText(tr("Close"));
+    openCloseButton->hide();
+    deleteButton->hide();
 
-        openCloseButton->setText(tr("Close"));
-        openCloseButton->hide();
-        deleteButton->hide();
+    // register for athlete change events
+    loadProgress_=99;
+    connect(context_, &Context::loadProgress, this, &AthleteCard::loadProgress);
+    connect(context_, &Context::loadDone, this, &AthleteCard::loadDone);
 
-        // register for athlete change events
-        loadProgress_=99;
-        connect(context_, &Context::loadProgress, this, &AthleteCard::loadProgress);
-        connect(context_, &Context::loadDone, this, &AthleteCard::loadDone);
-
-        // refresh updates
-        connect(context_, &Context::refreshStart, this, &AthleteCard::refreshStart);
-        connect(context_, &Context::refreshEnd, this, &AthleteCard::refreshEnd);
-        connect(context_, &Context::refreshUpdate, this, &AthleteCard::refreshUpdate); // we might miss 1st one
-    }
+    // refresh updates
+    connect(context_, &Context::refreshStart, this, &AthleteCard::refreshStart);
+    connect(context_, &Context::refreshEnd, this, &AthleteCard::refreshEnd);
+    connect(context_, &Context::refreshUpdate, this, &AthleteCard::refreshUpdate); // we might miss 1st one
 }
 
 // track refreshes
@@ -470,8 +478,6 @@ AthleteCard::loadDone(QString name, Context *)
 
         disconnect(context_, &Context::loadProgress, this, &AthleteCard::loadProgress);
         disconnect(context_, &Context::loadDone, this, &AthleteCard::loadDone);
-
-        connect(context_, &Context::athleteClose, this, &AthleteCard::closing);
 
         // watch activity changes
         registerRideEvents(true);
@@ -513,21 +519,17 @@ AthleteCard::dragChanged(bool drag)
 }
 
 void
-AthleteCard::closing(QString name, Context *)
+AthleteCard::closingAthlete(QString, Context *)
 {
-    // are we closing?
-    if (name == this->name) {
-
-        registerRideEvents(false); // stop watching activity changes
-        context_ = NULL; // MainWindow deletes the context when the athlete is closed
-        setShowConfig(false);
-        openCloseButton->setText(tr("Open"));
-        deleteButton->show();
-        saveAllUnsavedRidesButton->hide();
-        unsavedActivities=0;
-        loadProgress_=0;
-        update();
-    }
+    registerRideEvents(false); // stop watching activity changes
+    context_ = NULL; // MainWindow deletes the context when the athlete is closed
+    setShowConfig(false);
+    openCloseButton->setText(tr("Open"));
+    deleteButton->show();
+    saveAllUnsavedRidesButton->hide();
+    unsavedActivities=0;
+    loadProgress_=0;
+    update();
 }
 
 void

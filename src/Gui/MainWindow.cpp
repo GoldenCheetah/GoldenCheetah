@@ -423,6 +423,7 @@ MainWindow::MainWindow(const QDir &home)
      *--------------------------------------------------------------------*/
     splash->showMessage(tr("Setting up GUI: Central Widget..."));
 
+    blockTabbarUpdates = false;
     tabbar = new DragBar(this);
     tabbar->setTabsClosable(false); // use athlete view
 #ifdef Q_OS_MAC
@@ -450,9 +451,8 @@ MainWindow::MainWindow(const QDir &home)
     tabStack->addWidget(currentAthleteTab);
     tabStack->setCurrentIndex(0);
 
-    connect(tabbar, SIGNAL(dragTab(int)), this, SLOT(switchAthleteTab(int)));
-    connect(tabbar, SIGNAL(currentChanged(int)), this, SLOT(switchAthleteTab(int)));
-    //connect(tabbar, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTabClicked(int))); // use athlete view
+    connect(tabbar, SIGNAL(dragTab(int)), this, SLOT(tabbarAthleteChange(int)));
+    connect(tabbar, SIGNAL(currentChanged(int)), this, SLOT(tabbarAthleteChange(int)));
 
     /*----------------------------------------------------------------------
      * Central Widget
@@ -503,6 +503,10 @@ MainWindow::MainWindow(const QDir &home)
     // ATHLETE (FILE) MENU
     QMenu *fileMenu = menuBar()->addMenu(tr("&Athlete"));
 
+    // add create new option
+    fileMenu->addAction(tr("&New Athlete..."), QKeySequence("Ctrl+N"), this, SLOT(newCyclistTab()));
+
+    fileMenu->addSeparator();
     openTabMenu = fileMenu->addMenu(tr("Open..."));
     connect(openTabMenu, SIGNAL(aboutToShow()), this, SLOT(setOpenTabMenu()));
 
@@ -2068,37 +2072,12 @@ MainWindow::closeAthleteTab(QString name)
     return false;
 }
 
-bool
-MainWindow::closeAthleteTab()
-{
-    // check for autoimport and let it finalize
-    if (currentAthleteTab->context->athlete->autoImport) {
-        if (currentAthleteTab->context->athlete->autoImport->importInProcess() ) {
-            QMessageBox::information(this, tr("Activity Import"),
-                    tr("INFO for athlete %1\n\nClosing of athlete window not possible while background activity import is in progress...")
-                        .arg(currentAthleteTab->context->athlete->cyclist));
-            return false;
-        }
-    }
-
-    // wipe it down ...
-    if (saveRideExitDialog(currentAthleteTab->context) == false) return false;
-
-    // if its the last tab we close the window
-    if (tabList.count() == 1) {
-        closeWindow();
-    } else {
-        removeAthleteTab(currentAthleteTab);
-    }
-    appsettings->syncQSettings();
-    // we did it
-    return true;
-}
-
 // no questions asked just wipe away the current tab
 void
 MainWindow::removeAthleteTab(AthleteTab *tab)
 {
+    blockTabbarUpdates = true;
+
     setUpdatesEnabled(false);
 
     if (tabList.count() == 2) showTabbar(false); // don't need it for one!
@@ -2118,12 +2097,17 @@ MainWindow::removeAthleteTab(AthleteTab *tab)
     // switch to neighbour (currentTab will change)
     int index = tabList.indexOf(tab);
 
-    // if we're not the last then switch
-    // before removing so the GUI is clean
-    if (tabList.count() > 1) {
-        if (index) switchAthleteTab(index-1);
-        else switchAthleteTab(index+1);
+    // if this is not the last athlete and we are removing the current 
+    // athlete tab then we need to select another athlete
+    if ((tabList.count() > 1) && (tab == currentAthleteTab)) {
+        switchAthleteTab((index == 0) ? index+1 : index-1);
     }
+    
+    // close the athlete's card
+    emit closingAthlete(name, tab->context);
+
+    // refresh the athlete's card button labels, there might only be one open athlete now
+    emit currentAthlete(currentAthleteTab->context->athlete->cyclist);
 
     // close gracefully
     tab->close();
@@ -2142,6 +2126,8 @@ MainWindow::removeAthleteTab(AthleteTab *tab)
     delete tab;
     delete athlete;
     delete context;
+
+    blockTabbarUpdates = false;
 
     setUpdatesEnabled(true);
 }
@@ -2184,10 +2170,6 @@ MainWindow::setOpenTabMenu()
         connect(action, SIGNAL(triggered()), tabMapper, SLOT(map()));
         tabMapper->setMapping(action, name);
     }
-
-    // add create new option
-    openTabMenu->addSeparator();
-    openTabMenu->addAction(tr("&New Athlete..."), QKeySequence("Ctrl+N"), this, SLOT(newCyclistTab()));
 }
 
 void
@@ -2295,8 +2277,6 @@ MainWindow::saveGCState(Context *context)
 void
 MainWindow::restoreGCState(Context *context)
 {
-qDebug() << "MainWindow::restoreGCState" << context->athlete->cyclist;
-
     if (viewStack->currentIndex() != GcViewStackIdx::SELECT_ATHLETE_VIEW) {
 
         // not on athlete view...
@@ -2324,36 +2304,37 @@ qDebug() << "MainWindow::restoreGCState" << context->athlete->cyclist;
 }
 
 void
+MainWindow::tabbarAthleteChange(int index)
+{
+    // when closing an athlete, the tabbar events are not helpful
+    if (blockTabbarUpdates == false) {
+
+        switchAthleteTab(index);
+
+        // refresh the athlete's card button labels
+        emit currentAthlete(currentAthleteTab->context->athlete->cyclist);
+    }   
+}
+
+void
 MainWindow::switchAthleteTab(int index)
 {
     if (index < 0) return;
 
     setUpdatesEnabled(false);
 
-#if 0 // use athlete view, these buttons don't exist
-#ifdef Q_OS_MAC // close buttons on the left on Mac
-    // Only have close button on current tab (prettier)
-    for(int i=0; i<tabbar->count(); i++) tabbar->tabButton(i, QTabBar::LeftSide)->hide();
-    tabbar->tabButton(index, QTabBar::LeftSide)->show();
-#else
-    // Only have close button on current tab (prettier)
-    for(int i=0; i<tabbar->count(); i++) tabbar->tabButton(i, QTabBar::RightSide)->hide();
-    tabbar->tabButton(index, QTabBar::RightSide)->show();
-#endif
-#endif
-
     // save how we are
     saveGCState(currentAthleteTab->context);
 
     currentAthleteTab = tabList[index];
+
     tabStack->setCurrentIndex(index);
+    tabbar->setCurrentIndex(index);
 
     // restore back
     restoreGCState(currentAthleteTab->context);
 
-    setWindowTitle(currentAthleteTab->context->athlete->home->root().dirName());
-
-    athleteView->setCurrentAthlete(currentAthleteTab->context->athlete->home->root().dirName());
+    setWindowTitle(currentAthleteTab->context->athlete->cyclist);
 
     setUpdatesEnabled(true);
 }
