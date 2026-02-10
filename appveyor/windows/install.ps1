@@ -1,6 +1,3 @@
-# Python version configuration - update this when upgrading Python
-$PYTHON_EMBED_VERSION="3.11.9"
-
 # Get the libraries
 if (-not (Test-Path 'C:\LIBS')) {
   Start-FileDownload "https://github.com/GoldenCheetah/WindowsSDK/releases/download/v0.1.1/gc-ci-libs.zip"
@@ -25,21 +22,3 @@ if (-not (Test-Path 'C:\R')) {
   Start-Process -FilePath .\R-win.exe -ArgumentList "/VERYSILENT /DIR=C:\R" -NoNewWindow -Wait
 }
 C:\R\bin\R --version
-
-# Get Python
-if (-not (Test-Path 'C:\Python')) {
-  $pyurl = "https://www.python.org/ftp/python/$PYTHON_EMBED_VERSION/python-$PYTHON_EMBED_VERSION-embed-amd64.zip"
-  Start-FileDownload $pyurl "python-embed.zip"
-  Expand-Archive -Path python-embed.zip -DestinationPath C:\Python -Force
-  # Enable site import
-  mkdir C:\Python\lib\site-packages
-  $py_ver = $($env:PYTHON_VERSION -replace '\.', '')
-  (Get-Content C:\Python\python$py_ver._pth) -replace '#import site', 'import site' | Set-Content C:\Python\python$py_ver._pth
-  # Enable pip in embedded Python
-  Start-FileDownload "https://bootstrap.pypa.io/get-pip.py" "get-pip.py"
-  C:\Python\python.exe get-pip.py --no-warn-script-location
-  # Upgrade pip to ensure you have the latest version
-  C:\Python\python -m pip install --upgrade pip
-  # Install your project's dependencies from a requirements.txt file
-  C:\Python\python -m pip install --upgrade --only-binary :all: -r src\Python\requirements.txt -t C:\Python\lib\site-packages
-}
