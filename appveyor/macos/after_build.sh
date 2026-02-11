@@ -386,4 +386,4 @@ hdiutil create -volname GoldenCheetah -srcfolder GoldenCheetah.app -ov -format U
 echo "Renaming dmg file to branch and build number ready for deploy"
 mv GoldenCheetah.dmg ../GoldenCheetah_v3.8_x64.dmg
 
-curl --max-time 300 -F "file=../GoldenCheetah_v3.8_x64.dmg" https://temp.sh/upload
+curl --max-time 300 -F "file=@../GoldenCheetah_v3.8_x64.dmg" https://temp.sh/upload
