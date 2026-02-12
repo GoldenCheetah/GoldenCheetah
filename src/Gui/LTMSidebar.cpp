@@ -590,7 +590,6 @@ LTMSidebar::buildDateRangeMenu
         menu.addAction(tr("Add season") % ellipsis, this, &LTMSidebar::addRange);
     } else if (isPhase) {
         QString seasonName = season->getName();
-        const int maxLength = 30;
         menu.addAction(tr("Edit phase") % ellipsis, this, &LTMSidebar::editRange);
         menu.addAction(tr("Delete phase"), this, &LTMSidebar::deleteRange);
         menu.addSeparator();

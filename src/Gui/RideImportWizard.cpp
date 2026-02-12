@@ -983,7 +983,7 @@ RideImportWizard::abortClicked()
        hide();
        if (autoImportStealth) {
            // inform the user that the work is done
-           QMessageBox::information(NULL, tr("Auto Import"), tr("Automatic import from defined directories is completed."));
+           QMessageBox::information(NULL, tr("Auto Import"), tr("INFO for athlete %1\n\nAutomatic import from defined directories is completed.").arg(context->athlete->cyclist));
        }
        done(0);
        return;
