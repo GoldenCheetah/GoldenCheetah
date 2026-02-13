@@ -312,6 +312,21 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
             printd("Install stdio catcher\n");
             PyRun_SimpleString(stdOutErr.c_str()); //invoke code to redirect
 
+            // Retrieve and prepare user library paths
+            QStringList userPaths = appsettings->value(NULL, GC_PYTHON_USER_LIBRARY_PATHS).toStringList();
+
+            // Ensure directories exist and add to sys.path
+            for (const QString &path : userPaths) {
+                QDir dir(path);
+                if (!dir.exists()) {
+                    dir.mkpath(".");
+                }
+                if (dir.exists()) {
+                     QString code = QString("import sys; sys.path.append(r'%1')").arg(path);
+                     PyRun_SimpleString(code.toStdString().c_str());
+                     printd("Added to sys.path: %s\n", path.toStdString().c_str());
+                }
+            }
  #ifdef Q_OS_LINUX
             // ensure site-packages is in path when using deployed Python on Linux
             if (PYTHONHOME == deployedPython) {
