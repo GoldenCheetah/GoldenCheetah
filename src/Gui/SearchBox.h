@@ -42,7 +42,7 @@ public:
     enum searchboxmode { Search, Filter };
     typedef enum searchboxmode SearchBoxMode;
 
-    SearchBox(Context *context, QWidget *parent = 0, bool nochooser=true);
+    SearchBox(QWidget *parent, Context *context, bool nochooser=true);
 
     // either search box or filter box
     void setMode(SearchBoxMode mode);
@@ -50,7 +50,7 @@ public:
     void setText(QString);
     SearchBoxMode getMode() { return mode; }
     bool isFiltered() const { return filtered; }
-    void setContext(Context *c) { context = c; }
+    void setContext(Context *con);
 
 protected:
     void resizeEvent(QResizeEvent *);
@@ -109,10 +109,10 @@ signals:
     void lostFocus();
 
 private:
-    Context *context;
     QWidget *parent;
-    bool filtered;
+    Context *context;
     bool nochooser;
+    bool filtered;
     QToolButton *clearButton, *searchButton, *toolButton;
     QMenu *dropMenu;
     SearchBoxMode mode;

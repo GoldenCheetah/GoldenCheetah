@@ -140,17 +140,26 @@ GlobalContext::userMetricsConfigChanged()
 
 bool Context::isValid(Context *p) { return p != NULL &&_contexts.contains(p); }
 
-Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
+Context::Context(MainWindow *mainWindow)
+    : mainWindow(mainWindow), nav(nullptr), rideNavigator(nullptr), tab(nullptr),
+      athlete(nullptr), ride(nullptr), season(nullptr), workout(nullptr), videosync(nullptr),
+      now(0) 
 {
-    ride = NULL;
-    workout = NULL;
-    videosync = NULL;
-    isfiltered = ishomefiltered = false;
-    isCompareIntervals = isCompareDateRanges = false;
-    isRunning = isPaused = false;
+    // mainwindow state
     viewType = GcViewType::NO_VIEW_SET;
+    showSidebar = showLowbar = false;
+    showToolbar = true;
+    style = 2;
+    scopehighlighted = false;
 
-    connect(this, SIGNAL(loadProgress(QString, double)), mainWindow, SLOT(loadProgress(QString, double)));
+    // search filter
+    isfiltered = ishomefiltered = false;
+
+    // train mode state
+    isRunning = isPaused = false;
+
+    // comparing things
+    isCompareIntervals = isCompareDateRanges = false;
 
 #ifdef GC_HAS_CLOUD_DB
     cdbChartListDialog = NULL;

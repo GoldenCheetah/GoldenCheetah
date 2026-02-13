@@ -89,7 +89,7 @@ class MainWindow : public QMainWindow
 
     public:
 
-        MainWindow(const QDir &home);
+        MainWindow();
         ~MainWindow(); // temp to zap db - will move to tab //
 
         void byebye() { close(); } // go bye bye for a restart
@@ -133,8 +133,10 @@ class MainWindow : public QMainWindow
         void backClicked();
         void forwardClicked();
         void openingAthlete(QString, Context *);
+        void closingAthlete(QString, Context *);
         void newAthlete(QString);
         void deletedAthlete(QString);
+        void currentAthlete(QString);
 
     public slots:
         bool eventFilter(QObject*,QEvent*);
@@ -146,9 +148,6 @@ class MainWindow : public QMainWindow
         void helpView();
         void logBug();
         void support();
-
-        void loadProgress(QString folder, double progress);
-
 
         // perspective selected
         void perspectiveSelected(int index);
@@ -170,14 +169,11 @@ class MainWindow : public QMainWindow
 
         void setOpenTabMenu(); // set the Open Tab menu
         void newCyclistTab();  // create a new Cyclist
-        void openAthleteTab(QString name);
+        bool openAthleteTab(QString name);
         void loadCompleted(QString name, Context *context);
-        void closeTabClicked(int index); // user clicked to close tab
+        bool closeTabClicked(int index); // user clicked to close tab
         bool closeAthleteTab(QString name); // close named athlete
-        bool closeAthleteTab();       // close current, might not if the user
-                               // changes mind if there are unsaved changes.
-        void removeAthleteTab(AthleteTab*);  // remove without question
-        void switchAthleteTab(int index); // for switching between one tab and another
+        void tabbarAthleteChange(int index); // blockable tabbar generated athlete switching
 
         // sidebar selecting views and actions
         void sidebarClicked(GcSideBarBtnId id);
@@ -274,12 +270,9 @@ class MainWindow : public QMainWindow
         void mergeRide();
         void deleteRide();
         void saveRide();                        // save current ride menu item
-        void saveAllUnsavedRides();
+        void saveAllUnsavedRides(Context *);
         void revertRide();
         bool saveRideExitDialog(Context *);              // save dirty rides on exit dialog
-
-        // autoload rides from athlete specific directory (preferences)
-        void ridesAutoImport();
 
 #ifdef GC_HAS_CLOUD_DB
         // CloudDB actions
@@ -297,6 +290,13 @@ class MainWindow : public QMainWindow
 
         void configChanged(qint32);
         void onEditMenuAboutToShow();
+
+    protected:
+
+        void displayMainWindow();
+
+        void switchAthleteTab(int index); // athlete switching for change & athlete closure
+        void removeAthleteTab(AthleteTab*);  // remove without question
 
     private:
 
@@ -362,6 +362,8 @@ class MainWindow : public QMainWindow
         CloudDBVersionClient *versionClient;
         CloudDBTelemetryClient *telemetryClient;
 #endif
+
+        bool blockTabbarUpdates;
 
 };
 

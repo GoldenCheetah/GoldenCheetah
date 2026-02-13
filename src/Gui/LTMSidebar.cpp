@@ -61,8 +61,9 @@
 #include "RideMetadata.h"
 #include "SpecialFields.h"
 
-
-LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context(context), active(false),
+// initially create LTMSidebar without a parent widget, the first display
+// of a view (trends, plan) will attach LTMSidebar's mainLayout to the view.
+LTMSidebar::LTMSidebar(Context *context) : QWidget(nullptr), context(context), active(false),
                                            isqueryfilter(false), isautofilter(false)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -590,7 +591,6 @@ LTMSidebar::buildDateRangeMenu
         menu.addAction(tr("Add season") % ellipsis, this, &LTMSidebar::addRange);
     } else if (isPhase) {
         QString seasonName = season->getName();
-        const int maxLength = 30;
         menu.addAction(tr("Edit phase") % ellipsis, this, &LTMSidebar::editRange);
         menu.addAction(tr("Delete phase"), this, &LTMSidebar::deleteRange);
         menu.addSeparator();

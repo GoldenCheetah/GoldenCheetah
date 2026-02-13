@@ -1741,10 +1741,10 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     estimateSelect = new QComboBox(this);
 
     // working with estimates, local utility functions
-    models << new CP2Model(context);
-    models << new CP3Model(context);
+    models << new CP2Model();
+    models << new CP3Model();
     //models << new MultiModel(context); disabled in v3.6
-    models << new ExtendedModel(context);
+    models << new ExtendedModel();
     //models << new WSModel(context); disabled in v3.6
     foreach(PDModel *model, models) {
         modelSelect->addItem(model->name(), model->code());
