@@ -1044,10 +1044,28 @@ CalendarWindow::getSummaries
     int numTimeBuckets = firstDay.daysTo(lastDay) / timeBucketSize + 1;
     bool useMetricUnits = GlobalContext::context()->useMetricUnits;
 
-    const RideMetricFactory &factory = RideMetricFactory::instance();
-    FilterSet filterSet(context->isfiltered, context->filters);
     Specification spec;
-    spec.setFilterSet(filterSet);
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    if (context->isfiltered && context->ishomefiltered) {
+
+        // take the intersection of the two filter sets
+        auto mergedSet =
+                QSet<QString>(
+                        context->filters.begin(),
+                        context->filters.end()).intersect(
+                QSet<QString>(
+                        context->homeFilters.begin(),
+                        context->homeFilters.end()
+                        )
+                );
+        spec.setFilterSet(FilterSet(true, QStringList(mergedSet.begin(), mergedSet.end())));
+
+    } else if (context->isfiltered) {
+        spec.setFilterSet(FilterSet(true, context->filters));
+    } else if (context->ishomefiltered) {
+        spec.setFilterSet(FilterSet(true, context->homeFilters));
+    }
+
     for (int timeBucket = 0; timeBucket < numTimeBuckets; ++timeBucket) {
         QDate firstDayOfTimeBucket = firstDay.addDays(timeBucket * timeBucketSize);
         QDate lastDayOfTimeBucket = firstDayOfTimeBucket.addDays(timeBucketSize - 1);
