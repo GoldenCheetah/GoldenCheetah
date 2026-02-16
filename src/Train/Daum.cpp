@@ -65,22 +65,25 @@ bool Daum::discover(QString dev) {
     QSerialPort &s(*serial_dev_);
     QByteArray data;
     data.append(0x11);
-
-    s.write(data);
-    if (!s.waitForBytesWritten(1000)) {
-        return false;
-    }
-    if (!s.waitForReadyRead(1000)) {
-        return false;
-    }
-    data = s.read(2);
-    if ((int)data[0] != 0x11) {
-        return false;
-    }
-    data = s.readAll();
+    const bool ret = [&]() {
+        if (s.write(data) == -1) {
+            return false;
+        }
+        if (!s.waitForBytesWritten(1000)) {
+            return false;
+        }
+        if (!s.waitForReadyRead(1000)) {
+            return false;
+        }
+        data = s.read(2);
+        if ((int)data[0] != 0x11) {
+            return false;
+        }
+        data = s.readAll();
+        return true;
+    }();
     closePort();
-
-    return true;
+    return ret;
 }
 
 void Daum::setLoad(double load) {
@@ -155,8 +158,12 @@ void Daum::run() {
         if (timer_ == nullptr) {
             timer_ = new QTimer();
 
-            connect(this, SIGNAL(finished()), timer_, SLOT(stop()), Qt::DirectConnection);
-            connect(timer_, SIGNAL(timeout()), this, SLOT(requestRealtimeData()), Qt::DirectConnection);
+            if (!connect(this, SIGNAL(finished()), timer_, SLOT(stop()), Qt::DirectConnection)) {
+                qFatal("Failed to connect finished signal in Daum");
+            }
+            if (!connect(timer_, SIGNAL(timeout()), this, SLOT(requestRealtimeData()), Qt::DirectConnection)) {
+                qFatal("Failed to connect timeout signal in Daum");
+            }
         }
 
         // discard prev. read data
@@ -499,7 +506,10 @@ QByteArray Daum::WriteDataAndGetAnswer(QByteArray const& dat, int response_bytes
     }
 
     QThread::msleep(serialWriteDelay_);
-    s.write(dat);
+    if(s.write(dat) == -1) {
+        qWarning() << "failed to write data to daum cockpit";
+        exit(-1);
+    }
     if(!s.waitForBytesWritten(1000)) {
         qWarning() << "failed to write data to daum cockpit";
         exit(-1);
