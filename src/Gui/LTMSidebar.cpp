@@ -185,7 +185,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     filterTree->setColumnCount(1);
     filterTree->setSelectionBehavior(QAbstractItemView::SelectRows);
     filterTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    filterTree->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    filterTree->setSelectionMode(QAbstractItemView::MultiSelection);
     filterTree->header()->hide();
     filterTree->setIndentation(5);
     filterTree->expandItem(allFilters);
@@ -237,6 +237,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 
     // filters
     connect(filterTree,SIGNAL(itemSelectionChanged()), this, SLOT(filterTreeWidgetSelectionChanged()));
+    connect(filtersWidget->controlAction, &QAction::triggered, this, &LTMSidebar::filterVisibilityChanged);
 
     // events
     connect(eventTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(eventPopup(const QPoint &)));
@@ -261,6 +262,25 @@ void
 LTMSidebar::chartVisibilityChanged()
 {
     chartsWidgetVisible = chartsWidget->isVisible();
+}
+
+void
+LTMSidebar::filterVisibilityChanged()
+{
+    // when the filters are hidden, unselect LTMS sidebar filtering options
+    if (filterTree->isVisible() == false) {
+
+        // clear the named filters
+        filterTree->clearSelection();
+        filterTreeWidgetSelectionChanged();
+
+        // clear the autofilters
+        for (int i=1; i<filterSplitter->count(); i++) {
+            GcSplitterItem *item = static_cast<GcSplitterItem*>(filterSplitter->widget(i));
+            static_cast<QTreeWidget*>(item->content)->clearSelection();
+        }
+        autoFilterSelectionChanged();
+    }
 }
 
 void
@@ -590,7 +610,6 @@ LTMSidebar::buildDateRangeMenu
         menu.addAction(tr("Add season") % ellipsis, this, &LTMSidebar::addRange);
     } else if (isPhase) {
         QString seasonName = season->getName();
-        const int maxLength = 30;
         menu.addAction(tr("Edit phase") % ellipsis, this, &LTMSidebar::editRange);
         menu.addAction(tr("Delete phase"), this, &LTMSidebar::deleteRange);
         menu.addSeparator();

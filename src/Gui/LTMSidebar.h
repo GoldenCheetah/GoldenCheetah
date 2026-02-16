@@ -108,6 +108,7 @@ class LTMSidebar : public QWidget
     protected slots:
 
         void chartVisibilityChanged();
+        void filterVisibilityChanged();
 
     private:
 
