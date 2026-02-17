@@ -67,7 +67,7 @@ class ScriptContext {
 class PythonEmbed {
 
     public:
-    
+
     PythonEmbed(const bool verbose=false, const bool interactive=false);
     ~PythonEmbed();
 
@@ -75,6 +75,9 @@ class PythonEmbed {
     // find installed binary and check version and module path
     static bool pythonInstalled(QString &pybin, QString &pypath, QString PYTHONHOME=QString(""));
     QString pybin, pypath;
+
+    // verify core dependencies are importable
+    [[nodiscard]] bool checkDependencies() const;
 
     // scripts can set a result value
     double result;

@@ -228,15 +228,34 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     pythonDirectoryLayout->setContentsMargins(0, 0, 0, 0);
     pythonDirectoryLayout->addWidget(pythonDirectory);
     pythonDirectoryLayout->addWidget(pythonBrowseButton);
-
     connect(pythonBrowseButton, SIGNAL(clicked()), this, SLOT(browsePythonDir()));
+
+    // User Library Paths
+    pythonPathList = new QListWidget(this);
+    pythonPathList->setSelectionMode(QAbstractItemView::ExtendedSelection); // Allow multi-select
+    QStringList paths = appsettings->value(this, GC_PYTHON_USER_LIBRARY_PATHS).toStringList();
+    pythonPathList->addItems(paths);
+
+    pythonActions = new ActionButtonBox(ActionButtonBox::AddDeleteGroup);
+
+    connect(pythonActions, &ActionButtonBox::addRequested, this, &GeneralPage::addPythonPathClicked);
+    connect(pythonActions, &ActionButtonBox::deleteRequested, this, &GeneralPage::removePythonPathClicked);
+
     connect(embedPython,
 #if QT_VERSION < QT_VERSION_CHECK(6,7,0)
             &QCheckBox::stateChanged,
-            this, [this](int state) { pythonDirectorySel->setEnabled(state); });
+            this, [this](int state) {
+                pythonDirectorySel->setEnabled(state);
+                pythonPathList->setEnabled(state);
+                pythonActions->setEnabled(state);
+            });
 #else
             QOverload<Qt::CheckState>::of(&QCheckBox::checkStateChanged),
-            this, [this](Qt::CheckState state) { pythonDirectorySel->setEnabled(state); });
+            this, [this](Qt::CheckState state) {
+                pythonDirectorySel->setEnabled(state);
+                pythonPathList->setEnabled(state);
+                pythonActions->setEnabled(state);
+            });
 #endif
 
     embedPython->setChecked(appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool());
@@ -314,6 +333,8 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 #ifdef GC_WANT_PYTHON
     form->addRow("", embedPython);
     form->addRow(tr("Python Home"), pythonDirectorySel);
+    form->addRow(tr("User Library Paths"), pythonPathList);
+    form->addRow("", pythonActions);
 #endif
 #ifdef GC_WANT_R
     form->addRow("", embedR);
@@ -375,6 +396,11 @@ GeneralPage::saveClicked()
 #endif
 #ifdef GC_WANT_PYTHON
     appsettings->setValue(GC_PYTHON_HOME, pythonDirectory->text());
+    QStringList paths;
+    for(int i = 0; i < pythonPathList->count(); ++i) {
+        paths << pythonPathList->item(i)->text();
+    }
+    appsettings->setValue(GC_PYTHON_USER_LIBRARY_PATHS, paths);
 #endif
 
     // update to reflect the state - if hidden user hasn't been asked yet to
@@ -465,6 +491,26 @@ GeneralPage::browsePythonDir()
         }
      }
 }
+
+void
+GeneralPage::addPythonPathClicked()
+{
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Select Python Library Path"),
+                                                    "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if (!dir.isEmpty()) {
+        // Check for duplicates
+        if (pythonPathList->findItems(dir, Qt::MatchExactly).isEmpty()) {
+            pythonPathList->addItem(dir);
+        }
+    }
+}
+
+void
+GeneralPage::removePythonPathClicked()
+{
+    qDeleteAll(pythonPathList->selectedItems());
+}
+
 #endif
 
 void
