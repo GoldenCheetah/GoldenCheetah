@@ -263,24 +263,23 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 
     connect(athleteBrowseButton, SIGNAL(clicked()), this, SLOT(browseAthleteDir()));
 
+    // the order of the ComboBox entries below must align with the
+    // gcStartupView functionality in MainWindow's constructor
     startupView = new QComboBox();
-    startupView->addItem(tr("Trends")); // startViewIdx = 0
+    startupView->addItem(tr("Trends"));   // startViewIdx = 0
     startupView->addItem(tr("Analysis")); // startViewIdx = 1
-    startupView->addItem(tr("Plan")); // startViewIdx = 2
-    startupView->addItem(tr("Train")); // startViewIdx = 3
+    startupView->addItem(tr("Plan"));     // startViewIdx = 2
+    startupView->addItem(tr("Train"));    // startViewIdx = 3
 
-    // map viewTypes to combo box index values, default to analysis view
-    int startViewIdx = 1;
-    GcViewType viewType = static_cast<GcViewType>(appsettings->value(NULL, GC_STARTUP_VIEW,
-                                QString::number(static_cast<int>(GcViewType::VIEW_ANALYSIS))).toInt());
-    switch (viewType) {
-        case GcViewType::VIEW_TRENDS: startViewIdx = 0; break;
-        case GcViewType::VIEW_ANALYSIS: startViewIdx = 1; break;
-        case GcViewType::VIEW_PLAN: startViewIdx = 2; break;
-        case GcViewType::VIEW_TRAIN: startViewIdx = 3; break;
-        default: {
-            qDebug() << "Startup view not specified or unknown value in GeneralPage, defaulting to analysis view";
-        } break;
+    // get the configured startup view configuration which matches with
+    // the startViewIdx values defined by the comboBox order above.
+    int startViewIdx = appsettings->value(NULL, GC_STARTUP_VIEW, -1).toInt();
+
+    // the configuration values are retained and the startupView Combobox uses the same values
+    // the default is analysis when no config exists or the configuration value is not recognised.
+    if (startViewIdx < 0 && startViewIdx > 3) {
+        startViewIdx = 1;
+        appsettings->setValue(GC_STARTUP_VIEW, startViewIdx);
     }
     startupView->setCurrentIndex(startViewIdx);
 
@@ -347,16 +346,8 @@ GeneralPage::saveClicked()
     };
     appsettings->setValue(GC_LANG, langs[langCombo->currentIndex()]);
 
-    // map combo box index values to viewTypes, default to analysis view
-    GcViewType startupViewType = GcViewType::VIEW_ANALYSIS;
-    switch (startupView->currentIndex()) {
-        case 0: startupViewType = GcViewType::VIEW_TRENDS; break;
-        case 1: startupViewType = GcViewType::VIEW_ANALYSIS; break;
-        case 2: startupViewType = GcViewType::VIEW_PLAN; break;
-        case 3: startupViewType = GcViewType::VIEW_TRAIN; break;
-        default: qDebug() << "Unhandled startup view in GeneralPage:" << static_cast<std::underlying_type_t<GcViewType>>(startupView->currentIndex()); break;
-    }
-    appsettings->setValue(GC_STARTUP_VIEW, static_cast<std::underlying_type_t<GcViewType>>(startupViewType));
+    // save the startup view
+    appsettings->setValue(GC_STARTUP_VIEW, startupView->currentIndex());
 
     // Garmin and cranks
     appsettings->setValue(GC_GARMIN_HWMARK, garminHWMarkedit->value());
