@@ -1014,7 +1014,6 @@ bool ViewParser::startElement( const QString&, const QString&, const QString &na
         type = static_cast<GcWinID>(typeStr.toInt());
         chart = GcWindowRegistry::newGcWindow(type, context);
         if (chart != NULL) {
-            chart->hide();
             chart->setProperty("title", QVariant(title));
         }
     }

@@ -88,7 +88,6 @@ class LiveMapWebPageWindow : public GcChartWindow
 
         QWebEngineView *view;
         QWebEnginePage* webPage;
-        LiveMapWebPageWindow();  // default ctor
         // setting dialog
         QLabel* customUrlLabel;
         QLabel* customLonLabel;
