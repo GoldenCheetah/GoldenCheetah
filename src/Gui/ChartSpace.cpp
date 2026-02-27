@@ -52,7 +52,7 @@ ChartSpace::ChartSpace(Context *context, OverviewScope scope, GcWindow *window) 
 
     // add a view and scene and centre
     scene = new QGraphicsScene(this);
-    view = new GGraphicsView(context, this);
+    view = new GGraphicsView(context->mainWindow, this);
 
     view->viewport()->setAttribute(Qt::WA_AcceptTouchEvents, false); // stops it stealing focus on mouseover
     scrollbar = new QScrollBar(Qt::Vertical, this);

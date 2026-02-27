@@ -66,18 +66,18 @@ inline constexpr bool operator&(OverviewScope Lhs, OverviewScope Rhs) {
 class GGraphicsView : public QGraphicsView
 {
     public:
-        GGraphicsView(Context *context, QWidget *parent) : QGraphicsView(parent), context(context) {
+        GGraphicsView(MainWindow *mainWindow, QWidget *parent) : QGraphicsView(parent), mainWindow_(mainWindow) {
             setAcceptDrops(true);
         }
 
     protected:
-        void dragEnterEvent(QDragEnterEvent *event) { context->mainWindow->dragEnterEvent(event); }
-        void dragLeaveEvent(QDragLeaveEvent *event) { context->mainWindow->dragLeaveEvent(event); }
-        void dropEvent(QDropEvent *event) { context->mainWindow->dropEvent(event); }
-        void dragMoveEvent(QDragMoveEvent *event) { context->mainWindow->dragMoveEvent(event); }
+        void dragEnterEvent(QDragEnterEvent *event) { mainWindow_->dragEnterEvent(event); }
+        void dragLeaveEvent(QDragLeaveEvent *event) { mainWindow_->dragLeaveEvent(event); }
+        void dropEvent(QDropEvent *event) { mainWindow_->dropEvent(event); }
+        void dragMoveEvent(QDragMoveEvent *event) { mainWindow_->dragMoveEvent(event); }
 
     private:
-        Context *context;
+        MainWindow *mainWindow_;
 };
 
 // must be subclassed to add items to a ChartSpace
