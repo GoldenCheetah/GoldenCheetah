@@ -50,7 +50,5 @@ export PATH="/usr/local/opt/python@${PYTHON_VERSION}/bin:$PATH"
 python3 --version
 # Upgrade pip to ensure you have the latest version
 python3 -m pip install --upgrade pip
-# Install your project's dependencies from a requirements.txt file
-python3 -m pip install -r src/Python/requirements.txt
 
 exit
