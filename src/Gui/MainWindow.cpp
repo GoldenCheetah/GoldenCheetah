@@ -1289,21 +1289,24 @@ MainWindow::displayMainWindow()
 {
     splash->showMessage(tr("Opening Main Window..."));
 
-    // switch to the startup view, default is analysis.
-    GcViewType startupViewType = static_cast<GcViewType>(appsettings->value(NULL, GC_STARTUP_VIEW, QString::number(static_cast<int>(GcViewType::NO_VIEW_SET))).toInt());
-    switch (startupViewType) {
-        case GcViewType::VIEW_TRENDS: selectTrends(); break;
-        case GcViewType::VIEW_ANALYSIS: selectAnalysis(); break;
-        case GcViewType::VIEW_PLAN: selectPlan(); break;
-        case GcViewType::VIEW_TRAIN: selectTrain(); break;
+    // switch to the startup view based on the configured value,
+    // the default is analysis when no config exists or the configuration value is not recognised.
+    // note: the gcStartupView values must align with the startViewIdx entries in Pages.cpp
+    int gcStartupView = appsettings->value(NULL, GC_STARTUP_VIEW, -1).toInt();
+    switch (gcStartupView) {
+        case 0: selectTrends(); break;
+        case 1: selectAnalysis(); break;
+        case 2: selectPlan(); break;
+        case 3: selectTrain(); break;
         default: {
             qDebug() << "Startup view not specified or unknown value, defaulting to analysis view";
-            appsettings->setValue(GC_STARTUP_VIEW, static_cast<std::underlying_type_t<GcViewType>>(GcViewType::VIEW_ANALYSIS));
+            appsettings->setValue(GC_STARTUP_VIEW, 1);
             selectAnalysis();
         } break;
     }
 
-    currentAthleteTab->setFocus(); //grab focus
+    //grab focus
+    currentAthleteTab->setFocus();
 
 #if !defined(OPENDATA_DISABLE)
     splash->showMessage(tr("Checking for udates..."));

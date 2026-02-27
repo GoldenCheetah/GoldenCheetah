@@ -322,7 +322,7 @@ Perspective::configChanged(qint32)
     tileArea->verticalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
 //#endif
     QPalette palette;
-    palette.setBrush(backgroundRole(), viewType() == GcViewType::VIEW_TRAIN ? GColor(CTRAINPLOTBACKGROUND) : GColor(CPLOTBACKGROUND));
+    palette.setBrush(backgroundRole(), viewType_ == GcViewType::VIEW_TRAIN ? GColor(CTRAINPLOTBACKGROUND) : GColor(CPLOTBACKGROUND));
     setPalette(palette);
     tileWidget->setPalette(palette);
     tileArea->setPalette(palette);
@@ -335,7 +335,7 @@ Perspective::configChanged(qint32)
             if (charts[i]->type() == GcWindowTypes::Overview || charts[i]->type() == GcWindowTypes::OverviewTrends) chartbar->setColor(i, GColor(COVERVIEWBACKGROUND));
             else if (charts[i]->type() == GcWindowTypes::UserAnalysis || charts[i]->type() == GcWindowTypes::UserTrends) chartbar->setColor(i, RGBColor(QColor(charts[i]->property("color").toString())));
             else {
-                if (viewType() == GcViewType::VIEW_TRAIN) chartbar->setColor(i, GColor(CTRAINPLOTBACKGROUND));
+                if (viewType_ == GcViewType::VIEW_TRAIN) chartbar->setColor(i, GColor(CTRAINPLOTBACKGROUND));
                 else chartbar->setColor(i, GColor(CPLOTBACKGROUND));
             }
         }
@@ -739,7 +739,7 @@ Perspective::addChart(GcChartWindow* newone)
             // tab colors
             if (newone->type() == GcWindowTypes::Overview || newone->type() == GcWindowTypes::OverviewTrends) chartbar->setColor(chartnum, GColor(COVERVIEWBACKGROUND));
             else {
-                if (viewType() == GcViewType::VIEW_TRAIN) chartbar->setColor(chartnum, GColor(CTRAINPLOTBACKGROUND));
+                if (viewType_ == GcViewType::VIEW_TRAIN) chartbar->setColor(chartnum, GColor(CTRAINPLOTBACKGROUND));
                 else chartbar->setColor(chartnum, GColor(CPLOTBACKGROUND));
             }
 
@@ -796,7 +796,6 @@ Perspective::addChart(GcChartWindow* newone)
         // add to the list
         if (currentStyle == 2 && chartCursor >= 0) charts.insert(chartCursor, newone);
         else charts.append(newone);
-        newone->hide();
 
         // watch for moves etc
         connect(newone, SIGNAL(resizing(GcWindow*)), this, SLOT(windowResizing(GcWindow*)));

@@ -220,15 +220,15 @@ AthleteTab::selectView(GcViewType viewType)
     // ensure an initial viewChanged() event occurs for the navigation model, otherwise if the
     // startup view is trends (value zero) the guard rejects the selection as views->currentIndex() is zero
     if (startupViewChangeSent && views->currentIndex() == viewTypeToIndex(viewType)) return; // not changing
-    startupViewChangeSent = true;
 
     // suspend screen updates while the view is changed.
     views->setUpdatesEnabled(false);
 
     emit viewChanged(viewType);
 
-    // first we deselect the current view
-    currentView()->setSelected(false);
+    // deselect the current view, but only after the initial selectView() call.
+    if (startupViewChangeSent) currentView()->setSelected(false);
+    startupViewChangeSent = true;
 
     // now select the real one
     views->setCurrentIndex(viewTypeToIndex(viewType));
