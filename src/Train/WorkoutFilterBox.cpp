@@ -45,18 +45,23 @@ WorkoutFilterBox::WorkoutFilterBox(QWidget *parent, Context *context) : FilterEd
     this->setFilterCommands(workoutFilterCommands());
     this->setMenuProvider(new WorkoutMenuProvider(this, QDir(gcroot).canonicalPath() + "/workoutfilters.xml"));
     connect(this, &FilterEditor::returnPressed, this, &WorkoutFilterBox::processInput);
-    if (context != nullptr) {
-        connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    if (context) connect(context, &Context::configChanged, this, &WorkoutFilterBox::configChanged);
 
-        // set appearance
-        configChanged(CONFIG_APPEARANCE);
-    }
+    // set appearance
+    configChanged(CONFIG_APPEARANCE);
 }
 
 WorkoutFilterBox::~WorkoutFilterBox()
 {
 }
 
+void
+WorkoutFilterBox::setContext(Context *ctx)
+{
+    if (context) disconnect(context, &Context::configChanged, this, &WorkoutFilterBox::configChanged);
+    context = ctx;
+    if (context) connect(context, &Context::configChanged, this, &WorkoutFilterBox::configChanged);
+}
 
 void
 WorkoutFilterBox::clear

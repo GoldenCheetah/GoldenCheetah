@@ -408,15 +408,15 @@ static struct {
     { "", -1 }
 };
 
-static QStringList pdmodels(Context *context)
+static QStringList pdmodels()
 {
     QStringList returning;
 
-    returning << CP2Model(context).code();
-    returning << CP3Model(context).code();
-    //returning << MultiModel(context).code(); disabled in v3.6
-    returning << ExtendedModel(context).code();
-    //returning << WSModel(context).code(); disabled in v3.6
+    returning << CP2Model().code();
+    returning << CP3Model().code();
+    //returning << MultiModel().code(); disabled in v3.6
+    returning << ExtendedModel().code();
+    //returning << WSModel().code(); disabled in v3.6
     return returning;
 }
 
@@ -456,7 +456,7 @@ DataFilter::completerList(Context *context, bool withSymbols)
     QString last;
 
     // start with just a list of functions
-    list = builtins(context);
+    list = builtins();
 
     // add ridefile data series and symbols for use in activities contexts
     if (withSymbols) {
@@ -494,7 +494,7 @@ DataFilter::completerList(Context *context, bool withSymbols)
 }
 
 QStringList
-DataFilter::builtins(Context *context)
+DataFilter::builtins()
 {
     QStringList returning;
 
@@ -542,8 +542,8 @@ DataFilter::builtins(Context *context)
 
         } else if (i == 30 || i == 95) { // special case 'estimate' and 'estimates' we describe it
 
-            if (i==30) { foreach(QString model, pdmodels(context)) returning << "estimate(" + model + ", cp|ftp|w'|pmax|x)"; }
-            if (i==95) { foreach(QString model, pdmodels(context)) returning << "estimates(" + model + ", cp|ftp|w'|pmax|x|date)"; }
+            if (i==30) { foreach(QString model, pdmodels()) returning << "estimate(" + model + ", cp|ftp|w'|pmax|x)"; }
+            if (i==95) { foreach(QString model, pdmodels()) returning << "estimates(" + model + ", cp|ftp|w'|pmax|x|date)"; }
 
         } else if (i == 31) { // which example
             returning << "which(x>0, ...)";
@@ -3099,7 +3099,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                         } else {
 
-                            if (!pdmodels(context).contains(*(leaf->fparms[0]->lvalue.n))) {
+                            if (!pdmodels().contains(*(leaf->fparms[0]->lvalue.n))) {
                                 leaf->inerror = leaf->fparms[0]->inerror = true;
                                 DataFiltererrors << QString(tr("%1 function expects model name as first parameter")).arg(name);
                             }
@@ -3264,11 +3264,11 @@ DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), con
     rt.isdynamic = false;
 
     // set up the models we support
-    rt.models << new CP2Model(context);
-    rt.models << new CP3Model(context);
-    rt.models << new MultiModel(context);
-    rt.models << new ExtendedModel(context);
-    rt.models << new WSModel(context);
+    rt.models << new CP2Model();
+    rt.models << new CP3Model();
+    rt.models << new MultiModel();
+    rt.models << new ExtendedModel();
+    rt.models << new WSModel();
 
     // random number generator
     gsl_rng_env_setup();
@@ -3278,34 +3278,11 @@ DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), con
     gsl_rng_set(r, mySeed);
 
     configChanged(CONFIG_FIELDS);
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
-    //connect(context, SIGNAL(rideSelected(RideItem*)), this, SLOT(dynamicParse()));
+    if (context) connect(context, &Context::configChanged, this, &DataFilter::configChanged);
 }
 
-DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QObject(parent), context(context), treeRoot(NULL), parent_(parent)
+DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : DataFilter(parent, context)
 {
-    // let folks know who owns this rumtime for signalling
-    rt.owner = this;
-    rt.chart = NULL;
-
-    // be sure not to enable this by accident!
-    rt.isdynamic = false;
-
-    // set up the models we support
-    rt.models << new CP2Model(context);
-    rt.models << new CP3Model(context);
-    rt.models << new MultiModel(context);
-    rt.models << new ExtendedModel(context);
-    rt.models << new WSModel(context);
-
-    gsl_rng_env_setup();
-    unsigned long mySeed = QDateTime::currentMSecsSinceEpoch();
-    T = gsl_rng_default; // Generator setup
-    r = gsl_rng_alloc (T);
-    gsl_rng_set(r, mySeed);
-
-    configChanged(CONFIG_FIELDS);
-
     // regardless of success or failure set signature
     setSignature(formula);
 
@@ -3322,6 +3299,14 @@ DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QOb
         treeRoot=NULL;
 
     errors = DataFiltererrors;
+}
+
+void
+DataFilter::setContext(Context* con)
+{
+    if (context) disconnect(context, &Context::configChanged, this, &DataFilter::configChanged);
+    context = con;
+    if (context) connect(context, &Context::configChanged, this, &DataFilter::configChanged);
 }
 
 Result DataFilter::evaluate(RideItem *item, RideFilePoint *p)
@@ -8479,7 +8464,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
     return Result(0); // false
 }
 
-DFModel::DFModel(RideItem *item, Leaf *formula, DataFilterRuntime *df) : PDModel(item->context), item(item), formula(formula), df(df)
+DFModel::DFModel(RideItem *item, Leaf *formula, DataFilterRuntime *df) : item(item), formula(formula), df(df)
 {
     // extract info from the passed params
     formula->findSymbols(parameters);

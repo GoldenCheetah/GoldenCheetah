@@ -201,7 +201,7 @@ NamedSearchParser::serialize(QString filename, QList<NamedSearch>NamedSearches)
         msgBox.setInformativeText(QObject::tr("File: %1 cannot be opened for 'Writing'. Please check file properties.").arg(filename));
         msgBox.exec();
         return false;
-    };
+    }
     file.resize(0);
     QTextStream out(&file);
 
@@ -259,7 +259,7 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, Context *context) : QDialo
     layout->addLayout(row2);
     QLabel *filter = new QLabel(tr("Filter"), this);
     row2->addWidget(filter);
-    editSearch = new SearchBox(context, this, true);
+    editSearch = new SearchBox(this, context);
     row2->addWidget(editSearch);
 
     // add/update buttons

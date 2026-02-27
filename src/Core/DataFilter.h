@@ -221,6 +221,8 @@ class DataFilter : public QObject
         DataFilter(QObject *parent, Context *context, QString formula);
         ~DataFilter() { clearFilter(); }
 
+        void setContext(Context *con);
+
         // runtime passed by datafilter
         DataFilterRuntime rt;
         QObject *parent() { return parent_; }
@@ -248,7 +250,7 @@ class DataFilter : public QObject
         void colorSyntax(QTextDocument *content, int pos);
 
         static QStringList completerList(Context *, bool); // return list of names for auto-completers
-        static QStringList builtins(Context *); // return list of functions supported
+        static QStringList builtins(); // return list of functions supported
 
         int refcount; // used by user metrics
 

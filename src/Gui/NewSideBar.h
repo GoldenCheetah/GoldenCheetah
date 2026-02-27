@@ -36,7 +36,6 @@ enum class GcSideBarBtnId : int {
     OPTIONS_BTN = 8
 };
 
-class Context;
 class NewSideBarItem;
 class NewSideBar : public QWidget
 {
@@ -47,7 +46,7 @@ class NewSideBar : public QWidget
     friend class ::NewSideBarItem;
 
     public:
-        NewSideBar(Context *context, QWidget *parent);
+        NewSideBar(QWidget *parent);
 
     public slots:
 
@@ -76,9 +75,6 @@ class NewSideBar : public QWidget
 
         void itemSelected(GcSideBarBtnId id);
         void itemClicked(GcSideBarBtnId id);
-
-    protected:
-        Context *context;
 
     private:
 

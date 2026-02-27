@@ -42,7 +42,7 @@ public:
     QString text() const { return searchbox->text(); }
     void setText(QString t) { searchbox->setText(t); }
 
-    void setContext(Context *c) { context = c; searchbox->setContext(c); }
+    void setContext(Context *con);
 
     SearchBox *searchbox;
 
