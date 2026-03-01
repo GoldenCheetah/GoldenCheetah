@@ -2005,9 +2005,6 @@ MainWindow::loadCompleted(QString name, Context *context)
     // to show it to avoid crappy paint artefacts
     if (tabList.count() > 1) showTabbar(true); // need it for more than one!
 
-    // clear the workout filter box text
-    // workoutFilterBox->clear();
-
     // splash is a proxy for first startup, so now display the main window
     if (splash) displayMainWindow();
 
