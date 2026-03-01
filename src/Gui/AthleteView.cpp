@@ -196,6 +196,20 @@ AthleteView::configItem(ChartSpaceItem *item, QPoint)
     card->configAthlete();
 }
 
+bool
+AthleteView::clickOverride(ChartSpaceItem *item, QGraphicsSceneMouseEvent* event)
+{
+    // is the click within the athlete card's override region?
+    if (static_cast<AthleteCard*>(item)->clickWithinAthleteSwitchRegion(event->scenePos())) {
+
+        // if the athlete is open, then switch
+        if (static_cast<AthleteCard*>(item)->isAthleteOpen()) {
+            mainWindow_->switchAthleteTab(item->name);
+        }
+        return true; // the click was within the override region
+    }
+    return false; // the click was outside the override region
+}
 
 AthleteCard::AthleteCard(ChartSpace *parent, QString name) :
     ChartSpaceItem(parent, name),loadProgress_(0), context_(NULL), refresh_(false), actualActivities(0),
@@ -312,6 +326,16 @@ AthleteCard::refreshStats(RideItem * /* item = nullptr */ )
     }
 }
 
+bool
+AthleteCard::clickWithinAthleteSwitchRegion(const QPointF& scenePos)
+{
+    QPointF click(scenePos.x()-geometry().x(), scenePos.y()-geometry().y());
+
+    QRectF avatarImg(ROWHEIGHT,ROWHEIGHT*2,ROWHEIGHT* gl_avatar_width, ROWHEIGHT* gl_avatar_width);
+
+    return (avatarImg.contains(click));
+}
+
 void
 AthleteCard::setCurrentAthlete(bool status)
 {
@@ -325,9 +349,7 @@ AthleteCard::setCurrentAthlete(bool status)
     backupButton->setBkgdColor(cardBkgdColor);
     deleteButton->setBkgdColor(cardBkgdColor);
 
-    if ((currentAthlete_) && (static_cast<AthleteView*>(parent)->openAthletes() == 1)) {  // current athlete must be loaded
-        openCloseButton->setText((unsavedActivities != 0) ? tr("Shutdown...") : tr("Shutdown"));
-    } else if (loadProgress_ == 0) {
+    if (loadProgress_ == 0) {
         openCloseButton->setText(tr("Open"));
     } else if (loadProgress_ == 100) {
         openCloseButton->setText((unsavedActivities != 0) ? tr("Close...") : tr("Close"));

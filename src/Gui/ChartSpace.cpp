@@ -1012,8 +1012,13 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                double offx = pos.x()-item->geometry().x();
                double offy = pos.y()-item->geometry().y();
 
+               if (clickOverride(item, static_cast<QGraphicsSceneMouseEvent*>(event))) {
 
-               if (item->geometry().height()-offy < (gl_near*dpiXFactor)) {
+                    // thanks we'll take that
+                    event->accept();
+                    returning = true;
+
+               } else if (item->geometry().height()-offy < (gl_near*dpiXFactor)) {
 
                     // We can span resize a specific chartspaceitem
                     // by pressing SHIFT when we click

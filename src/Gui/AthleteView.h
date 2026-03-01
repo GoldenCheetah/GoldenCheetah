@@ -39,6 +39,8 @@ protected:
 
     uint32_t openAthletes();
 
+    bool clickOverride(ChartSpaceItem*, QGraphicsSceneMouseEvent*) override;
+
 protected slots:
 
     void configChanged(qint32);
@@ -76,8 +78,11 @@ class AthleteCard : public ChartSpaceItem
 
         void configAthlete();
         bool isAthleteClosed() const { return loadProgress_ == 0; }
+        bool isAthleteOpen() const { return loadProgress_ == 100; }
         void openingAthlete(QString, Context*);
         void closingAthlete(QString, Context*);
+
+        bool clickWithinAthleteSwitchRegion(const QPointF& scenePos);
 
         // accessible via AthleteView equivalents
         void setCurrentAthlete(bool status);
