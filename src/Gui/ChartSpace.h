@@ -324,6 +324,8 @@ class ChartSpace : public QWidget
         // process events
         bool eventFilter(QObject *, QEvent *event);
 
+        virtual bool clickOverride(ChartSpaceItem*, QGraphicsSceneMouseEvent*) { return false; }
+
     private:
 
         // gui setup

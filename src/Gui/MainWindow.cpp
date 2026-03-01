@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
  * Copyright (c) 2013 Mark Liversedge (liversedge@gmail.com)
+ * Remove Bootstrap Athlete Copyright (c) 2026 Paul Johnson (paulj49457@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -425,7 +426,7 @@ MainWindow::MainWindow(const QDir &home)
 
     blockTabbarUpdates = false;
     tabbar = new DragBar(this);
-    tabbar->setTabsClosable(false); // use athlete view
+    tabbar->setTabsClosable(true);
 #ifdef Q_OS_MAC
     tabbar->setDocumentMode(true);
 #endif
@@ -453,6 +454,7 @@ MainWindow::MainWindow(const QDir &home)
 
     connect(tabbar, SIGNAL(dragTab(int)), this, SLOT(tabbarAthleteChange(int)));
     connect(tabbar, SIGNAL(currentChanged(int)), this, SLOT(tabbarAthleteChange(int)));
+    connect(tabbar, &DragBar::tabCloseRequested, this, &MainWindow::closeTabClicked);
 
     /*----------------------------------------------------------------------
      * Central Widget
@@ -2364,14 +2366,35 @@ MainWindow::tabbarAthleteChange(int index)
 }
 
 void
+MainWindow::switchAthleteTab(QString name)
+{
+    for (int i=0; i<tabbar->count(); i++) {
+        if (name == tabbar->tabText(i)) {
+            switchAthleteTab(i);
+            break;
+        }
+    }
+}
+
+void
 MainWindow::switchAthleteTab(int index)
 {
     if (index < 0) return;
 
     setUpdatesEnabled(false);
 
-    // save how we are
-    saveGCState(currentAthleteTab->context);
+#ifdef Q_OS_MAC // close buttons on the left on Mac
+    // Only have close button on current tab (prettier)
+    for(int i=0; i<tabbar->count(); i++) tabbar->tabButton(i, QTabBar::LeftSide)->hide();
+    tabbar->tabButton(index, QTabBar::LeftSide)->show();
+#else
+    // Only have close button on current tab (prettier)
+    for(int i=0; i<tabbar->count(); i++) tabbar->tabButton(i, QTabBar::RightSide)->hide();
+    tabbar->tabButton(index, QTabBar::RightSide)->show();
+#endif
+
+    // save the previous athlete's settings (there isn't one at startup)
+    if (currentAthleteTab) saveGCState(currentAthleteTab->context);
 
     currentAthleteTab = tabList[index];
 
