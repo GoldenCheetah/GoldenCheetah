@@ -147,9 +147,7 @@ Context::Context(MainWindow *mainWindow)
 {
     // mainwindow state
     viewType = GcViewType::NO_VIEW_SET;
-    showSidebar = showLowbar = false;
     showToolbar = true;
-    style = 2;
     scopehighlighted = false;
 
     // search filter

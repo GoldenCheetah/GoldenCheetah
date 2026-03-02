@@ -652,17 +652,17 @@ MainWindow::MainWindow()
     viewMenu->addAction(tr("Activities"), this, SLOT(selectAnalysis()));
     viewMenu->addAction(tr("Train"), this, SLOT(selectTrain()));
     viewMenu->addSeparator();
-    viewMenu->addAction(tr("Import Perspective..."), this, SLOT(importPerspective()));
-    viewMenu->addAction(tr("Export Perspective..."), this, SLOT(exportPerspective()));
+    importPerspectiveAction = viewMenu->addAction(tr("Import Perspective..."), this, SLOT(importPerspective()));
+    exportPerspectiveAction = viewMenu->addAction(tr("Export Perspective..."), this, SLOT(exportPerspective()));
     viewMenu->addSeparator();
     subChartMenu = viewMenu->addMenu(tr("Add Chart"));
-    viewMenu->addAction(tr("Import Chart..."), this, SLOT(importChart()));
+    importChartAction = viewMenu->addAction(tr("Import Chart..."), this, SLOT(importChart()));
 #ifdef GC_HAS_CLOUD_DB
-    viewMenu->addAction(tr("Upload Chart..."), this, SLOT(exportChartToCloudDB()));
-    viewMenu->addAction(tr("Download Chart..."), this, SLOT(addChartFromCloudDB()));
+    uploadChartAction = viewMenu->addAction(tr("Upload Chart..."), this, SLOT(exportChartToCloudDB()));
+    downloadChartAction = viewMenu->addAction(tr("Download Chart..."), this, SLOT(addChartFromCloudDB()));
     viewMenu->addSeparator();
 #endif
-    viewMenu->addAction(tr("Reset Layout"), this, SLOT(resetWindowLayout()));
+    resetLayoutAction = viewMenu->addAction(tr("Reset Layout"), this, SLOT(resetWindowLayout()));
     styleAction = viewMenu->addAction(tr("Tabbed not Tiled"), this, SLOT(toggleStyle()));
     styleAction->setCheckable(true);
     styleAction->setChecked(true);
@@ -733,9 +733,13 @@ MainWindow::MainWindow()
 void
 MainWindow::toggleSidebar()
 {
-    currentAthleteTab->toggleSidebar();
+    // only applicable to athlete views
+    if (viewStack->currentIndex() == GcViewStackIdx::SELECT_ATHLETE_VIEW) return;
+
+    currentAthleteTab->currentView()->setSidebarEnabled(!currentAthleteTab->currentView()->sidebarEnabled());
     setToolButtons();
 }
+
 void
 MainWindow::showViewbar(bool want)
 {
@@ -743,25 +747,36 @@ MainWindow::showViewbar(bool want)
     showhideViewbar->setChecked(want);
     setToolButtons();
 }
+
 void
 MainWindow::showSidebar(bool want)
 {
-    currentAthleteTab->setSidebarEnabled(want);
-    showhideSidebar->setChecked(want);
+    // only applicable to athlete views
+    if (viewStack->currentIndex() == GcViewStackIdx::SELECT_ATHLETE_VIEW) return;
+
+    currentAthleteTab->currentView()->setSidebarEnabled(want);
     setToolButtons();
 }
 
 void
 MainWindow::toggleLowbar()
 {
-    if (currentAthleteTab->hasBottom()) currentAthleteTab->setBottomRequested(!currentAthleteTab->isBottomRequested());
-    setToolButtons();
+    // only applicable to athlete views
+    if (viewStack->currentIndex() == GcViewStackIdx::SELECT_ATHLETE_VIEW) return;
+
+    if (currentAthleteTab->currentView()->hasBottom()) {
+        currentAthleteTab->currentView()->setBottomRequested(!currentAthleteTab->currentView()->isBottomRequested());
+        setToolButtons();
+    }
 }
 
 void
 MainWindow::showLowbar(bool want)
 {
-    if (currentAthleteTab->hasBottom()) currentAthleteTab->setBottomRequested(want);
+    // only applicable to athlete views
+    if (viewStack->currentIndex() == GcViewStackIdx::SELECT_ATHLETE_VIEW) return;
+
+    if (currentAthleteTab->currentView()->hasBottom()) currentAthleteTab->currentView()->setBottomRequested(want);
     showhideLowbar->setChecked(want);
     setToolButtons();
 }
@@ -826,6 +841,9 @@ MainWindow::setChartMenu(QMenu *menu)
 void
 MainWindow::addChart(QAction*action)
 {
+    // only applicable to athlete views
+    if (viewStack->currentIndex() == GcViewStackIdx::SELECT_ATHLETE_VIEW) return;
+
     // & removed to avoid issues with kde AutoCheckAccelerators
     QString actionText = QString(action->text()).replace("&", "");
     GcWinID id = GcWindowTypes::None;
@@ -836,12 +854,15 @@ MainWindow::addChart(QAction*action)
         }
     }
     if (id != GcWindowTypes::None)
-        currentAthleteTab->addChart(id); // called from MainWindow to inset chart
+        currentAthleteTab->currentView()->addChart(id); // called from MainWindow to inset chart
 }
 
 void
 MainWindow::importChart()
 {
+    // only applicable to athlete views
+    if (viewStack->currentIndex() == GcViewStackIdx::SELECT_ATHLETE_VIEW) return;
+
     QString fileName = QFileDialog::getOpenFileName(this, tr("Select Chart file to import"), "", tr("GoldenCheetah Chart Files (*.gchart)"));
 
     if (!fileName.isEmpty()) {
@@ -852,6 +873,9 @@ MainWindow::importChart()
 void
 MainWindow::exportPerspective()
 {
+    // only applicable to athlete views
+    if (viewStack->currentIndex() == GcViewStackIdx::SELECT_ATHLETE_VIEW) return;
+
     AbstractView * current = currentAthleteTab->currentView();
 
     // export the current perspective to a file
@@ -870,6 +894,9 @@ MainWindow::exportPerspective()
 void
 MainWindow::importPerspective()
 {
+    // only applicable to athlete views
+    if (viewStack->currentIndex() == GcViewStackIdx::SELECT_ATHLETE_VIEW) return;
+
     // import a new perspective from a file
     QString fileName = QFileDialog::getOpenFileName(this, tr("Select Perspective file to import"), "", tr("GoldenCheetah Perspective Files (*.gchartset)"));
     if (fileName.isEmpty()) {
@@ -899,6 +926,9 @@ MainWindow::importPerspective()
 void
 MainWindow::exportChartToCloudDB()
 {
+    // only applicable to athlete views
+    if (viewStack->currentIndex() == GcViewStackIdx::SELECT_ATHLETE_VIEW) return;
+
     // upload the current chart selected to the chart db
     // called from the sidebar menu
     Perspective *page=currentAthleteTab->currentView()->page();
@@ -909,6 +939,9 @@ MainWindow::exportChartToCloudDB()
 void
 MainWindow::addChartFromCloudDB()
 {
+    // only applicable to athlete views
+    if (viewStack->currentIndex() == GcViewStackIdx::SELECT_ATHLETE_VIEW) return;
+
     if (!(appsettings->cvalue(currentAthleteTab->context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
        CloudDBAcceptConditionsDialog acceptDialog(currentAthleteTab->context->athlete->cyclist);
        acceptDialog.setModal(true);
@@ -942,8 +975,11 @@ MainWindow::addChartFromCloudDB()
 void
 MainWindow::toggleStyle()
 {
-    currentAthleteTab->toggleTile();
-    styleAction->setChecked(currentAthleteTab->isTiled());
+    // only applicable to athlete views
+    if (viewStack->currentIndex() == GcViewStackIdx::SELECT_ATHLETE_VIEW) return;
+
+    currentAthleteTab->currentView()->setTiled(!currentAthleteTab->currentView()->isTiled());
+    styleAction->setChecked(currentAthleteTab->currentView()->isTiled());
     setToolButtons();
 }
 
@@ -1110,6 +1146,9 @@ void MainWindow::showWorkoutWizard()
 
 void MainWindow::resetWindowLayout()
 {
+    // only applicable to athlete views
+    if (viewStack->currentIndex() == GcViewStackIdx::SELECT_ATHLETE_VIEW) return;
+
     QMessageBox msgBox;
     msgBox.setText(tr("You are about to reset all charts to the default setup"));
     msgBox.setInformativeText(tr("Do you want to continue?"));
@@ -1119,7 +1158,7 @@ void MainWindow::resetWindowLayout()
     msgBox.exec();
 
     if(msgBox.clickedButton() == msgBox.button(QMessageBox::Ok))
-        currentAthleteTab->resetLayout(perspectiveSelector);
+        currentAthleteTab->currentView()->resetLayout(perspectiveSelector);
 }
 
 void MainWindow::manualProcess(QString name)
@@ -1201,6 +1240,7 @@ MainWindow::selectAthlete()
     perspectiveSelector->hide();
     searchBox->hide();
     workoutFilterBox->hide();
+    setToolButtons();
 }
 
 void
@@ -1341,18 +1381,56 @@ MainWindow::filenameWillChange(RideItem *rideItem, QString *newName) const
 void
 MainWindow::setToolButtons()
 {
-    int select = currentAthleteTab->isTiled() ? 1 : 0;
-    int lowselected = currentAthleteTab->isBottomRequested() ? 1 : 0;
-    int sidebarselected = currentAthleteTab->isSidebarEnabled() ? 1 : 0;
+    if (viewStack->currentIndex() == GcViewStackIdx::SELECT_ATHLETE_VIEW) {
 
-    styleAction->setChecked(select);
-    showhideLowbar->setChecked(lowselected);
-    showhideSidebar->setChecked(sidebarselected);
+        styleAction->setDisabled(true);
+        styleAction->setChecked(false);
 
-    //if (styleSelector->isSegmentSelected(select) == false)
-        //styleSelector->setSegmentSelected(select, true);
+        showhideLowbar->setDisabled(true);
+        showhideLowbar->setChecked(false);
 
-#ifdef Q_OS_MAC // bizarre issue with searchbox focus on tab voew change
+        showhideSidebar->setDisabled(true);
+        showhideSidebar->setChecked(false);
+
+        importPerspectiveAction->setDisabled(true);
+        exportPerspectiveAction->setDisabled(true);
+
+        subChartMenu->setDisabled(true);
+
+        importChartAction->setDisabled(true);
+        resetLayoutAction->setDisabled(true);
+
+#ifdef GC_HAS_CLOUD_DB
+        uploadChartAction->setDisabled(true);
+        downloadChartAction->setDisabled(true);
+#endif
+
+    } else { // set athlete view specific settings
+
+        styleAction->setDisabled(false);
+        styleAction->setChecked(currentAthleteTab->currentView()->isTiled());
+
+        showhideLowbar->setDisabled(false);
+        showhideLowbar->setChecked(currentAthleteTab->currentView()->isBottomRequested());
+
+        showhideSidebar->setDisabled(false);
+        showhideSidebar->setChecked(currentAthleteTab->currentView()->sidebarEnabled());
+
+        importPerspectiveAction->setDisabled(false);
+        exportPerspectiveAction->setDisabled(false);
+
+        subChartMenu->setDisabled(false);
+
+        importChartAction->setDisabled(false);
+        resetLayoutAction->setDisabled(false);
+
+#ifdef GC_HAS_CLOUD_DB
+        uploadChartAction->setDisabled(false);
+        downloadChartAction->setDisabled(false);
+#endif
+    }
+
+#ifdef Q_OS_MAC // bizarre issue with searchbox focus on tab view change
     searchBox->clearFocus();
 #endif
 }
@@ -1509,6 +1587,9 @@ MainWindow::dragEnterEvent(QDragEnterEvent *event)
 void
 MainWindow::dropEvent(QDropEvent *event)
 {
+    // only applicable to athlete views
+    if (viewStack->currentIndex() == GcViewStackIdx::SELECT_ATHLETE_VIEW) return;
+
     QList<QUrl> urls = event->mimeData()->urls();
     if (urls.isEmpty()) return;
 
@@ -2085,7 +2166,7 @@ MainWindow::removeAthleteTab(AthleteTab *tab, bool updateLastAthlete /* = true *
     if (tabList.count() == 1) { // last athlete so save the settings, don't switch
 
         // save the previous athlete's settings
-        saveGCState(tab->context);
+        saveGCState(tab);
 
     } else { // switching athlete
 
@@ -2252,27 +2333,31 @@ MainWindow::deleteAthlete(QString name)
 }
 
 void
-MainWindow::saveGCState(Context *context)
+MainWindow::saveGCState(AthleteTab *athleteTab)
 {
-    // save all the current state to the supplied context
-    context->showSidebar = showhideSidebar->isChecked();
-    context->showLowbar = showhideLowbar->isChecked();
-    context->showToolbar = showhideToolbar->isChecked();
-    context->searchText = searchBox->text();
-    context->workoutFilterText = workoutFilterBox->text();
-    context->style = styleAction->isChecked();
+    // save the view related state to the athleteTab's view
+    athleteTab->currentView()->setSidebarEnabled(showhideSidebar->isChecked());
+    athleteTab->currentView()->setShowBottom(showhideLowbar->isChecked());
+    athleteTab->currentView()->setTiled(styleAction->isChecked());
+
+    Context* tabContext(athleteTab->context);
+
+    // save the athlete related state to the athleteTab's context
+    tabContext->showToolbar = showhideToolbar->isChecked();
+    tabContext->searchText = searchBox->text();
+    tabContext->workoutFilterText = workoutFilterBox->text();
 }
 
 void
-MainWindow::restoreGCState(Context *context)
+MainWindow::restoreGCState(AthleteTab *athleteTab)
 {
     if (viewStack->currentIndex() != GcViewStackIdx::SELECT_ATHLETE_VIEW) {
 
         // not on athlete view...
-        GcViewType viewType = currentAthleteTab->currentViewType();
+        GcViewType viewType = athleteTab->currentViewType();
         resetPerspective(viewType); // will lazy load, hence doing it first
 
-        // restore window state from the supplied context
+        // restore window state from the supplied athleteTab view
         switch(viewType) {
         case GcViewType::VIEW_TRENDS: sidebar->setItemSelected(GcSideBarBtnId::TRENDS_BTN,true); break;
         case GcViewType::VIEW_ANALYSIS: sidebar->setItemSelected(GcSideBarBtnId::ACTIVITIES_BTN,true); break;
@@ -2280,16 +2365,24 @@ MainWindow::restoreGCState(Context *context)
         case GcViewType::VIEW_TRAIN: sidebar->setItemSelected(GcSideBarBtnId::TRAIN_BTN, true); break;
         default: sidebar->setItemSelected(GcSideBarBtnId::SELECT_ATHLETE_BTN, true); break;
         }
+
+        // restore the view related state from the provided athleteTab's view
+        showSidebar(athleteTab->currentView()->sidebarEnabled());
+        showLowbar(athleteTab->currentView()->hasBottom());
+        // there is no set style action, so...
+        styleAction->setChecked(athleteTab->currentView()->isTiled());
+        setToolButtons();
     }
 
-    showSidebar(context->showSidebar);
-    showToolbar(context->showToolbar);
-    showLowbar(context->showLowbar);
-    searchBox->setContext(context);
-    searchBox->setText(context->searchText);
-    workoutFilterBox->setContext(context);
-    workoutFilterBox->setText(context->workoutFilterText);
-    setWindowTitle(context->athlete->cyclist);
+    Context* tabContext(athleteTab->context);
+
+    // restore the context related state from the athleteTab's context
+    showToolbar(tabContext->showToolbar);
+    searchBox->setContext(tabContext);
+    searchBox->setText(tabContext->searchText);
+    workoutFilterBox->setContext(tabContext);
+    workoutFilterBox->setText(tabContext->workoutFilterText);
+    setWindowTitle(tabContext->athlete->cyclist);
 }
 
 void
@@ -2328,7 +2421,7 @@ MainWindow::switchAthleteTab(int index, bool updateLastAthlete /* = true */)
 #endif
 
     // save the previous athlete's settings (there isn't one at startup)
-    if (currentAthleteTab) saveGCState(currentAthleteTab->context);
+    if (currentAthleteTab) saveGCState(currentAthleteTab);
 
     // switch to the new athlete
     currentAthleteTab = tabList[index];
@@ -2337,7 +2430,7 @@ MainWindow::switchAthleteTab(int index, bool updateLastAthlete /* = true */)
     tabbar->setCurrentIndex(index);
 
     // restore new athlete's settings
-    restoreGCState(currentAthleteTab->context);
+    restoreGCState(currentAthleteTab);
 
     // store the new athlete as the "last_openend" athlete for next time
     if (updateLastAthlete) appsettings->setValue(GC_SETTINGS_LAST, currentAthleteTab->context->athlete->cyclist);

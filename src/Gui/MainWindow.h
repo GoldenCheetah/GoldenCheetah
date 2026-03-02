@@ -285,8 +285,8 @@ class MainWindow : public QMainWindow
         void exportChartToCloudDB();
 #endif
         // save and restore state to context
-        void saveGCState(Context *);
-        void restoreGCState(Context *);
+        void saveGCState(AthleteTab *);
+        void restoreGCState(AthleteTab *);
 
         void configChanged(qint32);
         void onEditMenuAboutToShow();
@@ -356,6 +356,16 @@ class MainWindow : public QMainWindow
 
         QAction *shareAction;
         QAction *checkAction;
+
+        QAction *importPerspectiveAction;
+        QAction *exportPerspectiveAction;
+        QAction *importChartAction;
+        QAction *resetLayoutAction;
+
+#ifdef GC_HAS_CLOUD_DB
+        QAction *uploadChartAction;
+        QAction *downloadChartAction;
+#endif
 
         // Miscellany
         std::unique_ptr<QSignalMapper> toolMapper;

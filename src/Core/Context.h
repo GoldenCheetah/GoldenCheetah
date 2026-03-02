@@ -129,8 +129,7 @@ class Context : public QObject
         // mainwindow state
         NavigationModel *nav;
         GcViewType viewType;
-        bool showSidebar, showLowbar, showToolbar;
-        int style;
+        bool showToolbar;
         QString searchText;
         QString workoutFilterText;
         bool scopehighlighted;
