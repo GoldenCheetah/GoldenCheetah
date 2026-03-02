@@ -423,7 +423,10 @@ MainWindow::MainWindow()
 
     connect(tabbar, &DragBar::dragTab, this, &MainWindow::tabbarAthleteChange);
     connect(tabbar, &DragBar::currentChanged, this, &MainWindow::tabbarAthleteChange);
-    connect(tabbar, &DragBar::tabCloseRequested, this, &MainWindow::closeTabClicked);
+    connect(tabbar, &DragBar::tabCloseRequested, this, [this](int index) {
+        closeAthleteTab(tabList[index]->context->athlete->cyclist);
+    });
+
 
     /*----------------------------------------------------------------------
      * Central Widget
@@ -1000,38 +1003,24 @@ void
 MainWindow::closeEvent(QCloseEvent* event)
 {
     QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-    QList<AthleteTab*> closing = tabList;
-    bool needtosave = false;
-    bool importrunning = false;
+    bool importRunningOrUnsaved(false);
 
-    // close all the tabs .. if any refuse we need to ignore
-    //                       the close event
-    foreach(AthleteTab *tab, closing) {
+    // close all the tabs without changing positions, if any refuse we need to ignore the close event
+    for(int i=tabbar->count()-1; i > -1; i--) {
 
-        // check for if RideImport is is process and let it finalize / or be stopped by the user
-        if (tab->context->athlete->autoImport) {
-            if (tab->context->athlete->autoImport->importInProcess() ) {
-                importrunning = true;
-                QGuiApplication::restoreOverrideCursor();
-                QMessageBox::information(this, tr("Activity Import"),
-                        tr("INFO for athlete %1\n\nClosing of athlete window not possible while background activity import is in progress...")
-                            .arg(tab->context->athlete->cyclist));
-                QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-            }
+        QGuiApplication::restoreOverrideCursor();
+
+        if (checkImportAndUnsaved(i)) {
+            removeAthleteTab(tabList[i]);
+        } else {
+            importRunningOrUnsaved = true;
         }
 
-        // only check for unsaved if autoimport is not running any more
-        if (!importrunning) {
-            // do we need to save?
-            if (tab->context->mainWindow->saveRideExitDialog(tab->context) == true)
-                removeAthleteTab(tab);
-            else
-                needtosave = true;
-        }
+        QGuiApplication::setOverrideCursor(Qt::WaitCursor);
     }
 
     // were any left hanging around? or autoimport in action on any windows, then don't close any
-    if (needtosave || importrunning) event->ignore();
+    if (importRunningOrUnsaved) event->ignore();
     else {
 
         // finish off the job and leave
@@ -1044,6 +1033,7 @@ MainWindow::closeEvent(QCloseEvent* event)
 
         // save global mainwindow settings
         appsettings->setValue(GC_TABBAR, showhideTabbar->isChecked());
+
         // wait for threads.. max of 10 seconds before just exiting anyway
         for (int i=0; i<10 && QThreadPool::globalInstance()->activeThreadCount(); i++) {
             QThread::sleep(1);
@@ -2018,7 +2008,34 @@ MainWindow::loadCompleted(QString name, Context *context)
 }
 
 bool
-MainWindow::closeTabClicked(int index)
+MainWindow::closeAthleteTab(QString name)
+{
+    int athleteCanBeClosed(-1);
+
+    for(int i=0; i<tabbar->count(); i++) {
+        if (name == tabbar->tabText(i)) {
+
+            if (checkImportAndUnsaved(i)) athleteCanBeClosed = i;
+            break;
+        }
+    }
+
+    if (athleteCanBeClosed != -1) {
+
+        // lets wipe it
+        removeAthleteTab(tabList[athleteCanBeClosed]);
+
+        // if its the last athlete tab we must close GoldenCheetah
+        if (tabList.count() == 0) closeWindow();
+
+        return true;
+    }
+
+    return false;
+}
+
+bool
+MainWindow::checkImportAndUnsaved(int index)
 {
     AthleteTab *tab = tabList[index];
 
@@ -2032,28 +2049,9 @@ MainWindow::closeTabClicked(int index)
         }
     }
 
-    if (saveRideExitDialog(tab->context) == false) return false;
+    // now check for unsaved activities
+    return saveRideExitDialog(tab->context);
 
-    // lets wipe it
-    removeAthleteTab(tab);
-
-    return true;
-}
-
-bool
-MainWindow::closeAthleteTab(QString name)
-{
-    // if its the last athlete tab we close GoldenCheetah
-    if (tabbar->count() == 1) {
-        closeWindow();
-    } else {
-        for(int i=0; i<tabbar->count(); i++) {
-            if (name == tabbar->tabText(i)) {
-                return closeTabClicked(i);
-            }
-        }
-    }
-    return false;
 }
 
 // no questions asked just wipe away the current tab
@@ -2066,7 +2064,8 @@ MainWindow::removeAthleteTab(AthleteTab *tab)
 
     if (tabList.count() == 2) showTabbar(false); // don't need it for one!
 
-    // cancel ridecache refresh if its in progress
+    // cancel ridecache refresh if its in progress, this is some what belt and braces as
+    // import in progress is always checked before removeAthleteTab() is called
     tab->context->athlete->rideCache->cancel();
 
     // save the named searches
@@ -2081,20 +2080,28 @@ MainWindow::removeAthleteTab(AthleteTab *tab)
     // switch to neighbour (currentTab will change)
     int index = tabList.indexOf(tab);
 
-    // if this is not the last athlete and we are removing the current 
-    // athlete tab then we need to select another athlete
-    if ((tabList.count() > 1) && (tab == currentAthleteTab)) {
-        switchAthleteTab((index == 0) ? index+1 : index-1);
-    } 
-    
+    if (tabList.count() == 1) { // last athlete so save the settings, don't switch
+
+        // save the previous athlete's settings
+        saveGCState(tab->context);
+
+    } else { // switching athlete
+
+        // if this is not the last athlete and we are removing the current 
+        // athlete tab then we need to select another athlete
+        if ((tabList.count() > 1) && (tab == currentAthleteTab)) {
+            switchAthleteTab((index == 0) ? index+1 : index-1);
+        }
+    }
+ 
     // close the athlete's card
     emit closingAthlete(name, tab->context);
 
-    // close gracefully
+    // close athlete gracefully
     tab->close();
     tab->context->athlete->close();
 
-    // remove from state
+    // remove athlete from state
     athletetabs.remove(name);
     tabList.removeAt(index);
     tabbar->removeTab(index);

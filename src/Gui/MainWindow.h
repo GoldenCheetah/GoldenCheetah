@@ -171,7 +171,6 @@ class MainWindow : public QMainWindow
         void newCyclistTab();  // create a new Cyclist
         bool openAthleteTab(QString name);
         void loadCompleted(QString name, Context *context);
-        bool closeTabClicked(int index); // user clicked to close tab
         bool closeAthleteTab(QString name); // close named athlete
         void switchAthleteTab(QString name); // athlete switching for change
         void tabbarAthleteChange(int index); // blockable tabbar generated athlete switching
@@ -297,6 +296,7 @@ class MainWindow : public QMainWindow
         void displayMainWindow();
 
         void switchAthleteTab(int index); // athlete switching for change & athlete closure
+        bool checkImportAndUnsaved(int index);
         void removeAthleteTab(AthleteTab*);  // remove without question
 
     private:
