@@ -291,6 +291,7 @@ CalendarWindow::CalendarWindow(Context *context)
 : GcChartWindow(context), context(context)
 {
     mkControls();
+    const QSignalBlocker blocker(this);
 
     calendar = new Calendar(QDate::currentDate(), static_cast<Qt::DayOfWeek>(getFirstDayOfWeek()), context->athlete->measures);
 
@@ -306,7 +307,7 @@ CalendarWindow::CalendarWindow(Context *context)
     connect(context->athlete->rideCache, &RideCache::itemSaved, this, &CalendarWindow::updateActivitiesIfInRange);
     connect(context->athlete->seasons, &Seasons::seasonsChanged, this, [this]() {
         updateSeason(this->context->currentSeason(), true);
-    });
+    }, Qt::QueuedConnection);
     connect(context, &Context::seasonSelected, this, [this](Season const *season, bool changed) {
         if (changed || first) {
             first = false;
@@ -441,6 +442,7 @@ CalendarWindow::CalendarWindow(Context *context)
 
     QTimer::singleShot(0, this, [this]() {
         configChanged(CONFIG_APPEARANCE);
+        updateActivities();
     });
 }
 
@@ -961,9 +963,10 @@ CalendarWindow::getActivities
     }
 
     for (RideItem *rideItem : context->athlete->rideCache->rides()) {
-        if (   rideItem->dateTime.date() < firstDay
-            || rideItem->dateTime.date() > lastDay
-            || rideItem == nullptr) {
+        if (   rideItem == nullptr
+            || ! rideItem->dateTime.isValid()
+            || rideItem->dateTime.date() < firstDay
+            || rideItem->dateTime.date() > lastDay) {
             continue;
         }
         if (   (context->isfiltered && ! context->filters.contains(rideItem->fileName))
