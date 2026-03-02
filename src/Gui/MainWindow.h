@@ -295,9 +295,9 @@ class MainWindow : public QMainWindow
 
         void displayMainWindow();
 
-        void switchAthleteTab(int index); // athlete switching for change & athlete closure
+        void switchAthleteTab(int index, bool updateLastAthlete = true); // athlete switching for change & athlete closure
         bool checkImportAndUnsaved(int index);
-        void removeAthleteTab(AthleteTab*);  // remove without question
+        void removeAthleteTab(AthleteTab*, bool updateLastAthlete = true);  // remove without question
 
     private:
 

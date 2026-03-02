@@ -1005,13 +1005,15 @@ MainWindow::closeEvent(QCloseEvent* event)
     QGuiApplication::setOverrideCursor(Qt::WaitCursor);
     bool importRunningOrUnsaved(false);
 
-    // close all the tabs without changing positions, if any refuse we need to ignore the close event
+    // if the closure is due to main menu quit or the window decoration close X button, then there will be athlete's to
+    // close, so close them without changing their positions and without updating the last open athlete,
+    // if any refuse we need to ignore the close event
     for(int i=tabbar->count()-1; i > -1; i--) {
 
         QGuiApplication::restoreOverrideCursor();
 
         if (checkImportAndUnsaved(i)) {
-            removeAthleteTab(tabList[i]);
+            removeAthleteTab(tabList[i], false); // don't update the last open athlete
         } else {
             importRunningOrUnsaved = true;
         }
@@ -2056,7 +2058,7 @@ MainWindow::checkImportAndUnsaved(int index)
 
 // no questions asked just wipe away the current tab
 void
-MainWindow::removeAthleteTab(AthleteTab *tab)
+MainWindow::removeAthleteTab(AthleteTab *tab, bool updateLastAthlete /* = true */)
 {
     blockTabbarUpdates = true;
 
@@ -2090,7 +2092,7 @@ MainWindow::removeAthleteTab(AthleteTab *tab)
         // if this is not the last athlete and we are removing the current 
         // athlete tab then we need to select another athlete
         if ((tabList.count() > 1) && (tab == currentAthleteTab)) {
-            switchAthleteTab((index == 0) ? index+1 : index-1);
+            switchAthleteTab((index == 0) ? index+1 : index-1, updateLastAthlete);
         }
     }
  
@@ -2309,7 +2311,7 @@ MainWindow::switchAthleteTab(QString name)
 }
 
 void
-MainWindow::switchAthleteTab(int index)
+MainWindow::switchAthleteTab(int index, bool updateLastAthlete /* = true */)
 {
     if (index < 0) return;
 
@@ -2337,8 +2339,8 @@ MainWindow::switchAthleteTab(int index)
     // restore new athlete's settings
     restoreGCState(currentAthleteTab->context);
 
-    // store "last_openend" athlete for next time
-    appsettings->setValue(GC_SETTINGS_LAST, currentAthleteTab->context->athlete->cyclist);
+    // store the new athlete as the "last_openend" athlete for next time
+    if (updateLastAthlete) appsettings->setValue(GC_SETTINGS_LAST, currentAthleteTab->context->athlete->cyclist);
 
     // refresh the athlete's card button labels
     emit currentAthlete(currentAthleteTab->context->athlete->cyclist);
