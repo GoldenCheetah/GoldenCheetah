@@ -40,6 +40,7 @@ AgendaWindow::AgendaWindow(Context *context)
 : GcChartWindow(context), context(context)
 {
     mkControls();
+    const QSignalBlocker blocker(this);
 
     agendaView = new AgendaView();
     agendaView->updateDate();
@@ -95,6 +96,7 @@ AgendaWindow::AgendaWindow(Context *context)
 
     QTimer::singleShot(0, this, [this]() {
         configChanged(CONFIG_APPEARANCE);
+        updateActivities();
     });
 }
 
@@ -540,6 +542,7 @@ AgendaWindow::getActivities
     int showTertiaryFor = getShowTertiaryFor();
     for (RideItem *rideItem : context->athlete->rideCache->rides()) {
         if (   rideItem == nullptr
+            || ! rideItem->dateTime.isValid()
             || ! rideItem->planned
             || rideItem->dateTime.date() < firstDay
             || rideItem->dateTime.date() > lastDay
