@@ -400,6 +400,9 @@ LTMSidebar::dateRangeTreeWidgetSelectionChanged()
                 phase = NULL;
             }
         } else if (which->type() >= Phase::phase) {
+            if (which->parent() == nullptr) {
+                return;
+            }
             int seasonIdx = allDateRanges->indexOfChild(which->parent());
             int phaseIdx = which->parent()->indexOfChild(which);
             if (which != allDateRanges) {
@@ -492,7 +495,7 @@ LTMSidebar::resetSeasons()
                 addSeason->setExpanded(true);
                 addPhase->setSelected(true);
             }
-            addPhase->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+            addPhase->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
             addPhase->setText(0, phase.getName());
         }
 
@@ -1091,6 +1094,14 @@ LTMSidebar::deleteFilter()
 void
 LTMSidebar::dateRangeMoved(QTreeWidgetItem*item, int oldposition, int newposition)
 {
+    if (   oldposition < 0
+        || oldposition >= seasons->seasons.count()
+        || newposition < 0
+        || newposition >= seasons->seasons.count()) {
+        return;
+    }
+    QSignalBlocker blocker(dateRangeTree);
+
     // report the move in the seasons
     seasons->seasons.move(oldposition, newposition);
 
@@ -1100,9 +1111,15 @@ LTMSidebar::dateRangeMoved(QTreeWidgetItem*item, int oldposition, int newpositio
     active = false;
 
     // deselect actual selection
-    dateRangeTree->selectedItems().first()->setSelected(false);
+    dateRangeTree->clearSelection();
     // select the move/drop item
-    item->setSelected(true);
+    if (item) {
+        item->setSelected(true);
+        dateRangeTree->setCurrentItem(item);
+    }
+
+    blocker.unblock();
+    dateRangeTreeWidgetSelectionChanged();
 }
 
 void
@@ -1426,7 +1443,7 @@ LTMSidebar::addPhase()
 
         QTreeWidgetItem *addPhase = new QTreeWidgetItem(selectedDateRange, myphase.getType());
         addPhase->setSelected(true);
-        addPhase->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+        addPhase->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         addPhase->setText(0, myphase.getName());
 
         // save changes away
