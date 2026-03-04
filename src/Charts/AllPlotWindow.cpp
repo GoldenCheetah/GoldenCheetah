@@ -2049,7 +2049,7 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
             showCad->setEnabled(dataPresent->cad);
             showTorque->setEnabled(dataPresent->nm);
             showHr->setEnabled(dataPresent->hr);
-            showTcore->setEnabled(dataPresent->tcore);
+            showTcore->setEnabled(dataPresent->tcore || dataPresent->hr);
             showSpeed->setEnabled(dataPresent->kph);
             showAccel->setEnabled(dataPresent->kph);
             showAlt->setEnabled(dataPresent->alt);
