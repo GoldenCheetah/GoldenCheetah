@@ -1140,11 +1140,22 @@ LTMSidebar::addRange()
             newOne.setAbsoluteEnd(temp);
         }
 
+        // Ensure the current season is nullptr during creation of the new season
+        // to prevent usage of a dangling pointer (see comment #ref1# below)
+        context->notifySeasonChanged(nullptr);
+
         // save
         seasons->seasons.insert(0, newOne);
         seasons->writeSeasons();
         active = false;
 
+        if (seasons->seasons.count() > 0) {
+            // #ref1#
+            // Ensure the pointer to the season is guaranteed to be valid if the
+            // QList<Season> (Seasons::seasons) was reorganized during insertion
+            // and its objects were relocated
+            context->notifySeasonChanged(&seasons->seasons[0]);
+        }
         // signal its changed!
         resetSeasons();
     }
