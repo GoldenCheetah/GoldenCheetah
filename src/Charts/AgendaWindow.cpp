@@ -40,7 +40,6 @@ AgendaWindow::AgendaWindow(Context *context)
 : GcChartWindow(context), context(context)
 {
     mkControls();
-    const QSignalBlocker blocker(this);
 
     agendaView = new AgendaView();
     agendaView->updateDate();
@@ -96,7 +95,6 @@ AgendaWindow::AgendaWindow(Context *context)
 
     QTimer::singleShot(0, this, [this]() {
         configChanged(CONFIG_APPEARANCE);
-        updateActivities();
     });
 }
 
@@ -521,6 +519,14 @@ AgendaWindow::getActivities
 (const QDate &firstDay, const QDate &today, const QDate &lastDay) const
 {
     QHash<QDate, QList<AgendaEntry>> activities;
+    if (! context || ! context->athlete || ! context->athlete->rideCache) {
+        return activities;
+    }
+    const QList<RideItem*> rides = context->athlete->rideCache->rides();
+    if (rides.isEmpty()) {
+        return activities;
+    }
+
     const RideMetricFactory &factory = RideMetricFactory::instance();
     QList<RideMetric const *> rideMetrics;
     QStringList rideMetricNames;
@@ -540,12 +546,15 @@ AgendaWindow::getActivities
     }
 
     int showTertiaryFor = getShowTertiaryFor();
-    for (RideItem *rideItem : context->athlete->rideCache->rides()) {
+    for (RideItem *rideItem : rides) {
         if (   rideItem == nullptr
-            || ! rideItem->dateTime.isValid()
-            || ! rideItem->planned
-            || rideItem->dateTime.date() < firstDay
-            || rideItem->dateTime.date() > lastDay
+            || ! rideItem->dateTime.isValid()) {
+            continue;
+        }
+        QDate rideDate = rideItem->dateTime.date();
+        if (   ! rideItem->planned
+            || rideDate < firstDay
+            || rideDate > lastDay
             || rideItem->hasLinkedActivity()) {
             continue;
         }
@@ -589,7 +598,7 @@ AgendaWindow::getActivities
             activity.secondaryValues << tr("N/A");
             activity.secondaryLabels << "";
         }
-        if (showTertiaryFor == 0 || (showTertiaryFor == 1 && rideItem->dateTime.date() == today)) {
+        if (showTertiaryFor == 0 || (showTertiaryFor == 1 && rideDate == today)) {
             activity.tertiary = rideItem->getText(getTertiaryField(), "").trimmed();
             activity.tertiary = Utils::unprotect(activity.tertiary);
         }
@@ -601,7 +610,7 @@ AgendaWindow::getActivities
         activity.start = rideItem->dateTime.time();
         activity.type = ENTRY_TYPE_PLANNED_ACTIVITY;
         activity.hasTrainMode = sport == "Bike" && ! buildWorkoutFilter(rideItem).isEmpty();
-        activities[rideItem->dateTime.date()] << activity;
+        activities[rideDate] << activity;
     }
     for (auto dayIt = activities.begin(); dayIt != activities.end(); ++dayIt) {
         std::sort(dayIt.value().begin(), dayIt.value().end(), [](const AgendaEntry &a, const AgendaEntry &b) {

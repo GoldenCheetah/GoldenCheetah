@@ -291,7 +291,6 @@ CalendarWindow::CalendarWindow(Context *context)
 : GcChartWindow(context), context(context)
 {
     mkControls();
-    const QSignalBlocker blocker(this);
 
     calendar = new Calendar(QDate::currentDate(), static_cast<Qt::DayOfWeek>(getFirstDayOfWeek()), context->athlete->measures);
 
@@ -307,7 +306,7 @@ CalendarWindow::CalendarWindow(Context *context)
     connect(context->athlete->rideCache, &RideCache::itemSaved, this, &CalendarWindow::updateActivitiesIfInRange);
     connect(context->athlete->seasons, &Seasons::seasonsChanged, this, [this]() {
         updateSeason(this->context->currentSeason(), true);
-    }, Qt::QueuedConnection);
+    });
     connect(context, &Context::seasonSelected, this, [this](Season const *season, bool changed) {
         if (changed || first) {
             first = false;
@@ -442,7 +441,6 @@ CalendarWindow::CalendarWindow(Context *context)
 
     QTimer::singleShot(0, this, [this]() {
         configChanged(CONFIG_APPEARANCE);
-        updateActivities();
     });
 }
 
@@ -950,6 +948,15 @@ CalendarWindow::getActivities
 (const QDate &firstDay, const QDate &lastDay) const
 {
     QHash<QDate, QList<CalendarEntry>> activities;
+
+    if (! context || ! context->athlete || ! context->athlete->rideCache) {
+        return activities;
+    }
+    const QList<RideItem*> rides = context->athlete->rideCache->rides();
+    if (rides.isEmpty()) {
+        return activities;
+    }
+
     const RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *rideMetric = factory.rideMetric(getSecondaryMetric());
     QString rideMetricName;
@@ -962,11 +969,14 @@ CalendarWindow::getActivities
         }
     }
 
-    for (RideItem *rideItem : context->athlete->rideCache->rides()) {
+    for (RideItem *rideItem : rides) {
         if (   rideItem == nullptr
-            || ! rideItem->dateTime.isValid()
-            || rideItem->dateTime.date() < firstDay
-            || rideItem->dateTime.date() > lastDay) {
+            || ! rideItem->dateTime.isValid()) {
+            continue;
+        }
+        QDate rideDate = rideItem->dateTime.date();
+        if (   rideDate < firstDay
+            || rideDate > lastDay) {
             continue;
         }
         if (   (context->isfiltered && ! context->filters.contains(rideItem->fileName))
@@ -1014,7 +1024,7 @@ CalendarWindow::getActivities
         }
 
         RideItem *linkedRide = context->athlete->rideCache->getLinkedActivity(rideItem);
-        if (linkedRide != nullptr) {
+        if (linkedRide != nullptr && linkedRide->dateTime.isValid()) {
             activity.linkedReference = linkedRide->fileName;
             activity.linkedPrimary = getPrimary(linkedRide);
             activity.linkedStartDT = linkedRide->dateTime;
@@ -1023,7 +1033,7 @@ CalendarWindow::getActivities
             }
         }
 
-        activities[rideItem->dateTime.date()] << activity;
+        activities[rideDate] << activity;
     }
     for (auto dayIt = activities.begin(); dayIt != activities.end(); ++dayIt) {
         std::sort(dayIt.value().begin(), dayIt.value().end(), [](const CalendarEntry &a, const CalendarEntry &b) {
