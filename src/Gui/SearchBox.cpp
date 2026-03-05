@@ -35,7 +35,7 @@
 
 const int BUTTON_SIZE = 12;
 
-SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
+SearchBox::SearchBox(QWidget *parent, Context *context, bool nochooser)
     : QLineEdit(parent), context(context), parent(parent), filtered(false), nochooser(nochooser), active(false), fixed(false)
 {
     setFixedHeight(28*dpiYFactor);
@@ -90,10 +90,18 @@ SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
     setDragEnabled(true);
 
     connect(this, SIGNAL(returnPressed()), this, SLOT(searchSubmit()));
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    if (context) connect(context, &Context::configChanged, this, &SearchBox::configChanged);
 
     // set colors and curviness
     configChanged(CONFIG_APPEARANCE | CONFIG_FIELDS);
+}
+
+void
+SearchBox::setContext(Context *con)
+{
+    if (context) disconnect(context, &Context::configChanged, this, &SearchBox::configChanged);
+    context = con;
+    if (context) connect(context, &Context::configChanged, this, &SearchBox::configChanged);
 }
 
 void
@@ -122,7 +130,7 @@ SearchBox::configChanged(qint32)
               .arg(clearButton->sizeHint().width() + frameWidth + 12));
 
     // set new completer list
-    completer->setList(DataFilter::completerList(context, false));
+    if (context) completer->setList(DataFilter::completerList(context, false));
 }
 
 void
@@ -231,7 +239,7 @@ void SearchBox::updateCloseButton(const QString& text)
 void SearchBox::searchSubmit()
 {
     // return hit / key pressed
-    if (text() != "") {
+    if (context && text() != "") {
         filtered = true;
         mode == Search ? submitQuery(context, text()) : submitFilter(context, text());
     }
@@ -247,7 +255,7 @@ void SearchBox::clearClicked()
 
 void SearchBox::checkMenu()
 {
-    if (context->athlete->namedSearches->getList().count() || text() != "") toolButton->show();
+    if (context && (context->athlete->namedSearches->getList().count() || text() != "")) toolButton->show();
     else toolButton->hide();
 }
 

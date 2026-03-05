@@ -56,7 +56,6 @@ public:
 
     int getNumberOfFiles();  // get the number of files selected for processing
     int process();
-    bool importInProcess() { return _importInProcess; }
     bool isAutoImport() { return autoImportMode;}
 
 private slots:

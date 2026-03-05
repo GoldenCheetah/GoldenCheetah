@@ -48,7 +48,7 @@ class Library : QObject
         QList<QString> paths;   // array of search paths for files in this library
         QList<QString> refs;    // array of drag-n-dropped files referenced not copied
 
-        static void initialise(QDir); // init
+        static void initialise(QDir gcRoot); // init
         static Library *findLibrary(QString);
         static void importFiles(Context *context, QStringList files, LibraryBatchImportConfirmation dialog=LibraryBatchImportConfirmation::optionalDialog);
         void removeRef(Context *context, QString ref);

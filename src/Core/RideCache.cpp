@@ -474,7 +474,7 @@ RideCache::writeAsCSV(QString filename)
         msgBox.setInformativeText(tr("File: %1 cannot be opened for 'Writing'. Please check file properties.").arg(filename));
         msgBox.exec();
         return;
-    };
+    }
     file.resize(0);
     QTextStream out(&file);
 
