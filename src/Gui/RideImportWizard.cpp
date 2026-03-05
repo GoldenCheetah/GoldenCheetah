@@ -55,6 +55,7 @@ enum WizardTable {
 // drag and drop passes urls ... convert to a list of files and call main constructor
 RideImportWizard::RideImportWizard(QList<QUrl> *urls, Context *context, QWidget *parent) : QDialog(parent), context(context)
 {
+    context->activityImportInProgress++;
     _importInProcess = true;
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
@@ -71,8 +72,10 @@ RideImportWizard::RideImportWizard(QList<QUrl> *urls, Context *context, QWidget 
 
 RideImportWizard::RideImportWizard(QList<QString> files, Context *context, QWidget *parent) : QDialog(parent), context(context)
 {
+    context->activityImportInProgress++;
     _importInProcess = true;
     setAttribute(Qt::WA_DeleteOnClose);
+    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     autoImportMode = false;
     autoImportStealth = false;
     init(files, context);
@@ -83,7 +86,10 @@ RideImportWizard::RideImportWizard(QList<QString> files, Context *context, QWidg
 
 RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context, QWidget *parent) : QDialog(parent), context(context), importConfig(dirs)
 {
+    context->activityImportInProgress++;
     _importInProcess = true;
+    setAttribute(Qt::WA_DeleteOnClose);
+    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     autoImportMode = true;
     autoImportStealth = true;
 
@@ -1226,6 +1232,8 @@ RideImportWizard::done(int rc)
 RideImportWizard::~RideImportWizard()
 {
     foreach(QString name, deleteMe) QFile(name).remove();
+
+    if (context->activityImportInProgress > 0) context->activityImportInProgress--;
 }
 
 

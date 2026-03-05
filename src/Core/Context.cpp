@@ -143,7 +143,7 @@ bool Context::isValid(Context *p) { return p != NULL &&_contexts.contains(p); }
 Context::Context(MainWindow *mainWindow)
     : mainWindow(mainWindow), nav(nullptr), rideNavigator(nullptr), tab(nullptr),
       athlete(nullptr), ride(nullptr), season(nullptr), workout(nullptr), videosync(nullptr),
-      now(0) 
+      now(0), activityImportInProgress(0)
 {
     // mainwindow state
     viewType = GcViewType::NO_VIEW_SET;

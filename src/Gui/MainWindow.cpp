@@ -2122,19 +2122,22 @@ MainWindow::checkImportAndUnsaved(int index)
 {
     AthleteTab *tab = tabList[index];
 
-    // check for autoimport and let it finalize
-    if (tab->context->athlete->autoImport) {
-        if (tab->context->athlete->autoImport->importInProcess() ) {
-            QMessageBox::information(this, tr("Activity Import"),
-                    tr("INFO for athlete %1\n\nClosing of athlete window not possible while background activity import is in progress...")
-                        .arg(tab->context->athlete->cyclist));
-            return false;
-        }
+    // check for any ride import process in progress
+    if (tab->context->activityImportInProgress > 0) {
+
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Information");
+        msgBox.setText(tr("INFO for athlete %1\n\nClosing the athlete window is not possible while file import is in progress...")
+                            .arg(tab->context->athlete->cyclist));
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setWindowFlags(msgBox.windowFlags() | Qt::WindowStaysOnTopHint);
+        msgBox.exec();
+
+        return false;
     }
 
     // now check for unsaved activities
     return saveRideExitDialog(tab->context);
-
 }
 
 // no questions asked just wipe away the current tab

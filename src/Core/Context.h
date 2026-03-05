@@ -152,6 +152,7 @@ class Context : public QObject
         VideoSyncFile *videosync; // the currently selected videosync file
         QString videoFilename;
         long now; // point in time during train session
+        unsigned int activityImportInProgress;
 
         // search filter
         bool isfiltered;
