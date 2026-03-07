@@ -45,6 +45,7 @@
 #include "LiveMapWebPageWindow.h"
 #include "CalendarWindow.h"
 #include "AgendaWindow.h"
+#include "PlanAdherenceWindow.h"
 #ifdef GC_WANT_R
 #include "RChart.h"
 #endif
@@ -114,6 +115,7 @@ GcWindowRegistry::initialize()
     { GcViewType::VIEW_ANALYSIS|GcViewType::VIEW_TRENDS|GcViewType::VIEW_TRAIN, tr("Web page"),GcWindowTypes::WebPageWindow },
     { GcViewType::VIEW_TRENDS|GcViewType::VIEW_PLAN, tr("Calendar"),GcWindowTypes::Calendar },
     { GcViewType::VIEW_TRENDS|GcViewType::VIEW_PLAN, tr("Agenda"),GcWindowTypes::Agenda },
+    { GcViewType::VIEW_PLAN, tr("Plan Adherence"),GcWindowTypes::PlanAdherence },
     { GcViewType::NO_VIEW_SET, "", GcWindowTypes::None }};
   // initialize the global registry
   GcWindows = GcWindowsInit;
@@ -264,6 +266,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::Diary:
     case GcWindowTypes::Calendar: returning = new CalendarWindow(context); break;
     case GcWindowTypes::Agenda: returning = new AgendaWindow(context); break;
+    case GcWindowTypes::PlanAdherence: returning = new PlanAdherenceWindow(context); break;
     default: return NULL; break;
     }
     if (returning) returning->setProperty("type", QVariant::fromValue<GcWinID>(id));

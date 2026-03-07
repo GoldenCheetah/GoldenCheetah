@@ -1085,6 +1085,15 @@ QColor GCColor::getThemeColor(const ColorTheme& theme, int colorIdx)
     return color;
 }
 
+QColor
+GCColor::getSuccessColor(const QPalette &palette)
+{
+    if (isPaletteDark(palette)) {
+        return QColor("#4CAF50");
+    }
+    return QColor("#27ae60");
+}
+
 void
 GCColor::applyTheme(int index)
 {
