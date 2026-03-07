@@ -19,6 +19,7 @@
 #include "PlanAdherence.h"
 
 #include <QHeaderView>
+#include <QToolTip>
 
 #include "Colors.h"
 #include "Settings.h"
@@ -621,7 +622,6 @@ PlanAdherenceTitleDelegate::paint
     const int iconX = opt.rect.x() + leftPadding;
     const int textX = iconX + iconWidth + iconTextSpacing;
     const int line1Y = opt.rect.top() + paddingTop;
-    const int line2Y = line1Y + lineHeight + lineSpacing;
     const int maxTextWidth = opt.rect.width() - (leftPadding + iconWidth + iconTextSpacing);
 
     painter->save();
@@ -737,10 +737,6 @@ PlanAdherenceOffsetDelegate::paint
             actualY = vertBottom;
         }
     }
-
-    QFont font;
-    const QFontMetrics fontMetrics(font);
-    const int lineHeight = fontMetrics.height();
 
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing, true);
@@ -924,8 +920,6 @@ PlanAdherenceHeaderView::paintSection
         const int availableWidth = rect.width() - 2 * horMargin;
         const int availableLeft = rect.left() + horMargin;
         const float cellWidth = availableWidth / cellCount;
-        const float cellHorCenter = cellWidth / 2.0;
-        const int vertCenter = rect.top() + rect.height() / 2;
         painter->save();
         QRect cellRect(availableLeft, rect.top(), availableWidth, rect.height());
         bool addMinOverflow = hasMinOverflow();
@@ -1206,7 +1200,7 @@ PlanAdherenceView::PlanAdherenceView
     QWidget *spacer = new QWidget(toolbar);
     spacer->setFixedWidth(10 * dpiXFactor);
     spacer->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-    QAction *filterSpacerAction = toolbar->addWidget(spacer);
+    toolbar->addWidget(spacer);
 
     QLabel *filterLabel = new QLabel("<i>" + tr("Filters applied") + "</i>");
     filterLabelAction = toolbar->addWidget(filterLabel);
