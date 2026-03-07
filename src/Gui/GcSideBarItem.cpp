@@ -442,6 +442,7 @@ GcSplitterItem::GcSplitterItem(QString title, QIcon icon, QWidget *parent) : QWi
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(0);
     content = NULL;
+    splitterHandle = NULL;
     //titleBar = new GcSideBarTitle(title, this);
     //layout->addWidget(titleBar);
 }
