@@ -2350,6 +2350,9 @@ void
 Calendar::activateDateRange
 (const DateRange &dr, bool allowKeepMonth, bool canHavePhasesOrEvents)
 {
+    if (dateRange == dr) {
+        return;
+    }
     QDate currentDate = selectedDate();
     dateRange = dr;
     monthView->limitDateRange(dr, allowKeepMonth, canHavePhasesOrEvents);

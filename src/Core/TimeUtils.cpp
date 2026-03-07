@@ -189,7 +189,7 @@ QDateTime convertToLocalTime(QString timestamp)
     return QDateTime::fromString(timestamp);
 }
 
-DateRange::DateRange(QDate from, QDate to, QString name, QColor color) : QObject()
+DateRange::DateRange(QDate from, QDate to, QString name, QColor color)
 {
     this->from=from;
     this->to=to;
@@ -198,7 +198,7 @@ DateRange::DateRange(QDate from, QDate to, QString name, QColor color) : QObject
     valid = from.isValid() && to.isValid();
 }
 
-DateRange::DateRange(const DateRange &other) : QObject()
+DateRange::DateRange(const DateRange &other)
 {
     from=other.from;
     to=other.to;
@@ -215,7 +215,6 @@ DateRange& DateRange::operator=(const DateRange &other)
     name=other.name;
     color=other.color;
     valid = from.isValid() && to.isValid();
-    emit changed(from, to);
 
     return *this;
 }

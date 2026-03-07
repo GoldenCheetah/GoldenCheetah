@@ -49,10 +49,8 @@ extern ShowDaysAsUnit showDaysAs(int days);
 */
 QDateTime convertToLocalTime(QString timestamp);
 
-class DateRange : QObject
+class DateRange
 {
-    Q_OBJECT
-
     public:
         DateRange(const DateRange& other);
         DateRange(QDate from = QDate(), QDate to = QDate(), QString name ="", QColor=QColor(127,127,127));
@@ -81,14 +79,9 @@ class DateRange : QObject
         }
         bool isValid() const { return valid; }
 
-
-    Q_SIGNALS:
-        void changed(QDate from, QDate to);
-
     protected:
         bool valid;
 };
-Q_DECLARE_METATYPE(DateRange)
 
 class DateSettingsEdit : public QWidget
 {

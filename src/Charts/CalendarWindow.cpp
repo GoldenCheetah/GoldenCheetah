@@ -948,6 +948,15 @@ CalendarWindow::getActivities
 (const QDate &firstDay, const QDate &lastDay) const
 {
     QHash<QDate, QList<CalendarEntry>> activities;
+
+    if (! context || ! context->athlete || ! context->athlete->rideCache) {
+        return activities;
+    }
+    const QList<RideItem*> rides = context->athlete->rideCache->rides();
+    if (rides.isEmpty()) {
+        return activities;
+    }
+
     const RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *rideMetric = factory.rideMetric(getSecondaryMetric());
     QString rideMetricName;
@@ -960,10 +969,14 @@ CalendarWindow::getActivities
         }
     }
 
-    for (RideItem *rideItem : context->athlete->rideCache->rides()) {
-        if (   rideItem->dateTime.date() < firstDay
-            || rideItem->dateTime.date() > lastDay
-            || rideItem == nullptr) {
+    for (RideItem *rideItem : rides) {
+        if (   rideItem == nullptr
+            || ! rideItem->dateTime.isValid()) {
+            continue;
+        }
+        QDate rideDate = rideItem->dateTime.date();
+        if (   rideDate < firstDay
+            || rideDate > lastDay) {
             continue;
         }
         if (   (context->isfiltered && ! context->filters.contains(rideItem->fileName))
@@ -1011,7 +1024,7 @@ CalendarWindow::getActivities
         }
 
         RideItem *linkedRide = context->athlete->rideCache->getLinkedActivity(rideItem);
-        if (linkedRide != nullptr) {
+        if (linkedRide != nullptr && linkedRide->dateTime.isValid()) {
             activity.linkedReference = linkedRide->fileName;
             activity.linkedPrimary = getPrimary(linkedRide);
             activity.linkedStartDT = linkedRide->dateTime;
@@ -1020,7 +1033,7 @@ CalendarWindow::getActivities
             }
         }
 
-        activities[rideItem->dateTime.date()] << activity;
+        activities[rideDate] << activity;
     }
     for (auto dayIt = activities.begin(); dayIt != activities.end(); ++dayIt) {
         std::sort(dayIt.value().begin(), dayIt.value().end(), [](const CalendarEntry &a, const CalendarEntry &b) {
