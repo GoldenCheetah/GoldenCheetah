@@ -201,12 +201,12 @@ Estimator::run()
     }
 
     // set up the models we support
-    CP2Model p2model(context);
-    CP3Model p3model(context);
-    ExtendedModel extmodel(context);
+    CP2Model p2model;
+    CP3Model p3model;
+    ExtendedModel extmodel;
 #if 0 // disable until model fitting errors are fixed (!!!)
-    WSModel wsmodel(context);
-    MultiModel multimodel(context);
+    WSModel wsmodel;
+    MultiModel multimodel;
 #endif
 
     QList <PDModel *> models;

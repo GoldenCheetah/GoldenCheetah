@@ -294,7 +294,7 @@ SaveOnExitDialogWidget::SaveOnExitDialogWidget(MainWindow *mainWindow, Context *
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
     // Warning text
-    warnText = new QLabel(tr("WARNING\n\nYou have made changes to some rides which\nhave not been saved. They are listed below."));
+    warnText = new QLabel(tr("WARNING for athlete %1\n\nYou have made changes to some rides which\nhave not been saved. They are listed below.").arg(context->athlete->cyclist));
     mainLayout->addWidget(warnText);
 
     // File List

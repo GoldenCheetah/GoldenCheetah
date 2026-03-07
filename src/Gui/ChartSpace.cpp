@@ -52,7 +52,7 @@ ChartSpace::ChartSpace(Context *context, OverviewScope scope, GcWindow *window) 
 
     // add a view and scene and centre
     scene = new QGraphicsScene(this);
-    view = new GGraphicsView(context, this);
+    view = new GGraphicsView(context->mainWindow, this);
 
     view->viewport()->setAttribute(Qt::WA_AcceptTouchEvents, false); // stops it stealing focus on mouseover
     scrollbar = new QScrollBar(Qt::Vertical, this);
@@ -88,7 +88,12 @@ ChartSpace::ChartSpace(Context *context, OverviewScope scope, GcWindow *window) 
     scene->installEventFilter(this);
 
     // once all widgets created we can connect the signals
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    if (context->athlete) {
+        connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    } else {
+        // as no athlete exists within the context, register a global configChanged signal registration instead 
+        connect(GlobalContext::context(), &GlobalContext::configChanged, this, &ChartSpace::configChanged);
+    }
     connect(scroller, SIGNAL(finished()), this, SLOT(scrollFinished()));
     connect(scrollbar, SIGNAL(valueChanged(int)), this, SLOT(scrollbarMoved(int)));
 
@@ -1007,8 +1012,13 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                double offx = pos.x()-item->geometry().x();
                double offy = pos.y()-item->geometry().y();
 
+               if (clickOverride(item, static_cast<QGraphicsSceneMouseEvent*>(event))) {
 
-               if (item->geometry().height()-offy < (gl_near*dpiXFactor)) {
+                    // thanks we'll take that
+                    event->accept();
+                    returning = true;
+
+               } else if (item->geometry().height()-offy < (gl_near*dpiXFactor)) {
 
                     // We can span resize a specific chartspaceitem
                     // by pressing SHIFT when we click

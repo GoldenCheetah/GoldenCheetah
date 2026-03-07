@@ -52,17 +52,14 @@ Library::findLibrary(QString name)
 }
 
 void
-Library::initialise(QDir home)
+Library::initialise(QDir gcRoot)
 {
     // Search paths from library.xml
     if (libraries.count() == 0) {
 
-        // it sits above all cyclist directories
-        home.cdUp();
-
         // lets read library.xml, if not there then add workout config
         // if thats not set then add home
-        QFile libraryXML(home.canonicalPath() + "/library.xml");
+        QFile libraryXML(gcRoot.canonicalPath() + "/library.xml");
         if (libraryXML.exists() == true) {
 
             // parse it!
@@ -82,7 +79,7 @@ Library::initialise(QDir home)
             Library *one = new Library;
             one->name = "Media Library";
             QString spath = appsettings->value(NULL, GC_WORKOUTDIR).toString();
-            if (spath == "") spath = home.absolutePath();
+            if (spath == "") spath = gcRoot.absolutePath();
             one->paths.append(spath);
             libraries.append(one);
         }

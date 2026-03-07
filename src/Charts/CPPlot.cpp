@@ -355,21 +355,21 @@ CPPlot::initModel()
         pdModel = NULL;
         break;
     case 1 : // 2 param
-        pdModel = new CP2Model(context);
+        pdModel = new CP2Model();
         break;
     case 2 : // 3 param
-        pdModel = new CP3Model(context);
+        pdModel = new CP3Model();
         static_cast<CP3Model*>(pdModel)->modelDecay = modelDecay;
         break;
     case 3 : // extended model
-        pdModel = new ExtendedModel(context);
+        pdModel = new ExtendedModel();
         break;
     case 4 : // multimodel
-        pdModel = new MultiModel(context);
+        pdModel = new MultiModel();
         pdModel->setVariant(modelVariant);
         break;
     case 5 : // ward smith
-        pdModel = new WSModel(context);
+        pdModel = new WSModel();
         pdModel->setVariant(modelVariant);
         break;
     }
@@ -890,20 +890,20 @@ CPPlot::plotModel(QVector<double> vector, QColor plotColor, PDModel *baseline)
     switch (model) {
 
     case 1 : // 2 param
-        pdmodel = new CP2Model(context);
+        pdmodel = new CP2Model();
         break;
     case 2 : // 3 param
-        pdmodel = new CP3Model(context);
+        pdmodel = new CP3Model();
         break;
     case 3 : // extended model
-        pdmodel = new ExtendedModel(context);
+        pdmodel = new ExtendedModel();
         break;
     case 4 : // multimodel
-        pdmodel = new MultiModel(context);
+        pdmodel = new MultiModel();
         pdmodel->setVariant(modelVariant);
         break;
     case 5 : // ward smith model
-        pdmodel = new WSModel(context);
+        pdmodel = new WSModel();
         pdmodel->setVariant(modelVariant);
         break;
     }
@@ -2751,20 +2751,20 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
             // get a model
             switch (model) {
             case 1 : // 2 param
-                baselineModel = new CP2Model(context);
+                baselineModel = new CP2Model();
                 break;
             case 2 : // 3 param
-                baselineModel = new CP3Model(context);
+                baselineModel = new CP3Model();
                 break;
             case 3 : // extended model
-                baselineModel = new ExtendedModel(context);
+                baselineModel = new ExtendedModel();
                 break;
             case 4 : // multimodel
-                baselineModel = new MultiModel(context);
+                baselineModel = new MultiModel();
                 baselineModel->setVariant(modelVariant);
                 break;
             case 5 : // ward smith
-                baselineModel = new WSModel(context);
+                baselineModel = new WSModel();
                 baselineModel->setVariant(modelVariant);
                 break;
             }
