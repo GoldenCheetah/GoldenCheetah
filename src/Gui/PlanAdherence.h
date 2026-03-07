@@ -24,6 +24,8 @@
 #include <QTreeWidget>
 #include <QHeaderView>
 #include <QStackedWidget>
+#include <QToolBar>
+#include <QStyledItemDelegate>
 
 #include "TimeUtils.h"
 #include "Colors.h"
