@@ -26,6 +26,7 @@
 #include <QHash>
 #include <QMap>
 #include <QColor>
+
 #include <utility>
 
 #define ENTRY_TYPE_ACTUAL_ACTIVITY 0

@@ -148,6 +148,7 @@ class GCColor : public QObject
         static Themes &themes();
         static void applyTheme(int index);
         static QColor getThemeColor(const ColorTheme& theme, int colorIdx);
+        static QColor getSuccessColor(const QPalette &palette);
 
         // for styling things with current preferences
         static QLinearGradient linearGradient(int size, bool active, bool alternate=false);

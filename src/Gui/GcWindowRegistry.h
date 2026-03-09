@@ -82,7 +82,8 @@ enum gcwinid {
         Agenda=53,
         UserPlan=54,
         OverviewPlan=55,
-        OverviewPlanBlank = 56
+        OverviewPlanBlank = 56,
+        PlanAdherence = 57
 };
 };
 typedef enum GcWindowTypes::gcwinid GcWinID;
