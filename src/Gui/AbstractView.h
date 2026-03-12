@@ -54,6 +54,7 @@ class AbstractView : public QWidget
 
     public:
 
+        AbstractView(Context *context, int type, const QString& view, const QString& heading);
         virtual ~AbstractView();
         virtual void close() {};
 
@@ -99,8 +100,7 @@ class AbstractView : public QWidget
         void setSelected(bool x) { _selected=x; selectionChanged(); }
         bool isSelected() const { return _selected; }
 
-        GcViewType viewType() const { return _viewType; }
-        virtual QString viewTypeDesc() const = 0;
+        int viewType() { return type; }
 
         void importChart(QMap<QString,QString>properties, bool select) { perspective_->importChart(properties, select); }
 
@@ -142,14 +142,11 @@ class AbstractView : public QWidget
 
     protected:
 
-        // Hide constructor to create an Abstract class
-        AbstractView(Context *context, GcViewType viewType, const QString& view, const QString& heading);
-
         Context *context;
-        const GcViewType _viewType; // used by windowregistry; e.g VIEW_TRAIN VIEW_ANALYSIS VIEW_PLAN VIEW_TRENDS
+        const int type; // used by windowregistry; e.g VIEW_TRAIN VIEW_ANALYSIS VIEW_PLAN VIEW_TRENDS
                         // we don't care what values are pass through to the GcWindowRegistry to decide
                         // what charts are relevant for this view.
-        const QString _viewName; // type of view:  "train", "analysis", "plan", "home"
+        const QString view; // type of view:  "train", "analysis", "plan", "home"
         QString viewCfgPath; // directory path to the view's configuration
 
         // properties
@@ -206,7 +203,7 @@ class ViewParser : public QXmlDefaultHandler
 {
 
 public:
-    ViewParser(Context *context, GcViewType viewType, bool useDefault) : style(2), context(context), viewType(viewType), useDefault(useDefault) {}
+    ViewParser(Context *context, int type, bool useDefault) : style(2), context(context), type(type), useDefault(useDefault) {}
 
     // the results!
     QList<Perspective*> perspectives;
@@ -223,7 +220,7 @@ protected:
     Context *context;
     GcChartWindow *chart;
     Perspective *page; // current
-    GcViewType viewType; // what type of view is this VIEW_{TRENDS,ANALYSIS,PLAN,TRAIN}
+    int type; // what type of view is this VIEW_{HOME,ANALYSIS,PLAN,TRAIN}
     bool useDefault; // force a reset by using the default layouts
 
 };
@@ -246,7 +243,7 @@ protected:
     QSplitterHandle *createHandle() override {
         if (this->tabView)
         {
-            if (this->tabView->viewType() == GcViewType::VIEW_TRAIN)
+            if (this->tabView->viewType() == VIEW_TRAIN)
             {
                 return new GcSplitterHandle(name, orientation, NULL, NULL, NULL, this);
             }
