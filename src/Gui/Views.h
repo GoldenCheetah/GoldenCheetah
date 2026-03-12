@@ -51,7 +51,7 @@ class LTMSidebarView : public AbstractView
 
     protected:
 
-        LTMSidebarView(Context *context, GcViewType viewType, const QString& view, const QString& heading);
+        LTMSidebarView(Context *context, int type, const QString& view, const QString& heading);
         virtual ~LTMSidebarView();
 
         void showEvent(QShowEvent*) override;
@@ -77,8 +77,6 @@ class AnalysisView : public AbstractView
         void close() override;
         void setRide(RideItem*ride) override;
         void addIntervals();
-
-        QString viewTypeDesc() const override { return "Analysis"; }
 
         RideNavigator *rideNavigator();
         AnalysisSidebar *analSidebar;
@@ -108,8 +106,6 @@ class PlanView : public LTMSidebarView
         PlanView(Context *context, QStackedWidget *controls);
         virtual ~PlanView();
 
-        QString viewTypeDesc() const override { return "Diary"; }
-
     public slots:
 
         bool isBlank() override;
@@ -124,8 +120,6 @@ class TrainView : public AbstractView
         TrainView(Context *context, QStackedWidget *controls);
         virtual ~TrainView();
         void close() override;
-
-        QString viewTypeDesc() const override { return "Train"; }
 
     public slots:
 
@@ -153,8 +147,6 @@ class TrendsView : public LTMSidebarView
 
         TrendsView(Context *context, QStackedWidget *controls);
         virtual ~TrendsView();
-
-        QString viewTypeDesc() const override { return "Trends"; }
 
         int countActivities(Perspective *, DateRange dr);
 

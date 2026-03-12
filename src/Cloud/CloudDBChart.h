@@ -120,7 +120,7 @@ public:
     CloudDBChartListDialog();
     ~CloudDBChartListDialog();
 
-    bool prepareData(QString athlete, CloudDBCommon::UserRole role, GcViewType chartViewType = GcViewType::VIEW_TRENDS);
+    bool prepareData(QString athlete, CloudDBCommon::UserRole role, int chartView = 0);
     QList<QString> getSelectedSettings() {return g_selected; }
 
     // re-implemented
@@ -190,7 +190,7 @@ private:
 
     // UserRole - UserEdit
     QPushButton *deleteUserEditButton, *editUserEditButton, *closeUserEditButton;
-    GcViewType g_chartViewType;
+    int g_chartView;
 
     // UserRole - Curator Edit
     QPushButton *curateCuratorEditButton, *editCuratorEditButton, *deleteCuratorEditButton, *closeCuratorButton;

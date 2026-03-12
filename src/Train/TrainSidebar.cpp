@@ -241,7 +241,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
 #endif
 
     connect(context, SIGNAL(newLap()), this, SLOT(resetLapTimer()));
-    connect(context, SIGNAL(viewChanged(GcViewType)), this, SLOT(viewChanged(GcViewType)));
+    connect(context, SIGNAL(viewChanged(int)), this, SLOT(viewChanged(int)));
 
     // workout filters
     connect(context, SIGNAL(workoutFiltersChanged(QList<ModelFilter*>&)), this, SLOT(workoutFiltersChanged(QList<ModelFilter*>&)));
@@ -1739,7 +1739,8 @@ void TrainSidebar::Connect()
     //qDebug() << "current tab:" << context->tab->currentView();
 
     // only try and connect if we are in train view..
-    if (context->tab->currentViewType() != GcViewType::VIEW_TRAIN) return;
+    // fixme: these values are hard-coded throughout
+    if (!(context->tab->currentView() == 3)) return;
 
     if (status&RT_CONNECTED) return; // already connected
 
@@ -3455,16 +3456,17 @@ void TrainSidebar::vo2Data(double rf, double rmv, double vo2, double vco2, doubl
 
 // connect/disconnect automatically when view changes
 void
-TrainSidebar::viewChanged(GcViewType viewType)
+TrainSidebar::viewChanged(int index)
 {
-    //qDebug() << "view has changed to:" << static_cast<int>(viewType);
+    //qDebug() << "view has changed to:" << index;
 
     // ensure buttons reflect current state
     setStatusFlags(0);
 
     if (!autoConnect) return;
 
-    if (viewType == GcViewType::VIEW_TRAIN) {
+    // fixme: value hard-coded throughout
+    if (index == 3) {
         //train view
         if ((status&RT_CONNECTED) == 0) {
             Connect();

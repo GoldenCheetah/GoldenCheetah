@@ -264,9 +264,9 @@ LTMSidebar::chartVisibilityChanged()
 }
 
 void
-LTMSidebar::updatePresetChartsOnShow(GcViewType viewType)
+LTMSidebar::updatePresetChartsOnShow(int viewType)
 {
-    bool trendsView(viewType == GcViewType::VIEW_TRENDS);
+    bool trendsView(viewType == VIEW_TRENDS);
 
     // show/hide the splitter toolbar icon
     chartsWidget->controlAction->setVisible(trendsView);

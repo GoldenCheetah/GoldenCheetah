@@ -61,14 +61,14 @@ class Perspective : public GcWindow
 
     public:
 
-        Perspective(Context *, QString title, GcViewType viewType);
+        Perspective(Context *, QString title, int type);
         ~Perspective();
 
         // am I relevant? (for switching when ride selected)
         bool relevant(RideItem*);
 
         // the items I'd choose (for filtering on trends view, optionally refined by chart filter)
-        bool isFiltered() const override { return (viewType_ == GcViewType::VIEW_TRENDS && df != NULL); }
+        bool isFiltered() const override { return (type_ == VIEW_TRENDS && df != NULL); }
         QStringList filterlist(DateRange dr, bool isfiltered=false, QStringList files=QStringList());
 
         // get/set the expression (will compile df)
@@ -81,11 +81,11 @@ class Perspective : public GcWindow
         void setTrainSwitch(int x) { trainswitch = (switchenum)x; }
 
         // import and export
-        static Perspective *fromFile(Context *context, QString filename, GcViewType viewType);
+        static Perspective *fromFile(Context *context, QString filename, int type);
         bool toFile(QString filename);
         void toXml(QTextStream &out);
 
-        GcViewType viewType() const { return viewType_; }
+        int type() const { return type_; }
         QString title() const { return title_; }
 
         void resetLayout();
@@ -159,7 +159,8 @@ class Perspective : public GcWindow
         bool dropPending;
 
         // what are we?
-        GcViewType viewType_;
+        int type_;
+        QString view;
 
         // top bar
         QString title_;
@@ -254,7 +255,7 @@ class AddPerspectiveDialog : public QDialog
     Q_OBJECT
 
     public:
-        AddPerspectiveDialog(QWidget *parent, Context *context, QString &name, QString &expression, GcViewType viewType, Perspective::switchenum &trainswitch, bool edit=false);
+        AddPerspectiveDialog(QWidget *parent, Context *context, QString &name, QString &expression, int type, Perspective::switchenum &trainswitch, bool edit=false);
 
     protected:
         QLineEdit *nameEdit;
@@ -271,6 +272,6 @@ class AddPerspectiveDialog : public QDialog
         QString &name;
         QString &expression;
         Perspective::switchenum &trainswitch;
-        GcViewType viewType;
+        int type;
 };
 #endif // _GC_HomeWindow_h
