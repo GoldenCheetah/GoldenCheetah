@@ -2529,6 +2529,9 @@ IntervalOverviewItem::setData(RideItem *item)
 void
 IntervalOverviewItem::setData(RideItem *item, bool animate)
 {
+    if (item == nullptr) {
+        return;
+    }
 
     if (block) return;
     block = true;

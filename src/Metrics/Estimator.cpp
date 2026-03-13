@@ -245,7 +245,7 @@ Estimator::run()
         // lets extract the best performance of the week first.
         // only care about performances between 3-20 minutes.
         Performance bestperformance(end,0,0,0);
-        for (int t=240; t<week.length() && t<3600; t++) {
+        for (int t=240; t<week.length() && t<weekdates.length() && t<3600; t++) {
 
             double p = double(week[t]);
             if (week[t]<=0) continue;

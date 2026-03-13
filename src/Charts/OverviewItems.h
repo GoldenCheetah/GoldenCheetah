@@ -561,7 +561,7 @@ class IntervalOverviewItem : public ChartSpaceItem
         BubbleViz *bubble;
 
         bool block; // block when signals occur too quickly
-        RideItem *item;  // remember what we are showing
+        QPointer<RideItem> item;  // remember what we are showing
         IntervalItem *hover = nullptr; // currently being hovered
 
         OverviewItemConfig *configwidget;
