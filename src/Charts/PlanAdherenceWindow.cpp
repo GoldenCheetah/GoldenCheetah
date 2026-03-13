@@ -62,17 +62,22 @@ PlanAdherenceWindow::PlanAdherenceWindow(Context *context)
     });
     connect(context->athlete->rideCache, QOverload<RideItem*>::of(&RideCache::itemChanged), this, &PlanAdherenceWindow::updateActivitiesIfInRange);
     connect(context->athlete->seasons, &Seasons::seasonsChanged, this, [this]() {
-        DateRange dr(this->context->currentSeason()->getStart(), this->context->currentSeason()->getEnd(), this->context->currentSeason()->getName());
-        adherenceView->setDateRange(dr);
-    });
-    connect(context, &Context::seasonSelected, this, [this](Season const *season, bool changed) {
-        if (changed || first) {
-            first = false;
-            DateRange dr(season->getStart(), season->getEnd(), season->getName());
+        Season const * current = this->context->currentSeason();
+        if (current != nullptr) {
+            DateRange dr(current->getStart(), current->getEnd(), current->getName());
             adherenceView->setDateRange(dr);
         }
     });
-    connect(context, &Context::seasonSelected, this, &PlanAdherenceWindow::updateActivities);
+    connect(context, &Context::seasonSelected, this, [this](Season const *season, bool changed) {
+        if (season != nullptr) {
+            if (changed || first) {
+                first = false;
+                DateRange dr(season->getStart(), season->getEnd(), season->getName());
+                adherenceView->setDateRange(dr);
+            }
+        }
+        updateActivities();
+    });
     connect(context, &Context::filterChanged, this, &PlanAdherenceWindow::updateActivities);
     connect(context, &Context::homeFilterChanged, this, &PlanAdherenceWindow::updateActivities);
     connect(context, &Context::rideAdded, this, &PlanAdherenceWindow::updateActivitiesIfInRange);

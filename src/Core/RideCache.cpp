@@ -184,6 +184,17 @@ RideCache::~RideCache()
 {
     exiting = true;
 
+    if (estimator) {
+        estimator->stop();
+        if (! estimator->wait(5000)) {
+            qWarning() << "Estimator did not stop in time, forcing termination.";
+            estimator->terminate();
+            estimator->wait();
+        }
+        delete estimator;
+        estimator = nullptr;
+    }
+
     // cancel any refresh that may be running
     cancel();
 

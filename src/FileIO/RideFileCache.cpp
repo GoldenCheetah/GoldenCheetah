@@ -322,7 +322,8 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &
     bool first = true;
 
     // look at all the rides
-    foreach (RideItem *item, context->athlete->rideCache->rides()) {
+    QList<RideItem*> rides = context->athlete->rideCache->rides(); // Create a copy of the ride list to prevent a crash
+    for (RideItem *item : rides) {
 
         if (item->dateTime.date() < from || item->dateTime.date() > to) continue; // not one we want
 
@@ -409,13 +410,13 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float>&w
                 // read from cache and put straight into QVector memory
                 // a little naughty but seems to work ok
                 returning.resize(head.wattsMeanMaxCount);
-                inFile.readRawData((char*)returning.constData(), head.wattsMeanMaxCount * sizeof(float));
+                inFile.readRawData((char*)returning.data(), head.wattsMeanMaxCount * sizeof(float));
 
                 offset = offsetForMeanMax(head, RideFile::wattsKg) + sizeof(head);
                 cacheFile.seek(qint64(offset));
 
                 wpk.resize(head.wattsKgMeanMaxCount);
-                inFile.readRawData((char*)wpk.constData(), head.wattsKgMeanMaxCount * sizeof(float));
+                inFile.readRawData((char*)wpk.data(), head.wattsKgMeanMaxCount * sizeof(float));
                 for(int i=0; i<wpk.size(); i++) wpk[i] = wpk[i] / 100.00f;
 
                 //qDebug()<<"retrieved:"<<head.wattsMeanMaxCount<<"in:"<<start.elapsed()<<"ms";
