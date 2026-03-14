@@ -297,6 +297,7 @@ CalendarWindow::CalendarWindow(Context *context)
     setStartHour(8);
     setEndHour(21);
     setShowSecondaryLabel(true);
+    setSummaryIncludePlanned(0);
 
     QVBoxLayout *mainLayout = new QVBoxLayout();
     setChartLayout(mainLayout);
@@ -536,6 +537,22 @@ CalendarWindow::isSummaryVisibleDay
 () const
 {
     return summaryDayCheck->isChecked();
+}
+
+
+int
+CalendarWindow::getSummaryIncludePlanned
+() const
+{
+    return includePlannedCombo->currentIndex();
+}
+
+
+void
+CalendarWindow::setSummaryIncludePlanned
+(int type)
+{
+    includePlannedCombo->setCurrentIndex(type);
 }
 
 
@@ -799,6 +816,11 @@ CalendarWindow::mkControls
     endHourSpin = new QSpinBox();
     endHourSpin->setSuffix(":00");
     endHourSpin->setMaximum(24);
+    includePlannedCombo = new QComboBox();
+    includePlannedCombo->addItem(tr("Always"), QVariant::fromValue(PlanFilterType::IncludeAll));
+    includePlannedCombo->addItem(tr("If upcoming or missed"), QVariant::fromValue(PlanFilterType::IncludeIfUpcomingOrMissed));
+    includePlannedCombo->addItem(tr("If upcoming"), QVariant::fromValue(PlanFilterType::IncludeIfUpcoming));
+    includePlannedCombo->addItem(tr("Never"), QVariant::fromValue(PlanFilterType::IncludeNone));
     summaryDayCheck = new QCheckBox(tr("Day View"));
     summaryDayCheck->setChecked(true);
     summaryWeekCheck = new QCheckBox(tr("Week View"));
@@ -836,6 +858,7 @@ CalendarWindow::mkControls
     generalForm->addRow(tr("Default End Time"), endHourSpin);
     generalForm->addItem(new QSpacerItem(0, 20 * dpiYFactor));
     generalForm->addRow(new QLabel(HLO + tr("Summary Options") + HLC));
+    generalForm->addRow(tr("Include Planned"), includePlannedCombo);
     generalForm->addRow(tr("Show Summary In"), summaryDayCheck);
     generalForm->addRow("", summaryWeekCheck);
     generalForm->addRow("", summaryMonthCheck);
@@ -866,6 +889,7 @@ CalendarWindow::mkControls
     connect(primaryFallbackCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::updateActivities);
     connect(secondaryCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::updateActivities);
     connect(tertiaryCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::updateActivities);
+    connect(includePlannedCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::updateActivities);
     connect(summaryDayCheck, &QCheckBox::toggled, this, &CalendarWindow::setSummaryVisibleDay);
     connect(summaryWeekCheck, &QCheckBox::toggled, this, &CalendarWindow::setSummaryVisibleWeek);
     connect(summaryMonthCheck, &QCheckBox::toggled, this, &CalendarWindow::setSummaryVisibleMonth);
@@ -969,6 +993,11 @@ CalendarWindow::getActivities
         }
     }
 
+    PlanFilter planFilter(PlanFilterType::IncludeAll);
+    if (includePlannedCombo->currentIndex() != -1) {
+        planFilter.setType(includePlannedCombo->currentData().value<PlanFilterType>());
+    }
+
     for (RideItem *rideItem : rides) {
         if (   rideItem == nullptr
             || ! rideItem->dateTime.isValid()) {
@@ -1021,6 +1050,7 @@ CalendarWindow::getActivities
         activity.dirty = rideItem->isDirty();
         if (rideItem->planned) {
             activity.originalPlanLabel = buildOriginalLabel(rideItem);
+            activity.isExcludedFromSummary = ! planFilter.pass(rideItem);
         }
 
         RideItem *linkedRide = context->athlete->rideCache->getLinkedActivity(rideItem);
@@ -1061,6 +1091,11 @@ CalendarWindow::getSummaries
     FilterSet filterSet(context->isfiltered, context->filters);
     Specification spec;
     spec.setFilterSet(filterSet);
+    PlanFilterType planFilterType = PlanFilterType::IncludeAll;
+    if (includePlannedCombo->currentIndex() != -1) {
+        planFilterType = includePlannedCombo->currentData().value<PlanFilterType>();
+    }
+    spec.setPlanFilter(planFilterType);
     for (int timeBucket = 0; timeBucket < numTimeBuckets; ++timeBucket) {
         QDate firstDayOfTimeBucket = firstDay.addDays(timeBucket * timeBucketSize);
         QDate lastDayOfTimeBucket = firstDayOfTimeBucket.addDays(timeBucketSize - 1);

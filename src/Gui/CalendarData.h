@@ -65,6 +65,7 @@ struct CalendarEntry {
     QTime start;
     int durationSecs = 0;
     int type = 0;
+    bool isExcludedFromSummary = false;
     bool isRelocatable = false;
     bool hasTrainMode = false;
     bool dirty = false;
