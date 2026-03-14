@@ -303,9 +303,7 @@ ManualActivityPageBasics::ManualActivityPageBasics
     woTypeEdit->addItem(tr("Manual Entry"));
     woTypeEdit->setCurrentIndex(1);
     if (plan) {
-
         connect(woTypeEdit, &QComboBox::currentIndexChanged, this, [sportEdit](int index) {
-
             sportEdit->setEnabled(index != 0);
             if (index == 0) {
                 sportEdit->setText("Bike");
@@ -331,8 +329,6 @@ ManualActivityPageBasics::ManualActivityPageBasics
         }
     }
 
-    workoutCodeLabel->setVisible(! plan);
-    workoutCodeEdit->setVisible(! plan);
     rpeLabel->setVisible(! plan);
     rpeEdit->setVisible(! plan);
     woTypeLabel->setVisible(plan);
