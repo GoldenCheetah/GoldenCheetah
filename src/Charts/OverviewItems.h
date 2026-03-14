@@ -114,6 +114,11 @@ class OverviewItemConfig : public QWidget
         // background color
         ColorButton *bgcolor;
 
+        // custom colors
+        ColorButton *barcolor1 = nullptr; // Zone bar color
+        ColorButton *fontcolor1 = nullptr; // Font color for Metric/KPI/Route/Meta
+        ColorButton *ctlcolor1 = nullptr, *atlcolor1 = nullptr, *tsbcolor1 = nullptr, *rrcolor1 = nullptr; // PMC indicator colors
+
 };
 
 class KPIOverviewItem : public ChartSpaceItem
@@ -139,6 +144,7 @@ class KPIOverviewItem : public ChartSpaceItem
         double start, stop;
         QString program, units;
         bool istime;
+        QString fontcolor;
 
         // computed and ready for painting
         QString value;
@@ -269,6 +275,7 @@ class MetricOverviewItem : public ChartSpaceItem
         QString symbol;
         const RideMetric *metric;
         QString units;
+        QString fontcolor;
 
         bool up;
         bool showrange = false;
@@ -384,6 +391,7 @@ class MetaOverviewItem : public ChartSpaceItem
 
         QString symbol;
         GcFieldType fieldtype;
+        QString fontcolor;
 
         // for numeric metadata items
         bool up, showrange;
@@ -424,6 +432,7 @@ class PMCOverviewItem : public ChartSpaceItem
         static ChartSpaceItem *create(ChartSpace *parent) { return new PMCOverviewItem(parent, "coggan_tss"); }
 
         QString symbol;
+        QString ctlcolor, atlcolor, tsbcolor, rrcolor;
 
         double sts, lts, sb, rr, stress;
 
@@ -453,6 +462,7 @@ class ZoneOverviewItem : public ChartSpaceItem
 
         RideFile::seriestype series;
         bool polarized;
+        QString barcolor;
 
         QChart *chart;
         QBarSet *barset;
@@ -531,6 +541,7 @@ class RouteOverviewItem : public ChartSpaceItem
         static ChartSpaceItem *create(ChartSpace *parent) { return new RouteOverviewItem(parent, tr("Route")); }
 
         Routeline *routeline;
+        QString fontcolor;
 
         OverviewItemConfig *configwidget;
 };

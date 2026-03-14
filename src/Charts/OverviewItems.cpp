@@ -687,8 +687,13 @@ ZoneOverviewItem::configChanged(qint32)
     barset = new QBarSet(tr("Time In Zone"), this);
     barset->setLabelFont(parent->midfont);
 
-    // config changed...
-    if (series == RideFile::hr) {
+    // use custom bar color if set, otherwise default per series type
+    if (!barcolor.isEmpty()) {
+        QColor bc(barcolor);
+        barset->setLabelColor(bc);
+        barset->setBorderColor(bc);
+        barset->setBrush(bc);
+    } else if (series == RideFile::hr) {
         barset->setLabelColor(GColor(CHEARTRATE));
         barset->setBorderColor(GColor(CHEARTRATE));
         barset->setBrush(GColor(CHEARTRATE));
@@ -2797,7 +2802,7 @@ KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
     QFontMetrics fm(parent->bigfont);
     QRectF rect = QFontMetrics(parent->bigfont, parent->device()).boundingRect(value);
 
-    painter->setPen(GColor(CPLOTMARKER));
+    painter->setPen(fontcolor.isEmpty() ? GColor(CPLOTMARKER) : QColor(fontcolor));
     painter->setFont(parent->bigfont);
     painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
                               mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
@@ -3365,7 +3370,7 @@ MetricOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem 
     QFontMetrics fm(parent->bigfont);
     QRectF rect = QFontMetrics(parent->bigfont, parent->device()).boundingRect(value);
 
-    painter->setPen(GColor(CPLOTMARKER));
+    painter->setPen(fontcolor.isEmpty() ? GColor(CPLOTMARKER) : QColor(fontcolor));
     painter->setFont(parent->bigfont);
     painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
                               mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
@@ -3594,7 +3599,7 @@ MetaOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
 
         if (fieldtype == GcFieldType::FIELD_TEXTBOX) {
             // long texts need to be formatted into a smaller font an word wrapped
-            painter->setPen(QColor(150,150,150));
+            painter->setPen(fontcolor.isEmpty() ? QColor(150,150,150) : QColor(fontcolor));
             painter->setFont(parent->smallfont);
 
             // draw text and wrap / truncate to bounding rectangle
@@ -3603,7 +3608,7 @@ MetaOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
         } else {
 
             // any other kind of metadata just paint it
-            painter->setPen(GColor(CPLOTMARKER));
+            painter->setPen(fontcolor.isEmpty() ? GColor(CPLOTMARKER) : QColor(fontcolor));
             painter->setFont(parent->bigfont);
 
             QString displayValue(value);
@@ -3635,7 +3640,7 @@ MetaOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
         QFontMetrics fm(parent->bigfont);
         QRectF rect = QFontMetrics(parent->bigfont, parent->device()).boundingRect(value);
 
-        painter->setPen(GColor(CPLOTMARKER));
+        painter->setPen(fontcolor.isEmpty() ? GColor(CPLOTMARKER) : QColor(fontcolor));
         painter->setFont(parent->bigfont);
         painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
                                   mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
@@ -3715,7 +3720,7 @@ PMCOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
                               nexty + (tfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
     nexty += rect.height() + 30;
 
-    painter->setPen(PMCData::sbColor(sb, GColor(CPLOTMARKER)));
+    painter->setPen(PMCData::sbColor(sb, tsbcolor.isEmpty() ? GColor(CPLOTMARKER) : QColor(tsbcolor)));
     painter->setFont(parent->bigfont);
     string = QString("%1").arg(round(sb));
     rect = bfm.boundingRect(string);
@@ -3736,7 +3741,7 @@ PMCOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
                                       nexty + (tfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
         nexty += rect.height() + 30;
 
-        painter->setPen(PMCData::ltsColor(lts, GColor(CPLOTMARKER)));
+        painter->setPen(PMCData::ltsColor(lts, ctlcolor.isEmpty() ? GColor(CPLOTMARKER) : QColor(ctlcolor)));
         painter->setFont(parent->bigfont);
         string = QString("%1").arg(round(lts));
         rect = bfm.boundingRect(string);
@@ -3759,7 +3764,7 @@ PMCOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
                                   nexty + (tfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
         nexty += rect.height() + 30;
 
-        painter->setPen(PMCData::stsColor(sts, GColor(CPLOTMARKER)));
+        painter->setPen(PMCData::stsColor(sts, atlcolor.isEmpty() ? GColor(CPLOTMARKER) : QColor(atlcolor)));
         painter->setFont(parent->bigfont);
         string = QString("%1").arg(round(sts));
         rect = bfm.boundingRect(string);
@@ -3782,7 +3787,7 @@ PMCOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
                                   nexty + (tfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
         nexty += rect.height() + 30;
 
-        painter->setPen(PMCData::rrColor(rr, GColor(CPLOTMARKER)));
+        painter->setPen(PMCData::rrColor(rr, rrcolor.isEmpty() ? GColor(CPLOTMARKER) : QColor(rrcolor)));
         painter->setFont(parent->bigfont);
         string = QString("%1").arg(round(rr));
         rect = bfm.boundingRect(string);
@@ -3958,6 +3963,55 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), it
         connect(bgcolor, SIGNAL(colorChosen(QColor)), this, SLOT(dataChanged()));
     }
 
+    // zone bar color
+    if (item->type == OverviewItemType::ZONE) {
+        ZoneOverviewItem *zi = dynamic_cast<ZoneOverviewItem*>(item);
+        QColor initBarColor = zi->barcolor.isEmpty() ? QColor(Qt::gray) : QColor(zi->barcolor);
+        barcolor1 = new ColorButton(this, tr("Bar Color"), initBarColor, true);
+        barcolor1->setSelectAll(true);
+        layout->addRow(tr("Bar Color"), barcolor1);
+        connect(barcolor1, SIGNAL(colorChosen(QColor)), this, SLOT(dataChanged()));
+    }
+
+    // font color for Metric, KPI, Meta, Route
+    if (item->type == OverviewItemType::METRIC || item->type == OverviewItemType::KPI ||
+        item->type == OverviewItemType::META || item->type == OverviewItemType::ROUTE) {
+        QString fc;
+        if (item->type == OverviewItemType::METRIC) fc = dynamic_cast<MetricOverviewItem*>(item)->fontcolor;
+        else if (item->type == OverviewItemType::KPI) fc = dynamic_cast<KPIOverviewItem*>(item)->fontcolor;
+        else if (item->type == OverviewItemType::META) fc = dynamic_cast<MetaOverviewItem*>(item)->fontcolor;
+        else if (item->type == OverviewItemType::ROUTE) fc = dynamic_cast<RouteOverviewItem*>(item)->fontcolor;
+        QColor initFontColor = fc.isEmpty() ? GColor(CPLOTMARKER) : QColor(fc);
+        fontcolor1 = new ColorButton(this, tr("Font Color"), initFontColor, true);
+        fontcolor1->setSelectAll(true);
+        layout->addRow(tr("Font Color"), fontcolor1);
+        connect(fontcolor1, SIGNAL(colorChosen(QColor)), this, SLOT(dataChanged()));
+    }
+
+    // PMC indicator colors
+    if (item->type == OverviewItemType::PMC) {
+        PMCOverviewItem *pi = dynamic_cast<PMCOverviewItem*>(item);
+        ctlcolor1 = new ColorButton(this, tr("Fitness (CTL)"), pi->ctlcolor.isEmpty() ? GColor(CPLOTMARKER) : QColor(pi->ctlcolor), true);
+        ctlcolor1->setSelectAll(true);
+        layout->addRow(tr("Fitness Color"), ctlcolor1);
+        connect(ctlcolor1, SIGNAL(colorChosen(QColor)), this, SLOT(dataChanged()));
+
+        atlcolor1 = new ColorButton(this, tr("Fatigue (ATL)"), pi->atlcolor.isEmpty() ? GColor(CPLOTMARKER) : QColor(pi->atlcolor), true);
+        atlcolor1->setSelectAll(true);
+        layout->addRow(tr("Fatigue Color"), atlcolor1);
+        connect(atlcolor1, SIGNAL(colorChosen(QColor)), this, SLOT(dataChanged()));
+
+        tsbcolor1 = new ColorButton(this, tr("Form (TSB)"), pi->tsbcolor.isEmpty() ? GColor(CPLOTMARKER) : QColor(pi->tsbcolor), true);
+        tsbcolor1->setSelectAll(true);
+        layout->addRow(tr("Form Color"), tsbcolor1);
+        connect(tsbcolor1, SIGNAL(colorChosen(QColor)), this, SLOT(dataChanged()));
+
+        rrcolor1 = new ColorButton(this, tr("Risk (RR)"), pi->rrcolor.isEmpty() ? GColor(CPLOTMARKER) : QColor(pi->rrcolor), true);
+        rrcolor1->setSelectAll(true);
+        layout->addRow(tr("Risk Color"), rrcolor1);
+        connect(rrcolor1, SIGNAL(colorChosen(QColor)), this, SLOT(dataChanged()));
+    }
+
     // last item to export the data, note in main layout, aligned with bottom buttons
     if (item->type == OverviewItemType::DATATABLE)  {
         main->addWidget(exp);
@@ -4059,6 +4113,7 @@ OverviewItemConfig::setWidgets()
             MetricOverviewItem *mi = dynamic_cast<MetricOverviewItem*>(item);
             name->setText(mi->name);
             metric1->setSymbol(mi->symbol);
+            fontcolor1->setColor(mi->fontcolor.isEmpty() ? GColor(CPLOTMARKER) : QColor(mi->fontcolor));
         }
         break;
 
@@ -4085,6 +4140,7 @@ OverviewItemConfig::setWidgets()
             MetaOverviewItem *mi = dynamic_cast<MetaOverviewItem*>(item);
             name->setText(mi->name);
             meta1->setMeta(mi->symbol);
+            fontcolor1->setColor(mi->fontcolor.isEmpty() ? GColor(CPLOTMARKER) : QColor(mi->fontcolor));
         }
         break;
 
@@ -4094,6 +4150,7 @@ OverviewItemConfig::setWidgets()
             name->setText(mi->name);
             series1->setSeries(mi->series);
             cb1->setChecked(mi->polarized);
+            barcolor1->setColor(mi->barcolor.isEmpty() ? QColor(Qt::gray) : QColor(mi->barcolor));
         }
         break;
 
@@ -4112,6 +4169,7 @@ OverviewItemConfig::setWidgets()
         {
             RouteOverviewItem *mi = dynamic_cast<RouteOverviewItem*>(item);
             name->setText(mi->name);
+            fontcolor1->setColor(mi->fontcolor.isEmpty() ? GColor(CPLOTMARKER) : QColor(mi->fontcolor));
         }
         break;
 
@@ -4119,6 +4177,10 @@ OverviewItemConfig::setWidgets()
         {
             PMCOverviewItem *mi = dynamic_cast<PMCOverviewItem*>(item);
             metric1->setSymbol(mi->symbol);
+            ctlcolor1->setColor(mi->ctlcolor.isEmpty() ? GColor(CPLOTMARKER) : QColor(mi->ctlcolor));
+            atlcolor1->setColor(mi->atlcolor.isEmpty() ? GColor(CPLOTMARKER) : QColor(mi->atlcolor));
+            tsbcolor1->setColor(mi->tsbcolor.isEmpty() ? GColor(CPLOTMARKER) : QColor(mi->tsbcolor));
+            rrcolor1->setColor(mi->rrcolor.isEmpty() ? GColor(CPLOTMARKER) : QColor(mi->rrcolor));
         }
         break;
 
@@ -4139,6 +4201,7 @@ OverviewItemConfig::setWidgets()
             double2->setValue(mi->stop);
             cb1->setChecked(mi->istime);
             string1->setText(mi->units);
+            fontcolor1->setColor(mi->fontcolor.isEmpty() ? GColor(CPLOTMARKER) : QColor(mi->fontcolor));
         }
     }
     block = false;
@@ -4176,6 +4239,7 @@ OverviewItemConfig::dataChanged()
                 mi->units = metric1->rideMetric()->units(GlobalContext::context()->useMetricUnits);
             }
             mi->bgcolor = bgcolor->getColor().name();
+            mi->fontcolor = fontcolor1->getColor().name();
         }
         break;
 
@@ -4211,6 +4275,7 @@ OverviewItemConfig::dataChanged()
             mi->name = name->text();
             if (meta1->isValid()) mi->symbol = meta1->metaname();
             mi->bgcolor = bgcolor->getColor().name();
+            mi->fontcolor = fontcolor1->getColor().name();
         }
         break;
 
@@ -4221,6 +4286,7 @@ OverviewItemConfig::dataChanged()
             if (series1->currentIndex() >= 0) mi->series = static_cast<RideFile::SeriesType>(series1->itemData(series1->currentIndex(), Qt::UserRole).toInt());
             mi->polarized = cb1->isChecked();
             mi->bgcolor = bgcolor->getColor().name();
+            mi->barcolor = barcolor1->getColor().name();
         }
         break;
 
@@ -4241,6 +4307,7 @@ OverviewItemConfig::dataChanged()
             RouteOverviewItem *mi = dynamic_cast<RouteOverviewItem*>(item);
             mi->name = name->text();
             mi->bgcolor = bgcolor->getColor().name();
+            mi->fontcolor = fontcolor1->getColor().name();
         }
         break;
 
@@ -4248,6 +4315,11 @@ OverviewItemConfig::dataChanged()
         {
             PMCOverviewItem *mi = dynamic_cast<PMCOverviewItem*>(item);
             if (metric1->isValid()) mi->symbol = metric1->rideMetric()->symbol();
+            mi->bgcolor = bgcolor->getColor().name();
+            mi->ctlcolor = ctlcolor1->getColor().name();
+            mi->atlcolor = atlcolor1->getColor().name();
+            mi->tsbcolor = tsbcolor1->getColor().name();
+            mi->rrcolor = rrcolor1->getColor().name();
         }
         break;
 
@@ -4270,6 +4342,7 @@ OverviewItemConfig::dataChanged()
             mi->start = double1->value();
             mi->stop = double2->value();
             mi->bgcolor = bgcolor->getColor().name();
+            mi->fontcolor = fontcolor1->getColor().name();
         }
     }
 }

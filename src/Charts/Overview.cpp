@@ -242,27 +242,39 @@ OverviewWindow::getConfiguration() const
             break;
 
         case OverviewItemType::TOPN:
+            {
+                TopNOverviewItem *topn = reinterpret_cast<TopNOverviewItem*>(item);
+                config += "\"symbol\":\"" + QString("%1").arg(topn->symbol) + "\",";
+            }
+            break;
         case OverviewItemType::METRIC:
             {
                 MetricOverviewItem *metric = reinterpret_cast<MetricOverviewItem*>(item);
                 config += "\"symbol\":\"" + QString("%1").arg(metric->symbol) + "\",";
+                if (!metric->fontcolor.isEmpty()) config += "\"fontcolor\":\"" + metric->fontcolor + "\",";
             }
             break;
         case OverviewItemType::META:
             {
                 MetaOverviewItem *meta = reinterpret_cast<MetaOverviewItem*>(item);
                 config += "\"symbol\":\"" + QString("%1").arg(meta->symbol) + "\",";
+                if (!meta->fontcolor.isEmpty()) config += "\"fontcolor\":\"" + meta->fontcolor + "\",";
             }
             break;
         case OverviewItemType::PMC:
             {
                 PMCOverviewItem *pmc = reinterpret_cast<PMCOverviewItem*>(item);
                 config += "\"symbol\":\"" + QString("%1").arg(pmc->symbol) + "\",";
+                if (!pmc->ctlcolor.isEmpty()) config += "\"ctlcolor\":\"" + pmc->ctlcolor + "\",";
+                if (!pmc->atlcolor.isEmpty()) config += "\"atlcolor\":\"" + pmc->atlcolor + "\",";
+                if (!pmc->tsbcolor.isEmpty()) config += "\"tsbcolor\":\"" + pmc->tsbcolor + "\",";
+                if (!pmc->rrcolor.isEmpty()) config += "\"rrcolor\":\"" + pmc->rrcolor + "\",";
             }
             break;
         case OverviewItemType::ROUTE:
             {
-                // UNUSED RouteOverviewItem *route = reinterpret_cast<RouteOverviewItem*>(item);
+                RouteOverviewItem *route = reinterpret_cast<RouteOverviewItem*>(item);
+                if (!route->fontcolor.isEmpty()) config += "\"fontcolor\":\"" + route->fontcolor + "\",";
             }
             break;
         case OverviewItemType::INTERVAL:
@@ -279,6 +291,7 @@ OverviewWindow::getConfiguration() const
                 ZoneOverviewItem *zone = reinterpret_cast<ZoneOverviewItem*>(item);
                 config += "\"series\":" + QString("%1").arg(static_cast<int>(zone->series)) + ",";
                 config += "\"polarized\":" + QString("%1").arg(zone->polarized) + ",";
+                if (!zone->barcolor.isEmpty()) config += "\"barcolor\":\"" + zone->barcolor + "\",";
             }
             break;
         case OverviewItemType::DATATABLE:
@@ -300,6 +313,7 @@ OverviewWindow::getConfiguration() const
                 config += "\"istime\":" + QString("%1").arg(kpi->istime) + ",";
                 config += "\"start\":" + QString("%1").arg(kpi->start) + ",";
                 config += "\"stop\":" + QString("%1").arg(kpi->stop) + ",";
+                if (!kpi->fontcolor.isEmpty()) config += "\"fontcolor\":\"" + kpi->fontcolor + "\",";
             }
             break;
         case OverviewItemType::USERCHART:
@@ -470,6 +484,7 @@ badconfig:
             {
                 QString symbol=obj["symbol"].toString();
                 add = new MetricOverviewItem(space, name,symbol);
+                if (obj.contains("fontcolor")) static_cast<MetricOverviewItem*>(add)->fontcolor = obj["fontcolor"].toString();
                 add->datafilter = datafilter;
                 space->addItem(order,column,span,deep, add);
             }
@@ -479,6 +494,7 @@ badconfig:
             {
                 QString symbol=obj["symbol"].toString();
                 add = new MetaOverviewItem(space, name,symbol);
+                if (obj.contains("fontcolor")) static_cast<MetaOverviewItem*>(add)->fontcolor = obj["fontcolor"].toString();
                 add->datafilter = datafilter;
                 space->addItem(order,column,span,deep, add);
             }
@@ -488,6 +504,10 @@ badconfig:
             {
                 QString symbol=obj["symbol"].toString();
                 add = new PMCOverviewItem(space, symbol); // doesn't have a title
+                if (obj.contains("ctlcolor")) static_cast<PMCOverviewItem*>(add)->ctlcolor = obj["ctlcolor"].toString();
+                if (obj.contains("atlcolor")) static_cast<PMCOverviewItem*>(add)->atlcolor = obj["atlcolor"].toString();
+                if (obj.contains("tsbcolor")) static_cast<PMCOverviewItem*>(add)->tsbcolor = obj["tsbcolor"].toString();
+                if (obj.contains("rrcolor")) static_cast<PMCOverviewItem*>(add)->rrcolor = obj["rrcolor"].toString();
                 add->datafilter = datafilter;
                 space->addItem(order,column,span,deep, add);
             }
@@ -498,6 +518,10 @@ badconfig:
                 RideFile::SeriesType series = static_cast<RideFile::SeriesType>(obj["series"].toInt());
                 bool polarized = obj["polarized"].toInt();
                 add = new ZoneOverviewItem(space, name, series, polarized);
+                if (obj.contains("barcolor")) {
+                    static_cast<ZoneOverviewItem*>(add)->barcolor = obj["barcolor"].toString();
+                    static_cast<ZoneOverviewItem*>(add)->configChanged(0); // re-apply with custom color
+                }
                 add->datafilter = datafilter;
                 space->addItem(order,column,span,deep, add);
 
@@ -506,7 +530,8 @@ badconfig:
 
         case OverviewItemType::ROUTE :
             {
-                add = new RouteOverviewItem(space, name); // doesn't have a title
+                add = new RouteOverviewItem(space, name);
+                if (obj.contains("fontcolor")) static_cast<RouteOverviewItem*>(add)->fontcolor = obj["fontcolor"].toString();
                 add->datafilter = datafilter;
                 space->addItem(order,column,span,deep, add);
             }
@@ -551,6 +576,7 @@ badconfig:
                 QString units =obj["units"].toString();
                 bool istime =obj["istime"].toInt();
                 add = new KPIOverviewItem(space, name, start, stop, program, units, istime);
+                if (obj.contains("fontcolor")) static_cast<KPIOverviewItem*>(add)->fontcolor = obj["fontcolor"].toString();
                 add->datafilter = datafilter;
                 space->addItem(order,column,span,deep, add);
             }
