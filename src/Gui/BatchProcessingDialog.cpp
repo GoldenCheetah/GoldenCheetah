@@ -102,6 +102,7 @@ processed(0), fails(0), numFilesToProcess(0), metadataCompleter(nullptr) {
         files->setItemWidget(add, 0, checkBox);
 
         add->setText(1, rideItem->fileName);
+        add->setData(1, Qt::UserRole, rideItem->planned);
         add->setText(2, rideItem->dateTime.toString(tr("dd MMM yyyy")));
         add->setText(3, rideItem->dateTime.toString(tr("hh:mm:ss")));
         add->setText(4, tr(""));
@@ -635,7 +636,13 @@ BatchProcessingDialog::exportFiles()
             // open it..
             QStringList errors;
             QList<RideFile*> rides;
-            QFile thisfile(QString(context->athlete->home->activities().absolutePath()+"/"+current->text(1)));
+            QString rideFileName;
+            if (current->data(1, Qt::UserRole).toBool()) {
+                rideFileName = context->athlete->home->planned().absolutePath()+"/"+current->text(1);
+            } else {
+                rideFileName = context->athlete->home->activities().absolutePath()+"/"+current->text(1);
+            }
+            QFile thisfile(rideFileName);
             RideFile *rideF = RideFileFactory::instance().openRideFile(context, thisfile, errors, &rides);
 
             // open success?
