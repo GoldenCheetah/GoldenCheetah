@@ -165,6 +165,7 @@ class UserChartSettings : public QWidget {
 
         // configuration - data series
         void refreshSeriesTab(); // update gui with current config
+        void duplicateSeries();
         void editSeries();
         void seriesClicked(int,int);
         void addSeries();

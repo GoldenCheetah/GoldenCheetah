@@ -869,6 +869,15 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     // custom buttons
     ActionButtonBox *seriesActionButtons = new ActionButtonBox(ActionButtonBox::UpDownGroup | ActionButtonBox::EditGroup | ActionButtonBox::AddDeleteGroup);
     seriesActionButtons->defaultConnect(seriesTable);
+    QPushButton *duplicateButton = seriesActionButtons->addButton(tr("Duplicate"), ActionButtonBox::Right);
+    QModelIndex index = seriesTable->selectionModel()->currentIndex();
+    duplicateButton->setEnabled(index.isValid());
+
+    connect(seriesTable->selectionModel(), &QItemSelectionModel::currentChanged, this, [this, duplicateButton]() {
+        QModelIndex index = this->seriesTable->selectionModel()->currentIndex();
+        duplicateButton->setEnabled(index.isValid());
+    });
+    connect(duplicateButton, &QPushButton::clicked, this, &UserChartSettings::duplicateSeries);
     connect(seriesActionButtons, &ActionButtonBox::editRequested, this, &UserChartSettings::editSeries);
     connect(seriesActionButtons, &ActionButtonBox::addRequested, this, &UserChartSettings::addSeries);
     connect(seriesActionButtons, &ActionButtonBox::deleteRequested, this, &UserChartSettings::deleteSeries);
@@ -1056,6 +1065,33 @@ UserChartSettings::seriesClicked(int row,int)
         refreshSeriesTab();
         emit chartConfigChanged();
     }
+}
+
+void
+UserChartSettings::duplicateSeries()
+{
+    QList<QTableWidgetItem*> items = seriesTable->selectedItems();
+    if (items.count() < 1) return;
+    int index = seriesTable->row(items.first());
+    GenericSeriesInfo seriesInfo = seriesinfo[index];
+
+    bool duplicate = false;
+    QString name = seriesInfo.name;
+    int dup = 1;
+    do {
+        duplicate = false;
+        for (const GenericSeriesInfo &info : seriesinfo) {
+            if (info.name == seriesInfo.name) {
+                duplicate = true;
+                seriesInfo.name = name + QString("_%1").arg(dup);
+                ++dup;
+                break;
+            }
+        }
+    } while (duplicate);
+    seriesinfo.append(seriesInfo);
+    refreshSeriesTab();
+    emit chartConfigChanged();
 }
 
 void

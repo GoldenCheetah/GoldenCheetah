@@ -83,6 +83,43 @@ class GenericSeriesInfo {
             color("red"), opacity(100.0), opengl(true), legend(true), datalabels(false), fill(false)
         {}
 
+        GenericSeriesInfo(const GenericSeriesInfo &other) {
+            *this = other;
+        }
+
+        GenericSeriesInfo &operator=(const GenericSeriesInfo &other) {
+            if (this == &other) return *this;
+
+            name = other.name;
+            group = other.group;
+            xseries = other.xseries;
+            yseries = other.yseries;
+            fseries = other.fseries;
+            xname = other.xname;
+            yname = other.yname;
+            labels = other.labels;
+            colors = other.colors;
+            line = other.line;
+            symbol = other.symbol;
+            size = other.size;
+            color = other.color;
+            opacity = other.opacity;
+            opengl = other.opengl;
+            legend = other.legend;
+            datalabels = other.datalabels;
+            fill = other.fill;
+            aggregateby = other.aggregateby;
+            annotations = other.annotations;
+            string1 = other.string1;
+            string2 = other.string2;
+            string3 = other.string3;
+            string4 = other.string4;
+
+            user1 = user2 = user3 = user4 = nullptr;
+
+            return *this;
+        }
+
         // available for use (e.g. UserChartSettings)
         void *user1, *user2, *user3, *user4;
         QString string1, string2, string3, string4;
