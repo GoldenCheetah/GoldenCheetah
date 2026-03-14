@@ -74,12 +74,33 @@ class FilterSet
         int count() { return filters_.count(); }
 };
 
+enum class PlanFilterType {
+    IncludeAll,
+    IncludeIfUpcomingOrMissed,
+    IncludeIfUpcoming,
+    IncludeNone
+};
+Q_DECLARE_METATYPE(PlanFilterType)
+
+class PlanFilter
+{
+    public:
+        PlanFilter(PlanFilterType type = PlanFilterType::IncludeAll);
+
+        void setType(PlanFilterType type);
+        PlanFilterType getType() const;
+        bool pass(RideItem const * const rideItem) const;
+
+    private:
+        PlanFilterType type = PlanFilterType::IncludeAll;
+};
+
 class RideFileIterator;
 class Specification
 {
     friend class ::RideFileIterator;
     public:
-        Specification(DateRange dr, FilterSet fs);
+        Specification(DateRange dr, FilterSet fs, PlanFilter pf = PlanFilter());
         Specification(IntervalItem *it, double recintsecs);
         Specification();
 
@@ -101,6 +122,7 @@ class Specification
         // set criteria
         void setDateRange(DateRange dr);
         void setFilterSet(FilterSet fs);
+        void setPlanFilter(PlanFilter pf);
         void setIntervalItem(IntervalItem *it, double recintsecs);
         void setRideItem(RideItem *ri);
 
@@ -123,6 +145,7 @@ class Specification
     private:
         DateRange dr;
         FilterSet fs;
+        PlanFilter pf;
         IntervalItem *it;
         double recintsecs;
         RideItem *ri;

@@ -79,6 +79,7 @@ class CalendarWindow : public GcChartWindow
     Q_PROPERTY(int firstDayOfWeek READ getFirstDayOfWeek WRITE setFirstDayOfWeek USER true)
     Q_PROPERTY(int startHour READ getStartHour WRITE setStartHour USER true)
     Q_PROPERTY(int endHour READ getEndHour WRITE setEndHour USER true)
+    Q_PROPERTY(int summaryIncludePlanned READ getSummaryIncludePlanned WRITE setSummaryIncludePlanned USER true)
     Q_PROPERTY(bool summaryVisibleDay READ isSummaryVisibleDay WRITE setSummaryVisibleDay USER true)
     Q_PROPERTY(bool summaryVisibleWeek READ isSummaryVisibleWeek WRITE setSummaryVisibleWeek USER true)
     Q_PROPERTY(bool summaryVisibleMonth READ isSummaryVisibleMonth WRITE setSummaryVisibleMonth USER true)
@@ -96,6 +97,7 @@ class CalendarWindow : public GcChartWindow
         int getFirstDayOfWeek() const;
         int getStartHour() const;
         int getEndHour() const;
+        int getSummaryIncludePlanned() const;
         bool isSummaryVisibleDay() const;
         bool isSummaryVisibleWeek() const;
         bool isSummaryVisibleMonth() const;
@@ -115,6 +117,7 @@ class CalendarWindow : public GcChartWindow
         void setFirstDayOfWeek(int fdw);
         void setStartHour(int hour);
         void setEndHour(int hour);
+        void setSummaryIncludePlanned(int type);
         void setSummaryVisibleDay(bool visible);
         void setSummaryVisibleWeek(bool visible);
         void setSummaryVisibleMonth(bool svm);
@@ -139,6 +142,7 @@ class CalendarWindow : public GcChartWindow
         QComboBox *firstDayOfWeekCombo;
         QSpinBox *startHourSpin;
         QSpinBox *endHourSpin;
+        QComboBox *includePlannedCombo;
         QCheckBox *summaryDayCheck;
         QCheckBox *summaryWeekCheck;
         QCheckBox *summaryMonthCheck;

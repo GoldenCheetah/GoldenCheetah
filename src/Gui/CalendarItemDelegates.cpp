@@ -1756,7 +1756,10 @@ toolTipDayEntry(const QPoint &pos, QAbstractItemView *view, const CalendarDay &d
             status = QObject::tr("planned");
         }
         if (calEntry.dirty) {
-            status += ", " + QObject::tr("modified");
+            status += " • " + QObject::tr("modified");
+        }
+        if (calEntry.isExcludedFromSummary) {
+            status += " • " + QObject::tr("not in summary");
         }
 
         QString tooltip = QString("<div style='padding: %1px;'>").arg(4 * dpiXFactor);
