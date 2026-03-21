@@ -52,7 +52,7 @@ ChartSpace::ChartSpace(Context *context, OverviewScope scope, GcWindow *window) 
 
     // add a view and scene and centre
     scene = new QGraphicsScene(this);
-    view = new GGraphicsView(context, this);
+    view = new GGraphicsView(context->mainWindow, this);
 
     view->viewport()->setAttribute(Qt::WA_AcceptTouchEvents, false); // stops it stealing focus on mouseover
     scrollbar = new QScrollBar(Qt::Vertical, this);
@@ -1007,8 +1007,13 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                double offx = pos.x()-item->geometry().x();
                double offy = pos.y()-item->geometry().y();
 
+               if (clickOverride(item, static_cast<QGraphicsSceneMouseEvent*>(event))) {
 
-               if (item->geometry().height()-offy < (gl_near*dpiXFactor)) {
+                    // thanks we'll take that
+                    event->accept();
+                    returning = true;
+
+               } else if (item->geometry().height()-offy < (gl_near*dpiXFactor)) {
 
                     // We can span resize a specific chartspaceitem
                     // by pressing SHIFT when we click

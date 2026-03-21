@@ -97,8 +97,15 @@ class GlobalContext : public QObject
         void readConfig(qint32);
         void userMetricsConfigChanged();
 
+        void notifyStart() { emit start(); }
+        void notifyStop() { emit stop(); }
+
     signals:
         void configChanged(qint32); // for global widgets that aren't athlete specific
+
+        // realtime signals global widgets that aren't athlete specific
+        void start();
+        void stop();
 
     private:
         // singleton pattern
@@ -222,10 +229,10 @@ class Context : public QObject
         void notifySetNow(long x) { now = x; setNow(x); }
         long getNow() { return now; }
         void notifyNewLap() { emit newLap(); }
-        void notifyStart() { emit start(); }
+        void notifyStart() { GlobalContext::context()->notifyStart(); emit start(); }
         void notifyUnPause() { emit unpause(); }
         void notifyPause() { emit pause(); }
-        void notifyStop() { emit stop(); }
+        void notifyStop() { GlobalContext::context()->notifyStop(); emit stop(); }
         void notifySeek(long x) { emit seek(x); }
         void notifyIntensityChanged(int intensity) { emit intensityChanged(intensity); };
 
