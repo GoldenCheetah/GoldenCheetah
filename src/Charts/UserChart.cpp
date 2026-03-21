@@ -1089,6 +1089,7 @@ UserChartSettings::duplicateSeries()
             }
         }
     } while (duplicate);
+    seriesInfo.user1 = seriesInfo.user2 = seriesInfo.user3 = seriesInfo.user4 = nullptr;
     seriesinfo.append(seriesInfo);
     refreshSeriesTab();
     emit chartConfigChanged();
