@@ -90,6 +90,8 @@ class GeneralPage : public QWidget
         void browseAthleteDir();
 #ifdef GC_WANT_PYTHON
         void browsePythonDir();
+        void addPythonPathClicked();
+        void removePythonPathClicked();
 #endif
 #ifdef GC_WANT_R
         void browseRDir();
@@ -114,6 +116,8 @@ class GeneralPage : public QWidget
 #ifdef GC_WANT_PYTHON
         QCheckBox *embedPython;
         QWidget *pythonDirectorySel;
+        QListWidget *pythonPathList;
+        ActionButtonBox *pythonActions;
 #endif
         QCheckBox *opendata;
         QSpinBox *garminHWMarkedit;
@@ -702,6 +706,5 @@ class MeasuresConfigPage : public QWidget
         void addMeasuresFieldClicked();
         void removeMeasuresFieldClicked();
 };
-
 
 #endif

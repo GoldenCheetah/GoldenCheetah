@@ -132,7 +132,6 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     spacer->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     head->addWidget(spacer);
 
-
     pagesWidget = new QStackedWidget(this);
 
     // create those config pages
@@ -250,7 +249,6 @@ void ConfigDialog::saveClicked()
     changed |= train->saveClicked();
     changed |= interval->saveClicked();
     changed |= measures->saveClicked();
-
     hide();
 
     // did the home directory change?
