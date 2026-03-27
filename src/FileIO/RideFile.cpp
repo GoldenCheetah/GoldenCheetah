@@ -888,7 +888,10 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
     if (compression == "gz") {
 
         // read and uncompress
-        file.open(QFile::ReadOnly);
+        if (!file.open(QFile::ReadOnly)) {
+            errors << "Failed to open compressed file for reading.";
+            return NULL;
+        }
         data = gUncompress(file.readAll());
         file.close();
 
@@ -906,8 +909,15 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
         QString tmp = context->athlete->home->temp().absolutePath() + "/" + QFileInfo(file.fileName()).baseName() + "." + suffix;
 
         QFile ufile(tmp); // look at uncompressed version mot the source
-        ufile.open(QFile::ReadWrite);
-        ufile.write(data);
+        if (!ufile.open(QFile::ReadWrite)) {
+            errors << "Failed to open temp file for writing.";
+            return NULL;
+        }
+        if (ufile.write(data) == -1) {
+            errors << "Failed to write to temp file.";
+            ufile.close();
+            return NULL;
+        }
         ufile.close();
 
         // open and read the  uncompressed file

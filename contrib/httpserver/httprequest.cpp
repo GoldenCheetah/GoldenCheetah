@@ -142,8 +142,10 @@ void HttpRequest::readBody(QTcpSocket* socket) {
         #ifdef SUPERVERBOSE
             wDebug("HttpRequest: receiving multipart body");
         #endif
-        if (!tempFile.isOpen()) {
-            tempFile.open();
+        if (!tempFile.isOpen() && !tempFile.open()) {
+            qCritical("HttpRequest: failed to open temp file for multipart body");
+            status=abort;
+            return;
         }
         // Transfer data in 64kb blocks
         int fileSize=tempFile.size();
@@ -405,7 +407,12 @@ void HttpRequest::parseMultiPartFile() {
                     // this is a file
                     if (!uploadedFile) {
                         uploadedFile=new QTemporaryFile();
-                        uploadedFile->open();
+                        if (!uploadedFile->open()) {
+                            qCritical("HttpRequest: failed to open temp file for uploaded file");
+                            delete uploadedFile;
+                            uploadedFile = nullptr;
+                            continue;
+                        }
                     }
                     uploadedFile->write(line);
                     if (uploadedFile->error()) {
