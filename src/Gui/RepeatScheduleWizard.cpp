@@ -20,6 +20,7 @@
 
 #include <QtGui>
 #include <QScrollArea>
+#include <QButtonGroup>
 
 #include "Context.h"
 #include "Athlete.h"
