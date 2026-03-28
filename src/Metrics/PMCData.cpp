@@ -291,7 +291,7 @@ void PMCData::refresh()
                         todayActualStress += value;
                     }
                 } else if (start_.addDays(offset).daysTo(QDate::currentDate()) < 0) {
-                    if (item->planned) {
+                    if (item->planned && ! item->hasLinkedActivity()) {
                         expected_stress_[offset] += value;
                     }
                 } else {
