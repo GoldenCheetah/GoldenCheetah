@@ -28,6 +28,9 @@
 #include "Colors.h"
 #include "SaveDialogs.h"
 
+#define HLO "<span style='font-weight:600;'>"
+#define HLC "</span>"
+
 #define ICON_COLOR QColor("#F79130")
 #ifdef Q_OS_MAC
 #define ICON_SIZE 250
@@ -42,16 +45,284 @@
 static QString rideItemName(RideItem const * const rideItem);
 static QString rideItemSport(RideItem const * const rideItem);
 
+static constexpr int IndexRole = Qt::UserRole + 100;
+
+
+////////////////////////////////////////////////////////////////////////////////
+// TargetRangeBar
+
+TargetRangeBar::TargetRangeBar
+(QString errorMsg, QWidget *parent)
+: QFrame(parent), currentState(State::Neutral), errorMsg(errorMsg)
+{
+    setObjectName("TargetRangeBar");
+
+    setFrameShape(QFrame::StyledPanel);
+    setFrameShadow(QFrame::Plain);
+    setLineWidth(1 * dpiXFactor);
+
+    QHBoxLayout *layout = new QHBoxLayout(this);
+    layout->setContentsMargins(8 * dpiXFactor, 4 * dpiYFactor, 8 * dpiXFactor, 4 * dpiYFactor);
+    layout->setSpacing(6 * dpiXFactor);
+
+    iconLabel = new QLabel(this);
+    iconLabel->setFixedWidth(16 * dpiXFactor);
+    iconLabel->setAlignment(Qt::AlignCenter);
+
+    textLabel = new QLabel();
+    textLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    textLabel->setWordWrap(false);
+    textLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+
+    layout->addWidget(iconLabel);
+    layout->addWidget(textLabel);
+
+    applyStateStyle(State::Neutral);
+}
+
+
+void
+TargetRangeBar::setResult
+(const QDate &start, const QDate &end, int activityCount, int deletedCount)
+{
+    QString text;
+    if (activityCount == 0) {
+        currentState = State::Error;
+        text = errorMsg;
+    } else {
+        QLocale locale;
+        QString localFormat = locale.dateFormat(QLocale::ShortFormat);
+        QString customFormat = "ddd, " + localFormat;
+
+        currentState = State::Neutral;
+        QString duration = formatDuration(start, end);
+        text = QString("%1 - %2 (%3) • ")
+                      .arg(locale.toString(start, customFormat))
+                      .arg(locale.toString(end, customFormat))
+                      .arg(duration);
+        text += tr("%1 to copy")
+                  .arg(activityCount);
+
+        if (deletedCount > 0) {
+            text += " • " + tr("%1 to remove").arg(deletedCount);
+            currentState = State::Warning;
+        }
+    }
+    if (text != textLabel->text()) {
+        textLabel->setText(text);
+        applyStateStyle(currentState);
+        if (flashEnabled) {
+            flash();
+        }
+    }
+}
+
+
+void
+TargetRangeBar::setFlashEnabled
+(bool enabled)
+{
+    flashEnabled = enabled;
+}
+
+
+QString
+TargetRangeBar::formatDuration
+(const QDate &start, const QDate &end) const
+{
+    if (! start.isValid() || ! end.isValid()) {
+        return "";
+    }
+    int days = start.daysTo(end) + 1;
+    ShowDaysAsUnit unit = showDaysAs(days);
+    if (unit == ShowDaysAsUnit::Months) {
+        return tr("%1 mo").arg(daysToMonths(days));
+    } else if (unit == ShowDaysAsUnit::Weeks) {
+        return tr("%1 w").arg(daysToWeeks(days));
+    } else {
+        return tr("%1 d").arg(days);
+    }
+}
+
+
+void
+TargetRangeBar::applyStateStyle
+(State state)
+{
+    QIcon icon;
+    QColor accentColor;
+    switch (state) {
+    case State::Neutral:
+        icon = style()->standardIcon(QStyle::SP_MessageBoxInformation);
+        accentColor = Qt::gray;
+        break;
+    case State::Warning:
+        icon = style()->standardIcon(QStyle::SP_MessageBoxWarning);
+        accentColor = QColor(255, 193, 7);
+        break;
+    case State::Error:
+        icon = style()->standardIcon(QStyle::SP_MessageBoxCritical);
+        accentColor = Qt::red;
+        break;
+    }
+    QColor bg = QApplication::palette().window().color();
+    accentColor.setAlpha(20);
+    baseColor = GCColor::blendedColor(accentColor, bg);
+    accentColor.setAlpha(200);
+    borderColor = GCColor::blendedColor(accentColor, bg);
+    iconLabel->setPixmap(icon.pixmap(14 * dpiXFactor, 14 * dpiYFactor));
+    setStyleSheet(QString("#TargetRangeBar { background-color: %1; border: 1px solid %2; }")
+                         .arg(baseColor.name())
+                         .arg(borderColor.name()));
+}
+
+
+QColor
+TargetRangeBar::highlightColor
+() const
+{
+    return hlColor;
+}
+
+
+void
+TargetRangeBar::setHighlightColor
+(const QColor &color)
+{
+    hlColor = color;
+    QColor blended;
+    blended.setRed((baseColor.red() + color.red()) / 2);
+    blended.setGreen((baseColor.green() + color.green()) / 2);
+    blended.setBlue((baseColor.blue() + color.blue()) / 2);
+    setStyleSheet(QString("#TargetRangeBar { background-color: %1; border: 1px solid %2; }")
+                         .arg(blended.name())
+                         .arg(borderColor.name()));
+}
+
+
+void
+TargetRangeBar::flash
+()
+{
+    QPropertyAnimation *anim = new QPropertyAnimation(this, "highlightColor");
+    anim->setDuration(350);
+    anim->setStartValue(GColor(CCALPLANNED));
+    anim->setEndValue(baseColor);
+    anim->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// IndicatorDelegate
+
+IndicatorDelegate::IndicatorDelegate
+(QObject *parent)
+: QStyledItemDelegate(parent)
+{
+}
+
+
+void
+IndicatorDelegate::paint
+(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    if (index.column() != 0) {
+        QStyledItemDelegate::paint(painter, option, index);
+        return;
+    }
+
+    const bool isRadio = index.data(IndicatorTypeRole).toInt() == RadioIndicator;
+    const bool isCheck = index.data(IndicatorTypeRole).toInt() == CheckIndicator;
+    if (! isRadio && ! isCheck) {
+        QStyledItemDelegate::paint(painter, option, index);
+        return;
+    }
+
+    QStyleOptionViewItem opt = option;
+    initStyleOption(&opt, index);
+    QStyle *style = opt.widget ? opt.widget->style() : QApplication::style();
+    style->drawPrimitive(QStyle::PE_PanelItemViewItem, &opt, painter, opt.widget);
+
+    const int size = style->pixelMetric(QStyle::PM_IndicatorWidth, nullptr, opt.widget);
+    const int spacing = 4 * dpiXFactor;
+    QRect indicatorRect(opt.rect.left() + spacing, opt.rect.top() + (opt.rect.height() - size) / 2, size, size);
+
+    QStyleOptionButton buttonOpt;
+    buttonOpt.rect = indicatorRect;
+    buttonOpt.state = QStyle::State_Enabled;
+    buttonOpt.state |= index.data(IndicatorStateRole).toBool() ? QStyle::State_On : QStyle::State_Off;
+    if (opt.state & QStyle::State_MouseOver) {
+        buttonOpt.state |= QStyle::State_MouseOver;
+    }
+
+    style->drawPrimitive(isRadio ? QStyle::PE_IndicatorRadioButton : QStyle::PE_IndicatorCheckBox, &buttonOpt, painter, opt.widget);
+
+    QRect textRect = opt.rect;
+    textRect.setLeft(indicatorRect.right() + spacing);
+    painter->save();
+    painter->setClipRect(textRect);
+    QColor textColor = (opt.state & QStyle::State_Selected) ? opt.palette.highlightedText().color() : opt.palette.text().color();
+    painter->setPen(textColor);
+    painter->drawText(textRect, opt.displayAlignment, index.data(Qt::DisplayRole).toString());
+    painter->restore();
+}
+
+
+bool
+IndicatorDelegate::editorEvent
+(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
+{
+    const bool isRadio = index.data(IndicatorTypeRole).toInt() == RadioIndicator;
+    const bool isCheck = index.data(IndicatorTypeRole).toInt() == CheckIndicator;
+    if (! isRadio && ! isCheck) {
+        return QStyledItemDelegate::editorEvent(event, model, option, index);
+    } else if (event->type() != QEvent::MouseButtonRelease) {
+        return false;
+    } else if (isRadio) {
+        model->setData(index, true, IndicatorStateRole);
+        QModelIndex parent = index.parent();
+        for (int row = 0; row < model->rowCount(parent); ++row) {
+            QModelIndex sibling = model->index(row, index.column(), parent);
+            if (sibling != index && sibling.data(IndicatorTypeRole).toInt() == RadioIndicator) {
+                model->setData(sibling, false, IndicatorStateRole);
+            }
+        }
+        return true;
+    } else if (isCheck) {
+        model->setData(index, ! index.data(IndicatorStateRole).toBool(), IndicatorStateRole);
+        return true;
+    }
+    return false;
+}
+
+
+QSize
+IndicatorDelegate::sizeHint
+(const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    const bool isRadio = index.data(IndicatorTypeRole).toInt() == RadioIndicator;
+    const bool isCheck = index.data(IndicatorTypeRole).toInt() == CheckIndicator;
+    if ((! isRadio && ! isCheck) || index.column() != 0) {
+        return QStyledItemDelegate::sizeHint(option, index);
+    }
+    QStyle *style = option.widget ? option.widget->style() : QApplication::style();
+    const int indicatorWidth = style->pixelMetric(QStyle::PM_IndicatorWidth, nullptr, option.widget);
+    const int spacing = 4 * dpiXFactor;
+    QFontMetrics fm(option.font);
+    int textWidth = fm.horizontalAdvance(index.data(Qt::DisplayRole).toString());
+    return QSize(indicatorWidth + spacing + textWidth + spacing, QStyledItemDelegate::sizeHint(option, index).height());
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // RepeatScheduleWizard
 
 RepeatScheduleWizard::RepeatScheduleWizard
 (Context *context, const QDate &when, QWidget *parent)
-: QWizard(parent), context(context), when(when)
+: QWizard(parent), context(context), targetRangeStart(when), targetRangeEnd(when)
 {
     setWindowTitle(tr("Repeat Schedule"));
-    setMinimumSize(800 * dpiXFactor, 650 * dpiYFactor);
+    setMinimumSize(800 * dpiXFactor, 750 * dpiYFactor);
     setModal(true);
 
 #ifdef Q_OS_MAC
@@ -63,8 +334,175 @@ RepeatScheduleWizard::RepeatScheduleWizard
 
     setPage(PageSetup, new RepeatSchedulePageSetup(context, when));
     setPage(PageActivities, new RepeatSchedulePageActivities(context));
-    setPage(PageSummary, new RepeatSchedulePageSummary(context, when));
+    setPage(PageSummary, new RepeatSchedulePageSummary(context));
     setStartId(PageSetup);
+}
+
+
+QDate
+RepeatScheduleWizard::getTargetRangeStart
+() const
+{
+    return targetRangeStart;
+}
+
+
+QDate
+RepeatScheduleWizard::getTargetRangeEnd
+() const
+{
+    return targetRangeEnd;
+}
+
+
+const QList<RideItem*>&
+RepeatScheduleWizard::getDeletionList
+() const
+{
+    return deletionList;
+}
+
+
+void
+RepeatScheduleWizard::updateTargetRange
+()
+{
+    updateTargetRange(sourceRangeStart, sourceRangeEnd, keepGap, preferOriginal);
+}
+
+
+void
+RepeatScheduleWizard::updateTargetRange
+(QDate sourceStart, QDate sourceEnd, bool keepGap, bool preferOriginal)
+{
+    if (   sourceRangeStart != sourceStart
+        || sourceRangeEnd != sourceEnd
+        || keepGap != this->keepGap
+        || preferOriginal != this->preferOriginal) {
+
+        sourceRangeStart = sourceStart;
+        sourceRangeEnd = sourceEnd;
+        this->keepGap = keepGap;
+        this->preferOriginal = preferOriginal;
+
+        sourceRides.clear();
+        for (RideItem *rideItem : context->athlete->rideCache->rides()) {
+            if (   rideItem == nullptr
+                || ! rideItem->planned) {
+                continue;
+            }
+            QDate rideDate = getDate(rideItem, preferOriginal);
+            if (   rideDate < sourceStart
+                || rideDate > sourceEnd) {
+                continue;
+            }
+            sourceRides << SourceRide { rideItem, rideDate, QDate(), true, -1, false };
+        }
+        std::sort(sourceRides.begin(), sourceRides.end(),
+            [](const SourceRide &a, const SourceRide &b) { return a.sourceDate < b.sourceDate; });
+
+        // Assume all planned activities from the range will be copied
+        int prelimFrontGap = 0;
+        if (! keepGap && ! sourceRides.isEmpty()) {
+            prelimFrontGap = sourceStart.daysTo(sourceRides.first().sourceDate);
+        }
+        for (SourceRide &sourceRide : sourceRides) {
+            sourceRide.targetDate = targetRangeStart.addDays(
+                sourceRangeStart.daysTo(sourceRide.sourceDate) - prelimFrontGap);
+        }
+
+        // QDateTime of any planned RideItem must be unique
+        QHash<QDateTime, int> targetKeyCount;
+        for (const SourceRide &sourceRide : sourceRides) {
+            QDateTime key(sourceRide.targetDate, sourceRide.rideItem->dateTime.time());
+            targetKeyCount[key]++;
+        }
+        QHash<QDateTime, int> keyToGroup;
+        int nextGroup = 0;
+        for (SourceRide &sourceRide : sourceRides) {
+            QDateTime key(sourceRide.targetDate, sourceRide.rideItem->dateTime.time());
+            if (targetKeyCount[key] > 1) {
+                if (! keyToGroup.contains(key)) {
+                    keyToGroup[key] = nextGroup++;
+                }
+                sourceRide.conflictGroup = keyToGroup[key];
+            } else {
+                sourceRide.conflictGroup = -1;
+            }
+        }
+
+        QHash<int, bool> groupHasSelection;
+        for (SourceRide &sourceRide : sourceRides) {
+            if (sourceRide.conflictGroup < 0) {
+                continue;
+            }
+            if (! groupHasSelection.value(sourceRide.conflictGroup, false)) {
+                sourceRide.selected = true;
+                groupHasSelection[sourceRide.conflictGroup] = true;
+            } else {
+                sourceRide.selected = false;
+            }
+        }
+    }
+
+    // Calculate frontGap and rangeLength
+    frontGap = 0;
+    int rangeLength = 0;
+    if (! sourceRides.isEmpty()) {
+        QDate firstSelectedDate;
+        QDate lastSelectedDate;
+        for (const SourceRide &sourceRide : sourceRides) {
+            if (! sourceRide.selected) {
+                continue;
+            }
+            if (firstSelectedDate.isNull()) {
+                firstSelectedDate = sourceRide.sourceDate;
+                if (! keepGap) {
+                    frontGap = sourceStart.daysTo(firstSelectedDate);
+                }
+            }
+            lastSelectedDate = sourceRide.sourceDate;
+        }
+
+        for (SourceRide &sourceRide : sourceRides) {
+            sourceRide.targetDate = targetRangeStart.addDays(
+                sourceRangeStart.daysTo(sourceRide.sourceDate) - frontGap);
+        }
+
+        if (firstSelectedDate.isValid()) {
+            rangeLength = sourceStart.daysTo(sourceEnd);
+            if (! keepGap) {
+                rangeLength -= (frontGap + lastSelectedDate.daysTo(sourceEnd));
+            }
+        }
+    }
+    targetRangeEnd = targetRangeStart.addDays(rangeLength);
+
+    // Find conflicting planned and linked activities (they wont be autodeleted)
+    deletionList.clear();
+    QSet<QDateTime> blockedKeys;
+    for (RideItem *rideItem : context->athlete->rideCache->rides()) {
+        if (   rideItem == nullptr
+            || ! rideItem->planned) {
+            continue;
+        }
+        QDate rideDate = rideItem->dateTime.date();
+        if (   rideDate < targetRangeStart
+            || rideDate > targetRangeEnd) {
+            continue;
+        }
+        if (rideItem->hasLinkedActivity()) {
+            blockedKeys.insert(QDateTime(rideDate, rideItem->dateTime.time()));
+        } else {
+            deletionList << rideItem;
+        }
+    }
+    for (SourceRide &sourceRide : sourceRides) {
+        QDateTime key(sourceRide.targetDate, sourceRide.rideItem->dateTime.time());
+        sourceRide.targetBlocked = blockedKeys.contains(key);
+    }
+
+    emit targetRangeChanged();
 }
 
 
@@ -72,52 +510,49 @@ void
 RepeatScheduleWizard::done
 (int result)
 {
-    int finalResult = result;
     if (result == QDialog::Accepted) {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        RepeatSchedulePageSummary *summaryPage = qobject_cast<RepeatSchedulePageSummary*>(page(PageSummary));
-        QList<RideItem*> deletionList = summaryPage->getDeletionList();
-        QList<std::pair<RideItem*, QDate>> scheduleList = summaryPage->getScheduleList();
-
+        const QList<RideItem*> &deletionList = getDeletionList();
+        QList<std::pair<RideItem*, QDate>> scheduleList;
+        for (const SourceRide &sourceRide : sourceRides) {
+            if (! sourceRide.selected || sourceRide.targetBlocked) {
+                continue;
+            }
+            scheduleList << std::pair<RideItem*, QDate> { sourceRide.rideItem, sourceRide.targetDate };
+        }
         context->tab->setNoSwitch(true);
-        RideCache::OperationPreCheck unlinkCheck = context->athlete->rideCache->checkUnlinkActivities(deletionList);
+        for (RideItem *rideItem : deletionList) {
+            context->athlete->rideCache->removeRide(rideItem->fileName);
+        }
+        RideCache::OperationPreCheck check = context->athlete->rideCache->checkCopyPlannedActivities(scheduleList);
+        if (check.canProceed) {
+            RideCache::OperationResult result = context->athlete->rideCache->copyPlannedActivities(scheduleList);
+            if (! result.success) {
+                QMessageBox::warning(this, "Failed", result.error);
+            }
+        }
         context->tab->setNoSwitch(false);
-        bool nextStep = true;
-        if (nextStep && unlinkCheck.canProceed) {
-             if (proceedDialog(context, unlinkCheck)) {
-                context->tab->setNoSwitch(true);
-                RideCache::OperationResult result = context->athlete->rideCache->unlinkActivities(deletionList);
-                context->tab->setNoSwitch(false);
-                if (result.success) {
-                    QString error;
-                    context->athlete->rideCache->saveActivities(unlinkCheck.affectedItems, error);
-                } else {
-                    QMessageBox::warning(this, "Failed", result.error);
-                    nextStep = false;
-                }
-            } else {
-                nextStep = false;
-            }
-        }
-        if (nextStep) {
-            context->tab->setNoSwitch(true);
-            for (RideItem *rideItem : deletionList) {
-                context->athlete->rideCache->removeRide(rideItem->fileName);
-            }
-            context->tab->setNoSwitch(false);
-            RideCache::OperationPreCheck check = context->athlete->rideCache->checkCopyPlannedActivities(scheduleList);
-            if (check.canProceed) {
-                RideCache::OperationResult result = context->athlete->rideCache->copyPlannedActivities(scheduleList);
-                if (! result.success) {
-                    QMessageBox::warning(this, "Failed", result.error);
-                }
-            }
-            context->tab->setNoSwitch(false);
-        }
         QApplication::restoreOverrideCursor();
     }
+    QWizard::done(result);
+}
 
-    QWizard::done(finalResult);
+
+QDate
+RepeatScheduleWizard::getDate
+(RideItem const * const rideItem, bool preferOriginal) const
+{
+    QDate date = rideItem->dateTime.date();
+    if (preferOriginal) {
+        QString originalDateString = rideItem->getText("Original Date", "");
+        if (! originalDateString.isEmpty()) {
+            QDate originalDate = QDate::fromString(originalDateString, "yyyy/MM/dd");
+            if (originalDate.isValid()) {
+                date = originalDate;
+            }
+        }
+    }
+    return date;
 }
 
 
@@ -128,8 +563,13 @@ RepeatSchedulePageSetup::RepeatSchedulePageSetup
 (Context *context, const QDate &when, QWidget *parent)
 : QWizardPage(parent), context(context)
 {
+    QLocale locale;
+    QString localFormat = locale.dateFormat(QLocale::ShortFormat);
+    QString customFormat = "ddd, " + localFormat;
+
     setTitle(tr("Repeat Schedule Setup"));
-    setSubTitle(tr("Specify the time range and strategy for repeating the schedule. All planned activities within this range will be copied. You can optionally select a season or phase to prefill the start and end dates."));
+    setSubTitle(tr("Define the time range and repetition strategy for copying activities. Optionally select a season or phase to prefill the dates; only those ending before the target date <b>%1</b> can be selected.")
+                  .arg(locale.toString(when, customFormat)));
 
     QTreeWidget *seasonTree = new QTreeWidget();
     seasonTree->setColumnCount(1);
@@ -142,7 +582,8 @@ RepeatSchedulePageSetup::RepeatSchedulePageSetup
         seasonItem->setData(0, Qt::DisplayRole, season.getName());
         seasonItem->setData(0, Qt::UserRole, season.getStart());
         seasonItem->setData(0, Qt::UserRole + 1, season.getEnd());
-        if (context->currentSeason() != nullptr && context->currentSeason()->id() == season.id()) {
+        seasonItem->setDisabled(DateRange(season.getStart(), season.getEnd()).pass(when) || season.getStart() > when);
+        if (! seasonItem->isDisabled() && context->currentSeason() != nullptr && context->currentSeason()->id() == season.id()) {
             currentSeason = seasonItem;
         }
         for (const Phase &phase : season.phases) {
@@ -150,49 +591,59 @@ RepeatSchedulePageSetup::RepeatSchedulePageSetup
             phaseItem->setData(0, Qt::DisplayRole, phase.getName());
             phaseItem->setData(0, Qt::UserRole, phase.getStart());
             phaseItem->setData(0, Qt::UserRole + 1, phase.getEnd());
+            phaseItem->setDisabled(DateRange(phase.getStart(), phase.getEnd()).pass(when) || phase.getStart() > when);
             seasonItem->addChild(phaseItem);
-            if (context->currentSeason() != nullptr && context->currentSeason()->id() == phase.id()) {
+            if (! phaseItem->isDisabled() && context->currentSeason() != nullptr && context->currentSeason()->id() == phase.id()) {
                 currentSeason = phaseItem;
             }
         }
         seasonTree->addTopLevelItem(seasonItem);
     }
 
-    QSpinBox *restDayBox = new QSpinBox();
-    restDayBox->setSuffix(" " + tr("active days"));
-    restDayBox->setValue(3);
-    restDayBox->setRange(1, 99);
+    startDate = new QDateEdit();
+    startDate->setMaximumDate(when.addDays(-2));
+    startDate->setCalendarPopup(true);
+    startDate->setDisplayFormat(customFormat);
 
-    QComboBox *conflictBox = new QComboBox();
-    conflictBox->addItem("Delete all pre-existing activities");
-    conflictBox->addItem("Skip days with pre-existing activities");
-    conflictBox->addItem("Fail for all");
-
-    QDateEdit *startDate = new QDateEdit();
-    startDate->setMaximumDate(when.addDays(-1));
-
-    QDateEdit *endDate = new QDateEdit();
+    endDate = new QDateEdit(when.addDays(-1));
     endDate->setMaximumDate(when.addDays(-1));
+    endDate->setCalendarPopup(true);
+    endDate->setDisplayFormat(customFormat);
 
-    QCheckBox *sameDayCheck = new QCheckBox(tr("Copy same-day activities to consecutive days"));
+    QHBoxLayout *dateRangeLayout = new QHBoxLayout();
+    dateRangeLayout->addWidget(startDate);
+    dateRangeLayout->addWidget(new QLabel(" - "));
+    dateRangeLayout->addWidget(endDate);
+    dateRangeLayout->addStretch();
 
-    registerField("startDate", startDate);
-    registerField("endDate", endDate);
-    registerField("restDayHandling", restDayBox);
-    registerField("sameDay", sameDayCheck);
-    registerField("conflictHandling", conflictBox);
+    originalRadio = new QRadioButton(tr("As originally planned"));
+    currentRadio = new QRadioButton(tr("As currently scheduled"));
+    QButtonGroup *sourceDateGroup = new QButtonGroup(this);
+    sourceDateGroup->setExclusive(true);
+    sourceDateGroup->addButton(originalRadio);
+    sourceDateGroup->addButton(currentRadio);
+    originalRadio->setChecked(true);
 
-    QFormLayout *form = newQFormLayout();
-    form->addRow(seasonTree);
-    form->addRow(tr("Start Date"), startDate);
-    form->addRow(tr("End Date"), endDate);
-    form->addRow(tr("Insert rest day after"), restDayBox);
-    form->addRow("", sameDayCheck);
-    form->addRow(tr("Conflict Handling"), conflictBox);
+    keepGapCheck = new QCheckBox(tr("Keep leading and trailing gaps"));
+    keepGapCheck->setChecked(true);
+
+    targetRangeBar = new TargetRangeBar(tr("No planned activities in source period"));
+    targetRangeBar->setMinimumWidth(650 * dpiXFactor);
+
+    QVBoxLayout *form = new QVBoxLayout();
+    form->addWidget(new QLabel(HLO + tr("Source Period") + HLC));
+    form->addWidget(seasonTree);
+    form->addLayout(dateRangeLayout);
+    form->addSpacing(10 * dpiYFactor);
+    form->addWidget(new QLabel(HLO + tr("Repetition Strategy") + HLC));
+    form->addWidget(originalRadio);
+    form->addWidget(currentRadio);
+    form->addWidget(keepGapCheck);
+    form->addSpacing(10 * dpiYFactor);
+    form->addWidget(targetRangeBar);
 
     QWidget *scrollWidget = new QWidget();
-    QVBoxLayout *scrollLayout = new QVBoxLayout(scrollWidget);
-    scrollLayout->addWidget(centerLayoutInWidget(form, false));
+    scrollWidget->setLayout(form);
     QScrollArea *scrollArea = new QScrollArea();
     scrollArea->setFrameShape(QFrame::NoFrame);
     scrollArea->setWidget(scrollWidget);
@@ -202,7 +653,7 @@ RepeatSchedulePageSetup::RepeatSchedulePageSetup
     all->addWidget(scrollArea);
     setLayout(all);
 
-    connect(seasonTree, &QTreeWidget::currentItemChanged, this, [startDate, endDate, when](QTreeWidgetItem *current) {
+    connect(seasonTree, &QTreeWidget::currentItemChanged, this, [this, when](QTreeWidgetItem *current) {
         if (current != nullptr) {
             QDate seasonStart(current->data(0, Qt::UserRole).toDate());
             QDate seasonEnd(current->data(0, Qt::UserRole + 1).toDate());
@@ -212,16 +663,26 @@ RepeatSchedulePageSetup::RepeatSchedulePageSetup
             if (seasonStart > when) {
                 seasonEnd = when;
             }
+
+            QSignalBlocker b1(startDate);
+            QSignalBlocker b2(endDate);
             startDate->setDate(seasonStart);
             endDate->setDate(seasonEnd);
+            refresh();
         }
     });
-    connect(startDate, &QDateEdit::dateChanged, this, [endDate](QDate date) {
+    connect(startDate, &QDateEdit::dateChanged, this, [this, seasonTree](QDate date) {
         endDate->setMinimumDate(date);
+        seasonTree->setCurrentItem(nullptr);
+        refresh();
     });
-    connect(endDate, &QDateEdit::dateChanged, this, [startDate](QDate date) {
+    connect(endDate, &QDateEdit::dateChanged, this, [this, seasonTree](QDate date) {
         startDate->setMaximumDate(date);
+        seasonTree->setCurrentItem(nullptr);
+        refresh();
     });
+    connect(keepGapCheck, &QCheckBox::toggled, this, &RepeatSchedulePageSetup::refresh);
+    connect(sourceDateGroup, &QButtonGroup::idClicked, this, &RepeatSchedulePageSetup::refresh);
 
     if (currentSeason != nullptr) {
         seasonTree->setCurrentItem(currentSeason);
@@ -240,6 +701,42 @@ RepeatSchedulePageSetup::nextId
 }
 
 
+void
+RepeatSchedulePageSetup::initializePage
+()
+{
+    targetRangeBar->setFlashEnabled(false);
+    refresh();
+    targetRangeBar->setFlashEnabled(true);
+}
+
+
+bool
+RepeatSchedulePageSetup::isComplete
+() const
+{
+    RepeatScheduleWizard *rsw = qobject_cast<RepeatScheduleWizard*>(wizard());
+    return rsw->sourceRides.count() > 0;
+}
+
+
+void
+RepeatSchedulePageSetup::refresh
+()
+{
+    RepeatScheduleWizard *rsw = qobject_cast<RepeatScheduleWizard*>(wizard());
+    if (rsw == nullptr) {
+        return;
+    }
+
+    rsw->updateTargetRange(startDate->date(), endDate->date(), keepGapCheck->isChecked(), originalRadio->isChecked());
+
+    targetRangeBar->setResult(rsw->getTargetRangeStart(), rsw->getTargetRangeEnd(), rsw->sourceRides.count(), rsw->getDeletionList().count());
+
+    emit completeChanged();
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // RepeatSchedulePageActivities
 
@@ -253,18 +750,25 @@ RepeatSchedulePageActivities::RepeatSchedulePageActivities
     setFinalPage(false);
 
     activityTree = new QTreeWidget();
-    activityTree->setColumnCount(4);
-    basicTreeWidgetStyle(activityTree, false);
     activityTree->setHeaderHidden(true);
+    activityTree->setColumnCount(3);
+    activityTree->setRootIsDecorated(false);
+    activityTree->setSelectionMode(QAbstractItemView::SingleSelection);
+    activityTree->setItemDelegate(new IndicatorDelegate());
+    activityTree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
+    targetRangeBar = new TargetRangeBar(tr("No selected activities"));
+    targetRangeBar->setMinimumWidth(650 * dpiXFactor);
 
     QWidget *formWidget = new QWidget();
     QVBoxLayout *form = new QVBoxLayout(formWidget);
-    form->addWidget(new QLabel("<h4>" + tr("Activities for your new schedule") + "</h4"));
+    form->addWidget(new QLabel(HLO + tr("Activities for your new schedule") + HLC));
     form->addWidget(activityTree);
+    form->addSpacing(10 * dpiYFactor);
+    form->addWidget(targetRangeBar);
 
     QWidget *scrollWidget = new QWidget();
-    QVBoxLayout *scrollLayout = new QVBoxLayout(scrollWidget);
-    scrollLayout->addWidget(formWidget);
+    scrollWidget->setLayout(form);
     QScrollArea *scrollArea = new QScrollArea();
     scrollArea->setFrameShape(QFrame::NoFrame);
     scrollArea->setWidget(scrollWidget);
@@ -288,42 +792,91 @@ void
 RepeatSchedulePageActivities::initializePage
 ()
 {
-    activityTree->clear();
-    QDate startDate = field("startDate").toDate();
-    QDate endDate = field("endDate").toDate();
-    QLocale locale;
+    disconnect(dataChangedConnection);
     numSelected = 0;
-    for (RideItem *rideItem : context->athlete->rideCache->rides()) {
-        if (   rideItem == nullptr
-            || ! rideItem->planned
-            || rideItem->dateTime.date() < startDate
-            || rideItem->dateTime.date() > endDate) {
-            continue;
-        }
-        if (context->isfiltered && ! context->filters.contains(rideItem->fileName)) {
-            continue;
-        }
-        ++numSelected;
-        QTreeWidgetItem *item = new QTreeWidgetItem();
-        item->setData(1, Qt::DisplayRole, locale.toString(rideItem->dateTime.date(), QLocale::ShortFormat));
-        item->setData(1, Qt::UserRole, QVariant::fromValue(rideItem));
-        item->setData(1, Qt::UserRole + 1, true);
-        item->setData(2, Qt::DisplayRole, rideItemSport(rideItem));
-        item->setData(3, Qt::DisplayRole, rideItemName(rideItem));
-        activityTree->addTopLevelItem(item);
+    activityTree->clear();
 
-        QCheckBox *selectionBox = new QCheckBox();
-        selectionBox->setChecked(true);
-        QWidget *selectionWidget = new QWidget(activityTree);
-        QVBoxLayout *layout = new QVBoxLayout(selectionWidget);
-        layout->addWidget(selectionBox, 0, Qt::AlignCenter);
-        activityTree->setItemWidget(item, 0, selectionWidget);
-        connect(selectionBox, &QCheckBox::toggled, this, [this, item](bool checked) {
-            item->setData(1, Qt::UserRole + 1, checked);
+    RepeatScheduleWizard *rsw = qobject_cast<RepeatScheduleWizard*>(wizard());
+    if (rsw == nullptr) {
+        return;
+    }
+    targetRangeBar->setFlashEnabled(false);
+    rsw->updateTargetRange();
+
+    QLocale locale;
+    int i = 0;
+    while (i < rsw->sourceRides.count()) {
+        const SourceRide &sourceRide = rsw->sourceRides[i];
+
+        if (sourceRide.conflictGroup < 0) {
+            QTreeWidgetItem *item = new QTreeWidgetItem();
+            item->setData(0, Qt::DisplayRole, locale.toString(sourceRide.sourceDate, QLocale::ShortFormat));
+            item->setData(0, IndicatorDelegate::IndicatorTypeRole, IndicatorDelegate::CheckIndicator);
+            item->setData(0, IndicatorDelegate::IndicatorStateRole, sourceRide.selected);
+            item->setData(0, IndexRole, i);
+            item->setData(1, Qt::DisplayRole, rideItemSport(sourceRide.rideItem));
+            item->setData(2, Qt::DisplayRole, rideItemName(sourceRide.rideItem));
+            activityTree->addTopLevelItem(item);
+
+            if (sourceRide.selected) {
+                ++numSelected;
+            }
+            ++i;
+        } else {
+            int group = sourceRide.conflictGroup;
+            QList<int> groupIndices;
+            while (i < rsw->sourceRides.count() && rsw->sourceRides[i].conflictGroup == group) {
+                groupIndices << i;
+                ++i;
+            }
+
+            bool linkedConflict = std::any_of(groupIndices.begin(), groupIndices.end(), [rsw](int idx) { return rsw->sourceRides[idx].targetBlocked; });
+
+            // Parent node — warning icon, shared target date, no checkbox
+            QTreeWidgetItem *groupItem = new QTreeWidgetItem(activityTree);
+            groupItem->setFirstColumnSpanned(true);
+            groupItem->setIcon(0, style()->standardIcon(QStyle::SP_MessageBoxWarning));
+            groupItem->setData(0, Qt::DisplayRole, tr("Choose one to schedule"));
+            if (linkedConflict) {
+                groupItem->setData(0, Qt::DisplayRole, tr("Blocked by linked activity"));
+            }
+            groupItem->setExpanded(true);
+
+            for (int idx : groupIndices) {
+                const SourceRide &groupRide = rsw->sourceRides[idx];
+                QTreeWidgetItem *child = new QTreeWidgetItem(groupItem);
+                child->setData(0, Qt::DisplayRole, locale.toString(groupRide.sourceDate, QLocale::ShortFormat));
+                child->setData(0, IndicatorDelegate::IndicatorTypeRole, IndicatorDelegate::RadioIndicator);
+                child->setData(0, IndicatorDelegate::IndicatorStateRole, groupRide.selected);
+                child->setData(0, IndexRole, idx);
+                child->setData(1, Qt::DisplayRole, rideItemSport(groupRide.rideItem));
+                child->setData(2, Qt::DisplayRole, rideItemName(groupRide.rideItem));
+            }
+            ++numSelected;
+        }
+    }
+
+    dataChangedConnection = connect(activityTree->model(), &QAbstractItemModel::dataChanged, this, [this, rsw](const QModelIndex &index) {
+        QModelIndex col0Index = index.siblingAtColumn(0);
+        int indicatorType = col0Index.data(IndicatorDelegate::IndicatorTypeRole).toInt();
+        if (indicatorType == IndicatorDelegate::NoIndicator) {
+            return;
+        }
+        int i = col0Index.data(IndexRole).toInt();
+        if (i < 0) {
+            return;
+        }
+        bool checked = col0Index.data(IndicatorDelegate::IndicatorStateRole).toBool();
+        rsw->sourceRides[i].selected = checked;
+        if (indicatorType == IndicatorDelegate::CheckIndicator) {
             numSelected += checked ? 1 : -1;
             emit completeChanged();
-        });
-    }
+        }
+        rsw->updateTargetRange();
+        targetRangeBar->setResult(rsw->getTargetRangeStart(), rsw->getTargetRangeEnd(), numSelected, rsw->getDeletionList().count());
+    });
+    targetRangeBar->setResult(rsw->getTargetRangeStart(), rsw->getTargetRangeEnd(), numSelected, rsw->getDeletionList().count());
+    targetRangeBar->setFlashEnabled(true);
 }
 
 
@@ -335,63 +888,46 @@ RepeatSchedulePageActivities::isComplete
 }
 
 
-QList<RideItem*>
-RepeatSchedulePageActivities::getSelectedRideItems
-() const
-{
-    QList<RideItem*> ret;
-    for (int i = 0; i < activityTree->topLevelItemCount(); ++i) {
-        QTreeWidgetItem *item = activityTree->topLevelItem(i);
-        if (item->data(1, Qt::UserRole + 1).toBool()) {
-            ret << item->data(1, Qt::UserRole).value<RideItem*>();
-        }
-    }
-    return ret;
-}
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // RepeatSchedulePageSummary
 
 RepeatSchedulePageSummary::RepeatSchedulePageSummary
-(Context *context, const QDate &when, QWidget *parent)
-: QWizardPage(parent), context(context), when(when)
+(Context *context, QWidget *parent)
+: QWizardPage(parent), context(context)
 {
     setTitle(tr("Repeat Schedule Summary"));
     setSubTitle(tr("Preview the schedule updates, including planned additions and deletions. No changes will be made until you continue."));
 
     setFinalPage(true);
 
-    failedLabel = new QLabel("<center><h4>"
-                             + tr("Unable to create a new schedule due to conflicts")
-                             + "</h4>"
-                             + tr("Adjust conflict handling on the first page to proceed.")
-                             + "</center>");
-    failedLabel->setWordWrap(true);
-
-    scheduleLabel = new QLabel("<h4>" + tr("New Schedule Overview") + "</h4");
+    scheduleLabel = new QLabel(HLO + tr("New Schedule Overview") + HLC);
     scheduleTree = new QTreeWidget();
     scheduleTree->setColumnCount(5);
     basicTreeWidgetStyle(scheduleTree, false);
     scheduleTree->setHeaderHidden(true);
 
-    deletionLabel = new QLabel("<h4>" + tr("Planned Activities Marked for Deletion") + "</h4>");
+    deletionLabel = new QLabel(HLO + tr("Planned Activities Marked for Deletion") + HLC);
     deletionTree = new QTreeWidget();
     deletionTree->setColumnCount(3);
     basicTreeWidgetStyle(deletionTree, false);
     deletionTree->setHeaderHidden(true);
 
+    targetRangeBar = new TargetRangeBar(tr("No selected activities"));
+    targetRangeBar->setMinimumWidth(650 * dpiXFactor);
+    targetRangeBar->setFlashEnabled(false);
+
     QWidget *formWidget = new QWidget();
     QVBoxLayout *form = new QVBoxLayout(formWidget);
-    form->addWidget(failedLabel);
     form->addWidget(scheduleLabel);
     form->addWidget(scheduleTree);
+    form->addSpacing(10 * dpiYFactor);
     form->addWidget(deletionLabel);
     form->addWidget(deletionTree);
+    form->addSpacing(10 * dpiYFactor);
+    form->addWidget(targetRangeBar);
 
     QWidget *scrollWidget = new QWidget();
-    QVBoxLayout *scrollLayout = new QVBoxLayout(scrollWidget);
-    scrollLayout->addWidget(formWidget);
+    scrollWidget->setLayout(form);
     QScrollArea *scrollArea = new QScrollArea();
     scrollArea->setFrameShape(QFrame::NoFrame);
     scrollArea->setWidget(scrollWidget);
@@ -415,155 +951,59 @@ void
 RepeatSchedulePageSummary::initializePage
 ()
 {
-    failed = false;
-    scheduleList.clear();
-    deletionList.clear();
-
     scheduleTree->clear();
     deletionTree->clear();
 
-    failedLabel->setVisible(false);
     scheduleLabel->setVisible(false);
     scheduleTree->setVisible(false);
     deletionLabel->setVisible(false);
     deletionTree->setVisible(false);
 
-    int restDayAfter = field("restDayHandling").toInt();
-    bool sameDay = field("sameDay").toBool();
-    int conflictHandling = field("conflictHandling").toInt();
+    RepeatScheduleWizard *rsw = qobject_cast<RepeatScheduleWizard*>(wizard());
+    if (rsw == nullptr) {
+        return;
+    }
 
-    QList<RideItem*> preexistingPlanned; // Currently planned activities with date > when
-    QHash<QDate, int> preexistingCount; // Number of preexisting activities with date > when per date
-    for (RideItem *rideItem : context->athlete->rideCache->rides()) {
-        if (   rideItem == nullptr
-            || ! rideItem->planned
-            || rideItem->dateTime.date() < when) {
+    QLocale locale;
+    int numSelected = 0;
+    for (const SourceRide &sourceRide : rsw->sourceRides) {
+        if (! sourceRide.selected) {
             continue;
         }
-        if (context->isfiltered && ! context->filters.contains(rideItem->fileName)) {
-            continue;
+        QTreeWidgetItem *scheduleItem = new QTreeWidgetItem(scheduleTree);
+        scheduleItem->setData(0, Qt::DisplayRole, locale.toString(sourceRide.sourceDate, QLocale::ShortFormat));
+        scheduleItem->setData(1, Qt::DisplayRole, "→");
+        if (! sourceRide.targetBlocked) {
+            scheduleItem->setData(2, Qt::DisplayRole, locale.toString(sourceRide.targetDate, QLocale::ShortFormat));
+            ++numSelected;
+        } else {
+            QFont font;
+            font.setItalic(true);
+            scheduleItem->setData(0, Qt::ForegroundRole, palette().color(QPalette::Disabled, QPalette::Text));
+            scheduleItem->setData(1, Qt::ForegroundRole, palette().color(QPalette::Disabled, QPalette::Text));
+            scheduleItem->setData(2, Qt::ForegroundRole, palette().color(QPalette::Disabled, QPalette::Text));
+            scheduleItem->setData(2, Qt::FontRole, font);
+            scheduleItem->setData(2, Qt::DisplayRole, tr("skipped"));
+            scheduleItem->setData(3, Qt::ForegroundRole, palette().color(QPalette::Disabled, QPalette::Text));
+            scheduleItem->setData(4, Qt::ForegroundRole, palette().color(QPalette::Disabled, QPalette::Text));
         }
-        preexistingPlanned << rideItem;
-        preexistingCount.insert(rideItem->dateTime.date(), preexistingCount.value(rideItem->dateTime.date(), 0) + 1);
+        scheduleItem->setData(3, Qt::DisplayRole, rideItemSport(sourceRide.rideItem));
+        scheduleItem->setData(4, Qt::DisplayRole, rideItemName(sourceRide.rideItem));
     }
-
-    RepeatSchedulePageActivities *activitiesPage = qobject_cast<RepeatSchedulePageActivities*>(wizard()->page(RepeatScheduleWizard::PageActivities));
-    QList<RideItem*> selectedItems = activitiesPage->getSelectedRideItems(); // list of all selected activities that are to be copied to after when
-    QHash<QDate, int> selectedCount; // Number of selected activities per date
-    for (RideItem *rideItem : selectedItems) {
-        selectedCount.insert(rideItem->dateTime.date(), selectedCount.value(rideItem->dateTime.date(), 0) + 1);
+    scheduleLabel->setVisible(true);
+    scheduleTree->setVisible(true);
+    const QList<RideItem*> &deletionList = rsw->getDeletionList();
+    if (deletionList.count() > 0) {
+        for (RideItem *rideItem : deletionList) {
+            QTreeWidgetItem *deletionItem = new QTreeWidgetItem(deletionTree);
+            deletionItem->setData(0, Qt::DisplayRole, locale.toString(rideItem->dateTime.date(), QLocale::ShortFormat));
+            deletionItem->setData(1, Qt::DisplayRole, rideItemSport(rideItem));
+            deletionItem->setData(2, Qt::DisplayRole, rideItemName(rideItem));
+        }
+        deletionLabel->setVisible(true);
+        deletionTree->setVisible(true);
     }
-
-    QDate nextAddDate(when);
-    QDate lastSourceDate;
-    QDate minDate;
-    QDate maxDate;
-    int activeDays = 0;
-    for (RideItem *rideItem : selectedItems) {
-        bool found = sameDay && lastSourceDate.isValid() && lastSourceDate == rideItem->dateTime.date();
-        while (! found) {
-            bool hasPreexisting = preexistingCount.value(nextAddDate, 0) > 0;
-            if (hasPreexisting) {
-                if (conflictHandling == 1) { // Skip days with preexisting
-                    nextAddDate = nextAddDate.addDays(1);
-                    ++activeDays;
-                    continue;
-                } else if (conflictHandling == 2) { // Fail
-                    failed = true;
-                    break;
-                }
-            }
-            if (activeDays >= restDayAfter) {
-                activeDays = 0;
-                found = false;
-                nextAddDate = nextAddDate.addDays(1);
-                continue;
-            }
-            found = true;
-        }
-        if (failed) {
-            deletionList.clear();
-            scheduleList.clear();
-            break;
-        }
-        scheduleList << std::make_pair(rideItem, nextAddDate);
-        if (conflictHandling == 0) {
-            if (! minDate.isValid() || minDate > nextAddDate) {
-                minDate = nextAddDate;
-            }
-            if (! maxDate.isValid() || maxDate < nextAddDate) {
-                maxDate = nextAddDate;
-            }
-        }
-
-        int remaining = selectedCount.value(rideItem->dateTime.date(), 1) - 1;
-        selectedCount.insert(rideItem->dateTime.date(), remaining);
-        if (! (sameDay && remaining > 0)) {
-            nextAddDate = nextAddDate.addDays(1);
-            ++activeDays;
-        }
-        lastSourceDate = rideItem->dateTime.date();
-    }
-    if (! failed) {
-        QLocale locale;
-        if (minDate.isValid() && maxDate.isValid()) {
-            for (RideItem *rideItem : preexistingPlanned) {
-                if (rideItem->dateTime.date() >= minDate && rideItem->dateTime.date() <= maxDate) {
-                    deletionList << rideItem;
-                }
-            }
-        }
-        if (! scheduleList.isEmpty()) {
-            scheduleLabel->setVisible(true);
-            scheduleTree->setVisible(true);
-            for (std::pair<RideItem*, QDate> entry : scheduleList) {
-                QTreeWidgetItem *scheduleItem = new QTreeWidgetItem();
-                scheduleItem->setData(0, Qt::DisplayRole, locale.toString(entry.first->dateTime.date(), QLocale::ShortFormat));
-                scheduleItem->setData(1, Qt::DisplayRole, "→");
-                scheduleItem->setData(2, Qt::DisplayRole, locale.toString(entry.second, QLocale::ShortFormat));
-                scheduleItem->setData(3, Qt::DisplayRole, rideItemSport(entry.first));
-                scheduleItem->setData(4, Qt::DisplayRole, rideItemName(entry.first));
-                scheduleTree->addTopLevelItem(scheduleItem);
-            }
-        }
-        if (! deletionList.isEmpty()) {
-            deletionLabel->setVisible(true);
-            deletionTree->setVisible(true);
-            for (RideItem *rideItem : deletionList) {
-                QTreeWidgetItem *deletionItem = new QTreeWidgetItem();
-                deletionItem->setData(0, Qt::DisplayRole, locale.toString(rideItem->dateTime.date(), QLocale::ShortFormat));
-                deletionItem->setData(1, Qt::DisplayRole, rideItemSport(rideItem));
-                deletionItem->setData(2, Qt::DisplayRole, rideItemName(rideItem));
-                deletionTree->addTopLevelItem(deletionItem);
-            }
-        }
-    } else {
-        failedLabel->setVisible(true);
-    }
-}
-
-
-bool
-RepeatSchedulePageSummary::isComplete
-() const
-{
-    return ! failed;
-}
-
-
-QList<RideItem*>
-RepeatSchedulePageSummary::getDeletionList
-() const
-{
-    return deletionList;
-}
-
-
-QList<std::pair<RideItem*, QDate>>
-RepeatSchedulePageSummary::getScheduleList
-() const
-{
-    return scheduleList;
+    targetRangeBar->setResult(rsw->getTargetRangeStart(), rsw->getTargetRangeEnd(), numSelected, rsw->getDeletionList().count());
 }
 
 
