@@ -223,7 +223,7 @@ class RideItem : public QObject
         bool hasLinkedActivity() const;
 
         // refresh when stale
-        void refresh();
+        void refresh(bool bUpdateIntervals=true);
 
         // get/set
         void setRide(RideFile *);
