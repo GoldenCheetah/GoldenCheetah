@@ -144,7 +144,6 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
 
     // read athlete's autoimport configuration and initialize the autoimport process
     autoImportConfig = new RideAutoImportConfig(home->config());
-    autoImport = NULL;
 
     // Search / filter
     namedSearches = new NamedSearches(this); // must be before navigator
@@ -259,7 +258,6 @@ Athlete::~Athlete()
     foreach (HrZones* hrzones, hrzones_) delete hrzones;
     for (int i=0; i<2; i++) delete pacezones_[i];
     delete autoImportConfig;
-    delete autoImport;
 
 }
 
@@ -371,14 +369,14 @@ Athlete::configChanged(qint32 state)
 void
 Athlete::importFilesWhenOpeningAthlete() {
 
-    autoImport = NULL;
     // just do it if something is configured
     if (autoImportConfig->hasRules()) {
 
-        autoImport = new RideImportWizard(autoImportConfig, context);
+        // memory deleted on closure by Qt::WA_DeleteOnClose attribute
+        RideImportWizard* autoImport = new RideImportWizard(autoImportConfig, context);
 
         // only process the popup if we have any files available at all
-        if ( autoImport->getNumberOfFiles() > 0) {
+        if (autoImport->getNumberOfFiles() > 0) {
            autoImport->process();
         }
     }

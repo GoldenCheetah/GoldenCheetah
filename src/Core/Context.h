@@ -129,8 +129,7 @@ class Context : public QObject
         // mainwindow state
         NavigationModel *nav;
         int viewIndex;
-        bool showSidebar, showLowbar, showToolbar, showTabbar;
-        int style;
+        bool showToolbar;
         QString searchText;
         QString workoutFilterText;
         bool scopehighlighted;
@@ -148,11 +147,12 @@ class Context : public QObject
         Athlete *athlete;
         RideItem *ride;  // the currently selected ride
         DateRange dr_;
-        Season const *season = nullptr;
+        Season const *season;
         ErgFile *workout; // the currently selected workout file
         VideoSyncFile *videosync; // the currently selected videosync file
         QString videoFilename;
         long now; // point in time during train session
+        unsigned int importInProgress;
 
         // search filter
         bool isfiltered;

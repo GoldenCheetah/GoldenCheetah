@@ -89,7 +89,7 @@ class MainWindow : public QMainWindow
 
     public:
 
-        MainWindow(const QDir &home);
+        MainWindow();
         ~MainWindow(); // temp to zap db - will move to tab //
 
         void byebye() { close(); } // go bye bye for a restart
@@ -149,9 +149,6 @@ class MainWindow : public QMainWindow
         void logBug();
         void support();
 
-        void loadProgress(QString folder, double progress);
-
-
         // perspective selected
         void perspectiveSelected(int index);
         void perspectivesChanged(); // when the list of perspectives is updated in PerspectivesDialog
@@ -174,7 +171,6 @@ class MainWindow : public QMainWindow
         void newCyclistTab();  // create a new Cyclist
         bool openAthleteTab(QString name);
         void loadCompleted(QString name, Context *context);
-        bool closeTabClicked(int index); // user clicked to close tab
         bool closeAthleteTab(QString name); // close named athlete
         void switchAthleteTab(QString name); // athlete switching for change
         void tabbarAthleteChange(int index); // blockable tabbar generated athlete switching
@@ -278,9 +274,6 @@ class MainWindow : public QMainWindow
         void revertRide();
         bool saveRideExitDialog(Context *);              // save dirty rides on exit dialog
 
-        // autoload rides from athlete specific directory (preferences)
-        void ridesAutoImport();
-
 #ifdef GC_HAS_CLOUD_DB
         // CloudDB actions
         void cloudDBuserEditChart();
@@ -292,16 +285,19 @@ class MainWindow : public QMainWindow
         void exportChartToCloudDB();
 #endif
         // save and restore state to context
-        void saveGCState(Context *);
-        void restoreGCState(Context *);
+        void saveGCState(AthleteTab *);
+        void restoreGCState(AthleteTab *);
 
         void configChanged(qint32);
         void onEditMenuAboutToShow();
 
     protected:
 
-        void switchAthleteTab(int index); // athlete switching for change & athlete closure
-        void removeAthleteTab(AthleteTab*);  // remove without question
+        void displayMainWindow();
+
+        void switchAthleteTab(int index, bool updateLastOpenedAthlete = true); // athlete switching for change & athlete closure
+        bool checkImportAndUnsaved(int index);
+        void removeAthleteTab(AthleteTab*, bool updateLastOpenedAthlete = true);  // remove without question
 
     private:
 

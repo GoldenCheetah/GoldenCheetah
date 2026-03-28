@@ -135,4 +135,4 @@ class ProgressLine : public QWidget
     private:
         Context *context;
 };
-#endif // _GC_TabView_h
+#endif // _GC_Tab_h

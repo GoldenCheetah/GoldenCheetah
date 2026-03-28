@@ -41,20 +41,9 @@ static const int gl_progress_width = ROWHEIGHT/2;
 static const int gl_button_height = ROWHEIGHT*1.5;
 static const int gl_button_width = ROWHEIGHT*5;
 
-AthleteView::AthleteView(Context *context) : ChartSpace(context, OverviewScope::ATHLETES, NULL), mainWindow_(context->mainWindow)
+AthleteView::AthleteView(MainWindow *mainWindow)
+    : ChartSpace(mainWindow, OverviewScope::ATHLETES, nullptr), mainWindow_(mainWindow)
 {
-    // AthleteView most likely has a lifetime greater than the athlete's context, so ensure
-    // we do not register signals, events or hold this context pointer...
-
-    // remove the athlete context specific configChanged signal registration created by ChartSpace, and
-    // replace it with a global configChanged signal registration instead 
-    disconnect(context, &Context::configChanged, this, &ChartSpace::configChanged);
-    connect(GlobalContext::context(), &GlobalContext::configChanged, this, &ChartSpace::configChanged);
-
-    // the athlete's context provided to this constructor must not be used!
-    // it is set to null to ensure misuse is detected, and prevent unintended behaviour
-    this->context = context = nullptr;
-
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ScopeBar_Athletes));
 
@@ -156,6 +145,18 @@ AthleteView::closingAthlete(QString name, Context *context)
             static_cast<AthleteCard*>(item)->closingAthlete(name, context);
         }    
     }
+
+    if (openAthletes() == 1) {
+        // find the selected one, and update it
+        foreach(ChartSpaceItem* item, allItems()) {
+            if (!static_cast<AthleteCard*>(item)->isAthleteClosed()) {
+
+                // must be the selected item, so update it
+                static_cast<AthleteCard*>(item)->setCurrentAthlete(true);
+                break;
+            }
+        }
+    }
 }
 
 uint32_t
@@ -174,20 +175,6 @@ AthleteView::currentAthlete(QString name)
     foreach(ChartSpaceItem* item, allItems()) {
         static_cast<AthleteCard*>(item)->setCurrentAthlete(item->name == name);
     }
-}
-
-bool
-AthleteView::setBootStrapAthlete(Context *context)
-{
-    foreach(ChartSpaceItem* item, allItems()) {
-        if (item->name == context->athlete->cyclist) {
-            if (static_cast<AthleteCard*>(item)->setBootStrapAthlete(context)) {
-                currentAthlete(context->athlete->cyclist);
-                return true;
-            }
-        }
-    }
-    return false;
 }
 
 void
@@ -281,41 +268,6 @@ AthleteCard::AthleteCard(ChartSpace *parent, QString name) :
 
     refreshStats();
     update();
-}
-
-bool
-AthleteCard::setBootStrapAthlete(Context *context)
-{
-    static bool onlyOnce{false};
-    if (onlyOnce == false) {
-        onlyOnce = true;
-
-        // register context and signals for the bootstrap (first) athlete
-        // note: opening() and loadDone() are not called for the bootstrap (first) athlete
-        context_ = context;
-        currentAthlete_ = true;
-
-        // the current athlete is loaded by default
-        loadProgress_=100;
-        deleteButton->hide();
-
-        // watch metric updates
-        connect(context_, &Context::refreshStart, this, &AthleteCard::refreshStart);
-        connect(context_, &Context::refreshEnd, this, &AthleteCard::refreshEnd);
-        connect(context_, &Context::refreshUpdate, this, &AthleteCard::refreshUpdate); // we might miss 1st one
-
-        // watch activity changes
-        registerRideEvents(true);
-
-        // config icon for loaded athletes
-        setShowConfig(true);
-
-        refreshStats();
-        update();
-
-        return true;
-    }
-    return false;
 }
 
 void
