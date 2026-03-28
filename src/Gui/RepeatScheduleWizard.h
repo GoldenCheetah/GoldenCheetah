@@ -26,6 +26,9 @@
 #include <QWizardPage>
 #include <QLabel>
 #include <QTreeWidget>
+#include <QCheckBox>
+#include <QRadioButton>
+#include <QStyledItemDelegate>
 
 
 struct SourceRide {
