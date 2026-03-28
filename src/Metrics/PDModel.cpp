@@ -22,11 +22,10 @@
 
 //extern ztable PD_ZTABLE;
 // base class for all models
-PDModel::PDModel(Context *context) :
+PDModel::PDModel() :
     QwtSyntheticPointData(PDMODEL_MAXT),
     fit(Envelope),
     inverseTime(false),
-    context(context),
     sanI1(0), sanI2(0), anI1(0), anI2(0), aeI1(0), aeI2(0), laeI1(0), laeI2(0),
     cp(0), tau(0), t0(0), minutes(false)
 {
@@ -483,8 +482,7 @@ PDModel::calcSummary()
 // Classic 2 Parameter Model
 //
 
-CP2Model::CP2Model(Context *context) :
-    PDModel(context)
+CP2Model::CP2Model()
 {
     // set default intervals to search CP 2-3 mins and 10-20 mins
     anI1=120;
@@ -545,8 +543,7 @@ void CP2Model::onIntervalsChanged()
 //
 // Morton 3 Parameter Model
 //
-CP3Model::CP3Model(Context *context) :
-    PDModel(context)
+CP3Model::CP3Model()
 {
     // set default intervals to search CP 2-3 mins and 12-20mins
     anI1=120;
@@ -631,7 +628,7 @@ void CP3Model::onIntervalsChanged()
 //
 // Ward Smith Model
 //
-WSModel::WSModel(Context *context) : PDModel(context)
+WSModel::WSModel()
 {
     // set default intervals to search CP 30-60
     anI1=1800;
@@ -746,8 +743,7 @@ void WSModel::onIntervalsChanged()
 //
 // Currently deciding which of the three formulations to use
 // as the base for GoldenCheetah (we have enough models already !)
-MultiModel::MultiModel(Context *context) :
-    PDModel(context),
+MultiModel::MultiModel() :
     variant(0), w1(0), p1(0), p2(0), tau1(0), tau2(0), alpha(0), beta(0)
 {
     // set default intervals to search CP 30-60
@@ -891,8 +887,7 @@ void MultiModel::onIntervalsChanged()
 //
 // Extended CP Model
 //
-ExtendedModel::ExtendedModel(Context *context) :
-    PDModel(context),
+ExtendedModel::ExtendedModel() :
     paa(0), paa_dec(0), ecp(0), etau(0), ecp_del(0), tau_del(0), ecp_dec(0),
     ecp_dec_del(0)
 {

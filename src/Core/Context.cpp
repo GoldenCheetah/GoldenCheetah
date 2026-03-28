@@ -140,16 +140,24 @@ GlobalContext::userMetricsConfigChanged()
 
 bool Context::isValid(Context *p) { return p != NULL &&_contexts.contains(p); }
 
-Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
+Context::Context(MainWindow *mainWindow)
+    : mainWindow(mainWindow), nav(nullptr), rideNavigator(nullptr), tab(nullptr),
+      athlete(nullptr), ride(nullptr), season(nullptr), workout(nullptr), videosync(nullptr),
+      now(0), importInProgress(0)
 {
-    ride = NULL;
-    workout = NULL;
-    videosync = NULL;
+    // mainwindow state
+    viewIndex = -1;
+    showToolbar = true;
+    scopehighlighted = false;
+
+    // search filter
     isfiltered = ishomefiltered = false;
-    isCompareIntervals = isCompareDateRanges = false;
+
+    // train mode state
     isRunning = isPaused = false;
 
-    connect(this, SIGNAL(loadProgress(QString, double)), mainWindow, SLOT(loadProgress(QString, double)));
+    // comparing things
+    isCompareIntervals = isCompareDateRanges = false;
 
 #ifdef GC_HAS_CLOUD_DB
     cdbChartListDialog = NULL;

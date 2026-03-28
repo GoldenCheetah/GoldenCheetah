@@ -231,7 +231,12 @@ class ChartSpace : public QWidget
 
     public:
 
+        // Constructor for athlete specific chart spaces
         ChartSpace(Context *context, OverviewScope scope, GcWindow *window);
+
+        // Constructor for non athlete chart spaces
+        ChartSpace(MainWindow *mainWindow, OverviewScope scope, GcWindow *window);
+
         QGraphicsScene *getScene() { return scene; }
 
         // current state for event processing
@@ -327,6 +332,8 @@ class ChartSpace : public QWidget
         virtual bool clickOverride(ChartSpaceItem*, QGraphicsSceneMouseEvent*) { return false; }
 
     private:
+
+        void initialise(MainWindow *mainWindow);
 
         // gui setup
         QGraphicsScene *scene;

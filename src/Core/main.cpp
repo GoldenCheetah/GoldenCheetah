@@ -720,12 +720,12 @@ main(int argc, char *argv[])
                     appsettings->initializeQSettingsAthlete(homeDir, cyclist);
                     GcUpgrade v3;
                     if (v3.upgradeConfirmedByUser(home)) {
-                        MainWindow *mainWindow = new MainWindow(home);
-                        mainWindow->show();
-                        mainWindow->ridesAutoImport();
-                        gc_opened++;
+                        MainWindow *mainWindow = new MainWindow();
+                        if (mainWindow->openAthleteTab(cyclist)) {
+                            gc_opened++;
+                            anyOpened = true;
+                        }
                         home.cdUp();
-                        anyOpened = true;
                     } else {
                         delete trainDB;
                         terminate(0);
@@ -759,10 +759,8 @@ main(int argc, char *argv[])
             // .. and open a mainwindow
             GcUpgrade v3;
             if (v3.upgradeConfirmedByUser(home)) {
-                MainWindow *mainWindow = new MainWindow(home);
-                mainWindow->show();
-                mainWindow->ridesAutoImport();
-                gc_opened++;
+                MainWindow *mainWindow = new MainWindow();
+                if (mainWindow->openAthleteTab(home.dirName())) gc_opened++;
             } else {
                 delete trainDB;
                 terminate(0);

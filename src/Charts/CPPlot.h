@@ -25,7 +25,7 @@
 
 #include "CriticalPowerWindow.h"
 #include "RideFileCache.h"
-#include "PDModel.h"
+#include "PDModel.h" // for all the models
 #include "ExtendedCriticalPower.h"
 #include "CpPlotCurve.h"
 #include "PowerHist.h" // for penTooltip
@@ -49,8 +49,6 @@ class Context;
 class LTMCanvasPicker;
 class CriticalPowerWindow;
 class LogTimeScaleDraw;
-
-#include "PDModel.h" // for all the models
 
 class CPPlot : public QwtPlot
 {

@@ -39,11 +39,29 @@ static QIcon grayEdit, whiteEdit, accentEdit;
 
 ChartSpaceItemRegistry *ChartSpaceItemRegistry::_instance;
 
-ChartSpace::ChartSpace(Context *context, OverviewScope scope, GcWindow *window) :
-    state(NONE), context(context), scope(scope), mincols(5), window(window), group(NULL), fixedZoom(0), _viewY(0),
-    yresizecursor(false), xresizecursor(false), block(false), scrolling(false),
-    setscrollbar(false), lasty(-1)
+ChartSpace::ChartSpace(Context *context, OverviewScope scope, GcWindow *window)
+    : context(context), scope(scope), window(window)
 {
+    initialise(context->mainWindow);
+}
+
+ChartSpace::ChartSpace(MainWindow *mainWindow, OverviewScope scope, GcWindow *window)
+    : context(nullptr), scope(scope), window(window)
+{
+    initialise(mainWindow);
+}
+
+void
+ChartSpace::initialise(MainWindow *mainWindow)
+{
+    state = NONE;
+    mincols = 5;
+    group = nullptr;
+    fixedZoom = 0;
+    _viewY = 0;
+    yresizecursor = xresizecursor = false;
+    block = scrolling = setscrollbar = false;
+    lasty = -1;
     setContentsMargins(0,0,0,0);
 
     QHBoxLayout *main = new QHBoxLayout;
@@ -52,7 +70,7 @@ ChartSpace::ChartSpace(Context *context, OverviewScope scope, GcWindow *window) 
 
     // add a view and scene and centre
     scene = new QGraphicsScene(this);
-    view = new GGraphicsView(context->mainWindow, this);
+    view = new GGraphicsView(mainWindow, this);
 
     view->viewport()->setAttribute(Qt::WA_AcceptTouchEvents, false); // stops it stealing focus on mouseover
     scrollbar = new QScrollBar(Qt::Vertical, this);
@@ -88,7 +106,12 @@ ChartSpace::ChartSpace(Context *context, OverviewScope scope, GcWindow *window) 
     scene->installEventFilter(this);
 
     // once all widgets created we can connect the signals
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    if (context) {
+        connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    } else {
+        // as no context exists register a global configChanged signal instead 
+        connect(GlobalContext::context(), &GlobalContext::configChanged, this, &ChartSpace::configChanged);
+    }
     connect(scroller, SIGNAL(finished()), this, SLOT(scrollFinished()));
     connect(scrollbar, SIGNAL(valueChanged(int)), this, SLOT(scrollbarMoved(int)));
 

@@ -30,12 +30,7 @@ class AthleteView : public ChartSpace
         friend AthleteCard;
 
 public:
-    // only mainWindow is used from the provided context in AthleteView & ChartSpace
-    AthleteView(Context *context);
-
-    // called once at startup for the bootstrap athlete and sets the 
-    // bootstrap as the current athlete, subsequent calls are ignored.
-    bool setBootStrapAthlete(Context *context);
+    AthleteView(MainWindow *mainWindow);
 
 protected:
 
@@ -89,7 +84,6 @@ class AthleteCard : public ChartSpaceItem
         bool clickWithinAthleteSwitchRegion(const QPointF& scenePos);
 
         // accessible via AthleteView equivalents
-        bool setBootStrapAthlete(Context *context);
         void setCurrentAthlete(bool status);
 
     protected slots:

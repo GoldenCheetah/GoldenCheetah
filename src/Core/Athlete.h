@@ -126,7 +126,6 @@ class Athlete : public QObject
 #endif
 
         // Athlete's autoimport handling
-        RideImportWizard *autoImport;
         RideAutoImportConfig *autoImportConfig;
 
         // preset charts
