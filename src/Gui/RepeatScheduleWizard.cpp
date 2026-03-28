@@ -583,7 +583,7 @@ RepeatSchedulePageSetup::RepeatSchedulePageSetup
         seasonItem->setData(0, Qt::UserRole, season.getStart());
         seasonItem->setData(0, Qt::UserRole + 1, season.getEnd());
         seasonItem->setDisabled(DateRange(season.getStart(), season.getEnd()).pass(when) || season.getStart() > when);
-        if (context->currentSeason() != nullptr && context->currentSeason()->id() == season.id()) {
+        if (! seasonItem->isDisabled() && context->currentSeason() != nullptr && context->currentSeason()->id() == season.id()) {
             currentSeason = seasonItem;
         }
         for (const Phase &phase : season.phases) {
@@ -593,7 +593,7 @@ RepeatSchedulePageSetup::RepeatSchedulePageSetup
             phaseItem->setData(0, Qt::UserRole + 1, phase.getEnd());
             phaseItem->setDisabled(DateRange(phase.getStart(), phase.getEnd()).pass(when) || phase.getStart() > when);
             seasonItem->addChild(phaseItem);
-            if (context->currentSeason() != nullptr && context->currentSeason()->id() == phase.id()) {
+            if (! phaseItem->isDisabled() && context->currentSeason() != nullptr && context->currentSeason()->id() == phase.id()) {
                 currentSeason = phaseItem;
             }
         }
