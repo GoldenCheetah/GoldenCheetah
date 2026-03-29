@@ -1436,7 +1436,7 @@ CalendarMonthTable::setRelated
 (const QString &linkedReference)
 {
     if (! linkedReference.isEmpty()) {
-        for (int row = 0; row < rowCount() - 1; ++row) {
+        for (int row = 0; row < rowCount(); ++row) {
             for (int col = 0; col < 7; ++col) {
                 QTableWidgetItem *item = this->item(row, col);
                 if (item) {
@@ -1458,7 +1458,7 @@ void
 CalendarMonthTable::clearRelated
 ()
 {
-    for (int row = 0; row < rowCount() - 1; ++row) {
+    for (int row = 0; row < rowCount(); ++row) {
         for (int col = 0; col < 7; ++col) {
             QTableWidgetItem *item = this->item(row, col);
             if (! item) {
@@ -1794,6 +1794,12 @@ CalendarDayView::measureDialog
         form->addRow(valuesLabel[i], valuesEdit[i]);
 
         ++i;
+    }
+    if (i > 0) {
+        QTimer::singleShot(0, this, [this, valuesEdit]() {
+            valuesEdit[0]->setFocus();
+            valuesEdit[0]->selectAll();
+        });
     }
 
     Measure measure;
