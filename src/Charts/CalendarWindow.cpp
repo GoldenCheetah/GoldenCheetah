@@ -1089,6 +1089,7 @@ CalendarWindow::getSummaries
 
     const RideMetricFactory &factory = RideMetricFactory::instance();
     FilterSet filterSet(context->isfiltered, context->filters);
+    filterSet.addFilter(context->ishomefiltered, context->homeFilters);
     Specification spec;
     spec.setFilterSet(filterSet);
     PlanFilterType planFilterType = PlanFilterType::IncludeAll;
