@@ -57,8 +57,6 @@
 #include "Overview.h"
 #endif
 #include "UserChartWindow.h"
-// Not until v4.0
-//#include "RouteWindow.h"
 
 // GcWindows initialization is done in initialize method to enable translations
 GcWindowRegistry* GcWindows;
@@ -231,11 +229,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::WebPageWindow: returning = new WebPageWindow(context); break;
     case GcWindowTypes::LiveMapWebPageWindow: returning = new LiveMapWebPageWindow(context); break;
     case GcWindowTypes::ElevationChart: returning = new ElevationChartWindow(context); break;
-#if 0 // not till v4.0
-    case GcWindowTypes::RouteSegment: returning = new RouteWindow(context); break;
-#else
-    case GcWindowTypes::RouteSegment: returning = new GcChartWindow(context); break;
-#endif
+    case GcWindowTypes::RouteSegment: returning = new GcChartWindow(context); break; // Deprecated
 
     // summary and old ride summary charts now replaced with an Overview - note id gets reset
     case GcWindowTypes::Summary:

@@ -789,12 +789,6 @@ win32-msvc* {
   SOURCES += Core/WindowsCrashHandler.cpp
 }
 
-###======================================
-### PENDING SOURCE FILES [not active yet]
-###======================================
-
-DEFERRES += Core/RouteWindow.h Core/RouteWindow.cpp Core/RouteItem.h Core/RouteItem.cpp
-
 ###====================
 ### MISCELLANEOUS FILES
 ###====================

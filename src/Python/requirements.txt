@@ -9,6 +9,7 @@ scipy
 lmfit
 plotly
 importlib_metadata
+Jinja2
 #
 # Nice to have
 #
