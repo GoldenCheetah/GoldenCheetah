@@ -267,7 +267,7 @@ Perspective::importChart(QMap<QString,QString>properties, bool select)
     const QMetaObject *m = chart->metaObject();
 
     // set all the properties
-    chart->setProperty("view", static_cast<std::underlying_type_t<GcViewType>>(viewType_));
+    chart->setProperty("view", context->tab->view(viewType_)->viewsInternalName());
     chart->setProperty("perspective", QVariant::fromValue<Perspective*>(this));
 
     // each of the user properties
@@ -720,7 +720,7 @@ Perspective::addChart(GcChartWindow* newone)
         newone->installEventFilter(this);
 
         RideItem *notconst = (RideItem*)context->currentRideItem();
-        newone->setProperty("view", static_cast<std::underlying_type_t<GcViewType>>(viewType_));
+        newone->setProperty("view", context->tab->view(viewType_)->viewsInternalName());
         newone->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
         newone->setProperty("dateRange", property("dateRange"));
         newone->setProperty("style", currentStyle);
@@ -1763,10 +1763,11 @@ ImportChartDialog::ImportChartDialog(Context *context, QList<QMap<QString,QStrin
         // convert to user name for view from here, since
         // they won't recognise the names used internally
         // as they need to be translated too
-        if (view == "plan") view = tr("Plan");
-        if (view == "home") view = tr("Trends");
-        if (view == "analysis") view = tr("Activities");
-        if (view == "train") view = tr("Train");
+        if (view == PlanView::internalName) view = tr(PlanView::userName);
+        else if (view == TrendsView::internalName) view = tr(TrendsView::userName);
+        else if (view == AnalysisView::internalName) view = tr(AnalysisView::userName);
+        else if (view == TrainView::internalName) view = tr(TrainView::userName);
+        else qDebug() << "Unhandled view type in ImportChartDialog:" << view;
 
         QTableWidgetItem *t;
 #ifndef GC_HAVE_ICAL
@@ -1778,13 +1779,13 @@ ImportChartDialog::ImportChartDialog(Context *context, QList<QMap<QString,QStrin
 
 #else
         // we should be able to select trend/plan
-        if (view == tr("Plan") || view == tr("Trends")) {
+        if (view == tr(PlanView::userName)  || view == tr(TrendsView::userName)) {
 
             QComboBox *com = new QComboBox(this);
-            com->addItem(tr("Plan"));
-            com->addItem(tr("Trends"));
+            com->addItem(tr(PlanView::userName));
+            com->addItem(tr(TrendsView::userName));
             table->setCellWidget(i,1,com);
-            if (view == tr("Plan")) com->setCurrentIndex(0);
+            if (view == tr(PlanView::userName) ) com->setCurrentIndex(0);
             else com->setCurrentIndex(1);
 
         } else {
@@ -1836,20 +1837,20 @@ ImportChartDialog::importClicked()
             if (com) {
                 switch(com->currentIndex()) {
 
-                    case 0 : view = tr("Plan"); break;
+                    case 0 : view = tr(PlanView::userName) ; break;
 
                     default:
-                    case 1 : view = tr("Trends"); break;
+                    case 1 : view = tr(TrendsView::userName); break;
                 }
             } else {
                 view = table->item(i,1)->text();
             }
 
             GcViewType viewType = GcViewType::NO_VIEW_SET;
-            if (view == tr("Trends"))      { viewType=GcViewType::VIEW_TRENDS; context->mainWindow->selectTrends(); }
-            if (view == tr("Activities"))  { viewType=GcViewType::VIEW_ANALYSIS; context->mainWindow->selectAnalysis(); }
-            if (view == tr("Plan"))        { viewType=GcViewType::VIEW_PLAN; context->mainWindow->selectPlan(); }
-            if (view == tr("Train"))       { viewType=GcViewType::VIEW_TRAIN; context->mainWindow->selectTrain(); }
+            if (view == tr(TrendsView::userName))    { viewType=GcViewType::VIEW_TRENDS; context->mainWindow->selectTrends(); }
+            if (view == tr(AnalysisView::userName))  { viewType=GcViewType::VIEW_ANALYSIS; context->mainWindow->selectAnalysis(); }
+            if (view == tr(PlanView::userName))      { viewType=GcViewType::VIEW_PLAN; context->mainWindow->selectPlan(); }
+            if (view == tr(TrainView::userName))     { viewType=GcViewType::VIEW_TRAIN; context->mainWindow->selectTrain(); }
 
             // add to the currently selected tab and select if only adding one chart
             if (viewType != GcViewType::NO_VIEW_SET) {

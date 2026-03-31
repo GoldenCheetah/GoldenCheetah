@@ -78,7 +78,12 @@ class AnalysisView : public AbstractView
         void setRide(RideItem*ride) override;
         void addIntervals();
 
-        QString viewTypeDesc() const override { return "Analysis"; }
+        // the view's user name must be translated for display
+        static constexpr const char* userName = "Activities";
+        QString viewsUserName() const override { return userName; }
+
+        static constexpr const char* internalName = "analysis";
+        QString viewsInternalName() const override { return internalName; }
 
         RideNavigator *rideNavigator();
         AnalysisSidebar *analSidebar;
@@ -108,7 +113,12 @@ class PlanView : public LTMSidebarView
         PlanView(Context *context, QStackedWidget *controls);
         virtual ~PlanView();
 
-        QString viewTypeDesc() const override { return "Diary"; }
+        // the view's user name must be translated for display
+        static constexpr const char* userName = "Plan";
+        QString viewsUserName() const override { return userName; }
+
+        static constexpr const char* internalName = "plan";
+        QString viewsInternalName() const override { return internalName; }
 
     public slots:
 
@@ -125,7 +135,12 @@ class TrainView : public AbstractView
         virtual ~TrainView();
         void close() override;
 
-        QString viewTypeDesc() const override { return "Train"; }
+        // the view's user name must be translated for display
+        static constexpr const char* userName = "Train";
+        QString viewsUserName() const override { return userName; }
+
+        static constexpr const char* internalName = "train";
+        QString viewsInternalName() const override { return internalName; }
 
     public slots:
 
@@ -154,7 +169,12 @@ class TrendsView : public LTMSidebarView
         TrendsView(Context *context, QStackedWidget *controls);
         virtual ~TrendsView();
 
-        QString viewTypeDesc() const override { return "Trends"; }
+        // the view's user name must be translated for display
+        static constexpr const char* userName = "Trends";
+        QString viewsUserName() const override { return userName; }
+
+        static constexpr const char* internalName = "home";
+        QString viewsInternalName() const override { return internalName; }
 
         int countActivities(Perspective *, DateRange dr);
 

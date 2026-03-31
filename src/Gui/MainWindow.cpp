@@ -225,16 +225,16 @@ MainWindow::MainWindow(const QDir &home)
     // The ids of the sidebar buttons below are defined in NewSideBar.h
     sidebar->addItem(QImage(":sidebar/athlete.png"), tr("athletes"), GcSideBarBtnId::SELECT_ATHLETE_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Athletes));
 
-    sidebar->addItem(QImage(":sidebar/plan.png"), tr("plan"), GcSideBarBtnId::PLAN_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Plan));
+    sidebar->addItem(QImage(":sidebar/plan.png"), tr(PlanView::userName).toLower(), GcSideBarBtnId::PLAN_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Plan));
 
-    sidebar->addItem(QImage(":sidebar/trends.png"), tr("trends"), GcSideBarBtnId::TRENDS_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Trends));
+    sidebar->addItem(QImage(":sidebar/trends.png"), tr(TrendsView::userName).toLower(), GcSideBarBtnId::TRENDS_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Trends));
 
-    sidebar->addItem(QImage(":sidebar/assess.png"), tr("activities"), GcSideBarBtnId::ACTIVITIES_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Rides));
+    sidebar->addItem(QImage(":sidebar/assess.png"), tr(AnalysisView::userName).toLower(), GcSideBarBtnId::ACTIVITIES_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Rides));
 
     sidebar->addItem(QImage(":sidebar/reflect.png"), tr("reflect"), GcSideBarBtnId::REFLECT_BTN, tr("Feature not implemented yet"));
     sidebar->setItemEnabled(GcSideBarBtnId::REFLECT_BTN, false);
 
-    sidebar->addItem(QImage(":sidebar/train.png"), tr("train"), GcSideBarBtnId::TRAIN_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Train));
+    sidebar->addItem(QImage(":sidebar/train.png"), tr(TrainView::userName).toLower(), GcSideBarBtnId::TRAIN_BTN, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Train));
 
     sidebar->addStretch();
     sidebar->addItem(QImage(":sidebar/apps.png"), tr("apps"), GcSideBarBtnId::APPS_BTN, tr("Feature not implemented yet"));
@@ -676,10 +676,10 @@ MainWindow::MainWindow(const QDir &home)
     showhideTabbar->setChecked(true);
 
     viewMenu->addSeparator();
-    viewMenu->addAction(tr("Plan"), this, SLOT(selectPlan()));
-    viewMenu->addAction(tr("Trends"), this, SLOT(selectTrends()));
-    viewMenu->addAction(tr("Activities"), this, SLOT(selectAnalysis()));
-    viewMenu->addAction(tr("Train"), this, SLOT(selectTrain()));
+    viewMenu->addAction(tr(PlanView::userName) , this, SLOT(selectPlan()));
+    viewMenu->addAction(tr(TrendsView::userName), this, SLOT(selectTrends()));
+    viewMenu->addAction(tr(AnalysisView::userName), this, SLOT(selectAnalysis()));
+    viewMenu->addAction(tr(TrainView::userName), this, SLOT(selectTrain()));
     viewMenu->addSeparator();
     viewMenu->addAction(tr("Import Perspective..."), this, SLOT(importPerspective()));
     viewMenu->addAction(tr("Export Perspective..."), this, SLOT(exportPerspective()));
@@ -922,7 +922,7 @@ MainWindow::exportPerspective()
     // export the current perspective to a file
     QString suffix;
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export Persepctive"),
-                       QDir::homePath()+"/"+ current->viewTypeDesc() + " " + current->perspective_->title() + ".gchartset",
+                       QDir::homePath()+"/"+ current->viewsUserName() + " " + current->perspective_->title() + ".gchartset",
                        ("*.gchartset;;"), &suffix, QFileDialog::DontUseNativeDialog); // native dialog hangs when threads in use (!)
 
     if (fileName.isEmpty()) {

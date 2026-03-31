@@ -112,7 +112,7 @@ LTMSidebarView::dateRangeChanged(DateRange dr)
 }
 
 AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) :
-        AbstractView(context, GcViewType::VIEW_ANALYSIS, "analysis", tr("Compare Activities and Intervals"))
+        AbstractView(context, GcViewType::VIEW_ANALYSIS, internalName, tr("Compare Activities and Intervals"))
 {
     analSidebar = new AnalysisSidebar(context);
     BlankStateAnalysisPage *b = new BlankStateAnalysisPage(context);
@@ -131,7 +131,8 @@ AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) :
     setBlank(b);
     setBottom(new ComparePane(context, this, ComparePane::interval));
 
-    setSidebarEnabled(appsettings->value(this, GC_SETTINGS_MAIN_SIDEBAR "analysis", defaultAppearance.sideanalysis).toBool());
+    QString path = QString(GC_SETTINGS_MAIN_SIDEBAR) + internalName;
+    setSidebarEnabled(appsettings->value(this, path, defaultAppearance.sideanalysis).toBool());
 
     connect(bottomSplitter(), SIGNAL(compareChanged(bool)), this, SLOT(compareChanged(bool)));
     connect(bottomSplitter(), SIGNAL(compareClear()), bottom(), SLOT(clear()));
@@ -144,7 +145,8 @@ RideNavigator *AnalysisView::rideNavigator()
 
 AnalysisView::~AnalysisView()
 {
-    appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "analysis", _sidebar);
+    QString path = QString(GC_SETTINGS_MAIN_SIDEBAR) + internalName;
+    appsettings->setValue(path, _sidebar);
     delete analSidebar;
 }
 
@@ -247,7 +249,7 @@ AnalysisView::notifyViewSplitterMoved() {
 }
 
 PlanView::PlanView(Context *context, QStackedWidget *controls) :
-        LTMSidebarView(context, GcViewType::VIEW_PLAN, "plan", tr("Plan future activities"))
+        LTMSidebarView(context, GcViewType::VIEW_PLAN, internalName, tr("Plan future activities"))
 {
     BlankStatePlanPage *b = new BlankStatePlanPage(context);
 
@@ -256,7 +258,8 @@ PlanView::PlanView(Context *context, QStackedWidget *controls) :
     controls->addWidget(cstack);
     controls->setCurrentIndex(0);
 
-    setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "plan", defaultAppearance.sideplan).toBool());
+    QString path = QString(GC_SETTINGS_MAIN_SIDEBAR) + internalName;
+    setSidebarEnabled(appsettings->value(this, path, defaultAppearance.sideplan).toBool());
 
     pstack = new QStackedWidget(this);
     setPages(pstack);
@@ -265,7 +268,8 @@ PlanView::PlanView(Context *context, QStackedWidget *controls) :
 
 PlanView::~PlanView()
 {
-    appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "plan", _sidebar);
+    QString path = QString(GC_SETTINGS_MAIN_SIDEBAR) + internalName;
+    appsettings->setValue(path, _sidebar);
 }
 
 bool
@@ -276,7 +280,7 @@ PlanView::isBlank()
 }
 
 TrendsView::TrendsView(Context *context, QStackedWidget *controls) :
-        LTMSidebarView(context, GcViewType::VIEW_TRENDS, "home", tr("Compare Date Ranges"))
+        LTMSidebarView(context, GcViewType::VIEW_TRENDS, internalName, tr("Compare Date Ranges"))
 {
     BlankStateHomePage *b = new BlankStateHomePage(context);
 
@@ -285,6 +289,7 @@ TrendsView::TrendsView(Context *context, QStackedWidget *controls) :
     controls->addWidget(cstack);
     controls->setCurrentIndex(0);
 
+    // note: "trend" differs from the normal internalName usage for sidebar settings
     setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "trend", defaultAppearance.sidetrend).toBool());
 
     pstack = new QStackedWidget(this);
@@ -298,6 +303,7 @@ TrendsView::TrendsView(Context *context, QStackedWidget *controls) :
 
 TrendsView::~TrendsView()
 {
+    // note: "trend" differs from the normal internalName usage for sidebar settings
     appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "trend", _sidebar);
 }
 
@@ -342,7 +348,7 @@ TrendsView::isBlank()
 }
 
 TrainView::TrainView(Context *context, QStackedWidget *controls) :
-        AbstractView(context, GcViewType::VIEW_TRAIN, "train", tr("Intensity Adjustments and Workout Control"))
+        AbstractView(context, GcViewType::VIEW_TRAIN, internalName, tr("Intensity Adjustments and Workout Control"))
 {
     trainTool = new TrainSidebar(context);
     trainTool->setTrainView(this);
@@ -364,7 +370,8 @@ TrainView::TrainView(Context *context, QStackedWidget *controls) :
     setBottom(trainBottom);
     setHideBottomOnIdle(false);
 
-    setSidebarEnabled(appsettings->value(NULL,  GC_SETTINGS_MAIN_SIDEBAR "train", defaultAppearance.sidetrain).toBool());
+    QString path = QString(GC_SETTINGS_MAIN_SIDEBAR) + internalName;
+    setSidebarEnabled(appsettings->value(NULL, path, defaultAppearance.sidetrain).toBool());
     connect(this, SIGNAL(onSelectionChanged()), this, SLOT(onSelectionChanged()));
     connect(trainBottom, SIGNAL(autoHideChanged(bool)), this, SLOT(onAutoHideChanged(bool)));
 }
@@ -376,7 +383,8 @@ void TrainView::onAutoHideChanged(bool enabled)
 
 TrainView::~TrainView()
 {
-    appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "train", _sidebar);
+    QString path = QString(GC_SETTINGS_MAIN_SIDEBAR) + internalName;
+    appsettings->setValue(path, _sidebar);
     delete trainTool;
 }
 

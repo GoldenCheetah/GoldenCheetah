@@ -112,7 +112,7 @@ GcWindowRegistry::initialize()
     { GcViewType::VIEW_TRAIN, tr("Elevation Chart"),GcWindowTypes::ElevationChart },
     { GcViewType::VIEW_ANALYSIS|GcViewType::VIEW_TRENDS|GcViewType::VIEW_TRAIN, tr("Web page"),GcWindowTypes::WebPageWindow },
     { GcViewType::VIEW_TRENDS|GcViewType::VIEW_PLAN, tr("Calendar"),GcWindowTypes::Calendar },
-    { GcViewType::VIEW_TRENDS|GcViewType::VIEW_PLAN, tr("Agenda"),GcWindowTypes::Agenda },
+    { GcViewType::VIEW_PLAN, tr("Agenda"),GcWindowTypes::Agenda },
     { GcViewType::VIEW_PLAN, tr("Plan Adherence"),GcWindowTypes::PlanAdherence },
     { GcViewType::NO_VIEW_SET, "", GcWindowTypes::None }};
   // initialize the global registry

@@ -100,7 +100,8 @@ class AbstractView : public QWidget
         bool isSelected() const { return _selected; }
 
         GcViewType viewType() const { return _viewType; }
-        virtual QString viewTypeDesc() const = 0;
+        virtual QString viewsUserName() const = 0; // user name for the view
+        virtual QString viewsInternalName() const = 0; // internal name for the view
 
         void importChart(QMap<QString,QString>properties, bool select) { perspective_->importChart(properties, select); }
 
@@ -143,13 +144,13 @@ class AbstractView : public QWidget
     protected:
 
         // Hide constructor to create an Abstract class
-        AbstractView(Context *context, GcViewType viewType, const QString& view, const QString& heading);
+        AbstractView(Context *context, GcViewType viewType, const QString& viewsInternalName, const QString& heading);
 
         Context *context;
         const GcViewType _viewType; // used by windowregistry; e.g VIEW_TRAIN VIEW_ANALYSIS VIEW_PLAN VIEW_TRENDS
                         // we don't care what values are pass through to the GcWindowRegistry to decide
                         // what charts are relevant for this view.
-        const QString _viewName; // type of view:  "train", "analysis", "plan", "home"
+        const QString _internalViewName; // Cannot use the view's internalViewName() function as this is required in the destructor
         QString viewCfgPath; // directory path to the view's configuration
 
         // properties

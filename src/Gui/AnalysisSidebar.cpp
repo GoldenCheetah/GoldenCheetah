@@ -45,6 +45,8 @@
 // Filter for similar activities
 #include "FilterSimilarDialog.h"
 
+#include "Views.h"
+
 AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow), context(context)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -166,7 +168,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     splitterBanner->insertWidget(2, activityFilter);
     splitterBanner->insertStretch(2);
 
-    splitter->prepare(context->athlete->cyclist, "analysis");
+    splitter->prepare(context->athlete->cyclist, AnalysisView::internalName);
 
     // GC signal
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));

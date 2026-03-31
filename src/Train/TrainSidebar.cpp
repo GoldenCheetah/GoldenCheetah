@@ -326,7 +326,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     trainSplitter->addWidget(videosyncItem);
 #endif //USE_RLV
 #endif //GC_VIDEO_NONE
-    trainSplitter->prepare(context->athlete->cyclist, "train");
+    trainSplitter->prepare(context->athlete->cyclist, TrainView::internalName);
 
 #ifdef Q_OS_MAC
     // get rid of annoying focus rectangle for sidebar components

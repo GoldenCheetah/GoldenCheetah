@@ -35,8 +35,8 @@
 
 const int SIDEBAR_DEFAULT_WIDTH=200;
 
-AbstractView::AbstractView(Context *context, GcViewType viewType, const QString& viewName, const QString& heading) :
-    QWidget(context->tab), context(context), _viewType(viewType), _viewName(viewName),
+AbstractView::AbstractView(Context *context, GcViewType viewType, const QString& viewsInternalName, const QString& heading) :
+    QWidget(context->tab), context(context), _viewType(viewType), _internalViewName(viewsInternalName),
     _sidebar(true), _tiled(false), _selected(false), lastHeight(130*dpiYFactor), sidewidth(0),
     active(false), bottomRequested(false), bottomHideOnIdle(false), perspectiveactive(false),
     stack(NULL), splitter(NULL), mainSplitter(NULL), 
@@ -294,7 +294,7 @@ AbstractView::saveState()
     // we do not save all the other Qt properties since
     // we're not interested in them
     // NOTE: currently we support QString, int, double and bool types - beware custom types!!
-    QString filename = viewCfgPath + "/" + _viewName + "-perspectives.xml";
+    QString filename = viewCfgPath + "/" + _internalViewName + "-perspectives.xml";
 
     QFile file(filename);
     if (!file.open(QFile::WriteOnly)) {
@@ -325,7 +325,7 @@ void
 AbstractView::restoreState(bool useDefault)
 {
     // restore window state
-    QString filename = viewCfgPath + "/" + _viewName + "-perspectives.xml";
+    QString filename = viewCfgPath + "/" + _internalViewName + "-perspectives.xml";
 
     QFileInfo finfo(filename);
 
@@ -344,7 +344,7 @@ AbstractView::restoreState(bool useDefault)
         // fetch from the goldencheetah.org website
         QString request = QString("%1/%2-perspectives.xml")
                              .arg(VERSION_CONFIG_PREFIX)
-                             .arg(_viewName);
+                             .arg(_internalViewName);
 
         QNetworkReply *reply = nam.get(QNetworkRequest(QUrl(request)));
 
@@ -379,7 +379,7 @@ AbstractView::restoreState(bool useDefault)
         // renamed as "Legacy" and prepended to default perspectives,
         // except when useDefault is requested
         if (!finfo.exists() && !useDefault) {
-            filename = context->athlete->home->config().canonicalPath() + "/" + _viewName + "-layout.xml";
+            filename = context->athlete->home->config().canonicalPath() + "/" + _internalViewName + "-layout.xml";
 
             QFile file(filename);
             if (file.open(QIODevice::ReadOnly)) {
@@ -411,7 +411,7 @@ AbstractView::restoreState(bool useDefault)
 
         // drop back to what is baked in
         if (!finfo.exists()) {
-            filename = QString(":xml/%1-perspectives.xml").arg(_viewName);
+            filename = QString(":xml/%1-perspectives.xml").arg(_internalViewName);
             useDefault = true;
         }
         QFile file(filename);

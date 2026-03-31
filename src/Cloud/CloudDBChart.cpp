@@ -711,10 +711,10 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
     QString view = tr("unknown");
     if (g_role == CloudDBCommon::UserImport ) {
         switch(g_chartViewType) {
-        case GcViewType::VIEW_TRENDS : view = tr("Trends"); break;
-        case GcViewType::VIEW_ANALYSIS : view = tr("Activities"); break;
-        case GcViewType::VIEW_PLAN : view = tr("Plan"); break;
-        case GcViewType::VIEW_TRAIN : view = tr("Train"); break;
+        case GcViewType::VIEW_TRENDS : view = tr(TrendsView::userName); break;
+        case GcViewType::VIEW_ANALYSIS : view = tr(AnalysisView::userName); break;
+        case GcViewType::VIEW_PLAN : view = tr(PlanView::userName) ; break;
+        case GcViewType::VIEW_TRAIN : view = tr(TrainView::userName); break;
         default: qDebug() << "Unhandled view type: " << static_cast<std::underlying_type_t<GcViewType>>(g_chartViewType); break;
         }
     } else

@@ -266,10 +266,10 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     // the order of the ComboBox entries below must align with the
     // gcStartupView functionality in MainWindow's constructor
     startupView = new QComboBox();
-    startupView->addItem(tr("Trends"));   // startViewIdx = 0
-    startupView->addItem(tr("Activities")); // startViewIdx = 1
-    startupView->addItem(tr("Plan"));     // startViewIdx = 2
-    startupView->addItem(tr("Train"));    // startViewIdx = 3
+    startupView->addItem(tr(TrendsView::userName));
+    startupView->addItem(tr(AnalysisView::userName)); 
+    startupView->addItem(tr(PlanView::userName));
+    startupView->addItem(tr(TrainView::userName));
 
     // get the configured startup view configuration which matches with
     // the startViewIdx values defined by the comboBox order above.

@@ -23,6 +23,7 @@
 #include "AddTileWizard.h"
 #include "Utils.h"
 #include "HelpWhatsThis.h"
+#include "Views.h"
 
 OverviewWindow::OverviewWindow(Context *context, OverviewScope scope, bool blank) : GcChartWindow(context), context(context), configured(false), scope(scope), blank(blank)
 {
@@ -738,9 +739,9 @@ OverviewConfigDialog::exportChart()
     int chartId = GcWindowTypes::None;
 
     switch (item->parent->scope) {
-    case OverviewScope::ANALYSIS: chartId = GcWindowTypes::UserAnalysis; viewName = "analysis"; break;
-    case OverviewScope::TRENDS: chartId = GcWindowTypes::UserTrends; viewName = "home"; break;
-    case OverviewScope::PLAN: chartId = GcWindowTypes::UserPlan; viewName = "plan"; break;
+    case OverviewScope::ANALYSIS: chartId = GcWindowTypes::UserAnalysis; viewName = AnalysisView::internalName; break;
+    case OverviewScope::TRENDS: chartId = GcWindowTypes::UserTrends; viewName = TrendsView::internalName; break;
+    case OverviewScope::PLAN: chartId = GcWindowTypes::UserPlan; viewName = PlanView::internalName; break;
     default: break;
     }
 

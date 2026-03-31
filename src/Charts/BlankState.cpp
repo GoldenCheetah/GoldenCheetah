@@ -21,6 +21,7 @@
 #include "Context.h"
 #include "Colors.h"
 #include "Athlete.h"
+#include "Views.h"
 
 //
 // Replace home window when no ride
@@ -181,7 +182,7 @@ BlankStateAnalysisPage::BlankStateAnalysisPage(Context *context) : BlankStatePag
 BlankStateHomePage::BlankStateHomePage(Context *context) : BlankStatePage(context)
 {
     dontShow->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_BLANK_HOME, false).toBool());
-    welcomeTitle->setText(tr("Trends"));
+    welcomeTitle->setText(tr(TrendsView::userName));
     welcomeText->setText(tr("No ride ?\nLet's start with some data."));
 
     img->setIcon(QPixmap(":images/home.png"));
@@ -210,7 +211,7 @@ BlankStateHomePage::BlankStateHomePage(Context *context) : BlankStatePage(contex
 BlankStatePlanPage::BlankStatePlanPage(Context *context) : BlankStatePage(context)
 {
     dontShow->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_BLANK_PLAN, false).toBool());
-    welcomeTitle->setText(tr("Plan"));
+    welcomeTitle->setText(tr(PlanView::userName) );
     welcomeText->setText(tr("No ride ?\nLet's start with some data."));
 
     img->setIcon(QPixmap(":images/plan.png"));
@@ -239,7 +240,7 @@ BlankStatePlanPage::BlankStatePlanPage(Context *context) : BlankStatePage(contex
 BlankStateTrainPage::BlankStateTrainPage(Context *context) : BlankStatePage(context)
 {
     dontShow->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_BLANK_TRAIN, false).toBool());
-    welcomeTitle->setText(tr("Train"));
+    welcomeTitle->setText(tr(TrainView::userName));
     welcomeText->setText(tr("No devices or workouts ?\nLet's get you setup."));
 
     img->setIcon(QPixmap(":images/train.png"));
