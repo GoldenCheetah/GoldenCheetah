@@ -27,7 +27,7 @@
 
 NavigationModel::NavigationModel(AthleteTab *tab) : tab(tab), block(false), viewinit(false), drinit(false), iteminit(false)
 {
-    connect(tab, SIGNAL(viewChanged(int)), this, SLOT(viewChanged(int)));
+    connect(tab, SIGNAL(viewChanged(GcViewType)), this, SLOT(viewChanged(GcViewType)));
     connect(tab, SIGNAL(rideItemSelected(RideItem*)), this, SLOT(rideChanged(RideItem*)));
     connect(tab->context, SIGNAL(dateRangeSelected(DateRange)), this, SLOT(dateChanged(DateRange)));
     connect(tab->context->mainWindow, SIGNAL(backClicked()), this, SLOT(back()));
@@ -115,7 +115,7 @@ NavigationModel::dateChanged(DateRange x)
 }
 
 void
-NavigationModel::viewChanged(int x)
+NavigationModel::viewChanged(GcViewType x)
 {
     if (block) return;
 
@@ -150,13 +150,13 @@ NavigationModel::action(bool redo, NavigationEvent event)
     switch(event.type) {
     case NavigationEvent::VIEW:
     {
-        view = redo ? event.after.toInt() : event.before.toInt();
+        view = static_cast<GcViewType>(redo ? event.after.toInt() : event.before.toInt());
 
         switch (view) {
-        case 0:  tab->context->mainWindow->selectTrends(); break;
-        case 1:  tab->context->mainWindow->selectAnalysis(); break;
-        case 2:  tab->context->mainWindow->selectPlan(); break;
-        case 3:  tab->context->mainWindow->selectTrain(); break;
+        case GcViewType::VIEW_TRENDS:  tab->context->mainWindow->selectTrends(); break;
+        case GcViewType::VIEW_ANALYSIS:  tab->context->mainWindow->selectAnalysis(); break;
+        case GcViewType::VIEW_PLAN:  tab->context->mainWindow->selectPlan(); break;
+        case GcViewType::VIEW_TRAIN:  tab->context->mainWindow->selectTrain(); break;
         }
     }
     break;

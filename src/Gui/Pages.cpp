@@ -263,15 +263,25 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 
     connect(athleteBrowseButton, SIGNAL(clicked()), this, SLOT(browseAthleteDir()));
 
+    // the order of the ComboBox entries below must align with the
+    // gcStartupView functionality in MainWindow's constructor
     startupView = new QComboBox();
-    startupView->addItem(tr("Trends"));
-    startupView->addItem(tr("Activities"));
-    startupView->addItem(tr("Plan"));
-    startupView->addItem(tr("Train"));
+    startupView->addItem(tr("Trends"));   // startViewIdx = 0
+    startupView->addItem(tr("Activities")); // startViewIdx = 1
+    startupView->addItem(tr("Plan"));     // startViewIdx = 2
+    startupView->addItem(tr("Train"));    // startViewIdx = 3
 
-    // map view indexes to combo box values
-    int startView = appsettings->value(NULL, GC_STARTUP_VIEW, "1").toInt();
-    startupView->setCurrentIndex(startView);
+    // get the configured startup view configuration which matches with
+    // the startViewIdx values defined by the comboBox order above.
+    int startViewIdx = appsettings->value(NULL, GC_STARTUP_VIEW, -1).toInt();
+
+    // the configuration values are retained and the startupView Combobox uses the same values
+    // the default is analysis when no config exists or the configuration value is not recognised.
+    if (startViewIdx < 0 && startViewIdx > 3) {
+        startViewIdx = 1;
+        appsettings->setValue(GC_STARTUP_VIEW, startViewIdx);
+    }
+    startupView->setCurrentIndex(startViewIdx);
 
     QFormLayout *form = newQFormLayout();
     form->addRow(new QLabel(HLO + tr("Localization") + HLC));
@@ -336,9 +346,8 @@ GeneralPage::saveClicked()
     };
     appsettings->setValue(GC_LANG, langs[langCombo->currentIndex()]);
 
-    // map combo box values to view indexes
-    int startView = startupView->currentIndex();
-    appsettings->setValue(GC_STARTUP_VIEW, startView);
+    // save the startup view
+    appsettings->setValue(GC_STARTUP_VIEW, startupView->currentIndex());
 
     // Garmin and cranks
     appsettings->setValue(GC_GARMIN_HWMARK, garminHWMarkedit->value());
