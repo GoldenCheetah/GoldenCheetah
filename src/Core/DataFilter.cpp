@@ -499,6 +499,7 @@ DataFilter::builtins(Context *context)
     QStringList returning;
 
     // add special/old functions
+    returning <<"isPlanned";
     returning <<"isRun"<<"isRide"<<"isSwim"<<"isXtrain";
     returning << "ctl" << "tsb" << "atl";
     returning << "config(cranklength)";
@@ -964,6 +965,7 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
                 if (!sym.compare("Date", Qt::CaseInsensitive) ||
                     !sym.compare("Time", Qt::CaseInsensitive) ||
                     !sym.compare("isPlanned", Qt::CaseInsensitive) ||
+                    !sym.compare("Planned", Qt::CaseInsensitive) ||
                     !sym.compare("banister", Qt::CaseInsensitive) ||
                     !sym.compare("best", Qt::CaseInsensitive) ||
                     !sym.compare("tiz", Qt::CaseInsensitive) ||
@@ -1726,6 +1728,7 @@ bool Leaf::isNumber(DataFilterRuntime *df, Leaf *leaf)
             else if (!symbol.compare("Date", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("Time", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("isPlanned", Qt::CaseInsensitive)) return true;
+            else if (!symbol.compare("Planned", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("Today", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("Current", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("RECINTSECS", Qt::CaseInsensitive)) return true;
@@ -1827,6 +1830,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                 if (symbol.compare("Date", Qt::CaseInsensitive) &&
                     symbol.compare("Time", Qt::CaseInsensitive) &&
                     symbol.compare("isPlanned", Qt::CaseInsensitive) &&
+                    symbol.compare("Planned", Qt::CaseInsensitive) &&
                     symbol.compare("x", Qt::CaseInsensitive) && // used by which and [lexpr]
                     symbol.compare("i", Qt::CaseInsensitive) && // used by which and [lexpr]
                     symbol.compare("Today", Qt::CaseInsensitive) &&
@@ -3048,6 +3052,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                             if (!symbol.compare("Date", Qt::CaseInsensitive) ||
                                 !symbol.compare("Time", Qt::CaseInsensitive) ||
                                 !symbol.compare("isPlanned", Qt::CaseInsensitive) ||
+                                !symbol.compare("Planned", Qt::CaseInsensitive) ||
                                 !symbol.compare("x", Qt::CaseInsensitive) || // used by which
                                 !symbol.compare("i", Qt::CaseInsensitive) || // used by which
                                 !symbol.compare("Today", Qt::CaseInsensitive) ||
@@ -6701,7 +6706,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                     // lets copy into our array
                     if (series == "date") value = earliest.daysTo(QDateTime(date, QTime(0,0,0)));
-                    if (QString::compare(type, "planned", Qt::CaseInsensitive) == 0) {
+                    if (QString::compare(type, "Planned", Qt::CaseInsensitive) == 0) {
                         if (series == "lts") value = pmcData->plannedLts()[si];
                         if (series == "stress") value = pmcData->plannedStress()[si];
                         if (series == "sts") value = pmcData->plannedSts()[si];
@@ -7188,7 +7193,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                     PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df);
                     QString type = (leaf->fparms.count() >= 2) ?  *(leaf->fparms[1]->lvalue.n) : "actual";
-                    if (QString::compare(type, "planned", Qt::CaseInsensitive) == 0)
+                    if (QString::compare(type, "Planned", Qt::CaseInsensitive) == 0)
                         return Result(pmcData->plannedLts(m->dateTime.date()));
                     else if (QString::compare(type, "expected", Qt::CaseInsensitive) == 0)
                         return Result(pmcData->expectedLts(m->dateTime.date()));
@@ -7203,7 +7208,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                     PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df);
                     QString type = (leaf->fparms.count() >= 2) ?  *(leaf->fparms[1]->lvalue.n) : "actual";
-                    if (QString::compare(type, "planned", Qt::CaseInsensitive) == 0)
+                    if (QString::compare(type, "Planned", Qt::CaseInsensitive) == 0)
                         return Result(pmcData->plannedSts(m->dateTime.date()));
                     else if (QString::compare(type, "expected", Qt::CaseInsensitive) == 0)
                         return Result(pmcData->expectedSts(m->dateTime.date()));
@@ -7218,7 +7223,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                     PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df);
                     QString type = (leaf->fparms.count() >= 2) ?  *(leaf->fparms[1]->lvalue.n) : "actual";
-                    if (QString::compare(type, "planned", Qt::CaseInsensitive) == 0)
+                    if (QString::compare(type, "Planned", Qt::CaseInsensitive) == 0)
                         return Result(pmcData->plannedSb(m->dateTime.date()));
                     else if (QString::compare(type, "expected", Qt::CaseInsensitive) == 0)
                         return Result(pmcData->expectedSb(m->dateTime.date()));
@@ -7233,7 +7238,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                     PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df);
                     QString type = (leaf->fparms.count() >= 2) ?  *(leaf->fparms[1]->lvalue.n) : "actual";
-                    if (QString::compare(type, "planned", Qt::CaseInsensitive) == 0)
+                    if (QString::compare(type, "Planned", Qt::CaseInsensitive) == 0)
                         return Result(pmcData->plannedRr(m->dateTime.date()));
                     else if (QString::compare(type, "expected", Qt::CaseInsensitive) == 0)
                         return Result(pmcData->expectedRr(m->dateTime.date()));
@@ -7989,7 +7994,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             lhsdouble = QTime(0,0,0).secsTo(m->dateTime.time());
             lhsisNumber = true;
 
-        } else if (!symbol.compare("isPlanned", Qt::CaseInsensitive)) {
+        } else if (!symbol.compare("isPlanned", Qt::CaseInsensitive) ||
+                   !symbol.compare("Planned", Qt::CaseInsensitive)) {
 
             lhsdouble = m->planned;
             lhsisNumber = true;
