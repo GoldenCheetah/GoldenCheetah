@@ -265,7 +265,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 
     startupView = new QComboBox();
     startupView->addItem(tr("Trends"));
-    startupView->addItem(tr("Analysis"));
+    startupView->addItem(tr("Activities"));
     startupView->addItem(tr("Plan"));
     startupView->addItem(tr("Train"));
 
