@@ -11,14 +11,16 @@ the loopback HTTP API at `127.0.0.1` by default.
 - `gc_get_athlete_snapshot`
 - `gc_create_workout_draft`
 - `gc_save_workout`
+- `gc_create_planned_activity`
 
 The write path is intentionally split:
 
 1. Generate a draft with `gc_create_workout_draft`
 2. Review it in the client
 3. Persist it with `gc_save_workout(confirm=true, ...)`
+4. Optionally schedule it with `gc_create_planned_activity(confirm=true, ...)`
 
-`gc_save_workout` rejects calls unless `confirm=true`.
+The write tools reject calls unless `confirm=true`.
 
 ## GoldenCheetah prerequisites
 
@@ -109,7 +111,14 @@ Supported workout types:
 
 Calls `POST /<athlete>/ai/save`.
 
-This is the only write tool in the MVP and requires `confirm=true`.
+This write tool requires `confirm=true`.
+
+### `gc_create_planned_activity`
+
+Calls `POST /<athlete>/ai/plan`.
+
+This creates a planned activity that points at a saved workout file and also
+requires `confirm=true`.
 
 ## Smoke test
 
@@ -122,6 +131,7 @@ With GoldenCheetah running and an athlete already open:
 5. Call `gc_create_workout_draft`
 6. Review the returned draft
 7. Call `gc_save_workout` with the returned draft and `confirm=true`
+8. Call `gc_create_planned_activity` with the saved `filepath` and `confirm=true`
 
 ## Tests
 

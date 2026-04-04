@@ -13,6 +13,7 @@
 #include "Context.h"
 #include "ErgFile.h"
 #include "PMCData.h"
+#include "RideMetadata.h"
 #include "Settings.h"
 #include "TrainDB.h"
 #include "Zones.h"
@@ -173,6 +174,30 @@ sanitizeFilenameBase(QString value)
         value = QStringLiteral("ai_workout");
     }
     return value.left(80);
+}
+
+QString
+plannedActivityBasename(const QDateTime &dateTime)
+{
+    return dateTime.toString(QStringLiteral("yyyy_MM_dd_HH_mm_ss"));
+}
+
+QString
+normalizedSport(QString sport)
+{
+    sport = RideFile::sportTag(sport.trimmed());
+    return sport.isEmpty() ? QStringLiteral("Bike") : sport;
+}
+
+void
+setMetricOverride(RideFile &rideFile, const QString &metricName, int value)
+{
+    if (value <= 0) {
+        return;
+    }
+    QMap<QString, QString> values;
+    values.insert(QStringLiteral("value"), QString::number(value));
+    rideFile.metricOverrides.insert(metricName, values);
 }
 
 int
@@ -596,6 +621,118 @@ WorkoutGenerationService::saveDraft(Context *context, const WorkoutDraft &draft,
 
     if (savedPath) {
         *savedPath = filepath;
+    }
+    return true;
+}
+
+bool
+WorkoutGenerationService::createPlannedActivity(Context *context, const QString &workoutPath,
+                                                const QDateTime &when, const QString &sport,
+                                                const QString &title, const QString &description,
+                                                QString *savedPath, QStringList &errors)
+{
+    if (!context || !context->athlete || !context->athlete->rideCache) {
+        errors << QStringLiteral("Invalid context");
+        return false;
+    }
+
+    QString cleanedWorkoutPath = workoutPath.trimmed();
+    if (cleanedWorkoutPath.isEmpty()) {
+        errors << QStringLiteral("workoutPath is required");
+        return false;
+    }
+
+    QFileInfo workoutInfo(cleanedWorkoutPath);
+    if (!workoutInfo.exists() || !workoutInfo.isFile()) {
+        errors << QStringLiteral("Workout file does not exist");
+        return false;
+    }
+
+    QDateTime effectiveWhen = when.isValid()
+        ? when
+        : QDateTime(QDate::currentDate(), QTime(6, 0, 0));
+    if (!effectiveWhen.isValid()) {
+        errors << QStringLiteral("Invalid planned activity date/time");
+        return false;
+    }
+
+    QString plannedDirPath = context->athlete->home->planned().canonicalPath();
+    if (plannedDirPath.isEmpty()) {
+        errors << QStringLiteral("Planned activity directory is not available");
+        return false;
+    }
+
+    QString plannedFileName = plannedActivityBasename(effectiveWhen) + QStringLiteral(".json");
+    QString plannedPath = plannedDirPath + QLatin1Char('/') + plannedFileName;
+    if (QFile::exists(plannedPath)) {
+        errors << QStringLiteral("There is already a planned activity at the requested time");
+        return false;
+    }
+
+    ErgFile ergFile(cleanedWorkoutPath, ErgFileFormat::unknown, context, effectiveWhen.date());
+    if (!ergFile.isValid()) {
+        errors << QStringLiteral("Saved workout could not be parsed");
+        return false;
+    }
+
+    RideFile rideFile;
+    rideFile.setStartTime(effectiveWhen);
+    rideFile.setRecIntSecs(0.00);
+    rideFile.setDeviceType(QStringLiteral("Manual"));
+    rideFile.setFileFormat(QStringLiteral("GoldenCheetah Json"));
+    rideFile.setTag(QStringLiteral("Original Date"), effectiveWhen.date().toString(QStringLiteral("yyyy/MM/dd")));
+    rideFile.setTag(QStringLiteral("Year"), effectiveWhen.toString(QStringLiteral("yyyy")));
+    rideFile.setTag(QStringLiteral("Month"), effectiveWhen.toString(QStringLiteral("MMMM")));
+    rideFile.setTag(QStringLiteral("Weekday"), effectiveWhen.toString(QStringLiteral("ddd")));
+    rideFile.setTag(QStringLiteral("Sport"), normalizedSport(sport));
+    rideFile.setTag(QStringLiteral("WorkoutFilename"), cleanedWorkoutPath);
+
+    QString resolvedTitle = title.trimmed();
+    if (resolvedTitle.isEmpty()) {
+        resolvedTitle = ergFile.name().trimmed();
+    }
+    if (resolvedTitle.isEmpty()) {
+        resolvedTitle = workoutInfo.completeBaseName();
+    }
+    if (!resolvedTitle.isEmpty()) {
+        rideFile.setTag(QStringLiteral("Route"), resolvedTitle);
+        rideFile.setTag(QStringLiteral("Workout Code"), resolvedTitle);
+    }
+
+    QString resolvedDescription = description.trimmed();
+    if (resolvedDescription.isEmpty()) {
+        resolvedDescription = ergFile.description().trimmed();
+    }
+    if (!resolvedDescription.isEmpty()) {
+        rideFile.setTag(QStringLiteral("Notes"), resolvedDescription);
+    }
+
+    int durationSec = static_cast<int>(std::lround(ergFile.duration() / 1000.0));
+    setMetricOverride(rideFile, QStringLiteral("workout_time"), durationSec);
+    setMetricOverride(rideFile, QStringLiteral("time_riding"), durationSec);
+    setMetricOverride(rideFile, QStringLiteral("average_power"), static_cast<int>(std::lround(ergFile.AP())));
+    setMetricOverride(rideFile, QStringLiteral("coggan_np"), static_cast<int>(std::lround(ergFile.IsoPower())));
+    setMetricOverride(rideFile, QStringLiteral("coggan_tss"), static_cast<int>(std::lround(ergFile.bikeStress())));
+    setMetricOverride(rideFile, QStringLiteral("skiba_bike_score"), static_cast<int>(std::lround(ergFile.BS())));
+    setMetricOverride(rideFile, QStringLiteral("skiba_xpower"), static_cast<int>(std::lround(ergFile.XP())));
+    setMetricOverride(rideFile, QStringLiteral("elevation_gain"), static_cast<int>(std::lround(ergFile.ele())));
+
+    GlobalContext::context()->rideMetadata->setLinkedDefaults(&rideFile);
+
+    QFile out(plannedPath);
+    if (!RideFileFactory::instance().writeRideFile(context, &rideFile, out, QStringLiteral("json"))) {
+        errors << QStringLiteral("Failed to write planned activity");
+        return false;
+    }
+
+    context->athlete->addRide(plannedFileName, true, false, false, true);
+    RideItem *plannedItem = context->athlete->rideCache->getRide(plannedFileName, true);
+    if (plannedItem) {
+        context->athlete->rideCache->updateFromWorkout(plannedItem, true);
+    }
+
+    if (savedPath) {
+        *savedPath = plannedPath;
     }
     return true;
 }

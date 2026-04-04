@@ -72,6 +72,9 @@ class GoldenCheetahApiClient:
     def save_draft(self, athlete: str, payload: dict[str, Any]) -> dict[str, Any]:
         return self._request_json("POST", self._athlete_path(athlete, "ai", "save"), payload=payload)
 
+    def create_planned_activity(self, athlete: str, payload: dict[str, Any]) -> dict[str, Any]:
+        return self._request_json("POST", self._athlete_path(athlete, "ai", "plan"), payload=payload)
+
     def _athlete_path(self, athlete: str, *segments: str) -> str:
         encoded = [urllib.parse.quote(part, safe="") for part in (athlete, *segments)]
         return "/" + "/".join(encoded)
@@ -165,7 +168,7 @@ def build_server(
         instructions=(
             "This server bridges to a local GoldenCheetah instance over loopback HTTP. "
             "Use gc_create_workout_draft to prepare workouts and only call gc_save_workout "
-            "after explicit user confirmation."
+            "or gc_create_planned_activity after explicit user confirmation."
         ),
         host=host,
         port=port,
@@ -293,6 +296,45 @@ def build_server(
         if date.strip():
             payload["date"] = date.strip()
         return client.save_draft(athlete=athlete, payload=payload)
+
+    @mcp.tool(
+        name="gc_create_planned_activity",
+        description=(
+            "Create a planned activity in GoldenCheetah that references a saved workout file. "
+            "Only use this after the user has explicitly approved the write."
+        ),
+        annotations=ToolAnnotations(
+            title="Create Planned Activity",
+            readOnlyHint=False,
+            destructiveHint=False,
+            idempotentHint=False,
+            openWorldHint=False,
+        ),
+    )
+    def gc_create_planned_activity(
+        athlete: str,
+        workout_path: str,
+        date: str,
+        confirm: bool,
+        time: str = "06:00:00",
+        sport: str = "Bike",
+        title: str = "",
+        description: str = "",
+    ) -> dict[str, Any]:
+        if not confirm:
+            raise ValueError("gc_create_planned_activity requires confirm=true after explicit user approval.")
+
+        payload = _remove_empty_strings(
+            {
+                "workoutPath": workout_path,
+                "date": date,
+                "time": time,
+                "sport": sport,
+                "title": title,
+                "description": description,
+            }
+        )
+        return client.create_planned_activity(athlete=athlete, payload=payload)
 
     return mcp
 

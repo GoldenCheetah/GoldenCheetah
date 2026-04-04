@@ -58,6 +58,48 @@ parseApiDate(const QString &value)
     return parsed;
 }
 
+QTime
+parseApiTime(const QString &value)
+{
+    if (value.isEmpty()) {
+        return QTime();
+    }
+    QTime parsed = QTime::fromString(value, Qt::ISODate);
+    if (!parsed.isValid()) {
+        parsed = QTime::fromString(value, QStringLiteral("hh:mm"));
+    }
+    if (!parsed.isValid()) {
+        parsed = QTime::fromString(value, QStringLiteral("hh:mm:ss"));
+    }
+    return parsed;
+}
+
+QDateTime
+parseApiDateTime(const QString &whenValue, const QString &dateValue, const QString &timeValue)
+{
+    QString cleanedWhen = whenValue.trimmed();
+    if (!cleanedWhen.isEmpty()) {
+        QDateTime parsed = QDateTime::fromString(cleanedWhen, Qt::ISODate);
+        if (!parsed.isValid()) {
+            parsed = QDateTime::fromString(cleanedWhen, Qt::ISODateWithMs);
+        }
+        if (parsed.isValid()) {
+            return parsed;
+        }
+    }
+
+    QDate date = parseApiDate(dateValue);
+    if (!date.isValid()) {
+        return QDateTime();
+    }
+
+    QTime time = parseApiTime(timeValue);
+    if (!time.isValid()) {
+        time = QTime(6, 0, 0);
+    }
+    return QDateTime(date, time);
+}
+
 QJsonArray
 toJsonArray(const QStringList &values)
 {
@@ -282,6 +324,10 @@ APIWebService::aiEndpoint(QString athlete, QStringList paths, HttpRequest &reque
         aiSave(athlete, request, response);
         return;
     }
+    if (paths[0] == "plan") {
+        aiPlan(athlete, request, response);
+        return;
+    }
 
     writeJsonError(response, 404, QStringLiteral("Unknown AI endpoint"), QByteArray("Not Found"));
 }
@@ -417,6 +463,68 @@ APIWebService::aiSave(QString athlete, HttpRequest &request, HttpResponse &respo
     object.insert(QStringLiteral("filepath"), savedPath);
     object.insert(QStringLiteral("displayName"), draft.displayName);
     object.insert(QStringLiteral("generatorId"), draft.generatorId);
+    writeJson(response, QJsonDocument(object));
+}
+
+void
+APIWebService::aiPlan(QString athlete, HttpRequest &request, HttpResponse &response)
+{
+    if (!requireMethod(request, response, "POST", "POST")) {
+        return;
+    }
+
+    QJsonDocument document;
+    if (!requireJsonBody(request, response, document)) {
+        return;
+    }
+
+    Context *context = Context::findAthleteContext(athlete);
+    if (context == NULL) {
+        writeJsonError(response, 409,
+                       QStringLiteral("AI endpoints currently require athlete '%1' to be open in GoldenCheetah").arg(athlete),
+                       QByteArray("Conflict"));
+        return;
+    }
+
+    QJsonObject root = document.object();
+    QString workoutPath = root.value(QStringLiteral("workoutPath")).toString().trimmed();
+    if (workoutPath.isEmpty()) {
+        workoutPath = root.value(QStringLiteral("filepath")).toString().trimmed();
+    }
+    if (workoutPath.isEmpty()) {
+        writeJsonError(response, 400, QStringLiteral("workoutPath is required"), QByteArray("Bad Request"));
+        return;
+    }
+
+    QDateTime when = parseApiDateTime(root.value(QStringLiteral("when")).toString(),
+                                      root.value(QStringLiteral("date")).toString(),
+                                      root.value(QStringLiteral("time")).toString());
+    if (!when.isValid()) {
+        writeJsonError(response, 400, QStringLiteral("A valid when or date is required"), QByteArray("Bad Request"));
+        return;
+    }
+
+    QStringList errors;
+    QString savedPath;
+    bool planned = WorkoutGenerationService::createPlannedActivity(
+        context,
+        workoutPath,
+        when,
+        root.value(QStringLiteral("sport")).toString(),
+        root.value(QStringLiteral("title")).toString(),
+        root.value(QStringLiteral("description")).toString(),
+        &savedPath,
+        errors);
+    if (!planned) {
+        writeJsonError(response, 422, errors.join(QStringLiteral("; ")), QByteArray("Unprocessable Entity"));
+        return;
+    }
+
+    QJsonObject object;
+    object.insert(QStringLiteral("saved"), true);
+    object.insert(QStringLiteral("filepath"), savedPath);
+    object.insert(QStringLiteral("workoutPath"), workoutPath);
+    object.insert(QStringLiteral("when"), when.toString(Qt::ISODate));
     writeJson(response, QJsonDocument(object));
 }
 

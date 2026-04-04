@@ -107,6 +107,16 @@ class MockGoldenCheetahHandler(BaseHTTPRequestHandler):
             self._write_json(200, body)
             return
 
+        if self.path == "/Test%20Rider/ai/plan":
+            body = {
+                "saved": True,
+                "filepath": "/tmp/2026_04_04_06_00_00.json",
+                "workoutPath": payload["workoutPath"],
+                "when": "2026-04-04T06:00:00",
+            }
+            self._write_json(200, body)
+            return
+
         self._write_json(404, {"error": f"Unhandled POST {self.path}"})
 
     def log_message(self, format: str, *args: Any) -> None:  # noqa: A003
@@ -167,6 +177,7 @@ class GoldenCheetahMcpIntegrationTest(unittest.TestCase):
                 self.assertIn("gc_get_athlete_snapshot", tool_names)
                 self.assertIn("gc_create_workout_draft", tool_names)
                 self.assertIn("gc_save_workout", tool_names)
+                self.assertIn("gc_create_planned_activity", tool_names)
 
                 athletes_result = await session.call_tool("gc_list_athletes")
                 athletes = athletes_result.structuredContent["athletes"]
@@ -194,3 +205,15 @@ class GoldenCheetahMcpIntegrationTest(unittest.TestCase):
                 )
                 self.assertTrue(save_result.structuredContent["saved"])
                 self.assertEqual(save_result.structuredContent["filepath"], "/tmp/mock-workout.erg")
+
+                plan_result = await session.call_tool(
+                    "gc_create_planned_activity",
+                    {
+                        "athlete": "Test Rider",
+                        "workout_path": "/tmp/mock-workout.erg",
+                        "date": "2026-04-04",
+                        "confirm": True,
+                    },
+                )
+                self.assertTrue(plan_result.structuredContent["saved"])
+                self.assertEqual(plan_result.structuredContent["filepath"], "/tmp/2026_04_04_06_00_00.json")

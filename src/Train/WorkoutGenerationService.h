@@ -13,6 +13,7 @@
 #include "WorkoutDraft.h"
 
 #include <QDate>
+#include <QDateTime>
 #include <QString>
 #include <QStringList>
 
@@ -74,6 +75,15 @@ class WorkoutGenerationService {
         /** Save a draft to the workout directory and import it into TrainDB. */
         static bool saveDraft(Context *context, const WorkoutDraft &draft, const QDate &when,
                               QString *savedPath, QStringList &errors);
+
+        /**
+         * Create a planned activity JSON entry that references a saved workout.
+         * Uses the existing planned-activity directory and ride cache refresh flow.
+         */
+        static bool createPlannedActivity(Context *context, const QString &workoutPath,
+                                          const QDateTime &when, const QString &sport,
+                                          const QString &title, const QString &description,
+                                          QString *savedPath, QStringList &errors);
 
         /** Small deterministic draft for tests and offline demos (no ML). */
         static WorkoutDraft exampleDeterministicDraft();

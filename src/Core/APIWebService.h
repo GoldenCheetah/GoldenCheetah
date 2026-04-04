@@ -56,6 +56,7 @@ class APIWebService : public HttpRequestHandler
         void aiSnapshot(QString athlete, HttpRequest &request, HttpResponse &response);
         void aiDraft(QString athlete, HttpRequest &request, HttpResponse &response);
         void aiSave(QString athlete, HttpRequest &request, HttpResponse &response);
+        void aiPlan(QString athlete, HttpRequest &request, HttpResponse &response);
 
         // utility
         void writeRideLine(RideItem &item, HttpRequest *request, HttpResponse *response);

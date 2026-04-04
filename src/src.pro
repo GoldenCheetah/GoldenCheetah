@@ -553,6 +553,24 @@ LEXSOURCES  += Core/DataFilter.l \
                Train/WorkoutFilter.l \
                Train/TrainerDayAPIQuery.l
 
+# qmake's yacc rules clean the *_yacc outputs but not the temporary *.tab.{h,c}
+# files. When stale *.tab.h symlinks exist, parallel/full builds can end up
+# moving a generated file onto itself. Clean those temporary yacc artifacts
+# before regeneration.
+YACC_TAB_ARTIFACTS = DataFilter.tab.h DataFilter.tab.c \
+                     JsonRideFile.tab.h JsonRideFile.tab.c \
+                     RideDB.tab.h RideDB.tab.c \
+                     WorkoutFilter.tab.h WorkoutFilter.tab.c \
+                     TrainerDayAPIQuery.tab.h TrainerDayAPIQuery.tab.c
+
+yacc_cleanup_tabfiles.target = yacc_cleanup_tabfiles
+yacc_cleanup_tabfiles.commands = -$(DEL_FILE) $$YACC_TAB_ARTIFACTS
+QMAKE_EXTRA_TARGETS += yacc_cleanup_tabfiles
+yacc_decl.depends += yacc_cleanup_tabfiles
+yacc_impl.depends += yacc_cleanup_tabfiles
+compiler_yacc_decl_make_all.depends += yacc_cleanup_tabfiles
+compiler_yacc_impl_make_all.depends += yacc_cleanup_tabfiles
+
 # Fix parallel build races (YACC headers must exist before LEX runs)
 compiler_lex_make_all.depends += compiler_yacc_decl_make_all
 
