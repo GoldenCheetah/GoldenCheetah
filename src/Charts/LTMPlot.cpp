@@ -782,8 +782,7 @@ LTMPlot::setData(LTMSettings *set)
 
                 // we need to fill in the gaps sadly
                 int lcount = xdata[count];
-
-                if (lcount) {
+                if (lcount > 0) {
                     // calculated values
                     QVector<double> xtrend(lcount);
                     QVector<double> btrend(lcount);
