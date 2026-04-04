@@ -125,6 +125,8 @@ class Context : public QObject
 
         // check if valid (might be deleted)
         static bool isValid(Context *);
+        static QList<Context*> contexts();
+        static Context *findAthleteContext(const QString &athleteName = QString());
 
         // mainwindow state
         NavigationModel *nav;

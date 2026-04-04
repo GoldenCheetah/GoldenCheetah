@@ -140,6 +140,26 @@ GlobalContext::userMetricsConfigChanged()
 
 bool Context::isValid(Context *p) { return p != NULL &&_contexts.contains(p); }
 
+QList<Context*>
+Context::contexts()
+{
+    return _contexts;
+}
+
+Context *
+Context::findAthleteContext(const QString &athleteName)
+{
+    foreach (Context *context, _contexts) {
+        if (!isValid(context) || context->athlete == NULL) {
+            continue;
+        }
+        if (athleteName.isEmpty() || context->athlete->cyclist == athleteName) {
+            return context;
+        }
+    }
+    return NULL;
+}
+
 Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
 {
     ride = NULL;
@@ -206,4 +226,3 @@ Context::notifyConfigChanged(qint32 state)
     emit configChanged(state);
     QApplication::restoreOverrideCursor();
 }
-

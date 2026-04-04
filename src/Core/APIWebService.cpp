@@ -19,8 +19,10 @@
 #include "APIWebService.h"
 
 #include "Settings.h"
+#include "Context.h"
 #include "GcUpgrade.h"
 #include "RideDB.h"
+#include "WorkoutGenerationService.h"
 
 #include "RideFile.h"
 #include "RideFileCache.h"
@@ -33,6 +35,100 @@
 
 #include <QTemporaryFile>
 #include <QFile>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonParseError>
+#include <QMutexLocker>
+
+namespace {
+
+QDate
+parseApiDate(const QString &value)
+{
+    if (value.isEmpty()) {
+        return QDate();
+    }
+    QDate parsed = QDate::fromString(value, Qt::ISODate);
+    if (!parsed.isValid()) {
+        parsed = QDate::fromString(value, QStringLiteral("yyyy/MM/dd"));
+    }
+    if (!parsed.isValid()) {
+        parsed = QDate::fromString(value, QStringLiteral("yyyy-MM-dd"));
+    }
+    return parsed;
+}
+
+QJsonArray
+toJsonArray(const QStringList &values)
+{
+    QJsonArray array;
+    for (const QString &value : values) {
+        array.append(value);
+    }
+    return array;
+}
+
+}
+
+void
+APIWebService::writeJson(HttpResponse &response, const QJsonDocument &document, int statusCode, const QByteArray &reason)
+{
+    response.setStatus(statusCode, reason);
+    response.setHeader("Content-Type", "application/json; charset=UTF-8");
+    response.write(document.toJson(QJsonDocument::Compact), true);
+}
+
+void
+APIWebService::writeJsonError(HttpResponse &response, int statusCode, const QString &message, const QByteArray &reason)
+{
+    QJsonObject object;
+    object.insert(QStringLiteral("error"), message);
+    writeJson(response, QJsonDocument(object), statusCode, reason.isEmpty() ? QByteArray("Error") : reason);
+}
+
+bool
+APIWebService::requireMethod(HttpRequest &request, HttpResponse &response, const QByteArray &method, const QByteArray &allow)
+{
+    if (request.getMethod().toUpper() != method.toUpper()) {
+        response.setHeader("Allow", allow);
+        writeJsonError(response, 405,
+                       QStringLiteral("Method %1 not allowed").arg(QString::fromLatin1(request.getMethod())),
+                       QByteArray("Method Not Allowed"));
+        return false;
+    }
+    return true;
+}
+
+bool
+APIWebService::requireJsonBody(HttpRequest &request, HttpResponse &response, QJsonDocument &document)
+{
+    QByteArray contentType = request.getHeader("Content-Type");
+    if (contentType.isEmpty()) {
+        contentType = request.getHeader("content-type");
+    }
+    QString loweredType = QString::fromLatin1(contentType).trimmed().toLower();
+    if (!loweredType.startsWith(QStringLiteral("application/json"))) {
+        writeJsonError(response, 415, QStringLiteral("Content-Type must be application/json"),
+                       QByteArray("Unsupported Media Type"));
+        return false;
+    }
+
+    QByteArray body = request.getBody();
+    if (body.isEmpty()) {
+        writeJsonError(response, 400, QStringLiteral("Request body is empty"), QByteArray("Bad Request"));
+        return false;
+    }
+
+    QJsonParseError parseError;
+    document = QJsonDocument::fromJson(body, &parseError);
+    if (parseError.error != QJsonParseError::NoError || document.isNull() || !document.isObject()) {
+        writeJsonError(response, 400,
+                       QStringLiteral("Invalid JSON body: %1").arg(parseError.errorString()),
+                       QByteArray("Bad Request"));
+        return false;
+    }
+    return true;
+}
 
 void
 APIWebService::service(HttpRequest &request, HttpResponse &response)
@@ -113,6 +209,12 @@ APIWebService::athleteData(QStringList &paths, HttpRequest &request, HttpRespons
         QString athlete = paths[0];
         paths.removeFirst();
 
+        if (paths[0] == "ai") {
+            paths.removeFirst();
+            aiEndpoint(athlete, paths, request, response);
+            return;
+        }
+
         // GET ACTIVITY
         // http://localhost:12021/athlete/activity/filename
         // optional query parameters:
@@ -157,6 +259,165 @@ APIWebService::athleteData(QStringList &paths, HttpRequest &request, HttpRespons
     response.setStatus(404); // malformed URL
     response.setHeader("Content-Type", "text; charset=ISO-8859-1");
     response.write("malformed url");
+}
+
+void
+APIWebService::aiEndpoint(QString athlete, QStringList paths, HttpRequest &request, HttpResponse &response)
+{
+    QMutexLocker locker(&aiMutex);
+
+    if (paths.isEmpty()) {
+        writeJsonError(response, 404, QStringLiteral("Missing AI endpoint"), QByteArray("Not Found"));
+        return;
+    }
+    if (paths[0] == "snapshot") {
+        aiSnapshot(athlete, request, response);
+        return;
+    }
+    if (paths[0] == "draft") {
+        aiDraft(athlete, request, response);
+        return;
+    }
+    if (paths[0] == "save") {
+        aiSave(athlete, request, response);
+        return;
+    }
+
+    writeJsonError(response, 404, QStringLiteral("Unknown AI endpoint"), QByteArray("Not Found"));
+}
+
+void
+APIWebService::aiSnapshot(QString athlete, HttpRequest &request, HttpResponse &response)
+{
+    if (!requireMethod(request, response, "GET", "GET")) {
+        return;
+    }
+
+    Context *context = Context::findAthleteContext(athlete);
+    if (context == NULL) {
+        writeJsonError(response, 409,
+                       QStringLiteral("AI endpoints currently require athlete '%1' to be open in GoldenCheetah").arg(athlete),
+                       QByteArray("Conflict"));
+        return;
+    }
+
+    WorkoutAthleteSnapshot snapshot =
+        WorkoutGenerationService::athleteSnapshot(context, parseApiDate(QString::fromLatin1(request.getParameter("date"))));
+
+    QJsonObject object;
+    object.insert(QStringLiteral("snapshot"), snapshot.toJson());
+    object.insert(QStringLiteral("generatorId"), QStringLiteral("goldencheetah-heuristic-v1"));
+    object.insert(QStringLiteral("supportedWorkoutTypes"),
+                  toJsonArray(QStringList()
+                              << QStringLiteral("recovery")
+                              << QStringLiteral("endurance")
+                              << QStringLiteral("sweetspot")
+                              << QStringLiteral("threshold")
+                              << QStringLiteral("vo2max")
+                              << QStringLiteral("anaerobic")
+                              << QStringLiteral("mixed")));
+    writeJson(response, QJsonDocument(object));
+}
+
+void
+APIWebService::aiDraft(QString athlete, HttpRequest &request, HttpResponse &response)
+{
+    if (!requireMethod(request, response, "POST", "POST")) {
+        return;
+    }
+
+    QJsonDocument document;
+    if (!requireJsonBody(request, response, document)) {
+        return;
+    }
+
+    Context *context = Context::findAthleteContext(athlete);
+    if (context == NULL) {
+        writeJsonError(response, 409,
+                       QStringLiteral("AI endpoints currently require athlete '%1' to be open in GoldenCheetah").arg(athlete),
+                       QByteArray("Conflict"));
+        return;
+    }
+
+    QString parseError;
+    bool ok = false;
+    WorkoutHeuristicRequest generationRequest =
+        WorkoutHeuristicRequest::fromJson(document.object(), &ok, &parseError);
+    if (!ok) {
+        writeJsonError(response, 400, parseError, QByteArray("Bad Request"));
+        return;
+    }
+
+    WorkoutAthleteSnapshot snapshot = WorkoutGenerationService::athleteSnapshot(context, generationRequest.date);
+    if (!snapshot.canGenerate()) {
+        writeJsonError(response, 422,
+                       QStringLiteral("Bike FTP/CP is not configured for the requested date"),
+                       QByteArray("Unprocessable Entity"));
+        return;
+    }
+
+    QStringList warnings;
+    WorkoutDraft draft = WorkoutGenerationService::generateHeuristicDraft(snapshot, generationRequest, &warnings);
+
+    QJsonObject object;
+    object.insert(QStringLiteral("snapshot"), snapshot.toJson());
+    object.insert(QStringLiteral("draft"), draft.toJson());
+    object.insert(QStringLiteral("warnings"), toJsonArray(warnings));
+    writeJson(response, QJsonDocument(object));
+}
+
+void
+APIWebService::aiSave(QString athlete, HttpRequest &request, HttpResponse &response)
+{
+    if (!requireMethod(request, response, "POST", "POST")) {
+        return;
+    }
+
+    QJsonDocument document;
+    if (!requireJsonBody(request, response, document)) {
+        return;
+    }
+
+    Context *context = Context::findAthleteContext(athlete);
+    if (context == NULL) {
+        writeJsonError(response, 409,
+                       QStringLiteral("AI endpoints currently require athlete '%1' to be open in GoldenCheetah").arg(athlete),
+                       QByteArray("Conflict"));
+        return;
+    }
+
+    QJsonObject root = document.object();
+    QJsonObject draftObject = root;
+    if (root.contains(QStringLiteral("draft")) && root.value(QStringLiteral("draft")).isObject()) {
+        draftObject = root.value(QStringLiteral("draft")).toObject();
+    }
+
+    bool ok = false;
+    WorkoutDraft draft = WorkoutDraft::fromJson(draftObject, &ok);
+    if (!ok) {
+        writeJsonError(response, 400, QStringLiteral("Invalid WorkoutDraft payload"), QByteArray("Bad Request"));
+        return;
+    }
+
+    QStringList errors;
+    QString savedPath;
+    bool saved = WorkoutGenerationService::saveDraft(
+        context,
+        draft,
+        parseApiDate(root.value(QStringLiteral("date")).toString()),
+        &savedPath,
+        errors);
+    if (!saved) {
+        writeJsonError(response, 422, errors.join(QStringLiteral("; ")), QByteArray("Unprocessable Entity"));
+        return;
+    }
+
+    QJsonObject object;
+    object.insert(QStringLiteral("saved"), true);
+    object.insert(QStringLiteral("filepath"), savedPath);
+    object.insert(QStringLiteral("displayName"), draft.displayName);
+    object.insert(QStringLiteral("generatorId"), draft.generatorId);
+    writeJson(response, QJsonDocument(object));
 }
 
 void
