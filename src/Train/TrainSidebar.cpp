@@ -99,6 +99,8 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     autoConnect = false;
     trainView=NULL;
     useSimulatedSpeed = false;
+    m_autoPauseZeroCount = 0;
+    m_autoPaused = false;
 
     cl->setSpacing(0);
     cl->setContentsMargins(0,0,0,0);
@@ -1297,6 +1299,8 @@ void TrainSidebar::Start()       // when start button is pressed
         session_time.start();
         lap_time.start();
         clearStatusFlags(RT_PAUSED);
+        m_autoPaused = false;
+        m_autoPauseZeroCount = 0;
 
         // Reset speed simulation timer.
         bicycle.resettimer();
@@ -1418,6 +1422,10 @@ void TrainSidebar::Start()       // when start button is pressed
         lap_elapsed_msec = 0;
         wbalr = 0;
         wbal = WPRIME;
+
+        // reset auto-pause state for new workout
+        m_autoPauseZeroCount = 0;
+        m_autoPaused = false;
         
         resetTextAudioEmitTracking();
 
@@ -1540,6 +1548,10 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
 #endif
 
     clearStatusFlags(RT_RUNNING|RT_PAUSED);
+
+    // reset auto-pause state
+    m_autoPauseZeroCount = 0;
+    m_autoPaused = false;
 
     // Stop users from selecting different devices
     // media or workouts whilst a workout is in progress
@@ -2192,6 +2204,9 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
             rtData.setWbal(wbal);
 
+            // check auto-pause: pause when 0W sustained, resume when power returns
+            checkAutoPause(rtData.getWatts());
+
             // go update the displays...
             context->notifyTelemetryUpdate(rtData); // signal everyone to update telemetry
         }
@@ -2204,6 +2219,52 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             //The system will be able to sleep again.
         }
 #endif
+    }
+}
+
+void TrainSidebar::checkAutoPause(double watts)
+{
+    // only act when auto-pause is enabled and a workout is running
+    if (!appsettings->value(this, TRAIN_AUTOPAUSE, false).toBool()) return;
+    if (!(status & RT_RUNNING) || !(status & RT_WORKOUT)) return;
+
+    int delaySecs = appsettings->value(this, TRAIN_AUTOPAUSE_DELAY, 3).toInt();
+    int threshold = qMax(1, (delaySecs * 1000) / REFRESHRATE); // ticks needed
+
+    if (watts < 1.0) {
+        m_autoPauseZeroCount++;
+
+        if (!m_autoPaused && !(status & RT_PAUSED) && m_autoPauseZeroCount >= threshold) {
+            // trigger auto-pause — reuse the manual pause path
+            m_autoPaused = true;
+            session_elapsed_msec += session_time.elapsed();
+            lap_elapsed_msec += lap_time.elapsed();
+            setStatusFlags(RT_PAUSED);
+            if (status & RT_RECORDING) disk_timer->stop();
+            load_timer->stop();
+            load_msecs += load_period.restart();
+            context->notifyPause();
+            context->notifySetNotification(tr("Auto-Paused.."), 2);
+            qDebug() << "auto-pause triggered after" << m_autoPauseZeroCount << "zero-power ticks";
+        }
+    } else {
+        m_autoPauseZeroCount = 0;
+
+        if (m_autoPaused && (status & RT_PAUSED)) {
+            // auto-resume — reuse the manual unpause path
+            m_autoPaused = false;
+            session_time.start();
+            lap_time.start();
+            clearStatusFlags(RT_PAUSED);
+            bicycle.resettimer();
+            maintainLapDistanceState();
+            if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
+            load_period.restart();
+            load_timer->start(LOADRATE);
+            context->notifyUnPause();
+            context->notifySetNotification(tr("Resuming.."), 2);
+            qDebug() << "auto-pause resumed — power back:" << watts;
+        }
     }
 }
 
