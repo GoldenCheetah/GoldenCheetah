@@ -76,6 +76,12 @@ class GoldenCheetahApiClient:
     def create_planned_activity(self, athlete: str, payload: dict[str, Any]) -> dict[str, Any]:
         return self._request_json("POST", self._athlete_path(athlete, "ai", "plan"), payload=payload)
 
+    def simulate(self, athlete: str, payload: dict[str, Any]) -> dict[str, Any]:
+        return self._request_json("POST", self._athlete_path(athlete, "ai", "simulate"), payload=payload)
+
+    def banister(self, athlete: str, payload: dict[str, Any]) -> dict[str, Any]:
+        return self._request_json("POST", self._athlete_path(athlete, "ai", "banister"), payload=payload)
+
     def list_activities(
         self,
         athlete: str,
@@ -405,6 +411,74 @@ def build_server(
             }
         )
         return client.create_planned_activity(athlete=athlete, payload=payload)
+
+    # ------------------------------------------------------------------
+    # AI simulation tools (Phase 1+2)
+    # ------------------------------------------------------------------
+
+    @mcp.tool(
+        name="gc_simulate_workout",
+        description=(
+            "Simulate all 7 workout types forward and rank them by training goal. "
+            "Uses PMC-based forward projection with physiological safety constraints. "
+            "Goals: 'build' (maximize fitness), 'maintain' (steady state), "
+            "'taper' (reduce fatigue pre-race), 'recover' (maximize freshness). "
+            "Returns ranked candidates with projected CTL/ATL/TSB and constraint violations."
+        ),
+        annotations=ToolAnnotations(
+            title="Simulate Workout Selection",
+            readOnlyHint=True,
+            destructiveHint=False,
+            idempotentHint=True,
+            openWorldHint=False,
+        ),
+    )
+    def gc_simulate_workout(
+        athlete: str,
+        goal: str = "build",
+        duration_min: int = 60,
+        date: str = "",
+    ) -> dict[str, Any]:
+        payload: dict[str, Any] = {
+            "goal": goal,
+            "durationMin": duration_min,
+        }
+        if date.strip():
+            payload["date"] = date.strip()
+        return client.simulate(athlete=athlete, payload=payload)
+
+    @mcp.tool(
+        name="gc_banister_compare",
+        description=(
+            "Compare training plan templates using the Banister impulse-response model. "
+            "Extracts the athlete's fitted model parameters (k1, k2, τ1, τ2) and projects "
+            "predicted performance for each plan template over the specified number of days. "
+            "Templates: '3-1' (3 build + 1 recovery week), '2-1', 'progressive', 'polarized', 'flat'. "
+            "Requires weeklyTSS (target weekly training stress) and days (planning horizon)."
+        ),
+        annotations=ToolAnnotations(
+            title="Banister Plan Comparison",
+            readOnlyHint=True,
+            destructiveHint=False,
+            idempotentHint=True,
+            openWorldHint=False,
+        ),
+    )
+    def gc_banister_compare(
+        athlete: str,
+        weekly_tss: float,
+        days: int = 28,
+        date: str = "",
+        metric: str = "coggan_tss",
+    ) -> dict[str, Any]:
+        payload: dict[str, Any] = {
+            "weeklyTSS": weekly_tss,
+            "days": days,
+            "metric": metric,
+        }
+        if date.strip():
+            payload["date"] = date.strip()
+        return client.banister(athlete=athlete, payload=payload)
 
     # ------------------------------------------------------------------
     # New read tools
