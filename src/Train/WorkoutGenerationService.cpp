@@ -18,12 +18,14 @@
 #include "TrainDB.h"
 #include "Zones.h"
 
+#include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonValue>
 #include <QRegularExpression>
+#include <QThread>
 
 #include <algorithm>
 #include <cmath>
@@ -609,9 +611,22 @@ WorkoutGenerationService::saveDraft(Context *context, const WorkoutDraft &draft,
         return false;
     }
 
-    trainDB->startLUW();
-    bool imported = trainDB->importWorkout(filepath, *ergFile);
-    trainDB->endLUW();
+    // trainDB's SQLite connection lives on the main thread; when called from
+    // an HTTP-handler thread we must dispatch the import there.
+    bool imported = false;
+    if (QThread::currentThread() == QCoreApplication::instance()->thread()) {
+        trainDB->startLUW();
+        imported = trainDB->importWorkout(filepath, *ergFile);
+        trainDB->endLUW();
+    } else {
+        ErgFile *ef = ergFile;              // captured by the lambda
+        QString fp  = filepath;
+        QMetaObject::invokeMethod(trainDB, [&imported, fp, ef]() {
+            trainDB->startLUW();
+            imported = trainDB->importWorkout(fp, *ef);
+            trainDB->endLUW();
+        }, Qt::BlockingQueuedConnection);
+    }
     delete ergFile;
 
     if (!imported) {
@@ -725,10 +740,24 @@ WorkoutGenerationService::createPlannedActivity(Context *context, const QString 
         return false;
     }
 
-    context->athlete->addRide(plannedFileName, true, false, false, true);
-    RideItem *plannedItem = context->athlete->rideCache->getRide(plannedFileName, true);
-    if (plannedItem) {
-        context->athlete->rideCache->updateFromWorkout(plannedItem, true);
+    // addRide / rideCache operations touch main-thread Qt objects; dispatch
+    // there when called from an HTTP-handler thread.
+    if (QThread::currentThread() == QCoreApplication::instance()->thread()) {
+        context->athlete->addRide(plannedFileName, true, false, false, true);
+        RideItem *plannedItem = context->athlete->rideCache->getRide(plannedFileName, true);
+        if (plannedItem) {
+            context->athlete->rideCache->updateFromWorkout(plannedItem, true);
+        }
+    } else {
+        Context *ctx = context;
+        QString pfn  = plannedFileName;
+        QMetaObject::invokeMethod(QCoreApplication::instance(), [ctx, pfn]() {
+            ctx->athlete->addRide(pfn, true, false, false, true);
+            RideItem *plannedItem = ctx->athlete->rideCache->getRide(pfn, true);
+            if (plannedItem) {
+                ctx->athlete->rideCache->updateFromWorkout(plannedItem, true);
+            }
+        }, Qt::BlockingQueuedConnection);
     }
 
     if (savedPath) {

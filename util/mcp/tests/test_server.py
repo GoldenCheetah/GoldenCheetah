@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import threading
 import unittest
 from datetime import timedelta
@@ -156,7 +157,7 @@ class GoldenCheetahMcpIntegrationTest(unittest.TestCase):
         env["GC_API_BASE_URL"] = self.base_url
 
         server = StdioServerParameters(
-            command=os.environ.get("PYTHON", "python"),
+            command=os.environ.get("PYTHON", str(Path(sys.executable))),
             args=["-m", "goldencheetah_mcp.server", "--transport", "stdio"],
             env=env,
             cwd=ROOT,
