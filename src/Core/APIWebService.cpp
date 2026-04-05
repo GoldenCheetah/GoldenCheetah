@@ -24,6 +24,7 @@
 #include "RideDB.h"
 #include "BanisterSimulator.h"
 #include "TrainingSimulator.h"
+#include "TrainingPlan.h"
 #include "WorkoutGenerationService.h"
 
 #include "RideFile.h"
@@ -336,6 +337,11 @@ APIWebService::aiEndpoint(QString athlete, QStringList paths, HttpRequest &reque
     }
     if (paths[0] == "banister") {
         aiBanister(athlete, request, response);
+        return;
+    }
+    if (paths[0] == "plans") {
+        QStringList subPaths = paths.mid(1);
+        aiPlans(athlete, subPaths, request, response);
         return;
     }
 
@@ -659,6 +665,152 @@ APIWebService::aiBanister(QString athlete, HttpRequest &request, HttpResponse &r
     }
 
     writeJson(response, QJsonDocument(object));
+}
+
+void
+APIWebService::aiPlans(QString athlete, QStringList subPaths, HttpRequest &request, HttpResponse &response)
+{
+    Context *context = Context::findAthleteContext(athlete);
+    if (context == NULL) {
+        writeJsonError(response, 409,
+                       QStringLiteral("AI endpoints currently require athlete '%1' to be open in GoldenCheetah").arg(athlete),
+                       QByteArray("Conflict"));
+        return;
+    }
+
+    QString method = QString::fromLatin1(request.getMethod());
+
+    // GET /ai/plans — list all plans
+    if (subPaths.isEmpty() && method == QLatin1String("GET")) {
+        QList<TrainingPlan> plans = TrainingPlan::listAll(context);
+        QJsonArray arr;
+        for (const auto &plan : plans)
+            arr.append(plan.toJson());
+        QJsonObject object;
+        object.insert(QStringLiteral("plans"), arr);
+        writeJson(response, QJsonDocument(object));
+        return;
+    }
+
+    // POST /ai/plans — create a new plan
+    if (subPaths.isEmpty() && method == QLatin1String("POST")) {
+        QJsonDocument document;
+        if (!requireJsonBody(request, response, document)) return;
+
+        bool ok = false;
+        QJsonObject root = document.object();
+
+        // Assign id and timestamps if missing
+        if (!root.contains(QStringLiteral("id")) || root.value(QStringLiteral("id")).toString().isEmpty())
+            root[QStringLiteral("id")] = TrainingPlan::generateId();
+        if (!root.contains(QStringLiteral("createdAt")))
+            root[QStringLiteral("createdAt")] = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+        root[QStringLiteral("updatedAt")] = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+
+        TrainingPlan plan = TrainingPlan::fromJson(root, &ok);
+        if (!ok) {
+            writeJsonError(response, 400, QStringLiteral("Invalid TrainingPlan payload (name and id are required)"),
+                           QByteArray("Bad Request"));
+            return;
+        }
+
+        QStringList errors;
+        QString savedPath;
+        if (!plan.save(context, &savedPath, &errors)) {
+            writeJsonError(response, 422, errors.join(QStringLiteral("; ")), QByteArray("Unprocessable Entity"));
+            return;
+        }
+
+        QJsonObject object;
+        object.insert(QStringLiteral("saved"), true);
+        object.insert(QStringLiteral("filepath"), savedPath);
+        object.insert(QStringLiteral("plan"), plan.toJson());
+        writeJson(response, QJsonDocument(object), 201, QByteArray("Created"));
+        return;
+    }
+
+    // Routes with a plan ID: /ai/plans/{id}
+    if (subPaths.size() == 1) {
+        QString planId = subPaths[0];
+
+        // GET /ai/plans/{id}
+        if (method == QLatin1String("GET")) {
+            QList<TrainingPlan> plans = TrainingPlan::listAll(context);
+            for (const auto &plan : plans) {
+                if (plan.id == planId) {
+                    QJsonObject object;
+                    object.insert(QStringLiteral("plan"), plan.toJson());
+                    writeJson(response, QJsonDocument(object));
+                    return;
+                }
+            }
+            writeJsonError(response, 404, QStringLiteral("Plan not found: %1").arg(planId),
+                           QByteArray("Not Found"));
+            return;
+        }
+
+        // PUT /ai/plans/{id}
+        if (method == QLatin1String("PUT")) {
+            QJsonDocument document;
+            if (!requireJsonBody(request, response, document)) return;
+
+            QJsonObject root = document.object();
+            root[QStringLiteral("id")] = planId;
+            root[QStringLiteral("updatedAt")] = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+
+            // Preserve createdAt from existing plan if not in payload
+            if (!root.contains(QStringLiteral("createdAt"))) {
+                QList<TrainingPlan> existing = TrainingPlan::listAll(context);
+                for (const auto &p : existing) {
+                    if (p.id == planId && p.createdAt.isValid()) {
+                        root[QStringLiteral("createdAt")] = p.createdAt.toString(Qt::ISODate);
+                        break;
+                    }
+                }
+            }
+
+            bool ok = false;
+            TrainingPlan plan = TrainingPlan::fromJson(root, &ok);
+            if (!ok) {
+                writeJsonError(response, 400, QStringLiteral("Invalid TrainingPlan payload"),
+                               QByteArray("Bad Request"));
+                return;
+            }
+
+            QStringList errors;
+            QString savedPath;
+            if (!plan.save(context, &savedPath, &errors)) {
+                writeJsonError(response, 422, errors.join(QStringLiteral("; ")),
+                               QByteArray("Unprocessable Entity"));
+                return;
+            }
+
+            QJsonObject object;
+            object.insert(QStringLiteral("saved"), true);
+            object.insert(QStringLiteral("filepath"), savedPath);
+            object.insert(QStringLiteral("plan"), plan.toJson());
+            writeJson(response, QJsonDocument(object));
+            return;
+        }
+
+        // DELETE /ai/plans/{id}
+        if (method == QLatin1String("DELETE")) {
+            QStringList errors;
+            if (!TrainingPlan::remove(context, planId, &errors)) {
+                writeJsonError(response, 404, errors.join(QStringLiteral("; ")),
+                               QByteArray("Not Found"));
+                return;
+            }
+
+            QJsonObject object;
+            object.insert(QStringLiteral("deleted"), true);
+            object.insert(QStringLiteral("id"), planId);
+            writeJson(response, QJsonDocument(object));
+            return;
+        }
+    }
+
+    writeJsonError(response, 404, QStringLiteral("Unknown plans endpoint"), QByteArray("Not Found"));
 }
 
 void

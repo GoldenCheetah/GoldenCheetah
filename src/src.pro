@@ -676,6 +676,7 @@ HEADERS += Train/AddDeviceWizard.h Train/CalibrationData.h Train/ComputrainerCon
            Train/BanisterSimulator.h \
            Train/BayesianEstimator.h \
            Train/MultiComponentModel.h \
+           Train/TrainingPlan.h \
            Train/LLMWorkoutBridge.h \
            Train/ModelFilter.h Train/MultiFilterProxyModel.h Train/WorkoutFilter.h Train/FilterEditor.h \
            Train/WorkoutFilterBox.h Train/TagBar.h Train/Taggable.h Train/TagStore.h Train/TagWidget.h \
@@ -798,6 +799,7 @@ SOURCES += Train/AddDeviceWizard.cpp Train/CalibrationData.cpp Train/Computraine
            Train/BanisterSimulator.cpp \
            Train/BayesianEstimator.cpp \
            Train/MultiComponentModel.cpp \
+           Train/TrainingPlan.cpp \
            Train/LLMWorkoutBridge.cpp \
            Train/ModelFilter.cpp Train/MultiFilterProxyModel.cpp Train/WorkoutFilter.cpp Train/FilterEditor.cpp \
            Train/WorkoutFilterBox.cpp Train/TagBar.cpp Train/TagWidget.cpp \

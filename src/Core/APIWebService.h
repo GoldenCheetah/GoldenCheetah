@@ -59,6 +59,7 @@ class APIWebService : public HttpRequestHandler
         void aiPlan(QString athlete, HttpRequest &request, HttpResponse &response);
         void aiSimulate(QString athlete, HttpRequest &request, HttpResponse &response);
         void aiBanister(QString athlete, HttpRequest &request, HttpResponse &response);
+        void aiPlans(QString athlete, QStringList subPaths, HttpRequest &request, HttpResponse &response);
 
         // utility
         void writeRideLine(RideItem &item, HttpRequest *request, HttpResponse *response);
