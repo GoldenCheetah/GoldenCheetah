@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+import tempfile
 import threading
 import unittest
 from datetime import timedelta
@@ -49,6 +50,44 @@ class MockGoldenCheetahHandler(BaseHTTPRequestHandler):
                 ],
             }
             self._write_json(200, body)
+            return
+
+        if self.path == "/Test%20Rider":
+            body = (
+                "date, time, filename\n"
+                "2026/04/01, 06:00:00, 2026_04_01_06_00_00.json\n"
+                "2026/04/02, 07:00:00, 2026_04_02_07_00_00.json\n"
+            )
+            self._write(200, body, "text/csv; charset=UTF-8")
+            return
+
+        if self.path.startswith("/Test%20Rider/activity/"):
+            body = {
+                "RIDE": {
+                    "STARTTIME": "2026/04/01 06:00:00 UTC",
+                    "DEVICETYPE": "Mock Trainer",
+                    "SAMPLES": [
+                        {"SECS": 0, "WATTS": 150, "HR": 120, "CAD": 85},
+                        {"SECS": 1, "WATTS": 155, "HR": 121, "CAD": 86},
+                    ],
+                }
+            }
+            self._write_json(200, body)
+            return
+
+        if self.path.startswith("/Test%20Rider/meanmax/"):
+            body = "seconds, watts\n1, 800\n5, 600\n60, 350\n300, 280\n1200, 250\n"
+            self._write(200, body, "text/csv; charset=UTF-8")
+            return
+
+        if self.path.startswith("/Test%20Rider/zones"):
+            body = "date, cp, wprime, pmax, aetp, ftp\n2026/01/01, 250, 20000, 1000, 200, 250\n"
+            self._write(200, body, "text/csv; charset=UTF-8")
+            return
+
+        if self.path.startswith("/Test%20Rider/measures"):
+            body = "date, weight_kg, body_fat_percent\n2026/04/01, 72, 15.0\n"
+            self._write(200, body, "text/csv; charset=UTF-8")
             return
 
         self._write_json(404, {"error": f"Unhandled GET {self.path}"})
@@ -218,3 +257,158 @@ class GoldenCheetahMcpIntegrationTest(unittest.TestCase):
                 )
                 self.assertTrue(plan_result.structuredContent["saved"])
                 self.assertEqual(plan_result.structuredContent["filepath"], "/tmp/2026_04_04_06_00_00.json")
+
+    def test_read_tools(self) -> None:
+        anyio.run(self._exercise_read_tools)
+
+    async def _exercise_read_tools(self) -> None:
+        env = os.environ.copy()
+        env["GC_API_BASE_URL"] = self.base_url
+
+        server = StdioServerParameters(
+            command=os.environ.get("PYTHON", str(Path(sys.executable))),
+            args=["-m", "goldencheetah_mcp.server", "--transport", "stdio"],
+            env=env,
+            cwd=ROOT,
+        )
+
+        async with stdio_client(server) as (read_stream, write_stream):
+            session = ClientSession(
+                read_stream,
+                write_stream,
+                read_timeout_seconds=timedelta(seconds=10),
+            )
+            async with session:
+                await session.initialize()
+
+                tools = await session.list_tools()
+                tool_names = {tool.name for tool in tools.tools}
+                self.assertIn("gc_list_activities", tool_names)
+                self.assertIn("gc_get_activity", tool_names)
+                self.assertIn("gc_get_meanmax", tool_names)
+                self.assertIn("gc_get_zones", tool_names)
+                self.assertIn("gc_get_measures", tool_names)
+                self.assertIn("gc_list_planned_activities", tool_names)
+                self.assertIn("gc_delete_planned_activity", tool_names)
+                self.assertIn("gc_update_planned_activity", tool_names)
+                self.assertIn("gc_delete_workout", tool_names)
+
+                activities = await session.call_tool(
+                    "gc_list_activities",
+                    {"athlete": "Test Rider"},
+                )
+                self.assertIn("csv", activities.structuredContent)
+                self.assertIn("2026/04/01", activities.structuredContent["csv"])
+
+                activity = await session.call_tool(
+                    "gc_get_activity",
+                    {"athlete": "Test Rider", "filename": "2026_04_01_06_00_00.json"},
+                )
+                self.assertIn("RIDE", activity.structuredContent)
+
+                mmp = await session.call_tool(
+                    "gc_get_meanmax",
+                    {"athlete": "Test Rider"},
+                )
+                self.assertIn("csv", mmp.structuredContent)
+                self.assertIn("800", mmp.structuredContent["csv"])
+
+                zones = await session.call_tool(
+                    "gc_get_zones",
+                    {"athlete": "Test Rider"},
+                )
+                self.assertIn("csv", zones.structuredContent)
+                self.assertIn("250", zones.structuredContent["csv"])
+
+                measures = await session.call_tool(
+                    "gc_get_measures",
+                    {"athlete": "Test Rider", "group": "Body"},
+                )
+                self.assertIn("csv", measures.structuredContent)
+                self.assertIn("72", measures.structuredContent["csv"])
+
+    def test_file_management_tools(self) -> None:
+        anyio.run(self._exercise_file_management_tools)
+
+    async def _exercise_file_management_tools(self) -> None:
+        env = os.environ.copy()
+        env["GC_API_BASE_URL"] = self.base_url
+
+        server = StdioServerParameters(
+            command=os.environ.get("PYTHON", str(Path(sys.executable))),
+            args=["-m", "goldencheetah_mcp.server", "--transport", "stdio"],
+            env=env,
+            cwd=ROOT,
+        )
+
+        gc_home = Path.home() / ".goldencheetah"
+
+        with tempfile.TemporaryDirectory(dir=gc_home) as tmpdir:
+            planned_dir = Path(tmpdir) / "planned"
+            planned_dir.mkdir()
+
+            activity_data = {
+                "workoutPath": "/tmp/mock.erg",
+                "date": "2026-04-04",
+                "time": "06:00:00",
+                "sport": "Bike",
+                "title": "Test Ride",
+            }
+            activity_file = planned_dir / "2026_04_04_06_00_00.json"
+            activity_file.write_text(json.dumps(activity_data), encoding="utf-8")
+
+            workout_file = Path(tmpdir) / "test_workout.erg"
+            workout_file.write_text("[COURSE HEADER]\n[END COURSE HEADER]\n", encoding="utf-8")
+
+            # Derive a fake athlete name from the tmpdir basename
+            # so _resolve_planned_dir won't be used — we pass filepath directly
+            async with stdio_client(server) as (read_stream, write_stream):
+                session = ClientSession(
+                    read_stream,
+                    write_stream,
+                    read_timeout_seconds=timedelta(seconds=10),
+                )
+                async with session:
+                    await session.initialize()
+
+                    update_result = await session.call_tool(
+                        "gc_update_planned_activity",
+                        {
+                            "athlete": "Test Rider",
+                            "filepath": str(activity_file),
+                            "confirm": True,
+                            "title": "Updated Ride",
+                            "time": "08:00:00",
+                        },
+                    )
+                    self.assertTrue(update_result.structuredContent["updated"])
+                    self.assertEqual(
+                        update_result.structuredContent["activity"]["title"],
+                        "Updated Ride",
+                    )
+                    self.assertEqual(
+                        update_result.structuredContent["activity"]["time"],
+                        "08:00:00",
+                    )
+
+                    delete_plan_result = await session.call_tool(
+                        "gc_delete_planned_activity",
+                        {
+                            "athlete": "Test Rider",
+                            "filepath": str(activity_file),
+                            "confirm": True,
+                        },
+                    )
+                    self.assertTrue(delete_plan_result.structuredContent["deleted"])
+                    self.assertFalse(activity_file.exists())
+
+                    delete_workout_result = await session.call_tool(
+                        "gc_delete_workout",
+                        {
+                            "athlete": "Test Rider",
+                            "filepath": str(workout_file),
+                            "confirm": True,
+                        },
+                    )
+                    self.assertTrue(delete_workout_result.structuredContent["deleted"])
+                    self.assertFalse(workout_file.exists())

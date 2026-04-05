@@ -672,6 +672,11 @@ HEADERS += Train/AddDeviceWizard.h Train/CalibrationData.h Train/ComputrainerCon
            Train/SpinScanPlotWindow.h Train/SpinScanPolarPlot.h Train/GarminServiceHelper.h Train/PhysicsUtility.h Train/BicycleSim.h \
            Train/PolynomialRegression.h Train/MultiRegressionizer.h Train/StravaRoutesDownload.h \
            Train/VideoSyncFileBase.h Train/ErgFileBase.h Train/WorkoutDraft.h Train/WorkoutGenerationService.h \
+           Train/TrainingConstraintChecker.h Train/TrainingSimulator.h \
+           Train/BanisterSimulator.h \
+           Train/BayesianEstimator.h \
+           Train/MultiComponentModel.h \
+           Train/LLMWorkoutBridge.h \
            Train/ModelFilter.h Train/MultiFilterProxyModel.h Train/WorkoutFilter.h Train/FilterEditor.h \
            Train/WorkoutFilterBox.h Train/TagBar.h Train/Taggable.h Train/TagStore.h Train/TagWidget.h \
            Train/TrainerDayAPIQuery.h Train/TrainerDayAPIDialog.h Train/ElevationChartWindow.h
@@ -789,6 +794,11 @@ SOURCES += Train/AddDeviceWizard.cpp Train/CalibrationData.cpp Train/Computraine
            Train/SpinScanPlotWindow.cpp Train/SpinScanPolarPlot.cpp Train/GarminServiceHelper.cpp Train/PhysicsUtility.cpp Train/BicycleSim.cpp \
            Train/PolynomialRegression.cpp Train/StravaRoutesDownload.cpp \
            Train/VideoSyncFileBase.cpp Train/ErgFileBase.cpp Train/WorkoutDraft.cpp Train/WorkoutGenerationService.cpp \
+           Train/TrainingConstraintChecker.cpp Train/TrainingSimulator.cpp \
+           Train/BanisterSimulator.cpp \
+           Train/BayesianEstimator.cpp \
+           Train/MultiComponentModel.cpp \
+           Train/LLMWorkoutBridge.cpp \
            Train/ModelFilter.cpp Train/MultiFilterProxyModel.cpp Train/WorkoutFilter.cpp Train/FilterEditor.cpp \
            Train/WorkoutFilterBox.cpp Train/TagBar.cpp Train/TagWidget.cpp \
            Train/TrainerDayAPIQuery.cpp Train/TrainerDayAPIDialog.cpp Train/ElevationChartWindow.cpp

@@ -12,6 +12,15 @@ the loopback HTTP API at `127.0.0.1` by default.
 - `gc_create_workout_draft`
 - `gc_save_workout`
 - `gc_create_planned_activity`
+- `gc_list_activities`
+- `gc_get_activity`
+- `gc_get_meanmax`
+- `gc_get_zones`
+- `gc_get_measures`
+- `gc_list_planned_activities`
+- `gc_delete_planned_activity`
+- `gc_update_planned_activity`
+- `gc_delete_workout`
 
 The write path is intentionally split:
 
@@ -119,6 +128,61 @@ Calls `POST /<athlete>/ai/plan`.
 
 This creates a planned activity that points at a saved workout file and also
 requires `confirm=true`.
+
+### `gc_list_activities`
+
+Calls `GET /<athlete>` and returns ride history as CSV.
+
+Optional query parameters:
+
+- `metrics` – comma-separated metric names (or `NONE`)
+- `metadata` – comma-separated metadata fields (or `ALL` / `NONE`)
+- `since` / `before` – date range filter (`yyyy/MM/dd`)
+
+### `gc_get_activity`
+
+Calls `GET /<athlete>/activity/<filename>`.
+
+Supported formats: `json` (default), `csv`, `tcx`, `pwx`.
+
+### `gc_get_meanmax`
+
+Calls `GET /<athlete>/meanmax/<filename>`.
+
+Use `filename=bests` (default) for all-time best power curve, or pass a
+specific activity filename. Supports `series` (`watts`, `hr`, `cad`, `speed`,
+`vam`, `IsoPower`, `xPower`, `nm`) and `since`/`before` date filtering.
+
+### `gc_get_zones`
+
+Calls `GET /<athlete>/zones`.
+
+Supported zone types: `power` (default), `hr`, `pace`, `swimpace`.
+
+### `gc_get_measures`
+
+Calls `GET /<athlete>/measures` or `GET /<athlete>/measures/<group>`.
+
+Omit `group` to list available measure groups. Common groups: `Body`, `Hrv`.
+Supports `since`/`before` date filtering.
+
+### `gc_list_planned_activities`
+
+Lists all planned activity JSON files in `~/.goldencheetah/<athlete>/planned/`.
+
+### `gc_delete_planned_activity`
+
+Removes a planned activity JSON file by filepath. Requires `confirm=true`.
+
+### `gc_update_planned_activity`
+
+Updates fields (date, time, workout path, sport, title, description) on an
+existing planned activity JSON file. Requires `confirm=true`.
+
+### `gc_delete_workout`
+
+Removes a saved workout file (`.erg`, `.mrc`, or `.zwo`) by filepath.
+Requires `confirm=true`.
 
 ## Smoke test
 

@@ -9,6 +9,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from mcp.server.fastmcp import FastMCP
@@ -74,6 +75,75 @@ class GoldenCheetahApiClient:
 
     def create_planned_activity(self, athlete: str, payload: dict[str, Any]) -> dict[str, Any]:
         return self._request_json("POST", self._athlete_path(athlete, "ai", "plan"), payload=payload)
+
+    def list_activities(
+        self,
+        athlete: str,
+        *,
+        since: str = "",
+        before: str = "",
+        metrics: str = "",
+        metadata: str = "",
+    ) -> str:
+        query: dict[str, str] = {}
+        if since.strip():
+            query["since"] = since.strip()
+        if before.strip():
+            query["before"] = before.strip()
+        if metrics.strip():
+            query["metrics"] = metrics.strip()
+        if metadata.strip():
+            query["metadata"] = metadata.strip()
+        return self._request_text("GET", self._athlete_path(athlete), query=query or None)
+
+    def get_activity(self, athlete: str, filename: str, *, fmt: str = "json") -> str:
+        query: dict[str, str] | None = None
+        if fmt.strip() and fmt.strip() != "json":
+            query = {"format": fmt.strip()}
+        return self._request_text("GET", self._athlete_path(athlete, "activity", filename), query=query)
+
+    def get_meanmax(
+        self,
+        athlete: str,
+        filename: str = "bests",
+        *,
+        series: str = "watts",
+        since: str = "",
+        before: str = "",
+    ) -> str:
+        query: dict[str, str] = {}
+        if series.strip() and series.strip() != "watts":
+            query["series"] = series.strip()
+        if since.strip():
+            query["since"] = since.strip()
+        if before.strip():
+            query["before"] = before.strip()
+        return self._request_text("GET", self._athlete_path(athlete, "meanmax", filename), query=query or None)
+
+    def get_zones(self, athlete: str, *, zone_type: str = "power") -> str:
+        query: dict[str, str] | None = None
+        if zone_type.strip() and zone_type.strip() != "power":
+            query = {"for": zone_type.strip()}
+        return self._request_text("GET", self._athlete_path(athlete, "zones"), query=query)
+
+    def get_measures(
+        self,
+        athlete: str,
+        group: str = "",
+        *,
+        since: str = "",
+        before: str = "",
+    ) -> str:
+        if group.strip():
+            path = self._athlete_path(athlete, "measures", group.strip())
+        else:
+            path = self._athlete_path(athlete, "measures")
+        query: dict[str, str] = {}
+        if since.strip():
+            query["since"] = since.strip()
+        if before.strip():
+            query["before"] = before.strip()
+        return self._request_text("GET", path, query=query or None)
 
     def _athlete_path(self, athlete: str, *segments: str) -> str:
         encoded = [urllib.parse.quote(part, safe="") for part in (athlete, *segments)]
@@ -336,7 +406,309 @@ def build_server(
         )
         return client.create_planned_activity(athlete=athlete, payload=payload)
 
+    # ------------------------------------------------------------------
+    # New read tools
+    # ------------------------------------------------------------------
+
+    @mcp.tool(
+        name="gc_list_activities",
+        description=(
+            "List activities for an athlete with optional metric/metadata columns and date filtering. "
+            "Returns CSV text. Use 'metrics' to request specific ride metrics (comma-separated, or 'NONE'), "
+            "'metadata' for metadata fields (comma-separated, 'ALL', or 'NONE'), "
+            "and 'since'/'before' for date range filtering (yyyy/MM/dd)."
+        ),
+        annotations=ToolAnnotations(
+            title="List Activities",
+            readOnlyHint=True,
+            destructiveHint=False,
+            idempotentHint=True,
+            openWorldHint=False,
+        ),
+    )
+    def gc_list_activities(
+        athlete: str,
+        since: str = "",
+        before: str = "",
+        metrics: str = "",
+        metadata: str = "",
+    ) -> dict[str, Any]:
+        csv_text = client.list_activities(
+            athlete,
+            since=since,
+            before=before,
+            metrics=metrics,
+            metadata=metadata,
+        )
+        return {"csv": csv_text}
+
+    @mcp.tool(
+        name="gc_get_activity",
+        description=(
+            "Get detailed data for a single activity by filename. "
+            "Supported formats: json (default), csv, tcx, pwx."
+        ),
+        annotations=ToolAnnotations(
+            title="Get Activity",
+            readOnlyHint=True,
+            destructiveHint=False,
+            idempotentHint=True,
+            openWorldHint=False,
+        ),
+    )
+    def gc_get_activity(
+        athlete: str,
+        filename: str,
+        format: str = "json",
+    ) -> dict[str, Any]:
+        raw = client.get_activity(athlete, filename, fmt=format)
+        if format.strip() == "json" or not format.strip():
+            try:
+                return json.loads(raw)
+            except json.JSONDecodeError:
+                return {"raw": raw}
+        return {"raw": raw}
+
+    @mcp.tool(
+        name="gc_get_meanmax",
+        description=(
+            "Get mean-max (best power/HR/etc.) data. Use filename='bests' for all-time bests "
+            "or a specific activity filename. Supports series: watts (default), hr, cad, speed, "
+            "vam, IsoPower, xPower, nm. Supports 'since'/'before' date filtering for bests."
+        ),
+        annotations=ToolAnnotations(
+            title="Mean Max Data",
+            readOnlyHint=True,
+            destructiveHint=False,
+            idempotentHint=True,
+            openWorldHint=False,
+        ),
+    )
+    def gc_get_meanmax(
+        athlete: str,
+        filename: str = "bests",
+        series: str = "watts",
+        since: str = "",
+        before: str = "",
+    ) -> dict[str, Any]:
+        csv_text = client.get_meanmax(
+            athlete,
+            filename=filename,
+            series=series,
+            since=since,
+            before=before,
+        )
+        return {"csv": csv_text}
+
+    @mcp.tool(
+        name="gc_get_zones",
+        description=(
+            "Get training zones for an athlete. Supported zone types: "
+            "power (default), hr, pace, swimpace."
+        ),
+        annotations=ToolAnnotations(
+            title="Get Zones",
+            readOnlyHint=True,
+            destructiveHint=False,
+            idempotentHint=True,
+            openWorldHint=False,
+        ),
+    )
+    def gc_get_zones(
+        athlete: str,
+        zone_type: str = "power",
+    ) -> dict[str, Any]:
+        csv_text = client.get_zones(athlete, zone_type=zone_type)
+        return {"csv": csv_text}
+
+    @mcp.tool(
+        name="gc_get_measures",
+        description=(
+            "Get body measures or HRV data for an athlete. "
+            "Omit 'group' to list available measure groups. "
+            "Common groups: Body, Hrv. Supports 'since'/'before' date filtering."
+        ),
+        annotations=ToolAnnotations(
+            title="Get Measures",
+            readOnlyHint=True,
+            destructiveHint=False,
+            idempotentHint=True,
+            openWorldHint=False,
+        ),
+    )
+    def gc_get_measures(
+        athlete: str,
+        group: str = "",
+        since: str = "",
+        before: str = "",
+    ) -> dict[str, Any]:
+        csv_text = client.get_measures(
+            athlete,
+            group=group,
+            since=since,
+            before=before,
+        )
+        return {"csv": csv_text}
+
+    # ------------------------------------------------------------------
+    # File-based write tools (calendar / workout management)
+    # ------------------------------------------------------------------
+
+    @mcp.tool(
+        name="gc_list_planned_activities",
+        description=(
+            "List all planned activities on the calendar for an athlete. "
+            "Returns the JSON content of each planned activity file."
+        ),
+        annotations=ToolAnnotations(
+            title="List Planned Activities",
+            readOnlyHint=True,
+            destructiveHint=False,
+            idempotentHint=True,
+            openWorldHint=False,
+        ),
+    )
+    def gc_list_planned_activities(athlete: str) -> dict[str, Any]:
+        planned_dir = _resolve_planned_dir(athlete)
+        if not planned_dir.is_dir():
+            return {"activities": []}
+        activities: list[dict[str, Any]] = []
+        for f in sorted(planned_dir.glob("*.json")):
+            try:
+                data = json.loads(f.read_text(encoding="utf-8"))
+                data["_filepath"] = str(f)
+                activities.append(data)
+            except (json.JSONDecodeError, OSError):
+                continue
+        return {"activities": activities}
+
+    @mcp.tool(
+        name="gc_delete_planned_activity",
+        description=(
+            "Remove a planned activity from the calendar by its filepath. "
+            "Only use this after the user has explicitly approved the deletion."
+        ),
+        annotations=ToolAnnotations(
+            title="Delete Planned Activity",
+            readOnlyHint=False,
+            destructiveHint=True,
+            idempotentHint=False,
+            openWorldHint=False,
+        ),
+    )
+    def gc_delete_planned_activity(
+        athlete: str,
+        filepath: str,
+        confirm: bool,
+    ) -> dict[str, Any]:
+        if not confirm:
+            raise ValueError("gc_delete_planned_activity requires confirm=true after explicit user approval.")
+        path = Path(filepath)
+        _validate_gc_path(path)
+        if not path.exists():
+            raise ValueError(f"Planned activity file not found: {filepath}")
+        if not path.suffix == ".json":
+            raise ValueError("Expected a .json planned activity file.")
+        path.unlink()
+        return {"deleted": True, "filepath": filepath}
+
+    @mcp.tool(
+        name="gc_update_planned_activity",
+        description=(
+            "Update a planned activity on the calendar. Provide the filepath of the existing "
+            "planned activity and any fields to change (date, time, workout_path, sport, title, description). "
+            "Only use this after the user has explicitly approved the change."
+        ),
+        annotations=ToolAnnotations(
+            title="Update Planned Activity",
+            readOnlyHint=False,
+            destructiveHint=False,
+            idempotentHint=False,
+            openWorldHint=False,
+        ),
+    )
+    def gc_update_planned_activity(
+        athlete: str,
+        filepath: str,
+        confirm: bool,
+        date: str = "",
+        time: str = "",
+        workout_path: str = "",
+        sport: str = "",
+        title: str = "",
+        description: str = "",
+    ) -> dict[str, Any]:
+        if not confirm:
+            raise ValueError("gc_update_planned_activity requires confirm=true after explicit user approval.")
+        path = Path(filepath)
+        _validate_gc_path(path)
+        if not path.exists():
+            raise ValueError(f"Planned activity file not found: {filepath}")
+
+        data = json.loads(path.read_text(encoding="utf-8"))
+
+        if date.strip():
+            data["date"] = date.strip()
+        if time.strip():
+            data["time"] = time.strip()
+        if workout_path.strip():
+            data["workoutPath"] = workout_path.strip()
+        if sport.strip():
+            data["sport"] = sport.strip()
+        if title.strip():
+            data["title"] = title.strip()
+        if description.strip():
+            data["description"] = description.strip()
+
+        path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+        return {"updated": True, "filepath": filepath, "activity": data}
+
+    @mcp.tool(
+        name="gc_delete_workout",
+        description=(
+            "Remove a saved workout (.erg) file from the workout library. "
+            "Only use this after the user has explicitly approved the deletion."
+        ),
+        annotations=ToolAnnotations(
+            title="Delete Workout",
+            readOnlyHint=False,
+            destructiveHint=True,
+            idempotentHint=False,
+            openWorldHint=False,
+        ),
+    )
+    def gc_delete_workout(
+        athlete: str,
+        filepath: str,
+        confirm: bool,
+    ) -> dict[str, Any]:
+        if not confirm:
+            raise ValueError("gc_delete_workout requires confirm=true after explicit user approval.")
+        path = Path(filepath)
+        _validate_gc_path(path)
+        if not path.exists():
+            raise ValueError(f"Workout file not found: {filepath}")
+        if path.suffix not in (".erg", ".mrc", ".zwo"):
+            raise ValueError("Expected a workout file (.erg, .mrc, or .zwo).")
+        path.unlink()
+        return {"deleted": True, "filepath": filepath}
+
     return mcp
+
+
+def _resolve_planned_dir(athlete: str) -> Path:
+    gc_home = Path.home() / ".goldencheetah" / athlete / "planned"
+    return gc_home
+
+
+def _validate_gc_path(path: Path) -> None:
+    gc_home = Path.home() / ".goldencheetah"
+    try:
+        path.resolve().relative_to(gc_home.resolve())
+    except ValueError:
+        raise ValueError(
+            f"Path {path} is not inside the GoldenCheetah data directory ({gc_home})."
+        )
 
 
 def _remove_empty_strings(payload: dict[str, Any]) -> dict[str, Any]:

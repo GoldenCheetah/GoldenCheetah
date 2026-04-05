@@ -29,7 +29,15 @@ struct WorkoutAthleteSnapshot {
     double atl = 0.0;
     double tsb = 0.0;
 
+    // Phase 1 enrichments for simulation-based workout selection
+    double tsbTrend = 0.0;         // 7-day TSB delta (positive = freshening, negative = accumulating fatigue)
+    double ctlRampRate = 0.0;      // CTL change per week over last 14 days
+    int daysToEvent = -1;          // days until next SeasonEvent (-1 = no event)
+    QString nextEventName;         // name of next event
+    QVector<double> recentStress;  // last 7 days of daily TSS (index 0 = 7 days ago)
+
     bool canGenerate() const { return ftp > 0 || cp > 0; }
+    bool hasSimulationData() const { return ctl > 0.0 || atl > 0.0; }
     QJsonObject toJson() const;
 };
 

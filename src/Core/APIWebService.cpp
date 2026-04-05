@@ -22,6 +22,8 @@
 #include "Context.h"
 #include "GcUpgrade.h"
 #include "RideDB.h"
+#include "BanisterSimulator.h"
+#include "TrainingSimulator.h"
 #include "WorkoutGenerationService.h"
 
 #include "RideFile.h"
@@ -328,6 +330,14 @@ APIWebService::aiEndpoint(QString athlete, QStringList paths, HttpRequest &reque
         aiPlan(athlete, request, response);
         return;
     }
+    if (paths[0] == "simulate") {
+        aiSimulate(athlete, request, response);
+        return;
+    }
+    if (paths[0] == "banister") {
+        aiBanister(athlete, request, response);
+        return;
+    }
 
     writeJsonError(response, 404, QStringLiteral("Unknown AI endpoint"), QByteArray("Not Found"));
 }
@@ -525,6 +535,129 @@ APIWebService::aiPlan(QString athlete, HttpRequest &request, HttpResponse &respo
     object.insert(QStringLiteral("filepath"), savedPath);
     object.insert(QStringLiteral("workoutPath"), workoutPath);
     object.insert(QStringLiteral("when"), when.toString(Qt::ISODate));
+    writeJson(response, QJsonDocument(object));
+}
+
+void
+APIWebService::aiSimulate(QString athlete, HttpRequest &request, HttpResponse &response)
+{
+    if (!requireMethod(request, response, "POST", "GET")) {
+        return;
+    }
+
+    Context *context = Context::findAthleteContext(athlete);
+    if (context == NULL) {
+        writeJsonError(response, 409,
+                       QStringLiteral("AI endpoints currently require athlete '%1' to be open in GoldenCheetah").arg(athlete),
+                       QByteArray("Conflict"));
+        return;
+    }
+
+    // Parse parameters from either query string (GET) or JSON body (POST)
+    QString goalStr, dateStr;
+    int durationMin = 60;
+
+    if (request.getMethod() == "POST") {
+        QJsonDocument document;
+        if (requireJsonBody(request, response, document)) {
+            QJsonObject root = document.object();
+            goalStr = root.value(QStringLiteral("goal")).toString();
+            dateStr = root.value(QStringLiteral("date")).toString();
+            durationMin = root.value(QStringLiteral("durationMin")).toInt(60);
+        } else {
+            return;
+        }
+    } else {
+        goalStr = QString::fromLatin1(request.getParameter("goal"));
+        dateStr = QString::fromLatin1(request.getParameter("date"));
+        QString durStr = QString::fromLatin1(request.getParameter("durationMin"));
+        if (!durStr.isEmpty()) durationMin = durStr.toInt();
+    }
+
+    TrainingGoal goal = trainingGoalFromString(goalStr);
+    QDate when = parseApiDate(dateStr);
+
+    WorkoutAthleteSnapshot snapshot = WorkoutGenerationService::athleteSnapshot(context, when);
+    if (!snapshot.hasSimulationData()) {
+        writeJsonError(response, 422,
+                       QStringLiteral("Insufficient training data for simulation (no CTL/ATL history)"),
+                       QByteArray("Unprocessable Entity"));
+        return;
+    }
+
+    SimulationRanking ranking = TrainingSimulator::rankCandidates(snapshot, goal, durationMin);
+
+    QJsonObject object;
+    object.insert(QStringLiteral("snapshot"), snapshot.toJson());
+    object.insert(QStringLiteral("ranking"), ranking.toJson());
+    writeJson(response, QJsonDocument(object));
+}
+
+void
+APIWebService::aiBanister(QString athlete, HttpRequest &request, HttpResponse &response)
+{
+    if (!requireMethod(request, response, "POST", "GET")) {
+        return;
+    }
+
+    Context *context = Context::findAthleteContext(athlete);
+    if (context == NULL) {
+        writeJsonError(response, 409,
+                       QStringLiteral("AI endpoints currently require athlete '%1' to be open in GoldenCheetah").arg(athlete),
+                       QByteArray("Conflict"));
+        return;
+    }
+
+    // Parse parameters
+    QString dateStr, metricStr;
+    int days = 28;
+    double weeklyTSS = 0;
+
+    if (request.getMethod() == "POST") {
+        QJsonDocument document;
+        if (requireJsonBody(request, response, document)) {
+            QJsonObject root = document.object();
+            dateStr = root.value(QStringLiteral("date")).toString();
+            metricStr = root.value(QStringLiteral("metric")).toString();
+            days = root.value(QStringLiteral("days")).toInt(28);
+            weeklyTSS = root.value(QStringLiteral("weeklyTSS")).toDouble(0);
+        } else {
+            return;
+        }
+    } else {
+        dateStr = QString::fromLatin1(request.getParameter("date"));
+        metricStr = QString::fromLatin1(request.getParameter("metric"));
+        QString daysStr = QString::fromLatin1(request.getParameter("days"));
+        QString tssStr = QString::fromLatin1(request.getParameter("weeklyTSS"));
+        if (!daysStr.isEmpty()) days = daysStr.toInt();
+        if (!tssStr.isEmpty()) weeklyTSS = tssStr.toDouble();
+    }
+
+    if (metricStr.isEmpty()) metricStr = QStringLiteral("coggan_tss");
+    QDate when = parseApiDate(dateStr);
+
+    // Extract fitted parameters
+    BanisterParams params = BanisterSimulator::extractParams(context->athlete, metricStr, when);
+
+    QJsonObject object;
+    object.insert(QStringLiteral("params"), params.toJson());
+
+    // If weeklyTSS provided, compare plan templates
+    if (weeklyTSS > 0) {
+        QJsonArray comparisons;
+        QStringList templates = BanisterSimulator::planTemplateNames();
+        for (int i = 0; i < templates.size(); i++) {
+            QVector<double> plan = BanisterSimulator::buildPlanTemplate(templates[i], weeklyTSS, days);
+            BanisterProjection proj = BanisterSimulator::projectForward(params, plan, when);
+
+            QJsonObject planObj;
+            planObj[QStringLiteral("template")] = templates[i];
+            planObj[QStringLiteral("projection")] = proj.toJson();
+            comparisons.append(planObj);
+        }
+        object.insert(QStringLiteral("planComparisons"), comparisons);
+    }
+
     writeJson(response, QJsonDocument(object));
 }
 

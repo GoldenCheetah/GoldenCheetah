@@ -14,6 +14,8 @@
 #include "ErgFile.h"
 #include "PMCData.h"
 #include "RideMetadata.h"
+#include "Season.h"
+#include "Seasons.h"
 #include "Settings.h"
 #include "TrainDB.h"
 #include "Zones.h"
@@ -230,6 +232,20 @@ WorkoutAthleteSnapshot::toJson() const
     o[QStringLiteral("atl")] = atl;
     o[QStringLiteral("tsb")] = tsb;
     o[QStringLiteral("canGenerate")] = canGenerate();
+
+    // Phase 1 enrichments
+    o[QStringLiteral("tsbTrend")] = tsbTrend;
+    o[QStringLiteral("ctlRampRate")] = ctlRampRate;
+    o[QStringLiteral("hasSimulationData")] = hasSimulationData();
+    if (daysToEvent >= 0) {
+        o[QStringLiteral("daysToEvent")] = daysToEvent;
+        o[QStringLiteral("nextEventName")] = nextEventName;
+    }
+    if (!recentStress.isEmpty()) {
+        QJsonArray arr;
+        for (double s : recentStress) arr.append(s);
+        o[QStringLiteral("recentStress")] = arr;
+    }
     return o;
 }
 
@@ -450,6 +466,40 @@ WorkoutGenerationService::athleteSnapshot(Context *context, const QDate &when)
         snapshot.ctl = pmc->lts(snapshot.date);
         snapshot.atl = pmc->sts(snapshot.date);
         snapshot.tsb = pmc->sb(snapshot.date);
+
+        // TSB trend: 7-day delta (positive = freshening up)
+        double tsbNow = snapshot.tsb;
+        double tsb7ago = pmc->sb(snapshot.date.addDays(-7));
+        snapshot.tsbTrend = tsbNow - tsb7ago;
+
+        // CTL ramp rate over last 14 days (change per week)
+        double ctl14ago = pmc->lts(snapshot.date.addDays(-14));
+        snapshot.ctlRampRate = (snapshot.ctl - ctl14ago) / 2.0;
+
+        // Recent 7 days of daily stress for monotony/constraint checks
+        snapshot.recentStress.resize(7);
+        for (int i = 0; i < 7; i++) {
+            QDate d = snapshot.date.addDays(-(7 - i));
+            snapshot.recentStress[i] = pmc->stress(d);
+        }
+    }
+
+    // Days to next event from Seasons
+    Seasons *seasons = context->athlete->seasons;
+    if (seasons) {
+        int closestDays = -1;
+        QString closestName;
+        for (const Season &s : seasons->seasons) {
+            for (const SeasonEvent &e : s.events) {
+                int days = static_cast<int>(snapshot.date.daysTo(e.date));
+                if (days >= 0 && (closestDays < 0 || days < closestDays)) {
+                    closestDays = days;
+                    closestName = e.name;
+                }
+            }
+        }
+        snapshot.daysToEvent = closestDays;
+        snapshot.nextEventName = closestName;
     }
 
     return snapshot;
