@@ -26,6 +26,19 @@ jobs:
           sudo update-alternatives --set g++ /usr/bin/g++-11
           gcc --version
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            flex libpulse-dev \
+            libglu1-mesa-dev libxcb-cursor-dev \
+            libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+            libsamplerate0-dev \
+            libical-dev \
+            libusb-1.0-0-dev libudev-dev \
+            libgsl-dev \
+            libfuse2 patchelf
+
       - name: Install Qt 6.8
         uses: jurplel/install-qt-action@v4
         with:
@@ -37,18 +50,6 @@ jobs:
             qtwebengine qtmultimedia qtserialport qtcharts
             qtconnectivity qtwebchannel qtpositioning qt5compat
           cache: true
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -qq flex libpulse-dev
-          sudo apt-get install -qq libglu1-mesa-dev libxcb-cursor-dev
-          sudo apt-get install -qq libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
-          sudo apt-get install -qq libsamplerate0-dev
-          sudo apt-get install -qq libical-dev
-          sudo apt-get install -qq libusb-1.0-0-dev libudev-dev
-          sudo apt-get install -qq libgsl-dev
-          sudo apt-get install -qq libfuse2 patchelf
 
       - name: Install R
         run: |
