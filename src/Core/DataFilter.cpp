@@ -8259,42 +8259,57 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         }
         break;
 
+        // relational operations should all work with vectors or scalars
         case EQ:
-        {
-            if (lhs.isNumber) return Result(lhs.number() == rhs.number());
-            else return Result(lhs.string() == rhs.string());
-        }
-        break;
-
         case NEQ:
-        {
-            if (lhs.isNumber) return Result(lhs.number() != rhs.number());
-            else return Result(lhs.string() != rhs.string());
-        }
-        break;
-
         case LT:
-        {
-            if (lhs.isNumber) return Result(lhs.number() < rhs.number());
-            else return Result(lhs.string() < rhs.string());
-        }
-        break;
         case LTE:
-        {
-            if (lhs.isNumber) return Result(lhs.number() <= rhs.number());
-            else return Result(lhs.string() <= rhs.string());
-        }
-        break;
         case GT:
-        {
-            if (lhs.isNumber) return Result(lhs.number() > rhs.number());
-            else return Result(lhs.string() > rhs.string());
-        }
-        break;
         case GTE:
         {
-            if (lhs.isNumber) return Result(lhs.number() >= rhs.number());
-            else return Result(lhs.string() >= rhs.string());
+            if (lhs.isVector() || rhs.isVector()) {
+
+                Result returning(0);
+                // coerce both into a vector of matching size
+                int size = std::max(lhs.isNumber ? lhs.asNumeric().count() : lhs.asString().count(),
+                                    rhs.isNumber ? rhs.asNumeric().count() : rhs.asString().count());
+                lhs.vectorize(size);
+                rhs.vectorize(size);
+
+                for(int i=0; i<size; i++) {
+
+                    double value = 0;
+
+                    switch (leaf->op) {
+                    case EQ:  value = lhs.isNumber ? lhs.number() == rhs.number() : lhs.string() == rhs.string(); break;
+                    case NEQ: value = lhs.isNumber ? lhs.number() != rhs.number() : lhs.string() != rhs.string(); break;
+                    case LT:  value = lhs.isNumber ? lhs.number() < rhs.number() : lhs.string() < rhs.string(); break;
+                    case LTE: value = lhs.isNumber ? lhs.number() <= rhs.number() : lhs.string() <= rhs.string(); break;
+                    case GT:  value = lhs.isNumber ? lhs.number() > rhs.number() : lhs.string() > rhs.string(); break;
+                    case GTE: value = lhs.isNumber ? lhs.number() >= rhs.number() : lhs.string() >= rhs.string(); break;
+                    }
+                    returning.asNumeric() << value;
+                    returning.number() += value;
+                }
+                return returning;
+
+            } else {
+
+                switch (leaf->op) {
+                case EQ:  if (lhs.isNumber) return Result(lhs.number() == rhs.number());
+                          else return Result(lhs.string() == rhs.string());
+                case NEQ: if (lhs.isNumber) return Result(lhs.number() != rhs.number());
+                          else return Result(lhs.string() != rhs.string());
+                case LT:  if (lhs.isNumber) return Result(lhs.number() < rhs.number());
+                          else return Result(lhs.string() < rhs.string());
+                case LTE: if (lhs.isNumber) return Result(lhs.number() <= rhs.number());
+                          else return Result(lhs.string() <= rhs.string());
+                case GT:  if (lhs.isNumber) return Result(lhs.number() > rhs.number());
+                          else return Result(lhs.string() > rhs.string());
+                case GTE: if (lhs.isNumber) return Result(lhs.number() >= rhs.number());
+                          else return Result(lhs.string() >= rhs.string());
+                }
+            }
         }
         break;
 
