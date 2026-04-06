@@ -649,7 +649,7 @@ def build_server(
         activities: list[dict[str, Any]] = []
         for f in sorted(planned_dir.glob("*.json")):
             try:
-                data = json.loads(f.read_text(encoding="utf-8"))
+                data = json.loads(f.read_text(encoding="utf-8-sig"))
                 data["_filepath"] = str(f)
                 activities.append(data)
             except (json.JSONDecodeError, OSError):
@@ -719,7 +719,7 @@ def build_server(
         if not path.exists():
             raise ValueError(f"Planned activity file not found: {filepath}")
 
-        data = json.loads(path.read_text(encoding="utf-8"))
+        data = json.loads(path.read_text(encoding="utf-8-sig"))
 
         if date.strip():
             data["date"] = date.strip()

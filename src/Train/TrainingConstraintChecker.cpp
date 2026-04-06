@@ -169,18 +169,22 @@ ConstraintCheckResult
 TrainingConstraintChecker::checkAll(const QVector<double> &dailyStress,
                                     const QDate &startDate,
                                     double priorCtl, double priorAtl,
-                                    const TrainingConstraintBounds &bounds)
+                                    const TrainingConstraintBounds &bounds,
+                                    int checkFromDay)
 {
     ConstraintCheckResult result;
     const int n = dailyStress.size();
     if (n == 0) return result;
 
-    // Project PMC forward
+    // Clamp to valid range
+    const int from = std::max(0, std::min(checkFromDay, n));
+
+    // Project PMC forward (over the full sequence for accurate state)
     QVector<double> projCtl, projAtl, projTsb;
     projectPMC(dailyStress, priorCtl, priorAtl, 42, 7, projCtl, projAtl, projTsb);
 
     // 1. Max daily TSS
-    for (int i = 0; i < n; i++) {
+    for (int i = from; i < n; i++) {
         if (dailyStress[i] > bounds.maxDailyTSS) {
             ConstraintViolation v;
             v.constraintId = QStringLiteral("maxDailyTSS");
@@ -196,7 +200,7 @@ TrainingConstraintChecker::checkAll(const QVector<double> &dailyStress,
     }
 
     // 2. TSB floor
-    for (int i = 0; i < n; i++) {
+    for (int i = from; i < n; i++) {
         if (projTsb[i] < bounds.tsbFloor) {
             ConstraintViolation v;
             v.constraintId = QStringLiteral("tsbFloor");
@@ -212,12 +216,20 @@ TrainingConstraintChecker::checkAll(const QVector<double> &dailyStress,
     }
 
     // 3. ACWR (check each day)
-    for (int i = 0; i < n; i++) {
+    // ACWR is only meaningful when CTL is high enough for the ratio to be
+    // reliable. With CTL < 30, even a moderate workout produces an extreme
+    // ratio because the denominator is so small. Below that threshold,
+    // all ACWR violations are warnings — absolute load checks (TSB floor,
+    // daily TSS cap) remain the primary safety gates.
+    static constexpr double kACWRHardCtlThreshold = 30.0;
+    for (int i = from; i < n; i++) {
         double a = acwr(projAtl[i], projCtl[i]);
         if (projCtl[i] > 5.0 && (a < bounds.minACWR || a > bounds.maxACWR)) {
             ConstraintViolation v;
             v.constraintId = QStringLiteral("acwr");
-            v.severity = (a > 1.5) ? ConstraintViolation::Hard : ConstraintViolation::Warning;
+            v.severity = (a > 1.5 && projCtl[i] >= kACWRHardCtlThreshold)
+                             ? ConstraintViolation::Hard
+                             : ConstraintViolation::Warning;
             v.date = startDate.addDays(i);
             v.actual = a;
             v.limit = (a > bounds.maxACWR) ? bounds.maxACWR : bounds.minACWR;
@@ -232,6 +244,7 @@ TrainingConstraintChecker::checkAll(const QVector<double> &dailyStress,
     // 4. CTL ramp rate (check week-by-week)
     for (int week = 0; week * 7 < n; week++) {
         int dayStart = week * 7;
+        if (dayStart + 6 < from) continue; // entire week is historical
         int dayEnd = std::min(dayStart + 7, n) - 1;
         double ctlAtStart = (dayStart == 0) ? priorCtl : projCtl[dayStart - 1];
         double ctlAtEnd = projCtl[dayEnd];
@@ -252,6 +265,7 @@ TrainingConstraintChecker::checkAll(const QVector<double> &dailyStress,
 
     // 5. Training monotony (7-day rolling windows)
     for (int i = 0; i + 7 <= n; i++) {
+        if (i + 6 < from) continue; // window ends before check range
         double m = monotony(dailyStress, i, 7);
         if (m > bounds.maxMonotony) {
             ConstraintViolation v;
@@ -271,6 +285,7 @@ TrainingConstraintChecker::checkAll(const QVector<double> &dailyStress,
     static constexpr double kRestThreshold = 20.0;
     for (int week = 0; week * 7 < n; week++) {
         int dayStart = week * 7;
+        if (dayStart + 6 < from) continue; // entire week is historical
         int dayEnd = std::min(dayStart + 7, n);
         int restDays = 0;
         for (int i = dayStart; i < dayEnd; i++) {

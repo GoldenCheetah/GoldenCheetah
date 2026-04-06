@@ -80,7 +80,7 @@ exposed to the workout generator:
 
 ## Phased Implementation
 
-### Phase 1: PMC-Based Plan Comparator (Minimum Viable Simulation)
+### Phase 1: PMC-Based Plan Comparator — COMPLETE
 
 **Goal:** Replace blind heuristic selection with model-informed workout type choice.
 
@@ -89,99 +89,92 @@ exposed to the workout generator:
 Project the resulting CTL/ATL/TSB trajectory forward. Select the type that best serves
 the athlete's target (build fitness, maintain, taper, recover).
 
-**Key insight:** This does NOT require Banister performance prediction. It only needs
-the existing PMC forward projection machinery, plus constraint checking.
+**Implementation:**
+- `TrainingSimulator` — simulates all 7 workout types, ranks by goal (build/maintain/taper/recover)
+- `TrainingConstraintChecker` — ACWR, monotony, CTL ramp rate, TSB floor enforcement
+- `/athlete/ai/simulate` REST endpoint + `gc_simulate_workout` MCP tool
+- `WorkoutAthleteSnapshot` enriched with TSB trend, days-to-event, recent load pattern
 
-**What changes:**
-- Enrich `WorkoutAthleteSnapshot` with TSB trend, days-to-event, recent load pattern
-- New `simulateDay()` function: given a workout type + duration, estimate its TSS and
-  project PMC forward 7-14 days
-- New constraint checker: verify projected trajectory stays within bounds
-- Modify `/athlete/ai/draft` to accept a `goal` parameter (build/maintain/taper/recover)
-  and auto-select workout type via simulation
+Works for every athlete with CTL data. No performance tests required.
 
-**What stays the same:**
-- Existing heuristic workout structure (interval patterns, warmup/cooldown)
-- WorkoutDraft format
-- ErgFile generation and TrainDB import
-
-**No performance tests required. Works for every athlete with CTL data.**
-
-### Phase 2: Banister Forward Prediction
+### Phase 2: Banister Forward Prediction — COMPLETE
 
 **Goal:** Use individually fitted Banister parameters to predict performance outcomes
 for candidate multi-week plans.
 
-**Approach:**
-1. Generate 3-5 heuristic plan templates (polarized, pyramidal, threshold-heavy, etc.)
-2. For each, populate a daily TSS array spanning current date to target event
-3. Run Banister forward simulation using athlete's fitted k1, k2, τ1, τ2
-4. Rank plans by predicted performance at target date
-5. Select winner, subject to constraint validation
+**Implementation:**
+- `BanisterSimulator` — extracts fitted k1, k2, τ1, τ2 from athlete's Banister model
+- `projectForward()` — runs IR model forward given a daily TSS array
+- `buildPlanTemplate()` — generates heuristic plan templates (3-1, 2-1, progressive, polarized, flat)
+- `comparePlans()` — ranks templates by predicted peak performance
+- `/athlete/ai/banister` REST endpoint + `gc_banister_compare` MCP tool
+- Graceful degradation to population priors when no fitted model exists
 
-**Prerequisites:**
-- Athlete must have sufficient performance test data (≥5 tests recommended)
-- Banister model must be fitted with acceptable RMSE
-- Must use nonlinear model variant (Busso VDR) or heavy constraints to prevent
-  "train maximally" pathology
-
-**Key additions:**
-- `BanisterSimulator` class: takes fitted params + daily TSS array → performance curve
-- Nonlinear fatigue extension (Busso 2003: k2 becomes load-dependent)
-- `/athlete/ai/simulate` endpoint returning ranked plan comparisons with projections
-- Graceful degradation: fall back to Phase 1 if insufficient test data
-
-**Open-source references:**
-- Turner's nonlinear GA optimizer: github.com/jturner314/nl_perf_model_opt (Python)
-- dorem R package for cross-validation
-
-### Phase 3: Bayesian Estimation + Uncertainty
+### Phase 3: Bayesian Estimation + Uncertainty — PARTIAL
 
 **Goal:** Solve cold-start, quantify prediction confidence, enable rolling updates.
 
-**Approach:**
-- Implement Bayesian parameter estimation with population priors compiled from
-  ~57 published parameter sets (per Peng et al., 2024)
-- Reparameterize model: replace k2 with α·k1 where α > 1 for identifiability
-- Provide posterior predictive intervals on all predictions
-- Sequential Bayesian updating as new data arrives (no batch refitting needed)
+**Implemented:**
+- `BayesianEstimator` — bootstrap-based approximate Bayesian computation (ABC)
+- `estimateUncertainty()` — parameter distributions via bootstrap resampling
+- `ensembleProject()` — forward projection with 50% and 95% confidence bands
+- `planDifferenceSignificance()` — tests if two plans are meaningfully different
+- `dataConfidenceLevel()` — qualitative confidence based on data availability
+- Cold-start tiers: <2 tests (population priors), 2-5 (wide CI), >5 (individual params)
 
-**Cold-start behavior:**
-- <5 performance observations: use population priors only → wide confidence intervals
-- 5-15 observations: blend priors with individual data → narrowing intervals
-- >15 observations: individual parameters dominate → tight predictions
+**Not yet implemented:**
+- Full MCMC via Stan/JAGS (currently using bootstrap approximation)
+- Reparameterized model (k2 = α·k1 for identifiability)
+- Sequential Bayesian updating (currently requires batch refit)
 
 **Open-source reference:**
 - Peng's Bayesian IR model: github.com/KenKPeng/IR-model (R/JAGS)
 
-### Phase 4: Multi-Component (3D) Model
+### Phase 4: Multi-Component (3D) Model — INTERFACE ONLY
 
 **Goal:** Distinguish between training stimuli targeting different energy systems.
 
-**Approach:** Separate IR filters for:
+**Implemented:**
+- `MultiComponentModel` — class with full interface design
+- `DecomposedImpulse` — aerobic / glycolytic / neuromuscular impulse split
+- `ComponentParams` — per-energy-system Banister parameters
+- `decomposeByIF()` — heuristic decomposition when zone data unavailable
+- `projectForward()` — independent per-component projection with composite weighting
+
+**Not yet implemented:**
+- Actual decomposition math (zone time-in-zone extraction from rides)
+- Per-component model fitting (requires component-specific performance tests)
+- Zone boundary calibration (VT1/VT2 thresholds)
+- Empirical validation — this remains unvalidated as of 2026
+
+**Approach (when implemented):** Separate IR filters for:
 - Aerobic (oxidative) → maps to CP; τ1 ≈ 40-60 days, τ2 ≈ 11-15 days
 - Glycolytic (lactic) → maps to W'; τ1 ≈ 5-12 days, τ2 ≈ 3-5 days
 - Alactic (phosphocreatine) → maps to Pmax; τ1 ≈ 15-30 days, τ2 ≈ 2-4 days
 
-GoldenCheetah already tracks CP, W', and Pmax via `PDEstimate`. The optimizer can
-then target specific energy systems (e.g., maximize CP while permitting W' decline
-for a long TT) by adjusting intensity distribution.
-
-**This is the long-term vision. Empirically unvalidated as of 2025.**
-
-### Phase 5: LLM Tactical Executor
+### Phase 5: LLM Tactical Executor — COMPLETE (architecture evolved)
 
 **Goal:** Translate mathematical load targets into structured, context-aware workouts.
 
-**The math model outputs:** "Day 42 needs Aerobic Impulse = 85, Glycolytic = 15"
+**Original design:** Embedded LLM call within the C++ pipeline.
 
-**The LLM translates to:** A complete WorkoutDraft with specific intervals, rest
-periods, progression patterns, adapted for subjective context (fatigue, time
-constraints, equipment availability).
+**Actual implementation:** The architecture inverted — the LLM (Claude via MCP) is
+the external caller, and GoldenCheetah provides the structured context and validation
+layer. This is a better design: the LLM orchestrates the full workflow rather than
+being a single step in a rigid pipeline.
 
-**Architecture:** The LLM receives model outputs as rigid constraints in its system
-prompt — not as suggestions. It cannot override the macro plan. It can only choose
-*how* to structure the session within the prescribed energy system targets.
+**Implementation:**
+- `LLMWorkoutBridge` — packages simulation outputs into structured LLM context
+- `buildContext()` — bundles snapshot + recommendation + constraints for the LLM
+- `generatePrompt()` — structured JSON prompt with safety bounds and output schema
+- `validateDraft()` — validates LLM-generated WorkoutDraft against TSS target (±20%)
+- `clampToSafety()` — reduces any power values exceeding safe bounds
+- `estimateDraftTSS()` — TSS estimation for generated workouts
+- MCP server (`goldencheetah-mcp`) exposes all tools for external LLM orchestration
+
+**Architecture:** The LLM receives model outputs as rigid constraints — not as
+suggestions. It cannot override the macro plan. It can only choose *how* to structure
+the session within the prescribed energy system targets.
 
 ## Key Principles
 

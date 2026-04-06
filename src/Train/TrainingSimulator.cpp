@@ -63,6 +63,9 @@ QJsonObject SimulationResult::toJson() const
     if (!constraints.violations.isEmpty()) {
         o[QStringLiteral("constraints")] = constraints.toJson();
     }
+    if (preExistingHardViolations > 0) {
+        o[QStringLiteral("preExistingHardViolations")] = preExistingHardViolations;
+    }
 
     return o;
 }
@@ -183,10 +186,38 @@ TrainingSimulator::simulateCandidate(const WorkoutAthleteSnapshot &snapshot,
         contextAtl = std::max(0.0, contextAtl);
     }
 
-    // Check constraints on the full context
+    // Check constraints on the full context, but only flag violations from today onward.
+    // Historical days are used for accurate PMC seeding, not penalized.
+    int checkFromDay = snapshot.recentStress.size();
     result.constraints = TrainingConstraintChecker::checkAll(
-        fullContext, contextStart, contextCtl, contextAtl, bounds);
-    result.feasible = result.constraints.passed;
+        fullContext, contextStart, contextCtl, contextAtl, bounds, checkFromDay);
+
+    // Compute a rest-day baseline: what violations exist even with TSS=0 today?
+    // Pre-existing violations (e.g., ACWR already above threshold) shouldn't
+    // prevent the simulator from recommending the least-bad option.
+    QVector<double> restContext;
+    if (!snapshot.recentStress.isEmpty())
+        restContext = snapshot.recentStress;
+    restContext.append(QVector<double>(1 + (fullContext.size() - restContext.size() - 1), 0.0));
+    // Ensure same length as fullContext but with 0 TSS from today onward
+    restContext.resize(fullContext.size(), 0.0);
+    ConstraintCheckResult baselineResult = TrainingConstraintChecker::checkAll(
+        restContext, contextStart, contextCtl, contextAtl, bounds, checkFromDay);
+
+    // Count baseline hard violations
+    int baselineHard = 0;
+    for (const ConstraintViolation &v : baselineResult.violations)
+        if (v.severity == ConstraintViolation::Hard) baselineHard++;
+
+    // Count this workout's hard violations
+    int workoutHard = 0;
+    for (const ConstraintViolation &v : result.constraints.violations)
+        if (v.severity == ConstraintViolation::Hard) workoutHard++;
+
+    result.preExistingHardViolations = baselineHard;
+
+    // Feasible if the workout doesn't cause MORE hard violations than rest
+    result.feasible = (workoutHard <= baselineHard);
 
     // Project from today forward (for scoring)
     TrainingConstraintChecker::projectPMC(dailyStress, snapshot.ctl, snapshot.atl,

@@ -177,6 +177,53 @@ private slots:
     }
 
     // ---------------------------------------------------------------
+    // checkFromDay — historical context not penalized
+    // ---------------------------------------------------------------
+
+    void checkAll_checkFromDay_skipsHistoricalViolations()
+    {
+        // First 7 days have a 400 TSS spike (would fail maxDailyTSS).
+        // Day 7 onward is moderate. With checkFromDay=7, only the
+        // forward portion is evaluated — the historical spike is ignored.
+        QVector<double> stress = {400, 0, 0, 0, 0, 0, 0,   // historical context
+                                  80, 60, 0, 70, 80, 60, 50}; // forward plan
+        QDate start(2025, 1, 1);
+
+        // Without checkFromDay: should fail (400 TSS violation)
+        ConstraintCheckResult full = TrainingConstraintChecker::checkAll(
+            stress, start, 50.0, 55.0);
+        bool hasTSSViolation = false;
+        for (const auto &v : full.violations)
+            if (v.constraintId == QStringLiteral("maxDailyTSS")) hasTSSViolation = true;
+        QVERIFY(hasTSSViolation);
+
+        // With checkFromDay=7: should pass (forward portion is clean)
+        ConstraintCheckResult forward = TrainingConstraintChecker::checkAll(
+            stress, start, 50.0, 55.0, TrainingConstraintBounds::recreational(), 7);
+        bool forwardHasTSSViolation = false;
+        for (const auto &v : forward.violations)
+            if (v.constraintId == QStringLiteral("maxDailyTSS")) forwardHasTSSViolation = true;
+        QVERIFY(!forwardHasTSSViolation);
+    }
+
+    void checkAll_checkFromDay_stillUsesHistoryForPMC()
+    {
+        // High historical load should affect forward ACWR even when
+        // historical violations are skipped. The PMC state carries forward.
+        QVector<double> stress = {200, 200, 200, 200, 200, 200, 200,  // heavy history
+                                  200, 200, 200, 200, 200, 200, 200};  // heavy forward
+        QDate start(2025, 1, 1);
+
+        ConstraintCheckResult result = TrainingConstraintChecker::checkAll(
+            stress, start, 10.0, 10.0, TrainingConstraintBounds::recreational(), 7);
+
+        // The forward portion should still have violations because PMC
+        // from historical load affects the forward ACWR/TSB calculations.
+        // With CTL=10 and 200 TSS/day for 14 days, ACWR will be extreme.
+        QVERIFY(!result.passed || !result.violations.isEmpty());
+    }
+
+    // ---------------------------------------------------------------
     // JSON serialization
     // ---------------------------------------------------------------
 

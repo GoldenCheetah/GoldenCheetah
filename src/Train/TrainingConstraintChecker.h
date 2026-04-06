@@ -82,11 +82,14 @@ public:
      * @param priorCtl     CTL on the day before startDate (for ramp calculation)
      * @param priorAtl     ATL on the day before startDate (for ACWR)
      * @param bounds       constraint thresholds to apply
+     * @param checkFromDay only flag violations from this day index onward;
+     *                     earlier days are used for PMC seeding but not penalized
      */
     static ConstraintCheckResult checkAll(const QVector<double> &dailyStress,
                                           const QDate &startDate,
                                           double priorCtl, double priorAtl,
-                                          const TrainingConstraintBounds &bounds = TrainingConstraintBounds::recreational());
+                                          const TrainingConstraintBounds &bounds = TrainingConstraintBounds::recreational(),
+                                          int checkFromDay = 0);
 
     /** Training monotony = mean(daily load) / stddev(daily load) over a 7-day window. */
     static double monotony(const QVector<double> &dailyStress, int windowStart, int windowSize = 7);

@@ -47,6 +47,10 @@ struct SimulationResult {
     bool feasible = true;
     ConstraintCheckResult constraints;
 
+    // Pre-existing hard violations that also occur with a rest day (TSS=0).
+    // These are conditions the athlete can't fix today.
+    int preExistingHardViolations = 0;
+
     QJsonObject toJson() const;
 };
 
