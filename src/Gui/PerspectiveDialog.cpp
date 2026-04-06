@@ -330,6 +330,9 @@ PerspectiveDialog::importPerspectiveClicked()
 
             // new one added
             emit perspectivesChanged();
+        } else {
+            // no valid perspective found for this view... (maybe its for another type of view)
+            QMessageBox::information(this, tr("Perspective Import"), tr("No perspectives found that are appropriate for the current view."));
         }
     }
 }

@@ -965,13 +965,16 @@ MainWindow::importPerspective()
         pactive = true;
         if (current->importPerspective(fileName)) {
 
-            // on success we select the new one
-            resetPerspective(view);
+            // on success we select the new one forcefully, as the view hasn't changed.
+            resetPerspective(view, true);
             //current->setPerspectives(perspectiveSelector);
 
             // and select remember pactive is true, so we do the heavy lifting here
             perspectiveSelector->setCurrentIndex(current->perspectives_.count()-1);
             current->perspectiveSelected(perspectiveSelector->currentIndex());
+        } else {
+            // no valid perspective found for this view... (maybe its for another type of view)
+            QMessageBox::information(this, tr("Perspective Import"), tr("No perspectives found that are appropriate for the current view."));
         }
         pactive = false;
     }
