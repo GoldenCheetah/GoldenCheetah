@@ -39,6 +39,8 @@
 #include "RideNavigator.h"
 
 #include "UserChartOverviewItem.h"
+#include "TrainingSimulator.h"
+#include "WorkoutGenerationService.h"
 
 #include <cmath>
 #include <QGraphicsSceneMouseEvent>
@@ -68,6 +70,7 @@ OverviewItemConfig::registerItems()
     registry.addItem(OverviewItemType::PMC,        QObject::tr("PMC"),        QObject::tr("PMC Status Summary"),                 OverviewScope::ANALYSIS,                                           PMCOverviewItem::create);
     registry.addItem(OverviewItemType::ROUTE,      QObject::tr("Route"),      QObject::tr("Route Summary"),                      OverviewScope::ANALYSIS,                                           RouteOverviewItem::create);
     registry.addItem(OverviewItemType::DONUT,      QObject::tr("Donut"),      QObject::tr("Metric breakdown by category"),       OverviewScope::TRENDS|OverviewScope::PLAN,                         DonutOverviewItem::create);
+    registry.addItem(OverviewItemType::SIMULATION, QObject::tr("AI Workout"), QObject::tr("AI workout recommendation for today"), OverviewScope::ANALYSIS,                                           SimulationOverviewItem::create);
 
     return true;
 }
@@ -951,6 +954,20 @@ PMCOverviewItem::PMCOverviewItem(ChartSpace *parent, QString symbol) : ChartSpac
 }
 
 PMCOverviewItem::~PMCOverviewItem()
+{
+}
+
+SimulationOverviewItem::SimulationOverviewItem(ChartSpace *parent) : ChartSpaceItem(parent, tr("AI Workout"))
+{
+    this->type = OverviewItemType::SIMULATION;
+    ctl = atl = tsb = acwr = 0.0;
+    hasData = false;
+
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
+}
+
+SimulationOverviewItem::~SimulationOverviewItem()
 {
 }
 
@@ -1951,6 +1968,60 @@ PMCOverviewItem::setData(RideItem *item)
     rr = pmc->rr(date);
 
 }
+
+void
+SimulationOverviewItem::setData(RideItem *item)
+{
+    if (item == NULL || item->ride() == NULL) return;
+
+    QDate date = item ? item->dateTime.date() : QDate();
+
+    // Get athlete snapshot for this date
+    WorkoutAthleteSnapshot snapshot =
+        WorkoutGenerationService::athleteSnapshot(parent->context, date);
+
+    if (!snapshot.hasSimulationData()) {
+        hasData = false;
+        update();
+        return;
+    }
+
+    ctl = snapshot.ctl;
+    atl = snapshot.atl;
+    tsb = snapshot.tsb;
+    acwr = (ctl > 0) ? atl / ctl : 0.0;
+
+    // Run simulation with "build" goal (most common use case)
+    SimulationRanking ranking = TrainingSimulator::rankCandidates(
+        snapshot, TrainingGoal::Build, 60);
+
+    goalName = trainingGoalToString(ranking.goal);
+    topCandidates.clear();
+
+    for (const SimulationResult &c : ranking.candidates) {
+        SimulationCardEntry entry;
+        entry.workoutType = c.workoutType;
+        entry.score = c.score;
+        entry.estimatedTSS = c.estimatedTSS;
+        entry.feasible = c.feasible;
+        entry.warnings = 0;
+        entry.hardViolations = 0;
+        for (const ConstraintViolation &v : c.constraints.violations) {
+            if (v.severity == ConstraintViolation::Hard)
+                entry.hardViolations++;
+            else
+                entry.warnings++;
+        }
+        topCandidates.append(entry);
+        if (topCandidates.size() >= 3) break; // top 3 is enough for the card
+    }
+
+    hasData = true;
+    update();
+}
+
+void
+SimulationOverviewItem::itemGeometryChanged() {}
 
 static bool lessthan(const aggmeta &a, const aggmeta &b)
 {
@@ -3790,6 +3861,132 @@ PMCOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
                                   nexty + (bfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
         nexty += ROWHEIGHT*2;
 
+    }
+}
+
+void
+SimulationOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
+
+    QFontMetrics tfm(parent->titlefont, parent->device());
+    QFontMetrics bfm(parent->bigfont, parent->device());
+    QFontMetrics mfm(parent->midfont, parent->device());
+
+    double nexty = ROWHEIGHT;
+
+    if (!hasData) {
+        painter->setPen(QColor(150,150,150));
+        painter->setFont(parent->midfont);
+        painter->drawText(QPointF(ROWHEIGHT / 2.0f, nexty + mfm.ascent() / 3.0f),
+                          tr("No simulation data"));
+        return;
+    }
+
+    // Top recommendation
+    if (!topCandidates.isEmpty()) {
+        const SimulationCardEntry &top = topCandidates.first();
+
+        // Workout type label
+        painter->setPen(QColor(200,200,200));
+        painter->setFont(parent->titlefont);
+        QString label = tr("Recommended");
+        painter->drawText(QPointF(ROWHEIGHT / 2.0f, nexty + tfm.ascent() / 3.0f), label);
+        nexty += tfm.height() + 30;
+
+        // Workout type name (big)
+        QColor typeColor = top.feasible ? GColor(CPLOTMARKER) : QColor(200, 80, 80);
+        painter->setPen(typeColor);
+        painter->setFont(parent->bigfont);
+
+        // Capitalize first letter
+        QString typeName = top.workoutType;
+        if (!typeName.isEmpty()) typeName[0] = typeName[0].toUpper();
+
+        QRectF rect = bfm.boundingRect(typeName);
+        painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
+                                  nexty + bfm.ascent() / 3.0f), typeName);
+        nexty += ROWHEIGHT * 2;
+
+        // TSS estimate
+        painter->setPen(QColor(200,200,200));
+        painter->setFont(parent->titlefont);
+        QString tssLabel = QString(tr("Est. TSS: %1")).arg(qRound(top.estimatedTSS));
+        painter->drawText(QPointF(ROWHEIGHT / 2.0f, nexty + tfm.ascent() / 3.0f), tssLabel);
+        nexty += tfm.height() + 20;
+    }
+
+    // ACWR status
+    if (deep > 8) {
+        painter->setPen(QColor(200,200,200));
+        painter->setFont(parent->titlefont);
+        QString acwrLabel = tr("ACWR");
+        painter->drawText(QPointF(ROWHEIGHT / 2.0f, nexty + tfm.ascent() / 3.0f), acwrLabel);
+        nexty += tfm.height() + 30;
+
+        // Color ACWR by risk level
+        QColor acwrColor;
+        if (acwr >= 0.8 && acwr <= 1.3) acwrColor = QColor(100, 200, 100); // green - safe
+        else if (acwr < 0.8 || acwr <= 1.5) acwrColor = QColor(230, 180, 50); // amber - caution
+        else acwrColor = QColor(220, 80, 80); // red - danger
+
+        painter->setPen(acwrColor);
+        painter->setFont(parent->bigfont);
+        QString acwrStr = QString::number(acwr, 'f', 2);
+        QRectF rect = bfm.boundingRect(acwrStr);
+        painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
+                                  nexty + bfm.ascent() / 3.0f), acwrStr);
+        nexty += ROWHEIGHT * 2;
+    }
+
+    // Constraint summary
+    if (deep > 12 && !topCandidates.isEmpty()) {
+        const SimulationCardEntry &top = topCandidates.first();
+        painter->setPen(QColor(200,200,200));
+        painter->setFont(parent->titlefont);
+        QString constraintLabel = tr("Constraints");
+        painter->drawText(QPointF(ROWHEIGHT / 2.0f, nexty + tfm.ascent() / 3.0f), constraintLabel);
+        nexty += tfm.height() + 30;
+
+        QColor statusColor;
+        QString statusText;
+        if (top.hardViolations > 0) {
+            statusColor = QColor(220, 80, 80);
+            statusText = QString(tr("%1 violation(s)")).arg(top.hardViolations);
+        } else if (top.warnings > 0) {
+            statusColor = QColor(230, 180, 50);
+            statusText = QString(tr("%1 warning(s)")).arg(top.warnings);
+        } else {
+            statusColor = QColor(100, 200, 100);
+            statusText = tr("All clear");
+        }
+
+        painter->setPen(statusColor);
+        painter->setFont(parent->bigfont);
+        QRectF rect = bfm.boundingRect(statusText);
+        painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
+                                  nexty + bfm.ascent() / 3.0f), statusText);
+        nexty += ROWHEIGHT * 2;
+    }
+
+    // Runner-up candidates
+    if (deep > 16 && topCandidates.size() > 1) {
+        painter->setPen(QColor(200,200,200));
+        painter->setFont(parent->titlefont);
+        QString altLabel = tr("Alternatives");
+        painter->drawText(QPointF(ROWHEIGHT / 2.0f, nexty + tfm.ascent() / 3.0f), altLabel);
+        nexty += tfm.height() + 20;
+
+        painter->setFont(parent->midfont);
+        for (int i = 1; i < topCandidates.size() && i <= 2; i++) {
+            const SimulationCardEntry &alt = topCandidates[i];
+            QString name = alt.workoutType;
+            if (!name.isEmpty()) name[0] = name[0].toUpper();
+            QString line = QString("%1  TSS %2").arg(name).arg(qRound(alt.estimatedTSS));
+
+            QColor altColor = alt.feasible ? QColor(180, 180, 180) : QColor(180, 100, 100);
+            painter->setPen(altColor);
+            painter->drawText(QPointF(ROWHEIGHT / 2.0f, nexty + mfm.ascent() / 3.0f), line);
+            nexty += mfm.height() + 10;
+        }
     }
 }
 

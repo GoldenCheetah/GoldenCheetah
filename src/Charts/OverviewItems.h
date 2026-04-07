@@ -53,7 +53,7 @@ class ColorButton;
 
 // types we use start from 100 to avoid clashing with main chart types
 enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE, KPI,
-                        TOPN, DONUT, ACTIVITIES, ATHLETE, DATATABLE, USERCHART };
+                        TOPN, DONUT, ACTIVITIES, ATHLETE, DATATABLE, USERCHART, SIMULATION };
 
 //
 // Configuration widget for ALL Overview Items
@@ -427,6 +427,44 @@ class PMCOverviewItem : public ChartSpaceItem
         QString symbol;
 
         double sts, lts, sb, rr, stress;
+
+        OverviewItemConfig *configwidget;
+};
+
+struct SimulationCardEntry {
+    QString workoutType;
+    double score;
+    double estimatedTSS;
+    bool feasible;
+    int warnings;
+    int hardViolations;
+};
+
+class SimulationOverviewItem : public ChartSpaceItem
+{
+    Q_OBJECT
+
+    public:
+
+        SimulationOverviewItem(ChartSpace *parent);
+        ~SimulationOverviewItem();
+
+        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+        void itemGeometryChanged();
+        void setData(RideItem *item);
+        void setDateRange(DateRange) {} // analysis view only
+
+        QWidget *config() { return configwidget; }
+
+        static ChartSpaceItem *create(ChartSpace *parent) { return new SimulationOverviewItem(parent); }
+
+        // snapshot state
+        double ctl, atl, tsb, acwr;
+
+        // ranked candidates
+        QList<SimulationCardEntry> topCandidates;
+        QString goalName;
+        bool hasData;
 
         OverviewItemConfig *configwidget;
 };
