@@ -476,11 +476,8 @@ AbstractView::importPerspective(QString filename)
     if (newone) {
         appendPerspective(newone);
         return true;
-    } else {
-        // no valid perspective found for this view... (maybe its for another type of view)
-        QMessageBox::information(this, tr("Perspective Import"), tr("No perspectives found that are appropriate for the current view."));
-        return false;
     }
+    return false;
 }
 
 void
