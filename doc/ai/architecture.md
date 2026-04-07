@@ -43,14 +43,17 @@ exposed to the workout generator:
 ## Target Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    REST API Layer                        │
-│  /athlete/ai/snapshot  — enriched athlete context        │
-│  /athlete/ai/simulate  — compare candidate plans (NEW)   │
-│  /athlete/ai/draft     — generate single workout         │
-│  /athlete/ai/save      — persist to disk                 │
-│  /athlete/ai/plan      — create planned activity         │
-└────────────────────────┬────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                     REST API Layer                           │
+│  GET  /ai/snapshot  — enriched athlete context               │
+│  POST /ai/simulate  — rank 7 workout types by goal           │
+│  POST /ai/banister   — compare multi-week plan templates     │
+│  POST /ai/draft      — generate heuristic workout            │
+│  POST|DELETE /ai/save — save or delete workout               │
+│  POST|PUT|DELETE /ai/plan — create, update, delete planned   │
+│  CRUD /ai/plans[/:id] — training plan management             │
+│  (see metrics.md for full API reference)                     │
+└────────────────────────┬────────────────────────────────────┘
                          │
          ┌───────────────┼───────────────┐
          ▼               ▼               ▼

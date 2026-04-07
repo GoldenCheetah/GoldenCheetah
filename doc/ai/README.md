@@ -10,6 +10,7 @@ doc/ai/
 ├── README.md                  ← You are here
 ├── architecture.md            ← System design, hybrid model, phased roadmap
 ├── constraints.md             ← Hard physiological safety constraints (reference table)
+├── metrics.md                 ← Complete catalog of computed metrics + API reference
 ├── research/
 │   ├── banister-forward-simulation.md   ← Literature review: using IR models prospectively
 │   └── computational-optimization.md    ← Algorithms, nonlinear models, 3D-IR, hybrid LLM
@@ -26,8 +27,9 @@ If you are an AI agent working on GoldenCheetah's training features:
 
 1. **Always read `constraints.md` first** — these are non-negotiable safety bounds.
 2. **Read `architecture.md`** to understand the hybrid math-model + LLM design.
-3. **Consult `research/`** for evidence behind design decisions.
-4. **Never optimize the linear Banister model directly** — it produces pathological
+3. **Read `metrics.md`** for the complete catalog of computed metrics and API endpoints.
+4. **Consult `research/`** for evidence behind design decisions.
+5. **Never optimize the linear Banister model directly** — it produces pathological
    "train maximally" prescriptions. Use nonlinear extensions or constrained heuristics.
 
 ## For Humans
