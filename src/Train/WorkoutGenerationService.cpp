@@ -861,6 +861,151 @@ WorkoutGenerationService::deletePlannedActivity(Context *context, const QString 
     return true;
 }
 
+bool
+WorkoutGenerationService::updatePlannedActivity(Context *context, const QString &filepath,
+                                                const QDateTime &newWhen,
+                                                const QString &sport, const QString &title,
+                                                const QString &description,
+                                                const QString &workoutPath,
+                                                QString *updatedPath, QStringList &errors)
+{
+    if (!context || !context->athlete || !context->athlete->rideCache) {
+        errors << QStringLiteral("Invalid context");
+        return false;
+    }
+
+    QFileInfo fi(filepath);
+    if (!fi.exists()) {
+        errors << QStringLiteral("Planned activity file not found: %1").arg(filepath);
+        return false;
+    }
+
+    QString filename = fi.fileName();
+    RideItem *item = context->athlete->rideCache->getRide(filename, true);
+    if (!item) {
+        errors << QStringLiteral("Planned activity not found in ride cache: %1").arg(filename);
+        return false;
+    }
+
+    // If date/time is changing, use moveActivity to rename the file properly
+    bool dateChanged = newWhen.isValid() && newWhen != item->dateTime;
+
+    // Apply metadata changes via ride tags
+    auto applyMetadata = [&](RideItem *ri) {
+        RideFile *ride = ri->ride(true);
+        if (!ride) return false;
+
+        bool changed = false;
+        if (!sport.trimmed().isEmpty()) {
+            ride->setTag(QStringLiteral("Sport"), normalizedSport(sport));
+            changed = true;
+        }
+        if (!title.trimmed().isEmpty()) {
+            ride->setTag(QStringLiteral("Route"), title.trimmed());
+            ride->setTag(QStringLiteral("Workout Code"), title.trimmed());
+            changed = true;
+        }
+        if (!description.trimmed().isEmpty()) {
+            ride->setTag(QStringLiteral("Notes"), description.trimmed());
+            changed = true;
+        }
+        if (!workoutPath.trimmed().isEmpty()) {
+            ride->setTag(QStringLiteral("WorkoutFilename"), workoutPath.trimmed());
+            changed = true;
+        }
+        if (changed) ri->setDirty(true);
+        return true;
+    };
+
+    // All RideCache operations must run on the main thread.
+    bool ok = false;
+    QString resultPath;
+
+    auto doUpdate = [&]() {
+        if (!applyMetadata(item)) {
+            errors << QStringLiteral("Failed to open activity for metadata update");
+            return;
+        }
+
+        if (dateChanged) {
+            RideCache::OperationResult moveResult =
+                context->athlete->rideCache->moveActivity(item, newWhen);
+            if (!moveResult.success) {
+                errors << moveResult.error;
+                return;
+            }
+        }
+
+        if (item->isDirty()) {
+            QString saveError;
+            context->athlete->rideCache->saveActivity(item, saveError);
+            if (!saveError.isEmpty()) {
+                errors << saveError;
+                return;
+            }
+        }
+
+        QString dir = context->athlete->home->planned().canonicalPath();
+        resultPath = dir + QLatin1Char('/') + item->fileName;
+        ok = true;
+    };
+
+    if (QThread::currentThread() == QCoreApplication::instance()->thread()) {
+        doUpdate();
+    } else {
+        QMetaObject::invokeMethod(QCoreApplication::instance(), doUpdate,
+                                  Qt::BlockingQueuedConnection);
+    }
+
+    if (ok && updatedPath) {
+        *updatedPath = resultPath;
+    }
+    return ok;
+}
+
+bool
+WorkoutGenerationService::deleteWorkout(Context *context, const QString &filepath,
+                                        QStringList &errors)
+{
+    Q_UNUSED(context);
+
+    QFileInfo fi(filepath);
+    if (!fi.exists()) {
+        errors << QStringLiteral("Workout file not found: %1").arg(filepath);
+        return false;
+    }
+
+    QString suffix = fi.suffix().toLower();
+    if (suffix != QLatin1String("erg") && suffix != QLatin1String("mrc") && suffix != QLatin1String("zwo")) {
+        errors << QStringLiteral("Expected a workout file (.erg, .mrc, or .zwo)");
+        return false;
+    }
+
+    QString absPath = fi.absoluteFilePath();
+
+    // Remove from TrainDB (SQLite connection lives on main thread)
+    auto doDelete = [&]() {
+        trainDB->startLUW();
+        trainDB->deleteWorkout(absPath);
+        trainDB->endLUW();
+    };
+
+    if (QThread::currentThread() == QCoreApplication::instance()->thread()) {
+        doDelete();
+    } else {
+        QMetaObject::invokeMethod(QCoreApplication::instance(), doDelete,
+                                  Qt::BlockingQueuedConnection);
+    }
+
+    // Delete the file from disk
+    if (!QFile::remove(absPath)) {
+        errors << QStringLiteral("Failed to delete workout file: %1").arg(absPath);
+        return false;
+    }
+
+    return true;
+}
+
 WorkoutDraft
 WorkoutGenerationService::exampleDeterministicDraft()
 {

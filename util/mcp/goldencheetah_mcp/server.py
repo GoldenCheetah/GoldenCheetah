@@ -79,6 +79,12 @@ class GoldenCheetahApiClient:
     def delete_planned_activity(self, athlete: str, filepath: str) -> dict[str, Any]:
         return self._request_json("DELETE", self._athlete_path(athlete, "ai", "plan"), payload={"filepath": filepath})
 
+    def update_planned_activity(self, athlete: str, payload: dict[str, Any]) -> dict[str, Any]:
+        return self._request_json("PUT", self._athlete_path(athlete, "ai", "plan"), payload=payload)
+
+    def delete_workout(self, athlete: str, filepath: str) -> dict[str, Any]:
+        return self._request_json("DELETE", self._athlete_path(athlete, "ai", "save"), payload={"filepath": filepath})
+
     def simulate(self, athlete: str, payload: dict[str, Any]) -> dict[str, Any]:
         return self._request_json("POST", self._athlete_path(athlete, "ai", "simulate"), payload=payload)
 
@@ -710,28 +716,18 @@ def build_server(
     ) -> dict[str, Any]:
         if not confirm:
             raise ValueError("gc_update_planned_activity requires confirm=true after explicit user approval.")
-        path = Path(filepath)
-        _validate_gc_path(path)
-        if not path.exists():
-            raise ValueError(f"Planned activity file not found: {filepath}")
-
-        data = json.loads(path.read_text(encoding="utf-8-sig"))
-
-        if date.strip():
-            data["date"] = date.strip()
-        if time.strip():
-            data["time"] = time.strip()
-        if workout_path.strip():
-            data["workoutPath"] = workout_path.strip()
-        if sport.strip():
-            data["sport"] = sport.strip()
-        if title.strip():
-            data["title"] = title.strip()
-        if description.strip():
-            data["description"] = description.strip()
-
-        path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
-        return {"updated": True, "filepath": filepath, "activity": data}
+        payload = _remove_empty_strings(
+            {
+                "filepath": filepath,
+                "date": date,
+                "time": time,
+                "workoutPath": workout_path,
+                "sport": sport,
+                "title": title,
+                "description": description,
+            }
+        )
+        return client.update_planned_activity(athlete=athlete, payload=payload)
 
     @mcp.tool(
         name="gc_delete_workout",
@@ -754,14 +750,7 @@ def build_server(
     ) -> dict[str, Any]:
         if not confirm:
             raise ValueError("gc_delete_workout requires confirm=true after explicit user approval.")
-        path = Path(filepath)
-        _validate_gc_path(path)
-        if not path.exists():
-            raise ValueError(f"Workout file not found: {filepath}")
-        if path.suffix not in (".erg", ".mrc", ".zwo"):
-            raise ValueError("Expected a workout file (.erg, .mrc, or .zwo).")
-        path.unlink()
-        return {"deleted": True, "filepath": filepath}
+        return client.delete_workout(athlete=athlete, filepath=filepath)
 
     return mcp
 
@@ -770,15 +759,6 @@ def _resolve_planned_dir(athlete: str) -> Path:
     gc_home = Path.home() / ".goldencheetah" / athlete / "planned"
     return gc_home
 
-
-def _validate_gc_path(path: Path) -> None:
-    gc_home = Path.home() / ".goldencheetah"
-    try:
-        path.resolve().relative_to(gc_home.resolve())
-    except ValueError:
-        raise ValueError(
-            f"Path {path} is not inside the GoldenCheetah data directory ({gc_home})."
-        )
 
 
 def _remove_empty_strings(payload: dict[str, Any]) -> dict[str, Any]:

@@ -431,7 +431,11 @@ APIWebService::aiDraft(QString athlete, HttpRequest &request, HttpResponse &resp
 void
 APIWebService::aiSave(QString athlete, HttpRequest &request, HttpResponse &response)
 {
-    if (!requireMethod(request, response, "POST", "POST")) {
+    QString method = QString::fromLatin1(request.getMethod()).toUpper();
+
+    if (method != QLatin1String("POST") && method != QLatin1String("DELETE")) {
+        writeJsonError(response, 405, QStringLiteral("Method not allowed"), QByteArray("Method Not Allowed"));
+        response.setHeader("Allow", "POST, DELETE");
         return;
     }
 
@@ -448,6 +452,28 @@ APIWebService::aiSave(QString athlete, HttpRequest &request, HttpResponse &respo
         return;
     }
 
+    // DELETE /api/athlete/{name}/ai/save — remove a workout file and its TrainDB entry
+    if (method == QLatin1String("DELETE")) {
+        QString filepath = document.object().value(QStringLiteral("filepath")).toString().trimmed();
+        if (filepath.isEmpty()) {
+            writeJsonError(response, 400, QStringLiteral("filepath is required"), QByteArray("Bad Request"));
+            return;
+        }
+
+        QStringList errors;
+        if (!WorkoutGenerationService::deleteWorkout(context, filepath, errors)) {
+            writeJsonError(response, 404, errors.join(QStringLiteral("; ")), QByteArray("Not Found"));
+            return;
+        }
+
+        QJsonObject object;
+        object.insert(QStringLiteral("deleted"), true);
+        object.insert(QStringLiteral("filepath"), filepath);
+        writeJson(response, QJsonDocument(object));
+        return;
+    }
+
+    // POST /api/athlete/{name}/ai/save — save a workout draft
     QJsonObject root = document.object();
     QJsonObject draftObject = root;
     if (root.contains(QStringLiteral("draft")) && root.value(QStringLiteral("draft")).isObject()) {
@@ -487,9 +513,9 @@ APIWebService::aiPlan(QString athlete, HttpRequest &request, HttpResponse &respo
 {
     QString method = QString::fromLatin1(request.getMethod()).toUpper();
 
-    if (method != QLatin1String("POST") && method != QLatin1String("DELETE")) {
+    if (method != QLatin1String("POST") && method != QLatin1String("DELETE") && method != QLatin1String("PUT")) {
         writeJsonError(response, 405, QStringLiteral("Method not allowed"), QByteArray("Method Not Allowed"));
-        response.setHeader("Allow", "POST, DELETE");
+        response.setHeader("Allow", "POST, PUT, DELETE");
         return;
     }
 
@@ -522,6 +548,45 @@ APIWebService::aiPlan(QString athlete, HttpRequest &request, HttpResponse &respo
         QJsonObject object;
         object.insert(QStringLiteral("deleted"), true);
         object.insert(QStringLiteral("filepath"), filepath);
+        writeJson(response, QJsonDocument(object));
+        return;
+    }
+
+    // PUT /api/athlete/{name}/ai/plan — update a planned activity
+    if (method == QLatin1String("PUT")) {
+        QJsonDocument document;
+        if (!requireJsonBody(request, response, document)) {
+            return;
+        }
+
+        QJsonObject root = document.object();
+        QString filepath = root.value(QStringLiteral("filepath")).toString().trimmed();
+        if (filepath.isEmpty()) {
+            writeJsonError(response, 400, QStringLiteral("filepath is required"), QByteArray("Bad Request"));
+            return;
+        }
+
+        QDateTime newWhen = parseApiDateTime(root.value(QStringLiteral("when")).toString(),
+                                             root.value(QStringLiteral("date")).toString(),
+                                             root.value(QStringLiteral("time")).toString());
+
+        QStringList errors;
+        QString updatedPath;
+        bool updated = WorkoutGenerationService::updatePlannedActivity(
+            context, filepath, newWhen,
+            root.value(QStringLiteral("sport")).toString(),
+            root.value(QStringLiteral("title")).toString(),
+            root.value(QStringLiteral("description")).toString(),
+            root.value(QStringLiteral("workoutPath")).toString(),
+            &updatedPath, errors);
+        if (!updated) {
+            writeJsonError(response, 422, errors.join(QStringLiteral("; ")), QByteArray("Unprocessable Entity"));
+            return;
+        }
+
+        QJsonObject object;
+        object.insert(QStringLiteral("updated"), true);
+        object.insert(QStringLiteral("filepath"), updatedPath);
         writeJson(response, QJsonDocument(object));
         return;
     }

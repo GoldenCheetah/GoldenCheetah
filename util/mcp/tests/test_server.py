@@ -159,12 +159,30 @@ class MockGoldenCheetahHandler(BaseHTTPRequestHandler):
 
         self._write_json(404, {"error": f"Unhandled POST {self.path}"})
 
+    def do_PUT(self) -> None:  # noqa: N802
+        length = int(self.headers.get("Content-Length", "0"))
+        raw = self.rfile.read(length)
+        payload = json.loads(raw.decode("utf-8"))
+
+        if self.path == "/Test%20Rider/ai/plan":
+            body = {"updated": True, "filepath": payload.get("filepath", "")}
+            self._write_json(200, body)
+            return
+
+        self._write_json(404, {"error": f"Unhandled PUT {self.path}"})
+
     def do_DELETE(self) -> None:  # noqa: N802
         length = int(self.headers.get("Content-Length", "0"))
         raw = self.rfile.read(length)
         payload = json.loads(raw.decode("utf-8"))
 
         if self.path == "/Test%20Rider/ai/plan":
+            filepath = payload.get("filepath", "")
+            body = {"deleted": True, "filepath": filepath}
+            self._write_json(200, body)
+            return
+
+        if self.path == "/Test%20Rider/ai/save":
             filepath = payload.get("filepath", "")
             body = {"deleted": True, "filepath": filepath}
             self._write_json(200, body)
@@ -396,12 +414,8 @@ class GoldenCheetahMcpIntegrationTest(unittest.TestCase):
                     )
                     self.assertTrue(update_result.structuredContent["updated"])
                     self.assertEqual(
-                        update_result.structuredContent["activity"]["title"],
-                        "Updated Ride",
-                    )
-                    self.assertEqual(
-                        update_result.structuredContent["activity"]["time"],
-                        "08:00:00",
+                        update_result.structuredContent["filepath"],
+                        str(activity_file),
                     )
 
                     delete_plan_result = await session.call_tool(
@@ -427,7 +441,10 @@ class GoldenCheetahMcpIntegrationTest(unittest.TestCase):
                         },
                     )
                     self.assertTrue(delete_workout_result.structuredContent["deleted"])
-                    self.assertFalse(workout_file.exists())
+                    self.assertEqual(
+                        delete_workout_result.structuredContent["filepath"],
+                        str(workout_file),
+                    )
 
     def test_bom_handling(self) -> None:
         """GoldenCheetah writes JSON with UTF-8 BOM; list and update must handle it."""
@@ -481,23 +498,6 @@ class GoldenCheetahMcpIntegrationTest(unittest.TestCase):
                     self.assertEqual(activities[0]["title"], "BOM Test Ride")
                     self.assertEqual(activities[0]["_filepath"], str(bom_file))
 
-                    # gc_update_planned_activity must read BOM files and update them
-                    update_result = await session.call_tool(
-                        "gc_update_planned_activity",
-                        {
-                            "athlete": Path(tmpdir).name,
-                            "filepath": str(bom_file),
-                            "confirm": True,
-                            "title": "Updated BOM Ride",
-                        },
-                    )
-                    self.assertTrue(update_result.structuredContent["updated"])
-                    self.assertEqual(
-                        update_result.structuredContent["activity"]["title"],
-                        "Updated BOM Ride",
-                    )
-
-                    # Verify the updated file is still valid JSON (with or without BOM)
-                    updated_content = bom_file.read_text(encoding="utf-8-sig")
-                    updated_data = json.loads(updated_content)
-                    self.assertEqual(updated_data["title"], "Updated BOM Ride")
+                    # gc_list_planned_activities correctly parsed the BOM file above;
+                    # gc_update_planned_activity now routes through GC's HTTP API,
+                    # so BOM handling on the write path is GoldenCheetah's concern.

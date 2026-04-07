@@ -100,6 +100,24 @@ class WorkoutGenerationService {
         static bool deletePlannedActivity(Context *context, const QString &filepath,
                                           QStringList &errors);
 
+        /**
+         * Update a planned activity's metadata and/or date/time.
+         * Routes through RideCache::moveActivity() for date changes and
+         * saveActivity() for metadata to keep the UI in sync.
+         */
+        static bool updatePlannedActivity(Context *context, const QString &filepath,
+                                          const QDateTime &newWhen,
+                                          const QString &sport, const QString &title,
+                                          const QString &description,
+                                          const QString &workoutPath,
+                                          QString *updatedPath, QStringList &errors);
+
+        /**
+         * Delete a workout (.erg/.mrc/.zwo) file and remove it from TrainDB.
+         */
+        static bool deleteWorkout(Context *context, const QString &filepath,
+                                  QStringList &errors);
+
         /** Small deterministic draft for tests and offline demos (no ML). */
         static WorkoutDraft exampleDeterministicDraft();
 };
