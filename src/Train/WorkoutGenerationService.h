@@ -93,6 +93,13 @@ class WorkoutGenerationService {
                                           const QString &title, const QString &description,
                                           QString *savedPath, QStringList &errors);
 
+        /**
+         * Delete a planned activity by its file path, going through
+         * RideCache::removeRide() to keep the UI in sync.
+         */
+        static bool deletePlannedActivity(Context *context, const QString &filepath,
+                                          QStringList &errors);
+
         /** Small deterministic draft for tests and offline demos (no ML). */
         static WorkoutDraft exampleDeterministicDraft();
 };

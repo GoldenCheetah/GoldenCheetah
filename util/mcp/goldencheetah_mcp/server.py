@@ -76,6 +76,9 @@ class GoldenCheetahApiClient:
     def create_planned_activity(self, athlete: str, payload: dict[str, Any]) -> dict[str, Any]:
         return self._request_json("POST", self._athlete_path(athlete, "ai", "plan"), payload=payload)
 
+    def delete_planned_activity(self, athlete: str, filepath: str) -> dict[str, Any]:
+        return self._request_json("DELETE", self._athlete_path(athlete, "ai", "plan"), payload={"filepath": filepath})
+
     def simulate(self, athlete: str, payload: dict[str, Any]) -> dict[str, Any]:
         return self._request_json("POST", self._athlete_path(athlete, "ai", "simulate"), payload=payload)
 
@@ -677,14 +680,7 @@ def build_server(
     ) -> dict[str, Any]:
         if not confirm:
             raise ValueError("gc_delete_planned_activity requires confirm=true after explicit user approval.")
-        path = Path(filepath)
-        _validate_gc_path(path)
-        if not path.exists():
-            raise ValueError(f"Planned activity file not found: {filepath}")
-        if not path.suffix == ".json":
-            raise ValueError("Expected a .json planned activity file.")
-        path.unlink()
-        return {"deleted": True, "filepath": filepath}
+        return client.delete_planned_activity(athlete=athlete, filepath=filepath)
 
     @mcp.tool(
         name="gc_update_planned_activity",

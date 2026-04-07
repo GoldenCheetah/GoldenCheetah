@@ -816,6 +816,51 @@ WorkoutGenerationService::createPlannedActivity(Context *context, const QString 
     return true;
 }
 
+bool
+WorkoutGenerationService::deletePlannedActivity(Context *context, const QString &filepath,
+                                                QStringList &errors)
+{
+    if (!context || !context->athlete || !context->athlete->rideCache) {
+        errors << QStringLiteral("Invalid context");
+        return false;
+    }
+
+    QFileInfo fi(filepath);
+    if (!fi.exists()) {
+        errors << QStringLiteral("Planned activity file not found: %1").arg(filepath);
+        return false;
+    }
+
+    QString filename = fi.fileName();
+
+    // Verify this is actually a planned activity in the ride cache
+    RideItem *item = context->athlete->rideCache->getRide(filename, true);
+    if (!item) {
+        errors << QStringLiteral("Planned activity not found in ride cache: %1").arg(filename);
+        return false;
+    }
+
+    // removeRide touches Qt UI objects (model updates, notifications);
+    // dispatch to the main thread when called from an HTTP-handler thread.
+    bool ok = false;
+    if (QThread::currentThread() == QCoreApplication::instance()->thread()) {
+        ok = context->athlete->rideCache->removeRide(filename);
+    } else {
+        Context *ctx = context;
+        QString fn = filename;
+        QMetaObject::invokeMethod(QCoreApplication::instance(), [ctx, fn, &ok]() {
+            ok = ctx->athlete->rideCache->removeRide(fn);
+        }, Qt::BlockingQueuedConnection);
+    }
+
+    if (!ok) {
+        errors << QStringLiteral("Failed to remove planned activity from ride cache");
+        return false;
+    }
+
+    return true;
+}
+
 WorkoutDraft
 WorkoutGenerationService::exampleDeterministicDraft()
 {

@@ -159,6 +159,19 @@ class MockGoldenCheetahHandler(BaseHTTPRequestHandler):
 
         self._write_json(404, {"error": f"Unhandled POST {self.path}"})
 
+    def do_DELETE(self) -> None:  # noqa: N802
+        length = int(self.headers.get("Content-Length", "0"))
+        raw = self.rfile.read(length)
+        payload = json.loads(raw.decode("utf-8"))
+
+        if self.path == "/Test%20Rider/ai/plan":
+            filepath = payload.get("filepath", "")
+            body = {"deleted": True, "filepath": filepath}
+            self._write_json(200, body)
+            return
+
+        self._write_json(404, {"error": f"Unhandled DELETE {self.path}"})
+
     def log_message(self, format: str, *args: Any) -> None:  # noqa: A003
         return
 
@@ -400,7 +413,10 @@ class GoldenCheetahMcpIntegrationTest(unittest.TestCase):
                         },
                     )
                     self.assertTrue(delete_plan_result.structuredContent["deleted"])
-                    self.assertFalse(activity_file.exists())
+                    self.assertEqual(
+                        delete_plan_result.structuredContent["filepath"],
+                        str(activity_file),
+                    )
 
                     delete_workout_result = await session.call_tool(
                         "gc_delete_workout",
@@ -412,3 +428,76 @@ class GoldenCheetahMcpIntegrationTest(unittest.TestCase):
                     )
                     self.assertTrue(delete_workout_result.structuredContent["deleted"])
                     self.assertFalse(workout_file.exists())
+
+    def test_bom_handling(self) -> None:
+        """GoldenCheetah writes JSON with UTF-8 BOM; list and update must handle it."""
+        anyio.run(self._exercise_bom_handling)
+
+    async def _exercise_bom_handling(self) -> None:
+        env = os.environ.copy()
+        env["GC_API_BASE_URL"] = self.base_url
+
+        server = StdioServerParameters(
+            command=os.environ.get("PYTHON", str(Path(sys.executable))),
+            args=["-m", "goldencheetah_mcp.server", "--transport", "stdio"],
+            env=env,
+            cwd=ROOT,
+        )
+
+        gc_home = Path.home() / ".goldencheetah"
+
+        with tempfile.TemporaryDirectory(dir=gc_home) as tmpdir:
+            planned_dir = Path(tmpdir) / "planned"
+            planned_dir.mkdir()
+
+            # Write a planned activity file WITH a UTF-8 BOM, mimicking GoldenCheetah
+            bom_data = {
+                "workoutPath": "/tmp/bom-test.erg",
+                "date": "2026-04-05",
+                "time": "07:00:00",
+                "sport": "Bike",
+                "title": "BOM Test Ride",
+            }
+            bom_file = planned_dir / "2026_04_05_07_00_00.json"
+            bom_content = b"\xef\xbb\xbf" + json.dumps(bom_data).encode("utf-8")
+            bom_file.write_bytes(bom_content)
+
+            async with stdio_client(server) as (read_stream, write_stream):
+                session = ClientSession(
+                    read_stream,
+                    write_stream,
+                    read_timeout_seconds=timedelta(seconds=10),
+                )
+                async with session:
+                    await session.initialize()
+
+                    # gc_list_planned_activities must parse BOM files without error
+                    list_result = await session.call_tool(
+                        "gc_list_planned_activities",
+                        {"athlete": Path(tmpdir).name},
+                    )
+                    activities = list_result.structuredContent["activities"]
+                    self.assertEqual(len(activities), 1)
+                    self.assertEqual(activities[0]["title"], "BOM Test Ride")
+                    self.assertEqual(activities[0]["_filepath"], str(bom_file))
+
+                    # gc_update_planned_activity must read BOM files and update them
+                    update_result = await session.call_tool(
+                        "gc_update_planned_activity",
+                        {
+                            "athlete": Path(tmpdir).name,
+                            "filepath": str(bom_file),
+                            "confirm": True,
+                            "title": "Updated BOM Ride",
+                        },
+                    )
+                    self.assertTrue(update_result.structuredContent["updated"])
+                    self.assertEqual(
+                        update_result.structuredContent["activity"]["title"],
+                        "Updated BOM Ride",
+                    )
+
+                    # Verify the updated file is still valid JSON (with or without BOM)
+                    updated_content = bom_file.read_text(encoding="utf-8-sig")
+                    updated_data = json.loads(updated_content)
+                    self.assertEqual(updated_data["title"], "Updated BOM Ride")

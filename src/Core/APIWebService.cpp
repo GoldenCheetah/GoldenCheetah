@@ -485,12 +485,11 @@ APIWebService::aiSave(QString athlete, HttpRequest &request, HttpResponse &respo
 void
 APIWebService::aiPlan(QString athlete, HttpRequest &request, HttpResponse &response)
 {
-    if (!requireMethod(request, response, "POST", "POST")) {
-        return;
-    }
+    QString method = QString::fromLatin1(request.getMethod()).toUpper();
 
-    QJsonDocument document;
-    if (!requireJsonBody(request, response, document)) {
+    if (method != QLatin1String("POST") && method != QLatin1String("DELETE")) {
+        writeJsonError(response, 405, QStringLiteral("Method not allowed"), QByteArray("Method Not Allowed"));
+        response.setHeader("Allow", "POST, DELETE");
         return;
     }
 
@@ -499,6 +498,37 @@ APIWebService::aiPlan(QString athlete, HttpRequest &request, HttpResponse &respo
         writeJsonError(response, 409,
                        QStringLiteral("AI endpoints currently require athlete '%1' to be open in GoldenCheetah").arg(athlete),
                        QByteArray("Conflict"));
+        return;
+    }
+
+    // DELETE /api/athlete/{name}/ai/plan — remove a planned activity by filepath
+    if (method == QLatin1String("DELETE")) {
+        QJsonDocument document;
+        if (!requireJsonBody(request, response, document)) {
+            return;
+        }
+        QString filepath = document.object().value(QStringLiteral("filepath")).toString().trimmed();
+        if (filepath.isEmpty()) {
+            writeJsonError(response, 400, QStringLiteral("filepath is required"), QByteArray("Bad Request"));
+            return;
+        }
+
+        QStringList errors;
+        if (!WorkoutGenerationService::deletePlannedActivity(context, filepath, errors)) {
+            writeJsonError(response, 404, errors.join(QStringLiteral("; ")), QByteArray("Not Found"));
+            return;
+        }
+
+        QJsonObject object;
+        object.insert(QStringLiteral("deleted"), true);
+        object.insert(QStringLiteral("filepath"), filepath);
+        writeJson(response, QJsonDocument(object));
+        return;
+    }
+
+    // POST /api/athlete/{name}/ai/plan — create a planned activity
+    QJsonDocument document;
+    if (!requireJsonBody(request, response, document)) {
         return;
     }
 
