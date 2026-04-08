@@ -667,8 +667,11 @@ RepeatSchedulePageSetup::RepeatSchedulePageSetup
 
             QSignalBlocker b1(startDate);
             QSignalBlocker b2(endDate);
+            startDate->setMaximumDate(seasonEnd);
+            endDate->setMinimumDate(seasonStart);
             startDate->setDate(seasonStart);
             endDate->setDate(seasonEnd);
+
             refresh();
         }
     });
@@ -687,6 +690,10 @@ RepeatSchedulePageSetup::RepeatSchedulePageSetup
 
     if (currentSeason != nullptr) {
         seasonTree->setCurrentItem(currentSeason);
+        currentSeason->setSelected(true);
+        if (currentSeason->parent() != nullptr) {
+            currentSeason->parent()->setExpanded(true);
+        }
     } else {
         startDate->setDate(QDate::currentDate().addDays(-7));
         endDate->setDate(QDate::currentDate().addDays(-1));
@@ -857,7 +864,11 @@ RepeatSchedulePageActivities::initializePage
         }
     }
 
-    dataChangedConnection = connect(activityTree->model(), &QAbstractItemModel::dataChanged, this, [this, rsw](const QModelIndex &index) {
+    dataChangedConnection = connect(activityTree->model(), &QAbstractItemModel::dataChanged, this, [this](const QModelIndex &index) {
+        RepeatScheduleWizard *rsw = qobject_cast<RepeatScheduleWizard*>(wizard());
+        if (rsw == nullptr) {
+            return;
+        }
         QModelIndex col0Index = index.siblingAtColumn(0);
         int indicatorType = col0Index.data(IndicatorDelegate::IndicatorTypeRole).toInt();
         if (indicatorType == IndicatorDelegate::NoIndicator) {
@@ -886,6 +897,14 @@ RepeatSchedulePageActivities::isComplete
 () const
 {
     return numSelected > 0;
+}
+
+
+void
+RepeatSchedulePageActivities::cleanupPage
+()
+{
+    disconnect(dataChangedConnection);
 }
 
 

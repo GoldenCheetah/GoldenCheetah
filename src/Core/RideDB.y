@@ -561,32 +561,34 @@ void RideCache::save(bool opendata, QString filename)
             stream << "\n\t\t\"METRICS\":{\n";
 
             bool firstMetric = true;
+            const QVector<double> &metrics = item->metrics();
+            const QVector<double> &counts = item->counts();
             for(int i=0; i<factory.metricCount(); i++) {
                 QString name = factory.metricName(i);
                 int index = factory.rideMetric(name)->index();
 
                 // don't output 0, nan or inf values, they're set to 0 by default
                 // unless aggregateZero indicates the count is relevant
-                if ((!std::isinf(item->metrics()[index]) && !std::isnan(item->metrics()[index]) &&
-                    (item->metrics()[index] > 0.00f || item->metrics()[index] < 0.00f)) ||
-                    (item->metrics()[index] == 0.00f && item->counts()[index] > 1.0 && factory.rideMetric(name)->aggregateZero())) {
+                if ((!std::isinf(metrics[index]) && !std::isnan(metrics[index]) &&
+                    (metrics[index] > 0.00f || metrics[index] < 0.00f)) ||
+                    (metrics[index] == 0.00f && counts[index] > 1.0 && factory.rideMetric(name)->aggregateZero())) {
                     if (!firstMetric) stream << ",\n";
                     firstMetric = false;
 
                     // if stdmean or variance is non-zero we write all 4
                     if (item->stdmeans().value(index, 0.0f) || item->stdvariances().value(index, 0.0f)) {
 
-                        stream << "\t\t\t\"" << name << "\":[\"" << QString("%1").arg(item->metrics()[index], 0, 'f', 5) <<"\",\""
-                                                                   << QString("%1").arg(item->counts()[index], 0, 'f', 5) << "\",\""
+                        stream << "\t\t\t\"" << name << "\":[\"" << QString("%1").arg(metrics[index], 0, 'f', 5) <<"\",\""
+                                                                   << QString("%1").arg(counts[index], 0, 'f', 5) << "\",\""
                                                                    << QString("%1").arg(item->stdmeans().value(index, 0.0f), 0, 'f', 5) << "\",\""
                                                                    << QString("%1").arg(item->stdvariances().value(index, 0.0f), 0, 'f', 5) <<"\"]";
-                    } else if (item->counts()[index] == 0) {
+                    } else if (counts[index] == 0) {
                         // if count is 0 don't write it
 						stream << ConstructNameNumberString(QString("\t\t\t\""), name,
-                            QString("\":\""), item->metrics()[index], QString("\""));
+                            QString("\":\""), metrics[index], QString("\""));
                     } else {
 					    stream << ConstructNameNumberNumberString(QString("\t\t\t\""), name,
-                            QString("\":[\""), item->metrics()[index], QString("\",\""), item->counts()[index], QString("\"]"));
+                            QString("\":[\""), metrics[index], QString("\",\""), counts[index], QString("\"]"));
                     }
                 }
             }
@@ -795,31 +797,35 @@ void RideCache::save(bool opendata, QString filename)
                         stream << ",\n\n\t\t\t\"METRICS\":{\n";
 
                         bool firstMetric = true;
+                        const QVector<double> &intervalMetrics = interval->metrics();
+                        const QVector<double> &intervalCounts = interval->counts();
+                        const QVector<double> &itemMetrics = item->metrics();
+                        const QVector<double> &itemCounts = item->counts();
                         for(int i=0; i<factory.metricCount(); i++) {
                             QString name = factory.metricName(i);
                             int index = factory.rideMetric(name)->index();
         
                             // don't output 0 values, they're set to 0 by default
                             // unless aggregateZero indicates the count is relevant
-                            if ((interval->metrics()[index] > 0.00f || interval->metrics()[index] < 0.00f) ||
-                                (item->metrics()[index] == 0.00f && item->counts()[i] > 1.0 && factory.rideMetric(name)->aggregateZero())) {
+                            if ((intervalMetrics[index] > 0.00f || intervalMetrics[index] < 0.00f) ||
+                                (itemMetrics[index] == 0.00f && itemCounts[index] > 1.0 && factory.rideMetric(name)->aggregateZero())) {
                                 if (!firstMetric) stream << ",\n";
                                 firstMetric = false;
 
                                 if (interval->stdmeans().value(index, 0.0f) || interval->stdvariances().value(index, 0.0f)) {
 
-                                    stream << "\t\t\t\t\"" << name << "\": [ \"" << QString("%1").arg(interval->metrics()[index], 0, 'f', 5) <<"\",\""
-                                                                               << QString("%1").arg(interval->counts()[index], 0, 'f', 5) << "\",\""
+                                    stream << "\t\t\t\t\"" << name << "\": [ \"" << QString("%1").arg(intervalMetrics[index], 0, 'f', 5) <<"\",\""
+                                                                               << QString("%1").arg(intervalCounts[index], 0, 'f', 5) << "\",\""
                                                                                << QString("%1").arg(interval->stdmeans().value(index, 0.0f), 0, 'f', 5) << "\",\""
                                                                                << QString("%1").arg(interval->stdvariances().value(index, 0.0f), 0, 'f', 5) <<"\"]";
 
                                 // if count is 0 don't write it
-                                } else if (interval->counts()[index] == 0) {
+                                } else if (intervalCounts[index] == 0) {
                                     stream << ConstructNameNumberString(QString("\t\t\t\""), name,
-                                        QString("\":\""), interval->metrics()[index], QString("\""));
+                                        QString("\":\""), intervalMetrics[index], QString("\""));
                                 } else {
                                     stream << ConstructNameNumberNumberString(QString("\t\t\t\""), name,
-                                        QString("\":[\""), interval->metrics()[index], QString("\",\""), interval->counts()[index], QString("\"]"));
+                                        QString("\":[\""), intervalMetrics[index], QString("\",\""), intervalCounts[index], QString("\"]"));
                                 }
                             }
                         }

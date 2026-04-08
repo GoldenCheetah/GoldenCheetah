@@ -1418,9 +1418,6 @@ RideCache::copyPlannedActivities
         rides_ << newItems;
         std::sort(rides_.begin(), rides_.end(), rideCacheLessThan);
         model_->endReset();
-        foreach(RideItem *item, newItems) {
-            item->refresh();
-        }
         refresh();
         estimator->refresh();
     }
