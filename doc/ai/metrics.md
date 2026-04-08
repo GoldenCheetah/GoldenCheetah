@@ -25,6 +25,19 @@ response as the `snapshot` object.
 | `nextEventName` | string | Name of next event | **No** |
 | `recentStress` | double[] | Last 7 days of daily TSS (index 0 = oldest) | **No** |
 
+### HRV Readiness (populated from Measures system)
+
+| Field | JSON path | Type | Description | Visualized |
+|-------|-----------|------|-------------|------------|
+| `hrvAvailable` | `snapshot.hrvAvailable` | bool | True if HRV data exists for today + baseline | **No** |
+| `rmssd` | `snapshot.hrv.rmssd` | double | Today's RMSSD reading (msec) | **No** |
+| `baseline` | `snapshot.hrv.baseline` | double | 7-day rolling average RMSSD (msec) | **No** |
+| `ratio` | `snapshot.hrv.ratio` | double | Today / baseline (1.0 = normal) | **No** |
+
+HRV data is sourced from GoldenCheetah's Measures system (`hrvmeasures.json`).
+Requires at least 3 days of baseline data within the prior 7 days to activate.
+When available, HRV ratio is used by the constraint checker and scoring modifier.
+
 **API:** All `/ai/*` endpoints include `snapshot` in their response.
 
 ## Simulation Metrics (Phase 1)
@@ -91,6 +104,7 @@ See `constraints.md` for rationale and bounds.
 | `maxDailyTSS` | Single-day TSS | ≤ 300 (recreational) / ≤ 450 (elite) | Hard | **No** |
 | `tsbFloor` | TSB minimum | > -30 | Hard | **No** |
 | `restDays` | Rest days (TSS < 20) per week | ≥ 1/week | Hard | **No** |
+| `hrvSuppressed` | Today's RMSSD / 7-day baseline RMSSD | ≥ 0.85 (hard) / ≥ 0.93 (warning) | Hard/Warning | **No** |
 
 ### Violation Detail
 

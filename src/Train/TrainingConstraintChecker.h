@@ -59,6 +59,10 @@ struct TrainingConstraintBounds {
     double tsbFloor = -30.0;
     int minRestDaysPerWeek = 1;
 
+    // HRV readiness thresholds (ratio = today's RMSSD / 7-day baseline)
+    double hrvHardThreshold = 0.85;    // below this: suppress high intensity
+    double hrvWarningThreshold = 0.93; // below this: prefer moderate intensity
+
     static TrainingConstraintBounds recreational();
     static TrainingConstraintBounds elite();
 };
@@ -99,6 +103,18 @@ public:
 
     /** CTL ramp rate = change in CTL per week. */
     static double ctlRampRate(double ctlStart, double ctlEnd, int days);
+
+    /**
+     * Check HRV readiness against thresholds.
+     * Returns a violation if HRV ratio is suppressed; empty result if OK or unavailable.
+     * @param hrvRatio     today's RMSSD / baseline RMSSD (1.0 = normal)
+     * @param hrvAvailable true if HRV data exists
+     * @param date         date for the violation record
+     * @param bounds       constraint thresholds
+     */
+    static ConstraintCheckResult checkHRV(double hrvRatio, bool hrvAvailable,
+                                          const QDate &date,
+                                          const TrainingConstraintBounds &bounds = TrainingConstraintBounds::recreational());
 
     /** Compute exponential weighted moving average (EWMA) forward. */
     static void projectPMC(const QVector<double> &dailyStress,

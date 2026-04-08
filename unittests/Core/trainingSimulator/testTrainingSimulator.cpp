@@ -221,6 +221,123 @@ private slots:
         QCOMPARE(trainingGoalToString(TrainingGoal::Build), QStringLiteral("build"));
         QCOMPARE(trainingGoalToString(TrainingGoal::Taper), QStringLiteral("taper"));
     }
+
+    // ---------------------------------------------------------------
+    // HRV integration
+    // ---------------------------------------------------------------
+
+    void hrv_noData_noEffect()
+    {
+        // Without HRV data, ranking should be identical to baseline
+        WorkoutAthleteSnapshot s = makeSnapshot();
+        s.hrvAvailable = false;
+        SimulationRanking ranking = TrainingSimulator::rankCandidates(
+            s, TrainingGoal::Build, 60, 7);
+
+        // VO2max should rank highest for build goal (most CTL gain)
+        QVERIFY(!ranking.candidates.isEmpty());
+        QCOMPARE(ranking.candidates.first().workoutType, QStringLiteral("vo2max"));
+    }
+
+    void hrv_normalRatio_noEffect()
+    {
+        // HRV ratio 1.05 (above baseline) should not change rankings
+        WorkoutAthleteSnapshot s = makeSnapshot();
+        s.hrvAvailable = true;
+        s.hrvRMSSD = 52.5;
+        s.hrvBaseline = 50.0;
+        s.hrvRatio = 1.05;
+
+        SimulationRanking ranking = TrainingSimulator::rankCandidates(
+            s, TrainingGoal::Build, 60, 7);
+
+        QVERIFY(!ranking.candidates.isEmpty());
+        // All should be feasible with normal HRV
+        for (const SimulationResult &r : ranking.candidates)
+            QVERIFY(r.feasible);
+    }
+
+    void hrv_severeSuppression_blocksHighIntensity()
+    {
+        // HRV ratio 0.75 (severe suppression) should make high-intensity infeasible
+        WorkoutAthleteSnapshot s = makeSnapshot();
+        s.hrvAvailable = true;
+        s.hrvRMSSD = 37.5;
+        s.hrvBaseline = 50.0;
+        s.hrvRatio = 0.75;
+
+        SimulationRanking ranking = TrainingSimulator::rankCandidates(
+            s, TrainingGoal::Build, 60, 7);
+
+        // Find the vo2max and threshold candidates — they should be infeasible
+        for (const SimulationResult &r : ranking.candidates) {
+            if (r.workoutType == QStringLiteral("vo2max") ||
+                r.workoutType == QStringLiteral("threshold") ||
+                r.workoutType == QStringLiteral("sweetspot") ||
+                r.workoutType == QStringLiteral("anaerobic")) {
+                QVERIFY2(!r.feasible,
+                         qPrintable(QStringLiteral("%1 should be infeasible with severe HRV suppression")
+                                    .arg(r.workoutType)));
+            }
+        }
+
+        // Recovery and endurance should remain feasible
+        for (const SimulationResult &r : ranking.candidates) {
+            if (r.workoutType == QStringLiteral("recovery") ||
+                r.workoutType == QStringLiteral("endurance")) {
+                QVERIFY2(r.feasible,
+                         qPrintable(QStringLiteral("%1 should remain feasible with HRV suppression")
+                                    .arg(r.workoutType)));
+            }
+        }
+    }
+
+    void hrv_mildSuppression_penalizesScore()
+    {
+        // HRV ratio 0.90 (mild suppression) should reduce high-intensity scores
+        WorkoutAthleteSnapshot sNormal = makeSnapshot();
+        sNormal.hrvAvailable = false;
+
+        WorkoutAthleteSnapshot sSuppressed = makeSnapshot();
+        sSuppressed.hrvAvailable = true;
+        sSuppressed.hrvRMSSD = 45.0;
+        sSuppressed.hrvBaseline = 50.0;
+        sSuppressed.hrvRatio = 0.90;
+
+        SimulationResult normalVO2 = TrainingSimulator::simulateCandidate(
+            sNormal, QStringLiteral("vo2max"), 60, 7);
+        double normalScore = TrainingSimulator::scoreForGoal(normalVO2, sNormal, TrainingGoal::Build);
+
+        SimulationResult suppressedVO2 = TrainingSimulator::simulateCandidate(
+            sSuppressed, QStringLiteral("vo2max"), 60, 7);
+        double suppressedScore = TrainingSimulator::scoreForGoal(suppressedVO2, sSuppressed, TrainingGoal::Build);
+
+        // Suppressed HRV should produce a lower (more penalized) score for VO2max
+        QVERIFY2(suppressedScore < normalScore,
+                 qPrintable(QStringLiteral("Suppressed score %1 should be < normal score %2")
+                            .arg(suppressedScore).arg(normalScore)));
+    }
+
+    void hrv_suppressionHasConstraintViolation()
+    {
+        WorkoutAthleteSnapshot s = makeSnapshot();
+        s.hrvAvailable = true;
+        s.hrvRMSSD = 40.0;
+        s.hrvBaseline = 50.0;
+        s.hrvRatio = 0.80;
+
+        SimulationResult result = TrainingSimulator::simulateCandidate(
+            s, QStringLiteral("vo2max"), 60, 7);
+
+        bool foundHrv = false;
+        for (const ConstraintViolation &v : result.constraints.violations) {
+            if (v.constraintId == QStringLiteral("hrvSuppressed")) {
+                foundHrv = true;
+                QCOMPARE(v.severity, ConstraintViolation::Hard);
+            }
+        }
+        QVERIFY2(foundHrv, "Expected hrvSuppressed constraint violation");
+    }
 };
 
 QTEST_MAIN(TestTrainingSimulator)

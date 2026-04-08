@@ -227,6 +227,71 @@ private slots:
     // JSON serialization
     // ---------------------------------------------------------------
 
+    // ---------------------------------------------------------------
+    // HRV readiness constraint
+    // ---------------------------------------------------------------
+
+    void checkHRV_noData_passes()
+    {
+        ConstraintCheckResult result = TrainingConstraintChecker::checkHRV(
+            0.0, false, QDate(2026, 4, 7));
+        QVERIFY(result.passed);
+        QVERIFY(result.violations.isEmpty());
+    }
+
+    void checkHRV_normalRatio_passes()
+    {
+        // HRV ratio 1.05 = above baseline, fully recovered
+        ConstraintCheckResult result = TrainingConstraintChecker::checkHRV(
+            1.05, true, QDate(2026, 4, 7));
+        QVERIFY(result.passed);
+        QVERIFY(result.violations.isEmpty());
+    }
+
+    void checkHRV_mildSuppression_warns()
+    {
+        // HRV ratio 0.90 = between warning (0.93) and hard (0.85)
+        ConstraintCheckResult result = TrainingConstraintChecker::checkHRV(
+            0.90, true, QDate(2026, 4, 7));
+        QVERIFY(result.passed); // warning doesn't fail
+        QCOMPARE(result.violations.size(), 1);
+        QCOMPARE(result.violations[0].severity, ConstraintViolation::Warning);
+        QCOMPARE(result.violations[0].constraintId, QStringLiteral("hrvSuppressed"));
+    }
+
+    void checkHRV_severeSuppression_hard()
+    {
+        // HRV ratio 0.75 = well below hard threshold (0.85)
+        ConstraintCheckResult result = TrainingConstraintChecker::checkHRV(
+            0.75, true, QDate(2026, 4, 7));
+        QVERIFY(!result.passed); // hard violation
+        QCOMPARE(result.violations.size(), 1);
+        QCOMPARE(result.violations[0].severity, ConstraintViolation::Hard);
+    }
+
+    void checkHRV_atWarningBoundary_passes()
+    {
+        // Exactly at 0.93 = at boundary, not below — should pass
+        ConstraintCheckResult result = TrainingConstraintChecker::checkHRV(
+            0.93, true, QDate(2026, 4, 7));
+        QVERIFY(result.passed);
+        QVERIFY(result.violations.isEmpty());
+    }
+
+    void checkHRV_atHardBoundary_warns()
+    {
+        // Exactly at 0.85 = at hard boundary, not below — should be warning
+        ConstraintCheckResult result = TrainingConstraintChecker::checkHRV(
+            0.85, true, QDate(2026, 4, 7));
+        QVERIFY(result.passed); // 0.85 is not < 0.85, so it's in warning range
+        QCOMPARE(result.violations.size(), 1);
+        QCOMPARE(result.violations[0].severity, ConstraintViolation::Warning);
+    }
+
+    // ---------------------------------------------------------------
+    // JSON serialization
+    // ---------------------------------------------------------------
+
     void violation_toJson_roundtrips()
     {
         ConstraintViolation v;

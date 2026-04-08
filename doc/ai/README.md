@@ -8,6 +8,7 @@ GoldenCheetah's AI-assisted training optimization system.
 ```
 doc/ai/
 ├── README.md                  ← You are here
+├── CHANGELOG.md               ← What changed and when
 ├── architecture.md            ← System design, hybrid model, phased roadmap
 ├── constraints.md             ← Hard physiological safety constraints (reference table)
 ├── metrics.md                 ← Complete catalog of computed metrics + API reference

@@ -12,6 +12,7 @@
 #include "Athlete.h"
 #include "Context.h"
 #include "ErgFile.h"
+#include "Measures.h"
 #include "PMCData.h"
 #include "RideMetadata.h"
 #include "Season.h"
@@ -246,6 +247,17 @@ WorkoutAthleteSnapshot::toJson() const
         for (double s : recentStress) arr.append(s);
         o[QStringLiteral("recentStress")] = arr;
     }
+
+    // HRV readiness
+    if (hrvAvailable) {
+        QJsonObject hrv;
+        hrv[QStringLiteral("rmssd")] = hrvRMSSD;
+        hrv[QStringLiteral("baseline")] = hrvBaseline;
+        hrv[QStringLiteral("ratio")] = hrvRatio;
+        o[QStringLiteral("hrv")] = hrv;
+    }
+    o[QStringLiteral("hrvAvailable")] = hrvAvailable;
+
     return o;
 }
 
@@ -500,6 +512,36 @@ WorkoutGenerationService::athleteSnapshot(Context *context, const QDate &when)
         }
         snapshot.daysToEvent = closestDays;
         snapshot.nextEventName = closestName;
+    }
+
+    // HRV readiness from Measures system
+    Measures *measures = context->athlete->measures;
+    if (measures) {
+        MeasuresGroup *hrvGroup = measures->getGroup(Measures::Hrv);
+        if (hrvGroup) {
+            // Field 0 = RMSSD in the hardcoded HRV group
+            double todayRMSSD = hrvGroup->getFieldValue(snapshot.date, 0);
+            if (todayRMSSD > 0.0) {
+                snapshot.hrvRMSSD = todayRMSSD;
+
+                // Compute 7-day rolling baseline (average of prior 7 days with data)
+                double sum = 0.0;
+                int count = 0;
+                for (int i = 1; i <= 7; i++) {
+                    double val = hrvGroup->getFieldValue(snapshot.date.addDays(-i), 0);
+                    if (val > 0.0) {
+                        sum += val;
+                        count++;
+                    }
+                }
+                if (count >= 3) {
+                    // Need at least 3 days of baseline data to be meaningful
+                    snapshot.hrvBaseline = sum / count;
+                    snapshot.hrvRatio = todayRMSSD / snapshot.hrvBaseline;
+                    snapshot.hrvAvailable = true;
+                }
+            }
+        }
     }
 
     return snapshot;

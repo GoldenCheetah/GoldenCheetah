@@ -219,6 +219,21 @@ TrainingSimulator::simulateCandidate(const WorkoutAthleteSnapshot &snapshot,
     // Feasible if the workout doesn't cause MORE hard violations than rest
     result.feasible = (workoutHard <= baselineHard);
 
+    // Check HRV constraints (independent of the daily stress sequence)
+    if (snapshot.hrvAvailable) {
+        ConstraintCheckResult hrvResult = TrainingConstraintChecker::checkHRV(
+            snapshot.hrvRatio, snapshot.hrvAvailable, snapshot.date, bounds);
+        for (const ConstraintViolation &v : hrvResult.violations) {
+            result.constraints.addViolation(v);
+            // HRV hard violation makes high-intensity workouts infeasible
+            if (v.severity == ConstraintViolation::Hard) {
+                double ifactor = typicalIF(workoutType);
+                if (ifactor >= 0.90) // sweetspot and above
+                    result.feasible = false;
+            }
+        }
+    }
+
     // Project from today forward (for scoring)
     TrainingConstraintChecker::projectPMC(dailyStress, snapshot.ctl, snapshot.atl,
                                           42, 7,
@@ -242,24 +257,40 @@ TrainingSimulator::scoreForGoal(const SimulationResult &result,
     double tsbEnd = result.projTsb.last();
     double ctlDelta = ctlEnd - snapshot.ctl;
 
+    double baseScore = 0.0;
     switch (goal) {
     case TrainingGoal::Build:
-        // Maximize CTL gain while staying feasible
-        return ctlDelta;
-
+        baseScore = ctlDelta;
+        break;
     case TrainingGoal::Maintain:
-        // Minimize absolute CTL change — closest to zero is best
-        return -std::abs(ctlDelta);
-
+        baseScore = -std::abs(ctlDelta);
+        break;
     case TrainingGoal::Taper:
-        // Maximize TSB (freshness) at end of projection while not losing too much CTL
-        return tsbEnd - 0.5 * std::abs(ctlDelta);
-
+        baseScore = tsbEnd - 0.5 * std::abs(ctlDelta);
+        break;
     case TrainingGoal::Recover:
-        // Maximize TSB recovery
-        return tsbEnd;
+        baseScore = tsbEnd;
+        break;
     }
-    return 0.0;
+
+    // HRV modifier: when HRV is suppressed, penalize high-intensity workouts.
+    // This nudges the ranking toward lower-intensity options without completely
+    // overriding the PMC-based score. The penalty is an additive offset
+    // (not multiplicative) so it works correctly with negative scores.
+    if (snapshot.hrvAvailable && snapshot.hrvRatio < 1.0) {
+        double ifactor = typicalIF(result.workoutType);
+        if (ifactor >= 0.90) {
+            // Penalty scales with suppression depth and workout intensity.
+            // At hrvRatio=0.85 and IF=1.05: penalty ≈ -1.58
+            // At hrvRatio=0.93 and IF=0.90: penalty ≈ -0.63
+            double suppression = 1.0 - snapshot.hrvRatio; // 0.0 to ~0.5
+            double intensityScale = (ifactor - 0.70) / 0.35; // 0.57 to 1.0
+            double penalty = suppression * intensityScale * 10.0;
+            baseScore -= penalty;
+        }
+    }
+
+    return baseScore;
 }
 
 // ---------------------------------------------------------------------------

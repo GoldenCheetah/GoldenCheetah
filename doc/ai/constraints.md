@@ -14,6 +14,7 @@ optimizer recommendation. No generated training plan may violate these bounds.
 | TSB Floor | Training Stress Balance minimum | > -30 | Prevents deep functional overreaching / OTS risk | Empirical coaching guideline |
 | Mandatory Rest | Minimum rest days per week | ≥ 1 day/week | Recovery requirement for adaptation consolidation | Consensus |
 | Weekly Load Cap | Maximum weekly TSS | ≤ CTL × 1.3 × 7 | Prevents acute spikes beyond chronic capacity | Derived from ACWR |
+| HRV Suppression | Today's RMSSD ÷ 7-day baseline RMSSD | ≥ 0.85 (hard) / ≥ 0.93 (warning) | Autonomic recovery marker; suppressed HRV indicates incomplete recovery | Plews et al. (2013); Buchheit (2014) |
 
 ## Constraint Enforcement Rules
 

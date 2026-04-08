@@ -36,6 +36,12 @@ struct WorkoutAthleteSnapshot {
     QString nextEventName;         // name of next event
     QVector<double> recentStress;  // last 7 days of daily TSS (index 0 = 7 days ago)
 
+    // HRV readiness (populated from Measures system when available)
+    double hrvRMSSD = 0.0;         // today's RMSSD reading (msec)
+    double hrvBaseline = 0.0;      // rolling baseline RMSSD (7-day average)
+    double hrvRatio = 0.0;         // today / baseline (1.0 = normal)
+    bool hrvAvailable = false;     // true if HRV data exists for scoring
+
     bool canGenerate() const { return ftp > 0 || cp > 0; }
     bool hasSimulationData() const { return ctl > 0.0 || atl > 0.0; }
     QJsonObject toJson() const;

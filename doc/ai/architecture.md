@@ -113,6 +113,22 @@ for candidate multi-week plans.
 - `/athlete/ai/banister` REST endpoint + `gc_banister_compare` MCP tool
 - Graceful degradation to population priors when no fitted model exists
 
+### Phase 1b: HRV Readiness Integration — COMPLETE
+
+**Goal:** Use heart rate variability data as a recovery signal to modulate workout recommendations.
+
+**Implementation:**
+- `WorkoutAthleteSnapshot` extended with `hrvRMSSD`, `hrvBaseline`, `hrvRatio`, `hrvAvailable`
+- `athleteSnapshot()` pulls today's RMSSD from Measures system, computes 7-day rolling baseline
+- `TrainingConstraintChecker::checkHRV()` — hard violation at ratio < 0.85, warning at < 0.93
+- `TrainingSimulator::scoreForGoal()` — additive penalty on high-intensity scores when HRV suppressed
+- `simulateCandidate()` — marks high-intensity workouts (IF ≥ 0.90) infeasible on hard HRV violation
+- API responses include `hrv` object in snapshot when data available
+- Graceful degradation: no HRV data = no effect (requires ≥3 days baseline within prior 7)
+- Algorithm-agnostic: works with any HRV source (Kubios, HRV4Training, Oura, Garmin, etc.)
+
+**Data path:** HRV app → CSV/API → `hrvmeasures.json` → Measures system → snapshot → simulator
+
 ### Phase 3: Bayesian Estimation + Uncertainty — PARTIAL
 
 **Goal:** Solve cold-start, quantify prediction confidence, enable rolling updates.

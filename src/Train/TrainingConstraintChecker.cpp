@@ -162,6 +162,47 @@ TrainingConstraintChecker::ctlRampRate(double ctlStart, double ctlEnd, int days)
 }
 
 // ---------------------------------------------------------------------------
+// HRV readiness check
+// ---------------------------------------------------------------------------
+
+ConstraintCheckResult
+TrainingConstraintChecker::checkHRV(double hrvRatio, bool hrvAvailable,
+                                    const QDate &date,
+                                    const TrainingConstraintBounds &bounds)
+{
+    ConstraintCheckResult result;
+    if (!hrvAvailable || hrvRatio <= 0.0) return result;
+
+    if (hrvRatio < bounds.hrvHardThreshold) {
+        ConstraintViolation v;
+        v.constraintId = QStringLiteral("hrvSuppressed");
+        v.severity = ConstraintViolation::Hard;
+        v.date = date;
+        v.actual = hrvRatio;
+        v.limit = bounds.hrvHardThreshold;
+        v.message = QStringLiteral("HRV ratio %1 below hard threshold %2 — "
+                                   "autonomic recovery suppressed, avoid high intensity")
+                        .arg(hrvRatio, 0, 'f', 2)
+                        .arg(bounds.hrvHardThreshold, 0, 'f', 2);
+        result.addViolation(v);
+    } else if (hrvRatio < bounds.hrvWarningThreshold) {
+        ConstraintViolation v;
+        v.constraintId = QStringLiteral("hrvSuppressed");
+        v.severity = ConstraintViolation::Warning;
+        v.date = date;
+        v.actual = hrvRatio;
+        v.limit = bounds.hrvWarningThreshold;
+        v.message = QStringLiteral("HRV ratio %1 below warning threshold %2 — "
+                                   "consider reducing intensity")
+                        .arg(hrvRatio, 0, 'f', 2)
+                        .arg(bounds.hrvWarningThreshold, 0, 'f', 2);
+        result.addViolation(v);
+    }
+
+    return result;
+}
+
+// ---------------------------------------------------------------------------
 // Full constraint check
 // ---------------------------------------------------------------------------
 
