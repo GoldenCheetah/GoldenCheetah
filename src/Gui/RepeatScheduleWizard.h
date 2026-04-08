@@ -178,6 +178,7 @@ class RepeatSchedulePageActivities : public QWizardPage
         int nextId() const override;
         void initializePage() override;
         bool isComplete() const override;
+        void cleanupPage() override;
 
     private:
         Context *context;
