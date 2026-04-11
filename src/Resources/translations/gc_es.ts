@@ -585,7 +585,7 @@ Puede que sea necesario deshabilitarlo de forma manual.</translation>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="114"/>
         <source>Sync planned workouts to WebDAV and CalDAV calendars like Google Calendar.</source>
-        <translation>Sincronizar entrenamientos planificados con calendarios WebDAV, CalDAV y Google.</translation>
+        <translation>Sincronizar entrenamientos programados con calendarios WebDAV, CalDAV y Google.</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="114"/>
@@ -3012,12 +3012,12 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="157"/>
         <source>Actual</source>
-        <translation>Actual</translation>
+        <translation>Realizado</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="158"/>
         <source>Planned</source>
-        <translation>Planeado</translation>
+        <translation>Programado</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="426"/>
@@ -6524,13 +6524,13 @@ ddd, dd MMM yyyy</source>
         <location filename="../../Gui/Calendar.cpp" line="175"/>
         <location filename="../../Gui/Calendar.cpp" line="201"/>
         <source>View planned activity</source>
-        <translation>Ver la actividad planeada</translation>
+        <translation>Ver la actividad programada</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="179"/>
         <location filename="../../Gui/Calendar.cpp" line="199"/>
         <source>View actual activity</source>
-        <translation>Ver la actividad actual</translation>
+        <translation>Ver la actividad realizada</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="188"/>
@@ -6541,23 +6541,23 @@ ddd, dd MMM yyyy</source>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="190"/>
         <source>Delete actual activity</source>
-        <translation>Eliminar la actividad</translation>
+        <translation>Eliminar la actividad realizada</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="202"/>
         <source>Copy planned activity</source>
-        <translation>Copiar la actividad planeada</translation>
+        <translation>Copiar la actividad programada</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="205"/>
         <location filename="../../Gui/Calendar.cpp" line="206"/>
         <source>Link to actual activity</source>
-        <translation>Enlazar con la actividad actual</translation>
+        <translation>Enlazar con la actividad realizada</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="208"/>
         <source>Unlink from actual activity</source>
-        <translation>Desconectar de la actividad actual</translation>
+        <translation>Desconectar de la actividad realizada</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="212"/>
@@ -6592,7 +6592,7 @@ ddd, dd MMM yyyy</source>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="271"/>
         <source>Paste planned activity</source>
-        <translation>Pegar la actividad planeada</translation>
+        <translation>Pegar la actividad programada</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="278"/>
@@ -6621,7 +6621,7 @@ ddd, dd MMM yyyy</source>
         <location filename="../../Gui/Calendar.cpp" line="182"/>
         <location filename="../../Gui/Calendar.cpp" line="183"/>
         <source>Link to planned activity</source>
-        <translation>Enlazar con la actividad planeada</translation>
+        <translation>Enlazar con la actividad programada</translation>
     </message>
     <message>
         <source>Link to planned activity...</source>
@@ -6630,7 +6630,7 @@ ddd, dd MMM yyyy</source>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="185"/>
         <source>Unlink from planned activity</source>
-        <translation>Desconectar de la actividad planeada</translation>
+        <translation>Desconectar de la actividad programada</translation>
     </message>
     <message>
         <source>Delete completed activity</source>
@@ -14153,12 +14153,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Colors.cpp" line="186"/>
         <source>Calendar Actual Workout</source>
-        <translation>Actividad actual en calendario</translation>
+        <translation>Actividad realizada en calendario</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="187"/>
         <source>Calendar Planned Workout</source>
-        <translation>Actividad planificada en calendario</translation>
+        <translation>Actividad programada en calendario</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="188"/>
@@ -14785,7 +14785,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="791"/>
         <source>&lt;center&gt;&lt;br&gt;After choosing &apos;Proceed to Athlete&apos;, the system will open the athlete window using the converted data. Depending on the errors this might lead to follow-up errors and incomplete athlete data. You may either fix the error(s) in your directory directly, or go back to your last backup and correct the error(s) in the source data. &lt;br&gt;The upgrade process will be done again each time you open the athlete, until the conversion was successful - and had no more errors.&lt;/center&gt;</source>
-        <translation>&lt;center&gt;&lt;br&gt;Luego de elegir &apos;Continuar con el atleta&apos; el sistema abrirá la ventana del atleta usando los datos convertidos. Dependiendo de los errores, durante la conversión se pueden producir otros errores y datos incompletos. Usted puede corregir los errores en su directorio directamente o volver al último respaldo y corregir los errores en los datos originales. &lt;br&gt;El proceso de actualización será repetido cada vez que abra el atleta hasta que la conversión sea exitosa y no se reporten errores.&lt;/center&gt;</translation>
+        <translation>&lt;center&gt;&lt;br&gt;Después de elegir &apos;Continuar con el atleta&apos; el sistema abrirá la ventana del atleta usando los datos convertidos. Dependiendo de los errores, durante la conversión se pueden producir otros errores y datos incompletos. Usted puede corregir los errores en su directorio directamente o volver al último respaldo y corregir los errores en los datos originales. &lt;br&gt;El proceso de actualización será repetido cada vez que abra el atleta hasta que la conversión sea exitosa y no se reporten errores.&lt;/center&gt;</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="798"/>
@@ -15891,7 +15891,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="75"/>
         <source>Plan future activities, analyse completed activities against planned</source>
-        <translation>Planificar actividades futuras y analizar las actividades completadas en comparación con las planificadas</translation>
+        <translation>Programar actividades futuras y analizar las actividades realizadas en comparación con las programadas</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="83"/>
@@ -19486,17 +19486,17 @@ Arrastre y suelte ficheros SVG aquí para añadir iconos.</translation>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1053"/>
         <source>Coggan Planned Chronic Training Load</source>
-        <translation>Carga crónica de trabajo planificada (Coggan)</translation>
+        <translation>Carga crónica de trabajo programada (Coggan)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1068"/>
         <source>Coggan Planned Acute Training Load</source>
-        <translation>Carga aguda de trabajo planificada (Coggan)</translation>
+        <translation>Carga aguda de trabajo programada (Coggan)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1083"/>
         <source>Coggan Planned Training Stress Balance</source>
-        <translation>Balance de estrés planificado (Coggan)</translation>
+        <translation>Balance de estrés programado (Coggan)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1099"/>
@@ -21018,7 +21018,7 @@ Arrastre y suelte ficheros SVG aquí para añadir iconos.</translation>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="117"/>
         <source>Show &lt;b&gt;planned %2&lt;/b&gt; activities</source>
-        <translation>Mostrar &lt;b&gt;%2&lt;/b&gt; actividades &lt;b&gt;planeadas&lt;/b&gt;</translation>
+        <translation>Mostrar &lt;b&gt;%2&lt;/b&gt; actividades &lt;b&gt;programadas&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="121"/>
@@ -21057,22 +21057,22 @@ Arrastre y suelte ficheros SVG aquí para añadir iconos.</translation>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="57"/>
         <source>Find an actual activity for:</source>
-        <translation>Encontrar una actividad para:</translation>
+        <translation>Encontrar una actividad realizada para:</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="115"/>
         <source>Show &lt;b&gt;actual %2&lt;/b&gt; activities</source>
-        <translation>Mostrar &lt;b&gt;%2&lt;/b&gt; actividades</translation>
+        <translation>Mostrar &lt;b&gt;%2&lt;/b&gt; actividades realizadas</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="140"/>
         <source>There are no unlinked actual %1 activities in the selected date range.</source>
-        <translation>No hay %1 actividades sin enlazar en el intervalo de fechas seleccionado</translation>
+        <translation>No hay %1 actividades realizadas sin enlazar en el intervalo de fechas seleccionado.</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="142"/>
         <source>There are no unlinked planned %1 activities in the selected date range.</source>
-        <translation>No hay %1 actividades programadas no enlazadas en el intervalo de fechas seleccionado</translation>
+        <translation>No hay %1 actividades programadas no enlazadas en el intervalo de fechas seleccionado.</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="144"/>
@@ -24560,12 +24560,12 @@ No se han encontrado actividades para importar.
     <message>
         <location filename="../../Core/NamedSearch.cpp" line="93"/>
         <source>Planned</source>
-        <translation>Planificado</translation>
+        <translation>Programado</translation>
     </message>
     <message>
         <location filename="../../Core/NamedSearch.cpp" line="96"/>
         <source>Actual</source>
-        <translation>Real</translation>
+        <translation>Realizado</translation>
     </message>
     <message>
         <location filename="../../Core/NamedSearch.cpp" line="99"/>
@@ -29302,7 +29302,7 @@ Python deshabilitado en preferencias.</translation>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1754"/>
         <source>actual</source>
-        <translation>actual</translation>
+        <translation>realizado</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1756"/>
@@ -30351,7 +30351,7 @@ Moverlas actualizará el enlace de referencia. Ha de guardar o descartar los cam
     <message>
         <location filename="../../Core/RideCache.cpp" line="1357"/>
         <source>Source item is not a planned activity: %1</source>
-        <translation>La fuente no es una actividad planificada: %1</translation>
+        <translation>La fuente no es una actividad programada: %1</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1362"/>
@@ -30399,7 +30399,7 @@ Moverlas actualizará el enlace de referencia. Ha de guardar o descartar los cam
 %1
 
 </source>
-        <translation>Actividades enlazadas con cambios sin guardar:
+        <translation>Actividades enlazadas realizadas con cambios sin guardar:
 %1
 
 </translation>
@@ -30407,7 +30407,7 @@ Moverlas actualizará el enlace de referencia. Ha de guardar o descartar los cam
     <message>
         <location filename="../../Core/RideCache.cpp" line="1843"/>
         <source>Cannot link two activities of the same type. One must be planned, one actual.</source>
-        <translation>No se pueden enlazar dos actividades del mismo tipo. Una debe ser la actual y otra planificada.</translation>
+        <translation>No se pueden enlazar dos actividades del mismo tipo. Una debe ser programada y la otra realizada.</translation>
     </message>
     <message>
         <source>Linked completed activities with unsaved changes:
