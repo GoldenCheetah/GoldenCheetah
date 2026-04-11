@@ -328,7 +328,7 @@ Puede que sea necesario deshabilitarlo de forma manual.</translation>
     <message>
         <location filename="../../Gui/AbstractView.cpp" line="761"/>
         <source>Add New Perspective...</source>
-        <translation>Agregar nueva perspectiva...</translation>
+        <translation>Añadir nueva perspectiva...</translation>
     </message>
     <message>
         <location filename="../../Gui/AbstractView.cpp" line="762"/>
@@ -629,7 +629,7 @@ Puede que sea necesario deshabilitarlo de forma manual.</translation>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="69"/>
         <source>Add Device Wizard</source>
-        <translation>Asistente para agregar dispositivos</translation>
+        <translation>Asistente para añadir dispositivos</translation>
     </message>
 </context>
 <context>
@@ -642,14 +642,14 @@ Puede que sea necesario deshabilitarlo de forma manual.</translation>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1578"/>
         <source>Confirm configuration and add device</source>
-        <translation>Confirmar configuración y agregar dispositivo</translation>
+        <translation>Confirmar configuración y añadir dispositivo</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1583"/>
         <source>We will now add a new device with the configuration shown below. Please take a moment to review and then click Finish to add the device and complete this wizard, or press the Back button to make amendments.
 
 </source>
-        <translation>Vamos a agregar un nuevo dispositivo con la configuración que se muestra más abajo. Por favor, tómese un momento para revisarla y luego presione en [Finalizar] para agregar el dispositivo y completar este asistente o presione el botón de retroceder para realizar cambios.
+        <translation>Vamos a añadir un nuevo dispositivo con la configuración que se muestra más abajo. Por favor, tómese un momento para revisarla y luego presione en [Finalizar] para añadir el dispositivo y completar este asistente o presione el botón de retroceder para realizar cambios.
 
 </translation>
     </message>
@@ -684,7 +684,7 @@ Puede que sea necesario deshabilitarlo de forma manual.</translation>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="654"/>
         <source>Add Cloud Account</source>
-        <translation>Agregar cuenta de servicio en línea</translation>
+        <translation>Añadir cuenta de servicio en línea</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="679"/>
@@ -986,7 +986,7 @@ Si usted elige copiar a la biblioteca el archivo será copiado a la biblioteca d
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="262"/>
         <source>&amp;Add to Activity</source>
-        <translation>&amp;Agregar a actividad</translation>
+        <translation>&amp;Añadir a actividad</translation>
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="501"/>
@@ -1134,7 +1134,7 @@ Si usted elige copiar a la biblioteca el archivo será copiado a la biblioteca d
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1879"/>
         <source>Add Perspective</source>
-        <translation>Agregar perspectiva</translation>
+        <translation>Añadir perspectiva</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1888"/>
@@ -1189,7 +1189,7 @@ Si usted elige copiar a la biblioteca el archivo será copiado a la biblioteca d
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1913"/>
         <source>Add</source>
-        <translation>Agregar</translation>
+        <translation>Añadir</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1914"/>
@@ -1357,7 +1357,7 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Gui/AddTileWizard.cpp" line="185"/>
         <source>Add Tile</source>
-        <translation>Agregar ficha</translation>
+        <translation>Añadir ficha</translation>
     </message>
 </context>
 <context>
@@ -1378,7 +1378,7 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Gui/AddTileWizard.cpp" line="55"/>
         <source>Add Tile Wizard</source>
-        <translation>Agregar ficha</translation>
+        <translation>Añadir ficha</translation>
     </message>
 </context>
 <context>
@@ -1391,7 +1391,7 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="95"/>
         <source>What kind of device to add</source>
-        <translation>Qué tipo de dispositivo agregar</translation>
+        <translation>Qué tipo de dispositivo añadir</translation>
     </message>
 </context>
 <context>
@@ -1511,7 +1511,7 @@ Presione siguiente para continuar
     <message>
         <location filename="../../FileIO/RideFileCommand.cpp" line="589"/>
         <source>Add XData Series</source>
-        <translation>Agregar serie XData</translation>
+        <translation>Añadir serie XData</translation>
     </message>
 </context>
 <context>
@@ -3007,17 +3007,17 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="156"/>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>Todo</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="157"/>
         <source>Actual</source>
-        <translation type="unfinished">Real</translation>
+        <translation>Actual</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="158"/>
         <source>Planned</source>
-        <translation type="unfinished">Planificado</translation>
+        <translation>Planeado</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="426"/>
@@ -3042,7 +3042,7 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="450"/>
         <source>Filter similar activities...</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrar actividades similares...</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="463"/>
@@ -3285,7 +3285,7 @@ Presione siguiente para continuar
     <message>
         <location filename="../../FileIO/RideFileCommand.cpp" line="442"/>
         <source>Append Points</source>
-        <translation>Agregar puntos</translation>
+        <translation>Añadir puntos</translation>
     </message>
 </context>
 <context>
@@ -3293,7 +3293,7 @@ Presione siguiente para continuar
     <message>
         <location filename="../../FileIO/RideFileCommand.cpp" line="724"/>
         <source>Append XData Points</source>
-        <translation>Agregar puntos XData</translation>
+        <translation>Añadir puntos XData</translation>
     </message>
 </context>
 <context>
@@ -4564,12 +4564,12 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Train/BT40Device.cpp" line="127"/>
         <source>Reconnected to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Reconectado a %1</translation>
     </message>
     <message>
         <location filename="../../Train/BT40Device.cpp" line="187"/>
         <source>Lost connection to %1, attempting to reconnect...</source>
-        <translation type="unfinished"></translation>
+        <translation>Conexión perdida con %1, intentando reconectar...</translation>
     </message>
     <message>
         <location filename="../../Train/BT40Device.cpp" line="322"/>
@@ -4610,7 +4610,7 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Train/BT40Device.cpp" line="925"/>
         <source>Reconnecting to %1 (attempt %2)...</source>
-        <translation type="unfinished"></translation>
+        <translation>Reconectando con %1 (intento %2)...</translation>
     </message>
     <message>
         <location filename="../../Train/BT40Device.cpp" line="1055"/>
@@ -5510,12 +5510,12 @@ Comencemos la configuración.</translation>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="251"/>
         <source>Find and add training devices.</source>
-        <translation>Buscar y agregar dispositivos de entrenamiento.</translation>
+        <translation>Buscar y añadir dispositivos de entrenamiento.</translation>
     </message>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="252"/>
         <source>Add device</source>
-        <translation>Agregar dispositivo</translation>
+        <translation>Añadir dispositivo</translation>
     </message>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="259"/>
@@ -6524,90 +6524,90 @@ ddd, dd MMM yyyy</source>
         <location filename="../../Gui/Calendar.cpp" line="175"/>
         <location filename="../../Gui/Calendar.cpp" line="201"/>
         <source>View planned activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Ver la actividad planeada</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="179"/>
         <location filename="../../Gui/Calendar.cpp" line="199"/>
         <source>View actual activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Ver la actividad actual</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="188"/>
         <location filename="../../Gui/Calendar.cpp" line="214"/>
         <source>Filter similar activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrar actividades similares</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="190"/>
         <source>Delete actual activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminar la actividad</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="202"/>
         <source>Copy planned activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Copiar la actividad planeada</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="205"/>
         <location filename="../../Gui/Calendar.cpp" line="206"/>
         <source>Link to actual activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Enlazar con la actividad actual</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="208"/>
         <source>Unlink from actual activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Desconectar de la actividad actual</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="212"/>
         <source>Show in train mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Ver en modo entrenamiento</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="220"/>
         <source>Edit event</source>
-        <translation type="unfinished"></translation>
+        <translation>Editar evento</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="226"/>
         <source>Edit phase</source>
-        <translation type="unfinished">Editar fase</translation>
+        <translation>Editar fase</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="227"/>
         <source>Delete phase</source>
-        <translation type="unfinished">Eliminar fase</translation>
+        <translation>Eliminar fase</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="246"/>
         <source>Log activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Grabar actividad</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="258"/>
         <source>Plan activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Planear actividad</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="271"/>
         <source>Paste planned activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Pegar la actividad planeada</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="278"/>
         <source>Add phase</source>
-        <translation type="unfinished"></translation>
+        <translation>Añadir fase</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="279"/>
         <source>Add event</source>
-        <translation type="unfinished">Agregar evento</translation>
+        <translation>Añadir evento</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="283"/>
         <source>Repeat schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Repetir programa</translation>
     </message>
     <message>
         <source>View planned activity...</source>
@@ -6977,32 +6977,32 @@ ddd, dd MMM yyyy</source>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="1355"/>
         <source>day</source>
-        <translation type="unfinished">día</translation>
+        <translation>día</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="1357"/>
         <source>days</source>
-        <translation type="unfinished">días</translation>
+        <translation>días</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="1362"/>
         <source>week</source>
-        <translation type="unfinished">semana</translation>
+        <translation>semana</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="1364"/>
         <source>weeks</source>
-        <translation type="unfinished">semanas</translation>
+        <translation>semanas</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="1369"/>
         <source>month</source>
-        <translation type="unfinished">mes</translation>
+        <translation>mes</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="1371"/>
         <source>months</source>
-        <translation type="unfinished">meses</translation>
+        <translation>meses</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="1447"/>
@@ -7022,7 +7022,7 @@ ddd, dd MMM yyyy</source>
         <location filename="../../Charts/CalendarWindow.cpp" line="1646"/>
         <location filename="../../Charts/CalendarWindow.cpp" line="1651"/>
         <source>Paste failed: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Fallo al pegar %1</translation>
     </message>
     <message>
         <source>Unable to save</source>
@@ -10471,7 +10471,7 @@ le sugerirá los posibles nombres
     <message>
         <location filename="../../Core/NamedSearch.cpp" line="269"/>
         <source>Add</source>
-        <translation>Agregar</translation>
+        <translation>Añadir</translation>
     </message>
     <message>
         <location filename="../../Core/NamedSearch.cpp" line="271"/>
@@ -11013,7 +11013,7 @@ le sugerirá los posibles nombres
     <message>
         <location filename="../../Gui/EditUserMetricDialog.cpp" line="96"/>
         <source>Aggregate Zero</source>
-        <translation>Agregar ceros</translation>
+        <translation>Añadir ceros</translation>
     </message>
     <message>
         <location filename="../../Gui/EditUserMetricDialog.cpp" line="99"/>
@@ -11141,7 +11141,7 @@ le sugerirá los posibles nombres
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1418"/>
         <source>Aggregate</source>
-        <translation>Agregar</translation>
+        <translation>Añadir</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1422"/>
@@ -12054,42 +12054,42 @@ le sugerirá los posibles nombres
     <message>
         <location filename="../../Gui/FilterSimilarDialog.cpp" line="35"/>
         <source>Filter for similar activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrar por actividades similares</translation>
     </message>
     <message>
         <location filename="../../Gui/FilterSimilarDialog.cpp" line="39"/>
         <source>Hide zeroed fields and metrics</source>
-        <translation type="unfinished"></translation>
+        <translation>Ocultar campos y métricas iguales a cero</translation>
     </message>
     <message>
         <location filename="../../Gui/FilterSimilarDialog.cpp" line="44"/>
         <source>Find fields and metrics by name...</source>
-        <translation type="unfinished"></translation>
+        <translation>Buscar campos y métricas por nombre...</translation>
     </message>
     <message>
         <location filename="../../Gui/FilterSimilarDialog.cpp" line="49"/>
         <source>equals</source>
-        <translation type="unfinished"></translation>
+        <translation>igual</translation>
     </message>
     <message>
         <location filename="../../Gui/FilterSimilarDialog.cpp" line="49"/>
         <source>contains</source>
-        <translation type="unfinished"></translation>
+        <translation>contiene</translation>
     </message>
     <message>
         <location filename="../../Gui/FilterSimilarDialog.cpp" line="118"/>
         <source>Generated Filter:</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtro:</translation>
     </message>
     <message>
         <location filename="../../Gui/FilterSimilarDialog.cpp" line="238"/>
         <source>Fields</source>
-        <translation type="unfinished">Campos</translation>
+        <translation>Campos</translation>
     </message>
     <message>
         <location filename="../../Gui/FilterSimilarDialog.cpp" line="288"/>
         <source>Metrics</source>
-        <translation type="unfinished">Métricas</translation>
+        <translation>Métricas</translation>
     </message>
 </context>
 <context>
@@ -12426,7 +12426,7 @@ Aviso: la precisión de la estimación puede ser demasiado pobre para ser de uso
     <message>
         <location filename="../../FileIO/FixDeriveTorque.cpp" line="94"/>
         <source>Add Torque Values</source>
-        <translation>Agregar valores de par</translation>
+        <translation>Añadir valores de par</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDeriveTorque.cpp" line="106"/>
@@ -15821,7 +15821,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="114"/>
         <source>Manual creation of an activity where the most relevant data can be added in this dialog</source>
-        <translation>Creación manual de una actividad donde se pueden agregar los datos más relevantes</translation>
+        <translation>Creación manual de una actividad donde se pueden añadir los datos más relevantes</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="123"/>
@@ -15851,7 +15851,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="150"/>
         <source>Search for Workout files and Video files in a configurable set of folders and add to the Train - Indoor Riding - Workout/Video library</source>
-        <translation>Búsqueda de archivos de entrenamiento y vídeo en un conjunto configurable de carpetas para agregar a la biblioteca de entrenamientos y vídeos para rodillo</translation>
+        <translation>Búsqueda de archivos de entrenamiento y vídeo en un conjunto configurable de carpetas para añadir a la biblioteca de entrenamientos y vídeos para rodillo</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="79"/>
@@ -15976,12 +15976,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="156"/>
         <source>Wizards which fix, adjust, add series data of the current activity</source>
-        <translation>Asistentes para corregir, ajustar y agregar series de datos a la actividad seleccionada</translation>
+        <translation>Asistentes para corregir, ajustar y añadir series de datos a la actividad seleccionada</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="158"/>
         <source>Add Torque Values</source>
-        <translation>Agregar valores de par</translation>
+        <translation>Añadir valores de par</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="160"/>
@@ -16056,7 +16056,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="189"/>
         <source>Options to show/hide views (e.g. Sidebar) as well as adding charts and resetting chart layouts to factory settings</source>
-        <translation>Opciones para mostrar/ocultar vistas (barra lateral, etc.) así como agregar gráficos y restablecer la configuración de gráficos a los valores originales</translation>
+        <translation>Opciones para mostrar/ocultar vistas (barra lateral, etc.) así como añadir gráficos y restablecer la configuración de gráficos a los valores originales</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="191"/>
@@ -16076,7 +16076,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="201"/>
         <source>Curves which are plotted for the specific chart - based on presets or individually added and modified here</source>
-        <translation>Curvas que forman parte del gráfico. Es posible agregar, modificar y eliminar curvas de manera individual aquí</translation>
+        <translation>Curvas que forman parte del gráfico. Es posible añadir, modificar y eliminar curvas de manera individual aquí</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="203"/>
@@ -16117,7 +16117,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="233"/>
         <source>Editor for activity file data - allowing to change/correct data, find entries and find anomalies</source>
-        <translation>Editor para los datos del archivo de actividad. Permite cambiar, corregir, eliminar y agregar datos, encontrar valores y anomalías</translation>
+        <translation>Editor para los datos del archivo de actividad. Permite cambiar, corregir, eliminar y añadir datos, encontrar valores y anomalías</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="236"/>
@@ -16342,12 +16342,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="392"/>
         <source>Add/Remove Train Devices</source>
-        <translation>Agregar/eliminar dispositivos de entrenamiento</translation>
+        <translation>Añadir/eliminar dispositivos de entrenamiento</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="394"/>
         <source>Add Train Devices</source>
-        <translation>Agregar dispositivos de entrenamiento</translation>
+        <translation>Añadir dispositivos de entrenamiento</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="396"/>
@@ -18981,7 +18981,7 @@ Arrastre y suelte ficheros SVG aquí para añadir iconos.</translation>
         <location filename="../../Gui/LTMSidebar.cpp" line="601"/>
         <location filename="../../Gui/LTMSidebar.cpp" line="610"/>
         <source>Add season</source>
-        <translation>Agregar rango de fechas</translation>
+        <translation>Añadir rango de fechas</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="604"/>
@@ -18998,7 +18998,7 @@ Arrastre y suelte ficheros SVG aquí para añadir iconos.</translation>
         <location filename="../../Gui/LTMSidebar.cpp" line="1258"/>
         <location filename="../../Gui/LTMSidebar.cpp" line="1273"/>
         <source>Add Event</source>
-        <translation>Agregar evento</translation>
+        <translation>Añadir evento</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="594"/>
@@ -19014,7 +19014,7 @@ Arrastre y suelte ficheros SVG aquí para añadir iconos.</translation>
         <location filename="../../Gui/LTMSidebar.cpp" line="1402"/>
         <location filename="../../Gui/LTMSidebar.cpp" line="1415"/>
         <source>Add Phase</source>
-        <translation>Agregar fase</translation>
+        <translation>Añadir fase</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="631"/>
@@ -19033,22 +19033,22 @@ Arrastre y suelte ficheros SVG aquí para añadir iconos.</translation>
         <location filename="../../Gui/LTMSidebar.cpp" line="642"/>
         <location filename="../../Gui/LTMSidebar.cpp" line="673"/>
         <source>Add event</source>
-        <translation>Agregar evento</translation>
+        <translation>Añadir evento</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="597"/>
         <source>Add phase to &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Añadir fase a &quot;%1&quot;</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="598"/>
         <source>Add event to &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Añadir evento a &quot;%1&quot;</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="607"/>
         <source>Add phase</source>
-        <translation type="unfinished"></translation>
+        <translation>Añadir fase</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="706"/>
@@ -19096,7 +19096,7 @@ Arrastre y suelte ficheros SVG aquí para añadir iconos.</translation>
         <location filename="../../Gui/LTMSidebar.cpp" line="1245"/>
         <location filename="../../Gui/LTMSidebar.cpp" line="1258"/>
         <source>You can only add events to user defined seasons. Please select a season you have created before adding an event.</source>
-        <translation>Sólo es posible agregar eventos a rangos de fechas definidos por el usuario. Por favor, seleccione un rango de fechas que haya creado previamente para agregar un evento.</translation>
+        <translation>Sólo es posible añadir eventos a rangos de fechas definidos por el usuario. Por favor, seleccione un rango de fechas que haya creado previamente para añadir un evento.</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="1273"/>
@@ -19107,12 +19107,12 @@ Arrastre y suelte ficheros SVG aquí para añadir iconos.</translation>
         <location filename="../../Gui/LTMSidebar.cpp" line="1402"/>
         <location filename="../../Gui/LTMSidebar.cpp" line="1415"/>
         <source>You can only add phases to user defined seasons. Please select a season you have created before adding a phase.</source>
-        <translation>Sólo es posible agregar fases a rangos de fechas definidos por el usuario. Por favor, seleccione un rango de fechas que haya creado previamente para agregar una fase.</translation>
+        <translation>Sólo es posible añadir fases a rangos de fechas definidos por el usuario. Por favor, seleccione un rango de fechas que haya creado previamente para añadir una fase.</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="1454"/>
         <source>Add Chart</source>
-        <translation>Agregar gráfico</translation>
+        <translation>Añadir gráfico</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="1461"/>
@@ -19216,7 +19216,7 @@ Arrastre y suelte ficheros SVG aquí para añadir iconos.</translation>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="156"/>
         <source>Add Current</source>
-        <translation>Agregar actual</translation>
+        <translation>Añadir actual</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="147"/>
@@ -21057,17 +21057,17 @@ Arrastre y suelte ficheros SVG aquí para añadir iconos.</translation>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="57"/>
         <source>Find an actual activity for:</source>
-        <translation type="unfinished"></translation>
+        <translation>Encontrar una actividad para:</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="115"/>
         <source>Show &lt;b&gt;actual %2&lt;/b&gt; activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar &lt;b&gt;%2&lt;/b&gt; actividades</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="140"/>
         <source>There are no unlinked actual %1 activities in the selected date range.</source>
-        <translation type="unfinished"></translation>
+        <translation>No hay %1 actividades sin enlazar en el intervalo de fechas seleccionado</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="142"/>
@@ -21368,7 +21368,7 @@ encendido y muestra &quot;PC-Link&quot;</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="666"/>
         <source>Add Chart</source>
-        <translation>Agregar gráfico</translation>
+        <translation>Añadir gráfico</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="311"/>
@@ -21655,7 +21655,7 @@ encendido y muestra &quot;PC-Link&quot;</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="556"/>
         <source>Add Cloud Account...</source>
-        <translation>Agregar cuenta de servicio en línea...</translation>
+        <translation>Añadir cuenta de servicio en línea...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="562"/>
@@ -23937,7 +23937,7 @@ Si presiona continuar la actividad se guardará. Si no quiere continuar vuelva a
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="933"/>
         <source>Merge Data to add another data series</source>
-        <translation>Combinar datos para agregar otra serie</translation>
+        <translation>Combinar datos para añadir otra serie</translation>
     </message>
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="934"/>
@@ -23952,7 +23952,7 @@ Si presiona continuar la actividad se guardará. Si no quiere continuar vuelva a
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="943"/>
         <source>Append the data to the end of the current activity  to create a longer activity that was recorded in multiple parts.</source>
-        <translation>Agregar los datos al final de la actividad actual para crear una actividad más prolongada que haya sido registrada en varias partes.</translation>
+        <translation>Añadir los datos al final de la actividad actual para crear una actividad más prolongada que haya sido registrada en varias partes.</translation>
     </message>
 </context>
 <context>
@@ -25408,7 +25408,7 @@ No se han encontrado actividades para importar.
     <message>
         <location filename="../../Charts/Overview.cpp" line="34"/>
         <source>Add Tile...</source>
-        <translation>Agregar ficha...</translation>
+        <translation>Añadir ficha...</translation>
     </message>
     <message>
         <location filename="../../Charts/Overview.cpp" line="37"/>
@@ -26335,7 +26335,7 @@ No se han encontrado actividades para importar.
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2534"/>
         <source>Append</source>
-        <translation>Agregar</translation>
+        <translation>Añadir</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2535"/>
@@ -29302,7 +29302,7 @@ Python deshabilitado en preferencias.</translation>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1754"/>
         <source>actual</source>
-        <translation type="unfinished"></translation>
+        <translation>actual</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1756"/>
@@ -29323,12 +29323,12 @@ Python deshabilitado en preferencias.</translation>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1778"/>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1799"/>
         <source>Originally</source>
-        <translation type="unfinished"></translation>
+        <translation>Original</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1783"/>
         <source>Linked</source>
-        <translation type="unfinished"></translation>
+        <translation>Enlazado</translation>
     </message>
     <message>
         <source>Completed by</source>
@@ -29351,7 +29351,7 @@ Python deshabilitado en preferencias.</translation>
     <message>
         <location filename="../../Python/PythonEmbed.cpp" line="341"/>
         <source>Python not available</source>
-        <translation type="unfinished"></translation>
+        <translation>Python no está disponible</translation>
     </message>
     <message>
         <location filename="../../Python/PythonEmbed.cpp" line="342"/>
@@ -29359,7 +29359,10 @@ Python deshabilitado en preferencias.</translation>
 
 Please ensure Python 3.%1 is installed and in your PATH.
 You can disable Python in Options &gt; General if you don&apos;t need it.</source>
-        <translation type="unfinished"></translation>
+        <translation>GoldenCheetah se ha compilado con Python 3.%1, pero es imposible inicializarlo.
+
+Asegúrese de que Python 3.%1 está instalado y es accesible desde la variable de entorno PATH.
+Si no necesita Python, puese deshabilitarlo en Opciones-&gt;General.</translation>
     </message>
 </context>
 <context>
@@ -30328,7 +30331,7 @@ Moverlas actualizará el enlace de referencia. Ha de guardar o descartar los cam
     <message>
         <location filename="../../Core/RideCache.cpp" line="1217"/>
         <source>Failed to save activity file after rename</source>
-        <translation type="unfinished"></translation>
+        <translation>Fallo al guardar la actividad tras el renombrado</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1279"/>
@@ -30396,12 +30399,15 @@ Moverlas actualizará el enlace de referencia. Ha de guardar o descartar los cam
 %1
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Actividades enlazadas con cambios sin guardar:
+%1
+
+</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1843"/>
         <source>Cannot link two activities of the same type. One must be planned, one actual.</source>
-        <translation type="unfinished"></translation>
+        <translation>No se pueden enlazar dos actividades del mismo tipo. Una debe ser la actual y otra planificada.</translation>
     </message>
     <message>
         <source>Linked completed activities with unsaved changes:
@@ -30812,7 +30818,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="867"/>
         <source>Add Column</source>
-        <translation>Agregar columna</translation>
+        <translation>Añadir columna</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="1038"/>
@@ -33148,7 +33154,7 @@ formato GoldenCheetah. ¿Quiere hacerlo?
         <location filename="../../Gui/SearchBox.cpp" line="257"/>
         <location filename="../../Gui/SearchBox.cpp" line="274"/>
         <source>Add to Named Filters</source>
-        <translation>Agregar a filtros nombrados</translation>
+        <translation>Añadir a filtros nombrados</translation>
     </message>
     <message>
         <location filename="../../Gui/SearchBox.cpp" line="264"/>
@@ -33170,7 +33176,7 @@ formato GoldenCheetah. ¿Quiere hacerlo?
     <message>
         <location filename="../../Gui/SearchBox.cpp" line="358"/>
         <source>Add new search</source>
-        <translation>Agregar nueva búsqueda</translation>
+        <translation>Añadir nueva búsqueda</translation>
     </message>
     <message>
         <location filename="../../Gui/SearchBox.cpp" line="359"/>
@@ -33302,7 +33308,7 @@ formato GoldenCheetah. ¿Quiere hacerlo?
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="3565"/>
         <source>Add</source>
-        <translation>Agregar</translation>
+        <translation>Añadir</translation>
     </message>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="3566"/>
@@ -36230,7 +36236,7 @@ Presionar F3 en el controlador al finalizar.</translation>
         <location filename="../../Train/TrainSidebar.cpp" line="3152"/>
         <location filename="../../Train/TrainSidebar.cpp" line="3170"/>
         <source>Add Device</source>
-        <translation>Agregar dispositivo</translation>
+        <translation>Añadir dispositivo</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="3157"/>
@@ -38021,12 +38027,12 @@ Aguante la respiración durante 5 segundos.</translation>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="94"/>
         <source>Add</source>
-        <translation>Agregar</translation>
+        <translation>Añadir</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="95"/>
         <source>Add row at end</source>
-        <translation>Agregar fila al final</translation>
+        <translation>Añadir fila al final</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="99"/>
@@ -38041,7 +38047,7 @@ Aguante la respiración durante 5 segundos.</translation>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="105"/>
         <source>Add a Lap below the highlighted row</source>
-        <translation>Agregar un intervalo debajo de la fila resaltada</translation>
+        <translation>Añadir un intervalo debajo de la fila resaltada</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="104"/>
@@ -38114,12 +38120,12 @@ Puede eliminar las referencias cuando administra la biblioteca usando el menú d
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="275"/>
         <source>Add Filter</source>
-        <translation>Agregar filtro</translation>
+        <translation>Añadir filtro</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="289"/>
         <source>Add Tag to Filter</source>
-        <translation>Agregar etiqueta al filtro</translation>
+        <translation>Añadir etiqueta al filtro</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="292"/>
@@ -38164,7 +38170,7 @@ Puede eliminar las referencias cuando administra la biblioteca usando el menú d
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="429"/>
         <source>Add Workout Filter</source>
-        <translation>Agregar filtro de entrenamiento</translation>
+        <translation>Añadir filtro de entrenamiento</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutMenuProvider.cpp" line="432"/>
@@ -38205,42 +38211,42 @@ Puede eliminar las referencias cuando administra la biblioteca usando el menú d
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="174"/>
         <source>Plot line width</source>
-        <translation type="unfinished"></translation>
+        <translation>Dibujar grosor de línea</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="176"/>
         <source>Show Curve</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar curva</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="177"/>
         <source>W&apos;bal Prediction</source>
-        <translation type="unfinished"></translation>
+        <translation>Predicción de W&apos;bal</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="178"/>
         <source>W&apos;bal</source>
-        <translation type="unfinished">W&apos;bal</translation>
+        <translation>W&apos;bal</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="179"/>
         <source>Power</source>
-        <translation type="unfinished">Potencia</translation>
+        <translation>Potencia</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="180"/>
         <source>Heartrate</source>
-        <translation type="unfinished"></translation>
+        <translation>Frecuencia cardíaca</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="181"/>
         <source>Cadence</source>
-        <translation type="unfinished">Cadencia</translation>
+        <translation>Cadencia</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="182"/>
         <source>Speed</source>
-        <translation type="unfinished">Velocidad</translation>
+        <translation>Velocidad</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="184"/>
@@ -38272,7 +38278,7 @@ Puede eliminar las referencias cuando administra la biblioteca usando el menú d
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="190"/>
         <source>Power zones transparency (when active)</source>
-        <translation type="unfinished"></translation>
+        <translation>Transparencia en las zonas de potencia (si estan activas)</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="192"/>
@@ -38594,7 +38600,7 @@ Puede eliminar las referencias cuando administra la biblioteca usando el menú d
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="3249"/>
         <source>Append Row</source>
-        <translation>Agregar fila</translation>
+        <translation>Añadir fila</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="3255"/>
@@ -38609,7 +38615,7 @@ Puede eliminar las referencias cuando administra la biblioteca usando el menú d
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="3271"/>
         <source>Add Column</source>
-        <translation>Agregar columna</translation>
+        <translation>Añadir columna</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="3418"/>
@@ -39618,7 +39624,7 @@ Puede eliminar las referencias cuando administra la biblioteca usando el menú d
     <message>
         <location filename="../../FileIO/RideFileCommand.cpp" line="510"/>
         <source>Add XData</source>
-        <translation>Agregar XData</translation>
+        <translation>Añadir XData</translation>
     </message>
 </context>
 <context>
