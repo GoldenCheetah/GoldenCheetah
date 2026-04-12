@@ -14,6 +14,10 @@ equals(GC_UNITTESTS, active) {
 			   Core/splineCrash \
 			   Core/trainingConstraints \
 			   Core/trainingSimulator \
+			   Core/trainingPlan \
+			   Cloud/jsonParsers \
+			   FileIO/tacxCaf \
+			   FileIO/rideAutoImport \
 			   Gui/calendarData
 	CONFIG += ordered
 } else {

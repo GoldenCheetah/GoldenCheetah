@@ -331,7 +331,7 @@ public:
 
     ResultEnum GetInfo(int i, int& row) {
 
-        if (i < 0 || i > laps.count())
+        if (i < 0 || i >= laps.count())
             return Failed;
 
         int lapRangeId = laps.at(i).lapRangeId;

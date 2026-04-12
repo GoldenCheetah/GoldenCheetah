@@ -4135,9 +4135,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             // loop, so lets get the control variables here
             QString sport;
             QDate date;
-            const Zones *powerzones;
-            const HrZones *hrzones;
-            const PaceZones *pacezones;
+            const Zones *powerzones = nullptr;
+            const HrZones *hrzones = nullptr;
+            const PaceZones *pacezones = nullptr;
 
             // which sport and date?
             if (d == DateRange()) {
@@ -4158,40 +4158,48 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             QString metricprefix;
 
             // metric/imperial pace setting for runs and swims
-            bool metricpace;
+            bool metricpace = GlobalContext::context()->useMetricUnits;
 
             // setup
             if (series == "power") {
 
                 // power zones are for Run or Bike, but not Swim
                 powerzones = m->context->athlete->zones(sport);
-                range= powerzones->whichRange(date);
-                if (range >= 0) nzones = powerzones->numZones(range);
+                if (powerzones != nullptr) {
+                    range = powerzones->whichRange(date);
+                    if (range >= 0) nzones = powerzones->numZones(range);
+                }
                 metricprefix = "time_in_zone_L";
 
             } else if (series == "hr") {
 
                 // hr zones are also for run or bike, but not Swim
                 hrzones = m->context->athlete->hrZones(sport);
-                range= hrzones->whichRange(date);
-                if (range >= 0) nzones = hrzones->numZones(range);
+                if (hrzones != nullptr) {
+                    range = hrzones->whichRange(date);
+                    if (range >= 0) nzones = hrzones->numZones(range);
+                }
                 metricprefix = "time_in_zone_H";
 
             } else if (series == "pace") {
 
                 // pace zones are for run or swim
                 pacezones = m->context->athlete->paceZones(sport == "Swim");
-                range= pacezones->whichRange(date);
-                if (range >= 0) nzones = pacezones->numZones(range);
+                if (pacezones != nullptr) {
+                    range = pacezones->whichRange(date);
+                    if (range >= 0) nzones = pacezones->numZones(range);
+                    metricpace = appsettings->value(nullptr, pacezones->paceSetting(), GlobalContext::context()->useMetricUnits).toBool();
+                }
                 metricprefix = "time_in_zone_P";
-                metricpace = appsettings->value(nullptr, pacezones->paceSetting(), GlobalContext::context()->useMetricUnits).toBool();
 
             } else if (series == "fatigue") {
 
                 int WPRIME = 0;
                 powerzones = m->context->athlete->zones(sport);
-                range = powerzones->whichRange(date);
-                if (range >= 0) WPRIME = powerzones->getWprime(range);
+                if (powerzones != nullptr) {
+                    range = powerzones->whichRange(date);
+                    if (range >= 0) WPRIME = powerzones->getWprime(range);
+                }
                 // easy for us, they are hardcoded
                 for (int i=0; i<WPrime::zoneCount(); i++) {
                     if (field == "name") strings << WPrime::zoneName(i);
@@ -4210,7 +4218,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 // Units are fixed, except for pace where they depend on sport
                 if (series == "power") return Result(RideFile::unitName(RideFile::watts, nullptr));
                 else if (series == "hr") return Result(RideFile::unitName(RideFile::hr, nullptr));
-                else if (series == "pace") return Result(pacezones->paceUnits(metricpace));
+                else if (series == "pace") return Result(pacezones != nullptr ? pacezones->paceUnits(metricpace) : QString());
                 else if (series == "fatigue") return Result(RideFile::unitName(RideFile::wprime, nullptr));
 
             } else if (field == "time" ) {
@@ -4233,7 +4241,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     QString name = QString("%1%2").arg(metricprefix).arg(n+1);
                     double value = (d==DateRange()) ? m->getForSymbol(name, true)
                                                     : m->context->athlete->rideCache->getAggregate(name, s, true, true).toDouble();
-                    double percent = round(value/total * 100.0);
+                    double percent = total > 0.0 ? round(value/total * 100.0) : 0.0;
                     strings << QString("%1").arg(percent);
                 }
 
@@ -7327,7 +7335,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                                 dfrom = earliest.daysTo(pde.from < d.from ? d.from : pde.from);
                                 dto = earliest.daysTo(pde.to > d.to ? d.to : pde.to);
 
-                                double v1, v2;
+                                double v1 = 0.0, v2 = 0.0;
+                                bool haveValues = false;
 
                                 // get a duration
                                 if (toDuration == true) {
@@ -7345,17 +7354,21 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                                         pdm->setMinutes(false);
 
                                         // get the model estimate for our duration
-                                        v1=v2 = pdm->y(duration);
+                                        v1 = v2 = pdm->y(duration);
+                                        haveValues = true;
+                                        break;
                                     }
 
                                 } else {
 
-                                    if (parm == "cp") v1=v2=pde.CP;
-                                    if (parm == "w'") v1=v2=pde.WPrime;
-                                    if (parm == "ftp") v1=v2=pde.FTP;
-                                    if (parm == "pmax") v1=v2=pde.PMax;
-                                    if (parm == "date") { v1=dfrom; v2=dto; }
+                                    if (parm == "cp") { v1 = v2 = pde.CP; haveValues = true; }
+                                    if (parm == "w'") { v1 = v2 = pde.WPrime; haveValues = true; }
+                                    if (parm == "ftp") { v1 = v2 = pde.FTP; haveValues = true; }
+                                    if (parm == "pmax") { v1 = v2 = pde.PMax; haveValues = true; }
+                                    if (parm == "date") { v1 = dfrom; v2 = dto; haveValues = true; }
                                 }
+
+                                if (!haveValues) continue;
 
                                 returning.number() += v1+v2;
                                 returning.asNumeric() << v1 << v2;
@@ -8141,14 +8154,16 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                             // get the next value to apply - needs to work with vectors
                             // and vectors will be repeated if they are too short
-                            double number;
+                            double number = 0.0;
                             QString string;
                             if (rhs.isVector()) {
                                 if (rhs.isNumber) {
-                                    if (rindex > rhs.asNumeric().count()) rindex=0;
+                                    if (rhs.asNumeric().isEmpty()) continue;
+                                    if (rindex >= rhs.asNumeric().count()) rindex=0;
                                     number = rhs.asNumeric()[rindex++];
                                 } else {
-                                    if (rindex > rhs.asString().count()) rindex=0;
+                                    if (rhs.asString().isEmpty()) continue;
+                                    if (rindex >= rhs.asString().count()) rindex=0;
                                     string = rhs.asString()[rindex++];
                                 }
                             } else {

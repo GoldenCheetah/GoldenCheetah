@@ -3,6 +3,7 @@ set -ev
 
 cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
 cp src/gcconfig.pri.in src/gcconfig.pri
+cp unittests/unittests.pri.in unittests/unittests.pri
 # required to use bison version higher than 3.7
 sed -i "s|#\(QMAKE_MOVE = cp.*\)|\1|" src/gcconfig.pri
 # make a release build

@@ -19,6 +19,7 @@
 #include "Secrets.h"
 
 #include "OAuthDialog.h"
+#include "CloudJsonParsers.h"
 #include "Athlete.h"
 #include "Context.h"
 #include "Settings.h"
@@ -28,6 +29,33 @@
 #include "PolarFlow.h"
 
 #include <QJsonParseError>
+
+namespace {
+
+bool hasEmbeddedStravaClientSecret()
+{
+    const QString secret = QString::fromLatin1(GC_STRAVA_CLIENT_SECRET).trimmed();
+    return !secret.isEmpty() && secret != QStringLiteral("__GC_STRAVA_CLIENT_SECRET__");
+}
+
+OAuthTokenSite oauthTokenSite(OAuthDialog::OAuthSite site)
+{
+    switch (site) {
+    case OAuthDialog::STRAVA: return OAuthTokenSite::Strava;
+    case OAuthDialog::DROPBOX: return OAuthTokenSite::Dropbox;
+    case OAuthDialog::CYCLING_ANALYTICS: return OAuthTokenSite::CyclingAnalytics;
+    case OAuthDialog::NOLIO: return OAuthTokenSite::Nolio;
+    case OAuthDialog::SPORTTRACKS: return OAuthTokenSite::SportTracks;
+    case OAuthDialog::WITHINGS: return OAuthTokenSite::Withings;
+    case OAuthDialog::POLAR: return OAuthTokenSite::Polar;
+    case OAuthDialog::XERT: return OAuthTokenSite::Xert;
+    case OAuthDialog::RIDEWITHGPS: return OAuthTokenSite::RideWithGPS;
+    case OAuthDialog::AZUM: return OAuthTokenSite::Azum;
+    default: return OAuthTokenSite::Dropbox;
+    }
+}
+
+} // namespace
 
 OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service, QString baseURL, QString clientsecret) :
     context(context), site(site), service(service), baseURL(baseURL), clientsecret(clientsecret)
@@ -66,6 +94,14 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
 
     // SSL is available - so authorisation can take place
     noSSLlib = false;
+
+    if (site == STRAVA && !hasEmbeddedStravaClientSecret()) {
+        QMessageBox::critical(this,
+                              tr("Authorization Error"),
+                              tr("This build does not include the Strava client secret required for OAuth.\n\nUse an official build or rebuild with GC_STRAVA_CLIENT_SECRET."));
+        noSSLlib = true;
+        return;
+    }
 
     layout = new QVBoxLayout();
     layout->setSpacing(0);
@@ -351,30 +387,27 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
 {
 
     // we've been told to ignore responses (used by POLAR, maybe others in future)
-    if (ignore) return;
-    // we can handle SSL handshake errors, if we got here then some kind of protocol was agreed
-    if (reply->error() == QNetworkReply::NoError || reply->error() == QNetworkReply::SslHandshakeFailedError) {
+    if (ignore) {
+        reply->deleteLater();
+        return;
+    }
+    if (reply->error() == QNetworkReply::NoError) {
 
-        QByteArray payload = reply->readAll(); // JSON
-        QString refresh_token;
-        QString access_token;
-        QString auth_token;
-        double polar_userid=0;
-
-        // parse the response and extract the tokens, pretty much the same for all services
-        // although polar choose to also pass a user id, which is needed for future calls
-        QJsonParseError parseError;
-        QJsonDocument document = QJsonDocument::fromJson(payload, &parseError);
-        if (parseError.error == QJsonParseError::NoError) {
-            refresh_token = document.object()["refresh_token"].toString();
-            access_token = document.object()["access_token"].toString();
-            if (site == POLAR)  polar_userid = document.object()["x_user_id"].toDouble();
-            if (site == RIDEWITHGPS) access_token = document.object()["user"].toObject()["auth_token"].toString();
-            if (site == WITHINGS) {
-                refresh_token = document.object()["body"].toObject()["refresh_token"].toString();
-                access_token = document.object()["body"].toObject()["access_token"].toString();
-            }
+        const QByteArray payload = reply->readAll();
+        const OAuthTokenResponse tokenResponse = parseOAuthTokenResponse(oauthTokenSite(site), payload);
+        if (!tokenResponse.ok) {
+            QString error = QString(tr("Error retrieving access token, %1")).arg(tokenResponse.errorMessage);
+            QMessageBox oautherr(QMessageBox::Critical, tr("OAuth Token Error"), error);
+            oautherr.setDetailedText(tokenResponse.errorMessage);
+            oautherr.exec();
+            reject();
+            reply->deleteLater();
+            return;
         }
+
+        const QString refresh_token = tokenResponse.refreshToken;
+        const QString access_token = tokenResponse.accessToken;
+        const double polar_userid = tokenResponse.polarUserId;
 
         // now set the tokens etc
         if (site == DROPBOX) {
@@ -422,9 +455,17 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
             connect(bind, SIGNAL(finished()), &loop, SLOT(quit()));
             loop.exec();
 
-            // Bind response lists athlete details, we ignore them for now
-            QByteArray r = bind->readAll();
-            //qDebug()<<bind->errorString()<< "bind response="<<r;
+            if (bind->error() != QNetworkReply::NoError) {
+                QString error = QString(tr("Error binding Polar athlete, %1 (%2)")).arg(bind->errorString()).arg(bind->error());
+                QMessageBox oautherr(QMessageBox::Critical, tr("Polar Authorization Error"), error);
+                oautherr.exec();
+                reject();
+                bind->deleteLater();
+                reply->deleteLater();
+                return;
+            }
+
+            bind->deleteLater();
 
             QString info = QString(tr("Polar Flow authorization was successful."));
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
@@ -500,8 +541,12 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
             QMessageBox oautherr(QMessageBox::Critical, tr("SSL Token Refresh Error"), error);
             oautherr.setDetailedText(error);
             oautherr.exec();
+            reject();
+            reply->deleteLater();
+            return;
     }
 
     // job done, dialog can be closed
+    reply->deleteLater();
     accept();
 }

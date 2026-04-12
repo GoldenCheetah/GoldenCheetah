@@ -2,7 +2,22 @@
 #include <QProcess>
 #include <QCoreApplication>
 #include <QDir>
+#include <QFileInfo>
 #include <iostream>
+
+static QString repoRootForTreeSafety()
+{
+    const QString testSource = QFINDTESTDATA("testTreeSafety.cpp");
+    if (!testSource.isEmpty()) {
+        QDir dir(QFileInfo(testSource).absoluteDir());
+        if (dir.cd("../../..")) return dir.absolutePath();
+    }
+
+    QDir dir(QCoreApplication::applicationDirPath());
+    if (dir.cd("../../..")) return dir.absolutePath();
+
+    return {};
+}
 
 class TestTreeSafety : public QObject
 {
@@ -10,20 +25,12 @@ class TestTreeSafety : public QObject
 
 private slots:
     void testUnsafeChildAccess() {
-        QDir sourceDir(QCoreApplication::applicationDirPath());
-        QString scriptPath = "../../../../util/check_unsafe_tree_child.py";
-        QString srcPath = "../../../../src";
+        const QString repoRoot = repoRootForTreeSafety();
+        QVERIFY2(!repoRoot.isEmpty(), "Could not locate repository root.");
 
-        // Adjust paths if needed
-        if (!QFile::exists(scriptPath)) {
-            // Try build dir depth = 3
-             scriptPath = "../../../util/check_unsafe_tree_child.py";
-             srcPath = "../../../src";
-        }
-
-        if (!QFile::exists(scriptPath)) {
-            QSKIP("Could not find check_unsafe_tree_child.py. Skipping.");
-        }
+        const QString scriptPath = QDir(repoRoot).filePath("util/check_unsafe_tree_child.py");
+        const QString srcPath = QDir(repoRoot).filePath("src");
+        QVERIFY2(QFile::exists(scriptPath), qPrintable(QString("Missing script: %1").arg(scriptPath)));
 
         QProcess process;
         QStringList args;
@@ -37,20 +44,10 @@ private slots:
         QVERIFY2(finished, "Script timed out");
 
         int exitCode = process.exitCode();
-        // The script prints warnings but currently returns 0.
-        // We should PROBABLY fail if we want to prevent regressions.
-        // But since there are 19 existing issues, we might want to check if the output count > 0
-        // to verify it works, but maybe not fail yet?
-        // Actually the user wants to ADD TESTS.
-        // The script returns 0 even if found? Let's check the script.
-
-        // If we want to prevent NEW ones, we need exclusions or a baseline.
-        // For now, let's just assert execution and maybe print output.
-        // Implementing strict failure later.
-
-        if (process.readAllStandardOutput().contains("UNSAFE CHAINING")) {
-            // For now, just warn or print.
-            // QWARN("Found unsafe tree chaining! See output.");
+        const QByteArray stdOut = process.readAllStandardOutput();
+        if (exitCode != 0) {
+            std::cout << stdOut.toStdString() << std::endl;
+            std::cerr << process.readAllStandardError().toStdString() << std::endl;
         }
 
         QCOMPARE(exitCode, 0);

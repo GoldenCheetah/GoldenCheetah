@@ -104,6 +104,14 @@ jobs:
       - name: Build GoldenCheetah
         run: make -j$(nproc) sub-src
 
+      - name: Build unit tests
+        run: make -j$(nproc) sub-unittests
+
+      - name: Run unit tests
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: make -C unittests check
+
       - name: Create AppImage
         run: bash appveyor/linux/after_build.sh
 

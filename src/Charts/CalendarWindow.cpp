@@ -34,10 +34,10 @@
 #include "FilterSimilarDialog.h"
 #include "SeasonDialogs.h"
 #include "SaveDialogs.h"
+#include <QDebug>
 
 #define HLO "<h4>"
 #define HLC "</h4>"
-
 
 //////////////////////////////////////////////////////////////////////////////
 // LinkDialog
@@ -329,9 +329,18 @@ CalendarWindow::CalendarWindow(Context *context)
         if (rideItem != nullptr) {
             QString filter = buildWorkoutFilter(rideItem);
             if (! filter.isEmpty()) {
+                QString workoutFilename = rideItem->getText("WorkoutFilename", "").trimmed();
+                qDebug() << "[TrainHandoff] CalendarWindow::showInTrainMode"
+                         << "rideFile=" << rideItem->fileName
+                         << "workoutFilename=" << workoutFilename
+                         << "filter=" << filter;
                 this->context->mainWindow->fillinWorkoutFilterBox(filter);
                 this->context->mainWindow->selectTrain();
-                this->context->notifySelectWorkout(0);
+                if (! workoutFilename.isEmpty()) {
+                    this->context->notifySelectWorkout(workoutFilename);
+                } else {
+                    this->context->notifySelectWorkout(0);
+                }
             }
         }
     });
@@ -1138,7 +1147,8 @@ CalendarWindow::getPhasesEvents
     QList<Season> tmpSeasons = context->athlete->seasons->seasons;
     std::sort(tmpSeasons.begin(), tmpSeasons.end(), Season::LessThanForStarts);
     for (const Season &s : tmpSeasons) {
-        for (const SeasonEvent &event : s.events) {
+        for (int eventIndex = 0; eventIndex < s.events.size(); ++eventIndex) {
+            const SeasonEvent &event = s.events.at(eventIndex);
             if (   (   (   firstDay.isValid()
                         && event.date >= firstDay)
                     || ! firstDay.isValid())
@@ -1160,11 +1170,7 @@ CalendarWindow::getPhasesEvents
                     entry.iconFile = ":images/breeze/task-process-0.svg";
                 }
                 entry.color = GColor(CCALEVENT);
-                if (event.id.isEmpty()) {
-                    entry.reference = QString("0x%1").arg(reinterpret_cast<quintptr>(&event), 0, 16);
-                } else {
-                    entry.reference = event.id;
-                }
+                entry.reference = calendarSeasonEventReference(s, event, eventIndex);
                 entry.start = QTime(0, 0, 0);
                 entry.durationSecs = 0;
                 entry.type = ENTRY_TYPE_EVENT;
@@ -1744,12 +1750,9 @@ CalendarWindow::editEvent
     Season *season = nullptr;
     SeasonEvent *seasonEvent = nullptr;
     for (Season &s : context->athlete->seasons->seasons) {
-        for (SeasonEvent &event : s.events) {
-            QString evId = event.id;
-            if (evId.isEmpty()) {
-                evId = QString("0x%1").arg(reinterpret_cast<quintptr>(&event), 0, 16);
-            }
-            if (entry.reference == evId) {
+        for (int eventIndex = 0; eventIndex < s.events.size(); ++eventIndex) {
+            SeasonEvent &event = s.events[eventIndex];
+            if (entry.reference == calendarSeasonEventReference(s, event, eventIndex)) {
                 season = &s;
                 seasonEvent = &event;
                 break;
@@ -1780,11 +1783,7 @@ CalendarWindow::delEvent
     for (Season &s : context->athlete->seasons->seasons) {
         int idx = 0;
         for (SeasonEvent &event : s.events) {
-            QString evId = event.id;
-            if (evId.isEmpty()) {
-                evId = QString("0x%1").arg(reinterpret_cast<quintptr>(&event), 0, 16);
-            }
-            if (entry.reference == evId) {
+            if (entry.reference == calendarSeasonEventReference(s, event, idx)) {
                 s.events.removeAt(idx);
                 context->athlete->seasons->writeSeasons();
                 done = true;

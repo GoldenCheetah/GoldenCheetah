@@ -31,10 +31,10 @@
 #include "WorkoutFilter.h"
 #include "IconManager.h"
 #include "SeasonDialogs.h"
+#include <QDebug>
 
 #define HLO "<h4>"
 #define HLC "</h4>"
-
 
 AgendaWindow::AgendaWindow(Context *context)
 : GcChartWindow(context), context(context)
@@ -73,9 +73,18 @@ AgendaWindow::AgendaWindow(Context *context)
             if (rideItem != nullptr && rideItem->fileName == activity.reference) {
                 QString filter = buildWorkoutFilter(rideItem);
                 if (! filter.isEmpty()) {
+                    QString workoutFilename = rideItem->getText("WorkoutFilename", "").trimmed();
+                    qDebug() << "[TrainHandoff] AgendaWindow::showInTrainMode"
+                             << "rideFile=" << rideItem->fileName
+                             << "workoutFilename=" << workoutFilename
+                             << "filter=" << filter;
                     context->mainWindow->fillinWorkoutFilterBox(filter);
                     context->mainWindow->selectTrain();
-                    context->notifySelectWorkout(0);
+                    if (! workoutFilename.isEmpty()) {
+                        context->notifySelectWorkout(workoutFilename);
+                    } else {
+                        context->notifySelectWorkout(0);
+                    }
                 }
                 break;
             }
@@ -699,7 +708,8 @@ AgendaWindow::getEvents
     QList<Season> tmpSeasons = context->athlete->seasons->seasons;
     std::sort(tmpSeasons.begin(), tmpSeasons.end(), Season::LessThanForStarts);
     for (const Season &s : tmpSeasons) {
-        for (const SeasonEvent &event : s.events) {
+        for (int eventIndex = 0; eventIndex < s.events.size(); ++eventIndex) {
+            const SeasonEvent &event = s.events.at(eventIndex);
             if (   (   (   firstDay.isValid()
                         && event.date >= firstDay)
                     || ! firstDay.isValid())) {
@@ -726,7 +736,7 @@ AgendaWindow::getEvents
                 }
                 entry.tertiary = event.description.trimmed();
                 entry.color = GColor(CCALEVENT);
-                entry.reference = event.id;
+                entry.reference = calendarSeasonEventReference(s, event, eventIndex);
                 entry.start = QTime(0, 0, 0);
                 entry.type = ENTRY_TYPE_EVENT;
                 entry.spanStart = event.date;
@@ -822,21 +832,9 @@ AgendaWindow::editEventEntry
     Season *season = nullptr;
     SeasonEvent *seasonEvent = nullptr;
     for (Season &s : context->athlete->seasons->seasons) {
-        for (SeasonEvent &event : s.events) {
-            // FIXME: Ugly comparison required because SeasonEvent::id is not populated
-            if (   event.name == entry.primary
-                && entry.secondaryValues.count() == 1
-                && (   (event.priority == 0 && entry.secondaryValues[0] == tr("Uncategorized"))
-                    || (event.priority == 1 && entry.secondaryValues[0] == tr("Category A"))
-                    || (event.priority == 2 && entry.secondaryValues[0] == tr("Category B"))
-                    || (event.priority == 3 && entry.secondaryValues[0] == tr("Category C"))
-                    || (event.priority == 4 && entry.secondaryValues[0] == tr("Category D"))
-                    || (   (event.priority < 0 || event.priority > 4)
-                        && entry.secondaryValues[0] == tr("Category E")))
-                && event.description.trimmed() == entry.tertiary
-                && event.id == entry.reference
-                && event.date == entry.spanStart
-                && event.date == entry.spanEnd) {
+        for (int eventIndex = 0; eventIndex < s.events.size(); ++eventIndex) {
+            SeasonEvent &event = s.events[eventIndex];
+            if (entry.reference == calendarSeasonEventReference(s, event, eventIndex)) {
                 season = &s;
                 seasonEvent = &event;
                 break;

@@ -17,6 +17,7 @@
  */
 
 #include "CyclingAnalytics.h"
+#include "CloudJsonParsers.h"
 #include "Athlete.h"
 #include "Settings.h"
 #include "mvjson.h"
@@ -27,6 +28,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonValue>
+#include <QTimer>
 
 #ifndef CYCLINGANALYTICS_DEBUG
 #define CYCLINGANALYTICS_DEBUG false
@@ -127,123 +129,141 @@ CyclingAnalytics::readdir(QString path, QStringList &errors, QDateTime, QDateTim
 
     // blocking request, with a 30s timeout
     QEventLoop loop;
+    bool timedOut = false;
+    QTimer timeout;
+    timeout.setSingleShot(true);
     connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    connect(&timeout, &QTimer::timeout, &loop, [&]() {
+        timedOut = true;
+        if (reply->isRunning()) reply->abort();
+        loop.quit();
+    });
+    timeout.start(30000);
     loop.exec();
-    QTimer::singleShot(30000,&loop, SLOT(quit())); // timeout after 30 seconds
+    timeout.stop();
 
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     printd("fetch response: status=%d, error=%d: %s\n", statusCode, reply->error(), reply->errorString().toStdString().c_str());
+    const QByteArray r = reply->readAll();
 
-    // if successful, lets unpack
-    if (reply->error() == 0) {
-
-        // get the data
-        QByteArray r = reply->readAll();
-
-        // parse JSON payload
-        QJsonParseError parseError;
-        QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
-
-        printd("parse (%d): %s\n", parseError.error, parseError.errorString().toStdString().c_str());
-        if (parseError.error == QJsonParseError::NoError) {
-
-            QJsonArray rides = document.object()["rides"].toArray();
-            for(int i=0; i<rides.count(); i++) {
-
-                QJsonObject item = rides.at(i).toObject();
-                CloudServiceEntry *add = newCloudServiceEntry();
-
-                // We extract:
-                // * summary - distance
-                // * summary - duration
-                // * starttime UTC
-                // * format
-                // * id
-                //
-                // Each record looks like this:
-                // {
-                //     "user_id": 8862271,
-                //     "summary": {
-                //         "pwc_r2": 0,
-                //         "avg_power": 0,
-                //         "avg_heartrate": 1,
-                //         "riding_time": 5320,
-                //         "max_speed": 53.0,
-                //         "load": 0,
-                //         "work": 0,
-                //         "pwc170": 0,
-                //         "max_heartrate": 1,
-                //         "intensity": 0.0,
-                //         "max_cadence": 0,
-                //         "distance": 39.852,
-                //         "pwc150": 0,
-                //         "avg_speed": 26.96751879699248,
-                //         "trimp": 0,
-                //         "max_power": 0,
-                //         "climbing": 578,
-                //         "variability": 0,
-                //         "max_temperature": 0.0,
-                //         "lrbalance": null,
-                //         "epower": 0,
-                //         "avg_temperature": 0.0,
-                //         "moving_time": 5320,
-                //         "duration": 5471,
-                //         "min_temperature": 0.0,
-                //         "zones": {
-                //             "heartrate": [
-                //                 0,
-                //                 0,
-                //                 0,
-                //                 0,
-                //                 0
-                //             ],
-                //             "power": [
-                //                 5471,
-                //                 0,
-                //                 0,
-                //                 0,
-                //                 0,
-                //                 0,
-                //                 0
-                //             ]
-                //         },
-                //         "total_time": 5476,
-                //         "avg_cadence": 0
-                //     },
-                //     "utc_datetime": "2012-08-18T11:11:27",
-                //     "trainer": false,
-                //     "format": "tcx",
-                //     "has": {
-                //         "temperature": false,
-                //         "cadence": false,
-                //         "gps": true,
-                //         "speed": true,
-                //         "heartrate": true,
-                //         "power": false,
-                //         "elevation": true
-                //     },
-                //     "id": 104592924158,
-                //     "title": "40km around Cranleigh",
-                //     "notes": "",
-                //     "local_datetime": "2012-08-18T12:11:27"
-                // }
-
-                add->name = QDateTime::fromString(item["local_datetime"].toString(), Qt::ISODate).toString("yyyy_MM_dd_HH_mm_ss")+".json";
-
-                QJsonObject summary = item["summary"].toObject();
-                add->distance = summary["distance"].toDouble();
-                add->duration = summary["duration"].toDouble();
-                add->id = QString("%1").arg(item["id"].toDouble(), 0, 'f', 0);
-                add->label = add->id;
-                add->isDir = false;
-
-                printd("item: %s %s\n", add->id.toStdString().c_str(), add->name.toStdString().c_str());
-
-                returning << add;
-            }
-        }
+    if (timedOut) {
+        errors << tr("Timed out reading Cycling Analytics data.");
+        reply->deleteLater();
+        return returning;
     }
 
+    if (reply->error() != QNetworkReply::NoError) {
+        QString errorMessage = tr("Network Problem reading Cycling Analytics data: %1").arg(reply->errorString());
+        if (!r.trimmed().isEmpty()) {
+            const CyclingAnalyticsRideListResponse response = parseCyclingAnalyticsRideListResponse(r);
+            if (!response.ok && !response.errorMessage.isEmpty()) errorMessage = response.errorMessage;
+        }
+        errors << errorMessage;
+        reply->deleteLater();
+        return returning;
+    }
+
+    const CyclingAnalyticsRideListResponse response = parseCyclingAnalyticsRideListResponse(r);
+    if (!response.ok) {
+        errors << response.errorMessage;
+        reply->deleteLater();
+        return returning;
+    }
+
+    for (int i=0; i<response.rides.count(); i++) {
+
+        QJsonObject item = response.rides.at(i).toObject();
+        CloudServiceEntry *add = newCloudServiceEntry();
+
+        // We extract:
+        // * summary - distance
+        // * summary - duration
+        // * starttime UTC
+        // * format
+        // * id
+        //
+        // Each record looks like this:
+        // {
+        //     "user_id": 8862271,
+        //     "summary": {
+        //         "pwc_r2": 0,
+        //         "avg_power": 0,
+        //         "avg_heartrate": 1,
+        //         "riding_time": 5320,
+        //         "max_speed": 53.0,
+        //         "load": 0,
+        //         "work": 0,
+        //         "pwc170": 0,
+        //         "max_heartrate": 1,
+        //         "intensity": 0.0,
+        //         "max_cadence": 0,
+        //         "distance": 39.852,
+        //         "pwc150": 0,
+        //         "avg_speed": 26.96751879699248,
+        //         "trimp": 0,
+        //         "max_power": 0,
+        //         "climbing": 578,
+        //         "variability": 0,
+        //         "max_temperature": 0.0,
+        //         "lrbalance": null,
+        //         "epower": 0,
+        //         "avg_temperature": 0.0,
+        //         "moving_time": 5320,
+        //         "duration": 5471,
+        //         "min_temperature": 0.0,
+        //         "zones": {
+        //             "heartrate": [
+        //                 0,
+        //                 0,
+        //                 0,
+        //                 0,
+        //                 0
+        //             ],
+        //             "power": [
+        //                 5471,
+        //                 0,
+        //                 0,
+        //                 0,
+        //                 0,
+        //                 0,
+        //                 0
+        //             ]
+        //         },
+        //         "total_time": 5476,
+        //         "avg_cadence": 0
+        //     },
+        //     "utc_datetime": "2012-08-18T11:11:27",
+        //     "trainer": false,
+        //     "format": "tcx",
+        //     "has": {
+        //         "temperature": false,
+        //         "cadence": false,
+        //         "gps": true,
+        //         "speed": true,
+        //         "heartrate": true,
+        //         "power": false,
+        //         "elevation": true
+        //     },
+        //     "id": 104592924158,
+        //     "title": "40km around Cranleigh",
+        //     "notes": "",
+        //     "local_datetime": "2012-08-18T12:11:27"
+        // }
+
+        add->name = QDateTime::fromString(item["local_datetime"].toString(), Qt::ISODate).toString("yyyy_MM_dd_HH_mm_ss")+".json";
+
+        QJsonObject summary = item["summary"].toObject();
+        add->distance = summary["distance"].toDouble();
+        add->duration = summary["duration"].toDouble();
+        add->id = QString("%1").arg(item["id"].toDouble(), 0, 'f', 0);
+        add->label = add->id;
+        add->isDir = false;
+
+        printd("item: %s %s\n", add->id.toStdString().c_str(), add->name.toStdString().c_str());
+
+        returning << add;
+    }
+    reply->deleteLater();
 
     // all good ?
     printd("returning count(%lld), errors(%s)\n", returning.count(), errors.join(",").toStdString().c_str());

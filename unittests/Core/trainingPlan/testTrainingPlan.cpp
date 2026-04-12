@@ -64,7 +64,7 @@ private:
         plan.startDate = QDate(2026, 4, 6);
         plan.endDate = QDate(2026, 7, 5);
         plan.generatorId = QStringLiteral("goldencheetah-mcp");
-        plan.createdAt = QDateTime(QDate(2026, 4, 5), QTime(5, 20, 0), Qt::UTC);
+        plan.createdAt = QDateTime(QDate(2026, 4, 5), QTime(5, 20, 0), QTimeZone::UTC);
         plan.updatedAt = plan.createdAt;
 
         plan.evaluationDates.append(QDate(2026, 5, 4));

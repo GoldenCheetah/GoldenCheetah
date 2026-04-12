@@ -34,6 +34,7 @@
 #include <QBarSeries>
 #include <QLineSeries>
 #include <QCursor>
+#include <QFutureWatcher>
 
 // subwidgets for viz inside each overview item
 class RPErating;
@@ -438,6 +439,22 @@ struct SimulationCardEntry {
     bool feasible;
     int warnings;
     int hardViolations;
+
+    // projected values after this workout (7 days)
+    QVector<double> projCtl, projAtl, projTsb;
+};
+
+struct SimulationCardResult {
+    quint64 requestId = 0;
+    double ctl = 0, atl = 0, tsb = 0, acwr = 0;
+    QList<SimulationCardEntry> topCandidates;
+    QString goalName;
+    QString rationale;
+    QString statusText;
+    bool hasData = false;
+
+    // historical PMC values (14 days back) for the chart
+    QVector<double> histCtl, histAtl, histTsb;
 };
 
 class SimulationOverviewItem : public ChartSpaceItem
@@ -453,6 +470,7 @@ class SimulationOverviewItem : public ChartSpaceItem
         void itemGeometryChanged();
         void setData(RideItem *item);
         void setDateRange(DateRange) {} // analysis view only
+        void dragChanged(bool x) override;
 
         QWidget *config() { return configwidget; }
 
@@ -464,9 +482,26 @@ class SimulationOverviewItem : public ChartSpaceItem
         // ranked candidates
         QList<SimulationCardEntry> topCandidates;
         QString goalName;
+        QString rationale;
+        QString statusText;
         bool hasData;
+        bool loading;
+
+        // PMC projection chart
+        QChart *chart;
 
         OverviewItemConfig *configwidget;
+
+    private slots:
+        void simulationFinished();
+
+    private:
+        void updateChart();
+        QFutureWatcher<SimulationCardResult> *watcher;
+        quint64 simulationRequestId;
+
+        // chart data
+        QVector<double> histCtl, histAtl, histTsb;
 };
 
 class ZoneOverviewItem : public ChartSpaceItem

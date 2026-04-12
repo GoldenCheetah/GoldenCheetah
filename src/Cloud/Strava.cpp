@@ -18,6 +18,7 @@
  */
 
 #include "Strava.h"
+#include "CloudJsonParsers.h"
 #include "JsonRideFile.h"
 #include "Athlete.h"
 #include "Settings.h"
@@ -51,6 +52,21 @@
         }                                                               \
     } while(0)
 #endif
+
+namespace {
+
+QString configuredStravaClientSecret()
+{
+    return QString::fromLatin1(GC_STRAVA_CLIENT_SECRET).trimmed();
+}
+
+bool hasEmbeddedStravaClientSecret()
+{
+    const QString secret = configuredStravaClientSecret();
+    return !secret.isEmpty() && secret != QStringLiteral("__GC_STRAVA_CLIENT_SECRET__");
+}
+
+} // namespace
 
 Strava::Strava(Context *context) : CloudService(context), context(context), root_(NULL) {
 
@@ -90,8 +106,24 @@ bool
 Strava::open(QStringList &errors)
 {
     printd("Strava::open\n");
-    QString token = getSetting(GC_STRAVA_REFRESH_TOKEN, "").toString();
-    if (token == "") {
+    const QString accessToken = getSetting(GC_STRAVA_TOKEN, "").toString().trimmed();
+    const QString refreshToken = getSetting(GC_STRAVA_REFRESH_TOKEN, "").toString().trimmed();
+
+    if (!hasEmbeddedStravaClientSecret()) {
+        if (!accessToken.isEmpty()) {
+            // Local/dev builds often do not embed Strava's client secret.
+            // A cached access token can still be used directly until it expires.
+            return true;
+        }
+        errors << tr("This build does not include the Strava client secret.");
+        errors << tr("Use an official build, rebuild with GC_STRAVA_CLIENT_SECRET, or authorise once in a build that embeds the secret.");
+        return false;
+    }
+
+    if (refreshToken.isEmpty()) {
+        if (!accessToken.isEmpty()) {
+            return true;
+        }
         errors << tr("No authorisation token configured.");
         return false;
     }
@@ -106,7 +138,7 @@ Strava::open(QStringList &errors)
     QString data;
     data += "client_id=" GC_STRAVA_CLIENT_ID;
     data += "&client_secret=" GC_STRAVA_CLIENT_SECRET;
-    data += "&refresh_token=" + getSetting(GC_STRAVA_REFRESH_TOKEN).toString();
+    data += "&refresh_token=" + refreshToken;
     data += "&grant_type=refresh_token";
 
     // make request
@@ -120,29 +152,32 @@ Strava::open(QStringList &errors)
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     printd("HTTP response code: %d\n", statusCode);
 
+    QByteArray r = reply->readAll();
+
     // oops, no dice
     if (reply->error() != 0) {
         printd("Got error %s\n", reply->errorString().toStdString().c_str());
-        errors << reply->errorString();
+        QString errorMessage = reply->errorString();
+        if (!r.trimmed().isEmpty()) {
+            const StravaTokenRefreshResponse tokenResponse = parseStravaTokenRefreshResponse(r);
+            if (!tokenResponse.ok && !tokenResponse.errorMessage.isEmpty()) errorMessage = tokenResponse.errorMessage;
+        }
+        errors << errorMessage;
+        reply->deleteLater();
         return false;
     }
 
-    // lets extract the access token, and possibly a new refresh token
-    QByteArray r = reply->readAll();
     printd("Got response: %s\n", r.data());
-
-    QJsonParseError parseError;
-    QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
-
-    // failed to parse result !?
-    if (parseError.error != QJsonParseError::NoError) {
-        printd("Parse error!\n");
-        errors << tr("JSON parser error") << parseError.errorString();
+    const StravaTokenRefreshResponse tokenResponse = parseStravaTokenRefreshResponse(r);
+    if (!tokenResponse.ok) {
+        printd("Token refresh parse/validation error!\n");
+        errors << tokenResponse.errorMessage;
+        reply->deleteLater();
         return false;
     }
 
-    QString access_token = document.object()["access_token"].toString();
-    QString refresh_token = document.object()["refresh_token"].toString();
+    const QString access_token = tokenResponse.accessToken;
+    const QString refresh_token = tokenResponse.refreshToken;
 
     // update our settings
     if (access_token != "") setSetting(GC_STRAVA_TOKEN, access_token);
@@ -151,6 +186,7 @@ Strava::open(QStringList &errors)
 
     // get the factory to save our settings permanently
     CloudServiceFactory::instance().saveSettings(this, context);
+    reply->deleteLater();
     return true;
 }
 

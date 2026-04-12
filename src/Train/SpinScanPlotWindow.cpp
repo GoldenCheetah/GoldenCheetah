@@ -59,8 +59,8 @@ SpinScanPlotWindow::SpinScanPlotWindow(Context *context) :
     history[5] = set6;
     history[6] = set7;
     history[7] = set8;
-    history[8] = set8;
-    history[9] = set9;
+    history[8] = set9;
+    history[9] = set10;
     history[10] = set11;
     history[11] = set12;
     history[12] = set13;

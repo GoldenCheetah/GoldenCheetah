@@ -597,7 +597,7 @@ HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPl
 
 # cloud services
 HEADERS += Cloud/CalendarDownload.h Cloud/CloudService.h \
-           Cloud/LocalFileStore.h Cloud/OAuthDialog.h \
+           Cloud/CloudJsonParsers.h Cloud/LocalFileStore.h Cloud/OAuthDialog.h \
            Cloud/WithingsDownload.h Cloud/Strava.h Cloud/CyclingAnalytics.h Cloud/RideWithGPS.h \
            Cloud/TrainingsTageBuch.h Cloud/Selfloops.h Cloud/SportsPlusHealth.h \
            Cloud/AddCloudWizard.h Cloud/Withings.h Cloud/MeasuresDownload.h Cloud/Xert.h \
@@ -619,6 +619,7 @@ HEADERS += FileIO/ArchiveFile.h FileIO/AthleteBackup.h  FileIO/Bin2RideFile.h Fi
            FileIO/ManualRideFile.h FileIO/MoxyDevice.h FileIO/PolarRideFile.h \
            FileIO/PowerTapDevice.h FileIO/PowerTapUtil.h FileIO/PwxRideFile.h FileIO/QuarqParser.h FileIO/QuarqRideFile.h \
            FileIO/RawRideFile.h FileIO/RideAutoImportConfig.h FileIO/RideFileCache.h \
+           FileIO/TacxCafParser.h \
            FileIO/RideFileCommand.h FileIO/RideFile.h FileIO/RideFileTableModel.h  FileIO/Serial.h \
            FileIO/SlfParser.h FileIO/SlfRideFile.h FileIO/SmfParser.h FileIO/SmfRideFile.h FileIO/SmlParser.h \
            FileIO/SmlRideFile.h FileIO/SrdRideFile.h FileIO/SrmRideFile.h FileIO/SyncRideFile.h FileIO/TcxParser.h \
@@ -714,7 +715,7 @@ SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts
 
 ## Cloud Services / Web resources
 SOURCES += Cloud/CalendarDownload.cpp Cloud/CloudService.cpp \
-           Cloud/LocalFileStore.cpp Cloud/OAuthDialog.cpp \
+           Cloud/CloudJsonParsers.cpp Cloud/LocalFileStore.cpp Cloud/OAuthDialog.cpp \
            Cloud/WithingsDownload.cpp Cloud/Strava.cpp Cloud/CyclingAnalytics.cpp Cloud/RideWithGPS.cpp \
            Cloud/TrainingsTageBuch.cpp Cloud/Selfloops.cpp Cloud/SportsPlusHealth.cpp \
            Cloud/AddCloudWizard.cpp Cloud/Withings.cpp Cloud/MeasuresDownload.cpp Cloud/Xert.cpp \
@@ -742,7 +743,7 @@ SOURCES += FileIO/ArchiveFile.cpp FileIO/AthleteBackup.cpp FileIO/Bin2RideFile.c
            FileIO/RideFileCache.cpp FileIO/RideFileCommand.cpp FileIO/RideFile.cpp FileIO/RideFileTableModel.cpp \
            FileIO/Serial.cpp FileIO/SlfParser.cpp FileIO/SlfRideFile.cpp FileIO/SmfParser.cpp FileIO/SmfRideFile.cpp FileIO/SmlParser.cpp \
            FileIO/SmlRideFile.cpp FileIO/Snippets.cpp FileIO/SrdRideFile.cpp FileIO/SrmRideFile.cpp FileIO/SyncRideFile.cpp \
-           FileIO/TacxCafRideFile.cpp FileIO/TcxParser.cpp FileIO/TcxRideFile.cpp FileIO/TxtRideFile.cpp FileIO/WkoRideFile.cpp \
+           FileIO/TacxCafParser.cpp FileIO/TacxCafRideFile.cpp FileIO/TcxParser.cpp FileIO/TcxRideFile.cpp FileIO/TxtRideFile.cpp FileIO/WkoRideFile.cpp \
            FileIO/XDataDialog.cpp FileIO/XDataTableModel.cpp FileIO/FilterHRV.cpp FileIO/MeasuresCsvImport.cpp \
            FileIO/LocationInterpolation.cpp FileIO/TTSReader.cpp FileIO/EpmRideFile.cpp FileIO/EpmParser.cpp
 
@@ -796,10 +797,10 @@ SOURCES += Train/AddDeviceWizard.cpp Train/CalibrationData.cpp Train/Computraine
            Train/PolynomialRegression.cpp Train/StravaRoutesDownload.cpp \
            Train/VideoSyncFileBase.cpp Train/ErgFileBase.cpp Train/WorkoutDraft.cpp Train/WorkoutGenerationService.cpp \
            Train/TrainingConstraintChecker.cpp Train/TrainingSimulator.cpp \
-           Train/BanisterSimulator.cpp \
+           Train/BanisterSimulator.cpp Train/BanisterSimulatorAthlete.cpp \
            Train/BayesianEstimator.cpp \
            Train/MultiComponentModel.cpp \
-           Train/TrainingPlan.cpp \
+           Train/TrainingPlan.cpp Train/TrainingPlanStorage.cpp \
            Train/LLMWorkoutBridge.cpp \
            Train/ModelFilter.cpp Train/MultiFilterProxyModel.cpp Train/WorkoutFilter.cpp Train/FilterEditor.cpp \
            Train/WorkoutFilterBox.cpp Train/TagBar.cpp Train/TagWidget.cpp \
