@@ -76,11 +76,21 @@ canonicalOrAbsolutePath(const QString &path)
     return canonical.isEmpty() ? info.absoluteFilePath() : canonical;
 }
 
+QString
+normalizedWorkoutReference(const QString &path)
+{
+    const QString trimmed = path.trimmed();
+    if (trimmed.isEmpty()) {
+        return QString();
+    }
+    return QDir::cleanPath(canonicalOrAbsolutePath(trimmed));
+}
+
 bool
 pathIsWithinDirectory(const QString &path, const QString &directory)
 {
-    QString normalizedPath = QDir::cleanPath(canonicalOrAbsolutePath(path));
-    QString normalizedDir = QDir::cleanPath(canonicalOrAbsolutePath(directory));
+    QString normalizedPath = normalizedWorkoutReference(path);
+    QString normalizedDir = normalizedWorkoutReference(directory);
     if (normalizedPath.isEmpty() || normalizedDir.isEmpty()) {
         return false;
     }
@@ -111,7 +121,7 @@ ensureWorkoutReference(Context *context, const QString &filepath)
         libraries.append(library);
     }
 
-    const QString normalizedPath = canonicalOrAbsolutePath(filepath);
+    const QString normalizedPath = normalizedWorkoutReference(filepath);
     if (normalizedPath.isEmpty()) {
         return;
     }
@@ -878,7 +888,7 @@ WorkoutGenerationService::createPlannedActivity(Context *context, const QString 
     rideFile.setTag(QStringLiteral("Month"), effectiveWhen.toString(QStringLiteral("MMMM")));
     rideFile.setTag(QStringLiteral("Weekday"), effectiveWhen.toString(QStringLiteral("ddd")));
     rideFile.setTag(QStringLiteral("Sport"), normalizedSport(sport));
-    rideFile.setTag(QStringLiteral("WorkoutFilename"), cleanedWorkoutPath);
+    rideFile.setTag(QStringLiteral("WorkoutFilename"), normalizedWorkoutReference(cleanedWorkoutPath));
 
     QString resolvedTitle = title.trimmed();
     if (resolvedTitle.isEmpty()) {
@@ -1017,6 +1027,7 @@ WorkoutGenerationService::updatePlannedActivity(Context *context, const QString 
 
     // If date/time is changing, use moveActivity to rename the file properly
     bool dateChanged = newWhen.isValid() && newWhen != item->dateTime;
+    const QString normalizedWorkoutPath = normalizedWorkoutReference(workoutPath);
 
     // Apply metadata changes via ride tags
     auto applyMetadata = [&](RideItem *ri) {
@@ -1037,8 +1048,8 @@ WorkoutGenerationService::updatePlannedActivity(Context *context, const QString 
             ride->setTag(QStringLiteral("Notes"), description.trimmed());
             changed = true;
         }
-        if (!workoutPath.trimmed().isEmpty()) {
-            ride->setTag(QStringLiteral("WorkoutFilename"), workoutPath.trimmed());
+        if (!normalizedWorkoutPath.isEmpty()) {
+            ride->setTag(QStringLiteral("WorkoutFilename"), normalizedWorkoutPath);
             changed = true;
         }
         if (changed) ri->setDirty(true);
@@ -1071,6 +1082,10 @@ WorkoutGenerationService::updatePlannedActivity(Context *context, const QString 
                 errors << saveError;
                 return;
             }
+        }
+
+        if (!normalizedWorkoutPath.isEmpty()) {
+            ensureWorkoutReference(context, normalizedWorkoutPath);
         }
 
         QString dir = context->athlete->home->planned().canonicalPath();
