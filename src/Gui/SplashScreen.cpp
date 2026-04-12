@@ -18,7 +18,6 @@
 
 #include "SplashScreen.h"
 
-#include <QDebug>
 #include <QSvgRenderer>
 #include <QPixmap>
 #include <QPainter>
@@ -32,6 +31,42 @@
 
 #define SHOW_BOX 0 // 1 shows labels background (useful for fitting)
 
+namespace {
+
+void drawLogoBadge(QPainter &painter, const QSize &pixmapSize, double scaleFactor)
+{
+    const QPixmap logoPixmap(":/images/gc.png");
+    if (logoPixmap.isNull()) {
+        return;
+    }
+
+    const int logoSize = qRound(76 * scaleFactor);
+    const int badgePadding = qRound(8 * scaleFactor);
+    const int badgeDiameter = logoSize + (badgePadding * 2);
+    const int badgeX = (pixmapSize.width() - badgeDiameter) / 2;
+    const int badgeY = qRound(18 * scaleFactor);
+    const QRect badgeRect(badgeX, badgeY, badgeDiameter, badgeDiameter);
+    const QRect shadowRect = badgeRect.translated(0, qRound(3 * scaleFactor));
+
+    painter.save();
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(QColor(0, 0, 0, 38));
+    painter.drawEllipse(shadowRect);
+
+    painter.setBrush(QColor(255, 255, 255, 228));
+    painter.drawEllipse(badgeRect);
+
+    const QPixmap scaledLogo = logoPixmap.scaled(logoSize, logoSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    const int logoX = badgeRect.x() + (badgeRect.width() - scaledLogo.width()) / 2;
+    const int logoY = badgeRect.y() + (badgeRect.height() - scaledLogo.height()) / 2;
+    painter.drawPixmap(logoX, logoY, scaledLogo);
+    painter.restore();
+}
+
+} // namespace
 
 SplashScreen::SplashScreen
 ()
@@ -68,7 +103,10 @@ SplashScreen::SplashScreen
     QPixmap pixmap(pixmapWidth, pixmapWidth / double(defaultSize.width()) * defaultSize.height());
     pixmap.fill(Qt::transparent);
     QPainter painter(&pixmap);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
     renderer.render(&painter);
+    drawLogoBadge(painter, pixmap.size(), scaleFactor);
 
     versionX *= scaleFactor;
     versionY *= scaleFactor;
