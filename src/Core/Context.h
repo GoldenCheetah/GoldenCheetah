@@ -225,8 +225,8 @@ class Context : public QObject
         VideoSyncFile *currentVideoSyncFile() { return videosync; }
         void notifyMediaSelected( QString x) { videoFilename = x; mediaSelected(x); }
         void notifySelectVideo(QString x) { selectMedia(x); }
-        void notifySelectWorkout(QString x) { selectWorkout(x); }
-        void notifySelectWorkout(int idx ) { selectWorkout(idx); }
+        void notifySelectWorkout(QString x) { QMetaObject::invokeMethod(this, [this, x]() { selectWorkout(x); }, Qt::QueuedConnection); }
+        void notifySelectWorkout(int idx ) { QMetaObject::invokeMethod(this, [this, idx]() { selectWorkout(idx); }, Qt::QueuedConnection); }
         void notifySelectVideoSync(QString x) { selectVideoSync(x); }
         void notifySetNow(long x) { now = x; setNow(x); }
         long getNow() { return now; }

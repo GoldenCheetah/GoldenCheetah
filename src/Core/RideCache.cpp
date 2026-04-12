@@ -1756,7 +1756,9 @@ RideCache::updateFromWorkout
         return false;
     }
     ErgFile ergFile(workoutFilename, ErgFileFormat::unknown, context, item->dateTime.date());
-    if (! ergFile.hasRelativeWatts()) {
+    // Linked planned workouts may be saved as either absolute-watt .erg files
+    // or relative-watt .mrc files. Both should refresh planned metrics.
+    if (! ergFile.hasWatts()) {
         return false;
     }
     bool changed = false;

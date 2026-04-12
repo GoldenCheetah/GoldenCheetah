@@ -12,6 +12,8 @@
 #include "Athlete.h"
 #include "Context.h"
 #include "ErgFile.h"
+#include "Library.h"
+#include "LibraryParser.h"
 #include "Measures.h"
 #include "PMCData.h"
 #include "RideMetadata.h"
@@ -64,6 +66,88 @@ parseDateString(const QString &raw)
         parsed = QDate::fromString(raw, QStringLiteral("yyyy-MM-dd"));
     }
     return parsed;
+}
+
+QString
+canonicalOrAbsolutePath(const QString &path)
+{
+    QFileInfo info(path);
+    QString canonical = info.canonicalFilePath();
+    return canonical.isEmpty() ? info.absoluteFilePath() : canonical;
+}
+
+bool
+pathIsWithinDirectory(const QString &path, const QString &directory)
+{
+    QString normalizedPath = QDir::cleanPath(canonicalOrAbsolutePath(path));
+    QString normalizedDir = QDir::cleanPath(canonicalOrAbsolutePath(directory));
+    if (normalizedPath.isEmpty() || normalizedDir.isEmpty()) {
+        return false;
+    }
+    if (!normalizedDir.endsWith(QLatin1Char('/'))) {
+        normalizedDir += QLatin1Char('/');
+    }
+    return normalizedPath == normalizedDir.chopped(1) || normalizedPath.startsWith(normalizedDir);
+}
+
+void
+ensureWorkoutReference(Context *context, const QString &filepath)
+{
+    if (!context || !context->athlete) {
+        return;
+    }
+
+    QDir gcRoot = context->athlete->home->root();
+    if (!gcRoot.cdUp()) {
+        return;
+    }
+
+    Library::initialise(gcRoot);
+
+    Library *library = Library::findLibrary(QStringLiteral("Media Library"));
+    if (!library) {
+        library = new Library;
+        library->name = QStringLiteral("Media Library");
+        libraries.append(library);
+    }
+
+    const QString normalizedPath = canonicalOrAbsolutePath(filepath);
+    if (normalizedPath.isEmpty()) {
+        return;
+    }
+
+    for (const QString &path : std::as_const(library->paths)) {
+        if (pathIsWithinDirectory(normalizedPath, path)) {
+            return;
+        }
+    }
+
+    for (const QString &ref : std::as_const(library->refs)) {
+        if (canonicalOrAbsolutePath(ref) == normalizedPath) {
+            return;
+        }
+    }
+
+    library->refs.append(normalizedPath);
+    LibraryParser::serialize(context->athlete->home->root());
+}
+
+void
+ensureWorkoutReferenceOnMainThread(Context *context, const QString &filepath)
+{
+    QCoreApplication *application = QCoreApplication::instance();
+    if (!application) {
+        return;
+    }
+
+    if (QThread::currentThread() == application->thread()) {
+        ensureWorkoutReference(context, filepath);
+        return;
+    }
+
+    QMetaObject::invokeMethod(application, [context, filepath]() {
+        ensureWorkoutReference(context, filepath);
+    }, Qt::BlockingQueuedConnection);
 }
 
 QString
@@ -725,6 +809,8 @@ WorkoutGenerationService::saveDraft(Context *context, const WorkoutDraft &draft,
         errors << QStringLiteral("Workout saved but failed to import into library");
         return false;
     }
+
+    ensureWorkoutReferenceOnMainThread(context, filepath);
 
     if (savedPath) {
         *savedPath = filepath;

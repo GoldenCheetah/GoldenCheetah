@@ -34,6 +34,8 @@
 #include <QStyleFactory>
 #include <QScrollBar>
 #include <QLabel>
+#include <QDir>
+#include <QFileInfo>
 
 #include <QEvent>
 #include <QInputEvent>
@@ -74,6 +76,25 @@
 
 #include "TrainDB.h"
 #include "Library.h"
+
+namespace {
+
+QString normalizedWorkoutPath(const QString &path)
+{
+    const QString trimmed = path.trimmed();
+    if (trimmed.isEmpty()) {
+        return QString();
+    }
+
+    QFileInfo info(trimmed);
+    const QString canonical = info.canonicalFilePath();
+    if (!canonical.isEmpty()) {
+        return QDir::cleanPath(canonical);
+    }
+    return QDir::cleanPath(info.absoluteFilePath());
+}
+
+} // namespace
 
 #if defined(GC_HAVE_VLC)||defined(GC_VIDEO_QT6) // RLV currently only support for VLC
 #define USE_RLV
@@ -3323,13 +3344,41 @@ TrainSidebar::selectVideoSync(QString fullpath)
 void
 TrainSidebar::selectWorkout(QString fullpath)
 {
+    const QString requestedPath = fullpath.trimmed();
+    const QString targetPath = normalizedWorkoutPath(requestedPath);
+    const QString targetFileName = QFileInfo(requestedPath).fileName();
+    if (targetPath.isEmpty()) {
+        return;
+    }
+
+    bool matched = false;
+    int basenameMatchRow = -1;
+    bool multipleBasenameMatches = false;
     // look at each entry in the top workoutTree
     for (int i=0; i<workoutTree->model()->rowCount(); i++) {
-        QString path = workoutTree->model()->data(workoutTree->model()->index(i, TdbWorkoutModelIdx::filepath)).toString();
-        if (path == fullpath) {
+        const QString rawPath = workoutTree->model()->data(workoutTree->model()->index(i, TdbWorkoutModelIdx::filepath)).toString().trimmed();
+        const QString normalizedPath = normalizedWorkoutPath(rawPath);
+        if (normalizedPath == targetPath || rawPath == requestedPath) {
             workoutTree->setCurrentIndex(workoutTree->model()->index(i, TdbWorkoutModelIdx::filepath));
+            matched = true;
             break;
         }
+
+        if (!targetFileName.isEmpty() && QFileInfo(rawPath).fileName().compare(targetFileName, Qt::CaseInsensitive) == 0) {
+            if (basenameMatchRow >= 0) {
+                multipleBasenameMatches = true;
+            } else {
+                basenameMatchRow = i;
+            }
+        }
+    }
+    if (!matched && basenameMatchRow >= 0 && !multipleBasenameMatches) {
+        workoutTree->setCurrentIndex(workoutTree->model()->index(basenameMatchRow, TdbWorkoutModelIdx::filepath));
+        matched = true;
+    }
+    if (! matched && workoutTree->model()->rowCount() > 0) {
+        workoutTree->setCurrentIndex(workoutTree->model()->index(0, TdbWorkoutModelIdx::filepath));
+        matched = true;
     }
 }
 
