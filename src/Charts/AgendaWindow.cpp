@@ -74,10 +74,6 @@ AgendaWindow::AgendaWindow(Context *context)
                 QString filter = buildWorkoutFilter(rideItem);
                 if (! filter.isEmpty()) {
                     QString workoutFilename = rideItem->getText("WorkoutFilename", "").trimmed();
-                    qDebug() << "[TrainHandoff] AgendaWindow::showInTrainMode"
-                             << "rideFile=" << rideItem->fileName
-                             << "workoutFilename=" << workoutFilename
-                             << "filter=" << filter;
                     context->mainWindow->fillinWorkoutFilterBox(filter);
                     context->mainWindow->selectTrain();
                     if (! workoutFilename.isEmpty()) {

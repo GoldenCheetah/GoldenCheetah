@@ -330,10 +330,6 @@ CalendarWindow::CalendarWindow(Context *context)
             QString filter = buildWorkoutFilter(rideItem);
             if (! filter.isEmpty()) {
                 QString workoutFilename = rideItem->getText("WorkoutFilename", "").trimmed();
-                qDebug() << "[TrainHandoff] CalendarWindow::showInTrainMode"
-                         << "rideFile=" << rideItem->fileName
-                         << "workoutFilename=" << workoutFilename
-                         << "filter=" << filter;
                 this->context->mainWindow->fillinWorkoutFilterBox(filter);
                 this->context->mainWindow->selectTrain();
                 if (! workoutFilename.isEmpty()) {

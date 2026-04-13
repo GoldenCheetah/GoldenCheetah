@@ -17,6 +17,7 @@ equals(GC_UNITTESTS, active) {
 			   Core/trainingPlan \
 			   Cloud/jsonParsers \
 			   FileIO/tacxCaf \
+			   FileIO/ttsReader \
 			   FileIO/rideAutoImport \
 			   Gui/calendarData
 	CONFIG += ordered

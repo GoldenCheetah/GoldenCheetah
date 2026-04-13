@@ -23,6 +23,8 @@
 
 #include <map>
 #include <cstring>
+#include <limits>
+#include <QtEndian>
 
 // -------------------------------------------------------------
 // LOG CONTROL
@@ -99,27 +101,31 @@ float AsFloat(int i) {
 }
 
 int toUInt(Byte b) {
-    return reinterpret_cast<UByte&>(b);
+    return static_cast<UByte>(b);
 }
 
-int getUByte(ByteArray &buffer, int offset) {
-    return (UByte)(buffer[offset]);
+int getUByte(const ByteArray &buffer, int offset) {
+    if (offset < 0 || static_cast<size_t>(offset) >= buffer.size()) {
+        return 0;
+    }
+    return static_cast<UByte>(buffer[static_cast<size_t>(offset)]);
 }
 
-int getUShort(ByteArray buffer, size_t offset) {
-    if((offset + 1) < buffer.size())
-        return *(unsigned short*)&buffer[offset];    
+int getUShort(const ByteArray &buffer, size_t offset) {
+    if ((offset + sizeof(quint16)) <= buffer.size()) {
+        return qFromLittleEndian<quint16>(reinterpret_cast<const uchar*>(buffer.data() + offset));
+    }
     return getUByte(buffer, static_cast<int>(offset));
 }
 
-int getUInt(ByteArray &buffer, size_t offset) {
-    if ((offset + 3) < buffer.size()) {
-        return *(unsigned*)&buffer[offset];
+int getUInt(const ByteArray &buffer, size_t offset) {
+    if ((offset + sizeof(quint32)) <= buffer.size()) {
+        return static_cast<int>(qFromLittleEndian<quint32>(reinterpret_cast<const uchar*>(buffer.data() + offset)));
     }
     return getUShort(buffer, offset);
 }
 
-bool isHeader(ByteArray &buffer) {
+bool isHeader(const ByteArray &buffer) {
     if (buffer.size() < 2) {
         return false;
     }
@@ -508,6 +514,10 @@ bool TTSReader::parseFile(QDataStream &file) {
     for (;;) {
         //    is = new FileInputStream(fileName);
         if (!readData(file, pre, false)) {
+            if (lastSize >= 0) {
+                DEBUG_LOG << "Missing " << lastSize << "b data block\n";
+                return false;
+            }
             break;
         }
 
@@ -516,7 +526,14 @@ bool TTSReader::parseFile(QDataStream &file) {
             header.resize(14);
             if (readData(file, header, true)) {
                 content.push_back(header);
-                lastSize = getUInt(header, 6) * getUInt(header, 10);
+                const quint32 recordWidth = static_cast<quint32>(getUInt(header, 6));
+                const quint32 recordCount = static_cast<quint32>(getUInt(header, 10));
+                const quint64 blockSize = static_cast<quint64>(recordWidth) * static_cast<quint64>(recordCount);
+                if (blockSize > static_cast<quint64>(std::numeric_limits<int>::max())) {
+                    DEBUG_LOG << "Block payload too large: " << blockSize << "b\n";
+                    return false;
+                }
+                lastSize = static_cast<int>(blockSize);
             }
             else {
                 DEBUG_LOG << "Error: Cannot read header\n";
