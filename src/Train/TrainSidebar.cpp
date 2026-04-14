@@ -3351,7 +3351,7 @@ TrainSidebar::selectWorkout(QString fullpath)
         return;
     }
 
-    bool matched = false;
+    QModelIndex selectedIndex;
     int basenameMatchRow = -1;
     bool multipleBasenameMatches = false;
     // look at each entry in the top workoutTree
@@ -3359,8 +3359,7 @@ TrainSidebar::selectWorkout(QString fullpath)
         const QString rawPath = workoutTree->model()->data(workoutTree->model()->index(i, TdbWorkoutModelIdx::filepath)).toString().trimmed();
         const QString normalizedPath = normalizedWorkoutPath(rawPath);
         if (normalizedPath == targetPath || rawPath == requestedPath) {
-            workoutTree->setCurrentIndex(workoutTree->model()->index(i, TdbWorkoutModelIdx::filepath));
-            matched = true;
+            selectedIndex = workoutTree->model()->index(i, TdbWorkoutModelIdx::filepath);
             break;
         }
 
@@ -3372,20 +3371,35 @@ TrainSidebar::selectWorkout(QString fullpath)
             }
         }
     }
-    if (!matched && basenameMatchRow >= 0 && !multipleBasenameMatches) {
-        workoutTree->setCurrentIndex(workoutTree->model()->index(basenameMatchRow, TdbWorkoutModelIdx::filepath));
-        matched = true;
+    if (!selectedIndex.isValid() && basenameMatchRow >= 0 && !multipleBasenameMatches) {
+        selectedIndex = workoutTree->model()->index(basenameMatchRow, TdbWorkoutModelIdx::filepath);
     }
-    if (! matched && workoutTree->model()->rowCount() > 0) {
-        workoutTree->setCurrentIndex(workoutTree->model()->index(0, TdbWorkoutModelIdx::filepath));
-        matched = true;
+    if (!selectedIndex.isValid() && workoutTree->model()->rowCount() > 0) {
+        selectedIndex = workoutTree->model()->index(0, TdbWorkoutModelIdx::filepath);
+    }
+
+    if (selectedIndex.isValid()) {
+        const bool sameIndex = workoutTree->currentIndex() == selectedIndex;
+        workoutTree->setCurrentIndex(selectedIndex);
+        if (sameIndex) {
+            workoutTreeWidgetSelectionChanged();
+        }
     }
 }
 
 void
 TrainSidebar::selectWorkout(int idx)
 {
-    workoutTree->setCurrentIndex(workoutTree->model()->index(idx, TdbWorkoutModelIdx::filepath));
+    QModelIndex selectedIndex = workoutTree->model()->index(idx, TdbWorkoutModelIdx::filepath);
+    if (!selectedIndex.isValid()) {
+        return;
+    }
+
+    const bool sameIndex = workoutTree->currentIndex() == selectedIndex;
+    workoutTree->setCurrentIndex(selectedIndex);
+    if (sameIndex) {
+        workoutTreeWidgetSelectionChanged();
+    }
 }
 
 // got a remote control command
