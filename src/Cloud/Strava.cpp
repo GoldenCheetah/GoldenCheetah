@@ -19,6 +19,7 @@
 
 #include "Strava.h"
 #include "CloudJsonParsers.h"
+#include "StravaCredentials.h"
 #include "JsonRideFile.h"
 #include "Athlete.h"
 #include "Settings.h"
@@ -55,15 +56,90 @@
 
 namespace {
 
-QString configuredStravaClientSecret()
+bool isSuccessfulHttpStatus(int statusCode)
 {
-    return QString::fromLatin1(GC_STRAVA_CLIENT_SECRET).trimmed();
+    return statusCode >= 200 && statusCode < 300;
 }
 
-bool hasEmbeddedStravaClientSecret()
+QString extractStravaApiError(const QByteArray &payload)
 {
-    const QString secret = configuredStravaClientSecret();
-    return !secret.isEmpty() && secret != QStringLiteral("__GC_STRAVA_CLIENT_SECRET__");
+    QJsonParseError parseError;
+    const QJsonDocument document = QJsonDocument::fromJson(payload, &parseError);
+    if (parseError.error != QJsonParseError::NoError || !document.isObject()) {
+        return QString();
+    }
+
+    const QJsonObject object = document.object();
+    QStringList parts;
+
+    const QString message = object.value("message").toString().trimmed();
+    if (!message.isEmpty()) {
+        parts << message;
+    }
+
+    const QString error = object.value("error").toString().trimmed();
+    if (!error.isEmpty() && !parts.contains(error)) {
+        parts << error;
+    }
+
+    const QJsonArray errors = object.value("errors").toArray();
+    for (const QJsonValue &value : errors) {
+        const QJsonObject item = value.toObject();
+        QStringList detail;
+        const QString resource = item.value("resource").toString().trimmed();
+        const QString field = item.value("field").toString().trimmed();
+        const QString code = item.value("code").toString().trimmed();
+        if (!resource.isEmpty()) {
+            detail << resource;
+        }
+        if (!field.isEmpty()) {
+            detail << field;
+        }
+        if (!code.isEmpty()) {
+            detail << code;
+        }
+        const QString joined = detail.join(QStringLiteral("/"));
+        if (!joined.isEmpty()) {
+            parts << joined;
+        }
+    }
+
+    return parts.join(QStringLiteral(": "));
+}
+
+QString stravaAuthorizationFailureMessage(const QByteArray &payload)
+{
+    const QString detail = extractStravaApiError(payload);
+    if (hasConfiguredStravaClientSecret()) {
+        if (!detail.isEmpty()) {
+            return QObject::tr("Strava authorization failed: %1. Re-authorize the service in this build.").arg(detail);
+        }
+        return QObject::tr("Strava authorization failed. Re-authorize the service in this build.");
+    }
+
+    if (!detail.isEmpty()) {
+        return QObject::tr("Strava authorization failed: %1. %2").arg(detail, stravaCredentialSetupMessage());
+    }
+    return QObject::tr("Strava authorization failed. %1").arg(stravaCredentialSetupMessage());
+}
+
+QString stravaReplyErrorMessage(QNetworkReply *reply, const QByteArray &payload)
+{
+    const int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    if (statusCode == 401 || statusCode == 403) {
+        return stravaAuthorizationFailureMessage(payload);
+    }
+
+    const QString apiError = extractStravaApiError(payload);
+    if (!apiError.isEmpty()) {
+        return apiError;
+    }
+
+    if (reply->error() != QNetworkReply::NoError) {
+        return reply->errorString();
+    }
+
+    return QObject::tr("Unexpected Strava response.");
 }
 
 } // namespace
@@ -109,14 +185,14 @@ Strava::open(QStringList &errors)
     const QString accessToken = getSetting(GC_STRAVA_TOKEN, "").toString().trimmed();
     const QString refreshToken = getSetting(GC_STRAVA_REFRESH_TOKEN, "").toString().trimmed();
 
-    if (!hasEmbeddedStravaClientSecret()) {
+    if (!hasConfiguredStravaClientSecret()) {
         if (!accessToken.isEmpty()) {
             // Local/dev builds often do not embed Strava's client secret.
             // A cached access token can still be used directly until it expires.
             return true;
         }
-        errors << tr("This build does not include the Strava client secret.");
-        errors << tr("Use an official build, rebuild with GC_STRAVA_CLIENT_SECRET, or authorise once in a build that embeds the secret.");
+        errors << tr("This build does not include a usable Strava client secret.");
+        errors << stravaCredentialSetupMessage();
         return false;
     }
 
@@ -136,8 +212,8 @@ Strava::open(QStringList &errors)
 
     // set params
     QString data;
-    data += "client_id=" GC_STRAVA_CLIENT_ID;
-    data += "&client_secret=" GC_STRAVA_CLIENT_SECRET;
+    data += "client_id=" + configuredStravaClientId();
+    data += "&client_secret=" + configuredStravaClientSecret();
     data += "&refresh_token=" + refreshToken;
     data += "&grant_type=refresh_token";
 
@@ -242,13 +318,16 @@ Strava::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
         connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
         loop.exec();
 
-        if (reply->error() != QNetworkReply::NoError) {
-            qDebug() << "error" << reply->errorString();
-            errors << tr("Network Problem reading Strava data");
-            //return returning;
-        }
-        // did we get a good response ?
         QByteArray r = reply->readAll();
+        const int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+
+        if (reply->error() != QNetworkReply::NoError || !isSuccessfulHttpStatus(statusCode)) {
+            qDebug() << "error" << reply->errorString();
+            errors << stravaReplyErrorMessage(reply, r);
+            reply->deleteLater();
+            break;
+        }
+
         printd("response: %s\n", r.toStdString().c_str());
 
         QJsonParseError parseError;
@@ -289,6 +368,8 @@ Strava::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
             // we had a parsing error - so something is wrong - stop requesting more data by ending the loop
             offset = INT_MAX;
         }
+
+        reply->deleteLater();
     }
 
     // all good ?
@@ -490,15 +571,16 @@ Strava::writeFileCompleted()
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
 
     bool uploadSuccessful = false;
-    QString response = reply->readLine();
-    QString uploadError="invalid response or parser error";
+    const QByteArray payload = reply->readAll();
+    QString uploadError = tr("invalid response or parser error");
+    const int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 
-    printd("reply:%s\n", response.toStdString().c_str());
+    printd("reply:%s\n", payload.toStdString().c_str());
 
     try {
 
         // parse !
-        MVJSONReader jsonResponse(response.toStdString());
+        MVJSONReader jsonResponse(payload.toStdString());
 
         // get error field
         if (jsonResponse.root) {
@@ -517,7 +599,7 @@ Strava::writeFileCompleted()
             //XXX     stravaUploadId = 0;
             //XXX }
         } else {
-            uploadError = "no connection";
+            uploadError = tr("no connection");
         }
 
     } catch(...) { // not really sure what exceptions to expect so do them all (bad, sorry)
@@ -527,7 +609,17 @@ Strava::writeFileCompleted()
     if (uploadError.toLower() == "none" || uploadError.toLower() == "null") uploadError = "";
 
     // if successful update ID
-    if (uploadError.length()>0 || reply->error() != QNetworkReply::NoError)  uploadSuccessful = false;
+    if (uploadError.length()>0 || reply->error() != QNetworkReply::NoError || !isSuccessfulHttpStatus(statusCode)) {
+        uploadSuccessful = false;
+        const QString replyError = stravaReplyErrorMessage(reply, payload);
+        if (!replyError.isEmpty() &&
+            (uploadError.isEmpty() ||
+             uploadError == tr("invalid response or parser error") ||
+             uploadError == tr("invalid response or parser exception.") ||
+             uploadError == tr("no connection"))) {
+            uploadError = replyError;
+        }
+    }
     else {
 
         //XXXride->ride()->setTag("Strava uploadId", QString("%1").arg(stravaUploadId));
@@ -543,13 +635,19 @@ Strava::writeFileCompleted()
     } else {
         notifyWriteComplete(replyName(static_cast<QNetworkReply*>(QObject::sender())), uploadError);
     }
+
+    reply->deleteLater();
 }
 
 void
 Strava::readyRead()
 {
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
-    buffers.value(reply)->append(reply->readAll());
+    QByteArray *buffer = buffers.value(reply, nullptr);
+    if (!buffer) {
+        return;
+    }
+    buffer->append(reply->readAll());
 }
 
 void
@@ -558,12 +656,27 @@ Strava::readFileCompleted()
     printd("Strava::readFileCompleted\n");
 
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
+    QByteArray *buffer = buffers.value(reply, nullptr);
+    if (!buffer) {
+        notifyReadComplete(new QByteArray(), replyName(reply), tr("Unexpected Strava response."));
+        reply->deleteLater();
+        return;
+    }
+    buffer->append(reply->readAll());
 
-    printd("reply:%s\n", buffers.value(reply)->toStdString().c_str());
+    printd("reply:%s\n", buffer->toStdString().c_str());
 
-    QByteArray* data = prepareResponse(buffers.value(reply));
+    const int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    if (reply->error() != QNetworkReply::NoError || !isSuccessfulHttpStatus(statusCode)) {
+        notifyReadComplete(buffer, replyName(reply), stravaReplyErrorMessage(reply, *buffer));
+        reply->deleteLater();
+        return;
+    }
+
+    QByteArray* data = prepareResponse(buffer);
 
     notifyReadComplete(data, replyName(reply), tr("Completed."));
+    reply->deleteLater();
 }
 
 void

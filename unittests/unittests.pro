@@ -16,6 +16,7 @@ equals(GC_UNITTESTS, active) {
 			   Core/trainingSimulator \
 			   Core/trainingPlan \
 			   Cloud/jsonParsers \
+			   Cloud/stravaCredentials \
 			   FileIO/tacxCaf \
 			   FileIO/ttsReader \
 			   FileIO/rideAutoImport \

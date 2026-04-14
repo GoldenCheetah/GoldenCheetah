@@ -20,6 +20,7 @@
 
 #include "OAuthDialog.h"
 #include "CloudJsonParsers.h"
+#include "StravaCredentials.h"
 #include "Athlete.h"
 #include "Context.h"
 #include "Settings.h"
@@ -31,12 +32,6 @@
 #include <QJsonParseError>
 
 namespace {
-
-bool hasEmbeddedStravaClientSecret()
-{
-    const QString secret = QString::fromLatin1(GC_STRAVA_CLIENT_SECRET).trimmed();
-    return !secret.isEmpty() && secret != QStringLiteral("__GC_STRAVA_CLIENT_SECRET__");
-}
 
 OAuthTokenSite oauthTokenSite(OAuthDialog::OAuthSite site)
 {
@@ -95,10 +90,11 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
     // SSL is available - so authorisation can take place
     noSSLlib = false;
 
-    if (site == STRAVA && !hasEmbeddedStravaClientSecret()) {
+    if (site == STRAVA && !hasConfiguredStravaClientSecret()) {
         QMessageBox::critical(this,
                               tr("Authorization Error"),
-                              tr("This build does not include the Strava client secret required for OAuth.\n\nUse an official build or rebuild with GC_STRAVA_CLIENT_SECRET."));
+                              tr("This build does not include a usable Strava client secret required for OAuth.\n\n%1")
+                                  .arg(stravaCredentialSetupMessage()));
         noSSLlib = true;
         return;
     }
@@ -128,7 +124,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
     if (site == STRAVA) {
 
         urlstr = QString("https://www.strava.com/oauth/authorize?");
-        urlstr.append("client_id=").append(GC_STRAVA_CLIENT_ID).append("&");
+        urlstr.append("client_id=").append(configuredStravaClientId()).append("&");
         urlstr.append("scope=read_all,activity:read_all,activity:write&");
         urlstr.append("redirect_uri=http://www.goldencheetah.org/&");
         urlstr.append("response_type=code&");
@@ -284,10 +280,11 @@ OAuthDialog::urlChanged(const QUrl &url)
             } else if (site == STRAVA) {
 
                 urlstr = QString("https://www.strava.com/oauth/token?");
-                params.addQueryItem("client_id", GC_STRAVA_CLIENT_ID);
-#ifdef GC_STRAVA_CLIENT_SECRET
-                params.addQueryItem("client_secret", GC_STRAVA_CLIENT_SECRET);
-#endif
+                params.addQueryItem("client_id", configuredStravaClientId());
+                const QString clientSecret = configuredStravaClientSecret();
+                if (!clientSecret.isEmpty()) {
+                    params.addQueryItem("client_secret", clientSecret);
+                }
 
             } else if (site == NOLIO) {
 
