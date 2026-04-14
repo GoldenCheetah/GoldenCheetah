@@ -398,6 +398,13 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     start_timer = new QTimer(this);
     start_timer->setSingleShot(true);
 
+    // Use coarse timers for non-latency-critical ticks so the OS can coalesce
+    // wakeups with other timers. Keeps trainer laptops out of the high-freq
+    // wakeup path and cuts idle battery draw in Train mode.
+    gui_timer->setTimerType(Qt::CoarseTimer);
+    load_timer->setTimerType(Qt::CoarseTimer);
+    disk_timer->setTimerType(Qt::CoarseTimer);
+
     session_time.start();
     session_elapsed_msec = 0;
     lap_time.start();
