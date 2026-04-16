@@ -28,7 +28,7 @@
 #include "RideMetadata.h"
 #include "Colors.h"
 #include "ManualActivityWizard.h"
-#include "RepeatScheduleWizard.h"
+#include "PlanWizards.h"
 #include "WorkoutFilter.h"
 #include "IconManager.h"
 #include "FilterSimilarDialog.h"
@@ -368,14 +368,28 @@ CalendarWindow::CalendarWindow(Context *context)
         wizard.exec();
         this->context->tab->setNoSwitch(false);
     });
-    connect(calendar, &Calendar::repeatSchedule, this, [this](const QDate &day) {
+    connect(calendar, &Calendar::repeatPlan, this, [this](const QDate &day) {
         this->context->tab->setNoSwitch(true);
-        RepeatScheduleWizard wizard(this->context, day);
+        RepeatPlanWizard wizard(this->context, day);
         if (wizard.exec() == QDialog::Accepted) {
             // Context::rideDeleted is not always emitted, therefore forcing the update
             updateActivities();
         }
         this->context->tab->setNoSwitch(false);
+    });
+    connect(calendar, &Calendar::importPlan, this, [this](const QDate &day) {
+        this->context->tab->setNoSwitch(true);
+        ImportPlanWizard wizard(this->context, day);
+        if (wizard.exec() == QDialog::Accepted) {
+            // Context::rideDeleted is not always emitted, therefore forcing the update
+            updateActivities();
+        }
+        this->context->tab->setNoSwitch(false);
+    });
+    connect(calendar, QOverload<CalendarEntry>::of(&Calendar::exportPlan), this, &CalendarWindow::exportPlan);
+    connect(calendar, QOverload<>::of(&Calendar::exportPlan), this, [this]() {
+        ExportPlanWizard wizard(this->context, nullptr);
+        wizard.exec();
     });
     connect(calendar, &Calendar::delActivity, this, [this](CalendarEntry activity) {
         QMessageBox::StandardButton res = QMessageBox::question(this, tr("Delete Activity"), tr("Are you sure you want to delete %1?").arg(activity.reference));
@@ -1623,7 +1637,7 @@ CalendarWindow::unlinkActivities
 {
     bool ret = false;
     RideItem *item = context->athlete->rideCache->getRide(entry.reference, entry.type == ENTRY_TYPE_PLANNED_ACTIVITY);
-    if (item->getLinkedFileName().isEmpty()) {
+    if (item == nullptr || item->getLinkedFileName().isEmpty()) {
         return true;
     }
     RideCache::OperationPreCheck check = context->athlete->rideCache->checkUnlinkActivity(item);
@@ -1905,5 +1919,36 @@ CalendarWindow::delPhase
             break;
         }
         ++idx;
+    }
+}
+
+
+void
+CalendarWindow::exportPlan
+(const CalendarEntry &entry)
+{
+    if (entry.type != ENTRY_TYPE_PHASE) {
+        return;
+    }
+    Season const *currentSeason = context->currentSeason();
+    if (currentSeason == nullptr) {
+        return;
+    }
+    Season *phaseSeason = nullptr;
+    for (Season &s : context->athlete->seasons->seasons) {
+        if (s.id() == currentSeason->id()) {
+            phaseSeason = &s;
+            break;
+        }
+    }
+    if (phaseSeason == nullptr) {
+        return;
+    }
+    for (Phase &editPhase : phaseSeason->phases) {
+        if (entry.reference == editPhase.id().toString()) {
+            ExportPlanWizard wizard(context, &editPhase);
+            wizard.exec();
+            break;
+        }
     }
 }

@@ -457,6 +457,101 @@ RideCache::removeRide(const QString& filenameToDelete) {
     return true;
 }
 
+
+bool
+RideCache::removeRides
+(const QStringList &filenamesToDelete, bool triggerRefresh)
+{
+    if (filenamesToDelete.isEmpty()) {
+        return false;
+    }
+    cancel();
+
+    bool anyDeleted = false;
+    for (const QString &filenameToDelete : filenamesToDelete) {
+        if (filenameToDelete.isEmpty()) {
+            continue;
+        }
+
+        RideItem *todelete = nullptr;
+        RideItem *select = nullptr;
+        int index = 0;
+
+        for (index = 0; index < rides_.count(); index++) {
+            RideItem *rideI = rides_[index];
+            if (rideI->fileName == filenameToDelete) {
+                todelete = rideI;
+                if (context->ride == todelete) {
+                    if (rides_.count() - index > 1) {
+                        select = rides_[index + 1];
+                    } else if (index > 0) {
+                        select = rides_[index - 1];
+                    }
+                }
+                break;
+            }
+        }
+
+        if (! todelete) {
+            qDebug() << "ERROR: delete not found:" << filenameToDelete;
+            continue;
+        }
+
+        if (todelete->hasLinkedActivity()) {
+            RideItem *linkedItem = getLinkedActivity(todelete);
+            if (linkedItem) {
+                linkedItem->clearLinkedFileName();
+                QString error;
+                saveActivity(linkedItem, error);
+            }
+        }
+
+        DataProcessorFactory::instance().autoProcess(todelete->ride(), "Save", "DELETE");
+
+        model_->startRemove(index);
+        rides_.remove(index, 1);
+        delete_ << todelete;
+        model_->endRemove(index);
+
+        QFile file((todelete->planned ? plannedDirectory : directory).canonicalPath() + "/" + filenameToDelete);
+        QString strNewName = filenameToDelete + ".bak";
+        QFile::remove(context->athlete->home->fileBackup().canonicalPath() + "/" + strNewName);
+        if (! file.rename(context->athlete->home->fileBackup().canonicalPath() + "/" + strNewName)) {
+            QMessageBox::critical(NULL, "Rename Error", tr("Can't rename %1 to %2 in %3")
+                                                          .arg(filenameToDelete)
+                                                          .arg(strNewName)
+                                                          .arg(context->athlete->home->fileBackup().canonicalPath()));
+        }
+
+        QStringList extras;
+        extras << "notes" << "cpi" << "cpx";
+        for (const QString &extension : extras) {
+            QString deleteMe = QFileInfo(filenameToDelete).baseName() + "." + extension;
+            QFile::remove(context->athlete->home->cache().canonicalPath() + "/" + deleteMe);
+        }
+
+        if (select) {
+            context->mainWindow->setUpdatesEnabled(false);
+            context->ride = select;
+            context->notifyRideDeleted(todelete);
+            context->mainWindow->setUpdatesEnabled(true);
+            QApplication::processEvents();
+            context->notifyRideSelected(select);
+        } else {
+            context->notifyRideSelected(context->ride);
+        }
+
+        anyDeleted = true;
+    }
+
+    if (anyDeleted && triggerRefresh) {
+        refresh();
+        estimator->refresh();
+    }
+    return anyDeleted;
+}
+
+
 // NOTE:
 // We use a bison parser to reduce memory
 // overhead and (believe it or not) simplicity
