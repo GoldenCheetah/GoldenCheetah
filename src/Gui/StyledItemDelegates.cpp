@@ -389,8 +389,8 @@ ComboBoxDelegate::fillSizeHint
 // DirectoryPathWidget /////////////////////////////////////////////////////////////////
 
 DirectoryPathWidget::DirectoryPathWidget
-(QWidget *parent)
-: QWidget(parent)
+(DirectoryPathMode mode, QWidget *parent)
+: QWidget(parent), directoryPathMode(mode)
 {
     lineEdit = new QLineEdit();
 
@@ -404,6 +404,7 @@ DirectoryPathWidget::DirectoryPathWidget
 
     connect(browseButton, &QPushButton::clicked, this, &DirectoryPathWidget::handleBrowseClicked);
     connect(lineEdit, &QLineEdit::editingFinished, this, &DirectoryPathWidget::lineEditFinished);
+    connect(lineEdit, &QLineEdit::textChanged, this, &DirectoryPathWidget::pathChanged);
 }
 
 
@@ -420,6 +421,14 @@ DirectoryPathWidget::getPath
 () const
 {
     return lineEdit->text().trimmed();
+}
+
+
+void
+DirectoryPathWidget::setNameFilter
+(const QString &nameFilter)
+{
+    this->nameFilter = nameFilter;
 }
 
 
@@ -469,9 +478,24 @@ DirectoryPathWidget::openFileDialog
 
     // Standard modal dialog approach for non-delegate mode or non-macOS
     QFileDialog dialog(window());
-    dialog.setFileMode(QFileDialog::Directory);
-    dialog.setOptions(  QFileDialog::ShowDirsOnly
-                      | QFileDialog::DontResolveSymlinks);
+    if (directoryPathMode == DirectoryPathMode::DirOnly) {
+        dialog.setFileMode(QFileDialog::Directory);
+        dialog.setOptions(  QFileDialog::ShowDirsOnly
+                          | QFileDialog::DontResolveSymlinks);
+    } else {
+        dialog.setFileMode(QFileDialog::AnyFile);
+        dialog.setOptions(QFileDialog::DontResolveSymlinks);
+        if (directoryPathMode == DirectoryPathMode::FileSave) {
+            dialog.setAcceptMode(QFileDialog::AcceptSave);
+            dialog.setOption(QFileDialog::DontConfirmOverwrite, false);
+        } else {
+            dialog.setAcceptMode(QFileDialog::AcceptOpen);
+            dialog.setOption(QFileDialog::DontConfirmOverwrite, true);
+        }
+        if (! nameFilter.isEmpty()) {
+            dialog.setNameFilter(nameFilter);
+        }
+    }
     QString path = lineEdit->text();
     if (path.isEmpty()) {
         path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
@@ -524,7 +548,7 @@ DirectoryPathDelegate::createEditor
     Q_UNUSED(option)
     Q_UNUSED(index)
 
-    DirectoryPathWidget *editor = new DirectoryPathWidget(parent);
+    DirectoryPathWidget *editor = new DirectoryPathWidget(DirectoryPathMode::DirOnly, parent);
     editor->setDelegateMode(true);
     editor->setPlaceholderText(placeholderText);
 

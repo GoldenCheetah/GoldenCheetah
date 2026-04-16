@@ -493,6 +493,29 @@ TrainDB::getWorkouts
 }
 
 
+QHash<QString, QString>
+TrainDB::getWorkoutHashes
+() const
+{
+    QHash<QString, QString> ret;
+    QSqlQuery query(connection());
+    query.prepare("SELECT filepath FROM workout WHERE source IS NOT 'gcdefault' AND type IS NOT 'code'");
+    if (query.exec()) {
+        while (query.next()) {
+            QFile file(query.value(0).toString());
+            if (! file.open(QIODevice::ReadOnly)) {
+                continue;
+            }
+            QCryptographicHash hash(QCryptographicHash::Md5);
+            while (! file.atEnd()) {
+                hash.addData(file.read(8192));
+            }
+            ret.insert(hash.result().toHex(), query.value(0).toString());
+        }
+    }
+    return ret;
+}
+
 
 ///////////////////////// Helpers for Taggable / Workout
 
