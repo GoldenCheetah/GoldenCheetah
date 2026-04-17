@@ -608,9 +608,12 @@ RideCache::refresh()
         //watcher.setFuture(future);
 
         // calculate number of threads and work per thread
+        // - leave one core for the GUI so the app stays responsive during
+        //   a long batch refresh, but don't spawn more workers than there
+        //   is work for (each excess worker just creates/destroys a thread
+        //   and exits immediately).
         int maxthreads = QThreadPool::globalInstance()->maxThreadCount();
-        int threads = maxthreads / 2;
-        if (threads==0) threads=1; // need at least one!
+        int threads = qMax(1, qMin(maxthreads - 1, staleCount));
         int n=0;
 
         // refresh happenning
