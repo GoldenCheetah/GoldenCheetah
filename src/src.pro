@@ -37,7 +37,8 @@ CONFIG(debug, debug|release) { QMAKE_CXXFLAGS += -DGC_DEBUG }
 
 # always
 QT += xml sql network svg  widgets concurrent serialport multimedia multimediawidgets \
-      webenginecore webenginewidgets webchannel positioning webenginequick core5compat
+      webenginecore webenginewidgets webchannel positioning webenginequick core5compat \
+      quick quickwidgets
 CONFIG += c++17
 
 ###=======================================================================
@@ -536,6 +537,10 @@ HEADERS += Charts/UserChartWindow.h Charts/UserChartOverviewItem.h Charts/UserCh
 SOURCES += Charts/UserChartWindow.cpp Charts/UserChartOverviewItem.cpp Charts/UserChart.cpp Charts/UserChartData.cpp \
            Charts/GenericChart.cpp Charts/GenericPlot.cpp Charts/GenericSelectTool.cpp Charts/GenericLegend.cpp \
 	   Charts/GenericAnnotations.cpp
+
+# QSG-backed line chart primitives (see prototypes/qsgChart/ for bench).
+HEADERS += Charts/GcLineCurve.h Charts/GcChartAxis.h
+SOURCES += Charts/GcLineCurve.cpp Charts/GcChartAxis.cpp
 
 ###=====================
 ### LEX AND YACC SOURCES

@@ -30,7 +30,10 @@
 #include "PowerProfile.h"
 #include "GcCrashDialog.h" // for versionHTML
 #include "OverviewItems.h"
+#include "GcLineCurve.h"
+#include "GcChartAxis.h"
 
+#include <QQmlEngine>
 #include <QApplication>
 #include <QtGui>
 #include <QFile>
@@ -421,6 +424,11 @@ main(int argc, char *argv[])
 
     // create the application -- only ever ONE regardless of restarts
     application = new QApplication(argc, argv);
+
+    // QSG-backed chart primitives (Charts/GcLineCurve, Charts/GcChartAxis).
+    // Registered once so any QML scene can instantiate them.
+    qmlRegisterType<GcLineCurve>("GoldenCheetah", 1, 0, "GcLineCurve");
+    qmlRegisterType<GcChartAxis>("GoldenCheetah", 1, 0, "GcChartAxis");
 
 #ifdef Q_OS_WIN
     if (application->style()->name() == "windows11") {
