@@ -19,6 +19,7 @@
  */
 
 #include "RideFile.h"
+#include "RideFileData.h"
 #include "FilterHRV.h"
 #include "WPrime.h"
 #include "Athlete.h"
@@ -126,6 +127,7 @@ RideFile::~RideFile()
         //delete interval;
     delete command;
     if (wprime_) delete wprime_;
+    delete cachedColumns_;
 
     // delete any Xdata
     QMapIterator<QString,XDataSeries*> it(xdata_);
@@ -140,6 +142,17 @@ RideFile::~RideFile()
 
 void RideFile::setStartTime(const QDateTime &value) {
     startTime_ = value;
+}
+
+const RideFileData &
+RideFile::columnar() const
+{
+    if (columnsStale_ || !cachedColumns_) {
+        delete cachedColumns_;
+        cachedColumns_ = new RideFileData(this);
+        columnsStale_ = false;
+    }
+    return *cachedColumns_;
 }
 
 unsigned int
@@ -1570,6 +1583,7 @@ void RideFile::appendOrUpdatePoint(double secs, double cad, double hr, double km
                            double rvert, double rcad, double rcontact, double tcore,
                            int interval, bool forceAppend)
 {
+    invalidateColumns_();
     // negative values are not good, make them zero
     // although alt, lat, lon, headwind, slope and temperature can be negative of course!
 #ifdef Q_CC_MSVC
@@ -1728,6 +1742,7 @@ void RideFile::appendPoint(const RideFilePoint &point)
 
 void
 RideFile::updatePoint(RideFilePoint *point, const RideFilePoint *oldPoint){
+    invalidateColumns_();
     if (point->cad == 0 && oldPoint->cad != 0)
         point->cad = oldPoint->cad;
     if (point->hr == 0 && oldPoint->hr != 0)
@@ -1946,6 +1961,7 @@ RideFile::setPointValue(double secs, SeriesType series, double value) {
 void
 RideFile::setPointValue(int index, SeriesType series, double value)
 {
+    invalidateColumns_();
     switch (series) {
         case secs : dataPoints_[index]->secs = value; break;
         case cad : dataPoints_[index]->cad = value; break;
@@ -2322,6 +2338,7 @@ RideFile::deletePoint(int index)
 {
     delete dataPoints_[index];
     dataPoints_.remove(index);
+    invalidateColumns_();
 }
 
 void
@@ -2329,12 +2346,14 @@ RideFile::deletePoints(int index, int count)
 {
     for(int i=index; i<(index+count); i++) delete dataPoints_[i];
     dataPoints_.remove(index, count);
+    invalidateColumns_();
 }
 
 void
 RideFile::insertPoint(int index, RideFilePoint *point)
 {
     dataPoints_.insert(index, point);
+    invalidateColumns_();
 }
 
 void
@@ -2355,6 +2374,7 @@ void
 RideFile::appendPoints(QVector <struct RideFilePoint *> newRows)
 {
     dataPoints_ += newRows;
+    invalidateColumns_();
 }
 
 void
@@ -2369,6 +2389,7 @@ RideFile::emitSaved()
 {
     weight_ = 0;
     wstale = dstale = true;
+    invalidateColumns_();
     emit saved();
 }
 
@@ -2377,6 +2398,7 @@ RideFile::emitReverted()
 {
     weight_ = 0;
     wstale = dstale = true;
+    invalidateColumns_();
     emit reverted();
 }
 
@@ -2385,6 +2407,7 @@ RideFile::emitModified()
 {
     weight_ = 0;
     wstale = dstale = true;
+    invalidateColumns_();
     emit modified();
 }
 
@@ -3043,6 +3066,7 @@ RideFile::recalculateDerivedSeries(bool force)
 
     // and we're done
     dstale=false;
+    invalidateColumns_();
 }
 
 #ifdef GC_HAVE_SAMPLERATE

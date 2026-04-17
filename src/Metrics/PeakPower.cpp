@@ -18,6 +18,7 @@
 
 #include "RideMetric.h"
 #include "RideItem.h"
+#include "RideFileData.h"
 #include "AddIntervalDialog.h"
 #include "Context.h"
 #include "Athlete.h"
@@ -201,18 +202,21 @@ class FatigueIndex : public RideMetric {
 
         // find peak and work from that
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->watts > maxp && point->watts != 0) minp = maxp = point->watts;
-        }
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *watts = view.series(RideFile::watts).constData();
+            for (int i = first; i <= last; ++i) {
+                if (watts[i] > maxp && watts[i] != 0) minp = maxp = watts[i];
+            }
 
-        // now again and find peak
-        bool hitpeak = false;
-        it.toFront();
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (hitpeak == false && point->watts >= maxp) hitpeak = true;
-            if (hitpeak == true && point->watts < minp && point->watts != 0) minp = point->watts;
+            // now again and find peak
+            bool hitpeak = false;
+            for (int i = first; i <= last; ++i) {
+                if (hitpeak == false && watts[i] >= maxp) hitpeak = true;
+                if (hitpeak == true && watts[i] < minp && watts[i] != 0) minp = watts[i];
+            }
         }
 
         if (minp > maxp) setValue(0.00); // minp wasn't changed, all zeroes?
@@ -257,12 +261,16 @@ class PacingIndex : public RideMetric {
 
         // find peak and work from that
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            if (point->watts > maxp && point->watts != 0) maxp = point->watts;
-            total += point->watts;
-            count++;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *watts = view.series(RideFile::watts).constData();
+            for (int i = first; i <= last; ++i) {
+                if (watts[i] > maxp && watts[i] != 0) maxp = watts[i];
+                total += watts[i];
+                count++;
+            }
         }
 
         if (!count || !total) setValue(0.00); // minp wasn't changed, all zeroes?
@@ -647,11 +655,17 @@ class PeakPowerHr : public RideMetric {
             int points = 0;
 
             RideFileIterator it(item->ride(), spec);
-            while (it.hasNext()) {
-                struct RideFilePoint *point = it.next();
-                if (point->secs >= start && point->secs < stop) {
-                    points++;
-                    hr = (point->hr + (points-1)*hr) / (points);
+            const int first = it.firstIndex();
+            const int last  = it.lastIndex();
+            if (first >= 0 && last >= first) {
+                const RideFileData &view = item->ride()->columnar();
+                const double *secs = view.series(RideFile::secs).constData();
+                const double *hrArr = view.series(RideFile::hr).constData();
+                for (int i = first; i <= last; ++i) {
+                    if (secs[i] >= start && secs[i] < stop) {
+                        points++;
+                        hr = (hrArr[i] + (points-1)*hr) / (points);
+                    }
                 }
             }
         }

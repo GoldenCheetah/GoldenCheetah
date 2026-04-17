@@ -18,6 +18,7 @@
  */
 
 #include "RideMetric.h"
+#include "RideFileData.h"
 #include "PaceZones.h"
 #include "Units.h"
 #include "Settings.h"
@@ -117,35 +118,42 @@ class LNP : public RideMetric {
             // loop over the data and convert to a rolling
             // average for the given windowsize
             RideFileIterator it(item->ride(), spec);
-            while (it.hasNext()) {
-                struct RideFilePoint *point = it.next();
+            const int first = it.firstIndex();
+            const int last  = it.lastIndex();
+            if (first >= 0 && last >= first) {
+                const RideFileData &view = item->ride()->columnar();
+                const double *kph = view.series(RideFile::kph).constData();
+                const double *slopeArr = view.series(RideFile::slope).constData();
+                const double recIntSecs = item->ride()->recIntSecs();
+                for (int i = first; i <= last; ++i) {
 
-                double speed = point->kph/3.6;
-                sumSpeed += speed;
-                sumSpeed -= rollingSpeed[index120];
-                rollingSpeed[index120] = speed;
-                double speed120 = sumSpeed/std::min(count+1, rollingwindowsize120); // speed rolling average
+                    double speed = kph[i]/3.6;
+                    sumSpeed += speed;
+                    sumSpeed -= rollingSpeed[index120];
+                    rollingSpeed[index120] = speed;
+                    double speed120 = sumSpeed/std::min(count+1, rollingwindowsize120); // speed rolling average
 
-                double slope = point->slope/100.0;
-                sumSlope += slope;
-                sumSlope -= rollingSlope[index120];
-                rollingSlope[index120] = slope;
-                double slope120 = sumSlope/std::min(count+1, rollingwindowsize120); // slope rolling average
+                    double slope = slopeArr[i]/100.0;
+                    sumSlope += slope;
+                    sumSlope -= rollingSlope[index120];
+                    rollingSlope[index120] = slope;
+                    double slope120 = sumSlope/std::min(count+1, rollingwindowsize120); // slope rolling average
 
-                // running power based on 120sec averages
-                double watts = running_power(weight, height, speed120, slope120, speed120*item->ride()->recIntSecs(), initial_speed);
-                initial_speed = speed120;
+                    // running power based on 120sec averages
+                    double watts = running_power(weight, height, speed120, slope120, speed120*recIntSecs, initial_speed);
+                    initial_speed = speed120;
 
-                sumPower += watts;
-                sumPower -= rollingPower[index30];
-                rollingPower[index30] = watts;
+                    sumPower += watts;
+                    sumPower -= rollingPower[index30];
+                    rollingPower[index30] = watts;
 
-                total += pow(sumPower/std::min(count+1, rollingwindowsize30), 4); // raise rolling average to 4th power
-                count ++;
+                    total += pow(sumPower/std::min(count+1, rollingwindowsize30), 4); // raise rolling average to 4th power
+                    count ++;
 
-                // move index on/round
-                index120 = (index120 >= rollingwindowsize120-1) ? 0 : index120+1;
-                index30 = (index30 >= rollingwindowsize30-1) ? 0 : index30+1;
+                    // move index on/round
+                    index120 = (index120 >= rollingwindowsize120-1) ? 0 : index120+1;
+                    index30 = (index30 >= rollingwindowsize30-1) ? 0 : index30+1;
+                }
             }
         }
         if (count) {

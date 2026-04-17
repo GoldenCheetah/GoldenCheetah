@@ -18,6 +18,7 @@
 
 #include "RideMetric.h"
 #include "RideItem.h"
+#include "RideFileData.h"
 #include "Zones.h"
 #include "PaceZones.h"
 #include "Context.h"
@@ -185,18 +186,24 @@ private:
         score = 0.0;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            while ((weighted > NEGLIGIBLE)
-                   && (point->secs > lastSecs + secsDelta + EPSILON)) {
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *watts = view.series(RideFile::watts).constData();
+            const double *secs = view.series(RideFile::secs).constData();
+            for (int i = first; i <= last; ++i) {
+                while ((weighted > NEGLIGIBLE)
+                       && (secs[i] > lastSecs + secsDelta + EPSILON)) {
+                    weighted *= attenuation;
+                    lastSecs += secsDelta;
+                    inc(secsDelta, weighted, cp);
+                }
                 weighted *= attenuation;
-                lastSecs += secsDelta;
+                weighted += sampleWeight * watts[i];
+                lastSecs = secs[i];
                 inc(secsDelta, weighted, cp);
             }
-            weighted *= attenuation;
-            weighted += sampleWeight * point->watts;
-            lastSecs = point->secs;
-            inc(secsDelta, weighted, cp);
         }
 
         // we must limit this loop, it could end up looping forever (and did before we constrained it)
@@ -228,26 +235,33 @@ private:
         score = 0.0;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *kph = view.series(RideFile::kph).constData();
+            const double *slope = view.series(RideFile::slope).constData();
+            const double *secs = view.series(RideFile::secs).constData();
+            for (int i = first; i <= last; ++i) {
 
-            // add speed for average calculation, for running adjust speed according slope (up/downwards)
-            weighted += (item->isSwim ? point->kph : running_grade_adjusted(point->kph, point->slope));
-            sampsPerWindow++;
+                // add speed for average calculation, for running adjust speed according slope (up/downwards)
+                weighted += (item->isSwim ? kph[i] : running_grade_adjusted(kph[i], slope[i]));
+                sampsPerWindow++;
 
-            if (point->secs > lastWindowSecs + AVERAGE_WINDOW_IN_SECS || // take average value of this window
-                point->secs > previousSecs + recIntSecs ||               // invalid recording gap, stop averaging
-                it.hasNext() == false) {                                 // last point of ride
+                if (secs[i] > lastWindowSecs + AVERAGE_WINDOW_IN_SECS || // take average value of this window
+                    secs[i] > previousSecs + recIntSecs ||               // invalid recording gap, stop averaging
+                    i == last) {                                         // last point of ride
 
-                weighted = sampsPerWindow > 0 ? (weighted / sampsPerWindow) : 0;
-                secsDelta = previousSecs - lastWindowSecs;
-                inc(secsDelta, weighted, cs);
+                    weighted = sampsPerWindow > 0 ? (weighted / sampsPerWindow) : 0;
+                    secsDelta = previousSecs - lastWindowSecs;
+                    inc(secsDelta, weighted, cs);
 
-                lastWindowSecs = point->secs;
-                weighted = 0;
-                sampsPerWindow = 0;
+                    lastWindowSecs = secs[i];
+                    weighted = 0;
+                    sampsPerWindow = 0;
+                }
+                previousSecs = secs[i];
             }
-            previousSecs = point->secs;
         }
         setValue(score);
     }
