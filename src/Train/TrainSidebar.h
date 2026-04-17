@@ -335,6 +335,12 @@ class TrainSidebar : public GcWindow
         int  m_autoPauseZeroCount;   // consecutive zero-power gui ticks
         bool m_autoPaused;           // true when paused by auto-pause (not manual)
 
+        // Cached settings refreshed in configChanged() so the 5 Hz tick
+        // never hits QSettings.
+        bool   cachedAutoPauseEnabled;
+        int    cachedAutoPauseThreshold;   // ticks of zero-power before pause
+        double cachedWbalTau;              // W'bal time-constant in seconds
+
         Bicycle bicycle;
 
     public:

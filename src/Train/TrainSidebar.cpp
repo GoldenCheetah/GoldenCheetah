@@ -122,6 +122,9 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     useSimulatedSpeed = false;
     m_autoPauseZeroCount = 0;
     m_autoPaused = false;
+    cachedAutoPauseEnabled = false;
+    cachedAutoPauseThreshold = qMax(1, (3 * 1000) / REFRESHRATE);
+    cachedWbalTau = 300;
 
     cl->setSpacing(0);
     cl->setContentsMargins(0,0,0,0);
@@ -717,6 +720,15 @@ TrainSidebar::configChanged(qint32 why)
     lapAudioEnabled = appsettings->value(this, TRAIN_LAPALERT, false).toBool();
 
     useSimulatedSpeed = appsettings->value(this, TRAIN_USESIMULATEDSPEED, false).toBool();
+
+    // cache hot-path settings so the 5 Hz tick never reads QSettings
+    cachedAutoPauseEnabled = appsettings->value(this, TRAIN_AUTOPAUSE, false).toBool();
+    {
+        int delaySecs = appsettings->value(this, TRAIN_AUTOPAUSE_DELAY, 3).toInt();
+        cachedAutoPauseThreshold = qMax(1, (delaySecs * 1000) / REFRESHRATE);
+    }
+    cachedWbalTau = appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toDouble();
+    if (cachedWbalTau <= 0) cachedWbalTau = 300;
 
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 #if !defined GC_VIDEO_NONE
@@ -2137,7 +2149,11 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     if (fPlayAudio) {
                         lapAudioThisLap = false;
                         static QSoundEffect effect;
-                        effect.setSource(QUrl::fromLocalFile(":audio/lap.wav"));
+                        static bool effectLoaded = false;
+                        if (!effectLoaded) {
+                            effect.setSource(QUrl::fromLocalFile(":audio/lap.wav"));
+                            effectLoaded = true;
+                        }
                         effect.play();
                     }
                 }
@@ -2220,15 +2236,17 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
             // W'bal on the fly
             // using Dave Waterworth's reformulation
-            double TAU = appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toInt();
+            const double TAU = cachedWbalTau;
 
             // any watts expended in last 200msec?
             double JOULES = double(rtData.getWatts() - FTP) / 5.00f;
             if (JOULES < 0) JOULES = 0;
 
             // running total of replenishment
-            wbalr += JOULES * exp((total_msecs/1000.00f) / TAU);
-            wbal = WPRIME - (wbalr * exp((-total_msecs/1000.00f) / TAU));
+            const double tSecs = total_msecs / 1000.00;
+            const double expPos = exp(tSecs / TAU);
+            wbalr += JOULES * expPos;
+            wbal = WPRIME - (wbalr / expPos);
 
             rtData.setWbal(wbal);
 
@@ -2253,16 +2271,13 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 void TrainSidebar::checkAutoPause(double watts)
 {
     // only act when auto-pause is enabled and a workout is running
-    if (!appsettings->value(this, TRAIN_AUTOPAUSE, false).toBool()) return;
+    if (!cachedAutoPauseEnabled) return;
     if (!(status & RT_RUNNING) || !(status & RT_WORKOUT)) return;
-
-    int delaySecs = appsettings->value(this, TRAIN_AUTOPAUSE_DELAY, 3).toInt();
-    int threshold = qMax(1, (delaySecs * 1000) / REFRESHRATE); // ticks needed
 
     if (watts < 1.0) {
         m_autoPauseZeroCount++;
 
-        if (!m_autoPaused && !(status & RT_PAUSED) && m_autoPauseZeroCount >= threshold) {
+        if (!m_autoPaused && !(status & RT_PAUSED) && m_autoPauseZeroCount >= cachedAutoPauseThreshold) {
             // trigger auto-pause — reuse the manual pause path
             m_autoPaused = true;
             session_elapsed_msec += session_time.elapsed();
