@@ -554,7 +554,7 @@ void VideoWindow::resumePlayback()
     state = PlaybackState::Playing;
 }
 
-void VideoWindow::telemetryUpdate(RealtimeData rtd)
+void VideoWindow::telemetryUpdate(const RealtimeData &rtd)
 {
     if (!isVisible())
         return;

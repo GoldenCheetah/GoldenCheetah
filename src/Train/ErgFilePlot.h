@@ -153,7 +153,7 @@ class ErgFilePlot : public QwtPlot
         bool eventFilter(QObject *obj, QEvent *event);
 
     public slots:
-        void performancePlot(RealtimeData);
+        void performancePlot(const RealtimeData &);
         void configChanged(qint32);
         void start();
         void hover(const QPoint &point);

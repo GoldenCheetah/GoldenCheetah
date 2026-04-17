@@ -49,7 +49,7 @@ class SpinScanPlotWindow : public GcChartWindow
    public slots:
 
         // trap signals
-        void telemetryUpdate(RealtimeData rtData); // got new data
+        void telemetryUpdate(const RealtimeData &rtData); // got new data
         void start();
         void stop();
         void pause();

@@ -357,7 +357,7 @@ class Context : public QObject
         void rideClean(RideItem*);
 
         // realtime
-        void telemetryUpdate(RealtimeData rtData);
+        void telemetryUpdate(const RealtimeData &rtData);
         void ergFileSelected(ErgFile *);
         void ergFileSelected(ErgFileBase *);
         void videoSyncFileSelected(VideoSyncFile *);
