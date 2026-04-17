@@ -63,6 +63,7 @@ doc/contrib/WASP Packet Protocol.pdf
 
 # unittests
 unittests/Cloud/jsonParsers/jsonParsers
+unittests/Cloud/stravaCredentials/stravaCredentials
 unittests/Core/season/season
 unittests/Core/seasonOffset/seasonOffset
 unittests/Core/seasonParser/seasonParser
@@ -74,6 +75,7 @@ unittests/Core/trainingPlan/trainingPlan
 unittests/Core/trainingSimulator/trainingSimulator
 unittests/Core/units/units
 unittests/Core/utils/utils
+unittests/FileIO/computrainer3dp/computrainer3dp
 unittests/FileIO/rideAutoImport/rideAutoImport
 unittests/FileIO/tacxCaf/tacxCaf
 unittests/Gui/calendarData/calendarData
