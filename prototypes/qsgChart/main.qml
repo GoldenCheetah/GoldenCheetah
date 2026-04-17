@@ -10,6 +10,7 @@ Rectangle {
     property double dataXMax: 1
     property double viewXMin: 0
     property double viewXMax: 1
+    property int sampleCount: 0
 
     property double powerMax: 400
     property double hrMax: 200
@@ -18,6 +19,9 @@ Rectangle {
     function resetView() {
         viewXMin = dataXMin
         viewXMax = dataXMax
+    }
+    function startAutoPan() {
+        autoPan.running = true
     }
 
     GridLayout {
@@ -87,6 +91,7 @@ Rectangle {
                 property real dragStartMouseX: 0
 
                 onPressed: (m) => {
+                    plotArea.forceActiveFocus()
                     dragStartViewXMin = root.viewXMin
                     dragStartViewXMax = root.viewXMax
                     dragStartMouseX = m.x
@@ -121,10 +126,37 @@ Rectangle {
                 anchors { right: parent.right; top: parent.top; margins: 6 }
                 color: "#555"
                 font.pixelSize: 11
-                text: "view [" + root.viewXMin.toFixed(0)
+                text: (frameCounter ? frameCounter.fps.toFixed(1) + " fps   " : "")
+                      + "view [" + root.viewXMin.toFixed(0)
                       + ", " + root.viewXMax.toFixed(0)
-                      + "]  drag=pan  wheel=zoom  dblclick=reset"
+                      + "]   samples=" + root.sampleCount
+                      + "   drag=pan  wheel=zoom  dblclick=reset  space=auto-pan"
             }
+
+            // Continuous pan: shifts viewport every tick so the
+            // renderer rebuilds geometry each frame. Space toggles it.
+            Timer {
+                id: autoPan
+                interval: 16
+                repeat: true
+                running: false
+                property real velocity: 2000 // data units per second (scale with ride length)
+                onTriggered: {
+                    const span = root.viewXMax - root.viewXMin
+                    const shift = velocity * (interval / 1000.0)
+                    let newMin = root.viewXMin + shift
+                    let newMax = root.viewXMax + shift
+                    if (newMax > root.dataXMax) {
+                        newMin = root.dataXMin
+                        newMax = root.dataXMin + span
+                    }
+                    root.viewXMin = newMin
+                    root.viewXMax = newMax
+                }
+            }
+
+            focus: true
+            Keys.onSpacePressed: autoPan.running = !autoPan.running
         }
 
         // --- bottom-left spacer -------------------------------------

@@ -4,5 +4,6 @@ Makefile
 *.cpp.autogen
 moc_*.cpp
 moc_*.h
+main.moc
 qrc_*.cpp
 .qmake.stash
