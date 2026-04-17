@@ -1,0 +1,8 @@
+qsgChart
+Makefile
+*.o
+*.cpp.autogen
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+.qmake.stash
