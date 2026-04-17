@@ -96,6 +96,7 @@ class RideCache : public QObject
         void addRide(QString name, bool dosignal, bool select, bool useTempActivities, bool planned);
         bool removeCurrentRide();
         bool removeRide(const QString& filenameToDelete);
+        bool removeRide(RideItem *rideToDelete);
 
         // export metrics in CSV format
         void writeAsCSV(QString filename);

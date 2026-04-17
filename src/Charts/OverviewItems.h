@@ -34,6 +34,7 @@
 #include <QBarSeries>
 #include <QLineSeries>
 #include <QCursor>
+#include <QFutureWatcher>
 
 // subwidgets for viz inside each overview item
 class RPErating;
@@ -53,7 +54,7 @@ class ColorButton;
 
 // types we use start from 100 to avoid clashing with main chart types
 enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE, KPI,
-                        TOPN, DONUT, ACTIVITIES, ATHLETE, DATATABLE, USERCHART };
+                        TOPN, DONUT, ACTIVITIES, ATHLETE, DATATABLE, USERCHART, SIMULATION };
 
 //
 // Configuration widget for ALL Overview Items
@@ -429,6 +430,78 @@ class PMCOverviewItem : public ChartSpaceItem
         double sts, lts, sb, rr, stress;
 
         OverviewItemConfig *configwidget;
+};
+
+struct SimulationCardEntry {
+    QString workoutType;
+    double score;
+    double estimatedTSS;
+    bool feasible;
+    int warnings;
+    int hardViolations;
+
+    // projected values after this workout (7 days)
+    QVector<double> projCtl, projAtl, projTsb;
+};
+
+struct SimulationCardResult {
+    quint64 requestId = 0;
+    double ctl = 0, atl = 0, tsb = 0, acwr = 0;
+    QList<SimulationCardEntry> topCandidates;
+    QString goalName;
+    QString rationale;
+    QString statusText;
+    bool hasData = false;
+
+    // historical PMC values (14 days back) for the chart
+    QVector<double> histCtl, histAtl, histTsb;
+};
+
+class SimulationOverviewItem : public ChartSpaceItem
+{
+    Q_OBJECT
+
+    public:
+
+        SimulationOverviewItem(ChartSpace *parent);
+        ~SimulationOverviewItem();
+
+        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+        void itemGeometryChanged();
+        void setData(RideItem *item);
+        void setDateRange(DateRange) {} // analysis view only
+        void dragChanged(bool x) override;
+
+        QWidget *config() { return configwidget; }
+
+        static ChartSpaceItem *create(ChartSpace *parent) { return new SimulationOverviewItem(parent); }
+
+        // snapshot state
+        double ctl, atl, tsb, acwr;
+
+        // ranked candidates
+        QList<SimulationCardEntry> topCandidates;
+        QString goalName;
+        QString rationale;
+        QString statusText;
+        bool hasData;
+        bool loading;
+
+        // PMC projection chart
+        QChart *chart;
+
+        OverviewItemConfig *configwidget;
+
+    private slots:
+        void simulationFinished();
+
+    private:
+        void updateChart();
+        QFutureWatcher<SimulationCardResult> *watcher;
+        quint64 simulationRequestId;
+
+        // chart data
+        QVector<double> histCtl, histAtl, histTsb;
 };
 
 class ZoneOverviewItem : public ChartSpaceItem

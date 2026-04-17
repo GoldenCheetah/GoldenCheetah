@@ -35,6 +35,8 @@ extern QList<ModelFilter*> workoutModelFilters;
 extern QString workoutModelErrorMsg;
 %}
 
+%define api.header.include {"WorkoutFilter_yacc.h"}
+
 %union {
     float floatValue;
     int numValue;

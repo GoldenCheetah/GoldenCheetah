@@ -23,6 +23,7 @@
 #include "Units.h"
 #include "Settings.h"
 #include "RideItem.h"
+#include "RideFileData.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "Specification.h"
@@ -101,20 +102,26 @@ class XPowerSwim : public RideMetric {
         int count = 0;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            while ((weighted > NEGLIGIBLE)
-                   && (point->secs > lastSecs + secsDelta + EPSILON)) {
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *kph = view.series(RideFile::kph).constData();
+            const double *secs_data = view.series(RideFile::secs).constData();
+            for (int i = first; i <= last; ++i) {
+                while ((weighted > NEGLIGIBLE)
+                       && (secs_data[i] > lastSecs + secsDelta + EPSILON)) {
+                    weighted *= attenuation;
+                    lastSecs += secsDelta;
+                    total += pow(weighted, 3.0);
+                    count++;
+                }
                 weighted *= attenuation;
-                lastSecs += secsDelta;
+                weighted += sampleWeight * swimming_power(weight, kph[i]/3.6);
+                lastSecs = secs_data[i];
                 total += pow(weighted, 3.0);
                 count++;
             }
-            weighted *= attenuation;
-            weighted += sampleWeight * swimming_power(weight, point->kph/3.6);
-            lastSecs = point->secs;
-            total += pow(weighted, 3.0);
-            count++;
         }
         xpower = count ? pow(total / count, 1/3.0) : 0.0;
         secs = count * secsDelta;

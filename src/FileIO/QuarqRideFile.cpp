@@ -19,7 +19,7 @@
 #include "QuarqRideFile.h"
 #include "QuarqParser.h"
 #include <iostream>
-#include <assert.h>
+#include <memory>
 
 static QString installed_path = "";
 
@@ -109,32 +109,42 @@ static int antFileReaderRegistered = quarqInterpreterInstalled()
 
 RideFile *QuarqFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
 {
-    (void) errors;
-    RideFile *rideFile = new RideFile();
+    if (!file.open(QIODevice::ReadOnly)) {
+        errors << QString("can't open file %1").arg(file.fileName());
+        return NULL;
+    }
+
+    std::unique_ptr<RideFile> rideFile(new RideFile());
     rideFile->setDeviceType("Quarq Qollector");
     rideFile->setFileFormat("Quarq ANT+ Files (qla)");
     rideFile->setRecIntSecs(1.0);
 
-    QuarqParser handler(rideFile);
+    QuarqParser handler(rideFile.get());
 
-    QProcess *antProcess = getInterpreterProcess( installed_path );
+    std::unique_ptr<QProcess> antProcess(getInterpreterProcess(installed_path));
+    if (!antProcess) {
+        errors << QString("failed to start Quarq interpreter");
+        return NULL;
+    }
 
-    assert(antProcess);
-
-    QXmlInputSource source (antProcess);
+    QXmlInputSource source (antProcess.get());
     QXmlSimpleReader reader;
     reader.setContentHandler (&handler);
 
     // this could done be a loop to "save memory."
-    file.open(QIODevice::ReadOnly);
     antProcess->write(file.readAll());
     antProcess->closeWriteChannel();
-    antProcess->waitForFinished(-1);
+    if (!antProcess->waitForFinished(-1)
+        || antProcess->exitStatus() != QProcess::NormalExit
+        || antProcess->exitCode() != 0) {
+        errors << QString("Quarq interpreter failed for %1").arg(file.fileName());
+        return NULL;
+    }
 
-    assert(QProcess::NormalExit == antProcess->exitStatus());
-    assert(0 == antProcess->exitCode());
-
-    reader.parse(source);
+    if (!reader.parse(source)) {
+        errors << QString("failed to parse Quarq interpreter output");
+        return NULL;
+    }
 
     reader.parseContinue();
 
@@ -150,8 +160,5 @@ RideFile *QuarqFileReader::openRideFile(QFile &file, QStringList &errors, QList<
         rideFile->setStartTime(datetime);
     }
 
-    delete antProcess;
-
-    return rideFile;
+    return rideFile.release();
 }
-

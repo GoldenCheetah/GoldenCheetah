@@ -394,7 +394,12 @@ CloudServiceUploadDialog::CloudServiceUploadDialog(QWidget *parent, Context *con
         // didn't work dude
         QMessageBox msgBox;
         msgBox.setWindowTitle(tr("Upload Failed") + store->uiName());
-        msgBox.setText(tr("Unable to upload, check your configuration in preferences."));
+        msgBox.setText(tr("Unable to upload."));
+        if (!errors.isEmpty()) {
+            msgBox.setInformativeText(errors.join(QStringLiteral("\n")));
+        } else {
+            msgBox.setInformativeText(tr("Check your configuration in preferences."));
+        }
 
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();

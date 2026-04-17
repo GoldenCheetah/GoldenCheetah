@@ -242,11 +242,13 @@ TrainingsTageBuch::writeFileCompleted()
     printd("TrainingStageBuch::writeFileCompleted()\n");
 
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
+    const QByteArray body = reply->readAll();
 
-    printd("reply:%s\n", reply->readAll().toStdString().c_str());
+    printd("reply:%s\n", body.constData());
 
     TTBUploadParser handler;
-    QXmlInputSource source(reply);
+    QXmlInputSource source;
+    source.setData(QString::fromUtf8(body));
 
     QXmlSimpleReader reader;
     reader.setContentHandler(&handler);

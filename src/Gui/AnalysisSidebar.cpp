@@ -460,11 +460,16 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
         if (rideItem->planned && rideItem->sport == "Bike") {
             QString filter = buildWorkoutFilter(rideItem);
             if (! filter.isEmpty()) {
+                QString workoutFilename = rideItem->getText("WorkoutFilename", "").trimmed();
                 QAction *actStartWorkout = new QAction(tr("Show in Train Mode..."), rideNavigator);
-                connect(actStartWorkout, &QAction::triggered, this, [this, filter]() {
+                connect(actStartWorkout, &QAction::triggered, this, [this, filter, workoutFilename]() {
                     context->mainWindow->fillinWorkoutFilterBox(filter);
                     context->mainWindow->selectTrain();
-                    context->notifySelectWorkout(0);
+                    if (! workoutFilename.isEmpty()) {
+                        context->notifySelectWorkout(workoutFilename);
+                    } else {
+                        context->notifySelectWorkout(0);
+                    }
                 });
                 menu.addAction(actStartWorkout);
             }

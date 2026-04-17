@@ -3,6 +3,7 @@
 
 #include <QTest>
 #include <QFile>
+#include <QFileInfo>
 #include <QList>
 
 
@@ -12,7 +13,10 @@ class TestSeasonParser: public QObject
 
 private slots:
     void readSeasons() {
-        QFile file("seasons.xml");
+        const QString seasonsPath = QFINDTESTDATA("seasons.xml");
+        QVERIFY2(!seasonsPath.isEmpty(), "Could not locate seasons.xml test fixture.");
+
+        QFile file(seasonsPath);
         QList<Season> seasons = SeasonParser::readSeasons(&file);
 
         QCOMPARE(seasons.size(), 5);

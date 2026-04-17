@@ -50,6 +50,7 @@
 
 #include "WPrime.h"
 #include "RideItem.h"
+#include "RideFileData.h"
 #include "Units.h" // for MILES_PER_KM
 #include "Settings.h" // for GC_WBALFORM
 
@@ -922,12 +923,17 @@ class WPrimeExp : public RideMetric {
         double total = 0;
         double secs = 0;
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            if (cp && point->watts > cp)  {
-                total += item->ride()->recIntSecs() * (point->watts - cp);
-                secs += item->ride()->recIntSecs();
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *watts = view.series(RideFile::watts).constData();
+            const double recIntSecs = item->ride()->recIntSecs();
+            for (int i = first; i <= last; ++i) {
+                if (cp && watts[i] > cp)  {
+                    total += recIntSecs * (watts[i] - cp);
+                    secs += recIntSecs;
+                }
             }
         }
         setValue(total/1000.00f);
@@ -969,12 +975,18 @@ class WPrimeWatts : public RideMetric {
         double secs = 0;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (cp && point->watts > cp)  {
-                total += item->ride()->recIntSecs() * (point->watts - cp);
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *watts = view.series(RideFile::watts).constData();
+            const double recIntSecs = item->ride()->recIntSecs();
+            for (int i = first; i <= last; ++i) {
+                if (cp && watts[i] > cp)  {
+                    total += recIntSecs * (watts[i] - cp);
+                }
+                secs += recIntSecs;
             }
-            secs += item->ride()->recIntSecs();
         }
         setValue(total/secs);
         setCount(secs);
@@ -1021,14 +1033,20 @@ class CPExp : public RideMetric {
         double total = 0;
         double secs = 0;
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (cp && point->watts >=0) {
-                if (point->watts > cp) 
-                    total += item->ride()->recIntSecs() * cp;
-                else 
-                    total += item->ride()->recIntSecs() * point->watts;
-                secs += item->ride()->recIntSecs();
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *watts = view.series(RideFile::watts).constData();
+            const double recIntSecs = item->ride()->recIntSecs();
+            for (int i = first; i <= last; ++i) {
+                if (cp && watts[i] >=0) {
+                    if (watts[i] > cp)
+                        total += recIntSecs * cp;
+                    else
+                        total += recIntSecs * watts[i];
+                    secs += recIntSecs;
+                }
             }
         }
         setValue(total/1000.00f);

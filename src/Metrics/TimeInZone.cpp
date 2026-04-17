@@ -19,6 +19,7 @@
 
 #include "RideMetric.h"
 #include "RideItem.h"
+#include "RideFileData.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "Specification.h"
@@ -62,11 +63,17 @@ class ZoneTime : public RideMetric {
 
         // iterate and compute
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            totalSecs += item->ride()->recIntSecs();
-            if (item->context->athlete->zones(item->sport)->whichZone(item->zoneRange, point->watts) == level)
-                seconds += item->ride()->recIntSecs();
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *watts = view.series(RideFile::watts).constData();
+            const double recIntSecs = item->ride()->recIntSecs();
+            for (int i = first; i <= last; ++i) {
+                totalSecs += recIntSecs;
+                if (item->context->athlete->zones(item->sport)->whichZone(item->zoneRange, watts[i]) == level)
+                    seconds += recIntSecs;
+            }
         }
         setValue(seconds);
         setCount(totalSecs);
@@ -764,12 +771,18 @@ class ZoneTimeI : public RideMetric {
         seconds = 0;
 
         // iterate and compute
+        const double recIntSecs = item->ride()->recIntSecs();
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            totalSecs += item->ride()->recIntSecs();
-            if (point->watts < AeT)
-                seconds += item->ride()->recIntSecs();
+        const int firstIdx = it.firstIndex();
+        const int lastIdx  = it.lastIndex();
+        if (firstIdx >= 0 && lastIdx >= firstIdx) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *watts = view.series(RideFile::watts).constData();
+            for (int i = firstIdx; i <= lastIdx; ++i) {
+                totalSecs += recIntSecs;
+                if (watts[i] < AeT)
+                    seconds += recIntSecs;
+            }
         }
         setValue(seconds);
         setCount(totalSecs);
@@ -824,12 +837,18 @@ class ZoneTimeII : public RideMetric {
         seconds = 0;
 
         // iterate and compute
+        const double recIntSecs = item->ride()->recIntSecs();
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            totalSecs += item->ride()->recIntSecs();
-            if (point->watts >= AeT && point->watts < CP)
-                seconds += item->ride()->recIntSecs();
+        const int firstIdx = it.firstIndex();
+        const int lastIdx  = it.lastIndex();
+        if (firstIdx >= 0 && lastIdx >= firstIdx) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *watts = view.series(RideFile::watts).constData();
+            for (int i = firstIdx; i <= lastIdx; ++i) {
+                totalSecs += recIntSecs;
+                if (watts[i] >= AeT && watts[i] < CP)
+                    seconds += recIntSecs;
+            }
         }
         setValue(seconds);
         setCount(totalSecs);
@@ -883,12 +902,18 @@ class ZoneTimeIII : public RideMetric {
         seconds = 0;
 
         // iterate and compute
+        const double recIntSecs = item->ride()->recIntSecs();
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            totalSecs += item->ride()->recIntSecs();
-            if (point->watts >= CP)
-                seconds += item->ride()->recIntSecs();
+        const int firstIdx = it.firstIndex();
+        const int lastIdx  = it.lastIndex();
+        if (firstIdx >= 0 && lastIdx >= firstIdx) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *watts = view.series(RideFile::watts).constData();
+            for (int i = firstIdx; i <= lastIdx; ++i) {
+                totalSecs += recIntSecs;
+                if (watts[i] >= CP)
+                    seconds += recIntSecs;
+            }
         }
         setValue(seconds);
         setCount(totalSecs);

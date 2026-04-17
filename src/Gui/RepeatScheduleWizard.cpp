@@ -523,7 +523,7 @@ RepeatScheduleWizard::done
         }
         context->tab->setNoSwitch(true);
         for (RideItem *rideItem : deletionList) {
-            context->athlete->rideCache->removeRide(rideItem->fileName);
+            context->athlete->rideCache->removeRide(rideItem);
         }
         RideCache::OperationPreCheck check = context->athlete->rideCache->checkCopyPlannedActivities(scheduleList);
         if (check.canProceed) {

@@ -37,6 +37,8 @@
 
 #define PLANNED_MIME_TYPE "application/x-goldencheetah-planned-activity"
 
+class Season;
+class SeasonEvent;
 
 struct AgendaEntry {
     QString primary;
@@ -107,6 +109,7 @@ Q_DECLARE_METATYPE(CalendarEntryLayout)
 Q_DECLARE_METATYPE(CalendarDay)
 Q_DECLARE_METATYPE(CalendarSummary)
 
+QString calendarSeasonEventReference(const Season &season, const SeasonEvent &event, int eventIndex);
 
 class CalendarEntryLayouter {
 public:

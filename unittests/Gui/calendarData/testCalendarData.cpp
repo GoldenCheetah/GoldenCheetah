@@ -1,6 +1,8 @@
 #include "Gui/CalendarData.h"
+#include "Core/Season.h"
 
 #include <QTest>
+#include <QUuid>
 
 
 class TestCalendarData: public QObject
@@ -32,6 +34,30 @@ private slots:
         QCOMPARE(layout[3].columnCount, 2);
         QCOMPARE(layout[4].columnIndex, 1);
         QCOMPARE(layout[4].columnCount, 2);
+    }
+
+    void seasonEventReference_prefersExplicitId() {
+
+        Season season;
+        season.setId(QUuid("{00000000-0000-0000-0000-000000000321}"));
+
+        SeasonEvent event("Race", QDate(2026, 4, 11), 1, "desc", "event-123");
+
+        QCOMPARE(calendarSeasonEventReference(season, event, 7), QString("event-123"));
+    }
+
+    void seasonEventReference_fallsBackToStableSeasonAndIndex() {
+
+        Season season;
+        season.setId(QUuid("{00000000-0000-0000-0000-000000000654}"));
+
+        SeasonEvent first("Race", QDate(2026, 4, 11), 1, "same");
+        SeasonEvent second("Race", QDate(2026, 4, 11), 1, "same");
+
+        QCOMPARE(calendarSeasonEventReference(season, first, 0),
+                 QString("season:{00000000-0000-0000-0000-000000000654}:event:0"));
+        QCOMPARE(calendarSeasonEventReference(season, second, 1),
+                 QString("season:{00000000-0000-0000-0000-000000000654}:event:1"));
     }
 };
 

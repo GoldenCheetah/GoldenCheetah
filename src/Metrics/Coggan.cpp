@@ -19,6 +19,7 @@
 #include "Context.h"
 #include "RideMetric.h"
 #include "RideItem.h"
+#include "RideFileData.h"
 #include "Zones.h"
 #include "Settings.h"
 #include "Athlete.h"
@@ -76,19 +77,24 @@ class IsoPower : public RideMetric {
             // loop over the data and convert to a rolling
             // average for the given windowsize
             RideFileIterator it(item->ride(), spec);
-            while (it.hasNext()) {
-                struct RideFilePoint *point = it.next();
+            const int first = it.firstIndex();
+            const int last  = it.lastIndex();
+            if (first >= 0 && last >= first) {
+                const RideFileData &view = item->ride()->columnar();
+                const double *watts = view.series(RideFile::watts).constData();
+                for (int i = first; i <= last; ++i) {
 
-                sum += point->watts;
-                sum -= rolling[index];
+                    sum += watts[i];
+                    sum -= rolling[index];
 
-                rolling[index] = point->watts;
+                    rolling[index] = watts[i];
 
-                total += pow(sum/rollingwindowsize,4); // raise rolling average to 4th power
-                count ++;
+                    total += pow(sum/rollingwindowsize,4); // raise rolling average to 4th power
+                    count ++;
 
-                // move index on/round
-                index = (index >= rollingwindowsize-1) ? 0 : index+1;
+                    // move index on/round
+                    index = (index >= rollingwindowsize-1) ? 0 : index+1;
+                }
             }
         }
         if (count) {

@@ -59,6 +59,7 @@
 
 static QString activityBasename(const QDateTime &dt);
 static QString activityFilename(const QDateTime &dt, bool plan, Context *context);
+static QString normalizedWorkoutReference(const QString &path);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -217,9 +218,28 @@ void
 ManualActivityWizard::field2TagString
 (RideFile &rideFile, const QString &fieldName, const QString &tagName) const
 {
-    if (! field(fieldName).toString().trimmed().isEmpty()) {
-        rideFile.setTag(tagName, field(fieldName).toString().trimmed());
+    QString value = field(fieldName).toString().trimmed();
+    if (tagName == QStringLiteral("WorkoutFilename")) {
+        value = normalizedWorkoutReference(value);
     }
+
+    if (! value.isEmpty()) {
+        rideFile.setTag(tagName, value);
+    }
+}
+
+
+QString
+normalizedWorkoutReference(const QString &path)
+{
+    const QString trimmed = path.trimmed();
+    if (trimmed.isEmpty()) {
+        return QString();
+    }
+
+    QFileInfo info(trimmed);
+    QString canonical = info.canonicalFilePath();
+    return QDir::cleanPath(canonical.isEmpty() ? info.absoluteFilePath() : canonical);
 }
 
 

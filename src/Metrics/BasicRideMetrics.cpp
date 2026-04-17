@@ -17,6 +17,7 @@
  */
 
 #include "RideMetric.h"
+#include "RideFileData.h"
 #include "Athlete.h"
 #include "Context.h"
 #include "Settings.h"
@@ -242,9 +243,11 @@ class TimeRecording : public RideMetric {
 
         secsRecording = 0;
 
-        // loop through and count
-        for (RideFileIterator it(item->ride(), spec); it.hasNext(); it.next())
-            secsRecording += item->ride()->recIntSecs();
+        RideFileIterator it(item->ride(), spec);
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first)
+            secsRecording = (last - first + 1) * item->ride()->recIntSecs();
         setValue(secsRecording);
     }
 
@@ -293,12 +296,19 @@ class TimeRiding : public RideMetric {
         // must have speed and cadence
         if (item->ride()->areDataPresent()->kph || item->ride()->areDataPresent()->cad ) {
 
-            // loop through and count
             RideFileIterator it(item->ride(), spec);
-            while (it.hasNext()) {
-                struct RideFilePoint *point = it.next();
-                if ((point->kph > 0.0) || (point->cad > 0.0))
-                    secsMovingOrPedaling += item->ride()->recIntSecs();
+            const int first = it.firstIndex();
+            const int last  = it.lastIndex();
+            if (first >= 0 && last >= first) {
+                const RideFileData &view = item->ride()->columnar();
+                const double *kph = view.series(RideFile::kph).constData();
+                const double *cad = view.series(RideFile::cad).constData();
+                const double dt = item->ride()->recIntSecs();
+                double sum = 0.0;
+                for (int i = first; i <= last; ++i) {
+                    if (kph[i] > 0.0 || cad[i] > 0.0) sum += dt;
+                }
+                secsMovingOrPedaling = sum;
             }
         }
         setValue(secsMovingOrPedaling);
@@ -354,30 +364,30 @@ class TimeCarrying : public RideMetric {
             if (hysteresis <= 0.1) hysteresis = 3.00;
 
             RideFileIterator it(item->ride(), spec);
-            bool first = true;
-
-            while (it.hasNext()) {
-                struct RideFilePoint *point = it.next();
-
-                // only consider pushing/carrying with elevation gain
-                if (first) {
-                    first = false;
-                    prevalt = point->alt;
+            const int first = it.firstIndex();
+            const int last  = it.lastIndex();
+            if (first >= 0 && last >= first) {
+                const RideFileData &view = item->ride()->columnar();
+                const double *kph  = view.series(RideFile::kph).constData();
+                const double *alt  = view.series(RideFile::alt).constData();
+                const double *cad  = view.series(RideFile::cad).constData();
+                const double *watts = view.series(RideFile::watts).constData();
+                const double dt = item->ride()->recIntSecs();
+                prevalt = alt[first];
+                for (int i = first; i <= last; ++i) {
+                    if (i > first) {
+                        if (alt[i] > prevalt + hysteresis)
+                            prevalt = alt[i];
+                        else if (alt[i] < prevalt - hysteresis)
+                            prevalt = alt[i];
+                    }
+                    if ((kph[i] > 0.0) &&
+                        (kph[i] < 8.0) &&
+                        (alt[i] > prevalt) &&
+                        (cad[i] == 0.0) &&
+                        (watts[i] == 0.0))
+                        secsCarrying += dt;
                 }
-                else if (point->alt > prevalt + hysteresis) {
-                    prevalt = point->alt;
-                }
-                else if (point->alt < prevalt - hysteresis) {
-                    prevalt = point->alt;
-                }
-
-                if ((point->kph > 0.0) &&          // we are moving
-                    (point->kph < 8.0) &&          // but slow (even slower than 8 kph)
-                    (point->alt > prevalt) &&  // gaining height
-                    (point->cad == 0.0) &&     // but no cadence
-                    (point->watts == 0.0))     // and no power
-
-                    secsCarrying += item->ride()->recIntSecs();
             }
         }
         setValue(secsCarrying);
@@ -430,28 +440,29 @@ class ElevationGainCarrying : public RideMetric {
         double hysteresis = appsettings->value(NULL, GC_ELEVATION_HYSTERESIS).toDouble();
         if (hysteresis <= 0.1) hysteresis = 3.00;
 
-        bool first = true;
-
         RideFileIterator it(item->ride(), spec);
-
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            if (first) {
-                first = false;
-                prevalt = point->alt;
-            }
-            else if (point->alt > prevalt + hysteresis) {
-                if ((point->kph > 0.0) &&
-                    (point->kph < 8.0) &&
-                    (point->watts == 0.0) &&
-                    (point->cad == 0.0)) {
-                    elegain += point->alt - prevalt;
-                };
-                prevalt = point->alt;
-            }
-            else if (point->alt < prevalt - hysteresis) {
-                prevalt = point->alt;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *alt   = view.series(RideFile::alt).constData();
+            const double *kph   = view.series(RideFile::kph).constData();
+            const double *watts = view.series(RideFile::watts).constData();
+            const double *cad   = view.series(RideFile::cad).constData();
+            prevalt = alt[first];
+            for (int i = first + 1; i <= last; ++i) {
+                if (alt[i] > prevalt + hysteresis) {
+                    if ((kph[i] > 0.0) &&
+                        (kph[i] < 8.0) &&
+                        (watts[i] == 0.0) &&
+                        (cad[i] == 0.0)) {
+                        elegain += alt[i] - prevalt;
+                    }
+                    prevalt = alt[i];
+                }
+                else if (alt[i] < prevalt - hysteresis) {
+                    prevalt = alt[i];
+                }
             }
         }
         setValue(elegain);
@@ -865,22 +876,21 @@ class ElevationGain : public RideMetric {
         double hysteresis = appsettings->value(NULL, GC_ELEVATION_HYSTERESIS).toDouble();
         if (hysteresis <= 0.1) hysteresis = 3.00;
 
-        bool first = true;
         RideFileIterator it(item->ride(), spec);
-
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            if (first) {
-                first = false;
-                prevalt = point->alt;
-            }
-            else if (point->alt > prevalt + hysteresis) {
-                elegain += point->alt - prevalt;
-                prevalt = point->alt;
-            }
-            else if (point->alt < prevalt - hysteresis) {
-                prevalt = point->alt;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *alt = view.series(RideFile::alt).constData();
+            prevalt = alt[first];
+            for (int i = first + 1; i <= last; ++i) {
+                if (alt[i] > prevalt + hysteresis) {
+                    elegain += alt[i] - prevalt;
+                    prevalt = alt[i];
+                }
+                else if (alt[i] < prevalt - hysteresis) {
+                    prevalt = alt[i];
+                }
             }
         }
         setValue(elegain);
@@ -933,22 +943,21 @@ class ElevationLoss : public RideMetric {
         double hysteresis = appsettings->value(NULL, GC_ELEVATION_HYSTERESIS).toDouble();
         if (hysteresis <= 0.1) hysteresis = 3.00;
 
-        bool first = true;
-
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            if (first) {
-                first = false;
-                prevalt = point->alt;
-            }
-            else if (point->alt < prevalt - hysteresis) {
-                eleLoss += prevalt - point->alt;
-                prevalt = point->alt;
-            }
-            else if (point->alt > prevalt + hysteresis) {
-                prevalt = point->alt;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *alt = view.series(RideFile::alt).constData();
+            prevalt = alt[first];
+            for (int i = first + 1; i <= last; ++i) {
+                if (alt[i] < prevalt - hysteresis) {
+                    eleLoss += prevalt - alt[i];
+                    prevalt = alt[i];
+                }
+                else if (alt[i] > prevalt + hysteresis) {
+                    prevalt = alt[i];
+                }
             }
         }
         setValue(eleLoss);
@@ -996,11 +1005,16 @@ class TotalWork : public RideMetric {
         joules = 0;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            if (point->watts >= 0.0)
-                joules += point->watts * item->ride()->recIntSecs();
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *watts = view.series(RideFile::watts).constData();
+            const double dt = item->ride()->recIntSecs();
+            for (int i = first; i <= last; ++i) {
+                if (watts[i] >= 0.0)
+                    joules += watts[i] * dt;
+            }
         }
         setValue(joules/1000);
     }
@@ -1049,9 +1063,15 @@ class AvgSpeed : public RideMetric {
             secsMoving = 0;
 
             RideFileIterator it(item->ride(), spec);
-            while (it.hasNext()) {
-                struct RideFilePoint *point = it.next();
-                if (point->kph > 0.0) secsMoving += item->ride()->recIntSecs();
+            const int first = it.firstIndex();
+            const int last  = it.lastIndex();
+            if (first >= 0 && last >= first) {
+                const RideFileData &view = item->ride()->columnar();
+                const double *kph = view.series(RideFile::kph).constData();
+                const double dt = item->ride()->recIntSecs();
+                for (int i = first; i <= last; ++i) {
+                    if (kph[i] > 0.0) secsMoving += dt;
+                }
             }
 
             setValue(secsMoving ? km / secsMoving * 3600.0 : 0.0);
@@ -1110,14 +1130,18 @@ struct AvgPower : public RideMetric {
         }
 
         total = count = 0;
-    
-        RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
 
-            if (point->watts >= 0.0) {
-                total += point->watts;
-                ++count;
+        RideFileIterator it(item->ride(), spec);
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *watts = view.series(RideFile::watts).constData();
+            for (int i = first; i <= last; ++i) {
+                if (watts[i] >= 0.0) {
+                    total += watts[i];
+                    ++count;
+                }
             }
         }
         setValue(count > 0 ? total / count : 0);
@@ -1168,12 +1192,16 @@ struct AvgSmO2 : public RideMetric {
         total = count = 0;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            if (point->smo2 > 0.0f) {  // SmO2 should always be > 0.0f
-                total += point->smo2;
-                ++count;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *smo2 = view.series(RideFile::smo2).constData();
+            for (int i = first; i <= last; ++i) {
+                if (smo2[i] > 0.0) {
+                    total += smo2[i];
+                    ++count;
+                }
             }
         }
         setValue(count > 0 ? total / count : 0);
@@ -1224,11 +1252,16 @@ struct AvgtHb : public RideMetric {
         total = count = 0.0f;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->thb > 0.0f) {
-                total += point->thb;
-                ++count;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *thb = view.series(RideFile::thb).constData();
+            for (int i = first; i <= last; ++i) {
+                if (thb[i] > 0.0) {
+                    total += thb[i];
+                    ++count;
+                }
             }
         }
         setValue(count > 0.0f ? total / count : 0.0f);
@@ -1280,11 +1313,16 @@ struct AAvgPower : public RideMetric {
         total = count = 0;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->apower >= 0.0) {
-                total += point->apower;
-                ++count;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *ap = view.series(RideFile::aPower).constData();
+            for (int i = first; i <= last; ++i) {
+                if (ap[i] >= 0.0) {
+                    total += ap[i];
+                    ++count;
+                }
             }
         }
         setValue(count > 0 ? total / count : 0);
@@ -1334,11 +1372,16 @@ struct NonZeroPower : public RideMetric {
         total = count = 0;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->watts > 0.0) {
-                total += point->watts;
-                ++count;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *watts = view.series(RideFile::watts).constData();
+            for (int i = first; i <= last; ++i) {
+                if (watts[i] > 0.0) {
+                    total += watts[i];
+                    ++count;
+                }
             }
         }
         setValue(count > 0 ? total / count : 0);
@@ -1388,11 +1431,16 @@ struct AvgHeartRate : public RideMetric {
 
         total = count = 0;
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->hr > 0) {
-                total += point->hr;
-                ++count;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *hr = view.series(RideFile::hr).constData();
+            for (int i = first; i <= last; ++i) {
+                if (hr[i] > 0) {
+                    total += hr[i];
+                    ++count;
+                }
             }
         }
         setValue(count > 0 ? total / count : 0);
@@ -1443,12 +1491,16 @@ struct AvgCoreTemp : public RideMetric {
         total = count = 0;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            if (point->tcore > 0) {
-                total += point->tcore;
-                ++count;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *tcore = view.series(RideFile::tcore).constData();
+            for (int i = first; i <= last; ++i) {
+                if (tcore[i] > 0) {
+                    total += tcore[i];
+                    ++count;
+                }
             }
         }
         setValue(count > 0 ? total / count : 0);
@@ -1499,9 +1551,14 @@ struct HeartBeats : public RideMetric {
         total = 0;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            total += (point->hr / 60) * item->ride()->recIntSecs();
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *hr = view.series(RideFile::hr).constData();
+            const double dt = item->ride()->recIntSecs();
+            for (int i = first; i <= last; ++i)
+                total += (hr[i] / 60) * dt;
         }
         setValue(total);
     }
@@ -1797,11 +1854,16 @@ struct AvgCadence : public RideMetric {
         total = count = 0;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->cad > 0) {
-                total += point->cad;
-                ++count;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *cad = view.series(RideFile::cad).constData();
+            for (int i = first; i <= last; ++i) {
+                if (cad[i] > 0) {
+                    total += cad[i];
+                    ++count;
+                }
             }
         }
         setValue(count > 0 ? total / count : count);
@@ -1866,11 +1928,16 @@ struct AvgTemp : public RideMetric {
         total = count = 0;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->temp != RideFile::NA) {
-                total += point->temp;
-                ++count;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *temp = view.series(RideFile::temp).constData();
+            for (int i = first; i <= last; ++i) {
+                if (temp[i] != RideFile::NA) {
+                    total += temp[i];
+                    ++count;
+                }
             }
         }
 
@@ -1916,10 +1983,14 @@ class MaxPower : public RideMetric {
         }
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->watts >= max)
-                max = point->watts;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *watts = view.series(RideFile::watts).constData();
+            for (int i = first; i <= last; ++i) {
+                if (watts[i] >= max) max = watts[i];
+            }
         }
         setValue(max);
     }
@@ -1962,10 +2033,13 @@ class MaxSmO2 : public RideMetric {
         }
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->smo2 >= max)
-                max = point->smo2;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *smo2 = view.series(RideFile::smo2).constData();
+            for (int i = first; i <= last; ++i)
+                if (smo2[i] >= max) max = smo2[i];
         }
         setValue(max);
     }
@@ -2009,11 +2083,13 @@ class MaxtHb : public RideMetric {
         }
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            if (point->thb >= max)
-                max = point->thb;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *thb = view.series(RideFile::thb).constData();
+            for (int i = first; i <= last; ++i)
+                if (thb[i] >= max) max = thb[i];
         }
         setValue(max);
     }
@@ -2059,13 +2135,16 @@ class MinSmO2 : public RideMetric {
         bool notset = true;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            if (point->smo2 >= 0.0f && (notset || point->smo2 < min)) {
-                min = point->smo2;
-                if (point->smo2 > 0.0f && notset)
-                  notset = false;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *smo2 = view.series(RideFile::smo2).constData();
+            for (int i = first; i <= last; ++i) {
+                if (smo2[i] >= 0.0 && (notset || smo2[i] < min)) {
+                    min = smo2[i];
+                    if (smo2[i] > 0.0 && notset) notset = false;
+                }
             }
         }
         setValue(min);
@@ -2110,11 +2189,16 @@ class MintHb : public RideMetric {
         bool notset = true;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->thb > 0.0f && (notset || point->thb < min)) {
-                min = point->thb;
-                notset = false;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *thb = view.series(RideFile::thb).constData();
+            for (int i = first; i <= last; ++i) {
+                if (thb[i] > 0.0 && (notset || thb[i] < min)) {
+                    min = thb[i];
+                    notset = false;
+                }
             }
         }
         setValue(min);
@@ -2157,10 +2241,13 @@ class MaxHr : public RideMetric {
         }
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->hr >= max)
-                max = point->hr;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *hr = view.series(RideFile::hr).constData();
+            for (int i = first; i <= last; ++i)
+                if (hr[i] >= max) max = hr[i];
         }
         setValue(max);
     }
@@ -2208,12 +2295,16 @@ class MinHr : public RideMetric {
         min = 0;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            if (point->hr > 0 && (notset || point->hr < min)) {
-                min = point->hr;
-                notset = false;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *hr = view.series(RideFile::hr).constData();
+            for (int i = first; i <= last; ++i) {
+                if (hr[i] > 0 && (notset || hr[i] < min)) {
+                    min = hr[i];
+                    notset = false;
+                }
             }
         }
         setValue(min);
@@ -2260,11 +2351,13 @@ class MaxCT : public RideMetric {
         }
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            if (point->tcore >= max)
-                max = point->tcore;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *tcore = view.series(RideFile::tcore).constData();
+            for (int i = first; i <= last; ++i)
+                if (tcore[i] >= max) max = tcore[i];
         }
         setValue(max);
     }
@@ -2316,9 +2409,13 @@ class MaxSpeed : public RideMetric {
         if (item->ride()->areDataPresent()->kph) {
 
             RideFileIterator it(item->ride(), spec);
-            while (it.hasNext()) {
-                struct RideFilePoint *point = it.next();
-                    if (point->kph > max) max = point->kph;
+            const int first = it.firstIndex();
+            const int last  = it.lastIndex();
+            if (first >= 0 && last >= first) {
+                const RideFileData &view = item->ride()->columnar();
+                const double *kph = view.series(RideFile::kph).constData();
+                for (int i = first; i <= last; ++i)
+                    if (kph[i] > max) max = kph[i];
             }
         }
         setValue(max);
@@ -2364,9 +2461,13 @@ class MaxCadence : public RideMetric {
         double max = 0.0;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->cad > max) max = point->cad;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *cad = view.series(RideFile::cad).constData();
+            for (int i = first; i <= last; ++i)
+                if (cad[i] > max) max = cad[i];
         }
 
         setValue(max);
@@ -2422,9 +2523,13 @@ class MaxTemp : public RideMetric {
 
         double max = RideFile::NA;
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->temp != RideFile::NA && point->temp > max) max = point->temp;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *temp = view.series(RideFile::temp).constData();
+            for (int i = first; i <= last; ++i)
+                if (temp[i] != RideFile::NA && temp[i] > max) max = temp[i];
         }
 
         setValue(max);
@@ -2478,9 +2583,13 @@ class MinTemp : public RideMetric {
 
         double min = 10000;
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->temp != RideFile::NA && point->temp < min) min = point->temp;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *temp = view.series(RideFile::temp).constData();
+            for (int i = first; i <= last; ++i)
+                if (temp[i] != RideFile::NA && temp[i] < min) min = temp[i];
         }
 
         setValue(min < 10000 ? min : (double)(RideFile::NA));
@@ -2525,10 +2634,14 @@ class NinetyFivePercentHeartRate : public RideMetric {
 
         QVector<double> hrs;
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->hr >= 0.0)
-                hrs.append(point->hr);
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *hrData = view.series(RideFile::hr).constData();
+            hrs.reserve(last - first + 1);
+            for (int i = first; i <= last; ++i)
+                if (hrData[i] >= 0.0) hrs.append(hrData[i]);
         }
         if (hrs.size() > 0) {
             std::sort(hrs.begin(), hrs.end());
@@ -2721,13 +2834,17 @@ class MeanPowerVariance : public RideMetric {
             topRank=0.00;
         } else {
 
-            QVector<double> power;
-            QVector<double> secs;
-
-            while (it.hasNext()) {
-                struct RideFilePoint *point = it.next();
-                power.append(point->watts);
-                secs.append(point->secs);
+            const int first = it.firstIndex();
+            const int last  = it.lastIndex();
+            const RideFileData &view = item->ride()->columnar();
+            const double *wattsCol = view.series(RideFile::watts).constData();
+            const double *secsCol  = view.series(RideFile::secs).constData();
+            const int n = last - first + 1;
+            QVector<double> power(n);
+            QVector<double> secs(n);
+            for (int i = 0; i < n; ++i) {
+                power[i] = wattsCol[first + i];
+                secs[i]  = secsCol[first + i];
             }
 
             LTMOutliers outliers(secs.data(), power.data(), power.count(), 30, false);
@@ -2849,12 +2966,19 @@ class AvgLTE : public RideMetric {
         double samples = 0.0f;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            if (point->lte && point->watts > 0.0f && point->cad && point->lrbalance != RideFile::NA) {
-                samples ++;
-                total += point->lte;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *lteCol = view.series(RideFile::lte).constData();
+            const double *watts  = view.series(RideFile::watts).constData();
+            const double *cad    = view.series(RideFile::cad).constData();
+            const double *lrbal  = view.series(RideFile::lrbalance).constData();
+            for (int i = first; i <= last; ++i) {
+                if (lteCol[i] && watts[i] > 0.0 && cad[i] && lrbal[i] != RideFile::NA) {
+                    samples++;
+                    total += lteCol[i];
+                }
             }
         }
 
@@ -2904,11 +3028,19 @@ class AvgRTE : public RideMetric {
         double samples = 0.0f;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->rte && point->watts > 0.0f && point->cad && point->lrbalance != RideFile::NA) {
-                samples ++;
-                total += point->rte;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *rteCol = view.series(RideFile::rte).constData();
+            const double *watts  = view.series(RideFile::watts).constData();
+            const double *cad    = view.series(RideFile::cad).constData();
+            const double *lrbal  = view.series(RideFile::lrbalance).constData();
+            for (int i = first; i <= last; ++i) {
+                if (rteCol[i] && watts[i] > 0.0 && cad[i] && lrbal[i] != RideFile::NA) {
+                    samples++;
+                    total += rteCol[i];
+                }
             }
         }
 
@@ -2958,11 +3090,19 @@ class AvgLPS : public RideMetric {
         double samples = 0.0f;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->lps && point->watts > 0.0f && point->cad && point->lrbalance != RideFile::NA) {
-                samples ++;
-                total += point->lps;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *lpsCol = view.series(RideFile::lps).constData();
+            const double *watts  = view.series(RideFile::watts).constData();
+            const double *cad    = view.series(RideFile::cad).constData();
+            const double *lrbal  = view.series(RideFile::lrbalance).constData();
+            for (int i = first; i <= last; ++i) {
+                if (lpsCol[i] && watts[i] > 0.0 && cad[i] && lrbal[i] != RideFile::NA) {
+                    samples++;
+                    total += lpsCol[i];
+                }
             }
         }
 
@@ -3012,11 +3152,19 @@ class AvgRPS : public RideMetric {
         double samples = 0.0f;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->rps && point->watts > 0.0f && point->cad && point->lrbalance != RideFile::NA) {
-                samples ++;
-                total += point->rps;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *rpsCol = view.series(RideFile::rps).constData();
+            const double *watts  = view.series(RideFile::watts).constData();
+            const double *cad    = view.series(RideFile::cad).constData();
+            const double *lrbal  = view.series(RideFile::lrbalance).constData();
+            for (int i = first; i <= last; ++i) {
+                if (rpsCol[i] && watts[i] > 0.0 && cad[i] && lrbal[i] != RideFile::NA) {
+                    samples++;
+                    total += rpsCol[i];
+                }
             }
         }
 
@@ -3066,11 +3214,18 @@ class AvgLPCO : public RideMetric {
         double secs = 0.0f;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->cad) {
-                secs += item->ride()->recIntSecs();
-                total += point->lpco;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *cad  = view.series(RideFile::cad).constData();
+            const double *lpcoCol = view.series(RideFile::lpco).constData();
+            const double dt = item->ride()->recIntSecs();
+            for (int i = first; i <= last; ++i) {
+                if (cad[i]) {
+                    secs += dt;
+                    total += lpcoCol[i];
+                }
             }
         }
 
@@ -3121,11 +3276,18 @@ class AvgRPCO : public RideMetric {
         double secs = 0.0f;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->cad) {
-                secs += item->ride()->recIntSecs();
-                total += point->rpco;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *cad  = view.series(RideFile::cad).constData();
+            const double *rpcoCol = view.series(RideFile::rpco).constData();
+            const double dt = item->ride()->recIntSecs();
+            for (int i = first; i <= last; ++i) {
+                if (cad[i]) {
+                    secs += dt;
+                    total += rpcoCol[i];
+                }
             }
         }
 
@@ -3173,11 +3335,18 @@ class AvgLPPB : public RideMetric {
         double secs = 0.0f;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->lppe>0) { // use for average if we have an end
-                secs += item->ride()->recIntSecs();
-                total += point->lppb + (point->lppb>180?-360:0);
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *lppbCol = view.series(RideFile::lppb).constData();
+            const double *lppeCol = view.series(RideFile::lppe).constData();
+            const double dt = item->ride()->recIntSecs();
+            for (int i = first; i <= last; ++i) {
+                if (lppeCol[i] > 0) {
+                    secs += dt;
+                    total += lppbCol[i] + (lppbCol[i] > 180 ? -360 : 0);
+                }
             }
         }
 
@@ -3225,11 +3394,18 @@ class AvgRPPB : public RideMetric {
         double secs = 0.0f;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->rppe>0) { // use for average if we have an end
-                secs += item->ride()->recIntSecs();
-                total += point->rppb + (point->rppb>180?-360:0);
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *rppbCol = view.series(RideFile::rppb).constData();
+            const double *rppeCol = view.series(RideFile::rppe).constData();
+            const double dt = item->ride()->recIntSecs();
+            for (int i = first; i <= last; ++i) {
+                if (rppeCol[i] > 0) {
+                    secs += dt;
+                    total += rppbCol[i] + (rppbCol[i] > 180 ? -360 : 0);
+                }
             }
         }
 
@@ -3279,11 +3455,17 @@ class AvgLPPE : public RideMetric {
         double secs = 0.0f;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->lppe > 0) {
-                secs += item->ride()->recIntSecs();
-                total += point->lppe;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *lppeCol = view.series(RideFile::lppe).constData();
+            const double dt = item->ride()->recIntSecs();
+            for (int i = first; i <= last; ++i) {
+                if (lppeCol[i] > 0) {
+                    secs += dt;
+                    total += lppeCol[i];
+                }
             }
         }
 
@@ -3331,12 +3513,17 @@ class AvgRPPE : public RideMetric {
         double secs = 0.0f;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            if (point->rppe > 0) { // end has to be > 0
-                secs += item->ride()->recIntSecs();
-                total += point->rppe;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *rppeCol = view.series(RideFile::rppe).constData();
+            const double dt = item->ride()->recIntSecs();
+            for (int i = first; i <= last; ++i) {
+                if (rppeCol[i] > 0) {
+                    secs += dt;
+                    total += rppeCol[i];
+                }
             }
         }
 
@@ -3384,12 +3571,18 @@ class AvgLPPPB : public RideMetric {
         double secs = 0.0f;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            if (point->lpppe>0) { // use for average if we have an end
-                secs += item->ride()->recIntSecs();
-                total += point->lpppb + (point->lpppb>180?-360:0);
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *lpppbCol = view.series(RideFile::lpppb).constData();
+            const double *lpppeCol = view.series(RideFile::lpppe).constData();
+            const double dt = item->ride()->recIntSecs();
+            for (int i = first; i <= last; ++i) {
+                if (lpppeCol[i] > 0) {
+                    secs += dt;
+                    total += lpppbCol[i] + (lpppbCol[i] > 180 ? -360 : 0);
+                }
             }
         }
 
@@ -3437,12 +3630,18 @@ class AvgRPPPB : public RideMetric {
         double secs = 0.0f;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            if (point->rpppe>0) { // use for average if we have an end
-                secs += item->ride()->recIntSecs();
-                total += point->rpppb + (point->rpppb>180?-360:0);
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *rpppbCol = view.series(RideFile::rpppb).constData();
+            const double *rpppeCol = view.series(RideFile::rpppe).constData();
+            const double dt = item->ride()->recIntSecs();
+            for (int i = first; i <= last; ++i) {
+                if (rpppeCol[i] > 0) {
+                    secs += dt;
+                    total += rpppbCol[i] + (rpppbCol[i] > 180 ? -360 : 0);
+                }
             }
         }
 
@@ -3491,11 +3690,17 @@ class AvgLPPPE : public RideMetric {
         double secs = 0.0f;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->lpppe > 0) { // end has to be > 0
-                secs += item->ride()->recIntSecs();
-                total += point->lpppe;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *lpppeCol = view.series(RideFile::lpppe).constData();
+            const double dt = item->ride()->recIntSecs();
+            for (int i = first; i <= last; ++i) {
+                if (lpppeCol[i] > 0) {
+                    secs += dt;
+                    total += lpppeCol[i];
+                }
             }
         }
 
@@ -3543,12 +3748,17 @@ class AvgRPPPE : public RideMetric {
         double secs = 0.0f;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            if (point->rpppe > 0) { // end has to be > 0
-                secs += item->ride()->recIntSecs();
-                total += point->rpppe;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *rpppeCol = view.series(RideFile::rpppe).constData();
+            const double dt = item->ride()->recIntSecs();
+            for (int i = first; i <= last; ++i) {
+                if (rpppeCol[i] > 0) {
+                    secs += dt;
+                    total += rpppeCol[i];
+                }
             }
         }
 

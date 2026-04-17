@@ -37,7 +37,8 @@ CONFIG(debug, debug|release) { QMAKE_CXXFLAGS += -DGC_DEBUG }
 
 # always
 QT += xml sql network svg  widgets concurrent serialport multimedia multimediawidgets \
-      webenginecore webenginewidgets webchannel positioning webenginequick core5compat
+      webenginecore webenginewidgets webchannel positioning webenginequick core5compat \
+      quick quickwidgets
 CONFIG += c++17
 
 ###=======================================================================
@@ -537,6 +538,10 @@ SOURCES += Charts/UserChartWindow.cpp Charts/UserChartOverviewItem.cpp Charts/Us
            Charts/GenericChart.cpp Charts/GenericPlot.cpp Charts/GenericSelectTool.cpp Charts/GenericLegend.cpp \
 	   Charts/GenericAnnotations.cpp
 
+# QSG-backed line chart primitives (see prototypes/qsgChart/ for bench).
+HEADERS += Charts/GcLineCurve.h Charts/GcChartAxis.h
+SOURCES += Charts/GcLineCurve.cpp Charts/GcChartAxis.cpp
+
 ###=====================
 ### LEX AND YACC SOURCES
 ###=====================
@@ -552,6 +557,24 @@ LEXSOURCES  += Core/DataFilter.l \
                Core/RideDB.l \
                Train/WorkoutFilter.l \
                Train/TrainerDayAPIQuery.l
+
+# qmake's yacc rules clean the *_yacc outputs but not the temporary *.tab.{h,c}
+# files. When stale *.tab.h symlinks exist, parallel/full builds can end up
+# moving a generated file onto itself. Clean those temporary yacc artifacts
+# before regeneration.
+YACC_TAB_ARTIFACTS = DataFilter.tab.h DataFilter.tab.c \
+                     JsonRideFile.tab.h JsonRideFile.tab.c \
+                     RideDB.tab.h RideDB.tab.c \
+                     WorkoutFilter.tab.h WorkoutFilter.tab.c \
+                     TrainerDayAPIQuery.tab.h TrainerDayAPIQuery.tab.c
+
+yacc_cleanup_tabfiles.target = yacc_cleanup_tabfiles
+yacc_cleanup_tabfiles.commands = -$(DEL_FILE) $$YACC_TAB_ARTIFACTS
+QMAKE_EXTRA_TARGETS += yacc_cleanup_tabfiles
+yacc_decl.depends += yacc_cleanup_tabfiles
+yacc_impl.depends += yacc_cleanup_tabfiles
+compiler_yacc_decl_make_all.depends += yacc_cleanup_tabfiles
+compiler_yacc_impl_make_all.depends += yacc_cleanup_tabfiles
 
 # Fix parallel build races (YACC headers must exist before LEX runs)
 compiler_lex_make_all.depends += compiler_yacc_decl_make_all
@@ -579,7 +602,8 @@ HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPl
 
 # cloud services
 HEADERS += Cloud/CalendarDownload.h Cloud/CloudService.h \
-           Cloud/LocalFileStore.h Cloud/OAuthDialog.h \
+           Cloud/CloudJsonParsers.h Cloud/LocalFileStore.h Cloud/OAuthDialog.h \
+           Cloud/StravaCredentials.h \
            Cloud/WithingsDownload.h Cloud/Strava.h Cloud/CyclingAnalytics.h Cloud/RideWithGPS.h \
            Cloud/TrainingsTageBuch.h Cloud/Selfloops.h Cloud/SportsPlusHealth.h \
            Cloud/AddCloudWizard.h Cloud/Withings.h Cloud/MeasuresDownload.h Cloud/Xert.h \
@@ -595,13 +619,14 @@ HEADERS += Core/Athlete.h Core/Context.h Core/DataFilter.h Core/FreeSearch.h Cor
 # device and file IO or edit
 HEADERS += FileIO/ArchiveFile.h FileIO/AthleteBackup.h  FileIO/Bin2RideFile.h FileIO/BinRideFile.h \
            FileIO/CommPort.h \
-           FileIO/Computrainer3dpFile.h FileIO/CsvRideFile.h FileIO/DataProcessor.h FileIO/Device.h  \
+           FileIO/Computrainer3dpFile.h FileIO/Computrainer3dpParser.h FileIO/CsvRideFile.h FileIO/DataProcessor.h FileIO/Device.h  \
            FileIO/FitlogParser.h FileIO/FitlogRideFile.h FileIO/FitRideFile.h FileIO/GcRideFile.h FileIO/GpxParser.h \
            FileIO/GpxRideFile.h FileIO/JouleDevice.h FileIO/JsonRideFile.h FileIO/LapsEditor.h FileIO/MacroDevice.h \
            FileIO/ManualRideFile.h FileIO/MoxyDevice.h FileIO/PolarRideFile.h \
            FileIO/PowerTapDevice.h FileIO/PowerTapUtil.h FileIO/PwxRideFile.h FileIO/QuarqParser.h FileIO/QuarqRideFile.h \
            FileIO/RawRideFile.h FileIO/RideAutoImportConfig.h FileIO/RideFileCache.h \
-           FileIO/RideFileCommand.h FileIO/RideFile.h FileIO/RideFileTableModel.h  FileIO/Serial.h \
+           FileIO/TacxCafParser.h \
+           FileIO/RideFileCommand.h FileIO/RideFile.h FileIO/RideFileData.h FileIO/RideFileTableModel.h  FileIO/Serial.h \
            FileIO/SlfParser.h FileIO/SlfRideFile.h FileIO/SmfParser.h FileIO/SmfRideFile.h FileIO/SmlParser.h \
            FileIO/SmlRideFile.h FileIO/SrdRideFile.h FileIO/SrmRideFile.h FileIO/SyncRideFile.h FileIO/TcxParser.h \
            FileIO/TcxRideFile.h FileIO/TxtRideFile.h FileIO/WkoRideFile.h FileIO/XDataDialog.h FileIO/XDataTableModel.h \
@@ -653,7 +678,13 @@ HEADERS += Train/AddDeviceWizard.h Train/CalibrationData.h Train/ComputrainerCon
            Train/RealtimeData.h Train/RealtimePlot.h Train/RealtimePlotWindow.h Train/RemoteControl.h Train/SpinScanPlot.h \
            Train/SpinScanPlotWindow.h Train/SpinScanPolarPlot.h Train/GarminServiceHelper.h Train/PhysicsUtility.h Train/BicycleSim.h \
            Train/PolynomialRegression.h Train/MultiRegressionizer.h Train/StravaRoutesDownload.h \
-           Train/VideoSyncFileBase.h Train/ErgFileBase.h \
+           Train/VideoSyncFileBase.h Train/ErgFileBase.h Train/WorkoutDraft.h Train/WorkoutGenerationService.h \
+           Train/TrainingConstraintChecker.h Train/TrainingSimulator.h \
+           Train/BanisterSimulator.h \
+           Train/BayesianEstimator.h \
+           Train/MultiComponentModel.h \
+           Train/TrainingPlan.h \
+           Train/LLMWorkoutBridge.h \
            Train/ModelFilter.h Train/MultiFilterProxyModel.h Train/WorkoutFilter.h Train/FilterEditor.h \
            Train/WorkoutFilterBox.h Train/TagBar.h Train/Taggable.h Train/TagStore.h Train/TagWidget.h \
            Train/TrainerDayAPIQuery.h Train/TrainerDayAPIDialog.h Train/ElevationChartWindow.h
@@ -690,7 +721,8 @@ SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts
 
 ## Cloud Services / Web resources
 SOURCES += Cloud/CalendarDownload.cpp Cloud/CloudService.cpp \
-           Cloud/LocalFileStore.cpp Cloud/OAuthDialog.cpp \
+           Cloud/CloudJsonParsers.cpp Cloud/LocalFileStore.cpp Cloud/OAuthDialog.cpp \
+           Cloud/StravaCredentials.cpp \
            Cloud/WithingsDownload.cpp Cloud/Strava.cpp Cloud/CyclingAnalytics.cpp Cloud/RideWithGPS.cpp \
            Cloud/TrainingsTageBuch.cpp Cloud/Selfloops.cpp Cloud/SportsPlusHealth.cpp \
            Cloud/AddCloudWizard.cpp Cloud/Withings.cpp Cloud/MeasuresDownload.cpp Cloud/Xert.cpp \
@@ -706,7 +738,7 @@ SOURCES += Core/Athlete.cpp Core/Context.cpp Core/DataFilter.cpp Core/FreeSearch
 ## File and Device IO and Editing
 SOURCES += FileIO/ArchiveFile.cpp FileIO/AthleteBackup.cpp FileIO/Bin2RideFile.cpp FileIO/BinRideFile.cpp \
            FileIO/CommPort.cpp \
-           FileIO/Computrainer3dpFile.cpp FileIO/CsvRideFile.cpp FileIO/DataProcessor.cpp FileIO/Device.cpp \
+           FileIO/Computrainer3dpFile.cpp FileIO/Computrainer3dpParser.cpp FileIO/CsvRideFile.cpp FileIO/DataProcessor.cpp FileIO/Device.cpp \
            FileIO/FitlogParser.cpp FileIO/FitlogRideFile.cpp FileIO/FitRideFile.cpp FileIO/FixAeroPod.cpp FileIO/FixDeriveDistance.cpp \
            FileIO/FixDeriveHeadwind.cpp FileIO/FixDerivePower.cpp FileIO/FixDeriveTorque.cpp FileIO/FixElevation.cpp FileIO/FixLapSwim.cpp \
            FileIO/FixFreewheeling.cpp FileIO/FixGaps.cpp FileIO/FixGPS.cpp FileIO/FixRunningCadence.cpp FileIO/FixRunningPower.cpp \
@@ -715,10 +747,10 @@ SOURCES += FileIO/ArchiveFile.cpp FileIO/AthleteBackup.cpp FileIO/Bin2RideFile.c
            FileIO/MacroDevice.cpp FileIO/ManualRideFile.cpp FileIO/MoxyDevice.cpp \
            FileIO/PolarRideFile.cpp FileIO/PowerTapDevice.cpp FileIO/PowerTapUtil.cpp FileIO/PwxRideFile.cpp FileIO/QuarqParser.cpp \
            FileIO/QuarqRideFile.cpp FileIO/RawRideFile.cpp FileIO/RideAutoImportConfig.cpp \
-           FileIO/RideFileCache.cpp FileIO/RideFileCommand.cpp FileIO/RideFile.cpp FileIO/RideFileTableModel.cpp \
+           FileIO/RideFileCache.cpp FileIO/RideFileCommand.cpp FileIO/RideFile.cpp FileIO/RideFileData.cpp FileIO/RideFileTableModel.cpp \
            FileIO/Serial.cpp FileIO/SlfParser.cpp FileIO/SlfRideFile.cpp FileIO/SmfParser.cpp FileIO/SmfRideFile.cpp FileIO/SmlParser.cpp \
            FileIO/SmlRideFile.cpp FileIO/Snippets.cpp FileIO/SrdRideFile.cpp FileIO/SrmRideFile.cpp FileIO/SyncRideFile.cpp \
-           FileIO/TacxCafRideFile.cpp FileIO/TcxParser.cpp FileIO/TcxRideFile.cpp FileIO/TxtRideFile.cpp FileIO/WkoRideFile.cpp \
+           FileIO/TacxCafParser.cpp FileIO/TacxCafRideFile.cpp FileIO/TcxParser.cpp FileIO/TcxRideFile.cpp FileIO/TxtRideFile.cpp FileIO/WkoRideFile.cpp \
            FileIO/XDataDialog.cpp FileIO/XDataTableModel.cpp FileIO/FilterHRV.cpp FileIO/MeasuresCsvImport.cpp \
            FileIO/LocationInterpolation.cpp FileIO/TTSReader.cpp FileIO/EpmRideFile.cpp FileIO/EpmParser.cpp
 
@@ -770,7 +802,13 @@ SOURCES += Train/AddDeviceWizard.cpp Train/CalibrationData.cpp Train/Computraine
            Train/RealtimeData.cpp Train/RealtimePlot.cpp Train/RealtimePlotWindow.cpp Train/RemoteControl.cpp Train/SpinScanPlot.cpp \
            Train/SpinScanPlotWindow.cpp Train/SpinScanPolarPlot.cpp Train/GarminServiceHelper.cpp Train/PhysicsUtility.cpp Train/BicycleSim.cpp \
            Train/PolynomialRegression.cpp Train/StravaRoutesDownload.cpp \
-           Train/VideoSyncFileBase.cpp Train/ErgFileBase.cpp \
+           Train/VideoSyncFileBase.cpp Train/ErgFileBase.cpp Train/WorkoutDraft.cpp Train/WorkoutGenerationService.cpp \
+           Train/TrainingConstraintChecker.cpp Train/TrainingSimulator.cpp \
+           Train/BanisterSimulator.cpp Train/BanisterSimulatorAthlete.cpp \
+           Train/BayesianEstimator.cpp \
+           Train/MultiComponentModel.cpp \
+           Train/TrainingPlan.cpp Train/TrainingPlanStorage.cpp \
+           Train/LLMWorkoutBridge.cpp \
            Train/ModelFilter.cpp Train/MultiFilterProxyModel.cpp Train/WorkoutFilter.cpp Train/FilterEditor.cpp \
            Train/WorkoutFilterBox.cpp Train/TagBar.cpp Train/TagWidget.cpp \
            Train/TrainerDayAPIQuery.cpp Train/TrainerDayAPIDialog.cpp Train/ElevationChartWindow.cpp

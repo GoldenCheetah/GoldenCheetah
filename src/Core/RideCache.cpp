@@ -338,50 +338,70 @@ RideCache::removeCurrentRide() {
     // if there is no current activity to delete then return
     if (context->ride == NULL) return false;
 
-    // pass the current ride filename for deletion
-    return removeRide(context->ride->fileName);
+    return removeRide(context->ride);
 }
 
 bool
 RideCache::removeRide(const QString& filenameToDelete) {
-  
     // if there is no file activity to delete then return
     if (filenameToDelete.isEmpty()) return false;
 
+    for (RideItem *rideItem : rides_) {
+        if (rideItem != nullptr && rideItem->fileName == filenameToDelete) {
+            return removeRide(rideItem);
+        }
+    }
+
+    qDebug()<<"ERROR: delete not found.";
+    return false;
+}
+
+bool
+RideCache::removeRide(RideItem *rideToDelete)
+{
+    if (rideToDelete == nullptr) {
+        return false;
+    }
+
     RideItem* select = NULL; // ride to select once its gone
-    RideItem* todelete = NULL;
-    int index = 0; // index to wipe out
+    RideItem* todelete = rideToDelete;
+    int index = rides_.indexOf(rideToDelete);
+    if (index < 0) {
+        qDebug()<<"ERROR: delete not found.";
+        return false;
+    }
 
     // find the filenameToDelete in the list and if it happens to be the
     // the current ride then select another one immediately after it, but
     // if it is the last one on the list select the one before
-    for (index = 0; index < rides_.count(); index++) {
-
-        RideItem* rideI = rides_[index];
-
-        if (rideI->fileName == filenameToDelete) {
-
-            // bingo!
-            todelete = rideI;
-
-            // if the ride to be deleted happens to be the current ride, then select another
-            if (context->ride == todelete) {
-                if (rides_.count() - index > 1) select = rides_[index + 1];
-                else if (index > 0) select = rides_[index - 1];
-            }
-            break;
-        }
+    if (context->ride == todelete) {
+        if (rides_.count() - index > 1) select = rides_[index + 1];
+        else if (index > 0) select = rides_[index - 1];
     }
 
-    // WTAF!?
-    if (!todelete) {
-        qDebug()<<"ERROR: delete not found.";
+    // delete the file by renaming it
+    const QString filenameToDelete = todelete->fileName;
+    const QString activityDirectory = todelete->path.isEmpty()
+        ? (todelete->planned ? plannedDirectory : directory).canonicalPath()
+        : todelete->path;
+    QFile file(activityDirectory + "/" + filenameToDelete);
+
+    // purposefully don't remove the old ext so the user wouldn't have to figure out what the old file type was
+    QString strNewName = filenameToDelete + ".bak";
+    const QString backupPath = context->athlete->home->fileBackup().canonicalPath() + "/" + strNewName;
+
+    // in case there was an existing bak file, delete it
+    // ignore errors since it probably isn't there.
+    QFile::remove(backupPath);
+
+    if (!file.rename(backupPath)) {
+        QMessageBox::critical(NULL, "Rename Error", tr("Can't rename %1 to %2 in %3")
+            .arg(filenameToDelete).arg(strNewName).arg(context->athlete->home->fileBackup().canonicalPath()));
         return false;
     }
 
     // If this activity is linked, unlink it first
     if (todelete->hasLinkedActivity()) {
-        QString linkedFileName = todelete->getLinkedFileName();
         RideItem *linkedItem = getLinkedActivity(todelete);
         if (linkedItem) {
             linkedItem->clearLinkedFileName();
@@ -394,29 +414,12 @@ RideCache::removeRide(const QString& filenameToDelete) {
     // hand for add, update, delete
     DataProcessorFactory::instance().autoProcess(todelete->ride(), "Save", "DELETE");
 
-    // remove from the cache, before deleting it this is so
-    // any aggregating functions no longer see it, when recalculating
-    // during aride deleted operation
-    // but model needs to know about this!
+    // remove from the cache only after the on-disk delete succeeded
+    // so failed renames do not leave the UI and filesystem out of sync.
     model_->startRemove(index);
     rides_.remove(index, 1);
     delete_<<todelete;
     model_->endRemove(index);
-
-    // delete the file by renaming it
-    QFile file((todelete->planned ? plannedDirectory : directory).canonicalPath() + "/" + filenameToDelete);
-
-    // purposefully don't remove the old ext so the user wouldn't have to figure out what the old file type was
-    QString strNewName = filenameToDelete + ".bak";
-
-    // in case there was an existing bak file, delete it
-    // ignore errors since it probably isn't there.
-    QFile::remove(context->athlete->home->fileBackup().canonicalPath() + "/" + strNewName);
-
-    if (!file.rename(context->athlete->home->fileBackup().canonicalPath() + "/" + strNewName)) {
-        QMessageBox::critical(NULL, "Rename Error", tr("Can't rename %1 to %2 in %3")
-            .arg(filenameToDelete).arg(strNewName).arg(context->athlete->home->fileBackup().canonicalPath()));
-    }
 
     // remove any other derived/additional files; notes, cpi etc (they can only exist in /cache )
     QStringList extras;
@@ -605,9 +608,12 @@ RideCache::refresh()
         //watcher.setFuture(future);
 
         // calculate number of threads and work per thread
+        // - leave one core for the GUI so the app stays responsive during
+        //   a long batch refresh, but don't spawn more workers than there
+        //   is work for (each excess worker just creates/destroys a thread
+        //   and exits immediately).
         int maxthreads = QThreadPool::globalInstance()->maxThreadCount();
-        int threads = maxthreads / 2;
-        if (threads==0) threads=1; // need at least one!
+        int threads = qMax(1, qMin(maxthreads - 1, staleCount));
         int n=0;
 
         // refresh happenning
@@ -1753,7 +1759,9 @@ RideCache::updateFromWorkout
         return false;
     }
     ErgFile ergFile(workoutFilename, ErgFileFormat::unknown, context, item->dateTime.date());
-    if (! ergFile.hasRelativeWatts()) {
+    // Linked planned workouts may be saved as either absolute-watt .erg files
+    // or relative-watt .mrc files. Both should refresh planned metrics.
+    if (! ergFile.hasWatts()) {
         return false;
     }
     bool changed = false;

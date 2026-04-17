@@ -153,12 +153,13 @@ SportsPlusHealth::writeFileCompleted()
     printd("SportsPlusHealth::writeFileCompleted()\n");
 
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
+    const QByteArray body = reply->readAll();
 
     bool success=false;
     int errorcode=-1;
 
-    printd("reply:%s\n", reply->readAll().toStdString().c_str());
-    MVJSONReader jsonResponse(reply->readAll().toStdString().c_str());
+    printd("reply:%s\n", body.constData());
+    MVJSONReader jsonResponse(body.toStdString().c_str());
     if(jsonResponse.root && jsonResponse.root->hasField("success") && jsonResponse.root->hasField("error_code")) {
         success = jsonResponse.root->getFieldBool("success");
         errorcode = jsonResponse.root->getFieldInt("error_code");

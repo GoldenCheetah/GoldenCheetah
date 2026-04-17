@@ -18,6 +18,7 @@
 
 #include "RideMetric.h"
 #include "RideItem.h"
+#include "RideFileData.h"
 #include "Specification.h"
 #include "RideFile.h"
 #include "Context.h"
@@ -81,21 +82,27 @@ class XPower : public RideMetric {
         int count = 0;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *watts = view.series(RideFile::watts).constData();
+            const double *secs_data = view.series(RideFile::secs).constData();
+            for (int i = first; i <= last; ++i) {
 
-            while ((weighted > NEGLIGIBLE)
-                   && (point->secs > lastSecs + secsDelta + EPSILON)) {
+                while ((weighted > NEGLIGIBLE)
+                       && (secs_data[i] > lastSecs + secsDelta + EPSILON)) {
+                    weighted *= attenuation;
+                    lastSecs += secsDelta;
+                    total += pow(weighted, 4.0);
+                    count++;
+                }
                 weighted *= attenuation;
-                lastSecs += secsDelta;
+                weighted += sampleWeight * watts[i];
+                lastSecs = secs_data[i];
                 total += pow(weighted, 4.0);
                 count++;
             }
-            weighted *= attenuation;
-            weighted += sampleWeight * point->watts;
-            lastSecs = point->secs;
-            total += pow(weighted, 4.0);
-            count++;
         }
         xpower = count ? pow(total / count, 0.25) : 0.0;
         secs = count * secsDelta;
@@ -272,12 +279,17 @@ class aTISS : public RideMetric {
         if (cp && item->ride()->areDataPresent()->watts) {
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-                // a * exp (b * exp (c * fraction of cp) ) 
-                aTISS += item->ride()->recIntSecs() * (a * exp(b * exp(c * (double(point->watts) / double(cp)))));
+        const int firstIdx = it.firstIndex();
+        const int lastIdx  = it.lastIndex();
+        if (firstIdx >= 0 && lastIdx >= firstIdx) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *watts = view.series(RideFile::watts).constData();
+            const double recIntSecs = item->ride()->recIntSecs();
+            for (int i = firstIdx; i <= lastIdx; ++i) {
+                // a * exp (b * exp (c * fraction of cp) )
+                aTISS += recIntSecs * (a * exp(b * exp(c * (double(watts[i]) / double(cp)))));
             }
+        }
         }
         setValue(aTISS);
     }
@@ -329,11 +341,16 @@ class anTISS : public RideMetric {
 
         if (cp && item->ride()->areDataPresent()->watts) {
             RideFileIterator it(item->ride(), spec);
-            while (it.hasNext()) {
-                struct RideFilePoint *point = it.next();
-
-                // a * exp (b * exp (c * fraction of cp) ) 
-                anTISS += item->ride()->recIntSecs() * (a * exp(b * exp(c * (double(point->watts) / double(cp)))));
+            const int firstIdx = it.firstIndex();
+            const int lastIdx  = it.lastIndex();
+            if (firstIdx >= 0 && lastIdx >= firstIdx) {
+                const RideFileData &view = item->ride()->columnar();
+                const double *watts = view.series(RideFile::watts).constData();
+                const double recIntSecs = item->ride()->recIntSecs();
+                for (int i = firstIdx; i <= lastIdx; ++i) {
+                    // a * exp (b * exp (c * fraction of cp) )
+                    anTISS += recIntSecs * (a * exp(b * exp(c * (double(watts[i]) / double(cp)))));
+                }
             }
         }
         setValue(anTISS);

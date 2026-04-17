@@ -82,8 +82,7 @@ RideAutoImportConfig::readConfig()
 void
 RideAutoImportConfig::writeConfig()
 {
-    // update seasons.xml
-    QString file = QString(config.canonicalPath() + "/autoimportrules.xml");
+    QString file = QString(config.canonicalPath() + "/autoimport.xml");
     RideAutoImportConfigParser::serialize(file, _configList);
 
     changedConfig(); // signal!
@@ -232,6 +231,5 @@ QString RideAutoImportConfigParser::DecodeXML ( const QString& decodeMe )
 
     return temp;
 }
-
 
 
