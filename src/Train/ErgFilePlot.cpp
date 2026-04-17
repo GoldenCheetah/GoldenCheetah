@@ -757,7 +757,7 @@ ErgFilePlot::setActiveCurveAlpha
 
 
 void
-ErgFilePlot::performancePlot(RealtimeData rtdata)
+ErgFilePlot::performancePlot(const RealtimeData &rtdata)
 {
     // don't update this plot if we are not running or are paused
     if ((!context->isRunning) || (context->isPaused)) return;

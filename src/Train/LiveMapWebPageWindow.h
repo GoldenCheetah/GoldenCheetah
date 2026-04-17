@@ -106,7 +106,7 @@ class LiveMapWebPageWindow : public GcChartWindow
         void drawRoute(ErgFile* f);
 
     private slots:
-        void telemetryUpdate(RealtimeData rtd);
+        void telemetryUpdate(const RealtimeData &rtd);
         void stop();
 
     protected:
