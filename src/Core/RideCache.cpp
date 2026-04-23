@@ -534,14 +534,35 @@ RideCache::nextRefresh()
     return(returning);
 }
 
+
+RideCacheRefreshThread::RideCacheRefreshThread(RideCache *cache)
+: cache(cache)
+{
+    QPointer<RideCacheRefreshThread> weakSelf(this);
+    connect(this, &QThread::finished, cache, [weakSelf, c = QPointer<RideCache>(cache)]() {
+        if (weakSelf && c) {
+            c->cleanupThread(weakSelf.data());
+        }
+    }, Qt::QueuedConnection);
+}
+
+void
+RideCache::cleanupThread(RideCacheRefreshThread *thread)
+{
+    thread->wait();
+    delete thread;
+}
+
 void
 RideCache::threadCompleted(RideCacheRefreshThread*thread)
 {
     updateMutex.lock();
     refreshThreads.removeOne(thread);
+    bool isLast = refreshThreads.isEmpty();
+    bool cancelled = isCancelled;
     updateMutex.unlock();
 
-    if (refreshThreads.count() == 0) {
+    if (isLast && ! cancelled) {
         //fprintf(stderr,"refresh ended\n"); fflush(stderr);
         context->notifyRefreshEnd();
         garbageCollect();
@@ -567,16 +588,24 @@ void
 RideCache::cancel()
 {
     updateMutex.lock();
-    QVector<RideCacheRefreshThread*>current = refreshThreads;
-    updates=-1;
+    QVector<RideCacheRefreshThread*> current = refreshThreads;
+    updates = -1;
+    isCancelled = true;
     updateMutex.unlock();
 
     // wait till threads are empty, but use our copy as the master
     // is going to be changing as threads terminate and we need to be
     // sure all our threads have stopped before returning.
-    foreach(RideCacheRefreshThread *thread, current) {
+    for (RideCacheRefreshThread *thread : current) {
+        thread->requestInterruption();
+        disconnect(thread, &QThread::finished, nullptr, nullptr);
         thread->wait();
+        delete thread;
     }
+
+    updateMutex.lock();
+    isCancelled = false;
+    updateMutex.unlock();
 }
 
 // check if we need to refresh the metrics then start the thread if needed
@@ -1813,24 +1842,28 @@ bool
 RideCache::updateFromWorkoutAfter
 (const QDate &when, bool autoSave)
 {
+    cancel();
+
     QList<RideItem*> changedItems;
-    for (RideItem *item : context->athlete->rideCache->rides()) {
-        if (item->planned && item->dateTime.date() >= when) {
-            if (context->athlete->rideCache->updateFromWorkout(item, false)) {
+    for (RideItem *item : rides()) {
+        if (   item
+            && item->planned
+            && item->dateTime.date() >= when) {
+            if (updateFromWorkout(item, false)) {
                 changedItems << item;
             }
         }
     }
-    if (changedItems.count() > 0) {
+
+    if (! changedItems.isEmpty()) {
         if (autoSave) {
             QString error;
             saveActivities(changedItems, error);
         }
-        cancel();
         refresh();
         estimator->refresh();
     }
-    return changedItems.count() > 0;
+    return ! changedItems.isEmpty();
 }
 
 
@@ -1909,26 +1942,35 @@ RideCache::copyPlannedRideFile
 // refresh metrics
 void RideCacheRefreshThread::run()
 {
-    //fprintf(stderr, "worker thread starts!\n"); fflush(stderr);
-    while (1) {
-
+    while (! isInterruptionRequested()) {
         int n = cache->nextRefresh();
         //fprintf(stderr, "refreshing %d of %d\n", n+1, cache->reverse_.count()); fflush(stderr);
-        if (n<0) {
+        if (n < 0) {
             //fprintf(stderr, "worker thread exits!\n"); fflush(stderr);
             goto exitthread;
         }
 
-        // we have one to do
-        RideItem *item = cache->reverse_[n];
-        if(item->isstale) {
+        if (isInterruptionRequested()) {
+            goto exitthread;
+        }
+
+        RideItem *item = nullptr;
+        {
+            QMutexLocker locker(&cache->updateMutex);
+            if (n < cache->reverse_.count()) {
+                item = cache->reverse_[n];
+            }
+        }
+
+        if (item && item->isstale) {
             item->refresh();
-            if (item == item->context->currentRideItem())
+            if (item == item->context->currentRideItem()) {
                 item->context->notifyRideChanged(item);
+            }
         }
     }
-
 exitthread:
-    cache->threadCompleted(this);
-    return;
+    if (cache) {
+        cache->threadCompleted(this);
+    }
 }
