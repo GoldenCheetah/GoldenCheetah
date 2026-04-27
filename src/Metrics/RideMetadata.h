@@ -22,6 +22,7 @@
 
 #include "Context.h"
 
+#include <QPointer>
 #include <QWidget>
 #include <QLabel>
 #include <QCheckBox>
@@ -180,7 +181,8 @@ class RideMetadata : public QWidget
     Q_OBJECT
     G_OBJECT
     Q_PROPERTY(RideItem *ride READ rideItem WRITE setRideItem)
-    RideItem *_ride, *_connected;
+    QPointer<RideItem> _ride;
+    QPointer<RideItem> _connected;
 
     public:
         RideMetadata(Context *, bool singlecolumn = false);
