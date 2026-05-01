@@ -48,6 +48,71 @@ static const QString planExtension(".gcplan");
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// DisplayBox::DisplayBox
+
+DisplayBox::DisplayBox
+(const QString &title, const Size &size, bool highlight, QWidget *parent)
+: QFrame(parent)
+{
+    setFrameShape(QFrame::StyledPanel);
+    setFrameShadow(QFrame::Raised);
+
+    QPalette pal = palette();
+    if (highlight) {
+        QColor palHighlightColor = pal.color(QPalette::Active, QPalette::Highlight);
+        palHighlightColor.setAlpha(30);
+        QColor highlightColor = GCColor::blendedColor(palHighlightColor, pal.color(QPalette::Base));
+        pal.setColor(QPalette::Window, highlightColor);
+        pal.setColor(QPalette::Text, GCColor::invertColor(highlightColor));
+    } else {
+        pal.setColor(QPalette::Window, pal.color(QPalette::Base));
+    }
+    setAutoFillBackground(true);
+    setPalette(pal);
+
+    valueLabel = new QLabel();
+    valueLabel->setAlignment(Qt::AlignLeft);
+    valueLabel->setWordWrap(true);
+    QFont valueFont = valueLabel->font();
+    if (size == Size::Large) {
+        valueFont.setPointSizeF(valueFont.pointSizeF() * 1.3);
+    } else if (size == Size::Medium) {
+        valueFont.setPointSizeF(valueFont.pointSizeF() * 1.15);
+    } else if (size == Size::Small) {
+        valueFont.setPointSizeF(valueFont.pointSizeF() * 1.0);
+    } else if (size == Size::Tiny) {
+        valueFont.setPointSizeF(valueFont.pointSizeF() * 0.85);
+    }
+    valueFont.setWeight(QFont::Medium);
+    valueLabel->setFont(valueFont);
+
+    titleLabel = new QLabel(title);
+    titleLabel->setAlignment(Qt::AlignLeft);
+    QFont titleFont = titleLabel->font();
+    titleFont.setPointSizeF(titleFont.pointSizeF() * 0.7);
+    titleFont.setWeight(QFont::Light);
+    titleLabel->setFont(titleFont);
+
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(12 * dpiXFactor, 8 * dpiYFactor, 12 * dpiXFactor, 8 * dpiYFactor);
+    layout->addWidget(titleLabel, 0);
+    layout->addWidget(valueLabel, 1);
+}
+
+
+void
+DisplayBox::setText
+(const QString &value)
+{
+    if (! value.trimmed().isEmpty()) {
+        valueLabel->setText(value.trimmed());
+    } else {
+        valueLabel->setText(tr("N/A"));
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // TargetRangeBar
 
 TargetRangeBar::TargetRangeBar
@@ -143,14 +208,11 @@ TargetRangeBar::formatDuration
     if (! start.isValid() || ! end.isValid()) {
         return "";
     }
-    int days = start.daysTo(end) + 1;
-    ShowDaysAsUnit unit = showDaysAs(days);
-    if (unit == ShowDaysAsUnit::Months) {
-        return tr("%1 mo").arg(daysToMonths(days));
-    } else if (unit == ShowDaysAsUnit::Weeks) {
-        return tr("%1 w").arg(daysToWeeks(days));
-    } else {
+    int days = std::abs(start.daysTo(end)) + 1;
+    if (days < 14) {
         return tr("%1 d").arg(days);
+    } else {
+        return tr("%1 w").arg((days + 6) / 7);
     }
 }
 
@@ -563,7 +625,7 @@ RepeatPlanPageSetup::RepeatPlanPageSetup
     QString localFormat = locale.dateFormat(QLocale::ShortFormat);
     QString customFormat = "ddd, " + localFormat;
 
-    setTitle(tr("Repeat Plan Setup"));
+    setTitle(tr("Repeat Plan - Setup"));
     setSubTitle(tr("Define the time range and repetition strategy for copying activities. Optionally select a season or phase to prefill the dates; only those ending before the target date <b>%1</b> can be selected.")
                   .arg(locale.toString(when, customFormat)));
 
@@ -747,7 +809,7 @@ RepeatPlanPageActivities::RepeatPlanPageActivities
 (Context *context, QWidget *parent)
 : QWizardPage(parent), context(context)
 {
-    setTitle(tr("Repeat Plan Activities"));
+    setTitle(tr("Repeat Plan - Activities"));
     setSubTitle(tr("Review and choose the activities you wish to add to your plan."));
 
     setFinalPage(false);
@@ -910,7 +972,7 @@ RepeatPlanPageSummary::RepeatPlanPageSummary
 (Context *context, QWidget *parent)
 : QWizardPage(parent), context(context)
 {
-    setTitle(tr("Repeat Plan Summary"));
+    setTitle(tr("Repeat Plan - Summary"));
     setSubTitle(tr("Preview the plan updates, including planned additions and deletions. No changes will be made until you continue."));
 
     setFinalPage(true);
@@ -1083,7 +1145,7 @@ void
 ExportPlanWizard::updateRange
 ()
 {
-    updateRange(description().rangeStart, description().rangeEnd, description().preferOriginal, true);
+    updateRange(description().rangeStart, description().rangeEnd, description().preferOriginal, false);
 }
 
 
@@ -1113,8 +1175,9 @@ ExportPlanWizard::updateRange
             }
             sourceRides << SourceRide { rideItem, rideDate, QDate(), true, -1, false };
         }
-        std::sort(sourceRides.begin(), sourceRides.end(),
-            [](const SourceRide &a, const SourceRide &b) { return a.sourceDate < b.sourceDate; });
+        std::sort(sourceRides.begin(), sourceRides.end(), [](const SourceRide &a, const SourceRide &b) {
+            return a.sourceDate < b.sourceDate;
+        });
 
         // QDateTime of any planned RideItem must be unique
         QHash<QDateTime, int> targetKeyCount;
@@ -1198,7 +1261,7 @@ ExportPlanPageSetup::ExportPlanPageSetup
     QString localFormat = locale.dateFormat(QLocale::ShortFormat);
     QString customFormat = "ddd, " + localFormat;
 
-    setTitle(tr("Export Plan Setup"));
+    setTitle(tr("Export Plan - Setup"));
     setSubTitle(tr("Define the time range and repetition strategy for exporting activities. Optionally select a season or phase to prefill the dates."));
 
 
@@ -1378,7 +1441,7 @@ ExportPlanPageActivities::ExportPlanPageActivities
 (Context *context, QWidget *parent)
 : QWizardPage(parent), context(context)
 {
-    setTitle(tr("Export Plan Activities"));
+    setTitle(tr("Export Plan - Activities"));
     setSubTitle(tr("Review and choose the activities you wish to export."));
 
 
@@ -1537,18 +1600,18 @@ ExportPlanPageMetadata::ExportPlanPageMetadata
 (Context *context, QWidget *parent)
 : QWizardPage(parent), context(context)
 {
-    setTitle(tr("Export Plan Metadata"));
+    setTitle(tr("Export Plan - Metadata"));
     setSubTitle(tr("Provide a description for the exported content. This will be shown again when importing."));
 
-    authorEdit = new QLineEdit();
     nameEdit = new QLineEdit();
+    authorEdit = new QLineEdit();
     copyrightEdit = new QLineEdit();
     descriptionEdit = new QTextEdit();
     descriptionEdit->setPlaceholderText(tr("Describe your plan in markdown..."));
 
     QFormLayout *form = newQFormLayout();
-    form->addRow(tr("Author") + "*", authorEdit);
     form->addRow(tr("Plan name") + "*", nameEdit);
+    form->addRow(tr("Author") + "*", authorEdit);
     form->addRow(tr("Copyright"), copyrightEdit);
     form->addRow(tr("Description"), descriptionEdit);
 
@@ -1640,61 +1703,101 @@ ExportPlanPageSummary::ExportPlanPageSummary
 (Context *context, QWidget *parent)
 : QWizardPage(parent), context(context)
 {
-    setTitle(tr("Export Plan Summary"));
+    setTitle(tr("Export Plan - Summary"));
     setSubTitle(tr("Preview the export results, including all selected activities. No data will be exported until you continue."));
 
     setFinalPage(true);
 
-    authorKey = new QLabel(tr("Author"));
-    QFont keyFont = authorKey->font();
-    keyFont.setBold(true);
-    authorKey->setFont(keyFont);
-    authorValue = new QLabel();
-    nameKey = new QLabel(tr("Plan name"));
-    nameKey->setFont(keyFont);
-    nameValue = new QLabel();
-    QLabel *rangeKey = new QLabel(tr("Source range"));
-    rangeKey->setFont(keyFont);
-    rangeValue = new QLabel();
-    QLabel *durationKey = new QLabel(tr("Duration"));
-    durationKey->setFont(keyFont);
-    durationValue = new QLabel();
-    QLabel *exportCountKey = new QLabel(tr("Number of activities"));
-    exportCountKey->setFont(keyFont);
-    exportCountValue = new QLabel();
-    copyrightKey = new QLabel(tr("Copyright"));
-    copyrightKey->setFont(keyFont);
-    copyrightValue = new QLabel();
+    nameBox = new DisplayBox(tr("Plan name"), DisplayBox::Size::Large);
+    authorBox = new DisplayBox(tr("Author"), DisplayBox::Size::Medium);
+    sportBox = new DisplayBox(tr("Sport"), DisplayBox::Size::Small, true);
+    durationBox = new DisplayBox(tr("Duration"), DisplayBox::Size::Small);
+    countBox = new DisplayBox(tr("Activities"), DisplayBox::Size::Small);
+    copyrightBox = new DisplayBox(tr("Copyright"), DisplayBox::Size::Tiny);
+
     descriptionValue = new QLabel();
     descriptionValue->setTextFormat(Qt::RichText);
+    descriptionValue->setWordWrap(true);
     descriptionValue->setTextInteractionFlags(Qt::NoTextInteraction);
+    QPalette descPal = descriptionValue->palette();
+    descPal.setColor(QPalette::Window, descPal.color(QPalette::Base));
+    descriptionValue->setAutoFillBackground(true);
+    descriptionValue->setPalette(descPal);
 
-    QFormLayout *overviewLayout = newQFormLayout();
-    overviewLayout->addRow(authorKey, authorValue);
-    overviewLayout->addRow(nameKey, nameValue);
-    overviewLayout->addRow(rangeKey, rangeValue);
-    overviewLayout->addRow(durationKey, durationValue);
-    overviewLayout->addRow(exportCountKey, exportCountValue);
-    overviewLayout->addRow(copyrightKey, copyrightValue);
-    overviewLayout->addItem(new QSpacerItem(0, 10 * dpiYFactor));
-    overviewLayout->addRow(descriptionValue);
+    QWidget *overviewFieldsWidget = new QWidget();
+
+    int row = 0;
+    QGridLayout *overviewFieldsLayout = new QGridLayout(overviewFieldsWidget);
+    overviewFieldsLayout->setColumnStretch(0, 6);
+    overviewFieldsLayout->setColumnStretch(1, 4);
+    overviewFieldsLayout->setContentsMargins(0, 0, 0, 0);
+    overviewFieldsLayout->addWidget(nameBox, row, 0, 1, 2);
+    ++row;
+    overviewFieldsLayout->addWidget(authorBox, row, 0, 1, 2);
+    ++row;
+    overviewFieldsLayout->addWidget(sportBox, row, 0, 1, 2);
+    ++row;
+    overviewFieldsLayout->addWidget(durationBox, row, 0);
+    overviewFieldsLayout->addWidget(countBox, row, 1);
+    ++row;
+    overviewFieldsLayout->addWidget(copyrightBox, row, 0, 1, 2);
+    ++row;
+    overviewFieldsLayout->setRowStretch(row, 1);
+
+    QScrollArea *overviewFieldsScroll = new QScrollArea();
+    overviewFieldsScroll->setFrameShape(QFrame::NoFrame);
+    overviewFieldsScroll->setWidget(overviewFieldsWidget);
+    overviewFieldsScroll->setWidgetResizable(true);
+    overviewFieldsScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    overviewFieldsScroll->setMinimumWidth(350 * dpiXFactor);
+    overviewFieldsScroll->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+
+    QScrollArea *overviewDescScroll = new QScrollArea();
+    overviewDescScroll->setFrameShape(QFrame::NoFrame);
+    overviewDescScroll->setWidget(descriptionValue);
+    overviewDescScroll->setWidgetResizable(true);
+    overviewDescScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    overviewDescScroll->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
+    QFrame *fieldsFrame = new QFrame();
+    fieldsFrame->setContentsMargins(10 * dpiXFactor, 30 * dpiYFactor, 0, 10 * dpiYFactor);
+
+    QVBoxLayout *fieldsLayout = new QVBoxLayout(fieldsFrame);
+    fieldsLayout->setContentsMargins(0, 0, 0, 0);
+    fieldsLayout->addWidget(new QLabel(tr("PLAN DETAILS")), 0);
+    fieldsLayout->addWidget(overviewFieldsScroll, 1);
+
+    QFrame *descFrame = new QFrame();
+    descFrame->setContentsMargins(15 * dpiXFactor, 30 * dpiYFactor, 0, 10 * dpiYFactor);
+    descFrame->setAutoFillBackground(true);
+    descFrame->setPalette(descPal);
+
+    QVBoxLayout *descLayout = new QVBoxLayout(descFrame);
+    descLayout->setContentsMargins(0, 0, 0, 0);
+    descLayout->addWidget(new QLabel(tr("PLAN DESCRIPTION")), 0);
+    descLayout->addWidget(overviewDescScroll, 1);
+
+    QWidget *overviewWidget = new QWidget();
+    overviewWidget->setAutoFillBackground(true);
+
+    QHBoxLayout *overviewSplitLayout = new QHBoxLayout(overviewWidget);
+    overviewSplitLayout->setContentsMargins(0, 0, 0, 0);
+    overviewSplitLayout->addWidget(fieldsFrame, 0);
+    overviewSplitLayout->addSpacing(10 * dpiXFactor);
+    overviewSplitLayout->addWidget(descFrame, 1);
 
     planTree = new QTreeWidget();
-    planTree->setColumnCount(3);
+    planTree->setColumnCount(4);
+    planTree->setHeaderLabels({ tr("Week"), tr("Day"), tr("Sport"), tr("Name") });
     basicTreeWidgetStyle(planTree, false);
-    planTree->setHeaderHidden(true);
+    planTree->setHeaderHidden(false);
 
     outputPathWidget = new DirectoryPathWidget(DirectoryPathMode::FileSave);
     outputPathWidget->setNameFilter(tr("Golden Cheetah Plans") + QString(" (*%1)").arg(planExtension));
     outputPathWidget->setPlaceholderText(tr("Output file"));
 
-    QScrollArea *overviewScroll = new QScrollArea();
-    overviewScroll->setFrameShape(QFrame::NoFrame);
-    overviewScroll->setWidget(centerLayoutInWidget(overviewLayout));
-    overviewScroll->setWidgetResizable(true);
-
     QTabWidget *tabWidget = new QTabWidget();
-    tabWidget->addTab(overviewScroll, tr("Overview"));
+    tabWidget->addTab(overviewWidget, tr("Overview"));
     tabWidget->addTab(planTree, tr("Activities in export"));
 
     QVBoxLayout *all = new QVBoxLayout();
@@ -1735,6 +1838,8 @@ ExportPlanPageSummary::initializePage
         return;
     }
 
+    QDate dayOne = wiz->description().rangeStart;
+
     QLocale locale;
     int numSelected = 0;
     QSet<QString> sports;
@@ -1744,9 +1849,11 @@ ExportPlanPageSummary::initializePage
         }
         QString sport = PlanBundle::getRideSport(sourceRide.rideItem);
         QTreeWidgetItem *planItem = new QTreeWidgetItem(planTree);
-        planItem->setData(0, Qt::DisplayRole, locale.toString(sourceRide.sourceDate, QLocale::ShortFormat));
-        planItem->setData(1, Qt::DisplayRole, sport);
-        planItem->setData(2, Qt::DisplayRole, PlanBundle::getRideName(sourceRide.rideItem));
+        int day = dayOne.daysTo(sourceRide.sourceDate);
+        planItem->setData(0, Qt::DisplayRole, QString::number(day / 7 + 1));
+        planItem->setData(1, Qt::DisplayRole, QString::number(day % 7 + 1));
+        planItem->setData(2, Qt::DisplayRole, sport);
+        planItem->setData(3, Qt::DisplayRole, PlanBundle::getRideName(sourceRide.rideItem));
         ++numSelected;
         sports.insert(sport);
     }
@@ -1754,24 +1861,21 @@ ExportPlanPageSummary::initializePage
 
     bool showAuthor = ! wiz->description().author.trimmed().isEmpty();
     if (showAuthor) {
-        authorValue->setText(wiz->description().author.trimmed());
+        authorBox->setText(wiz->description().author.trimmed());
     }
-    authorKey->setVisible(showAuthor);
-    authorValue->setVisible(showAuthor);
+    authorBox->setVisible(showAuthor);
 
     bool showName = ! wiz->description().name.trimmed().isEmpty();
     if (showName) {
-        nameValue->setText(wiz->description().name.trimmed());
+        nameBox->setText(wiz->description().name.trimmed());
     }
-    nameKey->setVisible(showName);
-    nameValue->setVisible(showName);
+    nameBox->setVisible(showName);
 
     bool showCopyright = ! wiz->description().copyright.trimmed().isEmpty();
     if (showCopyright) {
-        copyrightValue->setText(wiz->description().copyright.trimmed());
+        copyrightBox->setText(wiz->description().copyright.trimmed());
     }
-    copyrightKey->setVisible(showCopyright);
-    copyrightValue->setVisible(showCopyright);
+    copyrightBox->setVisible(showCopyright);
 
     bool showDescription = ! wiz->description().description.trimmed().isEmpty();
     if (showDescription) {
@@ -1781,35 +1885,17 @@ ExportPlanPageSummary::initializePage
     }
     descriptionValue->setVisible(showDescription);
 
-    rangeValue->setText(QString("%1 - %2")
-                               .arg(locale.toString(wiz->description().rangeStart, QLocale::ShortFormat))
-                               .arg(locale.toString(wiz->description().rangeEnd, QLocale::ShortFormat)));
-
     int days = wiz->description().rangeStart.daysTo(wiz->description().rangeEnd) + 1;
-    ShowDaysAsUnit unit = showDaysAs(days);
-    if (unit == ShowDaysAsUnit::Months) {
-        int months = daysToMonths(days);
-        if (months == 1) {
-            durationValue->setText(tr("1 month (%1 days)").arg(days));
-        } else {
-            durationValue->setText(tr("%1 months (%2 days)").arg(months).arg(days));
-        }
-    } else if (unit == ShowDaysAsUnit::Weeks) {
-        int weeks = daysToWeeks(days);
-        if (weeks == 1) {
-            durationValue->setText(tr("1 week (%1 days)").arg(days));
-        } else {
-            durationValue->setText(tr("%1 weeks (%2 days)").arg(weeks).arg(days));
-        }
+    if (days == 1) {
+        durationBox->setText(tr("1 day"));
+    } else if (days < 14) {
+        durationBox->setText(tr("%1 days").arg(days));
     } else {
-        if (days == 1) {
-            durationValue->setText(tr("1 day"));
-        } else {
-            durationValue->setText(tr("%1 days").arg(days));
-        }
+        durationBox->setText(tr("%1 weeks").arg((days + 6) / 7));
     }
 
-    exportCountValue->setText(QString("%1").arg(numSelected));
+    sportBox->setText(wiz->description().sport);
+    countBox->setText(QString("%1").arg(numSelected));
 
     if (wiz->description().planFile.trimmed().isEmpty()) {
         QDir dir = QDir::home();
@@ -1905,7 +1991,7 @@ ImportPlanWizard::ImportPlanWizard
 
     setOption(QWizard::NoCancelButtonOnLastPage, true);
 
-    setPage(PageSetup, new ImportPlanPageSetup(targetDay));
+    setPage(PageSetup, new ImportPlanPageSetup());
     setPage(PageActivities, new ImportPlanPageActivities());
     setPage(PageSummary, new ImportPlanPageSummary());
     setPage(PageResult, new ImportPlanPageResult());
@@ -1917,16 +2003,11 @@ ImportPlanWizard::ImportPlanWizard
 // ImportPlanPageSetup
 
 ImportPlanPageSetup::ImportPlanPageSetup
-(QDate targetDay, QWidget *parent)
+(QWidget *parent)
 : QWizardPage(parent)
 {
-    QLocale locale;
-    QString localFormat = locale.dateFormat(QLocale::ShortFormat);
-    QString customFormat = "ddd, " + localFormat;
-
-    setTitle(tr("Import Plan Setup"));
-    setSubTitle(tr("Define the target time range for placing the activities. Start date: <b>%1</b>.")
-                  .arg(locale.toString(targetDay, customFormat)));
+    setTitle(tr("Import Plan - Setup"));
+    setSubTitle(tr("Define the target time range for placing the activities."));
 
     DirectoryPathWidget *inputPathWidget = new DirectoryPathWidget(DirectoryPathMode::FileOpen);
     inputPathWidget->setNameFilter(tr("Golden Cheetah Plans") + QString(" (*%1)").arg(planExtension));
@@ -1945,86 +2026,127 @@ ImportPlanPageSetup::ImportPlanPageSetup
     statusFrame->setFrameShadow(QFrame::Plain);
     statusFrame->setLineWidth(1 * dpiXFactor);
     QHBoxLayout *statusLayout = new QHBoxLayout(statusFrame);
-    statusLayout->setContentsMargins(8 * dpiXFactor, 4 * dpiYFactor, 8 * dpiXFactor, 4 * dpiYFactor);
+    statusLayout->setContentsMargins(8 * dpiXFactor, 15 * dpiYFactor, 8 * dpiXFactor, 4 * dpiYFactor);
     statusLayout->setSpacing(6 * dpiXFactor);
-#if 0
-    statusLayout->addWidget(iconLabel);
-#endif
     statusLayout->addWidget(statusLabel);
 
-    authorKey = new QLabel(tr("Author"));
-    QFont keyFont = authorKey->font();
-    keyFont.setBold(true);
-    authorKey->setFont(keyFont);
-    authorValue = new QLabel();
-    nameKey = new QLabel(tr("Plan name"));
-    nameKey->setFont(keyFont);
-    nameValue = new QLabel();
-    QLabel *rangeKey = new QLabel(tr("Target range"));
-    rangeKey->setFont(keyFont);
-    rangeValue = new QLabel();
-    QLabel *durationKey = new QLabel(tr("Duration"));
-    durationKey->setFont(keyFont);
-    durationValue = new QLabel();
-    QLabel *countActivitiesKey = new QLabel(tr("Number of activities"));
-    countActivitiesKey->setFont(keyFont);
-    countActivitiesValue = new QLabel();
-    copyrightKey = new QLabel(tr("Copyright"));
-    copyrightKey->setFont(keyFont);
-    copyrightValue = new QLabel();
+    nameBox = new DisplayBox(tr("Plan name"), DisplayBox::Size::Large);
+    authorBox = new DisplayBox(tr("Author"), DisplayBox::Size::Medium);
+    sportBox = new DisplayBox(tr("Sport"), DisplayBox::Size::Small, true);
+    durationBox = new DisplayBox(tr("Duration"), DisplayBox::Size::Small);
+    countBox = new DisplayBox(tr("Activities"), DisplayBox::Size::Small);
+    copyrightBox = new DisplayBox(tr("Copyright"), DisplayBox::Size::Tiny);
+
+    QFrame *separator = new QFrame();
+    QColor sepCol = separator->palette().color(QPalette::Mid);
+    sepCol.setAlpha(180);
+    QString style = QString("background-color: %1;").arg(sepCol.name(QColor::HexArgb));
+    separator->setFixedHeight(1);
+    separator->setStyleSheet(style);
+
     descriptionValue = new QLabel();
     descriptionValue->setTextFormat(Qt::RichText);
     descriptionValue->setTextInteractionFlags(Qt::NoTextInteraction);
     descriptionValue->setWordWrap(true);
+    descriptionValue->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    QPalette descPal = descriptionValue->palette();
+    descPal.setColor(QPalette::Window, descPal.color(QPalette::Base));
+    descriptionValue->setAutoFillBackground(true);
+    descriptionValue->setPalette(descPal);
 
-    QFormLayout *overviewFieldsLayout = newQFormLayout();
-    overviewFieldsLayout->addRow(authorKey, authorValue);
-    overviewFieldsLayout->addRow(nameKey, nameValue);
-    overviewFieldsLayout->addRow(rangeKey, rangeValue);
-    overviewFieldsLayout->addRow(durationKey, durationValue);
-    overviewFieldsLayout->addRow(countActivitiesKey, countActivitiesValue);
-    overviewFieldsLayout->addRow(copyrightKey, copyrightValue);
+    QWidget *overviewFieldsWidget = new QWidget();
+
+    int row = 0;
+    QGridLayout *overviewFieldsLayout = new QGridLayout(overviewFieldsWidget);
+    overviewFieldsLayout->setColumnStretch(0, 6);
+    overviewFieldsLayout->setColumnStretch(1, 4);
+    overviewFieldsLayout->setContentsMargins(0, 0, 0, 0);
+    overviewFieldsLayout->addWidget(nameBox, row, 0, 1, 2);
+    ++row;
+    overviewFieldsLayout->addWidget(authorBox, row, 0, 1, 2);
+    ++row;
+    overviewFieldsLayout->addWidget(sportBox, row, 0, 1, 2);
+    ++row;
+    overviewFieldsLayout->addWidget(durationBox, row, 0);
+    overviewFieldsLayout->addWidget(countBox, row, 1);
+    ++row;
+    overviewFieldsLayout->addWidget(copyrightBox, row, 0, 1, 2);
+    ++row;
+    overviewFieldsLayout->setRowStretch(row, 1);
+
+    QScrollArea *overviewFieldsScroll = new QScrollArea();
+    overviewFieldsScroll->setFrameShape(QFrame::NoFrame);
+    overviewFieldsScroll->setWidget(overviewFieldsWidget);
+    overviewFieldsScroll->setWidgetResizable(true);
+    overviewFieldsScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    overviewFieldsScroll->setMinimumWidth(350 * dpiXFactor);
+    overviewFieldsScroll->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
 
     QScrollArea *overviewDescScroll = new QScrollArea();
     overviewDescScroll->setFrameShape(QFrame::NoFrame);
     overviewDescScroll->setWidget(descriptionValue);
     overviewDescScroll->setWidgetResizable(true);
     overviewDescScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    overviewDescScroll->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
+    QFrame *fieldsFrame = new QFrame();
+    fieldsFrame->setContentsMargins(0, 0, 0, 0);
+
+    QVBoxLayout *fieldsLayout = new QVBoxLayout(fieldsFrame);
+    fieldsLayout->setContentsMargins(0, 0, 0, 0);
+    fieldsLayout->addWidget(new QLabel(tr("PLAN DETAILS")), 0);
+    fieldsLayout->addWidget(overviewFieldsScroll, 1);
+
+    QFrame *descFrame = new QFrame();
+    fieldsFrame->setContentsMargins(0, 0, 0, 0);
+    descFrame->setAutoFillBackground(true);
+    descFrame->setPalette(descPal);
+
+    QVBoxLayout *descLayout = new QVBoxLayout(descFrame);
+    descLayout->setContentsMargins(15 * dpiXFactor, 0, 0, 0);
+    descLayout->addWidget(new QLabel(tr("PLAN DESCRIPTION")), 0);
+    descLayout->addWidget(overviewDescScroll, 1);
 
     QHBoxLayout *overviewSplitLayout = new QHBoxLayout();
-    overviewSplitLayout->addLayout(overviewFieldsLayout);
-    overviewSplitLayout->addWidget(overviewDescScroll);
+    overviewSplitLayout->setContentsMargins(0, 30 * dpiYFactor, 0, 0);
+    overviewSplitLayout->addWidget(fieldsFrame, 0);
+    overviewSplitLayout->addSpacing(10 * dpiXFactor);
+    overviewSplitLayout->addWidget(descFrame, 1);
 
     QVBoxLayout *overviewLayout = new QVBoxLayout();
-    overviewLayout->addWidget(statusFrame);
-    overviewLayout->addWidget(gapDayCheck);
+    overviewLayout->setContentsMargins(0, 0, 0, 0);
+    overviewLayout->addWidget(gapDayCheck, 0);
+    overviewLayout->addWidget(separator, 0);
+    overviewLayout->addWidget(statusFrame, 0);
+    overviewLayout->addLayout(overviewSplitLayout, 1);
     overviewLayout->addSpacing(10 * dpiYFactor);
-    overviewLayout->addLayout(overviewSplitLayout);
-    overviewLayout->addSpacing(10 * dpiYFactor);
-    overviewLayout->addWidget(targetRangeBar);
+    overviewLayout->addWidget(targetRangeBar, 0);
 
     QWidget *overviewWidget = new QWidget();
     overviewWidget->setLayout(overviewLayout);
 
     overviewError = new QLabel();
+    overviewError->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+    overviewError->setContentsMargins(0, 30 * dpiYFactor, 0, 30 * dpiYFactor);
     overviewEmpty = new QLabel();
+    overviewEmpty->setContentsMargins(0, 30 * dpiYFactor, 0, 30 * dpiYFactor);
+    overviewEmpty->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+    overviewEmpty->setText(  QString("<div style='line-height: 1.3;'>")
+                           + "<h4>" + tr("No plan loaded") + "</h4>"
+                           + tr("Select a training plan file (%1) to begin").arg(planExtension)
+                           + "</div>");
 
     overviewStack = new QStackedWidget();
+    overviewStack->setContentsMargins(0, 0, 0, 0);
     overviewStack->addWidget(overviewWidget);
     overviewStack->addWidget(overviewEmpty);
     overviewStack->addWidget(overviewError);
 
     QVBoxLayout *all = new QVBoxLayout();
     all->addWidget(inputPathWidget);
-    all->addSpacing(10 * dpiYFactor);
     all->addWidget(overviewStack);
     setLayout(all);
 
-    overviewEmpty->setText(  QString(HLO)
-                           + tr("No plan loaded")
-                           + HLC
-                           + "<br>"
-                           + tr("Select a training plan file (%1) to begin.").arg(planExtension));
     overviewStack->setCurrentIndex(1);
 
     connect(inputPathWidget, &DirectoryPathWidget::pathChanged, this, &ImportPlanPageSetup::bundlePathChanged);
@@ -2113,13 +2235,13 @@ ImportPlanPageSetup::bundlePathChanged
         }
         statusLabel->setText(statusMessage);
 
-        authorValue->setText(wiz->planReader.getMetadata().author);
-        nameValue->setText(wiz->planReader.getMetadata().name);
+        authorBox->setText(wiz->planReader.getMetadata().author);
+        nameBox->setText(wiz->planReader.getMetadata().name);
         updateRanges();
-        countActivitiesValue->setText(QString::number(wiz->planReader.getNumActivities()));
-        copyrightValue->setText(wiz->planReader.getMetadata().copyright);
-        copyrightKey->setVisible(! wiz->planReader.getMetadata().copyright.isEmpty());
-        copyrightValue->setVisible(! wiz->planReader.getMetadata().copyright.isEmpty());
+        sportBox->setText(wiz->planReader.getMetadata().sport);
+        countBox->setText(QString::number(wiz->planReader.getNumActivities()));
+        copyrightBox->setText(wiz->planReader.getMetadata().copyright);
+        copyrightBox->setVisible(! wiz->planReader.getMetadata().copyright.isEmpty());
 
         bool showDescription = ! wiz->planReader.getMetadata().description.trimmed().isEmpty();
         if (showDescription) {
@@ -2142,35 +2264,13 @@ ImportPlanPageSetup::updateRanges
         return;
     }
 
-    QLocale locale;
-    QString localFormat = locale.dateFormat(QLocale::ShortFormat);
-    QString customFormat = "ddd, " + localFormat;
-
-    rangeValue->setText(QString("%1 - %2")
-                               .arg(locale.toString(wiz->planReader.getTargetRangeStart(), customFormat))
-                               .arg(locale.toString(wiz->planReader.getTargetRangeEnd(), customFormat)));
     int days = wiz->planReader.getDuration();
-    ShowDaysAsUnit unit = showDaysAs(days);
-    if (unit == ShowDaysAsUnit::Months) {
-        int months = daysToMonths(days);
-        if (months == 1) {
-            durationValue->setText(tr("1 month (%1 days)").arg(days));
-        } else {
-            durationValue->setText(tr("%1 months (%2 days)").arg(months).arg(days));
-        }
-    } else if (unit == ShowDaysAsUnit::Weeks) {
-        int weeks = daysToWeeks(days);
-        if (weeks == 1) {
-            durationValue->setText(tr("1 week (%1 days)").arg(days));
-        } else {
-            durationValue->setText(tr("%1 weeks (%2 days)").arg(weeks).arg(days));
-        }
+    if (days == 1) {
+        durationBox->setText(tr("1 day"));
+    } else if (days < 14) {
+        durationBox->setText(tr("%1 days").arg(days));
     } else {
-        if (days == 1) {
-            durationValue->setText(tr("1 day"));
-        } else {
-            durationValue->setText(tr("%1 days").arg(days));
-        }
+        durationBox->setText(tr("%1 weeks").arg((days + 6) / 7));
     }
 
     targetRangeBar->setResult(wiz->planReader.getTargetRangeStart(), wiz->planReader.getTargetRangeEnd(), wiz->planReader.getNumActivities(), wiz->planReader.getActivitiesToRemove().count());
@@ -2184,7 +2284,7 @@ ImportPlanPageActivities::ImportPlanPageActivities
 (QWidget *parent)
 : QWizardPage(parent)
 {
-    setTitle(tr("Import Plan Activities"));
+    setTitle(tr("Import Plan - Activities"));
     setSubTitle(tr("Review and choose the activities you wish to import."));
 
     setFinalPage(false);
@@ -2241,9 +2341,6 @@ ImportPlanPageActivities::initializePage
     QString localFormat = locale.dateFormat(QLocale::ShortFormat);
     QString customFormat = "ddd, " + localFormat;
 
-#if 0
-    QSignalBlocker blocker(activityTree);
-#endif
     activityTree->clear();
 
     for (int i = 0; i < wiz->planReader.rideFiles.size(); ++i) {
@@ -2321,7 +2418,7 @@ ImportPlanPageSummary::ImportPlanPageSummary
 (QWidget *parent)
 : QWizardPage(parent)
 {
-    setTitle(tr("Import Plan Summary"));
+    setTitle(tr("Import Plan - Summary"));
     setSubTitle(tr("Preview the plan updates, including planned additions and deletions. No changes will be made until you continue."));
 
     setCommitPage(true);
@@ -2443,7 +2540,7 @@ ImportPlanPageResult::ImportPlanPageResult
 (QWidget *parent)
 : QWizardPage(parent)
 {
-    setTitle(tr("Import Plan Result"));
+    setTitle(tr("Import Plan - Result"));
     setSubTitle(tr("This page shows the outcome of importing the selected training plan."));
 
     setFinalPage(true);

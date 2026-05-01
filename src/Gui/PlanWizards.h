@@ -35,6 +35,27 @@
 #include "StyledItemDelegates.h"
 
 
+class DisplayBox : public QFrame {
+    Q_OBJECT
+
+public:
+    enum class Size {
+        Large,
+        Medium,
+        Small,
+        Tiny
+    };
+
+    explicit DisplayBox(const QString &title, const Size &size = Size::Large, bool highlight = false, QWidget *parent = nullptr);
+
+    void setText(const QString &value);
+
+private:
+    QLabel *valueLabel;
+    QLabel *titleLabel;
+};
+
+
 class TargetRangeBar : public QFrame
 {
     Q_OBJECT
@@ -339,16 +360,13 @@ class ExportPlanPageSummary : public QWizardPage
     private:
         Context *context;
 
-        QLabel *authorKey;
-        QLabel *authorValue;
-        QLabel *nameKey;
-        QLabel *nameValue;
+        DisplayBox *nameBox;
+        DisplayBox *authorBox;
+        DisplayBox *sportBox;
+        DisplayBox *durationBox;
+        DisplayBox *countBox;
+        DisplayBox *copyrightBox;
         QLabel *descriptionValue;
-        QLabel *rangeValue;
-        QLabel *durationValue;
-        QLabel *exportCountValue;
-        QLabel *copyrightKey;
-        QLabel *copyrightValue;
         QTreeWidget *planTree;
         DirectoryPathWidget *outputPathWidget;
 
@@ -383,7 +401,7 @@ class ImportPlanPageSetup : public QWizardPage
     Q_OBJECT
 
     public:
-        ImportPlanPageSetup(QDate targetDay, QWidget *parent = nullptr);
+        ImportPlanPageSetup(QWidget *parent = nullptr);
 
         int nextId() const override;
         bool isComplete() const override;
@@ -395,16 +413,13 @@ class ImportPlanPageSetup : public QWizardPage
         QLabel *overviewError;
         QFrame *statusFrame;
         QLabel *statusLabel;
-        QLabel *authorKey;
-        QLabel *authorValue;
-        QLabel *nameKey;
-        QLabel *nameValue;
+        DisplayBox *nameBox;
+        DisplayBox *authorBox;
+        DisplayBox *sportBox;
+        DisplayBox *durationBox;
+        DisplayBox *countBox;
+        DisplayBox *copyrightBox;
         QLabel *descriptionValue;
-        QLabel *rangeValue;
-        QLabel *durationValue;
-        QLabel *countActivitiesValue;
-        QLabel *copyrightKey;
-        QLabel *copyrightValue;
         TargetRangeBar *targetRangeBar;
 
     private slots:
