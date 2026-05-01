@@ -146,6 +146,11 @@ RideCache::RideCache(Context *context) : context(context)
     connect(rideCacheLoader, SIGNAL(finished()), this, SLOT(postLoad()));
     connect(rideCacheLoader, SIGNAL(finished()), this, SIGNAL(loadComplete()));
     rideCacheLoader->start();
+
+    saveThread_ = new QThread(this);
+    saveWorker_ = new QObject();
+    saveWorker_->moveToThread(saveThread_);
+    saveThread_->start();
 }
 
 void
@@ -197,6 +202,10 @@ RideCache::~RideCache()
 
     // cancel any refresh that may be running
     cancel();
+
+    saveThread_->quit();
+    saveThread_->wait();
+    delete saveWorker_;
 
     // save to store
     save();
@@ -566,7 +575,9 @@ RideCache::threadCompleted(RideCacheRefreshThread*thread)
         //fprintf(stderr,"refresh ended\n"); fflush(stderr);
         context->notifyRefreshEnd();
         garbageCollect();
-        save();
+        QMetaObject::invokeMethod(saveWorker_, [this]() {
+            save();
+        }, Qt::QueuedConnection);
     }
 }
 
