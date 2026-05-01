@@ -183,6 +183,7 @@ class CalendarWindow : public GcChartWindow
         void addPhase(const QDate &date);
         void editPhase(const CalendarEntry &entry);
         void delPhase(const CalendarEntry &entry);
+        void exportPlan(const CalendarEntry &entry);
 };
 
 #endif

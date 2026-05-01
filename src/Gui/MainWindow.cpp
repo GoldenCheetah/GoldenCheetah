@@ -79,6 +79,7 @@
 #include "LocalFileStore.h"
 #include "CloudService.h"
 #include "SaveDialogs.h"
+#include "PlanWizards.h"
 
 // GUI Widgets
 #include "AthleteTab.h"
@@ -618,6 +619,10 @@ MainWindow::MainWindow(const QDir &home)
 
     optionsMenu->addAction(tr("Create Heat Map..."), this, SLOT(generateHeatMap()));
     optionsMenu->addAction(tr("Export Metrics as CSV..."), this, SLOT(exportMetrics()));
+    optionsMenu->addAction(tr("Export Plan..."), this, [this]() {
+        ExportPlanWizard wizard(this->currentAthleteTab->context, nullptr);
+        wizard.exec();
+    });
 
 #ifdef GC_HAS_CLOUD_DB
     // CloudDB options

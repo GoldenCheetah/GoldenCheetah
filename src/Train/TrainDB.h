@@ -162,6 +162,7 @@ class TrainDB : public QObject, public TagStore
         bool hasItem(QString filepath, QString table) const;
 
         virtual QStringList getWorkouts() const;
+        virtual QHash<QString, QString> getWorkoutHashes() const;
 
         // Implementation of TagStore
         virtual void deferTagSignals(bool deferred);
