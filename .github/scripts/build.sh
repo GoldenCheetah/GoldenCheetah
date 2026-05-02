@@ -42,6 +42,7 @@ main() {
     libtool
     libusb
     python@"${PYTHON_VERSION}"
+    qt6
   )
 
   brew install "${brewdeps[@]}"
