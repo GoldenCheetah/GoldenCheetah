@@ -27,9 +27,9 @@ main() {
   export HOMEBREW_NO_AUTO_UPDATE=1
   export HOMEBREW_NO_INSTALL_CLEANUP=1
 
-  export OS_NAME=macos
-  export PATH=/opt/homebrew/opt/bison/bin:/opt/homebrew/opt/python@${PYTHON_VERSION}/libexec/bin:$PATH
   export PYTHON_VERSION=3.11
+  export OS_NAME=macos
+  export PATH=/opt/homebrew/opt/bison/bin:/opt/homebrew/opt/python@${PYTHON_VERSION}/libexec/bin:${PATH}
   export QTDIR=/opt/homebrew
 
   local brewdeps=(
