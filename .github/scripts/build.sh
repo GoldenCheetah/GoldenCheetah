@@ -16,14 +16,15 @@ main() {
   case "${1:-}" in
     "")
       :
-    ;;
+      ;;
     clean)
-    make clean || true
-    ;;
+      make clean || true
+      ;;
     *)
-    err "unrecognized argument: $1"
+      err "unrecognized argument: $1"
+      ;;
   esac
- 
+
   export HOMEBREW_NO_AUTO_UPDATE=1
   export HOMEBREW_NO_INSTALL_CLEANUP=1
 
@@ -47,7 +48,7 @@ main() {
 
   bash appveyor/macos/install.sh
   bash appveyor/macos/before_build.sh
- 
+
   qmake build.pro -r \
     QMAKE_CXXFLAGS_WARN_ON+="-Wno-unused-private-field -Wno-c++11-narrowing -Wno-deprecated-declarations -Wno-deprecated-register -Wno-nullability-completeness -Wno-sign-compare -Wno-inconsistent-missing-override" \
     QMAKE_CFLAGS_WARN_ON+="-Wno-deprecated-declarations -Wno-sign-compare"
