@@ -1,14 +1,16 @@
 #!/bin/bash
 set -ev
 
-export PATH="/usr/local/opt/python@${PYTHON_VERSION}/bin:$PATH"
+export PATH="/opt/homebrew/opt/bison/bin:$PATH"
+export PATH="/opt/homebrew/opt/python@${PYTHON_VERSION}/bin:$PATH"
 
 # Get config
 cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
 cp src/gcconfig.pri.in src/gcconfig.pri
 
 # Bison
-echo QMAKE_YACC=/usr/local/opt/bison@2.7/bin/bison >> src/gcconfig.pri
+echo QMAKE_YACC=/opt/homebrew/opt/bison/bin/bison >> src/gcconfig.pri
+echo 'QMAKE_MOVE = cp' >> src/gcconfig.pri
 
 # Enable compress library
 echo LIBZ_LIBS = -lz >> src/gcconfig.pri
@@ -26,7 +28,7 @@ sed -i "" "s|^#CloudDB|CloudDB|" src/gcconfig.pri
 sed -i "" "s|^#LIBZ|LIBZ|" src/gcconfig.pri
 
 # SRMIO
-sed -i "" "s|#\(SRMIO_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
+sed -i "" "s|#\(SRMIO_INSTALL =.*\)|\1 /opt/homebrew|" src/gcconfig.pri
 
 # D2XX
 sed -i "" "s|libftd2xx.dylib|@executable_path/../Frameworks/libftd2xx.1.4.24.dylib|" src/FileIO/D2XX.cpp
@@ -34,20 +36,20 @@ sed -i "" "s|#\(D2XX_INCLUDE =.*\)|\1 ../D2XX|" src/gcconfig.pri
 sed -i "" "s|#\(D2XX_LIBS    =.*\)|\1 -L../D2XX -lftd2xx|" src/gcconfig.pri
 
 # ICAL
-sed -i "" "s|#\(ICAL_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
-sed -i "" "s|#\(ICAL_LIBS    =.*\)|\1 -L/usr/local/lib -lical|" src/gcconfig.pri
+sed -i "" "s|#\(ICAL_INSTALL =.*\)|\1 /opt/homebrew|" src/gcconfig.pri
+sed -i "" "s|#\(ICAL_LIBS    =.*\)|\1 -L/opt/homebrew/lib -lical|" src/gcconfig.pri
 
 # LIBUSB
-sed -i "" "s|#\(LIBUSB_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
-sed -i "" "s|#\(LIBUSB_LIBS    =.*\)|\1 -L/usr/local/lib -lusb-1.0|" src/gcconfig.pri
+sed -i "" "s|#\(LIBUSB_INSTALL =\).*|\1 /opt/homebrew|" src/gcconfig.pri
+sed -i "" "s|#\(LIBUSB_LIBS    =.*\)|\1 -L/opt/homebrew/lib -lusb-1.0|" src/gcconfig.pri
 sed -i "" "s|#\(LIBUSB_USE_V_1 = true.*\)|\1|" src/gcconfig.pri
 
 # SAMPLERATE
-sed -i "" "s|#\(SAMPLERATE_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
-sed -i "" "s|#\(SAMPLERATE_LIBS =\).*|\1 -L/usr/local/lib -lsamplerate|" src/gcconfig.pri
+sed -i "" "s|#\(SAMPLERATE_INSTALL =\).*|\1 /opt/homebrew|" src/gcconfig.pri
+sed -i "" "s|#\(SAMPLERATE_LIBS =\).*|\1 -L/opt/homebrew/lib -lsamplerate|" src/gcconfig.pri
 
 # LMFIT
-sed -i "" "s|#\(LMFIT_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
+sed -i "" "s|#\(LMFIT_INSTALL =\).*|\1 /opt/homebrew|" src/gcconfig.pri
 
 sed -i "" "s|#\(DEFINES += GC_HAVE_LION*\)|\1|" src/gcconfig.pri
 
@@ -72,6 +74,6 @@ echo DEFINES += GC_WANT_TRAINERDAY_API >> src/gcconfig.pri
 echo DEFINES += GC_TRAINERDAY_API_PAGESIZE=25 >> src/gcconfig.pri
 
 # macOS version config
-echo "QMAKE_CXXFLAGS += -mmacosx-version-min=10.7 -arch x86_64" >> src/gcconfig.pri
-echo "QMAKE_CFLAGS_RELEASE += -mmacosx-version-min=10.7 -arch x86_64" >> src/gcconfig.pri
+echo "QMAKE_CXXFLAGS += -mmacosx-version-min=10.7 -arch arm64" >> src/gcconfig.pri
+echo "QMAKE_CFLAGS_RELEASE += -mmacosx-version-min=10.7 -arch arm64" >> src/gcconfig.pri
 echo "QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15" >> src/gcconfig.pri
