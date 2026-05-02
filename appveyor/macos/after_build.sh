@@ -232,10 +232,13 @@ else
     exit 1
 fi
 
-# Fix missing QtDBus framework (required by QtGui but missed by macdeployqt)
+# Fix missing QtDBus framework and libdbus.dylib (required by QtGui but missed by macdeployqt)
 # We copy it manually so it's present when we sign
 echo "Manually copying QtDBus framework..."
-cp -R "${QTDIR}/lib/QtDBus.framework" GoldenCheetah.app/Contents/Frameworks/
+# find src/GoldenCheetah.app/Contents/Frameworks -mindepth 4 -path '*/*.framework/*' -type f -not -name '*.*' -exec bash -c 'file "$@" | grep -q "shared library"' _ {} \; -exec otool -L {} \; | awk '/homebrew/ { print $1 }'
+cp -R "$(realpath "$(brew --prefix qt)"/lib/QtDBus.framework)" GoldenCheetah.app/Contents/Frameworks/
+cp "$(brew --prefix dbus)"/lib/libdbus-1*.dylib GoldenCheetah.app/Contents/Frameworks
+install_name_tool -change /opt/homebrew/opt/dbus/lib/libdbus-1.3.dylib @rpath/libdbus-1.3.dylib GoldenCheetah.app/Contents/Frameworks/QtDBus.framework/Versions/A/QtDBus
 
 # Deployment using macdeployqt - prepare bundle only
 macdeployqt GoldenCheetah.app -verbose=2 -executable=GoldenCheetah.app/Contents/MacOS/GoldenCheetah
