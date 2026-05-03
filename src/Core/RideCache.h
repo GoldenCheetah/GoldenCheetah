@@ -227,6 +227,8 @@ class RideCache : public QObject
         RideItem* copyPlannedRideFile(RideItem *sourceItem, const QDate &newDate, const QTime &newTime, QString &error);
 
         bool isCancelled = false;
+        QThread *saveThread_ = nullptr;
+        QObject *saveWorker_ = nullptr;
 };
 
 class AthleteBest
