@@ -2681,7 +2681,7 @@ DataFilterEdit::checkErrors()
     // parse and present errors to user
     DataFilter checker(this, context);
     QStringList errors = checker.check(toPlainText());
-    checker.colorSyntax(document(), textCursor().position()); // syntax + error highlighting
+    checker.colorSyntax(document(), textCursor().position(), GCColor::isPaletteDark(palette())); // syntax + error highlighting
 
     if (checker.rt.functions.contains("sample")) errors << tr("Warning: sample() is slow -- update code to use samples()");
 

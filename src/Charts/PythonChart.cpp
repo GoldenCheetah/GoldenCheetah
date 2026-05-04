@@ -520,7 +520,7 @@ PythonChart::configChanged(qint32)
 
     // refresh highlighter
     if (syntax) delete syntax;
-    syntax = new PythonSyntax(script->document(), GCColor::luminance(GColor(CPLOTBACKGROUND)) < 127);
+    syntax = new PythonSyntax(script->document(), GCColor::isPaletteDark(palette));
     runScript();
 }
 
