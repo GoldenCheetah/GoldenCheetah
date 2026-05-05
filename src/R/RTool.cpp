@@ -533,7 +533,7 @@ RTool::zones(SEXP pDate, SEXP pSport)
     // for a specific date?
     QDate d1970(1970,01,01);
     PROTECT(pDate=Rf_coerceVector(pDate,INTSXP));
-    if (INTEGER(pDate)[0] != 0) {
+    if (Rf_length(pDate) > 0 && INTEGER(pDate)[0] != 0) {
 
         // get settings for...
         QDate forDate=d1970.addDays(INTEGER(pDate)[0]);
