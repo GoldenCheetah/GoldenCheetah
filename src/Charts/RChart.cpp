@@ -470,14 +470,20 @@ RChart::configChanged(qint32)
 
 
     // tinted palette for headings etc
-    QPalette palette;
+    QPalette palette = this->palette();
     palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
     setPalette(palette);
+    script->setPalette(palette);
+    script->setStyleSheet(AbstractView::ourStyleSheet());
 
     runScript(); // to update
+
+    // refresh highlighter
+    if (syntax) delete syntax;
+    syntax = new RSyntax(script->document(), GCColor::isPaletteDark(this->palette()));
 }
 
 void
@@ -503,7 +509,6 @@ RChart::setScript(QString string)
 {
     if (rtool && script) {
         script->setText(string);
-        new RSyntax(script->document());
     }
     text = string;
 }

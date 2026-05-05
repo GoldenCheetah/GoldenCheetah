@@ -32,7 +32,7 @@ class RSyntax : public QSyntaxHighlighter
     Q_OBJECT
 
  public:
-    RSyntax(QTextDocument *parent = 0);
+    RSyntax(QTextDocument *parent = 0, bool dark = true);
 
  protected:
     void highlightBlock(const QString &text);
