@@ -27,6 +27,7 @@
 
 #include <QVector>
 #include <QThread>
+#include <QPointer>
 
 #include <QFuture>
 #include <QFutureWatcher>
@@ -161,6 +162,9 @@ class RideCache : public QObject
         void postLoad();
         void save(bool opendata=false, QString filename="");
 
+        // clean up refresh threads
+        void cleanupThread(RideCacheRefreshThread *thread);
+
         // find entry quickly
         int find(RideItem *);
 
@@ -222,6 +226,10 @@ class RideCache : public QObject
         bool renameRideFiles(const QString& oldFileName, const QString& newFileName, bool isPlanned, QString &error);
         bool isValidLink(RideItem *item1, RideItem *item2, QString &error);
         RideItem* copyPlannedRideFile(RideItem *sourceItem, const QDate &newDate, const QTime &newTime, QString &error);
+
+        bool isCancelled = false;
+        QThread *saveThread_ = nullptr;
+        QObject *saveWorker_ = nullptr;
 };
 
 class AthleteBest
@@ -238,7 +246,7 @@ class AthleteBest
 class RideCacheRefreshThread : public QThread
 {
     public:
-        RideCacheRefreshThread(RideCache *cache) : cache(cache) {}
+        RideCacheRefreshThread(RideCache *cache);
 
     protected:
 
@@ -246,7 +254,7 @@ class RideCacheRefreshThread : public QThread
         virtual void run() override;
 
     private:
-        RideCache *cache;
+        QPointer<RideCache> cache;
 };
 
 #endif // _GC_RideCache_h
