@@ -403,6 +403,11 @@
 #define GC_AZUM_URL                     "<athlete-private>azum_url"
 #define GC_AZUM_ATHLETE_ID              "<athlete-private>azum_athlete_id"
 
+// Tredict
+#define GC_TREDICT_TOKEN                "<athlete-private>tredict_token"
+#define GC_TREDICT_REFRESH_TOKEN        "<athlete-private>tredict_refresh_token"
+#define GC_TREDICT_LAST_REFRESH         "<athlete-private>tredict_last_refresh"
+
 // Polar Flow
 #define GC_POLARFLOW_TOKEN             "<athlete-private>polarflow_token"
 #define GC_POLARFLOW_USER_ID           "<athlete-private>polarflow_user_id"

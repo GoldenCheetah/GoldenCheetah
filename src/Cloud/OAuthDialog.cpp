@@ -26,6 +26,7 @@
 #include "TimeUtils.h"
 
 #include "PolarFlow.h"
+#include "OAuthPKCE.h"
 
 #include <QJsonParseError>
 
@@ -50,6 +51,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         if (service->id() == "Xert") site = this->site = XERT;
         if (service->id() == "RideWithGPS") site = this->site = RIDEWITHGPS;
         if (service->id() == "Azum") site = this->site = AZUM;
+        if (service->id() == "Tredict") site = this->site = TREDICT;
     }
 
     // check if SSL is available - if not - message and end
@@ -161,12 +163,25 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         urlstr.append("redirect_uri=http://www.goldencheetah.org/&");
         urlstr.append("response_type=code&");
         urlstr.append("client_id=").append(GC_AZUM_CLIENT_ID);
+
+    } else if (site == TREDICT) {
+
+        // generate PKCE pair and store verifier for token exchange in urlChanged
+        codeVerifier = OAuthPKCE::generateCodeVerifier();
+        QString codeChallenge = OAuthPKCE::computeCodeChallenge(codeVerifier);
+
+        urlstr = QString("https://www.tredict.com/authorization/?");
+        urlstr.append("client_id=").append(GC_TREDICT_CLIENT_ID).append("&");
+        urlstr.append("response_type=code&");
+        urlstr.append("redirect_uri=http://localhost/callback&");
+        urlstr.append("code_challenge=").append(codeChallenge).append("&");
+        urlstr.append("code_challenge_method=S256");
     }
 
     //
     // STEP 1: LOGIN AND AUTHORISE THE APPLICATION
     //
-    if (site == NOLIO || site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == WITHINGS || site == AZUM) {
+    if (site == NOLIO || site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == WITHINGS || site == AZUM || site == TREDICT) {
         url = QUrl(urlstr);
         view->setUrl(url);
         // connects
@@ -201,12 +216,20 @@ OAuthDialog::urlChanged(const QUrl &url)
     QString authheader;
 
     // sites that use this scheme
-    if (site == NOLIO || site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == XERT || site == RIDEWITHGPS || site == WITHINGS || site == AZUM) {
+    if (site == NOLIO || site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == XERT || site == RIDEWITHGPS || site == WITHINGS || site == AZUM || site == TREDICT) {
 
         if (url.toString().startsWith("http://www.goldencheetah.org/?state=&code=") ||
                 url.toString().contains("blank.html?code=") ||
                 url.toString().startsWith("https://www.goldencheetah.org/?code=") ||
-                url.toString().startsWith("http://www.goldencheetah.org/?code=")) {
+                url.toString().startsWith("http://www.goldencheetah.org/?code=") ||
+                url.toString().startsWith("http://localhost/callback?")) {
+
+            // stop the WebView from loading the redirect URL (avoids 404 pages)
+            if (view && url.toString().startsWith("http://localhost/")) {
+                view->stop();
+                view->setHtml("<html><body style=\"font-family:sans-serif;text-align:center;padding:40px\">"
+                              "<h2>" + tr("Authorizing...") + "</h2></body></html>");
+            }
 
             QUrlQuery parse(url);
             QString code=parse.queryItemValue("code");
@@ -307,6 +330,14 @@ OAuthDialog::urlChanged(const QUrl &url)
                 }
                 params.addQueryItem("redirect_uri","http://www.goldencheetah.org/");
                 params.addQueryItem("grant_type", "authorization_code");
+
+            } else if (site == TREDICT) {
+
+                urlstr = QString("https://www.tredict.com/user/oauth/v2/token");
+                params.addQueryItem("grant_type", "authorization_code");
+                params.addQueryItem("client_id", GC_TREDICT_CLIENT_ID);
+                params.addQueryItem("code_verifier", codeVerifier);
+                params.addQueryItem("redirect_uri", "http://localhost/callback");
             }
 
             // all services will need us to send the temporary code received
@@ -489,6 +520,14 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
             service->setSetting(GC_AZUM_ACCESS_TOKEN, access_token);
             service->setSetting(GC_AZUM_REFRESH_TOKEN, refresh_token);
             QString info = QString(tr("Azum authorization was successful."));
+            QMessageBox information(QMessageBox::Information, tr("Information"), info);
+            information.exec();
+
+        } else if (site == TREDICT) {
+            service->setSetting(GC_TREDICT_TOKEN, access_token);
+            service->setSetting(GC_TREDICT_REFRESH_TOKEN, refresh_token);
+            service->setSetting(GC_TREDICT_LAST_REFRESH, QDateTime::currentDateTime());
+            QString info = QString(tr("Tredict authorization was successful."));
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
 
