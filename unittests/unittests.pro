@@ -12,6 +12,15 @@ equals(GC_UNITTESTS, active) {
 			   Core/utils \
 			   Core/signalSafety \
 			   Core/splineCrash \
+			   Core/trainingConstraints \
+			   Core/trainingSimulator \
+			   Core/trainingPlan \
+			   Cloud/jsonParsers \
+			   Cloud/stravaCredentials \
+			   FileIO/computrainer3dp \
+			   FileIO/tacxCaf \
+			   FileIO/ttsReader \
+			   FileIO/rideAutoImport \
 			   Gui/calendarData
 	CONFIG += ordered
 } else {

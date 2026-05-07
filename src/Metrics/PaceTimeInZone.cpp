@@ -19,6 +19,7 @@
 
 #include "RideMetric.h"
 #include "RideItem.h"
+#include "RideFileData.h"
 #include "Specification.h"
 #include "Context.h"
 #include "Athlete.h"
@@ -68,11 +69,17 @@ class PaceZoneTime : public RideMetric {
         if (zone && zoneRange >= 0) {
             // iterate and compute
             RideFileIterator it(item->ride(), spec);
-            while (it.hasNext()) {
-                struct RideFilePoint *point = it.next();
-                totalSecs += item->ride()->recIntSecs();
-                if (zone->whichZone(zoneRange, point->kph) == level)
-                    seconds += item->ride()->recIntSecs();
+            const int first = it.firstIndex();
+            const int last  = it.lastIndex();
+            if (first >= 0 && last >= first) {
+                const RideFileData &view = item->ride()->columnar();
+                const double *kph = view.series(RideFile::kph).constData();
+                const double recIntSecs = item->ride()->recIntSecs();
+                for (int i = first; i <= last; ++i) {
+                    totalSecs += recIntSecs;
+                    if (zone->whichZone(zoneRange, kph[i]) == level)
+                        seconds += recIntSecs;
+                }
             }
         }
         setValue(seconds);
@@ -800,12 +807,18 @@ class PaceZoneTimeI : public RideMetric {
             double AeT = zone->getAeT(zoneRange);
 
             // iterate and compute
+            const double recIntSecs = item->ride()->recIntSecs();
             RideFileIterator it(item->ride(), spec);
-            while (it.hasNext()) {
-                struct RideFilePoint *point = it.next();
-                totalSecs += item->ride()->recIntSecs();
-                if (point->kph < AeT)
-                    seconds += item->ride()->recIntSecs();
+            const int firstIdx = it.firstIndex();
+            const int lastIdx  = it.lastIndex();
+            if (firstIdx >= 0 && lastIdx >= firstIdx) {
+                const RideFileData &view = item->ride()->columnar();
+                const double *kph = view.series(RideFile::kph).constData();
+                for (int i = firstIdx; i <= lastIdx; ++i) {
+                    totalSecs += recIntSecs;
+                    if (kph[i] < AeT)
+                        seconds += recIntSecs;
+                }
             }
         }
         setValue(seconds);
@@ -870,12 +883,18 @@ class PaceZoneTimeII : public RideMetric {
             double CV = zone->getCV(zoneRange);
 
             // iterate and compute
+            const double recIntSecs = item->ride()->recIntSecs();
             RideFileIterator it(item->ride(), spec);
-            while (it.hasNext()) {
-                struct RideFilePoint *point = it.next();
-                totalSecs += item->ride()->recIntSecs();
-                if (point->kph >= AeT && point->kph < CV)
-                    seconds += item->ride()->recIntSecs();
+            const int firstIdx = it.firstIndex();
+            const int lastIdx  = it.lastIndex();
+            if (firstIdx >= 0 && lastIdx >= firstIdx) {
+                const RideFileData &view = item->ride()->columnar();
+                const double *kph = view.series(RideFile::kph).constData();
+                for (int i = firstIdx; i <= lastIdx; ++i) {
+                    totalSecs += recIntSecs;
+                    if (kph[i] >= AeT && kph[i] < CV)
+                        seconds += recIntSecs;
+                }
             }
         }
         setValue(seconds);
@@ -939,12 +958,18 @@ class PaceZoneTimeIII : public RideMetric {
             double CV = zone->getCV(zoneRange);
 
             // iterate and compute
+            const double recIntSecs = item->ride()->recIntSecs();
             RideFileIterator it(item->ride(), spec);
-            while (it.hasNext()) {
-                struct RideFilePoint *point = it.next();
-                totalSecs += item->ride()->recIntSecs();
-                if (point->kph >= CV)
-                    seconds += item->ride()->recIntSecs();
+            const int firstIdx = it.firstIndex();
+            const int lastIdx  = it.lastIndex();
+            if (firstIdx >= 0 && lastIdx >= firstIdx) {
+                const RideFileData &view = item->ride()->columnar();
+                const double *kph = view.series(RideFile::kph).constData();
+                for (int i = firstIdx; i <= lastIdx; ++i) {
+                    totalSecs += recIntSecs;
+                    if (kph[i] >= CV)
+                        seconds += recIntSecs;
+                }
             }
         }
         setValue(seconds);

@@ -308,6 +308,11 @@ OverviewWindow::getConfiguration() const
                 config += "\"settings\":\"" + QString("%1").arg(Utils::jsonprotect(uc->getConfig())) + "\",";
             }
             break;
+        case OverviewItemType::SIMULATION:
+            {
+                // No additional config fields — simulation card is self-contained
+            }
+            break;
         }
 
         config += "\"datafilter\":\"" + Utils::jsonprotect(item->datafilter) + "\",";
@@ -560,6 +565,14 @@ badconfig:
             {
                 QString settings=Utils::jsonunprotect(obj["settings"].toString());
                 add = new UserChartOverviewItem(space, name, settings);
+                add->datafilter = datafilter;
+                space->addItem(order,column,span,deep, add);
+            }
+            break;
+        case OverviewItemType::SIMULATION :
+            {
+                add = new SimulationOverviewItem(space);
+                add->name = name;
                 add->datafilter = datafilter;
                 space->addItem(order,column,span,deep, add);
             }

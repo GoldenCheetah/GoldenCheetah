@@ -37,6 +37,7 @@
 
 #include "Context.h"
 #include "RideItem.h"
+#include "TimeUtils.h"
 
 class ChartBar;
 class LTMSettings;
@@ -192,6 +193,12 @@ class Perspective : public GcWindow
 
         // train view switching
         switchenum trainswitch;
+
+        // cache of what we last propagated to charts so re-selecting a view
+        // without a ride or date-range change can skip the per-chart refresh.
+        RideItem *lastAppliedRide = nullptr;
+        DateRange lastAppliedDateRange;
+        bool haveLastAppliedDateRange = false;
 
         static void translateChartTitles(QList<GcChartWindow*> charts);
 };

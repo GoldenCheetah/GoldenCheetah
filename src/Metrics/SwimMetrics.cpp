@@ -17,6 +17,7 @@
  */
 
 #include "RideMetric.h"
+#include "RideFileData.h"
 #include "Athlete.h"
 #include "Context.h"
 #include "Settings.h"
@@ -236,11 +237,17 @@ class SwimPace : public RideMetric {
         total = count = 0;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->cad > 0) {
-                total += point->kph;
-                ++count;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *cad = view.series(RideFile::cad).constData();
+            const double *kph = view.series(RideFile::kph).constData();
+            for (int i = first; i <= last; ++i) {
+                if (cad[i] > 0) {
+                    total += kph[i];
+                    ++count;
+                }
             }
         }
         setValue((count > 0 && total > 0.0) ? 6.0 * count / total : 0.0);
@@ -537,19 +544,24 @@ class SwimPaceStroke : public RideMetric {
         total = count = 0;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            for (int j=b; j<series->datapoints.count(); j++) {
-                if (series->datapoints.at(j)->secs > point->secs)
-                    break;
-                b=j;
-                // Stroke Type
-                type = series->datapoints.at(j)->number[typeIdx];
-            }
-            if (type == strokeType) {
-                total += point->kph;
-                ++count;
+        const int firstIdx = it.firstIndex();
+        const int lastIdx  = it.lastIndex();
+        if (firstIdx >= 0 && lastIdx >= firstIdx) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *kph = view.series(RideFile::kph).constData();
+            const double *secs = view.series(RideFile::secs).constData();
+            for (int i = firstIdx; i <= lastIdx; ++i) {
+                for (int j=b; j<series->datapoints.count(); j++) {
+                    if (series->datapoints.at(j)->secs > secs[i])
+                        break;
+                    b=j;
+                    // Stroke Type
+                    type = series->datapoints.at(j)->number[typeIdx];
+                }
+                if (type == strokeType) {
+                    total += kph[i];
+                    ++count;
+                }
             }
         }
         setValue((count > 0 && total > 0.0) ? 6.0 * count / total : 0.0);
@@ -725,20 +737,24 @@ class SwimStroke : public RideMetric {
         StrokeType type=na;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            for (int j=b; j<series->datapoints.count(); j++) {
-                if (series->datapoints.at(j)->secs > point->secs)
-                    break;
-                b=j;
-                // Stroke Type
-                type = static_cast<StrokeType>((int)series->datapoints.at(j)->number[typeIdx]);
-            }
-            if (strokeType < 0) {
-                strokeType = type; // first length indicates stroke
-            } else if (strokeType != type && type != rest) {
-                strokeType = mixed; // anything different other than rest indicates mixed
+        const int firstIdx = it.firstIndex();
+        const int lastIdx  = it.lastIndex();
+        if (firstIdx >= 0 && lastIdx >= firstIdx) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *secs = view.series(RideFile::secs).constData();
+            for (int i = firstIdx; i <= lastIdx; ++i) {
+                for (int j=b; j<series->datapoints.count(); j++) {
+                    if (series->datapoints.at(j)->secs > secs[i])
+                        break;
+                    b=j;
+                    // Stroke Type
+                    type = static_cast<StrokeType>((int)series->datapoints.at(j)->number[typeIdx]);
+                }
+                if (strokeType < 0) {
+                    strokeType = type; // first length indicates stroke
+                } else if (strokeType != type && type != rest) {
+                    strokeType = mixed; // anything different other than rest indicates mixed
+                }
             }
         }
         setValue(strokeType);

@@ -18,6 +18,7 @@
 
 
 #include "CPSolver.h"
+#include "RideFileData.h"
 #include <ctime>
 
 CPSolver::CPSolver(Context *context)
@@ -326,12 +327,17 @@ class BestR : public RideMetric {
 
                         // loop through and count
                         RideFileIterator it(item->ride(), spec);
-                        while (it.hasNext()) {
-                            struct RideFilePoint *point = it.next();
-
-                            // iterate for this point
-                            wpbal  += point->watts < CP ? (r * (W - wpbal)/W * (CP - point->watts)) : (CP-point->watts);
-                            if (point->secs > p->secs) break;
+                        const int firstIdx = it.firstIndex();
+                        const int lastIdx  = it.lastIndex();
+                        if (firstIdx >= 0 && lastIdx >= firstIdx) {
+                            const RideFileData &view = item->ride()->columnar();
+                            const double *watts = view.series(RideFile::watts).constData();
+                            const double *secs = view.series(RideFile::secs).constData();
+                            for (int i = firstIdx; i <= lastIdx; ++i) {
+                                // iterate for this point
+                                wpbal  += watts[i] < CP ? (r * (W - wpbal)/W * (CP - watts[i])) : (CP - watts[i]);
+                                if (secs[i] > p->secs) break;
+                            }
                         }
                         if (first || fabs(wpbal-double(500.0f))<bestW) {
                             first = false;

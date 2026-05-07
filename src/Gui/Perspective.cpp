@@ -361,8 +361,24 @@ Perspective::selected()
     setUpdatesEnabled(false);
 
     resize();
-    rideSelected();
-    dateRangeChanged(DateRange());
+
+    // If neither ride nor date-range has changed since the last time we
+    // propagated to charts, skip the per-chart refresh - it is the single
+    // biggest contributor to view-switch latency on heavy perspectives
+    // (Trends, Overview) because each chart otherwise reruns its query.
+    RideItem *currentRide = property("ride").value<RideItem*>();
+    DateRange currentDateRange = property("dateRange").value<DateRange>();
+    const bool sameRide = (currentRide == lastAppliedRide);
+    const bool sameDateRange = haveLastAppliedDateRange && (currentDateRange == lastAppliedDateRange);
+
+    if (!sameRide || !sameDateRange) {
+        rideSelected();
+        dateRangeChanged(DateRange());
+        lastAppliedRide = currentRide;
+        lastAppliedDateRange = currentDateRange;
+        haveLastAppliedDateRange = true;
+    }
+
     setUpdatesEnabled(true);
     //update();
 }
@@ -423,6 +439,7 @@ Perspective::rideSelected()
             else
                 charts[i]->setProperty("ride", property("ride"));
         }
+        lastAppliedRide = property("ride").value<RideItem*>();
     }
 }
 
@@ -454,6 +471,8 @@ Perspective::dateRangeChanged(DateRange dr)
             else
                 charts[i]->setProperty("dateRange", property("dateRange"));
         }
+        lastAppliedDateRange = property("dateRange").value<DateRange>();
+        haveLastAppliedDateRange = true;
     }
 }
 

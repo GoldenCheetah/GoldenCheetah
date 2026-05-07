@@ -331,7 +331,7 @@ public:
 
     ResultEnum GetInfo(int i, int& row) {
 
-        if (i < 0 || i > laps.count())
+        if (i < 0 || i >= laps.count())
             return Failed;
 
         int lapRangeId = laps.at(i).lapRangeId;
@@ -757,7 +757,7 @@ ErgFilePlot::setActiveCurveAlpha
 
 
 void
-ErgFilePlot::performancePlot(RealtimeData rtdata)
+ErgFilePlot::performancePlot(const RealtimeData &rtdata)
 {
     // don't update this plot if we are not running or are paused
     if ((!context->isRunning) || (context->isPaused)) return;

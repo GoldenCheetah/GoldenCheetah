@@ -18,104 +18,57 @@
 
 #include "SplashScreen.h"
 
-#include <QDebug>
-#include <QSvgRenderer>
 #include <QPixmap>
 #include <QPainter>
 #include <QFont>
-#include <QFontMetrics>
 #include <QApplication>
 #include <QScreen>
 
 #include "Colors.h"
 #include "GcUpgrade.h"
 
-#define SHOW_BOX 0 // 1 shows labels background (useful for fitting)
-
-
 SplashScreen::SplashScreen
 ()
 : QSplashScreen()
 {
     const QString textRgb("#000000");
-    int pixmapWidth = 340;
-    int versionX = 48;
-    int versionY = 296;
-    int versionWidth = 243;
-    int versionHeight = 21;
-    int sepOverlap = 2;
-    int msgX = versionX;
-    int msgY = 320;
-    int msgWidth = versionWidth;
-    int msgHeight = 14;
-    const QString svgPath(":images/splashscreen.svg");
-    const QString version = QString(tr("%1 - build %2")).arg(VERSION_STRING).arg(VERSION_LATEST);
+    const QPixmap logoPixmap(":/images/gc.png");
 
-    setAttribute(Qt::WA_TranslucentBackground);
-
-    QSvgRenderer renderer(svgPath);
-    QSize defaultSize = renderer.defaultSize();
-    double scaleFactor = 1;
-
-    if (QApplication::primaryScreen()->geometry().width() <= 1280) {
-        pixmapWidth = 280;
-        scaleFactor = 280 / 340.0;
-    } else if (dpiXFactor > 1) {
-        scaleFactor = dpiXFactor;
-        pixmapWidth *= scaleFactor;
+    int imageSize = 280;
+    if (QApplication::primaryScreen()->geometry().width() > 1280 && dpiXFactor > 1) {
+        imageSize = qRound(imageSize * dpiXFactor);
     }
+    const int versionHeight = qRound(imageSize * 0.08);
+    const int padding = qRound(imageSize * 0.04);
+    const int pixmapWidth = imageSize;
+    const int pixmapHeight = imageSize + padding + versionHeight;
 
-    QPixmap pixmap(pixmapWidth, pixmapWidth / double(defaultSize.width()) * defaultSize.height());
-    pixmap.fill(Qt::transparent);
-    QPainter painter(&pixmap);
-    renderer.render(&painter);
+    QPixmap pixmap(pixmapWidth, pixmapHeight);
+    pixmap.fill(Qt::white);
 
-    versionX *= scaleFactor;
-    versionY *= scaleFactor;
-    versionWidth *= scaleFactor;
-    versionHeight *= scaleFactor;
-    sepOverlap *= scaleFactor;
-    msgX *= scaleFactor;
-    msgY *= scaleFactor;
-    msgWidth *= scaleFactor;
-    msgHeight *= scaleFactor;
-
-    if (version.size() > 0) {
-        QLabel *versionLabel = new QLabel(this);
-#if SHOW_BOX == 0
-        versionLabel->setAttribute(Qt::WA_TranslucentBackground);
-        versionLabel->setStyleSheet(QString("QLabel { color: %1; }").arg(textRgb));
-#else
-        versionLabel->setStyleSheet("QLabel { color: white; background-color: darkgreen; }");
-#endif
-        QFont f = versionLabel->font();
-        f.setPixelSize(versionHeight * 0.8);
-        f.setBold(true);
-        versionLabel->setFont(f);
-        versionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-        versionLabel->setGeometry(versionX, versionY, versionWidth, versionHeight);
-        versionLabel->setText(version);
-
-        int sepLeft = versionX - sepOverlap;
-        int sepRight = versionX + versionWidth + sepOverlap;
-        int sepY = (versionY + versionHeight + msgY) / 2;
-        painter.setPen(QColor(textRgb));
-        painter.drawLine(sepLeft, sepY, sepRight, sepY);
+    if (! logoPixmap.isNull()) {
+        QPainter painter(&pixmap);
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+        const QPixmap scaled = logoPixmap.scaled(imageSize, imageSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        const int x = (pixmapWidth - scaled.width()) / 2;
+        painter.drawPixmap(x, 0, scaled);
     }
     setPixmap(pixmap);
 
+    const QString version = QString(tr("%1 - build %2")).arg(VERSION_STRING).arg(VERSION_LATEST);
+    QLabel *versionLabel = new QLabel(this);
+    versionLabel->setStyleSheet(QString("QLabel { color: %1; background-color: white; }").arg(textRgb));
+    QFont f = versionLabel->font();
+    f.setPixelSize(qRound(versionHeight * 0.8));
+    f.setBold(true);
+    versionLabel->setFont(f);
+    versionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    versionLabel->setGeometry(0, imageSize + padding, pixmapWidth, versionHeight);
+    versionLabel->setText(version);
+
     msgLabel = new QLabel(this);
-#if SHOW_BOX == 0
-    msgLabel->setAttribute(Qt::WA_TranslucentBackground);
-    msgLabel->setStyleSheet(QString("QLabel { color: %1; }").arg(textRgb));
-#else
-    msgLabel->setStyleSheet("QLabel { color: white; background-color: darkred; }");
-#endif
-    QFont f = msgLabel->font();
-    f.setPixelSize(msgHeight * 0.8);
-    msgLabel->setFont(f);
-    msgLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    msgLabel->setGeometry(msgX, msgY, msgWidth, msgHeight);
+    msgLabel->hide();
 
     show();
 }
@@ -129,9 +82,8 @@ SplashScreen::~SplashScreen
 
 void
 SplashScreen::showMessage
-(const QString &msg)
+(const QString &)
 {
-    msgLabel->setText(msg);
     QApplication::processEvents();
 }
 
@@ -140,6 +92,5 @@ void
 SplashScreen::clearMessage
 ()
 {
-    msgLabel->clear();
     QApplication::processEvents();
 }

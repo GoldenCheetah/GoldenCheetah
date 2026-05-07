@@ -260,7 +260,10 @@ void TrainBottom::updatePlayButtonIcon()
         applyIcon(m_playButton, "play");
         if (m_tooltips)
         {
-            m_playButton->setToolTip(tr("Resume"));
+            if (m_trainSidebar->isAutoPaused())
+                m_playButton->setToolTip(tr("Auto-Paused — Resume"));
+            else
+                m_playButton->setToolTip(tr("Resume"));
         }
     }
     else if (m_trainSidebar->currentStatus() & RT_RUNNING)

@@ -18,6 +18,8 @@
 
 #include "OverviewItems.h"
 
+#include <QTimer>
+#include <QtConcurrent>
 #include "AbstractView.h"
 #include "Athlete.h"
 #include "RideCache.h"
@@ -39,6 +41,8 @@
 #include "RideNavigator.h"
 
 #include "UserChartOverviewItem.h"
+#include "TrainingSimulator.h"
+#include "WorkoutGenerationService.h"
 
 #include <cmath>
 #include <QGraphicsSceneMouseEvent>
@@ -47,6 +51,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
+#include <limits>
 
 bool
 OverviewItemConfig::registerItems()
@@ -68,6 +73,7 @@ OverviewItemConfig::registerItems()
     registry.addItem(OverviewItemType::PMC,        QObject::tr("PMC"),        QObject::tr("PMC Status Summary"),                 OverviewScope::ANALYSIS,                                           PMCOverviewItem::create);
     registry.addItem(OverviewItemType::ROUTE,      QObject::tr("Route"),      QObject::tr("Route Summary"),                      OverviewScope::ANALYSIS,                                           RouteOverviewItem::create);
     registry.addItem(OverviewItemType::DONUT,      QObject::tr("Donut"),      QObject::tr("Metric breakdown by category"),       OverviewScope::TRENDS|OverviewScope::PLAN,                         DonutOverviewItem::create);
+    registry.addItem(OverviewItemType::SIMULATION, QObject::tr("Optimal Workout"), QObject::tr("Workout recommendation based on current training load"), OverviewScope::ANALYSIS,                                           SimulationOverviewItem::create);
 
     return true;
 }
@@ -952,6 +958,37 @@ PMCOverviewItem::PMCOverviewItem(ChartSpace *parent, QString symbol) : ChartSpac
 
 PMCOverviewItem::~PMCOverviewItem()
 {
+}
+
+SimulationOverviewItem::SimulationOverviewItem(ChartSpace *parent) : ChartSpaceItem(parent, tr("Optimal Workout"))
+{
+    this->type = OverviewItemType::SIMULATION;
+    ctl = atl = tsb = acwr = 0.0;
+    hasData = false;
+    loading = false;
+    statusText = tr("No simulation data");
+    simulationRequestId = 0;
+
+    // PMC projection chart
+    chart = new QChart(this);
+    chart->setBackgroundVisible(false);
+    chart->legend()->setVisible(false);
+    chart->setTitle("");
+    chart->setAnimationOptions(QChart::NoAnimation);
+    chart->setFont(parent->midfont);
+    chart->setMargins(QMargins(0,0,0,0));
+
+    watcher = new QFutureWatcher<SimulationCardResult>(this);
+    connect(watcher, &QFutureWatcher<SimulationCardResult>::finished,
+            this, &SimulationOverviewItem::simulationFinished);
+
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
+}
+
+SimulationOverviewItem::~SimulationOverviewItem()
+{
+    delete chart;
 }
 
 MetaOverviewItem::MetaOverviewItem(ChartSpace *parent, QString name, QString symbol) : ChartSpaceItem(parent, name)
@@ -1950,6 +1987,307 @@ PMCOverviewItem::setData(RideItem *item)
     sb = pmc->sb(date);
     rr = pmc->rr(date);
 
+}
+
+void
+SimulationOverviewItem::setData(RideItem *item)
+{
+    if (item == NULL) {
+        ++simulationRequestId;
+        loading = false;
+        hasData = false;
+        goalName.clear();
+        rationale.clear();
+        statusText = tr("No simulation data");
+        topCandidates.clear();
+        histCtl.clear();
+        histAtl.clear();
+        histTsb.clear();
+        updateChart();
+        update();
+        return;
+    }
+
+    // Defer all work — setData() is called synchronously from addItem()
+    // during the Add Tile wizard, before updateGeometry()/layoutItems().
+    // Any blocking work here freezes the UI.  We defer to the next event
+    // loop tick so the tile gets laid out first, then build the snapshot
+    // on the main thread (Context/Athlete access isn't thread-safe) and
+    // dispatch the heavy simulation to a worker thread.
+    QDate date = item->dateTime.date();
+    Context *ctx = parent->context;
+    const quint64 requestId = ++simulationRequestId;
+
+    loading = true;
+    hasData = false;
+    statusText = tr("Computing...");
+    topCandidates.clear();
+    updateChart();
+    update();
+
+    QTimer::singleShot(0, this, [this, ctx, date, requestId]() {
+
+        // Build snapshot on main thread (PMC data is typically cached already)
+        WorkoutAthleteSnapshot snapshot =
+            WorkoutGenerationService::athleteSnapshot(ctx, date);
+
+        if (requestId != simulationRequestId) {
+            return;
+        }
+
+        if (!snapshot.hasSimulationData()) {
+            loading = false;
+            hasData = false;
+            statusText = tr("No simulation data");
+            topCandidates.clear();
+            histCtl.clear();
+            histAtl.clear();
+            histTsb.clear();
+            updateChart();
+            update();
+            return;
+        }
+
+        // Collect 14 days of historical CTL/ATL/TSB from PMC (main thread, not thread-safe)
+        QVector<double> hCtl(14), hAtl(14), hTsb(14);
+        PMCData *pmc = ctx->athlete->getPMCFor(QStringLiteral("coggan_tss"));
+        if (pmc) {
+            for (int i = 0; i < 14; i++) {
+                QDate d = date.addDays(-(13 - i)); // oldest first
+                hCtl[i] = pmc->lts(d);
+                hAtl[i] = pmc->sts(d);
+                hTsb[i] = pmc->sb(d);
+            }
+        }
+
+        // Dispatch the CPU-heavy simulation (7 candidates × forward projection)
+        // to a thread-pool worker so the UI stays responsive.
+        QFuture<SimulationCardResult> future = QtConcurrent::run([snapshot, hCtl, hAtl, hTsb, requestId]() -> SimulationCardResult {
+            SimulationCardResult result;
+
+            result.requestId = requestId;
+            result.ctl = snapshot.ctl;
+            result.atl = snapshot.atl;
+            result.tsb = snapshot.tsb;
+            result.acwr = (snapshot.ctl > 0) ? snapshot.atl / snapshot.ctl : 0.0;
+            result.histCtl = hCtl;
+            result.histAtl = hAtl;
+            result.histTsb = hTsb;
+
+            SimulationRanking ranking = TrainingSimulator::rankCandidates(
+                snapshot, TrainingGoal::Build, 60);
+
+            result.goalName = trainingGoalToString(ranking.goal);
+
+            for (const SimulationResult &c : ranking.candidates) {
+                SimulationCardEntry entry;
+                entry.workoutType = c.workoutType;
+                entry.score = c.score;
+                entry.estimatedTSS = c.estimatedTSS;
+                entry.feasible = c.feasible;
+                entry.warnings = 0;
+                entry.hardViolations = 0;
+                for (const ConstraintViolation &v : c.constraints.violations) {
+                    if (v.severity == ConstraintViolation::Hard)
+                        entry.hardViolations++;
+                    else
+                        entry.warnings++;
+                }
+                entry.projCtl = c.projCtl;
+                entry.projAtl = c.projAtl;
+                entry.projTsb = c.projTsb;
+                result.topCandidates.append(entry);
+                if (result.topCandidates.size() >= 3) break;
+            }
+
+            // Build a short rationale explaining the recommendation
+            if (!result.topCandidates.isEmpty()) {
+                QString why;
+                if (result.tsb > 10)
+                    why = QObject::tr("You're fresh (TSB %1) — good day for intensity").arg(qRound(result.tsb));
+                else if (result.tsb > -10)
+                    why = QObject::tr("Balanced form (TSB %1) — steady progression").arg(qRound(result.tsb));
+                else if (result.tsb > -25)
+                    why = QObject::tr("Moderate fatigue (TSB %1) — manage load carefully").arg(qRound(result.tsb));
+                else
+                    why = QObject::tr("Deep fatigue (TSB %1) — prioritize recovery").arg(qRound(result.tsb));
+
+                if (result.acwr > 1.3)
+                    why += QObject::tr(" · ACWR %1 is elevated").arg(result.acwr, 0, 'f', 2);
+
+                result.rationale = why;
+                result.statusText = why;
+            } else {
+                result.statusText = QObject::tr("No recommendation available");
+            }
+
+            result.hasData = true;
+            return result;
+        });
+
+        watcher->setFuture(future);
+    });
+}
+
+void
+SimulationOverviewItem::simulationFinished()
+{
+    SimulationCardResult result = watcher->result();
+    if (result.requestId != simulationRequestId) {
+        return;
+    }
+
+    loading = false;
+    ctl = result.ctl;
+    atl = result.atl;
+    tsb = result.tsb;
+    acwr = result.acwr;
+    goalName = result.goalName;
+    rationale = result.rationale;
+    statusText = result.statusText;
+    topCandidates = result.topCandidates;
+    hasData = result.hasData;
+    histCtl = result.histCtl;
+    histAtl = result.histAtl;
+    histTsb = result.histTsb;
+
+    updateChart();
+    update();
+}
+
+void
+SimulationOverviewItem::dragChanged(bool drag)
+{
+    if (chart) {
+        chart->setVisible(!drag && hasData && !topCandidates.isEmpty());
+    }
+}
+
+void
+SimulationOverviewItem::updateChart()
+{
+    chart->setAnimationOptions(QChart::NoAnimation);
+    chart->removeAllSeries();
+
+    const QList<QAbstractAxis *> existingAxes = chart->axes();
+    for (QAbstractAxis *axis : existingAxes) {
+        chart->removeAxis(axis);
+        delete axis;
+    }
+
+    if (!hasData || topCandidates.isEmpty()) {
+        chart->hide();
+        return;
+    }
+
+    const SimulationCardEntry &top = topCandidates.first();
+    const int historyCount = qMin(histCtl.size(), qMin(histAtl.size(), histTsb.size()));
+    const int projectionCount = qMax(top.projCtl.size(), qMax(top.projAtl.size(), top.projTsb.size()));
+    if (historyCount == 0 && projectionCount == 0) {
+        chart->hide();
+        return;
+    }
+
+    struct SeriesPalette {
+        QColor color;
+        QVector<double> history;
+        QVector<double> projection;
+    };
+
+    const QList<SeriesPalette> seriesData = {
+        { QColor(100, 160, 220), histCtl, top.projCtl },
+        { QColor(230, 180, 50),  histAtl, top.projAtl },
+        { QColor(100, 200, 100), histTsb, top.projTsb }
+    };
+
+    double minValue = std::numeric_limits<double>::max();
+    double maxValue = std::numeric_limits<double>::lowest();
+    auto extendRange = [&](const QVector<double> &values) {
+        for (double value : values) {
+            minValue = qMin(minValue, value);
+            maxValue = qMax(maxValue, value);
+        }
+    };
+
+    for (const SeriesPalette &series : seriesData) {
+        extendRange(series.history);
+        extendRange(series.projection);
+    }
+
+    if (minValue == std::numeric_limits<double>::max()) {
+        chart->hide();
+        return;
+    }
+
+    const QPen axisPen(QColor(100, 100, 100, 120));
+
+    for (const SeriesPalette &series : seriesData) {
+        QLineSeries *historySeries = new QLineSeries(chart);
+        historySeries->setColor(series.color);
+        QPen historyPen(series.color);
+        historyPen.setWidthF(2.0);
+        historySeries->setPen(historyPen);
+
+        for (int i = 0; i < series.history.size(); ++i) {
+            historySeries->append(i, series.history.at(i));
+        }
+        chart->addSeries(historySeries);
+
+        if (!series.projection.isEmpty()) {
+            QLineSeries *projectionSeries = new QLineSeries(chart);
+            projectionSeries->setColor(series.color);
+            QPen projectionPen(series.color);
+            projectionPen.setStyle(Qt::DashLine);
+            projectionPen.setWidthF(2.0);
+            projectionSeries->setPen(projectionPen);
+
+            if (!series.history.isEmpty()) {
+                projectionSeries->append(series.history.size() - 1, series.history.last());
+            }
+            for (int i = 0; i < series.projection.size(); ++i) {
+                projectionSeries->append(historyCount + i, series.projection.at(i));
+            }
+            chart->addSeries(projectionSeries);
+        }
+    }
+
+    QValueAxis *xAxis = new QValueAxis(chart);
+    xAxis->setRange(0, qMax(0, historyCount + projectionCount - 1));
+    xAxis->setLabelsVisible(false);
+    xAxis->setGridLineVisible(false);
+    xAxis->setLinePen(axisPen);
+    xAxis->setLineVisible(false);
+    chart->addAxis(xAxis, Qt::AlignBottom);
+
+    QValueAxis *yAxis = new QValueAxis(chart);
+    double span = qMax(1.0, maxValue - minValue);
+    double padding = qMax(5.0, span * 0.15);
+    yAxis->setRange(minValue - padding, maxValue + padding);
+    yAxis->setLabelsVisible(false);
+    yAxis->setLinePen(axisPen);
+    yAxis->setGridLineColor(QColor(100, 100, 100, 60));
+    chart->addAxis(yAxis, Qt::AlignLeft);
+
+    for (QAbstractSeries *series : chart->series()) {
+        series->attachAxis(xAxis);
+        series->attachAxis(yAxis);
+    }
+
+    chart->setVisible(!drag);
+}
+
+void
+SimulationOverviewItem::itemGeometryChanged() {
+
+    QRectF geom = geometry();
+
+    // Chart occupies the middle section of the tile, below the recommendation
+    // and gauge bars, above the prediction text
+    chart->setAnimationOptions(QChart::NoAnimation);
+    double chartTop = ROWHEIGHT * 12;
+    double chartHeight = qMax(0.0, geom.height() - chartTop - ROWHEIGHT * 6);
+    chart->setGeometry(20, chartTop, geom.width() - 40, chartHeight);
+    chart->setVisible(!drag && hasData && !topCandidates.isEmpty() && chartHeight >= ROWHEIGHT * 2);
 }
 
 static bool lessthan(const aggmeta &a, const aggmeta &b)
@@ -3793,6 +4131,234 @@ PMCOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
     }
 }
 
+void
+SimulationOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
+
+    QFontMetrics tfm(parent->titlefont, parent->device());
+    QFontMetrics bfm(parent->bigfont, parent->device());
+    QFontMetrics mfm(parent->midfont, parent->device());
+
+    double margin = ROWHEIGHT;
+    double width = geometry().width();
+
+    // Start below the card title drawn by the base class
+    double nexty = ROWHEIGHT * 2;
+
+    if (!hasData) {
+        painter->setPen(QColor(150,150,150));
+        painter->setFont(parent->midfont);
+        painter->drawText(QPointF(margin / 2.0f, nexty + mfm.ascent() / 3.0f),
+                          statusText.isEmpty() ? tr("No simulation data") : statusText);
+        return;
+    }
+
+    // === Recommendation (big, centered, same layout as PMC values) ===
+    if (!topCandidates.isEmpty()) {
+        const SimulationCardEntry &top = topCandidates.first();
+
+        // Section label
+        painter->setPen(QColor(200,200,200));
+        painter->setFont(parent->titlefont);
+        painter->drawText(QPointF(margin / 2.0f, nexty + tfm.ascent() / 3.0f), tr("Recommended"));
+        nexty += tfm.height() + 30;
+
+        // Workout type (big centered value — matches PMC pattern)
+        QColor typeColor = top.feasible ? GColor(CPLOTMARKER) : QColor(200, 80, 80);
+        painter->setPen(typeColor);
+        painter->setFont(parent->bigfont);
+
+        QString typeName = top.workoutType;
+        if (!typeName.isEmpty()) typeName[0] = typeName[0].toUpper();
+
+        QRectF rect = bfm.boundingRect(typeName);
+        painter->drawText(QPointF((width - rect.width()) / 2.0f,
+                                  nexty + bfm.ascent() / 3.0f), typeName);
+        nexty += ROWHEIGHT * 2;
+
+        // TSS + Goal subtitle
+        painter->setPen(QColor(150,150,150));
+        painter->setFont(parent->midfont);
+        QString sub = QString("TSS %1  ·  %2").arg(qRound(top.estimatedTSS)).arg(goalName);
+        QRectF subRect = mfm.boundingRect(sub);
+        painter->drawText(QPointF((width - subRect.width()) / 2.0f,
+                                  nexty + mfm.ascent() / 3.0f), sub);
+        nexty += ROWHEIGHT;
+
+        if (deep > 7 && !rationale.isEmpty()) {
+            painter->setPen(QColor(150,150,150));
+            QRectF rationaleRect(margin / 2.0f, nexty, width - margin, ROWHEIGHT * 2.0);
+            painter->drawText(rationaleRect, Qt::AlignHCenter | Qt::AlignTop | Qt::TextWordWrap, rationale);
+            nexty += rationaleRect.height();
+        }
+    }
+
+    // === Factor gauge bars (ProgressBar style: fillRect) ===
+    if (deep > 6) {
+
+        double barLeft = margin * 2;
+        double barRight = width - margin * 2;
+        double barSpan = barRight - barLeft;
+        double barH = ROWHEIGHT / 3.0;
+
+        auto drawGauge = [&](const QString &label, double value, double minVal, double maxVal,
+                             const QString &valueStr, QColor barColor) {
+
+            // Label left, value right
+            painter->setFont(parent->midfont);
+            painter->setPen(QColor(200,200,200));
+            painter->drawText(QPointF(margin / 2.0f, nexty + mfm.ascent() / 3.0f), label);
+
+            painter->setPen(barColor);
+            QRectF valRect = mfm.boundingRect(valueStr);
+            painter->drawText(QPointF(width - margin / 2.0f - valRect.width(),
+                                      nexty + mfm.ascent() / 3.0f), valueStr);
+            nexty += mfm.height() + 8;
+
+            // Background bar (same as ProgressBar)
+            QRectF bgBox(barLeft, nexty, barSpan, barH);
+            painter->fillRect(bgBox, QBrush(QColor(100,100,100,100)));
+
+            // Fill bar
+            double factor = qBound(0.0, (value - minVal) / (maxVal - minVal), 1.0);
+            if (factor > 0.0) {
+                QRectF fillBox(barLeft, nexty, barSpan * factor, barH);
+                painter->fillRect(fillBox, QBrush(barColor));
+            }
+
+            nexty += barH + ROWHEIGHT * 0.6;
+        };
+
+        // Form (TSB): range -40 to +30
+        QColor tsbColor;
+        if (tsb > 5) tsbColor = QColor(100, 200, 100);
+        else if (tsb > -15) tsbColor = QColor(230, 180, 50);
+        else tsbColor = QColor(220, 80, 80);
+        drawGauge(tr("Form"), tsb, -40, 30, QString("%1 TSB").arg(qRound(tsb)), tsbColor);
+
+        // Fitness (CTL): range 0 to max(150, ctl*1.5)
+        double ctlMax = qMax(150.0, ctl * 1.5);
+        drawGauge(tr("Fitness"), ctl, 0, ctlMax, QString("%1 CTL").arg(qRound(ctl)), QColor(100, 160, 220));
+
+        // Fatigue (ATL): range 0 to max(150, atl*1.5)
+        QColor atlColor;
+        if (atl < ctl * 0.9) atlColor = QColor(100, 200, 100);
+        else if (atl < ctl * 1.3) atlColor = QColor(230, 180, 50);
+        else atlColor = QColor(220, 80, 80);
+        double atlMax = qMax(150.0, atl * 1.5);
+        drawGauge(tr("Fatigue"), atl, 0, atlMax, QString("%1 ATL").arg(qRound(atl)), atlColor);
+
+        // Risk (ACWR): range 0.5 to 2.0
+        QColor acwrColor;
+        if (acwr >= 0.8 && acwr <= 1.3) acwrColor = QColor(100, 200, 100);
+        else if (acwr <= 1.5) acwrColor = QColor(230, 180, 50);
+        else acwrColor = QColor(220, 80, 80);
+        drawGauge(tr("Risk"), acwr, 0.5, 2.0, QString("%1").arg(acwr, 0, 'f', 2), acwrColor);
+    }
+
+    // === Constraint summary ===
+    if (deep > 10 && !topCandidates.isEmpty()) {
+        const SimulationCardEntry &top = topCandidates.first();
+        QString statusText;
+        QColor statusColor;
+        if (top.hardViolations > 0) {
+            statusColor = QColor(220, 80, 80);
+            statusText = QString(tr("%1 violation(s)")).arg(top.hardViolations);
+        } else if (top.warnings > 0) {
+            statusColor = QColor(230, 180, 50);
+            statusText = QString(tr("%1 warning(s)")).arg(top.warnings);
+        } else {
+            statusColor = QColor(100, 200, 100);
+            statusText = tr("All clear");
+        }
+        painter->setPen(statusColor);
+        painter->setFont(parent->midfont);
+        QRectF rect = mfm.boundingRect(statusText);
+        painter->drawText(QPointF((width - rect.width()) / 2.0f,
+                                  nexty + mfm.ascent() / 3.0f), statusText);
+        nexty += ROWHEIGHT;
+    }
+
+    if (chart->isVisible()) {
+        nexty = qMax(nexty, chart->geometry().bottom() + ROWHEIGHT * 0.8);
+    }
+
+    // === Predicted outcome ===
+    if (deep > 11 && !topCandidates.isEmpty()) {
+        const SimulationCardEntry &top = topCandidates.first();
+
+        painter->setPen(QColor(200,200,200));
+        painter->setFont(parent->titlefont);
+        painter->drawText(QPointF(margin / 2.0f, nexty + tfm.ascent() / 3.0f), tr("Predicted Tomorrow"));
+        nexty += tfm.height() + 10;
+
+        painter->setFont(parent->midfont);
+
+        auto projectedTomorrow = [](const QVector<double> &series) {
+            if (series.size() > 1) return series.at(1);
+            if (!series.isEmpty()) return series.last();
+            return 0.0;
+        };
+
+        // Show next-day projected values with delta arrows
+        auto drawProjection = [&](const QString &label, double current, double projected, QColor color) {
+            double delta = projected - current;
+            QString arrow = delta >= 0 ? QString::fromUtf8("\u2191") : QString::fromUtf8("\u2193");
+            QString line = QString("%1  %2 %3%4")
+                .arg(label)
+                .arg(qRound(projected))
+                .arg(arrow)
+                .arg(qRound(qAbs(delta)));
+
+            painter->setPen(color);
+            painter->drawText(QPointF(margin / 2.0f, nexty + mfm.ascent() / 3.0f), line);
+
+            // Right-align "from X"
+            painter->setPen(QColor(120,120,120));
+            QString from = QString("(%1)").arg(qRound(current));
+            QRectF fromRect = mfm.boundingRect(from);
+            painter->drawText(QPointF(width - margin / 2.0f - fromRect.width(),
+                                      nexty + mfm.ascent() / 3.0f), from);
+            nexty += mfm.height() + 6;
+        };
+
+        double projCtlTomorrow = projectedTomorrow(top.projCtl);
+        double projAtlTomorrow = projectedTomorrow(top.projAtl);
+        double projTsbTomorrow = projectedTomorrow(top.projTsb);
+
+        // CTL change
+        drawProjection(tr("Fitness"), ctl, projCtlTomorrow, QColor(100, 160, 220));
+        // ATL change
+        QColor atlColor = projAtlTomorrow > atl ? QColor(230, 180, 50) : QColor(100, 200, 100);
+        drawProjection(tr("Fatigue"), atl, projAtlTomorrow, atlColor);
+        // TSB change
+        QColor tsbColor = projTsbTomorrow > 0 ? QColor(100, 200, 100) : QColor(220, 80, 80);
+        drawProjection(tr("Form"), tsb, projTsbTomorrow, tsbColor);
+
+        nexty += 6;
+    }
+
+    // === Alternatives ===
+    if (deep > 13 && topCandidates.size() > 1) {
+
+        painter->setPen(QColor(200,200,200));
+        painter->setFont(parent->titlefont);
+        painter->drawText(QPointF(margin / 2.0f, nexty + tfm.ascent() / 3.0f), tr("Alternatives"));
+        nexty += tfm.height() + 10;
+
+        painter->setFont(parent->midfont);
+        for (int i = 1; i < topCandidates.size() && i <= 2; i++) {
+            const SimulationCardEntry &alt = topCandidates[i];
+            QString name = alt.workoutType;
+            if (!name.isEmpty()) name[0] = name[0].toUpper();
+            QString line = QString("%1  TSS %2").arg(name).arg(qRound(alt.estimatedTSS));
+
+            painter->setPen(alt.feasible ? QColor(150,150,150) : QColor(180, 100, 100));
+            painter->drawText(QPointF(margin / 2.0f, nexty + mfm.ascent() / 3.0f), line);
+            nexty += mfm.height() + 6;
+        }
+    }
+}
+
 // no custom painting for these guys, they contain widgets only
 void RouteOverviewItem::itemPaint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) {  }
 void IntervalOverviewItem::itemPaint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) {  }
@@ -4140,6 +4706,12 @@ OverviewItemConfig::setWidgets()
             cb1->setChecked(mi->istime);
             string1->setText(mi->units);
         }
+        break;
+    case OverviewItemType::SIMULATION:
+        {
+            name->setText(item->name);
+        }
+        break;
     }
     block = false;
 }
@@ -4271,6 +4843,13 @@ OverviewItemConfig::dataChanged()
             mi->stop = double2->value();
             mi->bgcolor = bgcolor->getColor().name();
         }
+        break;
+    case OverviewItemType::SIMULATION:
+        {
+            item->name = name->text();
+            item->bgcolor = bgcolor->getColor().name();
+        }
+        break;
     }
 }
 

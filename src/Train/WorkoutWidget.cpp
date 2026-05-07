@@ -212,7 +212,7 @@ WorkoutWidget::setNow(long x)
 }
 
 void
-WorkoutWidget::telemetryUpdate(RealtimeData rt)
+WorkoutWidget::telemetryUpdate(const RealtimeData &rt)
 {
     // only plot when recording
     if (!recording_) return;

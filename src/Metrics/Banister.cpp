@@ -33,6 +33,7 @@
 #include "Banister.h"
 
 #include "RideMetric.h"
+#include "RideFileData.h"
 #include "RideFileCache.h"
 #include "Athlete.h"
 #include "Context.h"
@@ -618,11 +619,16 @@ class PowerIndex : public RideMetric {
 
             // loop through and count
             RideFileIterator it(item->ride(), spec);
-            while (it.hasNext()) {
-                struct RideFilePoint *point = it.next();
-                // use duration as count for now, and accumulate power
-                duration++;
-                averagepower += point->watts;
+            const int first = it.firstIndex();
+            const int last  = it.lastIndex();
+            if (first >= 0 && last >= first) {
+                const RideFileData &view = item->ride()->columnar();
+                const double *watts = view.series(RideFile::watts).constData();
+                for (int i = first; i <= last; ++i) {
+                    // use duration as count for now, and accumulate power
+                    duration++;
+                    averagepower += watts[i];
+                }
             }
             if (duration >0) {
                 averagepower /= duration; // convert to AP

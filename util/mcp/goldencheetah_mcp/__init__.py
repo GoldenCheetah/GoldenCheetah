@@ -1,0 +1,2 @@
+"""GoldenCheetah MCP package."""
+

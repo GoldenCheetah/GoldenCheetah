@@ -18,6 +18,7 @@
 
 #include "RideMetric.h"
 #include "RideItem.h"
+#include "RideFileData.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "Specification.h"
@@ -71,21 +72,27 @@ class aIsoPower : public RideMetric {
             double sum = 0;
 
             RideFileIterator it(item->ride(), spec);
+            const int first = it.firstIndex();
+            const int last  = it.lastIndex();
+            if (first >= 0 && last >= first) {
+                const RideFileData &view = item->ride()->columnar();
+                const double *apower = view.series(RideFile::aPower).constData();
 
-            // loop over the data and convert to a rolling
-            // average for the given windowsize
-            for (int i=it.firstIndex(); i >=0 && i<=it.lastIndex(); i++) {
+                // loop over the data and convert to a rolling
+                // average for the given windowsize
+                for (int i = first; i <= last; ++i) {
 
-                sum += item->ride()->dataPoints()[i]->apower;
-                sum -= rolling[index];
+                    sum += apower[i];
+                    sum -= rolling[index];
 
-                rolling[index] = item->ride()->dataPoints()[i]->apower;
+                    rolling[index] = apower[i];
 
-                total += pow(sum/rollingwindowsize,4); // raise rolling average to 4th power
-                count ++;
+                    total += pow(sum/rollingwindowsize,4); // raise rolling average to 4th power
+                    count ++;
 
-                // move index on/round
-                index = (index >= rollingwindowsize-1) ? 0 : index+1;
+                    // move index on/round
+                    index = (index >= rollingwindowsize-1) ? 0 : index+1;
+                }
             }
         }
         if (count) {

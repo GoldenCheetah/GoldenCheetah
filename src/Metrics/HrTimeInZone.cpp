@@ -19,6 +19,7 @@
 
 #include "RideMetric.h"
 #include "RideItem.h"
+#include "RideFileData.h"
 #include "HrZones.h"
 #include "Context.h"
 #include "Athlete.h"
@@ -63,11 +64,17 @@ public:
         if (item->context->athlete->hrZones(item->sport) && item->hrZoneRange >= 0 && item->ride()->areDataPresent()->hr) {
             // iterate and compute
             RideFileIterator it(item->ride(), spec);
-            while (it.hasNext()) {
-                struct RideFilePoint *point = it.next();
-                totalSecs += item->ride()->recIntSecs();
-                if (item->context->athlete->hrZones(item->sport)->whichZone(item->hrZoneRange, point->hr) == level)
-                    seconds += item->ride()->recIntSecs();
+            const int first = it.firstIndex();
+            const int last  = it.lastIndex();
+            if (first >= 0 && last >= first) {
+                const RideFileData &view = item->ride()->columnar();
+                const double *hr = view.series(RideFile::hr).constData();
+                const double recIntSecs = item->ride()->recIntSecs();
+                for (int i = first; i <= last; ++i) {
+                    totalSecs += recIntSecs;
+                    if (item->context->athlete->hrZones(item->sport)->whichZone(item->hrZoneRange, hr[i]) == level)
+                        seconds += recIntSecs;
+                }
             }
         }
         setValue(seconds);
@@ -785,12 +792,18 @@ public:
             int AeT = item->context->athlete->hrZones(item->sport)->getAeT(item->hrZoneRange);
 
             // iterate and compute
+            const double recIntSecs = item->ride()->recIntSecs();
             RideFileIterator it(item->ride(), spec);
-            while (it.hasNext()) {
-                struct RideFilePoint *point = it.next();
-                totalSecs += item->ride()->recIntSecs();
-                if (point->hr < AeT)
-                    seconds += item->ride()->recIntSecs();
+            const int firstIdx = it.firstIndex();
+            const int lastIdx  = it.lastIndex();
+            if (firstIdx >= 0 && lastIdx >= firstIdx) {
+                const RideFileData &view = item->ride()->columnar();
+                const double *hr = view.series(RideFile::hr).constData();
+                for (int i = firstIdx; i <= lastIdx; ++i) {
+                    totalSecs += recIntSecs;
+                    if (hr[i] < AeT)
+                        seconds += recIntSecs;
+                }
             }
         }
         setValue(seconds);
@@ -850,12 +863,18 @@ public:
             int LT = item->context->athlete->hrZones(item->sport)->getLT(item->hrZoneRange);
 
             // iterate and compute
+            const double recIntSecs = item->ride()->recIntSecs();
             RideFileIterator it(item->ride(), spec);
-            while (it.hasNext()) {
-                struct RideFilePoint *point = it.next();
-                totalSecs += item->ride()->recIntSecs();
-                if (point->hr >= AeT && point->hr < LT)
-                    seconds += item->ride()->recIntSecs();
+            const int firstIdx = it.firstIndex();
+            const int lastIdx  = it.lastIndex();
+            if (firstIdx >= 0 && lastIdx >= firstIdx) {
+                const RideFileData &view = item->ride()->columnar();
+                const double *hr = view.series(RideFile::hr).constData();
+                for (int i = firstIdx; i <= lastIdx; ++i) {
+                    totalSecs += recIntSecs;
+                    if (hr[i] >= AeT && hr[i] < LT)
+                        seconds += recIntSecs;
+                }
             }
         }
         setValue(seconds);
@@ -914,12 +933,18 @@ public:
             int LT = item->context->athlete->hrZones(item->sport)->getLT(item->hrZoneRange);
 
             // iterate and compute
+            const double recIntSecs = item->ride()->recIntSecs();
             RideFileIterator it(item->ride(), spec);
-            while (it.hasNext()) {
-                struct RideFilePoint *point = it.next();
-                totalSecs += item->ride()->recIntSecs();
-                if (point->hr >= LT)
-                    seconds += item->ride()->recIntSecs();
+            const int firstIdx = it.firstIndex();
+            const int lastIdx  = it.lastIndex();
+            if (firstIdx >= 0 && lastIdx >= firstIdx) {
+                const RideFileData &view = item->ride()->columnar();
+                const double *hr = view.series(RideFile::hr).constData();
+                for (int i = firstIdx; i <= lastIdx; ++i) {
+                    totalSecs += recIntSecs;
+                    if (hr[i] >= LT)
+                        seconds += recIntSecs;
+                }
             }
         }
         setValue(seconds);

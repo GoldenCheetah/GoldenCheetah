@@ -19,6 +19,8 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "MainWindow.h"
+#include "AthleteTab.h"
+#include "RideCache.h"
 #include "Settings.h"
 #include "CloudService.h"
 #include "TrainDB.h"
@@ -28,7 +30,10 @@
 #include "PowerProfile.h"
 #include "GcCrashDialog.h" // for versionHTML
 #include "OverviewItems.h"
+#include "GcLineCurve.h"
+#include "GcChartAxis.h"
 
+#include <QQmlEngine>
 #include <QApplication>
 #include <QtGui>
 #include <QFile>
@@ -261,6 +266,7 @@ main(int argc, char *argv[])
     bool server = false;
     nogui = false;
     bool help = false;
+    QString metricCsvOut; // --metric-csv <path>: dump all metric values, then exit
 
     // honour command line switches
     QString arg;
@@ -351,6 +357,9 @@ main(int argc, char *argv[])
         } else if (arg == "--debug-rules" && i < sargs.length()) {
             debugRules = QString(sargs[i]);
             i++;
+        } else if (arg == "--metric-csv" && i < sargs.length()) {
+            metricCsvOut = QString(sargs[i]);
+            i++;
         } else if (arg == "--clouddbcurator") {
 #ifdef GC_HAS_CLOUD_DB
             CloudDBCommon::addCuratorFeatures = true;
@@ -415,6 +424,11 @@ main(int argc, char *argv[])
 
     // create the application -- only ever ONE regardless of restarts
     application = new QApplication(argc, argv);
+
+    // QSG-backed chart primitives (Charts/GcLineCurve, Charts/GcChartAxis).
+    // Registered once so any QML scene can instantiate them.
+    qmlRegisterType<GcLineCurve>("GoldenCheetah", 1, 0, "GcLineCurve");
+    qmlRegisterType<GcChartAxis>("GoldenCheetah", 1, 0, "GcChartAxis");
 
 #ifdef Q_OS_WIN
     if (application->style()->name() == "windows11") {
@@ -721,11 +735,49 @@ main(int argc, char *argv[])
                     GcUpgrade v3;
                     if (v3.upgradeConfirmedByUser(home)) {
                         MainWindow *mainWindow = new MainWindow(home);
-                        mainWindow->show();
+                        if (metricCsvOut.isEmpty()) mainWindow->show();
                         mainWindow->ridesAutoImport();
                         gc_opened++;
                         home.cdUp();
                         anyOpened = true;
+
+                        // Metric equivalence harness: wait for the ride
+                        // cache refresh to finish, dump every metric to
+                        // CSV, then exit. Diff against a baseline to
+                        // catch numerical drift when migrating metrics.
+                        if (!metricCsvOut.isEmpty()) {
+                            Context *ctx = mainWindow->athleteTab()->getContext();
+                            RideCache *cache = ctx->athlete->rideCache;
+
+                            // Drain any queued signals (e.g. refreshEnd
+                            // already emitted from a worker thread) before
+                            // deciding whether to enter the event loop.
+                            application->processEvents();
+
+                            if (cache->isRunning()) {
+                                QEventLoop loop;
+                                QObject::connect(ctx, SIGNAL(refreshEnd()),
+                                                 &loop, SLOT(quit()));
+                                QTimer::singleShot(600000, &loop, SLOT(quit()));
+                                // re-check after connecting, in case it
+                                // finished between processEvents and here.
+                                if (cache->isRunning()) loop.exec();
+                            }
+
+                            cache->writeAsCSV(metricCsvOut);
+                            fprintf(stdout, "metrics written to %s (%d rides)\n",
+                                    metricCsvOut.toUtf8().constData(),
+                                    cache->count());
+                            fflush(stdout);
+
+                            // mark clean exit so the next run can auto-
+                            // open this athlete without the crash dialog.
+                            appsettings->setCValue(
+                                ctx->athlete->cyclist, GC_SAFEEXIT, true);
+
+                            delete trainDB;
+                            terminate(0);
+                        }
                     } else {
                         delete trainDB;
                         terminate(0);

@@ -19,6 +19,7 @@
 
 #include "RideMetric.h"
 #include "RideItem.h"
+#include "RideFileData.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "Specification.h"
@@ -81,21 +82,26 @@ class aXPower : public RideMetric {
         double total = 0.0;
         int count = 0;
 
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            while ((weighted > NEGLIGIBLE)
-                   && (point->secs > lastSecs + secsDelta + EPSILON)) {
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *apower = view.series(RideFile::aPower).constData();
+            const double *secs_data = view.series(RideFile::secs).constData();
+            for (int i = first; i <= last; ++i) {
+                while ((weighted > NEGLIGIBLE)
+                       && (secs_data[i] > lastSecs + secsDelta + EPSILON)) {
+                    weighted *= attenuation;
+                    lastSecs += secsDelta;
+                    total += pow(weighted, 4.0);
+                    count++;
+                }
                 weighted *= attenuation;
-                lastSecs += secsDelta;
+                weighted += sampleWeight * apower[i];
+                lastSecs = secs_data[i];
                 total += pow(weighted, 4.0);
                 count++;
             }
-            weighted *= attenuation;
-            weighted += sampleWeight * point->apower;
-            lastSecs = point->secs;
-            total += pow(weighted, 4.0);
-            count++;
         }
         xpower = count ? pow(total / count, 0.25) : 0.0;
         secs = count * secsDelta;

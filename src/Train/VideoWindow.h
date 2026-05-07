@@ -252,7 +252,7 @@ class VideoWindow : public GcChartWindow
         void stopPlayback();
         void pausePlayback();
         void resumePlayback();
-        void telemetryUpdate(RealtimeData rtd);
+        void telemetryUpdate(const RealtimeData &rtd);
         void seekPlayback(long ms);
         void mediaSelected(QString filename);
         bool hasActiveVideo() const;

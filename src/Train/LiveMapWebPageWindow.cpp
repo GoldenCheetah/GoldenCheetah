@@ -229,7 +229,7 @@ void LiveMapWebPageWindow::configChanged(qint32)
 }
 
 // Update position on the map when telemetry changes.
-void LiveMapWebPageWindow::telemetryUpdate(RealtimeData rtd)
+void LiveMapWebPageWindow::telemetryUpdate(const RealtimeData &rtd)
 {
     if (!isVisible())
         return;

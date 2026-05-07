@@ -17,6 +17,7 @@
  */
 
 #include "RideMetric.h"
+#include "RideFileData.h"
 #include "Athlete.h"
 #include "Context.h"
 #include "Settings.h"
@@ -64,15 +65,20 @@ struct AvgRunCadence : public RideMetric {
         total = count = 0;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            if (point->cad > 0) {
-                total += point->cad;
-                ++count;
-            } else if (point->rcad > 0) {
-                total += point->rcad;
-                ++count;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *cad = view.series(RideFile::cad).constData();
+            const double *rcad = view.series(RideFile::rcad).constData();
+            for (int i = first; i <= last; ++i) {
+                if (cad[i] > 0) {
+                    total += cad[i];
+                    ++count;
+                } else if (rcad[i] > 0) {
+                    total += rcad[i];
+                    ++count;
+                }
             }
         }
         setValue(count > 0 ? total / count : count);
@@ -121,10 +127,16 @@ class MaxRunCadence : public RideMetric {
         double max = 0.0;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->cad > max) max = point->cad;
-            if (point->rcad > max) max = point->rcad;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *cad = view.series(RideFile::cad).constData();
+            const double *rcad = view.series(RideFile::rcad).constData();
+            for (int i = first; i <= last; ++i) {
+                if (cad[i] > max) max = cad[i];
+                if (rcad[i] > max) max = rcad[i];
+            }
         }
 
         setValue(max);
@@ -175,12 +187,16 @@ struct AvgRunGroundContactTime : public RideMetric {
         total = count = 0;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            if (point->rcontact > 0) {
-                total += point->rcontact;
-                ++count;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *rcontact = view.series(RideFile::rcontact).constData();
+            for (int i = first; i <= last; ++i) {
+                if (rcontact[i] > 0) {
+                    total += rcontact[i];
+                    ++count;
+                }
             }
         }
         setValue(count > 0 ? total / count : count);
@@ -234,12 +250,16 @@ struct AvgRunVerticalOscillation  : public RideMetric {
         total = count = 0;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            if (point->rvert > 0) {
-                total += point->rvert;
-                ++count;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *rvert = view.series(RideFile::rvert).constData();
+            for (int i = first; i <= last; ++i) {
+                if (rvert[i] > 0) {
+                    total += rvert[i];
+                    ++count;
+                }
             }
         }
         setValue(count > 0 ? total / count : count);
@@ -428,12 +448,16 @@ struct AvgStrideLength  : public RideMetric {
         total = count = 0;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-
-            if (point->clength > 0) {
-                total += point->clength;
-                ++count;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *clength = view.series(RideFile::clength).constData();
+            for (int i = first; i <= last; ++i) {
+                if (clength[i] > 0) {
+                    total += clength[i];
+                    ++count;
+                }
             }
         }
         setValue(count > 0 ? total / count : count);

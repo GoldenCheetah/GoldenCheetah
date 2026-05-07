@@ -150,8 +150,9 @@ Selfloops::writeFileCompleted()
     printd("Selfloops::writeFileCompleted()\n");
 
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
+    const QByteArray body = reply->readAll();
 
-    printd("reply:%s\n", reply->readAll().toStdString().c_str());
+    printd("reply:%s\n", body.constData());
 
     bool uploadSuccessful = false;
     int error;
@@ -160,12 +161,17 @@ Selfloops::writeFileCompleted()
     try {
 
         // parse the response
-        QString response = reply->readAll();
+        QString response = QString::fromUtf8(body);
         MVJSONReader jsonResponse(string(response.toLatin1()));
 
         // get values
-        error = jsonResponse.root->getFieldInt("error_code");
-        uploadError = jsonResponse.root->getFieldString("message").c_str();
+        if (jsonResponse.root != NULL) {
+            error = jsonResponse.root->getFieldInt("error_code");
+            uploadError = jsonResponse.root->getFieldString("message").c_str();
+        } else {
+            error = 500;
+            uploadError = "bad response or parser exception.";
+        }
         //XXX selfloopsActivityId = jsonResponse.root->getFieldInt("activity_id");
 
     } catch(...) {

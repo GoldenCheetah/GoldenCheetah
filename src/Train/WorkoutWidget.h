@@ -265,7 +265,7 @@ class WorkoutWidget : public QWidget
         void start();
         void stop();
         void setNow(long);
-        void telemetryUpdate(RealtimeData rtData);
+        void telemetryUpdate(const RealtimeData &rtData);
 
         // and erg file was selected
         void ergFileSelected(ErgFile *, ErgFileFormat format = ErgFileFormat::unknown);

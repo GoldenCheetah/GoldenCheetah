@@ -34,6 +34,8 @@
 #include <QStyleFactory>
 #include <QScrollBar>
 #include <QLabel>
+#include <QDir>
+#include <QFileInfo>
 
 #include <QEvent>
 #include <QInputEvent>
@@ -75,6 +77,25 @@
 #include "TrainDB.h"
 #include "Library.h"
 
+namespace {
+
+QString normalizedWorkoutPath(const QString &path)
+{
+    const QString trimmed = path.trimmed();
+    if (trimmed.isEmpty()) {
+        return QString();
+    }
+
+    QFileInfo info(trimmed);
+    const QString canonical = info.canonicalFilePath();
+    if (!canonical.isEmpty()) {
+        return QDir::cleanPath(canonical);
+    }
+    return QDir::cleanPath(info.absoluteFilePath());
+}
+
+} // namespace
+
 #if defined(GC_HAVE_VLC)||defined(GC_VIDEO_QT6) // RLV currently only support for VLC
 #define USE_RLV
 #endif
@@ -99,6 +120,11 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     autoConnect = false;
     trainView=NULL;
     useSimulatedSpeed = false;
+    m_autoPauseZeroCount = 0;
+    m_autoPaused = false;
+    cachedAutoPauseEnabled = false;
+    cachedAutoPauseThreshold = qMax(1, (3 * 1000) / REFRESHRATE);
+    cachedWbalTau = 300;
 
     cl->setSpacing(0);
     cl->setContentsMargins(0,0,0,0);
@@ -374,6 +400,13 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     load_timer = new QTimer(this);
     start_timer = new QTimer(this);
     start_timer->setSingleShot(true);
+
+    // Use coarse timers for non-latency-critical ticks so the OS can coalesce
+    // wakeups with other timers. Keeps trainer laptops out of the high-freq
+    // wakeup path and cuts idle battery draw in Train mode.
+    gui_timer->setTimerType(Qt::CoarseTimer);
+    load_timer->setTimerType(Qt::CoarseTimer);
+    disk_timer->setTimerType(Qt::CoarseTimer);
 
     session_time.start();
     session_elapsed_msec = 0;
@@ -687,6 +720,15 @@ TrainSidebar::configChanged(qint32 why)
     lapAudioEnabled = appsettings->value(this, TRAIN_LAPALERT, false).toBool();
 
     useSimulatedSpeed = appsettings->value(this, TRAIN_USESIMULATEDSPEED, false).toBool();
+
+    // cache hot-path settings so the 5 Hz tick never reads QSettings
+    cachedAutoPauseEnabled = appsettings->value(this, TRAIN_AUTOPAUSE, false).toBool();
+    {
+        int delaySecs = appsettings->value(this, TRAIN_AUTOPAUSE_DELAY, 3).toInt();
+        cachedAutoPauseThreshold = qMax(1, (delaySecs * 1000) / REFRESHRATE);
+    }
+    cachedWbalTau = appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toDouble();
+    if (cachedWbalTau <= 0) cachedWbalTau = 300;
 
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 #if !defined GC_VIDEO_NONE
@@ -1297,6 +1339,8 @@ void TrainSidebar::Start()       // when start button is pressed
         session_time.start();
         lap_time.start();
         clearStatusFlags(RT_PAUSED);
+        m_autoPaused = false;
+        m_autoPauseZeroCount = 0;
 
         // Reset speed simulation timer.
         bicycle.resettimer();
@@ -1418,6 +1462,10 @@ void TrainSidebar::Start()       // when start button is pressed
         lap_elapsed_msec = 0;
         wbalr = 0;
         wbal = WPRIME;
+
+        // reset auto-pause state for new workout
+        m_autoPauseZeroCount = 0;
+        m_autoPaused = false;
         
         resetTextAudioEmitTracking();
 
@@ -1540,6 +1588,10 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
 #endif
 
     clearStatusFlags(RT_RUNNING|RT_PAUSED);
+
+    // reset auto-pause state
+    m_autoPauseZeroCount = 0;
+    m_autoPaused = false;
 
     // Stop users from selecting different devices
     // media or workouts whilst a workout is in progress
@@ -2097,7 +2149,11 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     if (fPlayAudio) {
                         lapAudioThisLap = false;
                         static QSoundEffect effect;
-                        effect.setSource(QUrl::fromLocalFile(":audio/lap.wav"));
+                        static bool effectLoaded = false;
+                        if (!effectLoaded) {
+                            effect.setSource(QUrl::fromLocalFile(":audio/lap.wav"));
+                            effectLoaded = true;
+                        }
                         effect.play();
                     }
                 }
@@ -2180,17 +2236,22 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
             // W'bal on the fly
             // using Dave Waterworth's reformulation
-            double TAU = appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toInt();
+            const double TAU = cachedWbalTau;
 
             // any watts expended in last 200msec?
             double JOULES = double(rtData.getWatts() - FTP) / 5.00f;
             if (JOULES < 0) JOULES = 0;
 
             // running total of replenishment
-            wbalr += JOULES * exp((total_msecs/1000.00f) / TAU);
-            wbal = WPRIME - (wbalr * exp((-total_msecs/1000.00f) / TAU));
+            const double tSecs = total_msecs / 1000.00;
+            const double expPos = exp(tSecs / TAU);
+            wbalr += JOULES * expPos;
+            wbal = WPRIME - (wbalr / expPos);
 
             rtData.setWbal(wbal);
+
+            // check auto-pause: pause when 0W sustained, resume when power returns
+            checkAutoPause(rtData.getWatts());
 
             // go update the displays...
             context->notifyTelemetryUpdate(rtData); // signal everyone to update telemetry
@@ -2204,6 +2265,49 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             //The system will be able to sleep again.
         }
 #endif
+    }
+}
+
+void TrainSidebar::checkAutoPause(double watts)
+{
+    // only act when auto-pause is enabled and a workout is running
+    if (!cachedAutoPauseEnabled) return;
+    if (!(status & RT_RUNNING) || !(status & RT_WORKOUT)) return;
+
+    if (watts < 1.0) {
+        m_autoPauseZeroCount++;
+
+        if (!m_autoPaused && !(status & RT_PAUSED) && m_autoPauseZeroCount >= cachedAutoPauseThreshold) {
+            // trigger auto-pause — reuse the manual pause path
+            m_autoPaused = true;
+            session_elapsed_msec += session_time.elapsed();
+            lap_elapsed_msec += lap_time.elapsed();
+            setStatusFlags(RT_PAUSED);
+            if (status & RT_RECORDING) disk_timer->stop();
+            load_timer->stop();
+            load_msecs += load_period.restart();
+            context->notifyPause();
+            context->notifySetNotification(tr("Auto-Paused.."), 2);
+            qDebug() << "auto-pause triggered after" << m_autoPauseZeroCount << "zero-power ticks";
+        }
+    } else {
+        m_autoPauseZeroCount = 0;
+
+        if (m_autoPaused && (status & RT_PAUSED)) {
+            // auto-resume — reuse the manual unpause path
+            m_autoPaused = false;
+            session_time.start();
+            lap_time.start();
+            clearStatusFlags(RT_PAUSED);
+            bicycle.resettimer();
+            maintainLapDistanceState();
+            if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
+            load_period.restart();
+            load_timer->start(LOADRATE);
+            context->notifyUnPause();
+            context->notifySetNotification(tr("Resuming.."), 2);
+            qDebug() << "auto-pause resumed — power back:" << watts;
+        }
     }
 }
 
@@ -3262,12 +3366,45 @@ TrainSidebar::selectVideoSync(QString fullpath)
 void
 TrainSidebar::selectWorkout(QString fullpath)
 {
+    const QString requestedPath = fullpath.trimmed();
+    const QString targetPath = normalizedWorkoutPath(requestedPath);
+    const QString targetFileName = QFileInfo(requestedPath).fileName();
+    if (targetPath.isEmpty()) {
+        return;
+    }
+
+    QModelIndex selectedIndex;
+    int basenameMatchRow = -1;
+    bool multipleBasenameMatches = false;
     // look at each entry in the top workoutTree
     for (int i=0; i<workoutTree->model()->rowCount(); i++) {
-        QString path = workoutTree->model()->data(workoutTree->model()->index(i, TdbWorkoutModelIdx::filepath)).toString();
-        if (path == fullpath) {
-            workoutTree->setCurrentIndex(workoutTree->model()->index(i, TdbWorkoutModelIdx::filepath));
+        const QString rawPath = workoutTree->model()->data(workoutTree->model()->index(i, TdbWorkoutModelIdx::filepath)).toString().trimmed();
+        const QString normalizedPath = normalizedWorkoutPath(rawPath);
+        if (normalizedPath == targetPath || rawPath == requestedPath) {
+            selectedIndex = workoutTree->model()->index(i, TdbWorkoutModelIdx::filepath);
             break;
+        }
+
+        if (!targetFileName.isEmpty() && QFileInfo(rawPath).fileName().compare(targetFileName, Qt::CaseInsensitive) == 0) {
+            if (basenameMatchRow >= 0) {
+                multipleBasenameMatches = true;
+            } else {
+                basenameMatchRow = i;
+            }
+        }
+    }
+    if (!selectedIndex.isValid() && basenameMatchRow >= 0 && !multipleBasenameMatches) {
+        selectedIndex = workoutTree->model()->index(basenameMatchRow, TdbWorkoutModelIdx::filepath);
+    }
+    if (!selectedIndex.isValid() && workoutTree->model()->rowCount() > 0) {
+        selectedIndex = workoutTree->model()->index(0, TdbWorkoutModelIdx::filepath);
+    }
+
+    if (selectedIndex.isValid()) {
+        const bool sameIndex = workoutTree->currentIndex() == selectedIndex;
+        workoutTree->setCurrentIndex(selectedIndex);
+        if (sameIndex) {
+            workoutTreeWidgetSelectionChanged();
         }
     }
 }
@@ -3275,7 +3412,16 @@ TrainSidebar::selectWorkout(QString fullpath)
 void
 TrainSidebar::selectWorkout(int idx)
 {
-    workoutTree->setCurrentIndex(workoutTree->model()->index(idx, TdbWorkoutModelIdx::filepath));
+    QModelIndex selectedIndex = workoutTree->model()->index(idx, TdbWorkoutModelIdx::filepath);
+    if (!selectedIndex.isValid()) {
+        return;
+    }
+
+    const bool sameIndex = workoutTree->currentIndex() == selectedIndex;
+    workoutTree->setCurrentIndex(selectedIndex);
+    if (sameIndex) {
+        workoutTreeWidgetSelectionChanged();
+    }
 }
 
 // got a remote control command

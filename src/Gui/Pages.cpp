@@ -751,6 +751,19 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
     lapAlert = new QCheckBox(tr("Play sound before new lap"), this);
     lapAlert->setChecked(appsettings->value(this, TRAIN_LAPALERT, false).toBool());
 
+    autoPause = new QCheckBox(tr("Auto-pause when power drops to zero"), this);
+    autoPause->setChecked(appsettings->value(this, TRAIN_AUTOPAUSE, false).toBool());
+    autoPause->setToolTip(tr("Automatically pause the workout when power is zero\n"
+                             "for the configured delay, and resume when you start\n"
+                             "pedaling again."));
+
+    autoPauseDelay = new QSpinBox(this);
+    autoPauseDelay->setMaximum(30);
+    autoPauseDelay->setMinimum(1);
+    autoPauseDelay->setSuffix(tr(" secs"));
+    autoPauseDelay->setValue(appsettings->value(this, TRAIN_AUTOPAUSE_DELAY, 3).toUInt());
+    autoPauseDelay->setToolTip(tr("Seconds of zero power before auto-pause triggers"));
+
     coalesce = new QCheckBox(tr("Coalesce contiguous sections of same wattage"), this);
     coalesce->setChecked(appsettings->value(this, TRAIN_COALESCE_SECTIONS, false).toBool());
 
@@ -777,6 +790,8 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
     form->addRow("", autoConnect);
     form->addRow("", autoHide);
     form->addRow("", lapAlert);
+    form->addRow("", autoPause);
+    form->addRow(tr("Auto-pause Delay"), autoPauseDelay);
     form->addRow("", coalesce);
     form->addRow("", tooltips);
     form->addRow(tr("Start Countdown"), startDelay);
@@ -798,6 +813,8 @@ TrainOptionsPage::saveClicked()
     appsettings->setValue(TRAIN_STARTDELAY, startDelay->value());
     appsettings->setValue(TRAIN_AUTOHIDE, autoHide->isChecked());
     appsettings->setValue(TRAIN_LAPALERT, lapAlert->isChecked());
+    appsettings->setValue(TRAIN_AUTOPAUSE, autoPause->isChecked());
+    appsettings->setValue(TRAIN_AUTOPAUSE_DELAY, autoPauseDelay->value());
     appsettings->setValue(TRAIN_COALESCE_SECTIONS, coalesce->isChecked());
     appsettings->setValue(TRAIN_TOOLTIPS, tooltips->isChecked());
     appsettings->setValue(TRAIN_TELEMETRY_FONT_SCALING, telemetryScaling->currentIndex());

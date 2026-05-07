@@ -100,7 +100,8 @@ void
 BT40Device::connectDevice()
 {
     qDebug() << "Connecting to device" << m_currentDevice.name() << " " << m_currentDevice.deviceUuid();
-    m_control->setRemoteAddressType(QLowEnergyController::RandomAddress);
+    // Let the backend pick the correct address type. Forcing RandomAddress can
+    // break connections to standard FTMS trainers and HR sensors using public addresses.
     m_control->connectToDevice();
     connected = true;
 }

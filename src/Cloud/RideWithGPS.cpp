@@ -214,8 +214,9 @@ RideWithGPS::writeFileCompleted()
     printd("RideWithGPS::writeFileCompleted()\n");
 
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
+    const QByteArray body = reply->readAll();
 
-    printd("reply:%s\n", reply->readAll().toStdString().c_str());
+    printd("reply:%s\n", body.constData());
 
     bool uploadSuccessful = false;
     QString uploadError;
@@ -224,7 +225,7 @@ RideWithGPS::writeFileCompleted()
     try {
 
         // parse the response
-        QString response = reply->readAll();
+        QString response = QString::fromUtf8(body);
         MVJSONReader jsonResponse(string(response.toLatin1()));
 
         // get values

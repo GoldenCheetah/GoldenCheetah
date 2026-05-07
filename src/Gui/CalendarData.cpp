@@ -16,7 +16,17 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <CalendarData.h>
+#include "CalendarData.h"
+#include "Season.h"
+
+QString calendarSeasonEventReference(const Season &season, const SeasonEvent &event, int eventIndex)
+{
+    if (!event.id.isEmpty()) {
+        return event.id;
+    }
+
+    return QString("season:%1:event:%2").arg(season.id().toString()).arg(eventIndex);
+}
 
 
 CalendarEntryLayouter::CalendarEntryLayouter

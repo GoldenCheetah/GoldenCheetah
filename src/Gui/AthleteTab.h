@@ -44,6 +44,7 @@ class AthleteTab: public QWidget
         ChartSettings *chartsettings() { return chartSettings; } // by HomeWindow
         int currentView() { return views->currentIndex(); }
         AbstractView *view(int index);
+        Context *getContext() const { return context; }
 
         NavigationModel *nav; // back/forward for this tab
 

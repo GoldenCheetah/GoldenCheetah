@@ -21,6 +21,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "RideCache.h"
+#include "RideFileData.h"
 #include "Zones.h"
 #include "HrZones.h"
 #include "PaceZones.h"
@@ -1269,33 +1270,41 @@ MeanMaxComputer::run()
     // that creates work for nil effect (but increases compute
     // time drastically).
     cpintdata data;
-    data.rec_int_ms = (int) round(ride->recIntSecs() * 1000.0);
+    const double recInt = ride->recIntSecs();
+    data.rec_int_ms = (int) round(recInt * 1000.0);
     double lastsecs = 0;
     bool first = true;
     double offset = 0;
-    foreach (const RideFilePoint *p, ride->dataPoints()) {
+    {
+        const RideFileData &view = ride->columnar();
+        const int n = view.samples();
+        const double *secsCol = view.series(RideFile::secs).constData();
+        const double *valCol = view.series(baseSeries).constData();
 
-        // get offset to apply on all samples if first sample
-        if (first == true) {
-            offset = p->secs;
-            first = false;
+        for (int i = 0; i < n; ++i) {
+
+            // get offset to apply on all samples if first sample
+            if (first == true) {
+                offset = secsCol[i];
+                first = false;
+            }
+
+            // drag back to start at 1s or whatever recIntSecs() is !
+            double psecs = secsCol[i] - offset + recInt;
+
+            // fill in any gaps in recording - use same dodgy rounding as before
+            int count = (psecs - lastsecs - recInt) / recInt;
+
+            // gap more than an hour, damn that ride file is a mess
+            if (count > 3600) count = 1;
+
+            for(int j=0; j<count; j++)
+                data.points.append(cpintpoint(round(lastsecs+((j+1)*recInt *1000.0)/1000), 0));
+            lastsecs = psecs;
+
+            double secs = round(psecs * 1000.0) / 1000;
+            if (secs > 0) data.points.append(cpintpoint(secs, (int) round(valCol[i]*double(decimals))));
         }
-
-        // drag back to start at 1s or whatever recIntSecs() is !
-        double psecs = p->secs - offset + ride->recIntSecs();
-
-        // fill in any gaps in recording - use same dodgy rounding as before
-        int count = (psecs - lastsecs - ride->recIntSecs()) / ride->recIntSecs();
-
-        // gap more than an hour, damn that ride file is a mess
-        if (count > 3600) count = 1;
-
-        for(int i=0; i<count; i++)
-            data.points.append(cpintpoint(round(lastsecs+((i+1)*ride->recIntSecs() *1000.0)/1000), 0));
-        lastsecs = psecs;
-
-        double secs = round(psecs * 1000.0) / 1000;
-        if (secs > 0) data.points.append(cpintpoint(secs, (int) round(p->value(baseSeries)*double(decimals))));
     }
 
 
@@ -1630,70 +1639,80 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
 
     } else {
 
-        foreach(RideFilePoint *dp, ride->dataPoints()) {
-            double value = dp->value(baseSeries);
-            if (series == RideFile::wattsKg || series == RideFile::aPowerKg) {
-                value /= ride->getWeight();
-            }
+        const RideFileData &view = ride->columnar();
+        const int n = view.samples();
+        const double *baseCol = view.series(baseSeries).constData();
+        const double *seriesCol = (series == baseSeries) ? baseCol
+                                                         : view.series(series).constData();
+        const double weight = ride->getWeight();
+        const bool scaleByWeight = (series == RideFile::wattsKg || series == RideFile::aPowerKg);
+        const double pow10dec = pow(10, decimals);
+        const double recInt = ride->recIntSecs();
 
-            float lvalue = value * pow(10, decimals);
+        for (int i = 0; i < n; ++i) {
+            double value = baseCol[i];
+            if (scaleByWeight) value /= weight;
+
+            float lvalue = value * pow10dec;
+
+            const double sv = seriesCol[i];
 
             // watts time in zone
             if (series == RideFile::watts && zoneRange != -1) {
-                int index = context->athlete->zones(ride->sport())->whichZone(zoneRange, dp->value(series));
-                if (index >=0) wattsTimeInZone[index] += ride->recIntSecs();
+                int index = context->athlete->zones(ride->sport())->whichZone(zoneRange, sv);
+                if (index >=0) wattsTimeInZone[index] += recInt;
             }
 
             // Polarized zones :- I(<AeTP), II (<CP and >0.85*CP), III (>CP)
             if (series == RideFile::watts && zoneRange != -1 && CP) {
-                if (dp->value(series) < 1) // I zero watts
-                    wattsCPTimeInZone[0] += ride->recIntSecs();
-                else if (dp->value(series) < AeTP) // I
-                    wattsCPTimeInZone[1] += ride->recIntSecs();
-                else if (dp->value(series) < CP) // II
-                    wattsCPTimeInZone[2] += ride->recIntSecs();
+                if (sv < 1) // I zero watts
+                    wattsCPTimeInZone[0] += recInt;
+                else if (sv < AeTP) // I
+                    wattsCPTimeInZone[1] += recInt;
+                else if (sv < CP) // II
+                    wattsCPTimeInZone[2] += recInt;
                 else // III
-                    wattsCPTimeInZone[3] += ride->recIntSecs();
+                    wattsCPTimeInZone[3] += recInt;
             }
 
             // hr time in zone
             if (series == RideFile::hr && hrZoneRange != -1) {
-                int index = context->athlete->hrZones(ride->sport())->whichZone(hrZoneRange, dp->value(series));
-                if (index >= 0) hrTimeInZone[index] += ride->recIntSecs();
+                int index = context->athlete->hrZones(ride->sport())->whichZone(hrZoneRange, sv);
+                if (index >= 0) hrTimeInZone[index] += recInt;
             }
 
             // Polarized zones :- I(<AeTHR), II (<LTHR and >0.9*LTHR), III (>LTHR)
             if (series == RideFile::hr && hrZoneRange != -1 && LTHR) {
-                if (dp->value(series) < 1) // I zero
-                    hrCPTimeInZone[0] += ride->recIntSecs();
-                else if (dp->value(series) < AeTHR) // I
-                    hrCPTimeInZone[1] += ride->recIntSecs();
-                else if (dp->value(series) < LTHR) // II
-                    hrCPTimeInZone[2] += ride->recIntSecs();
+                if (sv < 1) // I zero
+                    hrCPTimeInZone[0] += recInt;
+                else if (sv < AeTHR) // I
+                    hrCPTimeInZone[1] += recInt;
+                else if (sv < LTHR) // II
+                    hrCPTimeInZone[2] += recInt;
                 else // III
-                    hrCPTimeInZone[3] += ride->recIntSecs();
+                    hrCPTimeInZone[3] += recInt;
             }
 
             // pace time in zone, only for running and swimming activities
             if (series == RideFile::kph && paceZoneRange != -1 && (ride->isRun() || ride->isSwim())) {
-                int index = context->athlete->paceZones(ride->isSwim())->whichZone(paceZoneRange, dp->value(series));
-                if (index >= 0) paceTimeInZone[index] += ride->recIntSecs();
+                int index = context->athlete->paceZones(ride->isSwim())->whichZone(paceZoneRange, sv);
+                if (index >= 0) paceTimeInZone[index] += recInt;
             }
 
             // Polarized Pace Zones: I(<AeTV), II (>=AeTV and <CV), III (>=CV)
             if (series == RideFile::kph && paceZoneRange != -1 && CV && (ride->isRun() || ride->isSwim())) {
-                if (dp->value(series) < 0.1) // I zero
-                    paceCPTimeInZone[0] += ride->recIntSecs();
-                else if (dp->value(series) < AeTV) // I
-                    paceCPTimeInZone[1] += ride->recIntSecs();
-                else if (dp->value(series) < CV) // II
-                    paceCPTimeInZone[2] += ride->recIntSecs();
+                if (sv < 0.1) // I zero
+                    paceCPTimeInZone[0] += recInt;
+                else if (sv < AeTV) // I
+                    paceCPTimeInZone[1] += recInt;
+                else if (sv < CV) // II
+                    paceCPTimeInZone[2] += recInt;
                 else // III
-                    paceCPTimeInZone[3] += ride->recIntSecs();
+                    paceCPTimeInZone[3] += recInt;
             }
 
             int offset = lvalue - min;
-            if (offset >= 0 && offset < array.size()) array[offset] += ride->recIntSecs();
+            if (offset >= 0 && offset < array.size()) array[offset] += recInt;
         }
     }
 }

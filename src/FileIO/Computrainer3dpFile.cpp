@@ -23,6 +23,7 @@
  */
 
 #include "Computrainer3dpFile.h"
+#include "Computrainer3dpParser.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -58,7 +59,6 @@ RideFile *Computrainer3dpFileReader::openRideFile(QFile & file,
                    "\"");
         return NULL;
     }
-    RideFile *rideFile = new RideFile();
     QDataStream is(&file);
 
     // Note that QT4.6 and above default to 64 bit floats.  For
@@ -68,73 +68,14 @@ RideFile *Computrainer3dpFileReader::openRideFile(QFile & file,
     is.setVersion(QDataStream::Qt_4_0);
     is.setByteOrder(QDataStream::LittleEndian);
 
-    // start parsing the header
-
-    // looks like the first part is a header... ignore it.
-    is.skipRawData(4);
-
-    // the next 4 bytes are the ASCII characters 'perf'
-    char perfStr[5];
-    is.readRawData(perfStr, 4);
-    perfStr[4] = '\0';
-    if(strcmp(perfStr,"perf"))
-    {
-        errors << "File is encrypted.";
-        delete rideFile;
+    Computrainer3dpParser::Header header;
+    QString headerError;
+    if (!Computrainer3dpParser::parseHeader(is, file.size(), header, &headerError)) {
+        errors << headerError;
         return NULL;
     }
 
-
-    // not sure what the next 8 bytes are; skip them
-    is.skipRawData(0x8);
-
-    // the next 65 bytes are a null-terminated and padded
-    // ASCII user name string
-    char userName[65];
-    is.readRawData(userName, 65);
-
-    // next is a single byte of user age, in years.  I guess
-    // Computrainer doesn't allow people to get older than 255
-    // years. ;)
-    uint8_t age;
-    is >> age;
-
-    // not sure what the next 6 bytes are; skip them.
-    is.skipRawData(6);
-
-    // next is a (4 byte) C-style floating point with weight in kg
-    float weight;
-    is >> weight;
-
-    // next is the upper heart rate limit (4 byte int)
-    uint32_t upperHR;
-    is >> upperHR;
-
-    // and then the resting heart rate (4 byte int)
-    uint32_t lowerHR;
-    is >> lowerHR;
-
-    // then year, month, day, hour, minute the exercise started
-    // (4, 1, 1, 1, 1 bytes)
-    uint32_t year;
-    is >> year;
-    uint8_t month;
-    is >> month;
-    uint8_t day;
-    is >> day;
-    uint8_t hour;
-    is >> hour;
-    uint8_t minute;
-    is >> minute;
-
-    // the number of exercise data points in the file (4 byte int)
-    uint32_t numberSamples;
-    is >> numberSamples;
-
-    // go back to the start, and skip header to go to
-    // the start of the data samples.
-    file.seek(0);
-    is.skipRawData(0xf8);
+    RideFile *rideFile = new RideFile();
 
     // we'll keep track of the altitude over time.  since computrainer
     // gives us slope, we can calculate change in altitude if we know
@@ -165,6 +106,7 @@ RideFile *Computrainer3dpFileReader::openRideFile(QFile & file,
     double lastK = 0.0f;         // last sample distance seen in kilometers
 
     // loop through samples
+    uint32_t numberSamples = header.numberSamples;
     for (; numberSamples; numberSamples--) {
 
         //
@@ -321,8 +263,8 @@ RideFile *Computrainer3dpFileReader::openRideFile(QFile & file,
     QDateTime dateTime;
     QDate date;
     QTime ridetime;
-    date.setDate(year, month, day);
-    ridetime.setHMS(hour, minute, 0, 0);
+    date.setDate(header.year, header.month, header.day);
+    ridetime.setHMS(header.hour, header.minute, 0, 0);
     dateTime.setDate(date);
     dateTime.setTime(ridetime);
     rideFile->setStartTime(dateTime);

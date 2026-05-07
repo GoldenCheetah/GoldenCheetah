@@ -23,6 +23,8 @@
 #include "RideItem.h"
 #include "RideMetadata.h"
 #include <QDir>
+#include <QJsonDocument>
+#include <QMutex>
 
 struct listRideSettings {
     bool intervals;
@@ -50,12 +52,26 @@ class APIWebService : public HttpRequestHandler
         void listMMP(QString athlete, QStringList paths, HttpRequest &request, HttpResponse &response);
         void listZones(QString athlete, QStringList paths, HttpRequest &request, HttpResponse &response);
         void listMeasures(QString athlete, QStringList paths, HttpRequest &request, HttpResponse &response);
+        void aiEndpoint(QString athlete, QStringList paths, HttpRequest &request, HttpResponse &response);
+        void aiSnapshot(QString athlete, HttpRequest &request, HttpResponse &response);
+        void aiDraft(QString athlete, HttpRequest &request, HttpResponse &response);
+        void aiSave(QString athlete, HttpRequest &request, HttpResponse &response);
+        void aiPlan(QString athlete, HttpRequest &request, HttpResponse &response);
+        void aiSimulate(QString athlete, HttpRequest &request, HttpResponse &response);
+        void aiBanister(QString athlete, HttpRequest &request, HttpResponse &response);
+        void aiPlans(QString athlete, QStringList subPaths, HttpRequest &request, HttpResponse &response);
 
         // utility
         void writeRideLine(RideItem &item, HttpRequest *request, HttpResponse *response);
 
     private:
+        void writeJson(HttpResponse &response, const QJsonDocument &document, int statusCode = 200, const QByteArray &reason = QByteArray("OK"));
+        void writeJsonError(HttpResponse &response, int statusCode, const QString &message, const QByteArray &reason = QByteArray());
+        bool requireMethod(HttpRequest &request, HttpResponse &response, const QByteArray &method, const QByteArray &allow);
+        bool requireJsonBody(HttpRequest &request, HttpResponse &response, QJsonDocument &document);
+
         QDir home;
+        QMutex aiMutex;
 };
 
 #endif

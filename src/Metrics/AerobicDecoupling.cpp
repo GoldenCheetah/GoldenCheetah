@@ -17,6 +17,7 @@
  */
 
 #include "RideMetric.h"
+#include "RideFileData.h"
 #include <QApplication>
 #include "RideItem.h"
 #include "Specification.h"
@@ -75,7 +76,7 @@ class AerobicDecoupling : public RideMetric {
 
         } 
 
-        // first hald vs second half
+        // first half vs second half
         double firstHalfPower = 0.0, secondHalfPower = 0.0;
         double firstHalfSpeed = 0.0, secondHalfSpeed = 0.0;
         double firstHalfHR = 0.0, secondHalfHR = 0.0;
@@ -84,24 +85,28 @@ class AerobicDecoupling : public RideMetric {
         int firstHalfCount = 0;
         int secondHalfCount = 0;
         percent = 0;
-        while(it.hasNext()) {
-            struct RideFilePoint *point = it.next();
+
+        const RideFileData &view = item->ride()->columnar();
+        const double *watts = view.series(RideFile::watts).constData();
+        const double *kph = view.series(RideFile::kph).constData();
+        const double *hr = view.series(RideFile::hr).constData();
+        for (int i = start; i <= stop; ++i) {
 
             if (count++ < halfway) {
 
-                if (point->hr > 0) {
-                    firstHalfPower += point->watts;
-                    firstHalfSpeed += point->kph;
-                    firstHalfHR += point->hr;
+                if (hr[i] > 0) {
+                    firstHalfPower += watts[i];
+                    firstHalfSpeed += kph[i];
+                    firstHalfHR += hr[i];
                     ++firstHalfCount;
                 }
 
             } else {
 
-                if (point->hr > 0) {
-                    secondHalfPower += point->watts;
-                    secondHalfSpeed += point->kph;
-                    secondHalfHR += point->hr;
+                if (hr[i] > 0) {
+                    secondHalfPower += watts[i];
+                    secondHalfSpeed += kph[i];
+                    secondHalfHR += hr[i];
                     ++secondHalfCount;
                 }
             }

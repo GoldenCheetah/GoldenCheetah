@@ -131,6 +131,7 @@ class TrainSidebar : public GcWindow
 
         RemoteControl *remote;      // remote control settings
         int currentStatus() {return status;}
+        bool isAutoPaused() const { return m_autoPaused; }
 
     signals:
         void deviceSelected();
@@ -230,6 +231,9 @@ class TrainSidebar : public GcWindow
         // watch keyboard events.
         bool eventFilter(QObject *object, QEvent *e);
 
+        // auto-pause: pause/resume when power drops to / returns from zero
+        void checkAutoPause(double watts);
+
         GcSplitter   *trainSplitter;
         GcSplitterItem *deviceItem,
                        *workoutItem,
@@ -326,6 +330,16 @@ class TrainSidebar : public GcWindow
 
         bool autoConnect;
         bool pendingConfigChange;
+
+        // Auto-pause state: pause when power is 0W for a sustained period
+        int  m_autoPauseZeroCount;   // consecutive zero-power gui ticks
+        bool m_autoPaused;           // true when paused by auto-pause (not manual)
+
+        // Cached settings refreshed in configChanged() so the 5 Hz tick
+        // never hits QSettings.
+        bool   cachedAutoPauseEnabled;
+        int    cachedAutoPauseThreshold;   // ticks of zero-power before pause
+        double cachedWbalTau;              // W'bal time-constant in seconds
 
         Bicycle bicycle;
 

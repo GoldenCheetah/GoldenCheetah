@@ -201,6 +201,11 @@ AddTileFinal::validatePage()
 
             // we add user charts but make them a bit bigger
             wizard->item->parent->addItem(0,0,2,21, wizard->item);
+
+        } else if (wizard->item->type == OverviewItemType::SIMULATION) {
+
+            // simulation card needs vertical space for recommendation + gauges + prediction + alternatives
+            wizard->item->parent->addItem(0,0,1,17, wizard->item);
         } else {
 
             // everthing else is a bit smaller

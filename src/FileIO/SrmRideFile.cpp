@@ -28,6 +28,7 @@
 #include <QStringList>
 #include <assert.h>
 #include <cmath>
+#include <memory>
 #include <stdio.h>
 #ifdef WIN32
     #include <winsock.h>
@@ -97,13 +98,16 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
     QDataStream in(&file);
     in.setByteOrder( QDataStream::LittleEndian );
 
-    RideFile *result = new RideFile;
+    std::unique_ptr<RideFile> result(new RideFile);
     result->setDeviceType("SRM");
     result->setFileFormat("SRM training files (srm)");
     result->setTag("Sport", "Bike" );
 
-    char magic[4];
-    in.readRawData(magic, sizeof(magic));
+    char magic[4] = {};
+    if (in.readRawData(magic, sizeof(magic)) != sizeof(magic)) {
+        errorStrings << QString("failed to read file header" );
+        return NULL;
+    }
     if( strncmp(magic, "SRM", 3)){
         errorStrings << QString("Unrecognized file type, missing magic." );
         return NULL;
@@ -144,6 +148,11 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
     // assert propper markercnt to avoid segfaults
     if( in.status() != QDataStream::Ok ){
         errorStrings << QString("failed to read file header" );
+        return NULL;
+    }
+
+    if (recint2 == 0) {
+        errorStrings << QString("invalid recording interval");
         return NULL;
     }
 
@@ -317,7 +326,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
 
         km += result->recIntSecs() * kph / 3600.0;
 
-        double nm = watts / 2.0 / PI / cad * 60.0;
+        double nm = cad > 0 ? watts / 2.0 / PI / cad * 60.0 : 0.0;
         result->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lon, lat, 0.0, 0.0, temp, 0.0, 
                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, interval);
@@ -382,7 +391,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
 
     file.close();
     delete[] blockhdrs;
-    return result;
+    return result.release();
 }
 
 // vi:expandtab tabstop=4 shiftwidth=4

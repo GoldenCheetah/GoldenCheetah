@@ -41,6 +41,8 @@ extern const QList<QString> trainerDayAPIQueryZones = {
 };
 %}
 
+%define api.header.include {"TrainerDayAPIQuery_yacc.h"}
+
 %union {
     int numValue;
     char *word;

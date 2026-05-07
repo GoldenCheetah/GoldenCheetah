@@ -7,7 +7,29 @@ include(../src/gcconfig.pri)
 
 GC_SRC_DIR = ../../../src
 GC_OBJECTS_DIR = $$GC_SRC_DIR/$(OBJECTS_DIR)
+GC_REPO_ROOT = $$clean_path($$PWD/..)
 INCLUDEPATH += $$GC_SRC_DIR
+INCLUDEPATH += \
+    $$GC_SRC_DIR/ANT \
+    $$GC_SRC_DIR/Train \
+    $$GC_SRC_DIR/FileIO \
+    $$GC_SRC_DIR/Cloud \
+    $$GC_SRC_DIR/Charts \
+    $$GC_SRC_DIR/Metrics \
+    $$GC_SRC_DIR/Gui \
+    $$GC_SRC_DIR/Core \
+    $$GC_SRC_DIR/Planning
+INCLUDEPATH += \
+    $$GC_REPO_ROOT/qwt/src \
+    $$GC_REPO_ROOT/contrib/qxt/src \
+    $$GC_REPO_ROOT/contrib/qtsolutions/json \
+    $$GC_REPO_ROOT/contrib/qtsolutions/qwtcurve \
+    $$GC_REPO_ROOT/contrib/qtsolutions/flowlayout \
+    $$GC_REPO_ROOT/contrib/lmfit \
+    $$GC_REPO_ROOT/contrib/boost \
+    $$GC_REPO_ROOT/contrib/kmeans \
+    $$GC_REPO_ROOT/contrib/voronoi \
+    $$GC_REPO_ROOT/contrib/httpserver
 win32 {
 	PLATFORM_EXT = obj
 } else {

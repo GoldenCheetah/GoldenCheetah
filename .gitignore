@@ -62,16 +62,36 @@ build.pro.user.*
 doc/contrib/WASP Packet Protocol.pdf
 
 # unittests
+unittests/Cloud/jsonParsers/jsonParsers
+unittests/Cloud/stravaCredentials/stravaCredentials
 unittests/Core/season/season
 unittests/Core/seasonOffset/seasonOffset
 unittests/Core/seasonParser/seasonParser
 unittests/Core/signalSafety/testSignalSafety
 unittests/Core/signalSafety/testSignalSafety
+unittests/Core/splineCrash/testSplineCrash
+unittests/Core/trainingConstraints/trainingConstraints
+unittests/Core/trainingPlan/trainingPlan
+unittests/Core/trainingSimulator/trainingSimulator
 unittests/Core/units/units
+unittests/Core/utils/utils
+unittests/FileIO/computrainer3dp/computrainer3dp
+unittests/FileIO/rideAutoImport/rideAutoImport
+unittests/FileIO/tacxCaf/tacxCaf
 unittests/Gui/calendarData/calendarData
+unittests/**/*.moc
 
 # Qt testlib
 target_wrapper.sh
+
+# Local tool state
+.cursor/
+.github/copilot/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+.venv/
 
 # Precompiled Headers
 *.gch
@@ -84,4 +104,3 @@ _pch/
 *_yacc.cpp
 *_yacc.h
 qrc_*.cpp
-

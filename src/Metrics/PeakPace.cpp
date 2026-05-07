@@ -20,6 +20,7 @@
 #include "RideMetric.h"
 #include "AddIntervalDialog.h"
 #include "RideItem.h"
+#include "RideFileData.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "Specification.h"
@@ -1167,11 +1168,17 @@ class PeakPaceHr : public RideMetric {
             int points = 0;
 
             RideFileIterator it(item->ride(), spec);
-            while (it.hasNext()) {
-                struct RideFilePoint *point = it.next();
-                if (point->secs >= start && point->secs < stop) {
-                    points++;
-                    hr = (point->hr + (points-1)*hr) / (points);
+            const int first = it.firstIndex();
+            const int last  = it.lastIndex();
+            if (first >= 0 && last >= first) {
+                const RideFileData &view = item->ride()->columnar();
+                const double *secs = view.series(RideFile::secs).constData();
+                const double *hrArr = view.series(RideFile::hr).constData();
+                for (int i = first; i <= last; ++i) {
+                    if (secs[i] >= start && secs[i] < stop) {
+                        points++;
+                        hr = (hrArr[i] + (points-1)*hr) / (points);
+                    }
                 }
             }
         }

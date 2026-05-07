@@ -35,6 +35,7 @@ class Specification;
 class IntervalItem;
 class WPrime;
 class RideFile;
+class RideFileData;
 class XDataSeries;
 class XDataPoint;
 struct RideFilePoint;
@@ -331,6 +332,14 @@ class RideFile : public QObject // QObject to emit signals
 
         const QVector<RideFilePoint*> &dataPoints() const { return dataPoints_; }
 
+        // Columnar (struct-of-arrays) view of the samples. Lazily built on
+        // first access and cached; any RideFile writer path (setPointValue,
+        // append/delete/insertPoint, emitModified, recalculateDerivedSeries)
+        // invalidates the cache. Prefer this for tight scans of a single
+        // series — it hands back a contiguous double* instead of walking
+        // QVector<RideFilePoint*>.
+        const RideFileData &columnar() const;
+
         // recalculate all the derived data series
         // might want to move to a factory for these
         // at some point, but for now hard coded
@@ -497,6 +506,12 @@ class RideFile : public QObject // QObject to emit signals
 
         // data required to compute headwind based on weather broadcast
         double windSpeed_, windHeading_;
+
+        // Lazy columnar cache. Any dataPoints_ mutation calls
+        // invalidateColumns_(); columnar() rebuilds on next access.
+        mutable RideFileData *cachedColumns_ = nullptr;
+        mutable bool columnsStale_ = true;
+        void invalidateColumns_() const { columnsStale_ = true; }
 };
 
 struct RideFilePoint

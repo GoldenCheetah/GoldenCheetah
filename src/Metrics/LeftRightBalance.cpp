@@ -17,6 +17,7 @@
  */
 
 #include "RideMetric.h"
+#include "RideFileData.h"
 #include "Zones.h"
 #include "RideItem.h"
 #include "Context.h"
@@ -58,11 +59,20 @@ class LeftRightBalance : public RideMetric {
         total = count = 0;
 
         RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (((point->watts > 0.0f && point->cad) || (point->rcontact && point->rcad)) && point->lrbalance != RideFile::NA) {
-                total += point->lrbalance;
-                ++count;
+        const int first = it.firstIndex();
+        const int last  = it.lastIndex();
+        if (first >= 0 && last >= first) {
+            const RideFileData &view = item->ride()->columnar();
+            const double *watts = view.series(RideFile::watts).constData();
+            const double *cad = view.series(RideFile::cad).constData();
+            const double *rcontact = view.series(RideFile::rcontact).constData();
+            const double *rcad = view.series(RideFile::rcad).constData();
+            const double *lrbalance = view.series(RideFile::lrbalance).constData();
+            for (int i = first; i <= last; ++i) {
+                if (((watts[i] > 0.0f && cad[i]) || (rcontact[i] && rcad[i])) && lrbalance[i] != RideFile::NA) {
+                    total += lrbalance[i];
+                    ++count;
+                }
             }
         }
         setValue(count > 0 ? total / count : 0);
