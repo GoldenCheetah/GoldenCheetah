@@ -32,7 +32,7 @@ class Tredict : public CloudService {
 
         QString id() const { return "Tredict"; }
         QString uiName() const { return tr("Tredict"); }
-        QString description() const { return (tr("Sync activities with the Tredict training platform.")); }
+        QString description() const { return (tr("Sync activities, body measures, HRV and planned workouts with Tredict.")); }
         QImage logo() const;
 
         Tredict(Context *context);
@@ -40,7 +40,7 @@ class Tredict : public CloudService {
         ~Tredict();
 
         int capabilities() const { return OAuth | Upload | Download | Query; }
-        int type() const { return Activities; }
+        int type() const { return Activities | Measures; }
 
         bool open(QStringList &errors);
         bool close();

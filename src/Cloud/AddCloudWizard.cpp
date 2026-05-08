@@ -175,7 +175,7 @@ AddService::initializePage()
         const CloudService *s = factory.service(name);
 
         // only ones with the capability we need.
-        if (s->type() != wizard->type) continue;
+        if (!(s->type() & wizard->type)) continue;
 
         QCommandLinkButton *p = new QCommandLinkButton(s->uiName(), s->description(), this);
         p->setStyleSheet(QString("font-size: %1px;").arg(font.pointSizeF() * dpiXFactor));

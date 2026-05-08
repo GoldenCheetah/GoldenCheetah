@@ -504,6 +504,8 @@ SOURCES += Cloud/Tredict.cpp
 HEADERS += Cloud/Tredict.h
 SOURCES += Cloud/TredictWorkoutDownload.cpp
 HEADERS += Cloud/TredictWorkoutDownload.h
+SOURCES += Cloud/TredictMeasuresDownload.cpp
+HEADERS += Cloud/TredictMeasuresDownload.h
 
 SOURCES += Train/MonarkController.cpp Train/MonarkConnection.cpp
 HEADERS += Train/MonarkController.h Train/MonarkConnection.h

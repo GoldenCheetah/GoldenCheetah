@@ -58,6 +58,8 @@ Measure::getSourceDescription() const
         return tr("Withings");
     case Measure::CSV:
         return tr("CSV Upload");
+    case Measure::Tredict:
+        return tr("Tredict");
     default:
         return tr("Unknown");
     }
