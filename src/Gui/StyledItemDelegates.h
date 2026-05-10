@@ -144,15 +144,21 @@ private:
 };
 
 
+enum class DirectoryPathMode {
+    DirOnly,
+    FileOpen,
+    FileSave
+};
 
 class DirectoryPathWidget: public QWidget
 {
     Q_OBJECT
 
 public:
-    DirectoryPathWidget(QWidget *parent = nullptr);
+    DirectoryPathWidget(DirectoryPathMode mode = DirectoryPathMode::DirOnly, QWidget *parent = nullptr);
 
     QString getPath() const;
+    void setNameFilter(const QString &nameFilter);
     void setPlaceholderText(const QString &placeholder);
     void setDelegateMode(bool delegateMode);
 
@@ -161,12 +167,15 @@ public slots:
 
 signals:
     void editingFinished(bool accepted);
+    void pathChanged(QString path);
 #ifdef Q_OS_MACOS
     void browseRequested();
 #endif
 
 private:
     bool delegateMode = false;
+    DirectoryPathMode directoryPathMode;
+    QString nameFilter;
     QPushButton *browseButton;
     QLineEdit *lineEdit;
     bool lineEditAlreadyFinished = false;

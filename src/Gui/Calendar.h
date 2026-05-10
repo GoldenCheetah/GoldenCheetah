@@ -79,7 +79,10 @@ signals:
     void delActivity(CalendarEntry activity);
     void saveChanges(CalendarEntry activity);
     void discardChanges(CalendarEntry activity);
-    void repeatSchedule(QDate day);
+    void repeatPlan(QDate day);
+    void exportPlan(CalendarEntry entry);
+    void exportPlan();
+    void importPlan(QDate day);
     void insertRestday(QDate day);
     void delRestday(QDate day);
     void addEvent(QDate date);
@@ -276,7 +279,10 @@ signals:
     void delActivity(CalendarEntry activity);
     void saveChanges(CalendarEntry activity);
     void discardChanges(CalendarEntry activity);
-    void repeatSchedule(QDate day);
+    void repeatPlan(QDate day);
+    void exportPlan(CalendarEntry entry);
+    void exportPlan();
+    void importPlan(QDate day);
     void insertRestday(QDate day);
     void delRestday(QDate day);
     void addEvent(QDate date);
@@ -332,7 +338,10 @@ signals:
     void delActivity(CalendarEntry activity);
     void saveChanges(CalendarEntry activity);
     void discardChanges(CalendarEntry activity);
-    void repeatSchedule(QDate day);
+    void repeatPlan(QDate day);
+    void exportPlan(CalendarEntry entry);
+    void exportPlan();
+    void importPlan(QDate day);
     void insertRestday(QDate day);
     void delRestday(QDate day);
     void addEvent(QDate date);
@@ -401,7 +410,10 @@ signals:
     void delActivity(CalendarEntry activity);
     void saveChanges(CalendarEntry activity);
     void discardChanges(CalendarEntry activity);
-    void repeatSchedule(QDate day);
+    void repeatPlan(QDate day);
+    void exportPlan(CalendarEntry entry);
+    void exportPlan();
+    void importPlan(QDate day);
     void insertRestday(QDate day);
     void delRestday(QDate day);
     void addEvent(QDate date);

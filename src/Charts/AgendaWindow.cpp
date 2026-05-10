@@ -27,7 +27,6 @@
 #include "RideMetadata.h"
 #include "Colors.h"
 #include "ManualActivityWizard.h"
-#include "RepeatScheduleWizard.h"
 #include "WorkoutFilter.h"
 #include "IconManager.h"
 #include "SeasonDialogs.h"

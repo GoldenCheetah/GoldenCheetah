@@ -160,7 +160,7 @@ QMenu*
 CalendarBaseTable::buildContextMenu
 (const CalendarDay &day, CalendarEntry const * const entryPtr, const QTime &time, bool canHavePhasesEvents)
 {
-    QMenu *contextMenu = new QMenu(this);
+    QMenu *contextMenu = new QMenu();
     const QString ellipsis = QStringLiteral("...");
     if (entryPtr != nullptr) {
         CalendarEntry entry = *entryPtr; // Prevent dereferencing of dangling pointer in lambdas
@@ -225,6 +225,8 @@ CalendarBaseTable::buildContextMenu
             if (canHavePhasesEvents) {
                 contextMenu->addAction(tr("Edit phase") % ellipsis, this, [this, entry]() { emit editPhase(entry); });
                 contextMenu->addAction(tr("Delete phase") % ellipsis, this, [this, entry]() { emit delPhase(entry); });
+                contextMenu->addSeparator();
+                contextMenu->addAction(tr("Export schedule") % ellipsis, this, [this, entry]() { emit exportPlan(entry); });
             }
             break;
         default:
@@ -278,9 +280,11 @@ CalendarBaseTable::buildContextMenu
             contextMenu->addAction(tr("Add phase") % ellipsis, this, [this, day]() { emit addPhase(day.date); });
             contextMenu->addAction(tr("Add event") % ellipsis, this, [this, day]() { emit addEvent(day.date); });
         }
+        contextMenu->addSeparator();
+        contextMenu->addAction(tr("Export plan") % ellipsis, this, [this]() { emit exportPlan(); });
         if (day.date >= QDate::currentDate()) {
-            contextMenu->addSeparator();
-            contextMenu->addAction(tr("Repeat schedule") % ellipsis, this, [this, day]() { emit repeatSchedule(day.date); });
+            contextMenu->addAction(tr("Repeat plan") % ellipsis, this, [this, day]() { emit repeatPlan(day.date); });
+            contextMenu->addAction(tr("Import plan") % ellipsis, this, [this, day]() { emit importPlan(day.date); });
             bool hasPlannedActivity = false;
             for (const CalendarEntry &dayEntry : day.entries) {
                 if (dayEntry.type == ENTRY_TYPE_PLANNED_ACTIVITY) {
@@ -1561,7 +1565,10 @@ CalendarDayView::CalendarDayView
     connect(dayTable, &CalendarDayTable::delActivity, this, &CalendarDayView::delActivity);
     connect(dayTable, &CalendarDayTable::saveChanges, this, &CalendarDayView::saveChanges);
     connect(dayTable, &CalendarDayTable::discardChanges, this, &CalendarDayView::discardChanges);
-    connect(dayTable, &CalendarDayTable::repeatSchedule, this, &CalendarDayView::repeatSchedule);
+    connect(dayTable, &CalendarDayTable::repeatPlan, this, &CalendarDayView::repeatPlan);
+    connect(dayTable, QOverload<CalendarEntry>::of(&CalendarDayTable::exportPlan), this, QOverload<CalendarEntry>::of(&CalendarDayView::exportPlan));
+    connect(dayTable, QOverload<>::of(&CalendarDayTable::exportPlan), this, QOverload<>::of(&CalendarDayView::exportPlan));
+    connect(dayTable, &CalendarDayTable::importPlan, this, &CalendarDayView::importPlan);
     connect(dayTable, &CalendarDayTable::insertRestday, this, &CalendarDayView::insertRestday);
     connect(dayTable, &CalendarDayTable::delRestday, this, &CalendarDayView::delRestday);
     connect(dayTable, &CalendarDayTable::addPhase, this, &CalendarDayView::addPhase);
@@ -1869,7 +1876,10 @@ CalendarWeekView::CalendarWeekView
     connect(weekTable, &CalendarDayTable::delActivity, this, &CalendarWeekView::delActivity);
     connect(weekTable, &CalendarDayTable::saveChanges, this, &CalendarWeekView::saveChanges);
     connect(weekTable, &CalendarDayTable::discardChanges, this, &CalendarWeekView::discardChanges);
-    connect(weekTable, &CalendarDayTable::repeatSchedule, this, &CalendarWeekView::repeatSchedule);
+    connect(weekTable, &CalendarDayTable::repeatPlan, this, &CalendarWeekView::repeatPlan);
+    connect(weekTable, QOverload<CalendarEntry>::of(&CalendarDayTable::exportPlan), this, QOverload<CalendarEntry>::of(&CalendarWeekView::exportPlan));
+    connect(weekTable, QOverload<>::of(&CalendarDayTable::exportPlan), this, QOverload<>::of(&CalendarWeekView::exportPlan));
+    connect(weekTable, &CalendarDayTable::importPlan, this, &CalendarWeekView::importPlan);
     connect(weekTable, &CalendarDayTable::insertRestday, this, &CalendarWeekView::insertRestday);
     connect(weekTable, &CalendarDayTable::delRestday, this, &CalendarWeekView::delRestday);
     connect(weekTable, &CalendarDayTable::addPhase, this, &CalendarWeekView::addPhase);
@@ -2069,7 +2079,10 @@ Calendar::Calendar
     connect(dayView, &CalendarDayView::delActivity, this, &Calendar::delActivity);
     connect(dayView, &CalendarDayView::saveChanges, this, &Calendar::saveChanges);
     connect(dayView, &CalendarDayView::discardChanges, this, &Calendar::discardChanges);
-    connect(dayView, &CalendarDayView::repeatSchedule, this, &Calendar::repeatSchedule);
+    connect(dayView, &CalendarDayView::repeatPlan, this, &Calendar::repeatPlan);
+    connect(dayView, QOverload<CalendarEntry>::of(&CalendarDayView::exportPlan), this, QOverload<CalendarEntry>::of(&Calendar::exportPlan));
+    connect(dayView, QOverload<>::of(&CalendarDayView::exportPlan), this, QOverload<>::of(&Calendar::exportPlan));
+    connect(dayView, &CalendarDayView::importPlan, this, &Calendar::importPlan);
     connect(dayView, &CalendarDayView::insertRestday, this, &Calendar::insertRestday);
     connect(dayView, &CalendarDayView::delRestday, this, &Calendar::delRestday);
     connect(dayView, &CalendarDayView::addPhase, this, &Calendar::addPhase);
@@ -2100,7 +2113,10 @@ Calendar::Calendar
     connect(weekView, &CalendarWeekView::delActivity, this, &Calendar::delActivity);
     connect(weekView, &CalendarWeekView::saveChanges, this, &Calendar::saveChanges);
     connect(weekView, &CalendarWeekView::discardChanges, this, &Calendar::discardChanges);
-    connect(weekView, &CalendarWeekView::repeatSchedule, this, &Calendar::repeatSchedule);
+    connect(weekView, &CalendarWeekView::repeatPlan, this, &Calendar::repeatPlan);
+    connect(weekView, QOverload<CalendarEntry>::of(&CalendarWeekView::exportPlan), this, QOverload<CalendarEntry>::of(&Calendar::exportPlan));
+    connect(weekView, QOverload<>::of(&CalendarWeekView::exportPlan), this, QOverload<>::of(&Calendar::exportPlan));
+    connect(weekView, &CalendarWeekView::importPlan, this, &Calendar::importPlan);
     connect(weekView, &CalendarWeekView::insertRestday, this, &Calendar::insertRestday);
     connect(weekView, &CalendarWeekView::delRestday, this, &Calendar::delRestday);
     connect(weekView, &CalendarWeekView::addPhase, this, &Calendar::addPhase);
@@ -2131,7 +2147,10 @@ Calendar::Calendar
     connect(monthView, &CalendarMonthTable::copyPlannedActivity, this, &Calendar::copyPlannedActivity);
     connect(monthView, &CalendarMonthTable::pastePlannedActivity, this, &Calendar::pastePlannedActivity);
     connect(monthView, &CalendarMonthTable::addActivity, this, &Calendar::addActivity);
-    connect(monthView, &CalendarMonthTable::repeatSchedule, this, &Calendar::repeatSchedule);
+    connect(monthView, &CalendarMonthTable::repeatPlan, this, &Calendar::repeatPlan);
+    connect(monthView, QOverload<CalendarEntry>::of(&CalendarMonthTable::exportPlan), this, QOverload<CalendarEntry>::of(&Calendar::exportPlan));
+    connect(monthView, QOverload<>::of(&CalendarMonthTable::exportPlan), this, QOverload<>::of(&Calendar::exportPlan));
+    connect(monthView, &CalendarMonthTable::importPlan, this, &Calendar::importPlan);
     connect(monthView, &CalendarMonthTable::insertRestday, this, &Calendar::insertRestday);
     connect(monthView, &CalendarMonthTable::delRestday, this, &Calendar::delRestday);
     connect(monthView, &CalendarMonthTable::delActivity, this, &Calendar::delActivity);
