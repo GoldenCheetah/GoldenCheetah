@@ -29,6 +29,7 @@
 #include <QCheckBox>
 #include <QRadioButton>
 #include <QStyledItemDelegate>
+#include <QStackedWidget>
 
 #include "PlanBundle.h"
 #include "Season.h"
