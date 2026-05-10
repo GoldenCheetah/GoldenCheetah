@@ -877,7 +877,7 @@ DataFilter::fingerprint(QString &query)
 }
 
 void
-DataFilter::colorSyntax(QTextDocument *document, int pos)
+DataFilter::colorSyntax(QTextDocument *document, int pos, bool dark)
 {
     // matched bracket position
     int bpos = -1;
@@ -892,30 +892,32 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
     QTextCharFormat normal;
     normal.setFontWeight(QFont::Normal);
     normal.setUnderlineStyle(QTextCharFormat::NoUnderline);
-    normal.setForeground(Qt::black);
+    normal.setForeground(dark ? QColor("#c7c7c7") : QColor("#1a1a1a"));
 
     QTextCharFormat cyanbg;
-    cyanbg.setBackground(Qt::cyan);
+    cyanbg.setBackground(dark ? QColor("#68615e") : QColor("#a8a19f"));
     QTextCharFormat redbg;
-    redbg.setBackground(QColor(255,153,153));
+    redbg.setBackground(QColor("#f22c40"));
 
     QTextCharFormat function;
+    function.setFontWeight(QFont::Bold);
     function.setUnderlineStyle(QTextCharFormat::NoUnderline);
-    function.setForeground(Qt::blue);
+    function.setForeground(dark ? QColor("#79b8ff") : QColor("#007a99"));
 
     QTextCharFormat symbol;
+    symbol.setFontWeight(QFont::DemiBold);
     symbol.setUnderlineStyle(QTextCharFormat::NoUnderline);
-    symbol.setForeground(Qt::red);
+    symbol.setForeground(dark ? QColor("#9d8fcc") : QColor("#3d1a80"));
 
     QTextCharFormat literal;
-    literal.setFontWeight(QFont::Normal);
+    literal.setFontWeight(QFont::DemiBold);
     literal.setUnderlineStyle(QTextCharFormat::NoUnderline);
-    literal.setForeground(Qt::magenta);
+    literal.setForeground(dark ? QColor("#c38418") : QColor("#865910"));
 
     QTextCharFormat comment;
     comment.setFontWeight(QFont::Normal);
     comment.setUnderlineStyle(QTextCharFormat::NoUnderline);
-    comment.setForeground(Qt::darkGreen);
+    comment.setForeground(dark ? QColor("#6a737d") : QColor("#8c959e"));
 
     QTextCursor cursor(document);
 

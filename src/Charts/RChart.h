@@ -131,6 +131,7 @@ class RChart : public GcChartWindow {
         Context *context;
         QString text; // if Rtool not alive
         bool ridesummary;
+        QSyntaxHighlighter *syntax = nullptr;
 };
 
 

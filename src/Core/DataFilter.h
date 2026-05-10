@@ -245,7 +245,7 @@ class DataFilter : public QObject
         Result evaluate(DateRange dr, QString filter="");
         Result evaluate(Specification spec, DateRange dr);
         QStringList getErrors() { return errors; };
-        void colorSyntax(QTextDocument *content, int pos);
+        void colorSyntax(QTextDocument *content, int pos, bool dark = false);
 
         static QStringList completerList(Context *, bool); // return list of names for auto-completers
         static QStringList builtins(Context *); // return list of functions supported
