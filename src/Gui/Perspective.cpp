@@ -1755,6 +1755,7 @@ ImportChartDialog::ImportChartDialog(Context *context, QList<QMap<QString,QStrin
     table->setSelectionMode(QAbstractItemView::NoSelection);
     table->horizontalHeader()->setStretchLastSection(true);
     table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
 
     // Populate the list of named searches
     for(int i=0; i<list.count(); i++) {
@@ -1764,52 +1765,58 @@ ImportChartDialog::ImportChartDialog(Context *context, QList<QMap<QString,QStrin
         c->setChecked(true);
         table->setCellWidget(i, 0, c);
 
-        QString view = list[i].value("VIEW");
+        QComboBox *com = new QComboBox(this);
+        com->setSizeAdjustPolicy(QComboBox::AdjustToContents); 
 
-        // convert to user name for view from here, since
-        // they won't recognise the names used internally
-        // as they need to be translated too
-        if (view == "plan") view = tr("Plan");
-        if (view == "home") view = tr("Trends");
-        if (view == "analysis") view = tr("Activities");
-        if (view == "train") view = tr("Train");
+        // we should be able to import the chart to any relevant view
+        int winId = list[i].value("TYPE").toInt();
+        unsigned int chartRelevance = GcWindowRegistry::relevanceForId(GcWinID(winId));
 
-        QTableWidgetItem *t;
-#ifndef GC_HAVE_ICAL
-        // View
-        t = new QTableWidgetItem;
-        t->setText(view);
-        t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-        table->setItem(i, 1, t);
+        // add entries to combox for all relevant views
+        if (chartRelevance & VIEW_ANALYSIS) com->addItem(tr("Activities"), VIEW_ANALYSIS);
+        if (chartRelevance & VIEW_PLAN) com->addItem(tr("Plan"), VIEW_PLAN);
+        if (chartRelevance & VIEW_TRENDS) com->addItem(tr("Trends"), VIEW_TRENDS);
+        if (chartRelevance & VIEW_TRAIN) com->addItem(tr("Train"), VIEW_TRAIN);
 
-#else
-        // we should be able to select trend/plan
-        if (view == tr("Plan") || view == tr("Trends")) {
+        // ensure at least one relevance match
+        if (com->count() > 0) {
 
-            QComboBox *com = new QComboBox(this);
-            com->addItem(tr("Plan"));
-            com->addItem(tr("Trends"));
-            table->setCellWidget(i,1,com);
-            if (view == tr("Plan")) com->setCurrentIndex(0);
-            else com->setCurrentIndex(1);
+            // get the default chart view stored in the file
+            int chartDefaultView = 0;
+            QString view = list[i].value("VIEW");
+
+            if (view == "plan") { chartDefaultView = VIEW_PLAN; }
+            else if (view == "analysis") { chartDefaultView = VIEW_ANALYSIS; }
+            else if (view == "train") { chartDefaultView = VIEW_TRAIN; }
+            else if (view == "home") { chartDefaultView = VIEW_TRENDS; }
+            else { qDebug() << "The chart's default view" << view
+                            << "is not recognised, defaulting to the first relevant view"; }
+
+            // select the combo box index for the chart's default view,
+            // default to first entry if the chart's default view cannot be found
+            int index = com->findData(chartDefaultView);
+            com->setCurrentIndex( (index != -1) ? index : 0);
 
         } else {
-
-            // View
-            t = new QTableWidgetItem;
-            t->setText(view);
-            t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-            table->setItem(i, 1, t);
-
+            chartRelevance = 0;
+            com->addItem(tr("Unknown"), chartRelevance);
+            qDebug() << "Chart type" << winId << "is not relevant for any View!";
         }
-#endif
+
+        table->setCellWidget(i,1,com);
 
         // title
-        t = new QTableWidgetItem;
+        QTableWidgetItem* t = new QTableWidgetItem;
         t->setText(list[i].value("title"));
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
         table->setItem(i, 2, t);
 
+        // ensure the chart cannot be imported if it is not relevant for any views
+        if (chartRelevance == 0) {
+            c->setChecked(false);
+            c->setEnabled(false);
+            com->setEnabled(false);
+        }
     }
 
     layout->addWidget(table);
@@ -1835,27 +1842,27 @@ ImportChartDialog::importClicked()
         if (static_cast<QCheckBox*>(table->cellWidget(i,0))->isChecked()) {
 
             // where we putting it?
-            QString view;
+            int view = 0;
 
             // is there a combo box?
             QComboBox *com = static_cast<QComboBox*>(table->cellWidget(i,1));
-            if (com) {
-                switch(com->currentIndex()) {
 
-                    case 0 : view = tr("Plan"); break;
-
-                    default:
-                    case 1 : view = tr("Trends"); break;
-                }
-            } else {
-                view = table->item(i,1)->text();
+            if (com) { // Retrieve the selected view from the combox
+                view = com->currentData().toInt();
+            } else { // Retrieve the chart's view from the table item's user data
+                view = table->item(i,1)->data(Qt::UserRole).toInt();
             }
 
             int x=0;
-            if (view == tr("Trends"))      { x=0; context->mainWindow->selectTrends(); }
-            if (view == tr("Activities"))  { x=1; context->mainWindow->selectAnalysis(); }
-            if (view == tr("Plan"))        { x=2; context->mainWindow->selectPlan(); }
-            if (view == tr("Train"))       { x=3; context->mainWindow->selectTrain(); }
+            switch (view) {
+     
+                case VIEW_TRENDS: x=0; context->mainWindow->selectTrends(); break;
+                case VIEW_ANALYSIS: x=1; context->mainWindow->selectAnalysis(); break;
+                case VIEW_PLAN: x=2; context->mainWindow->selectPlan(); break;
+                case VIEW_TRAIN: x=3; context->mainWindow->selectTrain(); break;
+                default: qDebug() << "Unsupported view, defaulting to Trends";
+                         context->mainWindow->selectTrends(); break;
+            }
 
             // add to the currently selected tab and select if only adding one chart
             context->mainWindow->athleteTab()->view(x)->importChart(list[i], (list.count()==1));
