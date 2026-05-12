@@ -71,6 +71,7 @@
 #include "MeasuresDownload.h"
 #include "WorkoutWizard.h"
 #include "TrainerDayDownloadDialog.h"
+#include "TredictWorkoutDownload.h"
 #include "AddDeviceWizard.h"
 #include "Dropbox.h"
 #include "SixCycle.h"
@@ -613,6 +614,7 @@ MainWindow::MainWindow(const QDir &home)
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Create a new workout..."), this, SLOT(showWorkoutWizard()));
     optionsMenu->addAction(tr("Download workouts from TrainerDay..."), this, SLOT(downloadTrainerDay()));
+    optionsMenu->addAction(tr("Download workouts from Tredict..."), this, SLOT(downloadTredictWorkouts()));
     optionsMenu->addAction(tr("Download workouts from Strava Routes..."), this, SLOT(downloadStravaRoutes()));
     optionsMenu->addAction(tr("Import workouts, videos, videoSyncs..."), this, SLOT(importWorkout()));
     optionsMenu->addAction(tr("Scan disk for workouts, videos, videoSyncs..."), this, SLOT(manageLibrary()));
@@ -2497,6 +2499,27 @@ MainWindow::downloadTrainerDay()
         TrainerDayDownloadDialog *d = new TrainerDayDownloadDialog(currentAthleteTab->context);
         d->exec();
     } else{
+        QMessageBox::critical(this, tr("Workout Directory Invalid"),
+        tr("The workout directory is not configured, or the directory selected no longer exists.\n\n"
+        "Please check your preference settings."));
+    }
+}
+
+/*----------------------------------------------------------------------
+ * Tredict Planned Workouts
+ *--------------------------------------------------------------------*/
+
+void
+MainWindow::downloadTredictWorkouts()
+{
+    QString workoutDir = appsettings->value(this, GC_WORKOUTDIR).toString();
+
+    QFileInfo fi(workoutDir);
+
+    if (fi.exists() && fi.isDir()) {
+        TredictWorkoutDownload *d = new TredictWorkoutDownload(currentAthleteTab->context);
+        d->exec();
+    } else {
         QMessageBox::critical(this, tr("Workout Directory Invalid"),
         tr("The workout directory is not configured, or the directory selected no longer exists.\n\n"
         "Please check your preference settings."));

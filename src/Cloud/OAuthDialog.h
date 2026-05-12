@@ -53,7 +53,8 @@ public:
         POLAR,
         XERT,
         RIDEWITHGPS,
-        AZUM
+        AZUM,
+        TREDICT
     } OAuthSite;
 
     // will work with old config via site and new via cloudservice (which is null for calendar and withings for now)
@@ -77,6 +78,7 @@ private:
     CloudService *service;
     QString baseURL; // can be passed, but typically is blank (used by Todays Plan)
     QString clientsecret; // can be passed, but typicall is blank (used by Todays Plan)
+    QString codeVerifier; // PKCE code_verifier, used by Tredict and other PKCE services
 
     QVBoxLayout *layout;
 

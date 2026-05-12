@@ -108,6 +108,11 @@
 #define GC_XERT_CLIENT_SECRET "__GC_XERT_CLIENT_SECRET__"
 #endif
 
+// Tredict (PKCE, no client secret needed)
+#ifndef GC_TREDICT_CLIENT_ID
+#define GC_TREDICT_CLIENT_ID "rnS663Qw6JvXLNLbzzGpyN"
+#endif
+
 #ifndef GC_TRAINERDAY_API_KEY
 #define GC_TRAINERDAY_API_KEY "__GC_TRAINERDAY_API_KEY__"
 #endif
