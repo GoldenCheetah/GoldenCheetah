@@ -137,6 +137,9 @@ class TreeMap
 
             double total=0;
             for(int i=start; i<=end; i++) total += items[i]->value;
+            if (! (total > 0.0)) {
+                return;
+            }
             int mid=start;
             double a=items[start]->value/total;
             double b=a;
@@ -195,6 +198,9 @@ class TreeMap
             // setup
             double total=0, accumulator=0; // total value of items and running total
             for(int i= start; i<= end && i<items.count(); i++) total += items[i]->value;
+            if (! (total > 0.0)) {
+                return;
+            }
             Qt::Orientation orientation = (bounds.width() > bounds.height()) ? Qt::Horizontal : Qt::Vertical;
 
             // slice em up!
