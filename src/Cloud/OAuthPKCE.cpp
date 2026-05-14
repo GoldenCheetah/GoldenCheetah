@@ -145,18 +145,18 @@ OAuthPKCE::execute()
 
     QTimer timer;
     timer.setSingleShot(true);
-    connect(&timer, &QTimer::timeout, [&]() {
+    connect(&timer, &QTimer::timeout, &loop, [&timedOut, &loop]() {
         timedOut = true;
         loop.quit();
     });
     timer.start(timeout_ * 1000);
 
-    connect(&server, &QTcpServer::newConnection, [&]() {
+    connect(&server, &QTcpServer::newConnection, &server, [this, &server, &state, &gotCallback, &loop, &authCode]() {
         QTcpSocket *socket = server.nextPendingConnection();
         if (!socket) return;
 
         // wait for the request data
-        connect(socket, &QTcpSocket::readyRead, [&, socket]() {
+        connect(socket, &QTcpSocket::readyRead, socket, [this, socket, &state, &gotCallback, &loop, &authCode]() {
             QByteArray requestData = socket->readAll();
             QString requestLine = QString::fromUtf8(requestData).section("\r\n", 0, 0);
 
