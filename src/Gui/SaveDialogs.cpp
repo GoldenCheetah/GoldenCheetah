@@ -214,7 +214,9 @@ MainWindow::saveSilent(Context *context, RideItem *rideItem)
 void
 MainWindow::saveAllFilesSilent(Context *context)
 {
-    for (RideItem *rideItem : context->athlete->rideCache->rides()) {
+    // iterate over snapshot of rides to prevent crash by iterator invalidation
+    const QList<RideItem*> snapshot = context->athlete->rideCache->rides().toList();
+    for (RideItem *rideItem : snapshot) {
         if (rideItem->isDirty()) {
             this->saveRideSingleDialog(context, rideItem);
         }
