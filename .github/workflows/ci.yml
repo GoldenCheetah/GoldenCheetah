@@ -1,0 +1,26 @@
+---
+name: build
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build
+        run: ./.github/scripts/build.sh
+      - name: Upload dmg
+        uses: actions/upload-artifact@v7
+        with:
+          name: GoldenCheetah
+          path: GoldenCheetah_v*_arm64.dmg
+      - name: Release
+        if: contains(github.event.head_commit.message, '[publish binaries]')
+        uses: softprops/action-gh-release@v3
+        with:
+          files: |
+            /tmp/QS/build/Release/Quicksilver*.dmg
+            /tmp/QS/build/Release/checksum.txt
+            /tmp/Quicksilver-debug.zip
