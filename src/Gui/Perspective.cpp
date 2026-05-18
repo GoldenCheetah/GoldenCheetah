@@ -1841,17 +1841,8 @@ ImportChartDialog::importClicked()
         // is it checked?
         if (static_cast<QCheckBox*>(table->cellWidget(i,0))->isChecked()) {
 
-            // where we putting it?
-            int view = 0;
-
-            // is there a combo box?
-            QComboBox *com = static_cast<QComboBox*>(table->cellWidget(i,1));
-
-            if (com) { // Retrieve the selected view from the combox
-                view = com->currentData().toInt();
-            } else { // Retrieve the chart's view from the table item's user data
-                view = table->item(i,1)->data(Qt::UserRole).toInt();
-            }
+            // Retrieve the selected view from the combox
+            int view = static_cast<QComboBox*>(table->cellWidget(i,1))->currentData().toInt();
 
             int x=0;
             switch (view) {
