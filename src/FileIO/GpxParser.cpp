@@ -104,15 +104,7 @@ inline double toRadians(double degrees)
 bool
         GpxParser::endElement( const QString&, const QString&, const QString& qName)
 {
-    if(qName == "metadata")
-    {
-        metadata = false;
-    }
-    else if(metadata == true)
-    {
-        return true;
-    }
-    else if (qName == "time")
+    if (qName == "time")
     {
 
         time = convertToLocalTime(buffer);
@@ -120,8 +112,16 @@ bool
         {
             start_time = time;
             rideFile->setStartTime(time);
-            firstTime = false;
+            if (metadata == false) firstTime = false;
         }
+    }
+    else if(qName == "metadata")
+    {
+        metadata = false;
+    }
+    else if(metadata == true)
+    {
+        return true;
     }
     else if (qName == "ele")
     {
