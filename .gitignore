@@ -20,6 +20,7 @@ Makefile
 # osx noise
 .DS_Store
 profile
+src/dmg_staging
 
 # qmake Xcode generator side-effects
 *.xcodeproj
