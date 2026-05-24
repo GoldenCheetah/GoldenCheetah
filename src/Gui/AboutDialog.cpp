@@ -179,6 +179,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Michel Dagenais");
     contributors.append("Mitja Zupanic");
     contributors.append("Mitsukuni Sato");
+    contributors.append("Nathan Henrie");
     contributors.append("Ned Harding");
     contributors.append("Nicholas Feng");
     contributors.append("Nick Burrett");
