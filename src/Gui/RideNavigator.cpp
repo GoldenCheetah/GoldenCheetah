@@ -36,6 +36,7 @@
 #include <QStyle>
 #include <QStyleFactory>
 #include <QScrollBar>
+#include <QToolTip>
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1266,8 +1267,6 @@ ActivityItemDelegate::paint
 (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     painter->save();
-
-    const bool selected = option.state & QStyle::State_Selected;
 
     QFont font = option.font;
     if (isHeaderRow(index)) {
