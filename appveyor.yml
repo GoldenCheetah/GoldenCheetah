@@ -8,7 +8,7 @@ branches:
 image:
   - Visual Studio 2022
   - Ubuntu2204
-  - macos-sonoma
+  - macos-monterey
 
 environment:
   APPVEYOR_SAVE_CACHE_ON_ERROR: true
@@ -88,8 +88,8 @@ init:
       export QTDIR=$HOME/Qt/6.5/macos
       export PATH=$QTDIR/bin:$PATH
       qmake --version
-      # Setup Xcode 15.2
-      sudo xcode-select -s /Applications/Xcode-15.2.0.app
+      # Setup Xcode 14.2
+      sudo xcode-select -s /Applications/Xcode-14.2.0.app
     fi
 
 cache:
