@@ -11,7 +11,6 @@ image:
   - macos-monterey
 
 environment:
-  APPVEYOR_SAVE_CACHE_ON_ERROR: true
   PYTHON_VERSION: "3.11"
   GC_GOOGLE_CALENDAR_CLIENT_SECRET:
     secure: hwjHTrSAMEbKd9PA+5x/zI4x5Uk4KQm1hdfZzkwiu8k=
