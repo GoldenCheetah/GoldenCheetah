@@ -69,8 +69,11 @@ private:
     int colorColumn;
     int fileIndex;
     int plannedIndex;
+    int dirtyIndex;
     int tempIndex;
     int dateColumn;
+    int sportIndex;
+    int subSportIndex;
 
     QString starttimeHeader;
 
@@ -113,6 +116,16 @@ private:
 
 public:
 
+    enum Roles {
+        CalendarTextRole = Qt::UserRole, // [QString] CalendarText
+        FilenameRole = Qt::UserRole + 1, // [QString] Filename
+        PlannedRole = Qt::UserRole + 2,  // [bool] isPlanned
+        DirtyRole = Qt::UserRole + 3,    // [bool] isDirty
+        SportRole = Qt::UserRole + 4,    // [QString] Sport
+        SubSportRole = Qt::UserRole + 5, // [QString] SubSport
+        HeaderRole = Qt::UserRole + 6    // [bool] Is this index a grouping header
+    };
+
     GroupByModel(RideNavigator *parent) : QAbstractProxyModel(parent), rideNavigator(parent), groupBy(-1) {
         setParent(parent);
     }
@@ -125,6 +138,9 @@ public:
         colorColumn = -1;
         fileIndex = -1;
         plannedIndex = -1;
+        dirtyIndex = -1;
+        sportIndex = -1;
+        subSportIndex = -1;
         tempIndex = -1;
         for(int i=0; i<model->columnCount(); i++) {
 
@@ -134,6 +150,9 @@ public:
             if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "planned") {
                 plannedIndex = i;
             }
+            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "dirty") {
+                dirtyIndex = i;
+            }
             if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "filename" ||
                 model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == tr("File")) {
                 fileIndex = i;
@@ -141,14 +160,18 @@ public:
             if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "color") {
                 colorColumn = i;
             }
-            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "Calendar_Text") {
-                calendarText = i;
-            }
-            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "Calendar Text") {
+            if (   model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "Calendar_Text"
+                || model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "Calendar Text") {
                 calendarText = i;
             }
             if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "ride_date") {
                 dateColumn = i;
+            }
+            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "Sport") {
+                sportIndex = i;
+            }
+            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "SubSport") {
+                subSportIndex = i;
             }
             starttimeHeader = "ride_time"; //initialisation with techname
         }
@@ -296,7 +319,7 @@ public:
         //if (proxyIndex.internalPointer() != NULL || proxyIndex.column() > 0)
         if (proxyIndex.column() > 0) {
 
-            if (role == Qt::UserRole) {
+            if (role == CalendarTextRole) {
 
                 QString string;
 
@@ -337,7 +360,7 @@ public:
                     returning = GColor(CPLOTMARKER).name();
                 }
 
-            } else if (role == (Qt::UserRole+1)) { // FILENAME ?
+            } else if (role == FilenameRole) {
 
                 if (fileIndex != -1 && proxyIndex.internalPointer()) {
 
@@ -354,7 +377,7 @@ public:
                     returning = "";
                 }
 
-            } else if (role == (Qt::UserRole+2)) { // isRUN ?
+            } else if (role == PlannedRole) {
 
                 if (plannedIndex != -1 && proxyIndex.internalPointer()) {
 
@@ -371,6 +394,58 @@ public:
                     returning = false;
                 }
 
+            } else if (role == DirtyRole) {
+
+                if (dirtyIndex != -1 && proxyIndex.internalPointer()) {
+
+                    bool isDirty = false;
+
+                    // hideous code, sorry
+                    int groupNo = ((QModelIndex*)proxyIndex.internalPointer())->row();
+                    if (groupNo < 0 || groupNo >= groups.count() || proxyIndex.column() == 0)
+                        returning = false;
+                    else isDirty = sourceModel()->data(sourceModel()->index(groupToSourceRow.value(groups[groupNo])->at(proxyIndex.row()), dirtyIndex)).toBool();
+
+                    returning = isDirty;
+                } else {
+                    returning = false;
+                }
+
+            } else if (role == SportRole) {
+
+                if (sportIndex != -1 && proxyIndex.internalPointer()) {
+
+                    QString sport;
+
+                    // hideous code, sorry
+                    int groupNo = ((QModelIndex*)proxyIndex.internalPointer())->row();
+                    if (groupNo < 0 || groupNo >= groups.count() || proxyIndex.column() == 0)
+                        returning = QString();
+                    else sport = sourceModel()->data(sourceModel()->index(groupToSourceRow.value(groups[groupNo])->at(proxyIndex.row()), sportIndex)).toString();
+
+                    returning = sport;
+                } else {
+                    returning = QString();
+                }
+
+            } else if (role == SubSportRole) {
+
+                if (subSportIndex != -1 && proxyIndex.internalPointer()) {
+
+                    QString subSport;
+
+                    // hideous code, sorry
+                    int groupNo = ((QModelIndex*)proxyIndex.internalPointer())->row();
+                    if (groupNo < 0 || groupNo >= groups.count() || proxyIndex.column() == 0)
+                        returning = QString();
+                    else subSport = sourceModel()->data(sourceModel()->index(groupToSourceRow.value(groups[groupNo])->at(proxyIndex.row()), subSportIndex)).toString();
+
+                    returning = subSport;
+                } else {
+                    returning = QString();
+                }
+            } else if (role == HeaderRole) {
+                returning = (proxyIndex.internalPointer() == nullptr);
             } else {
 
                 // column 1 = ride_time we have to use ride_date
@@ -400,7 +475,9 @@ public:
         } else if (proxyIndex.internalPointer() == NULL) {
 
             // its our group by!
-            if (proxyIndex.row() < groups.count()) {
+            if (role == HeaderRole) {
+                returning = true;
+            } else if (proxyIndex.row() < groups.count()) {
 
                 // blank values become "(blank)"
                 QString group = groups[proxyIndex.row()];
@@ -638,6 +715,7 @@ class SearchFilter : public QSortFilterProxyModel
         // find the filename column
         fileIndex = -1;
         plannedIndex = -1;
+        dirtyIndex = -1;
         for(int i=0; i<model->columnCount(); i++) {
             if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "filename"
                 || model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == tr("File")) {
@@ -645,6 +723,9 @@ class SearchFilter : public QSortFilterProxyModel
             }
             if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "planned") {
                 plannedIndex = i;
+            }
+            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "dirty") {
+                dirtyIndex = i;
             }
         }
 
@@ -716,6 +797,7 @@ class SearchFilter : public QSortFilterProxyModel
         QStringList strings;
         int fileIndex;
         int plannedIndex;
+        int dirtyIndex;
         bool searchActive;
         RideNavFilter rideNavFilter;
 };

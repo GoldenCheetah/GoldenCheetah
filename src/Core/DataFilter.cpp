@@ -500,6 +500,7 @@ DataFilter::builtins(Context *context)
 
     // add special/old functions
     returning <<"isPlanned";
+    returning <<"isDirty";
     returning <<"isRun"<<"isRide"<<"isSwim"<<"isXtrain";
     returning << "ctl" << "tsb" << "atl";
     returning << "config(cranklength)";
@@ -968,6 +969,8 @@ DataFilter::colorSyntax(QTextDocument *document, int pos, bool dark)
                     !sym.compare("Time", Qt::CaseInsensitive) ||
                     !sym.compare("isPlanned", Qt::CaseInsensitive) ||
                     !sym.compare("Planned", Qt::CaseInsensitive) ||
+                    !sym.compare("isDirty", Qt::CaseInsensitive) ||
+                    !sym.compare("Dirty", Qt::CaseInsensitive) ||
                     !sym.compare("banister", Qt::CaseInsensitive) ||
                     !sym.compare("best", Qt::CaseInsensitive) ||
                     !sym.compare("tiz", Qt::CaseInsensitive) ||
@@ -1731,6 +1734,8 @@ bool Leaf::isNumber(DataFilterRuntime *df, Leaf *leaf)
             else if (!symbol.compare("Time", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("isPlanned", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("Planned", Qt::CaseInsensitive)) return true;
+            else if (!symbol.compare("isDirty", Qt::CaseInsensitive)) return true;
+            else if (!symbol.compare("Dirty", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("Today", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("Current", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("RECINTSECS", Qt::CaseInsensitive)) return true;
@@ -1833,6 +1838,8 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     symbol.compare("Time", Qt::CaseInsensitive) &&
                     symbol.compare("isPlanned", Qt::CaseInsensitive) &&
                     symbol.compare("Planned", Qt::CaseInsensitive) &&
+                    symbol.compare("isDirty", Qt::CaseInsensitive) &&
+                    symbol.compare("Dirty", Qt::CaseInsensitive) &&
                     symbol.compare("x", Qt::CaseInsensitive) && // used by which and [lexpr]
                     symbol.compare("i", Qt::CaseInsensitive) && // used by which and [lexpr]
                     symbol.compare("Today", Qt::CaseInsensitive) &&
@@ -3055,6 +3062,8 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                                 !symbol.compare("Time", Qt::CaseInsensitive) ||
                                 !symbol.compare("isPlanned", Qt::CaseInsensitive) ||
                                 !symbol.compare("Planned", Qt::CaseInsensitive) ||
+                                !symbol.compare("isDirty", Qt::CaseInsensitive) ||
+                                !symbol.compare("Dirty", Qt::CaseInsensitive) ||
                                 !symbol.compare("x", Qt::CaseInsensitive) || // used by which
                                 !symbol.compare("i", Qt::CaseInsensitive) || // used by which
                                 !symbol.compare("Today", Qt::CaseInsensitive) ||
@@ -8000,6 +8009,12 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                    !symbol.compare("Planned", Qt::CaseInsensitive)) {
 
             lhsdouble = m->planned;
+            lhsisNumber = true;
+
+        } else if (!symbol.compare("isDirty", Qt::CaseInsensitive) ||
+                   !symbol.compare("Dirty", Qt::CaseInsensitive)) {
+
+            lhsdouble = m->isdirty;
             lhsisNumber = true;
 
         } else if (isCoggan(symbol)) {

@@ -2087,7 +2087,7 @@ MetadataPage::saveClicked()
     defaultsPage->getDefinitions(defaultDefinitions);
 
     // save settings
-    appsettings->setValue(GC_RIDEBG, keywordsPage->rideBG->isChecked());
+    appsettings->setValue(GC_SUMMARYROWS, fieldsPage->summarySpin->value());
 
     // write to metadata.xml
     RideMetadata::serialize(QDir(gcroot).canonicalPath() + "/metadata.xml", keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
@@ -2125,10 +2125,6 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
     field->addWidget(fieldChooser);
     field->addStretch();
     mainLayout->addLayout(field);
-
-    rideBG = new QCheckBox(tr("Use for Background"));
-    rideBG->setChecked(appsettings->value(this, GC_RIDEBG, false).toBool());
-    field->addWidget(rideBG);
 
     keywords = new QTreeWidget;
     keywords->headerItem()->setText(0, tr("Keyword"));
@@ -2866,6 +2862,17 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
         add->setText(6, field.expression); // expression
     }
 
+    summarySpin = new QSpinBox();
+    summarySpin->setRange(0, 5);
+    summarySpin->setSingleStep(1);
+    summarySpin->setValue(appsettings->value(this, GC_SUMMARYROWS, 3).toInt());
+
+    QHBoxLayout *extraConfigLayout = new QHBoxLayout();
+    extraConfigLayout->addWidget(new QLabel(tr("Summary rows in activities list")));
+    extraConfigLayout->addWidget(summarySpin);
+    extraConfigLayout->addStretch();
+
+    mainLayout->addLayout(extraConfigLayout);
     mainLayout->addWidget(fields);
     mainLayout->addWidget(actionButtons);
 

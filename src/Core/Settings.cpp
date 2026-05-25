@@ -604,7 +604,6 @@ GSettings::upgradeGlobal() {
     migrateValue(GC_WORKOUTDIR);
     migrateValue(GC_LINEWIDTH);
     migrateValue(GC_ANTIALIAS);
-    migrateValue(GC_RIDEBG);
     migrateValue(GC_RIDESCROLL);
     migrateValue(GC_RIDEHEAD);
     migrateValue(GC_SHADEZONES);
