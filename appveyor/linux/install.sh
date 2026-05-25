@@ -24,6 +24,7 @@ fi
 
 # SRMIO
 if [ -z "$(ls -A srmio)" ]; then
+    sudo apt-get install -qq autoconf automake libtool build-essential
     git clone https://github.com/rclasen/srmio.git
     cd srmio
     sh genautomake.sh
