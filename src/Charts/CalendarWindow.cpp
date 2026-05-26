@@ -296,6 +296,7 @@ CalendarWindow::CalendarWindow(Context *context)
 
     setStartHour(8);
     setEndHour(21);
+    setMinVisibleMins(0);
     setShowSecondaryLabel(true);
     setSummaryIncludePlanned(0);
 
@@ -541,6 +542,25 @@ CalendarWindow::setEndHour
     startHourSpin->setMaximum(hour - 1);
     if (calendar != nullptr) {
         calendar->setEndHour(hour);
+        updateActivities();
+    }
+}
+
+
+int
+CalendarWindow::getMinVisibleMins
+() const
+{
+    return minVisibleMinsSpin->value();
+}
+
+
+void
+CalendarWindow::setMinVisibleMins
+(int mins)
+{
+    minVisibleMinsSpin->setValue(mins);
+    if (calendar != nullptr) {
         updateActivities();
     }
 }
@@ -830,6 +850,10 @@ CalendarWindow::mkControls
     endHourSpin = new QSpinBox();
     endHourSpin->setSuffix(":00");
     endHourSpin->setMaximum(24);
+    minVisibleMinsSpin = new QSpinBox();
+    minVisibleMinsSpin->setRange(0, 120);
+    minVisibleMinsSpin->setSingleStep(15);
+    minVisibleMinsSpin->setSuffix(" " + tr("mins"));
     includePlannedCombo = new QComboBox();
     includePlannedCombo->addItem(tr("Always"), QVariant::fromValue(PlanFilterType::IncludeAll));
     includePlannedCombo->addItem(tr("If upcoming or missed"), QVariant::fromValue(PlanFilterType::IncludeIfUpcomingOrMissed));
@@ -866,6 +890,7 @@ CalendarWindow::mkControls
     generalForm->addRow(new QLabel(HLO + tr("Calendar Basics") + HLC));
     generalForm->addRow(tr("Startup View"), defaultViewCombo);
     generalForm->addRow(tr("First Day of Week"), firstDayOfWeekCombo);
+    generalForm->addRow(tr("Minimum Display Duration"), minVisibleMinsSpin);
     generalForm->addItem(new QSpacerItem(0, 20 * dpiYFactor));
     generalForm->addRow(new QLabel(HLO + tr("Default Times") + HLC));
     generalForm->addRow(tr("Default Start Time"), startHourSpin);
@@ -897,6 +922,7 @@ CalendarWindow::mkControls
 
     connect(startHourSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setStartHour);
     connect(endHourSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setEndHour);
+    connect(minVisibleMinsSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setMinVisibleMins);
     connect(defaultViewCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::setDefaultView);
     connect(firstDayOfWeekCombo, &QComboBox::currentIndexChanged, this, [this](int idx) { setFirstDayOfWeek(idx + 1); });
     connect(primaryMainCombo, &QComboBox::currentIndexChanged, this, &CalendarWindow::updateActivities);
@@ -1058,6 +1084,7 @@ CalendarWindow::getActivities
         activity.reference = rideItem->fileName;
         activity.start = rideItem->dateTime.time();
         activity.durationSecs = rideItem->getForSymbol("workout_time", GlobalContext::context()->useMetricUnits);
+        activity.visibleSecs = std::min(std::max(activity.durationSecs, getMinVisibleMins() * 60), activity.start.secsTo(QTime(23, 59, 59)));
         activity.type = rideItem->planned ? ENTRY_TYPE_PLANNED_ACTIVITY : ENTRY_TYPE_ACTUAL_ACTIVITY;
         activity.isRelocatable = rideItem->planned;
         activity.hasTrainMode = rideItem->planned && sport == "Bike" && ! buildWorkoutFilter(rideItem).isEmpty();

@@ -401,7 +401,7 @@ CalendarDetailedDayDelegate::paint
         bool related = (l.entryIdx == relatedEntryIdx);
         const CalendarEntry &entry = calendarDay.entries[l.entryIdx];
         int startMinute = entry.start.hour() * 60 + entry.start.minute();
-        int endMinute = startMinute + entry.durationSecs / 60;
+        int endMinute = startMinute + entry.visibleSecs / 60;
         int columnWidth = (rectWidth - (l.columnCount - 1) * columnSpacing) / std::max(1, l.columnCount);
         int left = rectLeft + l.columnIndex * (columnWidth + columnSpacing);
         int top = timeScaleData->minuteToYInTable(startMinute, option.rect);
