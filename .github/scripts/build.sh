@@ -44,7 +44,6 @@ main() {
       ;;
   esac
 
-  export PYTHON_VERSION=3.11
   export \
     HOMEBREW_NO_AUTO_UPDATE=1 \
     HOMEBREW_NO_INSTALL_CLEANUP=1 \

@@ -4,11 +4,33 @@ name: build
 on:
   push:
 
+env:
+  PYTHON_VERSION: "3.11"
+  GC_CLOUD_OPENDATA_SECRET: ${{ secrets.GC_CLOUD_OPENDATA_SECRET }}
+  GC_NOKIA_CLIENT_SECRET: ${{ secrets.GC_NOKIA_CLIENT_SECRET }}
+  GC_DROPBOX_CLIENT_SECRET: ${{ secrets.GC_DROPBOX_CLIENT_SECRET }}
+  GC_STRAVA_CLIENT_SECRET: ${{ secrets.GC_STRAVA_CLIENT_SECRET }}
+  GC_CYCLINGANALYTICS_CLIENT_SECRET: ${{ secrets.GC_CYCLINGANALYTICS_CLIENT_SECRET }}
+  GC_CLOUD_DB_BASIC_AUTH: ${{ secrets.GC_CLOUD_DB_BASIC_AUTH }}
+  GC_CLOUD_DB_APP_NAME: ${{ secrets.GC_CLOUD_DB_APP_NAME }}
+  GC_POLARFLOW_CLIENT_SECRET: ${{ secrets.GC_POLARFLOW_CLIENT_SECRET }}
+  GC_SPORTTRACKS_CLIENT_SECRET: ${{ secrets.GC_SPORTTRACKS_CLIENT_SECRET }}
+  GC_RWGPS_API_KEY: ${{ secrets.GC_RWGPS_API_KEY }}
+  GC_NOLIO_CLIENT_ID: ${{ secrets.GC_NOLIO_CLIENT_ID }}
+  GC_NOLIO_SECRET: ${{ secrets.GC_NOLIO_SECRET }}
+  GC_XERT_CLIENT_SECRET: ${{ secrets.GC_XERT_CLIENT_SECRET }}
+  GC_AZUM_CLIENT_SECRET: ${{ secrets.GC_AZUM_CLIENT_SECRET }}
+  GC_TRAINERDAY_API_KEY: ${{ secrets.GC_TRAINERDAY_API_KEY }}
+
 jobs:
   build:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Add Secrets
+        shell: pwsh
+        run: ./util/add_secrets.ps1
       - name: Build
         run: ./.github/scripts/build.sh
       - name: Upload dmg
