@@ -1322,7 +1322,7 @@ ActivityItemDelegate::helpEvent
             flags << QString("<i>%1</i>").arg(tr("Unsaved changes").toHtmlEscaped());
         }
         if (! flags.isEmpty()) {
-            toolTipText += QString("<p>%1</p>").arg(flags.join(", "));
+            toolTipText += QString("<p>%1</p>").arg(flags.join(" • "));
         }
         QToolTip::showText(event->globalPos(), toolTipText, view);
     } else {
