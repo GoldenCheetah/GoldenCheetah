@@ -1805,6 +1805,9 @@ toolTipDayEntry(const QPoint &pos, QAbstractItemView *view, const CalendarDay &d
             }
         }
         tooltip += "</table>";
+        if (! calEntry.tertiary.isEmpty()) {
+            tooltip += QString("<p>%1</p>").arg(calEntry.tertiary.toHtmlEscaped());
+        }
         QToolTip::showText(pos, tooltip, view);
         return true;
     }
