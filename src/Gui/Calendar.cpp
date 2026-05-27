@@ -147,7 +147,7 @@ CalendarOverview::drawEntries
 
 
 //////////////////////////////////////////////////////////////////////////////
-// CalendarDayTable
+// CalendarBaseTable
 
 CalendarBaseTable::CalendarBaseTable
 (QWidget *parent)

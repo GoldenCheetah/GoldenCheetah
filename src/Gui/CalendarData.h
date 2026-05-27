@@ -64,6 +64,7 @@ struct CalendarEntry {
     QString reference;
     QTime start;
     int durationSecs = 0;
+    int visibleSecs = 0;
     int type = 0;
     bool isExcludedFromSummary = false;
     bool isRelocatable = false;

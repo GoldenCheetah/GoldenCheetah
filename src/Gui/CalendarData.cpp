@@ -52,7 +52,7 @@ CalendarEntryLayouter::groupOverlapping
     for (int i = 0; i < entries.size(); ++i) {
         const CalendarEntry &entry = entries[i];
         qint64 startSecs = entry.start.hour() * 3600 + entry.start.minute() * 60 + entry.start.second();
-        QTime endTime = entry.start.addSecs(entry.durationSecs);
+        QTime endTime = entry.start.addSecs(entry.visibleSecs);
         qint64 endSecs = endTime.hour() * 3600 + endTime.minute() * 60 + endTime.second();
         if (endTime < entry.start) {
             endSecs += 24 * 3600;
@@ -104,7 +104,7 @@ CalendarEntryLayouter::assignColumns
     for (int entryIdx : cluster) {
         const CalendarEntry &entry = entries[entryIdx];
         qint64 startSecs = entry.start.hour() * 3600 + entry.start.minute() * 60 + entry.start.second();
-        QTime endTime = entry.start.addSecs(entry.durationSecs);
+        QTime endTime = entry.start.addSecs(entry.visibleSecs);
         qint64 endSecs = endTime.hour() * 3600 + endTime.minute() * 60 + endTime.second();
         if (endTime < entry.start) {
             endSecs += 24 * 3600;
