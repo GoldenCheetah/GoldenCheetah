@@ -1751,43 +1751,48 @@ toolTipDayEntry(const QPoint &pos, QAbstractItemView *view, const CalendarDay &d
         CalendarEntry calEntry = day.entries[idx];
         QString status;
         if (calEntry.type == ENTRY_TYPE_ACTUAL_ACTIVITY) {
-            status = QObject::tr("actual");
+            status = QObject::tr("actual").toHtmlEscaped();
         } else {
-            status = QObject::tr("planned");
+            status = QObject::tr("planned").toHtmlEscaped();
         }
         if (calEntry.dirty) {
-            status += " • " + QObject::tr("modified");
+            status += " • " + QObject::tr("modified").toHtmlEscaped();
         }
         if (calEntry.isExcludedFromSummary) {
-            status += " • " + QObject::tr("not in summary");
+            status += " • " + QObject::tr("not in summary").toHtmlEscaped();
+        }
+        if (calEntry.visibleSecs > calEntry.durationSecs) {
+            status += " • " + QObject::tr("enlarged for readability").toHtmlEscaped();
+        } else if (calEntry.visibleSecs < calEntry.durationSecs) {
+            status += " • " + QObject::tr("shortened at midnight").toHtmlEscaped();
         }
 
         QString tooltip = QString("<div style='padding: %1px;'>").arg(4 * dpiXFactor);
-        tooltip += QString("<div style='font-weight: bold; font-size: 110%; margin-bottom: %1px;'>%2</div>").arg(8 * dpiYFactor).arg(calEntry.primary);
-        tooltip += QString("<div style='font-style: italic; color: gray; margin-bottom: %1px;'>%2</div>").arg(6 * dpiYFactor).arg(status);
+        tooltip += QString("<div style='font-weight: bold; font-size: 110%; margin-bottom: %1px;'>%2</div>").arg(8 * dpiYFactor).arg(calEntry.primary.toHtmlEscaped());
+        tooltip += QString("<div style='font-style: italic; color: gray; margin-bottom: %1px;'>%2</div>").arg(6 * dpiYFactor).arg(status.toHtmlEscaped());
         tooltip += "<table>";
         if (! calEntry.secondary.isEmpty()) {
-            tooltip += QString("<tr><td><b>%1:</b></td><td>%2</td></tr>").arg(calEntry.secondaryMetric).arg(calEntry.secondary);
+            tooltip += QString("<tr><td><b>%1:</b></td><td>%2</td></tr>").arg(calEntry.secondaryMetric).arg(calEntry.secondary.toHtmlEscaped());
         }
         if (calEntry.start.isValid()) {
             QString time = calEntry.start.toString();
             if (calEntry.durationSecs > 0) {
                 time += " - " + calEntry.start.addSecs(calEntry.durationSecs).toString();
             }
-            tooltip += QString("<tr><td><b>%1:</b></td><td>%2</td></tr>").arg(QObject::tr("When")).arg(time);
+            tooltip += QString("<tr><td><b>%1:</b></td><td>%2</td></tr>").arg(QObject::tr("When").toHtmlEscaped()).arg(time.toHtmlEscaped());
         }
         if (calEntry.type == ENTRY_TYPE_PLANNED_ACTIVITY && ! calEntry.originalPlanLabel.isEmpty()) {
             tooltip += QString("<tr><td><b>%1:</b></td><td>%2</td></tr>")
-                              .arg(QObject::tr("Originally"))
-                              .arg(calEntry.originalPlanLabel);
+                              .arg(QObject::tr("Originally").toHtmlEscaped())
+                              .arg(calEntry.originalPlanLabel.toHtmlEscaped());
         }
         if (! calEntry.linkedReference.isEmpty()) {
             QString countertype;
             countertype = QObject::tr("Linked");
             tooltip += QString("<tr><td style='padding-top: %1px'><b>%2:</b></td><td style='padding-top: %1px'>%3</td></tr>")
                               .arg(6 * dpiYFactor)
-                              .arg(countertype)
-                              .arg(calEntry.linkedPrimary);
+                              .arg(countertype.toHtmlEscaped())
+                              .arg(calEntry.linkedPrimary.toHtmlEscaped());
             if (calEntry.linkedStartDT.isValid()) {
                 QString linkedWhen;
                 QLocale locale;
@@ -1796,11 +1801,11 @@ toolTipDayEntry(const QPoint &pos, QAbstractItemView *view, const CalendarDay &d
                 } else {
                     linkedWhen = locale.toString(calEntry.linkedStartDT, QLocale::NarrowFormat);
                 }
-                tooltip += QString("<tr><td><b>%1:</b></td><td>%2</td></tr>").arg(QObject::tr("On")).arg(linkedWhen);
+                tooltip += QString("<tr><td><b>%1:</b></td><td>%2</td></tr>").arg(QObject::tr("On").toHtmlEscaped()).arg(linkedWhen.toHtmlEscaped());
                 if (calEntry.type == ENTRY_TYPE_ACTUAL_ACTIVITY && ! calEntry.originalPlanLabel.isEmpty()) {
                     tooltip += QString("<tr><td><b>%1:</b></td><td>%2</td></tr>")
-                                      .arg(QObject::tr("Originally"))
-                                      .arg(calEntry.originalPlanLabel);
+                                      .arg(QObject::tr("Originally").toHtmlEscaped())
+                                      .arg(calEntry.originalPlanLabel.toHtmlEscaped());
                 }
             }
         }
@@ -1824,7 +1829,7 @@ toolTipMore
         entries << entry.primary;
     }
     if (! entries.isEmpty()) {
-        QString tooltip = entries.join("\n");
+        QString tooltip = entries.join("\n").toHtmlEscaped();
         QToolTip::showText(pos, tooltip, view);
         return true;
     }

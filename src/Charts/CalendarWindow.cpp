@@ -1084,7 +1084,11 @@ CalendarWindow::getActivities
         activity.reference = rideItem->fileName;
         activity.start = rideItem->dateTime.time();
         activity.durationSecs = rideItem->getForSymbol("workout_time", GlobalContext::context()->useMetricUnits);
-        activity.visibleSecs = std::min(std::max(activity.durationSecs, getMinVisibleMins() * 60), activity.start.secsTo(QTime(23, 59, 59)));
+        if (calendar->currentView() == CalendarView::Day || calendar->currentView() == CalendarView::Week) {
+            activity.visibleSecs = std::min(std::max(activity.durationSecs, getMinVisibleMins() * 60), activity.start.secsTo(QTime(23, 59, 59)));
+        } else {
+            activity.visibleSecs = activity.durationSecs;
+        }
         activity.type = rideItem->planned ? ENTRY_TYPE_PLANNED_ACTIVITY : ENTRY_TYPE_ACTUAL_ACTIVITY;
         activity.isRelocatable = rideItem->planned;
         activity.hasTrainMode = rideItem->planned && sport == "Bike" && ! buildWorkoutFilter(rideItem).isEmpty();
