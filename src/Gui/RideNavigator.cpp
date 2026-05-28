@@ -1268,6 +1268,8 @@ ActivityItemDelegate::paint
 {
     painter->save();
 
+    const bool selected = option.state & QStyle::State_Selected;
+
     QFont font = option.font;
     if (isHeaderRow(index)) {
         font.setWeight(QFont::Bold);
@@ -1322,7 +1324,7 @@ ActivityItemDelegate::helpEvent
             flags << QString("<i>%1</i>").arg(tr("Unsaved changes").toHtmlEscaped());
         }
         if (! flags.isEmpty()) {
-            toolTipText += QString("<p>%1</p>").arg(flags.join(" • "));
+            toolTipText += QString("<p>%1</p>").arg(flags.join(", "));
         }
         QToolTip::showText(event->globalPos(), toolTipText, view);
     } else {
@@ -1355,8 +1357,11 @@ ActivityTreeView::ActivityTreeView
 (RideNavigator *rideNavigator, QWidget* parent)
 : QTreeView(parent), rideNavigator(rideNavigator)
 {
+    setDragDropMode(QAbstractItemView::DragDrop);
+    setDragEnabled(true);
+    setDragDropOverwriteMode(false);
+    setDropIndicatorShown(true);
     setUniformRowHeights(false);
-
 #ifdef Q_OS_MAC
     setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
@@ -1425,6 +1430,65 @@ ActivityTreeView::setSummaryLines
 
 
 void
+ActivityTreeView::startDrag
+(Qt::DropActions supportedActions)
+{
+    // The icon of the drag is based only on the QStyledItemDelegates, drawRow is ignored.
+    // Therefore the painting has to be called manually to get a preview of the full row.
+
+    QModelIndexList indexes = selectedIndexes();
+    if (indexes.isEmpty()) {
+        return;
+    }
+
+    QModelIndex index = indexes.first();
+
+    QRect rowRect = visualRect(index);
+    rowRect.setLeft(0);
+    rowRect.setWidth(viewport()->width());
+    int height = rowHeight(index);
+    rowRect.setHeight(height);
+
+    const int hotX = dragStartPos.x();
+    const int hotY = std::clamp(dragStartPos.y() - rowRect.top(), 0, height - 1);
+
+    QPixmap pixmap(rowRect.width(), height);
+    pixmap.fill(Qt::transparent);
+
+    QStyleOptionViewItem option;
+    initViewItemOption(&option);
+    option.rect = QRect(0, 0, rowRect.width(), height);
+
+    QPainter painter(&pixmap);
+    paintRow(&painter, option, index);
+    painter.end();
+
+    QPixmap blended(pixmap.size());
+    blended.fill(Qt::transparent);
+    QPainter p(&blended);
+    p.setOpacity(0.65);
+    p.drawPixmap(0, 0, pixmap);
+    pixmap = blended;
+
+    QMimeData *mimeData = model()->mimeData(indexes);
+    if (! mimeData) {
+        return;
+    }
+    QDrag *drag = new QDrag(this);
+    drag->setPixmap(pixmap);
+    drag->setMimeData(mimeData);
+    drag->setHotSpot(QPoint(hotX, hotY));
+
+    Qt::DropAction defaultAction = defaultDropAction();
+    if (defaultAction == Qt::IgnoreAction) {
+        defaultAction = Qt::MoveAction;
+    }
+
+    drag->exec(supportedActions, defaultAction);
+}
+
+
+void
 ActivityTreeView::dragEnterEvent
 (QDragEnterEvent *event)
 {
@@ -1442,6 +1506,43 @@ ActivityTreeView::dragMoveEvent
 
 void
 ActivityTreeView::drawRow
+(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    paintRow(painter, option, index);
+}
+
+
+void
+ActivityTreeView::resizeEvent
+(QResizeEvent *event)
+{
+    QTreeView::resizeEvent(event);
+    scheduleDelayedItemsLayout();
+}
+
+
+void
+ActivityTreeView::mousePressEvent
+(QMouseEvent *event)
+{
+    dragStartPos = event->pos();
+    QTreeView::mousePressEvent(event);
+}
+
+
+QColor
+ActivityTreeView::resolveBackgroundColor
+(bool selected) const
+{
+    if (selected) {
+        return GColor(CCALCURRENT);
+    }
+    return palette().base().color();
+}
+
+
+void
+ActivityTreeView::paintRow
 (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QModelIndex useIndex = index.siblingAtColumn(1);
@@ -1561,26 +1662,6 @@ ActivityTreeView::drawRow
         }
     }
     painter->restore();
-}
-
-
-void
-ActivityTreeView::resizeEvent
-(QResizeEvent *event)
-{
-    QTreeView::resizeEvent(event);
-    scheduleDelayedItemsLayout();
-}
-
-
-QColor
-ActivityTreeView::resolveBackgroundColor
-(bool selected) const
-{
-    if (selected) {
-        return GColor(CCALCURRENT);
-    }
-    return palette().base().color();
 }
 
 

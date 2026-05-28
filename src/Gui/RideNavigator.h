@@ -250,15 +250,19 @@ protected:
     void drawRow(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
     void resizeEvent(QResizeEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
 
+    void startDrag(Qt::DropActions supportedActions) override;
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dragMoveEvent(QDragMoveEvent *event) override;
 
 private:
     RideNavigator *rideNavigator;
     int summaryLines = 3;
+    QPoint dragStartPos;
 
     QColor resolveBackgroundColor(bool selected) const;
+    void paintRow(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 };
 
 
