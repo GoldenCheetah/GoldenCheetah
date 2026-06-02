@@ -1548,7 +1548,7 @@ ActivityTreeView::paintRow
     const bool selected = selectionModel()->isSelected(index);
     const bool isHeader = useIndex.data(GroupByModel::HeaderRole).toBool();
     const bool planned = useIndex.data(GroupByModel::PlannedRole).toBool();
-    const QString sport = useIndex.data(GroupByModel::SportRole).toString();
+    const QString sport = RideFile::sportTag(useIndex.data(GroupByModel::SportRole).toString());
     const QString subSport = useIndex.data(GroupByModel::SubSportRole).toString();
     const int lineHeight = fm.lineSpacing() + 1;
     const bool dark = GCColor::isPaletteDark(palette());
