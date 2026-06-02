@@ -2865,7 +2865,7 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     summarySpin = new QSpinBox();
     summarySpin->setRange(0, 5);
     summarySpin->setSingleStep(1);
-    summarySpin->setValue(appsettings->value(this, GC_SUMMARYROWS, 3).toInt());
+    summarySpin->setValue(appsettings->value(this, GC_SUMMARYROWS, 2).toInt());
 
     QHBoxLayout *extraConfigLayout = new QHBoxLayout();
     extraConfigLayout->addWidget(new QLabel(tr("Summary rows in activities list")));

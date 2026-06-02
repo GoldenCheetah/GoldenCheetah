@@ -396,7 +396,7 @@ RideNavigator::configChanged(qint32 state)
 
 #endif
     tableView->setStyleSheet(tableView->styleSheet() + "QTreeView::item:hover { background: transparent; color: inherit; }");
-    int summaryLines = appsettings->value(this, GC_SUMMARYROWS, 3).toInt();
+    int summaryLines = appsettings->value(this, GC_SUMMARYROWS, 2).toInt();
     if (! hasCalendarText) {
         summaryLines = 0;
     }
