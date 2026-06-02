@@ -50,12 +50,15 @@ static bool _initGroupRanges = false;
 static constexpr int kRowPaddingLeft = 2;
 static constexpr int kRowPaddingRight = 8;
 static constexpr int kFieldsTextIndent = 8;
-static constexpr int kFieldsTextPaddingTop = 6;
-static constexpr int kSummaryMarginTop = 8;
-static constexpr int kSummaryMarginBottom = 12;
+static constexpr int kFieldsTextPaddingTop = 3;
+static constexpr int kPlannedSepInset = 8;
+static constexpr int kSummaryMarginTop = 2;
+static constexpr int kSummaryPaddingBottom = 6;
+static constexpr int kSummaryMarginBottom = 4;
 static constexpr int kSummaryIconTextGap = 8;
 static constexpr int kHeaderSectionPadding = 5;
-static constexpr int kIconSpacing = 0;
+static constexpr int kIconSpacing = 2;
+static constexpr int kRadius = 4;
 
 static bool insensitiveLessThan(const QString &a, const QString &b);
 
@@ -530,7 +533,7 @@ RideNavigator::resetView()
     }
 
     // initialise to whatever groupBy we want to start with
-    tableView->sortByColumn(sortByIndex(), static_cast<Qt::SortOrder>(sortByOrder()));;
+    tableView->sortByColumn(sortByIndex(), static_cast<Qt::SortOrder>(sortByOrder()));
 
     tableView->setColumnHidden(0, true);
     tableView->setColumnWidth(0,0);
@@ -1255,7 +1258,7 @@ ActivityItemDelegate::sizeHint
     } else {
         height =   2 * kFieldsTextPaddingTop * dpiYFactor
                  + lineHeight
-                 + std::max(0, std::min(1, summaryLines)) * (kSummaryMarginTop + kSummaryMarginBottom) * dpiYFactor
+                 + (kSummaryMarginTop + std::min(1, std::max(0, summaryLines)) * kSummaryPaddingBottom + kSummaryMarginBottom) * dpiYFactor
                  + lineHeight * summaryLines;
     }
     return { option.rect.width(), height };
@@ -1267,8 +1270,6 @@ ActivityItemDelegate::paint
 (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     painter->save();
-
-    const bool selected = option.state & QStyle::State_Selected;
 
     QFont font = option.font;
     if (isHeaderRow(index)) {
@@ -1508,6 +1509,7 @@ void
 ActivityTreeView::drawRow
 (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    painter->fillRect(option.rect, option.palette.base());
     paintRow(painter, option, index);
 }
 
@@ -1530,36 +1532,27 @@ ActivityTreeView::mousePressEvent
 }
 
 
-QColor
-ActivityTreeView::resolveBackgroundColor
-(bool selected) const
-{
-    if (selected) {
-        return GColor(CCALCURRENT);
-    }
-    return palette().base().color();
-}
-
-
 void
 ActivityTreeView::paintRow
 (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QModelIndex useIndex = index.siblingAtColumn(1);
-    Q_ASSERT(useIndex.isValid());
     if (! useIndex.isValid()) {
         QTreeView::drawRow(painter, option, index);
         return;
     }
 
+    const QFontMetrics fm(option.font);
     const QRect rowRect = option.rect;
+    const QColor planColor = GColor(CCALPLANNED);
     const bool selected = selectionModel()->isSelected(index);
     const bool isHeader = useIndex.data(GroupByModel::HeaderRole).toBool();
     const bool planned = useIndex.data(GroupByModel::PlannedRole).toBool();
     const QString sport = useIndex.data(GroupByModel::SportRole).toString();
     const QString subSport = useIndex.data(GroupByModel::SubSportRole).toString();
-    const int lineHeight = QFontMetrics(option.font).lineSpacing() + 1;
+    const int lineHeight = fm.lineSpacing() + 1;
     const bool dark = GCColor::isPaletteDark(palette());
+    const QColor bg = (selected && ! isHeader) ? GColor(CCALCURRENT) : palette().base().color();
 
     QColor activityColor = useIndex.data(Qt::BackgroundRole).value<QBrush>().color();
     if (! activityColor.isValid() || activityColor == QColor(1,1,1)) {
@@ -1567,66 +1560,109 @@ ActivityTreeView::paintRow
     }
 
     painter->save();
-    QColor bg = resolveBackgroundColor(selected);
-    painter->setRenderHint(QPainter::Antialiasing, false);
-    painter->fillRect(rowRect, bg);
-
-    QColor titleFg;
-    QColor summaryFg;
-    if (! isHeader && ! selected) {
-        QColor titleBg;
-        if (planned) {
-            titleBg = GColor(CCALPLANNED);
-            titleBg.setAlphaF(dark ? 0.25 : 0.12);
-        } else if (summaryLines > 0) {
-            titleBg = palette().mid().color();
-            titleBg.setAlphaF(dark ? 0.2 : 0.2);
-        } else {
-            titleBg = bg;
-        }
-        titleBg = GCColor::blendedColor(titleBg, bg);
-        QRect headerRect(rowRect.x(), rowRect.y(), rowRect.width(), lineHeight + 2 * kFieldsTextPaddingTop * dpiYFactor);
-        painter->fillRect(headerRect, titleBg);
-        titleFg = GCColor::invertColor(titleBg);
-        summaryFg = titleFg;
-        summaryFg.setAlphaF(0.9);
-    } else {
-        titleFg = GCColor::invertColor(bg);
-        summaryFg = titleFg;
-    }
-    painter->restore();
-
-    painter->save();
     painter->setRenderHint(QPainter::Antialiasing, true);
-    QStyleOptionViewItem opt;
-    initViewItemOption(&opt);
-    opt.rect = rowRect;
-    opt.state &= ~QStyle::State_MouseOver;
-    opt.state &= ~QStyle::State_Selected;
-    opt.palette.setBrush(QPalette::All, QPalette::Text, titleFg);
-    QTreeView::drawRow(painter, opt, index);
 
+    QColor titleFg = GCColor::invertColor(bg);
     if (! isHeader) {
+        QColor summaryFg;
+        const float radiusX = kRadius * dpiXFactor;
+        const float radiusY = kRadius * dpiYFactor;
+        const float summaryMarginTop = kSummaryMarginTop * dpiYFactor;
+        const float fieldsTextPaddingTop = kFieldsTextPaddingTop * dpiYFactor;
+        const int summaryTop = rowRect.top() + 2 * fieldsTextPaddingTop + summaryMarginTop + lineHeight;
+        const int summaryHeight = (summaryLines - 1) * lineHeight + fm.height();
+        const int titleHeight = lineHeight + 2 * fieldsTextPaddingTop;
+
+        if (selected) {
+            const int selSummaryHeight = summaryMarginTop + summaryHeight + (summaryLines > 0 ? kSummaryPaddingBottom * dpiYFactor : 0);
+            const int selectionHeight = titleHeight + selSummaryHeight;
+
+            QRect selectionRect(rowRect.x(), rowRect.y(), rowRect.width(), selectionHeight);
+
+            QColor selectionBg = GColor(CCALCURRENT);
+            painter->save();
+            painter->setPen(Qt::NoPen);
+            painter->setBrush(selectionBg);
+            painter->drawRoundedRect(selectionRect, radiusX, radiusY);
+            painter->restore();
+            titleFg = GCColor::invertColor(selectionBg);
+            summaryFg = GCColor::invertColor(selectionBg);
+        } else {
+            const float borderWidth = 2 * dpiXFactor;
+            QRect titleRealRect(rowRect.x(), rowRect.y(), rowRect.width(), titleHeight);
+            QRect titleDrawRect(titleRealRect);
+            if (summaryLines > 0) {
+                titleDrawRect.setHeight(titleRealRect.height() + radiusY);
+            }
+            painter->save();
+            QColor titleBg = activityColor;
+            if (planned) {
+                titleBg = bg;
+                painter->setPen(QPen(planColor, borderWidth));
+                painter->setBrush(Qt::NoBrush);
+            } else {
+                titleBg.setAlphaF(dark ? 0.15 : 0.10);
+                titleBg = GCColor::blendedColor(titleBg, bg);
+                painter->setPen(Qt::NoPen);
+                painter->setBrush(titleBg);
+            }
+            painter->setClipRect(titleRealRect);
+            painter->drawRoundedRect(titleDrawRect, radiusX, radiusY);
+            painter->restore();
+            titleFg = GCColor::invertColor(titleBg);
+            if (summaryLines > 0) {
+                QColor summaryBg;
+                if (planned) {
+                    summaryBg = bg;
+                } else {
+                    summaryBg = activityColor;
+                    summaryBg.setAlphaF(dark ? 0.1 : 0.07);
+                    summaryBg = GCColor::blendedColor(summaryBg, bg);
+                }
+                summaryFg = GCColor::invertColor(summaryBg);
+                summaryFg.setAlphaF(0.9);
+                QRect summaryRealRect(rowRect.left(), summaryTop - summaryMarginTop, rowRect.width(), summaryHeight + summaryMarginTop + kSummaryPaddingBottom * dpiYFactor);
+                QRect summaryDrawRect(summaryRealRect);
+                summaryDrawRect.setTop(summaryRealRect.top() - radiusY);
+                summaryDrawRect.setHeight(summaryRealRect.height() + radiusY);
+                painter->save();
+                if (planned) {
+                    QColor sepColor(planColor);
+                    sepColor.setAlphaF(dark ? 0.6 : 0.4);
+                    painter->setPen(QPen(sepColor, 1 * dpiXFactor));
+                    const float plannedSepInset = kPlannedSepInset * dpiXFactor;
+                    painter->drawLine(summaryRealRect.left() + plannedSepInset, summaryRealRect.top(), summaryRealRect.right() - plannedSepInset, summaryRealRect.top());
+                    painter->setPen(QPen(planColor, borderWidth));
+                    painter->setBrush(Qt::NoBrush);
+                } else {
+                    painter->setPen(Qt::NoPen);
+                    painter->setBrush(summaryBg);
+                }
+                painter->setClipRect(summaryRealRect);
+                painter->drawRoundedRect(summaryDrawRect, radiusX, radiusY);
+                painter->restore();
+
+            }
+        }
         if (summaryLines > 0) {
+            const QString iconFile = IconManager::instance().getFilepath(sport, subSport);
+            const float iconSpacing = kIconSpacing * dpiXFactor;
             const int iconWidth = std::min(summaryLines, 2) * lineHeight;
             QSize pixmapSize(iconWidth, iconWidth);
             QPixmap pixmap;
 
-            const int summaryTop = rowRect.top() + 2 * kFieldsTextPaddingTop * dpiYFactor + lineHeight + kSummaryMarginTop * dpiYFactor;
+            if (planned) {
+                QColor iconColor = planColor;
+                if (selected) {
+                    iconColor = titleFg;
+                }
+                pixmap = svgAsColoredPixmap(iconFile, pixmapSize, iconSpacing, iconColor);
+            } else {
+                pixmap = svgOnBackground(iconFile, pixmapSize, iconSpacing, activityColor, radiusX);
+            }
             const int summaryLeft = rowRect.left() + (kRowPaddingLeft + kFieldsTextIndent) * dpiXFactor;
             const int summaryRight = rowRect.right() - kRowPaddingRight * dpiXFactor;
-            const QFontMetrics fm(option.font);
-            const int summaryHeight = (summaryLines - 1) * lineHeight + fm.height();
             const QRect summaryRect(summaryLeft, summaryTop, summaryRight - summaryLeft, summaryHeight);
-
-            const QString iconFile = IconManager::instance().getFilepath(sport, subSport);
-            QColor iconColor(activityColor);
-            if (selected) {
-                iconColor = GCColor::invertColor(bg);
-            } else if (planned) {
-                iconColor = GColor(CCALPLANNED);
-            }
-            pixmap = svgAsColoredPixmap(iconFile, pixmapSize, kIconSpacing * dpiXFactor, iconColor);
             painter->drawPixmap(summaryRect.left(), summaryRect.top(), pixmap);
 
             const QString detailText = useIndex.data(GroupByModel::CalendarTextRole).toString();
@@ -1635,7 +1671,6 @@ ActivityTreeView::paintRow
 
                 if (summaryTextRect.isValid()) {
                     painter->save();
-
                     QFont summaryFont = option.font;
                     summaryFont.setWeight(QFont::Light);
                     const bool dirty = useIndex.data(GroupByModel::DirtyRole).toBool();
@@ -1643,11 +1678,22 @@ ActivityTreeView::paintRow
                     painter->setFont(summaryFont);
                     painter->setPen(summaryFg);
                     painter->drawText(summaryTextRect, Qt::AlignLeft | Qt::TextWordWrap, detailText);
-
                     painter->restore();
                 }
             }
         }
+    }
+
+    QStyleOptionViewItem opt;
+    initViewItemOption(&opt);
+    opt.rect = rowRect;
+    opt.palette.setBrush(QPalette::All, QPalette::Text, titleFg);
+    opt.palette.setBrush(QPalette::All, QPalette::Highlight, Qt::transparent);
+    painter->save();
+    QTreeView::drawRow(painter, opt, index);
+    painter->restore();
+
+    if (! isHeader) {
         if (selected || summaryLines == 0) {
             const int size = lineHeight * 0.75;
             const int x = rowRect.left();
@@ -1656,7 +1702,7 @@ ActivityTreeView::paintRow
             triangle << QPoint(x, y)
                      << QPoint(x + size, y)
                      << QPoint(x, y + size);
-            painter->setBrush(planned ? GColor(CCALPLANNED) : activityColor);
+            painter->setBrush(planned ? planColor : activityColor);
             painter->setPen(Qt::NoPen);
             painter->drawPolygon(triangle);
         }

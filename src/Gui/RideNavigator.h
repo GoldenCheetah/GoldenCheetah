@@ -261,7 +261,6 @@ private:
     int summaryLines = 3;
     QPoint dragStartPos;
 
-    QColor resolveBackgroundColor(bool selected) const;
     void paintRow(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 };
 
