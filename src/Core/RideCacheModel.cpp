@@ -26,6 +26,10 @@
 
 #include "RideCacheModel.h"
 
+
+static constexpr int highestFixed = 6;
+
+
 RideCacheModel::RideCacheModel(Context *context, RideCache *cache) : QAbstractTableModel(cache), context(context), rideCache(cache)
 {
     factory = &RideMetricFactory::instance();
@@ -77,15 +81,16 @@ RideCacheModel::data(const QModelIndex &index, int role) const
         case 3 : return item->present;
         case 4 : return item->color.name();
         case 5 : return item->planned;
+        case 6 : return item->isdirty;
 
         default:
         {
             // from here we're either a metric or meta
             // lets work that out ...
-            if (index.column()-5 < factory->metricCount()) {
+            if (index.column() - highestFixed < factory->metricCount()) {
 
                 // is a metric
-                int i=index.column()-5;
+                int i=index.column()-highestFixed;
 
                 // unpack metric value into ridemetric and use it to get a stringified
                 // version using the right metric/imperial conversion
@@ -116,7 +121,7 @@ RideCacheModel::data(const QModelIndex &index, int role) const
             } else {
 
                 // is a metadata
-                int i = index.column() -5 - factory->metricCount();
+                int i = index.column() -highestFixed - factory->metricCount();
                 return item->getText(metadata[i].name, "");
             }
         }
@@ -197,8 +202,9 @@ RideCacheModel::configChanged(qint32)
     // 3    QString present;
     // 4    QColor color;
     // 5    bool planned;
+    // 6    bool dirty;
 
-    columns_ = 5 + factory->metricCount() + metadata.count();
+    columns_ = highestFixed + factory->metricCount() + metadata.count();
     headings_.clear();
 
     for (int section=0; section<columns_; section++) {
@@ -210,21 +216,22 @@ RideCacheModel::configChanged(qint32)
             case 3 : headings_<< QString("Data"); break;
             case 4 : headings_<< QString("color"); break;
             case 5 : headings_<< QString("planned"); break;
+            case 6 : headings_<< QString("dirty"); break;
 
             default:
             {
                 // from here we're either a metric or meta
                 // lets work that out ...
-                if (section-5 < factory->metricCount()) {
+                if (section-highestFixed < factory->metricCount()) {
 
                     // is a metric
-                    int i=section-5;
+                    int i=section-highestFixed;
                     headings_<< QString("%1").arg(factory->metricName(i));
 
                 } else {
 
                     // is a metadata
-                    int i= section -5 - factory->metricCount();
+                    int i= section - highestFixed - factory->metricCount();
                     headings_<< QString("%1").arg(SpecialFields::getInstance().makeTechName(metadata[i].name));
                 }
             }

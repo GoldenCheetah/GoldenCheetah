@@ -24716,7 +24716,7 @@ Geen ritten gevonden om te importeren.
     </message>
 </context>
 <context>
-    <name>NavigatorCellDelegate</name>
+    <name>ActivityItemDelegate</name>
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="1135"/>
         <source>Date</source>

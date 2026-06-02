@@ -2670,6 +2670,11 @@ MainWindow::configChanged(qint32)
     tabbar->setDocumentMode(true);
     athleteView->setPalette(tabbar->palette());
 
+    QPalette pal = QApplication::palette();
+    pal.setColor(QPalette::ToolTipBase, GColor(CPLOTBACKGROUND));
+    pal.setColor(QPalette::ToolTipText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    QApplication::setPalette(pal);
+
     head->updateGeometry();
     repaint();
 

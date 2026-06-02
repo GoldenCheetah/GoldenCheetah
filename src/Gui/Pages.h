@@ -389,7 +389,6 @@ class KeywordsPage : public QWidget
     public:
         KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>);
         void getDefinitions(QList<KeywordDefinition>&);
-        QCheckBox *rideBG;
 
     public slots:
         void addClicked();
@@ -509,6 +508,8 @@ class FieldsPage : public QWidget
     public:
         FieldsPage(QWidget *parent, QList<FieldDefinition>);
         void getDefinitions(QList<FieldDefinition>&);
+
+        QSpinBox *summarySpin;
 
     public slots:
         void addClicked();
