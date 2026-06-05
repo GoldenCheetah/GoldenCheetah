@@ -33,11 +33,18 @@ jobs:
         run: ./util/add_secrets.ps1
       - name: Build
         run: ./.github/scripts/build.sh
+      - name: Test
+        run: |
+          ./src/GoldenCheetah.app/Contents/MacOS/GoldenCheetah --version 2>GCversionMacOS-arm64.txt
+          git log -1 >> GCversionMacOS-arm64.txt
+          shasum -a 256 GoldenCheetah_v*_arm64.dmg | cut -f 1 -d ' ' >> GCversionMacOS-arm64.txt
       - name: Upload dmg
         uses: actions/upload-artifact@v7
         with:
           name: GoldenCheetah
-          path: GoldenCheetah_v*_arm64.dmg
+          path: |
+            GoldenCheetah_v*_arm64.dmg
+            GCversionMacOS-arm64.txt
       - name: Release
         if: contains(github.event.head_commit.message, '[publish binaries]')
         uses: softprops/action-gh-release@v3
@@ -47,3 +54,4 @@ jobs:
           prerelease: true
           files: |
             GoldenCheetah_v*_arm64.dmg
+            GCversionMacOS-arm64.txt
