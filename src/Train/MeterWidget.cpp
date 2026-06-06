@@ -663,6 +663,7 @@ void LiveMapWidget::createHtml(QString sBaseUrl, QString autoRunJS)
     currentPage = "";
 
     currentPage = QString("<html><head>\n"
+        "<meta name=\"referrer\" content=\"strict-origin-when-cross-origin\">\n"
         "<meta name=\"viewport\" content=\"initial-scale=1.0, user-scalable=yes\"/> \n"
         "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\"/>\n"
         "<title>GoldenCheetah LiveMap - TrainView</title>\n"
