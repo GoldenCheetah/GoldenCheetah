@@ -28,8 +28,8 @@ main() {
    s|#\(D2XX_LIBS    =.*\)|\1 -L../D2XX -lftd2xx|
 
    # ICAL
-   s|#\(ICAL_INSTALL =.*\)|\1 /opt/homebrew|
-   s|#\(ICAL_LIBS    =.*\)|\1 -L/opt/homebrew/lib -lical|
+   #s|#\(ICAL_INSTALL =.*\)|\1 /opt/homebrew|
+   #s|#\(ICAL_LIBS    =.*\)|\1 -L/opt/homebrew/lib -lical|
 
    # LIBUSB
    s|#\(LIBUSB_INSTALL =\).*|\1 /opt/homebrew|

@@ -11,7 +11,7 @@ sed -i "s|^#QMAKE_CXXFLAGS|QMAKE_CXXFLAGS|" src/gcconfig.pri
 # Enable -lz
 sed -i "s|^#LIBZ_LIBS|LIBZ_LIBS|" src/gcconfig.pri
 # ICAL
-sed -i "s|#\(ICAL_INSTALL =.*\)|\1 /usr|" src/gcconfig.pri
+#sed -i "s|#\(ICAL_INSTALL =.*\)|\1 /usr|" src/gcconfig.pri
 # LIBUSB
 sed -i "s|#\(LIBUSB_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
 sed -i "s|#\(LIBUSB_LIBS    =.*\)|\1 -lusb-1.0 -ldl -ludev|" src/gcconfig.pri

@@ -41,9 +41,9 @@ Replace-InFile $gcconfig "#D2XX_INCLUDE =" "D2XX_INCLUDE = c:\libs\10_Precompile
 Replace-InFile $gcconfig "#D2XX_LIBS =" "D2XX_LIBS = -Lc:\libs\10_Precompiled_DLL\D2XX\CDM\Static\amd64 -lftd2xx"
 
 # 7. ICAL
-Replace-InFile $gcconfig "#ICAL_INSTALL =" "ICAL_INSTALL = c:\libs\10_Precompiled_DLL\libical64"
-Replace-InFile $gcconfig "#ICAL_INCLUDE =" "ICAL_INCLUDE = c:\libs\10_Precompiled_DLL\libical64\include"
-Replace-InFile $gcconfig "#ICAL_LIBS    =" "ICAL_LIBS = -Lc:\libs\10_Precompiled_DLL\libical64\lib-release -llibical-static"
+#Replace-InFile $gcconfig "#ICAL_INSTALL =" "ICAL_INSTALL = c:\libs\10_Precompiled_DLL\libical64"
+#Replace-InFile $gcconfig "#ICAL_INCLUDE =" "ICAL_INCLUDE = c:\libs\10_Precompiled_DLL\libical64\include"
+#Replace-InFile $gcconfig "#ICAL_LIBS    =" "ICAL_LIBS = -Lc:\libs\10_Precompiled_DLL\libical64\lib-release -llibical-static"
 
 # 8. USBXPRESS
 Replace-InFile $gcconfig "#USBXPRESS_INSTALL =" "USBXPRESS_INSTALL = c:\libs\10_Precompiled_DLL\usbexpress_3.5.1\USBXpress\USBXpress_API\Host"
