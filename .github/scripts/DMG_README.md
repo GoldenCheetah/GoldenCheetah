@@ -29,4 +29,4 @@ To make this change permanent, after doing the above:
 - go to the `Privacy & Security` settings
 - scroll down and find the `Open Anyway` button for Golden Cheetah
 
-Fore more information, please review Apple's official guidance on this process: <https://support.apple.com/en-us/102445>
+For more information, please review Apple's official guidance on this process: <https://support.apple.com/en-us/102445>
