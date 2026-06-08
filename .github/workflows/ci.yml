@@ -38,13 +38,12 @@ jobs:
           ./src/GoldenCheetah.app/Contents/MacOS/GoldenCheetah --version 2>GCversionMacOS_arm64.txt
           git log -1 >> GCversionMacOS_arm64.txt
           shasum -a 256 GoldenCheetah_v*_arm64.dmg | cut -f 1 -d ' ' >> GCversionMacOS_arm64.txt
+          cat GCversionMacOS_arm64.txt
       - name: Upload dmg
         uses: actions/upload-artifact@v7
         with:
           name: GoldenCheetah
-          path: |
-            GoldenCheetah_v*_arm64.dmg
-            GCversionMacOS_arm64.txt
+          path: GoldenCheetah_v*_arm64.dmg
       - name: Release
         if: contains(github.event.head_commit.message, '[publish binaries]')
         uses: softprops/action-gh-release@v3
