@@ -167,10 +167,10 @@ public:
             if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "ride_date") {
                 dateColumn = i;
             }
-            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "Sport") {
+            if (model->headerData(i, Qt::Horizontal, Qt::UserRole + 1).toString() == "Sport") {
                 sportIndex = i;
             }
-            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "SubSport") {
+            if (model->headerData(i, Qt::Horizontal, Qt::UserRole + 1).toString() == "SubSport") {
                 subSportIndex = i;
             }
             starttimeHeader = "ride_time"; //initialisation with techname
