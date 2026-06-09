@@ -512,6 +512,7 @@ RideNavigator::resetView()
 
         if ((friendly = nameMap.value(techname, "unknown")) != "unknown") {
             sortModel->setHeaderData(i, Qt::Horizontal, friendly);
+            sortModel->setHeaderData(i, Qt::Horizontal, techname, Qt::UserRole + 1);
             logicalHeadings << friendly;
         } else
             logicalHeadings << techname;

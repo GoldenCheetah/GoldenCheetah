@@ -77,6 +77,7 @@ class RideCacheModel : public QAbstractTableModel
 
         int columns_; // column count, based upon metric + meta config
         QStringList headings_;
+        QStringList headingsTechnical_;
 
         // the fields as defined
         QList<FieldDefinition> metadata;

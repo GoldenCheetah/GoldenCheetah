@@ -166,12 +166,21 @@ RideCacheModel::endRemove(int)
 bool 
 RideCacheModel::setHeaderData (int section, Qt::Orientation orientation, const QVariant &value, int role)
 {
-    if (orientation == Qt::Horizontal && role == Qt::EditRole) {
-        headings_[section] = value.toString();
-        emit headerDataChanged (Qt::Horizontal, section, section);
-        return true;
+    if (orientation != Qt::Horizontal) {
+        return false;
     }
-    return false;
+    bool changed = false;
+    if (role == Qt::EditRole) {
+        headings_[section] = value.toString();
+        changed = true;
+    } else if (role == Qt::UserRole + 1) {
+        headingsTechnical_[section] = value.toString();
+        changed = true;
+    }
+    if (changed) {
+        emit headerDataChanged(Qt::Horizontal, section, section);
+    }
+    return changed;
 }
 
 QVariant 
@@ -179,6 +188,8 @@ RideCacheModel::headerData(int section, Qt::Orientation orientation, int role) c
 {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
         return headings_[section];
+    } else if (orientation == Qt::Horizontal && role == Qt::UserRole + 1) {
+        return headingsTechnical_[section];
     }
 
     // nought (importanty including 0 for Qt::SizeHintRole)
@@ -238,6 +249,7 @@ RideCacheModel::configChanged(qint32)
             break;
         }
     }
+    headingsTechnical_ = headings_;
 
     headerDataChanged (Qt::Horizontal, 0, columns_-1);
 
