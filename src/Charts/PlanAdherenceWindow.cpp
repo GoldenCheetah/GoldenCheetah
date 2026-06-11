@@ -413,6 +413,7 @@ PlanAdherenceWindow::updateActivities
             linkedItem = context->athlete->rideCache->getRide(rideItem->getLinkedFileName());
         }
         if (entry.isPlanned && linkedItem != nullptr) {
+            entry.iconFile = IconManager::instance().getFilepath(linkedItem);
             if (linkedItem->color.alpha() < 255) {
                 entry.color = GCColor::invertColor(GColor(CPLOTBACKGROUND));
             } else {
