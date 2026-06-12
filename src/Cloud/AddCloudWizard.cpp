@@ -586,7 +586,7 @@ AddSettings::initializePage()
         browse->show(); folder->show(); folderLabel->show();
         folder->setText(wizard->cloudService->getSetting(cname, "").toString());
     }
-    if (wizard->cloudService->capabilities() & CloudService::Query) {
+    if (wizard->cloudService->capabilities() & CloudService::Download) {
         QString value = wizard->cloudService->getSetting(wizard->cloudService->syncOnStartupSettingName(), "false").toString();
         syncStartup->setChecked(value == "true");
         syncStartup->show();

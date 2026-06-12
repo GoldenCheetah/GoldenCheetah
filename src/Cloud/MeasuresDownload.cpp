@@ -22,6 +22,7 @@
 #include "Athlete.h"
 #include "RideCache.h"
 #include "HelpWhatsThis.h"
+#include "CloudService.h"
 
 #include <QList>
 #include <QMutableListIterator>
@@ -408,4 +409,86 @@ MeasuresDownload::updateMeasures(Context *context,
 
    // do a refresh, it will check if needed
    context->athlete->rideCache->refresh();
+}
+
+void MeasuresDownload::autoDownload(Context *context) {
+    CloudServiceFactory &factory = CloudServiceFactory::instance();
+
+    // iterate over names, as they are sorted alphabetically
+    foreach(QString name, factory.serviceNames()) {
+
+        // get the service
+        const CloudService *s = factory.service(name);
+
+        // only ones with the capability we need.
+        if (!(s->type() & CloudService::Measures)) continue;
+        // only ones with Sync on Startup enabled
+        if (appsettings->cvalue(context->athlete->cyclist, s->syncOnStartupSettingName(), "false").toString() != "true") continue;
+        // don't allow options which are not supported or authorized
+        if (!(name == "Withings" && appsettings->cvalue(context->athlete->cyclist, GC_NOKIA_TOKEN, "").toString() !="") ||
+             (name == "Tredict" && appsettings->cvalue(context->athlete->cyclist, GC_TREDICT_TOKEN, "").toString() != "")) continue;
+
+        // iterate over measures groups
+        foreach(MeasuresGroup* measuresGroup, context->athlete->measures->getGroups()) {
+
+            QString group = measuresGroup->getSymbol();
+            // Only supported groups
+            if (group != "Body" && group != "Hrv") continue;
+
+            QList<Measure> current = measuresGroup->measures();
+            QList<Measure> measures;
+            QDateTime fromDate;
+            QDateTime toDate;
+            QDateTime firstRideDate;
+            QString err = "";
+            bool downloadOk = false;
+
+            // get the date of first ride as potential "from" value
+            QList<QDateTime> rideDates = context->athlete->rideCache->getAllDates();
+            if (rideDates.count() > 0) {
+                firstRideDate = rideDates.at(0);
+            }  else {
+                firstRideDate = QDateTime::fromMSecsSinceEpoch(0);
+            }
+
+            // determine the date range
+            if (current.count() > 0) {
+                fromDate = current.last().when.addSecs(1);
+            } else {
+                // use a reasonable default
+                fromDate = firstRideDate;
+            }
+            toDate = QDateTime::currentDateTimeUtc();
+            // to Time is always "end of the day"
+            toDate.setTime(QTime(23,59));
+
+            // do the download
+            if (name == "Withings" && group == "Body") {
+                downloadOk = WithingsDownload(context).getBodyMeasures(err, fromDate, toDate, measures);
+            } else if (name == "Tredict" && group == "Body") {
+                downloadOk = TredictMeasuresDownload(context).getBodyMeasures(err, fromDate, toDate, measures);
+            } else if (name == "Tredict" && group == "Hrv") {
+                downloadOk = TredictMeasuresDownload(context).getHrvMeasures(err, fromDate, toDate, measures);
+            }
+
+            if (downloadOk) {
+                // selection from various source may not be 100% accurate w.r.t. the from/to date filtering
+                // so remove all measures which do not fit the selection from/to interval
+                QMutableListIterator<Measure> i(measures);
+                Measure c;
+                while (i.hasNext()) {
+                    c = i.next();
+                    if (c.when <= fromDate || c.when >= toDate) {
+                        i.remove();
+                    }
+                }
+
+                updateMeasures(context, measuresGroup, measures, false);
+
+            } else if (!err.isEmpty()){
+                // handle error document in err String
+                qDebug() << tr("%1 Measures").arg(measuresGroup->getName()) << tr("Downloading of measures failed with error: %1").arg(err);
+            }
+        }
+    }
 }
