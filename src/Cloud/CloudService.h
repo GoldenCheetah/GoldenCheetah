@@ -160,7 +160,7 @@ class CloudService : public QObject {
         // in appsettings (e.g. during configuration dialogs when getting an OAuth token
         // or browsing for a folder.
         QHash<QString, QVariant> configuration;
-        QVariant getSetting(QString name, QVariant def=QString("")) { return configuration.value(name, def); }
+        QVariant getSetting(QString name, QVariant def=QString("")) const { return configuration.value(name, def); }
         void setSetting(QString name, QVariant value) { configuration.insert(name, value); }
 
         // we use a dirent style API for traversing

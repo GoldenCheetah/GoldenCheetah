@@ -50,6 +50,7 @@
 #include "RideAutoImportConfig.h"
 #include "AthleteBackup.h"
 #include "CloudService.h"
+#include "MeasuresDownload.h"
 
 #include "Route.h"
 
@@ -189,6 +190,8 @@ Athlete::loadComplete()
     loadCharts();
 
     // Downloaders
+    MeasuresDownload::autoDownload(context);
+
     calendarDownload = new CalendarDownload(context);
 
     // Calendar

@@ -45,6 +45,7 @@ public:
                                MeasuresGroup *measuresGroup,
                                QList<Measure>&measures,
                                bool discardExisting=false);
+    static void autoDownload(Context *context);
 
 private:
 
