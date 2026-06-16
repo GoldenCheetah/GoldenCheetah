@@ -46,6 +46,7 @@ class QTabWidget;
 class WebPageWindow;
 class IntervalSummaryWindow;
 class SmallPlot;
+class QWebChannel;
 
 // trick the maps api into ignoring gestures by
 // pretending to be chrome. see: http://developer.qt.nokia.com/forums/viewthread/1643/P15
@@ -102,6 +103,9 @@ class WebPageWindow : public GcChartWindow
         QWebEngineView *view;
         WebPageWindow();  // default ctor
         bool firstShow;
+
+        QWebChannel *m_webChannel;
+        void setupWebChannel();
 
     private slots:
 

@@ -661,6 +661,7 @@ HEADERS += Train/AddDeviceWizard.h Train/CalibrationData.h Train/ComputrainerCon
            Train/RealtimeData.h Train/RealtimePlot.h Train/RealtimePlotWindow.h Train/RemoteControl.h Train/SpinScanPlot.h \
            Train/SpinScanPlotWindow.h Train/SpinScanPolarPlot.h Train/GarminServiceHelper.h Train/PhysicsUtility.h Train/BicycleSim.h \
            Train/PolynomialRegression.h Train/MultiRegressionizer.h Train/StravaRoutesDownload.h \
+           Train/HtmlTrainingBridge.h \
            Train/VideoSyncFileBase.h Train/ErgFileBase.h \
            Train/ModelFilter.h Train/MultiFilterProxyModel.h Train/WorkoutFilter.h Train/FilterEditor.h \
            Train/WorkoutFilterBox.h Train/TagBar.h Train/Taggable.h Train/TagStore.h Train/TagWidget.h \
@@ -669,7 +670,7 @@ HEADERS += Train/AddDeviceWizard.h Train/CalibrationData.h Train/ComputrainerCon
 HEADERS += Train/TrainBottom.h Train/TrainDB.h Train/TrainSidebar.h \
            Train/VideoLayoutParser.h Train/VideoSyncFile.h Train/WorkoutPlotWindow.h Train/WebPageWindow.h \
            Train/WorkoutWidget.h Train/WorkoutWidgetItems.h Train/WorkoutWindow.h Train/WorkoutWizard.h Train/ZwoParser.h \
-           Train/LiveMapWebPageWindow.h Train/ScalingLabel.h \
+           Train/LiveMapWebPageWindow.h Train/HtmlChart.h Train/ScalingLabel.h \
            Train/InfoWidget.h Train/PowerInfoWidget.h Train/PowerZonesWidget.h Train/RatingWidget.h \
            Train/ErgOverview.h Train/Shy.h \
            Train/WorkoutTagWrapper.h \
@@ -786,7 +787,8 @@ SOURCES += Train/AddDeviceWizard.cpp Train/CalibrationData.cpp Train/Computraine
 SOURCES += Train/TrainBottom.cpp Train/TrainDB.cpp Train/TrainSidebar.cpp \
            Train/VideoLayoutParser.cpp Train/VideoSyncFile.cpp Train/WorkoutPlotWindow.cpp Train/WebPageWindow.cpp \
            Train/WorkoutWidget.cpp Train/WorkoutWidgetItems.cpp Train/WorkoutWindow.cpp Train/WorkoutWizard.cpp Train/ZwoParser.cpp \
-           Train/LiveMapWebPageWindow.cpp Train/ScalingLabel.cpp \
+           Train/LiveMapWebPageWindow.cpp Train/HtmlChart.cpp Train/ScalingLabel.cpp \
+           Train/HtmlTrainingBridge.cpp \
            Train/InfoWidget.cpp Train/PowerInfoWidget.cpp Train/PowerZonesWidget.cpp Train/RatingWidget.cpp \
            Train/ErgOverview.cpp Train/Shy.cpp \
            Train/WorkoutTagWrapper.cpp \

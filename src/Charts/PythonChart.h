@@ -43,6 +43,7 @@
 #include "GenericChart.h"
 
 class PythonChart;
+class QWebChannel;
 
 class PythonHost {
 public:
@@ -90,6 +91,8 @@ private:
     int promptStartIndex = 4;
 };
 
+enum class PythonChartMode { AnalysisRide, TrendsSeason, TrainWorkout };
+
 // the chart
 class PythonChart : public GcChartWindow, public PythonHost {
 
@@ -101,7 +104,7 @@ class PythonChart : public GcChartWindow, public PythonHost {
     Q_PROPERTY(bool asWeb READ asWeb WRITE setWeb USER true)
 
     public:
-        PythonChart(Context *context, bool ridesummary);
+        PythonChart(Context *context, PythonChartMode chartmode);
         ~PythonChart();
 
         QCheckBox *showCon, *web;
@@ -162,8 +165,9 @@ class PythonChart : public GcChartWindow, public PythonHost {
     private:
         Context *context;
         QString text; // if Rtool not alive
-        bool ridesummary;
+        PythonChartMode chartmode;
         QSyntaxHighlighter *syntax;
+        QWebChannel *m_webChannel;
 };
 
 

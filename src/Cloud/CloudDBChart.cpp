@@ -860,7 +860,8 @@ CloudDBChartListDialog::addAndCloseClicked() {
 #endif
 #ifdef GC_WANT_PYTHON
                 if (chartType == GcWindowTypes::Python ||
-                    chartType == GcWindowTypes::PythonSeason ) {
+                    chartType == GcWindowTypes::PythonSeason ||
+                    chartType == GcWindowTypes::PythonTraining ) {
                     if (python == NULL) {
                         QMessageBox::information(0, tr("Chart requires 'Python'"), tr("The chart your are downloading requires 'Python' to be installed \
                                                                               and activated for GoldenCheetah to show any graphics. Either 'Python' is not activated \

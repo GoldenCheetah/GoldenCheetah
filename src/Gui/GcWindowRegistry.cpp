@@ -57,6 +57,7 @@
 #include "Overview.h"
 #endif
 #include "UserChartWindow.h"
+#include "HtmlChart.h"
 
 // GcWindows initialization is done in initialize method to enable translations
 GcWindowRegistry* GcWindows;
@@ -96,6 +97,7 @@ GcWindowRegistry::initialize()
     { VIEW_TRENDS|VIEW_PLAN, tr("R Chart "),GcWindowTypes::RConsoleSeason },
     { VIEW_ANALYSIS, tr("Python Chart"),GcWindowTypes::Python },
     { VIEW_TRENDS|VIEW_PLAN, tr("Python Chart "),GcWindowTypes::PythonSeason },
+    { VIEW_TRAIN, tr("Python Chart "),GcWindowTypes::PythonTraining },
     //{ VIEW_ANALYSIS, tr("Bing Map"),GcWindowTypes::BingMap },
     { VIEW_ANALYSIS, tr("Scatter"),GcWindowTypes::Scatter },
     { VIEW_ANALYSIS, tr("Aerolab"),GcWindowTypes::Aerolab },
@@ -109,6 +111,7 @@ GcWindowRegistry::initialize()
     { VIEW_TRAIN, tr("Video Player"),GcWindowTypes::VideoPlayer },
     { VIEW_TRAIN, tr("Workout Editor"),GcWindowTypes::WorkoutWindow },
     { VIEW_TRAIN, tr("Live Map"),GcWindowTypes::LiveMapWebPageWindow },
+    { VIEW_TRAIN, tr("HTML Chart"),GcWindowTypes::HtmlTraining },
     { VIEW_TRAIN, tr("Elevation Chart"),GcWindowTypes::ElevationChart },
     { VIEW_ANALYSIS|VIEW_TRENDS|VIEW_TRAIN, tr("Web page"),GcWindowTypes::WebPageWindow },
     { VIEW_TRENDS|VIEW_PLAN, tr("Calendar"),GcWindowTypes::Calendar },
@@ -171,10 +174,12 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::RConsoleSeason: returning = new GcChartWindow(context); break;
 #endif
 #ifdef GC_WANT_PYTHON
-    case GcWindowTypes::Python: returning = new PythonChart(context, true); break;
-    case GcWindowTypes::PythonSeason: returning = new PythonChart(context, false); break;
+    case GcWindowTypes::Python: returning = new PythonChart(context, PythonChartMode::AnalysisRide); break;
+    case GcWindowTypes::PythonTraining: returning = new PythonChart(context, PythonChartMode::TrainWorkout); break;
+    case GcWindowTypes::PythonSeason: returning = new PythonChart(context, PythonChartMode::TrendsSeason); break;
 #else
     case GcWindowTypes::PythonSeason:
+    case GcWindowTypes::PythonTraining:
     case GcWindowTypes::Python: returning = new GcChartWindow(context); break;
 #endif
     case GcWindowTypes::Distribution: returning = new HistogramWindow(context, true); break;
@@ -228,6 +233,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
 
     case GcWindowTypes::WebPageWindow: returning = new WebPageWindow(context); break;
     case GcWindowTypes::LiveMapWebPageWindow: returning = new LiveMapWebPageWindow(context); break;
+    case GcWindowTypes::HtmlTraining: returning = new HtmlChart(context); break;
     case GcWindowTypes::ElevationChart: returning = new ElevationChartWindow(context); break;
     case GcWindowTypes::RouteSegment: returning = new GcChartWindow(context); break; // Deprecated
 

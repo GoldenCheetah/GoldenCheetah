@@ -74,7 +74,7 @@ class RideMetadata;
 class ColorEngine;
 class ModelFilter;
 class QWebEngineProfile;
-
+class HtmlTrainingBridge;
 
 class GlobalContext : public QObject
 {
@@ -134,6 +134,8 @@ class Context : public QObject
         QString searchText;
         QString workoutFilterText;
         bool scopehighlighted;
+
+        HtmlTrainingBridge *getHtmlTrainingBridge();
 
         // ride item
         RideItem *rideItem() const { return ride; }
@@ -290,6 +292,9 @@ class Context : public QObject
         // we need to act since the user metric config changed
         // and we need to notify other contexts !
         void userMetricsConfigChanged();
+
+    private:
+        HtmlTrainingBridge *m_HtmlTrainingBridge;
 
     signals:
 

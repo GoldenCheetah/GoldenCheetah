@@ -27,6 +27,7 @@
 #include "UserMetricParser.h"
 #include "SpecialFields.h"
 #include "DataFilter.h"
+#include "HtmlTrainingBridge.h"
 
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
@@ -148,6 +149,7 @@ Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
     isfiltered = ishomefiltered = false;
     isCompareIntervals = isCompareDateRanges = false;
     isRunning = isPaused = false;
+    m_HtmlTrainingBridge = nullptr;
 
     connect(this, SIGNAL(loadProgress(QString, double)), mainWindow, SLOT(loadProgress(QString, double)));
 
@@ -163,10 +165,24 @@ Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
     _contexts.append(this);
 }
 
+HtmlTrainingBridge *
+Context::getHtmlTrainingBridge()
+{
+    if (!m_HtmlTrainingBridge) {
+        m_HtmlTrainingBridge = new HtmlTrainingBridge(this);
+        qDebug() << "Context: HtmlTrainingBridge created";
+    }
+    return m_HtmlTrainingBridge;
+}
+
 Context::~Context()
 {
     int i=_contexts.indexOf(this);
     if (i >= 0) _contexts.removeAt(i);
+    if (m_HtmlTrainingBridge) {
+        delete m_HtmlTrainingBridge;
+        m_HtmlTrainingBridge = nullptr;
+    }
 }
 
 void 
