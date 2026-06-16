@@ -353,17 +353,25 @@ OAuthDialog::urlChanged(const QUrl &url)
             connect(manager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
             connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(networkRequestFinished(QNetworkReply*)));
 
+            QNetworkReply *reply;
             if (site == RIDEWITHGPS) {
                 url.setQuery(data);
                 QNetworkRequest request = QNetworkRequest(url);
-                manager->get(request);
+                reply = manager->get(request);
             } else {
                 QNetworkRequest request = QNetworkRequest(url);
                 request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
 
                 // client id and secret are encoded and sent in the header for NOLIO, POLAR and XERT
                 if (site == NOLIO || site == POLAR || site == XERT)  request.setRawHeader("Authorization", "Basic " +  authheader.toLatin1().toBase64());
-                manager->post(request, data);
+                reply = manager->post(request, data);
+
+            }
+            // services without web login need blocking requests
+            if (site == XERT || site == RIDEWITHGPS) {
+                QEventLoop loop;
+                connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+                loop.exec();
             }
 
         }
