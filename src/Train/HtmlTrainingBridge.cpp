@@ -97,7 +97,7 @@ HtmlTrainingBridge::HtmlTrainingBridge(Context *context, QObject *parent)
     // Connect context signals
     if (m_context) {
         connect(m_context, &Context::telemetryUpdate, this, &HtmlTrainingBridge::onTelemetryUpdate);
-        connect(m_context, &Context::ergFileSelected, this, &HtmlTrainingBridge::onErgFileSelected);
+        connect(m_context, static_cast<void (Context::*)(ErgFile*)>(&Context::ergFileSelected), this, &HtmlTrainingBridge::onErgFileSelected);
         connect(m_context, &Context::stop, this, &HtmlTrainingBridge::onStop);
         connect(m_context, &Context::start, this, &HtmlTrainingBridge::onStart);
         connect(m_context, &Context::pause, this, &HtmlTrainingBridge::onPause);
