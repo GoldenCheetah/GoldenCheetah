@@ -145,7 +145,6 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
     // add some settings
     view->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
     view->settings()->setAttribute(QWebEngineSettings::LocalStorageEnabled, true);
-    view->settings()->setAttribute(QWebEngineSettings::AllowRunningInsecureContent, true);
 
     view->setPage(new QWebEnginePage(context->webEngineProfile, view));
     view->page()->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
@@ -204,7 +203,6 @@ WebPageWindow::~WebPageWindow()
         delete m_webChannel;
         m_webChannel = nullptr;
     }
-    if (view) delete view->page();
 }
 
 

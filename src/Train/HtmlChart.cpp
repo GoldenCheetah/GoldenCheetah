@@ -203,11 +203,6 @@ HtmlChart::HtmlChart(Context *context) : GcChartWindow(context), context(context
 
 HtmlChart::~HtmlChart()
 {
-    if (m_webChannel) {
-        delete m_webChannel;
-        m_webChannel = nullptr;
-    }
-    if (canvas) delete canvas->page();
 }
 
 QString HtmlChart::getHtml() const
@@ -242,7 +237,8 @@ void HtmlChart::applyHtml()
         // Setting as html title the chart title (if set) for better identification in debug browser
         QString chartTitle = title();
         if (chartTitle.isEmpty()) chartTitle = "Html Chart";
-        QString injectScript = QString("<script>document.title = '%1';</script>").arg(chartTitle.replace("'", "\\'"));
+        chartTitle.replace("\\", "\\\\").replace("'", "\\'").replace("\"", "\\\"").replace("<", "\\x3C").replace(">", "\\x3E");
+        QString injectScript = QString("<script>document.title = '%1';</script>").arg(chartTitle);
 
         // Base url QUrl("qrc:/") is needed for the webchannel script
         canvas->page()->setHtml(currentHtml + injectScript, QUrl("qrc:/"));

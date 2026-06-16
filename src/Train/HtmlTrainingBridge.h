@@ -69,8 +69,6 @@ private slots:
 
 
 private:
-    QString buildGeoJson() const;
-    QString buildPerfil() const;
     QString formatTimestamp(qint64 msecs) const;
 
     Context *m_context;

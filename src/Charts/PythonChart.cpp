@@ -422,11 +422,6 @@ PythonChart::PythonChart(Context *context, const PythonChartMode chartmode) : Gc
 
 PythonChart::~PythonChart()
 {
-    if (m_webChannel) {
-        delete m_webChannel;
-        m_webChannel = nullptr;
-    }
-    if (canvas) delete canvas->page();
 }
 
 // switch between rendering to a web page and rendering to a chart page
@@ -487,6 +482,10 @@ PythonChart::setWeb(bool x)
             renderlayout->removeWidget(canvas);
             delete canvas;
             canvas = NULL;
+            if (m_webChannel) {
+                delete m_webChannel;
+                m_webChannel = nullptr;
+            }
         }
 
         // setup the chart

@@ -169,7 +169,7 @@ HtmlTrainingBridge *
 Context::getHtmlTrainingBridge()
 {
     if (!m_HtmlTrainingBridge) {
-        m_HtmlTrainingBridge = new HtmlTrainingBridge(this);
+        m_HtmlTrainingBridge = new HtmlTrainingBridge(this, this);
         qDebug() << "Context: HtmlTrainingBridge created";
     }
     return m_HtmlTrainingBridge;
@@ -179,10 +179,6 @@ Context::~Context()
 {
     int i=_contexts.indexOf(this);
     if (i >= 0) _contexts.removeAt(i);
-    if (m_HtmlTrainingBridge) {
-        delete m_HtmlTrainingBridge;
-        m_HtmlTrainingBridge = nullptr;
-    }
 }
 
 void 

@@ -31,8 +31,6 @@
 #include <QJsonArray>
 #include <QDateTime>
 #include <QDebug>
-#include <QFile>
-#include <cstdlib>
 #include <cmath>
 
 
@@ -98,12 +96,12 @@ HtmlTrainingBridge::HtmlTrainingBridge(Context *context, QObject *parent)
 
     // Connect context signals
     if (m_context) {
-        connect(m_context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(onTelemetryUpdate(RealtimeData)));
-        connect(m_context, SIGNAL(ergFileSelected(ErgFile*)), this, SLOT(onErgFileSelected(ErgFile*)));
-        connect(m_context, SIGNAL(stop()), this, SLOT(onStop()));
-        connect(m_context, SIGNAL(start()), this, SLOT(onStart()));
-        connect(m_context, SIGNAL(pause()), this, SLOT(onPause()));
-        connect(m_context, SIGNAL(unpause()), this, SLOT(onResume()));
+        connect(m_context, &Context::telemetryUpdate, this, &HtmlTrainingBridge::onTelemetryUpdate);
+        connect(m_context, &Context::ergFileSelected, this, &HtmlTrainingBridge::onErgFileSelected);
+        connect(m_context, &Context::stop, this, &HtmlTrainingBridge::onStop);
+        connect(m_context, &Context::start, this, &HtmlTrainingBridge::onStart);
+        connect(m_context, &Context::pause, this, &HtmlTrainingBridge::onPause);
+        connect(m_context, &Context::unpause, this, &HtmlTrainingBridge::onResume);
     }
 }
 
@@ -380,6 +378,13 @@ void HtmlTrainingBridge::onErgFileSelected(ErgFile *file)
         }
 
         while (cumulativeDistanceMeters >= nextMarkerMeters) {
+            double ratio = 1.0;
+            if (distM > 0.0) {
+                ratio = (nextMarkerMeters - (cumulativeDistanceMeters - distM)) / distM;
+            }
+            double markerLon = p1.lon + (p2.lon - p1.lon) * ratio;
+            double markerLat = p1.lat + (p2.lat - p1.lat) * ratio;
+
             QJsonObject markerFeature;
             markerFeature["type"] = "Feature";
 
@@ -391,8 +396,8 @@ void HtmlTrainingBridge::onErgFileSelected(ErgFile *file)
             QJsonObject markerGeom;
             markerGeom["type"] = "Point";
             QJsonArray markerCoord;
-            markerCoord.append(p2.lon);
-            markerCoord.append(p2.lat);
+            markerCoord.append(markerLon);
+            markerCoord.append(markerLat);
             markerGeom["coordinates"] = markerCoord;
             markerFeature["geometry"] = markerGeom;
 
