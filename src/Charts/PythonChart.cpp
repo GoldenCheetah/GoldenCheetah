@@ -24,12 +24,9 @@
 #include "AbstractView.h"
 #include "RideFileCommand.h"
 #include "HelpWhatsThis.h"
-#include "HtmlTrainingBridge.h"
 
 #include <QtConcurrent>
-#include <QDebug>
 
-#include <QtWebChannel>
 #include <QWebEngineSettings>
 
 // always pull in after all QT headers
@@ -283,7 +280,7 @@ void PythonConsole::contextMenuEvent(QContextMenuEvent *e)
     Q_UNUSED(e)
 }
 
-PythonChart::PythonChart(Context *context, const PythonChartMode chartmode) : GcChartWindow(context), context(context), chartmode(chartmode), m_webChannel(nullptr)
+PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(context), context(context), ridesummary(ridesummary)
 {
     HelpWhatsThis *helpContents = new HelpWhatsThis(this);
     this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::Chart_Python));
@@ -362,8 +359,7 @@ PythonChart::PythonChart(Context *context, const PythonChartMode chartmode) : Gc
         // passing data across python and gui threads
         connect(this, SIGNAL(setUrl(QUrl)), this, SLOT(webpage(QUrl)));
 
-        switch (chartmode) {
-        case PythonChartMode::AnalysisRide:
+        if (ridesummary) {
             connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(runScript()));
             connect(context, SIGNAL(rideChanged(RideItem*)), this, SLOT(runScript()));
 
@@ -373,19 +369,14 @@ PythonChart::PythonChart(Context *context, const PythonChartMode chartmode) : Gc
 
             // refresh when intervals are selected
             connect(context, SIGNAL(intervalSelected()), this, SLOT(runScript()));
-            break;
-        case PythonChartMode::TrendsSeason:
+
+        } else {
             connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(runScript()));
 
             // refresh when comparing
             connect(context, SIGNAL(compareDateRangesStateChanged(bool)), this, SLOT(runScript()));
             connect(context, SIGNAL(compareDateRangesChanged()), this, SLOT(runScript()));
-            break;
-        case PythonChartMode::TrainWorkout:
-            connect(context, SIGNAL(ergFileSelected(ErgFile*)), this, SLOT(runScript()));
-            break;
         }
-
 
         // we apply BOTH filters, so update when either change
         connect(context, SIGNAL(filterChanged()), this, SLOT(runScript()));
@@ -422,6 +413,7 @@ PythonChart::PythonChart(Context *context, const PythonChartMode chartmode) : Gc
 
 PythonChart::~PythonChart()
 {
+    if (canvas) delete canvas->page();
 }
 
 // switch between rendering to a web page and rendering to a chart page
@@ -443,25 +435,6 @@ PythonChart::setWeb(bool x)
 
         // setup the canvas
         canvas = new QWebEngineView(this);
-        canvas->settings()->setAttribute(QWebEngineSettings::LocalStorageEnabled, true);
-        canvas->setPage(new QWebEnginePage(context->webEngineProfile, canvas));
-        try {
-            m_webChannel = new QWebChannel(this);
-
-            HtmlTrainingBridge *bridge = context->getHtmlTrainingBridge();
-            if (!bridge) {
-                qWarning() << "PythonChart: Failed to get HtmlTrainingBridge from context";
-                return;
-            }
-
-            m_webChannel->registerObject("gc", bridge);
-            canvas->page()->setWebChannel(m_webChannel);
-            canvas->page()->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
-
-            qDebug() << "PythonChart: QtWebChannel setup complete";
-        } catch (const std::exception &e) {
-            qWarning() << "PythonChart: Exception setting up web channel:" << e.what();
-        }
         canvas->setUrl(QUrl());
         canvas->setContentsMargins(0,0,0,0);
         canvas->setZoomFactor(dpiXFactor);
@@ -470,8 +443,6 @@ PythonChart::setWeb(bool x)
         canvas->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
         canvas->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
         canvas->setAcceptDrops(false);
-
-
         renderlayout->insertWidget(0, canvas);
     }
 
@@ -482,10 +453,6 @@ PythonChart::setWeb(bool x)
             renderlayout->removeWidget(canvas);
             delete canvas;
             canvas = NULL;
-            if (m_webChannel) {
-                delete m_webChannel;
-                m_webChannel = nullptr;
-            }
         }
 
         // setup the chart
@@ -537,12 +504,7 @@ PythonChart::eventFilter(QObject *, QEvent *e)
 void
 PythonChart::configChanged(qint32)
 {
-    QColor bgcolor;
-    switch (chartmode) {
-    case PythonChartMode::AnalysisRide: bgcolor = GColor(CPLOTBACKGROUND); break;
-    case PythonChartMode::TrendsSeason: bgcolor = GColor(CTRENDPLOTBACKGROUND); break;
-    case PythonChartMode::TrainWorkout: bgcolor = GColor(CTRAINPLOTBACKGROUND); break;
-    }
+    QColor bgcolor = !ridesummary ? GColor(CTRENDPLOTBACKGROUND) : GColor(CPLOTBACKGROUND);
     setProperty("color", bgcolor);
     if (plot) plot->setBackgroundColor(bgcolor);
 

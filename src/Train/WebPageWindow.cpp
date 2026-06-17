@@ -35,7 +35,6 @@
 #include "HelpWhatsThis.h"
 #include "Library.h"
 #include "ErgFile.h"
-#include "HtmlTrainingBridge.h"
 
 #include <QtWebChannel>
 #include <QWebEngineProfile>
@@ -86,7 +85,7 @@ class WebSchemeHandler : public QWebEngineUrlSchemeHandler
 // declared in main, we only want to use it to get QStyle
 extern QApplication *application;
 
-WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context(context), firstShow(true), m_webChannel(nullptr)
+WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context(context), firstShow(true)
 {
     //
     // reveal controls widget
@@ -146,15 +145,11 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
     view->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
     view->settings()->setAttribute(QWebEngineSettings::LocalStorageEnabled, true);
 
-    view->setPage(new QWebEnginePage(context->webEngineProfile, view));
-    view->page()->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
+    view->setPage(new QWebEnginePage(context->webEngineProfile));
     view->setContentsMargins(0,0,0,0);
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     view->setAcceptDrops(false);
     layout->addWidget(view);
-
-    // Setup QtWebChannel for JS-to-C++ communication
-    setupWebChannel();
 
     HelpWhatsThis *help = new HelpWhatsThis(view);
     view->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Chart_Web));
@@ -172,41 +167,12 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
     forceReplot();
 }
 
-void
-WebPageWindow::setupWebChannel()
-{
-    if (!context || !view || !view->page()) {
-        return;
-    }
-
-    try {
-        m_webChannel = new QWebChannel(this);
-
-        HtmlTrainingBridge *bridge = context->getHtmlTrainingBridge();
-        if (!bridge) {
-            qWarning() << "WebPageWindow: Failed to get HtmlTrainingBridge from context";
-            return;
-        }
-
-        m_webChannel->registerObject("gc", bridge);
-        view->page()->setWebChannel(m_webChannel);
-
-        qDebug() << "WebPageWindow: QtWebChannel setup complete";
-    } catch (const std::exception &e) {
-        qWarning() << "WebPageWindow: Exception setting up web channel:" << e.what();
-    }
-}
-
 WebPageWindow::~WebPageWindow()
 {
-    if (m_webChannel) {
-        delete m_webChannel;
-        m_webChannel = nullptr;
-    }
+  if (view) delete view->page();
 }
 
-
-void
+void 
 WebPageWindow::configChanged(qint32)
 {
     setProperty("color", GColor(CPLOTBACKGROUND));
@@ -221,7 +187,7 @@ WebPageWindow::configChanged(qint32)
 
 void
 WebPageWindow::forceReplot()
-{
+{   
     view->setZoomFactor(dpiXFactor);
     view->setUrl(QUrl(customUrl->text()));
 }
@@ -259,7 +225,7 @@ bool
 WebPageWindow::event(QEvent *event)
 {
     // nasty nasty nasty hack to move widgets as soon as the widget geometry
-    // is set properly by the layout system, by default the width is 100 and
+    // is set properly by the layout system, by default the width is 100 and 
     // we wait for it to be set properly then put our helper widget on the RHS
     if (event->type() == QEvent::Resize && geometry().width() != 100) {
 

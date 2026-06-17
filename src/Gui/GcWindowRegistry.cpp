@@ -94,10 +94,9 @@ GcWindowRegistry::initialize()
     { VIEW_ANALYSIS, tr("Heartrate vs Power"),GcWindowTypes::HrPw },
     { VIEW_ANALYSIS, tr("Map"),GcWindowTypes::RideMapWindow },
     { VIEW_ANALYSIS, tr("R Chart"),GcWindowTypes::RConsole },
-    { VIEW_TRENDS|VIEW_PLAN, tr("R Chart"),GcWindowTypes::RConsoleSeason },
+    { VIEW_TRENDS|VIEW_PLAN, tr("R Chart "),GcWindowTypes::RConsoleSeason },
     { VIEW_ANALYSIS, tr("Python Chart"),GcWindowTypes::Python },
-    { VIEW_TRENDS|VIEW_PLAN, tr("Python Chart"),GcWindowTypes::PythonSeason },
-    { VIEW_TRAIN, tr("Python Chart"),GcWindowTypes::PythonTraining },
+    { VIEW_TRENDS|VIEW_PLAN, tr("Python Chart "),GcWindowTypes::PythonSeason },
     //{ VIEW_ANALYSIS, tr("Bing Map"),GcWindowTypes::BingMap },
     { VIEW_ANALYSIS, tr("Scatter"),GcWindowTypes::Scatter },
     { VIEW_ANALYSIS, tr("Aerolab"),GcWindowTypes::Aerolab },
@@ -174,12 +173,10 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::RConsoleSeason: returning = new GcChartWindow(context); break;
 #endif
 #ifdef GC_WANT_PYTHON
-    case GcWindowTypes::Python: returning = new PythonChart(context, PythonChartMode::AnalysisRide); break;
-    case GcWindowTypes::PythonTraining: returning = new PythonChart(context, PythonChartMode::TrainWorkout); break;
-    case GcWindowTypes::PythonSeason: returning = new PythonChart(context, PythonChartMode::TrendsSeason); break;
+    case GcWindowTypes::Python: returning = new PythonChart(context, true); break;
+    case GcWindowTypes::PythonSeason: returning = new PythonChart(context, false); break;
 #else
     case GcWindowTypes::PythonSeason:
-    case GcWindowTypes::PythonTraining:
     case GcWindowTypes::Python: returning = new GcChartWindow(context); break;
 #endif
     case GcWindowTypes::Distribution: returning = new HistogramWindow(context, true); break;
