@@ -24,6 +24,7 @@
 #include "HelpWhatsThis.h"
 
 #include <QDebug>
+#include <QTimer>
 
 #include <QVBoxLayout>
 #include <QWebEngineSettings>
@@ -57,6 +58,10 @@ QString HtmlChartBridge::getChartConfig() const
 HtmlChart::HtmlChart(Context *context) : GcChartWindow(context), context(context), m_webChannel(nullptr)
 {
     m_savedTopMargin = 0;
+
+    m_renderTimer = new QTimer(this);
+    m_renderTimer->setSingleShot(true);
+    connect(m_renderTimer, &QTimer::timeout, this, &HtmlChart::applyHtml);
 
     QWidget *c = new QWidget;
     setControls(c);
@@ -100,6 +105,10 @@ HtmlChart::HtmlChart(Context *context) : GcChartWindow(context), context(context
     editor->setAcceptRichText(false);
     QFont courier("Courier", QFont().pointSize());
     editor->setFont(courier);
+
+    connect(editor, &QTextEdit::textChanged, this, [this]() {
+        if (m_renderTimer) m_renderTimer->start(1000);
+    });
 
     splitter->addWidget(editor);
 
@@ -397,4 +406,6 @@ void HtmlChart::configTableChanged()
         }
     }
     currentChartConfig = QString::fromUtf8(QJsonDocument(obj).toJson(QJsonDocument::Compact));
+
+    applyHtml();
 }

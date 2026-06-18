@@ -29,6 +29,7 @@ class QCheckBox;
 class QTextEdit;
 class QSplitter;
 class QWidget;
+class QTimer;
 
 class Context;
 class HtmlChart;
@@ -105,6 +106,7 @@ private:
     int m_savedTopMargin;
     QString currentHtml;
     QString currentChartConfig;
+    QTimer *m_renderTimer;
 };
 
 #endif
