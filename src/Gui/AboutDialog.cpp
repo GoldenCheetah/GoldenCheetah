@@ -177,6 +177,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Mark Rages");
     contributors.append("Michael Puchowicz");
     contributors.append("Michel Dagenais");
+    contributors.append("Miguel Angel Quiles");
     contributors.append("Mitja Zupanic");
     contributors.append("Mitsukuni Sato");
     contributors.append("Nathan Henrie");
