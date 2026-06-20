@@ -277,7 +277,7 @@ void EditFixPyScriptDialog::setScript(QString string)
 {
     if (python && script) {
         script->setText(string);
-        new PythonSyntax(script->document());
+        new PythonSyntax(script->document(), GCColor::isDark(GColor(CPLOTBACKGROUND)));
     }
 
     text = string;
