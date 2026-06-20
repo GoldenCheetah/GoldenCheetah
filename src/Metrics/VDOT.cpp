@@ -50,10 +50,9 @@ class VDOT : public RideMetric {
         setDescription(tr("Daniels' VDOT computed from best average pace for durations from 4 min 4 hr"));
     }
 
-    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-
-        // not a run
-        if (!item->isRun) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+        // not a run or an interval
+        if (!item->isRun || spec.secsStart() >= 0) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
