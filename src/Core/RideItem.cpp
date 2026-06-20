@@ -584,7 +584,7 @@ bool RideItem::hasLinkedActivity() const
 }
 
 void
-RideItem::refresh(bool bUpdateIntervals)
+RideItem::refresh()
 {
     if (!isstale) return;
 
@@ -685,7 +685,7 @@ RideItem::refresh(bool bUpdateIntervals)
             }
 
         // Update auto intervals AFTER ridefilecache as used for bests
-        if (bUpdateIntervals) updateIntervals();
+        updateIntervals();
 
         // update fingerprints etc, crc done above
         fingerprint = static_cast<unsigned long>(context->athlete->zones(sport)->getFingerprint(dateTime.date()))
