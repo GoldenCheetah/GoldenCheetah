@@ -25,12 +25,18 @@
 #include "Zones.h"      // Zones
 #include "HrZones.h"    // HrZones
 #include "RideFile.h"   // RideFile::sportTag()
+#include "Colors.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QDateTime>
 #include <QDebug>
+#include <QColor>
+#include <QTimer>
+#include <QTimeZone>
+
+#include <utility> // For std::as_const()
 #include <cmath>
 
 
@@ -47,6 +53,13 @@ static QJsonArray toJsonArray(const QList<QString> &xs)
 {
     QJsonArray a;
     for (const auto &s : xs) a.append(s);
+    return a;
+}
+
+static QJsonArray toJsonArray(const QList<QColor> &xs)
+{
+    QJsonArray a;
+    for (const QColor &c : xs) a.append(c.name());
     return a;
 }
 
@@ -82,10 +95,11 @@ HtmlTrainingBridge::HtmlTrainingBridge(Context *context, QObject *parent)
     : QObject(parent),
       m_context(context),
       m_plannedRoute(),
-      m_currentTelemetry(),
       m_telemetryThrottle(new QTimer(this)),
       m_hasPendingTelemetry(false),
-      m_pendingTelemetrySample()
+      m_pendingTelemetrySample(),
+      m_notificationTimer(new QTimer(this)),
+      m_currentMessage("")
 {
     Q_ASSERT(m_context != nullptr);
 
@@ -93,6 +107,10 @@ HtmlTrainingBridge::HtmlTrainingBridge(Context *context, QObject *parent)
     m_telemetryThrottle->setInterval(1000);
     connect(m_telemetryThrottle, &QTimer::timeout,
             this, &HtmlTrainingBridge::onTelemetryThrottle);
+
+    connect(m_notificationTimer, &QTimer::timeout, this, [this]() {
+        m_currentMessage = "";
+    });
 
     // Connect context signals
     if (m_context) {
@@ -102,6 +120,20 @@ HtmlTrainingBridge::HtmlTrainingBridge(Context *context, QObject *parent)
         connect(m_context, &Context::start, this, &HtmlTrainingBridge::onStart);
         connect(m_context, &Context::pause, this, &HtmlTrainingBridge::onPause);
         connect(m_context, &Context::unpause, this, &HtmlTrainingBridge::onResume);
+        connect(m_context, &Context::setNotification, this, [this](const QString notification, int timeout) {
+            m_currentMessage = notification;
+            if (timeout > 0) {
+                m_notificationTimer->setInterval(timeout * 1000);
+                m_notificationTimer->setSingleShot(true);
+                m_notificationTimer->start();
+            } else {
+                m_notificationTimer->stop();
+            }
+        });
+        connect(m_context, &Context::clearNotification, this, [this]() {
+            m_currentMessage = "";
+            m_notificationTimer->stop();
+        });
     }
 }
 
@@ -117,6 +149,7 @@ QString HtmlTrainingBridge::getConfig()
     {
     "max_power_w": 250,
     "max_hr_bpm": 200,
+    "is_dark_background": true,
     "power": {
         "cp": 290,
         "ftp": 285,
@@ -124,7 +157,9 @@ QString HtmlTrainingBridge::getConfig()
         "pmax": 900,
         "aetp": 220,
         "zoneLows": [0, 160, 200, 240, 280, 320, 360],
-        "zoneNames": ["Z1", "Z2", "Z3", "Z4", "Z5", "Z6", "Z7"]
+        "zoneNames": ["Z1", "Z2", "Z3", "Z4", "Z5", "Z6", "Z7"],
+        "zoneDescriptions": ["Active Recovery", "Endurance", "Tempo", "Threshold", "VO2 Max", "Anaerobic Capacity", "Neuromuscular Power"],
+        "zoneColors": ["#ffffff", "#00ff00", "#ffff00", "#ffaa00", "#ff0000", "#aa0000", "#ff00ff"]
     },
     "hr": {
         "lthr": 170,
@@ -133,7 +168,9 @@ QString HtmlTrainingBridge::getConfig()
         "maxHr": 190,
         "zoneLows": [0, 115, 140, 155, 170, 180],
         "zoneNames": ["Z1", "Z2", "Z3", "Z4", "Z5"],
-        "zoneTrimps": [0.9, 1.1, 1.2, 2.0, 5.0]
+        "zoneTrimps": [0.9, 1.1, 1.2, 2.0, 5.0],
+        "zoneDescriptions": ["Recovery", "Endurance", "Tempo", "Threshold", "VO2 Max"],
+        "zoneColors": ["#ffffff", "#00ff00", "#ffff00", "#ffaa00", "#ff0000"]
     }
     }
     *****************/
@@ -161,6 +198,14 @@ QString HtmlTrainingBridge::getConfig()
                 p["aetp"]   = pz->getAeT(range);
                 p["zoneLows"]  = toJsonArray(pz->getZoneLows(range));
                 p["zoneNames"] = toJsonArray(pz->getZoneNames(range));
+                p["zoneDescriptions"] = toJsonArray(pz->getZoneDescriptions(range));
+                QList<QColor> zoneColors;
+                int numZones = pz->numZones(range);
+                for (int i = 0; i < numZones; ++i) {
+                    zoneColors << zoneColor(i, numZones);
+                }
+                p["zoneColors"] = toJsonArray(zoneColors);
+
                 obj["power"] = p;
 
                 const int pmax = pz->getPmax(range);
@@ -190,7 +235,15 @@ QString HtmlTrainingBridge::getConfig()
                 h["maxHr"]  = hz->getMaxHr(range);
                 h["zoneLows"]   = toJsonArray(hz->getZoneLows(range));
                 h["zoneNames"]  = toJsonArray(hz->getZoneNames(range));
-                h["zoneTrimps"] = toJsonArrayD(hz->getZoneTrimps(range)); // opcional
+                h["zoneTrimps"] = toJsonArrayD(hz->getZoneTrimps(range));
+                h["zoneDescriptions"] = toJsonArray(hz->getZoneDescriptions(range));
+                QList<QColor> zoneColors;
+                int numZones = hz->numZones(range);
+                for (int i = 0; i < numZones; ++i) {
+                    zoneColors << hrZoneColor(i, numZones);
+                }
+                h["zoneColors"] = toJsonArray(zoneColors);
+
                 obj["hr"] = h;
 
                 const int configuredMax = hz->getMaxHr(range);
@@ -212,6 +265,8 @@ QString HtmlTrainingBridge::getConfig()
     obj["max_power_w"] = maxPower;
     obj["max_hr_bpm"] = maxHr;
 
+    obj["is_dark_background"] = GCColor::isDark(GColor(CPLOTBACKGROUND));
+
     return QString::fromUtf8(QJsonDocument(obj).toJson(QJsonDocument::Compact));
 }
 
@@ -222,6 +277,27 @@ QString HtmlTrainingBridge::getPlannedRoute()
 
 void HtmlTrainingBridge::onTelemetryUpdate(const RealtimeData &rt)
 {
+    /*****************
+    {
+    "timestamp": "2026-06-22T18:23:40Z",
+    "msecs": 59824,
+    "lat": 40.4168,
+    "lon": -3.7038,
+    "alt": 650.0,
+    "slope": 2.5,
+    "speed_kmh": 32.5,
+    "hr_bpm": 150,
+    "power_w": 250,
+    "wbal": 15000,
+    "cadence_rpm": 90,
+    "distance_km": 15.2,
+    "target_power_w": 260,
+    "erg_time_msecs": 58521,
+    "sec_msecs_remaining": 361179,
+    "erg_msecs_remaining": 3541125,
+    "notification_text": "Next interval in 2 minutes"
+    }
+    *****************/
     double lat = rt.getLatitude();
     double lon = rt.getLongitude();
     double alt = rt.getAltitude();
@@ -231,11 +307,16 @@ void HtmlTrainingBridge::onTelemetryUpdate(const RealtimeData &rt)
     double power = rt.getWatts();
     double cadence = rt.getCadence();
     double distance = rt.getDistance();
+    double wbal = rt.getWbal();
     qint64 msecs = rt.getMsecs();
+    qint64 sec_msecs_remaining = rt.value(RealtimeData::DataSeries::ErgTimeRemaining);
+    qint64 erg_msecs_remaining = rt.value(RealtimeData::DataSeries::LapTimeRemaining);
+    qint64 erg_time_msecs = m_context ? m_context->getNow() : 0;
 
     // Queue for throttled emission
     QJsonObject tel;
     tel["timestamp"] = formatTimestamp(msecs);
+    tel["msecs"] = static_cast<qint64>(msecs);
     tel["lat"] = lat;
     tel["lon"] = lon;
     tel["alt"] = alt;
@@ -243,8 +324,19 @@ void HtmlTrainingBridge::onTelemetryUpdate(const RealtimeData &rt)
     tel["speed_kmh"] = speed;
     tel["hr_bpm"] = hr;
     tel["power_w"] = power;
+    tel["wbal"] = wbal;
     tel["cadence_rpm"] = cadence;
     tel["distance_km"] = distance;
+
+    tel["target_power_w"] = rt.getLoad();
+    tel["erg_time_msecs"] = erg_time_msecs;
+
+    tel["sec_msecs_remaining"] = sec_msecs_remaining;
+    tel["erg_msecs_remaining"] = erg_msecs_remaining;
+
+
+    tel["notification_text"] = m_currentMessage;
+
 
     m_pendingTelemetrySample = QString::fromUtf8(QJsonDocument(tel).toJson(QJsonDocument::Compact));
     m_hasPendingTelemetry = true;
@@ -265,158 +357,210 @@ void HtmlTrainingBridge::onTelemetryThrottle()
 
 void HtmlTrainingBridge::onErgFileSelected(ErgFile *file)
 {
-    if (!file || !file->hasGPS()) {
-        m_plannedRoute = QStringLiteral(R"({"geojson":{"type":"FeatureCollection","features":[]},"elevProfile":[]})");
+    /*****************
+    {
+    "geojson": {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": { "slope": 2.5 },
+                "geometry": { "type": "LineString", "coordinates": [[-3.7038, 40.4168], [-3.7040, 40.4170]] }
+            },
+            {
+                "type": "Feature",
+                "properties": { "km": 5, "is_marker": true },
+                "geometry": { "type": "Point", "coordinates": [-3.7050, 40.4180] }
+            }
+        ]
+    },
+    "elevProfile": [
+        [0.0, 650.0, 0.0, -3.7038, 40.4168],
+        [0.005, 650.5, 2.5, -3.7040, 40.4170]
+    ],
+    "workout": {
+        "type": "ERG",
+        "filename": "/path/to/workout.erg",
+        "duration_msecs": 3600000,
+        "name": "Tempo Ride",
+        "description": "3x10min Tempo intervals",
+        "tags": ["Tempo", "Intervals"]
+    }
+    }
+    *****************/
+    if (!file) {
+        //m_plannedRoute = QStringLiteral(R"({"geojson":{"type":"FeatureCollection","features":[]},"elevProfile":[]})");
+        m_plannedRoute = QStringLiteral("");
         emit plannedRouteChanged(m_plannedRoute);
         return;
     }
-
-    QJsonArray elevProfile;
-    QJsonArray features;
-
-    auto round1 = [](double v) { return std::round(v * 10.0) / 10.0; };
-    auto round3 = [](double v) { return std::round(v * 1000.0) / 1000.0; };
-
-    QVector<ErgFilePoint> points;
-    points.reserve(file->Points.size());
-    for (const ErgFilePoint &pt : file->Points) {
-        geolocation geo(pt.lat, pt.lon, pt.y);
-        if (geo.IsReasonableGeoLocation()) {
-            points.append(pt);
-        }
-    }
-
-    if (points.isEmpty()) {
-        m_plannedRoute = QStringLiteral(R"({"geojson":{"type":"FeatureCollection","features":[]},"elevProfile":[]})");
-        emit plannedRouteChanged(m_plannedRoute);
-        return;
-    }
-
-    double cumulativeDistanceMeters = 0.0;
-    double markerIntervalMeters = 5000.0;
-    double nextMarkerMeters = markerIntervalMeters;
-
-    const ErgFilePoint &p0 = points[0];
-    QJsonArray elevPoint;
-    elevPoint.append(0.0);
-    elevPoint.append(round1(p0.y));
-    elevPoint.append(0.0);
-    elevPoint.append(p0.lon);
-    elevPoint.append(p0.lat);
-    elevProfile.append(elevPoint);
-
-    // Aggregate small consecutive points into longer segments to avoid
-    // huge slope spikes caused by near-zero distance pairs.
-    const double MIN_SEGMENT_METERS = 5.0;
-    double segStartLat = points[0].lat;
-    double segStartLon = points[0].lon;
-    double segStartEle = points[0].y;
-    double segAccumulatedM = 0.0;
-
-    QJsonArray currentLineCoords;
-    QJsonArray startCoord;
-    startCoord.append(segStartLon);
-    startCoord.append(segStartLat);
-    currentLineCoords.append(startCoord);
-
-
-    for (int i = 1; i < points.size(); ++i) {
-        const ErgFilePoint &p1 = points[i - 1];
-        const ErgFilePoint &p2 = points[i];
-
-        const double distKm = haversineDistance(p1.lat, p1.lon, p2.lat, p2.lon);
-        const double distM = distKm * 1000.0;
-        cumulativeDistanceMeters += distM;
-        segAccumulatedM += distM;
-
-        QJsonArray pointCoord;
-        pointCoord.append(p2.lon);
-        pointCoord.append(p2.lat);
-        currentLineCoords.append(pointCoord);
-
-        const bool isLast = (i == points.size() - 1);
-
-        if (segAccumulatedM >= MIN_SEGMENT_METERS || isLast) {
-            double slope = 0.0;
-            if (segAccumulatedM > 0.0) {
-                const double unevenness = p2.y - segStartEle;
-                slope = (unevenness / segAccumulatedM) * 100.0;
-            }
-
-            const double kmActual = round3(cumulativeDistanceMeters / 1000.0);
-            const double eleActual = round1(p2.y);
-            slope = round1(slope);
-
-            QJsonArray elevPoint;
-            elevPoint.append(kmActual);
-            elevPoint.append(eleActual);
-            elevPoint.append(slope);
-            elevPoint.append(p2.lon);
-            elevPoint.append(p2.lat);
-            elevProfile.append(elevPoint);
-
-            QJsonObject lineFeature;
-            lineFeature["type"] = "Feature";
-
-            QJsonObject lineProps;
-            lineProps["slope"] = slope;
-            lineFeature["properties"] = lineProps;
-
-            QJsonObject lineGeom;
-            lineGeom["type"] = "LineString";
-            lineGeom["coordinates"] = currentLineCoords;
-            lineFeature["geometry"] = lineGeom;
-            features.append(lineFeature);
-
-            segStartLat = p2.lat;
-            segStartLon = p2.lon;
-            segStartEle = p2.y;
-            segAccumulatedM = 0.0;
-
-            currentLineCoords = QJsonArray();
-            currentLineCoords.append(pointCoord);
-        }
-
-        while (cumulativeDistanceMeters >= nextMarkerMeters) {
-            double ratio = 1.0;
-            if (distM > 0.0) {
-                ratio = (nextMarkerMeters - (cumulativeDistanceMeters - distM)) / distM;
-            }
-            double markerLon = p1.lon + (p2.lon - p1.lon) * ratio;
-            double markerLat = p1.lat + (p2.lat - p1.lat) * ratio;
-
-            QJsonObject markerFeature;
-            markerFeature["type"] = "Feature";
-
-            QJsonObject markerProps;
-            markerProps["km"] = static_cast<int>(nextMarkerMeters / 1000.0);
-            markerProps["is_marker"] = true;
-            markerFeature["properties"] = markerProps;
-
-            QJsonObject markerGeom;
-            markerGeom["type"] = "Point";
-            QJsonArray markerCoord;
-            markerCoord.append(markerLon);
-            markerCoord.append(markerLat);
-            markerGeom["coordinates"] = markerCoord;
-            markerFeature["geometry"] = markerGeom;
-
-            features.append(markerFeature);
-            nextMarkerMeters += markerIntervalMeters;
-        }
-    }
-
-
-    QJsonObject routeGeoJson;
-    routeGeoJson["type"] = "FeatureCollection";
-    routeGeoJson["features"] = features;
 
     QJsonObject route;
-    route["geojson"] = routeGeoJson;
-    route["elevProfile"] = elevProfile;
+
+    // file is GPS based
+
+    if (file->hasGPS()) {
+
+        QJsonArray elevProfile;
+        QJsonArray features;
+
+        auto round1 = [](double v) { return std::round(v * 10.0) / 10.0; };
+        auto round3 = [](double v) { return std::round(v * 1000.0) / 1000.0; };
+
+        QVector<ErgFilePoint> points;
+        points.reserve(file->Points.size());
+        for (const ErgFilePoint &pt : std::as_const(file->Points)) {
+            geolocation geo(pt.lat, pt.lon, pt.y);
+            if (geo.IsReasonableGeoLocation()) {
+                points.append(pt);
+            }
+        }
+
+        if (points.isEmpty()) {
+            m_plannedRoute = QStringLiteral(R"({"geojson":{"type":"FeatureCollection","features":[]},"elevProfile":[]})");
+            emit plannedRouteChanged(m_plannedRoute);
+            return;
+        }
+
+        double cumulativeDistanceMeters = 0.0;
+        double markerIntervalMeters = 5000.0;
+        double nextMarkerMeters = markerIntervalMeters;
+
+        const ErgFilePoint &p0 = points[0];
+        QJsonArray elevPoint;
+        elevPoint.append(0.0);
+        elevPoint.append(round1(p0.y));
+        elevPoint.append(0.0);
+        elevPoint.append(p0.lon);
+        elevPoint.append(p0.lat);
+        elevProfile.append(elevPoint);
+
+        // Aggregate small consecutive points into longer segments to avoid
+        // huge slope spikes caused by near-zero distance pairs.
+        const double MIN_SEGMENT_METERS = 5.0;
+        double segStartEle = points[0].y;
+        double segAccumulatedM = 0.0;
+
+        QJsonArray currentLineCoords;
+        QJsonArray startCoord;
+        startCoord.append(points[0].lon);
+        startCoord.append(points[0].lat);
+        currentLineCoords.append(startCoord);
+
+
+        for (int i = 1; i < points.size(); ++i) {
+            const ErgFilePoint &p1 = points[i - 1];
+            const ErgFilePoint &p2 = points[i];
+
+            const double distKm = haversineDistance(p1.lat, p1.lon, p2.lat, p2.lon);
+            const double distM = distKm * 1000.0;
+            cumulativeDistanceMeters += distM;
+            segAccumulatedM += distM;
+
+            QJsonArray pointCoord;
+            pointCoord.append(p2.lon);
+            pointCoord.append(p2.lat);
+            currentLineCoords.append(pointCoord);
+
+            const bool isLast = (i == points.size() - 1);
+
+            if (segAccumulatedM >= MIN_SEGMENT_METERS || isLast) {
+                double slope = 0.0;
+                if (segAccumulatedM > 0.0) {
+                    const double unevenness = p2.y - segStartEle;
+                    slope = (unevenness / segAccumulatedM) * 100.0;
+                }
+
+                const double kmActual = round3(cumulativeDistanceMeters / 1000.0);
+                const double eleActual = round1(p2.y);
+                slope = round1(slope);
+
+                QJsonArray elevPoint;
+                elevPoint.append(kmActual);
+                elevPoint.append(eleActual);
+                elevPoint.append(slope);
+                elevPoint.append(p2.lon);
+                elevPoint.append(p2.lat);
+                elevProfile.append(elevPoint);
+
+                QJsonObject lineFeature;
+                lineFeature["type"] = "Feature";
+
+                QJsonObject lineProps;
+                lineProps["slope"] = slope;
+                lineFeature["properties"] = lineProps;
+
+                QJsonObject lineGeom;
+                lineGeom["type"] = "LineString";
+                lineGeom["coordinates"] = currentLineCoords;
+                lineFeature["geometry"] = lineGeom;
+                features.append(lineFeature);
+
+                segStartEle = p2.y;
+                segAccumulatedM = 0.0;
+
+                currentLineCoords = QJsonArray();
+                currentLineCoords.append(pointCoord);
+            }
+
+            while (cumulativeDistanceMeters >= nextMarkerMeters) {
+                double ratio = 1.0;
+                if (distM > 0.0) {
+                    ratio = (nextMarkerMeters - (cumulativeDistanceMeters - distM)) / distM;
+                }
+                double markerLon = p1.lon + (p2.lon - p1.lon) * ratio;
+                double markerLat = p1.lat + (p2.lat - p1.lat) * ratio;
+
+                QJsonObject markerFeature;
+                markerFeature["type"] = "Feature";
+
+                QJsonObject markerProps;
+                markerProps["km"] = static_cast<int>(nextMarkerMeters / 1000.0);
+                markerProps["is_marker"] = true;
+                markerFeature["properties"] = markerProps;
+
+                QJsonObject markerGeom;
+                markerGeom["type"] = "Point";
+                QJsonArray markerCoord;
+                markerCoord.append(markerLon);
+                markerCoord.append(markerLat);
+                markerGeom["coordinates"] = markerCoord;
+                markerFeature["geometry"] = markerGeom;
+
+                features.append(markerFeature);
+                nextMarkerMeters += markerIntervalMeters;
+            }
+        }
+
+
+        QJsonObject routeGeoJson;
+        routeGeoJson["type"] = "FeatureCollection";
+        routeGeoJson["features"] = features;
+
+        route["geojson"] = routeGeoJson;
+        route["elevProfile"] = elevProfile;
+    }
+    else {
+        QJsonObject routeGeoJson;
+        routeGeoJson["type"] = "FeatureCollection";
+        routeGeoJson["features"] = QJsonArray();
+        route["geojson"] = routeGeoJson;
+        route["elevProfile"] = QJsonArray();
+    }
+
+    QJsonObject w;
+    w["type"] = file->typeString();
+    w["filename"] = file->filename();
+    if (file->type() == ErgFileType::erg) {
+        w["duration_msecs"] = static_cast<qint64>(file->duration());
+        w["name"] = file->name();
+        w["description"] = file->description();
+    }
+    w["tags"] = toJsonArray(file->tags());
+
+    route["workout"] = w;
 
     m_plannedRoute = QString::fromUtf8(QJsonDocument(route).toJson(QJsonDocument::Compact));
-
     emit plannedRouteChanged(m_plannedRoute);
 }
 
@@ -432,11 +576,12 @@ void HtmlTrainingBridge::onStop()
     if (m_telemetryThrottle) {
         m_telemetryThrottle->stop();
     }
+    m_currentMessage = "";
     emit stateChanged("stop");
 }
 
 QString HtmlTrainingBridge::formatTimestamp(qint64 msecs) const
 {
-    QDateTime dt = QDateTime::fromMSecsSinceEpoch(msecs, Qt::UTC);
+    QDateTime dt = QDateTime::fromMSecsSinceEpoch(msecs, QTimeZone::UTC);
     return dt.toString(Qt::ISODate);
 }

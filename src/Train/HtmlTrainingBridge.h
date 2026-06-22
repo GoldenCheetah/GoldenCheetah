@@ -21,12 +21,12 @@
 
 #include <QObject>
 #include <QPointF>
-#include <QTimer>
 #include <QString>
 
 class Context;
 class RealtimeData;
 class ErgFile;
+class QTimer;
 
 /**
  * HtmlTrainingBridge - Qt/JavaScript bridge for HTML training pages
@@ -73,10 +73,11 @@ private:
 
     Context *m_context;
     QString m_plannedRoute;
-    QString m_currentTelemetry;
     QTimer *m_telemetryThrottle;
     bool m_hasPendingTelemetry;
     QString m_pendingTelemetrySample;
+    QTimer *m_notificationTimer;
+    QString m_currentMessage;
 };
 
 #endif
