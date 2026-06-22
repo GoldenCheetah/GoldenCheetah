@@ -620,6 +620,22 @@ QList <QString> HrZones::getZoneNames(int rnum) const {
     return return_values;
 }
 
+// return the list of zone descriptions
+QList <QString> HrZones::getZoneDescriptions(int rnum) const
+{
+    if (rnum < 0 || rnum >= ranges.size()) return QList <QString>();
+
+    const HrZoneRange &range = ranges[rnum];
+    QList <QString> return_values;
+
+    for (int i = 0; i < range.zones.size(); i++) {
+        return_values.append(ranges[rnum].zones[i].desc);
+    }
+
+    return return_values;
+}
+
+
 // return the list of zone trimp coef
 QList <double> HrZones::getZoneTrimps(int rnum) const {
     if (rnum >= ranges.size())

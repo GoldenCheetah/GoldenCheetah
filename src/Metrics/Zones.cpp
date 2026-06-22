@@ -745,7 +745,7 @@ QList <QString> Zones::getZoneNames(int rnum) const
     return return_values;
 }
 
-// return the list of zone names
+// return the list of zone descriptions
 QList <QString> Zones::getZoneDescriptions(int rnum) const
 {
     if (rnum < 0 || rnum >= ranges.size()) return QList <QString>();
