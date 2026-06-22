@@ -120,7 +120,7 @@ HtmlTrainingBridge::HtmlTrainingBridge(Context *context, QObject *parent)
         connect(m_context, &Context::start, this, &HtmlTrainingBridge::onStart);
         connect(m_context, &Context::pause, this, &HtmlTrainingBridge::onPause);
         connect(m_context, &Context::unpause, this, &HtmlTrainingBridge::onResume);
-        connect(m_context, &Context::setNotification, this, [this](const QString notification, int timeout) {
+        connect(m_context, &Context::setNotification, this, [this](const QString &notification, int timeout) {
             m_currentMessage = notification;
             if (timeout > 0) {
                 m_notificationTimer->setInterval(timeout * 1000);
@@ -397,6 +397,19 @@ void HtmlTrainingBridge::onErgFileSelected(ErgFile *file)
 
     QJsonObject route;
 
+    QJsonObject w;
+    w["type"] = file->typeString();
+    w["filename"] = file->filename();
+    if (file->type() == ErgFileType::erg) {
+        w["duration_msecs"] = static_cast<qint64>(file->duration());
+        w["name"] = file->name();
+        w["description"] = file->description();
+    }
+    w["tags"] = toJsonArray(file->tags());
+
+    route["workout"] = w;
+
+
     // file is GPS based
 
     if (file->hasGPS()) {
@@ -417,7 +430,13 @@ void HtmlTrainingBridge::onErgFileSelected(ErgFile *file)
         }
 
         if (points.isEmpty()) {
-            m_plannedRoute = QStringLiteral(R"({"geojson":{"type":"FeatureCollection","features":[]},"elevProfile":[]})");
+            QJsonObject routeGeoJson;
+            routeGeoJson["type"] = "FeatureCollection";
+            routeGeoJson["features"] = QJsonArray();
+            route["geojson"] = routeGeoJson;
+            route["elevProfile"] = QJsonArray();
+
+            m_plannedRoute = QString::fromUtf8(QJsonDocument(route).toJson(QJsonDocument::Compact));
             emit plannedRouteChanged(m_plannedRoute);
             return;
         }
@@ -547,18 +566,6 @@ void HtmlTrainingBridge::onErgFileSelected(ErgFile *file)
         route["geojson"] = routeGeoJson;
         route["elevProfile"] = QJsonArray();
     }
-
-    QJsonObject w;
-    w["type"] = file->typeString();
-    w["filename"] = file->filename();
-    if (file->type() == ErgFileType::erg) {
-        w["duration_msecs"] = static_cast<qint64>(file->duration());
-        w["name"] = file->name();
-        w["description"] = file->description();
-    }
-    w["tags"] = toJsonArray(file->tags());
-
-    route["workout"] = w;
 
     m_plannedRoute = QString::fromUtf8(QJsonDocument(route).toJson(QJsonDocument::Compact));
     emit plannedRouteChanged(m_plannedRoute);
