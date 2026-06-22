@@ -205,6 +205,7 @@ class HrZones : public QObject
         QList <int> getZoneHighs(int rnum) const;
         QList <double> getZoneTrimps(int rnum) const;
         QList <QString> getZoneNames(int rnum) const;
+        QList <QString> getZoneDescriptions(int rnum) const;
 
         // get/set range start and end date
         QDate getStartDate(int rnum) const;
