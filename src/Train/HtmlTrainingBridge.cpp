@@ -384,6 +384,12 @@ void HtmlTrainingBridge::onErgFileSelected(ErgFile *file)
         "duration_msecs": 3600000,
         "name": "Tempo Ride",
         "description": "3x10min Tempo intervals",
+        "profile": [
+            [0, 150],
+            [60000, 150],
+            [60000, 250],
+            [300000, 250]
+        ],
         "tags": ["Tempo", "Intervals"]
     }
     }
@@ -404,6 +410,15 @@ void HtmlTrainingBridge::onErgFileSelected(ErgFile *file)
         w["duration_msecs"] = static_cast<qint64>(file->duration());
         w["name"] = file->name();
         w["description"] = file->description();
+
+        QJsonArray profileArr;
+        for (const ErgFilePoint &pt : std::as_const(file->Points)) {
+            QJsonArray ptArr;
+            ptArr.append(pt.x);   // time in ms
+            ptArr.append(pt.val); // load in watts
+            profileArr.append(ptArr);
+        }
+        w["profile"] = profileArr;
     }
     w["tags"] = toJsonArray(file->tags());
 
