@@ -393,7 +393,11 @@ APIWebService::listActivity(QString athlete, QStringList paths, HttpRequest &req
         if (success) {
 
             // read in the whole thing
-            out.open(QFile::ReadOnly | QFile::Text);
+            if (!out.open(QFile::ReadOnly | QFile::Text)) {
+                response.setStatus(500);
+                response.write("unable to open output file for reading.\\n");
+                return;
+            }
             QTextStream in(&out);
             contents = in.readAll();
             out.close();

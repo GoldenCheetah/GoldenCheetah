@@ -32,7 +32,10 @@ ANTLogger::open()
     qDebug() << "antlog path:" << fullpath;
     antlog.setFileName(fullpath);
 
-    antlog.open(QIODevice::WriteOnly | QIODevice::Truncate);
+    if (!antlog.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        qWarning() << "Failed to open ANT log file:" << fullpath;
+        return;
+    }
     isLogging=true;
 }
 
