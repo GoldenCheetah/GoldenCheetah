@@ -275,10 +275,6 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
             // our base code - traps stdout and loads goldencheetan module
             // mapping all the bindings to a GC object.
             std::string stdOutErr = ("import sys\n"
- #ifdef Q_OS_LINUX
-                                     "import os\n"
-                                     "sys.setdlopenflags(os.RTLD_NOW | os.RTLD_DEEPBIND)\n"
- #endif
                                      "class CatchOutErr:\n"
                                      "    def __init__(self):\n"
                                      "        self.value = ''\n"
@@ -299,6 +295,8 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
             // ensure site-packages is in path when using deployed Python on Linux
             if (PYTHONHOME == deployedPython) {
                 std::string ensureSitePackages = ("import sys\n"
+                                                  "import os\n"
+                                                  "sys.setdlopenflags(os.RTLD_NOW | os.RTLD_DEEPBIND)\n"
                                                   "sys.path.append(sys.prefix+'/lib/python3.'+str(sys.version_info.minor)+'/site-packages')\n");
                 PyRun_SimpleString(ensureSitePackages.c_str()); //invoke code
             }
