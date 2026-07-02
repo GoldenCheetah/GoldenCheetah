@@ -826,6 +826,205 @@ QString RealtimeData::seriesName(DataSeries series)
     }
 }
 
+QString RealtimeData::seriesSymbol(DataSeries series)
+{
+    switch (series) {
+
+    default:
+    case None: return QString("None");
+        break;
+
+    case Time: return QString("Time");
+        break;
+
+    case Lap: return QString("Lap");
+        break;
+
+    case LapTime: return QString("Lap Time");
+        break;
+
+    case LapTimeRemaining: return QString("Lap Time Remaining");
+        break;
+
+    case ErgTimeRemaining: return QString("Section Time Remaining");
+        break;
+
+    case BikeStress: return QString("BikeStress");
+        break;
+
+    case BikeScore: return "BikeScore (TM)";
+        break;
+
+    case Joules: return QString("kJoules");
+        break;
+
+    case Wbal: return QString("W' bal");
+        break;
+
+    case XPower: return QString("XPower");
+        break;
+
+    case IsoPower: return QString("Iso Power");
+        break;
+
+    case IF: return QString("Intensity Factor");
+        break;
+
+    case RI: return QString("Relative Intensity");
+        break;
+
+    case SkibaVI: return QString("Skiba Variability Index");
+        break;
+
+    case VI: return QString("Variability Index");
+        break;
+
+    case Distance: return QString("Distance");
+        break;
+
+    case RouteDistance: return QString("Route Distance");
+        break;
+
+    case DistanceRemaining: return QString("Distance Remaining");
+        break;
+
+    case AltWatts: return QString("Alternate Power");
+        break;
+
+    case Watts: return QString("Power");
+        break;
+
+    case Speed: return QString("Speed");
+        break;
+
+    case VirtualSpeed: return QString("Virtual Speed");
+        break;
+
+    case Cadence: return QString("Cadence");
+        break;
+
+    case HeartRate: return QString("Heart Rate");
+        break;
+
+    case Load: return QString("Target Power");
+        break;
+
+    case AvgWatts: return QString("Average Power");
+        break;
+
+    case AvgSpeed: return QString("Average Speed");
+        break;
+
+    case AvgHeartRate: return QString("Average Heartrate");
+        break;
+
+    case AvgCadence: return QString("Average Cadence");
+        break;
+
+    case AvgWattsLap: return QString("Lap Power");
+        break;
+
+    case AvgSpeedLap: return QString("Lap Speed");
+        break;
+
+    case AvgHeartRateLap: return QString("Lap Heartrate");
+        break;
+
+    case AvgCadenceLap: return QString("Lap Cadence");
+        break;
+
+    case LRBalance: return QString("Left/Right Balance");
+        break;
+
+    case tHb: return QString("Total Hb Mass");
+        break;
+
+    case SmO2: return QString("Hb O2 Saturation");
+        break;
+
+    case HHb: return QString("Deoxy Hb");
+        break;
+
+    case O2Hb: return QString("Oxy Hb");
+        break;
+
+    case LeftTorqueEffectiveness: return QString("Left Torque Effectiveness");
+        break;
+
+    case RightTorqueEffectiveness: return QString("Right Torque Effectiveness");
+        break;
+
+    case LeftPedalSmoothness: return QString("Left Pedal Smoothness");
+        break;
+
+    case RightPedalSmoothness: return QString("Right Pedal Smoothness");
+        break;
+
+    case RightPowerPhaseBegin: return QString("Right Power Phase Start");
+        break;
+
+    case RightPowerPhaseEnd: return QString("Right Power Phase End");
+        break;
+
+    case RightPowerPhasePeakBegin: return QString("Right Power Phase Peak Start");
+        break;
+
+    case RightPowerPhasePeakEnd: return QString("Right Power Phase Peak End");
+        break;
+
+    case Slope: return QString("Slope");
+        break;
+
+    case LapDistance: return QString("Lap Distance");
+        break;
+
+    case LapDistanceRemaining: return QString("Lap Distance Remaining");
+        break;
+
+    case Latitude: return QString("Latitude");
+        break;
+
+    case Longitude: return QString("Longitude");
+        break;
+
+    case Altitude: return QString("Altitude");
+        break;
+
+    case Rf: return QString("Respiratory Frequency");
+        break;
+
+    case RMV: return QString("Ventilation");
+        break;
+
+    case VO2: return QString("VO2");
+        break;
+
+    case VCO2: return QString("VCO2");
+        break;
+
+    case RER: return QString("Respiratory Exchange Ratio");
+        break;
+
+    case TidalVolume: return QString("Tidal Volume");
+        break;
+
+    case FeO2: return QString("Fraction O2 Expired");
+        break;
+
+    case Temp: return QString("Temperature");
+        break;
+
+    case CoreTemp: return QString("Core Temp");
+        break;
+    case SkinTemp: return QString("Skin Temp");
+        break;
+    case HeatStrain: return QString("Heat Strain");
+        break;
+    case HeatLoad: return QString("Estimated Heat Load");
+        break;
+    }
+}
+
 void RealtimeData::setHb(double smo2, double thb)
 {
     this->smo2 = smo2;

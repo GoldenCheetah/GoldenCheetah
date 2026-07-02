@@ -63,6 +63,7 @@ public:
 
     double value(DataSeries) const;
     static QString seriesName(DataSeries);
+    static QString seriesSymbol(DataSeries);
     static const QList<DataSeries> &listDataSeries();
 
     // style is coded to be compatible with FIT files
