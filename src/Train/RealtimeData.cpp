@@ -443,6 +443,9 @@ double RealtimeData::value(DataSeries series) const
     case Watts: return watts;
         break;
 
+    case Wbal: return wbal;
+        break;
+
     case Speed: return speed;
         break;
 
@@ -823,6 +826,11 @@ QString RealtimeData::seriesName(DataSeries series)
         break;
     case HeatLoad: return tr("Estimated Heat Load");
         break;
+
+    case RightPCO: return tr("Right PCO");
+        break;
+    case LeftPCO: return tr("Left PCO");
+        break;
     }
 }
 
@@ -1021,6 +1029,11 @@ QString RealtimeData::seriesSymbol(DataSeries series)
     case HeatStrain: return QString("Heat Strain");
         break;
     case HeatLoad: return QString("Estimated Heat Load");
+        break;
+
+    case RightPCO: return QString("Right PCO");
+        break;
+    case LeftPCO: return QString("Left PCO");
         break;
     }
 }
