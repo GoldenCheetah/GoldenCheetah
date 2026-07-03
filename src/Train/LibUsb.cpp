@@ -639,7 +639,7 @@ bool LibUsb::findAntStick()
     }
 
 #ifdef LIBUSB_V_1
-    delete firstBus;
+    if (OperatingSystem != OSX) delete firstBus; // may crash on macOS when no ANT+ Stick present
 #endif
 
     qCDebug(gcUsb) << "findAnt returns" << found;
@@ -674,7 +674,7 @@ usb_dev_handle* LibUsb::OpenAntStick()
     }
 
 #ifdef LIBUSB_V_1
-    delete firstBus;
+    if (OperatingSystem != OSX) delete firstBus; // may crash on macOS when no ANT+ Stick present
 #endif
 #endif
 
@@ -735,7 +735,7 @@ usb_dev_handle* LibUsb::OpenAntStick()
     }
 
 #ifdef LIBUSB_V_1
-    delete firstBus;
+    if (OperatingSystem != OSX) delete firstBus; // may crash on macOS when no ANT+ Stick present
 #endif
 
     return NULL;
