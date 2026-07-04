@@ -279,64 +279,31 @@ void HtmlTrainingBridge::onTelemetryUpdate(const RealtimeData &rt)
 {
     /*****************
     {
-    "timestamp": "2026-06-22T18:23:40Z",
-    "msecs": 59824,
-    "lat": 40.4168,
-    "lon": -3.7038,
-    "alt": 650.0,
-    "slope": 2.5,
-    "speed_kmh": 32.5,
-    "hr_bpm": 150,
-    "power_w": 250,
-    "wbal": 15000,
-    "cadence_rpm": 90,
-    "distance_km": 15.2,
-    "target_power_w": 260,
-    "erg_time_msecs": 58521,
-    "sec_msecs_remaining": 361179,
-    "erg_msecs_remaining": 3541125,
-    "notification_text": "Next interval in 2 minutes"
+        "Alternate Power": 0,
+        "Altitude": 0,
+        "Average Cadence": 0,
+        "Average Heartrate": 0,
+        "Average Power": 165.91304347826087,
+        "Average Speed": 9.25412584433036,
+        ...
+        "Virtual Speed": 25.31594394953218,
+        "W' bal": 5999.60661404098,
+        "XPower": 0,
+        "erg_time_msecs": 4921,
+        "kJoules": 0,
+        "notification_text": "Welcome to 2 by 2! Coach Shayne Gaffney here and I'll be your tour guide today :-) Let's get started with a warmup."
     }
     *****************/
-    double lat = rt.getLatitude();
-    double lon = rt.getLongitude();
-    double alt = rt.getAltitude();
-    double slope = rt.getSlope();
-    double speed = rt.getSpeed();
-    double hr = rt.getHr();
-    double power = rt.getWatts();
-    double cadence = rt.getCadence();
-    double distance = rt.getDistance();
-    double wbal = rt.getWbal();
-    qint64 msecs = rt.getMsecs();
-    qint64 sec_msecs_remaining = rt.value(RealtimeData::DataSeries::ErgTimeRemaining);
-    qint64 erg_msecs_remaining = rt.value(RealtimeData::DataSeries::LapTimeRemaining);
-    qint64 erg_time_msecs = m_context ? m_context->getNow() : 0;
 
     // Queue for throttled emission
     QJsonObject tel;
-    tel["timestamp"] = formatTimestamp(msecs);
-    tel["msecs"] = static_cast<qint64>(msecs);
-    tel["lat"] = lat;
-    tel["lon"] = lon;
-    tel["alt"] = alt;
-    tel["slope"] = slope;
-    tel["speed_kmh"] = speed;
-    tel["hr_bpm"] = hr;
-    tel["power_w"] = power;
-    tel["wbal"] = wbal;
-    tel["cadence_rpm"] = cadence;
-    tel["distance_km"] = distance;
 
-    tel["target_power_w"] = rt.getLoad();
-    tel["erg_time_msecs"] = erg_time_msecs;
+    for (RealtimeData::DataSeries series : RealtimeData::listDataSeries())
+        tel[RealtimeData::seriesSymbol(series)] = rt.value(series);
 
-    tel["sec_msecs_remaining"] = sec_msecs_remaining;
-    tel["erg_msecs_remaining"] = erg_msecs_remaining;
-
-
+    qint64 erg_time_msecs = m_context ? m_context->getNow() : 0;
+    tel["erg_time_msecs"] = static_cast<double>(erg_time_msecs);
     tel["notification_text"] = m_currentMessage;
-
 
     m_pendingTelemetrySample = QString::fromUtf8(QJsonDocument(tel).toJson(QJsonDocument::Compact));
     m_hasPendingTelemetry = true;
@@ -600,10 +567,4 @@ void HtmlTrainingBridge::onStop()
     }
     m_currentMessage = "";
     emit stateChanged("stop");
-}
-
-QString HtmlTrainingBridge::formatTimestamp(qint64 msecs) const
-{
-    QDateTime dt = QDateTime::fromMSecsSinceEpoch(msecs, QTimeZone::UTC);
-    return dt.toString(Qt::ISODate);
 }
