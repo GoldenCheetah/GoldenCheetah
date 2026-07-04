@@ -298,8 +298,10 @@ void HtmlTrainingBridge::onTelemetryUpdate(const RealtimeData &rt)
     // Queue for throttled emission
     QJsonObject tel;
 
-    for (RealtimeData::DataSeries series : RealtimeData::listDataSeries())
-        tel[RealtimeData::seriesSymbol(series)] = rt.value(series);
+for (RealtimeData::DataSeries series : RealtimeData::listDataSeries()) {
+    if (series == RealtimeData::None) continue;
+    tel[RealtimeData::seriesSymbol(series)] = rt.value(series);
+}
 
     qint64 erg_time_msecs = m_context ? m_context->getNow() : 0;
     tel["erg_time_msecs"] = static_cast<double>(erg_time_msecs);
