@@ -477,7 +477,7 @@ Sie müssen diesen möglicherweise manuell deaktivieren.</translation>
         <location filename="../../Gui/Agenda.cpp" line="589"/>
         <location filename="../../Gui/Agenda.cpp" line="594"/>
         <source>ddd, d.M.</source>
-        <translation type="unfinished"></translation>
+        <translation>ddd, d.M.</translation>
     </message>
 </context>
 <context>
@@ -3605,17 +3605,17 @@ gespeichert</translation>
     <message>
         <location filename="../../Gui/AthleteView.cpp" line="247"/>
         <source>Backup...</source>
-        <translation type="unfinished">Sicherung...</translation>
+        <translation>Sicherung...</translation>
     </message>
     <message>
         <location filename="../../Gui/AthleteView.cpp" line="256"/>
         <source>Saved</source>
-        <translation type="unfinished">Gespeichert</translation>
+        <translation>Gespeichert</translation>
     </message>
     <message>
         <location filename="../../Gui/AthleteView.cpp" line="267"/>
         <source>Delete...</source>
-        <translation type="unfinished">Löschen...</translation>
+        <translation>Löschen...</translation>
     </message>
     <message>
         <location filename="../../Gui/AthleteView.cpp" line="276"/>
@@ -3633,27 +3633,27 @@ gespeichert</translation>
     <message>
         <location filename="../../Gui/AthleteView.cpp" line="398"/>
         <source>Close...</source>
-        <translation type="unfinished"></translation>
+        <translation>Schließen...</translation>
     </message>
     <message>
         <location filename="../../Gui/AthleteView.cpp" line="579"/>
         <source>%1 activities, %2 planned</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Aktivitäten, %2 geplant</translation>
     </message>
     <message>
         <location filename="../../Gui/AthleteView.cpp" line="579"/>
         <source>No activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/AthleteView.cpp" line="585"/>
         <source>Last activity %1 days ago</source>
-        <translation type="unfinished"></translation>
+        <translation>Zuletzt aktiv vor %1 Tagen</translation>
     </message>
     <message>
         <location filename="../../Gui/AthleteView.cpp" line="591"/>
         <source>Unsaved:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht gespeichert:</translation>
     </message>
     <message>
         <source>No activities.</source>
@@ -6594,7 +6594,7 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="202"/>
         <source>Copy planned activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplante Aktivität kopieren</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="205"/>
@@ -6630,7 +6630,7 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="229"/>
         <source>Export schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeitplan exportieren</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="248"/>
@@ -6645,7 +6645,7 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="273"/>
         <source>Paste planned activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplante Aktivität einfügen</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="280"/>
@@ -6685,17 +6685,17 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="284"/>
         <source>Export plan</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan exportieren</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="286"/>
         <source>Repeat plan</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan wiederholen</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="287"/>
         <source>Import plan</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan importieren</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="296"/>
@@ -6713,7 +6713,7 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="844"/>
         <source>dd</source>
-        <translation type="unfinished"></translation>
+        <translation>dd</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="947"/>
@@ -6805,7 +6805,7 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="635"/>
         <source>ddd, dd.MM.</source>
-        <translation type="unfinished"></translation>
+        <translation>ddd, dd.MM.</translation>
     </message>
 </context>
 <context>
@@ -6854,27 +6854,27 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="856"/>
         <source>mins</source>
-        <translation type="unfinished"></translation>
+        <translation>Minuten</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="858"/>
         <source>Always</source>
-        <translation type="unfinished">Immer</translation>
+        <translation>Immer</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="859"/>
         <source>If upcoming or missed</source>
-        <translation type="unfinished"></translation>
+        <translation>wenn bevorstehend und verpasst</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="860"/>
         <source>If upcoming</source>
-        <translation type="unfinished"></translation>
+        <translation>wenn bevorstehend</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="861"/>
         <source>Never</source>
-        <translation type="unfinished">Nie</translation>
+        <translation>Nie</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="862"/>
@@ -6924,7 +6924,7 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="893"/>
         <source>Minimum Display Duration</source>
-        <translation type="unfinished"></translation>
+        <translation>Minimale Anzeigedauer</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="895"/>
@@ -6949,7 +6949,7 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="900"/>
         <source>Include Planned</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplante Aktivitäten miteinbeziehen</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="901"/>
@@ -7015,32 +7015,32 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="1449"/>
         <source>day</source>
-        <translation type="unfinished">Tag</translation>
+        <translation>Tag</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="1451"/>
         <source>days</source>
-        <translation type="unfinished">Tage</translation>
+        <translation>Tage</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="1456"/>
         <source>week</source>
-        <translation type="unfinished">Woche</translation>
+        <translation>Woche</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="1458"/>
         <source>weeks</source>
-        <translation type="unfinished">Wochen</translation>
+        <translation>Wochen</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="1463"/>
         <source>month</source>
-        <translation type="unfinished">Monat</translation>
+        <translation>Monat</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="1465"/>
         <source>months</source>
-        <translation type="unfinished">Monate</translation>
+        <translation>Monate</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="1541"/>
@@ -7060,7 +7060,7 @@ ddd, dd.MMM yyyy</translation>
         <location filename="../../Charts/CalendarWindow.cpp" line="1740"/>
         <location filename="../../Charts/CalendarWindow.cpp" line="1745"/>
         <source>Paste failed: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Einfügen fehlgeschlagen: %1</translation>
     </message>
     <message>
         <source>Unable to save</source>
@@ -9625,7 +9625,7 @@ Möchten Sie die Änderung durchführen und GoldenCheetah neu starten?</translat
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="110"/>
         <source>N/A</source>
-        <translation type="unfinished">N.V.</translation>
+        <translation>N.V.</translation>
     </message>
 </context>
 <context>
@@ -11807,7 +11807,7 @@ then click &quot;Rescan&quot; to check again.</source>
         <location filename="../../Gui/Agenda.cpp" line="855"/>
         <location filename="../../Gui/Agenda.cpp" line="860"/>
         <source>ddd, d.M.</source>
-        <translation type="unfinished"></translation>
+        <translation>ddd, d.M.</translation>
     </message>
 </context>
 <context>
@@ -11843,27 +11843,27 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1444"/>
         <source>Export Plan - Activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan exportieren - Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1445"/>
         <source>Review and choose the activities you wish to export.</source>
-        <translation type="unfinished"></translation>
+        <translation>Überprüfen Sie die Aktivitäten und wählen Sie diejenigen aus, die Sie exportieren möchten.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1458"/>
         <source>No selected activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine ausgewählten Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1463"/>
         <source>Activities for your export</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivitäten für Ihren Export</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1535"/>
         <source>Choose one to export</source>
-        <translation type="unfinished"></translation>
+        <translation>Wählen Sie eine zum Exportieren aus</translation>
     </message>
 </context>
 <context>
@@ -11871,42 +11871,42 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1603"/>
         <source>Export Plan - Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan exportieren - Metadaten</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1604"/>
         <source>Provide a description for the exported content. This will be shown again when importing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geben Sie eine Beschreibung für den exportierten Inhalt an. Diese wird beim Import erneut angezeigt.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1610"/>
         <source>Describe your plan in markdown...</source>
-        <translation type="unfinished"></translation>
+        <translation>Beschreiben Sie Ihren Plan in Markdown...</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1613"/>
         <source>Plan name</source>
-        <translation type="unfinished"></translation>
+        <translation>Name von dem Plan</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1614"/>
         <source>Author</source>
-        <translation type="unfinished">Autor</translation>
+        <translation>Autor</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1615"/>
         <source>Copyright</source>
-        <translation type="unfinished"></translation>
+        <translation>Urheberrecht</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1616"/>
         <source>Description</source>
-        <translation type="unfinished">Beschreibung</translation>
+        <translation>Beschreibung</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1618"/>
         <source>No selected activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine ausgewählten Aktivitäten</translation>
     </message>
 </context>
 <context>
@@ -11914,37 +11914,37 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1264"/>
         <source>Export Plan - Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan exportieren - Einstellungen</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1265"/>
         <source>Define the time range and repetition strategy for exporting activities. Optionally select a season or phase to prefill the dates.</source>
-        <translation type="unfinished"></translation>
+        <translation>Definieren Sie den Zeitraum und die Wiederholungsstrategie für den Export von Aktivitäten. Optional können Sie eine Saison oder Phase auswählen, um die Daten vorab auszufüllen.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1321"/>
         <source>As originally planned</source>
-        <translation type="unfinished"></translation>
+        <translation>Wie ursprünglich geplant</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1322"/>
         <source>As currently planned</source>
-        <translation type="unfinished"></translation>
+        <translation>Wie aktuell geplant</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1329"/>
         <source>No planned activities in source period</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine geplanten Aktivitäten im Quellzeitraum</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1333"/>
         <source>Source Period</source>
-        <translation type="unfinished"></translation>
+        <translation>Quellzeitraum</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1337"/>
         <source>Repetition Strategy</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederholungsstrategie</translation>
     </message>
 </context>
 <context>
@@ -11952,103 +11952,103 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1706"/>
         <source>Export Plan - Summary</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan exportieren - Übersicht</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1707"/>
         <source>Preview the export results, including all selected activities. No data will be exported until you continue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorschau der Exportergebnisse, einschließlich der hinzugefügten geplanten und gelöschten Aktivitäten. Es erfolgen keine Änderungen, bis Sie fortfahren.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1711"/>
         <source>Plan name</source>
-        <translation type="unfinished"></translation>
+        <translation>Name von dem Plan</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1712"/>
         <source>Author</source>
-        <translation type="unfinished">Autor</translation>
+        <translation>Autor</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1713"/>
         <location filename="../../Gui/PlanWizards.cpp" line="1791"/>
         <source>Sport</source>
-        <translation type="unfinished">Sport</translation>
+        <translation>Sport</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1714"/>
         <source>Duration</source>
-        <translation type="unfinished">Dauer</translation>
+        <translation>Dauer</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1715"/>
         <source>Activities</source>
-        <translation type="unfinished">Aktivitäten</translation>
+        <translation>Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1716"/>
         <source>Copyright</source>
-        <translation type="unfinished"></translation>
+        <translation>Urheberrecht</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1767"/>
         <source>PLAN DETAILS</source>
-        <translation type="unfinished"></translation>
+        <translation>Plandetails</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1777"/>
         <source>PLAN DESCRIPTION</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan Beschreibung</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1791"/>
         <source>Week</source>
-        <translation type="unfinished">Woche</translation>
+        <translation>Woche</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1791"/>
         <source>Day</source>
-        <translation type="unfinished">Tag</translation>
+        <translation>Tag</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1791"/>
         <source>Name</source>
-        <translation type="unfinished">Name</translation>
+        <translation>Name</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1796"/>
         <source>Golden Cheetah Plans</source>
-        <translation type="unfinished"></translation>
+        <translation>Golden Cheetah Pläne</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1797"/>
         <source>Output file</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausgabedatei</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1800"/>
         <source>Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>Übersicht</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1801"/>
         <source>Activities in export</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivitäten im Export</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1890"/>
         <source>1 day</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Tag</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1892"/>
         <source>%1 days</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Tage</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1894"/>
         <source>%1 weeks</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Wochen</translation>
     </message>
 </context>
 <context>
@@ -12056,7 +12056,7 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1094"/>
         <source>Export Plan</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan exportieren</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1099"/>
@@ -12078,7 +12078,24 @@ $SPORT
 
 ### Copyright
 $COPYRIGHT</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">## $NAME von $AUTHOR
+
+$SPORT
+
+### Voraussetzungen
+*Minimale Fitnessgrundlage, Erfahrungslevel oder benötigte Ausrüstung.*
+
+### Trainingsphase
+*Wann in der Saison dieser Plan passt – Grundausdauer, Aufbau, Höhepunkt, Regeneration.*
+
+### Ergebnis
+*Messbare Verbesserung für den Athleten.*
+
+### Hinweise
+*Ausrüstung, Höhe, Verletzungsaspekte oder bekannte Konflikte.*
+
+### Urheberrecht
+$COPYRIGHT</translation>
     </message>
 </context>
 <context>
@@ -15351,7 +15368,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="116"/>
         <source>Plan Adherence</source>
-        <translation type="unfinished"></translation>
+        <translation>Einhaltung der Planung</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="94"/>
@@ -15596,7 +15613,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/Pages.cpp" line="268"/>
         <source>Activities</source>
-        <translation type="unfinished">Aktivitäten</translation>
+        <translation>Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="283"/>
@@ -17706,13 +17723,13 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
         <location filename="../../Core/ICalendar.cpp" line="41"/>
         <source>Level</source>
         <translatorcomment>??? Currently code is inactive</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation>Ebene</translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="42"/>
         <source>Event Identifier</source>
         <translatorcomment>??? Currently code is inactive</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation>Ereigniskennung</translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="43"/>
@@ -17767,13 +17784,13 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
         <location filename="../../Core/ICalendar.cpp" line="76"/>
         <source>No later than</source>
         <translatorcomment>??? Currently code is inactive</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation>Spätestens bis</translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="53"/>
         <source>No earlier than</source>
         <translatorcomment>??? Currently code is inactive</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation>Nicht vor</translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="54"/>
@@ -18497,29 +18514,29 @@ Ziehen Sie .svg-Dateien hierher, um Symbole hinzuzufügen.</translation>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2287"/>
         <source>Import Plan - Activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan importieren - Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2288"/>
         <source>Review and choose the activities you wish to import.</source>
-        <translation type="unfinished"></translation>
+        <translation>Überprüfen und wählen Sie die Aktivitäten aus, die Sie importieren möchten.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2300"/>
         <source>No selected activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine ausgewählten Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2305"/>
         <source>Activities to import</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivitäten zum Importieren</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2359"/>
         <location filename="../../Gui/PlanWizards.cpp" line="2360"/>
         <location filename="../../Gui/PlanWizards.cpp" line="2361"/>
         <source>Conflicts with existing planned and linked activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Konflikte mit vorhandenen geplanten und verknüpften Aktivitäten</translation>
     </message>
 </context>
 <context>
@@ -18527,52 +18544,52 @@ Ziehen Sie .svg-Dateien hierher, um Symbole hinzuzufügen.</translation>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2543"/>
         <source>Import Plan - Result</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan importieren - Ergebnis</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2544"/>
         <source>This page shows the outcome of importing the selected training plan.</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese Seite zeigt das Ergebnis des Imports des ausgewählten Trainingsplans an.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2579"/>
         <source>Import completed successfully.</source>
-        <translation type="unfinished"></translation>
+        <translation>Import erfolgreich abgeschlossen.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2580"/>
         <source>All activities and workouts were imported without issues.</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Aktivitäten und Workouts wurden ohne Probleme importiert.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2582"/>
         <source>Import completed with warnings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Import abgeschlossen mit Warnungen.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2583"/>
         <source>Some items could not be fully processed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Einige Elemente konnten nicht vollständig verarbeitet werden.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2586"/>
         <source>Import failed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Import fehlgeschlagen</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2587"/>
         <source>The bundle could not be fully imported.</source>
-        <translation type="unfinished"></translation>
+        <translation>Das Paket konnte nicht vollständig importiert werden.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2588"/>
         <source>Errors</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2596"/>
         <source>Warnings</source>
-        <translation type="unfinished"></translation>
+        <translation>Warnungen</translation>
     </message>
 </context>
 <context>
@@ -18580,132 +18597,132 @@ Ziehen Sie .svg-Dateien hierher, um Symbole hinzuzufügen.</translation>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2009"/>
         <source>Import Plan - Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan importieren - Einstellungen</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2010"/>
         <source>Define the target time range for placing the activities.</source>
-        <translation type="unfinished"></translation>
+        <translation>Legen Sie den Zielzeitraum für die Platzierung der Aktivitäten fest.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2013"/>
         <source>Golden Cheetah Plans</source>
-        <translation type="unfinished"></translation>
+        <translation>Golden Cheetah Pläne</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2014"/>
         <source>Plan bundle</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan Pakete</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2016"/>
         <source>No planned activities in source period</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine geplanten Aktivitäten im Quellzeitraum</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2017"/>
         <source>%1 to import</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 importieren</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2020"/>
         <source>Keep leading and trailing gaps</source>
-        <translation type="unfinished"></translation>
+        <translation>Führende und nachfolgende Lücken beibehalten</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2033"/>
         <source>Plan name</source>
-        <translation type="unfinished"></translation>
+        <translation>Name von dem Plan</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2034"/>
         <source>Author</source>
-        <translation type="unfinished">Autor</translation>
+        <translation>Autor</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2035"/>
         <source>Sport</source>
-        <translation type="unfinished">Sport</translation>
+        <translation>Sport</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2036"/>
         <source>Duration</source>
-        <translation type="unfinished">Dauer</translation>
+        <translation>Dauer</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2037"/>
         <source>Activities</source>
-        <translation type="unfinished">Aktivitäten</translation>
+        <translation>Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2038"/>
         <source>Copyright</source>
-        <translation type="unfinished"></translation>
+        <translation>Urheberrecht</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2097"/>
         <source>PLAN DETAILS</source>
-        <translation type="unfinished"></translation>
+        <translation>Plandetails</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2107"/>
         <source>PLAN DESCRIPTION</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan Beschreibung</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2135"/>
         <source>No plan loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>Kein Plan geladen</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2136"/>
         <source>Select a training plan file (%1) to begin</source>
-        <translation type="unfinished"></translation>
+        <translation>Wählen Sie eine Trainingsplandatei (%1) aus, um zu beginnen.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2203"/>
         <source>Failed to load plan bundle.</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan Paket konnte nicht gelanden werden.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2204"/>
         <source>The selected file is not a valid training plan or is corrupted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die ausgewählte Datei ist kein gültiger Trainingsplan oder ist beschädigt.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2205"/>
         <source>Errors</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2212"/>
         <source>Warnings</source>
-        <translation type="unfinished"></translation>
+        <translation>Warnungen</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2225"/>
         <source>The plan was loaded with some warnings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Plan war mit einigen Warnungen versehen.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2226"/>
         <source>Some items may be incomplete or have been adjusted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Einige Elemente sind möglicherweise unvollständig oder wurden angepasst.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2269"/>
         <source>1 day</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Tag</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2271"/>
         <source>%1 days</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Tage</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2273"/>
         <source>%1 weeks</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Wochen</translation>
     </message>
 </context>
 <context>
@@ -18713,32 +18730,32 @@ Ziehen Sie .svg-Dateien hierher, um Symbole hinzuzufügen.</translation>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2421"/>
         <source>Import Plan - Summary</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan importieren - Übersicht</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2422"/>
         <source>Preview the plan updates, including planned additions and deletions. No changes will be made until you continue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorschau der Planungsänderungen, einschließlich der hinzugefügten geplanten und gelöschten Aktivitäten. Es erfolgen keine Änderungen, bis Sie fortfahren.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2426"/>
         <source>New Plan Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>Übersicht des neuen Plans</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2432"/>
         <source>Planned Activities Marked for Deletion</source>
-        <translation type="unfinished">Geplante Aktivitäten zum Löschen markiert</translation>
+        <translation>Geplante Aktivitäten zum Löschen markiert</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2438"/>
         <source>No selected activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine ausgewählten Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2500"/>
         <source>skipped</source>
-        <translation type="unfinished"></translation>
+        <translation>übersprungen</translation>
     </message>
 </context>
 <context>
@@ -18746,7 +18763,7 @@ Ziehen Sie .svg-Dateien hierher, um Symbole hinzuzufügen.</translation>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1981"/>
         <source>Import Plan</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan importieren</translation>
     </message>
 </context>
 <context>
@@ -22078,12 +22095,12 @@ on and that its display says, &quot;PC Link&quot;</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="984"/>
         <source>Perspective Import</source>
-        <translation type="unfinished">Perspektiven-Import</translation>
+        <translation>Perspektiven-Import</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="984"/>
         <source>No perspectives found that are appropriate for the current view.</source>
-        <translation type="unfinished">Es wurden keine Perspektiven gefunden, die für die aktuelle Ansicht geeignet sind.</translation>
+        <translation>Es wurden keine Perspektiven gefunden, die für die aktuelle Ansicht geeignet sind.</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1114"/>
@@ -22091,7 +22108,9 @@ on and that its display says, &quot;PC Link&quot;</source>
         <source>INFO for athlete %1
 
 Closing of athlete window not possible while background activity import is in progress...</source>
-        <translation type="unfinished"></translation>
+        <translation>INFO für Athlet %1
+
+Das Schließen des Athleten-Fensters ist nicht möglich, solange im Hintergrund der Import von Aktivitäten läuft...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1340"/>
@@ -22555,7 +22574,7 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="617"/>
         <source>Download workouts from Tredict...</source>
-        <translation type="unfinished"></translation>
+        <translation>Workouts aus Tredict herunterladen...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="618"/>
@@ -22565,7 +22584,7 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="624"/>
         <source>Export Plan...</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan exportieren...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="636"/>
@@ -23955,7 +23974,7 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Core/Measures.cpp" line="62"/>
         <source>Tredict</source>
-        <translation type="unfinished"></translation>
+        <translation>Tredict</translation>
     </message>
     <message>
         <location filename="../../Core/Measures.cpp" line="64"/>
@@ -24272,7 +24291,7 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Cloud/MeasuresDownload.cpp" line="45"/>
         <source>Tredict</source>
-        <translation type="unfinished"></translation>
+        <translation>Tredict</translation>
     </message>
     <message>
         <location filename="../../Cloud/MeasuresDownload.cpp" line="46"/>
@@ -25245,7 +25264,7 @@ Keine Aktivitäten zum Importieren gefunden.
     </message>
 </context>
 <context>
-    <name>ActivityItemDelegate</name>
+    <name>NavigatorCellDelegate</name>
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="1135"/>
         <source>Date</source>
@@ -25767,7 +25786,7 @@ Keine Aktivitäten zum Importieren gefunden.
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="231"/>
         <source>Authorizing...</source>
-        <translation type="unfinished"></translation>
+        <translation>Autorisieren...</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="423"/>
@@ -25807,7 +25826,7 @@ Keine Aktivitäten zum Importieren gefunden.
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="530"/>
         <source>Tredict authorization was successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Autorisierung für Tredict war erfolgreich.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="538"/>
@@ -25825,37 +25844,37 @@ Keine Aktivitäten zum Importieren gefunden.
     <message>
         <location filename="../../Cloud/OAuthPKCE.cpp" line="108"/>
         <source>Failed to start local HTTP server: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Local HTTP Server konnte nicht gestartet werden: %1</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthPKCE.cpp" line="136"/>
         <source>Failed to open system browser.</source>
-        <translation type="unfinished"></translation>
+        <translation>System-Browser konnte nicht gestartet werden: %1</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthPKCE.cpp" line="236"/>
         <source>Authorization timed out. No response from browser.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Autorisierung ist abgelaufen. Keine Antwort vom Browser.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthPKCE.cpp" line="242"/>
         <source>No authorization code received.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kein Autorisierungscode erhalten.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthPKCE.cpp" line="273"/>
         <source>Token exchange failed: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Token-Austausch fehlgeschlagen: %1</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthPKCE.cpp" line="284"/>
         <source>Failed to parse token response: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Token-Antwort konnte nicht verarbeitet werden: %1</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthPKCE.cpp" line="298"/>
         <source>No access token in response.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kein Zugriffstoken in der Antwort.</translation>
     </message>
 </context>
 <context>
@@ -28774,12 +28793,12 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../../Gui/PerspectiveDialog.cpp" line="335"/>
         <source>Perspective Import</source>
-        <translation type="unfinished">Perspektiven-Import</translation>
+        <translation>Perspektive Import</translation>
     </message>
     <message>
         <location filename="../../Gui/PerspectiveDialog.cpp" line="335"/>
         <source>No perspectives found that are appropriate for the current view.</source>
-        <translation type="unfinished">Es wurden keine Perspektiven gefunden, die für die aktuelle Ansicht geeignet sind.</translation>
+        <translation>Es wurden keine Perspektiven gefunden, die für die aktuelle Ansicht geeignet sind.</translation>
     </message>
     <message>
         <source>Edit</source>
@@ -29012,7 +29031,7 @@ Möchten Sie fortfahren?</translation>
         <location filename="../../Gui/Agenda.cpp" line="742"/>
         <location filename="../../Gui/Agenda.cpp" line="743"/>
         <source>ddd, d.M.</source>
-        <translation type="unfinished"></translation>
+        <translation>ddd, d.M.</translation>
     </message>
 </context>
 <context>
@@ -29020,7 +29039,7 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="940"/>
         <source>d</source>
-        <translation type="unfinished"></translation>
+        <translation>d</translation>
     </message>
 </context>
 <context>
@@ -29029,13 +29048,13 @@ Möchten Sie fortfahren?</translation>
         <location filename="../../Gui/PlanAdherence.cpp" line="640"/>
         <location filename="../../Gui/PlanAdherence.cpp" line="664"/>
         <source>ddd dd.MM.</source>
-        <translation type="unfinished"></translation>
+        <translation>ddd dd.MM.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="643"/>
         <location filename="../../Gui/PlanAdherence.cpp" line="667"/>
         <source>dd.MM.</source>
-        <translation type="unfinished"></translation>
+        <translation>dd.MM.</translation>
     </message>
 </context>
 <context>
@@ -29044,119 +29063,119 @@ Möchten Sie fortfahren?</translation>
         <location filename="../../Gui/PlanAdherence.cpp" line="995"/>
         <location filename="../../Gui/PlanAdherence.cpp" line="1104"/>
         <source>Unplanned</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungeplant</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="997"/>
         <location filename="../../Gui/PlanAdherence.cpp" line="1121"/>
         <location filename="../../Gui/PlanAdherence.cpp" line="1164"/>
         <source>Completed</source>
-        <translation type="unfinished">Abgeschlossen</translation>
+        <translation>Abgeschlossen</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="999"/>
         <source>d</source>
-        <translation type="unfinished"></translation>
+        <translation>t</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1002"/>
         <location filename="../../Gui/PlanAdherence.cpp" line="1161"/>
         <source>On-Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Pünktlich</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1006"/>
         <location filename="../../Gui/PlanAdherence.cpp" line="1009"/>
         <location filename="../../Gui/PlanAdherence.cpp" line="1123"/>
         <source>Upcoming</source>
-        <translation type="unfinished"></translation>
+        <translation>Bevorstehend</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1008"/>
         <location filename="../../Gui/PlanAdherence.cpp" line="1146"/>
         <source>Shifted</source>
-        <translation type="unfinished"></translation>
+        <translation>Verschoben</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1012"/>
         <location filename="../../Gui/PlanAdherence.cpp" line="1125"/>
         <source>Missed</source>
-        <translation type="unfinished"></translation>
+        <translation>Verpasst</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1079"/>
         <source>View planned activity</source>
-        <translation type="unfinished">Geplante Aktivität anzeigen</translation>
+        <translation>Geplante Aktivität anzeigen</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1082"/>
         <source>View actual activity</source>
-        <translation type="unfinished">Beendete Aktivität anzeigen</translation>
+        <translation>Beendete Aktivität anzeigen</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1105"/>
         <source>Date</source>
-        <translation type="unfinished">Datum</translation>
+        <translation>Datum</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1116"/>
         <source>Originally Planned</source>
-        <translation type="unfinished"></translation>
+        <translation>Ursprünglich geplant</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1118"/>
         <source>Planned</source>
-        <translation type="unfinished">Geplant</translation>
+        <translation>Geplant</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1129"/>
         <source>Status</source>
-        <translation type="unfinished">Status</translation>
+        <translation>Status</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1137"/>
         <source>%1 days earlier (→ %2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Tage früher (→ %2)</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1139"/>
         <source>1 day earlier (→ %1)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Tage früher (→ %2)</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1141"/>
         <source>1 day later (→ %1)</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Tag später (→ %1)</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1143"/>
         <source>%1 days later (→ %2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Tage später (→ %2)</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1153"/>
         <source>%1 days early (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Tage später (→ %2)</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1155"/>
         <source>1 day early (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Tage später (→ %2)</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1157"/>
         <source>1 day late (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Tag verspätet (%1)</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1159"/>
         <source>%1 days late (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Tage verspätet (%2)</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1167"/>
         <source>Completed as</source>
-        <translation type="unfinished"></translation>
+        <translation>Abgeschlossen als</translation>
     </message>
 </context>
 <context>
@@ -29164,117 +29183,117 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1186"/>
         <source>Previous Month</source>
-        <translation type="unfinished">Vorheriger Monat</translation>
+        <translation>Vorheriger Monat</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1187"/>
         <source>Next Month</source>
-        <translation type="unfinished">Nächster Monat</translation>
+        <translation>Nächster Monat</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1188"/>
         <source>Today</source>
-        <translation type="unfinished">Heute</translation>
+        <translation>Heute</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1205"/>
         <source>Filters applied</source>
-        <translation type="unfinished">Filter angewandt</translation>
+        <translation>Filter angewandt</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1214"/>
         <source>Total</source>
-        <translation type="unfinished">Summe</translation>
+        <translation>Summe</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1214"/>
         <source>Total number of activities in this period</source>
-        <translation type="unfinished"></translation>
+        <translation>Gesamtanzahl der Aktivitäten in diesem Zeitraum</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1215"/>
         <source>Planned</source>
-        <translation type="unfinished">Geplant</translation>
+        <translation>Geplant</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1215"/>
         <source>Activities that were part of the training plan</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivitäten, die Teil des Trainingsplans waren</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1216"/>
         <source>Unplanned</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungeplant</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1216"/>
         <source>Activities completed without being in the plan</source>
-        <translation type="unfinished"></translation>
+        <translation>Activities completed without being in the plan</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1217"/>
         <source>On-Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Pünktlich</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1217"/>
         <source>Planned activities completed on the scheduled date</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplante Aktivitäten am geplanten Datum abgeschlossen</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1218"/>
         <source>Shifted</source>
-        <translation type="unfinished"></translation>
+        <translation>Verschoben</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1218"/>
         <source>Planned activities rescheduled to a different date</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplante Aktivitäten auf ein anderes Datum verschoben</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1219"/>
         <source>Missed</source>
-        <translation type="unfinished"></translation>
+        <translation>Verpasst</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1219"/>
         <source>Planned activities that were not completed</source>
-        <translation type="unfinished"></translation>
+        <translation>Planned activities that were not completed</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1220"/>
         <source>Avg Shift</source>
-        <translation type="unfinished"></translation>
+        <translation>Durchschnittliche Verschiebung</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1220"/>
         <source>Average number of days between original and rescheduled planned date</source>
-        <translation type="unfinished"></translation>
+        <translation>Durchschnittliche Anzahl der Tage zwischen dem ursprünglichen und dem verschobenen geplanten Datum</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1221"/>
         <source>Total Shift Days</source>
-        <translation type="unfinished"></translation>
+        <translation>Verschibungstage insgesamt</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1221"/>
         <source>Sum of days by which planned activities were rescheduled</source>
-        <translation type="unfinished"></translation>
+        <translation>Summe der Tage, um die geplante Aktivitäten verschoben wurden</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1239"/>
         <source>No activities found</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Aktivitäts gefunden</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1240"/>
         <source>There are no activities for the selected month.</source>
-        <translation type="unfinished"></translation>
+        <translation>Für den ausgewählten Monat gibt es keine Aktivitäten.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1241"/>
         <source>Try selecting a different month, adjusting your filters, or creating a new activity.</source>
-        <translation type="unfinished"></translation>
+        <translation>Versuchen Sie, einen anderen Monat auszuwählen, Ihre Filter anzupassen oder eine neue Aktivität zu erstellen.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1318"/>
@@ -29283,12 +29302,12 @@ Möchten Sie fortfahren?</translation>
         <location filename="../../Gui/PlanAdherence.cpp" line="1326"/>
         <location filename="../../Gui/PlanAdherence.cpp" line="1327"/>
         <source>N/A</source>
-        <translation type="unfinished">N.V.</translation>
+        <translation>N.V.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1398"/>
         <source>Season: %1</source>
-        <translation type="unfinished">Saison: %1</translation>
+        <translation>Saison: %1</translation>
     </message>
 </context>
 <context>
@@ -29296,57 +29315,57 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../../Charts/PlanAdherenceWindow.cpp" line="286"/>
         <source>Absolute</source>
-        <translation type="unfinished">Absolut</translation>
+        <translation>Absolut</translation>
     </message>
     <message>
         <location filename="../../Charts/PlanAdherenceWindow.cpp" line="287"/>
         <source>Percentage</source>
-        <translation type="unfinished"></translation>
+        <translation>Prozentwert</translation>
     </message>
     <message>
         <location filename="../../Charts/PlanAdherenceWindow.cpp" line="292"/>
         <source>Activity title</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel der Aktivität</translation>
     </message>
     <message>
         <location filename="../../Charts/PlanAdherenceWindow.cpp" line="293"/>
         <source>Field</source>
-        <translation type="unfinished">Feld</translation>
+        <translation>Feld</translation>
     </message>
     <message>
         <location filename="../../Charts/PlanAdherenceWindow.cpp" line="294"/>
         <source>Fallback Field</source>
-        <translation type="unfinished">Ausweichfeld</translation>
+        <translation>Ausweichfeld</translation>
     </message>
     <message>
         <location filename="../../Charts/PlanAdherenceWindow.cpp" line="296"/>
         <source>Adherence window (days)</source>
-        <translation type="unfinished"></translation>
+        <translation>Einhaltungszeitraum (Tage)</translation>
     </message>
     <message>
         <location filename="../../Charts/PlanAdherenceWindow.cpp" line="297"/>
         <source>Before</source>
-        <translation type="unfinished"></translation>
+        <translation>Zuvor</translation>
     </message>
     <message>
         <location filename="../../Charts/PlanAdherenceWindow.cpp" line="298"/>
         <source>After</source>
-        <translation type="unfinished"></translation>
+        <translation>Danach</translation>
     </message>
     <message>
         <location filename="../../Charts/PlanAdherenceWindow.cpp" line="300"/>
         <source>Statistics display</source>
-        <translation type="unfinished"></translation>
+        <translation>Statistikanzeige</translation>
     </message>
     <message>
         <location filename="../../Charts/PlanAdherenceWindow.cpp" line="344"/>
         <source>Unnamed %1</source>
-        <translation type="unfinished">Unbenannt %1</translation>
+        <translation>Unbenannt %1</translation>
     </message>
     <message>
         <location filename="../../Charts/PlanAdherenceWindow.cpp" line="346"/>
         <source>&lt;unknown&gt;</source>
-        <translation type="unfinished">&lt;unbekannt&gt;</translation>
+        <translation>&lt;unbekannt&gt;</translation>
     </message>
 </context>
 <context>
@@ -30346,117 +30365,117 @@ Python wird in den Einstellungen deaktiviert.</translation>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="269"/>
         <source>Path is not a file</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Pfad ist keine Datei</translation>
     </message>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="273"/>
         <source>File is not readable</source>
-        <translation type="unfinished"></translation>
+        <translation>Datei ist nicht lesbar</translation>
     </message>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="279"/>
         <source>Failed to create temporary directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Temporäres Verzeichnis konnte nicht erstellt werden</translation>
     </message>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="286"/>
         <source>Failed to unpack bundle</source>
-        <translation type="unfinished"></translation>
+        <translation>Paket konnte nicht entpackt werden</translation>
     </message>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="291"/>
         <source>Failed to load metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Metadaten konnten nicht geladen werden</translation>
     </message>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="298"/>
         <source>Invalid bundle structure</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungültige Bundle-Struktur</translation>
     </message>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="309"/>
         <source>Failed to load activity %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivität %1 konnte nicht geladen werden</translation>
     </message>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="316"/>
         <source>No activities in bundle</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Aktivitäten im Paket</translation>
     </message>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="359"/>
         <source>No bundle was loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>Das aktuelle Paket ist ungültig</translation>
     </message>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="363"/>
         <source>Current bundle is invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>Das aktuelle Paket ist ungültig</translation>
     </message>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="371"/>
         <source>Bundle can&apos;t be imported: Conflicts with linked planned activity on %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Bundle kann nicht importiert werden: Konflikt mit verknüpfter geplanter Aktivität am %1</translation>
     </message>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="380"/>
         <source>Failed to process the attached workout</source>
-        <translation type="unfinished"></translation>
+        <translation>Konnte das angehängte Workout nicht verarbeiten</translation>
     </message>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="385"/>
         <source>Failed to import activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Import der Aktivität fehlgeschlagen</translation>
     </message>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="694"/>
         <source>No temporary directory set</source>
-        <translation type="unfinished"></translation>
+        <translation>Kein temporäres Verzeichnis festgelegt</translation>
     </message>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="711"/>
         <source>Bundle is missing required entry: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Bundle is missing required entry: %1</translation>
     </message>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="717"/>
         <source>Bundle contains unexpected entry: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Das Paket enthält einen unerwarteten Eintrag: %1</translation>
     </message>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="724"/>
         <source>Mismatch between the manifest and available activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Unstimmigkeit zwischen dem Manifest und den verfügbaren Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="733"/>
         <source>Invalid workout file %1 in bundle</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungültige Workout-Datei %1 im Paket</translation>
     </message>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="742"/>
         <source>Bad hash or filename for workout file (%1) in bundle</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungültiger Hash oder Dateiname für die Workout-Datei (%1) im Paket</translation>
     </message>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="746"/>
         <source>Non-file %1 given in workout folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht-Datei %1 im Workout-Ordner angegeben</translation>
     </message>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="760"/>
         <source>Missing workout %1 linked from activity %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Missing workout %1 linked from activity %2</translation>
     </message>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="766"/>
         <source>Bundle contains unused workouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Paket enthält ungenutzte Workouts</translation>
     </message>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="778"/>
         <source>Duration mismatch between manifest and activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Dauer stimmt zwischen Manifest und Aktivitäten nicht überein</translation>
     </message>
     <message>
         <location filename="../../Planning/PlanBundle.cpp" line="859"/>
@@ -30482,17 +30501,17 @@ Python wird in den Einstellungen deaktiviert.</translation>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1762"/>
         <source>not in summary</source>
-        <translation type="unfinished"></translation>
+        <translation>nicht in der Zusammenfassung</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1765"/>
         <source>enlarged for readability</source>
-        <translation type="unfinished"></translation>
+        <translation>Zur Lesbarkeit vergrößert</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1767"/>
         <source>shortened at midnight</source>
-        <translation type="unfinished"></translation>
+        <translation>Um Mitternacht gekürzt</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1782"/>
@@ -30503,7 +30522,7 @@ Python wird in den Einstellungen deaktiviert.</translation>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1786"/>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1807"/>
         <source>Originally</source>
-        <translation type="unfinished"></translation>
+        <translation>Ursprünglich</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1791"/>
@@ -30523,7 +30542,7 @@ Python wird in den Einstellungen deaktiviert.</translation>
     <message>
         <location filename="../../Python/PythonEmbed.cpp" line="341"/>
         <source>Python not available</source>
-        <translation type="unfinished"></translation>
+        <translation>Python ist nicht verfügbar.</translation>
     </message>
     <message>
         <location filename="../../Python/PythonEmbed.cpp" line="342"/>
@@ -30531,22 +30550,25 @@ Python wird in den Einstellungen deaktiviert.</translation>
 
 Please ensure Python 3.%1 is installed and in your PATH.
 You can disable Python in Options &gt; General if you don&apos;t need it.</source>
-        <translation type="unfinished"></translation>
+        <translation>GoldenCheetah wurde mit Python 3.%1 erstellt, konnte Python aber nicht starten.
+
+Bitte stelle sie sicher, dass Python 3.%1 installiert ist und sich in deinem PFAD befindet.
+Sie können Python unter Optionen -&gt; Allgemein deaktivieren, wenn Sie es nicht benötigen.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthPKCE.cpp" line="330"/>
         <source>Token refresh failed: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Tokenaktualisierung fehlgeschlagen: %1</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthPKCE.cpp" line="341"/>
         <source>Failed to parse refresh response: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler beim Parsen der Aktualisierungsantwort: %1</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthPKCE.cpp" line="355"/>
         <source>No access token in refresh response.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kein Zugriffstoken in der Aktualisierungsantwort.</translation>
     </message>
 </context>
 <context>
@@ -31232,32 +31254,32 @@ You can disable Python in Options &gt; General if you don&apos;t need it.</sourc
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="812"/>
         <source>Repeat Plan - Activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan wiederholen - Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="813"/>
         <source>Review and choose the activities you wish to add to your plan.</source>
-        <translation type="unfinished"></translation>
+        <translation>Überprüfen Sie die Aktivitäten und wählen Sie diejenigen aus, die Sie Ihrer Plannung hinzufügen möchten.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="825"/>
         <source>No selected activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine ausgewählten Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="830"/>
         <source>Activities for your new plan</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivitäten für Ihren neuen Plan</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="904"/>
         <source>Choose one to plan</source>
-        <translation type="unfinished"></translation>
+        <translation>Wählen Sie eine aus, um zu planen</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="906"/>
         <source>Blocked by linked activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Blockiert durch verknüpfte Aktivität</translation>
     </message>
 </context>
 <context>
@@ -31265,42 +31287,42 @@ You can disable Python in Options &gt; General if you don&apos;t need it.</sourc
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="628"/>
         <source>Repeat Plan - Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan wiederholen - Einstellungen</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="629"/>
         <source>Define the time range and repetition strategy for copying activities. Optionally select a season or phase to prefill the dates; only those ending before the target date &lt;b&gt;%1&lt;/b&gt; can be selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Definieren Sie den Zeitraum und die Wiederholungsstrategie für das Kopieren von Aktivitäten. Optional können Sie eine Saison oder Phase auswählen, um die Daten vorab auszufüllen; es können nur solche ausgewählt werden, die vor dem Zieldatum &lt;b&gt;%1&lt;/b&gt; enden.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="677"/>
         <source>As originally planned</source>
-        <translation type="unfinished"></translation>
+        <translation>Wie ursprünglich geplant</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="678"/>
         <source>As currently planned</source>
-        <translation type="unfinished"></translation>
+        <translation>Wie aktuell geplant</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="685"/>
         <source>Keep leading and trailing gaps</source>
-        <translation type="unfinished"></translation>
+        <translation>Führende und nachfolgende Lücken beibehalten</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="688"/>
         <source>No planned activities in source period</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine geplanten Aktivitäten im Quellzeitraum</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="692"/>
         <source>Source Period</source>
-        <translation type="unfinished"></translation>
+        <translation>Quellzeitraum</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="696"/>
         <source>Repetition Strategy</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederholungsstrategie</translation>
     </message>
 </context>
 <context>
@@ -31308,32 +31330,32 @@ You can disable Python in Options &gt; General if you don&apos;t need it.</sourc
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="975"/>
         <source>Repeat Plan - Summary</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan wiederholen - Übersicht</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="976"/>
         <source>Preview the plan updates, including planned additions and deletions. No changes will be made until you continue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorschau der Planungsänderungen, einschließlich der hinzugefügten geplanten und gelöschten Aktivitäten. Es erfolgen keine Änderungen, bis Sie fortfahren.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="980"/>
         <source>New Plan Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>Übersicht des neuen Plans</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="986"/>
         <source>Planned Activities Marked for Deletion</source>
-        <translation type="unfinished">Geplante Aktivitäten zum Löschen markiert</translation>
+        <translation>Geplante Aktivitäten zum Löschen markiert</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="992"/>
         <source>No selected activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine ausgewählten Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="1063"/>
         <source>skipped</source>
-        <translation type="unfinished"></translation>
+        <translation>übersprungen</translation>
     </message>
 </context>
 <context>
@@ -31341,7 +31363,7 @@ You can disable Python in Options &gt; General if you don&apos;t need it.</sourc
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="400"/>
         <source>Repeat Plan</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan wiederholen</translation>
     </message>
 </context>
 <context>
@@ -31616,7 +31638,7 @@ Durch das Verschieben wird die Linkreferenz aktualisiert. Sie müssen zuerst die
     <message>
         <location filename="../../Core/RideCache.cpp" line="1363"/>
         <source>Failed to save activity file after rename</source>
-        <translation type="unfinished"></translation>
+        <translation>Das Speichern der Aktivitätsdatei ist nach der Umbenennung fehlgeschlagen</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="1425"/>
@@ -33130,7 +33152,9 @@ Möchten Sie fortfahren?</translation>
         <source>INFO for athlete %1
 
 Automatic import from defined directories is completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>INFO für Athlet %1
+
+Der automatische Import aus den festgelegten Verzeichnissen ist abgeschlossen.</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="1044"/>
@@ -33749,7 +33773,10 @@ aufgelisteten Aktivitäten wurden noch nicht gespeichert.</translation>
 
 You have made changes to some rides which
 have not been saved. They are listed below.</source>
-        <translation type="unfinished"></translation>
+        <translation>WARNUNG für Athlet %1
+
+Die von Ihnen gemachten Änderungen an den nachfolgend 
+aufgelisteten Aktivitäten wurden noch nicht gespeichert.</translation>
     </message>
     <message>
         <location filename="../../Gui/SaveDialogs.cpp" line="330"/>
@@ -36568,22 +36595,22 @@ Falls eine neu erstellte Aktivität zeitlich mit einer bereits existierenden zus
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="170"/>
         <source>%1 to copy</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 zum Kopieren</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="174"/>
         <source>%1 to remove</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 zu entfernen</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="213"/>
         <source>%1 d</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 T</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="215"/>
         <source>%1 w</source>
-        <translation type="unfinished">%1 W</translation>
+        <translation>%1 W</translation>
     </message>
 </context>
 <context>
@@ -37845,7 +37872,7 @@ F3 drücken, wenn fertig.</translation>
     <message>
         <location filename="../../Cloud/Tredict.h" line="34"/>
         <source>Tredict</source>
-        <translation type="unfinished"></translation>
+        <translation>Tredict</translation>
     </message>
     <message>
         <location filename="../../Cloud/Tredict.h" line="35"/>
@@ -37882,17 +37909,17 @@ F3 drücken, wenn fertig.</translation>
     <message>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="66"/>
         <source>check/uncheck all</source>
-        <translation type="unfinished">Alle auswählen/abwählen</translation>
+        <translation>Alle auswählen/abwählen</translation>
     </message>
     <message>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="71"/>
         <source>From:</source>
-        <translation type="unfinished">Von:</translation>
+        <translation>Von:</translation>
     </message>
     <message>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="77"/>
         <source>To:</source>
-        <translation type="unfinished">Bis:</translation>
+        <translation>Bis:</translation>
     </message>
     <message>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="83"/>
@@ -37902,37 +37929,37 @@ F3 drücken, wenn fertig.</translation>
     <message>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="91"/>
         <source>Date</source>
-        <translation type="unfinished">Datum</translation>
+        <translation>Datum</translation>
     </message>
     <message>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="92"/>
         <source>Sport</source>
-        <translation type="unfinished">Sport</translation>
+        <translation>Sport</translation>
     </message>
     <message>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="93"/>
         <source>Name</source>
-        <translation type="unfinished">Name</translation>
+        <translation>Name</translation>
     </message>
     <message>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="94"/>
         <source>Duration</source>
-        <translation type="unfinished">Dauer</translation>
+        <translation>Dauer</translation>
     </message>
     <message>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="95"/>
         <source>Action</source>
-        <translation type="unfinished">Aktion</translation>
+        <translation>Aktion</translation>
     </message>
     <message>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="111"/>
         <source>Overwrite existing workouts</source>
-        <translation type="unfinished">Bestehende Workouts überschreiben</translation>
+        <translation>Bestehende Workouts überschreiben</translation>
     </message>
     <message>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="112"/>
         <source>Close</source>
-        <translation type="unfinished">Schließen</translation>
+        <translation>Schließen</translation>
     </message>
     <message>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="113"/>
@@ -37940,23 +37967,23 @@ F3 drücken, wenn fertig.</translation>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="174"/>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="220"/>
         <source>Download</source>
-        <translation type="unfinished">Herunterladen</translation>
+        <translation>Herunterladen</translation>
     </message>
     <message>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="168"/>
         <source>Download...</source>
-        <translation type="unfinished">Herunterladen...</translation>
+        <translation>Herunterladen...</translation>
     </message>
     <message>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="171"/>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="181"/>
         <source>Abort</source>
-        <translation type="unfinished">Abbrechen</translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="173"/>
         <source>%1 workouts downloaded, %2 failed or skipped.</source>
-        <translation type="unfinished">%1 Workouts heruntergeladen, %2 fehlgeschlagen oder übersprungen.</translation>
+        <translation>%1 Workouts heruntergeladen, %2 fehlgeschlagen oder übersprungen.</translation>
     </message>
     <message>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="198"/>
@@ -37994,22 +38021,22 @@ F3 drücken, wenn fertig.</translation>
     <message>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="545"/>
         <source>Downloading...</source>
-        <translation type="unfinished">Herunterladen...</translation>
+        <translation>Herunterladen...</translation>
     </message>
     <message>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="575"/>
         <source>Exists already</source>
-        <translation type="unfinished">Bereits vorhanden</translation>
+        <translation>Bereits vorhanden</translation>
     </message>
     <message>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="583"/>
         <source>Write failed</source>
-        <translation type="unfinished">Schreiben fehlgeschlagen</translation>
+        <translation>Schreiben fehlgeschlagen</translation>
     </message>
     <message>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="594"/>
         <source>Saved</source>
-        <translation type="unfinished">Gespeichert</translation>
+        <translation>Gespeichert</translation>
     </message>
     <message>
         <location filename="../../Cloud/TredictWorkoutDownload.cpp" line="599"/>
@@ -38255,7 +38282,7 @@ F3 drücken, wenn fertig.</translation>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="872"/>
         <source>Duplicate</source>
-        <translation type="unfinished"></translation>
+        <translation>Duplizieren</translation>
     </message>
     <message>
         <source>Edit</source>
