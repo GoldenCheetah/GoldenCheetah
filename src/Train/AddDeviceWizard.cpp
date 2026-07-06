@@ -92,7 +92,7 @@ AddDeviceWizard::AddDeviceWizard(Context *context) : QWizard(context->mainWindow
 AddType::AddType(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent)
 {
     setTitle(tr("Select Device"));
-    setSubTitle(tr("What kind of device to add"));
+    setSubTitle(tr("What kind of device to add") + tr(" ***Adapter/Device must be connected*** "));
 
     QWidget *buttons = new QWidget(this);
 
