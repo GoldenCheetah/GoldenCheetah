@@ -69,8 +69,6 @@ private slots:
 
 
 private:
-    QString formatTimestamp(qint64 msecs) const;
-
     Context *m_context;
     QString m_plannedRoute;
     QTimer *m_telemetryThrottle;
