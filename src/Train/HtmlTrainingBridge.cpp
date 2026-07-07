@@ -298,13 +298,13 @@ void HtmlTrainingBridge::onTelemetryUpdate(const RealtimeData &rt)
     // Queue for throttled emission
     QJsonObject tel;
 
-for (RealtimeData::DataSeries series : RealtimeData::listDataSeries()) {
-    if (series == RealtimeData::None) continue;
-    tel[RealtimeData::seriesSymbol(series)] = rt.value(series);
-}
+    for (RealtimeData::DataSeries series : RealtimeData::listDataSeries()) {
+        if (series == RealtimeData::None) continue;
+        tel[RealtimeData::seriesSymbol(series)] = rt.value(series);
+    }
 
-    qint64 erg_time_msecs = m_context ? m_context->getNow() : 0;
-    tel["erg_time_msecs"] = static_cast<double>(erg_time_msecs);
+    qint64 currentPosition = m_context ? m_context->getNow() : 0;
+    tel["Current Position"] = static_cast<double>(currentPosition);
     tel["notification_text"] = m_currentMessage;
 
     m_pendingTelemetrySample = QString::fromUtf8(QJsonDocument(tel).toJson(QJsonDocument::Compact));
