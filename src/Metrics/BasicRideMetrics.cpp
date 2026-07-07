@@ -661,6 +661,11 @@ class AthleteFat : public RideMetric {
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
         setValue(item->getWeight(Measure::FatKg));
+        if (item->getWeight(Measure::FatKg) > 0)
+            setValue(item->getWeight(Measure::FatKg));
+        else
+            setValue(item->getWeight() * item->getWeight(Measure::FatPercent) / 100.0);
+        setCount(1);
     }
 
     MetricClass classification() const { return Undefined; }
@@ -697,6 +702,7 @@ class AthleteBones : public RideMetric {
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
         setValue(item->getWeight(Measure::BonesKg));
+        setCount(1);
     }
 
     MetricClass classification() const { return Undefined; }
@@ -733,6 +739,7 @@ class AthleteMuscles : public RideMetric {
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
         setValue(item->getWeight(Measure::MuscleKg));
+        setCount(1);
     }
 
     MetricClass classification() const { return Undefined; }
@@ -769,6 +776,7 @@ class AthleteLean : public RideMetric {
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
         setValue(item->getWeight(Measure::LeanKg));
+        setCount(1);
     }
 
     MetricClass classification() const { return Undefined; }
@@ -803,7 +811,13 @@ class AthleteFatP : public RideMetric {
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-        setValue(item->getWeight(Measure::FatPercent));
+        if (item->getWeight(Measure::FatPercent) > 0)
+            setValue(item->getWeight(Measure::FatPercent));
+        else if (item->getWeight() > 0)
+            setValue(100 * item->getWeight(Measure::FatKg) / item->getWeight());
+        else
+            setValue(0.0);
+        setCount(1);
     }
 
     MetricClass classification() const { return Undefined; }
@@ -1041,6 +1055,7 @@ class AvgSpeed : public RideMetric {
             }
 
             setValue(secsMoving ? km / secsMoving * 3600.0 : 0.0);
+            setCount(secsMoving);
 
         } else {
 
@@ -1048,6 +1063,7 @@ class AvgSpeed : public RideMetric {
             assert(deps.contains("workout_time"));
             secsMoving = deps.value("workout_time")->value(true);
             setValue(secsMoving ? km / secsMoving * 3600.0 : 0.0);
+            setCount(secsMoving);
 
         }
     }
@@ -1303,7 +1319,7 @@ struct NonZeroPower : public RideMetric {
         setMetricUnits(tr("watts"));
         setImperialUnits(tr("watts"));
         setType(RideMetric::Average);
-        setDescription(tr("Average Power without zero values, it gives inflated values when frecuent coasting is present"));
+        setDescription(tr("Average Power without zero values, it gives inflated values when frequent coasting is present"));
     }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
@@ -1670,10 +1686,10 @@ class APPercent : public RideMetric {
         double percent = 0.0f;
         AvgPower *pw = dynamic_cast<AvgPower*>(deps.value("average_power"));
 
-        if (pw->value(true) > 0.0f && item->context->athlete->zones(item->isRun) && item->zoneRange >= 0) {
+        if (pw->value(true) > 0.0f && item->context->athlete->zones(item->sport) && item->zoneRange >= 0) {
 
             // get Pmax
-            double pmax = item->context->athlete->zones(item->isRun)->getPmax(item->zoneRange);
+            double pmax = item->context->athlete->zones(item->sport)->getPmax(item->zoneRange);
             percent = pw->value(true)/pmax * 100;
         }
         setValue(percent);
@@ -2836,7 +2852,7 @@ class AvgLTE : public RideMetric {
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
 
-            if (point->lte && point->watts > 0.0f && point->cad && point->lrbalance > 0.0f && point->lrbalance < 100.0f) {
+            if (point->lte && point->watts > 0.0f && point->cad && point->lrbalance != RideFile::NA) {
                 samples ++;
                 total += point->lte;
             }
@@ -2890,7 +2906,7 @@ class AvgRTE : public RideMetric {
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->rte && point->watts > 0.0f && point->cad && point->lrbalance > 0.0f && point->lrbalance < 100.0f) {
+            if (point->rte && point->watts > 0.0f && point->cad && point->lrbalance != RideFile::NA) {
                 samples ++;
                 total += point->rte;
             }
@@ -2944,7 +2960,7 @@ class AvgLPS : public RideMetric {
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->lps && point->watts > 0.0f && point->cad && point->lrbalance > 0.0f && point->lrbalance < 100.0f) {
+            if (point->lps && point->watts > 0.0f && point->cad && point->lrbalance != RideFile::NA) {
                 samples ++;
                 total += point->lps;
             }
@@ -2998,7 +3014,7 @@ class AvgRPS : public RideMetric {
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->rps && point->watts > 0.0f && point->cad && point->lrbalance > 0.0f && point->lrbalance < 100.0f) {
+            if (point->rps && point->watts > 0.0f && point->cad && point->lrbalance != RideFile::NA) {
                 samples ++;
                 total += point->rps;
             }

@@ -57,22 +57,7 @@ GcToolBar::paintBackground(QPaintEvent *)
     // get the widget area
     QRect all(0,0,width(),height());
 
-    // fill with a linear gradient
-    QLinearGradient linearGradient = GCColor::linearGradient(23, isActiveWindow());
-    
     painter.setPen(Qt::NoPen);
-    painter.fillRect(all, linearGradient);
+    painter.fillRect(all, GColor(CTOOLBAR));
 
-    if (!GCColor::isFlat()) {
-        // paint the bottom lines
-        QPen black(QColor(100,100,100));
-        painter.setPen(black);
-        painter.drawLine(0,height()-1, width()-1, height()-1);
-
-#ifndef Q_OS_WIN32 // never on windows.
-        QPen gray(QColor(230,230,230));
-        painter.setPen(gray);
-        painter.drawLine(0,0, width()-1, 0);
-#endif
-    }
 }

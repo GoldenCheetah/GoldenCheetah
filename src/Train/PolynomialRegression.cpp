@@ -287,7 +287,7 @@ struct RationalFitterGenerator {
 
 template <size_t T_maxSize, size_t T_maxDen, typename T, typename T_inittype>
 struct RationalFitterGenerator<T_maxSize, T_maxDen, T, T_inittype, T_maxSize> {
-    CONSTEXPR static void setMaker(std::array<T * (*)(const T_inittype&, const T_inittype&, const typename T_inittype::value_type&), T_maxSize>& p) { p; }
+    CONSTEXPR static void setMaker(std::array<T * (*)(const T_inittype&, const T_inittype&, const typename T_inittype::value_type&), T_maxSize>& p) { (void)(p); }
 };
 
 template <size_t T_maxNum, size_t T_maxDen, typename T, typename T_inittype>

@@ -35,7 +35,29 @@ defineReplace(qwtLibraryTarget) {
 
 defineTest(qwtAddLibrary) {
 
-    LIB_NAME = $$1
+    LIB_PATH = $$1
+    LIB_NAME = $$2
+
+    mac:contains(QWT_CONFIG, QwtFramework) {
+
+        LIBS      *= -F$${LIB_PATH}
+    }
+    else {
+
+        unix:lessThan(QT_MAJOR_VERSION, 5) {
+
+            # Many Linux distributions install Qwt in the same directory
+            # as the Qt libs and thus we need to prepend the path for the local build
+            # to avoid conflicting with the installed version.
+            # Qt5 qmake appends ( instead of prepending ) the path to the Qt libs
+            # to LIBS, but for Qt4 we need to use the QMAKE_LIBDIR_FLAGS.
+
+            QMAKE_LIBDIR_FLAGS *= -L$${LIB_PATH}
+        }
+        else {
+            LIBS *= -L$${LIB_PATH}
+        }
+    }
 
     unset(LINKAGE)
 
@@ -66,6 +88,7 @@ defineTest(qwtAddLibrary) {
     LIBS += $$LINKAGE
     export(LIBS)
     export(QMAKE_LFLAGS)
+    export(QMAKE_LIBDIR_FLAGS)
 
     return(true)
 }

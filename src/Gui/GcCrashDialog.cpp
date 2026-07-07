@@ -37,11 +37,7 @@
 #define COMPILER_VERSION QString("%1").arg(_MSC_VER)
 #endif
 
-#if defined(GC_VIDEO_AV) || defined(GC_VIDEO_QUICKTIME)
-#include "QtMacVideoWindow.h"
-#else
 #include "VideoWindow.h"
-#endif
 
 #ifdef GC_HAVE_ICAL
 #include "ICalendar.h"
@@ -69,8 +65,6 @@
 #endif
 
 #include <gsl/gsl_version.h>
-
-#include "levmar.h"
 
 QString gl_version;
 
@@ -132,7 +126,6 @@ GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(hom
 
     report = new QWebEngineView(this);
     report->setContentsMargins(0,0,0,0);
-    report->page()->view()->setContentsMargins(0,0,0,0);
     report->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     report->setAcceptDrops(false);
     report->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+1);
@@ -154,33 +147,15 @@ GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(hom
     setHTML();
 }
 
+GcCrashDialog::~GcCrashDialog()
+{
+    if (report) delete report->page();
+}
+
 QString GcCrashDialog::versionHTML()
 {
     // -- OS ----
-    QString os = "";
-
-    #ifdef Q_OS_LINUX
-    os = "Linux";
-    #endif
-
-    #ifdef WIN32
-    os = "Win";
-    #endif
-
-    #ifdef Q_OS_MAC
-    os = QString("Mac OS X 10.%1").arg(QSysInfo::MacintoshVersion - 2);
-    if (QSysInfo::MacintoshVersion == QSysInfo::MV_SNOWLEOPARD)
-        os += " Snow Leopard";
-    else if (QSysInfo::MacintoshVersion == QSysInfo::MV_LION)
-        os += " Lion";
-    else if (QSysInfo::MacintoshVersion == 10)
-        os += " Mountain Lion";
-    else if (QSysInfo::MacintoshVersion == 11)
-        os += " Mavericks";
-    else if (QSysInfo::MacintoshVersion == 12)
-        os += " Yosemite";
-
-    #endif
+    QString os = QSysInfo::prettyProductName();
 
     // -- SCHEMA VERSION ----
     QString schemaVersion = QString("%1").arg(DBSchemaVersion);
@@ -201,13 +176,6 @@ QString GcCrashDialog::versionHTML()
 
     #ifdef GC_HAVE_D2XX
     d2xx = "yes";
-    #endif
-
-    // -- KML ----
-    QString kml = "none";
-
-    #ifdef GC_HAVE_KML
-    kml = "yes";
     #endif
 
     // -- ICAL ----
@@ -258,8 +226,9 @@ QString GcCrashDialog::versionHTML()
             "<br>Metrics: %7"
             "<br>OS: %6"
 #ifdef Q_OS_LINUX
-            "<br>OpenGL: %8"
+            "<br>OpenGL: %10"
 #endif
+            "<br>UI: dpi scale (%8) font size (%9)"
             "<br>")
             .arg(__DATE__)
             .arg(__TIME__)
@@ -272,6 +241,8 @@ QString GcCrashDialog::versionHTML()
             .arg(schemaVersion)
             .arg(os)
             .arg(factory.metricCount())
+            .arg(dpiXFactor)
+            .arg(QFont().pointSizeF())
 #ifdef Q_OS_LINUX
             .arg(gl_version)
 #endif
@@ -284,7 +255,6 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">%3</td><td>%4</td></tr>"
             "<tr><td colspan=\"2\">SRMIO</td><td>%5</td></tr>"
             "<tr><td colspan=\"2\">D2XX</td><td>%6</td></tr>"
-            "<tr><td colspan=\"2\">KML</td><td>%8</td></tr>"
             "<tr><td colspan=\"2\">ICAL</td><td>%9</td></tr>"
             "<tr><td colspan=\"2\">USBXPRESS</td><td>%10</td></tr>"
             "<tr><td colspan=\"2\">LIBUSB</td><td>%11</td></tr>"
@@ -295,8 +265,7 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">R</td><td>%16</td></tr>"
             "<tr><td colspan=\"2\">Python</td><td>%18</td></tr>"
             "<tr><td colspan=\"2\">LMFIT</td><td>7.0</td></tr>"
-            "<tr><td colspan=\"2\">LEVMAR</td><td>%19</td></tr>"
-            "<tr><td colspan=\"2\">GSL</td><td>%20</td></tr>"
+            "<tr><td colspan=\"2\">GSL</td><td>%19</td></tr>"
             "</table>"
             )
             .arg(QT_VERSION_STR)
@@ -305,15 +274,12 @@ QString GcCrashDialog::versionHTML()
             .arg(COMPILER_VERSION)
             .arg(srmio)
             .arg(d2xx)
-            .arg(kml)
             .arg(ical)
             .arg(usbxpress)
             .arg(libusb)
             .arg(vlc)
-#if defined GC_VIDEO_QUICKTIME
-            .arg("quicktime")
-#elif defined GC_VIDEO_QT5
-            .arg("qt5")
+#if defined GC_VIDEO_QT6
+            .arg("qt6")
 #elif defined GC_VIDEO_VLC
             .arg("vlc")
 #else
@@ -326,12 +292,11 @@ QString GcCrashDialog::versionHTML()
 #else
             .arg("none")
 #endif
-#ifdef GC_HAVE_PYTHON
+#ifdef GC_WANT_PYTHON
             .arg(QString("%1 [%2]").arg(python ? python->version.split(" ").at(0) : QString("none")).arg(PythonEmbed::buildVersion()))
 #else
             .arg("none")
 #endif
-            .arg(LM_VERSION)
             .arg(gsl)
             ;
 
@@ -492,7 +457,6 @@ GcCrashDialog::saveAs()
     QFile file(fileName);
     file.resize(0);
     QTextStream out(&file);
-    out.setCodec("UTF-8");
 
     if (file.open(QIODevice::WriteOnly)) {
         // write the texts

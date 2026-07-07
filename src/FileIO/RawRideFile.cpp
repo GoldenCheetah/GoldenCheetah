@@ -30,6 +30,13 @@
 #define DUP(fd) dup(fd)
 #endif
 
+#ifdef Q_CC_MSVC
+// 'fscanf': This function or variable may be unsafe.
+// 'sprintf': This function or variable may be unsafe.
+// 'fdopen': The POSIX name for this item is deprecated.
+#pragma warning(disable:4996)
+#endif
+
 static int rawFileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "raw", "GoldenCheetah Raw PowerTap Format", new RawFileReader());
@@ -70,7 +77,7 @@ time_cb(struct tm *, time_t since_epoch, void *context)
     if (state->rideFile->startTime().isNull())
     {
         QDateTime t;
-        t.setTime_t(since_epoch);
+        t.setSecsSinceEpoch(since_epoch);
         state->rideFile->setStartTime(t);
     }
     if (state->start_since_epoch == 0)

@@ -25,14 +25,16 @@
 #include "NavigationModel.h"
 #include "UserMetricSettings.h"
 #include "UserMetricParser.h"
+#include "SpecialFields.h"
 #include "DataFilter.h"
+#include "HtmlTrainingBridge.h"
 
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
 #include <QMutex>
+#include <QWebEngineProfile>
 
-// singleton
-static GlobalContext *globalContext = NULL;
+
 static QList<Context*> _contexts;
 
 GlobalContext::GlobalContext()
@@ -42,9 +44,19 @@ GlobalContext::GlobalContext()
     readConfig(0); // don't reread user metrics just yet
 }
 
+GlobalContext*
+GlobalContext::context()
+{
+    // Meyer's singleton pattern
+    static GlobalContext globalContext; // Guaranteed thread-safe initialization
+    return &globalContext;
+}
+
 void
 GlobalContext::notifyConfigChanged(qint32 state)
 {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
     // read it in - global only
     readConfig(state);
 
@@ -55,6 +67,8 @@ GlobalContext::notifyConfigChanged(qint32 state)
     foreach(Context *p, _contexts)
         if (Context::isValid(p))
             p->notifyConfigChanged(state);
+
+    QApplication::restoreOverrideCursor();
 }
 
 void
@@ -77,7 +91,7 @@ GlobalContext::readConfig(qint32 state)
     // redo
     rideMetadata = new RideMetadata(NULL);
     colorEngine = new ColorEngine(this);
-    specialFields = SpecialFields();
+    SpecialFields::getInstance().reloadFields();
 
     if (state & CONFIG_USERMETRICS)  userMetricsConfigChanged();
 
@@ -109,31 +123,24 @@ GlobalContext::userMetricsConfigChanged()
     }
 
 
-    // change the schema version
-    quint16 changed = RideMetric::userMetricFingerprint(_userMetrics);
+    // change the schema version, this may trigger metrics recomputation
+    UserMetricSchemaVersion = RideMetric::userMetricFingerprint(_userMetrics);
 
-    if (UserMetricSchemaVersion != changed) {
+    // update metric factory deleting originals
+    RideMetricFactory::instance().removeUserMetrics();
 
-        // we'll fix it
-        UserMetricSchemaVersion = changed;
-
-        // update metric factory deleting originals
-        RideMetricFactory::instance().removeUserMetrics();
-
-        // now add user metrics
-        foreach(UserMetricSettings m, _userMetrics) {
-            RideMetricFactory::instance().addMetric(UserMetric(_contexts.at(0), m));
-        }
+    // now add user metrics
+    foreach(UserMetricSettings m, _userMetrics) {
+        RideMetricFactory::instance().addMetric(UserMetric(_contexts.at(0), m));
     }
+
+    // refresh SpecialFields to include updated user metrics
+    SpecialFields::getInstance().reloadFields();
 }
 
-GlobalContext *GlobalContext::context()
-{
-    if (globalContext == NULL) globalContext = new GlobalContext();
-    return globalContext;
-}
 
 bool Context::isValid(Context *p) { return p != NULL &&_contexts.contains(p); }
+
 Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
 {
     ride = NULL;
@@ -142,13 +149,30 @@ Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
     isfiltered = ishomefiltered = false;
     isCompareIntervals = isCompareDateRanges = false;
     isRunning = isPaused = false;
+    m_HtmlTrainingBridge = nullptr;
+
+    connect(this, SIGNAL(loadProgress(QString, double)), mainWindow, SLOT(loadProgress(QString, double)));
 
 #ifdef GC_HAS_CLOUD_DB
     cdbChartListDialog = NULL;
     cdbUserMetricListDialog = NULL;
 #endif
 
+    // WebEngineProfile - cookies and storage
+    webEngineProfile = new QWebEngineProfile("Default", this);
+    webEngineProfile->setPersistentCookiesPolicy(QWebEngineProfile::ForcePersistentCookies);
+
     _contexts.append(this);
+}
+
+HtmlTrainingBridge *
+Context::getHtmlTrainingBridge()
+{
+    if (!m_HtmlTrainingBridge) {
+        m_HtmlTrainingBridge = new HtmlTrainingBridge(this, this);
+        qDebug() << "Context: HtmlTrainingBridge created";
+    }
+    return m_HtmlTrainingBridge;
 }
 
 Context::~Context()
@@ -190,6 +214,8 @@ Context::notifyCompareDateRangesChanged()
 void
 Context::notifyConfigChanged(qint32 state)
 {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     emit configChanged(state);
+    QApplication::restoreOverrideCursor();
 }
 

@@ -1,0 +1,26 @@
+﻿{
+	"RIDE":{
+		"STARTTIME":"2010\/08\/15 00:53:30 UTC ",
+		"RECINTSECS":5,
+		"DEVICETYPE":"Polar CS600 ",
+		"IDENTIFIER":" ",
+		"TAGS":{
+			"Athlete":"Rohan Christmas ",
+			"Calendar Text":" ",
+			"Change History":"Changes on Thu Jul 29 15:55:18 2021:\n ",
+			"Data":"TDSPHC-A-L--V-- ",
+			"Device":"Polar CS600 ",
+			"File Format":" ",
+			"Filename":"2010_08_15_10_53_30.json ",
+			"Month":"August ",
+			"Source Filename":"2010_08_15_10_53_30.hrm ",
+			"Sport":"Bike ",
+			"Weekday":"Sun ",
+			"Year":"2010 "
+		},
+		"SAMPLES":[
+			{ "SECS":0, "KM":0, "WATTS":273, "CAD":87, "KPH":17.9, "HR":172, "ALT":200, "SLOPE":0, "LRBALANCE":50 },
+			{ "SECS":5, "KM":0.0248611, "WATTS":273, "CAD":87, "KPH":17.9, "HR":172, "ALT":200, "SLOPE":0, "LRBALANCE":50 }
+		]
+	}
+}

@@ -32,7 +32,7 @@
 extern const double typical_CP, typical_WPrime, typical_Pmax;
 
 // calculate power index, used to model in cp plot too
-extern double powerIndex(double averagepower, double duration, bool isRun=false);
+extern double powerIndex(double averagepower, double duration, QString sport="Bike");
 
 // gap with no training that constitutes break in seasons
 extern const int typical_SeasonBreak;

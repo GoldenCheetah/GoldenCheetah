@@ -17,15 +17,16 @@
  */
 
 #include "ChooseCyclistDialog.h"
-#include "NewCyclistDialog.h"
+#include "NewAthleteWizard.h"
 #include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "Colors.h"
 #include <QtGui>
+#include <QMessageBox>
 
 static void recursiveDelete(QDir dir)
-{   
+{
     // delete the directory contents recursively before
     // removing the directory itself
     foreach(QString name, dir.entryList()) {
@@ -48,7 +49,7 @@ static void recursiveDelete(QDir dir)
 #endif
 }
 
-ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home, bool allowNew) : home(home)
+ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home) : home(home)
 {
     setWindowTitle(tr("Choose an Athlete"));
     setMinimumHeight(300 * dpiYFactor);
@@ -62,24 +63,23 @@ ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home, bool allowNew) : home
 
     getList();
 
-    if (allowNew)
-        newButton = new QPushButton(tr("&New..."), this);
-    okButton = new QPushButton(tr("&Open"), this);
-    cancelButton = new QPushButton(tr("&Cancel"), this);
+    newButton = new QPushButton(tr("&New..."), this);
     deleteButton = new QPushButton(tr("Delete"), this);
+    cancelButton = new QPushButton(tr("&Cancel"), this);
+    okButton = new QPushButton(tr("&Open"), this);
 
     okButton->setEnabled(false);
     deleteButton->setEnabled(false);
 
     connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-    if (allowNew) connect(newButton, SIGNAL(clicked()), this, SLOT(newClicked()));
+    connect(newButton, SIGNAL(clicked()), this, SLOT(newClicked()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
     connect(listWidget, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(enableOkDelete(QListWidgetItem*)));
     connect(listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(accept()));
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
-    if (allowNew) buttonLayout->addWidget(newButton);
+    buttonLayout->addWidget(newButton);
     buttonLayout->addWidget(deleteButton);
     buttonLayout->addStretch();
     buttonLayout->addWidget(cancelButton);
@@ -88,6 +88,10 @@ ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home, bool allowNew) : home
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(listWidget);
     mainLayout->addLayout(buttonLayout);
+
+    if (listWidget->count() == 0) {
+        newClicked();
+    }
 }
 
 void
@@ -106,10 +110,13 @@ ChooseCyclistDialog::getList()
 
         QListWidgetItem *newone = new QListWidgetItem(name, listWidget);
 
-        // get avatar image if it exists
+        // get avatar image if it exists, otherwise default to noavatar.png
         QString iconpath = home.absolutePath() + "/" + name + "/config/avatar.png";
         if (QFile(iconpath).exists()) {
             QPixmap px(iconpath);
+            newone->setIcon(QIcon(px.scaled(64 *dpiXFactor,64 *dpiYFactor)));
+        } else {
+            QPixmap px(":images/noavatar.png");
             newone->setIcon(QIcon(px.scaled(64 *dpiXFactor,64 *dpiYFactor)));
         }
 
@@ -118,12 +125,11 @@ ChooseCyclistDialog::getList()
 
         // only allow selection of cyclists which are not already open
         foreach (MainWindow *x, mainwindows) {
-            QMapIterator<QString, Tab*> t(x->tabs);
+            QMapIterator<QString, AthleteTab*> t(x->athletetabs);
             while (t.hasNext()) {
                 t.next();
                 if (t.key() == name)
                     newone->setFlags(newone->flags() & ~Qt::ItemIsEnabled);
-
             }
         }
     }
@@ -138,14 +144,45 @@ ChooseCyclistDialog::choice()
 void
 ChooseCyclistDialog::enableOkDelete(QListWidgetItem *item)
 {
-    okButton->setEnabled(item != NULL);
-    deleteButton->setEnabled(item != NULL);
+    okButton->setEnabled(item != nullptr);
+    if (listWidget->count() > 0) {
+        okButton->setDefault(item != nullptr);
+    } else {
+        newButton->setDefault(true);
+    }
+    deleteButton->setEnabled(item != nullptr);
 }
 
 void
 ChooseCyclistDialog::cancelClicked()
 {
     reject();
+}
+
+bool
+ChooseCyclistDialog::deleteAthlete(QDir &homeDir, QString name, QWidget *parent)
+{
+    QMessageBox msgBox(parent);
+    msgBox.setWindowTitle(tr("Delete athlete"));
+    msgBox.setText(tr("You are about to delete %1").arg(name));
+    msgBox.setInformativeText(tr("This cannot be undone and all data will be permanently deleted.\n\nAre you sure?"));
+    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Cancel);
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.exec();
+
+    if(msgBox.clickedButton() == msgBox.button(QMessageBox::Ok)) {
+
+        // ok .. lets wipe the athlete !
+        QDir athleteDir = QDir(homeDir.absolutePath() + "/" + name);
+
+        // zap!
+        recursiveDelete(athleteDir);
+        homeDir.rmdir(name);
+
+        return true;
+    }
+    return false;
 }
 
 void
@@ -156,23 +193,7 @@ ChooseCyclistDialog::deleteClicked()
 
     QListWidgetItem *item = listWidget->selectedItems().first();
 
-    QMessageBox msgBox;
-    msgBox.setWindowTitle(tr("Delete athlete"));
-    msgBox.setText(tr("You are about to delete %1").arg(item->text()));
-    msgBox.setInformativeText(tr("This cannot be undone and all data will be permanently deleted.\n\nAre you sure?"));
-    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-    msgBox.setDefaultButton(QMessageBox::Cancel);
-    msgBox.setIcon(QMessageBox::Warning);
-    msgBox.exec();
-
-    if(msgBox.clickedButton() == msgBox.button(QMessageBox::Ok)) {
-
-        // ok .. lets wipe the athlete !
-        QDir athleteDir = QDir(home.absolutePath() + "/" + item->text());
-
-        // zap!
-        recursiveDelete(athleteDir);
-        home.rmdir(item->text());
+    if(deleteAthlete(home, item->text(), this)) {
 
         // list again, with athlete now gone
         getList();
@@ -180,28 +201,20 @@ ChooseCyclistDialog::deleteClicked()
 }
 
 QString
-ChooseCyclistDialog::newCyclistDialog(QDir &homeDir, QWidget *)
+ChooseCyclistDialog::newAthleteWizard(QDir &homeDir)
 {
-    NewCyclistDialog *newone = new NewCyclistDialog(homeDir);
-
-    // get new one..
-    QString name;
-    if (newone->exec() == QDialog::Accepted) 
-        name = newone->name->text();
-    else
-        name = "";
-
-    // zap the dialog now we have the results
-    delete newone;
-
-    // blank if cancelled
-    return name;
+    NewAthleteWizard newAthleteWizard(homeDir);
+    if (newAthleteWizard.exec() == QDialog::Accepted) {
+        return newAthleteWizard.getName();
+    } else {
+        return "";
+    }
 }
 
 void
 ChooseCyclistDialog::newClicked()
 {
-    QString name = newCyclistDialog(home, this);
+    QString name = newAthleteWizard(home);
     if (!name.isEmpty()) {
         QListWidgetItem *newone = new QListWidgetItem(name, listWidget);
 
@@ -209,6 +222,9 @@ ChooseCyclistDialog::newClicked()
         QString iconpath = home.absolutePath() + "/" + name + "/config/avatar.png";
         if (QFile(iconpath).exists()) {
             QPixmap px(iconpath);
+            newone->setIcon(QIcon(px.scaled(64 *dpiXFactor,64 *dpiYFactor)));
+        } else {
+            QPixmap px(":images/noavatar.png");
             newone->setIcon(QIcon(px.scaled(64 *dpiXFactor,64 *dpiYFactor)));
         }
 

@@ -127,7 +127,8 @@ RouteParser::serialize(QString filename, QList<RouteSegment>routes)
             out << "\t\t<points>\n";
             //qDebug() << "route->getPoints() " << route.getPoints().count();
             foreach (RoutePoint point, route.getPoints() ) {
-                out << QString("\t\t\t<point><lat>%1</lat><lon>%2</lon></point>\n").arg(point.lat).arg(point.lon);
+                out << QString("\t\t\t<point><lat>%1</lat><lon>%2</lon></point>\n").arg(point.lat, 0, 'g', 11)
+                                                                                   .arg(point.lon, 0, 'g', 11);
             }
             out << "\t\t</points>\n";
             out <<QString("\t</route>\n");

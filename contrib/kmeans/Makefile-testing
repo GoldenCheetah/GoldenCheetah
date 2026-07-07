@@ -1,0 +1,15 @@
+# doesn't work now since the source has been placed in a subdir
+# left for info and fairly trivial to fixup if you want to work
+# directly with the original sources
+
+OBJECTS=kmeans_dataset.o \
+general_functions.o \
+hamerly_kmeans.o \
+kmeans.o \
+original_space_kmeans.o \
+triangle_inequality_base_kmeans.o \
+driver-standalone.o
+
+driver-standalone: $(OBJECTS)
+	gcc -o $@ $(OBJECTS) -lstdc++ -lm
+	./driver-standalone hamerly smallDataset.txt 4 centers

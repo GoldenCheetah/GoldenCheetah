@@ -113,7 +113,7 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
     // and get the allowed files formats
     const RideFileFactory &rff = RideFileFactory::instance();
     QStringList suffixList = rff.suffixes();
-    suffixList.replaceInStrings(QRegExp("^"), "*.");
+    suffixList.replaceInStrings(QRegularExpression("^"), "*.");
     QStringList allFormats;
     foreach(QString suffix, rff.suffixes())
         allFormats << QString("*.%1").arg(suffix);
@@ -211,7 +211,9 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
                 case RideAutoImportRule::importBackground90:
                 case RideAutoImportRule::importBackground180:
                 case RideAutoImportRule::importBackground360:
-                    if (f.created().date() >= selectAfter || f.lastModified().date() >= selectAfter) {
+                    if (f.birthTime().date() >= selectAfter
+                        || f.metadataChangeTime().date() >= selectAfter
+                        || f.lastModified().date() >= selectAfter) {
                         files.append(f.absoluteFilePath());
                         j++;
                     };
@@ -244,10 +246,24 @@ void
 RideImportWizard::init(QList<QString> original, Context * /*mainWindow*/)
 {
 
+    // save target dir for the file import
+    this->homeImports = context->athlete->home->imports();
+    this->homeActivities = context->athlete->home->activities();
+    this->tmpActivities = context->athlete->home->tmpActivities();
+
     // expand files if they are archives - this may involve unzipping or extracting
     //                                     files into a subdirectory, so we also clean-up
     //                                     before we close.
-    QList<QString> files = expandFiles(original);
+    QList<QString> expanded = expandFiles(original);
+
+    QList<QString> files;
+    if (autoImportMode) {
+        // on auto-import skip files present in imports folder to avoid re-import
+        foreach (QString fname, expanded) if (homeImports.entryList(QStringList()<<QFileInfo(fname).baseName()+"*").isEmpty()) files<<fname;
+    } else {
+        // all files on manual import
+        files = expanded;
+    }
 
     // setup Help
     HelpWhatsThis *help = new HelpWhatsThis(this);
@@ -318,11 +334,6 @@ RideImportWizard::init(QList<QString> original, Context * /*mainWindow*/)
     statusHeading->setText(tr("Import Status"));
     tableWidget->setHorizontalHeaderItem(STATUS_COLUMN, statusHeading);
 
-    // save target dir for the file import
-    this->homeImports = context->athlete->home->imports();
-    this->homeActivities = context->athlete->home->activities();
-    this->tmpActivities = context->athlete->home->tmpActivities();
-
     // Fill in the filenames and all the textItems
     for (int i=0; i < files.count(); i++) {
         QTableWidgetItem *t;
@@ -343,7 +354,7 @@ RideImportWizard::init(QList<QString> original, Context * /*mainWindow*/)
         t = new QTableWidgetItem();
         t->setText(tr(""));
         t->setFlags(t->flags()  | Qt::ItemIsEditable);
-        t->setBackgroundColor(Qt::red);
+        t->setBackground(Qt::red);
         tableWidget->setItem(i,DATE_COLUMN,t);
 
         // Time
@@ -604,7 +615,7 @@ RideImportWizard::process()
                      t = new QTableWidgetItem();
                      t->setText(tr(""));
                      t->setFlags(t->flags()  | Qt::ItemIsEditable);
-                     t->setBackgroundColor(Qt::red);
+                     t->setBackground(Qt::red);
                      tableWidget->setItem(here+counter,DATE_COLUMN,t);
 
                      // Time
@@ -864,7 +875,6 @@ RideImportWizard::todayClicked(int index)
 
     // Only apply to selected date - set time to current time - ride duration
     // pretty daft but at least it sets it to something, anything is gonna be random
-    int countselected = 0;
     int totalduration = 0;
     for (int i=0; i< filenames.count(); i++) {
         if (tableWidget->item(i,FILENAME_COLUMN)->isSelected() ||
@@ -873,7 +883,6 @@ RideImportWizard::todayClicked(int index)
             tableWidget->item(i,DURATION_COLUMN)->isSelected() ||
             tableWidget->item(i,DISTANCE_COLUMN)->isSelected() ||
             tableWidget->item(i,STATUS_COLUMN)->isSelected()) {
-            countselected++;
 
             QTime duration = QTime().fromString(tableWidget->item(i,DURATION_COLUMN)->text(), "hh:mm:ss");
             totalduration += duration.hour() * 3600 +
@@ -974,7 +983,7 @@ RideImportWizard::abortClicked()
        hide();
        if (autoImportStealth) {
            // inform the user that the work is done
-           QMessageBox::information(NULL, tr("Auto Import"), tr("Automatic import from defined directories is completed."));
+           QMessageBox::information(NULL, tr("Auto Import"), tr("INFO for athlete %1\n\nAutomatic import from defined directories is completed.").arg(context->athlete->cyclist));
        }
        done(0);
        return;
@@ -1091,6 +1100,9 @@ RideImportWizard::abortClicked()
             tableWidget->item(i,STATUS_COLUMN)->setText(tr("Processing..."));
             DataProcessorFactory::instance().autoProcess(ride, "Auto", "Import");
             ride->recalculateDerivedSeries();
+            // now metrics have been calculated
+            DataProcessorFactory::instance().autoProcess(ride, "Save", "ADD");
+
 
             tableWidget->item(i,STATUS_COLUMN)->setText(tr("Saving file..."));
 
@@ -1111,6 +1123,17 @@ RideImportWizard::abortClicked()
                     tableWidget->item(i,STATUS_COLUMN)->setText(tr("File Saved"));
                     // and correct the path locally stored in Ride Item
                     context->ride->setFileName(homeActivities.canonicalPath(), activitiesTarget);
+
+                    // try autolinking to planned activity
+                    RideItem *other = context->athlete->rideCache->findSuggestion(context->ride);
+                    RideCache::OperationPreCheck check = context->athlete->rideCache->checkLinkActivities(context->ride, other);
+                    if (check.canProceed && ! check.requiresUserDecision) {
+                        RideCache::OperationResult result = context->athlete->rideCache->linkActivities(context->ride, other);
+                        if (result.success) {
+                            QString error;
+                            context->athlete->rideCache->saveActivities(check.affectedItems, error);
+                        }
+                    }
                 }  else {
                     tableWidget->item(i,STATUS_COLUMN)->setText(tr("Error - Moving %1 to activities folder").arg(activitiesTarget));
                 }
@@ -1121,9 +1144,6 @@ RideImportWizard::abortClicked()
         } else {
             tableWidget->item(i,STATUS_COLUMN)->setText(tr("Error - Import of activitiy file failed"));
         }
-
-        // now metrics have been calculated
-        DataProcessorFactory::instance().autoProcess(ride, "Save", "ADD");
 
         // clear
         delete ride;
@@ -1149,11 +1169,16 @@ RideImportWizard::abortClicked()
     phaseLabel->setText(donemessage);
     abortButton->setText(tr("Finish"));
     aborted = false;
+
+    // notify everyone that the auto import process is complete
+    context->notifyAutoImportCompleted();
+
     if (autoImportStealth) {
         abortClicked();  // simulate pressing the "Finish" button - even if the window got visible
     } else {
         if (!isActiveWindow()) activateWindow();
     }
+
 }
 
 

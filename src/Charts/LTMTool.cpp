@@ -18,26 +18,23 @@
 
 #include "LTMTool.h"
 #include "MainWindow.h"
+#include "ActionButtonBox.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "Settings.h"
 #include "Units.h"
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "RideNavigator.h"
 #include "HelpWhatsThis.h"
 #include "Utils.h"
+#include "Colors.h" // NamedColor and RGBColor
+#include "ColorButton.h" // GColorDialog
 
 #include <QApplication>
 #include <QtGui>
 
 // charts.xml support
 #include "LTMChartParser.h"
-
-// seasons.xml support
-#include "Season.h"
-#include "SeasonParser.h"
-#include <QXmlInputSource>
-#include <QXmlSimpleReader>
 
 // metadata.xml support
 #include "RideMetadata.h"
@@ -153,7 +150,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     charts->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     charts->setIndentation(0);
 
-    presetLayout->addWidget(charts, 0,0);
+    presetLayout->addWidget(charts, 0, Qt::Alignment());
 
     applyButton = new QPushButton(tr("Apply")); // connected in LTMWindow.cpp (weird!?)
     newButton = new QPushButton(tr("Add Current"));
@@ -185,7 +182,6 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
 
         adds.symbol = factory.metricName(i);
         adds.metric = factory.rideMetric(factory.metricName(i));
-        qsrand(QTime::currentTime().msec());
         cHSV.setHsv((i%6)*(255/(factory.metricCount()/5)), 255, 255);
         adds.penColor = cHSV.convertTo(QColor::Rgb);
         adds.curveStyle = curveStyle(factory.metricType(i));
@@ -216,10 +212,11 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
        metrics.append(m);
     }
 
+    SpecialFields& sp = SpecialFields::getInstance();
+
     // metadata metrics
-    SpecialFields sp;
     foreach (FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
-        if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
+        if (!sp.isMetric(field.name) && (field.type == GcFieldType::FIELD_INTEGER || field.type == GcFieldType::FIELD_DOUBLE)) {
             MetricDetail metametric;
             metametric.type = METRIC_META;
             QString underscored = field.name;
@@ -240,7 +237,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     }
 
     // sort the list
-    qSort(metrics);
+    std::sort(metrics.begin(), metrics.end());
 
     //----------------------------------------------------------------------------------------------------------
     // Custom Curves (4th TAB)
@@ -270,42 +267,15 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     connect(customTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(doubleClicked(int, int)));
 
     // custom buttons
-    editCustomButton = new QPushButton(tr("Edit"));
-    connect(editCustomButton, SIGNAL(clicked()), this, SLOT(editMetric()));
+    customActionButtons = new ActionButtonBox(ActionButtonBox::UpDownGroup | ActionButtonBox::EditGroup | ActionButtonBox::AddDeleteGroup);
+    customActionButtons->defaultConnect(customTable);
+    connect(customActionButtons, &ActionButtonBox::editRequested, this, &LTMTool::editMetric);
+    connect(customActionButtons, &ActionButtonBox::addRequested, this, &LTMTool::addMetric);
+    connect(customActionButtons, &ActionButtonBox::deleteRequested, this, &LTMTool::deleteMetric);
+    connect(customActionButtons, &ActionButtonBox::upRequested, this, &LTMTool::moveMetricUp);
+    connect(customActionButtons, &ActionButtonBox::downRequested, this, &LTMTool::moveMetricDown);
 
-    addCustomButton = new QPushButton("+");
-    connect(addCustomButton, SIGNAL(clicked()), this, SLOT(addMetric()));
-
-    deleteCustomButton = new QPushButton("-");
-    connect(deleteCustomButton, SIGNAL(clicked()), this, SLOT(deleteMetric()));
-
-#ifndef Q_OS_MAC
-    upCustomButton = new QToolButton(this);
-    downCustomButton = new QToolButton(this);
-    upCustomButton->setArrowType(Qt::UpArrow);
-    downCustomButton->setArrowType(Qt::DownArrow);
-    upCustomButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    downCustomButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    addCustomButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    deleteCustomButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    upCustomButton = new QPushButton(tr("Up"));
-    downCustomButton = new QPushButton(tr("Down"));
-#endif
-    connect(upCustomButton, SIGNAL(clicked()), this, SLOT(moveMetricUp()));
-    connect(downCustomButton, SIGNAL(clicked()), this, SLOT(moveMetricDown()));
-
-
-    QHBoxLayout *customButtons = new QHBoxLayout;
-    customButtons->setSpacing(2 *dpiXFactor);
-    customButtons->addWidget(upCustomButton);
-    customButtons->addWidget(downCustomButton);
-    customButtons->addStretch();
-    customButtons->addWidget(editCustomButton);
-    customButtons->addStretch();
-    customButtons->addWidget(addCustomButton);
-    customButtons->addWidget(deleteCustomButton);
-    customLayout->addLayout(customButtons);
+    customLayout->addWidget(customActionButtons);
 
     //----------------------------------------------------------------------------------------------------------
     // setup the Tabs
@@ -1070,6 +1040,51 @@ QList<MetricDetail> LTMTool::providePMmetrics() {
     cogganExpectedTSB.uunits = "TSB";
     metrics.append(cogganExpectedTSB);
 
+    MetricDetail cogganPlannedCTL;
+    cogganPlannedCTL.type = METRIC_PM;
+    cogganPlannedCTL.symbol = "planned_coggan_ctl";
+    cogganPlannedCTL.metric = NULL; // not a factory metric
+    cogganPlannedCTL.penColor = QColor(Qt::blue);
+    cogganPlannedCTL.curveStyle = QwtPlotCurve::Dots;
+    cogganPlannedCTL.symbolStyle = QwtSymbol::NoSymbol;
+    cogganPlannedCTL.smooth = false;
+    cogganPlannedCTL.trendtype = 0;
+    cogganPlannedCTL.topN = 1;
+    cogganPlannedCTL.uname = cogganPlannedCTL.name = tr("Coggan Planned Chronic Training Load");
+    cogganPlannedCTL.units = "CTL";
+    cogganPlannedCTL.uunits = "CTL";
+    metrics.append(cogganPlannedCTL);
+
+    MetricDetail cogganPlannedATL;
+    cogganPlannedATL.type = METRIC_PM;
+    cogganPlannedATL.symbol = "planned_coggan_atl";
+    cogganPlannedATL.metric = NULL; // not a factory metric
+    cogganPlannedATL.penColor = QColor(Qt::magenta);
+    cogganPlannedATL.curveStyle = QwtPlotCurve::Dots;
+    cogganPlannedATL.symbolStyle = QwtSymbol::NoSymbol;
+    cogganPlannedATL.smooth = false;
+    cogganPlannedATL.trendtype = 0;
+    cogganPlannedATL.topN = 1;
+    cogganPlannedATL.uname = cogganPlannedATL.name = tr("Coggan Planned Acute Training Load");
+    cogganPlannedATL.units = "ATL";
+    cogganPlannedATL.uunits = "ATL";
+    metrics.append(cogganPlannedATL);
+
+    MetricDetail cogganPlannedTSB;
+    cogganPlannedTSB.type = METRIC_PM;
+    cogganPlannedTSB.symbol = "planned_coggan_tsb";
+    cogganPlannedTSB.metric = NULL; // not a factory metric
+    cogganPlannedTSB.penColor = QColor(Qt::yellow);
+    cogganPlannedTSB.curveStyle = QwtPlotCurve::Dots;
+    cogganPlannedTSB.symbolStyle = QwtSymbol::NoSymbol;
+    cogganPlannedTSB.smooth = false;
+    cogganPlannedTSB.trendtype = 0;
+    cogganPlannedTSB.topN = 1;
+    cogganPlannedTSB.uname = cogganPlannedTSB.name = tr("Coggan Planned Training Stress Balance");
+    cogganPlannedTSB.units = "TSB";
+    cogganPlannedTSB.uunits = "TSB";
+    metrics.append(cogganPlannedTSB);
+
     // TRIMP LTS
     MetricDetail trimpLTS;
     trimpLTS.type = METRIC_PM;
@@ -1250,12 +1265,7 @@ LTMTool::hideBasic()
 void
 LTMTool::usePresetChanged()
 {
-    customTable->setEnabled(!usePreset->isChecked());
-    editCustomButton->setEnabled(!usePreset->isChecked());
-    addCustomButton->setEnabled(!usePreset->isChecked());
-    deleteCustomButton->setEnabled(!usePreset->isChecked());
-    upCustomButton->setEnabled(!usePreset->isChecked());
-    downCustomButton->setEnabled(!usePreset->isChecked());
+    customActionButtons->setEnabled(!usePreset->isChecked());
 
     // yuck .. this doesn't work nicely !
     //basic->setHidden(usePreset->isChecked());
@@ -1430,7 +1440,7 @@ LTMTool::moveMetricUp()
     int index = customTable->row(items.first());
 
     if (index > 0) {
-        settings->metrics.swap(index, index-1);
+        settings->metrics.swapItemsAt(index, index-1);
          // refresh
         refreshCustomTable(index-1);
         curvesChanged();
@@ -1446,7 +1456,7 @@ LTMTool::moveMetricDown()
     int index = customTable->row(items.first());
 
     if (index+1 <  settings->metrics.size()) {
-        settings->metrics.swap(index, index+1);
+        settings->metrics.swapItemsAt(index, index+1);
          // refresh
         refreshCustomTable(index+1);
         curvesChanged();
@@ -1591,11 +1601,6 @@ EditMetricDetailDialog::measureGroupChanged()
  * EDIT METRIC DETAIL DIALOG
  *--------------------------------------------------------------------*/
 
-static bool insensitiveLessThan(const QString &a, const QString &b)
-{
-    return a.toLower() < b.toLower();
-}
-
 EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmTool, MetricDetail *metricDetail) :
     QDialog(context->mainWindow, Qt::Dialog), context(context), ltmTool(ltmTool), metricDetail(metricDetail)
 {
@@ -1738,9 +1743,9 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     // working with estimates, local utility functions
     models << new CP2Model(context);
     models << new CP3Model(context);
-    models << new MultiModel(context);
+    //models << new MultiModel(context); disabled in v3.6
     models << new ExtendedModel(context);
-    models << new WSModel(context);
+    //models << new WSModel(context); disabled in v3.6
     foreach(PDModel *model, models) {
         modelSelect->addItem(model->name(), model->code());
     }
@@ -1812,7 +1817,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     QFontMetrics fm(courier);
 
     formulaEdit->setFont(courier);
-    formulaEdit->setTabStopWidth(4 * fm.width(' ')); // 4 char tabstop
+    formulaEdit->setTabStopDistance(4 * fm.horizontalAdvance(' ')); // 4 char tabstop
     //formulaEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     formulaType = new QComboBox(this);
     formulaType->addItem(tr("Total"), static_cast<int>(RideMetric::Total));
@@ -1854,78 +1859,8 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     weeklyPerfCheck->setChecked(metricDetail->perfs);
     submaxWeeklyPerfCheck->setChecked(metricDetail->submax);
 
-    // get suitably formated list
-    QList<QString> list;
-    QString last;
-    SpecialFields sp;
-
-    // get sorted list
-    QStringList names = context->tab->rideNavigator()->logicalHeadings;
-
-    // start with just a list of functions
-    list = DataFilter::builtins(context);
-
-    // ridefile data series symbols
-    list += RideFile::symbols();
-
-    // add special functions (older code needs fixing !)
-    list << "config(cranklength)";
-    list << "config(cp)";
-    list << "config(ftp)";
-    list << "config(w')";
-    list << "config(pmax)";
-    list << "config(cv)";
-    list << "config(height)";
-    list << "config(weight)";
-    list << "config(lthr)";
-    list << "config(maxhr)";
-    list << "config(rhr)";
-    list << "config(units)";
-    list << "const(e)";
-    list << "const(pi)";
-    list << "daterange(start)";
-    list << "daterange(stop)";
-    list << "ctl";
-    list << "tsb";
-    list << "atl";
-    list << "sb(BikeStress)";
-    list << "lts(BikeStress)";
-    list << "sts(BikeStress)";
-    list << "rr(BikeStress)";
-    list << "tiz(power, 1)";
-    list << "tiz(hr, 1)";
-    list << "best(power, 3600)";
-    list << "best(hr, 3600)";
-    list << "best(cadence, 3600)";
-    list << "best(speed, 3600)";
-    list << "best(torque, 3600)";
-    list << "best(isopower, 3600)";
-    list << "best(xpower, 3600)";
-    list << "best(vam, 3600)";
-    list << "best(wpk, 3600)";
-
-    qSort(names.begin(), names.end(), insensitiveLessThan);
-
-    foreach(QString name, names) {
-
-        // handle dups
-        if (last == name) continue;
-        last = name;
-
-        // Handle bikescore tm
-        if (name.startsWith("BikeScore")) name = QString("BikeScore");
-
-        //  Always use the "internalNames" in Filter expressions
-        name = sp.internalName(name);
-
-        // we do very little to the name, just space to _ and lower case it for now...
-        name.replace(' ', '_');
-        list << name;
-    }
-
-    // set new list
-    // create an empty completer, configchanged will fix it
-    DataFilterCompleter *completer = new DataFilterCompleter(list, this);
+    // create completer
+    DataFilterCompleter *completer = new DataFilterCompleter(DataFilter::completerList(context, false), this);
     formulaEdit->setCompleter(completer);
 
     // stress selection
@@ -1934,6 +1869,14 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     stressTypeSelect->addItem(tr("Long Term Stress  (LTS/CTL)"), STRESS_LTS);
     stressTypeSelect->addItem(tr("Stress Balance    (SB/TSB)"),  STRESS_SB);
     stressTypeSelect->addItem(tr("Stress Ramp Rate  (RR)"),      STRESS_RR);
+    stressTypeSelect->addItem(tr("Planned Short Term Stress (Planned STS/ATL)"), STRESS_PLANNED_STS);
+    stressTypeSelect->addItem(tr("Planned Long Term Stress  (Planned LTS/CTL)"), STRESS_PLANNED_LTS);
+    stressTypeSelect->addItem(tr("Planned Stress Balance    (Planned SB/TSB)"),  STRESS_PLANNED_SB);
+    stressTypeSelect->addItem(tr("Planned Stress Ramp Rate  (Planned RR)"),      STRESS_PLANNED_RR);
+    stressTypeSelect->addItem(tr("Expected Short Term Stress (Expected STS/ATL)"), STRESS_EXPECTED_STS);
+    stressTypeSelect->addItem(tr("Expected Long Term Stress  (Expected LTS/CTL)"), STRESS_EXPECTED_LTS);
+    stressTypeSelect->addItem(tr("Expected Stress Balance    (Expected SB/TSB)"),  STRESS_EXPECTED_SB);
+    stressTypeSelect->addItem(tr("Expected Stress Ramp Rate  (Expected RR)"),      STRESS_EXPECTED_RR);
     stressTypeSelect->setCurrentIndex(metricDetail->stressType);
 
     stressWidget = new QWidget(this);
@@ -2106,7 +2049,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
  
     // color background...
     penColor = metricDetail->penColor;
-    setButtonIcon(penColor);
+    setButtonIcon(RGBColor(penColor));
 
     QLabel *topN = new QLabel(tr("Highlight Highest"));
     showBest = new QDoubleSpinBox(this);
@@ -2151,6 +2094,10 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     trendType->addItem(tr("Simple Average"));
     trendType->setCurrentIndex(metricDetail->trendtype);
 
+    ignoreZerosLbl = new QLabel(tr("Ignore Zeros"));
+    ignoreZeros = new QCheckBox("", this);
+    ignoreZeros->setChecked(metricDetail->ignoreZeros);
+
     // add to grid
     grid->addWidget(filter, 0,0);
     grid->addWidget(dataFilter, 0,1,1,3);
@@ -2167,9 +2114,8 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     grid->addWidget(curveStyle, 5,1);
     grid->addWidget(symbol, 6,0);
     grid->addWidget(curveSymbol, 6,1);
-    QWidget *spacer2 = new QWidget(this);
-    spacer2->setFixedHeight(10);
-    grid->addWidget(spacer2, 7,0);
+    grid->addWidget(ignoreZerosLbl, 7,0);
+    grid->addWidget(ignoreZeros, 7,1);
     grid->addWidget(stackLabel, 8, 0);
     grid->addWidget(stack, 8, 1);
     grid->addWidget(color, 9,0);
@@ -2264,6 +2210,8 @@ EditMetricDetailDialog::typeChanged()
         performanceWidget->hide();
         banisterWidget->hide();
         typeStack->setCurrentIndex(0);
+        ignoreZerosLbl->setVisible(true);
+        ignoreZeros->setVisible(true);
     }
 
     if (chooseBest->isChecked()) {
@@ -2276,6 +2224,8 @@ EditMetricDetailDialog::typeChanged()
         performanceWidget->hide();
         banisterWidget->hide();
         typeStack->setCurrentIndex(1);
+        ignoreZerosLbl->setVisible(true);
+        ignoreZeros->setVisible(true);
     }
 
     if (chooseEstimate->isChecked()) {
@@ -2288,6 +2238,8 @@ EditMetricDetailDialog::typeChanged()
         performanceWidget->hide();
         banisterWidget->hide();
         typeStack->setCurrentIndex(2);
+        ignoreZerosLbl->setVisible(false);
+        ignoreZeros->setVisible(false);
     }
 
     if (chooseStress->isChecked()) {
@@ -2300,6 +2252,8 @@ EditMetricDetailDialog::typeChanged()
         performanceWidget->hide();
         banisterWidget->hide();
         typeStack->setCurrentIndex(0);
+        ignoreZerosLbl->setVisible(true);
+        ignoreZeros->setVisible(true);
     }
 
     if (chooseFormula->isChecked()) {
@@ -2312,6 +2266,8 @@ EditMetricDetailDialog::typeChanged()
         performanceWidget->hide();
         banisterWidget->hide();
         typeStack->setCurrentIndex(3);
+        ignoreZerosLbl->setVisible(true);
+        ignoreZeros->setVisible(true);
     }
 
     if (chooseMeasure->isChecked()) {
@@ -2324,6 +2280,8 @@ EditMetricDetailDialog::typeChanged()
         performanceWidget->hide();
         banisterWidget->hide();
         typeStack->setCurrentIndex(4);
+        ignoreZerosLbl->setVisible(false);
+        ignoreZeros->setVisible(false);
     }
 
     if (choosePerformance->isChecked()) {
@@ -2335,6 +2293,8 @@ EditMetricDetailDialog::typeChanged()
         stressWidget->hide();
         banisterWidget->hide();
         typeStack->setCurrentIndex(5);
+        ignoreZerosLbl->setVisible(true);
+        ignoreZeros->setVisible(true);
     }
 
     if (chooseBanister->isChecked()) {
@@ -2347,6 +2307,8 @@ EditMetricDetailDialog::typeChanged()
         performanceWidget->hide();
         banisterWidget->show();
         typeStack->setCurrentIndex(0);
+        ignoreZerosLbl->setVisible(false);
+        ignoreZeros->setVisible(false);
     }
     adjustSize();
 }
@@ -2478,7 +2440,7 @@ EditMetricDetailDialog::metricSelected()
         baseLine->setValue(ltmTool->metrics[index].baseline);
         penColor = ltmTool->metrics[index].penColor;
         trendType->setCurrentIndex(ltmTool->metrics[index].trendtype);
-        setButtonIcon(penColor);
+        setButtonIcon(RGBColor(penColor));
 
         // curve style
         switch (ltmTool->metrics[index].curveStyle) {
@@ -2601,6 +2563,7 @@ EditMetricDetailDialog::applyClicked()
     metricDetail->symbolStyle = symbolMap[curveSymbol->currentIndex()];
     metricDetail->penColor = penColor;
     metricDetail->fillCurve = fillCurve->isChecked();
+    metricDetail->ignoreZeros = ignoreZeros->isChecked();
     metricDetail->labels = labels->isChecked();
     metricDetail->uname = userName->text();
     metricDetail->uunits = userUnits->text();
@@ -2654,13 +2617,12 @@ EditMetricDetailDialog::cancelClicked()
 void
 EditMetricDetailDialog::colorClicked()
 {
-    // don't use native dialog, since there is a nasty bug causing focus loss
-    // see https://bugreports.qt-project.org/browse/QTBUG-14889
-    QColor color = QColorDialog::getColor(metricDetail->penColor, this, tr("Choose Metric Color"), QColorDialog::DontUseNativeDialog);
+    QColor color = GColorDialog::getColor(penColor.name());
 
-    if (color.isValid()) {
-        setButtonIcon(penColor=color);
-    }
+    if (NamedColor(color)) { // named color
+        penColor=color;
+        setButtonIcon(RGBColor(color));
+    } else if (color.isValid()) setButtonIcon(penColor=color); // normal rgb color
 }
 
 void
@@ -2719,7 +2681,7 @@ DataFilterEdit::checkErrors()
     // parse and present errors to user
     DataFilter checker(this, context);
     QStringList errors = checker.check(toPlainText());
-    checker.colorSyntax(document(), textCursor().position()); // syntax + error highlighting
+    checker.colorSyntax(document(), textCursor().position(), GCColor::isPaletteDark(palette())); // syntax + error highlighting
 
     if (checker.rt.functions.contains("sample")) errors << tr("Warning: sample() is slow -- update code to use samples()");
 
@@ -2830,7 +2792,7 @@ void DataFilterEdit::keyPressEvent(QKeyEvent *e)
 
     // are we in a comment ?
     QString line = textCursor().block().text().trimmed();
-    for(int i=textCursor().positionInBlock(); i>=0; i--)
+    for(int i=textCursor().positionInBlock(); i>=0 && i<line.size(); i--)
         if (line[i]=='#') return;
 
     if (!isShortcut && (hasModifier || e->text().isEmpty()|| completionPrefix.length() < 1

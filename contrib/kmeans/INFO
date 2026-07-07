@@ -1,0 +1,19 @@
+NOTE
+
+The sources in this sub-directory including the LICENSE and README files
+are imported with permission granted by the author (Greg Hamerly).
+
+The original sources are available from Github here:
+https://github.com/ghamerly/fast-kmeans
+
+Whilst the original source implements multiple algorithms we only kept
+the hamerly variant.
+
+The source files have not been adapted to use Qt containers or to refactor
+any of the class inheritance. So updating to newer versions should be
+very straightforward (although the base functionality and performance is
+good enough).
+
+Usage in Qt applications will likely use the Kmeans wrapper class
+
+28/09/2021

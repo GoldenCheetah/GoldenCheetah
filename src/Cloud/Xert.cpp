@@ -18,6 +18,7 @@
 
 #include "Xert.h"
 #include "Athlete.h"
+#include "Secrets.h"
 #include "Settings.h"
 #include "Units.h"
 #include "JsonRideFile.h"
@@ -77,9 +78,9 @@ Xert::~Xert() {
 }
 
 void
-Xert::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
+Xert::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    reply->ignoreSslErrors();
+    sslErrors(context->mainWindow, reply, errors);
 }
 
 bool
@@ -100,7 +101,8 @@ Xert::open(QStringList &errors)
     QNetworkRequest request(QUrl("https://www.xertonline.com/oauth/token"));
     request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
 
-    QString authheader = QString("%1:%1").arg("xert_public");
+    QString authheader = QString("%1:%2").arg(GC_XERT_CLIENT_ID).arg(GC_XERT_CLIENT_SECRET);
+
     request.setRawHeader("Authorization", "Basic " +  authheader.toLatin1().toBase64());
 
     // set params
@@ -197,12 +199,11 @@ Xert::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
     connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
     loop.exec();
 
-    // if successful, lets unpack
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    printd("fetch response: %d: %s\n", reply->error(), reply->errorString().toStdString().c_str());
+    printd("fetch response: status=%d, error=%d: %s\n", statusCode, reply->error(), reply->errorString().toStdString().c_str());
 
+    // if successful, lets unpack
     if (reply->error() == 0) {
-
         // get the data
         QByteArray r = reply->readAll();
 
@@ -234,7 +235,7 @@ Xert::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
                 // }
 
                 QDateTime startDate = QDateTime::fromString(activity["start_date"].toObject()["date"].toString(), Qt::ISODate);
-                startDate.setTimeSpec(Qt::UTC);
+                startDate.setTimeZone(QTimeZone::UTC);
                 startDate = startDate.toLocalTime();
 
                 add->name = startDate.toString("yyyy_MM_dd_HH_mm_ss")+".json";
@@ -257,7 +258,7 @@ Xert::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
     }
 
     // all good ?
-    printd("returning count(%d), errors(%s)\n", returning.count(), errors.join(",").toStdString().c_str());
+    printd("returning count(%lld), errors(%s)\n", returning.count(), errors.join(",").toStdString().c_str());
     return returning;
 }
 
@@ -265,8 +266,8 @@ QString
 Xert::getRideName(RideFile *ride)
 {
     QString name = "";
-    // is "Name" set?
-    if (!ride->getTag("Name", "").isEmpty()) {
+    // is "Objective" set?
+    if (!ride->getTag("Objective", "").isEmpty()) {
         name = ride->getTag("Name", "");
     } else {
         // is "Route" set?
@@ -306,10 +307,10 @@ Xert::readActivityDetail(QString path, bool withSessionData)
     connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
     loop.exec();
 
-    // if successful, lets unpack
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    printd("fetch response: %d: %s\n", reply->error(), reply->errorString().toStdString().c_str());
+    printd("fetch response: status=%d, error=%d: %s\n", statusCode, reply->error(), reply->errorString().toStdString().c_str());
 
+    // if successful, lets unpack
     if (reply->error() == 0) {
 
         // get the data
@@ -371,7 +372,7 @@ Xert::readyRead()
     buffers.value(reply)->append(reply->readAll());
 }
 
-// SportTracks workouts are delivered back as JSON, the original is lost
+// Xert workouts are delivered back as JSON, the original is lost
 // so we need to parse the response and turn it into a JSON file to
 // import. The description of the format is here:
 // https://sporttracks.mobi/api/doc/data-structures
@@ -394,7 +395,7 @@ Xert::readFileCompleted()
 
         QJsonObject ride = document.object();
         QDateTime starttime = QDateTime::fromString(ride["start_date"].toString(), Qt::ISODate);
-        starttime.setTimeSpec(Qt::UTC);
+        starttime.setTimeZone(QTimeZone::UTC);
         starttime = starttime.toLocalTime();
 
         // 1s samples with start time as UTC
@@ -410,7 +411,7 @@ Xert::readFileCompleted()
         }
 
         // location => route
-        if (!ride["name"].isNull()) ret->setTag("Objectives", ride["name"].toString());
+        if (!ride["name"].isNull()) ret->setTag("Objective", ride["name"].toString());
         if (!ride["notes"].isNull()) ret->setTag("Notes", ride["description"].toString());
 
         // SAMPLES DATA
@@ -436,6 +437,9 @@ Xert::readFileCompleted()
 
             if (!data["hr"].isNull())
                 add.hr = data["hr"].toInt();
+
+            if (!data["cad"].isNull())
+                add.cad = data["cad"].toDouble();
 
             if (!data["alt"].isNull())
                 add.alt = data["alt"].toDouble();
@@ -490,7 +494,7 @@ Xert::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     // MULTIPART *****************
 
     QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
-    QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
+    QString boundary = QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString();
     multiPart->setBoundary(boundary.toLatin1());
 
     request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
@@ -501,7 +505,7 @@ Xert::writeFile(QByteArray &data, QString remotename, RideFile *ride)
         QHttpPart namePart;
         namePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"name\""));
         printd("request: %s\n", name.toStdString().c_str());
-        namePart.setBody(name.toLatin1());
+        namePart.setBody(name.toUtf8());
         multiPart->append(namePart);
     }
 

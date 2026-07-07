@@ -77,6 +77,11 @@ ToolsRhoEstimator::ToolsRhoEstimator(Context *context, QWidget *parent) : QDialo
     thl->addWidget(tempLabel);
     tempSpinBox->setValue(59);
   }
+  // Use Average Temp from current activity when available
+  if (context && context->rideItem() &&
+      context->rideItem()->getForSymbol("average_temp", GlobalContext::context()->useMetricUnits) != RideFile::NA) {
+    tempSpinBox->setValue(context->rideItem()->getForSymbol("average_temp", GlobalContext::context()->useMetricUnits));
+  }
   tempSpinBox->setWrapping(false);
   tempSpinBox->setAlignment(Qt::AlignRight);
   connect(tempSpinBox, SIGNAL(valueChanged(double)),
@@ -125,6 +130,26 @@ ToolsRhoEstimator::ToolsRhoEstimator(Context *context, QWidget *parent) : QDialo
           this, SLOT(on_valueChanged(double)));
   dhl->addWidget(dewpSpinBox);
   mainVBox->addLayout(dhl);
+
+  // The relative humidity box.
+  QHBoxLayout *hhl = new QHBoxLayout;
+  rhumLabel = new QLabel(tr("Relative Humidity (%):"));
+  hhl->addWidget(rhumLabel);
+  rhumSpinBox = new QDoubleSpinBox(this);
+  rhumSpinBox->setDecimals(2);
+  rhumSpinBox->setRange(0, 100);
+  rhumSpinBox->setWrapping(false);
+  rhumSpinBox->setAlignment(Qt::AlignRight);
+  connect(rhumSpinBox, SIGNAL(valueChanged(double)),
+          this, SLOT(on_valueChanged(double)));
+  hhl->addWidget(rhumSpinBox);
+  rhumGroupBox = new QGroupBox(tr("Use Relative Humidity"));
+  rhumGroupBox->setCheckable(true);
+  rhumGroupBox->setChecked(false);
+  rhumGroupBox->setLayout(hhl);
+  connect(rhumGroupBox, SIGNAL(toggled(bool)),
+          this, SLOT(on_valueChanged()));
+  mainVBox->addWidget(rhumGroupBox);
 
   // Label for the computed air density.
   mainVBox->addSpacing(15);
@@ -198,7 +223,7 @@ void ToolsRhoEstimator::on_btnOK_clicked() {
 }
 
 void ToolsRhoEstimator::on_valueChanged(double newval) {
-  newval++;  // hack to avoid the "unused parameter" g++ warning.
+  Q_UNUSED(newval)
 
   // scrape the field values, convert to metric if needed.
   double temp = tempSpinBox->value();
@@ -209,6 +234,17 @@ void ToolsRhoEstimator::on_valueChanged(double newval) {
     temp = fahrenheit_to_celsius(temp);
     press = inchesmercury_to_hectopascals(press);
     dewp = fahrenheit_to_celsius(dewp);
+  }
+
+  if (rhumGroupBox->isChecked()) {
+    // compute dew point from relative humidity
+    dewpSpinBox->setEnabled(false);
+    dewp = dewp_from_rhum(rhumSpinBox->value(), temp);
+    dewpSpinBox->setValue(impBut->isChecked() ? celsius_to_fahrenheit(dewp) : dewp);
+  } else {
+    // compute relative humidity from dew point
+    rhumSpinBox->setValue(rhum_from_dewp(dewp, temp));
+    dewpSpinBox->setEnabled(true);
   }
 
   // calculate rho, in (kg/m^3)
@@ -244,6 +280,16 @@ double ToolsRhoEstimator::inchesmercury_to_hectopascals(double inhg) {
 
 double ToolsRhoEstimator::rho_met_to_imp(double rho) {
   return rho * ((0.30480061 * 0.30480061 * 0.30480061) / KG_PER_LB);
+}
+
+// source: http://bmcnoldy.rsmas.miami.edu/Humidity.html
+double ToolsRhoEstimator::dewp_from_rhum(double rhum, double temp) {
+    return 243.04*(log(rhum/100)+((17.625*temp)/(243.04+temp)))/(17.625-log(rhum/100)-((17.625*temp)/(243.04+temp)));
+}
+
+// source: http://bmcnoldy.rsmas.miami.edu/Humidity.html
+double ToolsRhoEstimator::rhum_from_dewp(double dewp, double temp) {
+    return 100*(exp((17.625*dewp)/(243.04+dewp))/exp((17.625*temp)/(243.04+temp)));
 }
 
 double ToolsRhoEstimator::calculate_rho(double temp,

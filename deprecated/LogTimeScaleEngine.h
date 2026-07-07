@@ -53,13 +53,13 @@ class LogTimeScaleEngine : public QwtScaleEngine
 
         void buildTicks(
             const QwtDoubleInterval &, double stepSize, int maxMinSteps,
-            QwtValueList ticks[QwtScaleDiv::NTickTypes]) const;
+            QList<double> ticks[QwtScaleDiv::NTickTypes]) const;
 
-        QwtValueList buildMinorTicks(
-            const QwtValueList& majorTicks,
+        QList<double> buildMinorTicks(
+            const QList<double>& majorTicks,
             int maxMinMark, double step) const;
 
-        QwtValueList buildMajorTicks(
+        QList<double> buildMajorTicks(
             const QwtDoubleInterval &interval, double stepSize) const;
 };
 

@@ -163,8 +163,13 @@
 // 153  8  Dec 2019 Mark Liversedge    Regenerate after v3.5 RC2/RC2X re-issue
 // 154 18  Apr 2020 Mark Liversedge    Added PeakPowerIndex (only for full rides)
 // 155 27  Jun 2020 Mark Liversedge    Added Ride Date as days since 1900,01,01
+// 156 18  Mar 2021 Ale Martinez       Added Time and % in Zones I, II and III
+// 157 27  May 2021 Ale Martinez       Added Pace Row
+// 158 28  Feb 2024 Ale Martinez       Enabled Pace for Walking
+// 159 28  Apr 2024 Ale Martinez       Fix Avg Speed aggregation
+// 160 22  Nov 2024 Ale Martinez       Added Swim Stroke metric for lap swims
 
-int DBSchemaVersion = 155;
+int DBSchemaVersion = 160;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
@@ -183,7 +188,7 @@ RideMetric::userMetricFingerprint(QList<UserMetricSettings> these)
     foreach(UserMetricSettings x, these)
         fingers += x.fingerprint.toLocal8Bit();
 
-    return qChecksum(fingers.constData(), fingers.size());
+    return qChecksum(fingers);
 }
 
 QHash<QString,RideMetricPtr>

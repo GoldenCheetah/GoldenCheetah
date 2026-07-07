@@ -23,7 +23,6 @@
 AboutDialog::AboutDialog(Context *context) : context(context)
 {
     setWindowTitle(tr("About GoldenCheetah"));
-
     aboutPage = new AboutPage(context);
     versionPage = new VersionPage(context);
     contributorsPage = new ContributorsPage(context);
@@ -52,6 +51,7 @@ AboutPage::AboutPage(Context *context) : context(context)
     QLabel *text;
     text=new QLabel(this);
     text->setContentsMargins(0,0,0,0);
+    text->setOpenExternalLinks(true);
     text->setText(
               tr(
                 "<center>"
@@ -62,8 +62,8 @@ AboutPage::AboutPage(Context *context) : context(context)
                 "<a href=\"https://opensource.org/licenses/GPL-2.0\">GNU General "
                 "Public License 2.0</a>."
                 "<p>Source code can be obtained from<br>"
-                "<a href=\"http://goldencheetah.org/\">"
-                "http://goldencheetah.org/</a>."
+                "<a href=\"https://www.goldencheetah.org/\">"
+                "https://www.goldencheetah.org/</a>."
                 "<br><p>Activity files and other data are stored in<br>"
                 "<a href=\"%1\">%2</a>"
                 "<p>Athlete ID %3<br>"
@@ -117,6 +117,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Alex Harsanyi");
     contributors.append("Alexandre Prokoudine");
     contributors.append("Andre Heider");
+    contributors.append("Andreas Buhr");
     contributors.append("Andrew Bryson");
     contributors.append("Andy Froncioni");
     contributors.append("Antonius Riha");
@@ -139,6 +140,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Eric Christoffersen");
     contributors.append("Eric Murray");
     contributors.append("Erik Boto");
+    contributors.append("Felix Gertz");
     contributors.append("Frank Zschockelt");
     contributors.append("Gareth Coco");
     contributors.append("Greg Lonnon");
@@ -151,10 +153,12 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Jan de Visser");
     contributors.append("Jim Ley");
     contributors.append("J&#246;rn Rischm&#252;ller");
+    contributors.append("Joachim Kohlhammer");
     contributors.append("Johan Martensson");
     contributors.append("John Ehrlinger");
     contributors.append("Jon Beverley");
     contributors.append("Jon Escombe");
+    contributors.append("Jonathan Savage");
     contributors.append("Josef Gebel");
     contributors.append("Julian Baumgartner");
     contributors.append("Julian Simioni");
@@ -173,13 +177,17 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Mark Rages");
     contributors.append("Michael Puchowicz");
     contributors.append("Michel Dagenais");
+    contributors.append("Miguel Angel Quiles");
+    contributors.append("Mitja Zupanic");
     contributors.append("Mitsukuni Sato");
+    contributors.append("Nathan Henrie");
     contributors.append("Ned Harding");
     contributors.append("Nicholas Feng");
     contributors.append("Nick Burrett");
     contributors.append("Okano Takayoshi");
     contributors.append("Omar Torres");
     contributors.append("Patrick McNerthney");
+    contributors.append("Paul Johnson");
     contributors.append("Peter Kanatselis");
     contributors.append("Dr Phil Skiba");
     contributors.append("Philip Willoughby");

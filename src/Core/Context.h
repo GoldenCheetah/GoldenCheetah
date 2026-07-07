@@ -21,10 +21,10 @@
 
 #include "TimeUtils.h" // for class DateRange
 #include "RealtimeData.h" // for class RealtimeData
-#include "SpecialFields.h" // for class RealtimeData
 #include "CompareInterval.h" // what intervals are being compared?
 #include "CompareDateRange.h" // what intervals are being compared?
 #include "RideFile.h"
+#include "Season.h"
 
 #ifdef GC_HAS_CLOUD_DB
 #include "CloudDBChart.h"
@@ -58,6 +58,7 @@
 #define CONFIG_WBAL              0x2000     // which w'bal formula to use ?
 #define CONFIG_WORKOUTS          0x4000     // workout location / files
 #define CONFIG_DISCOVERY         0x8000     // interval discovery
+#define CONFIG_WORKOUTTAGMANAGER 0x10000    // workout tags
 
 class RideItem;
 class IntervalItem;
@@ -67,11 +68,13 @@ class VideoSyncFile;
 class Context;
 class Athlete;
 class MainWindow;
-class Tab;
+class AthleteTab;
 class NavigationModel;
 class RideMetadata;
 class ColorEngine;
-
+class ModelFilter;
+class QWebEngineProfile;
+class HtmlTrainingBridge;
 
 class GlobalContext : public QObject
 {
@@ -79,13 +82,12 @@ class GlobalContext : public QObject
 
     public:
 
-        GlobalContext();
         static GlobalContext *context();
+
         void notifyConfigChanged(qint32);
 
         // metadata etc
         RideMetadata *rideMetadata;
-        SpecialFields specialFields;
         ColorEngine *colorEngine;
 
         // metric units
@@ -95,11 +97,24 @@ class GlobalContext : public QObject
         void readConfig(qint32);
         void userMetricsConfigChanged();
 
+        void notifyStart() { emit start(); }
+        void notifyStop() { emit stop(); }
+
     signals:
         void configChanged(qint32); // for global widgets that aren't athlete specific
 
+        // realtime signals global widgets that aren't athlete specific
+        void start();
+        void stop();
+
+    private:
+        // singleton pattern
+        GlobalContext();
+        GlobalContext(const GlobalContext&) = delete;
+        GlobalContext& operator=(const GlobalContext&) = delete;
 };
 
+class RideNavigator;
 class Context : public QObject
 {
     Q_OBJECT;
@@ -117,19 +132,25 @@ class Context : public QObject
         bool showSidebar, showLowbar, showToolbar, showTabbar;
         int style;
         QString searchText;
+        QString workoutFilterText;
         bool scopehighlighted;
+
+        HtmlTrainingBridge *getHtmlTrainingBridge();
 
         // ride item
         RideItem *rideItem() const { return ride; }
         const RideItem *currentRideItem() { return ride; }
         DateRange currentDateRange() { return dr_; }
+        Season const *currentSeason() { return season; }
 
-        // current selections
+        // current selections and widgetry
         MainWindow * const mainWindow;
-        Tab *tab;
+        RideNavigator *rideNavigator;
+        AthleteTab *tab;
         Athlete *athlete;
         RideItem *ride;  // the currently selected ride
         DateRange dr_;
+        Season const *season = nullptr;
         ErgFile *workout; // the currently selected workout file
         VideoSyncFile *videosync; // the currently selected videosync file
         QString videoFilename;
@@ -158,6 +179,9 @@ class Context : public QObject
         CloudDBUserMetricListDialog *cdbUserMetricListDialog;
 #endif
 
+        // WebEngineProfile for this user
+        QWebEngineProfile* webEngineProfile;
+
     public slots:
 
         // *********************************************
@@ -171,6 +195,8 @@ class Context : public QObject
         void notifyAthleteClose(QString folder, Context *context) { emit athleteClose(folder,context); }
         void notifyLoadDone(QString folder, Context *context) { emit loadDone(folder, context); } // MainWindow finished
 
+        void notifyAutoImportCompleted() { emit autoImportCompleted(); }
+
         // preset charts
         void notifyPresetsChanged() { emit presetsChanged(); }
         void notifyPresetSelected(int n) { emit presetSelected(n); }
@@ -182,6 +208,9 @@ class Context : public QObject
         void setFilter(QStringList&f) { filters=f; isfiltered=true; emit filterChanged(); }
         void clearFilter() { filters.clear(); isfiltered=false; emit filterChanged(); }
 
+        void setWorkoutFilters(QList<ModelFilter*> &f) { emit workoutFiltersChanged(f); }
+        void clearWorkoutFilters() { emit workoutFiltersRemoved(); }
+
         // user metrics - cascade
         void notifyUserMetricsChanged() { emit userMetricsChanged(); }
 
@@ -190,27 +219,38 @@ class Context : public QObject
 
         // realtime signals
         void notifyTelemetryUpdate(const RealtimeData &rtData) { telemetryUpdate(rtData); }
-        void notifyErgFileSelected(ErgFile *x) { workout=x; ergFileSelected(x); }
+        void notifyErgFileSelected(ErgFile *x) { workout=x; ergFileSelected(x); ergFileSelected((ErgFileBase*)(x));}
         void notifyVideoSyncFileSelected(VideoSyncFile *x) { videosync=x; videoSyncFileSelected(x); }
         ErgFile *currentErgFile() { return workout; }
         VideoSyncFile *currentVideoSyncFile() { return videosync; }
         void notifyMediaSelected( QString x) { videoFilename = x; mediaSelected(x); }
         void notifySelectVideo(QString x) { selectMedia(x); }
         void notifySelectWorkout(QString x) { selectWorkout(x); }
+        void notifySelectWorkout(int idx ) { selectWorkout(idx); }
         void notifySelectVideoSync(QString x) { selectVideoSync(x); }
         void notifySetNow(long x) { now = x; setNow(x); }
         long getNow() { return now; }
         void notifyNewLap() { emit newLap(); }
-        void notifyStart() { emit start(); }
+        void notifyStart() { GlobalContext::context()->notifyStart(); emit start(); }
         void notifyUnPause() { emit unpause(); }
         void notifyPause() { emit pause(); }
-        void notifyStop() { emit stop(); }
+        void notifyStop() { GlobalContext::context()->notifyStop(); emit stop(); }
         void notifySeek(long x) { emit seek(x); }
+        void notifyIntensityChanged(int intensity) { emit intensityChanged(intensity); };
+
+        void notifySetNotification(const QString &msg, int timeout) { emit setNotification(msg, timeout); };
+        void notifyClearNotification() { emit clearNotification(); };
 
         // date range selection
         void notifyDateRangeChanged(DateRange x) { dr_=x; emit dateRangeSelected(x); }
         void notifyWorkoutsChanged() { emit workoutsChanged(); }
         void notifyVideoSyncChanged() { emit VideoSyncChanged(); }
+
+        void notifySeasonChanged(Season const *season) {
+            bool changed = this->season != season;
+            this->season = season;
+            emit seasonSelected(season, changed);
+        }
 
         void notifyRideSelected(RideItem*x) { ride=x; rideSelected(x); }
         void notifyRideAdded(RideItem *x) { ride=x; rideAdded(x); }
@@ -253,6 +293,9 @@ class Context : public QObject
         // and we need to notify other contexts !
         void userMetricsConfigChanged();
 
+    private:
+        HtmlTrainingBridge *m_HtmlTrainingBridge;
+
     signals:
 
         // loading an athlete
@@ -261,9 +304,15 @@ class Context : public QObject
         void loadDone(QString, Context*);
         void athleteClose(QString, Context*);
 
+        void autoImportCompleted();
+
         // global filter changed
         void filterChanged();
         void homeFilterChanged();
+
+        // workout filters
+        void workoutFiltersChanged(QList<ModelFilter*>&);
+        void workoutFiltersRemoved();
 
         void workoutsChanged(); // added or deleted a workout in train view
         void VideoSyncChanged(); // added or deleted a workout in train view
@@ -291,6 +340,8 @@ class Context : public QObject
         void dateRangeSelected(DateRange);
         void rideSelected(RideItem*);
 
+        void seasonSelected(Season const *season, bool changed);
+
         // we added/deleted/changed an item
         void rideAdded(RideItem *);
         void rideDeleted(RideItem *);
@@ -311,9 +362,11 @@ class Context : public QObject
         // realtime
         void telemetryUpdate(RealtimeData rtData);
         void ergFileSelected(ErgFile *);
+        void ergFileSelected(ErgFileBase *);
         void videoSyncFileSelected(VideoSyncFile *);
         void mediaSelected(QString);
         void selectWorkout(QString); // ask traintool to select this
+        void selectWorkout(int idx); // ask traintool to select this
         void selectMedia(QString); // ask traintool to select this
         void selectVideoSync(QString); // ask traintool to select this
         void setNow(long);
@@ -323,6 +376,10 @@ class Context : public QObject
         void unpause();
         void pause();
         void stop();
+        void intensityChanged(int intensity);
+
+        void setNotification(const QString &msg, int timeout);
+        void clearNotification();
 
         // R messages
         void rMessage(QString);

@@ -77,9 +77,9 @@ SixCycle::~SixCycle() {
 }
 
 void
-SixCycle::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
+SixCycle::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    reply->ignoreSslErrors();
+    sslErrors(context->mainWindow, reply, errors);
 }
 
 // open by connecting and getting a basic list of folders available
@@ -258,7 +258,7 @@ SixCycle::readdir(QString path, QStringList &errors, QDateTime from, QDateTime t
         // results ?
         QJsonArray results = document.array();
 
-        printd("items found: %d\n", results.size());
+        printd("items found: %lld\n", results.size());
 
         // lets look at that then
         for(int i=0; i<results.size(); i++) {
@@ -398,7 +398,7 @@ SixCycle::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
 
     // boundary is a random number
-    QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
+    QString boundary = QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString();
     multiPart->setBoundary(boundary.toLatin1());
     printd("boundary: '%s'\n", boundary.toStdString().c_str());
 

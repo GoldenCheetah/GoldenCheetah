@@ -21,6 +21,9 @@
 #include "TTSReader.h"
 #include "LocationInterpolation.h"
 
+#include <map>
+#include <cstring>
+
 // -------------------------------------------------------------
 // LOG CONTROL
 //
@@ -103,13 +106,13 @@ int getUByte(ByteArray &buffer, int offset) {
     return (UByte)(buffer[offset]);
 }
 
-int getUShort(ByteArray buffer, int offset) {
+int getUShort(ByteArray buffer, size_t offset) {
     if((offset + 1) < buffer.size())
         return *(unsigned short*)&buffer[offset];    
-    return getUByte(buffer, offset);
+    return getUByte(buffer, static_cast<int>(offset));
 }
 
-int getUInt(ByteArray &buffer, int offset) {
+int getUInt(ByteArray &buffer, size_t offset) {
     if ((offset + 3) < buffer.size()) {
         return *(unsigned*)&buffer[offset];
     }
@@ -221,9 +224,9 @@ bool decryptData(IntArray &A_0, IntArray &A_1, IntArray &numArray) {
 
     numArray.resize(A_0.size());
 
-    int index = 0;
+    size_t index = 0;
     int num1 = 5;
-    int num2 = -1000;
+    size_t num2 = -1000;
 
     int e = 0; // set before each block
     while (true) {
@@ -381,7 +384,7 @@ void Point::print() const {
 //
 
 bool TTSReader::readData(QDataStream &is, ByteArray& buffer, bool copyPre) {
-    int first = 0;
+    size_t first = 0;
     if (copyPre) {
         buffer[0] = pre[0];
         buffer[1] = pre[1];
@@ -391,7 +394,7 @@ bool TTSReader::readData(QDataStream &is, ByteArray& buffer, bool copyPre) {
     if (buffer.size() != first) {
         size_t readSize = buffer.size() - first;
 
-        int iBytesRead = is.readRawData((char*)&buffer[first], (int)buffer.size() - first);
+        size_t iBytesRead = is.readRawData((char*)&buffer[first], (int)buffer.size() - static_cast<int>(first));
         if (iBytesRead != readSize) return false;
     }
 
@@ -612,7 +615,7 @@ bool TTSReader::loadHeaders() {
 
     StringType stringType = StringType::BLOCK;
 
-    int fingerprint = 0;
+    //int fingerprint = 0; // not used
 
     int bytes = 0;
 
@@ -627,7 +630,7 @@ bool TTSReader::loadHeaders() {
                 << getUShort(data, 4) << " " << getUInt(data, 6) << "x"
                 << getUInt(data, 10) << "\n";
 
-            fingerprint = getUInt(data, 6);
+            //fingerprint = getUInt(data, 6);
 
             IntArray ia;
             iarr(data, ia);
@@ -700,7 +703,7 @@ bool TTSReader::loadHeaders() {
 
             case IMAGE:
 
-                DEBUG_LOG << "[image " << blockType << "." << (stringId - 1000) + "]";
+                //DEBUG_LOG << "[image " << blockType << "." << (stringId - 1000) + "]";
 
                 /*
                  * try { result = currentFile + "." + (imageId++) + ".png";
@@ -722,7 +725,7 @@ bool TTSReader::loadHeaders() {
 
                 std::wstring result;
 
-                for (int i = 0; i < decrD.size() / 2; i++) {
+                for (size_t i = 0; i < decrD.size() / 2; i++) {
                     Char c = (Char)(decrD[2 * i] | (int)decrD[2 * i + 1] << 8);
                     result.append(1, c);
                 }
@@ -759,6 +762,7 @@ bool TTSReader::loadHeaders() {
                 barr(decrD, ba);
                 blockProcessing(blockType, version, ba);
             }
+            default:
             break;
             }
         }
@@ -806,7 +810,7 @@ bool TTSReader::loadHeaders() {
         basis = FrameMap;
     } else if (gpsCount >= slopeCount) {
         // GpsList basis    
-        for (int i = 0; i < gpsCount; i++) {
+        for (size_t i = 0; i < gpsCount; i++) {
             Point p;
 
             p.setDistanceFromStart(gpsPoints[i].distance);
@@ -819,7 +823,7 @@ bool TTSReader::loadHeaders() {
         basis = GPS;
     } else {
         // slope basis
-        for (int i = 0; i < slopeCount; i++) {
+        for (size_t i = 0; i < slopeCount; i++) {
             Point p;
 
             p.setDistanceFromStart(programList[i].distance);
@@ -841,11 +845,11 @@ bool TTSReader::loadHeaders() {
     DistancePointInterpolator<LinearTwoPointInterpolator> si;
 
     // Interpolate non-basis streams onto points[].
-    int frameMapIdx = 0;
-    int gpsIdx      = 0;
-    int slopeIdx    = 0;
+    size_t frameMapIdx = 0;
+    size_t gpsIdx      = 0;
+    size_t slopeIdx    = 0;
 
-    for (int i = 0; i < points.size(); i++) {
+    for (unsigned long i = 0; i < points.size(); i++) {
 
         fHasKM = true;
 
@@ -989,10 +993,12 @@ void TTSReader::blockProcessing(int blockType, int version, ByteArray &data) {
 
     case VIDEO_INFO:
         videoInfo(version, data);
+        break;
 
     default:
 
         DEBUG_LOG << "Unidentified block type " << blockType << "\n";
+        break;
     }
 }
 
@@ -1190,7 +1196,6 @@ void TTSReader::programData(int version, ByteArray &data) {
 
     double distance = 0;
     int pointCount = (int)data.size() / 6;
-    double bias = 0;
 
     for (int i = 0; i < pointCount; i++) {
         int slope = getUShort(data, i * 6);
@@ -1205,6 +1210,7 @@ void TTSReader::programData(int version, ByteArray &data) {
         ProgramPoint p;
 
         p.slope = (double)slope / 100;
+        p.distance = distance;
 
         if (i == 0) {
             // first time thru'
@@ -1220,15 +1226,13 @@ void TTSReader::programData(int version, ByteArray &data) {
             maxSlope = p.slope;
         }
 
-        // If first point isn't zero distance then bias
-        // it and all subseequent points by this distance.
-        // This might be rubbish but appears to help every
-        // tts I've tried.
+        // If first point isn't zero distance then create fake
+        // first point. This matters for a few early tts rides
+        // including NO_OCEAN from lunicus and IT_Mortirolo from
+        // tacx.
         if (i == 0 && distance != 0.) {
-            bias = -distance;
+            programList.push_back({0, 0});
         }
-
-        p.distance = distance + bias;
 
         programList.push_back(p);
     }

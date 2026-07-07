@@ -20,15 +20,28 @@
 #include "DialWindow.h"
 #include "Athlete.h"
 #include "Context.h"
+#include "RideFile.h"
+#include "HelpWhatsThis.h"
+
+
+#define HEATLOAD_OFFSET 0.9596
+#define  HEATLOAD_MULT 35.92
+#define  HEATLOAD_EXP 1.324
+
 
 DialWindow::DialWindow(Context *context) :
     GcChartWindow(context), context(context), average(1), isNewLap(false)
 {
+    HelpWhatsThis *helpContents = new HelpWhatsThis(this);
+    this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::ChartTrain_Telemetry));
+
     rolling.resize(150); // enough for 30 seconds at 5hz
 
     setContentsMargins(0,0,0,0);
 
     QWidget *c = new QWidget;
+    HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
+    c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartTrain_Telemetry));
     QVBoxLayout *cl = new QVBoxLayout(c);
     setControls(c);
 
@@ -73,7 +86,11 @@ DialWindow::DialWindow(Context *context) :
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->setContentsMargins(3,3,3,3);
-    valueLabel = new QLabel(this);
+    valueLabel = new ScalingLabel(this);
+    valueLabel->setStrategy(appsettings->value(this, TRAIN_TELEMETRY_FONT_SCALING, 0).toInt() == 0 ? ScalingLabelStrategy::HeightOnly : ScalingLabelStrategy::Linear);
+    QFont vlFont = valueLabel->font();
+    vlFont.setWeight(QFont::Bold);
+    valueLabel->setFont(vlFont);
     valueLabel->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
     layout->addWidget(valueLabel);
     setChartLayout(layout);
@@ -92,11 +109,15 @@ DialWindow::DialWindow(Context *context) :
     // setup colors
     seriesChanged();
 
-    // setup fontsize etc
-    resizeEvent(NULL);
-
     // set to zero
     resetValues();
+
+
+    //do this on init, but not in resetValues as we want to preserve the heat load across sessions, resetting if local midnight passes while not running
+    heatLoadMSec = 0;
+    heatLoad = 0;
+    heatLoadLocalDate = QDateTime::currentDateTime();
+    isRunning = false;
 }
 
 void
@@ -110,12 +131,14 @@ void
 DialWindow::start()
 {
     resetValues();
+    isRunning = true;
 }
 
 void
 DialWindow::stop()
 {
     resetValues();
+    isRunning = false;
 }
 
 void
@@ -138,11 +161,15 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
     if (series == RealtimeData::HeartRate ||
         series == RealtimeData::Watts  ||
         series == RealtimeData::AltWatts  ||
-        series == RealtimeData::Cadence) {
+        (series == RealtimeData::LRBalance && value != RideFile::NA)  ||
+        series == RealtimeData::Cadence ||
+        series == RealtimeData::CoreTemp) {
 
         sum += value;
-        int j = index-(count<average*5?count:average*5);
-        sum -= rolling[(j>=0?j:150+j)];
+        if (count >= average*5) {
+            int j = index - average*5;
+            sum -= rolling[(j>=0?j:150+j)];
+        }
 
         //store value
         rolling[index] = value;
@@ -160,7 +187,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         }
 
         // if we have a target load and erg mode then red background if not on target...
-        if (series == RealtimeData::Watts && (rtData.mode == ERG || rtData.mode == MRC) && rtData.getLoad() > 0) {
+        if (series == RealtimeData::Watts && (rtData.mode == ErgFileFormat::erg || rtData.mode == ErgFileFormat::mrc) && rtData.getLoad() > 0) {
 
             // background for power, if we have a target load
             double load=rtData.getLoad();
@@ -223,14 +250,14 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
     case RealtimeData::LRBalance:
         {
           double left = 0; double right = 0;
-          if (value == 0) { // no LR Balance provided - so use previous logic
+          if (value == RideFile::NA) { // no LR Balance provided - so use previous logic
               double tot = rtData.getWatts() + rtData.getAltWatts();
               left = rtData.getWatts() / tot * 100.00f;
               right = 100.00 - left;
-              if (tot < 0.1) left = right = 0;
+              if (tot < 0.1 || left >= 100) left = right = 0; // No power or no AltWatts
           } else {
-              left = 100.00 - value; // value in ANT message is the "right" pedal portion
-              right = value;
+              right = 100.00 - displayValue; // value in GC is the "left" pedal portion
+              left = displayValue;
           }
           valueLabel->setText(QString("%1 / %2").arg(left, 0, 'f', 0).arg(right, 0, 'f', 0));
         }
@@ -335,11 +362,11 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 
             double rif, cp;
             // carry on and calculate IF
-            if (context->athlete->zones(false)) {
+            if (context->athlete->zones("Bike")) {
 
                 // get cp for today
-                int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
-                if (zonerange >= 0) cp = context->athlete->zones(false)->getCP(zonerange);
+                int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
+                if (zonerange >= 0) cp = context->athlete->zones("Bike")->getCP(zonerange);
                 else cp = 0;
 
             } else {
@@ -421,11 +448,11 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 
             double rif, cp;
             // carry on and calculate IF
-            if (context->athlete->zones(false)) {
+            if (context->athlete->zones("Bike")) {
 
                 // get cp for today
-                int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
-                if (zonerange >= 0) cp = context->athlete->zones(false)->getCP(zonerange);
+                int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
+                if (zonerange >= 0) cp = context->athlete->zones("Bike")->getCP(zonerange);
                 else cp = 0;
 
             } else {
@@ -472,7 +499,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         break;
 
     case RealtimeData::Load:
-        if (rtData.mode == ERG || rtData.mode == MRC) {
+        if (rtData.mode == ErgFileFormat::erg || rtData.mode == ErgFileFormat::mrc) {
             value = rtData.getLoad();
             valueLabel->setText(QString("%1").arg(round(value)));
         } else {
@@ -529,33 +556,65 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 2));
         break;
 
+    case RealtimeData::Temp:
+        valueLabel->setText(QString("%1").arg(value, 0, 'f', 2));
+        break;
+
+    case RealtimeData::CoreTemp:
+        valueLabel->setText(QString("%1").arg(displayValue, 0, 'f', 2));
+        break;
+    //Skin temp, heat strain, and heat load are from CORE sensor
+    case RealtimeData::SkinTemp:
+        valueLabel->setText(QString("%1").arg(displayValue, 0, 'f', 2));
+        break;
+
+    case RealtimeData::HeatStrain:
+        valueLabel->setText(QString("%1").arg(displayValue, 0, 'f', 1));
+        break;
+
+    case RealtimeData::HeatLoad:
+        {
+            double heatStrain = rtData.getHeatStrain();
+            QDateTime currentTime = QDateTime::currentDateTimeUtc();
+            qint64 msecEpoc = currentTime.toMSecsSinceEpoch();
+
+            //qDebug()<<"reset check time isRunning" << isRunning << "at" << QDateTime::currentDateTime() << "heatLoadLocalDate" << heatLoadLocalDate << "DOY" << heatLoadLocalDate.date().dayOfYear();
+            if(!isRunning && heatLoadLocalDate.date().dayOfYear() != QDateTime::currentDateTime().date().dayOfYear())
+            {
+                qDebug()<<"resetting heat load at " << QDateTime::currentDateTime() << "heatLoadLocalDate" << heatLoadLocalDate;
+                heatLoadMSec = 0;
+                heatLoad = 0;
+                heatLoadLocalDate = QDateTime::currentDateTime();
+            }
+
+            if(heatLoadMSec != 0 && heatStrain > HEATLOAD_OFFSET) //don't try to calculate a negative effective heat strain
+            {
+                //(HSI-AOC_Off)^AOC_EXP*TIME/AOC_Mult
+
+                qint64 deltaMSec = msecEpoc - heatLoadMSec;
+                double deltamin = deltaMSec / (1000.0 * 60.0); //msec to minutes
+
+                double newLoad = pow(heatStrain-HEATLOAD_OFFSET, HEATLOAD_EXP) * deltamin / HEATLOAD_MULT;
+
+                if(newLoad > 0)
+                    heatLoad += newLoad;
+
+                //qDebug()<<"newLoad is "<< newLoad << "a" << a << "b" << b << "heatStrain" << heatStrain << "c" << c << "deltamin" << deltamin << "heatLoad" << heatLoad;
+
+                if(heatLoad >= 10.0)
+                    heatLoad = 10.0;
+            }
+            heatLoadMSec = msecEpoc;
+
+            valueLabel->setText(QString("%1").arg(heatLoad, 0, 'f', 3)); //HACK, three DP for extra details
+        }
+        break;
+
     default:
         valueLabel->setText(QString("%1").arg(round(displayValue)));
         break;
 
     }
-}
-
-void DialWindow::resizeEvent(QResizeEvent * )
-{
-    QFont font;
-
-    // hidpi is a bit more complex
-    if (dpiXFactor > 1) {
-
-        font.setPixelSize(pixelSizeForFont(font, geometry().height()-(24*dpiYFactor)));
-
-    } else {
-        // set point size within reasonable limits for low dpi screens
-        int size = (geometry().height() - 24) * 72 / logicalDpiY();
-        if (size <= 0) size = 4;
-        if (size >= 64) size = 64;
-
-        font.setPointSize(size);
-    }
-
-    font.setWeight(QFont::Bold);
-    valueLabel->setFont(font);
 }
 
 void DialWindow::seriesChanged()
@@ -567,7 +626,9 @@ void DialWindow::seriesChanged()
     if (series == RealtimeData::HeartRate ||
         series == RealtimeData::Watts  ||
         series == RealtimeData::AltWatts  ||
-        series == RealtimeData::Cadence) {
+        series == RealtimeData::LRBalance  ||
+        series == RealtimeData::Cadence ||
+        series == RealtimeData::CoreTemp ) {
         averageLabel->show();
         averageEdit->show();
         averageSlider->show();
@@ -584,6 +645,16 @@ void DialWindow::seriesChanged()
     case RealtimeData::LapTime:
     case RealtimeData::LapTimeRemaining:
     case RealtimeData::ErgTimeRemaining:
+    case RealtimeData::LRBalance:
+    case RealtimeData::Lap:
+    case RealtimeData::RI:
+    case RealtimeData::IF:
+    case RealtimeData::VI:
+    case RealtimeData::SkibaVI:
+    case RealtimeData::FeO2:
+        foreground = GColor(CFEO2);
+        break;
+
     case RealtimeData::Distance:
     case RealtimeData::RouteDistance:
     case RealtimeData::DistanceRemaining:
@@ -591,16 +662,6 @@ void DialWindow::seriesChanged()
     case RealtimeData::Longitude:
     case RealtimeData::LapDistance:
     case RealtimeData::LapDistanceRemaining:
-    case RealtimeData::LRBalance:
-    case RealtimeData::Lap:
-    case RealtimeData::RI:
-    case RealtimeData::IF:
-    case RealtimeData::VI:
-    case RealtimeData::SkibaVI:
-    case RealtimeData::Slope:
-    case RealtimeData::FeO2:
-        foreground = GColor(CFEO2);
-        break;
     case RealtimeData::RER:
     case RealtimeData::None:
             foreground = GColor(CDIAL);
@@ -626,9 +687,13 @@ void DialWindow::seriesChanged()
         foreground = GColor(CTIDALVOLUME);
         break;
 
+    case RealtimeData::Slope:
+        foreground = GColor(CSLOPE);
+        break;
+
     case RealtimeData::Load:
-            foreground = GColor(CLOAD);
-            break;
+        foreground = GColor(CLOAD);
+        break;
 
     case RealtimeData::BikeScore:
             foreground = GColor(CBIKESCORE);
@@ -702,6 +767,11 @@ void DialWindow::seriesChanged()
             foreground = GColor(CLTE);
             break;
 
+    // TODO: define colors tags for each Power phases
+    case RealtimeData::RightPowerPhaseBegin:
+    case RealtimeData::RightPowerPhaseEnd:
+    case RealtimeData::RightPowerPhasePeakBegin:
+    case RealtimeData::RightPowerPhasePeakEnd:
     case RealtimeData::RightTorqueEffectiveness:
            foreground = GColor(CRTE);
            break;
@@ -709,8 +779,24 @@ void DialWindow::seriesChanged()
     case RealtimeData::Altitude:
            foreground = GColor(CALTITUDE);
            break;
+
+    case RealtimeData::CoreTemp:
+           foreground = GColor(CCORETEMP);
+           break;
+    case RealtimeData::SkinTemp:
+           foreground = GColor(CSKINTEMP);
+           break;
+    case RealtimeData::HeatStrain:
+           foreground = GColor(CHEATSTRAIN);
+           break;
+    case RealtimeData::HeatLoad:
+           foreground = GColor(CHEATLOAD);
+           break;
+
+    default: break;
     }
 
+    valueLabel->setStrategy(appsettings->value(this, TRAIN_TELEMETRY_FONT_SCALING, 0).toInt() == 0 ? ScalingLabelStrategy::HeightOnly : ScalingLabelStrategy::Linear);
     // ugh. we use style sheets because palettes don't work on labels
     background = GColor(CTRAINPLOTBACKGROUND);
     setProperty("color", background);

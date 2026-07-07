@@ -172,7 +172,7 @@ class aIntensityFactor : public RideMetric {
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
         // no ride or no samples
-        if (item->zoneRange < 0 || item->context->athlete->zones(item->isRun) == NULL) {
+        if (item->zoneRange < 0 || item->context->athlete->zones(item->sport) == NULL) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
@@ -182,7 +182,7 @@ class aIntensityFactor : public RideMetric {
         aIsoPower *np = dynamic_cast<aIsoPower*>(deps.value("a_coggan_np"));
         assert(np);
         int cp = item->getText("CP","0").toInt();
-        rif = np->value(true) / (cp ? cp : item->context->athlete->zones(item->isRun)->getCP(item->zoneRange));
+        rif = np->value(true) / (cp ? cp : item->context->athlete->zones(item->sport)->getCP(item->zoneRange));
         secs = np->count();
 
         setValue(rif);
@@ -218,7 +218,7 @@ class aBikeStress : public RideMetric {
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
         // no ride or no samples
-        if (item->zoneRange < 0 || item->context->athlete->zones(item->isRun) == NULL) {
+        if (item->zoneRange < 0 || item->context->athlete->zones(item->sport) == NULL) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
@@ -232,7 +232,7 @@ class aBikeStress : public RideMetric {
         double normWork = np->value(true) * np->count();
         double rawTSS = normWork * rif->value(true);
         int cp = item->getText("CP","0").toInt();
-        double workInAnHourAtCP = (cp ? cp : item->context->athlete->zones(item->isRun)->getCP(item->zoneRange)) * 3600;
+        double workInAnHourAtCP = (cp ? cp : item->context->athlete->zones(item->sport)->getCP(item->zoneRange)) * 3600;
         score = rawTSS / workInAnHourAtCP * 100.0;
 
         setValue(score);

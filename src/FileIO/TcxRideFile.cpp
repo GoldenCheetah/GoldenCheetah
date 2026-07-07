@@ -113,7 +113,7 @@ TcxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
     if (ride->deviceType().toLower().contains("zwift") ) {
         text = doc.createTextNode("Zwift");
     } else {
-        text = doc.createTextNode("Garmin TCX");
+        text = doc.createTextNode("Garmin TCX with Barometer");
     }
     creatorName.appendChild(text);
     creator.appendChild(creatorName);
@@ -480,7 +480,6 @@ TcxFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file
     if (!file.open(QIODevice::WriteOnly)) return(false);
     file.resize(0);
     QTextStream out(&file);
-    out.setCodec("UTF-8");
     out.setGenerateByteOrderMark(true);
     out << xml;
     out.flush();

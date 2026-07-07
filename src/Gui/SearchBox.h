@@ -46,6 +46,7 @@ public:
 
     // either search box or filter box
     void setMode(SearchBoxMode mode);
+    void setFixedMode(bool);
     void setText(QString);
     SearchBoxMode getMode() { return mode; }
     bool isFiltered() const { return filtered; }
@@ -96,7 +97,7 @@ private slots:
 
 signals:
     // text search mode
-    void submitQuery(QString);
+    void submitQuery(Context*,QString);
     void clearQuery();
 
     // db filter mode
@@ -117,6 +118,7 @@ private:
     SearchBoxMode mode;
     DataFilterCompleter *completer;
     bool active;
+    bool fixed;
 };
 
 class DataFilterCompleter : public QCompleter

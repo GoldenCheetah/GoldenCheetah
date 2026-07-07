@@ -132,7 +132,7 @@ double IntervalAerolabData::x
 
     double result = 0;
 
-    int interval_no = number ? 1 + number / 4 : 1;
+    int interval_no = number ? 1 + static_cast<int>(number) / 4 : 1;
     // get the interval
     IntervalItem *current = intervalNum( interval_no );
 
@@ -218,21 +218,21 @@ Aerolab::Aerolab(
   static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
   setXTitle();
-  setAxisTitle(yLeft, tr("Elevation (m)"));
-  setAxisScale(yLeft, -300, 300);
-  setAxisTitle(xBottom, tr("Distance (km)"));
-  setAxisScale(xBottom, 0, 60);
+  setAxisTitle(QwtAxis::YLeft, tr("Elevation (m)"));
+  setAxisScale(QwtAxis::YLeft, -300, 300);
+  setAxisTitle(QwtAxis::XBottom, tr("Distance (km)"));
+  setAxisScale(QwtAxis::XBottom, 0, 60);
 
   veCurve = new QwtPlotCurve(tr("V-Elevation"));
   altCurve = new QwtPlotCurve(tr("Elevation"));
 
   // get rid of nasty blank space on right of the plot
-  veCurve->setYAxis( yLeft );
-  altCurve->setYAxis( yLeft );
+  veCurve->setYAxis( QwtAxis::YLeft );
+  altCurve->setYAxis( QwtAxis::YLeft );
 
   intervalHighlighterCurve = new QwtPlotCurve();
   intervalHighlighterCurve->setBaseline(-5000);
-  intervalHighlighterCurve->setYAxis( yLeft );
+  intervalHighlighterCurve->setYAxis( QwtAxis::YLeft );
   intervalHighlighterCurve->setSamples( new IntervalAerolabData( this, context ) );
   intervalHighlighterCurve->attach( this );
   //XXX broken this->legend()->remove( intervalHighlighterCurve ); // don't show in legend
@@ -252,10 +252,10 @@ Aerolab::configChanged(qint32)
   // set colors
   setCanvasBackground(GColor(CPLOTBACKGROUND));
   QPen vePen = QPen(GColor(CAEROVE));
-  vePen.setWidth(appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble());
+  vePen.setWidth(appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble());
   veCurve->setPen(vePen);
   QPen altPen = QPen(GColor(CAEROEL));
-  altPen.setWidth(appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble());
+  altPen.setWidth(appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble());
   altCurve->setPen(altPen);
   QPen gridPen(GColor(CPLOTGRID));
   gridPen.setStyle(Qt::DotLine);
@@ -273,8 +273,10 @@ Aerolab::configChanged(qint32)
   QPalette palette;
   palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
   palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
-  axisWidget(QwtPlot::xBottom)->setPalette(palette);
-  axisWidget(QwtPlot::yLeft)->setPalette(palette);
+  axisWidget(QwtAxis::XBottom)->setPalette(palette);
+  axisWidget(QwtAxis::YLeft)->setPalette(palette);
+
+  setXTitle(); // Just in case metric/imperial changed
 }
 
 void
@@ -332,7 +334,6 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
       }
 
       // Fill the virtual elevation profile with data from the ride data:
-      double t = 0.0;
       double vlast = 0.0;
       double e     = 0.0;
       arrayLength = 0;
@@ -369,7 +370,7 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
       //d += v * dt;
       //distanceArray[arrayLength] = d/1000;
 
-      distanceArray[arrayLength] = p1->km;
+      distanceArray[arrayLength] = p1->km * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM);
 
 
 
@@ -385,7 +386,6 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
       double de  = s * v * dt * (GlobalContext::context()->useMetricUnits ? 1 : FEET_PER_METER);
 
       e += de;
-      t += dt;
 
       veArray[arrayLength] = e;
 
@@ -424,7 +424,7 @@ void
 Aerolab::adjustEoffset() {
 
     if (autoEoffset && !altArray.empty()) {
-        double idx = axisScaleDiv( QwtPlot::xBottom ).lowerBound();
+        double idx = axisScaleDiv( QwtAxis::XBottom ).lowerBound();
         parent->eoffsetSlider->setEnabled(false);
 
         if (bydist) {
@@ -481,7 +481,7 @@ Aerolab::recalc( bool new_zoom ) {
   }
 
   if( new_zoom )
-      setAxisScale(xBottom, 0.0, (bydist?totalRideDistance:rideTimeSecs));
+      setAxisScale(QwtAxis::XBottom, 0.0, (bydist?totalRideDistance:rideTimeSecs));
 
 
 
@@ -503,7 +503,7 @@ Aerolab::setYMax(bool new_zoom)
 
              {
 
-                 setAxisTitle( yLeft, tr("Elevation (m)") );
+                 setAxisTitle( QwtAxis::YLeft, tr("Elevation (m)") );
 
              }
 
@@ -511,7 +511,7 @@ Aerolab::setYMax(bool new_zoom)
 
              {
 
-                 setAxisTitle( yLeft, tr("Elevation (')") );
+                 setAxisTitle( QwtAxis::YLeft, tr("Elevation (ft)") );
 
              }
 
@@ -521,9 +521,9 @@ Aerolab::setYMax(bool new_zoom)
             //************
 
   //if (veCurve->isVisible()) {
-   // setAxisTitle(yLeft, tr("Elevation"));
+   // setAxisTitle(QwtAxis::YLeft, tr("Elevation"));
     if ( !altArray.empty() ) {
-   //   setAxisScale(yLeft,
+   //   setAxisScale(QwtAxis::YLeft,
    //          min( veCurve->minYValue(), altCurve->minYValue() ) - 10,
    //          10.0 + max( veCurve->maxYValue(), altCurve->maxYValue() ) );
 
@@ -531,7 +531,7 @@ Aerolab::setYMax(bool new_zoom)
         maxY = 10.0 + max( veCurve->maxYValue(), altCurve->maxYValue() );
 
     } else {
-      //setAxisScale(yLeft,
+      //setAxisScale(QwtAxis::YLeft,
       //       veCurve->minYValue() ,
       //       1.05 * veCurve->maxYValue() );
 
@@ -562,12 +562,12 @@ Aerolab::setYMax(bool new_zoom)
 
     }
 
-    setAxisScale( yLeft, minY, maxY );
-    setAxisLabelRotation(yLeft,270);
-    setAxisLabelAlignment(yLeft,Qt::AlignVCenter);
+    setAxisScale( QwtAxis::YLeft, minY, maxY );
+    setAxisLabelRotation(QwtAxis::YLeft,270);
+    setAxisLabelAlignment(QwtAxis::YLeft,Qt::AlignVCenter);
   }
 
-  enableAxis(yLeft, veCurve->isVisible());
+  setAxisVisible(QwtAxis::YLeft, veCurve->isVisible());
 }
 
 
@@ -576,9 +576,9 @@ void
 Aerolab::setXTitle() {
 
   if (bydist)
-    setAxisTitle(xBottom, tr("Distance ")+QString(GlobalContext::context()->useMetricUnits?"(km)":"(miles)"));
+    setAxisTitle(QwtAxis::XBottom, tr("Distance ")+QString(GlobalContext::context()->useMetricUnits?"(km)":"(miles)"));
   else
-    setAxisTitle(xBottom, tr("Time (minutes)"));
+    setAxisTitle(QwtAxis::XBottom, tr("Time (minutes)"));
 }
 
 void

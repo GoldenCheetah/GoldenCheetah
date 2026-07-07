@@ -71,9 +71,9 @@ CyclingAnalytics::~CyclingAnalytics() {
 }
 
 void
-CyclingAnalytics::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
+CyclingAnalytics::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
-    reply->ignoreSslErrors();
+    sslErrors(context->mainWindow, reply, errors);
 }
 
 bool
@@ -131,10 +131,10 @@ CyclingAnalytics::readdir(QString path, QStringList &errors, QDateTime, QDateTim
     loop.exec();
     QTimer::singleShot(30000,&loop, SLOT(quit())); // timeout after 30 seconds
 
-    // if successful, lets unpack
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    printd("fetch response: %d: %s\n", reply->error(), reply->errorString().toStdString().c_str());
+    printd("fetch response: status=%d, error=%d: %s\n", statusCode, reply->error(), reply->errorString().toStdString().c_str());
 
+    // if successful, lets unpack
     if (reply->error() == 0) {
 
         // get the data
@@ -246,7 +246,7 @@ CyclingAnalytics::readdir(QString path, QStringList &errors, QDateTime, QDateTim
 
 
     // all good ?
-    printd("returning count(%d), errors(%s)\n", returning.count(), errors.join(",").toStdString().c_str());
+    printd("returning count(%lld), errors(%s)\n", returning.count(), errors.join(",").toStdString().c_str());
     return returning;
 }
 
@@ -402,7 +402,6 @@ CyclingAnalytics::readFileCompleted()
             add.secs = index;
 
             // move through tracks if they're waiting for this point
-            bool updated=false;
             for(int t=0; t<data.count(); t++) {
 
                // hr, distance et al
@@ -445,7 +444,7 @@ CyclingAnalytics::writeFile(QByteArray &data, QString remotename, RideFile *ride
     QUrl url = QUrl( "https://www.cyclinganalytics.com/api/me/upload" );
     QNetworkRequest request = QNetworkRequest(url);
 
-    QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
+    QString boundary = QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString();
 
     // MULTIPART *****************
 

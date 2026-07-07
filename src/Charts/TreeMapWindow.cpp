@@ -28,6 +28,8 @@
 #include "Units.h" // for MILES_PER_KM
 #include "HelpWhatsThis.h"
 #include "GoldenCheetah.h"
+#include "Perspective.h"
+#include "SpecialFields.h"
 
 #include <QtGui>
 #include <QString>
@@ -50,17 +52,17 @@ TreeMapWindow::TreeMapWindow(Context *context) :
     // the plot
     mainLayout = new QVBoxLayout;
 
-    ltmPlot = new TreeMapPlot(this, context);
-    ltmPlot->setVisible(true);
-    mainLayout->addWidget(ltmPlot);
+    treemapPlot = new TreeMapPlot(this, context);
+    treemapPlot->setVisible(true);
+    mainLayout->addWidget(treemapPlot);
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
     setChartLayout(mainLayout);
 
     setIsBlank(false);
 
-    HelpWhatsThis *helpLTMPlot = new HelpWhatsThis(ltmPlot);
-    ltmPlot->setWhatsThis(helpLTMPlot->getWhatsThisText(HelpWhatsThis::ChartTrends_CollectionTreeMap));
+    HelpWhatsThis *helpLTMPlot = new HelpWhatsThis(treemapPlot);
+    treemapPlot->setWhatsThis(helpLTMPlot->getWhatsThisText(HelpWhatsThis::ChartTrends_CollectionTreeMap));
 
     // read metadata.xml
     QString filename = QDir(gcroot).canonicalPath()+"/metadata.xml";
@@ -152,11 +154,13 @@ TreeMapWindow::TreeMapWindow(Context *context) :
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
     connect(context, SIGNAL(filterChanged()), this, SLOT(refresh(void)));
     connect(context, SIGNAL(homeFilterChanged()), this, SLOT(refresh(void)));
+    connect(this, SIGNAL(perspectiveFilterChanged(QString)), this, SLOT(refresh()));
+    connect(this, SIGNAL(perspectiveChanged(Perspective*)), this, SLOT(refresh()));
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(refresh()));
 
     // user clicked on a cell in the plot
-    connect(ltmPlot, SIGNAL(clicked(QString,QString)), this, SLOT(cellClicked(QString,QString)));
+    connect(treemapPlot, SIGNAL(clicked(QString,QString)), this, SLOT(cellClicked(QString,QString)));
 
     // date settings
     connect(dateSetting, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
@@ -180,7 +184,7 @@ TreeMapWindow::rideSelected()
 void
 TreeMapWindow::refreshPlot()
 {
-    ltmPlot->setData(&settings);
+    treemapPlot->setData(&settings);
 }
 
 void
@@ -247,11 +251,12 @@ TreeMapWindow::refresh()
         FilterSet fs;
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
+        if (myPerspective) fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(dr));
         settings.specification.setFilterSet(fs);
         settings.specification.setDateRange(dr);
 
         // and the fields to use
-        SpecialFields sp;
+        SpecialFields& sp = SpecialFields::getInstance();;
         settings.field1 = sp.internalName(field1->currentText());
         settings.field2 = sp.internalName(field2->currentText());
 
@@ -323,9 +328,18 @@ void
 TreeMapWindow::addTextFields(QComboBox *combo)
 {
     combo->addItem(tr("None")); // if "None" is changed to not being first any more, adjust public methods f1,f2,setf1,setf2
-    SpecialFields sp;
+    SpecialFields& sp = SpecialFields::getInstance();
     foreach (FieldDefinition x, fieldDefinitions) {
-        if (x.type < 4) combo->addItem(sp.displayName(x.name));
+        switch (x.type) {
+            case GcFieldType::FIELD_TEXT:
+            case GcFieldType::FIELD_TEXTBOX:
+            case GcFieldType::FIELD_SHORTTEXT:
+            case GcFieldType::FIELD_INTEGER:
+                combo->addItem(sp.displayName(x.name));
+                break;
+            default:
+                break;
+        }
     }
 }
 

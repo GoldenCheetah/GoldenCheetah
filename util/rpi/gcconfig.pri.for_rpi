@@ -263,7 +263,7 @@ macx {
 # What video playback do you want?
 DEFINES += GC_VIDEO_NONE             # dont add any video playback support
 #DEFINES += GC_VIDEO_QUICKTIME        # mac only and the default
-#DEFINES += GC_VIDEO_QT5              # use QT5 qvideowidget if QT > 5.2.1
+#DEFINES += GC_VIDEO_QT6              # use QT6 qvideowidget
 #DEFINES += GC_VIDEO_VLC               # use VideoLan library needs VLC_INSTALL defined above
 #DEFINES += GC_VIDEO_AV                 # use AV Foundation on Mac now QTKit is deprecated
 

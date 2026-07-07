@@ -18,8 +18,14 @@
  */
 
 #include "RealtimeData.h"
+#include "RideFile.h"
 
 #include <QtDebug>
+
+#ifdef Q_CC_MSVC
+// 'strcpy': This function or variable may be unsafe.
+#pragma warning(disable:4996)
+#endif
 
 RealtimeData::RealtimeData()
 {
@@ -28,7 +34,13 @@ RealtimeData::RealtimeData()
     cadence = distance = altDistance = virtualSpeed = wbal = 0.0;
     lap = msecs = lapMsecs = lapMsecsRemaining = ergMsecsRemaining = 0;
     thb = smo2 = o2hb = hhb = 0.0;
-    lrbalance = rte = lte = lps = rps = 0.0;
+    lrbalance = RideFile::NA;
+    position = RealtimeData::seated;
+    rte = lte = lps = rps = 0.0;
+    rppb = rppe = rpppb = rpppe = 0.0;
+    lppb = lppe = lpppb = lpppe = 0.0;
+    coreTemp = skinTemp = 0.0;
+    heatStrain = 0.0;
     latitude = longitude = altitude = 0.0;
     rf = rmv = vo2 = vco2 = tv = feo2 = 0.0;
     routeDistance = distanceRemaining = VAMValue = 0.0;
@@ -39,6 +51,7 @@ RealtimeData::RealtimeData()
     trainerConfigRequired = false;
     trainerBrakeFault = false;
     memset(spinScan, 0, 24);
+    temp = 0.0;
 }
 
 void RealtimeData::setName(char *name)
@@ -170,6 +183,13 @@ void RealtimeData::setRPS(double x)
     this->rps = x;
 }
 
+//Skin temp passed but not used elsewhere
+void RealtimeData::setCoreTemp(double core, double skin, double heatStrain) {
+    this->coreTemp = core;
+    this->skinTemp = skin;
+    this->heatStrain = heatStrain;
+}
+
 const char *
 RealtimeData::getName() const
 {
@@ -276,6 +296,56 @@ double RealtimeData::getLPS() const
 double RealtimeData::getRPS() const
 {
     return rps;
+}
+
+double RealtimeData::getRppb() const
+{
+    return rppb;
+}
+
+double RealtimeData::getRppe() const
+{
+    return rppe;
+}
+
+double RealtimeData::getRpppb() const
+{
+    return rpppb;
+}
+
+double RealtimeData::getRpppe() const
+{
+    return rpppe;
+}
+
+double RealtimeData::getLppb() const
+{
+    return lppb;
+}
+
+double RealtimeData::getLppe() const
+{
+    return lppe;
+}
+
+double RealtimeData::getLpppb() const
+{
+    return lpppb;
+}
+
+double RealtimeData::getLpppe() const
+{
+    return lpppe;
+}
+
+double RealtimeData::getRightPCO() const
+{
+    return rightPCO;
+}
+
+double RealtimeData::getLeftPCO() const
+{
+    return leftPCO;
 }
 
 double RealtimeData::getTorque() const
@@ -385,6 +455,9 @@ double RealtimeData::value(DataSeries series) const
     case Watts: return watts;
         break;
 
+    case Wbal: return wbal;
+        break;
+
     case Speed: return speed;
         break;
 
@@ -427,6 +500,24 @@ double RealtimeData::value(DataSeries series) const
     case RightPedalSmoothness: return rps;
         break;
 
+   case RightPowerPhaseBegin: return rppb;
+        break;
+
+    case RightPowerPhaseEnd: return rppe;
+        break;
+
+    case RightPowerPhasePeakBegin: return rpppb;
+        break;
+
+    case RightPowerPhasePeakEnd: return rpppe;
+        break;
+
+    case RightPCO: return rightPCO;
+        break;
+
+    case LeftPCO: return leftPCO;
+        break;
+
     case Slope: return slope;
         break;
 
@@ -458,6 +549,16 @@ double RealtimeData::value(DataSeries series) const
         break;
 
     case FeO2: return feo2;
+        break;
+
+    case Temp: return temp;
+        break;
+
+    case CoreTemp: return coreTemp;
+        break;
+    case SkinTemp: return skinTemp;
+        break;
+    case HeatStrain: return heatStrain;
         break;
 
     case None:
@@ -532,6 +633,11 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << Altitude;
         seriesList << RouteDistance;
         seriesList << DistanceRemaining;
+        seriesList << Temp;
+        seriesList << CoreTemp;
+        seriesList << SkinTemp;
+        seriesList << HeatStrain;
+        seriesList << HeatLoad;
         seriesList << VAM;
     }
     return seriesList;
@@ -674,6 +780,18 @@ QString RealtimeData::seriesName(DataSeries series)
     case RightPedalSmoothness: return tr("Right Pedal Smoothness");
         break;
 
+    case RightPowerPhaseBegin: return tr("Right Power Phase Start");
+        break;
+
+    case RightPowerPhaseEnd: return tr("Right Power Phase End");
+        break;
+
+    case RightPowerPhasePeakBegin: return tr("Right Power Phase Peak Start");
+        break;
+
+    case RightPowerPhasePeakEnd: return tr("Right Power Phase Peak End");
+        break;
+
     case Slope: return tr("Slope");
         break;
 
@@ -712,6 +830,230 @@ QString RealtimeData::seriesName(DataSeries series)
 
     case FeO2: return tr("Fraction O2 Expired");
         break;
+
+    case Temp: return tr("Temperature");
+        break;
+
+    case CoreTemp: return tr("Core Temp");
+        break;
+    case SkinTemp: return tr("Skin Temp");
+        break;
+    case HeatStrain: return tr("Heat Strain");
+        break;
+    case HeatLoad: return tr("Estimated Heat Load");
+        break;
+
+    case RightPCO: return tr("Right PCO");
+        break;
+    case LeftPCO: return tr("Left PCO");
+        break;
+    }
+}
+
+QString RealtimeData::seriesSymbol(DataSeries series)
+{
+    switch (series) {
+
+    default:
+    case None: return QString("None");
+        break;
+
+    case Time: return QString("Time");
+        break;
+
+    case Lap: return QString("Lap");
+        break;
+
+    case LapTime: return QString("Lap Time");
+        break;
+
+    case LapTimeRemaining: return QString("Lap Time Remaining");
+        break;
+
+    case ErgTimeRemaining: return QString("Section Time Remaining");
+        break;
+
+    case BikeStress: return QString("BikeStress");
+        break;
+
+    case BikeScore: return "BikeScore (TM)";
+        break;
+
+    case Joules: return QString("kJoules");
+        break;
+
+    case Wbal: return QString("W' bal");
+        break;
+
+    case XPower: return QString("XPower");
+        break;
+
+    case IsoPower: return QString("Iso Power");
+        break;
+
+    case IF: return QString("Intensity Factor");
+        break;
+
+    case RI: return QString("Relative Intensity");
+        break;
+
+    case SkibaVI: return QString("Skiba Variability Index");
+        break;
+
+    case VI: return QString("Variability Index");
+        break;
+
+    case Distance: return QString("Distance");
+        break;
+
+    case RouteDistance: return QString("Route Distance");
+        break;
+
+    case DistanceRemaining: return QString("Distance Remaining");
+        break;
+
+    case VAM: return QString("VAM");
+        break;
+
+    case AltWatts: return QString("Alternate Power");
+        break;
+
+    case Watts: return QString("Power");
+        break;
+
+    case Speed: return QString("Speed");
+        break;
+
+    case VirtualSpeed: return QString("Virtual Speed");
+        break;
+
+    case Cadence: return QString("Cadence");
+        break;
+
+    case HeartRate: return QString("Heart Rate");
+        break;
+
+    case Load: return QString("Target Power");
+        break;
+
+    case AvgWatts: return QString("Average Power");
+        break;
+
+    case AvgSpeed: return QString("Average Speed");
+        break;
+
+    case AvgHeartRate: return QString("Average Heartrate");
+        break;
+
+    case AvgCadence: return QString("Average Cadence");
+        break;
+
+    case AvgWattsLap: return QString("Lap Power");
+        break;
+
+    case AvgSpeedLap: return QString("Lap Speed");
+        break;
+
+    case AvgHeartRateLap: return QString("Lap Heartrate");
+        break;
+
+    case AvgCadenceLap: return QString("Lap Cadence");
+        break;
+
+    case LRBalance: return QString("Left/Right Balance");
+        break;
+
+    case tHb: return QString("Total Hb Mass");
+        break;
+
+    case SmO2: return QString("Hb O2 Saturation");
+        break;
+
+    case HHb: return QString("Deoxy Hb");
+        break;
+
+    case O2Hb: return QString("Oxy Hb");
+        break;
+
+    case LeftTorqueEffectiveness: return QString("Left Torque Effectiveness");
+        break;
+
+    case RightTorqueEffectiveness: return QString("Right Torque Effectiveness");
+        break;
+
+    case LeftPedalSmoothness: return QString("Left Pedal Smoothness");
+        break;
+
+    case RightPedalSmoothness: return QString("Right Pedal Smoothness");
+        break;
+
+    case RightPowerPhaseBegin: return QString("Right Power Phase Start");
+        break;
+
+    case RightPowerPhaseEnd: return QString("Right Power Phase End");
+        break;
+
+    case RightPowerPhasePeakBegin: return QString("Right Power Phase Peak Start");
+        break;
+
+    case RightPowerPhasePeakEnd: return QString("Right Power Phase Peak End");
+        break;
+
+    case Slope: return QString("Slope");
+        break;
+
+    case LapDistance: return QString("Lap Distance");
+        break;
+
+    case LapDistanceRemaining: return QString("Lap Distance Remaining");
+        break;
+
+    case Latitude: return QString("Latitude");
+        break;
+
+    case Longitude: return QString("Longitude");
+        break;
+
+    case Altitude: return QString("Altitude");
+        break;
+
+    case Rf: return QString("Respiratory Frequency");
+        break;
+
+    case RMV: return QString("Ventilation");
+        break;
+
+    case VO2: return QString("VO2");
+        break;
+
+    case VCO2: return QString("VCO2");
+        break;
+
+    case RER: return QString("Respiratory Exchange Ratio");
+        break;
+
+    case TidalVolume: return QString("Tidal Volume");
+        break;
+
+    case FeO2: return QString("Fraction O2 Expired");
+        break;
+
+    case Temp: return QString("Temperature");
+        break;
+
+    case CoreTemp: return QString("Core Temp");
+        break;
+    case SkinTemp: return QString("Skin Temp");
+        break;
+    case HeatStrain: return QString("Heat Strain");
+        break;
+    case HeatLoad: return QString("Estimated Heat Load");
+        break;
+
+    case RightPCO: return QString("Right PCO");
+        break;
+    case LeftPCO: return QString("Left PCO");
+        break;
     }
 }
 
@@ -731,6 +1073,16 @@ double RealtimeData::gettHb() const { return thb; }
 double RealtimeData::getHHb() const { return hhb; }
 double RealtimeData::getO2Hb() const { return o2hb; }
 
+void RealtimeData::setRTorque(double torque)
+{
+    this->RTorque = torque;
+}
+
+void RealtimeData::setLTorque(double torque)
+{
+    this->LTorque = torque;
+}
+
 void RealtimeData::setTorque(double torque)
 {
     this->torque = torque;
@@ -749,10 +1101,23 @@ long RealtimeData::getLap() const
 double RealtimeData::getLatitude() const { return latitude; }
 double RealtimeData::getLongitude() const { return longitude; }
 double RealtimeData::getAltitude() const { return altitude; }
+RealtimeData::riderPosition  RealtimeData::getPosition() const { return position; }
 
 void RealtimeData::setLatitude(double d) { latitude = d; }
 void RealtimeData::setLongitude(double d) { longitude = d; }
 void RealtimeData::setAltitude(double d) { altitude = d; }
+
+void RealtimeData::setRppb(double rppb) { this->rppb = rppb; }
+void RealtimeData::setRppe(double rppe) { this->rppe = rppe; }
+void RealtimeData::setRpppb(double rpppb) { this->rpppb = rpppb; }
+void RealtimeData::setRpppe(double rpppe) { this->rpppe = rpppe; }
+void RealtimeData::setLppb(double lppb) { this->lppb = lppb; }
+void RealtimeData::setLppe(double lppe) { this->lppe = lppe; }
+void RealtimeData::setLpppb(double lpppb) { this->lpppb = lpppb; }
+void RealtimeData::setLpppe(double lpppe) { this->lpppe = lpppe; }
+void RealtimeData::setRightPCO(double rightPCO) { this->rightPCO = rightPCO; }
+void RealtimeData::setLeftPCO(double leftPCO) { this->leftPCO = leftPCO; }
+void RealtimeData::setPosition(RealtimeData::riderPosition position) { this->position = position; }
 
 void RealtimeData::setRf(double rf) { this->rf = rf; }
 void RealtimeData::setRMV(double rmv) { this->rmv = rmv; }
@@ -776,3 +1141,10 @@ double RealtimeData::getVCO2() const { return vco2; }
 double RealtimeData::getRER() const { return rer; }
 double RealtimeData::getTv() const { return tv; }
 double RealtimeData::getFeO2() const { return feo2; }
+
+void RealtimeData::setTemp(double temp) { this->temp = temp; }
+double RealtimeData::getTemp() const { return temp; }
+
+double RealtimeData::getCoreTemp() const { return coreTemp; }
+double RealtimeData::getSkinTemp() const { return skinTemp; }
+double RealtimeData::getHeatStrain() const { return heatStrain; }

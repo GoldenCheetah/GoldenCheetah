@@ -24,7 +24,7 @@ RaceRider::RaceRider(QWidget *parent, QColor color, QString name, QString id) :
 {
     QPalette pal = palette();
     //QColor RGB = color.convertTo(QColor::Rgb);
-    pal.setColor(QPalette::Normal, QPalette::Background, color);
+    pal.setColor(QPalette::Normal, QPalette::Window, color);
     pal.setColor(QPalette::Normal, QPalette::Base, color);
     pal.setColor(QPalette::Normal, QPalette::Button, color);
     pal.setColor(QPalette::Normal, QPalette::Text, Qt::black);

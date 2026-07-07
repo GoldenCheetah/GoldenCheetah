@@ -17,6 +17,7 @@
  */
 
 #include "OpenData.h"
+#include "CloudService.h"
 #include "Settings.h"
 #include "Secrets.h"
 #include "Colors.h"
@@ -60,7 +61,7 @@ static int OpenDataVersion = 1;
 
 OpenData::OpenData(Context *context) : context(context) {}
 OpenData::~OpenData() {}
-void OpenData::onSslErrors(QNetworkReply *reply, const QList<QSslError>&) { reply->ignoreSslErrors(); }
+void OpenData::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors) { CloudService::sslErrors(context->mainWindow, reply, errors); }
 
 // check if its time to ask or send data
 void
@@ -278,7 +279,7 @@ OpenData::run()
     postingdata = zip.readAll();
     zip.close();
 
-    printd("Compressed to %s, size %d\n", zipFile.fileName().toStdString().c_str(), postingdata.size());
+    printd("Compressed to %s, size %lld\n", zipFile.fileName().toStdString().c_str(), postingdata.size());
 
     // ----------------------------------------------------------------
     // STEP FOUR: Sending data to server
@@ -292,7 +293,7 @@ OpenData::run()
 
     // send as multipart form data - "secret" field, "id" field and "data" file
     QHttpMultiPart form (QHttpMultiPart::FormDataType);
-    QString boundary = QVariant(qrand()).toString() + QVariant(qrand()).toString() + QVariant(qrand()).toString();
+    QString boundary = QVariant(QRandomGenerator::global()->generate()).toString() + QVariant(QRandomGenerator::global()->generate()).toString() + QVariant(QRandomGenerator::global()->generate()).toString();
     form.setBoundary(boundary.toLatin1());
 
     QHttpPart secretpart;

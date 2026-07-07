@@ -26,6 +26,8 @@
 #include <QLineEdit>
 #include <QFormLayout>
 
+#include "ScalingLabel.h"
+
 #include "Context.h"
 #include "Zones.h" // for data series types
 #include "RideFile.h" // for data series types
@@ -73,9 +75,6 @@ class DialWindow : public GcChartWindow
         int dataSeries() const { return seriesSelector->currentIndex(); }
         int style() const { return _style; }
         int avgSecs() const { return average; }
-
-        // change font as window resizes
-        void resizeEvent(QResizeEvent *);
 
    public slots:
 
@@ -130,6 +129,13 @@ class DialWindow : public GcChartWindow
         // used by XPower algorithm
         double rsum, ewma;
 
+        //heat load estimate (don't reset in resetValues, but preserve between sessions, and reset when local date changes)
+        //note: each athelete has it's own set of DialWindows if more than one athlete is loaded at the same time
+        double heatLoad;
+        qint64 heatLoadMSec;
+        QDateTime heatLoadLocalDate;
+        bool isRunning = false;
+
         void resetValues() {
 
             rolling.fill(0.00);
@@ -148,7 +154,7 @@ class DialWindow : public GcChartWindow
         QLineEdit   *averageEdit;
 
         // display
-        QLabel *valueLabel;
+        ScalingLabel *valueLabel;
 
         QColor foreground, background;
 

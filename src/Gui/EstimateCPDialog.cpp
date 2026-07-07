@@ -146,9 +146,9 @@ EstimateCPDialog::changeSport()
             labelWP->setText(tr("Your W':"));
             break;
         case 1: // Run
-            shortWattsSpinBox->setDecimals(1);
+            shortWattsSpinBox->setDecimals(3);
             shortWattsSpinBox->setSuffix(rnSuffix);
-            longWattsSpinBox->setDecimals(1);
+            longWattsSpinBox->setDecimals(3);
             longWattsSpinBox->setSuffix(rnSuffix);
             labelCP->setText(tr("Your critical pace:"));
             labelWP->setText(tr("Your D':"));

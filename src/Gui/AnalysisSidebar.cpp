@@ -39,6 +39,12 @@
 // the ride cache
 #include "RideCache.h"
 
+// Show in Train Mode
+#include "WorkoutFilter.h"
+
+// Filter for similar activities
+#include "FilterSimilarDialog.h"
+
 AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow), context(context)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -61,7 +67,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     calendarWidget->setWhatsThis(helpCalendar->getWhatsThisText(HelpWhatsThis::SideBarRidesView_Calendar));
 
     // Activity History
-    rideNavigator = new RideNavigator(context, true);
+    context->rideNavigator = rideNavigator = new RideNavigator(context, true);
     rideNavigator->showMore(false);
     groupByMapper = NULL;
 
@@ -106,7 +112,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
 
     // create tree for user intervals, so its always at the top
     QTreeWidgetItem *tree = new QTreeWidgetItem(intervalTree->invisibleRootItem(), RideFileInterval::USER);
-    tree->setData(0, Qt::UserRole, qVariantFromValue((void *)NULL)); // no intervalitem related
+    tree->setData(0, Qt::UserRole, QVariant::fromValue((void *)NULL)); // no intervalitem related
     tree->setText(0, RideFileInterval::typeDescription(RideFileInterval::USER));
     tree->setForeground(0, GColor(CPLOTMARKER));
     QFont bold;
@@ -145,6 +151,21 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     splitter->addWidget(activityItem);
     splitter->addWidget(intervalItem);
 
+    // create the ride navs display filter
+    activityFilter = new QComboBox(this);
+    activityFilter->addItem(tr("All"), static_cast<int>(RideNavFilter::ALL));
+    activityFilter->addItem(tr("Actual"), static_cast<int>(RideNavFilter::COMPLETED));
+    activityFilter->addItem(tr("Planned"), static_cast<int>(RideNavFilter::PLANNED));
+    int index = appsettings->cvalue(context->athlete->cyclist, GC_NAVDISPLAYFILTER, "0").toInt();
+    activityFilter->setCurrentIndex(index);
+    setDisplayFilter(index);
+
+    // add ride navs display filter to splitter's banner
+    QHBoxLayout* splitterBanner = activityItem->splitterHandle->getTitleLayout();
+    splitterBanner->insertStretch(2);
+    splitterBanner->insertWidget(2, activityFilter);
+    splitterBanner->insertStretch(2);
+
     splitter->prepare(context->athlete->cyclist, "analysis");
 
     // GC signal
@@ -158,9 +179,17 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     connect(intervalTree,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), this, SLOT(clickZoomInterval(QTreeWidgetItem*)));
     connect(intervalTree,SIGNAL(itemSelectionChanged()), this, SLOT(itemSelectionChanged()));
 
+    connect(activityFilter, &QComboBox::currentIndexChanged, this, &AnalysisSidebar::setDisplayFilter);
     connect (context, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
 
     configChanged(CONFIG_APPEARANCE);
+}
+
+void
+AnalysisSidebar::setDisplayFilter(int index)
+{
+    appsettings->setCValue(context->athlete->cyclist, GC_NAVDISPLAYFILTER, index);
+    rideNavigator->setDisplayFilter(static_cast<RideNavFilter>(index));
 }
 
 void
@@ -243,7 +272,7 @@ AnalysisSidebar::setRide(RideItem*ride)
             QTreeWidgetItem *tree = trees.value(interval->type, NULL);
             if (tree == NULL) {
                 tree = new QTreeWidgetItem(intervalTree->invisibleRootItem(), interval->type);
-                tree->setData(0, Qt::UserRole, qVariantFromValue((void *)NULL)); // no intervalitem related
+                tree->setData(0, Qt::UserRole, QVariant::fromValue((void *)NULL)); // no intervalitem related
                 tree->setText(0, RideFileInterval::typeDescription(interval->type));
                 tree->setForeground(0, GColor(CPLOTMARKER));
                 tree->setFont(0, bold);
@@ -257,7 +286,7 @@ AnalysisSidebar::setRide(RideItem*ride)
             // add this interval to the tree
             QTreeWidgetItem *add = new QTreeWidgetItem(tree, interval->type);
             add->setText(0, interval->name);
-            add->setData(0, Qt::UserRole, qVariantFromValue((void*)interval));
+            add->setData(0, Qt::UserRole, QVariant::fromValue((void*)interval));
             add->setData(0, Qt::UserRole+1, QVariant(interval->color));
             add->setData(0, Qt::UserRole+2, QVariant(interval->test));
             add->setFlags(Qt::ItemIsEnabled
@@ -326,6 +355,15 @@ AnalysisSidebar::configChanged(qint32)
     //intervalSummaryWindow->setStyleSheet(GCColor::stylesheet());
 
     splitter->setPalette(GCColor::palette());
+
+    // mimic the perspective selector colors for the activity filter
+    QColor selected;
+    if (GCColor::invertColor(GColor(CTOOLBAR)) == Qt::white) selected = QColor(Qt::lightGray);
+    else selected = QColor(Qt::darkGray);
+    activityFilter->setStyleSheet(
+        QString("QComboBox { background: %1; color: %2; border: 1px solid rgba(127,127,127,127); border-radius: 3; }")
+                .arg(GColor(CTOOLBAR).name()).arg(selected.name()));
+
     activityHistory->setStyleSheet(QString("background: %1;").arg(GColor(CPLOTBACKGROUND).name()));
     rideNavigator->tableView->viewport()->setPalette(GCColor::palette());
     rideNavigator->tableView->viewport()->setStyleSheet(QString("background: %1;").arg(GColor(CPLOTBACKGROUND).name()));
@@ -408,12 +446,40 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
         QAction *actFindBest = new QAction(tr("Find Intervals..."), intervalItem);
         connect(actFindBest, SIGNAL(triggered(void)), this, SLOT(addIntervals(void)));
         menu.addAction(actFindBest);
+
+        QAction *filterSimilar = new QAction(tr("Filter similar activities..."), rideNavigator);
+        connect(filterSimilar, &QAction::triggered, this, [this]() {
+            if (context->ride != nullptr) {
+                FilterSimilarDialog dlg(context, context->ride, this);
+                dlg.exec();
+            }
+        });
+        menu.addAction(filterSimilar);
+
+
+        if (rideItem->planned && rideItem->sport == "Bike") {
+            QString filter = buildWorkoutFilter(rideItem);
+            if (! filter.isEmpty()) {
+                QAction *actStartWorkout = new QAction(tr("Show in Train Mode..."), rideNavigator);
+                connect(actStartWorkout, &QAction::triggered, this, [this, filter]() {
+                    context->mainWindow->fillinWorkoutFilterBox(filter);
+                    context->mainWindow->selectTrain();
+                    context->notifySelectWorkout(0);
+                });
+                menu.addAction(actStartWorkout);
+            }
+        }
+
         menu.addSeparator();
 
         // ride navigator stuff
         QAction *colChooser = new QAction(tr("Show Column Chooser"), rideNavigator);
         connect(colChooser, SIGNAL(triggered(void)), rideNavigator, SLOT(showColumnChooser()));
         menu.addAction(colChooser);
+
+        QAction *scrollToCurrent = new QAction(tr("Scroll to current Activity"), rideNavigator);
+        connect(scrollToCurrent, SIGNAL(triggered(void)), rideNavigator, SLOT(cursorRide()));
+        menu.addAction(scrollToCurrent);
 
         if (rideNavigator->groupBy() >= 0) {
 
@@ -424,14 +490,14 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
 
         } else {
 
-            QMenu *groupByMenu = new QMenu(tr("Group By"), rideNavigator);
+            QMenu *groupByMenu = new QMenu(tr("Group By"), menu.window());
             groupByMenu->setEnabled(true);
             menu.addMenu(groupByMenu);
 
             // add menu options for each column
             if (groupByMapper) delete groupByMapper;
             groupByMapper = new QSignalMapper(this);
-            connect(groupByMapper, SIGNAL(mapped(const QString &)), rideNavigator, SLOT(setGroupByColumnName(QString)));
+            connect(groupByMapper, &QSignalMapper::mappedString, rideNavigator, &RideNavigator::setGroupByColumnName);
 
             foreach(QString heading, rideNavigator->columnNames()) {
                 if (heading == "*") continue; // special hidden column
@@ -1060,5 +1126,3 @@ AnalysisSidebar::backInterval()
 
 #endif
 }
-
-

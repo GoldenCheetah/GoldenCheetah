@@ -43,6 +43,17 @@ static double MAXZOOM = 3.0f;
 static double MINZOOM = 0.2f;
 static double ZOOMSTEP = 0.1f;
 
+
+// Offset the body temperatures otherwise changes get lost in the graphs
+static double CTEMP_BASE = 36.5;
+static double CTEMP_DEFAULT_MAX = 38.0;
+static double STEMP_BASE = 32.0;
+static double STEMP_DEFAULT_MAX = 38.0;
+// static double HRPWR_DEFAULT_MAX = 40;
+// static double HRPWR_MAX_LIMIT = 60;
+static double CTEMP_MAX_LIMIT = 39.5;
+
+
 void WorkoutWidget::adjustLayout()
 {
     // adjust all the settings based upon current size
@@ -91,6 +102,11 @@ WorkoutWidget::WorkoutWidget(WorkoutWindow *parent, Context *context) :
     maxVX_=maxWX_=3600;
     maxY_=400;
 
+    //starting point for body temperature graphs
+    ctempMax = CTEMP_DEFAULT_MAX - CTEMP_BASE;
+    stempMax = STEMP_DEFAULT_MAX - STEMP_BASE;
+    hsiMax = 5.0;
+
     // when plotting telemetry these are maxY for those series
     cadenceMax = 200; // make it line up between power and hr
     hrMax = 220;
@@ -100,6 +116,8 @@ WorkoutWidget::WorkoutWidget(WorkoutWindow *parent, Context *context) :
 
     onDrag = onCreate = onRect = atRect = QPointF(-1,-1);
     qwkactive = false;
+    format = ErgFileFormat::unknown;
+    ftp = 300;
 
     // watch mouse events for user interaction
     adjustLayout();
@@ -118,10 +136,10 @@ WorkoutWidget::updateErgFile(ErgFile *f)
     // update f with current values etc
     // just the points FOR NOW
     f->Points.clear();
-    f->Duration = 0;
+    f->duration(0);
     foreach(WWPoint *p, points_) {
         f->Points.append(ErgFilePoint(p->x * 1000, p->y, p->y));
-        f->Duration = p->x * 1000; // whatever the last is
+        f->duration(p->x * 1000); // whatever the last is
     }
 
     f->Laps = laps_;
@@ -149,15 +167,24 @@ WorkoutWidget::start()
     // clear previous data
     wbal.clear();
     watts.clear();
+    pwrAvg.clear();
     hr.clear();
+    hrAvg.clear();
     speed.clear();
+    speedAvg.clear();
     cadence.clear();
+    cadenceAvg.clear();
     sampleTimes.clear();
     vo2.clear();
+    vo2Avg.clear();
     ventilation.clear();
-
+    ventilationAvg.clear();
+    ctemp.clear();
+    stemp.clear();
+    hsi.clear();
     // and resampling data
     count = wbalSum = wattsSum = hrSum = speedSum = cadenceSum = vo2Sum = ventilationSum = 0;
+    ctempSum = stempSum = hsiSum = 0;
 
     // set initial
     cadenceMax = 200;
@@ -180,7 +207,8 @@ WorkoutWidget::stop()
 void
 WorkoutWidget::setNow(long x)
 {
-    ensureVisible(x/1000);
+    if (isVisible())
+        ensureVisible(x/1000);
 }
 
 void
@@ -196,6 +224,10 @@ WorkoutWidget::telemetryUpdate(RealtimeData rt)
     speedSum += rt.getSpeed();
     vo2Sum += rt.getVO2();
     ventilationSum += rt.getRMV();
+
+    ctempSum += rt.getCoreTemp();
+    stempSum += rt.getSkinTemp();
+    hsiSum += rt.getHeatStrain();
 
     count++;
 
@@ -217,8 +249,18 @@ WorkoutWidget::telemetryUpdate(RealtimeData rt)
         ventilation << ve;
         sampleTimes << context->getNow();
 
+        double ct = (ctempSum/5.0f) - CTEMP_BASE;
+        if(ct < 0) ct = 0; //core temp less than 37 we can ignore
+		ctemp << ct;
+        double st = (stempSum/5.0f) - STEMP_BASE;
+        if(st < 0) st = 0; //skin temp below 32 is quite possible, but we can ignore it
+		stemp << st;
+        double hi = hsiSum/5.0f;
+		hsi << hi;
+
         // clear for next time
         count = wbalSum = wattsSum = hrSum = speedSum = cadenceSum = vo2Sum = ventilationSum = 0;
+        ctempSum = stempSum = hsiSum  = 0;
 
         // do we need to increase maxes?
         if (c > cadenceMax) cadenceMax=c;
@@ -226,6 +268,14 @@ WorkoutWidget::telemetryUpdate(RealtimeData rt)
         if (h > hrMax) hrMax=h;
         if (v > vo2Max) vo2Max=v;
         if (ve > ventilationMax) ventilationMax=ve;
+
+        //ct already has base subtracted
+        double ct_headroom = ct * 1.05;
+        if(ct_headroom > ctempMax && ct_headroom < (CTEMP_MAX_LIMIT - CTEMP_BASE)) ctempMax = ct_headroom;
+        double st_headroom = st * 1.05;
+        if(st_headroom > stempMax) stempMax = st_headroom;
+        double hi_headroom = hi * 1.05;
+        if(hi_headroom > hsiMax) hsiMax = hi_headroom;
 
         // Do we need to increase plot x-axis max? (add 15 min at a time)
         if (cadence.size() > maxVX_) setMaxVX(maxVX_ + 900);
@@ -565,15 +615,21 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
     //
     if (event->type() == QEvent::Wheel) {
 
-        // STATE: NONE
-        if (state == none) {
-            QWheelEvent *w = static_cast<QWheelEvent*>(event);
-            updateNeeded = scale(w->angleDelta());
-            filterNeeded = true;
-        }
+        Qt::KeyboardModifiers kmod = static_cast<QInputEvent*>(event)->modifiers();
+        bool ctrl = (kmod & Qt::ControlModifier) != 0;
+        if (ctrl) {
 
-        // will need to ..
-        recompute();
+            // STATE: NONE
+            if (state == none) {
+
+                QWheelEvent *w = static_cast<QWheelEvent*>(event);
+                updateNeeded = scale(w->angleDelta());
+                filterNeeded = true;
+            }
+
+            // will need to ..
+            recompute();
+        }
     }
 
     //
@@ -865,7 +921,7 @@ WorkoutWidget::setBlockCursor()
     //
     // QWKCODE TEXT
     //
-    if (!parent->code->isHidden()) {
+    if (!parent->codeContainer->isHidden()) {
 
         qwkactive = true;
 
@@ -1414,7 +1470,7 @@ WorkoutWidget::selectClear()
 }
 
 void
-WorkoutWidget::ergFileSelected(ErgFile *ergFile)
+WorkoutWidget::ergFileSelected(ErgFile *ergFile, ErgFileFormat format)
 {
     // reset state and stack
     state = none;
@@ -1433,8 +1489,10 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
     foreach(WWPoint *point, points_) delete point;
     points_.clear();
 
-    // we suport ERG but not MRC/CRS currently
-    if (ergFile && (ergFile->format == MRC || ergFile->format == ERG)) {
+    this->format = ergFile ? ergFile->format() : format;
+
+    // we suport ERG/MRC but not CRS/CRS_LOC currently
+    if (ergFile && (ergFile->format() == ErgFileFormat::mrc || ergFile->format() == ErgFileFormat::erg)) {
 
         this->ergFile = ergFile;
 
@@ -1494,10 +1552,10 @@ WorkoutWidget::save()
     // so do not need to be scaled back, that happens when
     // they are read/written to file on disk
     ergFile->Points.clear();
-    ergFile->Duration = 0;
+    ergFile->duration(0);
     foreach(WWPoint *p, points_) {
         ergFile->Points.append(ErgFilePoint(p->x * 1000, p->y, p->y));
-        ergFile->Duration = p->x * 1000; // whatever the last is
+        ergFile->duration(p->x * 1000); // whatever the last is
     }
     ergFile->Laps = laps_;
     ergFile->Texts = texts_;
@@ -1545,30 +1603,35 @@ WorkoutWidget::recompute(bool editing)
     //
     setBlockCursor();
 
-    int rnum=-1;
-    if (context->athlete->zones(false) == NULL ||
-        (rnum = context->athlete->zones(false)->whichRange(QDate::currentDate())) == -1) {
-
-        // no cp or ftp set
-        parent->TSSlabel->setText("- Stress");
-        parent->IFlabel->setText("- Intensity");
-
-    }
-
     //
     // PREPARE DATA
     //
 
     // get CP/FTP to use in calculation
-    int WPRIME = context->athlete->zones(false)->getWprime(rnum);
-    int CP = context->athlete->zones(false)->getCP(rnum);
-    int PMAX = context->athlete->zones(false)->getPmax(rnum);
-    int FTP = context->athlete->zones(false)->getFTP(rnum);
+    int rnum=-1;
+    int CP, FTP, WPRIME, PMAX;
+    if (context->athlete->zones("Bike") == NULL ||
+        (rnum = context->athlete->zones("Bike")->whichRange(QDate::currentDate())) == -1) {
+
+        // no cp or ftp set
+        CP = FTP = 300;
+        WPRIME = 20000;
+        PMAX = 1000;
+        parent->TSSlabel->setText("- Stress");
+        parent->IFlabel->setText("- Intensity");
+    } else {
+        WPRIME = context->athlete->zones("Bike")->getWprime(rnum);
+        CP = context->athlete->zones("Bike")->getCP(rnum);
+        PMAX = context->athlete->zones("Bike")->getPmax(rnum);
+        FTP = context->athlete->zones("Bike")->getFTP(rnum);
+    }
+
     bool useCPForFTP = (appsettings->cvalue(context->athlete->cyclist,
-                        context->athlete->zones(false)->useCPforFTPSetting(), 0).toInt() == 0);
+                        context->athlete->zones("Bike")->useCPforFTPSetting(), 0).toInt() == 0);
     if (useCPForFTP) FTP=CP;
     if (PMAX<=0) PMAX=1000;
     int K=WPRIME/(PMAX-CP);
+    ftp = FTP;
 
     // truncate
     wattsArray.resize(0);
@@ -1774,17 +1837,19 @@ WorkoutWidget::qwkcode()
     //
     //       N - repeat N times
     //     ttt - duration N[ms]
-    //    @iii - watts
-    //    @iii-ppp - from iii to ppp watts
+    //    @iii - watts (if format=ERG), %CP (if format=MRC)
+    //    @iii-ppp - from iii to ppp watts/%CP
     //    rttt - recovery for ttt
-    //    @rrr - recovery watts
-    //    @rrr-sss - from rrr to sss watts
+    //    @rrr - recovery watts/%CP
+    //    @rrr-sss - from rrr to sss watts/%CP
     //
     //    e.g.
     //    4x10@300r3m@200  - 4 time 10 mins at 300W followed by 3m at 200w
     //    5x30s@450r30s    - 5 times 30seconds at 450w followed by 30s at 'recovery'
     //    20m@100-400       - 20 minutes going from 100w to 400w
     //
+    //    NOTE: only integer watts are supported, floating point numbers are
+    //    rounded when qwkcode is generated.
     //
     //    XXX COME AND FIX THIS EXAMPLE XXX
     //    A complete workout example;
@@ -1796,10 +1861,12 @@ WorkoutWidget::qwkcode()
     //    3) 5 sets of 5 minutes at 105% of CP with 3 minutes recovery at 65% of CPXXX
     //    4) 10minutes at 65% of CP to cool downXXX
 
+    double denom = format == ErgFileFormat::mrc ? ftp / 100.0 : 1;
+
     // just loop through for now doing xx@yy and optionally add rxx
     if (points_.count() == 1) {
         // just a single point?
-        codeStrings << QString("%1@%2").arg(qduration(points_[0]->x)).arg(points_[0]->y);
+        codeStrings << QString("%1@0-%2").arg(qduration(points_[0]->x)).arg(round(points_[0]->y/denom));
         codePoints<<0;
     }
 
@@ -1835,7 +1902,7 @@ WorkoutWidget::qwkcode()
             if (i==0 || points_[i]->x - points_[i-1]->x <= 0) {
 
                 // its a block
-                section = QString("0@%1-%2").arg(points_[i]->y).arg(points_[i+1]->y);
+                section = QString("0@%1-%2").arg(round(points_[i]->y/denom)).arg(round(points_[i+1]->y/denom));
                 ap = points_[i]->y;
 
             } else {
@@ -1849,14 +1916,14 @@ WorkoutWidget::qwkcode()
         if (doubles_equal(points_[i+1]->y, points_[i]->y)) {
 
             // its a block
-            section = QString("%1@%2").arg(qduration(duration)).arg(points_[i]->y);
+            section = QString("%1@%2").arg(qduration(duration)).arg(round(points_[i]->y/denom));
             ap = points_[i]->y;
 
         } else {
             // its a rise
             section = QString("%1@%2-%3").arg(qduration(duration))
-                                         .arg(points_[i]->y)
-                                         .arg(points_[i+1]->y);
+                                         .arg(round(points_[i]->y/denom))
+                                         .arg(round(points_[i+1]->y/denom));
             ap = ((points_[i]->y + points_[i+1]->y) / 2);
         }
 
@@ -1904,6 +1971,7 @@ WorkoutWidget::qwkcode()
                 break; // stop when end of matches
         }
 
+        /* Text cues are not supported on qwkcode yet
         foreach (const ErgFileText cue, texts_) {
             int secs = i > 0 ? points_[sectionp[i-1]]->x : 0;
             int offset = cue.x/1000 - secs;
@@ -1914,6 +1982,7 @@ WorkoutWidget::qwkcode()
                 codePoints << sectionp[i];
             }
         }
+        */
 
         // multiple or no ..
         if (count > 1) {
@@ -2033,6 +2102,9 @@ WorkoutWidget::apply(QString code)
 
     laps_.clear();
 
+    // transform if mrc
+    double factor = format == ErgFileFormat::mrc ? ftp / 100.0 : 1;
+
     foreach(QString line, code.split("\n")) {
 
         //
@@ -2043,11 +2115,11 @@ WorkoutWidget::apply(QString code)
         // [Nx]t1@w1[-w2][rt2@w3[-w4]][L]
         //
         // Where Nx      - Repeat N times
-        //       t1@w1   - Time t1 at Watts w1
-        //       -w2     - Optionally Time t from watts w1 to w2
+        //       t1@w1   - Time t1 at Watts/%CP w1
+        //       -w2     - Optionally Time t from watts/%CP w1 to w2
         //
-        //       rt2@w3  - Optional recovery time t2 at watts w3
-        //       -w4     - Optionally recover from time t2 watts w3 to watts w4
+        //       rt2@w3  - Optional recovery time t2 at watts/%CP w3
+        //       -w4     - Optionally recover from time t2 watts/%CP w to watts/%CP w
         //       L       - Optionally add laps to encapsulate sections added by this qwkcode line
         //
         //       time t2/t2 can be expressed as a number and may
@@ -2060,11 +2132,11 @@ WorkoutWidget::apply(QString code)
         // 0 - The entire line
         // 1 - Count with trailing x e.g. "4x"
         // 2 - Duration with trailing units (optional) e.g. "10m"
-        // 3 - Watts without units e.g. "120"
-        // 4 - Watts rise to with leading minus e.g. "-150"
+        // 3 - Watts/%CP without units e.g. "120"
+        // 4 - Watts/%CP rise to with leading minus e.g. "-150"
         // 5 - The entire recovery string (optional)
         // 6 - Recovery Duration with trailing units (optional) e.g. "3m"
-        // 7 - Recovery watts without units e.g. "70"
+        // 7 - Recovery watts/%CP without units e.g. "70"
         // 8 - Recovert rise to with leading minus e.g. "-100"
         // 9 - Trailing L if lap markers is to be added
         //
@@ -2148,9 +2220,9 @@ WorkoutWidget::apply(QString code)
 
                 // EFFORT
                 // add a point for starting watts if not already there
-                if (w1 != watts) {
+                if (w1 != watts || points_.isEmpty()) {
                     index++;
-                    new WWPoint(this, secs, w1);
+                    new WWPoint(this, secs, w1*factor);
                     bool addLap = laps_.isEmpty() ? secs != 0 : (laps_.last().x != secs*1000) && secs != 0;
                     if (insertLapMarkers && addLap)
                     {
@@ -2167,7 +2239,7 @@ WorkoutWidget::apply(QString code)
                 secs += t1;
                 watts = w2 > 0 ? w2 : w1;
                 index++;
-                new WWPoint(this, secs, watts);
+                new WWPoint(this, secs, watts*factor);
 
                 bool addLap = laps_.isEmpty() ? true : (laps_.last().x != secs*1000);
                 if (insertLapMarkers && addLap)
@@ -2184,7 +2256,7 @@ WorkoutWidget::apply(QString code)
                 if (t2 > 0) {
                     if (w3 != watts) {
                         index++;
-                        new WWPoint(this, secs, w3);
+                        new WWPoint(this, secs, w3*factor);
                         bool addLap = laps_.isEmpty() ? true : (laps_.last().x != secs*1000);
                         if (insertLapMarkers && addLap)
                         {
@@ -2201,7 +2273,7 @@ WorkoutWidget::apply(QString code)
                     secs += t2;
                     watts = w4 >0 ? w4 : w3;
                     index++;
-                    new WWPoint(this,secs,watts);
+                    new WWPoint(this,secs,watts*factor);
                     bool addLap = laps_.isEmpty() ? true : (laps_.last().x != secs*1000);
                     if (insertLapMarkers && addLap)
                     {
@@ -2523,7 +2595,16 @@ WorkoutWidget::transform(double seconds, double watts, WwSeriesType s)
         yratio = double(c.height()) / double(ventilationMax);
         }
         break;
-
+    //scale the hight of the line for core temp , which has base subtracted
+    case CORETEMP:
+        yratio = double(c.height()) / double(ctempMax);
+        break;
+    case SKINTEMP:
+        yratio = double(c.height()) / double(stempMax);
+        break;
+    case HSI:
+        yratio = double(c.height()) / double(hsiMax);
+        break;
     }
     return QPoint(c.x() - (minVX() * xratio) + (seconds * xratio), c.bottomLeft().y() - (watts * yratio));
 }
@@ -3020,7 +3101,21 @@ WorkoutWidget::shouldPlotSpeed()
 {
     return parent->shouldPlotSpeed();
 }
-
+bool
+WorkoutWidget::shouldPlotCoreTemp()
+{
+    return parent->shouldPlotCoreTemp();
+}
+bool
+WorkoutWidget::shouldPlotSkinTemp()
+{
+    return parent->shouldPlotSkinTemp();
+}
+bool
+WorkoutWidget::shouldPlotHSI()
+{
+    return parent->shouldPlotHSI();
+}
 int
 WorkoutWidget::hrPlotAvgLength()
 {

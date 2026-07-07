@@ -21,26 +21,68 @@
 #include "IntervalItem.h"
 #include "RideFile.h"
 
-Specification::Specification(DateRange dr, FilterSet fs) : dr(dr), fs(fs), it(NULL), recintsecs(0), ri(NULL) {}
+
+PlanFilter::PlanFilter
+(PlanFilterType type)
+: type(type)
+{
+}
+
+
+void
+PlanFilter::setType
+(PlanFilterType type)
+{
+    this->type = type;
+}
+
+
+PlanFilterType
+PlanFilter::getType
+() const
+{
+    return type;
+}
+
+
+bool
+PlanFilter::pass
+(RideItem const * const rideItem) const
+{
+    if (!rideItem->planned || type == PlanFilterType::IncludeAll) {
+        return true;
+    } else if (type == PlanFilterType::IncludeIfUpcomingOrMissed) {
+        return !rideItem->hasLinkedActivity();
+    } else if (type == PlanFilterType::IncludeIfUpcoming) {
+        return rideItem->dateTime.date() >= QDate::currentDate()
+               && !rideItem->hasLinkedActivity();
+    } else if (type == PlanFilterType::IncludeNone) {
+        return false;
+    }
+    return true;
+}
+
+
+Specification::Specification(DateRange dr, FilterSet fs, PlanFilter pf) : dr(dr), fs(fs), pf(pf), it(NULL), recintsecs(0), ri(NULL) {}
 Specification::Specification(IntervalItem *it, double recintsecs) : it(it), recintsecs(recintsecs), ri(NULL) {}
 Specification::Specification() : it(NULL), recintsecs(0), ri(NULL) {}
 
 // does the date pass the specification ?
 bool
-Specification::pass(QDate date)
+Specification::pass(QDate date) const
 {
     return (dr.pass(date));
 }
 
 // does the rideitem pass the specification ?
 bool 
-Specification::pass(RideItem*item)
+Specification::pass(RideItem*item) const
 {
-    return (dr.pass(item->dateTime.date()) && fs.pass(item->fileName));
+    return (dr.pass(item->dateTime.date()) && fs.pass(item->fileName) && pf.pass(item));
 }
 
 bool
-Specification::pass(RideFilePoint *p)
+Specification::pass(RideFilePoint *p) const
 {
     if (it == NULL) return true;
     else if ((p->secs+recintsecs) >= it->start && p->secs <= it->stop) return true;
@@ -58,6 +100,12 @@ void
 Specification::setFilterSet(FilterSet fs)
 {
     this->fs = fs;
+} 
+
+void
+Specification::setPlanFilter(PlanFilter pf)
+{
+    this->pf = pf;
 }
 
 void
@@ -88,7 +136,7 @@ Specification::secsEnd() const
 }
 
 bool
-Specification::isEmpty(RideFile *ride)
+Specification::isEmpty(RideFile *ride) const
 {
     // its null !
     if (!ride) return true;

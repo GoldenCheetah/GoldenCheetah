@@ -24,13 +24,14 @@
 #include <QTimer>
 #include "Context.h"
 #include "RideMetadata.h"
-#include "Season.h"
 #include "LTMPopup.h"
 #include "GcPane.h"
 #include "SpecialFields.h"
 #include "Specification.h"
 
 #include <cmath>
+
+#include <QTreeWidget>
 
 #include <qwt_plot_picker.h>
 #include <qwt_text_engine.h>
@@ -73,8 +74,7 @@ class TreeMapWindow : public GcChartWindow
             if (field1->currentIndex() == 0) {
                return "None"; // dont' translate
             } else {
-               SpecialFields sp;
-               return ( sp.internalName(field1->currentText()));
+               return (SpecialFields::getInstance().internalName(field1->currentText()));
             }
         }
 
@@ -83,23 +83,20 @@ class TreeMapWindow : public GcChartWindow
             if (field2->currentIndex() == 0) {
                return "None"; // dont' translate
             } else {
-               SpecialFields sp;
-               return ( sp.internalName(field2->currentText()));
+               return (SpecialFields::getInstance().internalName(field2->currentText()));
             }
         }
 
         void setf1(QString x)
         {   // consider translation on Screen, but Store only in EN
-            SpecialFields sp;
             if (x == "None") field1->setCurrentIndex(0); // "None" is the first item in Combo Box
-            else field1->setCurrentIndex(field1->findText(sp.displayName(x)));
+            else field1->setCurrentIndex(field1->findText(SpecialFields::getInstance().displayName(x)));
         }
 
         void setf2(QString x)
         {   // consider translation on Screen, but Store only in EN
-            SpecialFields sp;
             if (x == "None") field2->setCurrentIndex(0); // // "None" is the first item in Combo Box
-            else field2->setCurrentIndex(field2->findText(sp.displayName(x)));
+            else field2->setCurrentIndex(field2->findText(SpecialFields::getInstance().displayName(x)));
         }
 
         int useSelected() { return dateSetting->mode(); }
@@ -178,7 +175,7 @@ class TreeMapWindow : public GcChartWindow
 
         // Widgets
         QVBoxLayout *mainLayout;
-        TreeMapPlot *ltmPlot;
+        TreeMapPlot *treemapPlot;
         QLabel *title;
 
         QComboBox *field1,

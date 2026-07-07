@@ -23,8 +23,10 @@
 #include <QLowEnergyController>
 #include <QLowEnergyService>
 #include <QQueue>
+#include <QTimer>
 
 #include "CalibrationData.h"
+#include "Ftms.h"
 
 typedef struct btle_sensor_type {
     const char *descriptive_name;
@@ -73,6 +75,7 @@ private slots:
     void confirmedCharacteristicWrite(const QLowEnergyCharacteristic &c, 
                                       const QByteArray &value);
     void serviceError(QLowEnergyService::ServiceError e);
+    void attemptReconnect();
 
 signals:
     void setNotification(QString msg, int timeout);
@@ -97,22 +100,29 @@ private:
     double windResistance;
     double wheelSize;
     bool has_power;
+    bool has_controllable_service;
     CalibrationData calibrationData;
 
     // Service and Characteristic to set load
-    enum {Load_None, Tacx_UART, Wahoo_Kickr, Kurt_InRide, Kurt_SmartControl} loadType;
+    enum {Load_None, Tacx_UART, Wahoo_Kickr, Kurt_InRide, Kurt_SmartControl, FTMS_Device} loadType;
     QLowEnergyCharacteristic loadCharacteristic;
     QLowEnergyService* loadService;
     QQueue<QByteArray> commandQueue;
     int commandRetry;
 
+    // FTMS Device Configuration
+    FtmsDeviceInformation ftmsDeviceInfo;
+
     bool connected;
+    QTimer *reconnectTimer;
+    int reconnectAttempts;
     void getCadence(QDataStream& ds);
     void getWheelRpm(QDataStream& ds);
     void setLoadErg(double);
     void setLoadIntensity(double);
     void setLoadLevel(int);
     void setRiderCharacteristics(double weight, double rollingResistance, double windResistance);
+    void sendSimulationParameters();
     void commandSend(QByteArray &command);
     void commandWrite(QByteArray &command);
     void commandWriteFailed();

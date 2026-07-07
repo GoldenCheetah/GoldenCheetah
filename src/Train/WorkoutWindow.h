@@ -35,7 +35,7 @@
 #include "Context.h"
 #include "RideFile.h" // for data series types
 #include "Library.h"  // workout library
-#include "TabView.h"  // stylesheet for scroller
+#include "AbstractView.h"  // stylesheet for scroller
 
 #include "Settings.h"
 #include "Units.h"
@@ -61,6 +61,25 @@ class WWTelemetry;
 class WorkoutWindow : public GcChartWindow
 {
     Q_OBJECT
+    G_OBJECT
+    Q_PROPERTY(bool plotHr READ shouldPlotHr WRITE setShouldPlotHr USER true)
+    Q_PROPERTY(bool plotPwr READ shouldPlotPwr WRITE setShouldPlotPwr USER true)
+    Q_PROPERTY(bool plotCadence READ shouldPlotCadence WRITE setShouldPlotCadence USER true)
+    Q_PROPERTY(bool plotWbal READ shouldPlotWbal WRITE setShouldPlotWbal USER true)
+    Q_PROPERTY(bool plotVo2 READ shouldPlotVo2 WRITE setShouldPlotVo2 USER true)
+    Q_PROPERTY(bool plotVentilation READ shouldPlotVentilation WRITE setShouldPlotVentilation USER true)
+    Q_PROPERTY(bool plotSpeed READ shouldPlotSpeed WRITE setShouldPlotSpeed USER true)
+
+    Q_PROPERTY(bool plotCoreTemp READ shouldPlotCoreTemp WRITE setShouldPlotCoreTemp USER true)
+    Q_PROPERTY(bool plotSkinTemp READ shouldPlotSkinTemp WRITE setShouldPlotSkinTemp USER true)
+    Q_PROPERTY(bool plotHSI READ shouldPlotHSI WRITE setShouldPlotHSI USER true)
+    
+    Q_PROPERTY(int hrPlotAvgLength READ hrPlotAvgLength WRITE setPlotHrAvgLength USER true)
+    Q_PROPERTY(int pwrPlotAvgLength READ pwrPlotAvgLength WRITE setPlotPwrAvgLength USER true)
+    Q_PROPERTY(int cadencePlotAvgLength READ cadencePlotAvgLength WRITE setPlotCadenceAvgLength USER true)
+    Q_PROPERTY(int vo2PlotAvgLength READ vo2PlotAvgLength WRITE setPlotVo2AvgLength USER true)
+    Q_PROPERTY(int ventilationPlotAvgLength READ ventilationPlotAvgLength WRITE setPlotVentilationAvgLength USER true)
+    Q_PROPERTY(int speedPlotAvgLength READ speedPlotAvgLength WRITE setPlotSpeedAvgLength USER true)
 
     public:
 
@@ -68,8 +87,12 @@ class WorkoutWindow : public GcChartWindow
 
         // the ergfile we are editing
         ErgFile *ergFile;
+        ErgFileFormat format;
 
         // edit the definition
+        QLabel *codeFormat;
+        QLabel *coalescedSections;
+        QWidget *codeContainer;
         CodeEditor *code;
 
         // workout widget updates these
@@ -86,9 +109,11 @@ class WorkoutWindow : public GcChartWindow
         bool draw; // draw or select mode?
 
    public slots:
+        // set properties
 
         // toolbar functions
-        void newFile();
+        void newErgFile();
+        void newMrcFile();
         void saveFile();
         void saveAs();
         void properties();
@@ -107,7 +132,7 @@ class WorkoutWindow : public GcChartWindow
         void scrollMoved();
 
         // and erg file was selected
-        void ergFileSelected(ErgFile *);
+        void ergFileSelected(ErgFile *, ErgFileFormat format = ErgFileFormat::unknown);
 
         // qwkcode edited!
         void qwkcodeChanged();
@@ -122,14 +147,6 @@ class WorkoutWindow : public GcChartWindow
         // show hide toolbar if too small
         void resizeEvent(QResizeEvent * event);
 
-        // settings changes
-        void plotHrChanged(int value);
-        void plotPwrChanged(int value);
-        void plotCadenceChanged(int value);
-        void plotWbalChanged(int value);
-        void plotVo2Changed(int value);
-        void plotVentilationChanged(int value);
-        void plotSpeedChanged(int value);
         void plotHrAvgChanged(int value);
         void plotPwrAvgChanged(int value);
         void plotCadenceAvgChanged(int value);
@@ -137,21 +154,42 @@ class WorkoutWindow : public GcChartWindow
         void plotVentilationAvgChanged(int value);
         void plotSpeedAvgChanged(int value);
 
-        // get settings
-        bool shouldPlotHr() { return plotHr;}
-        bool shouldPlotPwr() { return plotPwr;}
-        bool shouldPlotCadence() { return plotCadence;}
-        bool shouldPlotWbal() { return plotWbal;}
-        bool shouldPlotVo2() { return plotVo2;}
-        bool shouldPlotVentilation() { return plotVentilation;}
-        bool shouldPlotSpeed() { return plotSpeed;}
+        void setShouldPlotHr(bool);
+        void setShouldPlotPwr(bool);
+        void setShouldPlotCadence(bool);
+        void setShouldPlotWbal(bool);
+        void setShouldPlotVo2(bool);
+        void setShouldPlotVentilation(bool);
+        void setShouldPlotSpeed(bool);
 
-        int hrPlotAvgLength() { return plotHrAvg; }
-        int pwrPlotAvgLength() { return plotPwrAvg; }
-        int cadencePlotAvgLength() { return plotCadenceAvg; }
-        int vo2PlotAvgLength() { return plotVo2Avg; }
-        int ventilationPlotAvgLength() { return plotVentilationAvg; }
-        int speedPlotAvgLength() { return plotSpeedAvg; }
+        void setShouldPlotCoreTemp(bool);
+        void setShouldPlotSkinTemp(bool);
+        void setShouldPlotHSI(bool);
+
+        void setPlotHrAvgLength(int);
+        void setPlotPwrAvgLength(int);
+        void setPlotCadenceAvgLength(int);
+        void setPlotVo2AvgLength(int);
+        void setPlotVentilationAvgLength(int);
+        void setPlotSpeedAvgLength(int);
+
+        // get settings
+        bool shouldPlotHr() { return plotHrCB->checkState() != Qt::Unchecked;}
+        bool shouldPlotPwr() { return plotPwrCB->checkState() != Qt::Unchecked;}
+        bool shouldPlotCadence() { return plotCadenceCB->checkState() != Qt::Unchecked;}
+        bool shouldPlotWbal() { return plotWbalCB->checkState() != Qt::Unchecked;}
+        bool shouldPlotVo2() { return plotVo2CB->checkState() != Qt::Unchecked;}
+        bool shouldPlotVentilation() { return plotVentilationCB->checkState() != Qt::Unchecked;}
+        bool shouldPlotSpeed() { return plotSpeedCB->checkState() != Qt::Unchecked;}
+        bool shouldPlotCoreTemp() { return plotCoreTempCB->checkState() != Qt::Unchecked;}
+        bool shouldPlotSkinTemp() { return plotSkinTempCB->checkState() != Qt::Unchecked;}
+        bool shouldPlotHSI() { return plotHSICB->checkState() != Qt::Unchecked;}
+        int hrPlotAvgLength();
+        int pwrPlotAvgLength();
+        int cadencePlotAvgLength();
+        int vo2PlotAvgLength();
+        int ventilationPlotAvgLength();
+        int speedPlotAvgLength();
 
     protected:
         bool eventFilter(QObject *obj, QEvent *event);
@@ -164,6 +202,7 @@ class WorkoutWindow : public GcChartWindow
         WorkoutWidget *workout; // will become editor.
         QScrollBar *scroll;     // for controlling the position
         QCheckBox *plotHrCB, *plotPwrCB, *plotCadenceCB, *plotWbalCB, *plotVo2CB, *plotVentilationCB, *plotSpeedCB;
+        QCheckBox *plotCoreTempCB, *plotSkinTempCB, *plotHSICB;
         QSpinBox *plotHrSB, *plotPwrSB, *plotCadenceSB, *plotVo2SB, *plotVentilationSB, *plotSpeedSB;
 
         WWPowerScale *powerscale;
@@ -182,8 +221,6 @@ class WorkoutWindow : public GcChartWindow
 
         bool active;
         bool recording;
-        bool plotHr, plotPwr, plotCadence, plotWbal, plotVo2, plotVentilation, plotSpeed;
-        int plotHrAvg, plotPwrAvg, plotCadenceAvg, plotVo2Avg, plotVentilationAvg, plotSpeedAvg;
 };
 
 #endif // _GC_WorkoutWindow_h

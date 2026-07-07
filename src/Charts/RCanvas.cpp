@@ -20,9 +20,7 @@
 
 #include "Context.h"
 #include "Colors.h"
-#include "TabView.h"
-
-#include <QGLWidget>
+#include "AbstractView.h"
 
 //
 //
@@ -49,14 +47,6 @@ RCanvas::RCanvas(Context *context, QWidget *parent) : QGraphicsView(parent), con
 {
     // no frame, its ugly
     setFrameStyle(QFrame::NoFrame);
-
-#ifdef Q_OS_LINUX // mac and windows both have issues. sigh.
-    // Enabled on Linux depending on Open GL version
-    if (QGLFormat::openGLVersionFlags().testFlag(QGLFormat::OpenGL_Version_2_0)) {
-        setViewport(new QGLWidget( QGLFormat(QGL::SampleBuffers)));
-        setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-    }
-#endif
 
     // allow to click and drag
     setDragMode(QGraphicsView::ScrollHandDrag);
@@ -86,7 +76,7 @@ RCanvas::configChanged(qint32)
     p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
     p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     setPalette(p);
-    setStyleSheet(TabView::ourStyleSheet());
+    setStyleSheet(AbstractView::ourStyleSheet());
 }
 
 void
@@ -95,7 +85,7 @@ RCanvas::wheelEvent(QWheelEvent *event){
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     // Scale the view / do the zoom
     double scaleFactor = 1.15;
-    if(event->delta() > 0) {
+    if(event->angleDelta().y() > 0) {
         // Zoom in
         scale(scaleFactor, scaleFactor);
 

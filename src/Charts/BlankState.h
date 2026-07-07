@@ -94,13 +94,13 @@ class BlankStateHomePage : public BlankStatePage
 
 };
 
-class BlankStateDiaryPage : public BlankStatePage
+class BlankStatePlanPage : public BlankStatePage
 {
     Q_OBJECT
     G_OBJECT
 
     public:
-        BlankStateDiaryPage(Context *context);
+        BlankStatePlanPage(Context *context);
         void saveState();
 
 };

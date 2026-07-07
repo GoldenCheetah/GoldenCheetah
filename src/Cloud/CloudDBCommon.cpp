@@ -147,7 +147,7 @@ void CloudDBAcceptConditionsDialog::rejectConditions() {
 
 QString CloudDBCommon::cloudDBBaseURL = QString("https://%1.appspot.com/v1/").arg(GC_CLOUD_DB_APP_NAME);
 QVariant  CloudDBCommon::cloudDBContentType = QVariant("application/json");
-QByteArray CloudDBCommon::cloudDBBasicAuth = "Basic " + QByteArray(GC_CLOUD_DB_BASIC_AUTH) ;
+QByteArray CloudDBCommon::cloudDBBasicAuth = "Basic " + QByteArray(GC_CLOUD_DB_BASIC_AUTH);
 
 QList<QString> CloudDBCommon::cloudDBLangsIds = QList<QString>() << "en" << "fr" << "ja" << "pt-br" << "it" << "de" << "ru" << "cs" << "es" << "pt" << "zh-cn" << "zh-tw" << "nl" << "sv" << "xx";
 
@@ -290,20 +290,6 @@ CloudDBCommon::unmarshallAPIHeaderV1(QByteArray json, QList<CommonAPIHeaderV1> *
 
     return true;
 }
-
-void
-CloudDBCommon::sslErrors(QNetworkReply* reply ,QList<QSslError> errors)
-{
-    QString errorString = "";
-    foreach (const QSslError e, errors ) {
-        if (!errorString.isEmpty())
-            errorString += ", ";
-        errorString += e.errorString();
-    }
-    QMessageBox::warning(NULL, tr("HTTP"), tr("SSL error(s) has occurred: %1").arg(errorString));
-    reply->ignoreSslErrors();
-}
-
 
 void
 CloudDBCommon::unmarshallAPIHeaderV1Object(QJsonObject* object, CommonAPIHeaderV1* chartHeader) {
@@ -496,7 +482,7 @@ CloudDBHeader::getAllCachedHeader(QList<CommonAPIHeaderV1> *objectHeader, CloudD
         selectAfter = objectHeader->at(0).LastChanged.addSecs(1); // DB has Microseconds - we not - so round up to next full second
     } else {
         // we do not have charts before 2000 :-)
-        selectAfter = QDateTime(QDate(2000,01,01));
+        selectAfter = QDateTime(QDate(2000,01,01).startOfDay());
     }
 
     // now get the missing headers (in bulks of xxx - since GAE is not nicely handling high single call volumes)
@@ -517,10 +503,10 @@ CloudDBHeader::getAllCachedHeader(QList<CommonAPIHeaderV1> *objectHeader, CloudD
 
         // wait for reply (synchronously) and process error codes as necessary
         if (!CloudDBCommon::replyReceivedAndOk(reply)) { 
-		    delete retrievedHeader;
-			delete newHeader;
-            return false;
-		};
+            delete retrievedHeader;
+            delete newHeader;
+            return true; // Allow the user to use cached data when CloudDB is not available
+        };
 
         QByteArray result = reply->readAll();
         retrievedHeader->clear();

@@ -191,7 +191,9 @@ void Computrainer::getTelemetry(double &power, double &heartrate, double &cadenc
 void Computrainer::getSpinScan(double spinData[])
 {
     pvars.lock();
-    for (int i=0; i<24; spinData[i] = this->spinScan[i]) ;
+    for (int i=0; i<24; i++) {
+        spinData[i] = this->spinScan[i];
+    }
     pvars.unlock();
 }
 
@@ -803,7 +805,7 @@ int Computrainer::openPort()
 
     // LINUX AND MAC USES TERMIO / IOCTL / STDIO
 
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
     int ldisc=TTYDISC;
 #else
     int ldisc=N_TTY; // LINUX
@@ -829,7 +831,7 @@ int Computrainer::openPort()
     deviceSettings.c_cflag &= (~CSIZE & ~CSTOPB);
     deviceSettings.c_oflag=0;
 
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
     deviceSettings.c_cflag &= (~CCTS_OFLOW & ~CRTS_IFLOW); // no hardware flow control
     deviceSettings.c_cflag |= (CS8 | CLOCAL | CREAD | HUPCL);
 #else
@@ -856,7 +858,7 @@ int Computrainer::openPort()
     // if deviceFilename references a port above COM9
     // then we need to open "\\.\COMX" not "COMX"
     QString portSpec;
-    int portnum = deviceFilename.midRef(3).toString().toInt();
+    int portnum = deviceFilename.mid(3).toInt();
     if (portnum < 10)
        portSpec = deviceFilename;
     else

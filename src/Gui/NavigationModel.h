@@ -21,7 +21,7 @@
 #include <QString>
 #include <QVariant>
 
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "TimeUtils.h"
 #include "Context.h"
 #include "Athlete.h"
@@ -54,7 +54,7 @@ class NavigationModel : public QObject
 
 public:
 
-    NavigationModel(Tab *tab);
+    NavigationModel(AthleteTab *tab);
     ~NavigationModel();
 
     // keep a track of the rides we've looked
@@ -74,7 +74,7 @@ public slots:
 
 private:
 
-    Tab *tab;
+    AthleteTab *tab;
 
     // block observer when undo/redo is active
     bool block;

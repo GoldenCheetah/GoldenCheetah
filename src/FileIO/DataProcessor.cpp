@@ -28,6 +28,83 @@
 #include "FixPySettings.h"
 #endif
 
+
+DataProcessor::Automation
+DataProcessor::getAutomation
+() const
+{
+    QString automationStr = appsettings->value(nullptr, configKeyAutomation(id()), "Manual").toString();
+    Automation automation = Manual;
+    if (automationStr == "Auto") {
+        automation = Auto;
+    } else if (automationStr == "Save") {
+        automation = Save;
+    }
+    return automation;
+}
+
+
+void
+DataProcessor::setAutomation
+(DataProcessor::Automation automation)
+{
+    QString automationStr;
+    // which mode is selected?
+    switch (automation) {
+    case Auto:
+        automationStr = "Auto";
+        break;
+    case Save:
+        automationStr = "Save";
+        break;
+    case Manual:
+    default:
+        automationStr = "Manual";
+        break;
+    }
+    appsettings->setValue(configKeyAutomation(id()), automationStr);
+}
+
+
+bool
+DataProcessor::isAutomatedOnly
+() const
+{
+    return appsettings->value(nullptr, configKeyAutomatedOnly(id()), false).toBool();
+}
+
+void
+DataProcessor::setAutomatedOnly
+(bool automatedOnly)
+{
+    appsettings->setValue(configKeyAutomatedOnly(id()), automatedOnly);
+}
+
+
+QString
+DataProcessor::configKeyAutomatedOnly
+(const QString &id)
+{
+    return GC_QSETTINGS_GLOBAL_GENERAL + QString("dp/%1/automatedonly").arg(id);
+}
+
+
+QString
+DataProcessor::configKeyAutomation
+(const QString &id)
+{
+    return GC_QSETTINGS_GLOBAL_GENERAL + QString("dp/%1/automation").arg(id);
+}
+
+
+QString
+DataProcessor::configKeyApply
+(const QString &id)
+{
+    return GC_QSETTINGS_GLOBAL_GENERAL + QString("dp/%1/apply").arg(id);
+}
+
+
 DataProcessorFactory *DataProcessorFactory::instance_;
 DataProcessorFactory &DataProcessorFactory::instance()
 {
@@ -43,10 +120,10 @@ DataProcessorFactory::~DataProcessorFactory()
 }
 
 bool
-DataProcessorFactory::registerProcessor(QString name, DataProcessor *processor)
+DataProcessorFactory::registerProcessor(DataProcessor *processor)
 {
-    if (processors.contains(name)) return false; // don't register twice!
-    processors.insert(name, processor);
+    if (processors.contains(processor->id())) return false; // don't register twice!
+    processors.insert(processor->id(), processor);
     return true;
 }
 
@@ -58,6 +135,31 @@ DataProcessorFactory::unregisterProcessor(QString name)
     processors.remove(name);
     delete processor;
 }
+
+
+DataProcessor*
+DataProcessorFactory::getProcessor
+(const QString &id) const
+{
+#ifdef GC_WANT_PYTHON
+    fixPySettings->initialize();
+#endif
+
+    DataProcessor *ret = processors.value(id, nullptr);
+    if (ret == nullptr) {
+        QMapIterator<QString, DataProcessor*> i(processors);
+        i.toFront();
+        while (i.hasNext()) {
+            i.next();
+            if (i.value()->legacyId() == id) {
+                ret = i.value();
+                break;
+            }
+        }
+    }
+    return ret;
+}
+
 
 QMap<QString, DataProcessor *>
 DataProcessorFactory::getProcessors(bool coreProcessorsOnly) const
@@ -79,6 +181,20 @@ DataProcessorFactory::getProcessors(bool coreProcessorsOnly) const
     return coreProcessors;
 }
 
+
+QList<DataProcessor*>
+DataProcessorFactory::getProcessorsSorted
+(bool coreProcessorsOnly) const
+{
+    QMap<QString, DataProcessor*> map = getProcessors(coreProcessorsOnly);
+    QList<DataProcessor*> processors = map.values();
+    std::sort(processors.begin(), processors.end(), [](DataProcessor *l, DataProcessor *r) {
+        return QString::localeAwareCompare(l->name(), r->name()) < 0;
+    });
+    return processors;
+}
+
+
 bool
 DataProcessorFactory::autoProcess(RideFile *ride, QString mode, QString op)
 {
@@ -99,19 +215,18 @@ DataProcessorFactory::autoProcess(RideFile *ride, QString mode, QString op)
     i.toFront();
     while (i.hasNext()) {
         i.next();
-        QString configsetting = QString("dp/%1/apply").arg(i.key());
 
         // if we're being run manually, run all that are defined
-        if (appsettings->value(NULL, GC_QSETTINGS_GLOBAL_GENERAL+configsetting, "Manual").toString() == mode)
+        if (appsettings->value(NULL, i.value()->configKeyAutomation(i.key()), "Manual").toString() == mode)
             i.value()->postProcess(ride, NULL, op);
     }
 
     return changed;
 }
 
-ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString name, RideItem *ride) : context(context), ride(ride)
+ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString name, RideItem *ride, DataProcessorConfig *conf) : context(context), ride(ride), config(conf)
 {
-    setAttribute(Qt::WA_DeleteOnClose);
+    if (config == nullptr) setAttribute(Qt::WA_DeleteOnClose); // don't destroy received config
     setWindowTitle(name);
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
@@ -134,10 +249,10 @@ ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString n
     QLabel *explainLabel = new QLabel(tr("Description"), this);
     explainLabel->setFont(font);
 
-    config = processor->processorConfig(this, ride->ride());
+    if (config == nullptr) config = processor->processorConfig(this, ride ? ride->ride() : nullptr);
     config->readConfig();
     explain = new QTextEdit(this);
-    explain->setText(config->explain());
+    explain->setText(processor->explain());
     explain->setReadOnly(true);
 
     mainLayout->addWidget(configLabel);
@@ -145,9 +260,12 @@ ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString n
     mainLayout->addWidget(explainLabel);
     mainLayout->addWidget(explain);
 
+    saveAsDefault = new QCheckBox(tr("Save parameters as default"), this);
+    saveAsDefault->setChecked(false);
     ok = new QPushButton(tr("OK"), this);
     cancel = new QPushButton(tr("Cancel"), this);
     QHBoxLayout *buttons = new QHBoxLayout();
+    buttons->addWidget(saveAsDefault);
     buttons->addStretch();
     buttons->addWidget(cancel);
     buttons->addWidget(ok);
@@ -170,6 +288,9 @@ ManualDataProcessorDialog::okClicked()
     if (ride && ride->ride() && processor->postProcess((RideFile *)ride->ride(), config, "UPDATE") == true) {
         context->notifyRideSelected(ride);     // to remain compatible with rest of GC for now
     }
+
+    // Save parameters as default on user request
+    if (saveAsDefault->isChecked()) config->saveConfig();
 
     // reset cursor and wait
     QApplication::restoreOverrideCursor();

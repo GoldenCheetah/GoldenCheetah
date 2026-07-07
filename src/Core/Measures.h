@@ -31,7 +31,7 @@ class Measure {
     Q_DECLARE_TR_FUNCTIONS(Measure)
 public:
 
-    enum measuresource { Manual, Withings, TodaysPlan, CSV };
+    enum measuresource { Manual, Withings, CSV, Tredict };
     typedef enum measuresource MeasureSource;
 
     enum bodymeasuretype { WeightKg = 0, FatKg = 1, MuscleKg = 2, BonesKg = 3, LeanKg = 4, FatPercent = 5 };
@@ -41,11 +41,15 @@ public:
         for (int i = 0; i<MAX_MEASURES; i++) values[i] = 0.0;
     }
     Measure(const Measure &other) {
+        *this = other;
+    }
+    Measure& operator=(const Measure &other) {
         this->when = other.when;
         this->comment = other.comment;
         this->source = other.source;
         this->originalSource = other.originalSource;
         for (int i = 0; i<MAX_MEASURES; i++) this->values[i] = other.values[i];
+        return *this;
     }
     ~Measure() {}
 
@@ -57,10 +61,9 @@ public:
 
     double values[MAX_MEASURES]; // field values for standard measures
 
-    // used by qSort()
-    bool operator< (Measure right) const {
-        return (when < right.when);
-    }
+    // used by std::sort
+    bool operator< (Measure right) const { return (when < right.when); }
+
     // calculate a CRC for the Measure data - used to see if
     // data is changed in Configuration pages
     quint16 getFingerprint() const;

@@ -20,12 +20,12 @@
 #define _GC_ICalendar_h 1
 #include "GoldenCheetah.h"
 
-#include <QtGui>
+#include <QObject>
 #include "Context.h"
 #include "RideMetric.h"
 #include <libical/ical.h>
 
-class ICalendar : public QWidget
+class ICalendar : public QObject
 {
     Q_OBJECT
     G_OBJECT

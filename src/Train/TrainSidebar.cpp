@@ -26,18 +26,20 @@
 #include "DeviceTypes.h"
 #include "DeviceConfiguration.h"
 #include "RideImportWizard.h"
-#include <QApplication>
+#include "HelpWhatsThis.h"
+#include "RideFile.h"
 #include <QtGui>
 #include <QRegExp>
 #include <QStyle>
 #include <QStyleFactory>
 #include <QScrollBar>
+#include <QLabel>
 
 #include <QEvent>
 #include <QInputEvent>
 #include <QKeyEvent>
-
-#include <QSound>
+#include <QMutexLocker>
+#include <QSoundEffect>
 
 // Three current realtime device types supported are:
 #include "RealtimeController.h"
@@ -58,11 +60,7 @@
 #endif
 
 // Media selection helper
-#if defined(GC_VIDEO_AV) || defined(GC_VIDEO_QUICKTIME)
-#include "QtMacVideoWindow.h"
-#else
 #include "VideoWindow.h"
-#endif
 #ifdef Q_OS_MAC
 #include <CoreServices/CoreServices.h>
 #include <QStyle>
@@ -77,14 +75,29 @@
 #include "TrainDB.h"
 #include "Library.h"
 
+#if defined(GC_HAVE_VLC)||defined(GC_VIDEO_QT6) // RLV currently only support for VLC
+#define USE_RLV
+#endif
+
 TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(context),
     bicycle(context)
 {
+    // Athlete
+    FTP=285; // default to 285 if zones are not set
+    WPRIME = 20000;
+
+    int range = context->athlete->zones("Bike") ? context->athlete->zones("Bike")->whichRange(QDate::currentDate()) : -1;
+    if (range != -1) {
+        FTP = context->athlete->zones("Bike")->getCP(range);
+        WPRIME = context->athlete->zones("Bike")->getWprime(range);
+    }
+
     QWidget *c = new QWidget;
     //c->setContentsMargins(0,0,0,0); // bit of space is useful
     QVBoxLayout *cl = new QVBoxLayout(c);
     setControls(c);
     autoConnect = false;
+    trainView=NULL;
     useSimulatedSpeed = false;
 
     cl->setSpacing(0);
@@ -95,11 +108,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     bpmTelemetry = wattsTelemetry = kphTelemetry = rpmTelemetry = -1;
 
 #if !defined GC_VIDEO_NONE
-    videoModel = new QSqlTableModel(this, trainDB->connection());
-    videoModel->setTable("videos");
-    videoModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
-    videoModel->select();
-    while (videoModel->canFetchMore(QModelIndex())) videoModel->fetchMore(QModelIndex());
+    videoModel = trainDB->getVideoModel();
 
     vsortModel = new QSortFilterProxyModel(this);
     vsortModel->setSourceModel(videoModel);
@@ -112,7 +121,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     // hide unwanted columns and header
     for(int i=0; i<mediaTree->header()->count(); i++)
         mediaTree->setColumnHidden(i, true);
-    mediaTree->setColumnHidden(1, false); // show filename
+    mediaTree->setColumnHidden(TdbVideoModelIdx::displayname, false); // show displayname
     mediaTree->header()->hide();
 
     mediaTree->setSortingEnabled(false);
@@ -125,6 +134,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     mediaTree->header()->setMinimumSectionSize(0);
     mediaTree->header()->setFocusPolicy(Qt::NoFocus);
     mediaTree->setFrameStyle(QFrame::NoFrame);
+    mediaTree->setRootIsDecorated(false);
 #ifdef Q_OS_MAC
     mediaTree->header()->setSortIndicatorShown(false); // blue looks nasty
     mediaTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
@@ -134,18 +144,13 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     mediaTree->verticalScrollBar()->setStyle(cde);
 #endif
 
-
-#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
-    videosyncModel = new QSqlTableModel(this, trainDB->connection());
-    videosyncModel->setTable("videosyncs");
-    videosyncModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
-    videosyncModel->select();
-    while (videosyncModel->canFetchMore(QModelIndex())) videosyncModel->fetchMore(QModelIndex());
+#ifdef USE_RLV
+    videosyncModel = trainDB->getVideoSyncModel();
 
     vssortModel = new QSortFilterProxyModel(this);
     vssortModel->setSourceModel(videosyncModel);
     vssortModel->setDynamicSortFilter(true);
-    vssortModel->sort(1, Qt::AscendingOrder); //filename order
+    vssortModel->sort(TdbVideosyncModelIdx::filepath, Qt::AscendingOrder); //filename order
 
     videosyncTree = new QTreeView;
     videosyncTree->setModel(vssortModel);
@@ -153,7 +158,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     // hide unwanted columns and header
     for(int i=0; i<videosyncTree->header()->count(); i++)
         videosyncTree->setColumnHidden(i, true);
-    videosyncTree->setColumnHidden(1, false); // show filename
+    videosyncTree->setColumnHidden(TdbVideosyncModelIdx::displayname, false); // show displayname
     videosyncTree->header()->hide();
 
     videosyncTree->setSortingEnabled(false);
@@ -166,6 +171,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     videosyncTree->header()->setMinimumSectionSize(0);
     videosyncTree->header()->setFocusPolicy(Qt::NoFocus);
     videosyncTree->setFrameStyle(QFrame::NoFrame);
+    videosyncTree->setRootIsDecorated(false);
 #ifdef Q_OS_MAC
     videosyncTree->header()->setSortIndicatorShown(false); // blue looks nasty
     videosyncTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
@@ -175,7 +181,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     videosyncTree->verticalScrollBar()->setStyle(cdevideosync);
 #endif
 
-#endif //GC_HAVE_VLC
+#endif //USE_RLV
 
 #endif //GC_VIDEO_NONE
 
@@ -191,21 +197,20 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     deviceTree->setIndentation(5);
     deviceTree->expandItem(deviceTree->invisibleRootItem());
     deviceTree->setContextMenuPolicy(Qt::CustomContextMenu);
+    deviceTree->setRootIsDecorated(false);
 #ifdef Q_OS_WIN
     QStyle *xde = QStyleFactory::create(OS_STYLE);
     deviceTree->verticalScrollBar()->setStyle(xde);
 #endif
 
-    workoutModel = new QSqlTableModel(this, trainDB->connection());
-    workoutModel->setTable("workouts");
-    workoutModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
-    workoutModel->select();
-    while (workoutModel->canFetchMore(QModelIndex())) workoutModel->fetchMore(QModelIndex());
+    workoutModel = trainDB->getWorkoutModel();
 
-    sortModel = new QSortFilterProxyModel(this);
+    sortModel = new MultiFilterProxyModel(this);
     sortModel->setSourceModel(workoutModel);
+    workoutModel->setParent(this);
     sortModel->setDynamicSortFilter(true);
-    sortModel->sort(1, Qt::AscendingOrder); //filename order
+    sortModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+    sortModel->sort(TdbWorkoutModelIdx::sortdummy, Qt::AscendingOrder); //sort by sortdummy-field
 
     workoutTree = new QTreeView;
     workoutTree->setModel(sortModel);
@@ -213,12 +218,11 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     // hide unwanted columns and header
     for(int i=0; i<workoutTree->header()->count(); i++)
         workoutTree->setColumnHidden(i, true);
-    workoutTree->setColumnHidden(1, false); // show filename
+    workoutTree->setColumnHidden(TdbWorkoutModelIdx::displayname, false); // show displayname
     workoutTree->header()->hide();
     workoutTree->setFrameStyle(QFrame::NoFrame);
     workoutTree->setAlternatingRowColors(false);
     workoutTree->setEditTriggers(QAbstractItemView::NoEditTriggers); // read-only
-    workoutTree->setSelectionMode(QAbstractItemView::ExtendedSelection);
     workoutTree->expandAll();
     workoutTree->header()->setCascadingSectionResizes(true); // easier to resize this way
     workoutTree->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -226,6 +230,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     workoutTree->header()->setMinimumSectionSize(0);
     workoutTree->header()->setFocusPolicy(Qt::NoFocus);
     workoutTree->setFrameStyle(QFrame::NoFrame);
+    workoutTree->setRootIsDecorated(false);
 #ifdef Q_OS_MAC
     workoutTree->header()->setSortIndicatorShown(false); // blue looks nasty
     workoutTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
@@ -237,6 +242,10 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
 
     connect(context, SIGNAL(newLap()), this, SLOT(resetLapTimer()));
     connect(context, SIGNAL(viewChanged(int)), this, SLOT(viewChanged(int)));
+
+    // workout filters
+    connect(context, SIGNAL(workoutFiltersChanged(QList<ModelFilter*>&)), this, SLOT(workoutFiltersChanged(QList<ModelFilter*>&)));
+    connect(context, SIGNAL(workoutFiltersRemoved()), this, SLOT(workoutFiltersRemoved()));
 
     // not used but kept in case re-instated in the future
     recordSelector = new QCheckBox(this);
@@ -259,9 +268,40 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     connect(moreWorkoutAct, SIGNAL(triggered(void)), this, SLOT(workoutPopup(void)));
 
     deviceItem->addWidget(deviceTree);
+    HelpWhatsThis *helpDeviceTree = new HelpWhatsThis(deviceTree);
+    deviceTree->setWhatsThis(helpDeviceTree->getWhatsThisText(HelpWhatsThis::SideBarTrainView_Devices));
     trainSplitter->addWidget(deviceItem);
+
+
     workoutItem->addWidget(workoutTree);
+    HelpWhatsThis *helpWorkoutTree = new HelpWhatsThis(workoutTree);
+    workoutTree->setWhatsThis(helpWorkoutTree->getWhatsThisText(HelpWhatsThis::SideBarTrainView_Workouts));
     trainSplitter->addWidget(workoutItem);
+
+
+    int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
+    QList<QColor> zoneColors;
+    if (zonerange != -1) {
+        int numZones = context->athlete->zones("Bike")->numZones(zonerange);
+        for (int i = 0; i < numZones; ++i) {
+            zoneColors << zoneColor(i, numZones);
+        }
+    }
+    workoutInfo = new InfoWidget(zoneColors, context->athlete->zones("Bike")->getZoneNames(zonerange), context->athlete->zones("Bike")->getZoneDescriptions(zonerange));
+    workoutInfo->setFrameStyle(QFrame::NoFrame);
+    workoutInfo->setStyleSheet(GCColor::stylesheet(true));
+    connect(context, SIGNAL(ergFileSelected(ErgFileBase*)), workoutInfo, SLOT(ergFileSelected(ErgFileBase*)));
+    QScrollArea *workoutInfoScroller = new QScrollArea();
+    workoutInfoScroller->setWidgetResizable(true);
+    workoutInfoScroller->setFrameStyle(QFrame::NoFrame);
+    workoutInfoScroller->setWidget(workoutInfo);
+#ifdef Q_OS_WIN
+    xde = QStyleFactory::create(OS_STYLE);
+    workoutInfoScroller->verticalScrollBar()->setStyle(xde);
+#endif
+    workoutInfoItem = new GcSplitterItem(tr("Workout Info"), iconFromPNG(":images/sidebar/charts.png"), this);
+    workoutInfoItem->addWidget(workoutInfoScroller);
+    trainSplitter->addWidget(workoutInfoItem);
     cl->addWidget(trainSplitter);
 
 
@@ -271,16 +311,20 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     mediaItem->addAction(moreMediaAct);
     connect(moreMediaAct, SIGNAL(triggered(void)), this, SLOT(mediaPopup(void)));
     mediaItem->addWidget(mediaTree);
+    HelpWhatsThis *helpMediaTree = new HelpWhatsThis(mediaTree);
+    mediaTree->setWhatsThis(helpMediaTree->getWhatsThisText(HelpWhatsThis::SideBarTrainView_Media));
     trainSplitter->addWidget(mediaItem);
 
-#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
+#ifdef USE_RLV
     videosyncItem = new GcSplitterItem(tr("VideoSync"), iconFromPNG(":images/sidebar/sync.png"), this);
     QAction *moreVideoSyncAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
     videosyncItem->addAction(moreVideoSyncAct);
     connect(moreVideoSyncAct, SIGNAL(triggered(void)), this, SLOT(videosyncPopup(void)));
     videosyncItem->addWidget(videosyncTree);
+    HelpWhatsThis *helpVideosyncTree = new HelpWhatsThis(videosyncTree);
+    videosyncTree->setWhatsThis(helpVideosyncTree->getWhatsThisText(HelpWhatsThis::SideBarTrainView_VideoSync));
     trainSplitter->addWidget(videosyncItem);
-#endif //GC_HAVE_VLC
+#endif //USE_RLV
 #endif //GC_VIDEO_NONE
     trainSplitter->prepare(context->athlete->cyclist, "train");
 
@@ -305,14 +349,15 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     connect(mediaTree->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
                             this, SLOT(mediaTreeWidgetSelectionChanged()));
     connect(context, SIGNAL(selectMedia(QString)), this, SLOT(selectVideo(QString)));
-#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
+#ifdef USE_RLV
     connect(videosyncTree->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
                             this, SLOT(videosyncTreeWidgetSelectionChanged()));
     connect(context, SIGNAL(selectVideoSync(QString)), this, SLOT(selectVideoSync(QString)));
-#endif //GC_HAVE_VLC
+#endif //USE_RLV
 #endif //GC_VIDEO_NONE
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(selectWorkout(QString)), this, SLOT(selectWorkout(QString)));
+    connect(context, SIGNAL(selectWorkout(int)), this, SLOT(selectWorkout(int)));
     connect(trainDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
 
     connect(workoutTree->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(workoutTreeWidgetSelectionChanged()));
@@ -327,19 +372,23 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     gui_timer = new QTimer(this);
     disk_timer = new QTimer(this);
     load_timer = new QTimer(this);
+    start_timer = new QTimer(this);
+    start_timer->setSingleShot(true);
 
-    session_time = QTime();
+    session_time.start();
     session_elapsed_msec = 0;
-    lap_time = QTime();
+    lap_time.start();
     lap_elapsed_msec = 0;
+    secs_to_start = 0;
 
-    rrFile = recordFile = vo2File = NULL;
+    rrFile = posFile = recordFile = vo2File = tcoreFile = NULL;
     lastRecordSecs = 0;
     status = 0;
     setStatusFlags(RT_MODE_ERGO);         // ergo mode by default
-    mode = ERG;
+    mode = ErgFileFormat::erg;
     pendingConfigChange = false;
 
+    displayTemp = 0;
     displayWorkoutLap = 0;
     pwrcount = 0;
     cadcount = 0;
@@ -351,14 +400,20 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     displayWorkoutDistance = displayDistance = displayPower = displayHeartRate =
     displaySpeed = displayCadence = slope = load = 0;
     displaySMO2 = displayTHB = displayO2HB = displayHHB = 0;
-    displayLRBalance = displayLTE = displayRTE = displayLPS = displayRPS = 0;
+    displayLRBalance = RideFile::NA;
+    displayLTE = displayRTE = displayLPS = displayRPS = 0;
     displayLatitude = displayLongitude = displayAltitude = 0.0;
+    displayPosition = RealtimeData::seated;
+    displayRppb = displayRppe = displayRpppb = displayRpppe = 0.0;
+    displayLppb = displayLppe = displayLpppb = displayLpppe = 0.0;
+    displayCoreTemp = displaySkinTemp = displayHeatStrain = 0.0;
 
     connect(gui_timer, SIGNAL(timeout()), this, SLOT(guiUpdate()));
     connect(disk_timer, SIGNAL(timeout()), this, SLOT(diskUpdate()));
     connect(load_timer, SIGNAL(timeout()), this, SLOT(loadUpdate()));
+    connect(start_timer, SIGNAL(timeout()), this, SLOT(Start()));
 
-    configChanged(CONFIG_APPEARANCE | CONFIG_DEVICES | CONFIG_ZONES); // will reset the workout tree
+    configChanged(CONFIG_APPEARANCE | CONFIG_DEVICES); // will reset the workout tree
     setLabels();
 
     // capture keyboard events so we can control during
@@ -371,6 +426,25 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
 
 }
 
+
+TrainSidebar::~TrainSidebar
+()
+{
+#if !defined GC_VIDEO_NONE
+    if (videoModel != nullptr) {
+        delete videoModel;
+    }
+#ifdef USE_RLV
+    if (videosyncModel != nullptr) {
+        delete videosyncModel;
+    }
+#endif
+#endif
+    if (workoutModel != nullptr) {
+        delete workoutModel;
+    }
+}
+
 void
 TrainSidebar::refresh()
 {
@@ -379,37 +453,46 @@ TrainSidebar::refresh()
 #if !defined GC_VIDEO_NONE
     // remember selection
     row = mediaTree->currentIndex().row();
-    QString videoPath = mediaTree->model()->data(mediaTree->model()->index(row,0)).toString();
+    QString videoPath = mediaTree->model()->data(mediaTree->model()->index(row, TdbVideoModelIdx::filepath)).toString();
 
-#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
+#ifdef USE_RLV
     // refresh data
-    videoModel->select();
-    while (videoModel->canFetchMore(QModelIndex())) videoModel->fetchMore(QModelIndex());
+    QAbstractTableModel *oldVideoModel = videoModel;
+    videoModel = trainDB->getVideoModel();
+    vsortModel->setSourceModel(videoModel);
+    videoModel->setParent(this);
+    delete oldVideoModel;
 #endif
 
     // restore selection
     selectVideo(videoPath);
 
-#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
+#ifdef USE_RLV
     // remember selection
     row = videosyncTree->currentIndex().row();
-    QString videosyncPath = videosyncTree->model()->data(videosyncTree->model()->index(row,0)).toString();
+    QString videosyncPath = videosyncTree->model()->data(videosyncTree->model()->index(row, TdbVideosyncModelIdx::filepath)).toString();
 
     // refresh data
-    videosyncModel->select();
-    while (videosyncModel->canFetchMore(QModelIndex())) videosyncModel->fetchMore(QModelIndex());
+    QAbstractTableModel *oldVideosyncModel = videosyncModel;
+    videosyncModel = trainDB->getVideoSyncModel();
+    vssortModel->setSourceModel(videosyncModel);
+    videosyncModel->setParent(this);
+    delete oldVideosyncModel;
 
     // restore selection
     selectVideoSync(videosyncPath);
-#endif // GC_HAVE_VLC
+#endif // USE_RLV
 
 #endif // GC_VIDEO_NONE
 
     row = workoutTree->currentIndex().row();
-    QString workoutPath = workoutTree->model()->data(workoutTree->model()->index(row,0)).toString();
+    QString workoutPath = workoutTree->model()->data(workoutTree->model()->index(row, TdbWorkoutModelIdx::filepath)).toString();
 
-    workoutModel->select();
-    while (workoutModel->canFetchMore(QModelIndex())) workoutModel->fetchMore(QModelIndex());
+    QAbstractTableModel *oldWorkoutModel = workoutModel;
+    workoutModel = trainDB->getWorkoutModel();
+    sortModel->setSourceModel(workoutModel);
+    workoutModel->setParent(this);
+    delete oldWorkoutModel;
 
     // restore selection
     selectWorkout(workoutPath);
@@ -421,14 +504,14 @@ TrainSidebar::workoutPopup()
     // OK - we are working with a specific event..
     QMenu menu(workoutTree);
     QAction *import = new QAction(tr("Import Workout from File"), workoutTree);
-    QAction *download = new QAction(tr("Get Workouts from ErgDB"), workoutTree);
-    QAction *dlTodaysPlan = new QAction(tr("Get Workouts from Today's Plan"), workoutTree);
+    QAction *download = new QAction(tr("Get Workouts from TrainerDay"), workoutTree);
+    QAction *dlStravaRoutes = new QAction(tr("Get Workouts from Strava Routes"), workoutTree);
     QAction *wizard = new QAction(tr("Create Workout via Wizard"), workoutTree);
     QAction *scan = new QAction(tr("Scan for Workouts"), workoutTree);
 
     menu.addAction(import);
     menu.addAction(download);
-    menu.addAction(dlTodaysPlan);
+    menu.addAction(dlStravaRoutes);
     menu.addAction(wizard);
     menu.addAction(scan);
 
@@ -441,8 +524,8 @@ TrainSidebar::workoutPopup()
     {
         QModelIndex target = sortModel->mapToSource(index);
 
-        QString filename = workoutModel->data(workoutModel->index(target.row(), 0), Qt::DisplayRole).toString();
-        if (QFileInfo(filename).exists()) {
+        QString filename = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::filepath), Qt::DisplayRole).toString();
+        if (QFileInfo::exists(filename)) {
             delNumber++;
         }
     }
@@ -460,8 +543,8 @@ TrainSidebar::workoutPopup()
     // connect menu to functions
     connect(import, SIGNAL(triggered(void)), context->mainWindow, SLOT(importWorkout(void)));
     connect(wizard, SIGNAL(triggered(void)), context->mainWindow, SLOT(showWorkoutWizard(void)));
-    connect(download, SIGNAL(triggered(void)), context->mainWindow, SLOT(downloadErgDB(void)));
-    connect(dlTodaysPlan, SIGNAL(triggered(void)), context->mainWindow, SLOT(downloadTodaysPlanWorkouts(void)));
+    connect(download, SIGNAL(triggered(void)), context->mainWindow, SLOT(downloadTrainerDay(void)));
+    connect(dlStravaRoutes, SIGNAL(triggered(void)), context->mainWindow, SLOT(downloadStravaRoutes(void)));
     connect(scan, SIGNAL(triggered(void)), context->mainWindow, SLOT(manageLibrary(void)));
 
     // execute the menu
@@ -487,7 +570,6 @@ TrainSidebar::eventFilter(QObject *, QEvent *event)
 
     // only when we are recording !
     if (status & RT_RECORDING) {
-#if 0
         if (event->type() == QEvent::KeyPress) {
 
             // we care about cmd / ctrl
@@ -513,15 +595,20 @@ TrainSidebar::eventFilter(QObject *, QEvent *event)
             //
             switch(key) {
 
-                //XXX TODO
+                case Qt::Key_Space:
+                    Start();
+                    break;
+
+                case Qt::Key_Escape:
+                    Stop();
+                    break;
 
                 default:
-                break;
+                    break;
 
             }
             return true; // we listen to 'em all
         }
-#endif
     }
     return false;
 }
@@ -543,8 +630,8 @@ TrainSidebar::mediaPopup()
 
     QModelIndex current = mediaTree->currentIndex();
     QModelIndex target = vsortModel->mapToSource(current);
-    QString filename = videoModel->data(videoModel->index(target.row(), 0), Qt::DisplayRole).toString();
-    if (QFileInfo(filename).exists()) {
+    QString filename = videoModel->data(videoModel->index(target.row(), TdbVideoModelIdx::filepath), Qt::DisplayRole).toString();
+    if (QFileInfo::exists(filename)) {
         QAction *del = new QAction(tr("Remove reference to selected video"), workoutTree);
         menu.addAction(del);
         connect(del, SIGNAL(triggered(void)), this, SLOT(deleteVideos(void)));
@@ -572,8 +659,8 @@ TrainSidebar::videosyncPopup()
 
     QModelIndex current = videosyncTree->currentIndex();
     QModelIndex target = vssortModel->mapToSource(current);
-    QString filename = videosyncModel->data(videosyncModel->index(target.row(), 0), Qt::DisplayRole).toString();
-    if (QFileInfo(filename).exists()) {
+    QString filename = videosyncModel->data(videosyncModel->index(target.row(), TdbVideosyncModelIdx::filepath), Qt::DisplayRole).toString();
+    if (QFileInfo::exists(filename)) {
         QAction *del = new QAction(tr("Delete selected VideoSync"), workoutTree);
         menu.addAction(del);
         connect(del, SIGNAL(triggered(void)), this, SLOT(deleteVideoSyncs(void)));
@@ -585,7 +672,7 @@ TrainSidebar::videosyncPopup()
 }
 
 void
-TrainSidebar::configChanged(qint32)
+TrainSidebar::configChanged(qint32 why)
 {
     // do not refresh if workout running, defer to end of workout
     if (status&RT_RUNNING) {
@@ -603,13 +690,25 @@ TrainSidebar::configChanged(qint32)
 
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 #if !defined GC_VIDEO_NONE
-    mediaTree->setStyleSheet(GCColor::stylesheet());
-#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
-    videosyncTree->setStyleSheet(GCColor::stylesheet());
+    mediaTree->setStyleSheet(GCColor::stylesheet(true));
+#ifdef USE_RLV
+    videosyncTree->setStyleSheet(GCColor::stylesheet(true));
 #endif
 #endif
-    workoutTree->setStyleSheet(GCColor::stylesheet());
-    deviceTree->setStyleSheet(GCColor::stylesheet());
+    workoutTree->setStyleSheet(GCColor::stylesheet(true));
+    workoutInfo->setStyleSheet(GCColor::stylesheet(true));
+    deviceTree->setStyleSheet(GCColor::stylesheet(true));
+
+    int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
+    QList<QColor> zoneColors;
+    if (zonerange != -1) {
+        int numZones = context->athlete->zones("Bike")->numZones(zonerange);
+        for (int i = 0; i < numZones; ++i) {
+            zoneColors << zoneColor(i, numZones);
+        }
+    }
+    workoutInfo->setPowerZoneColors(zoneColors);
+    workoutInfo->setPowerZoneNames(context->athlete->zones("Bike")->getZoneNames(zonerange), context->athlete->zones("Bike")->getZoneDescriptions(zonerange));
 
     // DEVICES
 
@@ -666,6 +765,8 @@ TrainSidebar::configChanged(qint32)
             connect(Devices[i].controller, SIGNAL(remoteControl(uint16_t)), this, SLOT(remoteControl(uint16_t)));
             // connect slot for receiving rrData
             connect(Devices[i].controller, SIGNAL(rrData(uint16_t,uint8_t,uint8_t)), this, SLOT(rrData(uint16_t,uint8_t,uint8_t)));
+            connect(Devices[i].controller, SIGNAL(posData(uint8_t)), this, SLOT(posData(uint8_t)));
+            connect(Devices[i].controller, SIGNAL(tcoreData(float,float,float,int)), this, SLOT(tcoreData(float,float,float,int)));
 #ifdef QT_BLUETOOTH_LIB
         } else if (Devices.at(i).type == DEV_BT40) {
             Devices[i].controller = new BT40Controller(this, &Devices[i]);
@@ -690,10 +791,14 @@ TrainSidebar::configChanged(qint32)
     FTP=285; // default to 285 if zones are not set
     WPRIME = 20000;
 
-    int range = context->athlete->zones(false)->whichRange(QDate::currentDate());
+    int range = context->athlete->zones("Bike") ? context->athlete->zones("Bike")->whichRange(QDate::currentDate()) : -1;
     if (range != -1) {
-        FTP = context->athlete->zones(false)->getCP(range);
-        WPRIME = context->athlete->zones(false)->getWprime(range);
+        FTP = context->athlete->zones("Bike")->getCP(range);
+        WPRIME = context->athlete->zones("Bike")->getWprime(range);
+    }
+
+    if (why & CONFIG_ZONES) {
+        Library::refreshWorkouts(context);
     }
 
     // Reinit Bicycle
@@ -745,11 +850,18 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
 {
     QModelIndex current = workoutTree->currentIndex();
     QModelIndex target = sortModel->mapToSource(current);
-    QString filename = workoutModel->data(workoutModel->index(target.row(), 0), Qt::DisplayRole).toString();
+    QString filename = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::filepath), Qt::DisplayRole).toString();
+    QString workoutTitle = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::displayname), Qt::DisplayRole).toString();
+    QString workoutType = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::type), Qt::DisplayRole).toString();
 
     // wipe away the current selected workout once we've told everyone
     // since they might be editing it and want to save changes first (!!)
     ErgFile *prior = const_cast<ErgFile*>(ergFileQueryAdapter.getErgFile());
+    if (prior != nullptr && prior->filename() == filename) {
+        // Prevent re-loading if the prior element is the same the new one
+        return;
+    }
+    workoutfile = filename;
 
     if (filename == "") {
 
@@ -763,30 +875,54 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
         return;
     }
 
+    if (workoutType == "code") {
+        ErgFileBase efb;
+        efb.filename(filename);
+        workoutInfo->ergFileSelected(&efb);
+    }
+
     // is it the auto mode?
-    int index = target.row();
-    if (index == 0) {
+    if (filename == "//1") {
         // ergo mode
+        codeWorkoutKey = filename;
+        codeWorkoutTitle = workoutTitle;
         context->notifyErgFileSelected(NULL);
         ergFileQueryAdapter.setErgFile(NULL);
-        mode = ERG;
+        mode = ErgFileFormat::erg;
         setLabels();
         clearStatusFlags(RT_WORKOUT);
         //ergPlot->setVisible(false);
-    } else if (index == 1) {
+    } else if (filename == "//2") {
         // slope mode
+        codeWorkoutKey = filename;
+        codeWorkoutTitle = workoutTitle;
         context->notifyErgFileSelected(NULL);
         ergFileQueryAdapter.setErgFile(NULL);
-        mode = CRS;
+        mode = ErgFileFormat::crs;
         setLabels();
         clearStatusFlags(RT_WORKOUT);
         //ergPlot->setVisible(false);
     } else {
         // workout mode
+        codeWorkoutKey = QString();
+        codeWorkoutTitle = QString();
         ErgFile* ergFile = new ErgFile(filename, mode, context);
-        mode = ergFile->mode;
+        mode = ergFile->mode();
 
         if (ergFile->isValid()) {
+            // Update shown zone names (short and description) as configChanged
+            // is not triggered when only zones are renamed (name and description
+            // are not considered in Zones::getFingerPrint)
+            int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
+            QList<QColor> zoneColors;
+            if (zonerange != -1) {
+                int numZones = context->athlete->zones("Bike")->numZones(zonerange);
+                for (int i = 0; i < numZones; ++i) {
+                    zoneColors << zoneColor(i, numZones);
+                }
+            }
+            workoutInfo->setPowerZoneColors(zoneColors);
+            workoutInfo->setPowerZoneNames(context->athlete->zones("Bike")->getZoneNames(zonerange), context->athlete->zones("Bike")->getZoneDescriptions(zonerange));
 
             setStatusFlags(RT_WORKOUT);
 
@@ -797,6 +933,23 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
             ergFileQueryAdapter.setErgFile(ergFile);
             adjustIntensity(100);
             setLabels();
+
+#if !defined GC_VIDEO_NONE
+            QWidget *focusWidget = QApplication::focusWidget();
+            // Try to select matching media and videosync files
+            QString workoutName = QFileInfo(filename).baseName();
+            mediaTree->setFocus();
+            mediaTree->keyboardSearch(workoutName);
+#ifdef USE_RLV
+            videosyncTree->setFocus();
+            videosyncTree->keyboardSearch(workoutName);
+#endif
+            if (focusWidget != nullptr) {
+                focusWidget->setFocus();
+            } else {
+                workoutTree->setFocus();
+            }
+#endif
         } else {
 
             // couldn't parse fall back to ERG mode
@@ -805,14 +958,14 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
             context->notifyErgFileSelected(NULL);
             ergFileQueryAdapter.setErgFile(NULL);
             removeInvalidWorkout();
-            mode = ERG;
+            mode = ErgFileFormat::erg;
             clearStatusFlags(RT_WORKOUT);
             setLabels();
         }
     }
 
     // set the device to the right mode
-    if (mode == ERG || mode == MRC) {
+    if (mode == ErgFileFormat::erg || mode == ErgFileFormat::mrc) {
         setStatusFlags(RT_MODE_ERGO);
         clearStatusFlags(RT_MODE_SPIN);
 
@@ -833,6 +986,30 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
 
     // clean last
     if (prior) delete prior;
+
+    // lets SWITCH PERSPECTIVE for the selected file, but only
+    // if everything has been initialised properly (aka lazy load)
+    if (trainView && trainView->page()) {
+
+        Perspective::switchenum want=Perspective::None;
+        if (mediafile != "") want=Perspective::Video; // if media file selected
+        else want = (mode == ErgFileFormat::erg || mode == ErgFileFormat::mrc) ? Perspective::Erg : Perspective::Slope; // mode always known
+        if (want == Perspective::Slope && ergFileQueryAdapter.hasGPS()) want=Perspective::Map; // Map without Video
+
+        // if the current perspective allows automatic switching,
+        // we want a view type and the current page isn't what
+        // we want then lets go find one to switch to and switch
+        // to the first one that matches
+        if (trainView->page()->trainSwitch() != Perspective::None && want != Perspective::None && trainView->page()->trainSwitch() != want) {
+
+            for(int i=0; i<trainView->perspectives_.count(); i++) {
+                if (trainView->perspectives_[i]->trainSwitch() == want) {
+                    context->mainWindow->switchPerspective(i);
+                    break;
+                }
+            }
+        }
+    }
 }
 
 /*
@@ -892,9 +1069,9 @@ TrainSidebar::deleteVideos()
 {
     QModelIndex current = mediaTree->currentIndex();
     QModelIndex target = vsortModel->mapToSource(current);
-    QString filename = videoModel->data(videoModel->index(target.row(), 0), Qt::DisplayRole).toString();
+    QString filename = videoModel->data(videoModel->index(target.row(), TdbVideoModelIdx::filepath), Qt::DisplayRole).toString();
 
-    if (QFileInfo(filename).exists()) {
+    if (QFileInfo::exists(filename)) {
         // are you sure?
         QMessageBox msgBox;
         msgBox.setText(tr("Are you sure you want to remove the reference to this video?"));
@@ -927,9 +1104,9 @@ TrainSidebar::deleteVideoSyncs()
 {
     QModelIndex current = videosyncTree->currentIndex();
     QModelIndex target = vssortModel->mapToSource(current);
-    QString filename = videosyncModel->data(videosyncModel->index(target.row(), 0), Qt::DisplayRole).toString();
+    QString filename = videosyncModel->data(videosyncModel->index(target.row(), TdbVideosyncModelIdx::filepath), Qt::DisplayRole).toString();
 
-    if (QFileInfo(filename).exists()) {
+    if (QFileInfo::exists(filename)) {
         // are you sure?
         QMessageBox msgBox;
         msgBox.setText(tr("Are you sure you want to delete this VideoSync?"));
@@ -957,7 +1134,7 @@ TrainSidebar::removeInvalidVideoSync()
 {
     QModelIndex current = videosyncTree->currentIndex();
     QModelIndex target = vssortModel->mapToSource(current);
-    QString filename = videosyncModel->data(videosyncModel->index(target.row(), 0), Qt::DisplayRole).toString();
+    QString filename = videosyncModel->data(videosyncModel->index(target.row(), TdbVideosyncModelIdx::filepath), Qt::DisplayRole).toString();
     QMessageBox msgBox;
     msgBox.setText(tr("The VideoSync file is either not valid or not existing and will be removed from the library."));
     msgBox.setInformativeText(filename);
@@ -983,8 +1160,8 @@ TrainSidebar::deleteWorkouts()
     QModelIndexList list = workoutTree->selectionModel()->selectedRows();
     foreach (QModelIndex index, list) {
         QModelIndex target = sortModel->mapToSource(index);
-        QString filename = workoutModel->data(workoutModel->index(target.row(), 0), Qt::DisplayRole).toString();
-        if (QFileInfo(filename).exists()) {
+        QString filename = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::filepath), Qt::DisplayRole).toString();
+        if (QFileInfo::exists(filename)) {
             nameList.append(filename);
         }
     }
@@ -1032,7 +1209,7 @@ TrainSidebar::removeInvalidWorkout()
 {
     QModelIndex current = workoutTree->currentIndex();
     QModelIndex target = sortModel->mapToSource(current);
-    QString filename = workoutModel->data(workoutModel->index(target.row(), 0), Qt::DisplayRole).toString();
+    QString filename = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::filepath), Qt::DisplayRole).toString();
 
     QMessageBox msgBox;
     msgBox.setText(tr("The Workout file is either not valid or not existing and will be removed from the library."));
@@ -1058,11 +1235,14 @@ TrainSidebar::mediaTreeWidgetSelectionChanged()
 
     QModelIndex current = mediaTree->currentIndex();
     QModelIndex target = vsortModel->mapToSource(current);
-    QString filename = videoModel->data(videoModel->index(target.row(), 0), Qt::DisplayRole).toString();
-    if (filename == context->videoFilename)
+    QString filename = videoModel->data(videoModel->index(target.row(), TdbVideoModelIdx::filepath), Qt::DisplayRole).toString();
+    if (filename == context->videoFilename) {
+        mediafile = "";
         context->notifyMediaSelected(""); // CTRL+Click to clear selection
-    else
+    } else {
+        mediafile = filename;
         context->notifyMediaSelected(filename);
+    }
 }
 
 void
@@ -1071,7 +1251,7 @@ TrainSidebar::videosyncTreeWidgetSelectionChanged()
 
     QModelIndex current = videosyncTree->currentIndex();
     QModelIndex target = vssortModel->mapToSource(current);
-    QString filename = videosyncModel->data(videosyncModel->index(target.row(), 0), Qt::DisplayRole).toString();
+    QString filename = videosyncModel->data(videosyncModel->index(target.row(), TdbVideosyncModelIdx::filepath), Qt::DisplayRole).toString();
 
     // wip away the current selected videosync
     if (videosyncFile) {
@@ -1090,6 +1270,7 @@ TrainSidebar::videosyncTreeWidgetSelectionChanged()
         // None menu entry
         context->notifyVideoSyncFileSelected(NULL);
     } else {
+        int mode = 0;
         videosyncFile = new VideoSyncFile(filename, mode, context);
         if (videosyncFile->isValid()) {
             context->notifyVideoSyncFileSelected(videosyncFile);
@@ -1126,11 +1307,11 @@ void TrainSidebar::Start()       // when start button is pressed
         //gui_timer->start(REFRESHRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
         load_period.restart();
-        if (status & RT_WORKOUT) load_timer->start(LOADRATE);
+        load_timer->start(LOADRATE);
 
 #if !defined GC_VIDEO_NONE
         mediaTree->setEnabled(false);
-#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
+#ifdef USE_RLV
         videosyncTree->setEnabled(false);
 #endif
 #endif
@@ -1138,7 +1319,7 @@ void TrainSidebar::Start()       // when start button is pressed
         // tell the world
         context->notifyUnPause();
 
-        emit setNotification(tr("Resuming.."), 2);
+        context->notifySetNotification(tr("Resuming.."), 2);
 
     } else if (status&RT_RUNNING) {
 
@@ -1151,13 +1332,13 @@ void TrainSidebar::Start()       // when start button is pressed
         //foreach(int dev, activeDevices) Devices[dev].controller->pause();
         //gui_timer->stop();
         if (status & RT_RECORDING) disk_timer->stop();
-        if (status & RT_WORKOUT) load_timer->stop();
+        load_timer->stop();
         load_msecs += load_period.restart();
 
 #if !defined GC_VIDEO_NONE
         // enable media tree so we can change movie - mid workout
         mediaTree->setEnabled(true);
-#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
+#ifdef USE_RLV
         videosyncTree->setEnabled(true);
 #endif
 #endif
@@ -1165,9 +1346,21 @@ void TrainSidebar::Start()       // when start button is pressed
         // tell the world
         context->notifyPause();
 
-        emit setNotification(tr("Paused.."), 2);
+        context->notifySetNotification(tr("Paused.."), 2);
 
     } else if (status&RT_CONNECTED) {
+
+        // Delayed start handling
+        if (secs_to_start == 0) {
+            secs_to_start = appsettings->value(this, TRAIN_STARTDELAY, 0).toUInt();
+        } else {
+            secs_to_start--;
+        }
+        if (secs_to_start > 0) {
+            context->notifySetNotification(tr("Starting in %1").arg(secs_to_start), 1);
+            start_timer->start(1000);
+            return;
+        }
 
         qDebug() << "start...";
 
@@ -1176,11 +1369,14 @@ void TrainSidebar::Start()       // when start button is pressed
         SetThreadExecutionState(ES_DISPLAY_REQUIRED | ES_CONTINUOUS);
 #endif
 
+        context->mainWindow->showSidebar(false);
+        if (appsettings->value(this, TRAIN_AUTOHIDE, false).toBool()) context->mainWindow->showLowbar(false);
+
         // Stop users from selecting different devices
         // media or workouts whilst a workout is in progress
 #if !defined GC_VIDEO_NONE
         mediaTree->setEnabled(false);
-#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
+#ifdef USE_RLV
         videosyncTree->setEnabled(false);
 #endif
 #endif
@@ -1196,7 +1392,7 @@ void TrainSidebar::Start()       // when start button is pressed
 
         maintainLapDistanceState();
 
-        if (mode == ERG || mode == MRC) {
+        if (mode == ErgFileFormat::erg || mode == ErgFileFormat::mrc) {
             setStatusFlags(RT_MODE_ERGO);
             clearStatusFlags(RT_MODE_SPIN);
             foreach(int dev, activeDevices) Devices[dev].controller->setMode(RT_MODE_ERGO);
@@ -1237,19 +1433,25 @@ void TrainSidebar::Start()       // when start button is pressed
         //    Devices[dev].controller->resetCalibrationState();
         //}
 
-        if (status & RT_WORKOUT) {
-            load_timer->start(LOADRATE);      // start recording
-        }
+        load_timer->start(LOADRATE);      // start recording
 
         if (recordSelector->isChecked()) {
             setStatusFlags(RT_RECORDING);
         }
 
         if (status & RT_RECORDING) {
+
+            QString workoutName;
+            if (context->currentErgFile()) {
+                workoutName = QFileInfo(context->currentErgFile()->filename()).baseName();
+            } else if (! codeWorkoutTitle.isEmpty()) {
+                workoutName = codeWorkoutTitle;
+            }
+
             QDateTime now = QDateTime::currentDateTime();
 
             // setup file
-            QString filename = now.toString(QString("yyyy_MM_dd_hh_mm_ss")) + QString(".csv");
+            QString filename = now.toString(QString("yyyy_MM_dd_hh_mm_ss")) + "_" + workoutName + QString(".csv");
 
             if (!context->athlete->home->records().exists())
                 context->athlete->home->createAllSubdirs();
@@ -1266,14 +1468,14 @@ void TrainSidebar::Start()       // when start button is pressed
                 // CSV File header
 
                 QTextStream recordFileStream(recordFile);
-                recordFileStream << "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb, target\n";
+                recordFileStream << "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb, target, rppb, rppe, rpppb, rpppe, lppb, lppe, lpppb, lpppe\n";
 
                 disk_timer->start(SAMPLERATE);  // start screen
             }
         }
         gui_timer->start(REFRESHRATE);      // start recording
 
-        emit setNotification(tr("Starting.."), 2);
+        context->notifySetNotification(tr("Starting.."), 2);
     }
 }
 
@@ -1293,11 +1495,11 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
         gui_timer->start(REFRESHRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
         load_period.restart();
-        if (status & RT_WORKOUT) load_timer->start(LOADRATE);
+        load_timer->start(LOADRATE);
 
 #if !defined GC_VIDEO_NONE
         mediaTree->setEnabled(false);
-#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
+#ifdef USE_RLV
         videosyncTree->setEnabled(false);
 #endif
 #endif
@@ -1312,13 +1514,13 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
         setStatusFlags(RT_PAUSED);
         gui_timer->stop();
         if (status & RT_RECORDING) disk_timer->stop();
-        if (status & RT_WORKOUT) load_timer->stop();
+        load_timer->stop();
         load_msecs += load_period.restart();
 
         // enable media tree so we can change movie
 #if !defined GC_VIDEO_NONE
         mediaTree->setEnabled(true);
-#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
+#ifdef USE_RLV
         videosyncTree->setEnabled(true);
 #endif
 #endif
@@ -1343,12 +1545,15 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     // media or workouts whilst a workout is in progress
 #if !defined GC_VIDEO_NONE
     mediaTree->setEnabled(true);
-#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
+#ifdef USE_RLV
     videosyncTree->setEnabled(true);
 #endif
 #endif
     workoutTree->setEnabled(true);
     deviceTree->setEnabled(true);
+
+    context->mainWindow->showSidebar(true);
+    if (appsettings->value(this, TRAIN_AUTOHIDE, false).toBool()) context->mainWindow->showLowbar(true);
 
     //reset all calibration data
     calibrating = startCalibration = restartCalibration = finishCalibration = false;
@@ -1365,13 +1570,18 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     load = 0;
     slope = 0.0;
 
-    QDateTime now = QDateTime::currentDateTime();
-
     if (status & RT_RECORDING) {
         disk_timer->stop();
 
         // close and reset File
         recordFile->close();
+
+        // Request mutual exclusion with ANT+/BTLE threads to change status and close rr/vo2 files
+        rrMutex.lock();
+        vo2Mutex.lock();
+
+        // cancel recording
+        status &= ~RT_RECORDING;
 
         // close rrFile
         if (rrFile) {
@@ -1381,12 +1591,32 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
             rrFile=NULL;
         }
 
+        // close posFile
+        if (posFile) {
+            //fprintf(stderr, "Closing position file\n"); fflush(stderr);
+            posFile->close();
+            delete posFile;
+            posFile=NULL;
+        }
+
         // close vo2File
         if (vo2File) {
             fprintf(stderr, "Closing vo2 file\n"); fflush(stderr);
             vo2File->close();
             delete vo2File;
             vo2File=NULL;
+        }
+
+        // Release mutual exclusion with ANT+/BTLE threads before to open import dialog to avoid deadlocks
+        rrMutex.unlock();
+        vo2Mutex.unlock();
+
+        // close tcoreFile
+        if (tcoreFile) {
+            fprintf(stderr, "Closing tcore file\n"); fflush(stderr);
+            tcoreFile->close();
+            delete tcoreFile;
+            tcoreFile=NULL;
         }
 
         if(deviceStatus == DEVICE_ERROR)
@@ -1403,16 +1633,16 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
 
             RideImportWizard *dialog = new RideImportWizard (list, context);
             dialog->process(); // do it!
+            if (context->currentErgFile() != nullptr) {
+                trainDB->lastWorkout(context->currentErgFile()->filename());
+            } else if (! codeWorkoutKey.isEmpty()) {
+                trainDB->lastWorkout(codeWorkoutKey);
+            }
         }
-
-        // cancel recording
-        status &= ~RT_RECORDING;
     }
 
-    if (status & RT_WORKOUT) {
-        load_timer->stop();
-        load_msecs = 0;
-    }
+    load_timer->stop();
+    load_msecs = 0;
 
     // get back to normal after it may have been adusted by the user
     //lastAppliedIntensity=100;
@@ -1437,6 +1667,7 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     hrcount = 0;
     spdcount = 0;
     lodcount = 0;
+    displayTemp = 0;
     displayWorkoutLap = 0;
     wbalr = 0;
     wbal = WPRIME;
@@ -1452,7 +1683,7 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     ergFileQueryAdapter.resetQueryState();
     guiUpdate();
 
-    emit setNotification(tr("Stopped.."), 2);
+    context->notifySetNotification(tr("Stopped.."), 2);
 
     return;
 }
@@ -1478,6 +1709,19 @@ void TrainSidebar::updateData(RealtimeData &rtData)
     displayLatitude = rtData.getLatitude();
     displayLongitude = rtData.getLongitude();
     displayAltitude = rtData.getAltitude();
+    displayRppb = rtData.getRppb();
+    displayRppe = rtData.getRppe();
+    displayRpppb = rtData.getRpppb();
+    displayRpppe = rtData.getRpppe();
+    displayLppb = rtData.getLppb();
+    displayLppe = rtData.getLppe();
+    displayLpppb = rtData.getLpppb();
+    displayLpppe = rtData.getLpppe();
+    displayPosition = rtData.getPosition();
+    displayTemp = rtData.getTemp();
+    displayCoreTemp = rtData.getCoreTemp();
+    displaySkinTemp = rtData.getSkinTemp();
+    displayHeatStrain = rtData.getHeatStrain();
     // Gradient not supported
     return;
 }
@@ -1521,39 +1765,41 @@ void TrainSidebar::Connect()
     foreach(int dev, activeDevices) {
         Devices[dev].controller->setWheelCircumference(Devices[dev].wheelSize);
         Devices[dev].controller->setRollingResistance(bicycle.RollingResistance());
-        Devices[dev].controller->setWindResistance(bicycle.WindResistance());
         Devices[dev].controller->setWeight(bicycle.MassKG());
         Devices[dev].controller->setWindSpeed(0); // Move to loadUpdate when wind simulation is added
 
         Devices[dev].controller->start();
         Devices[dev].controller->resetCalibrationState();
-        connect(Devices[dev].controller, &RealtimeController::setNotification, this, &TrainSidebar::setNotification);
+        connect(Devices[dev].controller, &RealtimeController::setNotification, context, &Context::setNotification);
     }
     setStatusFlags(RT_CONNECTED);
     gui_timer->start(REFRESHRATE);
 
-    emit setNotification(tr("Connected.."), 2);
+    context->notifySetNotification(tr("Connected.."), 2);
 }
 
 void TrainSidebar::Disconnect()
 {
+    // cancel any pending start
+    if (secs_to_start > 0) {
+        secs_to_start = 0;
+        start_timer->stop();
+    }
+
     // don't try to disconnect if running or not connected
     if ((status&RT_RUNNING) || ((status&RT_CONNECTED) == 0)) return;
-
-    static QIcon connectedIcon(":images/oxygen/power-on.png");
-    static QIcon disconnectedIcon(":images/oxygen/power-off.png");
 
     qDebug() << "disconnecting..";
 
     foreach(int dev, activeDevices) {
-        disconnect(Devices[dev].controller, &RealtimeController::setNotification, this, &TrainSidebar::setNotification);
+        disconnect(Devices[dev].controller, &RealtimeController::setNotification, context, &Context::setNotification);
         Devices[dev].controller->stop();
     }
     clearStatusFlags(RT_CONNECTED);
 
     gui_timer->stop();
 
-    emit setNotification(tr("Disconnected.."), 2);
+    context->notifySetNotification(tr("Disconnected.."), 2);
 }
 
 //----------------------------------------------------------------------
@@ -1643,6 +1889,8 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
             double distanceTick = 0;
 
+            // If any of the active devices is a footpod, simulated speed will not be used, as it is a treadmill
+            bool deviceIsFootpod = false;
             // fetch the right data from each device...
             foreach(int dev, activeDevices) {
 
@@ -1665,6 +1913,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
                 if (Devices[dev].type == DEV_ANTLOCAL || Devices[dev].type == DEV_NULL) {
                     rtData.setHb(local.getSmO2(), local.gettHb()); //only moxy data from ant and robot devices right now
+                    rtData.setTemp(local.getTemp());
                 }
 
                 if (Devices[dev].type == DEV_NULL || Devices[dev].type == DEV_BT40) {
@@ -1676,6 +1925,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     rtData.setFeO2(local.getFeO2());
                 }
 
+                rtData.setCoreTemp(local.getCoreTemp(),local.getSkinTemp(),local.getHeatStrain());
                 // what are we getting from this one?
                 if (dev == bpmTelemetry) rtData.setHr(local.getHr());
                 if (dev == rpmTelemetry) rtData.setCadence(local.getCadence());
@@ -1695,6 +1945,14 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     rtData.setRTE(local.getRTE());
                     rtData.setLPS(local.getLPS());
                     rtData.setRPS(local.getRPS());
+                    rtData.setRppb(local.getRppb());
+                    rtData.setRppe(local.getRppe());
+                    rtData.setRpppb(local.getRpppb());
+                    rtData.setRpppe(local.getRpppe());
+                    rtData.setLppb(local.getLppb());
+                    rtData.setLppe(local.getLppe());
+                    rtData.setLpppb(local.getLpppb());
+                    rtData.setLpppe(local.getLpppe());
                 }
                 if (local.getTrainerStatusAvailable())
                 {
@@ -1705,12 +1963,15 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     rtData.setTrainerConfigRequired(local.getTrainerConfigRequired());
                     rtData.setTrainerBrakeFault(local.getTrainerBrakeFault());
                 }
+                if (Devices[dev].type == DEV_ANTLOCAL && Devices[dev].deviceProfile.contains("o")) {
+                    deviceIsFootpod = true;
+                }
             }
 
             // If simulated speed is *not* checked then you get speed reported by
             // trainer which in ergo mode will be dictated by your gear and cadence,
             // and in slope mode is whatever the trainer happens to implement.
-            if (useSimulatedSpeed) {
+            if (useSimulatedSpeed && !deviceIsFootpod) {
                 BicycleSimState newState(rtData);
                 SpeedDistance ret = bicycle.SampleSpeed(newState);
 
@@ -1733,7 +1994,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 if (!(status&RT_MODE_ERGO) && (context->currentVideoSyncFile()))
                 {
                     // If we reached the end of the RLV then stop
-                    if (displayWorkoutDistance >= context->currentVideoSyncFile()->Distance) {
+                    if (displayWorkoutDistance >= context->currentVideoSyncFile()->distance()) {
                         Stop(DEVICE_OK);
                         return;
                     }
@@ -1756,18 +2017,19 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 if (ergFile) {
 
                     // update DistanceRemaining
-                    if (ergFile->Duration / 1000.0 > displayWorkoutDistance)
-                        rtData.setDistanceRemaining(ergFile->Duration / 1000.0 - displayWorkoutDistance);
+                    if (ergFile->duration() / 1000.0 > displayWorkoutDistance)
+                        rtData.setDistanceRemaining(ergFile->duration() / 1000.0 - displayWorkoutDistance);
                     else
                         rtData.setDistanceRemaining(0.0);
 
                     // If ergfile has no gradient then there is no location, or altitude (or slope.)
                     if (ergFile->hasGradient()) {
                         bool fAltitudeSet = false;
-                        if (!ergFile->StrictGradient) {
+                        int curLap; // displayWorkoutLap is updated by loadUpdate
+                        if (!ergFile->strictGradient()) {
                             // Attempt to obtain location and derived slope from altitude in ergfile.
                             geolocation geoloc;
-                            if (ergFileQueryAdapter.locationAt(displayWorkoutDistance * 1000, displayWorkoutLap, geoloc, slope)) {
+                            if (ergFileQueryAdapter.locationAt(displayWorkoutDistance * 1000, curLap, geoloc, slope)) {
                                 displayLatitude = geoloc.Lat();
                                 displayLongitude = geoloc.Long();
                                 displayAltitude = geoloc.Alt();
@@ -1780,35 +2042,26 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                             }
                         }
 
-                        if (ergFile->StrictGradient || !fAltitudeSet) {
-                            slope = ergFileQueryAdapter.gradientAt(displayWorkoutDistance * 1000, displayWorkoutLap);
+                        if (ergFile->strictGradient() || !fAltitudeSet) {
+                            slope = ergFileQueryAdapter.gradientAt(displayWorkoutDistance * 1000, curLap);
                         }
 
                         if (!fAltitudeSet) {
-                            // For classic rlv with no location data:
-                            // Estimate vertical change based upon time passed and slope.
-                            // Note this isn't exactly right but is very close - we should use the previous slope for the time passed.
-                            double altitudeDeltaMeters = slope * (10 * distanceTick); // ((slope / 100) * distanceTick) * 1000
-
-                            displayAltitude += altitudeDeltaMeters;
+                            // Since we have gradient, we also have altitude
+                            displayAltitude = ergFileQueryAdapter.altitudeAt(displayWorkoutDistance * 1000, curLap);
                         }
 
                         rtData.setSlope(slope);
                         rtData.setAltitude(displayAltitude);
                     }
                 }
-                else // no erg file, compute altitude from gradient and distance travelled.
-                {
+                else if (!(status & RT_MODE_ERGO)) {
+                    // For manual slope mode, estimate vertical change based upon time passed and slope.
+                    // Note this isn't exactly right but is very close - we should use the previous slope for the time passed.
                     double altitudeDeltaMeters = slope * (10 * distanceTick); // ((slope / 100) * distanceTick) * 1000
-
                     displayAltitude += altitudeDeltaMeters;
                     rtData.setAltitude(displayAltitude);
                 }
-
-                // VAMinator
-                displayVAM = vaminator.Push(displayAltitude, session_time.elapsed(), displayWorkoutDistance);
-                if (!GlobalContext::context()->useMetricUnits) displayVAM *= (1. / 0.3048);
-                rtData.setVAM(displayVAM);
 
                 // time
                 total_msecs = session_elapsed_msec + session_time.elapsed();
@@ -1843,7 +2096,9 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
                     if (fPlayAudio) {
                         lapAudioThisLap = false;
-                        QSound::play(":audio/lap.wav");
+                        static QSoundEffect effect;
+                        effect.setSource(QUrl::fromLocalFile(":audio/lap.wav"));
+                        effect.play();
                     }
                 }
 
@@ -1854,23 +2109,23 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     if (ergFileQueryAdapter.textsInRange(lapPosition, searchRange, rangeStart, rangeEnd)) {
                         for (int idx = rangeStart; idx <= rangeEnd; idx++) {
                             ErgFileText cue = ergFile->Texts.at(idx);
-                            emit setNotification(cue.text, cue.duration);
+                            context->notifySetNotification(cue.text, cue.duration);
                         }
+                        textPositionEmitted = lapPosition + searchRange;
                     }
-                    textPositionEmitted = lapPosition + searchRange;
                 }
 
                 // Maintain time in ERGO mode
                 if (status& RT_MODE_ERGO) {
                     if (lapTimeRemaining < 0) {
-                        if (ergFile) lapTimeRemaining = ergFile->Duration - load_msecs;
+                        if (ergFile) lapTimeRemaining = ergFile->duration() - load_msecs;
                         if (lapTimeRemaining < 0)
                             lapTimeRemaining = 0;
                     }
                     rtData.setLapMsecsRemaining(lapTimeRemaining);
 
                     if (ergTimeRemaining < 0) {
-                        if (ergFile) ergTimeRemaining = ergFile->Duration - load_msecs;
+                        if (ergFile) ergTimeRemaining = ergFile->duration() - load_msecs;
                         if (ergTimeRemaining < 0)
                             ergTimeRemaining = 0;
                     }
@@ -1904,8 +2159,21 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             displayLatitude = rtData.getLatitude();
             displayLongitude = rtData.getLongitude();
             displayAltitude = rtData.getAltitude();
+            displayRppb = rtData.getRppb();
+            displayRppe = rtData.getRppe();
+            displayRpppb = rtData.getRpppb();
+            displayRpppe = rtData.getRpppe();
+            displayLppb = rtData.getLppb();
+            displayLppe = rtData.getLppe();
+            displayLpppb = rtData.getLpppb();
+            displayLpppe = rtData.getLpppe();
+            displayPosition = rtData.getPosition();
+            displayTemp = rtData.getTemp();
+            displayCoreTemp = rtData.getCoreTemp();
+            displaySkinTemp = rtData.getSkinTemp();
+            displayHeatStrain = rtData.getHeatStrain();
 
-            double weightKG = context->athlete->getWeight(QDate::currentDate()) + 10; // 10kg bike
+            double weightKG = bicycle.MassKG();
             double vs = computeInstantSpeed(weightKG, rtData.getSlope(), rtData.getAltitude(), rtData.getWatts());
 
             rtData.setVirtualSpeed(vs);
@@ -1924,21 +2192,13 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
             rtData.setWbal(wbal);
 
+            // VAMinator
+            displayVAM = vaminator.Push(displayAltitude, session_time.elapsed(), displayWorkoutDistance);
+            if (!GlobalContext::context()->useMetricUnits) displayVAM *= (1. / 0.3048);
+            rtData.setVAM(displayVAM);
+
             // go update the displays...
             context->notifyTelemetryUpdate(rtData); // signal everyone to update telemetry
-
-            // set now to current time when not using a workout
-            // but limit to almost every second (account for
-            // slight timing errors of 100ms or so)
-
-            // Do some rounding to the hundreds because as time goes by, rtData.getMsecs() drifts just below and then it does not pass the mod 1000 < 100 test
-            // For example:  msecs = 42199.  Mod 1000 = 199 versus msecs = 42000.  Mod 1000 = 0
-            // With this, it will now call tick just about every second
-            long rmsecs = round((rtData.getMsecs() + 99) / 100) * 100;
-            // Test for <= 100ms
-            if (!(status&RT_WORKOUT) && ((rmsecs % 1000) <= 100)) {
-                context->notifySetNow(rtData.getMsecs());
-            }
         }
 
 #ifdef Q_OS_MAC
@@ -1957,21 +2217,11 @@ void TrainSidebar::newLap()
 {
     qDebug() << "running:" << (status&RT_RUNNING) << "paused:" << (status&RT_PAUSED);
 
-    if ((status&RT_RUNNING) && ((status&RT_PAUSED) == 0)) {
-
-        pwrcount  = 0;
-        cadcount  = 0;
-        hrcount   = 0;
-        spdcount  = 0;
-
-        ergFileQueryAdapter.addNewLap(displayWorkoutDistance * 1000.);
-        
-        resetTextAudioEmitTracking();
-        maintainLapDistanceState();
+    if ((status&RT_RUNNING) && ((status&RT_PAUSED) == 0) &&
+        ergFileQueryAdapter.addNewLap(displayWorkoutDistance * 1000.) >= 0) {
 
         context->notifyNewLap();
-
-        emit setNotification(tr("New lap.."), 2);
+        context->notifySetNotification(tr("New lap.."), 2);
     }
 }
 
@@ -1980,6 +2230,10 @@ void TrainSidebar::resetLapTimer()
     lap_time.restart();
     lap_elapsed_msec = 0;
     displayLapDistance = 0;
+    pwrcount  = 0;
+    cadcount  = 0;
+    hrcount   = 0;
+    spdcount  = 0;
     this->resetTextAudioEmitTracking();
     this->maintainLapDistanceState();
 }
@@ -1994,7 +2248,7 @@ void TrainSidebar::resetTextAudioEmitTracking()
 void TrainSidebar::steerScroll(int scrollAmount)
 {
     if (scrollAmount == 0)
-        emit setNotification(tr("Recalibrating steering.."), 10);
+        context->notifySetNotification(tr("Recalibrating steering.."), 10);
     else
         context->notifySteerScroll(scrollAmount);
 }
@@ -2042,7 +2296,7 @@ void TrainSidebar::diskUpdate()
     if (secs <= lastRecordSecs) return; // Avoid duplicates
     lastRecordSecs = secs;
 
-    // GoldenCheetah CVS Format "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb\n";
+    // GoldenCheetah CVS Format "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb, target, rppb, rppe, rpppb, rpppe, lppb, lppe, lpppb, lpppe\n";
 
     recordFileStream    << secs
                         << "," << displayCadence
@@ -2064,8 +2318,8 @@ void TrainSidebar::diskUpdate()
     }
 
     recordFileStream    << "," // headwind
-                        << "," // slope
-                        << "," // temp
+                        << "," << slope
+                        << "," << displayTemp
                         << "," << displayWorkoutLap
                         << "," << displayLRBalance
                         << "," << displayLTE
@@ -2077,6 +2331,14 @@ void TrainSidebar::diskUpdate()
                         << "," << displayO2HB
                         << "," << displayHHB
                         << "," << load
+                        << "," << displayRppb
+                        << "," << displayRppe
+                        << "," << displayRpppb
+                        << "," << displayRpppe
+                        << "," << displayLppb
+                        << "," << displayLppe
+                        << "," << displayLpppb
+                        << "," << displayLpppe
                         << "," << "\n";
 }
 
@@ -2096,14 +2358,16 @@ void TrainSidebar::loadUpdate()
     load_msecs += load_period.restart();
 
     if (status&RT_MODE_ERGO) {
-        load = ergFileQueryAdapter.wattsAt(load_msecs, curLap);
+        if (context->currentErgFile()) {
+            load = ergFileQueryAdapter.wattsAt(load_msecs, curLap);
 
-        if(displayWorkoutLap != curLap)
-        {
-            context->notifyNewLap();
-            maintainLapDistanceState();
+            if (displayWorkoutLap != curLap)
+            {
+                context->notifyNewLap();
+                maintainLapDistanceState();
+            }
+            displayWorkoutLap = curLap;
         }
-        displayWorkoutLap = curLap;
 
         // we got to the end!
         if (load == -100) {
@@ -2113,22 +2377,26 @@ void TrainSidebar::loadUpdate()
             context->notifySetNow(load_msecs);
         }
     } else {
+        if (context->currentErgFile()) {
+            // Call gradientAt to obtain current lap num.
+            ergFileQueryAdapter.gradientAt(displayWorkoutDistance * 1000., curLap);
 
-        // Call gradientAt to obtain current lap num.
-        ergFileQueryAdapter.gradientAt(displayWorkoutDistance * 1000., curLap);
-        
-        if(displayWorkoutLap != curLap) {
-            context->notifyNewLap();
-            maintainLapDistanceState();            
+            if (displayWorkoutLap != curLap) {
+                context->notifyNewLap();
+                maintainLapDistanceState();
+            }
+
+            displayWorkoutLap = curLap;
         }
-
-        displayWorkoutLap = curLap;
 
         // we got to the end!
         if (slope == -100) {
             Stop(DEVICE_OK);
         } else {
-            foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slope);
+            foreach(int dev, activeDevices) {
+                Devices[dev].controller->setGradient(slope);
+                Devices[dev].controller->setWindResistance(bicycle.WindResistance(displayAltitude));
+            }
             context->notifySetNow(displayWorkoutDistance * 1000);
         }
     }
@@ -2155,7 +2423,7 @@ void TrainSidebar::toggleCalibration()
         load_period.restart();
 
         clearStatusFlags(RT_CALIBRATING);
-        if (status & RT_WORKOUT) load_timer->start(LOADRATE);
+        load_timer->start(LOADRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
         context->notifyUnPause(); // get video started again, amongst other things
 
@@ -2189,7 +2457,7 @@ void TrainSidebar::toggleCalibration()
 
         setStatusFlags(RT_CALIBRATING);
         if (status & RT_RECORDING) disk_timer->stop();
-        if (status & RT_WORKOUT) load_timer->stop();
+        load_timer->stop();
         load_msecs += load_period.restart();
 
         context->notifyPause(); // get video started again, amongst other things
@@ -2236,7 +2504,7 @@ void TrainSidebar::updateCalibration()
 
         // leaving calibration, clear any notification text
         status = QString(tr("Exiting calibration.."));
-        emit setNotification(status,3);
+        context->notifySetNotification(status,3);
 
     } else {
 
@@ -2434,12 +2702,74 @@ void TrainSidebar::updateCalibration()
             }
             break;
 
+#ifdef GC_HAVE_LIBUSB
+        case CALIBRATION_TYPE_FORTIUS:
+
+            switch (calibrationState) {
+
+            case CALIBRATION_STATE_IDLE:
+            case CALIBRATION_STATE_PENDING:
+                break;
+
+            case CALIBRATION_STATE_REQUESTED:
+                if (calibrationZeroOffset == 0)
+                    status = QString(tr("Give the pedal a kick to start calibration...\nThe motor will run until calibration is complete."));
+                else
+                    status = QString(tr("Allow wheel speed to settle, DO NOT PEDAL...\nThe motor will run until calibration is complete."));
+
+                break;
+
+            case CALIBRATION_STATE_STARTING:
+                status = QString(tr("Calibrating... DO NOT PEDAL, remain seated...\nGathering enough samples to calculate average: %1"))
+                            .arg(QString::number((int16_t)calibrationZeroOffset));
+                break;
+
+            case CALIBRATION_STATE_STARTED:
+                {
+                    const double calibrationPower_W = Fortius::rawForce_to_N(calibrationZeroOffset) * Fortius::kph_to_ms(calibrationTargetSpeed);
+                    status = QString(tr("Calibrating... DO NOT PEDAL, remain seated...\nWaiting for value to stabilize (max %1s): %2 (%3W @ %4kph)"))
+                            .arg(QString::number((int16_t)FortiusController::calibrationDurationLimit_s),
+                                 QString::number((int16_t)calibrationZeroOffset),
+                                 QString::number((int16_t)calibrationPower_W),
+                                 QString::number((int16_t)calibrationTargetSpeed));
+                }
+                break;
+
+            case CALIBRATION_STATE_POWER:
+            case CALIBRATION_STATE_COAST:
+                break;
+
+            case CALIBRATION_STATE_SUCCESS:
+                {
+                    const double calibrationPower_W = Fortius::rawForce_to_N(calibrationZeroOffset) * Fortius::kph_to_ms(calibrationTargetSpeed);
+                    status = QString(tr("Calibration completed successfully!\nFinal calibration value %1 (%2W @ %3kph)"))
+                            .arg(QString::number((int16_t)calibrationZeroOffset),
+                                 QString::number((int16_t)calibrationPower_W),
+                                 QString::number((int16_t)calibrationTargetSpeed));
+
+                    // No further ANT messages to set state, so must move ourselves on..
+                    if ((stateCount % 25) == 0)
+                        finishCalibration = true;
+                }
+                break;
+
+            case CALIBRATION_STATE_FAILURE:
+                status = QString(tr("Calibration failed! Do not pedal while calibration is taking place.\nAllow wheel to run freely."));
+
+                // No further ANT messages to set state, so must move ourselves on..
+                if ((stateCount % 25) == 0)
+                    finishCalibration = true;
+                break;
+            }
+            break;
+#endif
+
         }
 
         lastState = calibrationState;
 
         // set notification text, no timeout
-        emit setNotification(status, 0);
+        context->notifySetNotification(status, 0);
     }
 }
 
@@ -2457,7 +2787,7 @@ void TrainSidebar::FFwd()
         double stepSize = 1.; // jump forward a kilometer in the workout
         if (context->currentVideoSyncFile()) {
             // If step would take us past the end then step to end.
-            double videoDistance = context->currentVideoSyncFile()->Distance;
+            double videoDistance = context->currentVideoSyncFile()->distance();
             if ((displayWorkoutDistance + stepSize) > videoDistance) {
                 stepSize = videoDistance - displayWorkoutDistance;
             }
@@ -2470,7 +2800,7 @@ void TrainSidebar::FFwd()
 
     maintainLapDistanceState();
 
-    emit setNotification(tr("Fast forward.."), 2);
+    context->notifySetNotification(tr("Fast forward.."), 2);
 }
 
 void TrainSidebar::Rewind()
@@ -2503,7 +2833,7 @@ void TrainSidebar::Rewind()
 
     maintainLapDistanceState();
 
-    emit setNotification(tr("Rewind.."), 2);
+    context->notifySetNotification(tr("Rewind.."), 2);
 }
 
 
@@ -2533,7 +2863,7 @@ void TrainSidebar::FFwdLap()
 
     maintainLapDistanceState();    
 
-    if (lapmarker >= 0) emit setNotification(tr("Next Lap.."), 2);
+    if (lapmarker >= 0) context->notifySetNotification(tr("Next Lap.."), 2);
 }
 
 // jump to next Lap marker (if there is one?)
@@ -2557,7 +2887,7 @@ void TrainSidebar::RewindLap()
         lapmarker = ergFileQueryAdapter.prevLap(target);
 
         // Go to slightly before lap marker so the lap transition message will be displayed.
-        lapmarker = std::max(0., lapmarker - 10.1);
+        if (lapmarker >= 0.) lapmarker = std::max(0., lapmarker - 10.1);
 
         if (lapmarker >= 0.) displayWorkoutDistance = lapmarker / 1000; // jump to lapmarker
     }
@@ -2566,7 +2896,7 @@ void TrainSidebar::RewindLap()
 
     maintainLapDistanceState();
 
-    if (lapmarker >= 0) emit setNotification(tr("Back Lap.."), 2);
+    if (lapmarker >= 0) context->notifySetNotification(tr("Back Lap.."), 2);
 }
 
 
@@ -2592,7 +2922,7 @@ void TrainSidebar::Higher()
             foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slope);
     }
 
-    emit setNotification(tr("Increasing intensity.."), 2);
+    context->notifySetNotification(tr("Increasing intensity.."), 2);
 }
 
 // lower load/gradient
@@ -2618,7 +2948,7 @@ void TrainSidebar::Lower()
             foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slope);
     }
 
-    emit setNotification(tr("Decreasing intensity.."), 2);
+    context->notifySetNotification(tr("Decreasing intensity.."), 2);
 }
 
 void TrainSidebar::setLabels()
@@ -2689,7 +3019,7 @@ void TrainSidebar::adjustIntensity(int value)
                     add.val = last.val / from * to;
 
                     // recalibrate altitude if gradient changing
-                    if (ergFile->format == CRS) add.y = last.y + ((add.x-last.x) * (add.val/100));
+                    if (ergFile->format() == ErgFileFormat::crs) add.y = last.y + ((add.x-last.x) * (add.val/100));
                     else add.y = add.val;
 
                     ergFile->Points.insert(i, add);
@@ -2704,7 +3034,7 @@ void TrainSidebar::adjustIntensity(int value)
 
             // recalibrate altitude if in CRS mode
             p->val = p->val / from * to;
-            if (ergFile->format == CRS) {
+            if (ergFile->format() == ErgFileFormat::crs) {
                 if (i) p->y = last.y + ((p->x-last.x) * (last.val/100));
             }
             else p->y = p->val;
@@ -2712,6 +3042,9 @@ void TrainSidebar::adjustIntensity(int value)
 
         // remember last
         last = ergFile->Points.at(i);
+    }
+    if (appsettings->value(nullptr, TRAIN_COALESCE_SECTIONS, false).toBool()) {
+        ergFile->coalesceSections();
     }
 
     // recalculate metrics
@@ -2728,7 +3061,7 @@ void TrainSidebar::adjustIntensity(int value)
     // force replot
     context->notifySetNow(context->getNow());
 
-    emit intensityChanged(lastAppliedIntensity);
+    context->notifyIntensityChanged(lastAppliedIntensity);
 }
 
 MultiDeviceDialog::MultiDeviceDialog(Context *, TrainSidebar *traintool) : traintool(traintool)
@@ -2908,9 +3241,9 @@ TrainSidebar::selectVideo(QString fullpath)
 {
     // look at each entry in the top workoutTree
     for (int i=0; i<mediaTree->model()->rowCount(); i++) {
-        QString path = mediaTree->model()->data(mediaTree->model()->index(i,0)).toString();
+        QString path = mediaTree->model()->data(mediaTree->model()->index(i, TdbVideoModelIdx::filepath)).toString();
         if (path == fullpath) {
-            mediaTree->setCurrentIndex(mediaTree->model()->index(i,0));
+            mediaTree->setCurrentIndex(mediaTree->model()->index(i, TdbVideoModelIdx::filepath));
             break;
         }
     }
@@ -2921,9 +3254,9 @@ TrainSidebar::selectVideoSync(QString fullpath)
 {
     // look at each entry in the top videosyncTree
     for (int i=0; i<videosyncTree->model()->rowCount(); i++) {
-        QString path = videosyncTree->model()->data(videosyncTree->model()->index(i,0)).toString();
+        QString path = videosyncTree->model()->data(videosyncTree->model()->index(i, TdbVideosyncModelIdx::filepath)).toString();
         if (path == fullpath) {
-            videosyncTree->setCurrentIndex(videosyncTree->model()->index(i,0));
+            videosyncTree->setCurrentIndex(videosyncTree->model()->index(i, TdbVideosyncModelIdx::filepath));
             break;
         }
     }
@@ -2936,12 +3269,18 @@ TrainSidebar::selectWorkout(QString fullpath)
 {
     // look at each entry in the top workoutTree
     for (int i=0; i<workoutTree->model()->rowCount(); i++) {
-        QString path = workoutTree->model()->data(workoutTree->model()->index(i,0)).toString();
+        QString path = workoutTree->model()->data(workoutTree->model()->index(i, TdbWorkoutModelIdx::filepath)).toString();
         if (path == fullpath) {
-            workoutTree->setCurrentIndex(workoutTree->model()->index(i,0));
+            workoutTree->setCurrentIndex(workoutTree->model()->index(i, TdbWorkoutModelIdx::filepath));
             break;
         }
     }
+}
+
+void
+TrainSidebar::selectWorkout(int idx)
+{
+    workoutTree->setCurrentIndex(workoutTree->model()->index(idx, TdbWorkoutModelIdx::filepath));
 }
 
 // got a remote control command
@@ -2985,6 +3324,9 @@ TrainSidebar::remoteControl(uint16_t command)
 void TrainSidebar::rrData(uint16_t  rrtime, uint8_t count, uint8_t bpm)
 {
     Q_UNUSED(count)
+
+    QMutexLocker locker(&rrMutex);
+
     if (status&RT_RECORDING && rrFile == NULL && recordFile != NULL) {
         QString rrfile = recordFile->fileName().replace("csv", "rr");
         //fprintf(stderr, "First r-r, need to open file %s\n", rrfile.toStdString().c_str()); fflush(stderr);
@@ -3015,9 +3357,80 @@ void TrainSidebar::rrData(uint16_t  rrtime, uint8_t count, uint8_t bpm)
     //fprintf(stderr, "R-R: %d ms, HR=%d, count=%d\n", rrtime, bpm, count); fflush(stderr);
 }
 
+// cyclist position data received
+void TrainSidebar::posData(uint8_t position)
+{
+    QMutexLocker locker(&posMutex);
+
+    // convert from milliseconds to secondes
+    double secs = double(session_elapsed_msec + session_time.elapsed()) / 1000.00;
+
+    if (status&RT_RECORDING && posFile == NULL && recordFile != NULL) {
+        QString posFilename = recordFile->fileName().replace(".csv", ".pos.csv");
+        //fprintf(stderr, "First cyclist position, need to open file %s\n", posFilename.toStdString().c_str()); fflush(stderr);
+
+        // setup the pos.csv file
+        posFile = new QFile(posFilename);
+        if (!posFile->open(QFile::WriteOnly | QFile::Truncate)) {
+            delete posFile;
+            posFile=NULL;
+        } else {
+
+            // CSV File header
+            QTextStream recordFileStream(posFile);
+            recordFileStream << "secs,position\n";
+            // add "seated" at begining when data stream starts late
+            if (secs!=0.0)
+                recordFileStream << "0,0\n";
+        }
+    }
+
+    // output a line if recording and file ready
+    if (status&RT_RECORDING && posFile) {
+        QTextStream recordFileStream(posFile);
+
+        // output a line
+        recordFileStream << secs << "," << position << "\n";
+    }
+    //fprintf(stderr, "position: %d ms, position=%d\n", posTime, position); fflush(stderr);
+}
+
+// Coretemp data received
+void TrainSidebar::tcoreData(float  core, float skin, float hsi, int qual)
+{
+    if (status&RT_RECORDING && tcoreFile == NULL && recordFile != NULL) {
+        QString tcorefile = recordFile->fileName().replace("csv", "tcr");
+
+        // setup the rr file
+        tcoreFile = new QFile(tcorefile);
+        if (!tcoreFile->open(QFile::WriteOnly | QFile::Truncate)) {
+            delete tcoreFile;
+            tcoreFile=NULL;
+        } else {
+
+            // CSV File header
+            QTextStream recordFileStream(rrFile);
+            recordFileStream << "secs, core, skin, hsi, qual\n";
+        }
+    }
+
+    // output a line if recording and file ready
+    if (status&RT_RECORDING && tcoreFile) {
+        QTextStream recordFileStream(tcoreFile);
+
+        // convert from milliseconds to secondes
+        double secs = double(session_elapsed_msec + session_time.elapsed()) / 1000.00;
+
+        // output a line
+        recordFileStream << secs << ", " << core << ", " << skin << ", " << hsi << ", " << qual << "\n";
+    }
+}
+
 // VO2 Measurement data received
 void TrainSidebar::vo2Data(double rf, double rmv, double vo2, double vco2, double tv, double feo2)
 {
+    QMutexLocker locker(&vo2Mutex);
+
     if (status&RT_RECORDING && vo2File == NULL && recordFile != NULL) {
         QString vo2filename = recordFile->fileName().replace("csv", "vo2");
 

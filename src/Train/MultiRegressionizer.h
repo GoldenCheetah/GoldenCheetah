@@ -392,7 +392,7 @@ public:
     }
     
     bool Build(const XYVector<T_fptype>& xy, double epsilon) {
-        epsilon; // This function has no ability to honor epsilon
+        Q_UNUSED(epsilon) // This function has no ability to honor epsilon
         m_stddev = ComputeCoefs(xy);
         return Valid();
     }
@@ -1019,7 +1019,7 @@ public:
     // to achieve the goal. Higher order functions are unstable and do wacky things, so
     // often its better to tolerate a looser data fit by lowering desired stddev than to
     // raise the maxOrder.
-    SpindownToPolyFit(double epsilon, unsigned maxOrder) : m_maxOrder(maxOrder), m_multifit(epsilon, maxOrder), m_built(false) {}
+    SpindownToPolyFit(double epsilon, unsigned maxOrder) :  m_multifit(epsilon, maxOrder), m_maxOrder(maxOrder), m_built(false) {}
 
     // Process spindown graph into speed/deceleration datapoints and accumulate.
     T_fptype Push(const C* p, unsigned count) {

@@ -24,7 +24,7 @@ void VMProConfigurator::setupCharNotifications(QLowEnergyService * service)
     connect(m_service, SIGNAL(characteristicChanged(QLowEnergyCharacteristic,QByteArray)),
             this, SLOT(onDeviceReply(QLowEnergyCharacteristic,QByteArray)));
 
-    const QLowEnergyDescriptor notificationDesc = m_comOutChar.descriptor(QBluetoothUuid::ClientCharacteristicConfiguration);
+    const QLowEnergyDescriptor notificationDesc = m_comOutChar.descriptor(QBluetoothUuid::DescriptorType::ClientCharacteristicConfiguration);
     if (notificationDesc.isValid()) {
         m_service->writeDescriptor(notificationDesc, QByteArray::fromHex("0100"));
     }

@@ -38,7 +38,7 @@ GcFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) 
         return NULL;
     }
 
-    bool parsed = doc.setContent(&file);
+    bool parsed = bool(doc.setContent(&file));
     file.close();
     if (!parsed) {
         errors << "Could not parse file.";
@@ -61,7 +61,7 @@ GcFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) 
             // by default QDateTime is localtime - the source however is UTC
             QDateTime aslocal = QDateTime::fromString(value, DATETIME_FORMAT);
             // construct in UTC so we can honour the conversion to localtime
-            QDateTime asUTC = QDateTime(aslocal.date(), aslocal.time(), Qt::UTC);
+            QDateTime asUTC = QDateTime(aslocal.date(), aslocal.time(), QTimeZone::UTC);
             // now set in localtime
             rideFile->setStartTime(asUTC.toLocalTime());
         }
@@ -275,7 +275,6 @@ GcFileReader::writeRideFile(Context *,const RideFile *ride, QFile &file) const
         return false;
     file.resize(0);
     QTextStream out(&file);
-    out.setCodec("UTF-8");
     out.setGenerateByteOrderMark(true);
     out << xml;
     out.flush();

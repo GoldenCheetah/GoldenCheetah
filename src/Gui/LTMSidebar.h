@@ -22,7 +22,8 @@
 
 #include "Context.h"
 #include "GcSideBarItem.h"
-#include "Season.h"
+#include "Seasons.h"
+#include "SeasonDialogs.h"
 #include "RideMetric.h"
 #include "LTMSettings.h"
 #include "LTMChartParser.h"
@@ -49,6 +50,8 @@ class LTMSidebar : public QWidget
         int newSeason(QString, QDate, QDate, int);
         void updateSeason(int, QString, QDate, QDate, int);
 
+        void updatePresetChartsOnShow(int viewType);
+
     signals:
         void dateRangeChanged(DateRange);
 
@@ -59,7 +62,6 @@ class LTMSidebar : public QWidget
         void dateRangeTreeWidgetSelectionChanged();
         void dateRangePopup(QPoint);
         void dateRangePopup();
-        void dateRangeChanged(QTreeWidgetItem *, int);
         void dateRangeMoved(QTreeWidgetItem *, int, int);
         void addRange();
         void editRange();
@@ -103,18 +105,21 @@ class LTMSidebar : public QWidget
         void setAutoFilterMenu();
         void autoFilterRefresh(); // refresh the value lists
 
+    protected slots:
+
+        void chartVisibilityChanged();
+
     private:
 
         Context *context;
         bool active;
-        QDate from, to; // so we don't repeat update...
-
 
         Seasons *seasons;
         GcSplitterItem *seasonsWidget;
         SeasonTreeView *dateRangeTree;
         QTreeWidgetItem *allDateRanges;
 
+        bool chartsWidgetVisible;
         GcSplitterItem *chartsWidget;
         ChartTreeView *chartTree;
         QTreeWidgetItem *allCharts;
@@ -136,6 +141,8 @@ class LTMSidebar : public QWidget
         // filter state
         bool isqueryfilter, isautofilter;
         QStringList autoFilterFiles, queryFilterFiles;
+
+        void buildDateRangeMenu(QMenu &menu, QTreeWidgetItem *item, bool asGlobal) const;
 
 };
 

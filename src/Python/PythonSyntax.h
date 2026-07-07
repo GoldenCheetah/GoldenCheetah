@@ -23,6 +23,7 @@
 
 #include <QHash>
 #include <QTextCharFormat>
+#include <QRegularExpression>
 
 class QTextDocument;
 
@@ -31,14 +32,14 @@ class PythonSyntax : public QSyntaxHighlighter
     Q_OBJECT
 
  public:
-    PythonSyntax(QTextDocument *parent = 0);
+    PythonSyntax(QTextDocument *parent = 0, bool dark=true);
 
  protected:
     void highlightBlock(const QString &text);
 
  private:
     struct HighlightingRule {
-        QRegExp pattern;
+        QRegularExpression pattern;
         QTextCharFormat format;
     };
     QVector<HighlightingRule> highlightingRules;

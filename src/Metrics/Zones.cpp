@@ -51,10 +51,10 @@ void Zones::initializeZoneParameters()
         sizeof(initial_zone_default) /
         sizeof(initial_zone_default[0]);
 
-    if (run) {
-        fileName_ = "run-power.zones";
-    } else {
+    if (sport_.isEmpty() || sport_ == "Bike") {
         fileName_ = "power.zones";
+    } else {
+        fileName_ = sport_.toLower() + "-power.zones";
     }
 
     scheme.zone_default.clear();
@@ -105,7 +105,6 @@ bool Zones::read(QFile &file)
         return false;
     }
     QTextStream fileStream(&file);
-    fileStream.setCodec("UTF-8");
 
     QRegExp commentrx("\\s*#.*$");
     QRegExp blankrx("^[ \t]*$");
@@ -123,6 +122,7 @@ bool Zones::read(QFile &file)
                 "\\s*:?\\s*$",                                       // optional :
                 Qt::CaseInsensitive)
     };
+    QRegExp aetrx("^AeT=(\\d+)$");
     QRegExp ftpx("^FTP=(\\d+)$");
     QRegExp wprimerx("^W'=(\\d+)$");
     QRegExp pmaxx("^Pmax=(\\d+)$");
@@ -139,6 +139,7 @@ bool Zones::read(QFile &file)
     bool in_range = false;
     QDate begin = date_zero, end = date_infinity;
     int cp=0;
+    int aet=0;
     int ftp=0;
     int wprime=0;
     int pmax=0;
@@ -182,7 +183,7 @@ bool Zones::read(QFile &file)
                 if (in_range) {
 
                     // if zones are empty, then generate them
-                    ZoneRange range(begin, end, cp, ftp ? ftp : cp, wprime ? wprime : defaultwprime, pmax ? pmax : defaultpmax);
+                    ZoneRange range(begin, end, cp, aet, ftp ? ftp : cp, wprime ? wprime : defaultwprime, pmax ? pmax : defaultpmax);
                     range.zones = zoneInfos;
 
                     if (range.zones.empty()) {
@@ -201,7 +202,7 @@ bool Zones::read(QFile &file)
 
                     } else {
 
-                        qSort(range.zones);
+                        std::sort(range.zones.begin(), range.zones.end());
 
                     }
                     ranges.append(range);
@@ -248,6 +249,14 @@ bool Zones::read(QFile &file)
                 // bleck
                 goto next_line;
             }
+        }
+
+        // check for AeT
+        if (aetrx.indexIn(line, 0) != -1) {
+            if (!in_range)
+                qDebug()<<"ignoring errant AeT= in "<<fileName_;
+            else
+                aet = aetrx.cap(1).toInt();
         }
 
         // check for FTP
@@ -380,7 +389,7 @@ next_line: {}
 
     if (in_range) {
 
-        ZoneRange range(begin, end, cp, ftp ? ftp : cp, wprime ? wprime : defaultwprime, pmax ? pmax : defaultpmax);
+        ZoneRange range(begin, end, cp, aet, ftp ? ftp : cp, wprime ? wprime : defaultwprime, pmax ? pmax : defaultpmax);
         range.zones = zoneInfos;
 
         if (range.zones.empty()) {
@@ -398,7 +407,7 @@ next_line: {}
 
         } else {
 
-            qSort(range.zones);
+            std::sort(range.zones.begin(), range.zones.end());
         }
 
         ranges.append(range);
@@ -406,7 +415,7 @@ next_line: {}
     file.close();
 
     // sort the ranges
-    qSort(ranges);
+    std::sort(ranges.begin(), ranges.end());
 
     // set the default zones if not in file
     if (!scheme.nzones_default)  {
@@ -573,6 +582,13 @@ int Zones::getCP(int rnum) const
     return ranges[rnum].cp;
 }
 
+int Zones::getAeT(int rnum) const
+{
+    assert(rnum < ranges.size());
+    if (ranges[rnum].aet > 0) return ranges[rnum].aet;
+    return round(0.85 * ranges[rnum].cp); // Default to 85% CP when not set
+}
+
 int Zones::getFTP(int rnum) const
 {
     assert(rnum < ranges.size());
@@ -594,6 +610,12 @@ int Zones::getPmax(int rnum) const
 void Zones::setCP(int rnum, int cp)
 {
     ranges[rnum].cp = cp;
+    modificationTime = QDateTime::currentDateTime();
+}
+
+void Zones::setAeT(int rnum, int aet)
+{
+    ranges[rnum].aet = aet;
     modificationTime = QDateTime::currentDateTime();
 }
 
@@ -655,7 +677,7 @@ void Zones::setZonesFromCP(ZoneRange &range)
 
     // sort the zones (some may be pct, others absolute, so zones need to be sorted,
     // rather than the defaults
-    qSort(range.zones);
+    std::sort(range.zones.begin(), range.zones.end());
 
     // set zone end dates
     for (int i = 0; i < range.zones.size(); i++) {
@@ -680,7 +702,7 @@ void Zones::setZonesFromCP(int rnum)
 // return the list of starting values of zones for a given range
 QList <int> Zones::getZoneLows(int rnum) const
 {
-    if (rnum >= ranges.size()) return QList <int>();
+    if (rnum < 0 || rnum >= ranges.size()) return QList <int>();
 
     const ZoneRange &range = ranges[rnum];
     QList <int> return_values;
@@ -696,7 +718,7 @@ QList <int> Zones::getZoneLows(int rnum) const
 QList <int> Zones::getZoneHighs(int rnum) const
 {
 
-    if (rnum >= ranges.size()) return QList <int>();
+    if (rnum < 0 || rnum >= ranges.size()) return QList <int>();
 
     const ZoneRange &range = ranges[rnum];
     QList <int> return_values;
@@ -711,13 +733,28 @@ QList <int> Zones::getZoneHighs(int rnum) const
 // return the list of zone names
 QList <QString> Zones::getZoneNames(int rnum) const
 {
-    if (rnum >= ranges.size()) return QList <QString>(); 
+    if (rnum < 0 || rnum >= ranges.size()) return QList <QString>(); 
 
     const ZoneRange &range = ranges[rnum];
     QList <QString> return_values;
 
     for (int i = 0; i < range.zones.size(); i++) {
         return_values.append(ranges[rnum].zones[i].name);
+    }
+
+    return return_values;
+}
+
+// return the list of zone descriptions
+QList <QString> Zones::getZoneDescriptions(int rnum) const
+{
+    if (rnum < 0 || rnum >= ranges.size()) return QList <QString>();
+
+    const ZoneRange &range = ranges[rnum];
+    QList <QString> return_values;
+
+    for (int i = 0; i < range.zones.size(); i++) {
+        return_values.append(ranges[rnum].zones[i].desc);
     }
 
     return return_values;
@@ -800,6 +837,7 @@ void Zones::write(QDir home)
     for (int i = 0; i < ranges.size(); i++) {
 
         int cp = getCP(i);
+        int aet = getAeT(i);
         int ftp = getFTP(i);
         int wprime = getWprime(i);
         int pmax = getPmax(i);
@@ -814,6 +852,8 @@ void Zones::write(QDir home)
         strzones += QString("%1: CP=%2").arg(getStartDate(i).toString("yyyy/MM/dd")).arg(cp);
         strzones += QString("\n");
 
+        // wite out the AeT value
+        strzones += QString("AeT=%1\n").arg(aet);
         // wite out the FTP value
         strzones += QString("FTP=%1\n").arg(ftp);
         // wite out the W' value
@@ -866,7 +906,6 @@ void Zones::write(QDir home)
     if (file.open(QFile::WriteOnly)) {
 
         QTextStream stream(&file);
-        stream.setCodec("UTF-8");
         stream << strzones;
         file.close();
     } else {
@@ -879,14 +918,14 @@ void Zones::write(QDir home)
     }
 }
 
-void Zones::addZoneRange(QDate _start, QDate _end, int _cp, int _ftp, int _wprime, int _pmax)
+void Zones::addZoneRange(QDate _start, QDate _end, int _cp, int _aet, int _ftp, int _wprime, int _pmax)
 {
-    ranges.append(ZoneRange(_start, _end, _cp, _ftp, _wprime, _pmax));
+    ranges.append(ZoneRange(_start, _end, _cp, _aet, _ftp, _wprime, _pmax));
 }
 
 // insert a new zone range using the current scheme
 // return the range number
-int Zones::addZoneRange(QDate _start, int _cp, int _ftp, int _wprime, int _pmax)
+int Zones::addZoneRange(QDate _start, int _cp, int _aet, int _ftp, int _wprime, int _pmax)
 {
     int rnum;
 
@@ -894,8 +933,8 @@ int Zones::addZoneRange(QDate _start, int _cp, int _ftp, int _wprime, int _pmax)
     for(rnum=0; rnum < ranges.count(); rnum++) if (ranges[rnum].begin > _start) break;
 
     // at the end ?
-    if (rnum == ranges.count()) ranges.append(ZoneRange(_start, date_infinity, _cp, _ftp, _wprime, _pmax));
-    else ranges.insert(rnum, ZoneRange(_start, ranges[rnum].begin, _cp, _ftp, _wprime, _pmax));
+    if (rnum == ranges.count()) ranges.append(ZoneRange(_start, date_infinity, _cp, _aet, _ftp, _wprime, _pmax));
+    else ranges.insert(rnum, ZoneRange(_start, ranges[rnum].begin, _cp, _aet, _ftp, _wprime, _pmax));
 
     // modify previous end date
     if (rnum) ranges[rnum-1].end = _start;
@@ -1006,6 +1045,9 @@ Zones::getFingerprint() const
         // CP
         x += ranges[i].cp;
 
+        // AeT
+        x += ranges[i].aet;
+
         // FTP
         x += ranges[i].ftp;
 
@@ -1023,7 +1065,7 @@ Zones::getFingerprint() const
     QByteArray ba = QByteArray::number(x);
 
     // we spot other things separately
-    return qChecksum(ba, ba.length());
+    return qChecksum(ba);
 }
 
 // get fingerprint just for the range that applies on this date
@@ -1038,6 +1080,9 @@ Zones::getFingerprint(QDate forDate) const
 
         // CP
         x += ranges[i].cp;
+
+        // AeT
+        x += ranges[i].aet;
 
         // FTP
         x += ranges[i].ftp;
@@ -1056,11 +1101,17 @@ Zones::getFingerprint(QDate forDate) const
     QByteArray ba = QByteArray::number(x);
 
     // limits to only zones now as we sport weight separately
-    return qChecksum(ba, ba.length());
+    return qChecksum(ba);
 }
 
 QString
 Zones::useCPforFTPSetting() const
 {
-    return run ? GC_USE_CP_FOR_FTP_RUN : GC_USE_CP_FOR_FTP;
+    return GC_USE_CP_FOR_FTP + ((sport_.isEmpty() || sport_ == "Bike") ? "" : sport_.toLower());
+}
+
+QString
+Zones::useCPModelSetting() const
+{
+    return GC_USE_CP_MODEL + ((sport_.isEmpty() || sport_ == "Bike") ? "" : sport_.toLower());
 }

@@ -31,7 +31,8 @@
 
 IntervalTreeView::IntervalTreeView(Context *context) : context(context)
 {
-    setDragDropMode(QAbstractItemView::InternalMove);
+    setDragDropMode(QAbstractItemView::DragDrop);
+    setDefaultDropAction(Qt::MoveAction);
     setDragDropOverwriteMode(false);
     setDropIndicatorShown(true);
 #ifdef Q_OS_MAC
@@ -62,9 +63,17 @@ IntervalTreeView::mouseHover(QTreeWidgetItem *item, int)
 }
 
 void
+IntervalTreeView::dragEnterEvent(QDragEnterEvent* event)
+{
+    if (event->source() != this || event->dropAction() != Qt::MoveAction) return;
+
+    QAbstractItemView::dragEnterEvent(event);
+}
+
+void
 IntervalTreeView::dropEvent(QDropEvent* event)
 {
-    QTreeWidgetItem* target = (QTreeWidgetItem *)itemAt(event->pos());
+    QTreeWidgetItem* target = (QTreeWidgetItem *)itemAt(event->position().toPoint());
     QTreeWidgetItem* parent = target->parent();
 
     QList<IntervalItem*> intervals =  context->rideItem()->intervals();
@@ -108,7 +117,8 @@ IntervalTreeView::mimeTypes() const
 }
 
 QMimeData *
-IntervalTreeView::mimeData (const QList<QTreeWidgetItem *> items) const
+IntervalTreeView::mimeData
+(const QList<QTreeWidgetItem *> &items) const
 {
     QMimeData *returning = new QMimeData;
 

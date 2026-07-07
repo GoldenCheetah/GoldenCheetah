@@ -27,6 +27,7 @@
 #include <QMap>
 #include <QVector>
 #include <QObject>
+#include <QRegExp>
 
 class RideItem;
 class RideCache;
@@ -88,6 +89,36 @@ struct RideFileDataPresent
 
 };
 
+// Mappings for QIC/ANT fields info
+struct CIQfield {
+    CIQfield(QString message, QString name, int nativeid, int id, QString type, QString unit, int scale, int offset)
+        : message(message), name(name), nativeid(nativeid), id(id), scale(scale), offset(offset), type(type), unit(unit) {}
+
+    QString message;
+    QString name;
+    int     nativeid;
+    int     id;
+    int     scale;
+    int     offset;
+    QString type;
+    QString unit;
+//  int     size;
+};
+
+struct CIQinfo
+{
+    CIQinfo(QString appid, int id, int ver) : appid(appid), devid(id), ver(ver){}
+    CIQinfo(const QJsonObject& obj);
+
+    static QString listToJson(const QList<CIQinfo>& ciqList);
+    static QList<CIQinfo> listFromJson(const QString& src);
+
+    QString appid;
+    int devid;
+    int ver;
+    QList<CIQfield> fields;
+};
+
 class RideFileInterval
 {
     Q_DECLARE_TR_FUNCTIONS(RideFileInterval);
@@ -115,12 +146,19 @@ class RideFileInterval
         static QString typeDescriptionLong(IntervalType);              // return a longer string to represent the type
         static qint32 intervalTypeBits(IntervalType);                  // returns the bit value or'ed into GC_DISCOVERY
 
+        const QMap<QString,QString>& tags() const { return tags_; }
+        QString getTag(QString name, QString fallback) const { return tags_.value(name, fallback); }
+        void setTag(QString name, QString value) { tags_.insert(name, value); }
+        bool removeTag(QString name) { return tags_.remove(name); }
+
         QString typeString;
         IntervalType type;
         double start, stop;
         QString name;
         bool test;
         QColor color;
+        QMap<QString,QString> tags_;
+
         RideFileInterval() : type(USER), start(0.0), stop(0.0), test(false), color(Qt::black) {}
         RideFileInterval(IntervalType type, double start, double stop, QString name, QColor color, bool test=false) :
         type(type), start(start), stop(stop), name(name), test(test), color(color) {}
@@ -177,7 +215,7 @@ class RideFile : public QObject // QObject to emit signals
         friend class TcxFileReader;
         friend struct PwxFileReader;
         friend struct JsonFileReader;
-        friend class ManualRideDialog;
+        friend class ManualActivityWizard;
         friend class PolarFileReader;
         friend class Strava;
         friend class ErgFile; // access to intervals
@@ -189,7 +227,7 @@ class RideFile : public QObject // QObject to emit signals
         // fix tools
         friend class FixLapSwim;
         friend class Snippets;
-        friend struct FitFileReaderState;
+        friend struct FitFileParser;
 
         // utility
         static unsigned int computeFileCRC(QString); 
@@ -242,11 +280,14 @@ class RideFile : public QObject // QObject to emit signals
         static double minimumFor(SeriesType series);
         static QColor colorFor(SeriesType series);
         static bool parseRideFileName(const QString &name, QDateTime *dt);
+
+        static QString sportTag(QString sport);
         QString sport() const;
         bool isBike() const;
         bool isRun() const;
         bool isSwim() const;
         bool isXtrain() const;
+        bool isAero() const;
 
         // Working with DATAPOINTS -- ***use command to modify***
         RideFileCommand *command;
@@ -281,9 +322,12 @@ class RideFile : public QObject // QObject to emit signals
                                  double rvert, double rcad, double rcontact, double tcore,
                                  int interval, bool forceAppend);
 
+        void updatePointValue(QString valueName, QString valueStr);
+
         void appendPoint(const RideFilePoint &);
 
         void updatePoint(RideFilePoint *point, const RideFilePoint *oldPoint);
+        void updatePoint(RideFilePoint *point, QString valueName, QString value);
 
         const QVector<RideFilePoint*> &dataPoints() const { return dataPoints_; }
 
@@ -309,8 +353,8 @@ class RideFile : public QObject // QObject to emit signals
     
         double recIntSecs() const { return recIntSecs_; }
         void setRecIntSecs(double value) { recIntSecs_ = value; }
-        const QString &deviceType() const { return deviceType_; }
-        void setDeviceType(const QString &value) { deviceType_ = value; }
+        const QString deviceType() const { return getTag("Device", "unknown"); }
+        void setDeviceType(const QString &value) { setTag("Device", value); }
         const QString &fileFormat() const { return fileFormat_; }
         void setFileFormat(const QString &value) { fileFormat_ = value; }
         const QString id() const { return id_; }
@@ -348,7 +392,8 @@ class RideFile : public QObject // QObject to emit signals
         int timeIndex(double) const;          // get index offset for time in secs
         int distanceIndex(double) const;      // get index offset for distance in KM
 
-        // Working with the METADATA TAGS
+        // Working with the METADATA TAGS -- these are ride metadata, there are similar in the RideFileInterval
+        //                                   to store and manage interval metadata
         const QMap<QString,QString>& tags() const { return tags_; }
         QString getTag(QString name, QString fallback) const { return tags_.value(name, fallback); }
         void setTag(QString name, QString value) { tags_.insert(name, value); }
@@ -361,10 +406,12 @@ class RideFile : public QObject // QObject to emit signals
         WPrime *wprimeData(); // return wprime, init/refresh if needed
 
         // XDATA
-        XDataSeries *xdata(QString name) { return xdata_.value(name, NULL); }
+        XDataSeries *xdata(QString name) const { return xdata_.value(name, NULL); }
         void addXData(QString name, XDataSeries *series);
         QMap<QString,XDataSeries*> &xdata() { return xdata_; }
-        double xdataValue(RideFilePoint *p, int &idx, QString xdata, QString series, RideFile::XDataJoin);
+        double xdataValue(const RideFilePoint *p, int &idx, QString xdata, QString series, RideFile::XDataJoin) const;
+        void addCIQ(CIQinfo &ciqinfo);
+        const QList<CIQinfo>& ciqinfo() const { return ciqinfo_; }
 
         // METRIC OVERRIDES
         QMap<QString,QMap<QString,QString> > metricOverrides;
@@ -382,6 +429,9 @@ class RideFile : public QObject // QObject to emit signals
         // rather use the RideFileCommand *command
         // to manipulate the ride data
         void setPointValue(int index, SeriesType series, double value);
+        // void setPointValue(int index, SeriesType series, int value);
+        void setPointValue(double secs, SeriesType series, double value);
+        // void setPointValue(double secs, SeriesType series, int value);
         void deletePoint(int index);
         void deletePoints(int index, int count);
         void insertPoint(int index, RideFilePoint *point);
@@ -405,6 +455,7 @@ class RideFile : public QObject // QObject to emit signals
 
         // xdata series
         QMap<QString, XDataSeries*> xdata_;
+        QList<CIQinfo> ciqinfo_; //ciq metadata
 
         void clearIntervals();
         void fillInIntervals();
@@ -427,7 +478,6 @@ class RideFile : public QObject // QObject to emit signals
         RideFilePoint* avgPoint;
         RideFilePoint* totalPoint;
         RideFileDataPresent dataPresent;
-        QString deviceType_;
         QString fileFormat_;
         QList<RideFileInterval*> intervals_;
         QList<RideFileCalibration*> calibrations_;
@@ -440,6 +490,7 @@ class RideFile : public QObject // QObject to emit signals
         QVariant getPointFromValue(double value, SeriesType series) const;
         void updateMin(RideFilePoint* point);
         void updateMax(RideFilePoint* point);
+        void updateAvg(SeriesType series, double value);
         void updateAvg(RideFilePoint* point);
 
         bool dstale; // is derived data up to date?
@@ -502,7 +553,7 @@ struct RideFilePoint
                   double lppb, double rppb, double lppe, double rppe,
                   double lpppb, double rpppb, double lpppe, double rpppe,
                   double smo2, double thb, 
-                  double rvert, double rcad, double rcontact, double(tcore),
+                  double rvert, double rcad, double rcontact, double tcore,
                   int interval) :
 
         secs(secs), cad(cad), hr(hr), km(km), kph(kph), nm(nm), watts(watts), alt(alt), lon(lon), 
@@ -550,7 +601,7 @@ class RideFileIterator {
         int start, stop, index;
 };
 
-#define XDATA_MAXVALUES 32
+#define XDATA_MAXVALUES 64
 
 class XDataPoint {
 public:
@@ -561,13 +612,17 @@ public:
             string[i]="";
         }
     }
-    XDataPoint (const XDataPoint &other) {
+    XDataPoint(const XDataPoint &other) {
+        *this = other;
+    }
+    XDataPoint& operator=(const XDataPoint &other) {
         this->secs=other.secs;
         this->km=other.km;
         for(int i=0; i<XDATA_MAXVALUES; i++) {
             this->number[i]= other.number[i];
             this->string[i]= other.string[i];
         }
+        return *this;
     }
 
     double secs, km;
@@ -578,16 +633,21 @@ public:
 class XDataSeries {
 public:
     XDataSeries() {}
-    XDataSeries(XDataSeries &other) {
+    XDataSeries(const XDataSeries& other) { *this = other; }
+    XDataSeries& operator=(const XDataSeries &other) {
         name = other.name;
         valuename = other.valuename;
         unitname = other.unitname;
         valuetype = other.valuetype;
+        // we need to delete objects pointed by the assignment target
+        foreach(XDataPoint *p, datapoints) delete p;
+        datapoints.clear();
         // we need to create new objects since we are holding pointers to objects
         // otherwise we would end up w/ multiple frees or dangling ptrs!
         foreach (XDataPoint *p, other.datapoints) {
             datapoints.push_back(new XDataPoint(*p));
         }
+        return *this;
     }
 
     ~XDataSeries() { foreach(XDataPoint *p, datapoints) delete p; }

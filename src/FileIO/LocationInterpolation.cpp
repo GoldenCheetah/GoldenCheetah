@@ -17,6 +17,7 @@
 */
 
 #include <assert.h>
+#include <algorithm>
 #include "LocationInterpolation.h"
 #include "BlinnSolver.h"
 

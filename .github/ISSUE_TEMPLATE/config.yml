@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+    - name: GoldenCheetah Users Forum
+      url: https://groups.google.com/forum/#!forum/golden-cheetah-users
+      about: Please ask and answer technical support questions here.
+    - name: GoldenCheetah Developers Forum
+      url: https://groups.google.com/forum/#!forum/golden-cheetah-developers
+      about: Please ask and answer source code related questions here.

@@ -27,6 +27,7 @@
 
 #include <QVector>
 #include <QThread>
+#include <QPointer>
 
 #include <QFuture>
 #include <QFutureWatcher>
@@ -34,7 +35,7 @@
 
 class Context;
 class LTMPlot;
-class RideCacheBackgroundRefresh;
+class RideCacheRefreshThread;
 class Specification;
 class AthleteBest;
 class RideCacheModel;
@@ -56,6 +57,7 @@ class RideCache : public QObject
         // query the cache
         int count() const { return rides_.count(); }
         RideItem *getRide(QString filename);
+        RideItem *getRide(const QString &filename, bool planned);
         RideItem *getRide(QDateTime dateTime);
 	    QList<QDateTime> getAllDates();
         QStringList getAllFilenames();
@@ -72,7 +74,7 @@ class RideCache : public QObject
 
         // Count of activities matching specification
         void getRideTypeCounts(Specification specification, int& nActivities,
-                               int& nRides, int& nRuns, int& nSwims);
+                               int& nRides, int& nRuns, int& nSwims, QString& sport);
         // Check if metric is relevant for some  activity matching specification
         enum SportRestriction { AnySport, OnlyRides, OnlyRuns, OnlySwims, OnlyXtrains };
         bool isMetricRelevantForRides(Specification specification,
@@ -80,14 +82,22 @@ class RideCache : public QObject
                                       SportRestriction sport=AnySport);
 
         // is running ?
-        bool isRunning() { return future.isRunning(); }
+        bool isRunning() { return refreshThreads.count() != 0; }
+
+        // how is update going?
+        QMutex updateMutex;
+        int updates; // for watching progress
+        int nextRefresh(); // returns -1 when all done
+        void threadCompleted(RideCacheRefreshThread*);
 
         // the ride list
 	    QVector<RideItem*>&rides() { return rides_; } 
 
         // add/remove a ride to the list
         void addRide(QString name, bool dosignal, bool select, bool useTempActivities, bool planned);
-        void removeCurrentRide();
+        bool removeCurrentRide();
+        bool removeRide(const QString& filenameToDelete);
+        bool removeRides(const QStringList &filenamesToDelete, bool triggerRefresh = true);
 
         // export metrics in CSV format
         void writeAsCSV(QString filename);
@@ -96,12 +106,64 @@ class RideCache : public QObject
         void refresh();
         double progress() { return progress_; }
 
+        struct OperationPreCheck {
+            bool canProceed = true;
+            QString blockingReason;
+            QList<RideItem*> affectedItems; // All items that would be modified
+            QList<RideItem*> dirtyItems; // Affected items that are already dirty
+            bool requiresUserDecision = false;
+            QString warningMessage;
+        };
+
+        struct OperationResult {
+            bool success = false;
+            QString error;
+            int affectedCount = 0;
+        };
+
+        // Split validations out of the action-methods to allow user interaction if dependent
+        // activities need to be saved or reverted.
+        // (!) The action-methods don't repeat the input-validation, check is always required upfront
+
+        OperationPreCheck checkLinkActivities(RideItem *item1, RideItem *item2);
+        OperationResult linkActivities(RideItem *item1, RideItem *item2);
+
+        OperationPreCheck checkUnlinkActivity(RideItem *item);
+        OperationResult unlinkActivity(RideItem *item);
+
+        OperationPreCheck checkUnlinkActivities(const QList<RideItem*> &items);
+        OperationResult unlinkActivities(const QList<RideItem*> &items);
+
+        OperationPreCheck checkMoveActivity(RideItem *item, const QDateTime &newDateTime);
+        OperationResult moveActivity(RideItem *item, const QDateTime &newDateTime);
+
+        OperationPreCheck checkCopyPlannedActivity(RideItem *sourceItem, const QDate &newDate, QTime newTime = QTime());
+        OperationResult copyPlannedActivity(RideItem *sourceItem, const QDate &newDate, QTime newTime = QTime());
+
+        OperationPreCheck checkCopyPlannedActivities(const QList<std::pair<RideItem*, QDate>> &sourceItemsAndTargets);
+        OperationResult copyPlannedActivities(const QList<std::pair<RideItem*, QDate>> &sourceItemsAndTargets);
+
+        OperationPreCheck checkShiftPlannedActivities(const QDate &fromDate, int dayOffset);
+        OperationResult shiftPlannedActivities(const QDate &fromDate, int dayOffset);
+
+        bool saveActivity(RideItem *item, QString &error);
+        bool saveActivities(QList<RideItem*> items, QString &error);
+
+        RideItem *getLinkedActivity(RideItem *item);
+        RideItem *findSuggestion(RideItem *rideItem);
+
+        bool updateFromWorkout(RideItem *item, bool autoSave = false);
+        bool updateFromWorkoutAfter(const QDate &when, bool autoSave = false);
+
     public slots:
 
         // restore / dump cache to disk (json)
         void load();
         void postLoad();
         void save(bool opendata=false, QString filename="");
+
+        // clean up refresh threads
+        void cleanupThread(RideCacheRefreshThread *thread);
 
         // find entry quickly
         int find(RideItem *);
@@ -131,17 +193,18 @@ class RideCache : public QObject
 
         // us telling the world the item changed
         void itemChanged(RideItem*);
+        void itemSaved(RideItem *item);
 
     protected:
 
         friend class ::Athlete;
         friend class ::MainWindow; // save dialog
-        friend class ::RideCacheBackgroundRefresh;
         friend class ::LTMPlot; // get weekly performances
         friend class ::Banister; // get weekly performances
         friend class ::Leaf; // get weekly performances
         friend class ::RideItem; // adds to deletelist in destructor
         friend class ::NavigationModel; // checks deletelist during redo/undo
+        friend class ::RideCacheRefreshThread;
 
         Context *context;
         QDir directory, plannedDirectory;
@@ -154,11 +217,19 @@ class RideCache : public QObject
         bool exiting;
 	    double progress_; // percent
 
-        QFuture<void> future;
-        QFutureWatcher<void> watcher;
+        QVector<RideCacheRefreshThread*> refreshThreads;
 
         Estimator *estimator;
         bool first; // updated when estimates are marked stale
+
+    private:
+        bool renameRideFiles(const QString& oldFileName, const QString& newFileName, bool isPlanned, QString &error);
+        bool isValidLink(RideItem *item1, RideItem *item2, QString &error);
+        RideItem* copyPlannedRideFile(RideItem *sourceItem, const QDate &newDate, const QTime &newTime, QString &error);
+
+        bool isCancelled = false;
+        QThread *saveThread_ = nullptr;
+        QObject *saveWorker_ = nullptr;
 };
 
 class AthleteBest
@@ -168,8 +239,22 @@ class AthleteBest
     QString value; // formatted value
     QDate date;
 
-    // for qsort
+    // for std::sort
     bool operator< (AthleteBest right) const { return (nvalue < right.nvalue); }
+};
+
+class RideCacheRefreshThread : public QThread
+{
+    public:
+        RideCacheRefreshThread(RideCache *cache);
+
+    protected:
+
+        // refresh metrics
+        virtual void run() override;
+
+    private:
+        QPointer<RideCache> cache;
 };
 
 #endif // _GC_RideCache_h

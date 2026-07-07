@@ -220,7 +220,8 @@ class WWTelemetry : public WorkoutWidgetItem {
                              const WorkoutWidget::WwSeriesType& seriesType)
         {
             QPen linePen(color);
-            linePen.setWidth(1);
+            double width = appsettings->value(workoutWidget(), GC_LINEWIDTH, 1.0*dpiXFactor).toDouble();
+            linePen.setWidth(width);
             painter->setPen(linePen);
 
             int index = 0;

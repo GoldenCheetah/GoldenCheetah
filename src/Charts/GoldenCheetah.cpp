@@ -25,6 +25,7 @@
 #include "Utils.h"
 #include "mvjson.h"
 #include "LTMSettings.h"
+#include "Perspective.h"
 
 #ifdef GC_HAS_CLOUD_DB
 #include "CloudDBChart.h"
@@ -188,18 +189,20 @@ bool GcWindow::gripped() const
     return _gripped;
 }
 
-GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow), dragState(None) 
+GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow)
 {
     qRegisterMetaType<QWidget*>("controls");
     qRegisterMetaType<RideItem*>("ride");
     qRegisterMetaType<GcWinID>("type");
     qRegisterMetaType<QColor>("color");
     qRegisterMetaType<DateRange>("dateRange");
+    qRegisterMetaType<Perspective*>("perspective");
     nomenu = false;
     revealed = false;
     setParent(context->mainWindow);
     setControls(NULL);
     setRideItem(NULL);
+    setPerspective(NULL);
     setTitle("");
     showtitle=true;
     setContentsMargins(0,0,0,0);
@@ -276,7 +279,7 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         // heading
         QFont font;
         // font too large on hidpi scaling
-        int pixelsize =pixelSizeForFont(font, ((contentsMargins().top()/2)+2));
+        int pixelsize =pixelSizeForFont(font, contentsMargins().top());
         font.setPixelSize(pixelsize);
         font.setWeight(QFont::Bold);
         painter.setFont(font);
@@ -413,8 +416,8 @@ GcWindow::spotHotSpot(QMouseEvent *e)
     int borderWidth = 3;
 
     // account for offset by mapping to GcWindow geom
-    int _y = e->y();
-    int _x = e->x();
+    int _y = e->position().y();
+    int _x = e->position().x();
     int _height = height();
     int _width = width();
 
@@ -644,7 +647,7 @@ GcWindow::setCursorShape(DragState d)
 }
 
 void
-GcWindow::enterEvent(QEvent *)
+GcWindow::enterEvent(QEnterEvent *)
 {
     if (_noevents) return;
 
@@ -932,8 +935,6 @@ GcChartWindow::saveChart()
 
     // lets go to it
     QTextStream out(&outfile);
-    out.setCodec ("UTF-8");
-
     serializeChartToQTextStream(out);
 
     // all done
@@ -956,7 +957,7 @@ GcChartWindow::serializeChartToQTextStream(QTextStream& out) {
 
     for (int i=0; i<m->propertyCount(); i++) {
         QMetaProperty p = m->property(i);
-        if (p.isUser(this)) {
+        if (p.isUser()) {
             if (QString(p.typeName()) == "int")      out<<"\t\t\t\""<<p.name()<<"\":\""<<p.read(this).toInt()<<"\",\n";
             if (QString(p.typeName()) == "double")   out<<"\t\t\t\""<<p.name()<<"\":\""<<p.read(this).toDouble()<<"\",\n";
             if (QString(p.typeName()) == "QDate")    out<<"\t\t\t\""<<p.name()<<"\":\""<<p.read(this).toDate().toString()<<"\",\n";
@@ -974,7 +975,7 @@ GcChartWindow::serializeChartToQTextStream(QTextStream& out) {
 
     // a last unused property, just to make it well formed json
     // regardless of how many properties we ever have
-    out <<"\t\t\t\"__LAST__\":\"1\",\n";
+    out <<"\t\t\t\"__LAST__\":\"1\"\n";
 
     // end here, only one chart
     out<<"\t\t}\n\t}\n}";
@@ -995,8 +996,8 @@ GcChartWindow::chartPropertiesFromFile(QString filename)
 
         // read in the whole thing
         QTextStream in(&file);
+
         // GC .JSON is stored in UTF-8 with BOM(Byte order mark) for identification
-        in.setCodec ("UTF-8");
         contents = in.readAll();
         file.close();
     }
@@ -1013,7 +1014,7 @@ GcChartWindow::chartPropertiesFromString(QString contents) {
 
     QList<QMap<QString,QString> > returning;
 
-    // parse via MVJson to avoid QT5 dependency
+    // parse via MVJson
     MVJSONReader json(string(contents.toStdString()));
 
     if (json.root && json.root->hasField("CHART")) {
@@ -1079,7 +1080,6 @@ GcChartWindow::exportChartToCloudDB()
     chart.Header.GcVersion =  QString::number(version);
     // get the gchart - definition json
     QTextStream out(&chart.ChartDef);
-    out.setCodec ("UTF-8");
     serializeChartToQTextStream(out);
     out.flush();
     // get Type and View from properties
@@ -1161,7 +1161,7 @@ GcChartWindow::chartHasUserMetrics() {
 
     for (int i=0; i<m->propertyCount(); i++) {
         QMetaProperty p = m->property(i);
-        if (p.isUser(this)) {
+        if (p.isUser()) {
             if (QString(p.typeName()) == "LTMSettings") {
                 LTMSettings x = p.read(this).value<LTMSettings>();
                 foreach (MetricDetail metricDetail, x.metrics) {

@@ -38,10 +38,10 @@
 
 #include <QtWebChannel>
 #include <QWebEngineProfile>
-#include <QWebEngineDownloadItem>
+#include <QWebEngineDownloadRequest>
 
 // overlay helper
-#include "TabView.h"
+#include "AbstractView.h"
 #include "GcOverlayWidget.h"
 #include "IntervalSummaryWindow.h"
 #include <QDebug>
@@ -113,8 +113,8 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
 
     QWidget *settingsWidget = new QWidget(this);
     settingsWidget->setContentsMargins(0,0,0,0);
-    //HelpWhatsThis *helpSettings = new HelpWhatsThis(settingsWidget);
-    //settingsWidget->setWhatsThis(helpSettings->getWhatsThisText(HelpWhatsThis::ChartRides_Critical_MM_Config_Settings));
+    HelpWhatsThis *helpSettings = new HelpWhatsThis(settingsWidget);
+    settingsWidget->setWhatsThis(helpSettings->getWhatsThisText(HelpWhatsThis::Chart_Web));
 
 
     QFormLayout *commonLayout = new QFormLayout(settingsWidget);
@@ -124,7 +124,7 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
     customUrl->setText("");
 
     commonLayout->addRow(customUrlLabel, customUrl);
-    commonLayout->addRow(new QLabel("Hit return to apply URL"));
+    commonLayout->addRow(new QLabel(tr("Hit return to apply URL")));
 
     setControls(settingsWidget);
 
@@ -137,36 +137,22 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
     view = new QWebEngineView(this);
     connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
 
-    //view->page()->profile()->setHttpUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393");
-
     // add a download interceptor
     WebDownloadInterceptor *interceptor = new WebDownloadInterceptor;
     view->page()->profile()->setUrlRequestInterceptor(interceptor);
-
-    // cookies and storage
-    view->page()->profile()->setPersistentCookiesPolicy(QWebEngineProfile::ForcePersistentCookies);
-    QString temp = const_cast<AthleteDirectoryStructure*>(context->athlete->directoryStructure())->temp().absolutePath();
-    view->page()->profile()->setCachePath(temp);
-    view->page()->profile()->setPersistentStoragePath(temp);
-
-    // web scheme handler - not needed must compile with QT 5.9 or higher
-    //WebSchemeHandler *handler = new WebSchemeHandler(view);
-    //view->page()->profile()->installUrlSchemeHandler("filesystem:https", handler);
-    //view->page()->profile()->installUrlSchemeHandler("filesystem", handler);
 
     // add some settings
     view->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
     view->settings()->setAttribute(QWebEngineSettings::LocalStorageEnabled, true);
 
-    view->setPage(new simpleWebPage());
+    view->setPage(new QWebEnginePage(context->webEngineProfile));
     view->setContentsMargins(0,0,0,0);
-    view->page()->view()->setContentsMargins(0,0,0,0);
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     view->setAcceptDrops(false);
     layout->addWidget(view);
 
     HelpWhatsThis *help = new HelpWhatsThis(view);
-    view->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Map));
+    view->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Chart_Web));
 
     // if we change in settings, force replot by pressing return
     connect(customUrl, SIGNAL(returnPressed()), this, SLOT(forceReplot()));
@@ -175,12 +161,15 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
     configChanged(CONFIG_APPEARANCE);
 
     // intercept downloads
-    connect(view->page()->profile(), SIGNAL(downloadRequested(QWebEngineDownloadItem*)), this, SLOT(downloadRequested(QWebEngineDownloadItem*)));
+    connect(view->page()->profile(), SIGNAL(downloadRequested(QWebEngineDownloadRequest*)), this, SLOT(downloadRequested(QWebEngineDownloadRequest*)));
     connect(view->page(), SIGNAL(linkHovered(QString)), this, SLOT(linkHovered(QString)));
+
+    forceReplot();
 }
 
 WebPageWindow::~WebPageWindow()
 {
+  if (view) delete view->page();
 }
 
 void 
@@ -255,7 +244,7 @@ WebPageWindow::event(QEvent *event)
 }
 
 void
-WebPageWindow::downloadRequested(QWebEngineDownloadItem *item)
+WebPageWindow::downloadRequested(QWebEngineDownloadRequest *item)
 {
     // only do it if I am visible, as shared across web page instances
     if (!amVisible()) return;
@@ -269,11 +258,10 @@ WebPageWindow::downloadRequested(QWebEngineDownloadItem *item)
 
     // lets go get it!
     filenames.clear();
-    filenames << item->path();
+    filenames << QDir(item->downloadDirectory()).absoluteFilePath(item->downloadFileName());
 
     // set save
-    connect(item, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(downloadProgress(qint64,qint64)));
-    connect(item, SIGNAL(finished()), this, SLOT(downloadFinished()));
+    connect(item, SIGNAL(isFinishedChanged()), this, SLOT(downloadFinished()));
 
     // kick off download
     item->accept(); // lets download it!
@@ -295,7 +283,7 @@ WebPageWindow::downloadFinished()
         dialog->process(); // do it!
     }
     if (workouts.count()) {
-        Library::importFiles(context, filenames, true);
+        Library::importFiles(context, filenames, LibraryBatchImportConfirmation::forcedDialog);
     }
 }
 

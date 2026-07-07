@@ -86,8 +86,13 @@ TreeMapPlot::setData(TMSettings *settings)
 void
 TreeMapPlot::resizeEvent(QResizeEvent *)
 {
+    static constexpr int margin = 9;
     // layout the map
-    if (root) root->layout(QRect(9,9,geometry().width()-18, geometry().height()-18));
+    if (   root
+        && geometry().width() > 2 * margin
+        && geometry().height() > 2 * margin) {
+        root->layout(QRect(margin, margin, geometry().width() - 2 * margin, geometry().height() - 2 * margin));
+    }
 }
 
 

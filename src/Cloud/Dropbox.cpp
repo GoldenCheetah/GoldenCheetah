@@ -31,6 +31,7 @@ Dropbox::Dropbox(Context *context) : CloudService(context), context(context), ro
     // config
     settings.insert(OAuthToken, GC_DROPBOX_TOKEN);
     settings.insert(Folder, GC_DROPBOX_FOLDER);
+    settings.insert(Combo1, QString("%1::Format::JSON::FIT::TCX::PWX::CSV").arg(GC_DROPBOX_FORMAT));
 }
 
 Dropbox::~Dropbox() {
@@ -41,6 +42,14 @@ Dropbox::~Dropbox() {
 bool
 Dropbox::open(QStringList &errors)
 {
+    // User selected file format, defaults to JSON
+    const QString format =  getSetting(GC_DROPBOX_FORMAT, "JSON").toString();
+    if (format == "JSON") filetype = uploadType::JSON;
+    else if (format == "FIT") filetype = uploadType::FIT;
+    else if (format == "TCX") filetype = uploadType::TCX;
+    else if (format == "PWX") filetype = uploadType::PWX;
+    else if (format == "CSV") filetype = uploadType::CSV;
+
     // do we have a token
     QString token = getSetting(GC_DROPBOX_TOKEN, "").toString();
     if (token == "") {
@@ -103,7 +112,7 @@ bool Dropbox::createFolder(QString path)
     request.setRawHeader("Content-Type", "application/json");
 
     QByteArray data;
-    data.append(QString("{ \"path\": \"%1\", \"autorename\": false }").arg(path));
+    data.append(QString("{ \"path\": \"%1\", \"autorename\": false }").arg(path).toUtf8());
     QNetworkReply *reply = nam->post(request, data);
 
     // blocking request
@@ -146,11 +155,11 @@ Dropbox::readdir(QString path, QStringList &errors)
         QByteArray data;
 
         if (firstRequest) {
-            data.append(QString("{ \"path\": \"%1\", \"recursive\": false ,\"include_deleted\": false }").arg(path));
+            data.append(QString("{ \"path\": \"%1\", \"recursive\": false ,\"include_deleted\": false }").arg(path).toUtf8());
             firstRequest = false;
         } else {
             request.setUrl(QUrl("https://api.dropboxapi.com/2/files/list_folder/continue"));
-            data.append(QString("{ \"cursor\": \"%1\" }").arg(cursor));
+            data.append(QString("{ \"cursor\": \"%1\" }").arg(cursor).toUtf8());
         }
         QNetworkReply *reply = nam->post(request, data);
 
@@ -158,6 +167,12 @@ Dropbox::readdir(QString path, QStringList &errors)
         QEventLoop loop;
         connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
         loop.exec();
+
+        // oops, no dice
+        if (reply->error() != 0) {
+            errors << reply->errorString();
+            return returning;
+        }
 
         // did we get a good response ?
         QByteArray r = reply->readAll();

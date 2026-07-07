@@ -34,10 +34,9 @@ DeviceConfiguration::DeviceConfiguration()
 {
     // just set all to empty!
     type=0;
-    defaultString="";
     wheelSize=2100;
     postProcess=0;
-    stridelength=80;
+    stridelength=0;
     controller = NULL;
     virtualPowerDefinitionString = "";
 }
@@ -110,15 +109,10 @@ DeviceConfigurations::readConfig()
             configStr = QString("%1%2").arg(GC_DEV_STRIDE).arg(i+1);
             configVal = appsettings->value(NULL, configStr);
             Entry.stridelength = configVal.toInt();
-            if (Entry.stridelength == 0) Entry.stridelength = 78; // default to 78cm
 
             configStr = QString("%1%2").arg(GC_DEV_PROF).arg(i+1);
             configVal = appsettings->value(NULL, configStr);
             Entry.deviceProfile = configVal.toString();
-
-            configStr = QString("%1%2").arg(GC_DEV_DEF).arg(i+1);
-            configVal = appsettings->value(NULL, configStr);
-            Entry.defaultString = configVal.toString();
 
             configStr = QString("%1%2").arg(GC_DEV_VIRTUAL).arg(i+1);
             configVal = appsettings->value(NULL, configStr);
@@ -167,10 +161,6 @@ DeviceConfigurations::writeConfig(QList<DeviceConfiguration> Configuration)
         configStr = QString("%1%2").arg(GC_DEV_PROF).arg(i+1);
         appsettings->setValue(configStr, Configuration.at(i).deviceProfile);
 
-        // default string
-        configStr = QString("%1%2").arg(GC_DEV_DEF).arg(i+1);
-        appsettings->setValue(configStr, Configuration.at(i).defaultString);
-
         // virtual post Process and definition string
         VirtualPowerTrainerManager& vptm = Configuration.at(i).controller->virtualPowerTrainerManager;
 
@@ -178,7 +168,7 @@ DeviceConfigurations::writeConfig(QList<DeviceConfiguration> Configuration)
         bool isPredefinedPostProcess = vptm.IsPredefinedVirtualPowerTrainerIndex(postProcess);
 
         int postProcessStoreValue = postProcess;
-        QString s = "";
+        QString s = Configuration.at(i).virtualPowerDefinitionString;
 
         if (!isPredefinedPostProcess) {
             postProcessStoreValue = 0;

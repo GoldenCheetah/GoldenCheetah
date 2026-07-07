@@ -26,7 +26,6 @@
 #include "SmallPlot.h"
 #include "Context.h"
 #include "Athlete.h"
-#include "Zones.h"
 #include "Settings.h"
 #include "Colors.h"
 #include "Units.h"
@@ -36,20 +35,21 @@
 #include "ErgFile.h"
 #include "LocationInterpolation.h"
 
-//#include <QtWebChannel>
-//#include <QWebEngineProfile>
-
 // overlay helper
-#include "TabView.h"
+#include "AbstractView.h"
 #include "GcOverlayWidget.h"
 #include "IntervalSummaryWindow.h"
+#include "HelpWhatsThis.h"
 
 // declared in main, we only want to use it to get QStyle
 extern QApplication *application;
 
 LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(context), context(context)
 {
-     // Connect signal to receive updates on lat/lon for ploting on map.
+    HelpWhatsThis *helpContents = new HelpWhatsThis(this);
+    this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::ChartTrain_LiveMap));
+
+    // Connect signal to receive updates on lat/lon for ploting on map.
     connect(context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
     connect(context, SIGNAL(stop()), this, SLOT(stop()));
     connect(context, SIGNAL(ergFileSelected(ErgFile*)), this, SLOT(ergFileSelected(ErgFile*)));
@@ -71,23 +71,30 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
 
     // Chart settings
     QWidget * settingsWidget = new QWidget(this);
+    HelpWhatsThis *helpConfig = new HelpWhatsThis(settingsWidget);
+    settingsWidget->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartTrain_LiveMap));
     settingsWidget->setContentsMargins(0,0,0,0);
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 
     QFormLayout* commonLayout = new QFormLayout(settingsWidget);
 
-    QString sValue = "";
     customUrlLabel = new QLabel(tr("OSM Base URL"));
     customUrl = new QLineEdit(this);
-    customUrl->setFixedWidth(300);
+    customUrl->setFixedWidth(600);
 
-    if (customUrl->text() == "") {
-        customUrl->setText("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
-    }
+    customZoomLabel = new QLabel(tr("Initial Zoom"));
+    customZoom = new QSpinBox(this);
+    customZoom->setFixedWidth(60);
+    customZoom->setRange(0, 20); // Set the range for zoom levels
+
+    if (customUrl->text().trimmed().isEmpty()) customUrl->setText("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
     commonLayout->addRow(customUrlLabel, customUrl);
 
     connect(customUrl, SIGNAL(returnPressed()), this, SLOT(userUrl()));
 
+    if (customZoom->text().trimmed().isEmpty()) customZoom->setValue(15);
+    commonLayout->addRow(customZoomLabel, customZoom);
+    
     applyButton = new QPushButton(application->style()->standardIcon(QStyle::SP_ArrowRight), tr("Apply changes"), this);
     commonLayout->addRow(applyButton);
 
@@ -103,11 +110,10 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
 
     // set webview for map
     view = new QWebEngineView(this);
-    webPage = view->page();
+    webPage = new QWebEnginePage(context->webEngineProfile);
     view->setPage(webPage);
 
-    view->setContentsMargins(0,0,0,0);
-    view->page()->view()->setContentsMargins(0,10,0,0);
+    view->setContentsMargins(0,10,0,0);
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     view->setAcceptDrops(false);
     layout->addWidget(view);
@@ -121,22 +127,20 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
 
 void LiveMapWebPageWindow::userUrl()
 {
-    // add http:// if scheme is missing
-    QRegExp hasscheme("^[^:]*://.*");
-    QString url = rCustomUrl->text();
-    if (!hasscheme.exactMatch(url)) url = "http://" + url;
+    QString url = customUrl->text();
     view->setZoomFactor(dpiXFactor);
     view->setUrl(QUrl(url));
 }
 
 LiveMapWebPageWindow::~LiveMapWebPageWindow()
 {
+  if (view) delete view->page();
 }
 
 void LiveMapWebPageWindow::ergFileSelected(ErgFile* f)
 {
     // rename window to workout name and draw route if data exists
-    if (f && f->filename != "" )
+    if (f && f->filename() != "" )
     {
         setIsBlank(false);
         // these values need extended precision or place marker jumps around.
@@ -149,7 +153,8 @@ void LiveMapWebPageWindow::ergFileSelected(ErgFile* f)
         }
         else
         {
-            QString js = ("<div><script type=\"text/javascript\">initMap (" + startingLat + ", " + startingLon + ",13);</script></div>\n");
+            QString sZoom = QString::number(zoom());
+            QString js = ("<div><script type=\"text/javascript\">initMap (" + startingLat + ", " + startingLon + ", " + sZoom + ");</script></div>\n");
             routeLatLngs = "[";
             QString code = "";
 
@@ -171,6 +176,7 @@ void LiveMapWebPageWindow::ergFileSelected(ErgFile* f)
             // So we create divs with the 2 methods we need to run when the document loads
             code = QString("showRoute (" + routeLatLngs + ");");
             js += ("<div><script type=\"text/javascript\">" + code + "</script></div>\n");
+            if (customUrl->text().trimmed().isEmpty()) customUrl->setText("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
             createHtml(customUrl->text(), js);
             view->page()->setHtml(currentPage);
         }
@@ -225,6 +231,9 @@ void LiveMapWebPageWindow::configChanged(qint32)
 // Update position on the map when telemetry changes.
 void LiveMapWebPageWindow::telemetryUpdate(RealtimeData rtd)
 {
+    if (!isVisible())
+        return;
+
     QString code = "";
     geolocation geoloc(rtd.getLatitude(), rtd.getLongitude(), rtd.getAltitude());
     if (geoloc.IsReasonableGeoLocation()) {
@@ -233,7 +242,8 @@ void LiveMapWebPageWindow::telemetryUpdate(RealtimeData rtd)
         code = "";
         if (!markerIsVisible)
         {
-            code = QString("centerMap (" + sLat + ", " + sLon + ", " + "15" + ");");
+            QString sZoom = QString::number(zoom());
+            code += QString("centerMap (" + sLat + ", " + sLon + ", " + sZoom + ");");
             code += QString("showMyMarker (" + sLat + ", " + sLon + ");");
             markerIsVisible = true;
         }
@@ -251,6 +261,7 @@ void LiveMapWebPageWindow::createHtml(QString sBaseUrl, QString autoRunJS)
     currentPage = "";
 
     currentPage = QString("<html><head>\n"
+        "<meta name=\"referrer\" content=\"strict-origin-when-cross-origin\">\n"
         "<meta name=\"viewport\" content=\"initial-scale=1.0, user-scalable=yes\"/> \n"
         "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\"/>\n"
         "<title>GoldenCheetah LiveMap - TrainView</title>\n"

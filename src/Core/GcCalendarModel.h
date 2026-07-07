@@ -325,9 +325,10 @@ public:
             QVector<int> *arr = dateToRows.value(date(proxyIndex), NULL);
             QStringList strings;
 
-            if (arr)
+            if (arr) {
                 foreach (int i, *arr)
                     filenames << sourceModel()->data(index(i, filenameIndex, QModelIndex())).toString();
+            }
 
 #ifdef GC_HAVE_ICAL
             // fold in planned workouts
@@ -347,9 +348,10 @@ public:
             QVector<int> *arr = dateToRows.value(date(proxyIndex), NULL);
             QStringList strings;
 
-            if (arr)
+            if (arr) {
                 foreach (int i, *arr)
                     strings << sourceModel()->data(index(i, textIndex, QModelIndex())).toString();
+            }
 
 #ifdef GC_HAVE_ICAL
             // fold in planned workouts
@@ -369,7 +371,8 @@ public:
             QDate today = date(proxyIndex);
             if (today.month() != month &&
                 (today.addDays(1).month() == month || today.addDays(-1).month() == month))
-                return QString("%1 %2").arg(today.day()).arg(QDate::shortMonthName(today.month()));
+                return QString("%1 %2").arg(today.day()).arg(
+                        QLocale::system().monthName(today.month(), QLocale::ShortFormat));
             else
                 return QString("%1").arg(today.day());
             }
@@ -395,7 +398,7 @@ public:
 
         if (role == Qt::DisplayRole) {
             if (orientation == Qt::Horizontal) {
-                return QDate::shortDayName(section+1);
+                return QLocale::system().dayName(section+1, QLocale::ShortFormat);
             } else {
                 return QString("%1").arg(date(index(section,0)).weekNumber());
             }

@@ -20,10 +20,15 @@
 #include "Athlete.h"
 #include "Context.h"
 #include "RideCache.h"
-#include "Tab.h"
-#include "TabView.h"
+#include "AthleteTab.h"
+#include "AbstractView.h"
+#include "SpecialFields.h"
 
 #include "RideCacheModel.h"
+
+
+static constexpr int highestFixed = 6;
+
 
 RideCacheModel::RideCacheModel(Context *context, RideCache *cache) : QAbstractTableModel(cache), context(context), rideCache(cache)
 {
@@ -75,16 +80,17 @@ RideCacheModel::data(const QModelIndex &index, int role) const
         case 2 : return item->dateTime;
         case 3 : return item->present;
         case 4 : return item->color.name();
-        case 5 : return item->isRun;
+        case 5 : return item->planned;
+        case 6 : return item->isdirty;
 
         default:
         {
             // from here we're either a metric or meta
             // lets work that out ...
-            if (index.column()-5 < factory->metricCount()) {
+            if (index.column() - highestFixed < factory->metricCount()) {
 
                 // is a metric
-                int i=index.column()-5;
+                int i=index.column()-highestFixed;
 
                 // unpack metric value into ridemetric and use it to get a stringified
                 // version using the right metric/imperial conversion
@@ -115,7 +121,7 @@ RideCacheModel::data(const QModelIndex &index, int role) const
             } else {
 
                 // is a metadata
-                int i = index.column() -5 - factory->metricCount();
+                int i = index.column() -highestFixed - factory->metricCount();
                 return item->getText(metadata[i].name, "");
             }
         }
@@ -160,12 +166,21 @@ RideCacheModel::endRemove(int)
 bool 
 RideCacheModel::setHeaderData (int section, Qt::Orientation orientation, const QVariant &value, int role)
 {
-    if (orientation == Qt::Horizontal && role == Qt::EditRole) {
-        headings_[section] = value.toString();
-        emit headerDataChanged (Qt::Horizontal, section, section);
-        return true;
+    if (orientation != Qt::Horizontal) {
+        return false;
     }
-    return false;
+    bool changed = false;
+    if (role == Qt::EditRole) {
+        headings_[section] = value.toString();
+        changed = true;
+    } else if (role == Qt::UserRole + 1) {
+        headingsTechnical_[section] = value.toString();
+        changed = true;
+    }
+    if (changed) {
+        emit headerDataChanged(Qt::Horizontal, section, section);
+    }
+    return changed;
 }
 
 QVariant 
@@ -173,6 +188,8 @@ RideCacheModel::headerData(int section, Qt::Orientation orientation, int role) c
 {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
         return headings_[section];
+    } else if (orientation == Qt::Horizontal && role == Qt::UserRole + 1) {
+        return headingsTechnical_[section];
     }
 
     // nought (importanty including 0 for Qt::SizeHintRole)
@@ -195,9 +212,10 @@ RideCacheModel::configChanged(qint32)
     // 2    QDateTime dateTime;
     // 3    QString present;
     // 4    QColor color;
-    // 5    bool isRun;
+    // 5    bool planned;
+    // 6    bool dirty;
 
-    columns_ = 5 + factory->metricCount() + metadata.count();
+    columns_ = highestFixed + factory->metricCount() + metadata.count();
     headings_.clear();
 
     for (int section=0; section<columns_; section++) {
@@ -208,28 +226,30 @@ RideCacheModel::configChanged(qint32)
             case 2 : headings_<< QString("ride_date"); break;
             case 3 : headings_<< QString("Data"); break;
             case 4 : headings_<< QString("color"); break;
-            case 5 : headings_<< QString("isRun"); break;
+            case 5 : headings_<< QString("planned"); break;
+            case 6 : headings_<< QString("dirty"); break;
 
             default:
             {
                 // from here we're either a metric or meta
                 // lets work that out ...
-                if (section-5 < factory->metricCount()) {
+                if (section-highestFixed < factory->metricCount()) {
 
                     // is a metric
-                    int i=section-5;
+                    int i=section-highestFixed;
                     headings_<< QString("%1").arg(factory->metricName(i));
 
                 } else {
 
                     // is a metadata
-                    int i= section -5 - factory->metricCount();
-                    headings_<< QString("%1").arg(GlobalContext::context()->specialFields.makeTechName(metadata[i].name));
+                    int i= section - highestFixed - factory->metricCount();
+                    headings_<< QString("%1").arg(SpecialFields::getInstance().makeTechName(metadata[i].name));
                 }
             }
             break;
         }
     }
+    headingsTechnical_ = headings_;
 
     headerDataChanged (Qt::Horizontal, 0, columns_-1);
 

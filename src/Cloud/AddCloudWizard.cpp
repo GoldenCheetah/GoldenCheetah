@@ -93,7 +93,7 @@ AddClass::AddClass(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
     setLayout(layout);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(int)), this, SLOT(clicked(int)));
+    connect(mapper, &QSignalMapper::mappedInt, this, &AddClass::clicked);
 
     // Activities
     QFont font;
@@ -110,12 +110,14 @@ AddClass::AddClass(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
     mapper->setMapping(p, CloudService::Measures);
     layout->addWidget(p);
 
+#ifdef GC_HAVE_ICAL
     // Calendar
     p = new QCommandLinkButton(tr("Calendar"), tr("Sync planned workouts to WebDAV and CalDAV calendars like Google Calendar."));
     p->setStyleSheet(QString("font-size: %1px;").arg(font.pointSizeF() * dpiXFactor));
     connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
     mapper->setMapping(p, CloudService::Calendar);
     layout->addWidget(p);
+#endif
 
     setFinalPage(false);
 }
@@ -147,7 +149,7 @@ AddService::AddService(AddCloudWizard *parent) : QWizardPage(parent), wizard(par
     scrollarea->setWidget(buttons);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(QString)), this, SLOT(clicked(QString)));
+    connect(mapper, &QSignalMapper::mappedString, this, &AddService::clicked);
 
     layout->addWidget(scrollarea);
 
@@ -175,7 +177,7 @@ AddService::initializePage()
         const CloudService *s = factory.service(name);
 
         // only ones with the capability we need.
-        if (s->type() != wizard->type) continue;
+        if (!(s->type() & wizard->type)) continue;
 
         QCommandLinkButton *p = new QCommandLinkButton(s->uiName(), s->description(), this);
         p->setStyleSheet(QString("font-size: %1px;").arg(font.pointSizeF() * dpiXFactor));
@@ -472,7 +474,7 @@ AddAthlete::AddAthlete(AddCloudWizard *parent) : QWizardPage(parent), wizard(par
     scrollarea->setWidget(buttons);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(int)), this, SLOT(clicked(int)));
+    connect(mapper, &QSignalMapper::mappedInt, this, &AddAthlete::clicked);
 
     layout->addWidget(scrollarea);
 
@@ -529,7 +531,7 @@ AddSettings::AddSettings(AddCloudWizard *parent) : QWizardPage(parent), wizard(p
     foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
 
         // only add text fields
-        if (field.type < 3) metaCombo->addItem(field.name, QVariant(field.name));
+        if (field.isTextField()) metaCombo->addItem(field.name, QVariant(field.name));
     }
 
     folderLabel = new QLabel(tr("Folder"));
@@ -584,7 +586,7 @@ AddSettings::initializePage()
         browse->show(); folder->show(); folderLabel->show();
         folder->setText(wizard->cloudService->getSetting(cname, "").toString());
     }
-    if (wizard->cloudService->capabilities() & CloudService::Query) {
+    if (wizard->cloudService->capabilities() & CloudService::Download) {
         QString value = wizard->cloudService->getSetting(wizard->cloudService->syncOnStartupSettingName(), "false").toString();
         syncStartup->setChecked(value == "true");
         syncStartup->show();
@@ -690,7 +692,7 @@ AddFinish::initializePage()
             case CloudService::Local3:
             case CloudService::Local4:
             case CloudService::Local5:
-            case CloudService::Local6: label=want.value().split(QRegExp("[<>/]")).last(); break;
+            case CloudService::Local6: label=want.value().split(QRegularExpression("[<>/]")).last(); break;
             case CloudService::Consent:
             case CloudService::DefaultURL: break;
         }

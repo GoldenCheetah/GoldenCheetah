@@ -21,17 +21,18 @@
 #include "GoldenCheetah.h"
 
 #include "Context.h"
-#include "Season.h"
 #include "RideMetric.h"
 #include "LTMSettings.h"
 #include "PDModel.h"
 
 #include "SearchFilterBox.h"
+#include "ActionButtonBox.h"
 
 #include <QDir>
 #include <QFileDialog>
 #include <QtGui>
 #include <QTableWidget>
+#include <QTreeWidget>
 #include <QButtonGroup>
 #include <QStackedWidget>
 #include <QTextEdit>
@@ -140,12 +141,7 @@ class LTMTool : public QWidget
 
         // custom tab:
         QTableWidget *customTable;
-        QPushButton *editCustomButton, *addCustomButton, *deleteCustomButton;
-#ifndef Q_OS_MAC
-        QToolButton *upCustomButton, *downCustomButton;
-#else
-        QPushButton *upCustomButton, *downCustomButton;
-#endif
+        ActionButtonBox *customActionButtons;
         void refreshCustomTable(int indexSelectedItem = -1); // refreshes the table from LTMSettings
 };
 
@@ -234,7 +230,8 @@ class EditMetricDetailDialog : public QDialog
                   *curveSymbol;
         QCheckBox *stack;
         QPushButton *curveColor;
-        QCheckBox *fillCurve;
+        QCheckBox *fillCurve, *ignoreZeros;
+        QLabel *ignoreZerosLbl;
         QCheckBox *labels;
         QDoubleSpinBox *showBest,
                        *showLowest,

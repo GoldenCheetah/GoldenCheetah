@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2020 Mark Liversedge <liversedge@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #include "Context.h"
 #include "NewSideBar.h"
 #include "Colors.h"
@@ -6,12 +24,12 @@ static constexpr int gl_itemwidth = 70;
 static constexpr int gl_itemheight = 50;
 static constexpr int gl_margin = 0;
 
-NewSideBar::NewSideBar(Context *context, QWidget *parent) : QWidget(parent), context(context)
+NewSideBar::NewSideBar(QWidget *parent) : QWidget(parent)
 
 {
     setFixedWidth(gl_itemwidth *dpiXFactor);
     setAutoFillBackground(true);
-    lastid=0;
+    lastid=GcSideBarBtnId::NO_BUTTON_SET;
 
     QVBoxLayout *mainlayout = new QVBoxLayout(this);
     mainlayout->setSpacing(0);
@@ -28,25 +46,25 @@ NewSideBar::NewSideBar(Context *context, QWidget *parent) : QWidget(parent), con
     layout->setSpacing(0);
     layout->setContentsMargins(0,gl_margin *dpiXFactor,0,gl_margin*dpiYFactor);
 
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), &GlobalContext::configChanged, this, &NewSideBar::configChanged);
     configChanged(0);
 
     show();
 }
 
 void
-NewSideBar::clicked(int id)
+NewSideBar::clicked(GcSideBarBtnId id)
 {
     // un selectable item was clicked (e.g. symc or settings)
     emit itemClicked(id);
 }
 
 void
-NewSideBar::selected(int id)
+NewSideBar::selected(GcSideBarBtnId id)
 {
     // we selected one, so need to set it selected
     // and deselect everyone else
-    QMapIterator<int,NewSideBarItem*>i(items);
+    QMapIterator<GcSideBarBtnId,NewSideBarItem*>i(items);
     while(i.hasNext()) {
         i.next();
         if (i.key() == id) i.value()->setSelected(true);
@@ -56,15 +74,15 @@ NewSideBar::selected(int id)
     emit itemSelected(id);
 }
 
-int
-NewSideBar::addItem(QImage icon, QString name, int id)
+GcSideBarBtnId
+NewSideBar::addItem(QImage icon, const QString& name, GcSideBarBtnId id, const QString& whatsThisText)
 {
-    // allocated an id
-    if (id == -1) id=lastid++;
-
-    NewSideBarItem *add = new NewSideBarItem(this, id, icon, name);
-    layout->addWidget(add);
-    items.insert(id, add);
+    if (id != GcSideBarBtnId::NO_BUTTON_SET) {
+        NewSideBarItem *add = new NewSideBarItem(this, id, icon, name);
+        if (!whatsThisText.isEmpty()) add->setWhatsThis(whatsThisText);
+        layout->addWidget(add);
+        items.insert(id, add);
+    }
 
     return id;
 }
@@ -79,14 +97,14 @@ NewSideBar::addStretch()
 
 // is it shown, is it usable?
 void
-NewSideBar::setItemVisible(int id, bool x)
+NewSideBar::setItemVisible(GcSideBarBtnId id, bool x)
 {
     NewSideBarItem *item = items.value(id, NULL);
     if (item) item->setVisible(x);
 }
 
 void
-NewSideBar::setItemEnabled(int id, bool x)
+NewSideBar::setItemEnabled(GcSideBarBtnId id, bool x)
 {
     NewSideBarItem *item = items.value(id, NULL);
     if (item) item->setEnabled(x);
@@ -94,14 +112,14 @@ NewSideBar::setItemEnabled(int id, bool x)
 
 // can we select it, select it by program?
 void
-NewSideBar::setItemSelectable(int id, bool x)
+NewSideBar::setItemSelectable(GcSideBarBtnId id, bool x)
 {
     NewSideBarItem *item = items.value(id, NULL);
     if (item) item->setSelectable(x);
 }
 
 void
-NewSideBar::setItemSelected(int id, bool x)
+NewSideBar::setItemSelected(GcSideBarBtnId id, bool x)
 {
     NewSideBarItem *item = items.value(id, NULL);
     if (item) item->setSelected(x);
@@ -130,7 +148,7 @@ NewSideBar::configChanged(qint32)
     middle->setStyleSheet(style);
 }
 
-NewSideBarItem::NewSideBarItem(NewSideBar *sidebar, int id, QImage icon, QString name) : QWidget(sidebar), sidebar(sidebar), id(id), icon(icon), name(name)
+NewSideBarItem::NewSideBarItem(NewSideBar *sidebar, GcSideBarBtnId id, QImage icon, QString name) : QWidget(sidebar), sidebar(sidebar), id(id), icon(icon), name(name)
 {
     clicked = selected = false;
     selectable = enabled = true;
@@ -141,7 +159,7 @@ NewSideBarItem::NewSideBarItem(NewSideBar *sidebar, int id, QImage icon, QString
 
     // trap events
     installEventFilter(this);
-    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), &GlobalContext::configChanged, this, &NewSideBarItem::configChanged);
 
     configChanged(0);
 
@@ -217,8 +235,9 @@ static QImage imageRGB(QImage &source, QColor target)
 void
 NewSideBarItem::configChanged(qint32)
 {
-    QColor col = GColor(CCHROME);
-    QString style=QString("QWidget { background: rgb(%1,%2,%3); }").arg(col.red()).arg(col.green()).arg(col.blue());
+    // set background colors
+    bg_normal = GColor(CCHROME);
+    QString style = QString("QWidget { background: rgb(%1,%2,%3); }").arg(bg_normal.red()).arg(bg_normal.green()).arg(bg_normal.blue());
     setStyleSheet(style);
 
     // set foreground colors
@@ -231,22 +250,12 @@ NewSideBarItem::configChanged(qint32)
     if (dark) fg_disabled = QColor(80,80,80);
     else fg_disabled = QColor(180,180,180);
 
-    // set background colors
-    col=GColor(CCHROME);
-    bool isblack = (col == QColor(Qt::black)); // e.g. mustang theme
-    bg_normal = col;
-
     // on select
-    bg_select =GColor(CCHROME);
-    if (dark) bg_select = bg_select.lighter(200);
-    else bg_select = bg_select.darker(200);
-    if (isblack) bg_select = QColor(30,30,30);
+    bg_select = GCColor::selectedColor(bg_normal);
     fg_select = GCColor::invertColor(bg_select);
 
     // on hover
-    bg_hover =GColor(CCHROME);
-    if (dark) bg_hover = QColor(Qt::darkGray);
-    else bg_hover = QColor(Qt::lightGray);
+    bg_hover =GColor(CHOVER);
 
     iconNormal = QPixmap::fromImage(imageRGB(icon, fg_normal), Qt::ColorOnly|Qt::PreferDither|Qt::DiffuseAlphaDither);
     iconNormal = iconNormal.scaled(24*dpiXFactor, 24*dpiXFactor, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);

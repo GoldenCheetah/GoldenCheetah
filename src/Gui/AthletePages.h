@@ -24,7 +24,6 @@
 #include <QLineEdit>
 #include <QComboBox>
 #include <QGroupBox>
-#include <QCalendarWidget>
 #include <QPushButton>
 #include <QTreeWidget>
 #include <QTableView>
@@ -33,6 +32,7 @@
 #include <QListWidget>
 #include <QList>
 #include <QFileDialog>
+#include <QFormLayout>
 #include "Zones.h"
 #include "HrZones.h"
 #include "PaceZones.h"
@@ -42,33 +42,31 @@
 #include <QValidator>
 #include <QGridLayout>
 #include <QProgressDialog>
-#include <QFontComboBox>
+#include <QDialogButtonBox>
 #include "DeviceTypes.h"
 #include "DeviceConfiguration.h"
 #include "RideMetadata.h"
 #include "DataProcessor.h"
 #include "Season.h"
-#include "SeasonParser.h"
 #include "RideAutoImportConfig.h"
 #include "RemoteControl.h"
 #include "Measures.h"
+#include "StyledItemDelegates.h"
 
 class MeasuresPage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
         MeasuresPage(QWidget *parent, Context *context, MeasuresGroup *measuresGroup);
+        ~MeasuresPage();
+
         qint32 saveClicked();
 
-    public slots:
-        void unitChanged(int currentIndex);
-        void addOReditClicked();
+    private slots:
+        void addClicked();
         void deleteClicked();
-        void rangeEdited();
-        void rangeSelectionChanged();
+        void rangeChanged(const QModelIndex &topLeft);
 
     private:
         Context *context;
@@ -76,30 +74,44 @@ class MeasuresPage : public QWidget
         bool metricUnits;
         QList<Measure> measures;
 
-        QLabel *dateLabel;
-        QDateTimeEdit *dateTimeEdit;
-
-        QVector<QLabel*> valuesLabel;
-        QVector<QDoubleSpinBox*> valuesEdit;
-
-        QLabel *commentlabel;
-        QLineEdit *comment;
+        QList<DoubleSpinBoxEditDelegate*> valueDelegates;
+        NoEditDelegate dateTimeDelegate;
+        NoEditDelegate sourceDelegate;
+        NoEditDelegate origSourceDelegate;
 
         QTreeWidget *measuresTree;
-        QPushButton *addButton, *updateButton, *deleteButton;
+
+        void fillItemFromMeasures(int rnum, QTreeWidgetItem *item) const;
 
     struct {
         unsigned long fingerprint;
     } b4;
+};
+
+class WheelSizeCalculator : public QDialog
+{
+    Q_OBJECT
+
+    public:
+        WheelSizeCalculator(QWidget *parent = nullptr);
+
+        int getWheelSize() const;
+
+    private:
+        QComboBox *rimSizeCombo;
+        QComboBox *tireSizeCombo;
+        QLabel *wheelSizeLabel;
+        QDialogButtonBox *buttonBox;
+
+        int wheelSize = -1;
 
     private slots:
+        void calc();
 };
 
 class AboutRiderPage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
         AboutRiderPage(QWidget *parent, Context *context);
@@ -116,17 +128,13 @@ class AboutRiderPage : public QWidget
         QLineEdit *nickname;
         QDateEdit *dob;
         QComboBox *sex;
-        QLabel *weightlabel;
         QDoubleSpinBox *weight;
-        QLabel *heightlabel;
         QDoubleSpinBox *height;
         QPushButton *avatarButton;
-        QPixmap     avatar;
+        QPixmap avatar;
         QComboBox *crankLengthCombo;
-        QComboBox *rimSizeCombo;
-        QComboBox *tireSizeCombo;
-        QLineEdit *wheelSizeEdit;
-
+        QSpinBox *wheelSizeEdit;
+        QPushButton *wheelSizeCalculatorButton;
 
     struct {
         double weight;
@@ -136,15 +144,12 @@ class AboutRiderPage : public QWidget
     } b4;
 
     private slots:
-        void calcWheelSize();
-        void resetWheelSize();
+        void openWheelSizeCalculator();
 };
 
 class AboutModelPage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
         AboutModelPage(Context *context);
@@ -153,27 +158,29 @@ class AboutModelPage : public QWidget
     private:
         Context *context;
 
-        QLabel *wbaltaulabel;
         QSpinBox *wbaltau;
-        QLabel *perfManSTSLabel;
-        QLabel *perfManLTSLabel;
-        QLineEdit *perfManSTSavg;
-        QLineEdit *perfManLTSavg;
-        QIntValidator *perfManSTSavgValidator;
-        QIntValidator *perfManLTSavgValidator;
+        QSpinBox *perfManSTSavg;
+        QSpinBox *perfManLTSavg;
         QCheckBox *showSBToday;
+        QPushButton *resetButton;
+
+        static const int defaultWbaltau = 300;
+        static const int defaultSTSavg = 7;
+        static const int defaultLTSavg = 42;
+        static const int defaultSBToday = 0;
 
     struct {
         int lts,sts;
     } b4;
 
+    private slots:
+        void restoreDefaults();
+        void anyChanged();
 };
 
 class BackupPage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
         BackupPage(Context *context);
@@ -183,12 +190,10 @@ class BackupPage : public QWidget
         Context *context;
 
         QSpinBox *autoBackupPeriod;
-        QLineEdit *autoBackupFolder;
-        QPushButton *autoBackupFolderBrowse;
+        DirectoryPathWidget *autoBackupFolder;
 
     private slots:
-
-        void chooseAutoBackupFolder();
+        void backupNow();
 };
 
 class CredentialsPage : public QScrollArea
@@ -213,7 +218,6 @@ class CredentialsPage : public QScrollArea
 
         Context *context;
         QTreeWidget *accounts;
-        QPushButton *addButton, *editButton, *deleteButton;
 
 };
 
@@ -223,68 +227,90 @@ class CredentialsPage : public QScrollArea
 class SchemePage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
         SchemePage(Zones *zones);
+
         ZoneScheme getScheme();
         qint32 saveClicked();
 
-    public slots:
+    private slots:
         void addClicked();
         void deleteClicked();
-        void renameClicked();
 
     private:
         Zones *zones;
         QTreeWidget *scheme;
-        QPushButton *addButton, *renameButton, *deleteButton;
+        SpinBoxEditDelegate zoneFromDelegate;
 };
+
 
 class CPPage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
         CPPage(Context *context, Zones *zones, SchemePage *schemePage);
-        QComboBox *useCPForFTPCombo;
+
         qint32 saveClicked();
 
-    struct {
-        int cpforftp;
-    } b4;
+        QComboBox *useModel;
+        QComboBox *useCPForFTPCombo;
+
+        struct {
+            int modelIdx;
+            int cpforftp;
+        } b4;
 
     public slots:
         void addClicked();
-        void editClicked();
         void deleteClicked();
         void defaultClicked();
-        void rangeEdited();
         void rangeSelectionChanged();
         void addZoneClicked();
         void deleteZoneClicked();
         void zonesChanged();
-        void initializeRanges();
+        void initializeRanges(int selectIndex = -1);
+        void reInitializeRanges();
+
+    private slots:
+        void rangeChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles = QList<int>());
+
+        void review();
 
     private:
         bool active;
 
-        QDateEdit *dateEdit;
-        QDoubleSpinBox *cpEdit;
-        QDoubleSpinBox *ftpEdit;
-        QDoubleSpinBox *wEdit;
-        QDoubleSpinBox *pmaxEdit;
+        DateEditDelegate dateDelegate;
+        SpinBoxEditDelegate cpDelegate;
+        SpinBoxEditDelegate aetDelegate;
+        SpinBoxEditDelegate ftpDelegate;
+        SpinBoxEditDelegate wDelegate;
+        SpinBoxEditDelegate pmaxDelegate;
+        NoEditDelegate statusDelegate;
+
+        SpinBoxEditDelegate zoneFromDelegate;
 
         Context *context;
         Zones *zones_;
         SchemePage *schemePage;
         QTreeWidget *ranges;
         QTreeWidget *zones;
-        QPushButton *addButton, *updateButton, *deleteButton;
-        QPushButton *addZoneButton, *deleteZoneButton, *defaultButton;
+        QPushButton *reviewButton;
+        QPushButton *defaultButton;
+        QPushButton *newZoneRequired;
+
+        bool getValuesFor(const QDate &date, bool allowDefaults, int &cp, int &aetp, int &ftp, int &wprime, int &pmax, int &estOffset, bool &defaults, QDate *startDate = nullptr) const;
+        void setEstimateStatus(QTreeWidgetItem *item);
+        void setRangeData(QModelIndex modelIndex, int column, QVariant data);
+        bool needsNewRange() const;
+        void mkReviewRow(QGridLayout *grid, int row, int labelId, const QString &unit, int cur, int est, QCheckBox *&accept, const QString &infoText = QString()) const;
+        void connectReviewDialogApplyButton(QVector<QCheckBox*> checkboxes, QPushButton *applyButton) const;
+        bool modelHasFtp() const;
+        bool modelHasPmax() const;
+        QWidget *mkInfoLabel(int labelId, const QString &infoText = QString()) const;
+        QString getText(int id, int value = 0) const;
+        bool addDialogManual(QDate &date, int &cp, int &aetp, int &wprime, int &ftp, int &pmax) const;
 };
 
 class ZonePage : public QWidget
@@ -310,21 +336,20 @@ class ZonePage : public QWidget
 
     private:
 
-        static const int nSports = 2;
-
         QLabel *sportLabel;
         QComboBox *sportCombo;
 
         //ZoneScheme scheme;
-        Zones *zones[nSports];
-        quint16 b4Fingerprint[nSports]; // how did it start ?
-        SchemePage *schemePage[nSports];
-        CPPage *cpPage[nSports];
+        QHash<QString, Zones*> zones;
+        QHash<QString, quint16> b4Fingerprint; // how did it start ?
+        QHash<QString, SchemePage*> schemePage;
+        QHash<QString, CPPage*> cpPage;
 
     private slots:
-        void changeSport(int i);
+        void changeSport();
 
 };
+
 
 //
 // Heartrate Zones
@@ -332,41 +357,38 @@ class ZonePage : public QWidget
 class HrSchemePage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
         HrSchemePage(HrZones *hrZones);
+
         HrZoneScheme getScheme();
         qint32 saveClicked();
 
-    public slots:
+    private slots:
         void addClicked();
         void deleteClicked();
-        void renameClicked();
 
     private:
         HrZones *hrZones;
         QTreeWidget *scheme;
-        QPushButton *addButton, *renameButton, *deleteButton;
+
+        SpinBoxEditDelegate ltDelegate;
+        DoubleSpinBoxEditDelegate trimpkDelegate;
 };
 
 
 class LTPage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
         LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage);
 
-    public slots:
+    private slots:
         void addClicked();
-        void editClicked();
         void deleteClicked();
         void defaultClicked();
-        void rangeEdited();
+        void rangeChanged(const QModelIndex &modelIndex);
         void rangeSelectionChanged();
         void addZoneClicked();
         void deleteZoneClicked();
@@ -375,56 +397,48 @@ class LTPage : public QWidget
     private:
         bool active;
 
-        QDateEdit *dateEdit;
-        QDoubleSpinBox *ltEdit;
-        QDoubleSpinBox *restHrEdit;
-        QDoubleSpinBox *maxHrEdit;
+        DateEditDelegate dateDelegate;
+        SpinBoxEditDelegate ltDelegate;
+        SpinBoxEditDelegate aetDelegate;
+        SpinBoxEditDelegate restHrDelegate;
+        SpinBoxEditDelegate maxHrDelegate;
+
+        SpinBoxEditDelegate zoneLoDelegate;
+        DoubleSpinBoxEditDelegate zoneTrimpDelegate;
 
         Context *context;
         HrZones *hrZones;
         HrSchemePage *schemePage;
         QTreeWidget *ranges;
         QTreeWidget *zones;
-        QPushButton *addButton, *updateButton, *deleteButton;
-        QPushButton *addZoneButton, *deleteZoneButton, *defaultButton;
+        QPushButton *defaultButton;
 };
 
 class HrZonePage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
-
         HrZonePage(Context *);
         ~HrZonePage();
         qint32 saveClicked();
 
-    public slots:
-
-
     protected:
-
         Context *context;
 
         QTabWidget *tabs;
 
     private:
-
-        static const int nSports = 2;
-
         QLabel *sportLabel;
         QComboBox *sportCombo;
 
-        HrZones *hrZones[nSports];
-        quint16 b4Fingerprint[nSports]; // how did it start ?
-        HrSchemePage *schemePage[nSports];
-        LTPage *ltPage[nSports];
+        QHash<QString, HrZones*> hrZones;
+        QHash<QString, quint16> b4Fingerprint; // how did it start ?
+        QHash<QString, HrSchemePage*> schemePage;
+        QHash<QString, LTPage*> ltPage;
 
     private slots:
-        
-        void changeSport(int i);
+        void changeSport();
 
 };
 
@@ -434,41 +448,37 @@ class HrZonePage : public QWidget
 class PaceSchemePage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
         PaceSchemePage(PaceZones* paceZones);
+
         PaceZoneScheme getScheme();
         qint32 saveClicked();
 
-    public slots:
+    private slots:
         void addClicked();
         void deleteClicked();
-        void renameClicked();
 
     private:
         PaceZones* paceZones;
         QTreeWidget *scheme;
-        QPushButton *addButton, *renameButton, *deleteButton;
+        SpinBoxEditDelegate fromDelegate;
 };
 
 class CVPage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
         CVPage(PaceZones* paceZones, PaceSchemePage *schemePage);
+
         bool metricPace;
 
-    public slots:
+    private slots:
         void addClicked();
-        void editClicked();
         void deleteClicked();
         void defaultClicked();
-        void rangeEdited();
+        void rangeChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles = QList<int>());
         void rangeSelectionChanged();
         void addZoneClicked();
         void deleteZoneClicked();
@@ -477,15 +487,17 @@ class CVPage : public QWidget
     private:
         bool active;
 
-        QDateEdit *dateEdit;
-        QTimeEdit *cvEdit;
+        DateEditDelegate dateDelegate;
+        TimeEditDelegate cvDelegate;
+        TimeEditDelegate aetDelegate;
+
+        TimeEditDelegate zoneFromDelegate;
 
         PaceZones* paceZones;
         PaceSchemePage *schemePage;
         QTreeWidget *ranges;
         QTreeWidget *zones;
-        QPushButton *addButton, *updateButton, *deleteButton;
-        QPushButton *addZoneButton, *deleteZoneButton, *defaultButton;
+        QPushButton *defaultButton;
         QLabel *per;
 };
 
@@ -543,7 +555,6 @@ class SeasonsPage : public QWidget
         void addClicked();
         void upClicked();
         void downClicked();
-        void renameClicked();
         void deleteClicked();
         void clearEdit();
         qint32 saveClicked();
@@ -569,38 +580,26 @@ class SeasonsPage : public QWidget
 class AutoImportPage : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
+        AutoImportPage(Context *context);
 
-        AutoImportPage(Context *);
         qint32 saveClicked();
         void addRuleTypes(QComboBox *p);
 
     public slots:
-
         void addClicked();
         void upClicked();
         void downClicked();
         void deleteClicked();
-        void browseImportDir();
-
 
     private:
-
         Context *context;
         QList<RideAutoImportRule> rules;
 
         QTreeWidget *fields;
-
-#ifndef Q_OS_MAC
-        QToolButton *upButton, *downButton;
-#else
-        QPushButton *upButton, *downButton;
-#endif
-        QPushButton *addButton, *renameButton, *deleteButton, *browseButton;
-
+        ComboBoxDelegate ruleDelegate;
+        DirectoryPathDelegate dirDelegate;
 };
 
 #endif

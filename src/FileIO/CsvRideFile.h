@@ -22,6 +22,8 @@
 
 #include "RideFile.h"
 
+#define GC_MAXFIELDS 40
+
 struct CsvFileReader : public RideFileReader {
     enum csvtypes { generic, gc, powertap, joule, ergomo, motoactv, ibike, xtrain, moxy, freemotion, peripedal, cpexport, bsx, rowpro, wprime, wahooMA, rp3, opendata, xdata };
     typedef enum csvtypes CsvType;

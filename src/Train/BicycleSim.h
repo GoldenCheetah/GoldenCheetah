@@ -168,7 +168,7 @@ public:
     double EquivalentMassKG() const;         // Additional mass due to rotational inertia
     double KEMass() const;                   // Total effective kinetic mass
     double RollingResistance() const { return m_constants.m_crr; }
-    double WindResistance() const { return m_constants.m_Cd * m_constants.m_A; }
+    double WindResistance(double altitude) const { return m_constants.m_Cd * m_constants.m_A * AirDensity(altitude, m_constants.m_T); }
 
     const BicycleWheel &FrontWheel() const { return m_frontWheel; }
     const BicycleWheel &RearWheel() const { return m_rearWheel; }

@@ -21,12 +21,15 @@
 
 #include <QWidget>
 #include "Context.h"
+#include "ErgFile.h"
 #include <QtWebChannel>
 #include <QWebEnginePage>
 #include <QWebEngineView>
 
 class MeterWidget : public QWidget
 {
+    Q_OBJECT
+
   public:
     explicit MeterWidget(QString name, QWidget *parent = 0, QString Source = QString("None"));
     QString Source() const { return m_Source; };
@@ -122,6 +125,8 @@ class NeedleMeterWidget : public MeterWidget
 
 class ElevationMeterWidget : public MeterWidget
 {
+    Q_OBJECT
+
     Context* context;
     QPolygon m_elevationPolygon;
     double m_minX, m_maxX;
@@ -129,7 +134,6 @@ class ElevationMeterWidget : public MeterWidget
 
   protected:
     virtual void paintEvent(QPaintEvent* paintevent);
-
     void lazySetup(void);
 
   public:
@@ -185,6 +189,45 @@ protected:
     QString currentPage;
     bool routeInitialized, mapInitialized;
    
+};
+
+class ElevationZoomedMeterWidget : public MeterWidget
+{
+    Context* context;
+    QPolygonF m_zoomedElevationPolygon;
+
+protected:
+    virtual void paintEvent(QPaintEvent* paintevent);
+ 
+private:
+    int windowWidthMeters;
+    int windowHeightMeters;
+    double bubbleSize;
+    ErgFileQueryAdapter m_ergFileAdapter;
+    ErgFile* savedErgFile;
+    QQueue<QPointF> plotQ;
+
+    double currDist;
+    double minX, minY, maxX, maxY;
+    double cyclistX;
+    double xScale;
+    double yScale;
+    int translateX;
+    int translateY;
+    double totalRideDistance;
+    int qSize; 
+
+    void scalePointsToPlot();
+    void calcScaleMultipliers();
+    void calcMinAndMax();
+    void updateRidePointsQ(int tDist);
+
+public:
+    explicit ElevationZoomedMeterWidget(QString name, QWidget* parent = 0, QString Source = QString("None"), Context* context = NULL);
+    void setContext(Context* context) { this->context = context; }
+    virtual void startPlayback(Context* context);
+    //virtual void stopPlayback();
+    float gradientValue;
 };
 
 #endif // _MeterWidget_h

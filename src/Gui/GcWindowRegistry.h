@@ -74,8 +74,17 @@ enum gcwinid {
         UserTrends=45,
         UserAnalysis=46,
         OverviewTrends=47,
-        LiveMapWebPageWindow = 48
-
+        LiveMapWebPageWindow = 48,
+        OverviewAnalysisBlank=49,
+        OverviewTrendsBlank=50,
+        ElevationChart=51,
+        Calendar=52,
+        Agenda=53,
+        UserPlan=54,
+        OverviewPlan=55,
+        OverviewPlanBlank = 56,
+        PlanAdherence = 57,
+        HtmlTraining = 58
 };
 };
 typedef enum GcWindowTypes::gcwinid GcWinID;
@@ -84,9 +93,8 @@ Q_DECLARE_METATYPE(GcWinID)
 // when declaring a window, what view is it relevant for?
 #define VIEW_TRAIN    0x01
 #define VIEW_ANALYSIS 0x02
-#define VIEW_DIARY    0x04
-#define VIEW_HOME     0x08
-#define VIEW_INTERVAL 0x16
+#define VIEW_PLAN 0x04
+#define VIEW_TRENDS   0x08
 
 class GcChartWindow;
 class GcWindowRegistry {
@@ -102,6 +110,7 @@ class GcWindowRegistry {
     static QStringList windowsForType(int type);
     static QList<GcWinID> idsForType(int type);
     static QString title(GcWinID id);
+    static unsigned int relevanceForId(GcWinID id);
 };
 
 extern GcWindowRegistry* GcWindows;

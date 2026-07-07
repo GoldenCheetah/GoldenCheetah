@@ -16,7 +16,7 @@ Open a terminal (as user pi) and run:
 ```sh
 $ git clone https://github.com/GoldenCheetah/GoldenCheetah.git
 $ cd GoldenCheetah/util/rpi
-$ make -f Makefile.rpi pre
+$ make -f Makefile.rpi gc/pre
 # ...
 # Wait for the processes to complete and *restart* the machine
 

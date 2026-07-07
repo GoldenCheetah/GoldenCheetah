@@ -45,7 +45,6 @@ bool ScanPddFile(QFile &file, QString &hrmFile, QString &hrvFile, QString &gpxFi
       // from a QString
       QString contents;
       QTextStream in(&file);
-      in.setCodec("UTF-8");
       contents = in.readAll();
       file.close();
       // check if the text string contains the replacement character for UTF-8 encoding
@@ -59,7 +58,7 @@ bool ScanPddFile(QFile &file, QString &hrmFile, QString &hrvFile, QString &gpxFi
   file.open(QFile::ReadOnly);
   QTextStream is(&file);
   if (useISO8859)
-      is.setCodec ("ISO 8859-1");
+      is.setEncoding (QStringConverter::Latin1);
 
   while (!is.atEnd()) {
     // the readLine() method doesn't handle old Macintosh CR line
@@ -176,9 +175,6 @@ void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeri
 
   RideFilePoint *p;
 
-  int lineno = 1;
-
-
   double next_interval=0;
   double hrv_time=0;
   QList<double> intervals;
@@ -189,7 +185,6 @@ void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeri
       // from a QString
       QString contents;
       QTextStream in(&file);
-      in.setCodec("UTF-8");
       contents = in.readAll();
       file.close();
       // check if the text string contains the replacement character for UTF-8 encoding
@@ -204,7 +199,8 @@ void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeri
   file.open(QFile::ReadOnly);
   QTextStream is(&file);
   if (useISO8859)
-      is.setCodec ("ISO 8859-1");
+      is.setEncoding (QStringConverter::Latin1);
+
   QString section = NULL;
 
   if (haveGPX)
@@ -220,7 +216,6 @@ void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeri
     QStringList lines = linesIn.split('\r');
     // workaround for empty lines
     if(lines.size() == 0) {
-      lineno++;
       continue;
     }
     for (int li = 0; li < lines.size(); ++li) {
@@ -468,8 +463,6 @@ void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeri
 	  seconds += recInterval;
 	}
       }
-
-      ++lineno;
     }
   }
 
@@ -529,9 +522,9 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
 
   if (n_s > 12)
     {
-      location = suffix.midRef(0, n_s - 12).toString();
-      hrmFileDate = suffix.midRef(n_s - 12, 6).toString();
-      hrmFile_orig = suffix.midRef(n_s - 12, n_s).toString();
+      location = suffix.mid(0, n_s - 12);
+      hrmFileDate = suffix.mid(n_s - 12, 6);
+      hrmFile_orig = suffix.mid(n_s - 12, n_s);
       pddfile.setFileName(location + "20" + hrmFileDate + ".pdd");
     }
 

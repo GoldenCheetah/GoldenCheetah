@@ -33,7 +33,6 @@
 #include <QFileIconProvider>
 #include <QMessageBox>
 #include <QHeaderView>
-#include <QDesktopWidget>
 
 #include "../qzip/zipwriter.h"
 #include "../qzip/zipreader.h"
@@ -237,8 +236,8 @@ RideFile *
 CloudService::uncompressRide(QByteArray *data, QString name, QStringList &errors)
 {
     // make sure its named as we expect
-    if ((downloadCompression== zip && !name.endsWith(".json.zip")) ||
-        (downloadCompression== gzip && !name.endsWith(".json.gz"))) {
+    if ((downloadCompression== zip && !name.endsWith(".zip")) ||
+        (downloadCompression== gzip && !name.endsWith(".gz"))) {
         errors << tr("expected compressed activity file.");
         return NULL;
     }
@@ -287,6 +286,19 @@ CloudService::uncompressRide(QByteArray *data, QString name, QStringList &errors
 
     // return whatever we got
     return ride;
+}
+
+void
+CloudService::sslErrors(QWidget* parent, [[maybe_unused]] QNetworkReply* reply ,QList<QSslError> errors)
+{
+    QString errorString = "";
+    foreach (const QSslError e, errors ) {
+        if (!errorString.isEmpty())
+            errorString += ", ";
+        errorString += e.errorString();
+    }
+    QMessageBox::warning(parent, tr("HTTP"), tr("SSL error(s) has occurred: %1").arg(errorString));
+    //reply->ignoreSslErrors(); // disabled for security reasons
 }
 
 QString
@@ -725,7 +737,7 @@ CloudServiceSyncDialog::CloudServiceSyncDialog(Context *context, CloudService *s
     QWidget * download = new QWidget(this);
     QWidget * sync = new QWidget(this);
     tabs->addTab(download, tr("Download"));
-    tabs->addTab(upload, tr("Upload"));
+    if (store->capabilities() & CloudService::Upload) tabs->addTab(upload, tr("Upload"));
     tabs->addTab(sync, tr("Synchronize"));
     tabs->setCurrentIndex(2);
     QVBoxLayout *downloadLayout = new QVBoxLayout(download);
@@ -956,6 +968,9 @@ CloudServiceSyncDialog::cancelClicked()
 void
 CloudServiceSyncDialog::refreshClicked()
 {
+    double distanceFactor = GlobalContext::context()->useMetricUnits ? 1.0 : MILES_PER_KM;
+    QString distanceUnits = GlobalContext::context()->useMetricUnits ? tr("km") : tr("mi");
+
     progressLabel->setText(tr(""));
     progressBar->setMinimum(0);
     progressBar->setMaximum(1);
@@ -1101,7 +1116,7 @@ CloudServiceSyncDialog::refreshClicked()
                 sync->setTextAlignment(4, Qt::AlignCenter);
 
                 double distance = workouts[i]->distance;
-                sync->setText(5, QString("%1 km").arg(distance, 0, 'f', 1));
+                sync->setText(5, QString("%1 %2").arg(distance*distanceFactor, 0, 'f', 1).arg(distanceUnits));
                 sync->setTextAlignment(5, Qt::AlignRight | Qt::AlignVCenter);
             }
             sync->setText(6, tr("Download"));
@@ -1115,10 +1130,11 @@ CloudServiceSyncDialog::refreshClicked()
     //
     // Now setup the upload list
     //
-    for(int i=0; i<context->athlete->rideCache->rides().count(); i++) {
+    bool uploadEnabled = (store->capabilities() & CloudService::Upload);
+    for(int i=0; uploadEnabled && i<context->athlete->rideCache->rides().count(); i++) {
 
         RideItem *ride = context->athlete->rideCache->rides().at(i);
-        if (!specification.pass(ride)) continue;
+        if (!specification.pass(ride) || ride->planned) continue;
 
         QTreeWidgetItem *add;
 
@@ -1145,7 +1161,7 @@ CloudServiceSyncDialog::refreshClicked()
         add->setTextAlignment(4, Qt::AlignCenter);
 
         double distance = ride->getForSymbol("total_distance");
-        add->setText(5, QString("%1 km").arg(distance, 0, 'f', 1));
+        add->setText(5, QString("%1 %2").arg(distance*distanceFactor, 0, 'f', 1).arg(distanceUnits));
         add->setTextAlignment(5, Qt::AlignRight | Qt::AlignVCenter);
 
         // exists? - we ignore seconds, since TP seems to do odd
@@ -1183,7 +1199,7 @@ CloudServiceSyncDialog::refreshClicked()
             sync->setTextAlignment(3, Qt::AlignCenter);
             sync->setText(4, duration);
             sync->setTextAlignment(4, Qt::AlignCenter);
-            sync->setText(5, QString("%1 km").arg(distance, 0, 'f', 1));
+            sync->setText(5, QString("%1 %2").arg(distance*distanceFactor, 0, 'f', 1).arg(distanceUnits));
             sync->setTextAlignment(5, Qt::AlignRight | Qt::AlignVCenter);
             sync->setText(6, tr("Upload"));
             sync->setTextAlignment(6, Qt::AlignLeft | Qt::AlignVCenter);
@@ -1732,6 +1748,10 @@ CloudServiceAutoDownload::checkDownload()
 void
 CloudServiceAutoDownload::run()
 {
+    // There are cases when athletes are opened and closed in quick succession that lead
+    // to the context becoming invalid, so we need to protect all uses of context.
+    if (!Context::isValid(context)) exit(0);
+
     // this is a separate thread and can run in parallel with the main gui
     // so we can loop through services and download the data needed.
     // we notify the main gui via the usual signals.
@@ -1739,6 +1759,7 @@ CloudServiceAutoDownload::run()
     // get a list of services to sync from
     QStringList worklist;
     foreach(QString name, CloudServiceFactory::instance().serviceNames()) {
+        if (!Context::isValid(context)) exit(0);
         if (appsettings->cvalue(context->athlete->cyclist, CloudServiceFactory::instance().service(name)->syncOnStartupSettingName(), "false").toString() == "true") {
             worklist << name;
         }
@@ -1750,13 +1771,14 @@ CloudServiceAutoDownload::run()
     if (worklist.count()) {
 
         // Start means we are looking for downloads to do
-        context->notifyAutoDownloadStart();
+        if (Context::isValid(context)) context->notifyAutoDownloadStart();
 
         // workthrough
         for(int i=0; i<worklist.count(); i++) {
 
             // instantiate
-            CloudService *service = CloudServiceFactory::instance().newService(worklist[i], context);
+            CloudService *service = (Context::isValid(context)) ? CloudServiceFactory::instance().newService(worklist[i], context) : nullptr;
+            if (service == nullptr) continue;
 
             // we want to trap received files
             connect(service, SIGNAL(readComplete(QByteArray*,QString,QString)), this, SLOT(readComplete(QByteArray*,QString,QString)));
@@ -1779,7 +1801,9 @@ CloudServiceAutoDownload::run()
 
                 Specification specification;
                 specification.setDateRange(DateRange(now.addDays(-30).date(), now.date()));
-                foreach(RideItem *item, context->athlete->rideCache->rides()) {
+
+                QVector<RideItem*> rides = (Context::isValid(context)) ? context->athlete->rideCache->rides() : QVector<RideItem*> {};
+                foreach(RideItem *item, rides) {
                     if (specification.pass(item))
                         rideFiles << QFileInfo(item->fileName).baseName().mid(0,16);
                 }
@@ -1845,7 +1869,7 @@ CloudServiceAutoDownload::run()
     for(int i=0; i<downloadlist.count(); i++) {
 
         // update progress indicator
-        context->notifyAutoDownloadProgress(downloadlist[i].provider->uiName(), progress, i, downloadlist.count());
+        if (Context::isValid(context)) context->notifyAutoDownloadProgress(downloadlist[i].provider->uiName(), progress, i, downloadlist.count());
 
         CloudServiceDownloadEntry download= downloadlist[i];
 
@@ -1866,14 +1890,16 @@ CloudServiceAutoDownload::run()
         progress += inc;
 
         // if last one we need to signal done.
-        if ((i+1) == downloadlist.count()) context->notifyAutoDownloadProgress(download.provider->uiName(), progress, i+1, downloadlist.count());
+        if ((i+1) == downloadlist.count()) {
+            if (Context::isValid(context)) context->notifyAutoDownloadProgress(download.provider->uiName(), progress, i+1, downloadlist.count());
+        }
     }
 
     // time to see completion
     sleep(3);
 
     // all done, close the sync notification, regardless of if anything was downloaded
-    context->notifyAutoDownloadEnd();
+    if (Context::isValid(context)) context->notifyAutoDownloadEnd();
 
     // remove providers
     foreach(CloudService *s, providers) {
@@ -1933,7 +1959,7 @@ CloudServiceAutoDownload::readComplete(QByteArray*data,QString name,QString)
                            .arg ( ridedatetime.time().minute(), 2, 10, zero )
                            .arg ( ridedatetime.time().second(), 2, 10, zero );
 
-    QString filename = context->athlete->home->activities().canonicalPath() + "/" + targetnosuffix + ".json";
+    QString filename = (Context::isValid(context)) ? context->athlete->home->activities().canonicalPath() + "/" + targetnosuffix + ".json" : "";
 
     // exists? -- totally should never happen unless readdir timestamp mismatches actual ride
     //            could happen if same file available at two services XXX should check above... XXX
@@ -1961,7 +1987,7 @@ CloudServiceAutoDownload::readComplete(QByteArray*data,QString name,QString)
     delete ride;
 
     // add to the ride list -- but don't select it
-    context->athlete->addRide(fileinfo.fileName(), true, false);
+    if (Context::isValid(context)) context->athlete->addRide(fileinfo.fileName(), true, false);
 
 }
 
@@ -2033,7 +2059,7 @@ CloudServiceAutoDownloadWidget::paintEvent(QPaintEvent*)
     QFontMetrics fm(font);
     painter.setFont(font);
     painter.setPen(GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    QRectF textbox = QRectF(0,0, fm.width(statusstring), height() / 2.0f);
+    QRectF textbox = QRectF(0,0, fm.horizontalAdvance(statusstring), height() / 2.0f);
     painter.drawText(textbox, Qt::AlignVCenter | Qt::AlignCenter, statusstring);
 
     // rectangle

@@ -11,22 +11,21 @@ Installation
 ------------
 
 Pre-requisite is to have the 
+- Visual C++ Redistributable for Visual Studio 2019 installed on you PC.
+For your convenience we have included a copy of "vc_redist.x64.exe".
 
-- Visual C++ Redistributable for Visual Studio 2019 -
-
-installed on you PC. For your convenience we have added
-a copy of them 
-
-- "vcredist.x64.exe" (for the 64bit Version)
-- "vcredist.x86.exe" (for the 32bit Version)
-
-to this ZIP archive.
-
-In case you want to be sure on the version, please download the 
-latest version of:
--  Microsoft Visual C++ Redistributable for Visual Studio 2015, 2017 and 2019
+Alternatively you can download the latest version of:
+- Microsoft Visual C++ Redistributable for Visual Studio 2015, 2017 and 2019
 from https://www.microsoft.com
 
+Installation steps:
+
+a) do not install to the same folder as an existing install,
+   uninstall the previous version or choose a different folder.
+b) install the vc++ redistributable
+c) reboot before running
+
+All 3 steps are required.
 
 Adding "R" Support to GoldenCheetah
 -----------------------------------

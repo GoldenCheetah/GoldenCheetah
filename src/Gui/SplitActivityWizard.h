@@ -36,6 +36,7 @@
 #include <QTreeWidget>
 
 #include <qwt_plot_marker.h>
+#include <qwt_scale_map.h>
 
 class SplitSelect;
 class SplitBackground;
@@ -193,7 +194,7 @@ class SplitBackground: public QwtPlotItem
             // not guaranteed to be ordered
             QList<double> points;
             foreach(QwtPlotMarker *m, parent->markers) points.append(m->xValue());
-            qSort(points.begin(), points.end());
+            std::sort(points.begin(), points.end());
 
             foreach(double mark, points) {
 

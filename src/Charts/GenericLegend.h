@@ -43,12 +43,13 @@
 #include "RCanvas.h"
 
 class GenericPlot;
+class GenericLegend;
 class GenericLegendItem : public QWidget {
 
     Q_OBJECT
 
     public:
-        GenericLegendItem(Context *context, QWidget *parent, QString name, QColor color);
+        GenericLegendItem(Context *context, GenericLegend *parent, QString name, QColor color);
 
     Q_SIGNALS:
         void clicked(QString name, bool enabled); // someone clicked on a legend and enabled/disabled it
@@ -59,8 +60,9 @@ class GenericLegendItem : public QWidget {
     public slots:
 
         void paintEvent(QPaintEvent *event);
-        void setValue(double p) { if (enabled) { hasvalue=true; value=p; update(); } } // set value to display
-        void noValue() { if (enabled) { hasvalue=false; update(); } } // no value to display
+        void setValue(double p) { if (enabled) { hasvalue=true;hasstring=false; value=p; update(); } } // set value to display
+        void setValue(QString s) { if (enabled) { hasvalue=false;hasstring=true; string=s; update(); } } // set value to display
+        void noValue() { if (enabled) { hasstring=false;hasvalue=false; update(); } } // no value to display
         void setClickable(bool x) { clickable=x; }
         void setDateTime(bool x, QString xf) { datetime=x; datetimeformat=xf; }
         void configChanged(qint32); // context changed
@@ -69,13 +71,16 @@ class GenericLegendItem : public QWidget {
         Context *context;
         QString name;
         QColor color;
+        GenericLegend *legend;
 
         bool hasvalue;
+        bool hasstring;
         bool enabled;
         bool clickable;
         bool datetime;
         QString datetimeformat;
         double value;
+        QString string;
 
         // geometry for painting fast / updated on config changes
         QRectF blockrect, namerect, valuerect, linerect, hoverrect;
@@ -92,15 +97,19 @@ class GenericLegend : public QWidget {
         void addSeries(QString name, QColor color);
         void addX(QString name, bool datetime, QString datetimeformat);
         void addLabel(QLabel *label);
+        void removeLabel(QLabel *label);
         void removeSeries(QString name);
         void removeAllSeries();
+        void setScale(double);
+
+        GenericPlot *plot() { return plot_; }
 
     Q_SIGNALS:
         void clicked(QString name, bool enabled); // someone clicked on a legend and enabled/disabled it
 
     public slots:
 
-        void setValue(GPointF value, QString name);
+        void setValue(GPointF value, QString name, QString xcategory="(null)");
         void unhover(QString name);
         void unhoverx();
         void setClickable(bool x);
@@ -111,7 +120,7 @@ class GenericLegend : public QWidget {
         // a label has a unique name, not directly tide to
         // a series or axis value, it depends...
         Context *context;
-        GenericPlot *plot;
+        GenericPlot *plot_;
         QBoxLayout *layout;
         QMap<QString,GenericLegendItem*> items;
         QString xname;

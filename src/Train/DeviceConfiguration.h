@@ -37,7 +37,6 @@ class DeviceConfiguration
                                 // used by ANT to store ANTIDs
                                 // available for use by all devices
 
-    QString defaultString;      // PHCS for power/heartrate/cadence/speed from this device
     int wheelSize;              // set wheel size for each device
     double inertialMomentKGM2;  // trainer inertial moment in kg m^2
     int stridelength;           // stride length in cm

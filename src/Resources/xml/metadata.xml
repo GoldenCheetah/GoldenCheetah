@@ -36,7 +36,7 @@
 			<fieldtab>"Workout"</fieldtab>
 			<fieldname>"Workout Code"</fieldname>
 			<fieldtype>2</fieldtype>
-			<fieldvalues>""</fieldvalues>
+			<fieldvalues>"*"</fieldvalues>
 			<fielddiary>1</fielddiary>
 		</field>
 		<field>
@@ -50,7 +50,7 @@
 			<fieldtab>"Workout"</fieldtab>
 			<fieldname>"Sport"</fieldname>
 			<fieldtype>2</fieldtype>
-			<fieldvalues>"Bike,Run,Swim"</fieldvalues>
+			<fieldvalues>"Bike,Run,Swim,Row,Ski,Gym"</fieldvalues>
 			<fielddiary>1</fielddiary>
 		</field>
 		<field>
@@ -76,6 +76,27 @@
 		</field>
 		<field>
 			<fieldtab>"Workout"</fieldtab>
+			<fieldname>"Feel"</fieldname>
+			<fieldtype>3</fieldtype>
+			<fieldvalues>"0,25,50,75,100"</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
+			<fieldtab>"Workout"</fieldtab>
+			<fieldname>"Commute"</fieldname>
+			<fieldtype>7</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
+			<fieldtab>"Workout"</fieldtab>
+			<fieldname>"Trainer"</fieldname>
+			<fieldtype>7</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
+			<fieldtab>"Workout"</fieldtab>
 			<fieldname>"Keywords"</fieldname>
 			<fieldtype>0</fieldtype>
 			<fieldvalues>""</fieldvalues>
@@ -84,6 +105,13 @@
 		<field>
 			<fieldtab>"Workout"</fieldtab>
 			<fieldname>"Route"</fieldname>
+			<fieldtype>0</fieldtype>
+			<fieldvalues>"*"</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
+			<fieldtab>"Workout"</fieldtab>
+			<fieldname>"Equipment"</fieldname>
 			<fieldtype>0</fieldtype>
 			<fieldvalues>""</fieldvalues>
 			<fielddiary>0</fielddiary>
@@ -280,6 +308,13 @@
 		<field>
 			<fieldtab>"Metric"</fieldtab>
 			<fieldname>"Anaerobic Training Effect"</fieldname>
+			<fieldtype>4</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"EPOC"</fieldname>
 			<fieldtype>4</fieldtype>
 			<fieldvalues>""</fieldvalues>
 			<fielddiary>0</fielddiary>

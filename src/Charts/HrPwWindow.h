@@ -40,7 +40,7 @@ class HrPwWindow : public GcChartWindow
     Q_OBJECT
     G_OBJECT
 
-    Q_PROPERTY(int shadeZones READ isShadeZones WRITE setShadeZones USER true)
+    Q_PROPERTY(bool shadeZones READ isShadeZones WRITE setShadeZones USER true)
     Q_PROPERTY(int joinLine READ isJoinLine WRITE setJoinLine USER true)
     Q_PROPERTY(int fullplot READ showFullplot WRITE setFullplot USER true)
 

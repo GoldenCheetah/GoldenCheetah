@@ -59,7 +59,7 @@ public:
     typedef enum metricsport MetricSport;
 
     // Type of metric for aggregation
-    enum metrictype { Total, Average, Peak, Low, RunningTotal, MeanSquareRoot, StdDev};
+    enum metrictype { Total=0, Average, Peak, Low, RunningTotal, MeanSquareRoot, StdDev};
     typedef enum metrictype MetricType;
 
     // Class of metric to help browse
@@ -301,6 +301,9 @@ public:
 
     // Get the value and apply conversion if needed
     double value(bool metric) const;
+
+    // Apply conversion if needed to the supplied value
+    double value(double v, bool metric) const;
 
     // for averages the count of items included in the average
     double count() const; 

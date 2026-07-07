@@ -58,9 +58,6 @@ class XDataDialog : public QDialog
         QTableWidget *xdataTable;
         QTableWidget *xdataSeriesTable;
 
-        QPushButton *addXData, *removeXData;
-        QPushButton *addXDataSeries, *removeXDataSeries;
-
         QPushButton *closeButton;
 };
 

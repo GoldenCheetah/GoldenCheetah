@@ -41,6 +41,7 @@ public:
     v3(double a, double b, double c) : m_t(a, b, c) {};
 
     v3(const v3& o) : m_t(o.m_t) {}
+    v3& operator=(const v3& o) { m_t = o.m_t; return *this; }
 
     double  x() const { return std::get<0>(m_t); }
     double  y() const { return std::get<1>(m_t); }
@@ -344,7 +345,7 @@ template <size_t T_bitsize> class MyBitset
         return (((x + (x >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
     }
 
-    void truncate() { m_mask &= (((unsigned)(-1 << (32 - T_bitsize))) >> (32 - T_bitsize)); }
+    void truncate() { m_mask &= ((~0U << (32 - T_bitsize)) >> (32 - T_bitsize)); }
 
 public:
 

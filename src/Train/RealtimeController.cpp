@@ -21,6 +21,11 @@
 #include "RealtimeData.h"
 #include "Units.h"
 
+#ifdef Q_CC_MSVC
+// 'strcpy': This function or variable may be unsafe.
+#pragma warning(disable:4996)
+#endif
+
 void VirtualPowerTrainer::to_string(std::string& s) const {
     // poly|wheelrpm|name
     s.clear();
@@ -176,7 +181,7 @@ void RealtimeController::processRealtimeData(RealtimeData &rtData)
 
 // Wrap static array in function to ensure it is init on use, which is after PolyFitGenerator
 // who is static init at load time.
-const VirtualPowerTrainer * const PredefinedVirtualPowerTrainerArray(size_t &size) {
+const VirtualPowerTrainer * PredefinedVirtualPowerTrainerArray(size_t &size) {
 
     static const VirtualPowerTrainer s_PredefinedVirtualPowerTrainerArray[] =
     {
@@ -658,7 +663,7 @@ int VirtualPowerTrainerManager::PushCustomVirtualPowerTrainer(const QString& str
         if (pieceCount != 5 && pieceCount != 6) break; // no inertia supported for back compat
 
         // section 0 DEF
-        QStringList defPieces = pieces.at(0).split(QRegExp(QRegExp::escape(",")));
+        QStringList defPieces = pieces.at(0).split(QRegularExpression(QRegExp::escape(",")));
         size_t defCount = defPieces.size();
         if (defCount != 3) break; // bad prefix section count...
 
@@ -677,7 +682,7 @@ int VirtualPowerTrainerManager::PushCustomVirtualPowerTrainer(const QString& str
         if (numeratorCount <= 0 || numeratorCount > 14) break; // bad numerator coef count
 
         // section 1 COEFS
-        QStringList coefs = pieces.at(1).split(QRegExp(QRegExp::escape(",")));
+        QStringList coefs = pieces.at(1).split(QRegularExpression(QRegExp::escape(",")));
         size_t coefPieceCount = coefs.size();
         if (coefPieceCount != coefCount) break; // wrong number of coefs in string
 

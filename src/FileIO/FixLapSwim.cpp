@@ -20,6 +20,7 @@
 #include "Settings.h"
 #include "Context.h"
 #include "Units.h"
+#include "Colors.h"
 #include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
@@ -35,9 +36,8 @@ class FixLapSwimConfig : public DataProcessorConfig
 
     friend class ::FixLapSwim;
     protected:
-        QHBoxLayout *layout;
-        QLabel *plLabel;
         QSpinBox *pl;
+        QSpinBox *minRest;
 
     public:
         FixLapSwimConfig(QWidget *parent) : DataProcessorConfig(parent) {
@@ -45,44 +45,38 @@ class FixLapSwimConfig : public DataProcessorConfig
             HelpWhatsThis *help = new HelpWhatsThis(parent);
             parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_FixLapSwim));
 
-            layout = new QHBoxLayout(this);
-
+            QFormLayout *layout = newQFormLayout(this);
             layout->setContentsMargins(0,0,0,0);
             setContentsMargins(0,0,0,0);
-
-            plLabel = new QLabel(tr("Pool Length (m)"));
 
             pl = new QSpinBox();
             pl->setMaximum(50);
             pl->setMinimum(0);
             pl->setSingleStep(1);
-            layout->addWidget(plLabel);
-            layout->addWidget(pl);
-            layout->addStretch();
+            pl->setSuffix(" " + tr("m"));
+
+            minRest = new QSpinBox();
+            minRest->setMaximum(10);
+            minRest->setMinimum(1);
+            minRest->setSingleStep(1);
+            minRest->setSuffix(" " + tr("s"));
+
+            layout->addRow(tr("Pool Length"), pl);
+            layout->addRow(tr("Min Rest"), minRest);
         }
 
         //~FixLapSwimConfig() {}  // deliberately not declared since Qt will
                                 // delete the widget and its children when
                                 // the config pane is deleted
 
-        QString explain() {
-            return tr("Sometimes length times or distances from "
-                      "lap swimming files are wrong.\n"
-                      "You can fix length-by-length information "
-                      "in Editor SWIM tab: TYPE, DURATION and STROKES.\n"
-                      "This tool recompute accumulated time, distance "
-                      "and sample Speed/Cadence from the updated lengths.\n"
-                      "Laps are recreated using pause lengths as markers\n\n"
-                      "Pool Length (in meters) allows to re-define the "
-                      "field if value is > 0");
-        }
-
         void readConfig() {
             pl->setValue(appsettings->value(NULL, GC_DPFLS_PL, "0").toDouble());
+            minRest->setValue(appsettings->value(NULL, GC_DPFLS_MR, "3").toDouble());
         }
 
         void saveConfig() {
             appsettings->setValue(GC_DPFLS_PL, pl->value());
+            appsettings->setValue(GC_DPFLS_MR, minRest->value());
         }
 };
 
@@ -99,32 +93,58 @@ class FixLapSwim : public DataProcessor {
         ~FixLapSwim() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op) override;
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) const override {
             Q_UNUSED(ride);
             return new FixLapSwimConfig(parent);
         }
 
         // Localized Name
-        QString name() {
-            return (tr("Fix Lap Swim from Length Data"));
+        QString name() const override {
+            return tr("Fix Lap Swim from Length Data");
+        }
+
+        QString id() const override {
+            return "::FixLapSwim";
+        }
+
+        QString legacyId() const override {
+            return "Fix Lap Swim";
+        }
+
+        QString explain() const override {
+            return tr("Sometimes length times or distances from "
+                      "lap swimming files are wrong.\n"
+                      "You can fix length-by-length information "
+                      "in Editor SWIM tab: TYPE, DURATION and STROKES.\n"
+                      "This tool recompute accumulated time, distance "
+                      "and sample Speed/Cadence from the updated lengths.\n"
+                      "Laps are recreated using length distance changes as markers\n\n"
+                      "Pool Length (in meters) allows to re-define the "
+                      "field if value is > 0\n\n"
+                      "Lengths shorter than Min Rest (in seconds) "
+                      "are removed and their duration carried to "
+                      "the next length.\n\n");
         }
 };
 
-static bool FixLapSwimAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix Lap Swim"), new FixLapSwim());
+static bool FixLapSwimAdded = DataProcessorFactory::instance().registerProcessor(new FixLapSwim());
 
 bool
 FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
     // get settings
     double pl;
+    double minRest;
     if (config == NULL) { // being called automatically
         // when the file is created use poll length in the file
         pl = (op == "NEW") ? 0.0 : appsettings->value(NULL, GC_DPFLS_PL, "0").toDouble();
+        minRest = appsettings->value(NULL, GC_DPFLS_MR, "3").toDouble();
     } else { // being called manually
         pl = ((FixLapSwimConfig*)(config))->pl->value();
+        minRest = ((FixLapSwimConfig*)(config))->minRest->value();
     }
 
     if (pl == 0.0) // If Pool Length is not configured, get from metadata
@@ -165,11 +185,29 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
     ride->command->startLUW("Fix Lap Swim");
     ride->command->deletePoints(0, ride->dataPoints().count());
 
+    // Remove lengths shorter than minRest secs and carry that time over the next length
+    double prev_length_duration = 0.0;
+    for (int i=0; i<series->datapoints.count(); i++) {
+
+        double length_duration = series->datapoints.at(i)->number[durationIdx];
+        if (length_duration < minRest) {
+            // remove shorter than minRest length, update row index and carry duration
+            ride->command->deleteXDataPoints("SWIM", i, 1);
+            i--;
+            prev_length_duration += length_duration;
+        } else if (prev_length_duration > 0.0) {
+            // increaase duration from removed lengths
+            ride->command->setXDataPointValue("SWIM", i, durationIdx+2, prev_length_duration+length_duration);
+            prev_length_duration = 0.0;
+        }
+    }
+
     double last_time = 0.0;
     double last_distance = 0.0;
     double frac_time = 0.0;
-    int interval = 1;
+    int interval = 0;
     double kph, cad;
+    double prev_length_distance = 0;
 
     for (int i=0; i< series->datapoints.count(); i++) {
 
@@ -202,7 +240,7 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
            QVector<struct RideFilePoint> newRows;
            kph = 3600.0 * length_distance / p->number[durationIdx];
            double deltaDist = length_duration > 1 ? length_distance / (length_duration - 1) : 0.0;
-           if (length_distance == 0.0) interval++; // pauses mark laps
+           if (length_distance != prev_length_distance) interval++; // length distance changes mark laps
            for (int i = 0; i < length_duration; i++) {
                // recover previous data or create a new sample point,
                // and fix time/speed/distance/cadence/interval
@@ -217,7 +255,7 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
             ride->command->appendPoints(newRows);
             last_time += length_duration;
             last_distance += length_distance;
-            if (length_distance == 0.0) interval++; // pauses mark laps
+            prev_length_distance = length_distance;
        }
        // Alternative way to mark pauses: Rest seconds after each length
        if (restIdx>0 && p->number[restIdx]>0) {

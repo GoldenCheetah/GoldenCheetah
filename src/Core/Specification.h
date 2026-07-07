@@ -47,7 +47,7 @@ class FilterSet
 
         // create one with a set
         FilterSet(bool on, QStringList list) {
-            if (on) filters_ << list.toSet();
+            if (on) filters_ << QSet<QString>(list.begin(), list.end());
         }
 
         // create an empty set
@@ -55,7 +55,7 @@ class FilterSet
 
         // add a new filter
         void addFilter(bool on, QStringList list) {
-            if (on) filters_ << list.toSet();
+            if (on) filters_ << QSet<QString>(list.begin(), list.end());
         }
 
         // clear the filter set
@@ -64,7 +64,7 @@ class FilterSet
         }
 
         // does the name in question pass the filter set ?
-        bool pass(QString name) {
+        bool pass(QString name) const {
             foreach(QSet<QString> set, filters_)
                 if (!set.contains(name))
                     return false;
@@ -74,26 +74,47 @@ class FilterSet
         int count() { return filters_.count(); }
 };
 
+enum class PlanFilterType {
+    IncludeAll,
+    IncludeIfUpcomingOrMissed,
+    IncludeIfUpcoming,
+    IncludeNone
+};
+Q_DECLARE_METATYPE(PlanFilterType)
+
+class PlanFilter
+{
+    public:
+        PlanFilter(PlanFilterType type = PlanFilterType::IncludeAll);
+
+        void setType(PlanFilterType type);
+        PlanFilterType getType() const;
+        bool pass(RideItem const * const rideItem) const;
+
+    private:
+        PlanFilterType type = PlanFilterType::IncludeAll;
+};
+
 class RideFileIterator;
 class Specification
 {
     friend class ::RideFileIterator;
     public:
-        Specification(DateRange dr, FilterSet fs);
+        Specification(DateRange dr, FilterSet fs, PlanFilter pf = PlanFilter());
         Specification(IntervalItem *it, double recintsecs);
         Specification();
 
         // does the date pass the specification ?
-        bool pass(QDate);
+        bool pass(QDate) const;
 
         // does the rideitem pass the specification ?
-        bool pass(RideItem*);
+        bool pass(RideItem*) const;
 
         // does the ridepoint pass the specification ?
-        bool pass(RideFilePoint *p);
+        bool pass(RideFilePoint *p) const;
 
         // would it yield no data points for this ride ?
-        bool isEmpty(RideFile *);
+        bool isEmpty(RideFile *) const;
 
         // non-null if exists
         IntervalItem *interval() { return it; }
@@ -101,6 +122,7 @@ class Specification
         // set criteria
         void setDateRange(DateRange dr);
         void setFilterSet(FilterSet fs);
+        void setPlanFilter(PlanFilter pf);
         void setIntervalItem(IntervalItem *it, double recintsecs);
         void setRideItem(RideItem *ri);
 
@@ -123,6 +145,7 @@ class Specification
     private:
         DateRange dr;
         FilterSet fs;
+        PlanFilter pf;
         IntervalItem *it;
         double recintsecs;
         RideItem *ri;

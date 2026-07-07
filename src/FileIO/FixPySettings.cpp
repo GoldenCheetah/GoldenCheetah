@@ -43,13 +43,14 @@ FixPyScript *FixPySettings::createScript(QString name)
     FixPyScript *script = new FixPyScript;
     script->name = name;
     FixPyDataProcessor *fixPyDp = new FixPyDataProcessor(script);
-    DataProcessorFactory::instance().registerProcessor(name, fixPyDp);
+    DataProcessorFactory::instance().registerProcessor(fixPyDp);
     scripts.append(script);
     return script;
 }
 
 void FixPySettings::deleteScript(QString name)
 {
+    DataProcessorFactory::instance().unregisterProcessor(name);
     QList<FixPyScript *> scripts = getScripts();
     for (int i = 0; i < scripts.size(); i++) {
         FixPyScript *script = scripts[i];
@@ -63,6 +64,9 @@ void FixPySettings::deleteScript(QString name)
             QFile pyFile(gcroot + "/" + PYFIXES_DIR_NAME + "/" + script->path);
             pyFile.remove();
 
+            appsettings->remove(DataProcessor::configKeyAutomation(name));
+            appsettings->remove(DataProcessor::configKeyAutomatedOnly(name));
+
             delete script;
             return;
         }
@@ -73,12 +77,28 @@ void FixPySettings::save()
 {
     QSettings iniSettings(gcroot + "/" + PYFIXES_DIR_NAME + "/" + PYFIXES_SETTINGS_FILE_NAME, QSettings::IniFormat);
 
-    // delete old py files first
+    // delete old py files first and move automation keys to new name
     foreach (FixPyScript *script, getScripts()) {
         if (!script->oldPath.isEmpty()) {
             QFile oldPyFixFile(gcroot + "/" + PYFIXES_DIR_NAME + "/" + script->oldPath);
             oldPyFixFile.remove();
             script->oldPath = QString();
+        }
+        if (! script->oldName.isEmpty()) {
+            DataProcessorFactory::instance().unregisterProcessor(script->oldName);
+            QVariant automation = appsettings->value(nullptr, DataProcessor::configKeyAutomation(script->oldName), QVariant());
+            QVariant automatedOnly = appsettings->value(nullptr, DataProcessor::configKeyAutomatedOnly(script->oldName), QVariant());
+            if (automation.isValid()) {
+                appsettings->remove(DataProcessor::configKeyAutomation(script->oldName));
+                appsettings->setValue(DataProcessor::configKeyAutomation(script->name), automation);
+            }
+            if (automatedOnly.isValid()) {
+                appsettings->remove(DataProcessor::configKeyAutomatedOnly(script->oldName));
+                appsettings->setValue(DataProcessor::configKeyAutomatedOnly(script->name), automatedOnly);
+            }
+            FixPyDataProcessor *fixPyDp = new FixPyDataProcessor(script);
+            DataProcessorFactory::instance().registerProcessor(fixPyDp);
+            script->oldName = QString();
         }
     }
 

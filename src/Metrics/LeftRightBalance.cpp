@@ -60,7 +60,7 @@ class LeftRightBalance : public RideMetric {
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (((point->watts > 0.0f && point->cad) || (point->rcontact && point->rcad)) && point->lrbalance > 0.0f && point->lrbalance < 100.0f) {
+            if (((point->watts > 0.0f && point->cad) || (point->rcontact && point->rcad)) && point->lrbalance != RideFile::NA) {
                 total += point->lrbalance;
                 ++count;
             }

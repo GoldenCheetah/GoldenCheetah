@@ -19,6 +19,7 @@
 #include "DataProcessor.h"
 #include "Settings.h"
 #include "Units.h"
+#include "Colors.h"
 #include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
@@ -113,10 +114,6 @@ class FixGPSConfig : public DataProcessorConfig
     Q_DECLARE_TR_FUNCTIONS(FixGPSConfig)
     friend class ::FixGPS;
     protected:
-        QVBoxLayout *mainLayout;
-        QHBoxLayout *simpleLayout;
-        QFormLayout *layout;
-
         // Altitude
         QCheckBox   *doSmoothAltitude;
 
@@ -174,7 +171,7 @@ class FixGPSConfig : public DataProcessorConfig
             {
                 QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
                 testButton->setEnabled(false);
-                
+
                 // PASS 0: ALTITUDE SMOOTHING TEST
 
                 AltitudeSmoothingStats altitudeSmoothingStats;
@@ -297,71 +294,22 @@ class FixGPSConfig : public DataProcessorConfig
 
     public:
         FixGPSConfig(QWidget *parent, const RideFile * rideFile) : DataProcessorConfig(parent) {
-
-            mainLayout = NULL;
-            simpleLayout = NULL;
-            layout = NULL;
-
-            // Altitude
-            doSmoothAltitude = NULL;
-
-            // Altitude smoothing degrees
-            degree0Label = NULL;
-            degree0SpinBox = NULL;
-            degree1Label = NULL;
-            degree1SpinBox = NULL;
-
-            // Altitude Outlier Criteria
-            outlierLabel = NULL;
-            outlierSpinBox = NULL;
-
-            // Altitude Stats
-            minSlopeLabel = NULL;
-            maxSlopeLabel = NULL;
-            avgSlopeLabel = NULL;
-            outlierCountLabel = NULL;
-
-            // Route
-            doSmoothRoute = NULL;
-
-            // Route smoothing degrees
-            degree0LabelRoute = NULL;
-            degree1LabelRoute = NULL;
-            degree0SpinBoxRoute = NULL;
-            degree1SpinBoxRoute = NULL;
-
-            // Route Outlier Criteria
-            outlierLabelRoute = NULL;
-            outlierSpinBoxRoute = NULL;
-
-            // Route Stats
-            stdDev0LabelRoute = NULL;
-            stdDev1LabelRoute = NULL;
-            outlierCountLabelRoute = NULL;
-
-            testButton = NULL;
-            stdDevLabel = NULL;
-
             ride = rideFile;
 
             HelpWhatsThis *help = new HelpWhatsThis(parent);
             parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_FixGPSErrors));
 
-            // In import config there's no room for verbosity.
-            bool fUseShortDescription = (rideFile == NULL);
-
-
             // ALTITUDE SMOOTHING CONTROLS
 
             // Apply Altitude Smoothing Checkbox
 
-            doSmoothAltitude = new QCheckBox(fUseShortDescription ? tr("Altitude") : tr("Apply BSpline Altitude Smoothing"));
+            doSmoothAltitude = new QCheckBox(tr("Apply BSpline Altitude Smoothing"));
             doSmoothAltitude->setToolTip(tr("Apply B-Spline based altitude smoothing after running the GPS outlier pass."));
             doSmoothAltitude->setCheckState(appsettings->value(NULL, GC_FIXGPS_ALTITUDE_FIX_DOAPPLY, Qt::Unchecked).toBool() ? Qt::Checked : Qt::Unchecked);
 
             // Altitude Degree 0 SpinBox - First Pass
 
-            degree0Label= new QLabel(fUseShortDescription ? tr("P1 Deg") : tr("Pass 1 Altitude Smoothing Degree:"));
+            degree0Label= new QLabel(tr("Pass 1 Altitude Smoothing Degree"));
             degree0SpinBox = new QSpinBox();
             degree0SpinBox->setRange(0, 1000);
             degree0SpinBox->setSingleStep(10);
@@ -376,7 +324,7 @@ class FixGPSConfig : public DataProcessorConfig
 
             // Altitude Degree 1 SpinBox - Second Pass
 
-            degree1Label = new QLabel(fUseShortDescription ? tr("P2 Deg") : tr("Pass 2 Altitude Smoothing Degree:"));
+            degree1Label = new QLabel(tr("Pass 2 Altitude Smoothing Degree"));
             degree1SpinBox = new QSpinBox();
             degree1SpinBox->setRange(0, 1000);
             degree1SpinBox->setSingleStep(10);
@@ -391,11 +339,12 @@ class FixGPSConfig : public DataProcessorConfig
 
             // Altitude Outlier Criteria
 
-            outlierLabel = new QLabel(fUseShortDescription ? tr("Crit") : tr("Altitude Outlier Criteria - Centimeters:"));
+            outlierLabel = new QLabel(tr("Altitude Outlier Criteria"));
             outlierSpinBox = new QDoubleSpinBox();
             outlierSpinBox->setRange(0.001, 10000);
             outlierSpinBox->setSingleStep(10);
             outlierSpinBox->setDecimals(3);
+            outlierSpinBox->setSuffix(" " + tr("cm"));
             outlierSpinBox->setValue(appsettings->value(this, GC_FIXGPS_ALTITUDE_OUTLIER_PERCENT, s_Default_AltitudeOutlierPercent).toInt());
             outlierSpinBox->setToolTip(tr("ALTITUDE OUTLIER CRITERIA - CENTIMETERS:\n"
                                           "An outlier point is one so eggregiously out of range that it should not be used to\n"
@@ -407,13 +356,13 @@ class FixGPSConfig : public DataProcessorConfig
 
             // Apply Route Smoothing Checkbox
 
-            doSmoothRoute = new QCheckBox(fUseShortDescription ? tr("Route") : tr("Apply BSpline Route Smoothing"));
+            doSmoothRoute = new QCheckBox(tr("Apply BSpline Route Smoothing"));
             doSmoothRoute->setToolTip(tr("Apply B-Spline based location smoothing after running the altitude smoothing pass."));
             doSmoothRoute->setCheckState(appsettings->value(NULL, GC_FIXGPS_ROUTE_FIX_DOAPPLY, Qt::Unchecked).toBool() ? Qt::Checked : Qt::Unchecked);
 
             // Route Degree 0 SpinBox - PASS 1
 
-            degree0LabelRoute= new QLabel(fUseShortDescription ? tr("P1 Deg") : tr("Pass 1 Route Smoothing Degree:"));
+            degree0LabelRoute= new QLabel(tr("Pass 1 Route Smoothing Degree"));
             degree0SpinBoxRoute = new QSpinBox();
             degree0SpinBoxRoute->setRange(0, 1000);
             degree0SpinBoxRoute->setSingleStep(10);
@@ -426,7 +375,7 @@ class FixGPSConfig : public DataProcessorConfig
                                                "the ridefile and can vary by sample. This is the initial spline\n"
                                                "degree prior to outlier removal.\n"));
 
-            degree1LabelRoute = new QLabel(fUseShortDescription ? tr("P2 Deg") : tr("Pass 2 Route Smoothing Degree:"));
+            degree1LabelRoute = new QLabel(tr("Pass 2 Route Smoothing Degree"));
             degree1SpinBoxRoute = new QSpinBox();
             degree1SpinBoxRoute->setRange(0, 1000);
             degree1SpinBoxRoute->setSingleStep(10);
@@ -439,11 +388,12 @@ class FixGPSConfig : public DataProcessorConfig
                                                "the ridefile and can vary by sample. This is the degree to be\n"
                                                "used for the second pass spline made after outliers are removed.\n"));
 
-            outlierLabelRoute = new QLabel(fUseShortDescription ? tr("Crit") : tr("Route Outlier criteria - Centimeters:"));
+            outlierLabelRoute = new QLabel(tr("Route Outlier criteria"));
             outlierSpinBoxRoute = new QDoubleSpinBox();
             outlierSpinBoxRoute->setRange(0.001, 10000);
             outlierSpinBoxRoute->setSingleStep(10);
             outlierSpinBoxRoute->setDecimals(3);
+            outlierSpinBoxRoute->setSuffix(" " + tr("cm"));
             outlierSpinBoxRoute->setValue(appsettings->value(this, GC_FIXGPS_ROUTE_OUTLIER_PERCENT, s_Default_RouteOutlierPercent).toInt());
             outlierSpinBoxRoute->setToolTip(tr("ROUTE OUTLIER CRITERIA - CENTIMETERS"
                                                "An outlier point is one so eggregiously out of range that it should not be used to\n"
@@ -453,33 +403,21 @@ class FixGPSConfig : public DataProcessorConfig
                                                "final smoothing spline.\n"));
 
             // If no ridefile is provided then present simple dialog
-            if (rideFile == NULL)
-            {
-                simpleLayout = new QHBoxLayout(this);
+            QFormLayout *layout = newQFormLayout(this);
 
-                simpleLayout->addWidget(doSmoothAltitude);
-                simpleLayout->addWidget(degree0Label);
-                simpleLayout->addWidget(degree0SpinBox);
-                simpleLayout->addWidget(degree1Label);
-                simpleLayout->addWidget(degree1SpinBox);
-                simpleLayout->addWidget(outlierLabel);
-                simpleLayout->addWidget(outlierSpinBox);
+            layout->addRow("", doSmoothAltitude);
+            layout->addRow(degree0Label, degree0SpinBox);
+            layout->addRow(degree1Label, degree1SpinBox);
+            layout->addRow(outlierLabel, outlierSpinBox);
 
-                simpleLayout->addWidget(doSmoothRoute);
-                simpleLayout->addWidget(degree0LabelRoute);
-                simpleLayout->addWidget(degree0SpinBoxRoute);
-                simpleLayout->addWidget(degree1LabelRoute);
-                simpleLayout->addWidget(degree1SpinBoxRoute);
-                simpleLayout->addWidget(outlierLabelRoute);
-                simpleLayout->addWidget(outlierSpinBoxRoute);
+            layout->addRow("", doSmoothRoute);
+            layout->addRow(degree0LabelRoute, degree0SpinBoxRoute);
+            layout->addRow(degree1LabelRoute, degree1SpinBoxRoute);
+            layout->addRow(outlierLabelRoute, outlierSpinBoxRoute);
 
-                simpleLayout->setContentsMargins(0, 0, 0, 0);
-                setContentsMargins(0, 0, 0, 0);
-
-                simpleLayout->addStretch();
-            }
-            else
-            {
+            layout->setContentsMargins(0, 0, 0, 0);
+            setContentsMargins(0, 0, 0, 0);
+            if (rideFile != nullptr) {
                 // Determine min and max slope of original ride file.
                 AltitudeSmoothingStats altitudeSmoothingStats;
                 double routePass1StdDev = 0;
@@ -489,13 +427,6 @@ class FixGPSConfig : public DataProcessorConfig
                 if (fHasAlt) {
                     ComputeRideFileStats(ride, altitudeSmoothingStats);
                 }
-
-                mainLayout = new QVBoxLayout(this);
-                layout = new QFormLayout();
-                mainLayout->addLayout(layout);
-
-                mainLayout->setContentsMargins(0, 0, 0, 0);
-                setContentsMargins(0, 0, 0, 0);
 
                 // Create widgets
 
@@ -546,100 +477,30 @@ class FixGPSConfig : public DataProcessorConfig
                 testButton = new QPushButton(tr("Test Current Smoothing Setup"), this);
                 testButton->setToolTip(tr("Click this button to simulate behavior of current smoothing settings and update the statistics. NOTE: This simulation does not perform the Pass 0 outlier removal."));
 
-                // Create Rows of Widgets
-
-                std::vector<QHBoxLayout*> rows;
-
-                QHBoxLayout* row;
-                
-                // Altitude Smoothing
-                
-                row = new QHBoxLayout();
-                row->addWidget(doSmoothAltitude);
-                rows.push_back(row);
-
-                row = new QHBoxLayout();
-                row->addWidget(degree0Label);
-                row->addWidget(degree0SpinBox);
-                rows.push_back(row);
-
-                row = new QHBoxLayout();
-                row->addWidget(outlierLabel);
-                row->addWidget(outlierSpinBox);
-                row->addWidget(degree1Label);
-                row->addWidget(degree1SpinBox);
-                rows.push_back(row);
-
-                // Route Smoothing
-
-                row = new QHBoxLayout();
-                row->addWidget(doSmoothRoute);
-                rows.push_back(row);
-
-                row = new QHBoxLayout();
-                row->addWidget(degree0LabelRoute);
-                row->addWidget(degree0SpinBoxRoute);
-                rows.push_back(row);
-
-                row = new QHBoxLayout();
-                row->addWidget(outlierLabelRoute);
-                row->addWidget(outlierSpinBoxRoute);
-                row->addWidget(degree1LabelRoute);
-                row->addWidget(degree1SpinBoxRoute);
-                rows.push_back(row);
-
                 // Test Button
+                layout->addRow(testButton);
 
-                row = new QHBoxLayout();
-                row->addWidget(testButton);
-                rows.push_back(row);
+                QHBoxLayout *row;
 
                 // Altitude Stats
-
                 row = new QHBoxLayout();
                 row->addWidget(minSlopeLabel);
                 row->addWidget(maxSlopeLabel);
                 row->addWidget(avgSlopeLabel);
                 row->addWidget(outlierCountLabel);
                 row->addWidget(stdDevLabel);
-                rows.push_back(row);
+                layout->addRow(row);
 
                 // Route Stats
-
                 row = new QHBoxLayout();
                 row->addWidget(stdDev0LabelRoute);
                 row->addWidget(stdDev1LabelRoute);
                 row->addWidget(outlierCountLabelRoute);
-                rows.push_back(row);
-
-                // Insert rows into layout
-                for (int i = 0; i < rows.size(); i++)
-                    layout->insertRow(i, rows[i]);
+                layout->addRow(row);
 
                 // Hook up testButton to testClicked method.
-
                 connect(testButton, &QPushButton::clicked, this, &FixGPSConfig::testClicked);
             }
-        }
-        
-        QString explain() {
-            return(QString(tr("Multiple Pass GPS Repair:\n"
-                              "0 - Always: Remove GPS errors and interpolate positional\n"
-                              "    data where the GPS device did not record any data,\n"
-                              "    or the data that was recorded is invalid.\n"
-                              "1 - Optional: Altitude B-Spline smoothing will be applied\n"
-                              "    if checkbox is set. This is potentially two pass smoothing.\n"
-                              "    Spline is built with Pass 1 Degree, any original samples\n"
-                              "    that fail outlier criteria are discarded and then a final\n"
-                              "    smoothing is run with Pass 2 degree.\n"
-                              "2 - Optional: Route B-Spline smoothing will be applied\n"
-                              "    if checkbox is set. Again this is two pass smoothing where\n"
-                              "    outliers are determined by euclidean distance's stddev relative\n"
-                              "    to the smoothing spline. Again a final pass is run without\n"
-                              "    outliers using Pass 2 degree.\n\n"
-                              "Generally altitude data is noisiest and requires highest degree for\n"
-                              "reasonable smoothness. Route gps data gnerally requires a much\n"
-                              "lighter touch.\n")));
         }
 
         void readConfig() {
@@ -679,21 +540,50 @@ class FixGPS : public DataProcessor {
         ~FixGPS() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig*settings=0, QString op="");
+        bool postProcess(RideFile *, DataProcessorConfig*settings=0, QString op="") override;
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) const override {
             Q_UNUSED(ride);
             return new FixGPSConfig(parent, ride);
         }
 
         // Localized Name
-        QString name() {
-            return (tr("Fix GPS errors"));
+        QString name() const override {
+            return tr("Fix GPS errors");
         }
+
+        QString id() const override {
+            return "::FixGPS";
+        }
+
+        QString legacyId() const override {
+            return "Fix GPS errors";
+        }
+
+        QString explain() const override {
+            return tr("Multiple Pass GPS Repair:\n"
+                      "0 - Always: Remove GPS errors and interpolate positional\n"
+                      "    data where the GPS device did not record any data,\n"
+                      "    or the data that was recorded is invalid.\n"
+                      "1 - Optional: Altitude B-Spline smoothing will be applied\n"
+                      "    if checkbox is set. This is potentially two pass smoothing.\n"
+                      "    Spline is built with Pass 1 Degree, any original samples\n"
+                      "    that fail outlier criteria are discarded and then a final\n"
+                      "    smoothing is run with Pass 2 degree.\n"
+                      "2 - Optional: Route B-Spline smoothing will be applied\n"
+                      "    if checkbox is set. Again this is two pass smoothing where\n"
+                      "    outliers are determined by euclidean distance's stddev relative\n"
+                      "    to the smoothing spline. Again a final pass is run without\n"
+                      "    outliers using Pass 2 degree.\n\n"
+                      "Generally altitude data is noisiest and requires highest degree for\n"
+                      "reasonable smoothness. Route gps data gnerally requires a much\n"
+                      "lighter touch.\n");
+        }
+
 };
 
-static bool fixGPSAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix GPS errors"), new FixGPS());
+static bool fixGPSAdded = DataProcessorFactory::instance().registerProcessor(new FixGPS());
 
 class SaveState
 {

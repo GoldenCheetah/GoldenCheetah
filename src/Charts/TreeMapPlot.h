@@ -78,7 +78,7 @@ class TreeMap
 
         void sort() {
             // sort the children in descending order
-            qSort(children.begin(), children.end(), TreeMapLessThan);
+            std::sort(children.begin(), children.end(), TreeMapLessThan);
             foreach (TreeMap *child, children) child->sort();
         }
 
@@ -137,6 +137,9 @@ class TreeMap
 
             double total=0;
             for(int i=start; i<=end; i++) total += items[i]->value;
+            if (! (total > 0.0)) {
+                return;
+            }
             int mid=start;
             double a=items[start]->value/total;
             double b=a;
@@ -195,6 +198,9 @@ class TreeMap
             // setup
             double total=0, accumulator=0; // total value of items and running total
             for(int i= start; i<= end && i<items.count(); i++) total += items[i]->value;
+            if (! (total > 0.0)) {
+                return;
+            }
             Qt::Orientation orientation = (bounds.width() > bounds.height()) ? Qt::Horizontal : Qt::Vertical;
 
             // slice em up!
@@ -261,7 +267,7 @@ class TreeMapPlot : public QWidget
         TMSettings *settings;
 
         TreeMap *root;      // the tree map data structure
-        TreeMap *highlight; // currently needs to be highlighted
+        TreeMap *highlight = nullptr; // currently needs to be highlighted
 };
 
 

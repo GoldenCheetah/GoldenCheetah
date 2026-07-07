@@ -48,7 +48,6 @@ GcPane::GcPane() : QWidget(NULL, Qt::FramelessWindowHint),
     scene->addItem(widget);
 
     view = new QGraphicsView(scene); // we made our own to resize nicely
-    //view->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setAutoFillBackground(false);
@@ -151,16 +150,16 @@ GcPane::spotHotSpot(QMouseEvent *e)
     int corner = closeImage.width()/2;
 
     // account for offset
-    int _y = e->y() - (closeImage.height()/2);
-    int _x = e->x();
+    int _y = e->position().y() - (closeImage.height()/2);
+    int _x = e->position().x();
     int _height = height() - (closeImage.height()/2);
     int _width = width() - (closeImage.width()/2);
 
-    if (e->x() > (width() - (closeImage.width()+10)) && e->y() < (closeImage.height()+12))
+    if (e->position().x() > (width() - (closeImage.width()+10)) && e->position().y() < (closeImage.height()+12))
         return Close;
-    else if (e->x() > (width() - 5 - closeImage.width() - flipImage.width()) &&
-             e->x() < (width() - 5 - closeImage.width()) &&
-             e->y() < (closeImage.height()-2))
+    else if (e->position().x() > (width() - 5 - closeImage.width() - flipImage.width()) &&
+             e->position().x() < (width() - 5 - closeImage.width()) &&
+             e->position().y() < (closeImage.height()-2))
         return Flip;
     else if (_x <= corner && _y <= corner) return (TLCorner);
     else if (_x >= (_width-corner) && _y <= corner) return (TRCorner);
@@ -174,7 +173,7 @@ GcPane::spotHotSpot(QMouseEvent *e)
 }
 
 void
-GcPane::enterEvent(QEvent *)
+GcPane::enterEvent(QEnterEvent *)
 {
     repaint();
 }
@@ -211,8 +210,8 @@ GcPane::mousePressEvent(QMouseEvent *e)
     oHeight = height();
     oX = pos().x();
     oY = pos().y();
-    mX = e->globalX();
-    mY = e->globalY();
+    mX = e->globalPosition().x();
+    mY = e->globalPosition().y();
 
     setDragState(h); // set drag state then!
 
@@ -236,8 +235,8 @@ GcPane::mouseMoveEvent(QMouseEvent *e)
     }
 
     // work out the relative move x and y
-    int relx = e->globalX() - mX;
-    int rely = e->globalY() - mY;
+    int relx = e->globalPosition().x() - mX;
+    int rely = e->globalPosition().y() - mY;
 
     switch (dragState) {
 

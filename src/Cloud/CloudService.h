@@ -18,7 +18,6 @@
 
 #ifndef GC_CloudService_h
 #define GC_CloudService_h
-
 #include <QList>
 #include <QMap>
 #include <QString>
@@ -161,7 +160,7 @@ class CloudService : public QObject {
         // in appsettings (e.g. during configuration dialogs when getting an OAuth token
         // or browsing for a folder.
         QHash<QString, QVariant> configuration;
-        QVariant getSetting(QString name, QVariant def=QString("")) { return configuration.value(name, def); }
+        QVariant getSetting(QString name, QVariant def=QString("")) const { return configuration.value(name, def); }
         void setSetting(QString name, QVariant value) { configuration.insert(name, value); }
 
         // we use a dirent style API for traversing
@@ -183,6 +182,7 @@ class CloudService : public QObject {
         void compressRide(RideFile*ride, QByteArray &data, QString id);
         RideFile *uncompressRide(QByteArray *data, QString id, QStringList &errors);
         QString uploadExtension();
+        static void sslErrors(QWidget *parent, QNetworkReply* reply ,QList<QSslError> errors);
 
         // APPSETTINGS SYMBOLS - SERVICE SPECIFIC
         QString syncOnImportSettingName() const { return QString("%1/%2/syncimport").arg(GC_QSETTINGS_ATHLETE_PRIVATE).arg(id()); }
@@ -513,7 +513,7 @@ class CloudServiceFactory {
 
     // sorted list of service names
     const QStringList serviceNames() const { QStringList returning = names_;
-                                              qSort(returning);
+                                              std::sort(returning.begin(), returning.end(), Utils::qstringascend);
                                               return returning; }
 
     const CloudService *service(QString name) const { return services_.value(name, NULL); }

@@ -28,30 +28,38 @@
 #include <QRadioButton>
 #include <QDoubleSpinBox>
 #include <QComboBox>
+#include <QObject>
 
 QString interval_to_str(double secs);  // output like 1h 2m 3s
 double str_to_interval(QString s);     // convert 1h 2m 3s -> 3123.0 , e.g.
 QString time_to_string(double secs, bool forceMinutes=false);   // output like 1:02:03
 QString time_to_string_for_sorting(double secs);   // output always xx:yy:zz
 QString time_to_string_minutes(double secs); // output always hh:mm - seconds are cut-off
+extern int daysToWeeks(int days);
+extern int daysToMonths(int days);
+enum class ShowDaysAsUnit {
+    Days,
+    Weeks,
+    Months
+};
+extern ShowDaysAsUnit showDaysAs(int days);
+
 
 /* takes a string containing an ISO 8601 timestamp and converts it to local time
 */
 QDateTime convertToLocalTime(QString timestamp);
 
-class DateRange : QObject
+class DateRange
 {
-    Q_OBJECT
-
     public:
         DateRange(const DateRange& other);
         DateRange(QDate from = QDate(), QDate to = QDate(), QString name ="", QColor=QColor(127,127,127));
         DateRange& operator=(const DateRange &);
-        bool operator!=(const DateRange&other) {
+        bool operator!=(const DateRange&other) const {
             if (other.from != from || other.to != to || other.name != name) return true;
             return false;
         }
-        bool operator==(const DateRange&other) {
+        bool operator==(const DateRange&other) const {
             if (other.from == from && other.to == to && other.name == name) return true;
             return false;
         }
@@ -62,23 +70,18 @@ class DateRange : QObject
         QUuid id;
 
         // does this date fall in the range selection ?
-        bool pass(QDate date) {
+        bool pass(QDate date) const {
             if (from == QDate() && to == QDate()) return true;
             if (from == QDate() && date <= to) return true;
             if (to == QDate() && date >= from) return true;
             if (date >= from && date <= to) return true;
             return false;
         }
-        bool isValid() { return valid; }
-
-
-    signals:
-        void changed(QDate from, QDate to);
+        bool isValid() const { return valid; }
 
     protected:
         bool valid;
 };
-Q_DECLARE_METATYPE(DateRange)
 
 class DateSettingsEdit : public QWidget
 {
@@ -124,10 +127,10 @@ class DateSettingsEdit : public QWidget
         int prevN() { return prevperiod->value(); }
         void setPrevN(int x) { return prevperiod->setValue(x); }
 
-    private slots:
+    private Q_SLOTS:
         void setDateSettings();
 
-    signals:
+    Q_SIGNALS:
         void useStandardRange();
         void useThruToday();
         void useCustomRange(DateRange);

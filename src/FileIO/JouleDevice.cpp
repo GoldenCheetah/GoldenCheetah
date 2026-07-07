@@ -24,6 +24,11 @@
 #include <errno.h>
 //#include <termios.h>
 
+#ifdef Q_CC_MSVC
+// 'sprintf': This function or variable may be unsafe.
+#pragma warning(disable:4996)
+#endif
+
 #define JOULE_DEBUG false // debug traces
 
 // Start pattern
@@ -188,7 +193,7 @@ JouleDevice::download( const QDir &tmpdir,
 
                 if (!tmp.open()) {
                     err = tr("Failed to create temporary file ")
-                        + tmpl + ": " + tmp.error();
+                        + tmpl + ": " + tmp.errorString();
                     return false;
                 }
 
@@ -205,11 +210,11 @@ JouleDevice::download( const QDir &tmpdir,
                 DeviceDownloadFile file;
                 file.extension = "bin2";
                 file.name = tmp.fileName();
-                file.startTime.setTime_t( mktime( &start ));
+                file.startTime.setSecsSinceEpoch( mktime( &start ));
                 files.append(file);
 
                 QTextStream os(&tmp);
-                os << hex;
+                os << Qt::hex;
 
                 qDebug() << tmp.fileName() << "-" << tmpl;
                 tmp.write(versionResponse.dataArray());
@@ -553,12 +558,12 @@ bool
 JoulePacket::write(CommPortPtr dev, QString &err)
 {
     QByteArray bytes = dataArrayForUnit();
-    const char *msg = cEscape(bytes.data(), bytes.count()).toLatin1().constData();
+    const char *msg = cEscape(bytes.data(), bytes.length()).toLatin1().constData();
 
     if (JOULE_DEBUG) printf("writing '%s' to device\n", msg);
 
-    int n = dev->write(bytes.data(), bytes.count() , err); //
-    if (n != bytes.count()) {
+    int n = dev->write(bytes.data(), bytes.length() , err); //
+    if (n != bytes.length()) {
         if (n < 0) {
             if (JOULE_DEBUG) printf("failed to write %s to device: %s\n", msg, err.toLatin1().constData());
             err = QString(tr("failed to write to device: %1")).arg(err);

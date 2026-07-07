@@ -65,7 +65,7 @@ public:
     enum action { Options, PropFind, Put, Get, Events, Report, None };
     typedef enum action ActionType;
 
-    enum type { Standard, Google, Webcal };
+    enum type { Standard, Webcal };
     typedef enum type CalDAVType;
 
     CalDAV(Context *context);
@@ -97,9 +97,6 @@ public slots:
     void userpass(QNetworkReply*r,QAuthenticator*a);
     void sslErrors(QNetworkReply*,QList<QSslError>);
 
-    // Google Access Token
-    void googleNetworkRequestFinished(QNetworkReply*);
-
     // enable aynchronous up/download for Google
     // since access token is temporarily valid only, it needs refresh before access to Google CALDAV
     bool doDownload();
@@ -116,10 +113,6 @@ private:
     QString googleCalDAVurl;
     bool ignoreDownloadErrors;
 
-    // specific part to get Google Access Token
-    QNetworkAccessManager *googleNetworkAccessManager;
-    void requestGoogleAccessTokenToExecute();
-    QByteArray googleCalendarAccessToken;
     ActionType mode;
     QString fileName;
     QByteArray vcardtext;

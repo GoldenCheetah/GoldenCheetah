@@ -25,6 +25,10 @@
 #include <QDir>
 #include <QVector>
 #include <QRegularExpression>
+#include <QStringRef>
+
+#include "GenericChart.h"
+#include "RideMetric.h"
 
 namespace Utils
 {
@@ -81,14 +85,14 @@ protected:
 
 public:
 
-    QString BuildSubstitutedString(QStringRef s) const
+    QString BuildSubstitutedString(QString s) const
     {
         QRegularExpression qr = GetFindAnyRegex();
 
         QRegularExpressionMatchIterator i = qr.globalMatch(s);
 
         if (!i.hasNext())
-            return s.toString();
+            return s;
 
         QString newstring;
 
@@ -132,7 +136,7 @@ struct RidefileUnEscaper : public StringSubstitutionizer
     }
 };
 
-QString RidefileUnEscape(const QStringRef s)
+QString RidefileUnEscape(const QString s)
 {
     // Static const object constructs it's search regex at load time.
     static const RidefileUnEscaper s_RidefileUnescaper;
@@ -155,6 +159,42 @@ QString xmlprotect(const QString &string)
     s.replace( "\'", "&apos;" );
     s.replace( "\n", "\\n" );
     s.replace( "\r", "\\r" );
+    return s;
+}
+
+QString quoteEscape(const QString &string)
+{
+    QString out;
+    out.reserve(string.size() * 2);
+    int backslashes = 0;
+    for (QChar c : string) {
+        if (c == '\\') {
+            backslashes++;
+            out += c;
+        } else if (c == '"') {
+            if (backslashes % 2 == 0) {
+                out += "\\\"";
+            } else {
+                out += '"';
+            }
+            backslashes = 0;
+        } else {
+            out += c;
+            backslashes = 0;
+        }
+    }
+    out.squeeze();
+    return out;
+}
+
+QString unescape(const QString &string)
+{
+    // just unescape common \ characters
+    QString s = string;
+    s.replace("\\\"","\"");
+    s.replace( "\\n", "\n" );
+    s.replace( "\\r", "\r" );
+
     return s;
 }
 
@@ -225,6 +265,64 @@ QString jsonunprotect(const QString &string)
     return s;
 }
 
+// json protection with special handling for quote (") and backslash (\)
+// used when embedding in xml
+QString jsonprotect2(const QString &string)
+{
+    QString s = string;
+    s.replace("\t", "\\t");  // tab
+    s.replace("\n", "\\n");  // newline
+    s.replace("\r", "\\r");  // carriage-return
+    s.replace("\b", "\\b");  // backspace
+    s.replace("\f", "\\f");  // formfeed
+    s.replace("/", "\\/");   // solidus
+    s.replace("\\", ":sl:"); // backslash
+    s.replace("\"", ":qu:"); // quote
+
+    // add a trailing space to avoid conflicting with GC special tokens
+    s += " ";
+
+    return s;
+}
+
+QString jsonunprotect2(const QString &string)
+{
+    QString s = string;
+    // legacy- these should never be present
+    //         but included to read older files
+    s.replace("\\\"", "\""); // quote
+    s.replace("\\\\", "\\"); // backslash
+
+    s.replace(":qu:", "\""); // quote
+    s.replace(":sl:", "\\"); // backslash
+    s.replace("\\t", "\t");  // tab
+    s.replace("\\n", "\n");  // newline
+    s.replace("\\r", "\r");  // carriage-return
+    s.replace("\\b", "\b");  // backspace
+    s.replace("\\f", "\f");  // formfeed
+    s.replace("\\/", "/");   // solidus
+
+    // those trailing spaces.
+    while (s.endsWith(" ")) s = s.mid(0,s.length()-1);
+    return s;
+}
+
+QString csvprotect(const QString &buffer, QChar sep)
+{
+
+    // if the string contains the sep we quote it
+    if (buffer.contains(sep) || buffer.contains("\"")) {
+
+        // first lets escape any quotes
+        QString rep = buffer;
+        rep.replace("\"", "\\\"");
+        rep = QString("\"%1\"").arg(rep);
+        return rep;
+    }
+
+    return buffer;
+}
+
 QStringList
 searchPath(QString path, QString binary, bool isexec)
 {
@@ -288,8 +386,8 @@ rank(QVector<double> &v, bool ascending)
     QVector<QPointF> tuple;
     for(int i=0; i<v.count(); i++) tuple << QPointF(v[i],i);
 
-    if (ascending) qSort(tuple.begin(), tuple.end(), qpointflessthan);
-    else qSort(tuple.begin(), tuple.end(), qpointfgreaterthan);
+    if (ascending) std::sort(tuple.begin(), tuple.end(), qpointflessthan);
+    else std::sort(tuple.begin(), tuple.end(), qpointfgreaterthan);
 
     // rank is offset into sorted vector, y contains original position
     QVector<int> returning(v.count());
@@ -305,8 +403,8 @@ argsort(QVector<double> &v, bool ascending)
     QVector<QPointF> tuple;
     for(int i=0; i<v.count(); i++) tuple << QPointF(v[i],i);
 
-    if (ascending) qSort(tuple.begin(), tuple.end(), qpointflessthan);
-    else qSort(tuple.begin(), tuple.end(), qpointfgreaterthan);
+    if (ascending) std::sort(tuple.begin(), tuple.end(), qpointflessthan);
+    else std::sort(tuple.begin(), tuple.end(), qpointfgreaterthan);
 
     // now create vector of indexes
     QVector<int> returning;
@@ -331,8 +429,8 @@ argsort(QVector<QString>&v, bool ascending)
     QVector<stringtuple> tuple;
     for(int i=0; i<v.count(); i++) tuple << stringtuple(v[i],i);
 
-    if (ascending) qSort(tuple.begin(), tuple.end(), stringtuplelessthan);
-    else qSort(tuple.begin(), tuple.end(), stringtuplegreaterthan);
+    if (ascending) std::sort(tuple.begin(), tuple.end(), stringtuplelessthan);
+    else std::sort(tuple.begin(), tuple.end(), stringtuplegreaterthan);
 
     // now create vector of indexes
     QVector<int> returning;
@@ -374,7 +472,7 @@ arguniq(QVector<double> &v)
             i--;
         }
     }
-    qSort(returning);
+    std::sort(returning.begin(), returning.end());
 
     return returning;
 }
@@ -412,7 +510,7 @@ arguniq(QVector<QString> &v)
             i--;
         }
     }
-    qSort(returning);
+    std::sort(returning.begin(), returning.end());
 
     return returning;
 }
@@ -433,14 +531,17 @@ static double mean(QVector<double>&data, int start, int end)
     return sum/count;
 }
 
+// return vector of smoothed values using mean average of window n samples
+// samples is usually 1 to return every sample, but can be higher in which
+// case sampling is performed before returning results (aka every nth sample)
 QVector<double>
-smooth_sma(QVector<double>&data, int pos, int window)
+smooth_sma(QVector<double>&data, int pos, int window, int samples)
 {
     QVector<double> returning;
 
     int window_start=0, window_end=0;
     int index=0;
-    double ma=0;
+    //double ma=0;
 
     // window is offset from index depending upon the forward/backward/centred position
     switch (pos) {
@@ -450,8 +551,8 @@ smooth_sma(QVector<double>&data, int pos, int window)
         break;
 
     case GC_SMOOTH_BACKWARD:
-        window_end=0;
-        window_start=window *-1;
+        window_end=1;
+        window_start=window *-1 + 1;
         break;
 
     case GC_SMOOTH_CENTERED: // we should handle odd/even size better
@@ -461,15 +562,25 @@ smooth_sma(QVector<double>&data, int pos, int window)
 
     while (index < data.count()) {
 
-        returning << mean(data, window_start, window_end);
-
+        if (samples == 1 || index%samples == 0) // sampling
+            returning << mean(data, window_start, window_end);
         index ++;
         window_start++;
         window_end++;
     }
-
     return returning;
 
+}
+
+// nth sampling to match sma above (usually for sampling x where sma has smoothed y
+QVector<double>
+sample(QVector<double>&data, int samples)
+{
+    QVector<double>returning;
+    for (int index=0; index< data.count(); index++)
+        if (samples == 1 || index%samples==0)
+            returning << data.at(index);
+    return returning;
 }
 
 QVector<double>
@@ -506,7 +617,7 @@ number(QString x)
         if (QString("0123456789").contains(x[i])) {
             innumber = true;
             extract += x[i];
-        } else if (innumber && (x[i] == "," ||  x[i]==".")) {
+        } else if (innumber && (x[i] == QChar(',') ||  x[i] == QChar('.'))) {
             if (seendp) break;
             else {
                 seendp = true;
@@ -517,5 +628,51 @@ number(QString x)
     return extract.toDouble();
 }
 
-};
+// calculate a heat value - pretty simple stuff
+double
+heat(double min, double max, double value)
+{
+    if (min == max) return 0;
+    if (value < min) return 0;
+    if (value > max) return 1;
+    return((value-min) / (max-min));
+}
 
+// return a heatmap color for value 0=cold 1=hot
+QColor
+heatcolor(double value)
+{
+    QColor returning;
+    returning.setHslF((1-value)/2, 1, 0.5f); // hue goes red-yellow-green-cyan then blue-magenta-purple-red - we want the first half
+
+    return returning;
+}
+
+// setup list of image extensions we will support
+static QVector<QString> imageexts;
+static bool initextensions() { imageexts << ".png" << ".gif" << ".jpeg" << ".jpg" << ".bmp"; return true; }
+static bool initexts = initextensions();
+
+// is the file an image?
+bool isImage(QString filename)
+{
+    QString lowername = filename.toLower();
+    foreach(QString ext, imageexts) {
+        if (lowername.endsWith(ext)) return true;
+    }
+    return false;
+}
+
+// used std::sort, std::lower_bound et al
+
+bool doubledescend(const double &s1, const double &s2) { return s1 > s2; }
+bool doubleascend(const double &s1, const double &s2) { return s1 < s2; }
+
+bool qstringdescend(const QString &s1, const QString &s2) { return s1 > s2; }
+bool qstringascend(const QString &s1, const QString &s2) { return s1 < s2; }
+
+double myisinf(double x) { return isinf(x); } // math.h
+double myisnan(double x) { return isnan(x); } // math.h
+
+
+};

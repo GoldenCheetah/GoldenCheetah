@@ -25,10 +25,10 @@
 // not made public. If you want to build with these services enabled
 // you will need to request a token from the provider and add a line
 // to your gcconfig.pri file off the form:
-//      DEFINES += GC_TWITTER_CONSUMER_SECRET="xxxxxxx"
+//      DEFINES += GC_STRAVA_CLIENT_SECRET="__XXXX_SECRET__"
 //
-// This file is modified by the travis build scripts to replace the
-// __XXXX_SECRET__ token with the secret gem held within the travis
+// This file is modified by the AppVeyor build scripts to replace the
+// __XXXX_SECRET__ token with the secret gem held within the AppVeyor
 // build environment.
 //
 // ********* DO NOT MODIFY THIS FILE EXCEPT TO ADD NEW ************
@@ -38,33 +38,17 @@
 #ifndef _GC_SECRETS_H
 #define _GC_SECRETS_H 1
 
-// used by OAuthDialog.cpp and CalDAV.cpp for Google Calendar
-#ifndef GC_GOOGLE_CALENDAR_CLIENT_SECRET
-#define GC_GOOGLE_CALENDAR_CLIENT_SECRET "__GC_GOOGLE_CALENDAR_CLIENT_SECRET__"
-#endif
-
-// used by OAuthDialog.cpp and GoogleDrive.cpp for Google Drive
-#ifndef GC_GOOGLE_DRIVE_CLIENT_ID
-#define GC_GOOGLE_DRIVE_CLIENT_ID "__GC_GOOGLE_DRIVE_CLIENT_ID__"
-#endif
-#ifndef GC_GOOGLE_DRIVE_CLIENT_SECRET
-#define GC_GOOGLE_DRIVE_CLIENT_SECRET "__GC_GOOGLE_DRIVE_CLIENT_SECRET__"
-#endif
-#ifndef GC_GOOGLE_DRIVE_API_KEY
-#define GC_GOOGLE_DRIVE_API_KEY "__GC_GOOGLE_DRIVE_API_KEY__"
-#endif
-
 #ifndef GC_CLOUD_OPENDATA_SECRET
 #define OPENDATA_DISABLE
 #define GC_CLOUD_OPENDATA_SECRET "__GC_CLOUD_OPENDATA_SECRET__"
 #endif
 
-#ifndef GC_WITHINGS_CONSUMER_SECRET
-#define GC_WITHINGS_CONSUMER_SECRET "__GC_WITHINGS_CONSUMER_SECRET__"
-#endif
-
 #ifndef GC_NOKIA_CLIENT_SECRET
 #define GC_NOKIA_CLIENT_SECRET "__GC_NOKIA_CLIENT_SECRET__"
+#endif
+
+#ifndef GC_AZUM_CLIENT_SECRET
+#define GC_AZUM_CLIENT_SECRET "__GC_AZUM_CLIENT_SECRET__"
 #endif
 
 #ifndef GC_DROPBOX_CLIENT_SECRET
@@ -79,10 +63,6 @@
 
 #ifndef GC_STRAVA_CLIENT_SECRET
 #define GC_STRAVA_CLIENT_SECRET "__GC_STRAVA_CLIENT_SECRET__"
-#endif
-
-#ifndef GC_TODAYSPLAN_CLIENT_SECRET
-#define GC_TODAYSPLAN_CLIENT_SECRET "__GC_TODAYSPLAN_CLIENT_SECRET__"
 #endif
 
 #ifndef GC_CYCLINGANALYTICS_CLIENT_SECRET
@@ -108,4 +88,31 @@
 #ifndef GC_SPORTTRACKS_CLIENT_SECRET
 #define GC_SPORTTRACKS_CLIENT_SECRET "__GC_SPORTTRACKS_CLIENT_SECRET__"
 #endif
+#endif
+
+#ifndef GC_RWGPS_API_KEY
+#define GC_RWGPS_API_KEY "__GC_RWGPS_API_KEY__"
+#endif
+
+//Nolio
+#ifndef GC_NOLIO_CLIENT_ID
+#define GC_NOLIO_CLIENT_ID "__GC_NOLIO_CLIENT_ID__"
+#endif
+
+#ifndef GC_NOLIO_SECRET
+#define GC_NOLIO_SECRET "__GC_NOLIO_SECRET__"
+#endif
+
+// XERT
+#ifndef GC_XERT_CLIENT_SECRET
+#define GC_XERT_CLIENT_SECRET "__GC_XERT_CLIENT_SECRET__"
+#endif
+
+// Tredict (PKCE, no client secret needed)
+#ifndef GC_TREDICT_CLIENT_ID
+#define GC_TREDICT_CLIENT_ID "rnS663Qw6JvXLNLbzzGpyN"
+#endif
+
+#ifndef GC_TRAINERDAY_API_KEY
+#define GC_TRAINERDAY_API_KEY "__GC_TRAINERDAY_API_KEY__"
 #endif

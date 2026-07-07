@@ -29,7 +29,7 @@ QProcess *getInterpreterProcess( QString path ) {
     QProcess *antProcess;
 
     antProcess = new QProcess( );
-    antProcess->start( path );
+    antProcess->start( path, QStringList() /* arguments */);
 
     if (!antProcess->waitForStarted()) {
       antProcess->deleteLater();

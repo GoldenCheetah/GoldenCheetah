@@ -37,7 +37,7 @@ CalendarDownload::download()
     if (request == "") return false;
     else {
         // change webcal to http, since it is basically the same port
-        QRegExp webcal("^webcal:");
+        QRegularExpression webcal("^webcal:");
         request.replace(webcal, QString("http:"));
     }
 

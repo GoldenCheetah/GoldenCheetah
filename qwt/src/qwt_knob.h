@@ -1,4 +1,4 @@
-/* -*- mode: C++ ; c-file-style: "stroustrup" -*- *****************************
+/******************************************************************************
  * Qwt Widget Library
  * Copyright (C) 1997   Josef Wilgen
  * Copyright (C) 2002   Uwe Rathmann
@@ -16,30 +16,30 @@
 class QwtRoundScaleDraw;
 
 /*!
-  \brief The Knob Widget
+   \brief The Knob Widget
 
-  The QwtKnob widget imitates look and behavior of a volume knob on a radio.
-  It looks similar to QDial - not to QwtDial.
+   The QwtKnob widget imitates look and behavior of a volume knob on a radio.
+   It looks similar to QDial - not to QwtDial.
 
-  The value range of a knob might be divided into several turns.
+   The value range of a knob might be divided into several turns.
 
-  The layout of the knob depends on the knobWidth().
+   The layout of the knob depends on the knobWidth().
 
-  - width > 0 
+   - width > 0
     The diameter of the knob is fixed and the knob is aligned
-    according to the alignment() flags inside of the contentsRect(). 
+    according to the alignment() flags inside of the contentsRect().
 
-  - width <= 0
+   - width <= 0
     The knob is extended to the minimum of width/height of the contentsRect()
     and aligned in the other direction according to alignment().
 
-  Setting a fixed knobWidth() is helpful to align several knobs with different
-  scale labels.
-  
-  \image html knob.png
-*/
+   Setting a fixed knobWidth() is helpful to align several knobs with different
+   scale labels.
 
-class QWT_EXPORT QwtKnob: public QwtAbstractSlider
+   \image html knob.png
+ */
+
+class QWT_EXPORT QwtKnob : public QwtAbstractSlider
 {
     Q_OBJECT
 
@@ -54,8 +54,8 @@ class QWT_EXPORT QwtKnob: public QwtAbstractSlider
     Q_PROPERTY( int markerSize READ markerSize WRITE setMarkerSize )
     Q_PROPERTY( int borderWidth READ borderWidth WRITE setBorderWidth )
 
-public:
-    /*! 
+  public:
+    /*!
        \brief Style of the knob surface
 
        Depending on the KnobStyle the surface of the knob is
@@ -71,52 +71,52 @@ public:
         //! Build a gradient from QPalette::Midlight and QPalette::Button
         Raised,
 
-        /*! 
-          Build a gradient from QPalette::Midlight, QPalette::Button
-          and QPalette::Midlight
+        /*!
+           Build a gradient from QPalette::Midlight, QPalette::Button
+           and QPalette::Midlight
          */
         Sunken,
 
-        /*! 
-          Build a radial gradient from QPalette::Button
-          like it is used for QDial in various Qt styles.
+        /*!
+           Build a radial gradient from QPalette::Button
+           like it is used for QDial in various Qt styles.
          */
         Styled
     };
 
     /*!
         \brief Marker type
- 
+
         The marker indicates the current value on the knob
         The default setting is a Notch marker.
 
         \sa setMarkerStyle(), setMarkerSize()
-    */
-    enum MarkerStyle 
-    { 
+     */
+    enum MarkerStyle
+    {
         //! Don't paint any marker
         NoMarker = -1,
 
         //! Paint a single tick in QPalette::ButtonText color
-        Tick, 
+        Tick,
 
         //! Paint a triangle in QPalette::ButtonText color
-        Triangle, 
+        Triangle,
 
         //! Paint a circle in QPalette::ButtonText color
-        Dot, 
+        Dot,
 
-        /*! 
-          Draw a raised ellipse with a gradient build from
-          QPalette::Light and QPalette::Mid
-         */ 
-        Nub, 
+        /*!
+           Draw a raised ellipse with a gradient build from
+           QPalette::Light and QPalette::Mid
+         */
+        Nub,
 
-        /*! 
-          Draw a sunken ellipse with a gradient build from
-          QPalette::Light and QPalette::Mid
-         */ 
-        Notch 
+        /*!
+           Draw a sunken ellipse with a gradient build from
+           QPalette::Light and QPalette::Mid
+         */
+        Notch
     };
 
     explicit QwtKnob( QWidget* parent = NULL );
@@ -137,7 +137,7 @@ public:
     void setKnobStyle( KnobStyle );
     KnobStyle knobStyle() const;
 
-    void setBorderWidth( int bw );
+    void setBorderWidth( int );
     int borderWidth() const;
 
     void setMarkerStyle( MarkerStyle );
@@ -146,33 +146,33 @@ public:
     void setMarkerSize( int );
     int markerSize() const;
 
-    virtual QSize sizeHint() const;
-    virtual QSize minimumSizeHint() const;
+    virtual QSize sizeHint() const QWT_OVERRIDE;
+    virtual QSize minimumSizeHint() const QWT_OVERRIDE;
 
-    void setScaleDraw( QwtRoundScaleDraw * );
+    void setScaleDraw( QwtRoundScaleDraw* );
 
-    const QwtRoundScaleDraw *scaleDraw() const;
-    QwtRoundScaleDraw *scaleDraw();
+    const QwtRoundScaleDraw* scaleDraw() const;
+    QwtRoundScaleDraw* scaleDraw();
 
     QRect knobRect() const;
 
-protected:
-    virtual void paintEvent( QPaintEvent * );
-    virtual void changeEvent( QEvent * );
+  protected:
+    virtual void paintEvent( QPaintEvent* ) QWT_OVERRIDE;
+    virtual void changeEvent( QEvent* ) QWT_OVERRIDE;
 
-    virtual void drawKnob( QPainter *, const QRectF & ) const;
+    virtual void drawKnob( QPainter*, const QRectF& ) const;
 
-    virtual void drawFocusIndicator( QPainter * ) const;
+    virtual void drawFocusIndicator( QPainter* ) const;
 
-    virtual void drawMarker( QPainter *, 
-        const QRectF &, double arc ) const;
+    virtual void drawMarker( QPainter*,
+        const QRectF&, double angle ) const;
 
-    virtual double scrolledTo( const QPoint & ) const;
-    virtual bool isScrollPosition( const QPoint & ) const;
+    virtual double scrolledTo( const QPoint& ) const QWT_OVERRIDE;
+    virtual bool isScrollPosition( const QPoint& ) const QWT_OVERRIDE;
 
-private:
+  private:
     class PrivateData;
-    PrivateData *d_data;
+    PrivateData* m_data;
 };
 
 #endif

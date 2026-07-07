@@ -20,6 +20,7 @@
 #ifndef _GC_RealtimeData_h
 #define _GC_RealtimeData_h 1
 #include "GoldenCheetah.h"
+#include "ErgFileBase.h"
 
 #include <stdint.h> // uint8_t
 #include <QString>
@@ -31,9 +32,12 @@ class RealtimeData
 
 public:
 
-    int mode;
+    ErgFileFormat mode;
 
     // abstract to dataseries
+    // the order matters. if we remove any entry, the corresponding layouts
+    // will break since the data series is defined by its enum value. new data
+    // series need to be appended.
     enum dataseries { None=0, Time, LapTime, Distance, Lap,
                       Watts, Speed, Cadence, HeartRate, Load,
                       XPower, BikeScore, RI, Joules, SkibaVI,
@@ -47,13 +51,25 @@ public:
                       LeftPedalSmoothness, RightPedalSmoothness, Slope, 
                       LapDistance, LapDistanceRemaining, ErgTimeRemaining,
                       Latitude, Longitude, Altitude, RouteDistance,
-                      DistanceRemaining, VAM };
+                      DistanceRemaining,
+                      RightPowerPhaseBegin, RightPowerPhaseEnd,
+                      RightPowerPhasePeakBegin, RightPowerPhasePeakEnd,
+                      Position, RightPCO, LeftPCO,
+                      Temp,
+                      CoreTemp, SkinTemp, HeatStrain, HeatLoad, VAM
+                    };
 
     typedef enum dataseries DataSeries;
 
     double value(DataSeries) const;
     static QString seriesName(DataSeries);
+    static QString seriesSymbol(DataSeries);
     static const QList<DataSeries> &listDataSeries();
+
+    // style is coded to be compatible with FIT files
+    // we use same IDs than ANT power meters messages.
+    enum riderposition { seated = 0, transistionToSeated = 1, standing = 2, transitionToStanding=3 };
+    typedef enum riderposition riderPosition;
 
     RealtimeData();
     void reset(); // set all values to zero
@@ -90,11 +106,24 @@ public:
     void setRTE(double);
     void setLPS(double);
     void setRPS(double);
+    void setRppb(double);
+    void setRppe(double);
+    void setRpppb(double);
+    void setRpppe(double);
+    void setLppb(double);
+    void setLppe(double);
+    void setLpppb(double);
+    void setLpppe(double);
+    void setRightPCO(double);
+    void setLeftPCO(double);
+    void setPosition(RealtimeData::riderPosition);
     void setTorque(double);
+    void setRTorque(double);
+    void setLTorque(double);
     void setLatitude(double);
     void setLongitude(double);
     void setAltitude(double);
-
+    void setCoreTemp(double,double,double);
     const char *getName() const;
 
     // new muscle oxygen stuff
@@ -117,6 +146,9 @@ public:
     double getRER() const;
     double getTv() const;
     double getFeO2() const;
+    double getCoreTemp() const;
+    double getSkinTemp() const;
+    double getHeatStrain() const;
 
     double getWatts() const;
     double getAltWatts() const;
@@ -145,6 +177,17 @@ public:
     double getRTE() const;
     double getLPS() const;
     double getRPS() const;
+    double getRppb() const;
+    double getRppe() const;
+    double getRpppb() const;
+    double getRpppe() const;
+    double getLppb() const;
+    double getLppe() const;
+    double getLpppb() const;
+    double getLpppe() const;
+    double getRightPCO() const;
+    double getLeftPCO() const;
+    RealtimeData::riderPosition getPosition() const;
     double getTorque() const;
     double getLatitude() const;
     double getLongitude() const;
@@ -163,6 +206,9 @@ public:
     bool getTrainerConfigRequired() const;
     bool getTrainerBrakeFault() const;
 
+    void setTemp(double temp);
+    double getTemp() const;
+
     uint8_t spinScan[24];
 
 private:
@@ -173,9 +219,17 @@ private:
     double cadence;      // in rpm
     double smo2, thb;
     double lte, rte, lps, rps; // torque efficiency and pedal smoothness
+    double rppb, rppe, rpppb, rpppe;
+    double lppb, lppe, lpppb, lpppe;
+    double rightPCO, leftPCO;
     double torque; // raw torque data for calibration display
+    double RTorque, LTorque;
     double latitude, longitude, altitude;
     double vo2, vco2, rf, rmv, tv, feo2;
+    RealtimeData::riderPosition position;
+    double temp;
+    double skinTemp, coreTemp;
+    double heatStrain;
 
     std::chrono::high_resolution_clock::time_point wheelRpmSampleTime;
 

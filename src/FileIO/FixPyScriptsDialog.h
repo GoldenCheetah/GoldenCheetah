@@ -8,24 +8,39 @@
 #include "PythonChart.h"
 #include "FixPySettings.h"
 
-class ManageFixPyScriptsDialog : public QDialog
+
+class ManageFixPyScriptsWidget : public QGroupBox
 {
     Q_OBJECT
 
 public:
-    ManageFixPyScriptsDialog(Context *);
+    ManageFixPyScriptsWidget(Context *context, QWidget *parent = nullptr);
 
 private slots:
+    void newClicked();
     void editClicked();
     void delClicked();
+    void scriptSelected();
 
 private:
+    void reload();
     void reload(int selRow);
+    void reload(const QString &selName);
 
     Context *context;
     QListWidget *scripts;
     QPushButton *edit, *del;
 };
+
+
+class ManageFixPyScriptsDialog : public QDialog
+{
+    Q_OBJECT
+
+public:
+    ManageFixPyScriptsDialog(Context *context);
+};
+
 
 class EditFixPyScriptDialog : public QDialog, public PythonHost
 {
@@ -36,6 +51,7 @@ public:
 
     PythonChart *chart() { return nullptr; }
     bool readOnly() { return false; }
+    QString getName() const;
 
 protected:
     void closeEvent(QCloseEvent *event);

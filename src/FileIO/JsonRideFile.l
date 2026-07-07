@@ -1,3 +1,7 @@
+%top{
+  #include <stdint.h>
+}
+
 %{
 /*
  * Copyright (c) 2010 Mark Liversedge (liversedge@gmail.com)
@@ -44,7 +48,7 @@ static QString unprotect(char *string)
 
     // this is a lexer string so it will be enclosed
     // in quotes. Lets strip those first
-    QStringRef r = string2.midRef(1,string2.length()-2);
+    QString r = string2.mid(1,string2.length()-2);
 
     // does it end with a space (to avoid token conflict) ?
     if (r.endsWith(" ")) r = r.mid(0, r.length()-1);

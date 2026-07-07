@@ -24,8 +24,10 @@
 #include "GoldenCheetah.h"
 #include "MainWindow.h" // for isfiltered and filters
 #include "Season.h"
+#include "Seasons.h"
 #include "RideFile.h"
 #include "SearchFilterBox.h"
+#include "Perspective.h"
 
 #include "qxtstringspinbox.h"
 #include <QtGui>
@@ -54,6 +56,8 @@ class CriticalPowerWindow : public GcChartWindow
     Q_PROPERTY(bool showTest READ showTest WRITE setShowTest USER true)
     Q_PROPERTY(bool filterBest READ filterBest WRITE setFilterBest USER true)
     Q_PROPERTY(bool showPercent READ showPercent WRITE setShowPercent USER true)
+    Q_PROPERTY(bool showDelta READ showDelta WRITE setShowDelta USER true)
+    Q_PROPERTY(bool showDeltaPercent READ showDeltaPercent WRITE setShowDeltaPercent USER true)
     Q_PROPERTY(bool showPowerIndex READ showPowerIndex WRITE setShowPowerIndex USER true)
     Q_PROPERTY(bool showGrid READ showGrid WRITE setShowGrid USER true)
 
@@ -124,7 +128,7 @@ class CriticalPowerWindow : public GcChartWindow
         void setVariant(int x);
 
         // filter
-        bool isFiltered() const { return (searchBox->isFiltered() || context->ishomefiltered || context->isfiltered); }
+        bool isFiltered() const { return (searchBox->isFiltered() || (myPerspective && myPerspective->isFiltered()) || context->ishomefiltered || context->isfiltered); }
         QString filter() const { return searchBox->filter(); }
         void setFilter(QString x) { searchBox->setFilter(x); }
 
@@ -232,6 +236,11 @@ class CriticalPowerWindow : public GcChartWindow
         bool showPercent() { return showPercentCheck->isChecked(); }
         void setShowPercent(bool x) { return showPercentCheck->setChecked(x); }
 
+        bool showDelta() { return showDeltaCheck->isChecked(); }
+        void setShowDelta(bool x) { return showDeltaCheck->setChecked(x); }
+        bool showDeltaPercent() { return showDeltaPercentCheck->isChecked(); }
+        void setShowDeltaPercent(bool x) { return showDeltaPercentCheck->setChecked(x); }
+
         bool showPP() { return showPPCheck->isChecked(); }
         void setShowPP(bool x) { return showPPCheck->setChecked(x); }
 
@@ -251,6 +260,7 @@ class CriticalPowerWindow : public GcChartWindow
         void showCSLinearChanged(int state);
         void showHeatByDateChanged(int check);
         void showPercentChanged(int check);
+        void showDeltaChanged();
         void showPowerIndexChanged(int check);
         void showBestChanged(int check);
         void showTestChanged(int check);
@@ -262,6 +272,7 @@ class CriticalPowerWindow : public GcChartWindow
         void resetSeasons();
         void filterChanged();
         void dateRangeChanged(DateRange);
+        void perspectiveFilterChanged();
 
         void useCustomRange(DateRange);
         void useStandardRange();
@@ -289,6 +300,11 @@ class CriticalPowerWindow : public GcChartWindow
         void exportData();
 
     private:
+        void showRelevantIntervals();
+        void showAnaerobicIntervals(bool);
+        void showAerobicIntervals(bool);
+        void showShortAnaerobicIntervals(bool);
+        void showLongAerobicIntervals(bool);
         void updateCpint(double minutes);
         void hideIntervalCurve(int index);
         void showIntervalCurve(IntervalItem *current, int index);
@@ -326,6 +342,7 @@ class CriticalPowerWindow : public GcChartWindow
         QCheckBox *showHeatCheck;
         QCheckBox *showHeatByDateCheck;
         QCheckBox *showPercentCheck;
+        QCheckBox *showDeltaCheck, *showDeltaPercentCheck;
         QCheckBox *showPowerIndexCheck;
         QCheckBox *showBestCheck;
         QCheckBox *showTestCheck;

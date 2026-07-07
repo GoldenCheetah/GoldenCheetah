@@ -30,8 +30,10 @@
 #include "ErgFilePlot.h"
 #include "GcSideBarItem.h"
 #include "RemoteControl.h"
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "PhysicsUtility.h"
+#include "MultiFilterProxyModel.h"
+#include "InfoWidget.h"
 
 // standard stuff
 #include <QDir>
@@ -44,6 +46,8 @@
 #include <QHeaderView>
 #include <QFormLayout>
 #include <QSqlTableModel>
+#include <QMutex>
+#include <QAction>
 
 #include "cmath" // for round()
 #include "Units.h" // for MILES_PER_KM
@@ -141,15 +145,13 @@ class TrainSidebar : public GcWindow
     public:
 
         TrainSidebar(Context *context);
+        ~TrainSidebar();
         Context *context;
+        void setTrainView(TrainView*x) { trainView=x; }
 
         QStringList listWorkoutFiles(const QDir &) const;
 
         QList<int> devices(); // convenience function for iterating over active devices
-
-        const QTreeWidgetItem *currentWorkout() { return workout; }
-        const QTreeWidgetItem *currentMedia() { return media; }
-        const QTreeWidgetItem *workoutItems() { return allWorkouts; }
 
         int selectedDeviceNumber();
 
@@ -181,10 +183,7 @@ class TrainSidebar : public GcWindow
         void start();
         void pause();
         void stop();
-        void intensityChanged(int value);
         void statusChanged(int status);
-        void setNotification(QString msg, int timeout);
-        void clearNotification(void);
 
     private slots:
         void deviceTreeWidgetSelectionChanged();
@@ -206,6 +205,7 @@ class TrainSidebar : public GcWindow
         void selectVideo(QString fullpath);
         void selectVideoSync(QString fullpath);
         void selectWorkout(QString fullpath);
+        void selectWorkout(int idx);
 
         void removeInvalidVideoSync();
         void removeInvalidWorkout();
@@ -213,6 +213,10 @@ class TrainSidebar : public GcWindow
         void viewChanged(int index);
 
         int  getCalibrationIndex(void);
+
+        // workout filters
+        void workoutFiltersChanged(QList<ModelFilter*>& f) { sortModel->setFilters(f); }
+        void workoutFiltersRemoved() { sortModel->removeFilters(); }
 
     public slots:
         void configChanged(qint32);
@@ -259,6 +263,9 @@ class TrainSidebar : public GcWindow
         // HRV R-R data being saved away
         void rrData(uint16_t  rrtime, uint8_t heartrateBeats, uint8_t instantHeartrate);
 
+        void posData(uint8_t position);
+        void tcoreData(float  core, float skin, float hsi, int qual);
+
         // VO2 measurement data to save
         void vo2Data(double rf, double rmv, double vo2, double vco2, double tv, double feo2);
 
@@ -272,25 +279,22 @@ class TrainSidebar : public GcWindow
         GcSplitter   *trainSplitter;
         GcSplitterItem *deviceItem,
                        *workoutItem,
+                       *workoutInfoItem,
                        *videosyncItem,
                        *mediaItem;
 
-        QSqlTableModel *videoModel;
-        QSqlTableModel *videosyncModel;
-        QSqlTableModel *workoutModel;
+        QAbstractTableModel *videoModel = nullptr;
+        QAbstractTableModel *videosyncModel = nullptr;
+        QAbstractTableModel *workoutModel = nullptr;
 
         DeviceTreeView *deviceTree;
         QTreeView *workoutTree;
         QTreeView *videosyncTree;
         QTreeView *mediaTree;
-        QSortFilterProxyModel *sortModel;  // sorting workout list
+        InfoWidget *workoutInfo;
+        MultiFilterProxyModel *sortModel;  // sorting workout list
         QSortFilterProxyModel *vsortModel; // sorting video list
         QSortFilterProxyModel *vssortModel; // sorting videosync list
-
-        QTreeWidgetItem *allWorkouts;
-        QTreeWidgetItem *workout;
-        QTreeWidgetItem *videosync;
-        QTreeWidgetItem *media;
 
         int lastAppliedIntensity;// remember how we scaled last time
 
@@ -310,6 +314,7 @@ class TrainSidebar : public GcWindow
         double displayLapDistance, displayLapDistanceRemaining;
         double displayLatitude, displayLongitude, displayAltitude; // geolocation
         double displayVAM;
+        double displayCoreTemp, displaySkinTemp, displayHeatStrain;
         long load;
         double slope;
         int displayWorkoutLap;     // which Lap in the workout are we at?
@@ -317,6 +322,10 @@ class TrainSidebar : public GcWindow
         bool lapAudioThisLap;
         double textPositionEmitted;
         bool useSimulatedSpeed;
+        double displayRppb, displayRppe, displayRpppb, displayRpppe;
+        double displayLppb, displayLppe, displayLpppb, displayLpppe;
+        RealtimeData::riderPosition displayPosition; // rider position (seated = 0, transistionToSeated = 1, standing = 2, transitionToStanding=3, aero = 10, off = 11)
+        double displayTemp;
 
         void maintainLapDistanceState();
 
@@ -327,10 +336,17 @@ class TrainSidebar : public GcWindow
         int status;
         int displaymode;
 
+        QString codeWorkoutKey;     // traindb-key of the workout in the case of a code-workout; empty otherwise
+        QString codeWorkoutTitle;   // title of the workout in the case of a code-workout; empty otherwise
         QFile *recordFile;      // where we record!
         int lastRecordSecs;     // to avoid duplicates
+        QMutex rrMutex;         // to coordinate async recording from ANT+ thread
         QFile *rrFile;          // r-r records, if any received.
+        QMutex posMutex;        // to coordinate async recording from ANT+ thread
+        QFile *posFile;         // cyclist position records, if any received.
+        QMutex vo2Mutex;         // to coordinate async recording from ANT+ thread
         QFile *vo2File;         // vo2 records, if any received.
+        QFile *tcoreFile;       // body temp records
 
         // ErgFile wrapper to support stateful location queries.
         ErgFileQueryAdapter        ergFileQueryAdapter;
@@ -347,13 +363,14 @@ class TrainSidebar : public GcWindow
         long total_msecs,
              lap_msecs,
              load_msecs;
-        QTime load_period;
+        QElapsedTimer load_period;
 
-        uint session_elapsed_msec, lap_elapsed_msec;
-        QTime session_time, lap_time;
+        uint session_elapsed_msec, lap_elapsed_msec, secs_to_start;
+        QElapsedTimer session_time, lap_time;
 
         QTimer      *gui_timer,     // refresh the gui
                     *load_timer,    // change the load on the device
+                    *start_timer,   // delayed start
                     *disk_timer;    // write to .CSV file
 
         bool autoConnect;
@@ -362,8 +379,10 @@ class TrainSidebar : public GcWindow
         Bicycle bicycle;
 
     public:
-        int mode;
+        ErgFileFormat mode;
+        QString mediafile, workoutfile;
         // everyone else wants this
+        TrainView *trainView;
         QCheckBox   *recordSelector;
         QSharedPointer<QFileSystemWatcher> watcher;
         bool calibrating;

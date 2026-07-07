@@ -137,6 +137,9 @@ class WorkoutWidget : public QWidget
         QList<int> vo2; // 1s samples [ml/min]
         QList<int> ventilation; // 1s samples [l/min]
         QList<double> hrAvg, pwrAvg, cadenceAvg, vo2Avg, ventilationAvg, speedAvg; // averages
+		QList<double> ctemp;
+		QList<double> stemp;
+		QList<double> hsi;
 
         // interaction state;
         // none - initial state
@@ -146,7 +149,7 @@ class WorkoutWidget : public QWidget
         // create - clicked to create
         enum { none, create, drag, dragblock, rect } state;
 
-        enum wwseriestype { CADENCE, HEARTRATE, POWER, SPEED, WBAL, VO2, VENTILATION };
+        enum wwseriestype { CADENCE, HEARTRATE, POWER, SPEED, WBAL, VO2, VENTILATION, CORETEMP, SKINTEMP, HSI };
         typedef enum wwseriestype WwSeriesType;
 
         // adding items and points
@@ -265,7 +268,7 @@ class WorkoutWidget : public QWidget
         void telemetryUpdate(RealtimeData rtData);
 
         // and erg file was selected
-        void ergFileSelected(ErgFile *);
+        void ergFileSelected(ErgFile *, ErgFileFormat format = ErgFileFormat::unknown);
 
         // save or save as (when erfile is NULL)
         void save();
@@ -310,6 +313,9 @@ class WorkoutWidget : public QWidget
         bool shouldPlotVo2();
         bool shouldPlotVentilation();
         bool shouldPlotSpeed();
+        bool shouldPlotCoreTemp();
+        bool shouldPlotSkinTemp();
+        bool shouldPlotHSI();
 
         int hrPlotAvgLength();
         int pwrPlotAvgLength();
@@ -366,6 +372,7 @@ class WorkoutWidget : public QWidget
         bool qwkactive; // we're editing it, not the user
         QStringList codeStrings;
         QList<int> codePoints; // index into points_ for each line
+        ErgFileFormat format;
 
         // the lap definitions
         QList<ErgFileLap>   laps_;      // interval markers in the file
@@ -388,6 +395,8 @@ class WorkoutWidget : public QWidget
 
         // for computing W'bal
         WPrime wpBal;
+
+        int ftp;
 
         // sizing
         double IHEIGHT;         // interval gap at bottom (used for TTE warning)
@@ -413,6 +422,9 @@ class WorkoutWidget : public QWidget
         double speedMax;
         int vo2Max;
         int ventilationMax;
+		double ctempMax;
+		double stempMax;
+		double hsiMax;
 
         // resampling when recording
         double wbalSum;
@@ -422,6 +434,9 @@ class WorkoutWidget : public QWidget
         double hrSum;
         double vo2Sum;
         double ventilationSum;
+        double ctempSum; 
+        double stempSum;
+        double hsiSum; 
         int count;
 };
 

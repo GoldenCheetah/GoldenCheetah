@@ -21,10 +21,11 @@
 
 #include <QWidget>
 #include <QLineEdit>
-#include <RideMetric.h>
+#include <QListWidget>
 #include <QCompleter>
 #include <QMap>
 
+#include "RideMetric.h"
 #include "RideMetadata.h"
 #include "Context.h"
 #include "Athlete.h"
@@ -82,6 +83,42 @@ class SeriesSelect : public QComboBox
 
     private:
         int scope;
+};
+
+class MultiMetricSelector : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        MultiMetricSelector(const QString &leftLabel, const QString &rightLabel, const QStringList &selectedMetrics, QWidget *parent = nullptr);
+
+        void setSymbols(const QStringList &selectedMetrics);
+        QStringList getSymbols() const;
+
+        void updateMetrics();
+
+    signals:
+        void selectedChanged();
+
+    private:
+        QLineEdit *filterEdit;
+        QListWidget *availList;
+        QListWidget *selectedList;
+#ifndef Q_OS_MAC
+        QToolButton *selectButton;
+        QToolButton *unselectButton;
+#else
+        QPushButton *selectButton;
+        QPushButton *unselectButton;
+#endif
+
+    private slots:
+        void filterAvail(const QString &filter);
+        void upClicked();
+        void downClicked();
+        void unselectClicked();
+        void selectClicked();
+        void updateSelectionButtons();
 };
 
 #endif

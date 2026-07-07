@@ -21,16 +21,15 @@
 #include "RideCache.h"
 // a little too intertwined with these two,
 // probably needs refactoring out at some point.
-#include "LTMSidebar.h"
 #include "NewSideBar.h"
 #include "MainWindow.h"
 
 
-NavigationModel::NavigationModel(Tab *tab) : tab(tab), block(false), viewinit(false), drinit(false), iteminit(false)
+NavigationModel::NavigationModel(AthleteTab *tab) : tab(tab), block(false), viewinit(false), drinit(false), iteminit(false)
 {
     connect(tab, SIGNAL(viewChanged(int)), this, SLOT(viewChanged(int)));
     connect(tab, SIGNAL(rideItemSelected(RideItem*)), this, SLOT(rideChanged(RideItem*)));
-    connect(static_cast<HomeView*>(tab->view(0))->sidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateChanged(DateRange)));
+    connect(tab->context, SIGNAL(dateRangeSelected(DateRange)), this, SLOT(dateChanged(DateRange)));
     connect(tab->context->mainWindow, SIGNAL(backClicked()), this, SLOT(back()));
     connect(tab->context->mainWindow, SIGNAL(forwardClicked()), this, SLOT(forward()));
 
@@ -152,19 +151,13 @@ NavigationModel::action(bool redo, NavigationEvent event)
     case NavigationEvent::VIEW:
     {
         view = redo ? event.after.toInt() : event.before.toInt();
-        tab->selectView(view);
 
-        // new side bar uses a different id, which will
-        // eventually be refactored to be the only id
-        // but for now we need to map this
-        int id=0;
-        switch(view) {
-        case 0: id=2; break; // trends
-        case 1: id=3; break; // analysis
-        case 2: id=0; break; // diary
-        case 3: id=5; break; // train
+        switch (view) {
+        case 0:  tab->context->mainWindow->selectTrends(); break;
+        case 1:  tab->context->mainWindow->selectAnalysis(); break;
+        case 2:  tab->context->mainWindow->selectPlan(); break;
+        case 3:  tab->context->mainWindow->selectTrain(); break;
         }
-        tab->context->mainWindow->newSidebar()->setItemSelected(id, true);
     }
     break;
 
@@ -185,7 +178,7 @@ NavigationModel::action(bool redo, NavigationEvent event)
     case NavigationEvent::DATERANGE:
     {
         dr = redo ? event.after.value<DateRange>() : event.before.value<DateRange>();
-        static_cast<HomeView*>(tab->view(0))->sidebar->selectDateRange(dr);
+        LTMSidebarView::selectDateRange(tab->context, dr);
     }
     break;
     }
@@ -233,7 +226,7 @@ NavigationModel::forward()
                 stack[stackpointer+2].after.toInt() == 1) {              // switch to analysis
 
                 stackpointer++;
-                action(false, stack[stackpointer]);
+                action(true, stack[stackpointer]);
             }
 
             // redo
@@ -241,4 +234,5 @@ NavigationModel::forward()
             action(true, stack[stackpointer]);
         }
     }
+
 }

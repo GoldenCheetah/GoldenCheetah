@@ -18,25 +18,29 @@
 
 #include "ChartSpace.h"
 
-#include "TabView.h"
+#include "AbstractView.h"
 #include "Athlete.h"
 #include "RideCache.h"
+#include "Colors.h"
 
 #include <cmath>
 #include <QGraphicsSceneMouseEvent>
-#include <QGLWidget>
-
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
 
 double gl_major;
+static double gl_wheelscale = 6; // rate we scroll for wheel events
+static double gl_near = 20; // close to boundary in pixels (will be factored by dpiXFactor)
+
 static QIcon grayConfig, whiteConfig, accentConfig;
+static QIcon grayEdit, whiteEdit, accentEdit;
+
 ChartSpaceItemRegistry *ChartSpaceItemRegistry::_instance;
 
-ChartSpace::ChartSpace(Context *context, int scope) :
-    state(NONE), context(context), scope(scope), group(NULL), fixedZoom(0), _viewY(0),
+ChartSpace::ChartSpace(Context *context, OverviewScope scope, GcWindow *window) :
+    state(NONE), context(context), scope(scope), mincols(5), window(window), group(NULL), fixedZoom(0), _viewY(0),
     yresizecursor(false), xresizecursor(false), block(false), scrolling(false),
     setscrollbar(false), lasty(-1)
 {
@@ -48,17 +52,7 @@ ChartSpace::ChartSpace(Context *context, int scope) :
 
     // add a view and scene and centre
     scene = new QGraphicsScene(this);
-    view = new QGraphicsView(this);
-
-#ifdef Q_OS_LINUX
-    // if we have OpenGL and its 2.0 or higher, lets use it.
-    // this is pretty much any GPU since 2004 and keeps Qt happy.
-    // we only do this on Linux since Windows and MacOS have issues
-    // on Windows AMD Radeon drivers are dreadful and on MacOS
-    // OpenGL support is deprecated and users have reported rendering
-    // issues when this is enabled.
-    if (gl_major >= 2.0)  view->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers | QGL::DirectRendering)));
-#endif
+    view = new GGraphicsView(context->mainWindow, this);
 
     view->viewport()->setAttribute(Qt::WA_AcceptTouchEvents, false); // stops it stealing focus on mouseover
     scrollbar = new QScrollBar(Qt::Vertical, this);
@@ -109,14 +103,15 @@ ChartSpace::ChartSpace(Context *context, int scope) :
 
 // add the item
 void
-ChartSpace::addItem(int order, int column, int deep, ChartSpaceItem *item)
+ChartSpace::addItem(int order, int column, int span, int deep, ChartSpaceItem *item)
 {
     item->order= order;
+    item->span= span;
     item->column = column;
     item->deep = deep;
     items.append(item);
     if (scope&OverviewScope::ANALYSIS && currentRideItem) item->setData(currentRideItem);
-    if (scope&OverviewScope::TRENDS) item->setDateRange(currentDateRange);
+    if (scope&(OverviewScope::TRENDS | OverviewScope::PLAN)) item->setDateRange(currentDateRange);
 }
 
 void
@@ -163,8 +158,8 @@ void
 ChartSpace::refresh()
 {
     stale = true;
-    if (scope == TRENDS) dateRangeChanged(currentDateRange);
-    else if (scope == ANALYSIS) rideSelected(currentRideItem);
+    if (scope & (OverviewScope::TRENDS | OverviewScope::PLAN)) dateRangeChanged(currentDateRange);
+    else if (scope & OverviewScope::ANALYSIS) rideSelected(currentRideItem);
 }
 
 void
@@ -194,6 +189,12 @@ ChartSpace::dateRangeChanged(DateRange dr)
 
     // ok, remember we did this one
     stale=false;
+}
+
+QColor
+ChartSpaceItem::color()
+{
+    return QColor(bgcolor);
 }
 
 void
@@ -241,6 +242,13 @@ ChartSpaceItem::sceneEvent(QEvent *event)
         incorner = inCorner();
         update();
         scene()->update();
+
+    // repaint when in the edit
+    } else if (event->type() == QEvent::GraphicsSceneHoverMove && inEdit() != inedit) {
+
+         inedit = inEdit();
+         update();
+         scene()->update();
     }
     return false;
 }
@@ -248,7 +256,7 @@ ChartSpaceItem::sceneEvent(QEvent *event)
 bool
 ChartSpaceItem::inHotspot()
 {
-    if (showconfig == false) return false;
+    if (showconfig == false && showedit == false) return false;
 
     QPoint vpos = parent->view->mapFromGlobal(QCursor::pos());
     QPointF spos = parent->view->mapToScene(vpos);
@@ -276,6 +284,24 @@ ChartSpaceItem::inCorner()
 }
 
 bool
+ChartSpaceItem::inEdit()
+{
+    if (showedit == false) return false;
+
+    QPoint vpos = parent->view->mapFromGlobal(QCursor::pos());
+    QPointF spos = parent->view->mapToScene(vpos);
+
+    if (geometry().contains(spos.x(), spos.y())) {
+        if (spos.y() - geometry().top() < (ROWHEIGHT + 40) &&
+            geometry().width() - (spos.x() - geometry().x()) > (ROWHEIGHT + 40) &&
+            geometry().width() - (spos.x() - geometry().x()) < (2*ROWHEIGHT + 80)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool
 ChartSpaceItem::underMouse()
 {
     QPoint vpos = parent->view->mapFromGlobal(QCursor::pos());
@@ -290,7 +316,7 @@ void
 ChartSpaceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QWidget *widget) {
 
     if (drag) painter->setBrush(QBrush(GColor(CPLOTMARKER)));
-    else painter->setBrush(GColor(CCARDBACKGROUND));
+    else painter->setBrush(RGBColor(color()));
 
     QPainterPath path;
     path.addRoundedRect(QRectF(0,0,geometry().width(),geometry().height()), ROWHEIGHT/5, ROWHEIGHT/5);
@@ -301,7 +327,7 @@ ChartSpaceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QW
     //XXXpainter->drawLine(QLineF(0,ROWHEIGHT*2,geometry().width(),ROWHEIGHT*2));
     //painter->fillRect(QRectF(0,0,geometry().width()+1,geometry().height()+1), brush);
     //titlefont.setWeight(QFont::Bold);
-    if (GCColor::luminance(GColor(CCARDBACKGROUND)) < 127) painter->setPen(QColor(200,200,200));
+    if (GCColor::luminance(RGBColor(color())) < 127) painter->setPen(QColor(200,200,200));
     else painter->setPen(QColor(70,70,70));
 
     painter->setFont(parent->titlefont);
@@ -324,7 +350,7 @@ ChartSpaceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QW
                 path.addRoundedRect(QRectF(geometry().width()-40-ROWHEIGHT,0,
                                     ROWHEIGHT+40, ROWHEIGHT+40), ROWHEIGHT/5, ROWHEIGHT/5);
                 painter->setPen(Qt::NoPen);
-                QColor darkgray(GColor(CCARDBACKGROUND).lighter(200));
+                QColor darkgray(RGBColor(color()).lighter(200));
                 painter->setBrush(darkgray);
                 painter->drawPath(path);
                 painter->fillRect(QRectF(geometry().width()-40-ROWHEIGHT, 0, ROWHEIGHT+40-(ROWHEIGHT/5), ROWHEIGHT+40), QBrush(darkgray));
@@ -343,11 +369,39 @@ ChartSpaceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QW
         } else painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, grayConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
     }
 
+    // edit icon
+    if (showedit) {
+        if (parent->state != ChartSpace::DRAG && underMouse()) {
+
+            if (inEdit()) {
+
+                // if hovering over the button show a background to indicate
+                // that pressing a button is good
+                painter->setPen(Qt::NoPen);
+                QColor darkgray(RGBColor(color()).lighter(200));
+                painter->setBrush(darkgray);
+                painter->fillRect(QRectF(geometry().width()-80-2*ROWHEIGHT, 0, ROWHEIGHT + 40, ROWHEIGHT + 40), QBrush(darkgray));
+
+                // draw the edit button and make it more obvious
+                // when hovering over the card
+                painter->drawPixmap(geometry().width()-60-(2*ROWHEIGHT), 20, ROWHEIGHT, ROWHEIGHT, accentEdit.pixmap(QSize(ROWHEIGHT, ROWHEIGHT)));
+
+            }
+            else {
+
+                // hover on card - make it more obvious there is a edit button
+                painter->drawPixmap(geometry().width()-60-(2*ROWHEIGHT), 20, ROWHEIGHT, ROWHEIGHT, whiteEdit.pixmap(QSize(ROWHEIGHT, ROWHEIGHT)));
+            }
+
+        }
+        else painter->drawPixmap(geometry().width()-60-(2*ROWHEIGHT), 20, ROWHEIGHT, ROWHEIGHT, grayEdit.pixmap(QSize(ROWHEIGHT, ROWHEIGHT)));
+    }
+
     // thin border
     if (!drag) {
         QPainterPath path;
         path.addRoundedRect(QRectF(1*dpiXFactor,1*dpiXFactor,geometry().width()-(2*dpiXFactor),geometry().height()-(2*dpiXFactor)), ROWHEIGHT/5, ROWHEIGHT/5);
-        QColor edge(GColor(CCARDBACKGROUND));
+        QColor edge(RGBColor(color()));
         edge = edge.darker(105);
         QPen pen(edge);
         pen.setWidth(3*dpiXFactor);
@@ -362,9 +416,188 @@ ChartSpaceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QW
 
 }
 
-static bool ChartSpaceItemSort(const ChartSpaceItem* left, const ChartSpaceItem* right)
+// convenient way to check if an item spans across a particular column
+// this is distinct from it being in that column, it must span it to the right
+static bool spanned(int column, LayoutChartSpaceItem item)
 {
-    return (left->column < right->column ? true : (left->column == right->column && left->order < right->order ? true : false));
+    if (item.column+1 <= column && (item.column + item.span -1) >= column) return true;
+    return false;
+}
+
+bool LayoutChartSpaceItem::LayoutChartSpaceItemSort(const LayoutChartSpaceItem left, const LayoutChartSpaceItem right) {
+    return (left.column < right.column ? true : (left.column == right.column && left.order < right.order ? true : false));
+}
+
+// Layout items, refactored out of old updateGeometry code
+// to isolate the before and after positioning of items from
+// the animations.
+QList<LayoutChartSpaceItem> ChartSpace::layoutItems()
+{
+    // remembering items that span columns
+    QList<QRectF> spanners;
+
+    // make a list of items to layout
+    QList<LayoutChartSpaceItem> items;
+    foreach(ChartSpaceItem *item, this->items)  items << LayoutChartSpaceItem(item);
+
+    // nothing to layout
+    if (items.count() == 0) return items;
+
+    //fprintf(stderr, "BEFORE: ");
+    //foreach(LayoutChartSpaceItem item, items)  fprintf(stderr, "%d:%d ", item.column, item.order);
+    //fprintf(stderr, "\n"); fflush(stderr);
+
+    // we iterate when a spanner moves, its the simplest way
+    // to redo layout code without lots of looping code
+repeatlayout:
+
+    // order the items to their positions
+    std::sort(items.begin(), items.end(), LayoutChartSpaceItem::LayoutChartSpaceItemSort);
+
+    // whatever we had, we need to start again
+    spanners.clear();
+
+    // starting from the top
+    int y=SPACING;
+    int maxy = y;
+    int column=-1;
+
+    int x=SPACING;
+
+    // ensure columns always start from 0
+    // can get out of whack when last entry
+    // from column 0 is dragged across to the right
+    // bit of a hack but easier to fix here
+    int diff=items[0].column;
+    for(int i=0; i<items.count(); i++)  items[i].column -= diff;
+
+    //fprintf(stderr, "RENUMBER: ");
+    //foreach(LayoutChartSpaceItem item, items)  fprintf(stderr, "%d:%d ", item.column, item.order);
+    //fprintf(stderr, "\n"); fflush(stderr);
+
+    // just set their geometry for now, no interaction
+    for(int i=0; i<items.count(); i++) {
+
+repeat:
+        // move on to next column, check if first item too
+        if (items[i].column > column) {
+
+            // once past the first column we need to update x
+            if (column >= 0) {
+
+                // the next column is contiguous so just move on
+                if (items[i].column == column+1) x+= columns[column] + SPACING; // onto next column then
+                else {
+
+                    // there are some empty columns, are they really empty
+                    // or does a spanned tile cover the first one?
+                    bool isspanned = false;
+                    for(int k=i-1; k>=0; k--)
+                        if (spanned(column+1, items[k]))
+                            isspanned = true;
+
+                    // the column is spanned, so its ok to move on
+                    if (isspanned) {
+                        // update x and try again
+                        x += columns[column] + SPACING;
+                        y = SPACING;
+                        column++;
+
+                        // we only checked if the first column is empty
+                        // but spanned, so lets loop round again in case
+                        // there are more (e.g. tile that spans many columns)
+                        // goto is simpler than a complete refactor here
+                        goto repeat;
+                    }
+
+                    // we missed some columns, there is a gap
+                    int diff = items[i].column - column - 1;
+                    if (diff > 0) {
+                        // there are empty columns so shift the cols to the right
+                        // to the left to fill  the gap left and all  the column
+                        // widths also need to move down too
+                        for(int j=items[i].column-1; j < 8; j++) columns[j]=columns[j+1];
+                        for(int j=i; j<items.count();j++) items[j].column -= diff;
+                    }
+                }
+            }
+            y=SPACING; column = items[i].column;
+
+        }
+
+        // set geometry
+        int ty = y;
+        int tx = x;
+
+        // tile width is for the column, or for the columns it spans
+        int twidth = columns[column];
+        for(int c=1; c<items[i].span && (c+column)<columns.count(); c++) twidth += columns[column+c] + SPACING;
+
+        int theight = items[i].deep * ROWHEIGHT;
+
+        // make em smaller when configuring visual cue stolen from Windows Start Menu
+        int add = 0; //XXX PERFORMANCE ISSSE XXX (state == DRAG) ? (ROWHEIGHT/2) : 0;
+
+        // check we don't overlap with any spanning items in earlier columns etc
+again:
+        for(int j=0; j< spanners.count(); j++) {
+            if (spanners[j].intersects(QRect(tx,ty,twidth,theight + (SPACING/2)))) {
+                ty = spanners[j].bottomLeft().y() + SPACING;
+                goto again;
+            }
+        }
+
+        // for setting the scene rectangle - but ignore a ChartSpaceItem if we are dragging it
+        if (maxy < ty+theight+SPACING) maxy = ty+theight+SPACING;
+
+        // add to scene if new
+        if (!items[i].onscene) items[i].geometry = QRectF(tx, ty, twidth, theight);
+        else if ((items[i].geometry.x() != tx+add ||
+                    items[i].geometry.y() != ty+add ||
+                    items[i].geometry.width() != twidth-(add*2) ||
+                    items[i].geometry.height() != theight-(add*2))) {
+
+            items[i].geometry = QRect(tx+add,ty+add,twidth-(add*2),theight-(add*2));
+
+            // when we move a spanner the impact needs to be
+            // addressed against all items, so sadly we need
+            // to start from scratch.
+            if (items[i].span > 1) goto repeatlayout;
+        }
+
+        // add us to spanners, so next tiles interaction
+        if (items[i].span > 1) {
+            if (items[i].drag)  spanners << QRectF(tx,ty,twidth-1,theight-1);
+            else spanners << items[i].geometry;
+        }
+
+        // set spot for next tile
+        y = ty + theight + SPACING;
+
+    }
+
+    //fprintf(stderr, "RESIZED: ");
+    //foreach(LayoutChartSpaceItem item, items)  fprintf(stderr, "%d:%d ", item.column, item.order);
+    //fprintf(stderr, "\n"); fflush(stderr);
+
+    // set the scene rectangle, columns start at 0
+    // bearing in mind we may have a spanner that extends across
+    // columns, so lets check that too?
+    x = x + columns[column];
+    foreach(QRectF spanner, spanners) {
+        if (spanner.topRight().x() > x) x = spanner.topRight().x();
+    }
+
+    // lets see if we need to increase the scene rectangle
+    // to show the minimum number of columns?
+    int minwidth=SPACING;
+    for(int i=0; i<mincols && i<columns.count(); i++)  minwidth += columns[i] + SPACING;
+    if (x < minwidth) x= minwidth;
+
+    // now set the scene rectangle
+    sceneRect = QRectF(0, 0, x + SPACING, maxy);
+
+    return items;
 }
 
 void
@@ -380,116 +613,87 @@ ChartSpace::updateGeometry()
     delete group;
     group = new QParallelAnimationGroup(this);
 
-    // order the items to their positions
-    qSort(items.begin(), items.end(), ChartSpaceItemSort);
+    foreach(LayoutChartSpaceItem item, layoutItems()) {
 
-    int y=SPACING;
-    int maxy = y;
-    int column=-1;
-
-    int x=SPACING;
-
-    // just set their geometry for now, no interaction
-    for(int i=0; i<items.count(); i++) {
-
-        // don't show hidden
-        if (!items[i]->isVisible()) continue;
-
-        // move on to next column, check if first item too
-        if (items[i]->column > column) {
-
-            // once past the first column we need to update x
-            if (column >= 0) x+= columns[column] + SPACING;
-
-            int diff = items[i]->column - column - 1;
-            if (diff > 0) {
-
-                // there are empty columns so shift the cols to the right
-                // to the left to fill  the gap left and all  the column
-                // widths also need to move down too
-                for(int j=items[i]->column-1; j < 8; j++) columns[j]=columns[j+1];
-                for(int j=i; j<items.count();j++) items[j]->column -= diff;
-            }
-            y=SPACING; column = items[i]->column;
-
-        }
-
-        // set geometry
-        int ty = y;
-        int tx = x;
-        int twidth = columns[column];
-        int theight = items[i]->deep * ROWHEIGHT;
-
-        // make em smaller when configuring visual cue stolen from Windows Start Menu
-        int add = 0; //XXX PERFORMANCE ISSSE XXX (state == DRAG) ? (ROWHEIGHT/2) : 0;
-
-
-        // for setting the scene rectangle - but ignore a ChartSpaceItem if we are dragging it
-        if (maxy < ty+theight+SPACING) maxy = ty+theight+SPACING;
+        item.item->column = item.column;
 
         // add to scene if new
-        if (!items[i]->onscene) {
-            scene->addItem(items[i]);
-            items[i]->setGeometry(tx, ty, twidth, theight);
-            items[i]->onscene = true;
+        if (!item.onscene) {
+            scene->addItem(item.item);
+            item.item->setGeometry(item.geometry);
+            item.item->onscene = true;
 
-        } else if (items[i]->invisible == false &&
-                   (items[i]->geometry().x() != tx+add ||
-                    items[i]->geometry().y() != ty+add ||
-                    items[i]->geometry().width() != twidth-(add*2) ||
-                    items[i]->geometry().height() != theight-(add*2))) {
+        } else if (item.invisible == false && item.geometry != item.item->geometry()) {
 
-            // we've got an animation to perform
+            // we've got an animation to perform -- because we are moving an item
             animated = true;
 
             // add an animation for this movement
-            QPropertyAnimation *animation = new QPropertyAnimation(items[i], "geometry");
+            QPropertyAnimation *animation = new QPropertyAnimation(item.item, "geometry");
             animation->setDuration(300);
-            animation->setStartValue(items[i]->geometry());
-            animation->setEndValue(QRect(tx+add,ty+add,twidth-(add*2),theight-(add*2)));
+            animation->setStartValue(item.item->geometry());
+            animation->setEndValue(item.geometry); // moving to here
 
             // when placing a little feedback helps
-            if (items[i]->placing) {
+            if (item.item->placing) {
                 animation->setEasingCurve(QEasingCurve(QEasingCurve::OutBack));
-                items[i]->placing = false;
+                item.item->placing = false;
             } else animation->setEasingCurve(QEasingCurve(QEasingCurve::OutQuint));
 
             group->addAnimation(animation);
+        } else if (item.invisible) {
+            if (landingzone == nullptr) {
+                QColor bgColor = GColor(CCARDBACKGROUND);
+                bgColor.setAlpha(200);
+                QPen pen(bgColor);
+                pen.setWidth(10 * dpiXFactor);
+                bgColor.setAlpha(100);
+                QBrush brush(bgColor);
+                landingzone = scene->addRect(item.geometry, pen, brush);
+            } else if (landingzone->rect() != item.geometry) {
+                landingzone->setRect(item.geometry);
+            }
         }
-
-        // set spot for next tile
-        y += theight + SPACING;
     }
 
-    // set the scene rectangle, columns start at 0
-    sceneRect = QRectF(0, 0, columns[column] + x + SPACING, maxy);
+    //fprintf(stderr, "AFTER: ");
+    //foreach(ChartSpaceItem *item, items)  fprintf(stderr, "%d:%d ", item->column, item->order);
+    //fprintf(stderr, "\n"); fflush(stderr);
 
     if (animated) group->start();
 }
 
 void
-ChartSpace::configChanged(qint32)
+ChartSpace::configChanged(qint32 why)
 {
     grayConfig = colouredIconFromPNG(":images/configure.png", GColor(COVERVIEWBACKGROUND).lighter(75));
     whiteConfig = colouredIconFromPNG(":images/configure.png", QColor(100,100,100));
     accentConfig = colouredIconFromPNG(":images/configure.png", QColor(150,150,150));
 
+    grayEdit = colouredIconFromPNG(":images/tile-edit.png", GColor(COVERVIEWBACKGROUND).lighter(75));
+    whiteEdit = colouredIconFromPNG(":images/tile-edit.png", QColor(100, 100, 100));
+    accentEdit = colouredIconFromPNG(":images/tile-edit.png", QColor(150, 150, 150));
+
     // set fonts
     bigfont.setPixelSize(pixelSizeForFont(bigfont, ROWHEIGHT *2.5f));
+    bigfont.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
     titlefont.setPixelSize(pixelSizeForFont(titlefont, ROWHEIGHT)); // need a bit of space
+    titlefont.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
     midfont.setPixelSize(pixelSizeForFont(midfont, ROWHEIGHT *0.8f));
+    midfont.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
     smallfont.setPixelSize(pixelSizeForFont(smallfont, ROWHEIGHT*0.7f));
+    smallfont.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
     tinyfont.setPixelSize(pixelSizeForFont(smallfont, ROWHEIGHT*0.5f));
+    tinyfont.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
 
     setProperty("color", GColor(COVERVIEWBACKGROUND));
     view->setBackgroundBrush(QBrush(GColor(COVERVIEWBACKGROUND)));
     scene->setBackgroundBrush(QBrush(GColor(COVERVIEWBACKGROUND)));
-    scrollbar->setStyleSheet(TabView::ourStyleSheet());
+    scrollbar->setStyleSheet(AbstractView::ourStyleSheet());
 
     // text edit colors
     QPalette palette;
     palette.setColor(QPalette::Window, GColor(COVERVIEWBACKGROUND));
-    palette.setColor(QPalette::Background, GColor(COVERVIEWBACKGROUND));
 
     // only change base if moved away from white plots
     // which is a Mac thing
@@ -509,6 +713,9 @@ ChartSpace::configChanged(qint32)
     palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(COVERVIEWBACKGROUND)));
     palette.setColor(QPalette::Text, GCColor::invertColor(GColor(COVERVIEWBACKGROUND)));
     //code->setPalette(palette);
+
+    foreach(ChartSpaceItem *item, items) item->configChanged(why);
+
     repaint();
 }
 
@@ -531,7 +738,7 @@ ChartSpace::updateView()
     }
 
     // don'r scale whilst resizing on x?
-    if (scrolling || (state != YRESIZE && state != XRESIZE && state != DRAG)) {
+    if (scrolling || (state != SPAN && state != YRESIZE && state != XRESIZE && state != DRAG)) {
 
         // much of a resize / change ?
         double dx = fabs(viewRect.x() - sceneRect.x());
@@ -666,6 +873,17 @@ ChartSpace::setViewRect(QRectF rect)
 
 }
 
+int
+ChartSpace::columnCount(int col)
+{
+    int count = 0;
+    for(int i=0; i<items.count(); i++) {
+        if (items[i]->column == col)
+            count++;
+    }
+    return count;
+}
+
 bool
 ChartSpace::eventFilter(QObject *, QEvent *event)
 {
@@ -730,9 +948,21 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
 
         // take it as applied
         QGraphicsSceneWheelEvent *w = static_cast<QGraphicsSceneWheelEvent*>(event);
-        scrollTo(_viewY - (w->delta()*2));
-        event->accept();
-        returning = true;
+
+        // give child a chance to process this
+        QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();
+        QGraphicsItem *gritem = scene->itemAt(pos, view->transform());
+        ChartSpaceItem *item = static_cast<ChartSpaceItem*>(gritem);
+
+        // give item a chance to process before we snag it
+        if (item) item->wheelEvent(w);
+
+        // we still get to process it if they didn't accept it
+        if (!w->isAccepted()) {
+            scrollTo(_viewY - (w->delta()*gl_wheelscale));
+            event->accept();
+            returning = true;
+        }
 
     } else  if (event->type() == QEvent::GraphicsSceneMousePress) {
 
@@ -758,20 +988,35 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
             if (item && item->inCorner()) {
 
                 block = false; // reeentry is allowed
-                emit itemConfigRequested(item);
+                emit itemConfigRequested(item, static_cast<QGraphicsSceneMouseEvent*>(event)->screenPos());
                 return true;
             }
 
-            // only respond to clicks not in config corner button
-            if (item && ! item->inCorner()) {
+            // trigger date edit menu
+            if (item && item->inEdit()) {
+
+                block = false; // reeentry is allowed
+                item->displayTileEditMenu(static_cast<QGraphicsSceneMouseEvent*>(event)->screenPos());
+                return true;
+            }
+
+            // only respond to clicks not in config corner or edit button
+            if (item && !item->inCorner() && !item->inEdit()) {
 
                // are we on the boundary of the ChartSpaceItem?
                double offx = pos.x()-item->geometry().x();
                double offy = pos.y()-item->geometry().y();
 
+               if (clickOverride(item, static_cast<QGraphicsSceneMouseEvent*>(event))) {
 
-               if (item->geometry().height()-offy < 10) {
+                    // thanks we'll take that
+                    event->accept();
+                    returning = true;
 
+               } else if (item->geometry().height()-offy < (gl_near*dpiXFactor)) {
+
+                    // We can span resize a specific chartspaceitem
+                    // by pressing SHIFT when we click
                     state = YRESIZE;
 
                     stateData.yresize.item = item;
@@ -782,11 +1027,13 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                     event->accept();
                     returning = true;
 
-               } else if (item->geometry().width()-offx < 10) {
+               } else if (item->geometry().width()-offx < (gl_near*dpiXFactor)) {
 
-                    state = XRESIZE;
+                    if (QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier)  state = SPAN;
+                    else state = XRESIZE;
 
-                    stateData.xresize.column = item->column;
+                    stateData.xresize.item = item;
+                    stateData.xresize.column = item->column+item->span-1;
                     stateData.xresize.width = columns[item->column];
                     stateData.xresize.posx = pos.x();
 
@@ -800,6 +1047,11 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                     // work out the offset so we can move
                     // it around when we start dragging
                     state = DRAG;
+
+                    // warn items we are dragging, they may temporarily
+                    // hide widgets to make things faster
+                    foreach(ChartSpaceItem *item, items) item->dragging(true);
+
                     item->invisible = true;
                     item->setDrag(true);
                     item->setZValue(100);
@@ -821,21 +1073,33 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
             }
         }
 
-    } else  if (event->type() == QEvent::GraphicsSceneMouseRelease) {
+    } else if (event->type() == QEvent::GraphicsSceneMouseRelease) {
 
         // stop dragging
-        if (state == DRAG || state == YRESIZE || state == XRESIZE) {
+        if (state == DRAG || state == YRESIZE || state == SPAN || state == XRESIZE) {
+            if (landingzone != nullptr) {
+                scene->removeItem(landingzone);
+                delete landingzone;
+                landingzone = nullptr;
+            }
 
             // we want this one
             event->accept();
             returning = true;
 
             // set back to visible if dragging
+            bool wasdrag=false;
             if (state == DRAG) {
+                wasdrag=true;
                 stateData.drag.item->invisible = false;
                 stateData.drag.item->setZValue(10);
                 stateData.drag.item->placing = true;
-                stateData.drag.item->setDrag(false);
+            }
+
+            if (state == DRAG) {
+                // tell items we are done dragging, they may temporarily
+                // hide widgets to make things faster, we need to show them again
+                foreach(ChartSpaceItem *item, items) item->dragging(false);
             }
 
             // end state;
@@ -844,6 +1108,15 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
             // drop it down
             updateGeometry();
             updateView();
+
+            // clear drag status once its been placed, regardless
+            // we need to leave the item marked as dragging until
+            // it has been placed, since it may overlap with another
+            // tile based upon where the user dragged it to
+            // and we don't want to move tiles out of the way of where
+            // it currently is (unplaced, hovering over something)
+            // when they release it to drop into place
+            if (wasdrag) stateData.drag.item->setDrag(false);
         }
 
     } else if (event->type() == QEvent::GraphicsSceneMouseMove) {
@@ -872,27 +1145,27 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                 double offx = pos.x()-item->geometry().x();
                 double offy = pos.y()-item->geometry().y();
 
-                if (yresizecursor == false && item->geometry().height()-offy < 10) {
+                if (yresizecursor == false && item->geometry().height()-offy < (gl_near*dpiXFactor)) {
 
                     yresizecursor = true;
-                    setCursor(QCursor(Qt::SizeVerCursor));
+                    view->viewport()->setCursor(QCursor(Qt::SizeVerCursor));
 
-                } else if (yresizecursor == true && item->geometry().height()-offy > 10) {
+                } else if (yresizecursor == true && item->geometry().height()-offy > (gl_near*dpiXFactor)) {
 
                     yresizecursor = false;
-                    setCursor(QCursor(Qt::ArrowCursor));
+                    view->viewport()->setCursor(QCursor(Qt::ArrowCursor));
 
                 }
 
-                if (xresizecursor == false && item->geometry().width()-offx < 10) {
+                if (xresizecursor == false && item->geometry().width()-offx < (gl_near*dpiXFactor)) {
 
                     xresizecursor = true;
-                    setCursor(QCursor(Qt::SizeHorCursor));
+                    view->viewport()->setCursor(QCursor(Qt::SizeHorCursor));
 
-                } else if (xresizecursor == true && item->geometry().width()-offx > 10) {
+                } else if (xresizecursor == true && item->geometry().width()-offx > (gl_near*dpiXFactor)) {
 
                     xresizecursor = false;
-                    setCursor(QCursor(Qt::ArrowCursor));
+                    view->viewport()->setCursor(QCursor(Qt::ArrowCursor));
 
                 }
 
@@ -902,120 +1175,166 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                 // set it back to the normal arrow pointer
                 if (yresizecursor || xresizecursor || cursor().shape() != Qt::ArrowCursor) {
                     xresizecursor = yresizecursor = false;
-                    setCursor(QCursor(Qt::ArrowCursor));
+                    view->viewport()->setCursor(QCursor(Qt::ArrowCursor));
                 }
             }
 
         } else if (state == DRAG && !scrolling) {          // dragging?
-
             // whilst mouse moves, only update geom when changed
             bool changed = false;
 
             // move the ChartSpaceItem being dragged
-            stateData.drag.item->setPos(pos.x()-stateData.drag.offx, pos.y()-stateData.drag.offy);
+            stateData.drag.item->setPos(pos.x() - stateData.drag.offx, pos.y() - stateData.drag.offy);
 
-            // should I move?
-            QList<QGraphicsItem *> overlaps;
-            foreach(QGraphicsItem *p, scene->items(pos))
-                if(items.contains(static_cast<ChartSpaceItem*>(p)))
-                    overlaps << p;
-
-            // we always overlap with ourself, so see if more
-            if (overlaps.count() > 1) {
-
-                ChartSpaceItem *over = static_cast<ChartSpaceItem*>(overlaps[1]);
-                if (pos.y()-over->geometry().y() > over->geometry().height()/2) {
-
-                    // place below the one its over
-                    stateData.drag.item->column = over->column;
-                    stateData.drag.item->order = over->order+1;
-                    for(int i=items.indexOf(over); i< items.count(); i++) {
-                        if (i>=0 && items[i]->column == over->column && items[i]->order > over->order && items[i] != stateData.drag.item) {
-                            items[i]->order += 1;
-                            changed = true;
-                        }
-                    }
-
-                } else {
-
-                    // place above the one its over
-                    stateData.drag.item->column = over->column;
-                    stateData.drag.item->order = over->order;
-                    for(int i=0; i< items.count(); i++) {
-                        if (i>=0 && items[i]->column == over->column && items[i]->order >= (over->order) && items[i] != stateData.drag.item) {
-                            items[i]->order += 1;
-                            changed = true;
-                        }
-                    }
-                }
-
-            } else {
-
-                // columns are now variable width
-                // create a new column to the right?
-                int x=SPACING;
+            // Nothing to do when mouse is over the landingzone
+            if (   landingzone == nullptr
+                || ! landingzone->contains(pos)) {
+                // What is my target column? Because of spans we can't rely only on overlaps
+                int x = SPACING;
                 int targetcol = -1;
-                for(int i=0; i<10; i++) {
-                    if (pos.x() > x && pos.x() < (x+columns[i]+SPACING)) {
+                for (int i = 0; i < 10; i++) {
+                    if (pos.x() > x && pos.x() < (x + columns[i] + SPACING)) {
                         targetcol = i;
                         break;
                     }
-                    x += columns[i]+SPACING;
+                    x += columns[i] + SPACING;
                 }
 
-                if (items.last()->column < 9 && targetcol < 0) {
-
-                    // don't keep moving - if we're already alone in column 0 then no move is needed
-                    if (stateData.drag.item->column != 0 || (items.count()>1 && items[1]->column == 0)) {
-
-                        // new col to left
-                        for(int i=0; i< items.count(); i++) items[i]->column += 1;
-                        stateData.drag.item->column = 0;
-                        stateData.drag.item->order = 0;
-
-                        // shift columns widths to the right
-                        for(int i=9; i>0; i--) columns[i] = columns[i-1];
-                        columns[0] = stateData.drag.width;
-
-                        changed = true;
+                // Do we overlap?
+                ChartSpaceItem *over = nullptr;
+                for (QGraphicsItem *p : scene->items(pos)) {
+                    if (p != landingzone) {
+                        ChartSpaceItem *testItem = static_cast<ChartSpaceItem*>(p);
+                        if (items.contains(testItem) && testItem != stateData.drag.item && testItem->column == targetcol) {
+                            over = testItem;
+                            break;
+                        }
                     }
+                }
 
-                } else if (items.last()->column < 9 && items.last() && items.last()->column < targetcol) {
+                // Find
+                // * the highest column in active use
+                // * all items currently placed in targetcol (excluding the dragged item)
+                // This excludes items "only" spanning over this column
+                QList<ChartSpaceItem*> columnItems;
+                int highestcol = -1;
+                for (ChartSpaceItem *item : items) {
+                    if (item->column == targetcol && item != stateData.drag.item) {
+                        columnItems << item;
+                    }
+                    highestcol = std::max(highestcol, item->column + item->span - 1);
+                }
+                std::sort(columnItems.begin(), columnItems.end(), LayoutChartSpaceItem::LayoutChartSpaceItemSort);
 
-                    // new col to the right
-                    stateData.drag.item->column = items.last()->column + 1;
-                    stateData.drag.item->order = 0;
+                // Correct targetcol if it exceeds highestcol with a (then) empty highestcol
+                targetcol = std::min(targetcol, highestcol + 1);
+                if (   highestcol >= 0
+                    && targetcol > highestcol
+                    && columnCount(highestcol) == 1
+                    && stateData.drag.item->column == highestcol) {
+                    targetcol = highestcol;
+                }
 
-                    // make column width same as source width
-                    columns[stateData.drag.item->column] = stateData.drag.width;
-
-                    changed = true;
-
+                if (over != nullptr) {
+                    if (pos.y() - over->geometry().y() > over->geometry().height() / 2) {
+                        // place below the one its over
+                        if (   stateData.drag.item->column != over->column
+                            || stateData.drag.item->order <= over->order) {
+                            stateData.drag.item->column = over->column;
+                            stateData.drag.item->order = over->order + 1;
+                            changed = true;
+                            for (int i = columnItems.indexOf(over); i < columnItems.count(); i++) {
+                                if (   columnItems[i]->order > over->order
+                                    && columnItems[i] != stateData.drag.item) {
+                                    columnItems[i]->order += 1;
+                                }
+                            }
+                        }
+                    } else {
+                        // place above the one its over
+                        if (   stateData.drag.item->column != over->column
+                            || stateData.drag.item->order >= over->order) {
+                            stateData.drag.item->column = over->column;
+                            stateData.drag.item->order = over->order;
+                            changed = true;
+                            for (ChartSpaceItem *colItem : columnItems) {
+                                if (   colItem->order >= (over->order)
+                                    && colItem != stateData.drag.item) {
+                                    colItem->order += 1;
+                                }
+                            }
+                        }
+                    }
                 } else {
+                    if (targetcol < 0) {
+                        // create a new column to the right?
+                        if (highestcol < 9 && columnCount(0) > 1) {
+                            // Drop as new first column
+                            // don't keep moving - if we're already alone in column 0 then no move is needed
+                            // new col to left
+                            for (ChartSpaceItem *item : items) {
+                                item->column += 1;
+                            }
+                            stateData.drag.item->column = 0;
+                            stateData.drag.item->order = 0;
 
-                    // add to the end of the column
-                    int last = -1;
-                    for(int i=0; i<items.count() && items[i]->column <= targetcol; i++) {
-                        if (items[i]->column == targetcol) last=i;
+                            // shift columns widths to the right
+                            for (int i = 9; i > 0; i--) {
+                                columns[i] = columns[i - 1];
+                            }
+                            columns[0] = stateData.drag.width;
+
+                            changed = true;
+                        }
+                    } else if (targetcol <= 9) {
+                        if (columnItems.count() > 0) {
+                            if (pos.y() > columnItems.last()->geometry().bottom()) {
+                                // Append below last
+                                if (   stateData.drag.item->column != targetcol
+                                    || (   stateData.drag.item->column == targetcol
+                                        && stateData.drag.item->order <= columnItems.last()->order)) {
+                                    stateData.drag.item->column = targetcol;
+                                    stateData.drag.item->order = columnItems.last()->order + 1;
+                                    changed = true;
+                                }
+                            } else {
+                                // Insert above item
+                                for (ChartSpaceItem *colItem : columnItems) {
+                                    if (! changed && pos.y() < colItem->geometry().top()) {
+                                        if (   stateData.drag.item->column != targetcol
+                                            || (   stateData.drag.item->column == targetcol
+                                                && stateData.drag.item->order >= colItem->order)) {
+                                            stateData.drag.item->column = targetcol;
+                                            stateData.drag.item->order = colItem->order;
+                                            changed = true;
+                                        }
+                                        if (! changed) {
+                                            break;
+                                        }
+                                    }
+                                    if (changed) {
+                                        ++colItem->order;
+                                    }
+                                }
+                            }
+                        } else {
+                            // Add as first item
+                            if (   stateData.drag.item->column != targetcol
+                                || stateData.drag.item->order != 0) {
+                                stateData.drag.item->column = targetcol;
+                                stateData.drag.item->order = 0;
+                                changed = true;
+                            }
+                        }
                     }
-
-                    // so long as its been dragged below the last entry on the column !
-                    if (last >= 0 && pos.y() > items[last]->geometry().bottom()) {
-                        stateData.drag.item->column = targetcol;
-                        stateData.drag.item->order = items[last]->order+1;
-                    }
-
-                    changed = true;
                 }
-
             }
 
-            if (changed) {
+            if (changed || landingzone == nullptr) {
                 // drop it down
                 updateGeometry();
                 updateView();
             }
-
         } else if (state == YRESIZE) {
 
             // resize in rows, so in 75px units
@@ -1030,6 +1349,21 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
             // drop it down
             updateGeometry();
             updateView();
+
+        } else if (state == SPAN) {
+
+            QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();
+
+            // which column is the cursor currently in?
+            int col = columnForX(pos.x());
+            int span = stateData.xresize.item->span;
+            int newspan = col-stateData.xresize.item->column+1;
+            if (span != newspan) stateData.xresize.item->span = newspan;
+
+            // animate
+            updateGeometry();
+            updateView();
+
 
         } else if ( state == XRESIZE) {
 
@@ -1053,6 +1387,20 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
     return returning;
 }
 
+// for x position, which column is that (starting at column 0) ?
+// used when span resizing a chartspace item
+int
+ChartSpace::columnForX(int x)
+{
+    int returning = 0;
+    int offset = SPACING;
+    for(int i=0; i<columns.count(); i++) {
+        if (x > offset) returning = i;
+        offset += columns[i] + SPACING;
+    }
+
+    return returning;
+}
 
 void
 ChartSpaceItem::clicked()

@@ -51,6 +51,8 @@
 //
 // ManualDataProcessorDialog is a dialog box to manually execute a
 // dataprocessor on the current ride and is called from the mainWindow menus
+// when no ride but DataProcessorConfig is provided it allows edit and confirm
+// to apply to multiple ride in BatchProcessingDialog
 //
 
 // every data processor must supply a configuration Widget
@@ -58,47 +60,60 @@
 class DataProcessorConfig : public QWidget
 {
     Q_OBJECT
-    G_OBJECT
-
 
     public:
         DataProcessorConfig(QWidget *parent=0) : QWidget(parent) {}
         virtual ~DataProcessorConfig() {}
         virtual void readConfig() = 0;
         virtual void saveConfig() = 0;
-        virtual QString explain() = 0;
 };
 
 // the data processor abstract base class
 class DataProcessor
 {
     public:
+        enum Automation {
+            Manual = 0,
+            Auto = 1,
+            Save = 2
+        };
+
         DataProcessor() {}
         virtual ~DataProcessor() {}
         virtual bool postProcess(RideFile *, DataProcessorConfig*settings=0, QString op="") = 0;
-        virtual DataProcessorConfig *processorConfig(QWidget *parent, const RideFile* ride = NULL) = 0;
-        virtual QString name() = 0; // Localized Name for user interface
-        virtual bool isCoreProcessor() { return true; }
+        virtual DataProcessorConfig *processorConfig(QWidget *parent, const RideFile* ride = NULL) const = 0;
+        virtual QString name() const = 0; // Localized Name for user interface
+        virtual QString id() const = 0; // Unique Id for internal handling
+        virtual QString legacyId() const { return QString(); }
+        virtual bool isCoreProcessor() const { return true; }
+        Automation getAutomation() const;
+        void setAutomation(Automation automation);
+        bool isAutomatedOnly() const;
+        void setAutomatedOnly(bool automatedOnly);
+        virtual QString explain() const = 0;
+
+        static QString configKeyAutomatedOnly(const QString &id);
+        static QString configKeyAutomation(const QString &id);
+        static QString configKeyApply(const QString &id); // Legacy key, only required for migration. Use configKeyAutomation instead
 };
 
 // all data processors
 class DataProcessorFactory {
 
     private:
-
         static DataProcessorFactory *instance_;
         static bool autoprocess;
         QMap<QString,DataProcessor*> processors;
         DataProcessorFactory() {}
 
-
     public:
-
         ~DataProcessorFactory();
         static DataProcessorFactory &instance();
-        bool registerProcessor(QString name, DataProcessor *processor);
+        bool registerProcessor(DataProcessor *processor);
         void unregisterProcessor(QString name);
+        DataProcessor* getProcessor(const QString &id) const;
         QMap<QString,DataProcessor*> getProcessors(bool coreProcessorsOnly = false) const;
+        QList<DataProcessor*> getProcessorsSorted(bool coreProcessorsOnly = false) const;
         bool autoProcess(RideFile *, QString mode, QString op); // run auto processes (after open rideFile)
         void setAutoProcessRule(bool b) { autoprocess = b; } // allows to switch autoprocess off (e.g. for Upgrades)
 };
@@ -111,7 +126,7 @@ class ManualDataProcessorDialog : public QDialog
 
 
     public:
-        ManualDataProcessorDialog(Context *, QString, RideItem *);
+        ManualDataProcessorDialog(Context *, QString, RideItem *, DataProcessorConfig *conf=nullptr);
 
     private slots:
         void cancelClicked();
@@ -124,6 +139,7 @@ class ManualDataProcessorDialog : public QDialog
         DataProcessor *processor;
         DataProcessorConfig *config;
         QTextEdit *explain;
+        QCheckBox *saveAsDefault;
         QPushButton *ok, *cancel;
 };
 #endif // _DataProcessor_h

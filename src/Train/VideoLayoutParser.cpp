@@ -23,11 +23,13 @@
 #include <QString>
 #include <QDebug>
 
+#include "Context.h"
+
 #include "VideoLayoutParser.h"
 #include "MeterWidget.h"
 
-VideoLayoutParser::VideoLayoutParser (QList<MeterWidget*>* metersWidget, QList<QString>* layoutNames, QWidget* VideoContainer)
-    : metersWidget(metersWidget), layoutNames(layoutNames), VideoContainer(VideoContainer)
+VideoLayoutParser::VideoLayoutParser (QList<MeterWidget*>* metersWidget, QList<QString>* layoutNames, QWidget* VideoContainer, Context* context)
+    : context(context), metersWidget(metersWidget), layoutNames(layoutNames), VideoContainer(VideoContainer)
 {
     nonameindex = 0;
     skipLayout = false;
@@ -185,9 +187,13 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
         {
             meterWidget = new ElevationMeterWidget(meterName, containerWidget, source);
         }
+        else if (meterType == QString("ElevationZoomed"))
+        {
+            meterWidget = new ElevationZoomedMeterWidget(meterName, containerWidget, source);
+        }
         else if (meterType == QString("LiveMap"))
         {
-            meterWidget = new LiveMapWidget(meterName, containerWidget, source);
+            meterWidget = new LiveMapWidget(meterName, containerWidget, source, context);
         }
         else
         {
@@ -263,7 +269,7 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
         meterWidget->m_AltFont = QFont(FontName, FontSize);
         meterWidget->m_AltFont.setFixedPitch(true);
     }
-    else if(qName != "layouts" && qName != "Text" && qName != "AltText" && qName != "Angle" && qName != "SubRange" && qName != "Zoom")
+    else if(qName != "layouts" && qName != "Text" && qName != "AltText" && qName != "Angle" && qName != "SubRange" && qName != "Zoom" && qName != "osmURL")
     {
         qDebug() << QObject::tr("Unknown start element ") << qName;
     }

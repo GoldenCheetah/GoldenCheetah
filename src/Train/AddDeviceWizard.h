@@ -76,7 +76,8 @@ public:
     DeviceScanner *scanner;
 
     // Device Data
-    int    virtualPowerIndex;      // index of selected virtual power function
+    int    virtualPowerIndex;   // index of selected virtual power function
+    QString virtualPowerName;   // name of selected virtual power curve
     int    wheelSize;
     int    strideLength;
     double inertialMomentKGM2;  // inertial moment of trainer in (KG M^2)
@@ -222,10 +223,17 @@ class AddPairBTLE : public QWizardPage
         bool validatePage();
         void cleanupPage();
 
+    private slots:
+        void scanFinished(bool foundDevices);
+
     private:
         AddDeviceWizard *wizard;
         QTreeWidget *channelWidget;
+        QProgressBar *bar;
 
+        static const int NameRole = Qt::UserRole + 1;
+        static const int AddressRole = Qt::UserRole + 2;
+        static const int UuidRole = Qt::UserRole + 3;
 };
 
 class AddVirtualPower : public QWizardPage
@@ -235,6 +243,7 @@ class AddVirtualPower : public QWizardPage
 public:
     AddVirtualPower(AddDeviceWizard*);
     void initializePage();
+    bool validatePage();
 
 private:
     AddDeviceWizard* wizard;
@@ -273,6 +282,7 @@ private slots:
     void myDoubleSpinBoxChanged(double d);
     void mySortTable(int i);
     void mySetTableFromComboBox(int i);
+    void virtualPowerNameChanged();
     void myCreateCustomPowerCurve();
 };
 
@@ -293,8 +303,7 @@ class AddFinal : public QWizardPage
         QLineEdit *name;
         QLineEdit *port;
         QLineEdit *profile;
-        QGroupBox *selectDefault;
-        QCheckBox *defWatts, *defBPM, *defKPH, *defRPM;
+        QLineEdit *virtualPowerName;
 };
 
 class DeviceScanner : public QThread

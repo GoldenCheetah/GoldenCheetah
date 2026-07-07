@@ -28,6 +28,11 @@
 #include "Settings.h"
 #include "Colors.h"
 #include "Units.h"
+#include "SplineLookup.h"
+
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
 
 #include <QtXml/QtXml>
 #include <algorithm> // for std::lower_bound
@@ -36,7 +41,6 @@
 #include <float.h>
 #endif
 #include <cmath>
-#include <qwt_spline.h>
 
 #ifdef GC_HAVE_SAMPLERATE
 // we have libsamplerate
@@ -64,7 +68,7 @@ const QChar deltaChar(0x0394);
 
 RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
             wstale(true), startTime_(startTime), recIntSecs_(recIntSecs),
-            deviceType_("unknown"), data(NULL), wprime_(NULL), 
+            data(NULL), wprime_(NULL),
             weight_(0), totalCount(0), totalTemp(0), dstale(true)
 {
     command = new RideFileCommand(this);
@@ -79,13 +83,13 @@ RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
 // when constructing a temporary ridefile when computing intervals
 // and we want to get special fields and ESPECIALLY "CP" and "Weight"
 RideFile::RideFile(RideFile *p) :
-    wstale(true), recIntSecs_(p->recIntSecs_), deviceType_(p->deviceType_), data(NULL), wprime_(NULL), 
-    weight_(p->weight_), totalCount(0), dstale(true)
+    wstale(true), recIntSecs_(p->recIntSecs_), data(NULL), wprime_(NULL),
+    weight_(p->weight_), totalCount(0), totalTemp(0), dstale(true)
 {
     startTime_ = p->startTime_;
     tags_ = p->tags_;
     referencePoints_ = p->referencePoints_;
-    deviceType_ = p->deviceType_;
+    setDeviceType(p->deviceType());
     fileFormat_ = p->fileFormat_;
     intervals_ = p->intervals_;
     calibrations_ = p->calibrations_;
@@ -100,8 +104,8 @@ RideFile::RideFile(RideFile *p) :
 }
 
 RideFile::RideFile() : 
-    wstale(true), recIntSecs_(0.0), deviceType_("unknown"), data(NULL), wprime_(NULL), 
-    weight_(0), totalCount(0), dstale(true)
+    wstale(true), recIntSecs_(0.0), data(NULL), wprime_(NULL),
+    weight_(0), totalCount(0), totalTemp(0), dstale(true)
 {
     command = new RideFileCommand(this);
 
@@ -155,7 +159,7 @@ RideFile::computeFileCRC(QString filename)
     rawstream->readRawData(&data[0], file.size());
     file.close();
 
-    return qChecksum(&data[0], file.size());
+    return qChecksum(QByteArrayView(&data[0], file.size()));
 }
 
 void
@@ -187,7 +191,8 @@ RideFile::updateDataTag()
     else flags += '-';
     if (areDataPresent()->headwind) flags += 'W'; // Windspeed
     else flags += '-';
-    if (areDataPresent()->temp) flags += 'E'; // Temperature
+    if (areDataPresent()->temp ||
+        areDataPresent()->tcore) flags += 'E'; // Temperature
     else flags += '-';
     if (areDataPresent()->lrbalance) flags += 'V'; // V for "Vector" aka lr pedal data
     else flags += '-';
@@ -213,22 +218,55 @@ RideFile::wprimeData()
 }
 
 QString
+RideFile::sportTag(QString sport)
+{
+    // Some sports are standarized, all others are up to the user
+    static const QHash<QString, QString> sports = {
+        { tr("Bike"), "Bike" },
+        { "Biking", "Bike" }, { tr("Biking"), "Bike" },
+        { "Cycle", "Bike" }, { tr("Cycle"), "Bike" },
+        { "Cycling", "Bike" }, { tr("Cycling"), "Bike" },
+
+        { tr("Run"), "Run" },
+        { "Running", "Run" }, { tr("Running"), "Run" },
+
+        { tr("Swim"), "Swim" },
+        { "Swimming", "Swim" }, { tr("Swimming"), "Swim" },
+
+        { tr("Row"), "Row" },
+        { "Rowing", "Row" }, { tr("Rowing"), "Row" },
+
+        { tr("Ski"), "Ski" },
+        { "XC Ski", "Ski" }, { tr("XC Ski"), "Ski" },
+        { "Cross Country Skiiing", "Ski" }, { tr("Cross Countr Skiing"), "Ski" },
+
+        { tr("Gym"), "Gym" },
+        { "Strength", "Gym" }, { tr("Strength"), "Gym" },
+
+        { tr("Walk"), "Walk" },
+        { "Walking", "Walk" }, { tr("Walking"), "Walk" },
+    };
+
+    return sports.value(sport, sport);
+}
+
+QString
 RideFile::sport() const
 {
     // Run, Bike and Swim are standarized, all others are up to the user
     if (isBike()) return "Bike";
     if (isRun()) return "Run";
     if (isSwim()) return "Swim";
-    return getTag("Sport","");
+    return sportTag(getTag("Sport",""));
 }
 
 bool
 RideFile::isBike() const
 {
     // for now we just look at Sport and default to Bike when Sport is not
-    // set and isRun and isSwim are false
-    return (getTag("Sport", "") == "Bike" || getTag("Sport", "") == tr("Bike")) ||
-           (getTag("Sport","") == "" && !isRun() && !isSwim());
+    // set and isRun and isSwim are false- but if its an aero test it must be bike
+    return isAero() || (sportTag(getTag("Sport", "")) == "Bike") ||
+           (getTag("Sport","").isEmpty() && !isRun() && !isSwim());
 }
 
 bool
@@ -236,22 +274,28 @@ RideFile::isRun() const
 {
     // for now we just look at Sport and if there are any
     // running specific data series in the data when Sport is not set
-    return (getTag("Sport", "") == "Run" || getTag("Sport", "") == tr("Run")) ||
-           (getTag("Sport","") == "" && (areDataPresent()->rvert || areDataPresent()->rcad || areDataPresent()->rcontact));
+    return (sportTag(getTag("Sport", "")) == "Run") ||
+           (getTag("Sport","").isEmpty() && (areDataPresent()->rvert || areDataPresent()->rcad || areDataPresent()->rcontact));
 }
 
 bool
 RideFile::isSwim() const
 {
     // for now we just look at Sport or presence of length data for lap swims
-    return (getTag("Sport", "") == "Swim" || getTag("Sport", "") == tr("Swim")) ||
-           (getTag("Sport","") == "" && xdata_.value("SWIM", NULL) != NULL);
+    return (sportTag(getTag("Sport", "")) == "Swim") ||
+           (getTag("Sport","").isEmpty() && xdata_.value("SWIM", NULL) != NULL);
 }
 
 bool
 RideFile::isXtrain() const
 {
-    return !isBike() && !isRun() && !isSwim();
+    return !isBike() && !isRun() && !isSwim() && !isAero();
+}
+
+bool
+RideFile::isAero() const
+{
+    return (getTag("Sport","") == "Aero" || xdata("AERO") != NULL);
 }
 
 // compatibility means used in e.g. R so no spaces in names,
@@ -371,7 +415,7 @@ RideFile::seriesName(SeriesType series, bool compat)
         case RideFile::gear: return QString(tr("Gear Ratio"));
         case RideFile::wbal: return QString(tr("W' Consumed"));
         case RideFile::index: return QString(tr("Sample Index"));
-        case RideFile::tcore: return QString("Core Temperature");
+        case RideFile::tcore: return QString(tr("Core Temperature"));
         default: return QString(tr("Unknown"));
         }
     }
@@ -426,6 +470,7 @@ RideFile::colorFor(SeriesType series)
     case RideFile::rcontact: return GColor(CRGCT);
     case RideFile::rcad: return GColor(CRCAD);
     case RideFile::gear: return GColor(CGEAR);
+    case RideFile::tcore: return GColor(CTEMP);
     case RideFile::secs:
     case RideFile::km:
     case RideFile::vam:
@@ -493,6 +538,7 @@ RideFile::unitName(SeriesType series, Context *context)
     case RideFile::rvert: return QString(tr("cm"));
     case RideFile::rcontact: return QString(tr("ms"));
     case RideFile::gear: return QString(tr("ratio"));
+    case RideFile::tcore: return QString(tr("°C"));
     default: return QString(tr("Unknown"));
     }
 }
@@ -881,11 +927,48 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
 
         result->context = context;
 
+        // post process metadata- take tags from main metadata
+        // and move to interval metadata where there is a match
+        // this really only applies to JSON ride files
+        QStringList removelist;
+        QMap<QString,QString>::const_iterator i;
+        for (i=result->tags().constBegin(); i != result->tags().constEnd(); i++) {
+
+            QString name = i.key();
+            QString value = i.value();
+
+            // if contains '##' we should id it as interval metadata
+            if (name.contains("##")) {
+                bool found=false;
+                foreach(FieldDefinition x, GlobalContext::context()->rideMetadata->getFields()) {
+                    if (x.interval == true) {
+                        if (name.endsWith("##" + x.name)) {
+                            // we have some metadata, lets see if it matches
+                            // any intervals we have defined
+                            foreach(RideFileInterval *p, result->intervals()) {
+                                if (name.startsWith(p->name + "##")) {
+                                    // we have a winner, lets transfer
+                                    p->setTag(x.name, value);
+                                    found=true;
+                                    removelist << name;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (found) break;
+                }
+            }
+        }
+        // now remove metadata that was inserted into
+        // interval metadata from the main tags
+        foreach(QString key, removelist) result->tags_.remove(key);
+
         if (result->intervals().empty()) result->fillInIntervals();
         // override the file ride time with that set from the filename
         // but only if it matches the GC format
         QFileInfo fileInfo(file.fileName());
-        
+
         // Regular expression to match either date format, including a mix of dashes and underscores
         // yyyy-MM-dd-hh-mm-ss.extension
         // or yyyy_MM_dd_hh_mm_ss.extension
@@ -912,7 +995,6 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
 
         // set other "special" fields
         result->setTag("Filename", QFileInfo(file.fileName()).fileName());
-        result->setTag("Device", result->deviceType());
         result->setTag("File Format", result->fileFormat());
         if (context) result->setTag("Athlete", context->athlete->cyclist);
         result->setTag("Year", result->startTime().toString("yyyy"));
@@ -932,12 +1014,28 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
                 p->km = p->km - kmOffset;
                 p->secs = p->secs - timeOffset;
             }
-        }
 
-        // drag back intervals
-        foreach(RideFileInterval *i, result->intervals()) {
-            i->start -= timeOffset;
-            i->stop -= timeOffset;
+            // drag back intervals
+            foreach(RideFileInterval *i, result->intervals()) {
+                i->start -= timeOffset;
+                i->stop -= timeOffset;
+            }
+
+            // drag back DEVELOPER xdata
+            QMapIterator<QString,XDataSeries*> it(result->xdata());
+            while(it.hasNext()) {
+                it.next();
+                XDataSeries *s = it.value();
+                if (s->name == "DEVELOPER")
+                {
+                    foreach (XDataPoint *p, s->datapoints) {
+                        if (p->secs>0)
+                            p->secs = p->secs - timeOffset;
+                        if (p->km>0)
+                            p->km = p->km -kmOffset;
+                    }
+                }
+            }
         }
 
         // calculate derived data series -- after data fixers applied above
@@ -959,6 +1057,23 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
         // what data is present - after processor in case 'derived' or adjusted
         result->updateDataTag();
 
+        //If we have a CIQ tag, populate the CIQinfo
+        QString ciq = result->getTag("CIQ","");
+        if (!ciq.isEmpty())
+        {
+            QJsonDocument doc = QJsonDocument::fromJson(ciq.toUtf8());
+
+            if (!doc.isNull() && (doc.isObject() || doc.isArray()))
+            {
+                ciq = doc.toJson(QJsonDocument::Compact);
+
+                QList<CIQinfo> infos = CIQinfo::listFromJson(ciq);
+                foreach(CIQinfo info, infos)
+                {
+                    result->addCIQ(info);
+                }
+            }
+        }
         //foreach(RideFile::seriestype x, result->arePresent()) qDebug()<<"present="<<x;
 
         // sample code for using XDATA, left here temporarily till we have an
@@ -1023,6 +1138,12 @@ RideFile::addXData(QString name, XDataSeries *series)
     xdata_.insert(name, series);
 }
 
+void
+RideFile::addCIQ(CIQinfo &ciqinfo)
+{
+    ciqinfo_ << ciqinfo;
+}
+
 QStringList RideFileFactory::listRideFiles(const QDir &dir) const
 {
     QStringList filters;
@@ -1040,7 +1161,7 @@ QStringList RideFileFactory::listRideFiles(const QDir &dir) const
 }
 
 double
-RideFile::xdataValue(RideFilePoint *p, int &idx, QString sxdata, QString series, RideFile::XDataJoin xjoin)
+RideFile::xdataValue(const RideFilePoint *p, int &idx, QString sxdata, QString series, RideFile::XDataJoin xjoin) const
 {
     double returning = RideFile::NA;
     XDataSeries *s = xdata(sxdata);
@@ -1282,46 +1403,48 @@ void RideFile::updateMax(RideFilePoint* point)
 
 void RideFile::updateAvg(RideFilePoint* point)
 {
-    // AVG
-    totalPoint->secs += point->secs;
-    totalPoint->cad += point->cad;
-    totalPoint->hr += point->hr;
-    totalPoint->km += point->km;
-    totalPoint->kph += point->kph;
-    totalPoint->nm += point->nm;
-    totalPoint->watts += point->watts;
-    totalPoint->alt += point->alt;
-    totalPoint->lon += point->lon;
-    totalPoint->lat += point->lat;
-    totalPoint->headwind += point->headwind;
-    totalPoint->slope += point->slope;
-    totalPoint->temp += point->temp == NA ? 0 : point->temp;
-    totalPoint->lte += point->lte;
-    totalPoint->rte += point->rte;
-    totalPoint->lps += point->lps;
-    totalPoint->rps += point->rps;
-    totalPoint->lrbalance += point->lrbalance;
-    totalPoint->lpco += point->lpco;
-    totalPoint->rpco += point->rpco;
-    totalPoint->lppb += point->lppb;
-    totalPoint->rppb += point->rppb;
-    totalPoint->rppe += point->rppe;
-    totalPoint->lpppb += point->lpppb;
-    totalPoint->rpppb += point->rpppb;
-    totalPoint->lpppe += point->lpppe;
-    totalPoint->rpppe += point->rpppe;
-    totalPoint->smo2 += point->smo2;
-    totalPoint->thb += point->thb;
-    totalPoint->o2hb += point->o2hb;
-    totalPoint->hhb += point->hhb;
-    totalPoint->rvert += point->rvert;
-    totalPoint->rcad += point->rcad;
-    totalPoint->rcontact += point->rcontact;
-    totalPoint->gear += point->gear;
-    totalPoint->tcore += point->tcore;
+    if (point!=NULL) {
+        // AVG
+        totalPoint->secs += point->secs;
+        totalPoint->cad += point->cad;
+        totalPoint->hr += point->hr;
+        totalPoint->km += point->km;
+        totalPoint->kph += point->kph;
+        totalPoint->nm += point->nm;
+        totalPoint->watts += point->watts;
+        totalPoint->alt += point->alt;
+        totalPoint->lon += point->lon;
+        totalPoint->lat += point->lat;
+        totalPoint->headwind += point->headwind;
+        totalPoint->slope += point->slope;
+        totalPoint->temp += point->temp == NA ? 0 : point->temp;
+        totalPoint->lte += point->lte;
+        totalPoint->rte += point->rte;
+        totalPoint->lps += point->lps;
+        totalPoint->rps += point->rps;
+        totalPoint->lrbalance += point->lrbalance;
+        totalPoint->lpco += point->lpco;
+        totalPoint->rpco += point->rpco;
+        totalPoint->lppb += point->lppb;
+        totalPoint->rppb += point->rppb;
+        totalPoint->rppe += point->rppe;
+        totalPoint->lpppb += point->lpppb;
+        totalPoint->rpppb += point->rpppb;
+        totalPoint->lpppe += point->lpppe;
+        totalPoint->rpppe += point->rpppe;
+        totalPoint->smo2 += point->smo2;
+        totalPoint->thb += point->thb;
+        totalPoint->o2hb += point->o2hb;
+        totalPoint->hhb += point->hhb;
+        totalPoint->rvert += point->rvert;
+        totalPoint->rcad += point->rcad;
+        totalPoint->rcontact += point->rcontact;
+        totalPoint->gear += point->gear;
+        totalPoint->tcore += point->tcore;
 
-    ++totalCount;
-    if (point->temp != NA) ++totalTemp;
+        ++totalCount;
+        if (point->temp != NA) ++totalTemp;
+    }
 
     // todo : division only for last after last point
     avgPoint->secs = totalPoint->secs/totalCount;
@@ -1361,6 +1484,53 @@ void RideFile::updateAvg(RideFilePoint* point)
     avgPoint->rcontact = totalPoint->rcontact/totalCount;
     avgPoint->gear = totalPoint->gear/totalCount;
     avgPoint->tcore = totalPoint->tcore/totalCount;
+}
+
+void RideFile::updateAvg(SeriesType series, double value)
+{
+   switch (series) {
+        case secs : totalPoint->secs += value; break;
+        case cad : totalPoint->cad += value; break;
+        case hr : totalPoint->hr += value; break;
+        case km : totalPoint->km += value; break;
+        case kph : totalPoint->kph += value; break;
+        case nm : totalPoint->nm += value; break;
+        case watts : totalPoint->watts += value; break;
+        case alt : totalPoint->alt += value; break;
+        case lon : totalPoint->lon += value; break;
+        case lat : totalPoint->lat += value; break;
+        case headwind : totalPoint->headwind += value; break;
+        case slope : totalPoint->slope += value; break;
+        case temp : totalPoint->temp += value; break;
+        case lrbalance : totalPoint->lrbalance += value; break;
+        case lte : totalPoint->lte += value; break;
+        case rte : totalPoint->rte += value; break;
+        case lps : totalPoint->lps += value; break;
+        case rps : totalPoint->rps += value; break;
+        case lpco : totalPoint->lpco += value; break;
+        case rpco : totalPoint->rpco += value; break;
+        case lppb : totalPoint->lppb += value; break;
+        case rppb : totalPoint->rppb += value; break;
+        case lppe : totalPoint->lppe += value; break;
+        case rppe : totalPoint->rppe += value; break;
+        case lpppb : totalPoint->lpppb += value; break;
+        case rpppb : totalPoint->rpppb += value; break;
+        case lpppe : totalPoint->lpppe += value; break;
+        case rpppe : totalPoint->rpppe += value; break;
+        case smo2 : totalPoint->smo2 += value; break;
+        case thb : totalPoint->thb += value; break;
+        case o2hb : totalPoint->o2hb += value; break;
+        case hhb : totalPoint->hhb += value; break;
+        case rvert : totalPoint->rvert += value; break;
+        case rcad : totalPoint->rcad += value; break;
+        case rcontact : totalPoint->rcontact += value; break;
+        case gear : totalPoint->gear += value; break;
+        case tcore : totalPoint->tcore += value; break;
+        case wbal : break; // not present
+        default:
+        case none : break;
+    }
+    updateAvg(NULL);
 }
 
 void RideFile::appendPoint(double secs, double cad, double hr, double km,
@@ -1477,12 +1647,15 @@ void RideFile::appendOrUpdatePoint(double secs, double cad, double hr, double km
                                              rvert, rcad, rcontact, tcore,
                                              interval);
 
+
     if (!forceAppend) {
+
         int idx = timeIndex(secs);
         if (idx != -1) {
             if (dataPoints_.at(idx)->secs == secs) {
                 updatePoint(point, dataPoints_.at(idx));
-                dataPoints_.replace(idx, point);
+                *dataPoints_.at(idx) = *point;
+                delete point;
             } else {
                 if (dataPoints_.at(idx)->secs > secs)
                     dataPoints_.insert(idx, point);
@@ -1490,21 +1663,10 @@ void RideFile::appendOrUpdatePoint(double secs, double cad, double hr, double km
                     dataPoints_.insert(idx+1, point);
             }
         } else
-           forceAppend = true;
+           forceAppend = true; // note if clause below
     }
 
-    if (forceAppend) {
-        RideFilePoint* point = new RideFilePoint(secs, cad, hr, km, kph, nm, watts, alt, lon, lat,
-                                                 headwind, slope, temp,
-                                                 lrbalance,
-                                                 lte, rte, lps, rps,
-                                                 lpco, rpco,
-                                                 lppb, rppb, lppe, rppe,
-                                                 lpppb, rpppb, lpppe, rpppe,
-                                                 smo2, thb,
-                                                 rvert, rcad, rcontact, tcore,
-                                                 interval);
-
+    if (forceAppend) { // note forceAppend = true above do not convert to else clause
         dataPoints_.append(point);
     }
 
@@ -1709,6 +1871,8 @@ RideFile::isDataPresent(SeriesType series)
         case kph : return dataPresent.kph; break;
         case nmd :
         case nm : return dataPresent.nm; break;
+        case wbal :
+        case wattsKg :
         case wattsd :
         case watts : return dataPresent.watts; break;
         case aPower : return dataPresent.apower; break;
@@ -1750,6 +1914,35 @@ RideFile::isDataPresent(SeriesType series)
     }
     return false;
 }
+
+void
+RideFile::setPointValue(double secs, SeriesType series, double value) {
+    int idx = timeIndex(secs);
+    if ((idx != -1) && (dataPoints_.at(idx)->secs == secs)) {
+        double previousVal = getPointValue(idx, series);
+        setPointValue(idx, series, value);
+        setDataPresent(series, true);
+
+        updateAvg(series, value-previousVal);
+        updateMin(dataPoints_.at(idx));
+        updateMax(dataPoints_.at(idx));
+    }
+}
+
+// void
+// RideFile::setPointValue(double secs, SeriesType series, int value) {
+//     int idx = timeIndex(secs);
+//     if ((idx != -1) && (dataPoints_.at(idx)->secs == secs)) {
+//         int previousVal = getPointValue(idx, series);
+//         setPointValue(idx, series, value);
+//         setDataPresent(series, true);
+
+//         updateAvg(series, value-previousVal);
+//         updateMin(dataPoints_.at(idx));
+//         updateMax(dataPoints_.at(idx));
+//     }
+// }
+
 void
 RideFile::setPointValue(int index, SeriesType series, double value)
 {
@@ -2349,10 +2542,10 @@ RideFile::recalculateDerivedSeries(bool force)
     double anTISS = 0.0f;
 
     // set WPrime and CP
-    if (context->athlete->zones(isRun())) {
-        int zoneRange = context->athlete->zones(isRun())->whichRange(startTime().date());
-        CP = zoneRange >= 0 ? context->athlete->zones(isRun())->getCP(zoneRange) : 0;
-        //WPRIME = zoneRange >= 0 ? context->athlete->zones(isRun())->getWprime(zoneRange) : 0;
+    if (context->athlete->zones(sport())) {
+        int zoneRange = context->athlete->zones(sport())->whichRange(startTime().date());
+        CP = zoneRange >= 0 ? context->athlete->zones(sport())->getCP(zoneRange) : 0;
+        //WPRIME = zoneRange >= 0 ? context->athlete->zones(sport())->getWprime(zoneRange) : 0;
 
         // did we override CP in metadata / metrics ?
         int oCP = getTag("CP","0").toInt();
@@ -2366,6 +2559,17 @@ RideFile::recalculateDerivedSeries(bool force)
 
     // last point looked at
     RideFilePoint *lastP = NULL;
+
+    // Hold cursor into xdata to speed up search
+    int coreidx = -1;
+    XDataSeries *devseries = xdata("DEVELOPER");
+    if (devseries && devseries->datapoints.count() > 0)  {
+        if (devseries->valuename.contains("core_temperature"))
+        {
+            setDataPresent(RideFile::tcore, true);
+            coreidx = 0;
+        }
+    }
 
     foreach(RideFilePoint *p, dataPoints_) {
 
@@ -2609,6 +2813,12 @@ RideFile::recalculateDerivedSeries(bool force)
             p->clength = 0.0f;
         }
 
+        // Since TCORE isn't stored in json, retrieve it from XDATA
+        // Otherwise, derive it later
+        //
+        if (coreidx>=0)
+            p->tcore = xdataValue(p, coreidx, "DEVELOPER","core_temperature", RideFile::REPEAT);
+
         // last point
         lastP = p;
     }
@@ -2680,7 +2890,8 @@ RideFile::recalculateDerivedSeries(bool force)
     // in between
 
     // we need HR data for this
-    if (dataPresent.hr) {
+    // but don't derive if we already have tcore data
+    if (dataPresent.hr && !dataPresent.tcore) {
 
         // resample the data into 60s samples
         static const int SAMPLERATE=60000; // milliseconds in a minute
@@ -2980,19 +3191,18 @@ RideFile::resample(double newRecIntSecs, int interpolate)
 RideFile *
 RideFile::resample(double newRecIntSecs, int /*interpolate*/)
 {
-
     // resample if interval has changed
     if (newRecIntSecs != recIntSecs()) {
+        QwtSplineBasis spline;
+        QMap<SeriesType, SplineLookup*> splineLookups;
 
-        QMap<SeriesType, QwtSpline *> splines;
-
-        // we remember the last point in time with data 
+        // we remember the last point in time with data
         double last = 0;
 
         // create a spline for every series present in the ridefile
         for(int i=0; i < static_cast<int>(none); i++) {
 
-            // save us casting all the time 
+            // save us casting all the time
             SeriesType series = static_cast<SeriesType>(i);
 
             if (series == secs) continue; // don't resample that !
@@ -3040,15 +3250,14 @@ RideFile::resample(double newRecIntSecs, int /*interpolate*/)
                 }
 
                 // Now create a spline with the values we've cleaned
-                QwtSpline *spline = new QwtSpline();
-                spline->setSplineType(QwtSpline::Periodic);
-                spline->setPoints(QPolygonF(points));
-                splines.insert(series,spline);
+                SplineLookup *splineLookup = new SplineLookup();
+                splineLookup->update(spline, QPolygonF(points), 1);
+                splineLookups.insert(series, splineLookup);
             }
         }
 
         // no data to resample
-        if (splines.count() == 0 || last == 0) return NULL;
+        if (splineLookups.count() == 0 || last == 0) return NULL;
 
         // we have a bunch of splines so lets add resampled
         // data points to a clone of the current ride (ie. we
@@ -3065,18 +3274,18 @@ RideFile::resample(double newRecIntSecs, int /*interpolate*/)
             p.secs = seconds;
 
             // for each spline get the value for point secs
-            QMapIterator<SeriesType, QwtSpline *> iterator(splines);
+            QMapIterator<SeriesType, SplineLookup*> iterator(splineLookups);
             while (iterator.hasNext()) {
                 iterator.next();
 
                 SeriesType series = iterator.key();
-                QwtSpline *spline = iterator.value();
+                SplineLookup *splineLookup = iterator.value();
 
                 double sum = 0;
                 for (double i=0; i<1; i+= 0.25) {
                     double dt = seconds + (newRecIntSecs * i);
                     double dtn = seconds + (newRecIntSecs * (i+0.25f));
-                    sum += (spline->value(dt) + spline->value(dtn)) /2.0f;
+                    sum += (splineLookup->valueY(dt) + splineLookup->valueY(dtn)) / 2.0f;
                 }
                 sum /= 4.0f;
 
@@ -3104,16 +3313,14 @@ RideFile::resample(double newRecIntSecs, int /*interpolate*/)
 
         // clean up and return
         // wipe away any splines created
-        QMapIterator<SeriesType, QwtSpline *> iterator(splines);
+        QMapIterator<SeriesType, SplineLookup*> iterator(splineLookups);
         while (iterator.hasNext()) {
             iterator.next();
             delete iterator.value();
         }
 
         return returning;
-
     } else {
-
         // not resampling but cloning a working copy
         // and removing gaps in recording
         RideFile *returning = new RideFile(this);
@@ -3417,4 +3624,106 @@ XDataSeries::timeIndex(double secs) const
     if (i == datapoints.end())
         return datapoints.size()-1;
     return i - datapoints.begin();
+}
+
+const char* CIQ_KEY = "application_id";
+const char* CIQ_ID = "developer_data_index";
+const char* VER_KEY = "verison";
+const char* FIELDS_KEY = "fields";
+
+const char* CIQ_FIELD_MESSAGE="message";
+const char* CIQ_FIELD_NAME="name";
+const char* CIQ_FIELD_NATIVE="native_id";
+const char* CIQ_FIELD_ID="dev_id";
+const char* CIQ_FIELD_TYPE="type";
+const char* CIQ_FIELD_UNIT="unit";
+const char* CIQ_FIELD_SCALE="scale";
+const char* CIQ_FIELD_OFFSET="offset";
+
+QString CIQinfo::listToJson(const QList<CIQinfo>& ciqList)
+{
+    QJsonArray ciqArray;
+    foreach (const CIQinfo& ciq, ciqList)
+    {
+        QJsonObject ciqObj;
+
+        ciqObj[QString(CIQ_KEY)] = ciq.appid;
+        ciqObj[QString(CIQ_ID)] = ciq.devid;
+        ciqObj[QString(VER_KEY)] = ciq.ver;
+
+        QJsonArray fieldsArray;
+        foreach (const CIQfield& field, ciq.fields)
+        {
+            QJsonObject fieldObj;
+            fieldObj[CIQ_FIELD_MESSAGE] = field.message;
+            fieldObj[CIQ_FIELD_NAME] = field.name;
+            fieldObj[CIQ_FIELD_NATIVE] = field.nativeid;
+            fieldObj[CIQ_FIELD_ID] = field.id;
+            fieldObj[CIQ_FIELD_TYPE] = field.type;
+            fieldObj[CIQ_FIELD_UNIT] = field.unit;
+            fieldObj[CIQ_FIELD_SCALE] = field.scale;
+            fieldObj[CIQ_FIELD_OFFSET] = field.offset;
+
+            fieldsArray.append(fieldObj);
+        }
+
+        ciqObj[QString(FIELDS_KEY)] = fieldsArray;
+
+        ciqArray.append(ciqObj);
+    }
+    QJsonDocument jsonDoc(ciqArray);
+
+    //Do we want it nicely formatted or compact?
+    QString jsonString = jsonDoc.toJson(QJsonDocument::Indented);
+    jsonString.replace("    ", "\t");
+
+    //QString jsonString = jsonDoc.toJson(QJsonDocument::Compact);
+    return jsonString;
+}
+
+QList<CIQinfo> CIQinfo::listFromJson(const QString& src)
+{
+    QList<CIQinfo> ciqList;
+
+    QJsonDocument doc = QJsonDocument::fromJson(src.toUtf8());
+
+    //Allow for either an array or single item
+    if (doc.isArray())
+    {
+        QJsonArray ciqArray = doc.array();
+        for (const QJsonValue& ciqValue : ciqArray)
+        {
+            QJsonObject ciqObj = ciqValue.toObject();
+            ciqList.append(CIQinfo(ciqObj));
+        }
+    }
+    else if (doc.isObject())
+    {
+        ciqList.append(CIQinfo(doc.object()));
+    }
+
+    return ciqList;
+}
+
+CIQinfo::CIQinfo(const QJsonObject& obj)
+{
+    appid = obj[QString(CIQ_KEY)].toString();
+    ver = obj[QString(VER_KEY)].toInt();
+    devid = obj[QString(CIQ_ID)].toInt();
+
+    QJsonArray jsonfields = obj[QString(FIELDS_KEY)].toArray();
+    for (const QJsonValue& field : jsonfields)
+    {
+        QJsonObject fieldObj = field.toObject();
+        CIQfield ciqfield(fieldObj[CIQ_FIELD_MESSAGE].toString(),
+                          fieldObj[CIQ_FIELD_NAME].toString(),
+                          fieldObj[CIQ_FIELD_NATIVE].toInt(),
+                          fieldObj[CIQ_FIELD_ID].toInt(),
+                          fieldObj[CIQ_FIELD_TYPE].toString(),
+                          fieldObj[CIQ_FIELD_UNIT].toString(),
+                          fieldObj[CIQ_FIELD_SCALE].toInt(),
+                          fieldObj[CIQ_FIELD_OFFSET].toInt());
+
+        fields.append(ciqfield);
+    }
 }

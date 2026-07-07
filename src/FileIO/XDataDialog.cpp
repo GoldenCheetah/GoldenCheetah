@@ -17,6 +17,7 @@
  */
 
 #include "XDataDialog.h"
+#include "ActionButtonBox.h"
 #include "RideItem.h"
 #include "RideFile.h"
 #include "RideFileCommand.h"
@@ -69,45 +70,26 @@ XDataDialog::XDataDialog(QWidget *parent) : QDialog(parent), item(NULL)
     xdataSeriesTable->setSelectionMode(QAbstractItemView::SingleSelection);
     xdataSeriesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-    addXData = new QPushButton("+", this);
-    removeXData = new QPushButton("-", this);
-    addXDataSeries = new QPushButton("+", this);
-    removeXDataSeries = new QPushButton("-", this);
+    ActionButtonBox *xdataActionButtons = new ActionButtonBox(ActionButtonBox::AddDeleteGroup);
 
-#ifdef Q_OS_MAC
-    addXData->setText(tr("Add"));
-    removeXData->setText(tr("Delete"));
-    addXDataSeries->setText(tr("Add"));
-    removeXDataSeries->setText(tr("Delete"));
-#else
-    addXData->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    addXDataSeries->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    removeXData->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    removeXDataSeries->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#endif
+    ActionButtonBox *xdataSeriesActionButtons = new ActionButtonBox(ActionButtonBox::AddDeleteGroup);
 
     // lay it out
     mainLayout->addWidget(xlabel);
     mainLayout->addWidget(xdataTable);
-    QHBoxLayout *xb = new QHBoxLayout();
-    xb->addStretch();
-    xb->addWidget(addXData);
-    xb->addWidget(removeXData);
-    mainLayout->addLayout(xb);
+    mainLayout->addWidget(xdataActionButtons);
 
     mainLayout->addWidget(xslabel);
     mainLayout->addWidget(xdataSeriesTable);
-    QHBoxLayout *xs = new QHBoxLayout();
-    xs->addStretch();
-    xs->addWidget(addXDataSeries);
-    xs->addWidget(removeXDataSeries);
-    mainLayout->addLayout(xs);
+    mainLayout->addWidget(xdataSeriesActionButtons);
 
     connect(xdataTable, SIGNAL(currentItemChanged(QTableWidgetItem*,QTableWidgetItem*)), this, SLOT(xdataSelected()));
-    connect(removeXData, SIGNAL(clicked(bool)), this, SLOT(removeXDataClicked()));
-    connect(addXData, SIGNAL(clicked(bool)), this, SLOT(addXDataClicked()));
-    connect(removeXDataSeries, SIGNAL(clicked(bool)), this, SLOT(removeXDataSeriesClicked()));
-    connect(addXDataSeries, SIGNAL(clicked(bool)), this, SLOT(addXDataSeriesClicked()));
+    xdataActionButtons->defaultConnect(xdataTable);
+    connect(xdataActionButtons, &ActionButtonBox::addRequested, this, &XDataDialog::addXDataClicked);
+    connect(xdataActionButtons, &ActionButtonBox::deleteRequested, this, &XDataDialog::removeXDataClicked);
+    xdataSeriesActionButtons->defaultConnect(xdataSeriesTable);
+    connect(xdataSeriesActionButtons, &ActionButtonBox::addRequested, this, &XDataDialog::addXDataSeriesClicked);
+    connect(xdataSeriesActionButtons, &ActionButtonBox::deleteRequested, this, &XDataDialog::removeXDataSeriesClicked);
 }
 
 void XDataDialog::close()

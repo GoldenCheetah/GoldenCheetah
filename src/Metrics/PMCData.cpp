@@ -25,6 +25,7 @@
 #include "RideItem.h"
 #include "Specification.h"
 #include "Season.h"
+#include "Seasons.h"
 #include "Context.h"
 
 #include <stdio.h>
@@ -41,7 +42,6 @@ PMCData::PMCData(Context *context, Specification spec, QString metricName, int s
 
     // we're not from a datafilter
     fromDataFilter = false;
-    df = NULL;
     expr = NULL;
 
     if (ltsDays < 0) {
@@ -72,10 +72,19 @@ PMCData::PMCData(Context *context, Specification spec, Leaf *expr, DataFilterRun
     // get defaults if not passed
     useDefaults = false;
 
-    // use an expression
-    fromDataFilter = true;
-    this->df = df;
-    this->expr = expr;
+    // If expr is just a metric name, we can use the faster and specific case
+    QString metricName = df->lookupMap.value(expr->toString(),"");
+    RideMetricFactory &factory = RideMetricFactory::instance();
+    if (factory.haveMetric(metricName)) {
+        // use a metric name
+        metricName_ = metricName;
+        fromDataFilter = false;
+        expr = NULL;
+    } else {
+        // use an expression
+        fromDataFilter = true;
+        this->expr = expr;
+    }
 
     if (ltsDays < 0) {
         QVariant lts = appsettings->cvalue(context->athlete->cyclist, GC_LTS_DAYS);
@@ -119,7 +128,7 @@ void PMCData::refresh()
         else stsDays_ = sts.toInt();
     }
 
-    QTime timer;
+    QElapsedTimer timer;
     timer.start();
 
     //
@@ -173,6 +182,7 @@ void PMCData::refresh()
         planned_sb_.resize(days_+1); // for SB tomorrow!
         planned_rr_.resize(days_);
 
+        expected_stress_.resize(days_);
         expected_lts_.resize(days_);
         expected_sts_.resize(days_);
         expected_sb_.resize(days_+1); // for SB tomorrow!
@@ -210,9 +220,8 @@ void PMCData::refresh()
     //
     // STEP TWO What are the seedings and ride values
     //
-    bool sbToday = appsettings->cvalue(context->athlete->cyclist, GC_SB_TODAY).toInt();
-    double lte = (double)exp(-1.0/ltsDays_);
-    double ste = (double)exp(-1.0/stsDays_);
+    // const double lte = (double)exp(-1.0/ltsDays_);
+    // const double ste = (double)exp(-1.0/stsDays_);
 
     // clear what's there
     stress_.fill(0);
@@ -227,6 +236,7 @@ void PMCData::refresh()
     planned_sb_.fill(0);
     planned_rr_.fill(0);
 
+    expected_stress_.fill(0);
     expected_lts_.fill(0);
     expected_sts_.fill(0);
     expected_sb_.fill(0);
@@ -244,6 +254,12 @@ void PMCData::refresh()
         }
     }
 
+    DataFilter* df = new DataFilter(this, context);
+
+    int todayOffset = -1;
+    double todayActualStress = 0;
+    double todayPlannedStress = 0;
+
     // add the stress scores
     foreach(RideItem *item, context->athlete->rideCache->rides()) {
 
@@ -256,7 +272,7 @@ void PMCData::refresh()
             // although metrics are cleansed, we check here because development
             // builds have a rideDB.json that has nan and inf values in it.
             double value = 0;;
-            if (fromDataFilter) value = expr->eval(df, expr, 0, 0, item).number();
+            if (fromDataFilter) value = expr->eval(&df->rt, expr, Result(0), 0, item).number();
             else value = item->getForSymbol(metricName_);
 
             if (!std::isinf(value) && !std::isnan(value)) {
@@ -265,176 +281,91 @@ void PMCData::refresh()
                 else
                     stress_[offset] += value;
                 //qDebug()<<"stress_["<<offset<<"] :"<<stress_[offset];
-            }
-        }
-    }
 
-    //
-    // STEP THREE Calculate sts/lts, sb and rr
-    //
-    double lastLTS=0.0f;
-    double lastSTS=0.0f;
-
-    double rollingStress=0;
-
-    double planned_lastLTS=0.0f;
-    double planned_lastSTS=0.0f;
-
-    double planned_rollingStress=0;
-
-#if notyet
-    double expected_lastLTS=0.0f;
-    double expected_lastSTS=0.0f;
-#endif
-
-    double expected_rollingStress=0;
-
-    for(int day=0; day < days_; day++) {
-
-        // not seeded
-        if (lts_[day] >=0 || sts_[day]>=0) {
-
-            // LTS
-            if (day) lastLTS = lts_[day-1];
-            lts_[day] = (stress_[day] * (1.0 - lte)) + (lastLTS * lte);
-
-            // STS
-            if (day) lastSTS = sts_[day-1];
-            sts_[day] = (stress_[day] * (1.0 - ste)) + (lastSTS * ste);
-
-        } else if (lts_[day]< 0 || sts_[day]<0) {
-
-            lts_[day] *= -1;
-            sts_[day] *= -1;
-        }
-
-        // rolling stress for STS days
-        if (day && day <= stsDays_) {
-            // just starting out
-            rollingStress += lts_[day] - lts_[day-1];
-            rr_[day] = rollingStress;
-        } else if (day) {
-            rollingStress += lts_[day] - lts_[day-1];
-            rollingStress -= lts_[day-stsDays_] - lts_[day-stsDays_-1];
-            rr_[day] = rollingStress;
-        }
-
-        // SB (stress balance)  long term - short term
-        // We allow it to be shown today or tomorrow where
-        // most (sane/thinking) folks usually show SB on the following day
-        sb_[day+(sbToday ? 0 : 1)] =  lts_[day] - sts_[day];
-
-        // *******************
-        // ****  PLANNED  ****
-        // *******************
-
-        // not seeded
-        if (planned_lts_[day] >=0 || planned_sts_[day]>=0) {
-
-            // LTS
-            if (day) planned_lastLTS = planned_lts_[day-1];
-            planned_lts_[day] = (planned_stress_[day] * (1.0 - lte)) + (planned_lastLTS * lte);
-
-            // STS
-            if (day) planned_lastSTS = planned_sts_[day-1];
-            planned_sts_[day] = (planned_stress_[day] * (1.0 - ste)) + (planned_lastSTS * ste);
-
-        } else if (planned_lts_[day]< 0 || planned_sts_[day]<0) {
-
-            planned_lts_[day] *= -1;
-            planned_sts_[day] *= -1;
-        }
-
-        // rolling stress for STS days
-        if (day && day <= stsDays_) {
-            // just starting out
-            planned_rollingStress += planned_lts_[day] - planned_lts_[day-1];
-            planned_rr_[day] = planned_rollingStress;
-        } else if (day) {
-            planned_rollingStress += planned_lts_[day] - planned_lts_[day-1];
-            planned_rollingStress -= planned_lts_[day-stsDays_] - planned_lts_[day-stsDays_-1];
-            planned_rr_[day] = planned_rollingStress;
-        }
-
-        // SB (stress balance)  long term - short term
-        // We allow it to be shown today or tomorrow where
-        // most (sane/thinking) folks usually show SB on the following day
-        planned_sb_[day+(sbToday ? 0 : 1)] =  planned_lts_[day] - planned_sts_[day];
-
-        // ********************
-        // ****  EXPECTED  ****
-        // ********************
-
-        if (start_.addDays(day).daysTo(QDate::currentDate())<0) {
-            double lastLts = 0.0;
-            double lastSts = 0.0;
-            double ltsAtStsDays1 = 0.0;
-            double ltsAtStsDays2 = 0.0;
-
-            if (day) {
-                if (start_.addDays(day).daysTo(QDate::currentDate())<-1) {
-                    lastLts = expected_lts_[day-1];
-                    lastSts = expected_sts_[day-1];
+                if (start_.addDays(offset).daysTo(QDate::currentDate()) == 0) {
+                    // Collect todays stress separately to decide later whether to use planned or actual stress
+                    todayOffset = offset;
+                    if (item->planned) {
+                        todayPlannedStress += value;
+                    } else {
+                        todayActualStress += value;
+                    }
+                } else if (start_.addDays(offset).daysTo(QDate::currentDate()) < 0) {
+                    if (item->planned && ! item->hasLinkedActivity()) {
+                        expected_stress_[offset] += value;
+                    }
                 } else {
-                    lastLts = lts_[day-1];
-                    lastSts = sts_[day-1];
-                }
-                if (day > stsDays_) {
-                    if (start_.addDays(day).daysTo(QDate::currentDate())<-1-stsDays_) {
-                        ltsAtStsDays1 = expected_lts_[day-stsDays_-1];
-                    } else {
-                        ltsAtStsDays1 = lts_[day-stsDays_-1];
-                    }
-
-                    if (start_.addDays(day).daysTo(QDate::currentDate())<-stsDays_) {
-                        ltsAtStsDays2 = expected_lts_[day-stsDays_];
-                    } else {
-                        ltsAtStsDays2 = lts_[day-stsDays_];
+                    if (! item->planned) {
+                        expected_stress_[offset] += value;
                     }
                 }
             }
-
-            // not seeded
-            if (expected_lts_[day] >=0 || expected_sts_[day]>=0) {
-                // LTS
-                expected_lts_[day] = (planned_stress_[day] * (1.0 - lte)) + (lastLts * lte);
-
-                // STS
-                expected_sts_[day] = (planned_stress_[day] * (1.0 - ste)) + (lastSts * ste);
-
-            } else if (expected_lts_[day]< 0 || expected_sts_[day]<0) {
-                expected_lts_[day] *= -1;
-                expected_sts_[day] *= -1;
-            }
-
-            // rolling stress for STS days
-            if (day && day <= stsDays_) {
-                // just starting out
-                expected_rollingStress += expected_lts_[day] - lastLts;
-                expected_rr_[day] = expected_rollingStress;
-            } else if (day) {
-                expected_rollingStress += expected_lts_[day] - lastLts;
-                expected_rollingStress -= ltsAtStsDays2 - ltsAtStsDays1;
-                expected_rr_[day] = expected_rollingStress;
-            }
-
-            // SB (stress balance)  long term - short term
-            // We allow it to be shown today or tomorrow where
-            // most (sane/thinking) folks usually show SB on the following day
-            expected_sb_[day+(sbToday ? 0 : 1)] =  expected_lts_[day] - expected_sts_[day];
-        } else {
-            expected_lts_[day] = 0;
-            expected_sts_[day] = 0;
-            expected_sb_[day] = 0;
-            expected_rr_[day] = 0;
-
         }
-
     }
+    if (todayOffset > -1) {
+        // Special case today: Use actual stress if available, otherwise planned
+        expected_stress_[todayOffset] = (todayActualStress > 0) ? todayActualStress : todayPlannedStress;
+    }
+
+    delete df;
+
+    calculateMetrics(days_, stress_, lts_, sts_, sb_, rr_);
+    calculateMetrics(days_, planned_stress_, planned_lts_, planned_sts_, planned_sb_, planned_rr_);
+    calculateMetrics(days_, expected_stress_, expected_lts_, expected_sts_, expected_sb_, expected_rr_);
 
     //qDebug()<<"refresh PMC in="<<timer.elapsed()<<"ms";
 
     isstale=false;
+}
+
+
+void
+PMCData::calculateMetrics
+(int days, const QVector<double> &stress, QVector<double> &lts, QVector<double> &sts, QVector<double> &sb, QVector<double> &rr) const
+{
+    const bool sbToday = appsettings->cvalue(context->athlete->cyclist, GC_SB_TODAY).toInt();
+    const double lte = (double)exp(-1.0/ltsDays_);
+    const double ste = (double)exp(-1.0/stsDays_);
+
+    double lastLTS=0.0f;
+    double lastSTS=0.0f;
+    double rollingStress=0;
+
+    for(int day=0; day < days; day++) {
+
+        // not seeded
+        if (lts[day] >=0 || sts[day]>=0) {
+
+            // LTS
+            if (day) lastLTS = lts[day-1];
+            lts[day] = (stress[day] * (1.0 - lte)) + (lastLTS * lte);
+
+            // STS
+            if (day) lastSTS = sts[day-1];
+            sts[day] = (stress[day] * (1.0 - ste)) + (lastSTS * ste);
+
+        } else if (lts[day]< 0 || sts[day]<0) {
+
+            lts[day] *= -1;
+            sts[day] *= -1;
+        }
+
+        // rolling stress for STS days
+        if (day && day <= stsDays_) {
+            // just starting out
+            rollingStress += lts[day] - lts[day-1];
+            rr[day] = rollingStress;
+        } else if (day) {
+            rollingStress += lts[day] - lts[day-1];
+            rollingStress -= lts[day-stsDays_] - lts[day-stsDays_-1];
+            rr[day] = rollingStress;
+        }
+
+        // SB (stress balance)  long term - short term
+        // We allow it to be shown today or tomorrow where
+        // most (sane/thinking) folks usually show SB on the following day
+        sb[day+(sbToday ? 0 : 1)] =  lts[day] - sts[day];
+    }
 }
 
 int

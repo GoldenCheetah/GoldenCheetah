@@ -23,7 +23,7 @@ void RemoteCmd::setCmdId(int id)
     cmdId = id;
 }
 
-int RemoteCmd::getCmdId()
+int RemoteCmd::getCmdId() const
 {
     return cmdId;
 }
@@ -33,7 +33,7 @@ void RemoteCmd::setCmdStr(QString string)
     cmdStr = string;
 }
 
-QString RemoteCmd::getCmdStr()
+QString RemoteCmd::getCmdStr() const
 {
     return cmdStr;
 }
@@ -43,7 +43,7 @@ void RemoteCmd::setDisplayStr(QString string)
     displayStr = string;
 }
 
-QString RemoteCmd::getDisplayStr()
+QString RemoteCmd::getDisplayStr() const
 {
     return displayStr;
 }
@@ -58,7 +58,7 @@ void CmdMap::setNativeCmdId(int id)
     nativeCmdId = id;
 }
 
-int CmdMap::getNativeCmdId()
+int CmdMap::getNativeCmdId() const
 {
     return nativeCmdId;
 }
@@ -68,7 +68,7 @@ void CmdMap::setAntCmdId(int id)
     antCmdId = id;
 }
 
-int CmdMap::getAntCmdId()
+int CmdMap::getAntCmdId() const
 {
     return antCmdId;
 }
@@ -86,32 +86,32 @@ RemoteControl::RemoteControl()
 
     remoteCmd.setCmdId(GC_REMOTE_CMD_START);
     remoteCmd.setCmdStr(GC_REMOTE_START);
-    remoteCmd.setDisplayStr("Start");
+    remoteCmd.setDisplayStr(tr("Start"));
     _nativeCmdList.append(remoteCmd);
 
     remoteCmd.setCmdId(GC_REMOTE_CMD_STOP);
     remoteCmd.setCmdStr(GC_REMOTE_STOP);
-    remoteCmd.setDisplayStr("Stop");
+    remoteCmd.setDisplayStr(tr("Stop"));
     _nativeCmdList.append(remoteCmd);
 
     remoteCmd.setCmdId(GC_REMOTE_CMD_LAP);
     remoteCmd.setCmdStr(GC_REMOTE_LAP);
-    remoteCmd.setDisplayStr("Lap");
+    remoteCmd.setDisplayStr(tr("Lap"));
     _nativeCmdList.append(remoteCmd);
 
     remoteCmd.setCmdId(GC_REMOTE_CMD_HIGHER);
     remoteCmd.setCmdStr(GC_REMOTE_HIGHER);
-    remoteCmd.setDisplayStr("Higher");
+    remoteCmd.setDisplayStr(tr("Higher"));
     _nativeCmdList.append(remoteCmd);
 
     remoteCmd.setCmdId(GC_REMOTE_CMD_LOWER);
     remoteCmd.setCmdStr(GC_REMOTE_LOWER);
-    remoteCmd.setDisplayStr("Lower");
+    remoteCmd.setDisplayStr(tr("Lower"));
     _nativeCmdList.append(remoteCmd);
 
     remoteCmd.setCmdId(GC_REMOTE_CMD_CALIBRATE);
     remoteCmd.setCmdStr(GC_REMOTE_CALIBRATE);
-    remoteCmd.setDisplayStr("Calibrate");
+    remoteCmd.setDisplayStr(tr("Calibrate"));
     _nativeCmdList.append(remoteCmd);
 
     //
@@ -237,7 +237,7 @@ RemoteControl::readConfig()
 }
 
 void
-RemoteControl::writeConfig(QList<CmdMap> mappings)
+RemoteControl::writeConfig(QList<CmdMap> mappings) const
 {
     QString key, value;
 
@@ -255,7 +255,7 @@ RemoteControl::writeConfig(QList<CmdMap> mappings)
 }
 
 QString
-RemoteControl::getCmdStr(int index, QList<RemoteCmd> cmdList)
+RemoteControl::getCmdStr(int index, QList<RemoteCmd> cmdList) const
 {
     foreach(RemoteCmd cmd, cmdList) {
         if (cmd.getCmdId() == index)
@@ -265,7 +265,7 @@ RemoteControl::getCmdStr(int index, QList<RemoteCmd> cmdList)
 }
 
 int
-RemoteControl::getNativeCmdId(int antCmd)
+RemoteControl::getNativeCmdId(int antCmd) const
 {
     foreach(CmdMap map, _cmdMaps) {
         if (map.getAntCmdId() == antCmd) {

@@ -22,6 +22,7 @@
 
 #include <QWidget>
 #include <QDialog>
+#include <QNetworkReply>
 
 #include <string>
 #include <iostream>
@@ -48,10 +49,7 @@ class SmallPlot;
 
 // trick the maps api into ignoring gestures by
 // pretending to be chrome. see: http://developer.qt.nokia.com/forums/viewthread/1643/P15
-class QWebEngineDownloadItem;
-class simpleWebPage : public QWebEnginePage
-{
-};
+class QWebEngineDownloadRequest;
 
 class WebPageWindow : public GcChartWindow
 {
@@ -82,7 +80,7 @@ class WebPageWindow : public GcChartWindow
 
         void downloadProgress(qint64, qint64);
         void downloadFinished();
-        void downloadRequested(QWebEngineDownloadItem*);
+        void downloadRequested(QWebEngineDownloadRequest*);
         void linkHovered(QString);
 
     private:

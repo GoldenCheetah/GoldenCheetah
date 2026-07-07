@@ -26,6 +26,13 @@
 #include <algorithm> // for std::sort
 #include "cmath"
 
+#ifdef Q_CC_MSVC
+// 'sprintf': This function or variable may be unsafe.
+// 'strcpy': This function or variable may be unsafe.
+// 'strncpy': This function or variable may be unsafe.
+#pragma warning(disable:4996)
+#endif
+
 static int wkoFileReaderRegistered = RideFileFactory::instance().registerReader(
                                      "wko", "WKO+ Files", new WkoFileReader());
 

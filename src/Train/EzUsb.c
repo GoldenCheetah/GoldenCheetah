@@ -334,7 +334,7 @@ int parse_ihex (
 	/* Read the record type */
 	tmp = buf[9];
 	buf[9] = 0;
-	type = strtoul(buf+7, 0, 16);
+	type = (char) strtoul(buf+7, 0, 16);
 	buf[9] = tmp;
 
 	/* If this is an EOF record, then make it so. */
@@ -378,7 +378,7 @@ int parse_ihex (
 	for (idx = 0, cp = buf+9 ;  idx < len ;  idx += 1, cp += 2) {
 	    tmp = cp[2];
 	    cp[2] = 0;
-	    data [data_len + idx] = strtoul(cp, 0, 16);
+	    data [data_len + idx] = (unsigned char) strtoul(cp, 0, 16);
 	    cp[2] = tmp;
 	}
 	data_len += len;
@@ -449,7 +449,7 @@ int parse_imagic (
     }
 
     while (1) {
-        rc = fread(&imagic_firmware_element, 1, sizeof(imagic_firmware_element), image);
+        rc = (int) fread(&imagic_firmware_element, 1, sizeof(imagic_firmware_element), image);
         if (rc != sizeof(imagic_firmware_element)) {
             printf("Error reading imagic driver file\n");
             return -2;
@@ -475,7 +475,7 @@ int parse_imagic (
         return -2;
     }
     while (1) {
-        rc = fread(&imagic_firmware_element, 1, sizeof(imagic_firmware_element), image);
+        rc = (int) fread(&imagic_firmware_element, 1, sizeof(imagic_firmware_element), image);
         if (rc != sizeof(imagic_firmware_element)) {
             printf("Error reading imagic driver file\n");
             return -2;
@@ -555,7 +555,7 @@ static int ram_poke (
 	return -EDOM;
     }
 
-    ctx->total += len;
+    ctx->total += (unsigned int) len;
     ctx->count++;
 
     /* Retry this till we get a real error. Control messages are not
@@ -749,10 +749,10 @@ static int eeprom_poke (
      */
 
     /* write header */
-    header [0] = len >> 8;
-    header [1] = len;
+    header [0] = (unsigned char) (len >> 8);
+    header [1] = (unsigned char) len;
     header [2] = addr >> 8;
-    header [3] = addr;
+    header [3] = (unsigned char) addr;
     if (ctx->last)
 	header [0] |= 0x80;
     if ((rc = ezusb_write (ctx->device, "write EEPROM segment header",
@@ -767,7 +767,7 @@ static int eeprom_poke (
 	return rc;
 
     /* next shouldn't overwrite it */
-    ctx->ee_addr += 4 + len;
+    ctx->ee_addr += (unsigned short) (4 + len);
 
     return 0;
 }

@@ -5,8 +5,8 @@
 #include "PythonEmbed.h"
 #include "RideFileCommand.h"
 
-FixPyRunner::FixPyRunner(Context *context, RideFile *rideFile, bool useNewThread)
-    : context(context), rideFile(rideFile), useNewThread(useNewThread)
+FixPyRunner::FixPyRunner(Context *context, RideFile *rideFile, RideItem *rideItem, bool useNewThread)
+    : context(context), rideFile(rideFile), rideItem(rideItem), useNewThread(useNewThread)
 {
 }
 
@@ -34,6 +34,7 @@ int FixPyRunner::run(QString source, QString scriptKey, QString &errText)
         FixPyRunParams params;
         params.context = context;
         params.rideFile = rideFile;
+        params.rideItem = rideItem;
         params.script = QString(line);
 
         if (useNewThread) {
@@ -75,7 +76,7 @@ void FixPyRunner::execScript(FixPyRunParams *params)
     QList<RideFile *> editedRideFiles;
     python->canvas = NULL;
     python->chart = NULL;
-    python->runline(ScriptContext(params->context, params->rideFile, false,
+    python->runline(ScriptContext(params->context, params->rideFile, params->rideItem, false,
                                   false, &editedRideFiles), params->script);
 
     // finish up commands on edited rides

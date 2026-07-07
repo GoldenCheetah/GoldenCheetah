@@ -69,7 +69,7 @@ class PeakPercent : public RideMetric {
             double CP = 250;
             double WPRIME = 22000;
 
-            const Zones* zones = item->context->athlete->zones(item->isRun);
+            const Zones* zones = item->context->athlete->zones(item->sport);
             if (zones) {
 
                 // if range is -1 we need to fall back to a default value
@@ -127,7 +127,7 @@ class PowerZone : public RideMetric {
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
         // no zones
-        const Zones* zones = item->context->athlete->zones(item->isRun);
+        const Zones* zones = item->context->athlete->zones(item->sport);
         if (!zones || !item->ride()->areDataPresent()->watts) {
             setValue(RideFile::NIL);
             setCount(0);

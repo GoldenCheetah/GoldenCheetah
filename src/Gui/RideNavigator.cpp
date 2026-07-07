@@ -25,8 +25,10 @@
 #include "RideNavigator.h"
 #include "RideNavigatorProxy.h"
 #include "SearchFilterBox.h"
-#include "TabView.h"
+#include "AbstractView.h"
+#include "SpecialFields.h"
 #include "HelpWhatsThis.h"
+#include "IconManager.h"
 
 #include <QtGui>
 #include <QString>
@@ -34,6 +36,204 @@
 #include <QStyle>
 #include <QStyleFactory>
 #include <QScrollBar>
+#include <QToolTip>
+
+
+//////////////////////////////////////////////////////////////////////////////
+// static declarations
+
+class groupRange;
+
+static QList<groupRange> groupRanges;
+static bool _initGroupRanges = false;
+
+static constexpr int kRowPaddingLeft = 2;
+static constexpr int kRowPaddingRight = 8;
+static constexpr int kFieldsTextIndent = 8;
+static constexpr int kFieldsTextPaddingTop = 3;
+static constexpr int kPlannedSepInset = 8;
+static constexpr int kSummaryMarginTop = 2;
+static constexpr int kSummaryPaddingBottom = 6;
+static constexpr int kSummaryMarginBottom = 4;
+static constexpr int kSummaryIconTextGap = 8;
+static constexpr int kHeaderSectionPadding = 5;
+static constexpr int kIconSpacing = 2;
+static constexpr int kRadius = 4;
+
+static bool insensitiveLessThan(const QString &a, const QString &b);
+
+
+//////////////////////////////////////////////////////////////////////////////
+// groupRange
+
+//
+// This function is called for every row in the ridecache
+// and wants to know what group string or 'name' you want
+// to put this row into. It is passed the heading value
+// as a string, and the row value for this column.
+//
+// It should return a string that will be used in the first
+// column tree to group rows together.
+//
+// It is intended to allow us to do clever groupings, such
+// as grouping dates as 'This week', 'Last week' etc or
+// Power values into zones etc.
+//
+class groupRange {
+    public:
+    class range {
+        public:
+        double low, high;
+        QString name;
+        range(double low, double high, QString name) : low(low), high(high), name(name) {}
+        range() : low(0), high(0), name("") {}
+    };
+
+    QString column;         // column name
+    QList<range> ranges;    // list of ranges we can put them in
+};
+
+
+//////////////////////////////////////////////////////////////////////////////
+// GroupByModel
+
+bool
+GroupByModel::initGroupRanges()
+{
+    groupRange::range add;
+    groupRange addColumn;
+
+    // BikeStress
+    addColumn.column = "BikeStress";
+    add = groupRange::range( 0.0,  0.0, tr("Zero or not present")); addColumn.ranges << add;
+    add = groupRange::range( 0,  150, tr("Low Stress")); addColumn.ranges << add;
+    add = groupRange::range( 150,  300, tr("Medium Stress")); addColumn.ranges << add;
+    add = groupRange::range( 300,  450, tr("High Stress")); addColumn.ranges << add;
+    add = groupRange::range( 450,  0.00, tr("Very High Stress")); addColumn.ranges << add;
+
+    groupRanges << addColumn;
+    addColumn.ranges.clear();
+
+    // Intensity Factor
+    addColumn.column = "BikeIntensity";
+    add = groupRange::range( 0.0,  0.0, tr("Zero or not present")); addColumn.ranges << add;
+    add = groupRange::range( 0.0,  0.55, tr("Active Recovery")); addColumn.ranges << add;
+    add = groupRange::range( 0.55,  0.75, tr("Endurance")); addColumn.ranges << add;
+    add = groupRange::range( 0.75,  0.90, tr("Tempo")); addColumn.ranges << add;
+    add = groupRange::range( 0.90, 1.05, tr("Threshold")); addColumn.ranges << add;
+    add = groupRange::range( 1.05, 1.2, tr("VO2Max")); addColumn.ranges << add;
+    add = groupRange::range( 1.2, 1.5, tr("Anaerobic Capacity")); addColumn.ranges << add;
+    add = groupRange::range( 1.5,  0.0, tr("Maximal")); addColumn.ranges << add;
+
+    groupRanges << addColumn;
+    addColumn.ranges.clear();
+
+    // Variability Index
+    addColumn.column = "VI";
+    add = groupRange::range( 0.0,  1.0, tr("Zero or not present")); addColumn.ranges << add;
+    add = groupRange::range( 1.0,  1.05, tr("Isopower")); addColumn.ranges << add;
+    add = groupRange::range( 1.05, 1.1, tr("Steady")); addColumn.ranges << add;
+    add = groupRange::range( 1.1,  1.2, tr("Variable")); addColumn.ranges << add;
+    add = groupRange::range( 1.2,  0.0, tr("Highly Variable")); addColumn.ranges << add;
+
+    groupRanges << addColumn;
+    addColumn.ranges.clear();
+
+    // Duration (seconds)
+    addColumn.column = "Duration";
+    add = groupRange::range( 0.0,  3600.0, tr("Less than an hour")); addColumn.ranges << add;
+    add = groupRange::range( 3600,  5400, tr("Less than 90 minutes")); addColumn.ranges << add;
+    add = groupRange::range( 5400, 10800, tr("Less than 3 hours")); addColumn.ranges << add;
+    add = groupRange::range( 10800,  18000, tr("Less than 5 hours")); addColumn.ranges << add;
+    add = groupRange::range( 18000,  0.0, tr("More than 5 hours")); addColumn.ranges << add;
+
+    groupRanges << addColumn;
+    addColumn.ranges.clear();
+
+    // Distance (km)
+    addColumn.column = "Distance";
+    add = groupRange::range( 0.0,  0.0, tr("Zero or not present")); addColumn.ranges << add;
+    add = groupRange::range( 0.0,  40.0, tr("Short")); addColumn.ranges << add;
+    add = groupRange::range( 40,  80.00, tr("Medium")); addColumn.ranges << add;
+    add = groupRange::range( 80,  140, tr("Long")); addColumn.ranges << add;
+    add = groupRange::range( 140,  0, tr("Very Long")); addColumn.ranges << add;
+
+    groupRanges << addColumn;
+    addColumn.ranges.clear();
+
+    return true;
+}
+
+// Perhaps a groupName function on the metrics would be useful
+QString
+GroupByModel::groupFromValue(QString headingName, QString value, double rank, double count) const
+{
+    if (!_initGroupRanges)
+        _initGroupRanges = initGroupRanges();
+    // Check for predefined thresholds / zones / bands for this metric/column
+    foreach (groupRange orange, groupRanges) {
+        if (orange.column == headingName) {
+
+            double number = value.toDouble();
+            // use thresholds defined for this column/metric
+            foreach(groupRange::range range, orange.ranges) {
+
+                // 0-x is lower, x-0 is upper, 0-0 is no data and x-x is a range
+                if (range.low == 0.0 && range.high == 0.0 && number == 0.0) return range.name;
+                else if (range.high != 0.0 && range.low == 0.0 && number < range.high) return range.name;
+                else if (range.low != 0.0 && range.high == 0.0 && number >= range.low) return range.name;
+                else if (number < range.high && number >= range.low) return range.name;
+            }
+            return tr("Undefined");
+        }
+    }
+
+    // Use upper quartile for anything left that is a metric
+    if (rideNavigator->columnMetrics.value(headingName, NULL) != NULL) {
+
+        double quartile = rank / count;
+
+        if (value.toDouble() == 0) return QString(tr("Zero or not present"));
+        else if (rank < 10) return QString(tr("Best 10"));
+        else if (quartile <= 0.25) return QString (tr("Quartile 1:  0% -  25%"));
+        else if (quartile <= 0.50) return QString (tr("Quartile 2: 25% -  50%"));
+        else if (quartile <= 0.75) return QString (tr("Quartile 3: 50% -  75%"));
+        else if (quartile <= 1) return QString    (tr("Quartile 4: 75% - 100%"));
+
+    } else {
+
+        if (headingName == tr("Date")) {
+
+            // get the date from value string
+            QDateTime dateTime = QDateTime::fromString(value, Qt::ISODate);
+            QDateTime today = QDateTime::currentDateTime();
+
+            if (today.date().weekNumber() == dateTime.date().weekNumber()
+                && today.date().year() == dateTime.date().year())
+                return tr("This week");
+            else if (today.date().month() == dateTime.date().month()
+                    && today.date().year() == dateTime.date().year())
+                return tr("This month");
+            else if (today.date().month() == (dateTime.date().month()+1)
+                    && today.date().year() == dateTime.date().year())
+                return tr("Last month");
+            else {
+                return dateTime.toString(tr("yyyy-MM (MMMM)"));
+            }
+        }
+
+        // not a metric, i.e. metadata
+        return value;
+    }
+
+    // if all else fails just return the value and group by
+    // that. Which is a fair approach for text fields for example
+    return value;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// RideNavigator
 
 RideNavigator::RideNavigator(Context *context, bool mainwindow) : GcChartWindow(context), context(context), active(false), _groupBy(-1)
 {
@@ -46,8 +246,6 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : GcChartWindow(
     currentColumn = -1;
     this->mainwindow = mainwindow;
     _groupBy = -1;
-    fontHeight = QFontMetrics(QFont()).height();
-    reverseColor = GlobalContext::context()->colorEngine->reverseColor;
     currentItem = NULL;
 
     init = false;
@@ -77,10 +275,10 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : GcChartWindow(
     }
 
     // get setup
-    tableView = new RideTreeView(this);
-    delegate = new NavigatorCellDelegate(this);
-    tableView->setAnimated(true);
+    tableView = new ActivityTreeView(this);
+    delegate = new ActivityItemDelegate(this);
     tableView->setItemDelegate(delegate);
+    tableView->setAnimated(true);
     tableView->setModel(sortModel);
     tableView->setSortingEnabled(true);
     tableView->setAlternatingRowColors(false);
@@ -102,7 +300,6 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : GcChartWindow(
 #endif
     tableView->installEventFilter(this);
     tableView->viewport()->installEventFilter(this);
-    tableView->setMouseTracking(true);
     tableView->setFrameStyle(QFrame::NoFrame);
     tableView->setAcceptDrops(true);
     tableView->setColumnWidth(1, 100 *dpiXFactor);
@@ -166,31 +363,45 @@ RideNavigator::~RideNavigator()
 void
 RideNavigator::configChanged(qint32 state)
 {
-    fontHeight = QFontMetrics(QFont()).height();
-    reverseColor = GlobalContext::context()->colorEngine->reverseColor;
+    bool hasCalendarText = GlobalContext::context()->rideMetadata->hasCalendarText();
 
-    // hide ride list scroll bar ?
 #ifndef Q_OS_MAC
-    tableView->setStyleSheet(TabView::ourStyleSheet());
+    tableView->setStyleSheet(AbstractView::ourStyleSheet());
     if (mainwindow) {
-        if (appsettings->value(this, GC_RIDESCROLL, true).toBool() == false)
+        if (appsettings->value(this, GC_RIDESCROLL, true).toBool() == false) {
             tableView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        else 
+        } else {
             tableView->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-        //if (appsettings->value(this, GC_RIDEHEAD, true).toBool() == false)
-            //tableView->header()->hide();
-        //else 
-            tableView->header()->show();
+        }
+        tableView->header()->show();
 
-        tableView->header()->setStyleSheet(
-        QString("QHeaderView { background-color: %1; color: %2; }"
-                "QHeaderView::section { background-color: %1; color: %2; "
-                " border: 0px ; }")
-                .arg(GColor(CPLOTBACKGROUND).name())
-                .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+        QColor headerBg = GColor(CPLOTBACKGROUND);
+        QString headerFormat = QString(
+            "QHeaderView {"
+            "    background-color: %1;"
+            "    color: %2;"
+            "}"
+            "QHeaderView::section {"
+            "    background-color: %1;"
+            "    color: %2;"
+            "    border: none;"
+            "    padding: %3px;"
+            "    font-weight: 700;"
+            "}")
+            .arg(headerBg.name())
+            .arg(GCColor::invertColor(headerBg).name())
+            .arg(kHeaderSectionPadding * dpiXFactor);
+        tableView->header()->setStyleSheet(headerFormat);
     }
 
 #endif
+    tableView->setStyleSheet(tableView->styleSheet() + "QTreeView::item:hover { background: transparent; color: inherit; }");
+    int summaryLines = appsettings->value(this, GC_SUMMARYROWS, 2).toInt();
+    if (! hasCalendarText) {
+        summaryLines = 0;
+    }
+    tableView->setSummaryLines(summaryLines);
+    delegate->setSummaryLines(summaryLines);
 
     // if the fields changed we need to reset indexes etc
     if (state & CONFIG_FIELDS) resetView();
@@ -235,14 +446,14 @@ RideNavigator::resetView()
 {
     active = true;
 
-    QList<QString> cols = _columns.split("|", QString::SkipEmptyParts);
-    int widco = _widths.split("|", QString::SkipEmptyParts).count();
+    QList<QString> cols = _columns.split("|", Qt::SkipEmptyParts);
+    int widco = _widths.split("|", Qt::SkipEmptyParts).count();
 
     // something is wrong with the config ? reset 
     if (widco != cols.count() || widco <= 1) {
         _columns = QString(tr("*|Workout Code|Date|"));
         _widths = QString("0|100|100|");
-        cols = _columns.split("|", QString::SkipEmptyParts);
+        cols = _columns.split("|", Qt::SkipEmptyParts);
     }
 
     // to account for translations
@@ -279,9 +490,9 @@ RideNavigator::resetView()
     }
 
     // add metadata fields...
-    SpecialFields sp; // all the special fields are in here...
+    SpecialFields& sp = SpecialFields::getInstance(); // all the special fields are in here...
     foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
-        if (!sp.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
+        if (!sp.isMetric(field.name) && (field.type != GcFieldType::FIELD_DATE && field.type != GcFieldType::FIELD_TIME)) {
             nameMap.insert(QString("%1").arg(sp.makeTechName(field.name)), sp.displayName(field.name));
             internalNameMap.insert(field.name, sp.displayName(field.name));
         }
@@ -301,6 +512,7 @@ RideNavigator::resetView()
 
         if ((friendly = nameMap.value(techname, "unknown")) != "unknown") {
             sortModel->setHeaderData(i, Qt::Horizontal, friendly);
+            sortModel->setHeaderData(i, Qt::Horizontal, techname, Qt::UserRole + 1);
             logicalHeadings << friendly;
         } else
             logicalHeadings << techname;
@@ -322,14 +534,15 @@ RideNavigator::resetView()
     }
 
     // initialise to whatever groupBy we want to start with
-    tableView->sortByColumn(sortByIndex(), static_cast<Qt::SortOrder>(sortByOrder()));;
+    tableView->sortByColumn(sortByIndex(), static_cast<Qt::SortOrder>(sortByOrder()));
 
-    //tableView->setColumnHidden(0, true);
+    tableView->setColumnHidden(0, true);
     tableView->setColumnWidth(0,0);
 
-    // set the column widths
+    // set the column widths, column zero is the
+    // group by column, so we always set that to zero width.
     int columnnumber=0;
-    foreach(QString size, _widths.split("|", QString::SkipEmptyParts)) {
+    foreach(QString size, _widths.split("|", Qt::SkipEmptyParts)) {
 
         if (columnnumber >= cols.count()) break;
 
@@ -365,6 +578,13 @@ void RideNavigator::clearSearch()
     searchFilter->clearStrings();
     QApplication::processEvents(); // repaint/resize list view - scrollbar..
     setWidth(geometry().width());  // before we update column sizes!
+}
+
+void
+RideNavigator::setDisplayFilter(RideNavFilter filter)
+{
+    searchFilter->setDisplayFilter(filter);
+    QApplication::processEvents(); // repaint/resize list view - scrollbar..
 }
 
 void RideNavigator::setWidth(int x)
@@ -484,13 +704,15 @@ RideNavigator::eventFilter(QObject *object, QEvent *e)
             break;
         }
 
-        case QEvent::WindowActivate:
+        case QEvent::LayoutRequest:
         {
             active=true;
-            // set the column widths
+            // set the column widths, column zero is the
+            // group by column, so we always set that to zero width.
             int columnnumber=0;
-            foreach(QString size, _widths.split("|", QString::SkipEmptyParts)) {
-                tableView->setColumnWidth(columnnumber, size.toInt());
+            foreach(QString size, _widths.split("|", Qt::SkipEmptyParts)) {
+                tableView->setColumnWidth(columnnumber, columnnumber ? size.toInt() : 0);
+                columnnumber++;
             }
             active=false;
             setWidth(geometry().width()); // calculate width...
@@ -574,7 +796,6 @@ RideNavigator::setSortBy(int index, Qt::SortOrder order)
     _sortByOrder = static_cast<int>(order);
 }
 
-
 void
 RideNavigator::calcColumnsChanged(bool resized, int logicalIndex, int oldSize, int newSize ) {
 
@@ -602,9 +823,10 @@ RideNavigator::calcColumnsChanged(bool resized, int logicalIndex, int oldSize, i
     // correct width and store result
     setColumnWidth(geometry().width(), resized, logicalIndex, oldSize, newSize); // calculate width...
 
-    // get column widths
-    QString widths;
-    for (int i=0; i<tableView->header()->count(); i++) {
+    // get column widths, column zero is the
+    // group by column, so we always set that to zero width.
+    QString widths("0|");
+    for (int i=1; i<tableView->header()->count(); i++) {
         int index = tableView->header()->logicalIndex(i);
         if (tableView->header()->isSectionHidden(index) != true) {
            widths += QString("%1|").arg(tableView->columnWidth(index));
@@ -624,11 +846,11 @@ RideNavigator::setColumnWidth(int x, bool resized, int logicalIndex, int oldWidt
 
     active = true;
 
-#if !defined (Q_OS_MAC) // on QT5 the scrollbars have no width
+#if !defined (Q_OS_MAC)
     if (tableView->verticalScrollBar()->isVisible())
         x -= tableView->verticalScrollBar()->width()
                 + 0 ; // !! no longer account for content margins of 3,3,3,3 was + 6
-#else // we're on a mac with QT5 .. so dodgy way of spotting preferences for scrollbars...
+#else // we're on a mac.. so dodgy way of spotting preferences for scrollbars...
     // this is a nasty hack, to see if the 'always on' preference for scrollbars is set we
     // look at the scrollbar width which is 15 in this case (it is 16 when they 'appear' when
     // needed. No doubt this will change over time and need to be fixed by referencing the
@@ -651,11 +873,9 @@ RideNavigator::setColumnWidth(int x, bool resized, int logicalIndex, int oldWidt
 
     // is it narrower than the headings?
     int headwidth=0;
-    int n=0;
     for (int i=1; i<tableView->header()->count(); i++)
         if (tableView->header()->isSectionHidden(i) == false) {
             headwidth += tableView->columnWidth(i);
-            n++;
         }
 
     if (!resized) {
@@ -698,12 +918,6 @@ RideNavigator::setColumnWidth(int x, bool resized, int logicalIndex, int oldWidt
                 }
             }
         }
-
-        if (setwidth < x)
-            delegate->setWidth(pwidth=setwidth);
-        else
-            delegate->setWidth(pwidth=x);
-
     } else {
 
         // columns are resized - for each affected column this function is called
@@ -757,172 +971,6 @@ RideNavigator::setColumnWidth(int x, bool resized, int logicalIndex, int oldWidt
     tableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     active = false;
 
-}
-
-
-
-
-//
-// This function is called for every row in the ridecache
-// and wants to know what group string or 'name' you want
-// to put this row into. It is passed the heading value
-// as a string, and the row value for this column.
-//
-// It should return a string that will be used in the first
-// column tree to group rows together.
-//
-// It is intended to allow us to do clever groupings, such
-// as grouping dates as 'This week', 'Last week' etc or
-// Power values into zones etc.
-//
-class groupRange {
-    public:
-    class range {
-        public:
-        double low, high;
-        QString name;
-        range(double low, double high, QString name) : low(low), high(high), name(name) {}
-        range() : low(0), high(0), name("") {}
-    };
-
-    QString column;         // column name
-    QList<range> ranges;    // list of ranges we can put them in
-};
-
-static QList<groupRange> groupRanges;
-bool
-GroupByModel::initGroupRanges()
-{
-    groupRange::range add;
-    groupRange addColumn;
-
-    // BikeStress
-    addColumn.column = "BikeStress";
-    add = groupRange::range( 0.0,  0.0, tr("Zero or not present")); addColumn.ranges << add;
-    add = groupRange::range( 0,  150, tr("Low Stress")); addColumn.ranges << add;
-    add = groupRange::range( 150,  300, tr("Medium Stress")); addColumn.ranges << add;
-    add = groupRange::range( 300,  450, tr("High Stress")); addColumn.ranges << add;
-    add = groupRange::range( 450,  0.00, tr("Very High Stress")); addColumn.ranges << add;
-
-    groupRanges << addColumn;
-    addColumn.ranges.clear();
-
-    // Intensity Factor
-    addColumn.column = "BikeIntensity";
-    add = groupRange::range( 0.0,  0.0, tr("Zero or not present")); addColumn.ranges << add;
-    add = groupRange::range( 0.0,  0.55, tr("Active Recovery")); addColumn.ranges << add;
-    add = groupRange::range( 0.55,  0.75, tr("Endurance")); addColumn.ranges << add;
-    add = groupRange::range( 0.75,  0.90, tr("Tempo")); addColumn.ranges << add;
-    add = groupRange::range( 0.90, 1.05, tr("Threshold")); addColumn.ranges << add;
-    add = groupRange::range( 1.05, 1.2, tr("VO2Max")); addColumn.ranges << add;
-    add = groupRange::range( 1.2, 1.5, tr("Anaerobic Capacity")); addColumn.ranges << add;
-    add = groupRange::range( 1.5,  0.0, tr("Maximal")); addColumn.ranges << add;
-
-    groupRanges << addColumn;
-    addColumn.ranges.clear();
-
-    // Variability Index
-    addColumn.column = "VI";
-    add = groupRange::range( 0.0,  1.0, tr("Zero or not present")); addColumn.ranges << add;
-    add = groupRange::range( 1.0,  1.05, tr("Isopower")); addColumn.ranges << add;
-    add = groupRange::range( 1.05, 1.1, tr("Steady")); addColumn.ranges << add;
-    add = groupRange::range( 1.1,  1.2, tr("Variable")); addColumn.ranges << add;
-    add = groupRange::range( 1.2,  0.0, tr("Highly Variable")); addColumn.ranges << add;
-
-    groupRanges << addColumn;
-    addColumn.ranges.clear();
-
-    // Duration (seconds)
-    addColumn.column = "Duration";
-    add = groupRange::range( 0.0,  3600.0, tr("Less than an hour")); addColumn.ranges << add;
-    add = groupRange::range( 3600,  5400, tr("Less than 90 minutes")); addColumn.ranges << add;
-    add = groupRange::range( 5400, 10800, tr("Less than 3 hours")); addColumn.ranges << add;
-    add = groupRange::range( 10800,  18000, tr("Less than 5 hours")); addColumn.ranges << add;
-    add = groupRange::range( 18000,  0.0, tr("More than 5 hours")); addColumn.ranges << add;
-
-    groupRanges << addColumn;
-    addColumn.ranges.clear();
-
-    // Distance (km)
-    addColumn.column = "Distance";
-    add = groupRange::range( 0.0,  0.0, tr("Zero or not present")); addColumn.ranges << add;
-    add = groupRange::range( 0.0,  40.0, tr("Short")); addColumn.ranges << add;
-    add = groupRange::range( 40,  80.00, tr("Medium")); addColumn.ranges << add;
-    add = groupRange::range( 80,  140, tr("Long")); addColumn.ranges << add;
-    add = groupRange::range( 140,  0, tr("Very Long")); addColumn.ranges << add;
-
-    groupRanges << addColumn;
-    addColumn.ranges.clear();
-
-    return true;
-}
-static bool _initGroupRanges = false;
-
-// Perhaps a groupName function on the metrics would be useful
-QString
-GroupByModel::groupFromValue(QString headingName, QString value, double rank, double count) const
-{
-    if (!_initGroupRanges)
-        _initGroupRanges = initGroupRanges();
-    // Check for predefined thresholds / zones / bands for this metric/column
-    foreach (groupRange orange, groupRanges) {
-        if (orange.column == headingName) {
-
-            double number = value.toDouble();
-            // use thresholds defined for this column/metric
-            foreach(groupRange::range range, orange.ranges) {
-
-                // 0-x is lower, x-0 is upper, 0-0 is no data and x-x is a range
-                if (range.low == 0.0 && range.high == 0.0 && number == 0.0) return range.name;
-                else if (range.high != 0.0 && range.low == 0.0 && number < range.high) return range.name;
-                else if (range.low != 0.0 && range.high == 0.0 && number >= range.low) return range.name;
-                else if (number < range.high && number >= range.low) return range.name;
-            }
-            return tr("Undefined");
-        }
-    }
-
-    // Use upper quartile for anything left that is a metric
-    if (rideNavigator->columnMetrics.value(headingName, NULL) != NULL) {
-
-        double quartile = rank / count;
-
-        if (value.toDouble() == 0) return QString(tr("Zero or not present"));
-        else if (rank < 10) return QString(tr("Best 10"));
-        else if (quartile <= 0.25) return QString (tr("Quartile 1:  0% -  25%"));
-        else if (quartile <= 0.50) return QString (tr("Quartile 2: 25% -  50%"));
-        else if (quartile <= 0.75) return QString (tr("Quartile 3: 50% -  75%"));
-        else if (quartile <= 1) return QString    (tr("Quartile 4: 75% - 100%"));
-
-    } else {
-
-        if (headingName == tr("Date")) {
-
-            // get the date from value string
-            QDateTime dateTime = QDateTime::fromString(value, Qt::ISODate);
-            QDateTime today = QDateTime::currentDateTime();
-
-            if (today.date().weekNumber() == dateTime.date().weekNumber()
-                && today.date().year() == dateTime.date().year())
-                return tr("This week");
-            else if (today.date().month() == dateTime.date().month()
-                    && today.date().year() == dateTime.date().year())
-                return tr("This month");
-            else if (today.date().month() == (dateTime.date().month()+1)
-                    && today.date().year() == dateTime.date().year())
-                return tr("Last month");
-            else {
-                return dateTime.toString(tr("yyyy-MM (MMMM)"));
-            }
-        }
-
-        // not a metric, i.e. metadata
-        return value;
-    }
-
-    // if all else fails just return the value and group by
-    // that. Which is a fair approach for text fields for example
-    return value;
 }
 
 void
@@ -1021,7 +1069,7 @@ RideNavigator::cursorRide()
 
         QModelIndex group = tableView->model()->index(i,0,QModelIndex());
         for (int j=0; j<tableView->model()->rowCount(group); j++) {
-            QString fileName = tableView->model()->data(tableView->model()->index(j,2, group), Qt::UserRole+1).toString();
+            QString fileName = tableView->model()->data(tableView->model()->index(j,2, group), GroupByModel::FilenameRole).toString();
             if (fileName == currentItem->fileName) {
                 // we set current index to column 2 (date/time) since we can be guaranteed it is always show (all others are removable)
                 tableView->scrollTo(tableView->model()->index(j,3,group));
@@ -1056,228 +1104,22 @@ RideNavigator::dropEvent(QDropEvent *event)
     columnsChanged();
 }
 
-NavigatorCellDelegate::NavigatorCellDelegate(RideNavigator *rideNavigator, QObject *parent) :
-    QItemDelegate(parent), rideNavigator(rideNavigator), pwidth(300)
+void
+RideNavigator::showTreeContextMenuPopup(const QPoint &pos)
 {
+    // map to global does not take into account the height of the header (??)
+    // so we take it off the result of map to global
+
+    // in the past this called mainwindow routinesfor the menu -- that was
+    // a bad design since it coupled the ride navigator with the gui
+    // we emit signals now, which only the sidebar is interested in trapping
+    // so the activity log for example doesn't have a context menu now
+    emit customContextMenuRequested(tableView->mapToGlobal(pos+QPoint(0,tableView->header()->geometry().height())));
 }
 
-// Editing functions are null since the model is read-only
-QWidget *NavigatorCellDelegate::createEditor(QWidget *, const QStyleOptionViewItem &, const QModelIndex &) const { return NULL; }
-void NavigatorCellDelegate::commitAndCloseEditor() { }
-void NavigatorCellDelegate::setEditorData(QWidget *, const QModelIndex &) const { }
-void NavigatorCellDelegate::updateEditorGeometry(QWidget *, const QStyleOptionViewItem &, const QModelIndex &) const {}
-void NavigatorCellDelegate::setModelData(QWidget *, QAbstractItemModel *, const QModelIndex &) const { }
-bool NavigatorCellDelegate::helpEvent(QHelpEvent*, QAbstractItemView*, const QStyleOptionViewItem&, const QModelIndex&) { return true; }
 
-QSize NavigatorCellDelegate::sizeHint(const QStyleOptionViewItem & /*option*/, const QModelIndex &index) const 
-{
-    QSize s;
-
-    if (rideNavigator->groupByModel->mapToSource(rideNavigator->sortModel->mapToSource(index)) != QModelIndex() &&
-        rideNavigator->groupByModel->data(rideNavigator->sortModel->mapToSource(index), Qt::UserRole).toString() != "") {
-        s.setHeight((rideNavigator->fontHeight+2) * 4);
-    } else s.setHeight(rideNavigator->fontHeight + 2);
-    return s;
-}
-
-// anomalies are underlined in red, otherwise straight paintjob
-void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
-                         const QModelIndex &index) const
-{
-
-    // paint background for user defined color ?
-    bool rideBG = appsettings->value(this,GC_RIDEBG,false).toBool();
-
-    // state of item
-    bool hover = false; //disable this, its annoying option.state & QStyle::State_MouseOver;
-    bool selected = option.state & QStyle::State_Selected;
-    bool focus = option.state & QStyle::State_HasFocus;
-    //bool isRun = rideNavigator->tableView->model()->data(index, Qt::UserRole+2).toBool();
-
-    // format the cell depending upon what it is...
-    QString columnName = rideNavigator->tableView->model()->headerData(index.column(), Qt::Horizontal).toString();
-    const RideMetric *m;
-    QString value;
-
-    // are we a selected cell ? need to paint accordingly
-    //bool selected = false;
-    //if (rideNavigator->tableView->selectionModel()->selectedIndexes().count()) { // zero if no rides in list
-        //if (rideNavigator->tableView->selectionModel()->selectedIndexes().value(0).row() == index.row())
-            //selected = true;
-    //}
-
-    if ((m=rideNavigator->columnMetrics.value(columnName, NULL)) != NULL) {
-
-        // get double from model, special case QTime to avoid default .000 msecs
-        if ((QMetaType::Type)index.model()->data(index, Qt::DisplayRole).type() == QMetaType::QTime)
-            value = index.model()->data(index, Qt::DisplayRole).toTime().toString("hh:mm:ss");
-        else
-            value = index.model()->data(index, Qt::DisplayRole).toString();
-
-        // get rid of 0 its ugly
-        if (value =="nan" || value == "0" || value == "0.0" || value == "0.00" || value == "00:00:00") value="";
-
-    } else {
-        // is this the ride date/time ?
-        value = index.model()->data(index, Qt::DisplayRole).toString();
-        if (columnName == tr("Date")) {
-            QDateTime dateTime = QDateTime::fromString(value, Qt::ISODate);
-            value = dateTime.toString(tr("MMM d, yyyy")); // same format as ride list
-        } else if (columnName == tr("Time")) {
-            QDateTime dateTime = QDateTime::fromString(value, Qt::ISODate);
-            value = dateTime.toString("hh:mm:ss"); // same format as ride list
-        } else if (columnName == tr("Last updated")) {
-            QDateTime dateTime;
-            dateTime.setTime_t(index.model()->data(index, Qt::DisplayRole).toInt());
-            value = dateTime.toString(tr("ddd MMM d, yyyy hh:mm")); // same format as ride list
-        }
-    }
-
-    QStyleOptionViewItem myOption = option;
-
-    // groupBy in bold please
-    if (columnName == "*") {
-        QFont enbolden = option.font;
-        enbolden.setWeight(QFont::Bold);
-        myOption.font = enbolden;
-    }
-
-    // normal render
-    bool isnormal=false;
-    QString calendarText = rideNavigator->tableView->model()->data(index, Qt::UserRole).toString();
-    QColor userColor = rideNavigator->tableView->model()->data(index, Qt::BackgroundRole).value<QBrush>().color();
-    if (userColor == QColor(1,1,1)) {
-        rideBG = false; // default so don't swap round...
-        isnormal = true; // just default so no bg or box
-        userColor = GColor(CPLOTMARKER);
-    }
-
-    // basic background
-    QBrush background = QBrush(GColor(CPLOTBACKGROUND));
-
-    // runs are darker
-    //if (isRun) {
-        //background.setColor(background.color().darker(150));
-        //userColor = userColor.darker(150);
-    //}
-
-    if (columnName != "*") {
-
-        myOption.displayAlignment = Qt::AlignLeft | Qt::AlignTop;
-        QRectF bigger(myOption.rect.x(), myOption.rect.y(), myOption.rect.width()+1, myOption.rect.height()+1);
-
-        if (hover) painter->fillRect(myOption.rect, QColor(Qt::lightGray));
-        else painter->fillRect(bigger, rideBG ? userColor : background);
-
-        // clear first
-        drawDisplay(painter, myOption, myOption.rect, ""); //added
-
-        // draw border of each cell
-        QPen rpen;
-        rpen.setWidth(1);
-        rpen.setColor(GColor(CPLOTBACKGROUND));
-        QPen isColor = painter->pen();
-        QFont isFont = painter->font();
-        painter->setPen(rpen);
-        painter->drawLine(0,myOption.rect.y(),rideNavigator->pwidth-1,myOption.rect.y());
-        painter->drawLine(0,myOption.rect.y()+myOption.rect.height(),rideNavigator->pwidth-1,myOption.rect.y()+myOption.rect.height());
-        painter->drawLine(0,myOption.rect.y()+myOption.rect.height(),0,myOption.rect.y()+myOption.rect.height());
-        painter->drawLine(rideNavigator->pwidth-1, myOption.rect.y(), rideNavigator->pwidth-1, myOption.rect.y()+myOption.rect.height());
-
-        // indent first column and draw all in plotmarker color
-        myOption.rect.setHeight(rideNavigator->fontHeight + 2); //added
-        myOption.font.setWeight(QFont::Bold);
-
-        QFont boldened = painter->font();
-        boldened.setWeight(QFont::Bold);
-        painter->setFont(boldened);
-        if (!selected) {
-            // not selected, so invert ride plot color
-            if (hover) painter->setPen(QColor(Qt::black));
-            else painter->setPen(rideBG ? rideNavigator->reverseColor : userColor);
-        } else if (!focus) { // selected but out of focus //
-            painter->setPen(QColor(Qt::black));
-        }
-
-        QRect normal(myOption.rect.x(), myOption.rect.y()+1, myOption.rect.width(), myOption.rect.height());
-        if (myOption.rect.x() == 0) {
-            // first line ?
-            QRect indented(myOption.rect.x()+5, myOption.rect.y()+1, myOption.rect.width()-5, myOption.rect.height());
-            painter->drawText(indented, value); //added
-        } else {
-            painter->drawText(normal, value); //added
-        }
-        painter->setPen(isColor);
-        painter->setFont(isFont);
-
-        // now get the calendar text to appear ...
-        if (calendarText != "") {
-            QRect high(myOption.rect.x()+myOption.rect.width() - (7*dpiXFactor), myOption.rect.y(), (7*dpiXFactor), (rideNavigator->fontHeight+2) * 4);
-
-            myOption.rect.setX(0);
-            myOption.rect.setY(myOption.rect.y() + rideNavigator->fontHeight + 2);//was +23
-            myOption.rect.setWidth(rideNavigator->pwidth);
-            myOption.rect.setHeight(rideNavigator->fontHeight * 3); //was 36
-            //myOption.font.setPointSize(myOption.font.pointSize());
-            myOption.font.setWeight(QFont::Normal);
-
-            if (hover) painter->fillRect(myOption.rect, QColor(Qt::lightGray)); 
-            else painter->fillRect(myOption.rect, rideBG ? userColor : background.color());
-
-            drawDisplay(painter, myOption, myOption.rect, "");
-            myOption.rect.setX(10); // wider notes display
-            myOption.rect.setWidth(pwidth-20);// wider notes display
-            painter->setFont(myOption.font);
-            QPen isColor = painter->pen();
-            if (!selected) {
-                // not selected, so invert ride plot color
-                if (hover) painter->setPen(QPen(Qt::black));
-                else painter->setPen(rideBG ? rideNavigator->reverseColor : GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-            }
-            painter->drawText(myOption.rect, Qt::AlignLeft | Qt::TextWordWrap, calendarText);
-            painter->setPen(isColor);
-
-#if defined (Q_OS_MAC) // on QT5 the scrollbars have no width
-            if (!selected && !rideBG && high.x()+12 > rideNavigator->geometry().width() && !isnormal) {
-#else
-            if (!selected && !rideBG && high.x()+32 > rideNavigator->geometry().width() && !isnormal) {
-#endif
-                painter->fillRect(high, userColor);
-            } else {
-
-                // border
-                QPen rpen;
-                rpen.setWidth(1);
-                rpen.setColor(GColor(CPLOTBACKGROUND));
-                QPen isColor = painter->pen();
-                QFont isFont = painter->font();
-                painter->setPen(rpen);
-                painter->drawLine(rideNavigator->pwidth-1, myOption.rect.y(), rideNavigator->pwidth-1, myOption.rect.y()+myOption.rect.height());
-                painter->setPen(isColor);
-            }
-        }
-
-    } else {
-
-        if (value != "") {
-            myOption.displayAlignment = Qt::AlignLeft | Qt::AlignBottom;
-            myOption.rect.setX(0);
-            myOption.rect.setHeight(rideNavigator->fontHeight + 2);
-            myOption.rect.setWidth(rideNavigator->pwidth);
-            painter->fillRect(myOption.rect, GColor(CPLOTBACKGROUND));
-        }
-        QPen isColor = painter->pen();
-        painter->setPen(QPen(GColor(CPLOTMARKER)));
-        myOption.palette.setColor(QPalette::WindowText, QColor(GColor(CPLOTMARKER))); //XXX
-        painter->drawText(myOption.rect, value);
-        painter->setPen(isColor);
-    }
-}
-
-static bool insensitiveLessThan(const QString &a, const QString &b)
-{
-    return a.toLower() < b.toLower();
-}
+//////////////////////////////////////////////////////////////////////////////
+// ColumnChooser
 
 ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
 {
@@ -1287,7 +1129,7 @@ ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
 
     clicked = new QSignalMapper(this); // maps each button click event
-    connect(clicked, SIGNAL(mapped(const QString &)), this, SLOT(buttonClicked(const QString &)));
+    connect(clicked, &QSignalMapper::mappedString, this, &ColumnChooser::buttonClicked);
 
     QVBoxLayout *us = new QVBoxLayout(this);
     us->setSpacing(0);
@@ -1305,7 +1147,7 @@ ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
     smallFont.setPointSizeF(baseFont.pointSizeF() *0.8f);
 
     QList<QString> buttonNames = logicalHeadings;
-    qSort(buttonNames.begin(), buttonNames.end(), insensitiveLessThan);
+    std::sort(buttonNames.begin(), buttonNames.end(), insensitiveLessThan);
 
     QString last;
     foreach (QString column, buttonNames) {
@@ -1359,53 +1201,553 @@ ColumnChooser::buttonClicked(QString name)
     drag->exec(Qt::MoveAction);
 }
 
-void
-RideNavigator::showTreeContextMenuPopup(const QPoint &pos)
-{
-    // map to global does not take into account the height of the header (??)
-    // so we take it off the result of map to global
 
-    // in the past this called mainwindow routinesfor the menu -- that was
-    // a bad design since it coupled the ride navigator with the gui
-    // we emit signals now, which only the sidebar is interested in trapping
-    // so the activity log for example doesn't have a context menu now
-    emit customContextMenuRequested(tableView->mapToGlobal(pos+QPoint(0,tableView->header()->geometry().height())));
+//////////////////////////////////////////////////////////////////////////////
+// ActivityItemDelegate
+
+ActivityItemDelegate::ActivityItemDelegate
+(RideNavigator *rideNavigator, QObject *parent)
+: QStyledItemDelegate(parent), rideNavigator(rideNavigator)
+{
 }
 
-RideTreeView::RideTreeView(QWidget *parent) : QTreeView(parent)
+
+QString
+ActivityItemDelegate::formatValue
+(const QModelIndex &index) const
 {
-    setDragDropMode(QAbstractItemView::InternalMove);
+    QString columnName = rideNavigator->tableView->model()->headerData(index.column(), Qt::Horizontal).toString();
+    const RideMetric *m;
+    QString value;
+    if ((m = rideNavigator->columnMetrics.value(columnName, nullptr)) != nullptr) {
+        if (index.model()->data(index, Qt::DisplayRole).metaType().id() == QMetaType::QTime) {
+            value = index.model()->data(index, Qt::DisplayRole).toTime().toString("hh:mm:ss");
+        } else {
+            value = index.model()->data(index, Qt::DisplayRole).toString();
+        }
+        if (value =="nan" || value == "0" || value == "0.0" || value == "0.00" || value == "00:00:00") {
+            value="";
+        }
+    } else {
+        // is this the activity date/time ?
+        value = index.model()->data(index, Qt::DisplayRole).toString();
+        QLocale locale;
+        if (columnName == tr("Date")) {
+            QDateTime dateTime = QDateTime::fromString(value, Qt::ISODate);
+            value = locale.toString(dateTime.date(), QLocale::NarrowFormat);
+        } else if (columnName == tr("Time")) {
+            QDateTime dateTime = QDateTime::fromString(value, Qt::ISODate);
+            value = locale.toString(dateTime.time(), QLocale::NarrowFormat);
+        } else if (columnName == tr("Last updated")) {
+            QDateTime dateTime;
+            dateTime.setSecsSinceEpoch(index.model()->data(index, Qt::DisplayRole).toInt());
+            value = locale.toString(dateTime, QLocale::NarrowFormat);
+        }
+    }
+    return value;
+}
+
+
+QSize
+ActivityItemDelegate::sizeHint
+(const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    const int lineHeight = QFontMetrics(option.font).lineSpacing() + 1;
+    int height;
+    if (isHeaderRow(index)) {
+        height = 2 * kFieldsTextPaddingTop * dpiYFactor + lineHeight;
+    } else {
+        height =   2 * kFieldsTextPaddingTop * dpiYFactor
+                 + lineHeight
+                 + (kSummaryMarginTop + std::min(1, std::max(0, summaryLines)) * kSummaryPaddingBottom + kSummaryMarginBottom) * dpiYFactor
+                 + lineHeight * summaryLines;
+    }
+    return { option.rect.width(), height };
+}
+
+
+void
+ActivityItemDelegate::paint
+(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    painter->save();
+
+    QFont font = option.font;
+    if (isHeaderRow(index)) {
+        font.setWeight(QFont::Bold);
+    } else {
+        font.setWeight(QFont::DemiBold);
+        const bool dirty = index.data(static_cast<int>(GroupByModel::DirtyRole)).toBool();
+        font.setItalic(dirty);
+    }
+    painter->setFont(font);
+    painter->setPen(option.palette.text().color());
+
+    const int leftPad = ((option.rect.x() == 0) ? kRowPaddingLeft + kFieldsTextIndent : kRowPaddingLeft) * dpiXFactor;
+    QRect titleRect = option.rect.adjusted(leftPad, kFieldsTextPaddingTop * dpiYFactor, -(kRowPaddingRight * dpiXFactor), 0);
+    titleRect.setHeight(QFontMetrics(font).height());
+
+    painter->drawText(titleRect, isHeaderRow(index) ? (Qt::AlignLeft | Qt::AlignBottom) : (Qt::AlignLeft | Qt::AlignVCenter), formatValue(index));
+
+    painter->restore();
+}
+
+
+bool
+ActivityItemDelegate::helpEvent
+(QHelpEvent *event, QAbstractItemView *view, const QStyleOptionViewItem &option, const QModelIndex &index)
+{
+    Q_UNUSED(option)
+
+    ActivityTreeView *tree = qobject_cast<ActivityTreeView*>(view);
+    if (! tree) {
+        return false;
+    }
+    QList<QModelIndex> indexes = tree->toolTipIndexes(index);
+    if (! indexes.isEmpty()) {
+        QString toolTipText = "<table>";
+        for (const QModelIndex &colIndex : indexes) {
+            QString columnName = colIndex.model()->headerData(colIndex.column(), Qt::Horizontal).toString();
+            toolTipText += QString("<tr><td><b>%1:</b></td><td>%2</td></tr>")
+                                  .arg(columnName.toHtmlEscaped())
+                                  .arg(formatValue(colIndex).toHtmlEscaped());
+        }
+        toolTipText += "</table>";
+        QModelIndex useIndex = index.siblingAtColumn(1);
+        QString calendarText = useIndex.data(GroupByModel::CalendarTextRole).toString();
+        if (! calendarText.isEmpty()) {
+            toolTipText += QString("<p>%1</p>").arg(calendarText.toHtmlEscaped());
+        }
+        QStringList flags;
+        if (useIndex.data(GroupByModel::PlannedRole).toBool()) {
+            flags << QString("<i>%1</i>").arg(tr("Planned").toHtmlEscaped());
+        }
+        if (useIndex.data(GroupByModel::DirtyRole).toBool()) {
+            flags << QString("<i>%1</i>").arg(tr("Unsaved changes").toHtmlEscaped());
+        }
+        if (! flags.isEmpty()) {
+            toolTipText += QString("<p>%1</p>").arg(flags.join(", "));
+        }
+        QToolTip::showText(event->globalPos(), toolTipText, view);
+    } else {
+        QToolTip::hideText();
+    }
+    return true;
+}
+
+
+void
+ActivityItemDelegate::setSummaryLines
+(int summaryLines)
+{
+    this->summaryLines = summaryLines;
+}
+
+
+bool
+ActivityItemDelegate::isHeaderRow
+(const QModelIndex &index) const
+{
+    return index.data(GroupByModel::HeaderRole).toBool();
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// ActivityTreeView
+
+ActivityTreeView::ActivityTreeView
+(RideNavigator *rideNavigator, QWidget* parent)
+: QTreeView(parent), rideNavigator(rideNavigator)
+{
+    setDragDropMode(QAbstractItemView::DragDrop);
     setDragEnabled(true);
     setDragDropOverwriteMode(false);
     setDropIndicatorShown(true);
+    setUniformRowHeights(false);
 #ifdef Q_OS_MAC
     setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
 }
 
 
-RideNavigatorSortProxyModel::RideNavigatorSortProxyModel(QObject *parent) : QSortFilterProxyModel (parent)
+QList<QModelIndex>
+ActivityTreeView::toolTipIndexes
+(const QModelIndex &index) const
+{
+    QList<QModelIndex> ret;
+    if (index.data(GroupByModel::HeaderRole).toBool()) {
+        return ret;
+    }
+    QModelIndex useIndex = index.siblingAtColumn(1);
+    for (int visual = 0; visual < header()->count(); ++visual) {
+        int logical = header()->logicalIndex(visual);
+        QString headerText = model()->headerData(logical, Qt::Horizontal, Qt::DisplayRole).toString();
+        if (isColumnHidden(logical) || headerText == "*") {
+            continue;
+        }
+        QModelIndex sibling = useIndex.siblingAtColumn(logical);
+        if (! sibling.isValid()) {
+            continue;
+        }
+        ret << sibling;
+    }
+    return ret;
+}
+
+
+void
+ActivityTreeView::selectionChanged
+(const QItemSelection &selected, const QItemSelection &deselected)
+{
+    emit rowSelected(selected);
+    QTreeView::selectionChanged(selected, deselected);
+
+    // Ugly hack to prevent visual artefacts remaining after selecting a new row
+    // Qt doesn't repaint the area beyond the last column on selection change
+    // Alternative fix: tableView->header()->setStretchLastSection(true) - but this
+    // gives a less predictable resizing UX
+    const int lastColumnRight = header()->sectionViewportPosition(header()->count() - 1) + header()->sectionSize(header()->count() - 1);
+    if (lastColumnRight >= viewport()->width()) {
+        return;
+    }
+    const int gapLeft  = lastColumnRight;
+    const int gapWidth = viewport()->width() - lastColumnRight;
+    for (const QModelIndex &idx : selected.indexes()) {
+        const QRect r = visualRect(idx);
+        viewport()->update(gapLeft, r.top(), gapWidth, r.height());
+    }
+    for (const QModelIndex &idx : deselected.indexes()) {
+        const QRect r = visualRect(idx);
+        viewport()->update(gapLeft, r.top(), gapWidth, r.height());
+    }
+}
+
+
+void
+ActivityTreeView::setSummaryLines
+(int summaryLines)
+{
+    this->summaryLines = summaryLines;
+}
+
+
+void
+ActivityTreeView::startDrag
+(Qt::DropActions supportedActions)
+{
+    // The icon of the drag is based only on the QStyledItemDelegates, drawRow is ignored.
+    // Therefore the painting has to be called manually to get a preview of the full row.
+
+    QModelIndexList indexes = selectedIndexes();
+    if (indexes.isEmpty()) {
+        return;
+    }
+
+    QModelIndex index = indexes.first();
+
+    QRect rowRect = visualRect(index);
+    rowRect.setLeft(0);
+    rowRect.setWidth(viewport()->width());
+    int height = rowHeight(index);
+    rowRect.setHeight(height);
+
+    const int hotX = dragStartPos.x();
+    const int hotY = std::clamp(dragStartPos.y() - rowRect.top(), 0, height - 1);
+
+    QPixmap pixmap(rowRect.width(), height);
+    pixmap.fill(Qt::transparent);
+
+    QStyleOptionViewItem option;
+    initViewItemOption(&option);
+    option.rect = QRect(0, 0, rowRect.width(), height);
+
+    QPainter painter(&pixmap);
+    paintRow(&painter, option, index);
+    painter.end();
+
+    QPixmap blended(pixmap.size());
+    blended.fill(Qt::transparent);
+    QPainter p(&blended);
+    p.setOpacity(0.65);
+    p.drawPixmap(0, 0, pixmap);
+    pixmap = blended;
+
+    QMimeData *mimeData = model()->mimeData(indexes);
+    if (! mimeData) {
+        return;
+    }
+    QDrag *drag = new QDrag(this);
+    drag->setPixmap(pixmap);
+    drag->setMimeData(mimeData);
+    drag->setHotSpot(QPoint(hotX, hotY));
+
+    Qt::DropAction defaultAction = defaultDropAction();
+    if (defaultAction == Qt::IgnoreAction) {
+        defaultAction = Qt::MoveAction;
+    }
+
+    drag->exec(supportedActions, defaultAction);
+}
+
+
+void
+ActivityTreeView::dragEnterEvent
+(QDragEnterEvent *event)
+{
+    event->accept();
+}
+
+
+void
+ActivityTreeView::dragMoveEvent
+(QDragMoveEvent *event)
+{
+    event->accept();
+}
+
+
+void
+ActivityTreeView::drawRow
+(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    painter->fillRect(option.rect, option.palette.base());
+    paintRow(painter, option, index);
+}
+
+
+void
+ActivityTreeView::resizeEvent
+(QResizeEvent *event)
+{
+    QTreeView::resizeEvent(event);
+    scheduleDelayedItemsLayout();
+}
+
+
+void
+ActivityTreeView::mousePressEvent
+(QMouseEvent *event)
+{
+    dragStartPos = event->pos();
+    QTreeView::mousePressEvent(event);
+}
+
+
+void
+ActivityTreeView::paintRow
+(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QModelIndex useIndex = index.siblingAtColumn(1);
+    if (! useIndex.isValid()) {
+        QTreeView::drawRow(painter, option, index);
+        return;
+    }
+
+    const QFontMetrics fm(option.font);
+    const QRect rowRect = option.rect;
+    const QColor planColor = GColor(CCALPLANNED);
+    const bool selected = selectionModel()->isSelected(index);
+    const bool isHeader = useIndex.data(GroupByModel::HeaderRole).toBool();
+    const bool planned = useIndex.data(GroupByModel::PlannedRole).toBool();
+    const QString sport = RideFile::sportTag(useIndex.data(GroupByModel::SportRole).toString());
+    const QString subSport = useIndex.data(GroupByModel::SubSportRole).toString();
+    const int lineHeight = fm.lineSpacing() + 1;
+    const bool dark = GCColor::isPaletteDark(palette());
+    const QColor bg = (selected && ! isHeader) ? GColor(CCALCURRENT) : palette().base().color();
+
+    QColor activityColor = useIndex.data(Qt::BackgroundRole).value<QBrush>().color();
+    if (! activityColor.isValid() || activityColor == QColor(1,1,1)) {
+        activityColor = palette().mid().color();
+    }
+
+    painter->save();
+    painter->setRenderHint(QPainter::Antialiasing, true);
+
+    QColor titleFg = GCColor::invertColor(bg);
+    if (! isHeader) {
+        QColor summaryFg;
+        const float radiusX = kRadius * dpiXFactor;
+        const float radiusY = kRadius * dpiYFactor;
+        const float summaryMarginTop = kSummaryMarginTop * dpiYFactor;
+        const float fieldsTextPaddingTop = kFieldsTextPaddingTop * dpiYFactor;
+        const int summaryTop = rowRect.top() + 2 * fieldsTextPaddingTop + summaryMarginTop + lineHeight;
+        const int summaryHeight = (summaryLines - 1) * lineHeight + fm.height();
+        const int titleHeight = lineHeight + 2 * fieldsTextPaddingTop;
+
+        if (selected) {
+            const int selSummaryHeight = summaryMarginTop + summaryHeight + (summaryLines > 0 ? kSummaryPaddingBottom * dpiYFactor : 0);
+            const int selectionHeight = titleHeight + selSummaryHeight;
+
+            QRect selectionRect(rowRect.x(), rowRect.y(), rowRect.width(), selectionHeight);
+
+            QColor selectionBg = GColor(CCALCURRENT);
+            painter->save();
+            painter->setPen(Qt::NoPen);
+            painter->setBrush(selectionBg);
+            painter->drawRoundedRect(selectionRect, radiusX, radiusY);
+            painter->restore();
+            titleFg = GCColor::invertColor(selectionBg);
+            summaryFg = GCColor::invertColor(selectionBg);
+        } else {
+            const float borderWidth = 2 * dpiXFactor;
+            QRect titleRealRect(rowRect.x(), rowRect.y(), rowRect.width(), titleHeight);
+            QRect titleDrawRect(titleRealRect);
+            if (summaryLines > 0) {
+                titleDrawRect.setHeight(titleRealRect.height() + radiusY);
+            }
+            painter->save();
+            QColor titleBg = activityColor;
+            if (planned) {
+                titleBg = bg;
+                painter->setPen(QPen(planColor, borderWidth));
+                painter->setBrush(Qt::NoBrush);
+            } else {
+                titleBg.setAlphaF(dark ? 0.15 : 0.10);
+                titleBg = GCColor::blendedColor(titleBg, bg);
+                painter->setPen(Qt::NoPen);
+                painter->setBrush(titleBg);
+            }
+            painter->setClipRect(titleRealRect);
+            painter->drawRoundedRect(titleDrawRect, radiusX, radiusY);
+            painter->restore();
+            titleFg = GCColor::invertColor(titleBg);
+            if (summaryLines > 0) {
+                QColor summaryBg;
+                if (planned) {
+                    summaryBg = bg;
+                } else {
+                    summaryBg = activityColor;
+                    summaryBg.setAlphaF(dark ? 0.1 : 0.07);
+                    summaryBg = GCColor::blendedColor(summaryBg, bg);
+                }
+                summaryFg = GCColor::invertColor(summaryBg);
+                summaryFg.setAlphaF(0.9);
+                QRect summaryRealRect(rowRect.left(), summaryTop - summaryMarginTop, rowRect.width(), summaryHeight + summaryMarginTop + kSummaryPaddingBottom * dpiYFactor);
+                QRect summaryDrawRect(summaryRealRect);
+                summaryDrawRect.setTop(summaryRealRect.top() - radiusY);
+                summaryDrawRect.setHeight(summaryRealRect.height() + radiusY);
+                painter->save();
+                if (planned) {
+                    QColor sepColor(planColor);
+                    sepColor.setAlphaF(dark ? 0.6 : 0.4);
+                    painter->setPen(QPen(sepColor, 1 * dpiXFactor));
+                    const float plannedSepInset = kPlannedSepInset * dpiXFactor;
+                    painter->drawLine(summaryRealRect.left() + plannedSepInset, summaryRealRect.top(), summaryRealRect.right() - plannedSepInset, summaryRealRect.top());
+                    painter->setPen(QPen(planColor, borderWidth));
+                    painter->setBrush(Qt::NoBrush);
+                } else {
+                    painter->setPen(Qt::NoPen);
+                    painter->setBrush(summaryBg);
+                }
+                painter->setClipRect(summaryRealRect);
+                painter->drawRoundedRect(summaryDrawRect, radiusX, radiusY);
+                painter->restore();
+
+            }
+        }
+        if (summaryLines > 0) {
+            const QString iconFile = IconManager::instance().getFilepath(sport, subSport);
+            const float iconSpacing = kIconSpacing * dpiXFactor;
+            const int iconWidth = std::min(summaryLines, 2) * lineHeight;
+            QSize pixmapSize(iconWidth, iconWidth);
+            QPixmap pixmap;
+
+            if (planned) {
+                QColor iconColor = planColor;
+                if (selected) {
+                    iconColor = titleFg;
+                }
+                pixmap = svgAsColoredPixmap(iconFile, pixmapSize, iconSpacing, iconColor);
+            } else {
+                pixmap = svgOnBackground(iconFile, pixmapSize, iconSpacing, activityColor, radiusX);
+            }
+            const int summaryLeft = rowRect.left() + (kRowPaddingLeft + kFieldsTextIndent) * dpiXFactor;
+            const int summaryRight = rowRect.right() - kRowPaddingRight * dpiXFactor;
+            const QRect summaryRect(summaryLeft, summaryTop, summaryRight - summaryLeft, summaryHeight);
+            painter->drawPixmap(summaryRect.left(), summaryRect.top(), pixmap);
+
+            const QString detailText = useIndex.data(GroupByModel::CalendarTextRole).toString();
+            if (! detailText.isEmpty()) {
+                QRect summaryTextRect = summaryRect.adjusted(iconWidth + kSummaryIconTextGap * dpiXFactor, 0, 0, 0);
+
+                if (summaryTextRect.isValid()) {
+                    painter->save();
+                    QFont summaryFont = option.font;
+                    summaryFont.setWeight(QFont::Light);
+                    const bool dirty = useIndex.data(GroupByModel::DirtyRole).toBool();
+                    summaryFont.setItalic(dirty);
+                    painter->setFont(summaryFont);
+                    painter->setPen(summaryFg);
+                    painter->drawText(summaryTextRect, Qt::AlignLeft | Qt::TextWordWrap, detailText);
+                    painter->restore();
+                }
+            }
+        }
+    }
+
+    QStyleOptionViewItem opt;
+    initViewItemOption(&opt);
+    opt.rect = rowRect;
+    opt.palette.setBrush(QPalette::All, QPalette::Text, titleFg);
+    opt.palette.setBrush(QPalette::All, QPalette::Highlight, Qt::transparent);
+    painter->save();
+    QTreeView::drawRow(painter, opt, index);
+    painter->restore();
+
+    if (! isHeader) {
+        if (selected || summaryLines == 0) {
+            const int size = lineHeight * 0.75;
+            const int x = rowRect.left();
+            const int y = rowRect.top();
+            QPolygon triangle;
+            triangle << QPoint(x, y)
+                     << QPoint(x + size, y)
+                     << QPoint(x, y + size);
+            painter->setBrush(planned ? planColor : activityColor);
+            painter->setPen(Qt::NoPen);
+            painter->drawPolygon(triangle);
+        }
+    }
+    painter->restore();
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// RideNavigatorSortProxyModel
+
+RideNavigatorSortProxyModel::RideNavigatorSortProxyModel
+(QObject *parent)
+: QSortFilterProxyModel(parent)
 {
 }
 
-bool RideNavigatorSortProxyModel::lessThan(const QModelIndex &left,
-                                           const QModelIndex &right) const
+
+bool
+RideNavigatorSortProxyModel::lessThan
+(const QModelIndex &left, const QModelIndex &right) const
 {
     QVariant leftData = sourceModel()->data(left);
     QVariant rightData = sourceModel()->data(right);
 
-    if (leftData.type() == QVariant::DateTime) {
+    if (leftData.metaType().id() == QMetaType::QDateTime) {
         return leftData.toDateTime() < rightData.toDateTime();
     }
     QString leftString = leftData.toString();
     QString rightString = rightData.toString();
 
-    if (leftString.contains(QRegExp("[^0-9.,]")) ||
-            rightString.contains(QRegExp("[^0-9.,]"))) { // alpha
+    if (   leftString.contains(QRegularExpression("[^0-9.,]"))
+        || rightString.contains(QRegularExpression("[^0-9.,]"))) { // alpha
         return QString::localeAwareCompare(leftString, rightString) < 0;
     }
     // assume numeric
     return leftString.toDouble() < rightString.toDouble();
-
 }
 
+
+//////////////////////////////////////////////////////////////////////////////
+// static functions
+
+static bool insensitiveLessThan(const QString &a, const QString &b)
+{
+    return a.toLower() < b.toLower();
+}

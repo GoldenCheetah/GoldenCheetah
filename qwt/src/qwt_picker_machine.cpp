@@ -1,4 +1,4 @@
-/* -*- mode: C++ ; c-file-style: "stroustrup" -*- *****************************
+/******************************************************************************
  * Qwt Widget Library
  * Copyright (C) 1997   Josef Wilgen
  * Copyright (C) 2002   Uwe Rathmann
@@ -9,12 +9,13 @@
 
 #include "qwt_picker_machine.h"
 #include "qwt_event_pattern.h"
+
 #include <qevent.h>
 
 //! Constructor
-QwtPickerMachine::QwtPickerMachine( SelectionType type ):
-    d_selectionType( type ),
-    d_state( 0 )
+QwtPickerMachine::QwtPickerMachine( SelectionType type )
+    : m_selectionType( type )
+    , m_state( 0 )
 {
 }
 
@@ -26,19 +27,19 @@ QwtPickerMachine::~QwtPickerMachine()
 //! Return the selection type
 QwtPickerMachine::SelectionType QwtPickerMachine::selectionType() const
 {
-    return d_selectionType;
+    return m_selectionType;
 }
 
 //! Return the current state
 int QwtPickerMachine::state() const
 {
-    return d_state;
+    return m_state;
 }
 
 //! Change the current state
 void QwtPickerMachine::setState( int state )
 {
-    d_state = state;
+    m_state = state;
 }
 
 //! Set the current state to 0.
@@ -54,10 +55,10 @@ QwtPickerTrackerMachine::QwtPickerTrackerMachine():
 }
 
 //! Transition
-QList<QwtPickerMachine::Command> QwtPickerTrackerMachine::transition(
-    const QwtEventPattern &, const QEvent *e )
+QList< QwtPickerMachine::Command > QwtPickerTrackerMachine::transition(
+    const QwtEventPattern&, const QEvent* e )
 {
-    QList<QwtPickerMachine::Command> cmdList;
+    QList< QwtPickerMachine::Command > cmdList;
 
     switch ( e->type() )
     {
@@ -96,17 +97,17 @@ QwtPickerClickPointMachine::QwtPickerClickPointMachine():
 }
 
 //! Transition
-QList<QwtPickerMachine::Command> QwtPickerClickPointMachine::transition(
-    const QwtEventPattern &eventPattern, const QEvent *event )
+QList< QwtPickerMachine::Command > QwtPickerClickPointMachine::transition(
+    const QwtEventPattern& eventPattern, const QEvent* event )
 {
-    QList<QwtPickerMachine::Command> cmdList;
+    QList< QwtPickerMachine::Command > cmdList;
 
     switch ( event->type() )
     {
         case QEvent::MouseButtonPress:
         {
-            if ( eventPattern.mouseMatch( QwtEventPattern::MouseSelect1, 
-                static_cast<const QMouseEvent *>( event ) ) )
+            if ( eventPattern.mouseMatch( QwtEventPattern::MouseSelect1,
+                static_cast< const QMouseEvent* >( event ) ) )
             {
                 cmdList += Begin;
                 cmdList += Append;
@@ -116,12 +117,15 @@ QList<QwtPickerMachine::Command> QwtPickerClickPointMachine::transition(
         }
         case QEvent::KeyPress:
         {
-            if ( eventPattern.keyMatch( QwtEventPattern::KeySelect1, 
-                static_cast<const QKeyEvent *> ( event ) ) )
+            const QKeyEvent* keyEvent = static_cast< const QKeyEvent* > ( event );
+            if ( eventPattern.keyMatch( QwtEventPattern::KeySelect1, keyEvent ) )
             {
-                cmdList += Begin;
-                cmdList += Append;
-                cmdList += End;
+                if ( !keyEvent->isAutoRepeat() )
+                {
+                    cmdList += Begin;
+                    cmdList += Append;
+                    cmdList += End;
+                }
             }
             break;
         }
@@ -139,17 +143,17 @@ QwtPickerDragPointMachine::QwtPickerDragPointMachine():
 }
 
 //! Transition
-QList<QwtPickerMachine::Command> QwtPickerDragPointMachine::transition(
-    const QwtEventPattern &eventPattern, const QEvent *event )
+QList< QwtPickerMachine::Command > QwtPickerDragPointMachine::transition(
+    const QwtEventPattern& eventPattern, const QEvent* event )
 {
-    QList<QwtPickerMachine::Command> cmdList;
+    QList< QwtPickerMachine::Command > cmdList;
 
     switch ( event->type() )
     {
         case QEvent::MouseButtonPress:
         {
-            if ( eventPattern.mouseMatch( QwtEventPattern::MouseSelect1, 
-                static_cast<const QMouseEvent *>( event ) ) )
+            if ( eventPattern.mouseMatch( QwtEventPattern::MouseSelect1,
+                static_cast< const QMouseEvent* >( event ) ) )
             {
                 if ( state() == 0 )
                 {
@@ -178,19 +182,22 @@ QList<QwtPickerMachine::Command> QwtPickerDragPointMachine::transition(
         }
         case QEvent::KeyPress:
         {
-            if ( eventPattern.keyMatch( QwtEventPattern::KeySelect1, 
-                static_cast<const QKeyEvent *>( event ) ) )
+            const QKeyEvent* keyEvent = static_cast< const QKeyEvent* > ( event );
+            if ( eventPattern.keyMatch( QwtEventPattern::KeySelect1, keyEvent ) )
             {
-                if ( state() == 0 )
+                if ( !keyEvent->isAutoRepeat() )
                 {
-                    cmdList += Begin;
-                    cmdList += Append;
-                    setState( 1 );
-                }
-                else
-                {
-                    cmdList += End;
-                    setState( 0 );
+                    if ( state() == 0 )
+                    {
+                        cmdList += Begin;
+                        cmdList += Append;
+                        setState( 1 );
+                    }
+                    else
+                    {
+                        cmdList += End;
+                        setState( 0 );
+                    }
                 }
             }
             break;
@@ -209,17 +216,17 @@ QwtPickerClickRectMachine::QwtPickerClickRectMachine():
 }
 
 //! Transition
-QList<QwtPickerMachine::Command> QwtPickerClickRectMachine::transition(
-    const QwtEventPattern &eventPattern, const QEvent *event )
+QList< QwtPickerMachine::Command > QwtPickerClickRectMachine::transition(
+    const QwtEventPattern& eventPattern, const QEvent* event )
 {
-    QList<QwtPickerMachine::Command> cmdList;
+    QList< QwtPickerMachine::Command > cmdList;
 
     switch ( event->type() )
     {
         case QEvent::MouseButtonPress:
         {
-            if ( eventPattern.mouseMatch( QwtEventPattern::MouseSelect1, 
-                static_cast<const QMouseEvent *>( event ) ) )
+            if ( eventPattern.mouseMatch( QwtEventPattern::MouseSelect1,
+                static_cast< const QMouseEvent* >( event ) ) )
             {
                 switch ( state() )
                 {
@@ -242,6 +249,7 @@ QList<QwtPickerMachine::Command> QwtPickerClickRectMachine::transition(
                     }
                 }
             }
+            break;
         }
         case QEvent::MouseMove:
         case QEvent::Wheel:
@@ -252,8 +260,8 @@ QList<QwtPickerMachine::Command> QwtPickerClickRectMachine::transition(
         }
         case QEvent::MouseButtonRelease:
         {
-            if ( eventPattern.mouseMatch( QwtEventPattern::MouseSelect1, 
-                static_cast<const QMouseEvent *>( event ) ) )
+            if ( eventPattern.mouseMatch( QwtEventPattern::MouseSelect1,
+                static_cast< const QMouseEvent* >( event ) ) )
             {
                 if ( state() == 1 )
                 {
@@ -265,26 +273,29 @@ QList<QwtPickerMachine::Command> QwtPickerClickRectMachine::transition(
         }
         case QEvent::KeyPress:
         {
-            if ( eventPattern.keyMatch( QwtEventPattern::KeySelect1, 
-                static_cast<const QKeyEvent *> ( event ) ) )
+            const QKeyEvent* keyEvent = static_cast< const QKeyEvent* > ( event );
+            if ( eventPattern.keyMatch( QwtEventPattern::KeySelect1, keyEvent ) )
             {
-                if ( state() == 0 )
+                if ( !keyEvent->isAutoRepeat() )
                 {
-                    cmdList += Begin;
-                    cmdList += Append;
-                    setState( 1 );
-                }
-                else
-                {
-                    if ( state() == 1 )
+                    if ( state() == 0 )
                     {
+                        cmdList += Begin;
                         cmdList += Append;
-                        setState( 2 );
+                        setState( 1 );
                     }
-                    else if ( state() == 2 )
+                    else
                     {
-                        cmdList += End;
-                        setState( 0 );
+                        if ( state() == 1 )
+                        {
+                            cmdList += Append;
+                            setState( 2 );
+                        }
+                        else if ( state() == 2 )
+                        {
+                            cmdList += End;
+                            setState( 0 );
+                        }
                     }
                 }
             }
@@ -304,17 +315,17 @@ QwtPickerDragRectMachine::QwtPickerDragRectMachine():
 }
 
 //! Transition
-QList<QwtPickerMachine::Command> QwtPickerDragRectMachine::transition(
-    const QwtEventPattern &eventPattern, const QEvent *event )
+QList< QwtPickerMachine::Command > QwtPickerDragRectMachine::transition(
+    const QwtEventPattern& eventPattern, const QEvent* event )
 {
-    QList<QwtPickerMachine::Command> cmdList;
+    QList< QwtPickerMachine::Command > cmdList;
 
     switch ( event->type() )
     {
         case QEvent::MouseButtonPress:
         {
-            if ( eventPattern.mouseMatch( QwtEventPattern::MouseSelect1, 
-                static_cast<const QMouseEvent *>( event ) ) )
+            if ( eventPattern.mouseMatch( QwtEventPattern::MouseSelect1,
+                static_cast< const QMouseEvent* >( event ) ) )
             {
                 if ( state() == 0 )
                 {
@@ -344,8 +355,8 @@ QList<QwtPickerMachine::Command> QwtPickerDragRectMachine::transition(
         }
         case QEvent::KeyPress:
         {
-            if ( eventPattern.keyMatch( QwtEventPattern::KeySelect1, 
-                static_cast<const QKeyEvent *> ( event ) ) )
+            if ( eventPattern.keyMatch( QwtEventPattern::KeySelect1,
+                static_cast< const QKeyEvent* > ( event ) ) )
             {
                 if ( state() == 0 )
                 {
@@ -376,17 +387,17 @@ QwtPickerPolygonMachine::QwtPickerPolygonMachine():
 }
 
 //! Transition
-QList<QwtPickerMachine::Command> QwtPickerPolygonMachine::transition(
-    const QwtEventPattern &eventPattern, const QEvent *event )
+QList< QwtPickerMachine::Command > QwtPickerPolygonMachine::transition(
+    const QwtEventPattern& eventPattern, const QEvent* event )
 {
-    QList<QwtPickerMachine::Command> cmdList;
+    QList< QwtPickerMachine::Command > cmdList;
 
     switch ( event->type() )
     {
         case QEvent::MouseButtonPress:
         {
-            if ( eventPattern.mouseMatch( QwtEventPattern::MouseSelect1, 
-                static_cast<const QMouseEvent *>( event ) ) )
+            if ( eventPattern.mouseMatch( QwtEventPattern::MouseSelect1,
+                static_cast< const QMouseEvent* >( event ) ) )
             {
                 if ( state() == 0 )
                 {
@@ -400,8 +411,8 @@ QList<QwtPickerMachine::Command> QwtPickerPolygonMachine::transition(
                     cmdList += Append;
                 }
             }
-            if ( eventPattern.mouseMatch( QwtEventPattern::MouseSelect2, 
-                static_cast<const QMouseEvent *>( event ) ) )
+            if ( eventPattern.mouseMatch( QwtEventPattern::MouseSelect2,
+                static_cast< const QMouseEvent* >( event ) ) )
             {
                 if ( state() == 1 )
                 {
@@ -420,28 +431,33 @@ QList<QwtPickerMachine::Command> QwtPickerPolygonMachine::transition(
         }
         case QEvent::KeyPress:
         {
-            if ( eventPattern.keyMatch( QwtEventPattern::KeySelect1, 
-                static_cast<const QKeyEvent *> ( event ) ) )
+            const QKeyEvent* keyEvent = static_cast< const QKeyEvent* > ( event );
+            if ( eventPattern.keyMatch( QwtEventPattern::KeySelect1, keyEvent ) )
             {
-                if ( state() == 0 )
+                if ( !keyEvent->isAutoRepeat() )
                 {
-                    cmdList += Begin;
-                    cmdList += Append;
-                    cmdList += Append;
-                    setState( 1 );
-                }
-                else
-                {
-                    cmdList += Append;
+                    if ( state() == 0 )
+                    {
+                        cmdList += Begin;
+                        cmdList += Append;
+                        cmdList += Append;
+                        setState( 1 );
+                    }
+                    else
+                    {
+                        cmdList += Append;
+                    }
                 }
             }
-            else if ( eventPattern.keyMatch( QwtEventPattern::KeySelect2, 
-                static_cast<const QKeyEvent *> ( event ) ) )
+            else if ( eventPattern.keyMatch( QwtEventPattern::KeySelect2, keyEvent ) )
             {
-                if ( state() == 1 )
+                if ( !keyEvent->isAutoRepeat() )
                 {
-                    cmdList += End;
-                    setState( 0 );
+                    if ( state() == 1 )
+                    {
+                        cmdList += End;
+                        setState( 0 );
+                    }
                 }
             }
             break;
@@ -460,17 +476,17 @@ QwtPickerDragLineMachine::QwtPickerDragLineMachine():
 }
 
 //! Transition
-QList<QwtPickerMachine::Command> QwtPickerDragLineMachine::transition(
-    const QwtEventPattern &eventPattern, const QEvent *event )
+QList< QwtPickerMachine::Command > QwtPickerDragLineMachine::transition(
+    const QwtEventPattern& eventPattern, const QEvent* event )
 {
-    QList<QwtPickerMachine::Command> cmdList;
+    QList< QwtPickerMachine::Command > cmdList;
 
     switch( event->type() )
     {
         case QEvent::MouseButtonPress:
         {
             if ( eventPattern.mouseMatch( QwtEventPattern::MouseSelect1,
-                static_cast<const QMouseEvent *>( event ) ) )
+                static_cast< const QMouseEvent* >( event ) ) )
             {
                 if ( state() == 0 )
                 {
@@ -485,7 +501,7 @@ QList<QwtPickerMachine::Command> QwtPickerDragLineMachine::transition(
         case QEvent::KeyPress:
         {
             if ( eventPattern.keyMatch( QwtEventPattern::KeySelect1,
-                static_cast<const QKeyEvent *> ( event ) ) )
+                static_cast< const QKeyEvent* > ( event ) ) )
             {
                 if ( state() == 0 )
                 {

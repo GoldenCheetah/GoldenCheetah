@@ -59,7 +59,7 @@ class IntervalCache;
 class Context;
 class ColorEngine;
 class AnalysisSidebar;
-class Tab;
+class AthleteTab;
 class Leaf;
 class DataFilterRuntime;
 class CloudServiceAutoDownload;
@@ -81,11 +81,11 @@ class Athlete : public QObject
         const AthleteDirectoryStructure *directoryStructure() const {return home; }
 
         // zones
-        const Zones *zones(bool isRun) const { return zones_[isRun]; }
-        const HrZones *hrZones(bool isRun) const { return hrzones_[isRun]; }
+        const Zones *zones(QString sport) const { return zones_.value(sport, zones_.value("Bike")); }
+        const HrZones *hrZones(QString sport) const { return hrzones_.value(sport, hrzones_.value("Bike")); }
         const PaceZones *paceZones(bool isSwim) const { return pacezones_[isSwim]; }
-        Zones *zones_[2];
-        HrZones *hrzones_[2];
+        QHash<QString, Zones*> zones_;
+        QHash<QString, HrZones*> hrzones_;
         PaceZones *pacezones_[2];
         void setCriticalPower(int cp);
 
@@ -100,8 +100,9 @@ class Athlete : public QObject
         CloudServiceAutoDownload *cloudAutoDownload;
 
         // Estimates
-        PDEstimate getPDEstimateFor(QDate, QString model, bool wpk, bool run);
-        QList<PDEstimate> getPDEstimates();
+        PDEstimate getPDEstimateFor(QDate, QString model, bool wpk, QString sport) const;
+        PDEstimate getPDEstimateClosestFor(QDate date, QString model, bool wpk, QString sport) const;
+        QList<PDEstimate> getPDEstimates() const;
 
         // PMC Data
         PMCData *getPMCFor(QString metricName, int stsDays = -1, int ltsDays = -1); // no Specification used!

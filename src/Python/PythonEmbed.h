@@ -43,9 +43,9 @@ class ScriptContext {
               interactiveShell(interactiveShell), readOnly(true), editedRideFiles(NULL) {}
 
         // read/write ctor
-        ScriptContext(Context *context, RideFile *rideFile, bool interactiveShell,
+        ScriptContext(Context *context, RideFile *rideFile, RideItem *item, bool interactiveShell,
                       bool readOnly, QList<RideFile *> *editedRideFiles)
-            : context(context), item(NULL), rideFile(rideFile), metrics(NULL), spec(),
+            : context(context), item(item), rideFile(rideFile), metrics(NULL), spec(),
               interactiveShell(interactiveShell), readOnly(readOnly), editedRideFiles(editedRideFiles) {}
 
         // default ctor
@@ -95,6 +95,7 @@ class PythonEmbed {
 
     // context for caller - can be called in a thread
     QMap<long, ScriptContext> contexts;
+    Perspective *perspective;
     PythonChart *chart;
     QWidget *canvas;
 
@@ -117,21 +118,25 @@ class PythonEmbed {
 #ifndef PYTHON_DEBUG
 #define PYTHON_DEBUG false
 #endif
+
+#include <QDebug>
+#include <stdio.h>
+
 #ifdef Q_CC_MSVC
 #define printd(fmt, ...) do {                                                \
     if (PYTHON_DEBUG) {                                 \
-        printf("[%s:%d %s] " fmt , __FILE__, __LINE__,        \
-               __FUNCTION__, __VA_ARGS__);                    \
-        fflush(stdout);                                       \
+        qDebug() << "PythonEmbed:" << QString::asprintf("[%s:%d %s] " fmt, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__); \
+        fprintf(stderr, "[%s:%d %s] " fmt, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__); \
+        fflush(stderr);                                       \
     }                                                         \
 } while(0)
 #else
 #define printd(fmt, args...)                                            \
     do {                                                                \
         if (PYTHON_DEBUG) {                                       \
-            printf("[%s:%d %s] " fmt , __FILE__, __LINE__,              \
-                   __FUNCTION__, ##args);                               \
-            fflush(stdout);                                             \
+            qDebug() << "PythonEmbed:" << QString::asprintf("[%s:%d %s] " fmt, __FILE__, __LINE__, __FUNCTION__, ##args); \
+            fprintf(stderr, "[%s:%d %s] " fmt, __FILE__, __LINE__, __FUNCTION__, ##args); \
+            fflush(stderr);                                             \
         }                                                               \
     } while(0)
 #endif

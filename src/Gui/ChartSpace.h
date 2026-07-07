@@ -39,6 +39,7 @@
 #include <QScrollBar>
 #include <QIcon>
 #include <QTimer>
+#include <QPoint>
 
 // geometry basics
 #define SPACING 80
@@ -50,12 +51,41 @@ class ChartSpace;
 class ChartSpaceItemFactory;
 
 // we need a scope for a chart space, one or more of
-enum OverviewScope { ANALYSIS=0x01, TRENDS=0x02, ATHLETES=0x04 };
+enum class OverviewScope : unsigned int { NO_SCOPE_SET=0x00, ANALYSIS=0x01, TRENDS=0x02, ATHLETES=0x04, PLAN=0x08 };
+
+// support bitwise "|" and "&" operators for the OverviewScope class
+inline constexpr OverviewScope operator|(OverviewScope Lhs, OverviewScope Rhs) {
+    return static_cast<OverviewScope>( static_cast<std::underlying_type_t<OverviewScope>>(Lhs) | static_cast<std::underlying_type_t<OverviewScope>>(Rhs) );
+}
+inline constexpr bool operator&(OverviewScope Lhs, OverviewScope Rhs) {
+    return static_cast<std::underlying_type_t<OverviewScope>>(Lhs) & static_cast<std::underlying_type_t<OverviewScope>>(Rhs);
+}
+
+// we need to intercept the graphics scene drag and drop
+// events and send them to MainWindow
+class GGraphicsView : public QGraphicsView
+{
+    public:
+        GGraphicsView(MainWindow *mainWindow, QWidget *parent) : QGraphicsView(parent), mainWindow_(mainWindow) {
+            setAcceptDrops(true);
+        }
+
+    protected:
+        void dragEnterEvent(QDragEnterEvent *event) { mainWindow_->dragEnterEvent(event); }
+        void dragLeaveEvent(QDragLeaveEvent *event) { mainWindow_->dragLeaveEvent(event); }
+        void dropEvent(QDropEvent *event) { mainWindow_->dropEvent(event); }
+        void dragMoveEvent(QDragMoveEvent *event) { mainWindow_->dragMoveEvent(event); }
+
+    private:
+        MainWindow *mainWindow_;
+};
 
 // must be subclassed to add items to a ChartSpace
 class ChartSpaceItem : public QGraphicsWidget
 {
     Q_OBJECT
+
+    friend class ::ChartSpace;
 
     public:
 
@@ -64,13 +94,29 @@ class ChartSpaceItem : public QGraphicsWidget
         virtual void itemGeometryChanged() =0;
         virtual void setData(RideItem *item)=0;
         virtual void setDateRange(DateRange )=0;
+        virtual QColor color();
         virtual QRectF hotspot() { return QRectF(0,0,0,0); } // don't steal events from this area of the item
+        
+        // Override to display tile specific edit menu
+        virtual void displayTileEditMenu(const QPoint&) {};
 
         virtual QWidget *config()=0; // must supply a widget to configure
+        virtual void configChanged(qint32) {}
 
         // turn off/on the config corner button
         void setShowConfig(bool x) { showconfig=x; update(); }
         bool showConfig() const { return showconfig; }
+
+        // turn off/on the edit corner button
+        void setShowEdit(bool x) { showedit = x; update(); }
+        bool showEdit() const { return showedit; }
+
+        // let item know that dragging is in process
+        // for some widgets (e.g. UserChart) this means
+        // its best to hide the widgets as rendering into
+        // the scene can be really slow. For other widgets
+        // it can be safely ignored.
+        virtual void dragging(bool) { }
 
         // what type am I- managed by user
         int type;
@@ -78,8 +124,8 @@ class ChartSpaceItem : public QGraphicsWidget
         ChartSpaceItem(ChartSpace *parent, QString name) : QGraphicsWidget(NULL),
                                        parent(parent), name(name),
                                        column(0), order(0), deep(5), onscene(false),
-                                       placing(false), drag(false), invisible(false),
-                                       showconfig(true)  {
+                                       placing(false), drag(false), incorner(false), inedit(false),
+                                       invisible(false), showconfig(true), showedit(false) {
 
             setAutoFillBackground(false);
             setFlags(flags() | QGraphicsItem::ItemClipsToShape); // don't paint outside the card
@@ -88,6 +134,7 @@ class ChartSpaceItem : public QGraphicsWidget
             setZValue(10);
 
             // a sensible default?
+            span = 1;
             type = 0;
             delcounter=0;
 
@@ -100,6 +147,8 @@ class ChartSpaceItem : public QGraphicsWidget
             this->setGraphicsEffect(effect);
 #endif
 
+            bgcolor = StandardColor(CCARDBACKGROUND).name();
+
             // watch geom changes
             connect(this, SIGNAL(geometryChanged()), SLOT(geometryChanged()));
         }
@@ -107,6 +156,7 @@ class ChartSpaceItem : public QGraphicsWidget
         // watch mouse enter/leave
         bool sceneEvent(QEvent *event);
         bool inCorner();
+        bool inEdit();
         bool inHotspot();
         bool underMouse();
 
@@ -131,11 +181,14 @@ class ChartSpaceItem : public QGraphicsWidget
         QString datafilter;
 
         // which column, sequence and size in rows
-        int column, order, deep;
+        int column, span, order, deep;
         bool onscene, placing, drag;
         bool incorner;
+        bool inedit;
         bool invisible;
         bool showconfig;
+        bool showedit;
+        QString bgcolor;
         QGraphicsDropShadowEffect *effect;
 
         // base paint
@@ -144,6 +197,29 @@ class ChartSpaceItem : public QGraphicsWidget
     public slots:
 
         void geometryChanged();
+};
+
+// we copy the current items and manage their layout (which is an iterative process)
+// and once the layout is done we create an animation to move from the current positions
+// to the new positions using this class to temporarily store new co-ordinates
+class LayoutChartSpaceItem {
+
+    public:
+        LayoutChartSpaceItem(ChartSpaceItem *from) :
+            column(from->column), span(from->span), order (from->order ), deep(from->deep), onscene(from->onscene),
+            placing(from->placing), drag(from->drag), incorner(from->incorner), inedit(from->inedit), invisible(from->invisible),
+            item(from), geometry(from->geometry()) {}
+
+        static bool LayoutChartSpaceItemSort(const LayoutChartSpaceItem left, const LayoutChartSpaceItem right);
+
+        int column, span, order, deep;
+        bool onscene, placing, drag;
+        bool incorner;
+        bool inedit;
+        bool invisible;
+
+        ChartSpaceItem *item;
+        QRectF geometry;
 };
 
 class ChartSpace : public QWidget
@@ -155,14 +231,20 @@ class ChartSpace : public QWidget
 
     public:
 
-        ChartSpace(Context *context, int scope);
+        ChartSpace(Context *context, OverviewScope scope, GcWindow *window);
+        QGraphicsScene *getScene() { return scene; }
 
         // current state for event processing
-        enum { NONE, DRAG, XRESIZE, YRESIZE } state;
+        enum { NONE, DRAG, SPAN, XRESIZE, YRESIZE } state;
+
+        void setMinimumColumns(int x) { mincols=x; updateGeometry(); updateView(); }
+        int minimumColumns() const { return mincols; }
 
         // used by children
         Context *context;
-        int scope;
+        OverviewScope scope;
+        int mincols;
+
         QGraphicsView *view;
         QFont titlefont, bigfont, midfont, smallfont, tinyfont;
 
@@ -174,9 +256,12 @@ class ChartSpace : public QWidget
         QGraphicsView *device() { return view; }
         const QList<ChartSpaceItem*> allItems() { return items; }
 
+        // window we are rendered in
+        GcWindow *window;
+
 
     signals:
-        void itemConfigRequested(ChartSpaceItem*);
+        void itemConfigRequested(ChartSpaceItem*, QPoint);
 
     public slots:
 
@@ -184,6 +269,10 @@ class ChartSpace : public QWidget
         void rideSelected(RideItem *item);
         void dateRangeChanged(DateRange);
         void filterChanged();
+
+        // column sizing
+        QVector<int> columnWidths() { return columns; }
+        void setColumnWidths(QVector<int> x) { columns =x; updateGeometry(); }
 
         // for smooth scrolling
         void setViewY(int x) { if (_viewY != x) {_viewY =x; updateView();} }
@@ -209,12 +298,13 @@ class ChartSpace : public QWidget
 
         // set geometry on the widgets (size and pos)
         void updateGeometry();
+        QList<LayoutChartSpaceItem> layoutItems(); // moves geom and lays out items
 
         // set scale, zoom etc appropriately
         void updateView();
 
         // add a ChartSpaceItem to the view
-        void addItem(int row, int column, int deep, ChartSpaceItem *item);
+        void addItem(int row, int column, int span, int deep, ChartSpaceItem *item);
 
         // remove an item
         void removeItem(ChartSpaceItem *item);
@@ -224,10 +314,17 @@ class ChartSpace : public QWidget
         // card when only one athlete
         void setFixedZoom(int width);
 
+        // which column are we in for position x
+        int columnForX(int x);
+        // how many items are in this column?
+        int columnCount(int x);
+
     protected:
 
         // process events
         bool eventFilter(QObject *, QEvent *event);
+
+        virtual bool clickOverride(ChartSpaceItem*, QGraphicsSceneMouseEvent*) { return false; }
 
     private:
 
@@ -248,7 +345,8 @@ class ChartSpace : public QWidget
 
         // content
         QVector<int> columns;                // column widths
-        QList<ChartSpaceItem*> items;         // tiles
+        QList<ChartSpaceItem*> items;        // tiles
+        QGraphicsRectItem *landingzone = nullptr;   // marker where the dragged ChartSpaceItem will be placed
 
         // state data
         bool yresizecursor;          // is the cursor set to resize?
@@ -272,6 +370,7 @@ class ChartSpace : public QWidget
             } yresize;
 
             struct {
+                ChartSpaceItem *item; // span resize
                 double posx;
                 int width;
                 int column;
@@ -286,11 +385,12 @@ class ChartSpace : public QWidget
 // each chart has an entry like this in the registry
 struct ChartSpaceItemDetail {
 
-    ChartSpaceItemDetail() : ChartSpaceItemDetail(0,"","",0,NULL) {}
-    ChartSpaceItemDetail(int type, QString quick, QString description, int scope, ChartSpaceItem* (*create)(ChartSpace *))
+    ChartSpaceItemDetail() : ChartSpaceItemDetail(0,"","",OverviewScope::NO_SCOPE_SET,NULL) {}
+    ChartSpaceItemDetail(int type, QString quick, QString description, OverviewScope scope, ChartSpaceItem* (*create)(ChartSpace *))
         : type(type), scope(scope), quick(quick), description(description), create(create) {}
 
-    int type, scope; // scope needs enums at some point
+    int type;
+    OverviewScope scope;
     QString quick, description;
     ChartSpaceItem* (*create)(ChartSpace *);
 };
@@ -307,7 +407,7 @@ class ChartSpaceItemRegistry {
         }
 
         // register chartspace items
-        bool addItem(int type, QString quick, QString description, int scope, ChartSpaceItem* (*create)(ChartSpace *)) {
+        bool addItem(int type, QString quick, QString description, OverviewScope scope, ChartSpaceItem* (*create)(ChartSpace *)) {
 
             // add to registry
             _items.append(ChartSpaceItemDetail(type, quick, description, scope, create));

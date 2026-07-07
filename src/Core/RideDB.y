@@ -19,6 +19,7 @@
 
 #include "RideDB.h"
 #include "RideFileCache.h"
+#include "SpecialFields.h"
 #include "Settings.h"
 #ifdef GC_WANT_HTTP
 #include "APIWebService.h"
@@ -82,16 +83,10 @@ ride: '{' rideelement_list '}'                                  {
                                                                         jc->api->writeRideLine(jc->item, jc->request, jc->response);
                                                                     #endif
                                                                     } else {
-
-                                                                        double progress= double(jc->loading++) / double(jc->cache->rides().count()) * 100.0f;
-                                                                        if (jc->context->mainWindow->progress) {
-
-                                                                            // percentage progress
-                                                                            QString m = QString("%1%").arg(progress , 0, 'f', 0);
-                                                                            jc->context->mainWindow->progress->setText(m);
-                                                                            QApplication::processEvents();
-                                                                        } else {
+                                                                        double progress= round(double(jc->loading++) / double(jc->cache->rides().count()) * 100.0f);
+                                                                        if (progress > jc->lastProgressUpdate) {
                                                                             jc->context->notifyLoadProgress(jc->folder,progress);
+                                                                            jc->lastProgressUpdate = progress;
                                                                         }
 
                                                                         // find entry and update it
@@ -144,12 +139,14 @@ ride_tuple: string ':' string                                   {
                                                                      else if ($1 == "dbversion") jc->item.dbversion = $3.toInt();
                                                                      else if ($1 == "udbversion") jc->item.udbversion = $3.toInt();
                                                                      else if ($1 == "color") jc->item.color = QColor($3);
+                                                                     else if ($1 == "aero") jc->item.isAero = $3.toInt() ? true: false;
                                                                      else if ($1 == "sport") {
                                                                          jc->item.sport = ($3);
-                                                                         jc->item.isBike=jc->item.isRun=jc->item.isSwim=jc->item.isXtrain=false;
+                                                                         jc->item.isBike=jc->item.isRun=jc->item.isSwim=jc->item.isXtrain=jc->item.isAero=false;
                                                                          if ($3 == "Bike") jc->item.isBike = true;
                                                                          else if ($3 == "Run") jc->item.isRun = true;
                                                                          else if ($3 == "Swim") jc->item.isSwim = true;
+                                                                         else if ($3 == "Aero") jc->item.isAero = true;
                                                                          else jc->item.isXtrain = true;
                                                                      }
                                                                      else if ($1 == "present") jc->item.present = $3;
@@ -161,7 +158,7 @@ ride_tuple: string ':' string                                   {
                                                                      else if ($1 == "pacezonerange") jc->item.paceZoneRange = $3.toInt();
                                                                      else if ($1 == "date") {
                                                                          QDateTime aslocal = QDateTime::fromString($3, DATETIME_FORMAT);
-                                                                         QDateTime asUTC = QDateTime(aslocal.date(), aslocal.time(), Qt::UTC);
+                                                                         QDateTime asUTC = QDateTime(aslocal.date(), aslocal.time(), QTimeZone::UTC);
                                                                          jc->item.dateTime = asUTC.toLocalTime();
                                                                      }
                                                                 }
@@ -333,13 +330,11 @@ RideCache::load()
         QDir plannedDirectory = context->athlete->home->planned();
 
         // ok, lets read it in
-        QTextStream stream(&rideDB);
-        stream.setCodec("UTF-8");
 
         // Read the entire file into a QString -- we avoid using fopen since it
         // doesn't handle foreign characters well. Instead we use QFile and parse
         // from a QString
-        QString contents = stream.readAll();
+        QString contents = QString(rideDB.readAll());
         rideDB.close();
 
         // create scanner context for reentrant parsing
@@ -349,6 +344,7 @@ RideCache::load()
         jc->api = NULL;
         jc->old = false;
         jc->loading = 0;
+        jc->lastProgressUpdate = 0.0;
         jc->folder = context->athlete->home->root().canonicalPath();
 
         // clean item
@@ -495,7 +491,6 @@ void RideCache::save(bool opendata, QString filename)
 
         // ok, lets write out the cache
         QTextStream stream(&rideDB);
-        stream.setCodec("UTF-8");
 
         // no BOM needed for opendata as it doesn't contain textual data
         if (!opendata) stream.setGenerateByteOrderMark(true);
@@ -544,6 +539,7 @@ void RideCache::save(bool opendata, QString filename)
                 stream << "\t\t\"color\":\"" <<item->color.name() <<"\",\n";
                 stream << "\t\t\"present\":\"" <<item->present <<"\",\n";
                 stream << "\t\t\"sport\":\"" <<item->sport <<"\",\n";
+                stream << "\t\t\"aero\":\"" << (item->isAero ? "1" : "0") <<"\",\n";
                 stream << "\t\t\"weight\":\"" <<item->weight <<"\",\n";
 
                 if (item->zoneRange >= 0) stream << "\t\t\"zonerange\":\"" <<item->zoneRange <<"\",\n";
@@ -565,32 +561,34 @@ void RideCache::save(bool opendata, QString filename)
             stream << "\n\t\t\"METRICS\":{\n";
 
             bool firstMetric = true;
+            const QVector<double> &metrics = item->metrics();
+            const QVector<double> &counts = item->counts();
             for(int i=0; i<factory.metricCount(); i++) {
                 QString name = factory.metricName(i);
                 int index = factory.rideMetric(name)->index();
 
                 // don't output 0, nan or inf values, they're set to 0 by default
                 // unless aggregateZero indicates the count is relevant
-                if ((!std::isinf(item->metrics()[index]) && !std::isnan(item->metrics()[index]) &&
-                    (item->metrics()[index] > 0.00f || item->metrics()[index] < 0.00f)) ||
-                    (item->metrics()[index] == 0.00f && item->counts()[index] > 1.0 && factory.rideMetric(name)->aggregateZero())) {
+                if ((!std::isinf(metrics[index]) && !std::isnan(metrics[index]) &&
+                    (metrics[index] > 0.00f || metrics[index] < 0.00f)) ||
+                    (metrics[index] == 0.00f && counts[index] > 1.0 && factory.rideMetric(name)->aggregateZero())) {
                     if (!firstMetric) stream << ",\n";
                     firstMetric = false;
 
                     // if stdmean or variance is non-zero we write all 4
                     if (item->stdmeans().value(index, 0.0f) || item->stdvariances().value(index, 0.0f)) {
 
-                        stream << "\t\t\t\"" << name << "\":[\"" << QString("%1").arg(item->metrics()[index], 0, 'f', 5) <<"\",\""
-                                                                   << QString("%1").arg(item->counts()[index], 0, 'f', 5) << "\",\""
+                        stream << "\t\t\t\"" << name << "\":[\"" << QString("%1").arg(metrics[index], 0, 'f', 5) <<"\",\""
+                                                                   << QString("%1").arg(counts[index], 0, 'f', 5) << "\",\""
                                                                    << QString("%1").arg(item->stdmeans().value(index, 0.0f), 0, 'f', 5) << "\",\""
                                                                    << QString("%1").arg(item->stdvariances().value(index, 0.0f), 0, 'f', 5) <<"\"]";
-                    } else if (item->counts()[index] == 0) {
+                    } else if (counts[index] == 0) {
                         // if count is 0 don't write it
 						stream << ConstructNameNumberString(QString("\t\t\t\""), name,
-                            QString("\":\""), item->metrics()[index], QString("\""));
+                            QString("\":\""), metrics[index], QString("\""));
                     } else {
 					    stream << ConstructNameNumberNumberString(QString("\t\t\t\""), name,
-                            QString("\":[\""), item->metrics()[index], QString("\",\""), item->counts()[index], QString("\"]"));
+                            QString("\":[\""), metrics[index], QString("\",\""), counts[index], QString("\"]"));
                     }
                 }
             }
@@ -721,7 +719,7 @@ void RideCache::save(bool opendata, QString filename)
                 for (i=item->metadata().constBegin(); i != item->metadata().constEnd(); i++) {
 
                     stream << "\t\t\t\"" << i.key() << "\":\"" << protect(i.value()) << "\"";
-                    if (i+1 != item->metadata().constEnd()) stream << ",\n";
+                    if (std::next(i) != item->metadata().constEnd()) stream << ",\n";
                     else stream << "\n";
                 }
 
@@ -747,7 +745,7 @@ void RideCache::save(bool opendata, QString filename)
                         first=false;
                     }
 
-                    if (i+1 != item->xdata().constEnd()) stream << "],\n";
+                    if (std::next(i) != item->xdata().constEnd()) stream << "],\n";
                     else stream << "]\n";
                 }
 
@@ -799,31 +797,35 @@ void RideCache::save(bool opendata, QString filename)
                         stream << ",\n\n\t\t\t\"METRICS\":{\n";
 
                         bool firstMetric = true;
+                        const QVector<double> &intervalMetrics = interval->metrics();
+                        const QVector<double> &intervalCounts = interval->counts();
+                        const QVector<double> &itemMetrics = item->metrics();
+                        const QVector<double> &itemCounts = item->counts();
                         for(int i=0; i<factory.metricCount(); i++) {
                             QString name = factory.metricName(i);
                             int index = factory.rideMetric(name)->index();
         
                             // don't output 0 values, they're set to 0 by default
                             // unless aggregateZero indicates the count is relevant
-                            if ((interval->metrics()[index] > 0.00f || interval->metrics()[index] < 0.00f) ||
-                                (item->metrics()[index] == 0.00f && item->counts()[i] > 1.0 && factory.rideMetric(name)->aggregateZero())) {
+                            if ((intervalMetrics[index] > 0.00f || intervalMetrics[index] < 0.00f) ||
+                                (itemMetrics[index] == 0.00f && itemCounts[index] > 1.0 && factory.rideMetric(name)->aggregateZero())) {
                                 if (!firstMetric) stream << ",\n";
                                 firstMetric = false;
 
                                 if (interval->stdmeans().value(index, 0.0f) || interval->stdvariances().value(index, 0.0f)) {
 
-                                    stream << "\t\t\t\t\"" << name << "\": [ \"" << QString("%1").arg(interval->metrics()[index], 0, 'f', 5) <<"\",\""
-                                                                               << QString("%1").arg(interval->counts()[index], 0, 'f', 5) << "\",\""
+                                    stream << "\t\t\t\t\"" << name << "\": [ \"" << QString("%1").arg(intervalMetrics[index], 0, 'f', 5) <<"\",\""
+                                                                               << QString("%1").arg(intervalCounts[index], 0, 'f', 5) << "\",\""
                                                                                << QString("%1").arg(interval->stdmeans().value(index, 0.0f), 0, 'f', 5) << "\",\""
                                                                                << QString("%1").arg(interval->stdvariances().value(index, 0.0f), 0, 'f', 5) <<"\"]";
 
                                 // if count is 0 don't write it
-                                } else if (interval->counts()[index] == 0) {
+                                } else if (intervalCounts[index] == 0) {
                                     stream << ConstructNameNumberString(QString("\t\t\t\""), name,
-                                        QString("\":\""), interval->metrics()[index], QString("\""));
+                                        QString("\":\""), intervalMetrics[index], QString("\""));
                                 } else {
                                     stream << ConstructNameNumberNumberString(QString("\t\t\t\""), name,
-                                        QString("\":[\""), interval->metrics()[index], QString("\",\""), interval->counts()[index], QString("\"]"));
+                                        QString("\":[\""), intervalMetrics[index], QString("\",\""), intervalCounts[index], QString("\"]"));
                                 }
                             }
                         }
@@ -923,7 +925,7 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
 
         RideMetadata::readXML(metaConfig, keywordDefinitions, settings.metafields, colorfield, defaultDefinitions);
 
-        SpecialFields sp;
+        SpecialFields& sp = SpecialFields::getInstance();
 
         // what is being asked for ?
         if (metadata.toUpper() == "ALL") {
@@ -993,7 +995,6 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
 
             // ok, lets read it in
             QTextStream stream(&rideDB);
-            stream.setCodec("UTF-8");
 
             // Read the entire file into a QString -- we avoid using fopen since it
             // doesn't handle foreign characters well. Instead we use QFile and parse

@@ -25,6 +25,7 @@
 #include <QDialog>
 #include <QLineEdit>
 #include <QLabel>
+#include <QGroupBox>
 
 class Context;
 
@@ -50,18 +51,23 @@ class ToolsRhoEstimator : public QDialog {
         QLabel *tempLabel;
         QLabel *pressLabel;
         QLabel *dewpLabel;
+        QLabel *rhumLabel;
         QDoubleSpinBox *tempSpinBox;
         QDoubleSpinBox *pressSpinBox;
         QDoubleSpinBox *dewpSpinBox;
+        QDoubleSpinBox *rhumSpinBox;
+        QGroupBox *rhumGroupBox;
         double fahrenheit_to_celsius(double f);
         double celsius_to_fahrenheit(double c);
         double hectopascals_to_inchesmercury(double hpa);
         double inchesmercury_to_hectopascals(double inhg);
         double rho_met_to_imp(double rho);
+        double dewp_from_rhum(double rhum, double temp);
+        double rhum_from_dewp(double dewp, double temp);
         double calculate_rho(double temp, double press, double dewp);
 
     private slots:
         void on_radio_toggled(bool checked);
         void on_btnOK_clicked();
-        void on_valueChanged(double newval);
+        void on_valueChanged(double newval=0.0);
 };

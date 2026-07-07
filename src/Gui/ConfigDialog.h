@@ -60,15 +60,15 @@ class AppearanceConfig : public QWidget
 
     public:
         AppearanceConfig(QDir home, Context *context);
+        ColorsPage *appearancePage;
 
     public slots:
         qint32 saveClicked();
-    
+
     private:
         QDir home;
         Context *context;
 
-        ColorsPage *appearancePage;
 };
 
 // METADATA PAGE
@@ -81,7 +81,7 @@ class DataConfig : public QWidget
 
     public slots:
         qint32 saveClicked();
-    
+
     private:
         QDir home;
         Context *context;
@@ -99,14 +99,12 @@ class MetricConfig : public QWidget
 
     public slots:
         qint32 saveClicked();
-    
+
     private:
         QDir home;
         Context *context;
 
-        BestsMetricsPage *bestsPage;
-        IntervalMetricsPage *intervalsPage;
-        SummaryMetricsPage *summaryPage;
+        FavouriteMetricsPage *intervalsPage;
         CustomMetricsPage *customPage;
 };
 
@@ -120,7 +118,7 @@ class TrainConfig : public QWidget
 
     public slots:
         qint32 saveClicked();
-    
+
     private:
         QDir home;
         Context *context;
@@ -129,6 +127,7 @@ class TrainConfig : public QWidget
         TrainOptionsPage *optionsPage;
         RemotePage *remotePage;
         SimBicyclePage *simBicyclePage;
+        WorkoutTagManagerPage *workoutTagManagerPage;
 };
 
 // INTERVAL PAGE
@@ -141,7 +140,7 @@ class IntervalConfig : public QWidget
 
     public slots:
         qint32 saveClicked();
-    
+
     private:
         QDir home;
         Context *context;
@@ -159,11 +158,11 @@ class MeasuresConfig : public QWidget
 
     public slots:
         qint32 saveClicked();
+        void resetClicked();
 
     private:
         QDir home;
         Context *context;
-
         MeasuresConfigPage *measuresPage;
 };
 
@@ -187,8 +186,7 @@ class ConfigDialog : public QMainWindow
         Context *context;
 
         QStackedWidget *pagesWidget;
-        QPushButton *saveButton;
-	    QPushButton *closeButton;
+        QPushButton *reset;
 
         // the config pages
         GeneralConfig *general;

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2013 Mark Liversedge (liversedge@gmail.com)
+ * LTMSidebarView Copyright (c) 2025 Paul Johnson (paulj49457@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -19,107 +20,139 @@
 #ifndef _GC_Views_h
 #define _GC_Views_h 1
 
-#include "TabView.h"
+#include "AbstractView.h"
+
 class TrainSidebar;
 class AnalysisSidebar;
+class LTMSidebar;
 class IntervalSidebar;
 class QDialog;
 class RideNavigator;
 class TrainBottom;
 
-class AnalysisView : public TabView
+// the LTMSidebarView class manages the sharing of the Long Term Metrics (LTM) sidebar
+// between the trends and plan views, each LTMSidebar instance is shared between the
+// views for the same context/athlete.
+class LTMSidebarView : public AbstractView
+{
+    Q_OBJECT
+
+    public:
+
+        static void selectDateRange(Context *sbContext, DateRange dr);
+
+    signals:
+        void dateChanged(DateRange);
+
+    protected slots:
+
+        void justSelected();
+        void dateRangeChanged(DateRange);
+
+    protected:
+
+        LTMSidebarView(Context *context, int type, const QString& view, const QString& heading);
+        virtual ~LTMSidebarView();
+
+        void showEvent(QShowEvent*) override;
+        void hideEvent(QHideEvent*) override;
+
+        LTMSidebar* getLTMSidebar(Context *sbContext);
+        void removeLTMSidebar(Context *sbContext);
+
+    private:
+
+        // each athlete has their own LTMSidebar shared by the plan & trends views.
+        static QMap<Context*, LTMSidebar*> LTMSidebars_;
+};
+
+class AnalysisView : public AbstractView
 {
     Q_OBJECT
 
     public:
 
         AnalysisView(Context *context, QStackedWidget *controls);
-        ~AnalysisView();
-        void close();
-        void setRide(RideItem*ride);
+        virtual ~AnalysisView();
+        void close() override;
+        void setRide(RideItem*ride) override;
         void addIntervals();
 
         RideNavigator *rideNavigator();
+        AnalysisSidebar *analSidebar;
 
     public slots:
 
-        bool isBlank();
+        bool isBlank() override;
         void compareChanged(bool);
 
-    private:
-        AnalysisSidebar *analSidebar;
-        HomeWindow *hw;
+    protected:
 
+        void notifyViewSidebarChanged() override;
+        int getViewSpecificPerspective() override;
+        void notifyViewSplitterMoved() override;
+
+    private:
+
+        int findRidesPerspective(RideItem* ride);
 };
 
-class DiarySidebar;
-class DiaryView : public TabView
+class PlanView : public LTMSidebarView
 {
     Q_OBJECT
 
     public:
 
-        DiaryView(Context *context, QStackedWidget *controls);
-        ~DiaryView();
-        void setRide(RideItem*ride);
+        PlanView(Context *context, QStackedWidget *controls);
+        virtual ~PlanView();
 
     public slots:
 
-        bool isBlank();
-        void dateRangeChanged(DateRange);
-
-    private:
-        DiarySidebar *diarySidebar;
-        HomeWindow *hw;
-
+        bool isBlank() override;
 };
 
-class TrainView : public TabView
+class TrainView : public AbstractView
 {
     Q_OBJECT
 
     public:
 
         TrainView(Context *context, QStackedWidget *controls);
-        ~TrainView();
-        void close();
+        virtual ~TrainView();
+        void close() override;
 
     public slots:
 
-        bool isBlank();
+        bool isBlank() override;
         void onSelectionChanged();
+
+    protected:
+
+        void notifyViewPerspectiveAdded(Perspective* page) override;
 
     private:
 
         TrainSidebar *trainTool;
         TrainBottom *trainBottom;
-        HomeWindow *hw;
 
-private slots:
+    private slots:
         void onAutoHideChanged(bool enabled);
 };
 
-class LTMSidebar;
-class HomeView : public TabView
+class TrendsView : public LTMSidebarView
 {
     Q_OBJECT
 
     public:
 
-        HomeView(Context *context, QStackedWidget *controls);
-        ~HomeView();
+        TrendsView(Context *context, QStackedWidget *controls);
+        virtual ~TrendsView();
 
-        LTMSidebar *sidebar;
-        HomeWindow *hw;
-
-    signals:
-        void dateChanged(DateRange);
+        int countActivities(Perspective *, DateRange dr);
 
     public slots:
 
-        bool isBlank();
-        void justSelected();
-        void dateRangeChanged(DateRange);
+        bool isBlank() override;
         void compareChanged(bool);
 };
 

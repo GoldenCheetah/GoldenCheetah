@@ -1,0 +1,396 @@
+/*
+ * Copyright (c) 2024 Joachim Kohlhammer (joachim.kohlhammer@gmx.de)
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+#ifndef STYLEDITEMSDELEGATES_H
+#define STYLEDITEMSDELEGATES_H
+
+#include <QStyledItemDelegate>
+#include <QPushButton>
+#include <QLineEdit>
+#include <QLabel>
+#include <QDialog>
+#include <QTime>
+#include <QStringList>
+#include <QStringListModel>
+#include <QListWidget>
+
+#include "ActionButtonBox.h"
+
+
+class ColorDelegate: public QStyledItemDelegate
+{
+    Q_OBJECT
+
+public:
+    ColorDelegate(QObject *parent = nullptr);
+
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+};
+
+
+class NoEditDelegate: public QStyledItemDelegate
+{
+public:
+    NoEditDelegate(QObject *parent = nullptr);
+
+    virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+};
+
+
+
+class NegativeListEditDelegate: public QStyledItemDelegate
+{
+    Q_OBJECT
+
+public:
+    NegativeListEditDelegate(const QStringList &negativeList, QObject *parent = nullptr);
+
+    virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+
+private:
+    QStringList negativeList;
+};
+
+
+
+class UniqueLabelEditDelegate: public QStyledItemDelegate
+{
+    Q_OBJECT
+
+public:
+    UniqueLabelEditDelegate(QObject *parent = nullptr);
+
+    void setNegativeList(const QStringList &negativeList);
+
+    virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+
+private:
+    QStringList negativeList;
+};
+
+
+
+class CompleterEditDelegate: public QStyledItemDelegate
+{
+    Q_OBJECT
+
+public:
+    enum DataSource {
+        Column = 0,
+        External
+    };
+
+    CompleterEditDelegate(QObject *parent = nullptr);
+
+    void setDataSource(DataSource source);
+    void setCompletionList(const QStringList &list);
+
+    virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+
+private:
+    DataSource source = Column;
+    QStringList completionList;
+};
+
+
+
+class ComboBoxDelegate: public QStyledItemDelegate
+{
+    Q_OBJECT
+
+public:
+    ComboBoxDelegate(QObject *parent = nullptr);
+
+    QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+
+    void addItems(const QStringList &texts);
+    void addItemsForType(int type, const QStringList &texts);
+    void setRoleForType(int role);
+    int roleForType() const;
+
+protected:
+    void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override;
+
+private slots:
+    void commitAndCloseEditor();
+
+private:
+    QStringList texts;
+    QMap<int, QStringList> textsForType;
+    int _roleForType = -1;
+    QSize _sizeHint;
+
+    void fillSizeHint();
+};
+
+
+enum class DirectoryPathMode {
+    DirOnly,
+    FileOpen,
+    FileSave
+};
+
+class DirectoryPathWidget: public QWidget
+{
+    Q_OBJECT
+
+public:
+    DirectoryPathWidget(DirectoryPathMode mode = DirectoryPathMode::DirOnly, QWidget *parent = nullptr);
+
+    QString getPath() const;
+    void setNameFilter(const QString &nameFilter);
+    void setPlaceholderText(const QString &placeholder);
+    void setDelegateMode(bool delegateMode);
+
+public slots:
+    void setPath(const QString &path);
+
+signals:
+    void editingFinished(bool accepted);
+    void pathChanged(QString path);
+#ifdef Q_OS_MACOS
+    void browseRequested();
+#endif
+
+private:
+    bool delegateMode = false;
+    DirectoryPathMode directoryPathMode;
+    QString nameFilter;
+    QPushButton *browseButton;
+    QLineEdit *lineEdit;
+    bool lineEditAlreadyFinished = false;
+
+private slots:
+    void handleBrowseClicked();
+    void openFileDialog();
+    void lineEditFinished();
+};
+
+
+class DirectoryPathDelegate: public QStyledItemDelegate
+{
+    Q_OBJECT
+
+public:
+    DirectoryPathDelegate(QObject *parent = nullptr);
+
+    virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+    virtual QString displayText(const QVariant &value, const QLocale &locale) const override;
+    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+
+    void setMaxWidth(int maxWidth);
+    void setPlaceholderText(const QString &placeholderText);
+
+private:
+    int maxWidth = -1;
+    QString placeholderText;
+#ifdef Q_OS_MACOS
+    void closeEditorForWidget(QWidget *editor);
+    void openFileDialogForEditor(QWidget *editor, const QModelIndex &index) const;
+#endif
+
+private slots:
+    void onEditingFinished(bool accepted);
+};
+
+
+
+class ListEditWidget: public QWidget
+{
+    Q_OBJECT
+public:
+    explicit ListEditWidget(QWidget *parent = nullptr);
+
+    void setTitle(const QString &text);
+    void setList(const QStringList &list);
+    QStringList getList() const;
+
+    void showDialog(QWidget *owner = nullptr);
+
+signals:
+    void editingFinished(const QStringList &newList);
+
+private slots:
+    void itemChanged(QListWidgetItem *item);
+    void dialogFinished(int result);
+    void moveDown();
+    void moveUp();
+    void addItem();
+    void deleteItem();
+
+private:
+    QDialog *dialog = nullptr;
+    QLabel *title = nullptr;
+    QListWidget *listWidget = nullptr;
+    ActionButtonBox *actionButtons = nullptr;
+    QStringList data;
+};
+
+
+class ListEditDelegate: public QStyledItemDelegate
+{
+    Q_OBJECT
+
+public:
+    ListEditDelegate(QObject *parent = nullptr);
+
+    void setDisplayLength(int limit, int reduce = 2);
+
+    QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    QString displayText(const QVariant &value, const QLocale &locale) const override;
+
+signals:
+    void requestListEdit(const QModelIndex &index) const;
+
+private slots:
+    void commitAndCloseEditor();
+
+private:
+    int limit = -1;
+    int reduce = 2;
+};
+
+
+
+class SpinBoxEditDelegate: public QStyledItemDelegate
+{
+public:
+    SpinBoxEditDelegate(QObject *parent = nullptr);
+
+    void setMinimum(int minimum);
+    void setMaximum(int maximum);
+    void setRange(int minimum, int maximum);
+    void setSingleStep(int val);
+    void setSuffix(const QString &suffix);
+    void setShowSuffixOnEdit(bool show);
+    void setShowSuffixOnDisplay(bool show);
+
+    virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+    virtual QString displayText(const QVariant &value, const QLocale &locale) const override;
+    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+
+private:
+    int minimum = 0;
+    int maximum = 100;
+    int singleStep = 1;
+    QString suffix;
+    bool showSuffixOnEdit = true;
+    bool showSuffixOnDisplay = true;
+    QSize _sizeHint;
+
+    void fillSizeHint();
+};
+
+
+
+class DoubleSpinBoxEditDelegate: public QStyledItemDelegate
+{
+public:
+    DoubleSpinBoxEditDelegate(QObject *parent = nullptr);
+
+    void setMinimum(double minimum);
+    void setMaximum(double maximum);
+    void setRange(double minimum, double maximum);
+    void setSingleStep(double val);
+    void setDecimals(int prec);
+    void setSuffix(const QString &suffix);
+    void setShowSuffixOnEdit(bool show);
+    void setShowSuffixOnDisplay(bool show);
+
+    virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+    virtual QString displayText(const QVariant &value, const QLocale &locale) const override;
+    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+
+private:
+    double minimum = 0;
+    double maximum = 100;
+    double singleStep = 1;
+    double prec = 0;
+    QString suffix;
+    bool showSuffixOnEdit = true;
+    bool showSuffixOnDisplay = true;
+    QSize _sizeHint;
+
+    void fillSizeHint();
+};
+
+
+
+class DateEditDelegate: public QStyledItemDelegate
+{
+public:
+    DateEditDelegate(QObject *parent = nullptr);
+
+    void setCalendarPopup(bool enable);
+
+    virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+    virtual QString displayText(const QVariant &value, const QLocale &locale) const override;
+    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+
+private:
+    bool calendarPopup = false;
+    QSize _sizeHint;
+
+    void fillSizeHint();
+};
+
+
+
+class TimeEditDelegate: public QStyledItemDelegate
+{
+public:
+    TimeEditDelegate(QObject *parent = nullptr);
+
+    void setFormat(const QString &format);
+    void setSuffix(const QString &suffix);
+    void setShowSuffixOnEdit(bool show);
+    void setShowSuffixOnDisplay(bool show);
+    void setTimeRange(const QTime &min, const QTime &max);
+
+    virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+    virtual QString displayText(const QVariant &value, const QLocale &locale) const override;
+    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+
+private:
+    QString format;
+    QString suffix;
+    bool showSuffixOnEdit = true;
+    bool showSuffixOnDisplay = true;
+    QTime min;
+    QTime max;
+    QSize _sizeHint;
+
+    void fillSizeHint();
+};
+
+#endif

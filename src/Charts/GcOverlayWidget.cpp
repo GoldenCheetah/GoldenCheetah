@@ -21,8 +21,7 @@
  */
 
 #include "GcOverlayWidget.h"
-#include "DiaryWindow.h"
-#include "DiarySidebar.h"
+#include "MiniCalendar.h"
 #include "Context.h"
 #include "Colors.h"
 
@@ -38,7 +37,7 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
     setMouseTracking(true);
     setFocusPolicy(Qt::ClickFocus);
 #ifdef GC_HAVE_MUMODEL
-    setMinimumSize(40(dpiXFactor,200*dpiYFactor); //XX temp for MU model...
+    setMinimumSize(40(dpiXFactor,200*dpiYFactor)); //XX temp for MU model...
 #else
     setMinimumSize(250*dpiXFactor,200*dpiYFactor);
 #endif
@@ -107,11 +106,7 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
 void
 GcOverlayWidget::configChanged(qint32)
 {
-    if (GCColor::isFlat()) {
-        titleLabel->setStyleSheet(QString("color: %1;").arg(GCColor::invertColor(GColor(CCHROME)).name()));
-    } else {
-        titleLabel->setStyleSheet("color: black;");
-    }
+    titleLabel->setStyleSheet(QString("color: %1;").arg(GCColor::invertColor(GColor(CCHROME)).name()));
 }
 
 void
@@ -224,16 +219,6 @@ GcOverlayWidget::paintBackground(QPaintEvent *)
     painter.fillRect(title, QColor(Qt::white));
     painter.fillRect(title, isActiveWindow() ? active : inactive);
 
-    if (!GCColor::isFlat()) {
-        QPen black(QColor(100,100,100,200));
-        painter.setPen(black);
-        painter.drawLine(0,22*dpiYFactor, width()-(1*dpiXFactor), 22*dpiYFactor);
-
-        //QPen gray(QColor(230,230,230));
-        //painter.setPen(gray);
-        //painter.drawLine(0,0, width()-1, 0);
-    }
-
     painter.restore();
 }
 
@@ -282,7 +267,7 @@ bool GcOverlayWidget::eventFilter( QObject *obj, QEvent *evt )
  
 void GcOverlayWidget::mousePressEvent(QMouseEvent *e) 
 {
-    position = QPoint(e->globalX()-geometry().x(), e->globalY()-geometry().y());
+    position = QPoint(e->globalPosition().x()-geometry().x(), e->globalPosition().y()-geometry().y());
     if (!m_isEditing) return;
     if (!m_infocus) return;
     //QWidget::mouseMoveEvent(e);
@@ -401,13 +386,13 @@ void GcOverlayWidget::mouseMoveEvent(QMouseEvent *e)
     if (!m_isEditing) return;
     if (!m_infocus) return;
     if (!(e->buttons() & Qt::LeftButton)) {
-        QPoint p = QPoint(e->x()+geometry().x(), e->y()+geometry().y());
+        QPoint p = QPoint(e->position().x()+geometry().x(), e->position().y()+geometry().y());
         setCursorShape(p);
         return;
     }
  
     if (mode == moving && (e->buttons() & Qt::LeftButton)) {
-        QPoint toMove = e->globalPos() - position;
+        QPoint toMove = e->globalPosition().toPoint() - position;
         if (toMove.x() < 0) return;
         if (toMove.y() < 0) return;
         if (toMove.x() > parentWidget()->width()-width()) return;
@@ -419,47 +404,47 @@ void GcOverlayWidget::mouseMoveEvent(QMouseEvent *e)
     if ((mode != moving) && (e->buttons() & Qt::LeftButton)) {
         switch (mode){
             case resizetl: {  //Left-Top
-                int newwidth = e->globalX() - position.x() - geometry().x();
-                int newheight = e->globalY() - position.y() - geometry().y();
-                QPoint toMove = e->globalPos() - position;
+                int newwidth = e->globalPosition().x() - position.x() - geometry().x();
+                int newheight = e->globalPosition().y() - position.y() - geometry().y();
+                QPoint toMove = e->globalPosition().toPoint() - position;
                 resize(geometry().width()-newwidth,geometry().height()-newheight);
                 move(toMove.x(),toMove.y());
                 break;
             }
             case resizetr: {  //Right-Top
-                int newheight = e->globalY() - position.y() - geometry().y();
-                QPoint toMove = e->globalPos() - position;
-                resize(e->x(),geometry().height()-newheight);
+                int newheight = e->globalPosition().y() - position.y() - geometry().y();
+                QPoint toMove = e->globalPosition().toPoint() - position;
+                resize(e->position().x(),geometry().height()-newheight);
                 move(x(),toMove.y());
                 break;
             }
             case resizebl: {  //Left-Bottom
-                int newwidth = e->globalX() - position.x() - geometry().x();
-                QPoint toMove = e->globalPos() - position;
-                resize(geometry().width()-newwidth,e->y());
+                int newwidth = e->globalPosition().x() - position.x() - geometry().x();
+                QPoint toMove = e->globalPosition().toPoint() - position;
+                resize(geometry().width()-newwidth,e->position().y());
                 move(toMove.x(),y());
                 break;
             }
             case resizeb: {   //Bottom
-                resize(width(),e->y()); break;}
+                resize(width(),e->position().y()); break;}
             case resizel:  {  //Left
-                int newwidth = e->globalX() - position.x() - geometry().x();
-                QPoint toMove = e->globalPos() - position;
+                int newwidth = e->globalPosition().x() - position.x() - geometry().x();
+                QPoint toMove = e->globalPosition().toPoint() - position;
                 resize(geometry().width()-newwidth,height());
                 move(toMove.x(),y());
                 break;
             }
             case resizet:  {  //Top
-                int newheight = e->globalY() - position.y() - geometry().y();
-                QPoint toMove = e->globalPos() - position;
+                int newheight = e->globalPosition().y() - position.y() - geometry().y();
+                QPoint toMove = e->globalPosition().toPoint() - position;
                 resize(width(),geometry().height()-newheight);
                 move(x(),toMove.y());
                 break;
             }
             case resizer:  {  //Right
-                resize(e->x(),height()); break;}
+                resize(e->position().x(),height()); break;}
             case resizebr: {  //Right-Bottom
-                resize(e->x(),e->y()); break;}
+                resize(e->globalPosition().x(),e->position().y()); break;}
         }
         parentWidget()->repaint();
     }

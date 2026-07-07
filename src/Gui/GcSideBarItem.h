@@ -109,6 +109,8 @@ public:
     void addAction(QAction *action);
     void addActions(QList<QAction*> actions);
 
+    QHBoxLayout* getTitleLayout() { return titleLayout; }
+
 protected:
     void paintEvent(QPaintEvent *);
     GcSubSplitter *gcSplitter;
@@ -170,5 +172,6 @@ private:
 
 };
 
+extern QIcon iconFromPNG(QString filename, QSize size);
 extern QIcon iconFromPNG(QString filename, bool emboss = true);
 #endif

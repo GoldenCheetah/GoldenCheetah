@@ -6,7 +6,7 @@
 
 #### **Do you have questions about the source code?**
 
-* Ask any question about how to build GoldenCheetah or anything related to the source code in the [golden-cheetah-developers mailing list](https://groups.google.com/forum/#!forum/golden-cheetah-developers), please see the [GoldenCheetah Developers Guide](https://github.com/GoldenCheetah/GoldenCheetah/wiki/Developers-guide) for addtional information.
+* Ask any question about how to build GoldenCheetah or anything related to the source code in the [golden-cheetah-developers mailing list](https://groups.google.com/forum/#!forum/golden-cheetah-developers), please see the [GoldenCheetah Developers Guide](https://github.com/GoldenCheetah/GoldenCheetah/wiki/Developers-guide) for additional information.
 
 ## How to contribute to GoldenCheetah
 

@@ -35,6 +35,7 @@
 #include <qwt_plot_marker.h>
 #include <qwt_scale_draw.h>
 #include <qwt_scale_widget.h>
+#include <qwt_scale_map.h>
 #include <qwt_symbol.h>
 #include <set>
 
@@ -67,7 +68,7 @@ public:
 
         if (parent->context->isCompareIntervals) {
 
-            zones = parent->context->athlete->zones(rideItem ? rideItem->isRun : false);
+            zones = parent->context->athlete->zones(rideItem ? rideItem->sport : "Bike");
             if (!zones) return;
 
             // use first compare interval date
@@ -78,9 +79,9 @@ public:
             if (zone_range == -1)
                 zone_range = zones->whichRange(QDate::currentDate());
 
-        } else if (rideItem && parent->context->athlete->zones(rideItem->isRun)) {
+        } else if (rideItem && parent->context->athlete->zones(rideItem->sport)) {
 
-            zones = parent->context->athlete->zones(rideItem->isRun);
+            zones = parent->context->athlete->zones(rideItem->sport);
             zone_range = zones->whichRange(rideItem->dateTime.date());
 
         } else {
@@ -149,20 +150,20 @@ PfPvPlot::PfPvPlot(Context *context)
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
     setAutoFillBackground(true);
-    setAxisTitle(yLeft, tr("Average Effective Pedal Force (N)"));
-    setAxisScale(yLeft, 0, 600);
-    setAxisTitle(xBottom, tr("Circumferential Pedal Velocity (m/s)"));
-    setAxisScale(xBottom, 0, 3);
-    setAxisMaxMinor(yLeft, 0);
-    setAxisMaxMinor(xBottom, 0);
+    setAxisTitle(QwtAxis::YLeft, tr("Average Effective Pedal Force (N)"));
+    setAxisScale(QwtAxis::YLeft, 0, 600);
+    setAxisTitle(QwtAxis::XBottom, tr("Circumferential Pedal Velocity (m/s)"));
+    setAxisScale(QwtAxis::XBottom, 0, 3);
+    setAxisMaxMinor(QwtAxis::YLeft, 0);
+    setAxisMaxMinor(QwtAxis::XBottom, 0);
     QwtScaleDraw *sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
-    setAxisScaleDraw(xBottom, sd);
+    setAxisScaleDraw(QwtAxis::XBottom, sd);
     sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     sd->enableComponent(QwtScaleDraw::Ticks, false);
     sd->enableComponent(QwtScaleDraw::Backbone, false);
-    setAxisScaleDraw(yLeft, sd);
+    setAxisScaleDraw(QwtAxis::YLeft, sd);
 
     mX = new QwtPlotMarker();
     mX->setLineStyle(QwtPlotMarker::VLine);
@@ -236,8 +237,8 @@ PfPvPlot::configChanged(qint32)
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
     setPalette(palette);
 
-    axisWidget(QwtPlot::xBottom)->setPalette(palette);
-    axisWidget(QwtPlot::yLeft)->setPalette(palette);
+    axisWidget(QwtAxis::XBottom)->setPalette(palette);
+    axisWidget(QwtAxis::YLeft)->setPalette(palette);
 
     // use grid line color for mX, mY and CPcurve
     QPen marker = GColor(CPLOTMARKER);
@@ -297,7 +298,7 @@ PfPvPlot::refreshZoneItems()
 
     // set zones from ride or athlete and date of
     // first item in the compare set
-    const Zones *zones = context->athlete->zones(rideItem ? rideItem->isRun : false);
+    const Zones *zones = context->athlete->zones(rideItem ? rideItem->sport : "Bike");
     int zone_range = -1;
 
     // comparing does zones for items selected not current ride
@@ -339,7 +340,7 @@ PfPvPlot::refreshZoneItems()
             QPen *pen = new QPen();
             pen->setStyle(Qt::NoPen);
 
-            QwtArray<double> yvalues;
+            QVector<double> yvalues;
 
             // generate x values
             for (int z = 0; z < num_zones; z ++) {
@@ -354,7 +355,7 @@ PfPvPlot::refreshZoneItems()
 
                 // generate data for curve
                 if (z < num_zones - 1) {
-                    QwtArray <double> contour_yvalues;
+                    QVector <double> contour_yvalues;
                     int watts = zone_power[z + 1];
                     int dwatts = (double) watts;
                     for (int i = 0; i < contour_xvalues.size(); i ++) {
@@ -365,8 +366,8 @@ PfPvPlot::refreshZoneItems()
                 } else {
 
                     // top zone has a curve at "infinite" power
-                    QwtArray <double> contour_x;
-                    QwtArray <double> contour_y;
+                    QVector <double> contour_x;
+                    QVector <double> contour_y;
                     contour_x.append(contour_xvalues[0]);
                     contour_x.append(contour_xvalues[contour_xvalues.size() - 1]);
                     contour_y.append(1e6);
@@ -484,7 +485,7 @@ PfPvPlot::refreshIntervalMarkers()
 
             QwtPlotMarker *p = new QwtPlotMarker();
             p->setValue(cpv, aepf);
-            p->setYAxis(yLeft);
+            p->setYAxis(QwtAxis::YLeft);
             p->setSymbol(sym);
             p->attach(this);
             intervalMarkers << p;
@@ -607,8 +608,8 @@ PfPvPlot::setData(RideItem *_rideItem)
         } else {
             // Now that we have the set of points, transform them into the
             // QwtArrays needed to set the curve's data.
-            QwtArray<double> aepfArray;
-            QwtArray<double> cpvArray;
+            QVector<double> aepfArray;
+            QVector<double> cpvArray;
 
             std::set<std::pair<double, double> >::const_iterator j(dataSet.begin());
             while (j != dataSet.end()) {
@@ -649,8 +650,8 @@ PfPvPlot::setData(RideItem *_rideItem)
             gearRatioCurves.clear();
 
             // get the detailed data
-            QVector<QwtArray<double> > aepfArrayGearRatio(num_gearRatio_Plots);
-            QVector<QwtArray<double> > cpvArrayGearRatio(num_gearRatio_Plots);
+            QVector<QVector<double> > aepfArrayGearRatio(num_gearRatio_Plots);
+            QVector<QVector<double> > cpvArrayGearRatio(num_gearRatio_Plots);
 
             for (int i=0;i<num_gearRatio_Plots;i++) {
                 std::set<std::pair<double, double> >::const_iterator m(gearSet[i].begin());
@@ -797,7 +798,6 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
        if (frameIntervals()==false && num_intervals) mainCurvesSetVisible(false);
        QVector<std::set<std::pair<double, double> > > dataSetInterval(num_intervals);
 
-       long tot_cad = 0;
        long tot_cad_points = 0;
 
         foreach(const RideFilePoint *p1, ride->dataPoints()) {
@@ -828,7 +828,6 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
                         }
                     }
                 }
-                tot_cad += p1->cad;
                 tot_cad_points++;
             }
         }
@@ -837,8 +836,8 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
 
            // Now that we have the set of points, transform them into the
            // QwtArrays needed to set the curve's data.
-           QVector<QwtArray<double> > aepfArrayInterval(num_intervals);
-           QVector<QwtArray<double> > cpvArrayInterval(num_intervals);
+           QVector<QVector<double> > aepfArrayInterval(num_intervals);
+           QVector<QVector<double> > cpvArrayInterval(num_intervals);
 
            for (int i=0;i<num_intervals;i++) {
                std::set<std::pair<double, double> >::const_iterator l(dataSetInterval[i].begin());
@@ -949,14 +948,14 @@ PfPvPlot::recalcCompare()
 
     if (maxAEPF > 600) {
 
-        setAxisScale(yLeft, 0, (maxAEPF < 2500) ? (maxAEPF * 1.1) : 2500); // a bit of headroom
+        setAxisScale(QwtAxis::YLeft, 0, (maxAEPF < 2500) ? (maxAEPF * 1.1) : 2500); // a bit of headroom
         tiqMarker[0]->setYValue(maxAEPF);
         tiqMarker[1]->setYValue(maxAEPF);
 
     } else {
 
         maxAEPF = 600; // for background shading and CP curve
-        setAxisScale(yLeft, 0, 600);
+        setAxisScale(QwtAxis::YLeft, 0, 600);
         tiqMarker[0]->setYValue(580);
         tiqMarker[1]->setYValue(580);
     }
@@ -965,14 +964,14 @@ PfPvPlot::recalcCompare()
 
         // round *UP* to next integer for axis to fill nicely
         maxCPV = round(maxCPV + 0.5);
-        setAxisScale(xBottom, 0, maxCPV);
+        setAxisScale(QwtAxis::XBottom, 0, maxCPV);
         tiqMarker[0]->setXValue(maxCPV - 0.5);
         tiqMarker[3]->setXValue(maxCPV - 0.5);
 
     } else {
 
         maxCPV = 3; // for background shading and CP curve
-        setAxisScale(xBottom, 0, 3);
+        setAxisScale(QwtAxis::XBottom, 0, 3);
         tiqMarker[0]->setXValue(2.9);
         tiqMarker[3]->setXValue(2.9);
     }
@@ -1072,7 +1071,7 @@ PfPvPlot::recalc()
                 double aepf = (p1->watts * 60.0) / (p1->cad * cl_ * 2.0 * PI);
                 double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
 
-                if (aepf < 255 && aepf > maxAEPF) maxAEPF = aepf;
+                if (aepf < 2500 && aepf > maxAEPF) maxAEPF = aepf;
                 if (cpv > maxCPV) maxCPV = cpv;
             }
         }
@@ -1080,14 +1079,14 @@ PfPvPlot::recalc()
 
     if (maxAEPF > 600) {
 
-        setAxisScale(yLeft, 0, (maxAEPF < 2500) ? (maxAEPF * 1.1) : 2500); // a bit of headroom
+        setAxisScale(QwtAxis::YLeft, 0, (maxAEPF < 2500) ? (maxAEPF * 1.1) : 2500); // a bit of headroom
         tiqMarker[0]->setYValue(maxAEPF);
         tiqMarker[1]->setYValue(maxAEPF);
 
     } else {
 
         maxAEPF = 600; // for background shading and CP curve
-        setAxisScale(yLeft, 0, 600);
+        setAxisScale(QwtAxis::YLeft, 0, 600);
         tiqMarker[0]->setYValue(580);
         tiqMarker[1]->setYValue(580);
     }
@@ -1096,14 +1095,14 @@ PfPvPlot::recalc()
 
         // round *UP* to next integer for axis to fill nicely
         maxCPV = round(maxCPV + 0.5);
-        setAxisScale(xBottom, 0, maxCPV);
+        setAxisScale(QwtAxis::XBottom, 0, maxCPV);
         tiqMarker[0]->setXValue(maxCPV - 0.5);
         tiqMarker[3]->setXValue(maxCPV - 0.5);
 
     } else {
 
         maxCPV = 3; // for background shading and CP curve
-        setAxisScale(xBottom, 0, 3);
+        setAxisScale(QwtAxis::XBottom, 0, 3);
         tiqMarker[0]->setXValue(2.9);
         tiqMarker[3]->setXValue(2.9);
     }
@@ -1179,7 +1178,7 @@ PfPvPlot::recalc()
 
     }
 
-    QwtArray<double> yvalues(contour_xvalues.size());
+    QVector<double> yvalues(contour_xvalues.size());
 
     if (cp_) {
 
@@ -1193,7 +1192,7 @@ PfPvPlot::recalc()
     } else {
 
         // an empty curve if no power (or zero power) is specified
-        QwtArray<double> data;
+        QVector<double> data;
         cpCurve->setSamples(data,data);
     }
     if (pmax_) {
@@ -1208,7 +1207,7 @@ PfPvPlot::recalc()
     } else {
 
         // an empty curve if no power (or zero power) is specified
-        QwtArray<double> data;
+        QVector<double> data;
         pmaxCurve->setSamples(data,data);
     }
 }
@@ -1332,7 +1331,6 @@ PfPvPlot::showCompareIntervals()
     recalcCompare();
 
     QVector<std::set<std::pair<double, double> > > dataSetInterval(num_intervals);
-    long tot_cad = 0;
     long tot_cad_points = 0;
 
     // prepare aggregates
@@ -1359,7 +1357,6 @@ PfPvPlot::showCompareIntervals()
 #else
                         dataSetInterval[high].insert(std::MAKEPAIR<double, double>(aepf, cpv));
 #endif
-                    tot_cad += p1->cad;
                     tot_cad_points++;
                 }
             }
@@ -1371,8 +1368,8 @@ PfPvPlot::showCompareIntervals()
 
         // Now that we have the set of points, transform them into the
         // QwtArrays needed to set the curve's data.
-        QVector<QwtArray<double> > aepfArrayInterval(num_intervals);
-        QVector<QwtArray<double> > cpvArrayInterval(num_intervals);
+        QVector<QVector<double> > aepfArrayInterval(num_intervals);
+        QVector<QVector<double> > cpvArrayInterval(num_intervals);
 
         for (int i=0;i<num_intervals;i++) {
             std::set<std::pair<double, double> >::const_iterator l(dataSetInterval[i].begin());

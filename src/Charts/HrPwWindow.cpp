@@ -91,7 +91,7 @@ HrPwWindow::HrPwWindow(Context *context) :
     hrPwPlot->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_HRvsPw));
 
     // tooltip on hover over point
-    hrPwPlot->tooltip = new LTMToolTip(QwtPlot::xBottom, QwtPlot::yLeft,
+    hrPwPlot->tooltip = new LTMToolTip(QwtAxis::XBottom, QwtAxis::YLeft,
                                QwtPicker::VLineRubberBand,
                                QwtPicker::AlwaysOn,
                                hrPwPlot->canvas(),

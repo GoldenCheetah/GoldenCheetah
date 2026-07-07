@@ -1,12 +1,15 @@
+#### Packages for embedded Python ###
 #
 # Core Tools
 #
-sip == 4.19.8
+sip == 6.15.1
 numpy
 pandas
 scipy
 lmfit
 plotly
+importlib_metadata
+Jinja2
 #
 # Nice to have
 #

@@ -14,10 +14,13 @@ Makefile
 *.swp
 *.user
 *.AppImage
+*.tab.c
+*.tab.h
 
 # osx noise
 .DS_Store
 profile
+src/dmg_staging
 
 # qmake Xcode generator side-effects
 *.xcodeproj
@@ -29,6 +32,7 @@ xcshareddata/
 
 moc_*
 moc/
+.moc
 obj/
 lib/
 bin/
@@ -36,6 +40,11 @@ plugins/
 resources/
 src/debug/
 src/release/
+doc/doxygen/latex
+doc/doxygen/html
+
+# qt creator builds
+build-src*
 
 qwt/src/debug/
 qwt/src/release/
@@ -52,4 +61,28 @@ qwt/textengines/mathml/release/
 build.pro.user
 build.pro.user.*
 doc/contrib/WASP Packet Protocol.pdf
+
+# unittests
+unittests/Core/season/season
+unittests/Core/seasonOffset/seasonOffset
+unittests/Core/seasonParser/seasonParser
+unittests/Core/signalSafety/testSignalSafety
+unittests/Core/signalSafety/testSignalSafety
+unittests/Core/units/units
+unittests/Gui/calendarData/calendarData
+
+# Qt testlib
+target_wrapper.sh
+
+# Precompiled Headers
+*.gch
+*.pch
+*.gch/
+_pch/
+
+# Generated Source Files
+*_lex.cpp
+*_yacc.cpp
+*_yacc.h
+qrc_*.cpp
 

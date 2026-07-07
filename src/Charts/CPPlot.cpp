@@ -53,9 +53,9 @@
 #include "LTMCanvasPicker.h"
 #include "TimeUtils.h"
 #include "Units.h"
-
+#include "Perspective.h"
+#include "qwt_spline_curve_fitter.h"
 #include "LTMTrend.h"
-
 
 CPPlot::CPPlot(CriticalPowerWindow *parent, Context *context, bool rangemode) : QwtPlot(parent), parent(parent),
 
@@ -63,11 +63,12 @@ CPPlot::CPPlot(CriticalPowerWindow *parent, Context *context, bool rangemode) : 
     model(0), modelVariant(0), fit(0), fitdata(0), modelDecay(false),
 
     // state
-    context(context), bestsCache(NULL), dateCV(0.0), isRun(false), isSwim(false),
-    rideSeries(RideFile::watts),
+    context(context), bestsCache(NULL), veloCP(0), dateCP(0), dateCV(0.0), sport(""),
+    rideSeries(RideFile::watts), criticalSeries(CriticalPowerWindow::CriticalSeriesType::watts),
     isFiltered(false), shadeMode(2),
     shadeIntervals(true), rangemode(rangemode), 
-    showTest(true), showBest(true), filterBest(false), showPowerIndex(false), showPercent(false), showHeat(false), showPP(false), showHeatByDate(false), showDelta(false), showDeltaPercent(false),
+    showTest(true), showBest(true), filterBest(false), showPowerIndex(false), showPercent(false), showHeat(false),
+    showEffort(false), showPP(false), showHeatByDate(false), showDelta(false), showDeltaPercent(false),
     plotType(0),
     xAxisLinearOnSpeed(true),
 
@@ -76,22 +77,22 @@ CPPlot::CPPlot(CriticalPowerWindow *parent, Context *context, bool rangemode) : 
 
 {
     setAutoFillBackground(true);
-    setAxisTitle(xBottom, tr("Interval Length"));
+    setAxisTitle(QwtAxis::XBottom, tr("Interval Length"));
 
     // Log scale on x-axis
     ltsd = new LogTimeScaleDraw;
     ltsd->setTickLength(QwtScaleDiv::MajorTick, 3);
-    setAxisScaleDraw(xBottom, ltsd);
-    setAxisScaleEngine(xBottom, new QwtLogScaleEngine);
+    setAxisScaleDraw(QwtAxis::XBottom, ltsd);
+    setAxisScaleEngine(QwtAxis::XBottom, new QwtLogScaleEngine);
 
     // left yAxis scale prettify
     sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     sd->enableComponent(QwtScaleDraw::Ticks, false);
     sd->enableComponent(QwtScaleDraw::Backbone, false);
-    setAxisScaleDraw(yLeft, sd);
-    setAxisTitle(yLeft, tr("Average Power (watts)"));
-    setAxisMaxMinor(yLeft, 0);
+    setAxisScaleDraw(QwtAxis::YLeft, sd);
+    setAxisTitle(QwtAxis::YLeft, tr("Average Power (watts)"));
+    setAxisMaxMinor(QwtAxis::YLeft, 0);
     plotLayout()->setAlignCanvasToScales(true);
 
     // right yAxis scale prettify
@@ -99,9 +100,9 @@ CPPlot::CPPlot(CriticalPowerWindow *parent, Context *context, bool rangemode) : 
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     sd->enableComponent(QwtScaleDraw::Ticks, false);
     sd->enableComponent(QwtScaleDraw::Backbone, false);
-    setAxisScaleDraw(yRight, sd);
-    setAxisTitle(yRight, tr("Percent of Best"));
-    setAxisMaxMinor(yRight, 0);
+    setAxisScaleDraw(QwtAxis::YRight, sd);
+    setAxisTitle(QwtAxis::YRight, tr("Percent of Best"));
+    setAxisMaxMinor(QwtAxis::YRight, 0);
 
     // zoom
     zoomer = new penTooltip(static_cast<QwtPlotCanvas*>(this->canvas()));
@@ -128,9 +129,9 @@ CPPlot::configChanged(qint32)
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
     setPalette(palette);
 
-    axisWidget(QwtPlot::xBottom)->setPalette(palette);
-    axisWidget(QwtPlot::yLeft)->setPalette(palette);
-    axisWidget(QwtPlot::yRight)->setPalette(palette);
+    axisWidget(QwtAxis::XBottom)->setPalette(palette);
+    axisWidget(QwtAxis::YLeft)->setPalette(palette);
+    axisWidget(QwtAxis::YRight)->setPalette(palette);
 
     if (rangemode) setCanvasBackground(GColor(CTRENDPLOTBACKGROUND));
     else setCanvasBackground(GColor(CPLOTBACKGROUND));
@@ -311,25 +312,25 @@ CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
     }
 
     // set scale to match what's needed
-    if (scale != log) setAxisScaleEngine(xBottom, new QwtLinearScaleEngine);
-    else setAxisScaleEngine(xBottom, new QwtLogScaleEngine);
+    if (scale != log) setAxisScaleEngine(QwtAxis::XBottom, new QwtLinearScaleEngine);
+    else setAxisScaleEngine(QwtAxis::XBottom, new QwtLogScaleEngine);
 
     if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
         sd = new QwtScaleDraw;
         sd->setTickLength(QwtScaleDiv::MajorTick, 3);
         sd->enableComponent(QwtScaleDraw::Ticks, false);
-        setAxisScaleDraw(xBottom, sd);
-        setAxisTitle(xBottom, tr("Power (W)"));
+        setAxisScaleDraw(QwtAxis::XBottom, sd);
+        setAxisTitle(QwtAxis::XBottom, tr("Power (W)"));
     } else {
         ltsd = new LogTimeScaleDraw;
         ltsd->setTickLength(QwtScaleDiv::MajorTick, 3);
         ltsd->enableComponent(QwtScaleDraw::Ticks, false);
-        setAxisScaleDraw(xBottom, ltsd);
-        setAxisTitle(xBottom, tr("Interval Length"));
+        setAxisScaleDraw(QwtAxis::XBottom, ltsd);
+        setAxisTitle(QwtAxis::XBottom, tr("Interval Length"));
     }
 
     // set axis title
-    setAxisTitle(yLeft, QString ("%1 %2 (%3) %4")
+    setAxisTitle(QwtAxis::YLeft, QString ("%1 %2 (%3) %4")
                  .arg(prefix)
                  .arg(series)
                  .arg(units)
@@ -532,7 +533,7 @@ CPPlot::plotLinearWorkModel()
 
         // curve cosmetics
         QPen pen(GColor(CCP));
-        double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+        double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
         pen.setWidth(width);
         if (showBest) pen.setStyle(Qt::DashLine);
         workModelCurve->setPen(pen);
@@ -601,13 +602,13 @@ CPPlot::plotModel()
             if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
                 // Plot the model for the veloclinic plot
                 pdModel->setMinutes(false);
-                QVector<double> power(pdModel->size());
-                QVector<double> wprime(pdModel->size());
-                for (size_t t = 0; t < pdModel->size(); t++) {
+                QVector<double> power(static_cast<int>(pdModel->size()));
+                QVector<double> wprime(static_cast<int>(pdModel->size()));
+                for (int t = 0; t < pdModel->size(); t++) {
                     power[t] = pdModel->y(t+1);
                     wprime[t] = (pdModel->y(t+1)-veloCP) * (pdModel->x(t+1)); // Joules
                 }
-                modelCurve->setSamples(power.data(), wprime.data(), pdModel->size()-1);
+                modelCurve->setSamples(power.data(), wprime.data(), static_cast<int>(pdModel->size())-1);
             }
             else
                 modelCurve->setData(pdModel);
@@ -631,7 +632,7 @@ CPPlot::plotModel()
 
             // curve cosmetics
             QPen pen(GColor(CCP));
-            double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+            double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
             pen.setWidth(width);
             if (showBest) pen.setStyle(Qt::DashLine);
             modelCurve->setPen(pen);
@@ -666,16 +667,16 @@ CPPlot::plotModel()
         }
 
         heatCurve->setSamples(time, heat);
-        heatCurve->setYAxis(yRight);
-        setAxisScale(yRight, 0, 100);  // fine if only heat is shown and percentage Scale will be fixed if shown
-        if (showPercent) setAxisTitle(yRight, tr("Percent of Best / Heat Activities"));
-        else setAxisTitle(yRight, tr("Heat Activities"));
+        heatCurve->setYAxis(QwtAxis::YRight);
+        setAxisScale(QwtAxis::YRight, 0, 100);  // fine if only heat is shown and percentage Scale will be fixed if shown
+        if (showPercent) setAxisTitle(QwtAxis::YRight, tr("Percent of Best / Heat Activities"));
+        else setAxisTitle(QwtAxis::YRight, tr("Heat Activities"));
         heatCurve->attach(this);
     }
 
-    setAxisVisible(yRight, showHeat || ((showPowerIndex||showPercent) && rideCurve));
+    setAxisVisible(QwtAxis::YRight, showHeat || ((showPowerIndex||showPercent) && rideCurve));
 
-   // setAxisVisible(yRight, showHeat || showPercent);
+   // setAxisVisible(QwtAxis::YRight, showHeat || showPercent);
 
     //
     // HEAT AGE
@@ -716,15 +717,15 @@ CPPlot::plotModel()
     // Pmax is often higher than the test values (they're for
     // 3-20 mins typically so well short of pmax).
     if (!showDelta && rideSeries == RideFile::watts && pdModel && pdModel->PMax() > ymax) {
-        if (pdModel->PMax() > ymax) setAxisScale(yLeft, 0, (ymax=pdModel->PMax() * 1.1f));
+        if (pdModel->PMax() > ymax) setAxisScale(QwtAxis::YLeft, 0, (ymax=pdModel->PMax() * 1.1f));
     }
 
     // if we're showing the power profile, must be at least 1500
     if (ymax < 20 && showPP && rideSeries == RideFile::wattsKg) {
-        setAxisScale(yLeft, 0, (ymax=20));
+        setAxisScale(QwtAxis::YLeft, 0, (ymax=20));
     }
     if (ymax < 1500 && showPP && rideSeries == RideFile::watts) {
-        setAxisScale(yLeft, 0, (ymax=1500));
+        setAxisScale(QwtAxis::YLeft, 0, (ymax=1500));
     }
 }
 
@@ -809,18 +810,18 @@ CPPlot::updateModelHelper()
 
     } else if (rideSeries == RideFile::kph) {
 
-        const PaceZones *zones = (isRun || isSwim) ? context->athlete->paceZones(isSwim) : NULL;
+        const PaceZones *zones = (sport == "Run" || sport == "Swim") ? context->athlete->paceZones(sport=="Swim") : NULL;
         // Rank field is reused for pace according to sport
         bool metricPace = zones ? appsettings->value(this, zones->paceSetting(), GlobalContext::context()->useMetricUnits).toBool() : GlobalContext::context()->useMetricUnits;
-        cpw->titleRank->setText(zones ? zones->paceUnits(metricPace) : "n/a");
+        cpw->titleRank->setText(zones ? zones->paceUnits(metricPace) : (sport=="Row" ? "min/500m" : "n/a"));
 
         //DPrime
         cpw->wprimeTitle->setText(tr("D'"));
         if (pdModel->hasWPrime()) {
             cpw->wprimeValue->setText(kmToString(pdModel->WPrime()/1000.0));
             cpw->wprimeRank->setText(QString(tr("%1 %2"))
-                            .arg(pdModel->WPrime()/(metricPace ? 1.0 : METERS_PER_YARD), 0, 'f', 0)
-                            .arg(metricPace ? tr("m") : tr("yd")));
+                            .arg(pdModel->WPrime()/((metricPace || sport=="Row") ? 1.0 : METERS_PER_YARD), 0, 'f', 0)
+                            .arg((metricPace  || sport=="Row") ? tr("m") : tr("yd")));
         } else {
             cpw->wprimeValue->setText(tr("n/a"));
             cpw->wprimeRank->setText(tr("n/a"));
@@ -830,13 +831,15 @@ CPPlot::updateModelHelper()
         cpw->cpTitle->setText(tr("CV"));
         // TODO: Should metric instead depend on the swim/run/default unit settings?
         cpw->cpValue->setText(kphToString(pdModel->CP()));
-        cpw->cpRank->setText(zones ? zones->kphToPaceString(pdModel->CP(), metricPace) : "n/a");
+        cpw->cpRank->setText(zones ? zones->kphToPaceString(pdModel->CP(), metricPace)
+                                   : (sport=="Row" ? kphToPace(pdModel->CP()*2, true, false) : "n/a"));
 
         // V-MAX
         cpw->pmaxTitle->setText(tr("Vmax"));
         if (pdModel->hasPMax()) {
             cpw->pmaxValue->setText(kphToString(pdModel->PMax()));
-            cpw->pmaxRank->setText(zones ? zones->kphToPaceString(pdModel->PMax(), metricPace) : "n/a");
+            cpw->pmaxRank->setText(zones ? zones->kphToPaceString(pdModel->PMax(), metricPace)
+                                         : (sport=="Row" ? kphToPace(pdModel->PMax()*2, true, false) : "n/a"));
 
         } else  {
             cpw->pmaxValue->setText(tr("n/a"));
@@ -933,7 +936,7 @@ CPPlot::plotModel(QVector<double> vector, QColor plotColor, PDModel *baseline)
 
     // curve cosmetics
     QPen pen(plotColor);
-    double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+    double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
     pen.setWidth(width);
     if (showBest) pen.setStyle(Qt::DashLine);
     curve->setPen(pen);
@@ -1060,7 +1063,8 @@ CPPlot::plotTests(RideItem *rideitem)
     QVector<QPointF> points;
 
     // just plot tests as power duration for now, will reiterate to add others later.
-    if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || criticalSeries == CriticalPowerWindow::work) {
+    if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg ||
+        criticalSeries == CriticalPowerWindow::work || rideSeries == RideFile::kph) {
 
         // rides to search, this one only -or- all in the date range selected?
         QList<RideItem*> rides;
@@ -1071,13 +1075,14 @@ CPPlot::plotTests(RideItem *rideitem)
         fs.addFilter(parent->searchBox->isFiltered(), SearchFilterBox::matches(context, parent->searchBox->filter())); // chart settings
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
+        if (parent->myPerspective) fs.addFilter(parent->myPerspective->isFiltered(), parent->myPerspective->filterlist(DateRange(startDate,endDate)));
         Specification spec;
         spec.setFilterSet(fs);
         spec.setDateRange(DateRange(startDate, endDate));
 
         foreach(RideItem *r, context->athlete->rideCache->rides()) {
             // does it match ?
-            if ((r->isSwim == isSwim) && (r->isRun == isRun) && spec.pass(r))
+            if ((r->sport == sport) && spec.pass(r))
                 rides << r;
         }
 
@@ -1086,7 +1091,9 @@ CPPlot::plotTests(RideItem *rideitem)
                 if (interval->istest()) {
 
                     double duration = (interval->stop - interval->start) + 1; // add offset used on log axis
-                    double watts = interval->getForSymbol("average_power",  GlobalContext::context()->useMetricUnits);
+                    double watts = rideSeries == RideFile::kph ?
+                                   interval->getForSymbol("average_speed",  GlobalContext::context()->useMetricUnits) :
+                                   interval->getForSymbol("average_power",  GlobalContext::context()->useMetricUnits);
 
 
                     // ignore where no power present
@@ -1116,10 +1123,11 @@ CPPlot::plotTests(RideItem *rideitem)
                         test->setSymbol(sym);
                         test->setValue(duration/60.00f, watts);
 
-                        QString desc = QString("%3\n%1 %4\n%2").arg(watts,0, 'f', rideSeries == RideFile::watts ? 0 : 2)
+                        QString desc = QString("%3\n%1 %4%5\n%2").arg(watts,0, 'f', rideSeries == RideFile::watts ? 0 : 2)
                                                              .arg(interval_to_str(duration))
                                                              .arg(interval->name)
-                                                             .arg(criticalSeries == CriticalPowerWindow::work ? tr("kJ") : RideFile::unitName(rideSeries, context));
+                                                             .arg(criticalSeries == CriticalPowerWindow::work ? tr("kJ") : RideFile::unitName(rideSeries, context))
+                                                             .arg(criticalSeries == CriticalPowerWindow::kph ? paceString(duration, watts) : "");
                         QwtText text(desc);
                         QFont font; // default
                         font.setPointSize(8);
@@ -1138,7 +1146,7 @@ CPPlot::plotTests(RideItem *rideitem)
         }
 
         // now sort the points on x so we can feed to model fit
-        qSort(points.begin(), points.end(), qpointflessthan);
+        std::sort(points.begin(), points.end(), qpointflessthan);
         foreach(QPointF point, points) {
             testtime << point.x() / 60.0f;
             testpower << point.y();
@@ -1195,7 +1203,18 @@ CPPlot::plotBests(RideItem *rideItem)
 
     // do we need to get the cache ?
     if (bestsCache == NULL) {
-        bestsCache = new RideFileCache(context, startDate, endDate, isFiltered, files, rangemode, rideItem);
+        // isFiltered and files are filters from CriticalPowerWindow's filter setting
+        // we also need to take into account the perspective filter if on trends so
+        // we pass isFiltered and files for filterlist to take care of them,
+        // but only if rangemode (aka on trends)
+        if (rangemode) {
+            bestsCache = new RideFileCache(context, startDate, endDate,
+                            isFiltered || (parent->myPerspective && parent->myPerspective->isFiltered()),
+                            parent->myPerspective ? parent->myPerspective->filterlist(DateRange(startDate,endDate), isFiltered, files) : files,
+                            rangemode, rideItem);
+        } else {
+            bestsCache = new RideFileCache(context, startDate, endDate, isFiltered, files, rangemode, rideItem);
+        }
     }
 
     // how much we got ?
@@ -1331,7 +1350,7 @@ CPPlot::plotBests(RideItem *rideItem)
             }
 
             fill.setAlpha(64);
-            line.setWidth(appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble());
+            line.setWidth(appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble());
 
             curve->setPen(line);
             if (criticalSeries == CriticalPowerWindow::work || rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || rideSeries == RideFile::aPower || rideSeries == RideFile::aPowerKg || rideSeries == RideFile::kph)
@@ -1474,7 +1493,7 @@ CPPlot::plotBests(RideItem *rideItem)
 
             // set zones from shading CP
             QList <int> power_zone;
-            int n_zones = context->athlete->zones(isRun)->lowsFromCP(&power_zone, (int) int(shadingCP));
+            int n_zones = context->athlete->zones(sport)->lowsFromCP(&power_zone, (int) int(shadingCP));
 
             // now run through each zone and create a curve
             int high = maxNonZero - 1;
@@ -1511,7 +1530,7 @@ CPPlot::plotBests(RideItem *rideItem)
                     curve->setRenderHint(QwtPlotItem::RenderAntialiased);
                 QPen pen(color.darker(200));
                 pen.setColor(GColor(CCP)); //XXX color ?
-                double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+                double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
                 pen.setWidth(width);
                 curve->setPen(pen);
 
@@ -1529,7 +1548,7 @@ CPPlot::plotBests(RideItem *rideItem)
                 // now the labels
                 if (shadeMode && (criticalSeries != CriticalPowerWindow::work || work[high] > 100.0)) {
 
-                    QwtText text(context->athlete->zones(isRun)->getDefaultZoneName(zone));
+                    QwtText text(context->athlete->zones(sport)->getDefaultZoneName(zone));
                     text.setFont(QFont("Helvetica", 20, QFont::Bold));
                     color.setAlpha(255);
                     text.setColor(color);
@@ -1568,7 +1587,7 @@ CPPlot::plotBests(RideItem *rideItem)
 
             // set zones from shading CV
             QList <double> pace_zone;
-            int n_zones = context->athlete->paceZones(isSwim)->lowsFromCV(&pace_zone, shadingCV);
+            int n_zones = context->athlete->paceZones(sport=="Swim")->lowsFromCV(&pace_zone, shadingCV);
 
             // now run through each zone and create a curve
             int high = maxNonZero - 1;
@@ -1599,7 +1618,7 @@ CPPlot::plotBests(RideItem *rideItem)
                     curve->setRenderHint(QwtPlotItem::RenderAntialiased);
                 QPen pen(color.darker(200));
                 pen.setColor(GColor(CCP)); //XXX color ?
-                double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+                double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
                 pen.setWidth(width);
                 curve->setPen(pen);
 
@@ -1617,7 +1636,7 @@ CPPlot::plotBests(RideItem *rideItem)
                 // now the labels
                 if (shadeMode) {
 
-                    QwtText text(context->athlete->paceZones(isSwim)->getDefaultZoneName(zone));
+                    QwtText text(context->athlete->paceZones(sport=="Swim")->getDefaultZoneName(zone));
                     text.setFont(QFont("Helvetica", 20, QFont::Bold));
                     color.setAlpha(255);
                     text.setColor(color);
@@ -1663,7 +1682,7 @@ CPPlot::plotBests(RideItem *rideItem)
         div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticksVeloclinic);
     else
         div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticks);
-    setAxisScaleDiv(QwtPlot::xBottom, div);
+    setAxisScaleDiv(QwtAxis::XBottom, div);
 
     if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
         double xmax;
@@ -1674,7 +1693,7 @@ CPPlot::plotBests(RideItem *rideItem)
         int max = xmax * 1.1f;
         max = ((max/100) + 1) * 100;
 
-        setAxisScale(QwtPlot::xBottom, 0, max);
+        setAxisScale(QwtAxis::XBottom, 0, max);
     }
 
     // Y-AXIS
@@ -1700,24 +1719,24 @@ CPPlot::plotBests(RideItem *rideItem)
         max = ((max/100) + 1) * 100;
         if (rideSeries == RideFile::watts && showPP && max<1500) max=1500;
 
-        setAxisScale(yLeft, 0, max);
+        setAxisScale(QwtAxis::YLeft, 0, max);
 
     } else if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
-        setAxisScale(yLeft, 0, 1.5*pdModel->WPrime());
+        setAxisScale(QwtAxis::YLeft, 0, 1.5*pdModel->WPrime());
 
     } else if (criticalSeries == CriticalPowerWindow::vam) {
         // VAM is very big anyway - so just 5% headroom
-        setAxisScale(yLeft, 0, 1.05*ymax);
+        setAxisScale(QwtAxis::YLeft, 0, 1.05*ymax);
 
     } else if (rideSeries == RideFile::wattsKg && showPP) {
         ymax *= 1.1;
         if (ymax<20) ymax = 20;
-        setAxisScale(yLeft, 0, ymax);
+        setAxisScale(QwtAxis::YLeft, 0, ymax);
 
     } else {
 
         // or just add 10% headroom
-        setAxisScale(yLeft, 0, 1.1*values[0]);
+        setAxisScale(QwtAxis::YLeft, 0, 1.1*values[0]);
     }
     zoomer->setZoomBase(false);
 }
@@ -1755,6 +1774,7 @@ CPPlot::plotEfforts()
         FilterSet fs; // apply filters when selecting intervals
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
+        if (parent->myPerspective) fs.addFilter(parent->myPerspective->isFiltered(), parent->myPerspective->filterlist(DateRange(startDate,endDate)));
         Specification spec;
         spec.setFilterSet(fs);
         spec.setDateRange(DateRange(startDate, endDate));
@@ -1864,7 +1884,7 @@ CPPlot::plotRide(RideItem *rideItem)
     // curve that gets any special colour treatment.
     QPen ridePen;
     ridePen.setColor(GColor(CRIDECP));
-    double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+    double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
     ridePen.setWidth(width);
     rideCurve->setPen(ridePen);
 
@@ -1916,11 +1936,11 @@ CPPlot::plotRide(RideItem *rideItem)
             int max = rideCurve->maxYValue();
             if (max < 100) max = 100;
             else max = max * 1.05f;
-            setAxisScale(yRight, 0, max); // always 100
+            setAxisScale(QwtAxis::YRight, 0, max); // always 100
 
             // set the right titles in case both Heat and Percent of best is show
-            if (showHeat) setAxisTitle(yRight, tr("Percent of Best / Heat Activities"));
-            else setAxisTitle(yRight, tr("Percent of Best"));
+            if (showHeat) setAxisTitle(QwtAxis::YRight, tr("Percent of Best / Heat Activities"));
+            else setAxisTitle(QwtAxis::YRight, tr("Percent of Best"));
 
         } else if (showPowerIndex && bestsCache && (rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts)) {
 
@@ -1941,27 +1961,27 @@ CPPlot::plotRide(RideItem *rideItem)
             int max = rideCurve->maxYValue();
             if (max < 1) max = 1;
             else max = max * 1.05f;
-            setAxisScale(yRight, 0, max); // always 100
+            setAxisScale(QwtAxis::YRight, 0, max); // always 100
 
             // set the right titles in case both Heat and Percent of best is show
-            setAxisTitle(yRight, tr("Power Index"));
+            setAxisTitle(QwtAxis::YRight, tr("Power Index"));
 
         } else {
 
             // JUST A NORMAL CURVE
-            rideCurve->setYAxis(yLeft);
+            rideCurve->setYAxis(QwtAxis::YLeft);
             rideCurve->setSamples(timeArray.data() + 1, rideItem->fileCache()->meanMaxArray(rideSeries).constData() + 1,
                                   maxNonZero > 0 ? maxNonZero-1 : 0);
 
             // Set the YAxis Title if Heat is active
-            if (showHeat) setAxisTitle(yRight, tr("Heat Activities"));
+            if (showHeat) setAxisTitle(QwtAxis::YRight, tr("Heat Activities"));
         }
     }
 
     // which axis should it be on?
     // and also make sure its visible
-    rideCurve->setYAxis((showPercent||showPowerIndex) ? yRight : yLeft);
-    setAxisVisible(yRight, showPercent || showPowerIndex || showHeat);
+    rideCurve->setYAxis((showPercent||showPowerIndex) ? QwtAxis::YRight : QwtAxis::YLeft);
+    setAxisVisible(QwtAxis::YRight, showPercent || showPowerIndex || showHeat);
     rideCurve->attach(this);
 
     zoomer->setZoomBase(false);
@@ -2012,7 +2032,7 @@ CPPlot::setRide(RideItem *rideItem)
     // if plotting in percentage mode, so get data and plot it now
     // delete if sport changed
     if (!rangemode) {
-        setSport(rideItem->isRun, rideItem->isSwim);
+        setSport(rideItem->sport);
         delete bestsCache;
         bestsCache = NULL;
         clearCurves();
@@ -2090,14 +2110,11 @@ CPPlot::setRide(RideItem *rideItem)
 void
 CPPlot::pointHover(QwtPlotCurve *curve, int index)
 {
-    if (criticalSeries == CriticalPowerWindow::watts && showBest && curve == modelCurve && modelCurve != NULL) 
-        return; // ignore model curve hover
-
     if (index >= 0) {
 
         const double xvalue = curve->sample(index).x();
         const double yvalue = curve->sample(index).y();
-        QString text, dateStr, paceStr;
+        QString text, dateStr;
         QString currentRidePercentStr;
         QString units1;
         QString units2;
@@ -2113,8 +2130,8 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
 
         // use the right pace config
         bool metricPace = true;
-        if (isSwim) metricPace = appsettings->value(this, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
-        else if (isRun)  metricPace = appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
+        if (sport == "Swim") metricPace = appsettings->value(this, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
+        else if (sport == "Run")  metricPace = appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
         else  metricPace = GlobalContext::context()->useMetricUnits;
 
 
@@ -2175,32 +2192,6 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
         }
 #endif
 
-
-        // for speed series add pace with units according to settings
-        if (criticalSeries == CriticalPowerWindow::kph) {
-
-            if (isRun || isSwim) {
-
-                const PaceZones *zones = context->athlete->paceZones(isSwim);
-                if (zones) paceStr = QString("\n%1 %2").arg(zones->kphToPaceString(yvalue, metricPace))
-                                                       .arg(zones->paceUnits(metricPace));
-
-            }
-            
-            const double km = yvalue*xvalue/60.0; // distance in km
-            if (isSwim) {
-
-                if (metricPace) paceStr += tr("\n%1 m").arg(1000*km, 0, 'f', 0);
-                else paceStr += tr("\n%1 yd").arg(1000*km/METERS_PER_YARD, 0, 'f', 0);
-
-            } else {
-
-                if (metricPace) paceStr += tr("\n%1 km").arg(km, 0, 'f', 3);
-                else  paceStr += tr("\n%1 mi").arg(MILES_PER_KM*km, 0, 'f', 3);
-
-            }
-        }
-
         // output the tooltip
         text = QString("%1%2\n%3 %4%5%6")
                .arg(criticalSeries == CriticalPowerWindow::veloclinicplot ?
@@ -2209,7 +2200,7 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
                .arg(units1)
                .arg(units2)
                .arg(currentRidePercentStr)
-               .arg(paceStr)
+               .arg(criticalSeries == CriticalPowerWindow::kph ? paceString(xvalue*60.0, yvalue) : "")
                .arg(dateStr);
 
         // set that text up
@@ -2232,13 +2223,13 @@ CPPlot::exportBests(QString filename)
 
     // open stream and write header
     QTextStream stream(&f);
-    stream << "seconds, value," << (expmodel ? " model, date" : " date") << endl;
+    stream << "seconds, value," << (expmodel ? " model, date" : " date") << Qt::endl;
 
     // output a row for each second
     foreach(QwtPlotCurve *bestsCurve, bestsCurves) {
 
         // just output for the bests curve
-        for (size_t i=0; i<bestsCurve->data()->size(); i++) {
+        for (int i=0; i<bestsCurve->data()->size(); i++) {
             const double xvalue = bestsCurve->sample(i).x();
             const double yvalue = bestsCurve->sample(i).y();
             const double modelvalue = expmodel ? pdModel->y(xvalue) : 0;
@@ -2250,13 +2241,24 @@ CPPlot::exportBests(QString filename)
             }
 
             // values
-            if (expmodel) stream << int(xvalue * 60.00f) << "," << yvalue << "," << modelvalue << "," << date.toString(Qt::ISODate) << endl;
-            else stream << int(xvalue * 60.00f) << "," << yvalue << "," << date.toString(Qt::ISODate) << endl;
+            if (expmodel) stream << int(xvalue * 60.00f) << "," << yvalue << "," << modelvalue << "," << date.toString(Qt::ISODate) << Qt::endl;
+            else stream << int(xvalue * 60.00f) << "," << yvalue << "," << date.toString(Qt::ISODate) << Qt::endl;
         }
     }
 
     // and we're done
     f.close();
+}
+
+// perspective filter changed, we need to replot with new bests
+void
+CPPlot::perspectiveFilterChanged()
+{
+    if (bestsCache) {
+        delete bestsCache;
+        bestsCache = NULL;
+    }
+    clearCurves();
 }
 
 // no filter
@@ -2433,7 +2435,7 @@ CPPlot::refreshReferenceLines(RideItem *rideItem)
                     QwtPlotMarker *referenceLine = new QwtPlotMarker;
                     QPen p;
                     p.setColor(GColor(CPLOTMARKER));
-                    double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+                    double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
                     p.setWidth(width);
                     p.setStyle(Qt::DashLine);
                     referenceLine->setLinePen(p);
@@ -2460,7 +2462,7 @@ void
 CPPlot::plotCentile(RideItem *rideItem)
 {
     qDebug() << "calculateCentile";
-    QTime elapsed;
+    QElapsedTimer elapsed;
     elapsed.start();
 
     qDebug() << "prepare datas ";
@@ -2539,8 +2541,7 @@ CPPlot::plotCentile(RideItem *rideItem)
             }
 
         }
-        //qSort(sums.begin(), sums.end());
-        qSort(sums);
+        std::sort(sums.begin(), sums.end());
 
         qDebug() << "sums (" << slice << ") : " << sums.size() << " max " << sums[sums.size()-1];
 
@@ -2618,8 +2619,7 @@ CPPlot::plotCentile(RideItem *rideItem)
                 sums[index++] = sum / windowsize;
 
         }
-        //qSort(sums.begin(), sums.end());
-        qSort(sums);
+        std::sort(sums.begin(), sums.end());
 
         qDebug() << "sums (" << slice << ") : " << sums.size() << " max " << sums[sums.size()-1];
 
@@ -2697,7 +2697,7 @@ CPPlot::plotCentile(RideItem *rideItem)
             QColor std = GColor(CRIDECP);
             QPen pen(QColor(250-(i*20),std.green(),std.blue()));
             pen.setStyle(Qt::DashLine); // Qt::SolidLine
-            double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+            double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
             pen.setWidth(width);
             rideCurve->setPen(pen);
             rideCurve->attach(this);
@@ -2929,7 +2929,7 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
         div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticksVeloclinic);
     else
         div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticks);
-    setAxisScaleDiv(QwtPlot::xBottom, div);
+    setAxisScaleDiv(QwtAxis::XBottom, div);
 
     // Y-AXIS
 
@@ -2940,17 +2940,17 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
         max = ((max/100) + 1) * 100;
 
         if (showPP && max < 1500) max=1500;
-        setAxisScale(yLeft, 0, max);
+        setAxisScale(QwtAxis::YLeft, 0, max);
 
     } else if (showPP && rideSeries == RideFile::wattsKg) {
         ymax *=1.1;
         if (ymax<20) ymax = 20;
 
-        setAxisScale(yLeft, 0, ymax);
+        setAxisScale(QwtAxis::YLeft, 0, ymax);
     } else {
 
         // or just add 10% headroom
-        setAxisScale(yLeft, ymin *1.1, 1.1*ymax);
+        setAxisScale(QwtAxis::YLeft, ymin *1.1, 1.1*ymax);
     }
 
     plotPowerProfile();
@@ -3081,7 +3081,7 @@ CPPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
         div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticksVeloclinic);
     else
         div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticks);
-    setAxisScaleDiv(QwtPlot::xBottom, div);
+    setAxisScaleDiv(QwtAxis::XBottom, div);
 
     // Y-AXIS
 
@@ -3092,18 +3092,18 @@ CPPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
         ymax = ((ymax/100) + 1) * 100;
         if (showPP && ymax<1500) ymax=1500;
 
-        setAxisScale(yLeft, ymin, ymax);
+        setAxisScale(QwtAxis::YLeft, ymin, ymax);
 
     } else if (showPP && rideSeries == RideFile::wattsKg) {
         ymax *=1.1;
         if (ymax<20) ymax = 20;
 
-        setAxisScale(yLeft, 0, ymax);
+        setAxisScale(QwtAxis::YLeft, 0, ymax);
 
     } else {
 
         // or just add 10% headroom
-        setAxisScale(yLeft, ymin *1.1, 1.1*ymax);
+        setAxisScale(QwtAxis::YLeft, ymin *1.1, 1.1*ymax);
     }
 
     plotPowerProfile();
@@ -3136,7 +3136,7 @@ CPPlot::plotCache(QVector<double> vector, QColor intervalColor)
 
     // set its color - based upon index in intervals!
     QPen pen(intervalColor);
-    double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+    double width = appsettings->value(this, GC_LINEWIDTH, 0.5*dpiXFactor).toDouble();
     pen.setWidth(width);
     //pen.setStyle(Qt::DotLine);
     intervalColor.setAlpha(64);
@@ -3171,4 +3171,35 @@ CPPlot::kmToString(double km)
     } else {
         return tr("%1 mi").arg(km*MILES_PER_KM, 0, 'f', 3);
     }
+}
+
+QString
+CPPlot::paceString(double secs, double kph)
+{
+    QString paceStr;
+    const PaceZones *zones = context->athlete->paceZones(sport=="Swim");
+    const bool metricPace = zones ? appsettings->value(this, zones->paceSetting(), GlobalContext::context()->useMetricUnits).toBool() : GlobalContext::context()->useMetricUnits;
+
+    if (sport == "Run" || sport == "Swim") {
+
+        if (zones) paceStr = QString("\n%1 %2").arg(zones->kphToPaceString(kph, metricPace))
+                                               .arg(zones->paceUnits(metricPace));
+    } else if (sport == "Row") {
+
+        paceStr = QString("\n%1 %2").arg(kphToPace(kph*2, true, false)).arg(tr("min/500m"));
+    }
+
+    const double km = kph*secs/3600.0; // distance in km
+    if (sport == "Swim") {
+
+        if (metricPace) paceStr += tr("\n%1 m").arg(1000*km, 0, 'f', 0);
+        else paceStr += tr("\n%1 yd").arg(1000*km/METERS_PER_YARD, 0, 'f', 0);
+
+    } else {
+
+        if (metricPace) paceStr += tr("\n%1 km").arg(km, 0, 'f', 3);
+        else  paceStr += tr("\n%1 mi").arg(MILES_PER_KM*km, 0, 'f', 3);
+
+    }
+    return paceStr;
 }

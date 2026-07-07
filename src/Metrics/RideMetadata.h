@@ -21,8 +21,8 @@
 #include "GoldenCheetah.h"
 
 #include "Context.h"
-#include "SpecialFields.h"
 
+#include <QPointer>
 #include <QWidget>
 #include <QLabel>
 #include <QCheckBox>
@@ -33,16 +33,20 @@
 #include <QMessageBox>
 
 // field types
-#define FIELD_TEXT      0
-#define FIELD_TEXTBOX   1
-#define FIELD_SHORTTEXT 2
-#define FIELD_INTEGER   3
-#define FIELD_DOUBLE    4
-#define FIELD_DATE      5
-#define FIELD_TIME      6
-#define FIELD_CHECKBOX  7
+enum class GcFieldType : int {
+    NO_FIELD_SET = -1,
+    FIELD_TEXT = 0,
+    FIELD_TEXTBOX = 1,
+    FIELD_SHORTTEXT = 2,
+    FIELD_INTEGER = 3,
+    FIELD_DOUBLE = 4,
+    FIELD_DATE = 5,
+    FIELD_TIME = 6,
+    FIELD_CHECKBOX = 7
+};
 
 class RideMetadata;
+class RideFileInterval;
 class RideEditor;
 
 class KeywordDefinition
@@ -61,19 +65,26 @@ class FieldDefinition
 
         QString tab,
                 name;
-        int type;
+        GcFieldType type;
         bool diary; // show in summary on diary page...
+        bool interval; // this is interval specific metadata
+
         QStringList values; // autocomplete 'defaults'
+        QString expression; // expression to evaluate, if true field is available
+
+        bool isTextField() const { return type == GcFieldType::FIELD_TEXT || type == GcFieldType::FIELD_TEXTBOX || type == GcFieldType::FIELD_SHORTTEXT; }
+        bool isNumericField() const { return !isTextField() && type != GcFieldType::NO_FIELD_SET; }
 
         static unsigned long fingerprint(QList<FieldDefinition>);
         QCompleter *getCompleter(QObject *parent, RideCache *rideCache);
         QString calendarText(QString value);
 
-        FieldDefinition() : tab(""), name(""), type(0), diary(false), values() {}
-        FieldDefinition(QString tab, QString name, int type, bool diary, QStringList values)
-                        : tab(tab), name(name), type(type), diary(diary), values(values) {}
+        FieldDefinition() : tab(""), name(""), type(GcFieldType::NO_FIELD_SET), diary(false), interval(false), values(), expression("") {}
+        FieldDefinition(QString tab, QString name, GcFieldType type, bool diary, bool interval, QStringList values, QString expression)
+                        : tab(tab), name(name), type(type), diary(diary), interval(interval), values(values), expression(expression) {}
 };
 
+class Form;
 class FormField : public QWidget
 {
     Q_OBJECT
@@ -81,9 +92,10 @@ class FormField : public QWidget
 
 
     public:
-        FormField(FieldDefinition, RideMetadata *);
+        FormField(Form *, FieldDefinition, RideMetadata *);
         ~FormField();
         FieldDefinition definition; // define the field
+        Form *form;                 // the form we are on
         QLabel  *label;             // label
         QCheckBox *enabled;           // is the widget enabled or not?
         QWidget *widget;            // updating widget
@@ -104,6 +116,7 @@ class FormField : public QWidget
         bool edited;                // value has been changed
         bool active;                // when data being changed for rideSelected
         bool isTime;                // when we edit metrics but they are really times
+        bool warn;                  // a warning is displayed
 };
 
 class Form : public QScrollArea
@@ -115,6 +128,12 @@ class Form : public QScrollArea
     public:
         Form(RideMetadata *);
         ~Form();
+
+        // ride item or intervals are selected
+        void rideSelected(RideItem *ride);
+        void intervalSelected(IntervalItem *interval);
+        void metadataChanged();
+
         void addField(FieldDefinition &x);
         void arrange(); // the meat of the action, arranging fields on the screen
         void clear();  // destroy contents prior to delete
@@ -122,6 +141,18 @@ class Form : public QScrollArea
 
         QVector<FormField*> fields; // keep track so we can destroy
         QVector<QHBoxLayout *> overrides; // keep track so we can destroy
+
+        // interval navigation
+        bool hasintervals;
+        RideFileInterval *interval;
+        QPushButton *left, *right;
+        QLabel *intervalname;
+
+    public slots:
+        // user switching interval using the selector
+        void intervalLeft();
+        void intervalRight();
+
     private:
         RideMetadata *meta;
         QWidget *contents;
@@ -150,7 +181,8 @@ class RideMetadata : public QWidget
     Q_OBJECT
     G_OBJECT
     Q_PROPERTY(RideItem *ride READ rideItem WRITE setRideItem)
-    RideItem *_ride, *_connected;
+    QPointer<RideItem> _ride;
+    QPointer<RideItem> _connected;
 
     public:
         RideMetadata(Context *, bool singlecolumn = false);
@@ -159,7 +191,10 @@ class RideMetadata : public QWidget
         QList<KeywordDefinition> getKeywords() { return keywordDefinitions; }
         QList<FieldDefinition> getFields() { return fieldDefinitions; }
         QList<DefaultDefinition> getDefaults() { return defaultDefinitions; }
+        bool hasCalendarText();
         QString calendarText(RideItem *rideItem);
+
+        QStringList sports();
 
         QString getColorField() const { return colorfield; }
         void setColorField(QString x) { colorfield = x; }
@@ -173,14 +208,18 @@ class RideMetadata : public QWidget
         bool singlecolumn;
 
         Context *context;
-        SpecialTabs specialTabs;
 
         QPalette palette; // to be applied to all widgets
 
         void setLinkedDefaults(RideFile* ride);
 
+        bool active;            // ignore signals when editing is active
+
     public slots:
         void configChanged(qint32);
+        void intervalSelected();
+        void intervalsChanged(); // when intervals are edited or deleted
+
         void metadataFlush();
         void metadataChanged(); // when its changed elsewhere we need to refresh fields
         void setExtraTab();     // shows fields not configured but present in ride file

@@ -59,10 +59,6 @@ class FixDeriveTorqueConfig : public DataProcessorConfig
         //~FixDeriveTorqueConfig() {} // deliberately not declared since Qt will delete
                               // the widget and its children when the config pane is deleted
 
-        QString explain() {
-            return(QString(tr("Derive torque when power and cadence data is available.")));
-        }
-
         void readConfig() {
             //ta->setText(appsettings->value(NULL, GC_DPTA, "0 nm").toString());
         }
@@ -85,21 +81,33 @@ class FixDeriveTorque : public DataProcessor {
         ~FixDeriveTorque() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op) override;
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) const override {
             Q_UNUSED(ride);
             return new FixDeriveTorqueConfig(parent);
         }
 
         // Localized Name
-        QString name() {
-            return (tr("Add Torque Values"));
+        QString name() const override {
+            return tr("Add Torque Values");
+        }
+
+        QString id() const override {
+            return "::FixDeriveTorque";
+        }
+
+        QString legacyId() const override {
+            return "Add Torque Values";
+        }
+
+        QString explain() const override{
+            return tr("Derive torque when power and cadence data is available.");
         }
 };
 
-static bool FixDeriveTorqueAdded = DataProcessorFactory::instance().registerProcessor(QString("Add Torque Values"), new FixDeriveTorque());
+static bool FixDeriveTorqueAdded = DataProcessorFactory::instance().registerProcessor(new FixDeriveTorque());
 
 bool
 FixDeriveTorque::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
@@ -119,8 +127,7 @@ FixDeriveTorque::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStr
     bool changed=false;
 
     for (int i=0; i< ride->dataPoints().count(); i++) {
-   
-        RideFilePoint *p = ride->dataPoints()[i]; 
+        RideFilePoint *p = ride->dataPoints()[i];
 
         // Estimate Power if not in data
         if (p->cad > 0 && p->watts > 0) {

@@ -90,14 +90,20 @@ NamedSearches::read()
     if (list.isEmpty()) {
         NamedSearch namedSearch;
         namedSearch.type = NamedSearch::filter;
+        namedSearch.name = tr("Planned");
+        namedSearch.text = "isPlanned";
+        list.append(namedSearch);
+        namedSearch.name = tr("Actual");
+        namedSearch.text = "!isPlanned";
+        list.append(namedSearch);
         namedSearch.name = tr("Swim");
-        namedSearch.text = "isSwim<>0";
+        namedSearch.text = "isSwim";
         list.append(namedSearch);
         namedSearch.name = tr("Bike");
-        namedSearch.text = "(isRun=0) and (isSwim=0)";
+        namedSearch.text = "isRide";
         list.append(namedSearch);
         namedSearch.name = tr("Run");
-        namedSearch.text = "isRun<>0";
+        namedSearch.text = "isRun";
         list.append(namedSearch);
     }
 
@@ -198,7 +204,6 @@ NamedSearchParser::serialize(QString filename, QList<NamedSearch>NamedSearches)
     };
     file.resize(0);
     QTextStream out(&file);
-    out.setCodec("UTF-8");
 
     // begin document
     out << "<NamedSearches>\n";
@@ -236,9 +241,9 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, Context *context) : QDialo
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowModality(Qt::NonModal);
 #ifdef Q_OS_MAC
-    setFixedSize(350,400);
+    setMinimumSize(350*dpiXFactor,400*dpiYFactor);
 #else
-    setFixedSize(450*dpiXFactor,400*dpiYFactor);
+    setMinimumSize(450*dpiXFactor,400*dpiYFactor);
 #endif
 
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -299,6 +304,9 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, Context *context) : QDialo
     row4->addStretch();
     deleteButton = new QPushButton(tr("Delete"), this);
     row4->addWidget(deleteButton);
+    row4->addStretch();
+    closeButton = new QPushButton(tr("Close"), this);
+    row4->addWidget(closeButton);
 
     // Populate the list of named searches
     foreach(NamedSearch x, context->athlete->namedSearches->getList()) {
@@ -317,6 +325,7 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, Context *context) : QDialo
     // connect the buttons
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
     connect(updateButton, SIGNAL(clicked()), this, SLOT(updateClicked()));
     connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
     connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));

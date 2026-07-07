@@ -1,0 +1,17 @@
+{
+	"CHART":{
+		"VERSION":"1",
+		"VIEW":"home",
+		"TYPE":"4",
+		"PROPERTIES":{
+			"title":"Calendar ",
+			"subtitle":" ",
+			"widthFactor":"1",
+			"heightFactor":"1",
+			"style":"0",
+			"resizable":"0",
+			"view":"0",
+			"__LAST__":"1"
+		}
+	}
+}

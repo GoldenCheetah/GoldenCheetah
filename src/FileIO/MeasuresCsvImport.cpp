@@ -27,7 +27,8 @@
 
 
 
-MeasuresCsvImport::MeasuresCsvImport(Context *context) : context(context) {
+MeasuresCsvImport::MeasuresCsvImport(Context *context, QWidget *parent) : context(context), parent(parent)
+{
 }
 
 MeasuresCsvImport::~MeasuresCsvImport()
@@ -43,7 +44,7 @@ MeasuresCsvImport::getMeasures(MeasuresGroup *measuresGroup, QString &error, QDa
   bool dateExists = false;
   bool reqFieldExists = false; // the first field is required
 
-  QString fileName = QFileDialog::getOpenFileName(NULL, tr("Select %1 measurements file to import").arg(measuresGroup->getName()), "", tr("CSV Files (*.csv)"));
+  QString fileName = QFileDialog::getOpenFileName(parent, tr("Select %1 measurements file to import").arg(measuresGroup->getName()), "", tr("CSV Files (*.csv)"));
   if (fileName.isEmpty()) {
       error = tr("No file selected.");
       return false;
@@ -57,10 +58,10 @@ MeasuresCsvImport::getMeasures(MeasuresGroup *measuresGroup, QString &error, QDa
 
   emit downloadStarted(100);
 
-  int fieldCount = std::min(measuresGroup->getFieldSymbols().count(), MAX_MEASURES);
+  int fieldCount = std::min((int)measuresGroup->getFieldSymbols().count(), MAX_MEASURES);
 
   // get all lines considering both LF and CR endings
-  QStringList lines = QString(file.readAll()).split(QRegExp("[\n\r]"));
+  QStringList lines = QString(file.readAll()).split(QRegularExpression("[\n\r]"));
 
   // get headers first / and check if this is a valid measures file
   CsvString headerLine = lines[0];
@@ -151,7 +152,7 @@ MeasuresCsvImport::getMeasures(MeasuresGroup *measuresGroup, QString &error, QDa
               }
           } else if (!tsExists && h == "date") {
               // parse date (HRV4Training for Android)
-              m.when = QDateTime(QDate::fromString(i, "yyyy-dd-MM"));
+              m.when = QDateTime(QDate::fromString(i, "yyyy-dd-MM").startOfDay());
               if (m.when.date().isValid()) {
                   // skip line if not in date range
                   if (m.when < from || m.when > to) {

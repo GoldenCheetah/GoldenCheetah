@@ -26,7 +26,7 @@ Daum::Daum(QObject *parent, QString device, QString profile) : QThread(parent),
     deviceAddress_(-1),
     maxDeviceLoad_(800),
     serialWriteDelay_(0),
-    playSound_(false),
+    playSound_(profile.contains("sound", Qt::CaseInsensitive)),
     paused_(false),
     devicePower_(0),
     deviceHeartRate_(0),
@@ -34,7 +34,8 @@ Daum::Daum(QObject *parent, QString device, QString profile) : QThread(parent),
     deviceSpeed_(0),
     load_(kDefaultLoad),
     loadToWrite_(kDefaultLoad),
-    forceUpdate_(profile.contains("force", Qt::CaseInsensitive)) {
+    forceUpdate_(profile.contains("force", Qt::CaseInsensitive)),
+    profile_(profile) {
 }
 
 int Daum::start() {
@@ -119,7 +120,11 @@ bool Daum::openPort(QString dev) {
     }
 
     serial_dev_->setPortName(dev);
-    serial_dev_->setBaudRate(QSerialPort::Baud9600);
+    if (profile_ == "OLD_DAUM") {
+        serial_dev_->setBaudRate(QSerialPort::Baud4800);  // Old cockpits use 4800 Baud
+    } else {
+        serial_dev_->setBaudRate(QSerialPort::Baud9600);
+    }
     serial_dev_->setStopBits(QSerialPort::OneStop);
     serial_dev_->setDataBits(QSerialPort::Data8);
     serial_dev_->setFlowControl(QSerialPort::NoFlowControl);
@@ -206,21 +211,31 @@ void Daum::initializeConnection() {
 
     QThread::msleep(100);
 
-    // check version info for know devices
-    int dat = GetDeviceVersion();
+    int dat;
+    if (profile_ == "OLD_DAUM") {
+        qDebug() << "Daum cockpit: using old serial interface type";
+        dat = COCKPIT_8008;   // Old cockpits do not have a version information. Use 8008 timing
+    } else {
+        // check version info for know devices
+        dat = GetDeviceVersion();
+    }
 
     if (configureForCockpitType(dat)) {
         qDebug() << "Daum cockpit type: " << Qt::hex << dat;
+        qDebug() << "  Using communication delay:" << serialWriteDelay_ << "msec";
+        qDebug() << "  Playing sound:" << playSound_;
     } else {
         qWarning() << "unable to identify daum cockpit type" << Qt::hex << dat;
         exit(-1);
     }
-
-    if (!SetDate()) {
-        qWarning() << "set date failed";
-    }
-    if (!SetTime()) {
-        qWarning() << "set time failed";
+    
+    if (profile_ != "OLD_DAUM") { // Function not available
+        if (!SetDate()) {
+            qWarning() << "set date failed";
+        }
+        if (!SetTime()) {
+            qWarning() << "set time failed";
+        }
     }
 
     if (!SetProgram(0)) {
@@ -236,29 +251,49 @@ void Daum::initializeConnection() {
 
 bool Daum::configureForCockpitType(int cockpitType) {
     serialWriteDelay_ = 0;
-    playSound_ = false;
+
+    if (configureFromProfile()) {
+        // the profile string contains a valid configuration
+        return true;
+    }
 
     switch (cockpitType) {
     case COCKPIT_CARDIO:
-        return true;
     case COCKPIT_FITNESS:
-        return true;
     case COCKPIT_VITA_DE_LUXE:
-        return true;
-    case COCKPIT_8008:
-        return true;
-    case COCKPIT_8080:
-        return true;
     case COCKPIT_UNKNOWN:
-        return true;
     case COCKPIT_THERAPIE:
         return true;
+    case COCKPIT_8008:
+    case COCKPIT_8080:
+    case COCKPIT_8008_TRS:
     case COCKPIT_8008_TRS_PRO:
         serialWriteDelay_ = 50;
         playSound_ = true;
         return true;
     }
     return false;
+}
+
+bool Daum::configureFromProfile() {
+    QRegularExpression re("(\\d+)");
+    QRegularExpressionMatch match = re.match(profile_);
+    bool ok = false;
+
+    if (!match.hasMatch() || match.lastCapturedIndex() == 0) {
+        // no delay found in the profile
+
+        // if the string sound was found, use delay 0 and enable sound
+        return playSound_;
+    }
+
+    uint delay = match.captured(1).toUInt(&ok);
+    if (ok) {
+        // use the matched number found as the command delay
+        serialWriteDelay_ = delay;
+    }
+
+    return true;
 }
 
 void Daum::requestRealtimeData() {
@@ -276,8 +311,14 @@ void Daum::requestRealtimeData() {
     data.clear();
     data.append((char)0x40);
     data.append(addr);
-    data = WriteDataAndGetAnswer(data, 19);
-    if (data.length() < 19) {
+
+    int answer_len = 19;
+    if (profile_ == "OLD_DAUM") {
+        answer_len = 17;   // Old cockpits only send 17 bytes
+    }
+    
+    data = WriteDataAndGetAnswer(data, answer_len);
+    if (data.length() < answer_len) {
         return;
     }
 
@@ -290,6 +331,9 @@ void Daum::requestRealtimeData() {
     // sanity check
     if (pwr >= 5 && pwr <= 160) {
         int pedalling = data[4];   // either 0/1 or w/ offset of 128
+        if (profile_ == "OLD_DAUM") {
+            pedalling = (data[4] & 0x01);  // Only use last bit for old cockpit
+        }
         pwr = pwr * 5 * (pedalling != 0 ? 1 : 0);
     } else {
         pwr = 0;
@@ -346,11 +390,18 @@ void Daum::requestRealtimeData() {
 bool Daum::ResetDevice() {
     QByteArray dat;
     dat.append((char)0x12).append(deviceAddress_);
-    return WriteDataAndGetAnswer(dat, 3).length() == 2; // device tells pedalling state too
+    int answer_len = 2;
+    if (profile_ == "OLD_DAUM") {
+        answer_len = 3;   // Old cockpits send 3 bytes answer
+    }
+    return WriteDataAndGetAnswer(dat, 3).length() == answer_len; // device tells pedalling state too
 }
 int Daum::GetAddress() {
     QByteArray dat;
     dat.append((char)0x11);
+    if (profile_ == "OLD_DAUM") {
+        dat.append((char)0x00); // Old cockpits need additional 0 byte
+    }
     dat = WriteDataAndGetAnswer(dat, 2);
     if (dat.length() == 2 && (int)dat[0] == 0x11) {
         return (int)dat[1];
@@ -381,7 +432,11 @@ bool Daum::SetProgram(unsigned int prog) {
     QByteArray dat;
     if (prog > 79) { prog = 79; }   // clamp to max
     dat.append((char)0x23).append(deviceAddress_).append((char)prog);
-    return WriteDataAndGetAnswer(dat, dat.length() + 1).length() == 4; // device tells pedalling state too
+    int answer_len = 4;
+    if (profile_ == "OLD_DAUM") {
+        answer_len = 3;   // Old cockpits send 3 bytes answer
+    }
+    return WriteDataAndGetAnswer(dat, dat.length() + 1).length() == answer_len; // device tells pedalling state too
 }
 bool Daum::StartProgram(unsigned int prog) {
     Q_UNUSED(prog);

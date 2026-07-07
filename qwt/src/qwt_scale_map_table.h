@@ -1,4 +1,4 @@
-/* -*- mode: C++ ; c-file-style: "stroustrup" -*- *****************************
+/******************************************************************************
  * Qwt Widget Library
  * Copyright (C) 1997   Josef Wilgen
  * Copyright (C) 2002   Uwe Rathmann
@@ -18,22 +18,22 @@
 
 class QWT_EXPORT QwtScaleMapTable
 {
-public:
+  public:
     bool isValid( QwtAxisId ) const;
-    const QwtScaleMap &map( QwtAxisId ) const;
+    const QwtScaleMap& map( QwtAxisId ) const;
 
-    QList< QwtScaleMap > maps[ QwtAxis::PosCount ];
+    QList< QwtScaleMap > maps[ QwtAxis::AxisPositions ];
 };
 
 inline bool QwtScaleMapTable::isValid( QwtAxisId axisId ) const
 {
-    if ( axisId.pos >= 0 && axisId.pos < QwtAxis::PosCount && axisId.id >= 0 )
+    if ( axisId.pos >= 0 && axisId.pos < QwtAxis::AxisPositions && axisId.id >= 0 )
         return maps[ axisId.pos ].size() > axisId.id;
 
     return false;
 }
 
-inline const QwtScaleMap &QwtScaleMapTable::map( QwtAxisId axisId ) const
+inline const QwtScaleMap& QwtScaleMapTable::map( QwtAxisId axisId ) const
 {
     return maps[ axisId.pos ].at( axisId.id );
 }

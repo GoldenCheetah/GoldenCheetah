@@ -27,30 +27,32 @@
 #include "Colors.h"
 
 #include <QTreeView>
-#include <QItemDelegate>
+#include <QStyledItemDelegate>
 #include <QHeaderView>
 #include <QScrollBar>
 #include <QScrollArea>
 #include <QDragMoveEvent>
 #include <QDragEnterEvent>
 
-class NavigatorCellDelegate;
+class ActivityItemDelegate;
 class GroupByModel;
 class SearchFilter;
 class SearchFilterBox;
-class DiaryWindow;
-class DiarySidebar;
 class QSortFilterProxyModel;
 class RideNavigatorSortProxyModel;
 class DataFilter;
 class GcMiniCalendar;
 class SearchBox;
-class RideTreeView;
+class ActivityTreeView;
 class EditMetricDetailDialog;
 class EditUserDataDialog;
 class EditUserMetricDialog;
 class EditUserSeriesDialog;
 class OverviewItemConfig;
+class RideMetric;
+
+// Ride Navigator activity list display filter options 
+enum class RideNavFilter { ALL=0, COMPLETED, PLANNED };
 
 //
 // The RideNavigator
@@ -70,18 +72,10 @@ class RideNavigator : public GcChartWindow
     Q_PROPERTY(QString columns READ columns WRITE setColumns USER true)
     Q_PROPERTY(QString widths READ widths WRITE setWidths USER true)
 
-    friend class ::NavigatorCellDelegate;
+    friend class ::ActivityItemDelegate;
     friend class ::GroupByModel;
-    friend class ::DiaryWindow;
-    friend class ::DiarySidebar;
-    friend class ::GcMiniCalendar;
     friend class ::DataFilter;
     friend class ::SearchBox;
-    friend class ::EditMetricDetailDialog;
-    friend class ::EditUserDataDialog;
-    friend class ::EditUserMetricDialog;
-    friend class ::EditUserSeriesDialog;
-    friend class ::OverviewItemConfig;
 
     public:
         RideNavigator(Context *, bool mainwindow = false);
@@ -90,7 +84,7 @@ class RideNavigator : public GcChartWindow
         void borderMenu(const QPoint &pos);
 
         // so the cell delegate can access
-        RideTreeView *tableView; // the view
+        ActivityTreeView *tableView; // the view
 
         Context *context;
 
@@ -161,6 +155,8 @@ class RideNavigator : public GcChartWindow
 
         void resetView(); // when columns/width changes
 
+        void setDisplayFilter(RideNavFilter filter);
+
         void searchStrings(QStringList);
         void clearSearch();
 
@@ -182,7 +178,7 @@ class RideNavigator : public GcChartWindow
         bool init;
         int currentColumn;
         int pwidth;
-        NavigatorCellDelegate *delegate;
+        ActivityItemDelegate *delegate;
         QVBoxLayout *mainLayout;
         RideItem *currentItem;
 
@@ -192,10 +188,6 @@ class RideNavigator : public GcChartWindow
         int _groupBy;
         QString _columns;
         QString _widths;
-
-        // font metrics for display etc
-        int fontHeight;
-        QColor reverseColor; // used by delegate when 'use for color' set
 
         // search filter
         SearchFilter *searchFilter;
@@ -208,45 +200,6 @@ class RideNavigator : public GcChartWindow
         void setColumnWidth(int, bool, int logicalIndex=0, int oldWidth=0, int newWidth=0);
 };
 
-//
-// Used to paint the cells in the ride navigator
-//
-class NavigatorCellDelegate : public QItemDelegate
-{
-    Q_OBJECT
-    G_OBJECT
-
-
-public:
-    NavigatorCellDelegate(RideNavigator *, QObject *parent = 0);
-
-    // These are all null since we don't allow editing
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    void setEditorData(QWidget *editor, const QModelIndex &index) const;
-    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
-    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-
-    // We increase the row height if there is a calendar text to display
-    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const ;
-
-    // override stanard painter to use color config to paint background
-    // and perform correct level of rounding for each column before displaying
-    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-
-    void setWidth(int x) { pwidth=x; }
-
-public slots:
-    bool helpEvent(QHelpEvent*, QAbstractItemView*, const QStyleOptionViewItem&, const QModelIndex&);
-
-private slots:
-
-    void commitAndCloseEditor();
-
-private:
-    RideNavigator *rideNavigator;
-    int pwidth;
-
-};
 
 //
 // Column Chooser
@@ -276,40 +229,75 @@ private:
     QSignalMapper *clicked;
 };
 
-class RideTreeView : public QTreeView
+
+class ActivityTreeView : public QTreeView
 {
-    Q_OBJECT;
+    Q_OBJECT
 
-    public:
-        RideTreeView(QWidget *);
+public:
+    explicit ActivityTreeView(RideNavigator *rideNavigator, QWidget *parent = nullptr);
 
-    signals:
-        void rowSelected(QItemSelection);
+    virtual QList<QModelIndex> toolTipIndexes(const QModelIndex &index) const;
 
-    public slots:
-        void selectionChanged (const QItemSelection &selected, const QItemSelection&deselected) {
-            rowSelected(selected);
-            QTreeView::selectionChanged(selected,deselected);
-        }
+signals:
+    void rowSelected(const QItemSelection &selected);
 
-    protected:
-         void dragEnterEvent(QDragEnterEvent *e) {
-            e->accept();
-        }
- 
-        void dragMoveEvent(QDragMoveEvent *e) {
-            e->accept();
-        }
+public slots:
+    void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) override;
+    void setSummaryLines(int summaryLines);
+
+protected:
+    void drawRow(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+
+    void resizeEvent(QResizeEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+
+    void startDrag(Qt::DropActions supportedActions) override;
+    void dragEnterEvent(QDragEnterEvent *event) override;
+    void dragMoveEvent(QDragMoveEvent *event) override;
+
+private:
+    RideNavigator *rideNavigator;
+    int summaryLines = 3;
+    QPoint dragStartPos;
+
+    void paintRow(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 };
+
+
+class ActivityItemDelegate : public QStyledItemDelegate
+{
+    Q_OBJECT
+
+public:
+    explicit ActivityItemDelegate(RideNavigator *rideNavigator, QObject* parent = nullptr);
+
+    virtual QString formatValue(const QModelIndex &index) const;
+    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    bool helpEvent(QHelpEvent *event, QAbstractItemView *view, const QStyleOptionViewItem &option, const QModelIndex &index) override;
+
+public slots:
+    void setSummaryLines(int summaryLines);
+
+private:
+    RideNavigator *rideNavigator;
+    int summaryLines = 3;
+
+    virtual bool isHeaderRow(const QModelIndex &index) const;
+};
+
 
 class RideNavigatorSortProxyModel : public QSortFilterProxyModel
 {
     Q_OBJECT
 
 public:
-    RideNavigatorSortProxyModel(QObject *parent = 0);
+    explicit RideNavigatorSortProxyModel(QObject* parent = nullptr);
 
 protected:
-    bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
+    bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;
 };
+
+
 #endif

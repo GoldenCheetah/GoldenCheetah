@@ -186,7 +186,7 @@ extern double calllmfitf(double t, const double *p);
 class PDEstimate
 {
     public:
-        PDEstimate() : WPrime(0), CP(0), FTP(0), PMax(0), EI(0), wpk(false), run(false) {}
+        PDEstimate() : WPrime(0), CP(0), FTP(0), PMax(0), EI(0), wpk(false), sport("Bike") {}
 
         QDate from, to;
         QString model;
@@ -197,7 +197,7 @@ class PDEstimate
             EI;
 
         bool wpk;
-        bool run;
+        QString sport;
 
         QList<double> parameters; // parameters are stored/retrieved from here
                                   // so we can run the model using pre-computed

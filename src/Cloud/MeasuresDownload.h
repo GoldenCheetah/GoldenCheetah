@@ -23,7 +23,7 @@
 #include "Context.h"
 
 #include "WithingsDownload.h"
-#include "TodaysPlanBodyMeasures.h"
+#include "TredictMeasuresDownload.h"
 #include "MeasuresCsvImport.h"
 
 #include <QDialog>
@@ -45,6 +45,7 @@ public:
                                MeasuresGroup *measuresGroup,
                                QList<Measure>&measures,
                                bool discardExisting=false);
+    static void autoDownload(Context *context);
 
 private:
 
@@ -53,7 +54,7 @@ private:
      MeasuresGroup *measuresGroup;
 
      WithingsDownload *withingsDownload;
-     TodaysPlanBodyMeasures *todaysPlanBodyMeasureDownload;
+     TredictMeasuresDownload *tredictDownload;
      MeasuresCsvImport *csvFileImport;
 
      QPushButton *downloadButton;
@@ -61,9 +62,9 @@ private:
 
      QCheckBox *discardExistingMeasures;
 
-     // withings, todaysplan, csv file
+     // withings, tredict, csv file
      QRadioButton *downloadWithings;
-     QRadioButton *downloadTP;
+     QRadioButton *downloadTredict;
      QRadioButton *downloadCSV;
 
      //  all, from last measure, manual date interval
@@ -79,7 +80,8 @@ private:
 
      enum source { WITHINGS = 1,
                    TP = 2,
-                   CSV = 3
+                   CSV = 3,
+                   TREDICT = 4
                  } ;
 
      enum timeframe { ALL = 1,
@@ -95,7 +97,7 @@ private slots:
      void dateRangeManualSettingChanged(bool);
 
      void downloadWithingsSettingChanged(bool);
-     void downloadTPSettingChanged(bool);
+     void downloadTredictSettingChanged(bool);
      void downloadCSVSettingChanged(bool);
 
      void downloadProgressStart(int);

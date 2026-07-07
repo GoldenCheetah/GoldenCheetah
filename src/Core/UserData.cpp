@@ -19,8 +19,9 @@
 #include "UserData.h"
 
 #include "RideNavigator.h"
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "HelpWhatsThis.h"
+#include "SpecialFields.h"
 #include "Utils.h"
 
 #include <QTextEdit> // for parsing trademark symbols (!)
@@ -56,11 +57,6 @@ UserData::edit()
     return false; //XXX
 }
 
-static bool insensitiveLessThan(const QString &a, const QString &b)
-{
-    return a.toLower() < b.toLower();
-}
-
 bool
 UserData::isEmpty()
 {
@@ -94,7 +90,7 @@ EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     QFont courier("Courier", QFont().pointSize());
     QFontMetrics fm(courier);
     formulaEdit->setFont(courier);
-    formulaEdit->setTabStopWidth(4 * fm.width(' ')); // 4 char tabstop
+    formulaEdit->setTabStopDistance(4 * fm.horizontalAdvance(' ')); // 4 char tabstop
     formulaEdit->setText(here->formula);
     if (here->formula == "") {
         // lets put a template in there
@@ -105,81 +101,8 @@ EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     }
     formulaEdit->setText(here->formula);
 
-    // get suitably formated list XXX too much cut and paste
-    // should be done in formula completer !
-    QList<QString> list;
-    QString last;
-    SpecialFields sp;
-
-    // get sorted list
-    QStringList names = context->tab->rideNavigator()->logicalHeadings;
-
-    // start with just a list of functions
-    list = DataFilter::builtins(context);
-
-    // ridefile data series symbols
-    list += RideFile::symbols();
-
-    // add special functions (older code needs fixing !)
-    list << "config(cranklength)";
-    list << "config(cp)";
-    list << "config(ftp)";
-    list << "config(w')";
-    list << "config(pmax)";
-    list << "config(cv)";
-    list << "config(height)";
-    list << "config(weight)";
-    list << "config(lthr)";
-    list << "config(maxhr)";
-    list << "config(rhr)";
-    list << "config(units)";
-    list << "const(e)";
-    list << "const(pi)";
-    list << "daterange(start)";
-    list << "daterange(stop)";
-    list << "ctl";
-    list << "tsb";
-    list << "atl";
-    list << "sb(BikeStress)";
-    list << "lts(BikeStress)";
-    list << "sts(BikeStress)";
-    list << "rr(BikeStress)";
-    list << "tiz(power, 1)";
-    list << "tiz(hr, 1)";
-    list << "best(power, 3600)";
-    list << "best(hr, 3600)";
-    list << "best(cadence, 3600)";
-    list << "best(speed, 3600)";
-    list << "best(torque, 3600)";
-    list << "best(isopower, 3600)";
-    list << "best(xpower, 3600)";
-    list << "best(vam, 3600)";
-    list << "best(wpk, 3600)";
-    list << "RECINTSECS";
-    list << "NA";
-
-    qSort(names.begin(), names.end(), insensitiveLessThan);
-
-    foreach(QString name, names) {
-
-        // handle dups
-        if (last == name) continue;
-        last = name;
-
-        // Handle bikescore tm
-        if (name.startsWith("BikeScore")) name = QString("BikeScore");
-
-        //  Always use the "internalNames" in Filter expressions
-        name = sp.internalName(name);
-
-        // we do very little to the name, just space to _ and lower case it for now...
-        name.replace(' ', '_');
-        list << name;
-    }
-
-    // set new list
-    // create an empty completer, configchanged will fix it
-    DataFilterCompleter *completer = new DataFilterCompleter(list, this);
+    // create a completer
+    DataFilterCompleter *completer = new DataFilterCompleter(DataFilter::completerList(context, true), this);
     formulaEdit->setCompleter(completer);
 
     // color

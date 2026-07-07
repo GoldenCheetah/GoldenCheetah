@@ -32,7 +32,7 @@ RideFile *GpxFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 {
     (void) errors;
     RideFile *rideFile = new RideFile();
-    rideFile->setRecIntSecs(1.0);
+    rideFile->setRecIntSecs(GPX_SAMPLE_INTERVAL);
     //rideFile->setDeviceType("GPS Exchange Format");
     rideFile->setFileFormat("GPS Exchange Format (gpx)");
 
@@ -71,7 +71,7 @@ GpxFileReader::toByteArray(Context *, const RideFile *ride, bool withAlt, bool w
                      "http://www.garmin.com/xmlschemas/PowerExtensionv1.xsd"        );
 
     gpx.setAttribute("version", "1.1");
-    gpx.setAttribute("creator", QString("GoldenCheetah (build %1)").arg(VERSION_LATEST));
+    gpx.setAttribute("creator", QString("GoldenCheetah (build %1) with Barometer").arg(VERSION_LATEST));
     doc.appendChild(gpx);
 
 
@@ -178,7 +178,6 @@ GpxFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file
     if (!file.open(QIODevice::WriteOnly)) return(false);
     file.resize(0);
     QTextStream out(&file);
-    out.setCodec("UTF-8");
     //out.setGenerateByteOrderMark(true);
     out << xml;
     out.flush();

@@ -1,0 +1,61 @@
+if: commit_message =~ /\[publish binaries\]/
+
+branches:
+  only:
+  - master
+
+language: cpp
+
+cache:
+  directories:
+  - qwt
+  - D2XX
+  - VLC
+
+env:
+  global:
+  - BRANCH=master
+  - secure: iqYW7f3//ZkMVzeCEarYn0S0DqKjFU9juBh0KF6WTlUsKX902Jtsk7dFoJlNDYBf63HLgV+wW2Hc6MxI9sGiUkom0gY9/To/aeGIJFGEX2sLm/e0Ok3qN521FA0Q/OiCFsD0RC6J+yrHxzI+rf8Z1rujceUsz2KgsrfAjYYv+BY=
+  - secure: C6f58PXwvvHeVOjCLbyDRjgyF0tk+bXjCNUDur8VJLhJEGNdnrt+rH+d3azYaX0n348ZnQZ14as4M4rHjN1A/3DRbdUdOS7PQZrkj/n363ck1tvYOG/tzYqkEcVoQyjIJ7ZoTuBXDQry/VJmLxQjM0glTa2upNFHMOMwqZNkF+I=
+  - secure: mgf181ok4rJTHxAdSaeIb/OzUx7PQc6UjJYfhJQcZDjN1Nou+Um6OHpnooMHeEq0CdGuLSiv2xVmuQnRjI5MfG5re/a3l39hSzi9tPLWi1y7uOLCtQFooJw3H+LhiKZcgAtEnkTmEhUCEu5uZ7cp4lWhrQZWCR5mCDNtJrGHjiw=
+  - secure: UkW6SpgeACb6enGZADTAtPPRe23Tffne/SRQoBsZ3kGbKzgv8kTCLY0G5N71B1xEGdLB/36piOa0yji2SMW1jbflxR7tdOsiNpfd9R5qYqWVZRulY0qite8ZCwU5dqgy87pp4ECC1hNSOTq17aa4Sc4G4egg9AOy8cntLBTtxJA=
+  - secure: rb/MKPHEK8yOK5uYpXq2o+MQ7h65ft+c/xE9XmLFk1jLnK0oxe6+KeoSFlQ0n5UwLSsHrytMXVaUHex6EEt0TheXFlohi7BcNFWRWXr+wLucuaPjMnU49VErrSigjJ5VW/rcR7fORmnDwn5y06r3Rer9SC1hImCxf/pqF8hFZps=
+  - secure: FXJzm98lwbc1R2eh9/CvVReVRHEPLDm+sCRjiV9HJgeCveIUauLasp9Skamz0c6OKLmkjLY8JERPT491ZgCG8YcQ9x1bM8HGbmRqnn9xSUxINIRzVmyTiLMBoT/ibHHeFjFpyiGfukOAkHwMNNsrSrbaekhiJuekaXo7iTwYQB0=
+  - secure: K9+6ufffQ2a6dCTwVSI5ZtrGE+JSsj2ZeQwJ8Xk/y1yhSlbnW6Uptfs5oZ4XJ/BAQbuKbctnczP/jwDtGBG/Y0WOxn8m1DYBrkeLeToc0JZ8dn2lF6H6BEcB3VI3iPUtxAXWHNeSCk2qaC83z80Ydjc5GCxoAOwlw5/BEsRYI/s=
+  - secure: n6khzr3bPnvh2lTE1NmcaPWRWkqLBUcXZL20EO0Q0HyhH2O22fwsKfnODCDtP1UEQxW+E0G3DkedSz/RmpMWbv1KpWKNNKl74wIdUE53nRIBLTULRoypCq1tDZzQqkoogbXu3pWrb23YoUuM2p5zxM9l3TiNbcrdZeQ+PInVL6o=
+  - secure: mJEJUwt1jhx5qx5h5C8gnYJyaUb5fItSJGU/Tgp0IMCPCUSXtjHf9QTKITAKvg/hY8zggSwo+Vg2VzdMypdxDKqAeH/xAjq/o1+4linWphSjWpUGTqF/B8sR37WtduXtetamX+ctsbG4I77Xw+7y8OPPoCPxDct9hWxfCw6eBrI=
+  - secure: BX7lVlMs6c6qOCMc7Eu0s3G7/es+3h/EGElS/4wjw4/nxp91bd0RbkOmGmgEKOFw5XRFl8gV0kEzmFhrJTdGfTnWHmdsGjSo2VzwePgW/PbDdQrTVD2rYBmmPoeTXf3S3v0P7d3pBrpuxAqkmj7bFkpnvviCN9erC4bUhSg6jEI=
+  - secure: AC6pelym0R1Pq6GgcAy7E/BmlNWrni+41P8V8PMtjBKEtiyJ3tQa+KCn5g0UfGzktRHk+0l+szz3Wdy+bzl+ifiJVhXXs95B9F9El03p33UQLFPi+wFlivddP5DLc+4vIsDUiaNX97p89vo1/R96OLjpF1mUzfOMKYmAiMGP/Co=
+  - secure: QXyyyutxesRVae/WFi75dxlNw2qTyWc6WQ3vmRER9BFhlrNtt8lmE+M6ghMDOhxigzSXWxHcG9r66BLOw4DML7AXg4f3NIAIYuYQrpfsWQ1TKGC/vVvIPDlNBKL62zSOoNowjup1HfZpB575wl4JkmHjoMPDfQ4yM/JVR+MKmIM=
+  - secure: lefpL3SB8yN0Vn1R2e0hAFpJgFnu4rJ/vn7DucSKQvJ61K7t3LrUHFXElDQGFZMbytx4OJDeYsJtrccrIHjcsSAEIyW8TTcwn5/JopnyeQ3ukV5AYpEoQusym09XKru9E7awqvnZrXz6mdoIum5JP7+H116mPN4vsvz5nkNWxeg=
+  - secure: RAGPq/thN9x6STNueDbeJWGUN75OLNcUVUkLHI/eZwPrkMaiQPfxIaJ+8eO2PszDcBojw3eYVhzbRvLnLiXmHL3buwD6oXMTyYnxGzCZ61DeDQ2cQa8ynKmRim5JL3viKMqtdyasXVoGf/u0GqMsgaLcqN6e/vXuXMGu6kkUPEQ=
+  - secure: Lydms45scczE9gZvkWze2fXVbEInKW48DOCIRJWziEzxKkvXUE7WPy74fLvfvL+0JW0LH/ZLZ9EbgHcJAYYs8CBrfAeOOtnyo2DZ0ouEO13RmomSZneEKSpJxRtErcPIu+B0LzcEGyAgf7bxPVevEte50CK0pZJ7z7bHMhU23pY=
+  - secure: cc0pAJjkmFNw2bO3zVACmtyHTwINAHALrtUxi+nRD+FhOO9KxuxuuwvcKCZKfp9EUOjz5PrYWKV1ZH/zt/jMix8A4Gyue2mWX8WYih7aTmJBcJWsFNTCybnClreKBCh18kHdWWhkmhk8EMINDvlqxzJZGpcNO04gxhL9wuLLrNQ=
+  - secure: em0xXIm69rMHsHXYQiizeJB7dEFBkX33PsWDHwBNrX6lFBued23eL96KJC4RVbk6A+AHFtXFATrreZ14D5JH/E/37CXhe3X2R93WqiPUSH0s7NI4fFA1BroKUNAlqO4bMqDBidtNmwMPaLTXjaOnOZyvbAG7z+QV3TKC8tOeZDU=
+  - secure: VFaSERlgsjzjiDQhKw8XFvQrjdvFzHHL7V3NQg+RfELHoT6I1pAGFdl/+lRBIVOiVkbQ6XnpBA28nlf0QydPHElRZdqmh0azQV/bkUXD4ffPE8q0iSqeqhAZ+5L05K5K+Gby/y8TZE4FX6e/7trFL7oq+h9x0gq5RQO8rAcTV84=
+  - secure: eTSJmS38EsTkI22yvDJLUrBxSyLDwd3pDRsyLQfZ3ThN0UJ9cQN2uB7aLy3OzNYadpi+Axlr46MgG0G5qGV1hHXkf+C4orGkURQWxHA7L5R/oE98TuYMO1bisZu9dJEVbmEM4cehCjbB7DExzxK4m6+oTJsWhVbIwlNh5Poq/v4=
+  - secure: gUDTEErUOhzkSVofEvdw1jqHHsE/K+/SOqRBKDToaFPhi6XK+Tvu1LqPMjfPdjYLaCSiwc/R79fJrAEuK+7KSwdiLEnDv3RMpRS5g1UWyJ/ZYd5xNR+WiBqUvnY/S/CJokuNw7gBbGq7JCO4pmIGV5YB9FA4Na6MG/eHzTSOIig=
+  - secure: Qk+gzBLwjrB8abUYzxap10dYSpIeKpB1gqhdoMbqS23G0r1lejnsjutIfReuJGK/efCmhisKN1xIX/InvJWD8z6GsLJFmf3F0oRj7aDJ/X5UIn9Upflje9xgHQafP1FJuzZBWtzandNfPE8EmEOgAQsJZ3c7xBE1SY/6xcJaQTc=
+  - secure: m4+k3/QcYvqmMoRO8uq3ef2jAO1FWeRVDG/XtlbjBlgmB5OR/zW5c7c1Ywm6IM5yzsi1rRks8GFffZ6gYqXhML10EfGKVbnyBcZZ7HVylNtvxDF68W1BLacChzDs4mGYQSV8kJRGI3EaVNdyFJ5yln/HUZ6qBbQ473MtxprO6BI=
+  - secure: GEyUuLuIc7D3F4noKhtTCbWbQAlm61Y7Vh2mOKBEgmyfoV1johwlEL0RaeRyr9MnU2MN+4jeFthvDjxm3LGP19zrpB46GTGHU6/H9BZBodDCJsFTqj32T+5QTcAF2RQ66ZgYpSyTf063/RLlfy7YjCb8KLiJ2asCaoYtQIjx3hA=
+  - secure: LvO6/hNrhZo/4GCy4QoXV4V1UucnSt1upKg5K5LF0KgVOrAENYny0zdOJZgT5f6rTWLTU4WlY9ZXzipEhsyBMeWF8SH2LmDYvqHj5gTb3ANNgvvgVyutwq2XqnMTTrJy38CJaoLHHAF4uxkKr22omjSNzHKntAis95VjnIXLxug=
+  - secure: iMqhxWG5UXT/mPGiisqMlFTH9fr06H511FfhcBsKjXS5GT0xxqTscDkN7t6umljyMefFbf32lVaryzIlE/nd9858DYK8yxm4pj8Q9CFVpKFIH5NTC6l4vH1PT3FfeMpkoA0/n1G3bZbiVwi4smHDyxNXRyIaAWUAlCVmg2B1IFM=
+
+jobs:
+  include:
+  - if: commit_message !~ /\[skip linux\]/
+    os: linux
+    dist: jammy
+    compiler: gcc
+
+before_install:
+- travis/$TRAVIS_OS_NAME/before_install.sh
+
+before_script:
+- travis/$TRAVIS_OS_NAME/before_script.sh
+
+script:
+- travis/$TRAVIS_OS_NAME/script.sh
+
+after_success:
+- travis/$TRAVIS_OS_NAME/after_success.sh

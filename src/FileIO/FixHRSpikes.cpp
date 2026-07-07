@@ -23,6 +23,7 @@
 #include "LTMOutliers.h"
 #include "Settings.h"
 #include "Units.h"
+#include "Colors.h"
 #include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
@@ -35,10 +36,7 @@ class FixHRSpikesConfig : public DataProcessorConfig
 
     friend class ::FixHRSpikes;
     protected:
-        QHBoxLayout *layout;
-        QLabel *maxLabel, *varianceLabel;
-        QDoubleSpinBox *max,
-                       *variance;
+        QDoubleSpinBox *max;
 
     public:
         FixHRSpikesConfig(QWidget *parent) : DataProcessorConfig(parent) {
@@ -46,39 +44,22 @@ class FixHRSpikesConfig : public DataProcessorConfig
             HelpWhatsThis *help = new HelpWhatsThis(parent);
             parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_FixHRSpikes));
 
-            layout = new QHBoxLayout(this);
-
+            QFormLayout *layout = newQFormLayout(this);
             layout->setContentsMargins(0,0,0,0);
             setContentsMargins(0,0,0,0);
-
-            maxLabel = new QLabel(tr("Max"));
 
             max = new QDoubleSpinBox();
             max->setMaximum(220.00);
             max->setMinimum(0);
+            max->setDecimals(0);
             max->setSingleStep(1);
+            max->setSuffix(" " + tr("bpm"));
 
-            layout->addWidget(maxLabel);
-            layout->addWidget(max);
-            layout->addStretch();
+            layout->addRow(tr("Max"), max);
         }
 
         //~FixHRSpikesConfig() {} // deliberately not declared since Qt will delete
                               // the widget and its children when the config pane is deleted
-
-        QString explain() {
-            return(QString(tr("Occasionally heart rate sensors will erroneously "
-                           "report high values for heart rate or drop out (0). "
-                           "This function will look for spikes and dropouts "
-                           "in heart rate data and replace the erroneous data "
-                           "by interpolating the data from either "
-                           "side of the point in question\n\n"
-                           "It takes the following parameter:\n\n"
-                           "Absolute Max - this defines an absolute value "
-                           "for heart rates, and will smooth any values above this "
-                           "absolute value that have been identified as being "
-			   "anomalies (i.e. at odds with the data surrounding it).")));
-        }
 
         void readConfig() {
             double tol = appsettings->value(NULL, GC_DPFHRS_MAX, "220").toDouble();
@@ -103,21 +84,43 @@ class FixHRSpikes : public DataProcessor {
         ~FixHRSpikes() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op) override;
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) const override {
             Q_UNUSED(ride);
             return new FixHRSpikesConfig(parent);
         }
 
         // Localized Name
-        QString name() {
-            return (tr("Fix HR Spikes"));
+        QString name() const override {
+            return tr("Fix HR Spikes");
+        }
+
+        QString id() const override {
+            return "::FixHRSpikes";
+        }
+
+        QString legacyId() const override {
+            return "Fix HR Spikes";
+        }
+
+        QString explain() const override {
+            return tr("Occasionally heart rate sensors will erroneously "
+                      "report high values for heart rate or drop out (0). "
+                      "This function will look for spikes and dropouts "
+                      "in heart rate data and replace the erroneous data "
+                      "by interpolating the data from either "
+                      "side of the point in question\n\n"
+                      "It takes the following parameter:\n\n"
+                      "Absolute Max - this defines an absolute value "
+                      "for heart rates, and will smooth any values above this "
+                      "absolute value that have been identified as being "
+		      "anomalies (i.e. at odds with the data surrounding it).");
         }
 };
 
-static bool fixHRSpikesAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix HR Spikes"), new FixHRSpikes());
+static bool fixHRSpikesAdded = DataProcessorFactory::instance().registerProcessor(new FixHRSpikes());
 
 bool
 FixHRSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")

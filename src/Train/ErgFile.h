@@ -18,6 +18,8 @@
 
 #ifndef _ErgFile_h
 #define _ErgFile_h
+#include "ErgFileBase.h"
+
 #include "GoldenCheetah.h"
 #include "Context.h"
 
@@ -33,6 +35,7 @@
 #include <QRegExp>
 #include "Zones.h"      // For zones ... see below vvvv
 #include "LocationInterpolation.h"
+#include "Settings.h"
 
 // which section of the file are we in?
 #define NOMANSLAND  0
@@ -73,6 +76,20 @@ class ErgFileSection
         double start, end;
 };
 
+class ErgFileZoneSection
+: public ErgFileSection
+{
+    public:
+        ErgFileZoneSection() : ErgFileSection(), startValue(0), endValue(0), zone(0) {}
+        ErgFileZoneSection(int startMSecs, int startValue, int endMSecs, int endValue, int zone)
+         : ErgFileSection(endMSecs - startMSecs, startMSecs, endMSecs), startValue(startValue), endValue(endValue), zone(zone)
+        {}
+
+        int startValue;
+        int endValue;
+        int zone;
+};
+
 class ErgFileText
 {
     public:
@@ -98,11 +115,11 @@ class ErgFileLap
         bool selected; // used by the editor
 };
 
-class ErgFile
+class ErgFile : public ErgFileBase
 {
     public:
-        ErgFile(QString, int, Context *context);       // constructor uses filename
-        ErgFile(Context *context); // no filename, going to use a string
+        ErgFile(QString, ErgFileFormat, Context *context, QDate when = QDate());       // constructor uses filename
+        ErgFile(Context *context, QDate when = QDate()); // no filename, going to use a string
 
         ~ErgFile();             // delete the contents
 
@@ -111,8 +128,8 @@ class ErgFile
         void setFrom(ErgFile *f); // clone an existing workout
         bool save(QStringList &errors); // save back, with changes
 
-        static ErgFile *fromContent(QString, Context *); // read from memory *.erg
-        static ErgFile *fromContent2(QString, Context *); // read from memory *.erg2
+        static ErgFile *fromContent(QString, Context *, QDate when = QDate()); // read from memory *.erg
+        static ErgFile *fromContent2(QString, Context *, QDate when = QDate()); // read from memory *.erg2
 
         static bool isWorkout(QString);  // is this a supported workout?
 
@@ -127,16 +144,17 @@ class ErgFile
 
         bool isValid() const;            // is the file valid or not?
 
-        double Cp;
-        int format;             // ERG, CRS, MRC, ERG2 currently supported
-
-        bool hasGradient() const { return CRS == format; }
-        bool hasWatts()    const { return ERG == format || MRC == format; }
-
 private:
         void sortLaps() const;
         void sortTexts() const;
+
+        bool coalescedSections = false;
+
+        QDate when;
+
 public:
+        void coalesceSections();
+        bool hasCoalescedSections() const;
 
         double nextLap(double) const;    // return the start value (erg - time(ms) or slope - distance(m)) for the next lap
         double prevLap(double) const;    // return the start value (erg - time(ms) or slope - distance(m)) for the prev lap
@@ -149,23 +167,9 @@ public:
         // turn the ergfile into a series of sections rather
         // than a list of points
         QList<ErgFileSection> Sections();
+        QList<ErgFileZoneSection> ZoneSections();
 
-        QString Version,        // version number / identifer
-                Units,          // units used
-                Filename,       // filename from inside file
-                filename,       // filename on disk
-                Name,           // description in file
-                Description,    // long narrative for workout
-                ErgDBId,        // if downloaded from ergdb
-                Source;         // where did this come from
-        QStringList Tags;       // tagged strings
-
-        long    Duration;       // Duration of this workout in msecs
-        int     Ftp;            // FTP this file was targetted at
-        int     MaxWatts;       // maxWatts in this ergfile (scaling)
         bool    valid;          // did it parse ok?
-        int     mode;
-        bool    StrictGradient; // should gradient be strict or smoothed?
 
         QList<ErgFilePoint>         Points; // points in workout
         mutable QList<ErgFileLap>   Laps;   // interval markers in the file
@@ -174,13 +178,6 @@ public:
         GeoPointInterpolator gpi;      // Location interpolator
 
         void calculateMetrics();       // calculate IsoPower value for ErgFile
-
-        // Metrics for this workout
-        double minY, maxY;             // minimum and maximum Y value
-        double CP;
-        double AP, IsoPower, IF, BikeStress, VI; // Coggan for erg / mrc
-        double XP, RI, BS, SVI;        // Skiba for erg / mrc
-        double ELE, ELEDIST, GRADE;    // crs
 
         Context *context;
 };
@@ -231,6 +228,7 @@ public:
     // Const getters
     bool   hasGradient() const { return ergFile && ergFile->hasGradient(); }
     bool   hasWatts()    const { return ergFile && ergFile->hasWatts();    }
+    bool   hasGPS()      const { return ergFile && ergFile->hasGPS();      }
 
     double nextLap   (double x) const { return !ergFile ? -1 : ergFile->nextLap(x);    }
     double prevLap   (double x) const { return !ergFile ? -1 : ergFile->prevLap(x);    }
@@ -242,11 +240,12 @@ public:
 
     double currentTime() const { return !ergFile ? 0. : ergFile->Points.at(qs.rightPoint).x; }
 
-    double Duration(void) const { return !ergFile ? 0. : ergFile->Duration; }
+    double Duration(void) const { return !ergFile ? 0. : ergFile->duration(); }
 
     // State queries (maintain mutable state.)
     double wattsAt(double msec, int& lapnum) const;
     double gradientAt(double meters, int& lapnum) const;
+    double altitudeAt(double meters, int& lapnum) const;
     bool   locationAt(double meters, int& lapnum, geolocation& geoLoc, double& slope100) const;
 };
 

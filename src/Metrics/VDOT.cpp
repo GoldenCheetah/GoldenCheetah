@@ -50,10 +50,9 @@ class VDOT : public RideMetric {
         setDescription(tr("Daniels' VDOT computed from best average pace for durations from 4 min 4 hr"));
     }
 
-    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-
-        // not a run
-        if (!item->isRun) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+        // not a run or an interval
+        if (!item->isRun || spec.secsStart() >= 0) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
@@ -64,7 +63,7 @@ class VDOT : public RideMetric {
 
         // search for max VDOT from 4 min to 4 hr
         vdot = 0.0;
-        int iMax = std::min(rfc.meanMaxArray(RideFile::kph).size(), 14400);
+        int iMax = std::min((int)rfc.meanMaxArray(RideFile::kph).size(), 14400);
         for (int i = 240; i < iMax; i++) {
             double vel = rfc.meanMaxArray(RideFile::kph)[i]*1000.0/60.0;
             vdot = std::max(vdot, VDOTCalculator::vdot(i / 60.0, vel));

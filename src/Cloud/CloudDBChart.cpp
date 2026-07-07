@@ -19,6 +19,7 @@
 #include "CloudDBChart.h"
 #include "CloudDBCommon.h"
 #include "CloudDBStatus.h"
+#include "CloudService.h"
 
 #include "LTMChartParser.h"
 #include "GcUpgrade.h"
@@ -42,7 +43,7 @@
 #include <QJsonArray>
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
-#include <QDesktopWidget>
+#include <QRegularExpressionValidator>
 
 CloudDBChartClient::CloudDBChartClient()
 {
@@ -243,7 +244,7 @@ CloudDBChartClient::getAllChartHeader(QList<CommonAPIHeaderV1>* header) {
 void
 CloudDBChartClient::sslErrors(QNetworkReply* reply ,QList<QSslError> errors)
 {
-    CloudDBCommon::sslErrors(reply, errors);
+    CloudService::sslErrors(nullptr, reply, errors);
 }
 
 // Internal Methods
@@ -417,7 +418,7 @@ CloudDBChartClient::unmarshallAPIv1Object(QJsonObject* object, ChartAPIv1* chart
     chart->ChartDef = object->value("chartDef").toString();
     QString imageString = object->value("image").toString();
     QByteArray ba;
-    ba.append(imageString);
+    ba.append(imageString.toUtf8());
     chart->Image = QByteArray::fromBase64(ba);
     chart->CreatorNick = object->value("creatorNick").toString();
     chart->CreatorEmail = object->value("creatorEmail").toString();
@@ -711,7 +712,7 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
         switch(g_chartView) {
         case 0 : view = tr("Trends"); break;
         case 1 : view = tr("Activities"); break;
-        case 2 : view = tr("Diary"); break;
+        case 2 : view = tr("Plan"); break;
         case 3 : view = tr("Train"); break;
         }
     } else
@@ -734,7 +735,7 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
         newPxItem->setSizeHint(QSize(chartImageWidth, chartImageHeight));
         newPxItem->setFlags(newPxItem->flags() & ~Qt::ItemIsEditable);
         tableWidget->setItem(i, 0, newPxItem);
-        tableWidget->item(i,0)->setBackgroundColor(Qt::darkGray);
+        tableWidget->item(i,0)->setBackground(Qt::darkGray);
         tableWidget->setRowHeight(i, chartImageHeight+20);
 
         QString cellText = QString(tr("<h3>%1</h3><h4>Last Edited At: %2 - Creator: %3</h4>%4"))
@@ -1066,26 +1067,25 @@ CloudDBChartListDialog::applyAllFilters() {
     // setup to only show charts that are relevant to the current view
     unsigned int mask=0;
     switch(g_chartView) {
-        case 0 : mask = VIEW_HOME; break;
+        case 0 : mask = VIEW_TRENDS; break;
         default:
         case 1 : mask = VIEW_ANALYSIS; break;
-        case 2 : mask = VIEW_DIARY; break;
+        case 2 : mask = VIEW_PLAN; break;
         case 3 : mask = VIEW_TRAIN; break;
-        case 4 : mask = VIEW_INTERVAL; break;
     }
 
     QStringList searchList;
     g_currentHeaderList->clear();
     if (!textFilter->text().isEmpty()) {
         // split by any whitespace
-        searchList = textFilter->text().split(QRegExp("\\s+"), QString::SkipEmptyParts);
+        searchList = textFilter->text().split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
     }
     foreach (CommonAPIHeaderV1 chart, *g_fullHeaderList) {
 
         // list does not contain any deleted chart id's
 
 
-        // first filter based on the current view (Home, Analysis, Diary) - but only on Imp
+        // first filter based on the current view (Home, Analysis, Plan) - but only on Imp
         bool chartOkForView = false;
         if (g_role == CloudDBCommon::UserImport) {
             int winId = chart.ChartType.toInt();
@@ -1173,7 +1173,7 @@ CloudDBChartListDialog::cellDoubleClicked(int row, int /*column */) {
 
 CloudDBChartShowPictureDialog::CloudDBChartShowPictureDialog(QByteArray imageData) : imageData(imageData) {
 
-    QRect rec = QApplication::desktop()->screenGeometry();
+    QRect rec = QApplication::primaryScreen()->geometry();
     imageLabel = new QLabel();
     imageLabel->setMinimumSize(150,100); // not scaled to hi-dpi screens (cloud db constraint not device)
     chartImage.loadFromData(imageData);
@@ -1238,8 +1238,8 @@ CloudDBChartObjectDialog::CloudDBChartObjectDialog(ChartAPIv1 data, QString athl
        name->setText(nameDefault);
        nameOk = false;
    }
-   QRegExp name_rx("^.{5,50}$");
-   QValidator *name_validator = new QRegExpValidator(name_rx, this);
+   QRegularExpression name_rx("^.{5,50}$");
+   QValidator *name_validator = new QRegularExpressionValidator(name_rx, this);
    name->setValidator(name_validator);
 
    QLabel* sportLabel = new QLabel(tr("Sport"));
@@ -1284,8 +1284,8 @@ CloudDBChartObjectDialog::CloudDBChartObjectDialog(ChartAPIv1 data, QString athl
        email->setText(appsettings->cvalue(athlete, GC_CLOUDDB_EMAIL, "").toString());
    }
    // regexp: simple e-mail validation / also allow long domain types & subdomains
-   QRegExp email_rx("^.+@([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,10}$");
-   QValidator *email_validator = new QRegExpValidator(email_rx, this);
+   QRegularExpression email_rx("^.+@([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,10}$");
+   QValidator *email_validator = new QRegularExpressionValidator(email_rx, this);
    email->setValidator(email_validator);
    emailOk = !email->text().isEmpty(); // email from properties is ok when loaded
 

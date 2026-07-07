@@ -1,0 +1,14 @@
+C=edgelist.c geometry.c heap.c main.c memory.c output.c voronoi.c 
+O=edgelist.o geometry.o heap.o main.o memory.o output.o voronoi.o
+
+tt: voronoi t
+	./voronoi <t >tt
+voronoi: $O
+	cc -o voronoi $O -lm
+$O:vdefs.h
+
+voronoi.tar : $C vdefs.h Makefile Doc t
+	tar -cf voronoi.tar $C vdefs.h Makefile Doc t
+
+mailable:	$C vdefs.h Makefile t
+	bundle $C vdefs.h Makefile t > mailable

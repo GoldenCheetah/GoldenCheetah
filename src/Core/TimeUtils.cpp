@@ -20,9 +20,9 @@
 #include "TimeUtils.h"
 #include "Colors.h"
 #include <cmath>
-#include <QRegExpValidator>
 #include <QFormLayout>
 #include <QLabel>
+#include <QRegExp>
 
 QString time_to_string(double secs, bool forceMinutes)
 {
@@ -94,6 +94,27 @@ QString time_to_string_minutes(double secs)
     return result;
 }
 
+int daysToWeeks(int days)
+{
+    return std::round(std::abs(days) / 7.0);
+}
+
+int daysToMonths(int days)
+{
+    return std::round(std::abs(days) / 30.44);
+}
+
+ShowDaysAsUnit showDaysAs(int days)
+{
+    int d = std::abs(days);
+    if (d <= 13) {
+        return ShowDaysAsUnit::Days;
+    } else if (d <= 59) {
+        return ShowDaysAsUnit::Weeks;
+    }
+    return ShowDaysAsUnit::Months;
+}
+
 double str_to_interval(QString s)
 {
     QRegExp rx("(\\d+\\s*h)?\\s*(\\d{1,2}\\s*m)?\\s*(\\d{1,2})(\\.\\d+)?\\s*s");
@@ -145,7 +166,7 @@ QDateTime convertToLocalTime(QString timestamp)
 
         // Z at end indicates the time is in fact UTC
         QDateTime datetime = QDateTime::fromString(timestamp, Qt::ISODate);
-        datetime.setTimeSpec(Qt::UTC);
+        datetime.setTimeZone(QTimeZone::UTC);
         datetime=datetime.toLocalTime();
         return datetime;
 
@@ -168,7 +189,7 @@ QDateTime convertToLocalTime(QString timestamp)
     return QDateTime::fromString(timestamp);
 }
 
-DateRange::DateRange(QDate from, QDate to, QString name, QColor color) : QObject()
+DateRange::DateRange(QDate from, QDate to, QString name, QColor color)
 {
     this->from=from;
     this->to=to;
@@ -177,7 +198,7 @@ DateRange::DateRange(QDate from, QDate to, QString name, QColor color) : QObject
     valid = from.isValid() && to.isValid();
 }
 
-DateRange::DateRange(const DateRange &other) : QObject()
+DateRange::DateRange(const DateRange &other)
 {
     from=other.from;
     to=other.to;
@@ -194,7 +215,6 @@ DateRange& DateRange::operator=(const DateRange &other)
     name=other.name;
     color=other.color;
     valid = from.isValid() && to.isValid();
-    emit changed(from, to);
 
     return *this;
 }

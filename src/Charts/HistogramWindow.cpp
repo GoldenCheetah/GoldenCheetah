@@ -21,6 +21,7 @@
 #include "Specification.h"
 #include "HelpWhatsThis.h"
 #include "Utils.h"
+#include "Perspective.h"
 
 // predefined deltas for each series
 static const double wattsDelta = 1.0;
@@ -263,6 +264,10 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     showInCPZones->setText(tr("Use polarised zones"));
     cl->addRow(blankLabel7 = new QLabel(""), showInCPZones);
 
+    showZoneLimits = new QCheckBox;
+    showZoneLimits->setText(tr("Show Zone limits"));
+    cl->addRow(blankLabel8 = new QLabel(""), showZoneLimits);
+
     // bin width
     QHBoxLayout *binWidthLayout = new QHBoxLayout;
     QLabel *binWidthLabel = new QLabel(tr("Bin width"), this);
@@ -314,6 +319,10 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
         connect(distMetricTree, SIGNAL(itemSelectionChanged()), this, SLOT(treeSelectionChanged()));
         connect(totalMetricTree, SIGNAL(itemSelectionChanged()), this, SLOT(treeSelectionChanged()));
 
+        // perspective filter changed
+        connect(this, SIGNAL(perspectiveFilterChanged(QString)), this, SLOT(perspectiveFilterChanged()));
+        connect(this, SIGNAL(perspectiveChanged(Perspective*)), this, SLOT(perspectiveFilterChanged()));
+
         // replot when background refresh is progressing
         connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(refreshUpdate(QDate)));
 
@@ -342,6 +351,8 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     connect(showInCPZones, SIGNAL(stateChanged(int)), this, SLOT(forceReplot()));
     connect(showInZones, SIGNAL(stateChanged(int)), this, SLOT(setZoned(int)));
     connect(showInZones, SIGNAL(stateChanged(int)), this, SLOT(forceReplot()));
+    connect(showZoneLimits, SIGNAL(stateChanged(int)), this, SLOT(setZoneLimited(int)));
+    connect(showZoneLimits, SIGNAL(stateChanged(int)), this, SLOT(forceReplot()));
     connect(shadeZones, SIGNAL(stateChanged(int)), this, SLOT(setShade(int)));
     connect(shadeZones, SIGNAL(stateChanged(int)), this, SLOT(forceReplot()));
     connect(showSumY, SIGNAL(currentIndexChanged(int)), this, SLOT(forceReplot()));
@@ -411,6 +422,7 @@ HistogramWindow::compareChanged()
         powerHist->setShading(shadeZones->isChecked() ? true : false);
         powerHist->setZoned(showInZones->isChecked() ? true : false);
         powerHist->setCPZoned(showInCPZones->isChecked() ? true : false);
+        powerHist->setZoneLimited(showZoneLimits->isChecked() ? true : false);
         powerHist->setlnY(showLnY->isChecked() ? true : false);
         powerHist->setWithZeros(showZeroes->isChecked() ? true : false);
         powerHist->setSumY(showSumY->currentIndex()== 0 ? true : false);
@@ -605,6 +617,11 @@ HistogramWindow::switchMode()
 {
     if (!rangemode) return; // ! only valid in rangemode
 
+    // Show Zone Limits doesn't apply to rangemode since different activities
+    // can be zonified using different zone limits according to sport and date.
+    setZoneLimited(false);
+    showZoneLimits->hide();
+
     if (data->isChecked()) {
 
         // hide all the metric controls
@@ -770,8 +787,8 @@ HistogramWindow::rideSelected()
 
     if (rangemode) {
         // get range that applies to this ride
-        powerRange = context->athlete->zones(ride->isRun)->whichRange(ride->dateTime.date());
-        hrRange = context->athlete->hrZones(ride->isRun)->whichRange(ride->dateTime.date());
+        powerRange = context->athlete->zones(ride->sport)->whichRange(ride->dateTime.date());
+        hrRange = context->athlete->hrZones(ride->sport)->whichRange(ride->dateTime.date());
     }
 
     // update
@@ -927,6 +944,12 @@ HistogramWindow::setZoned(int x)
 }
 
 void
+HistogramWindow::setZoneLimited(int x)
+{
+    showZoneLimits->setCheckState((Qt::CheckState)x);
+}
+
+void
 HistogramWindow::setShade(int x)
 {
     rShade->setCheckState((Qt::CheckState)x);
@@ -972,7 +995,7 @@ HistogramWindow::updateChart()
 
     // If no data present show the blank state page
     if (!rangemode) {
-        if (rideItem() != NULL)
+        if (rideItem() && rideItem()->ride() && rideItem()->ride()->isDataPresent(series))
             setIsBlank(false);
         else
             setIsBlank(true);
@@ -1008,7 +1031,12 @@ HistogramWindow::updateChart()
 
                 // plotting a data series, so refresh the ridefilecache
 
-                source = new RideFileCache(context, use.from, use.to, isfiltered, files, rangemode);
+                if (rangemode) {
+                    // filterlist takes care of both chart and perspective filters to generate the file list
+                    source = new RideFileCache(context, use.from, use.to, isfiltered || (myPerspective && myPerspective->isFiltered()),
+                                               myPerspective ? myPerspective->filterlist(use, isfiltered, files) : files, rangemode);
+                } else source = new RideFileCache(context, use.from, use.to, isfiltered, files, rangemode);
+
                 cfrom = use.from;
                 cto = use.to;
                 stale = false;
@@ -1023,6 +1051,7 @@ HistogramWindow::updateChart()
                 powerHist->setShading(shadeZones->isChecked() ? true : false);
                 powerHist->setZoned(showInZones->isChecked() ? true : false);
                 powerHist->setCPZoned(showInCPZones->isChecked() ? true : false);
+                powerHist->setZoneLimited(showZoneLimits->isChecked() ? true : false);
                 powerHist->setlnY(showLnY->isChecked() ? true : false);
                 powerHist->setWithZeros(showZeroes->isChecked() ? true : false);
                 powerHist->setSumY(showSumY->currentIndex()== 0 ? true : false);
@@ -1043,6 +1072,7 @@ HistogramWindow::updateChart()
                 fs.addFilter(isfiltered, files);
                 fs.addFilter(context->isfiltered, context->filters);
                 fs.addFilter(context->ishomefiltered, context->homeFilters);
+                if (myPerspective) fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(use));
 
                 // setData using the summary metrics -- always reset since filters may
                 // have changed, or perhaps the bin width...
@@ -1063,6 +1093,7 @@ HistogramWindow::updateChart()
             powerHist->setShading(shadeZones->isChecked() ? true : false);
             powerHist->setZoned(showInZones->isChecked() ? true : false);
             powerHist->setCPZoned(showInCPZones->isChecked() ? true : false);
+            powerHist->setZoneLimited(showZoneLimits->isChecked() ? true : false);
             powerHist->setlnY(showLnY->isChecked() ? true : false);
             powerHist->setWithZeros(showZeroes->isChecked() ? true : false);
             powerHist->setSumY(showSumY->currentIndex()== 0 ? true : false);
@@ -1083,6 +1114,14 @@ HistogramWindow::updateChart()
                         // of interval selection -- simplifies the setters
                         // and getters, so worth this 'hack'.
     } // if stale
+}
+
+void
+HistogramWindow::perspectiveFilterChanged()
+{
+    stale = true;
+    updateChart();
+    repaint();
 }
 
 void 

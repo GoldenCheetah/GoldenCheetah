@@ -20,6 +20,7 @@
 #include <QSettings>
 
 #include "Context.h"
+#include "TrainDB.h"
 #include "Athlete.h"
 #include "ConfigDialog.h"
 #include "RideCache.h"
@@ -52,6 +53,9 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     setMinimumSize(800 *dpiXFactor,650 *dpiYFactor);   //changed for hidpi sizing
 #endif
 
+    // Enable What's this button and disable minimize/maximize buttons
+    setWindowFlags(Qt::Window | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint);
+
     // center
     QWidget *spacer = new QWidget(this);
     spacer->setAutoFillBackground(false);
@@ -70,39 +74,55 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     // Setup the signal mapping so the right config
     // widget is displayed when the icon is clicked
     QSignalMapper *iconMapper = new QSignalMapper(this); // maps each option
-    connect(iconMapper, SIGNAL(mapped(int)), this, SLOT(changePage(int)));
+    connect(iconMapper, &QSignalMapper::mappedInt, this, &ConfigDialog::changePage);
     head->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     head->setIconSize(QSize(32*dpiXFactor,32*dpiXFactor)); // use XFactor for both to ensure aspect ratio maintained
 
+    QActionGroup *actionGroup = new QActionGroup(head);
     QAction *added;
 
     // General settings
     added = head->addAction(generalIcon, tr("General"));
+    added->setCheckable(true);
+    added->setActionGroup(actionGroup);
+    added->setChecked(true);
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 0);
 
     added =head->addAction(appearanceIcon, tr("Appearance"));
+    added->setCheckable(true);
+    added->setActionGroup(actionGroup);
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 1);
 
     added =head->addAction(dataIcon, tr("Data Fields"));
+    added->setCheckable(true);
+    added->setActionGroup(actionGroup);
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 2);
 
     added =head->addAction(metricsIcon, tr("Metrics"));
+    added->setCheckable(true);
+    added->setActionGroup(actionGroup);
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 3);
 
     added =head->addAction(intervalIcon, tr("Intervals"));
+    added->setCheckable(true);
+    added->setActionGroup(actionGroup);
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 4);
 
     added =head->addAction(measuresIcon, tr("Measures"));
+    added->setCheckable(true);
+    added->setActionGroup(actionGroup);
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 5);
 
 
     added =head->addAction(devicesIcon, tr("Training"));
+    added->setCheckable(true);
+    added->setActionGroup(actionGroup);
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 6);
 
@@ -143,7 +163,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
 
     measures = new MeasuresConfig(_home, context);
     HelpWhatsThis *measuresHelp = new HelpWhatsThis(measures);
-    measures->setWhatsThis(intervalHelp->getWhatsThisText(HelpWhatsThis::Preferences_Measures));
+    measures->setWhatsThis(measuresHelp->getWhatsThisText(HelpWhatsThis::Preferences_Measures));
     pagesWidget->addWidget(measures);
 
     train = new TrainConfig(_home, context);
@@ -151,17 +171,11 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     train->setWhatsThis(trainHelp->getWhatsThisText(HelpWhatsThis::Preferences_Training));
     pagesWidget->addWidget(train);
 
-    closeButton = new QPushButton(tr("Close"));
-    saveButton = new QPushButton(tr("Save"));
-
     QHBoxLayout *horizontalLayout = new QHBoxLayout;
     horizontalLayout->addWidget(pagesWidget, 1);
 
-    QHBoxLayout *buttonsLayout = new QHBoxLayout;
-    buttonsLayout->addStretch();
-    buttonsLayout->setSpacing(5 *dpiXFactor);
-    buttonsLayout->addWidget(closeButton);
-    buttonsLayout->addWidget(saveButton);
+    QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Close | QDialogButtonBox::Save);
+    reset = buttons->addButton(tr("Reset Appearance to Defaults"), QDialogButtonBox::ResetRole);
 
     QWidget *contents = new QWidget(this);
     setCentralWidget(contents);
@@ -169,20 +183,22 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(horizontalLayout);
-    mainLayout->addLayout(buttonsLayout);
+    mainLayout->addWidget(buttons);
     mainLayout->setSpacing(0);
     contents->setLayout(mainLayout);
 
     // We go fixed width to ensure a consistent layout for
     // tabs, sub-tabs and internal widgets and lists
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     setWindowTitle(tr("Preferences"));
 #else
     setWindowTitle(tr("Options"));
 #endif
 
-    connect(closeButton, SIGNAL(clicked()), this, SLOT(closeClicked()));
-    connect(saveButton, SIGNAL(clicked()), this, SLOT(saveClicked()));
+    reset->setVisible(false);
+
+    connect(buttons, &QDialogButtonBox::rejected, this, &ConfigDialog::closeClicked);
+    connect(buttons, &QDialogButtonBox::accepted, this, &ConfigDialog::saveClicked);
 }
 
 ConfigDialog::~ConfigDialog()
@@ -193,6 +209,20 @@ ConfigDialog::~ConfigDialog()
 
 void ConfigDialog::changePage(int index)
 {
+    // only want reset appearance button on the appearances page
+    reset->disconnect();
+    if (index == 1) {
+        reset->setText(tr("Reset Appearance to Defaults"));
+        reset->setVisible(true);
+        connect(reset, SIGNAL(clicked()), appearance->appearancePage, SLOT(resetClicked()));
+    } else if (index == 5) {
+        reset->setText(tr("Reset Measures to Defaults"));
+        reset->setVisible(true);
+        connect(reset, SIGNAL(clicked()), measures, SLOT(resetClicked()));
+    } else {
+        reset->setVisible(false);
+    }
+
     pagesWidget->setCurrentIndex(index);
 }
 
@@ -206,7 +236,7 @@ void ConfigDialog::closeClicked()
 //   ! new mode: change the CP associated with the present mode
 void ConfigDialog::saveClicked()
 {
-    // if a refresh is happenning stop it, whilst we 
+    // if a refresh is happening stop it, whilst we
     // update all the configuration settings!
     context->athlete->rideCache->cancel();
 
@@ -225,7 +255,7 @@ void ConfigDialog::saveClicked()
 
     // did the home directory change?
     QString shome = appsettings->value(this, GC_HOMEDIR).toString();
-    if (shome != general->generalPage->athleteWAS || QFileInfo(shome).absoluteFilePath() != QFileInfo(home.absolutePath()).absolutePath()) {
+    if (shome != general->generalPage->athleteWAS) {
 
         // are you sure you want to change the location of the athlete library?
         // if so we will restart, if not I'll revert to current directory
@@ -238,10 +268,11 @@ void ConfigDialog::saveClicked()
 
         // we want our own buttons...
         msgBox.addButton(tr("No, Keep current"), QMessageBox::RejectRole);
-        msgBox.addButton(tr("Yes, Apply and Restart"), QMessageBox::AcceptRole);
+        QAbstractButton *acceptButton = msgBox.addButton(tr("Yes, Apply and Restart"), QMessageBox::AcceptRole);
         msgBox.setDefaultButton(QMessageBox::Abort);
+        msgBox.exec();
 
-        if (msgBox.exec() == 1) { // accept!
+        if (msgBox.clickedButton() == acceptButton) {
 
             // lets restart
             restarting = true;
@@ -256,15 +287,15 @@ void ConfigDialog::saveClicked()
             //       has been zapped along with the windows we need to get out
             //       as quickly as possible.
             close();
-            return; 
+            return;
 
         } else {
 
-            // revert to current home and let everyone know
-            appsettings->setValue(GC_HOMEDIR, QFileInfo(home.absolutePath()).absolutePath());
+            // revert to previous home
+            appsettings->setValue(GC_HOMEDIR, general->generalPage->athleteWAS);
         }
 
-    } 
+    }
 
     // global context changed, will be cascaded to each athlete context
     GlobalContext::context()->notifyConfigChanged(changed);
@@ -282,6 +313,7 @@ GeneralConfig::GeneralConfig(QDir home, Context *context) :
     layout->addWidget(generalPage);
 
     layout->setSpacing(0);
+    layout->setContentsMargins(0,0,0,0);
     setContentsMargins(0,0,0,0);
 }
 
@@ -299,6 +331,7 @@ AppearanceConfig::AppearanceConfig(QDir home, Context *context) :
     layout->addWidget(appearancePage);
 
     layout->setSpacing(0);
+    layout->setContentsMargins(0,0,0,0);
     setContentsMargins(0,0,0,0);
 }
 
@@ -316,6 +349,7 @@ DataConfig::DataConfig(QDir home, Context *context) :
     layout->addWidget(dataPage);
 
     layout->setSpacing(0);
+    layout->setContentsMargins(0,0,0,0);
     setContentsMargins(0,0,0,0);
 }
 
@@ -329,21 +363,16 @@ MetricConfig::MetricConfig(QDir home, Context *context) :
     home(home), context(context)
 {
     // the widgets
-    bestsPage = new BestsMetricsPage(this);
-    intervalsPage = new IntervalMetricsPage(this);
-    summaryPage = new SummaryMetricsPage(this);
+    intervalsPage = new FavouriteMetricsPage(this);
     customPage = new CustomMetricsPage(this, context);
 
     setContentsMargins(0,0,0,0);
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(0,0,0,0);
 
     QTabWidget *tabs = new QTabWidget(this);
+    tabs->addTab(intervalsPage, tr("Favourites"));
     tabs->addTab(customPage, tr("Custom"));
-    tabs->addTab(bestsPage, tr("Bests"));
-    tabs->addTab(summaryPage, tr("Summary"));
-    tabs->addTab(intervalsPage, tr("Intervals"));
     mainLayout->addWidget(tabs);
 }
 
@@ -351,8 +380,6 @@ qint32 MetricConfig::saveClicked()
 {
     qint32 state = 0;
 
-    state |= bestsPage->saveClicked();
-    state |= summaryPage->saveClicked();
     state |= intervalsPage->saveClicked();
     state |= customPage->saveClicked();
 
@@ -371,6 +398,7 @@ IntervalConfig::IntervalConfig(QDir home, Context *context) :
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
 
+    mainLayout->addStretch();
     mainLayout->addWidget(intervalsPage);
     mainLayout->addStretch();
 }
@@ -408,27 +436,35 @@ qint32 MeasuresConfig::saveClicked()
     return state;
 }
 
+
+void
+MeasuresConfig::resetClicked
+()
+{
+    measuresPage->resetMeasuresClicked();
+}
+
 // TRAIN CONFIG
 TrainConfig::TrainConfig(QDir home, Context *context) :
     home(home), context(context)
 {
-
     // the widgets
     devicePage = new DevicePage(this, context);
     optionsPage = new TrainOptionsPage(this, context);
     remotePage = new RemotePage(this, context);
     simBicyclePage = new SimBicyclePage(this, context);
+    workoutTagManagerPage = new WorkoutTagManagerPage(trainDB, this);
 
     setContentsMargins(0,0,0,0);
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
     mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(0,0,0,0);
 
     QTabWidget *tabs = new QTabWidget(this);
-    tabs->addTab(devicePage, tr("Train Devices"));
     tabs->addTab(optionsPage, tr("Preferences"));
+    tabs->addTab(devicePage, tr("Train Devices"));
     tabs->addTab(remotePage, tr("Remote Controls"));
     tabs->addTab(simBicyclePage, tr("Virtual Bicycle Specifications"));
+    tabs->addTab(workoutTagManagerPage, tr("Workout Tags"));
 
     mainLayout->addWidget(tabs);
 }
@@ -441,6 +477,7 @@ qint32 TrainConfig::saveClicked()
     state |= optionsPage->saveClicked();
     state |= remotePage->saveClicked();
     state |= simBicyclePage->saveClicked();
+    state |= workoutTagManagerPage->saveClicked();
 
     return state;
 }

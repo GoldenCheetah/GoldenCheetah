@@ -19,6 +19,7 @@
 #ifndef _Library_h
 #define _Library_h
 #include "GoldenCheetah.h"
+#include "ActionButtonBox.h"
 
 #include <QDir>
 #include <QLabel>
@@ -31,6 +32,13 @@
 #include <QTreeWidgetItem>
 #include <QThread>
 
+
+enum class LibraryBatchImportConfirmation {
+    forcedDialog,
+    optionalDialog,
+    noDialog
+};
+
 class Library : QObject
 {
     Q_OBJECT
@@ -40,10 +48,12 @@ class Library : QObject
         QList<QString> paths;   // array of search paths for files in this library
         QList<QString> refs;    // array of drag-n-dropped files referenced not copied
 
-        static void initialise(QDir); // init
+        static void initialise(QDir gcRoot); // init
         static Library *findLibrary(QString);
-        static void importFiles(Context *context, QStringList files, bool forcedialog=false);
+        static void importFiles(Context *context, QStringList files, LibraryBatchImportConfirmation dialog=LibraryBatchImportConfirmation::optionalDialog);
         void removeRef(Context *context, QString ref);
+
+        static bool refreshWorkouts(Context *context);
 };
 
 extern QList<Library *> libraries;        // keep track of all Library search paths for all users
@@ -92,8 +102,7 @@ class LibrarySearchDialog : public QDialog
         QCheckBox *findWorkouts,
                   *findVideoSyncs,
                   *findMedia;
-        QPushButton *addPath,
-                    *removePath;
+        ActionButtonBox *actionButtons;
         QPushButton *removeRef;
         QTreeWidget *searchPathTable;
         QTreeWidget *refTable;
