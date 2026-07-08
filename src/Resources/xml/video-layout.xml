@@ -263,16 +263,24 @@
        <AltFont Name="Consolas" Size="64" />
        <AltText> RPM</AltText>
    </meter>
-   <meter name="Elapsed" container="MeterPanel" source="Time" type="Text">
+   <meter name="VAMmeter" container="MeterPanel" source="VAM" type="Text" alignment="AlignLeft" textWidth="5">
        <RelativeSize Width="100.0" Height="10.0" />
        <RelativePosition X="50.0" Y="80.0" />
+       <MainColor R="250" G="250" B="250" A="200" />
+       <MainFont Name="Consolas" Size="64" />
+       <AltFont Name="Consolas" Size="64" />
+       <AltText> VAM</AltText>
+   </meter>
+   <meter name="Elapsed" container="MeterPanel" source="Time" type="Text">
+       <RelativeSize Width="100.0" Height="10.0" />
+       <RelativePosition X="50.0" Y="92.0" />
        <MainColor R="250" G="250" B="250" A="200" />
        <MainFont Name="Consolas" Size="64" />
        <AltFont Name="Consolas" Size="64" />
    </meter>
    <meter name="elevation" container="Video" source="Elevation" type="Elevation">
        <RelativeSize Width="40.0" Height="15.0" />
-       <RelativePosition X="20.0" Y="92.0" />
+       <RelativePosition X="20.0" Y="104.0" />
        <BackgroundColor R="200" G="200" B="200" A="125" />
        <OutlineColor R="255" G="255" B="255" A="250" />
        <MainColor R="255" G="0" B="0" A="250" />

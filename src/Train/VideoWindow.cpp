@@ -664,6 +664,12 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
             p_meterWidget->Text = QString::number((int)p_meterWidget->Value).rightJustified(p_meterWidget->textWidth);
             p_meterWidget->AltText = p_meterWidget->AltTextSuffix;
         }
+        else if (p_meterWidget->Source() == QString("VAM"))
+        {
+            p_meterWidget->Value =  rtd.getVAM();
+            p_meterWidget->Text = QString::number((int)p_meterWidget->Value).rightJustified(p_meterWidget->textWidth);
+            p_meterWidget->AltText = p_meterWidget->AltTextSuffix;
+        }
         else if (p_meterWidget->Source() == QString("Load"))
         {
             if (rtd.mode == ErgFileFormat::erg || rtd.mode == ErgFileFormat::mrc) {
