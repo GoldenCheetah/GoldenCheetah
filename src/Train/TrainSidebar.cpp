@@ -2192,6 +2192,11 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
             rtData.setWbal(wbal);
 
+            // VAMinator
+            displayVAM = vaminator.Push(displayAltitude, session_time.elapsed(), displayWorkoutDistance);
+            if (!GlobalContext::context()->useMetricUnits) displayVAM *= (1. / 0.3048);
+            rtData.setVAM(displayVAM);
+
             // go update the displays...
             context->notifyTelemetryUpdate(rtData); // signal everyone to update telemetry
         }
