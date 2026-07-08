@@ -873,34 +873,7 @@ QString RealtimeData::seriesSymbol(DataSeries series)
     case ErgTimeRemaining: return QString("Section Time Remaining");
         break;
 
-    case BikeStress: return QString("BikeStress");
-        break;
-
-    case BikeScore: return "BikeScore (TM)";
-        break;
-
-    case Joules: return QString("kJoules");
-        break;
-
     case Wbal: return QString("W' bal");
-        break;
-
-    case XPower: return QString("XPower");
-        break;
-
-    case IsoPower: return QString("Iso Power");
-        break;
-
-    case IF: return QString("Intensity Factor");
-        break;
-
-    case RI: return QString("Relative Intensity");
-        break;
-
-    case SkibaVI: return QString("Skiba Variability Index");
-        break;
-
-    case VI: return QString("Variability Index");
         break;
 
     case Distance: return QString("Distance");
@@ -934,30 +907,6 @@ QString RealtimeData::seriesSymbol(DataSeries series)
         break;
 
     case Load: return QString("Target Power");
-        break;
-
-    case AvgWatts: return QString("Average Power");
-        break;
-
-    case AvgSpeed: return QString("Average Speed");
-        break;
-
-    case AvgHeartRate: return QString("Average Heartrate");
-        break;
-
-    case AvgCadence: return QString("Average Cadence");
-        break;
-
-    case AvgWattsLap: return QString("Lap Power");
-        break;
-
-    case AvgSpeedLap: return QString("Lap Speed");
-        break;
-
-    case AvgHeartRateLap: return QString("Lap Heartrate");
-        break;
-
-    case AvgCadenceLap: return QString("Lap Cadence");
         break;
 
     case LRBalance: return QString("Left/Right Balance");
@@ -1046,8 +995,6 @@ QString RealtimeData::seriesSymbol(DataSeries series)
     case SkinTemp: return QString("Skin Temp");
         break;
     case HeatStrain: return QString("Heat Strain");
-        break;
-    case HeatLoad: return QString("Estimated Heat Load");
         break;
 
     case RightPCO: return QString("Right PCO");
