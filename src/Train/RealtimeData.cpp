@@ -19,6 +19,7 @@
 
 #include "RealtimeData.h"
 #include "RideFile.h"
+#include "Context.h"
 
 #include <QtDebug>
 
@@ -1095,3 +1096,43 @@ double RealtimeData::getTemp() const { return temp; }
 double RealtimeData::getCoreTemp() const { return coreTemp; }
 double RealtimeData::getSkinTemp() const { return skinTemp; }
 double RealtimeData::getHeatStrain() const { return heatStrain; }
+
+//
+// RealtimeDataSession
+//
+void RealtimeDataSession::start()
+{
+    wbalr = 0;
+    wbal = WPRIME;
+}
+
+void RealtimeDataSession::stop()
+{
+    wbalr = 0;
+    wbal = WPRIME;
+}
+
+void RealtimeDataSession::newLap()
+{
+}
+
+void RealtimeDataSession::updateDerived()
+{
+    // W'bal on the fly
+    // using Dave Waterworth's reformulation
+
+    // any watts expended in last 200msec?
+    double joules = double(getWatts() - CP) / 5.00f;
+    if (joules < 0) joules = 0;
+
+    // running total of replenishment
+    wbalr += joules * exp((getMsecs()/1000.00f) / TAU);
+    wbal = WPRIME - (wbalr * exp((-getMsecs()/1000.00f) / TAU));
+
+    setWbal(wbal);
+
+    // VAMinator
+    double VAM = vaminator.Push(getAltitude(), getMsecs(), getRouteDistance());
+    if (!GlobalContext::context()->useMetricUnits) VAM *= (1. / 0.3048);
+    setVAM(VAM);
+}
