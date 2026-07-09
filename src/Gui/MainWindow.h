@@ -159,7 +159,7 @@ class MainWindow : public QMainWindow
 
         // import and export perspectives
         void exportPerspective();
-        void importPerspective();
+        void importPerspective(QString fileName="");
 
         // chart importing
         void importCharts(QStringList);

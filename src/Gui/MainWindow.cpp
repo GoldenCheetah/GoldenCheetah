@@ -950,7 +950,7 @@ MainWindow::exportPerspective()
 }
 
 void
-MainWindow::importPerspective()
+MainWindow::importPerspective(QString fileName)
 {
     int view = currentAthleteTab->currentView();
     AbstractView *current = NULL;
@@ -963,7 +963,8 @@ MainWindow::importPerspective()
     }
 
     // import a new perspective from a file
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Select Perspective file to import"), "", tr("GoldenCheetah Perspective Files (*.gchartset)"));
+    if (fileName.isEmpty())
+        fileName = QFileDialog::getOpenFileName(this, tr("Select Perspective file to import"), "", tr("GoldenCheetah Perspective Files (*.gchartset)"));
     if (fileName.isEmpty()) {
         QMessageBox::critical(this, tr("Import Perspective"), tr("No perspective file selected!"));
     } else {
@@ -1609,7 +1610,7 @@ MainWindow::dropEvent(QDropEvent *event)
     // is this a chart file ?
     QStringList filenames;
     QList<LTMSettings> imported;
-    QStringList list, workouts, images;
+    QStringList list, workouts, images, perspectives;
     for(int i=0; i<urls.count(); i++) {
 
         QString filename = QFileInfo(urls.value(i).toLocalFile()).absoluteFilePath();
@@ -1618,6 +1619,10 @@ MainWindow::dropEvent(QDropEvent *event)
         if (filename.endsWith(".gchart", Qt::CaseInsensitive)) {
             // add to the list of charts to import
             list << filename;
+
+        } else if (filename.endsWith(".gchartset", Qt::CaseInsensitive)) {
+            // add to the list of perspectives to import
+            perspectives << filename;
 
         } else if (filename.endsWith(".xml", Qt::CaseInsensitive)) {
 
@@ -1666,6 +1671,9 @@ MainWindow::dropEvent(QDropEvent *event)
 
     // are there any .gcharts to import?
     if (list.count())  importCharts(list);
+
+    // are there any .gchartsets to import?
+    for (QString perspective : perspectives) importPerspective(perspective);
 
     // import workouts
     if (workouts.count()) Library::importFiles(currentAthleteTab->context, workouts, LibraryBatchImportConfirmation::forcedDialog);
