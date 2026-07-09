@@ -304,7 +304,7 @@ FilterHrvOutliers::postProcess(RideFile *ride, DataProcessorConfig *config=0, QS
             if (fieldSymbols.contains("PNN50"))
                 hrvMeasure.values[fieldSymbols.indexOf("PNN50")] = rideItem->getForSymbol("pNN50");
             if (fieldSymbols.contains("RECOVERY_POINTS"))
-                hrvMeasure.values[fieldSymbols.indexOf("RECOVERY_POINTS")] = 1.5 * log(rideItem->getForSymbol("rMSSD")) + 2;
+                hrvMeasure.values[fieldSymbols.indexOf("RECOVERY_POINTS")] = 2 * log(rideItem->getForSymbol("rMSSD"));
 
             QList<Measure> hrvMeasures;
             hrvMeasures.append(hrvMeasure);
