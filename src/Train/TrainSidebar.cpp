@@ -394,11 +394,6 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
 
     displayTemp = 0;
     displayWorkoutLap = 0;
-    pwrcount = 0;
-    cadcount = 0;
-    hrcount = 0;
-    spdcount = 0;
-    lodcount = 0;
     load_msecs = total_msecs = lap_msecs = 0;
     displayWorkoutDistance = displayDistance = displayPower = displayHeartRate =
     displaySpeed = displayCadence = slope = load = 0;
@@ -1664,11 +1659,6 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
 
     // Re-enable gui elements
     // reset counters etc
-    pwrcount = 0;
-    cadcount = 0;
-    hrcount = 0;
-    spdcount = 0;
-    lodcount = 0;
     displayTemp = 0;
     displayWorkoutLap = 0;
     session_elapsed_msec = 0;
@@ -2214,10 +2204,6 @@ void TrainSidebar::resetLapTimer()
     lap_time.restart();
     lap_elapsed_msec = 0;
     displayLapDistance = 0;
-    pwrcount  = 0;
-    cadcount  = 0;
-    hrcount   = 0;
-    spdcount  = 0;
     this->resetTextAudioEmitTracking();
     this->maintainLapDistanceState();
 }

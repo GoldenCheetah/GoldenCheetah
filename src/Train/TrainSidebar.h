@@ -284,10 +284,7 @@ class TrainSidebar : public GcWindow
 
         RealtimeDataSession rtData;
 
-        // for non-zero average calcs
-        int pwrcount, cadcount, hrcount, spdcount, lodcount, grdcount; // for NZ average calc
         int status;
-        int displaymode;
 
         QString codeWorkoutKey;     // traindb-key of the workout in the case of a code-workout; empty otherwise
         QString codeWorkoutTitle;   // title of the workout in the case of a code-workout; empty otherwise
