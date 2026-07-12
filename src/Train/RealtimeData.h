@@ -96,7 +96,7 @@ public:
     void setDistanceRemaining(double);
     void setVAM(double);
     void setBikeScore(long);
-    void setJoules(long);
+    void setJoules(double);
     void setXPower(long);
     void setLap(long);
     void setLapDistance(double distance);
@@ -157,6 +157,7 @@ public:
     long getTime() const;
     double getSpeed() const;
     double getWbal() const;
+    double getJoules() const;
     double getVirtualSpeed() const;
     double getWheelRpm() const;
     std::chrono::high_resolution_clock::time_point getWheelRpmSampleTime() const;
@@ -242,6 +243,7 @@ private:
     double lapDistanceRemaining;
     double virtualSpeed;
     double wbal;
+    double joules;
     double hhb, o2hb;
     double rer;
     long lap;

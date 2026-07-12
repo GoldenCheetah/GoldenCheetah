@@ -83,6 +83,10 @@ void RealtimeData::setSpeed(double speed)
 {
     this->speed = speed;
 }
+void RealtimeData::setJoules(double joules)
+{
+    this->joules = joules;
+}
 void RealtimeData::setWbal(double wbal)
 {
     this->wbal = wbal;
@@ -216,6 +220,10 @@ double RealtimeData::getHr() const
 double RealtimeData::getSpeed() const
 {
     return speed;
+}
+double RealtimeData::getJoules() const
+{
+    return joules;
 }
 double RealtimeData::getWbal() const
 {
@@ -453,6 +461,9 @@ double RealtimeData::value(DataSeries series) const
         break;
 
     case Watts: return watts;
+        break;
+
+    case Joules: return joules;
         break;
 
     case Wbal: return wbal;
@@ -873,6 +884,9 @@ QString RealtimeData::seriesSymbol(DataSeries series)
     case ErgTimeRemaining: return QString("Section Time Remaining");
         break;
 
+    case Joules: return QString("kJoules");
+        break;
+
     case Wbal: return QString("W' bal");
         break;
 
@@ -1102,6 +1116,11 @@ double RealtimeData::getHeatStrain() const { return heatStrain; }
 RealtimeDataSession::RealtimeDataSession(double CP, double WPRIME, double TAU) : CP(CP), WPRIME(WPRIME), TAU(TAU)
 {
     // Initialize derived series data for the session
+
+    // Joules
+    setJoules(0.0);
+
+    // W'bal
     wbalr = 0;
     wbal = WPRIME;
 }
@@ -1113,7 +1132,12 @@ void RealtimeDataSession::newLap()
 
 void RealtimeDataSession::updateDerived()
 {
-    // Update derived series data for session and lap
+    // Update derived series data for session and lap (each 200msec)
+
+    //
+    // Joules
+    //
+    setJoules(getJoules() + getWatts()/5000.0);
 
     //
     // W'bal on the fly using Dave Waterworth's reformulation
