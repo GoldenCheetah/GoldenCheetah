@@ -162,6 +162,46 @@ void RealtimeData::setLapDistanceRemaining(double x)
     this->lapDistanceRemaining = x;
 }
 
+void RealtimeData::setAvgWatts(double x)
+{
+    this->avgWatts = x;
+}
+
+void RealtimeData::setAvgSpeed(double x)
+{
+    this->avgSpeed = x;
+}
+
+void RealtimeData::setAvgCadence(double x)
+{
+    this->avgCadence = x;
+}
+
+void RealtimeData::setAvgHeartRate(double x)
+{
+    this->avgHeartRate = x;
+}
+
+void RealtimeData::setAvgWattsLap(double x)
+{
+    this->avgWattsLap = x;
+}
+
+void RealtimeData::setAvgSpeedLap(double x)
+{
+    this->avgSpeedLap = x;
+}
+
+void RealtimeData::setAvgCadenceLap(double x)
+{
+    this->avgCadenceLap = x;
+}
+
+void RealtimeData::setAvgHeartRateLap(double x)
+{
+    this->avgHeartRateLap = x;
+}
+
 void RealtimeData::setLRBalance(double x)
 {
     this->lrbalance = x;
@@ -284,6 +324,38 @@ double RealtimeData::getLapDistance() const
 double RealtimeData::getLapDistanceRemaining() const
 {
     return lapDistanceRemaining;
+}
+double RealtimeData::getAvgWatts() const
+{
+    return avgWatts;
+}
+double RealtimeData::getAvgSpeed() const
+{
+    return avgSpeed;
+}
+double RealtimeData::getAvgCadence() const
+{
+    return avgCadence;
+}
+double RealtimeData::getAvgHeartRate() const
+{
+    return avgHeartRate;
+}
+double RealtimeData::getAvgWattsLap() const
+{
+    return avgWattsLap;
+}
+double RealtimeData::getAvgSpeedLap() const
+{
+    return avgSpeedLap;
+}
+double RealtimeData::getAvgCadenceLap() const
+{
+    return avgCadenceLap;
+}
+double RealtimeData::getAvgHeartRateLap() const
+{
+    return avgHeartRateLap;
 }
 double RealtimeData::getLRBalance() const
 {
@@ -494,6 +566,30 @@ double RealtimeData::value(DataSeries series) const
         break;
 
     case O2Hb: return o2hb;
+        break;
+
+    case AvgWatts: return avgWatts;
+        break;
+
+    case AvgSpeed: return avgSpeed;
+        break;
+
+    case AvgCadence: return avgCadence;
+        break;
+
+    case AvgHeartRate: return avgHeartRate;
+        break;
+
+    case AvgWattsLap: return avgWattsLap;
+        break;
+
+    case AvgSpeedLap: return avgSpeedLap;
+        break;
+
+    case AvgCadenceLap: return avgCadenceLap;
+        break;
+
+    case AvgHeartRateLap: return avgHeartRateLap;
         break;
 
     case LRBalance: return lrbalance;
@@ -923,6 +1019,30 @@ QString RealtimeData::seriesSymbol(DataSeries series)
     case Load: return QString("Target Power");
         break;
 
+    case AvgWatts: return QString("Average Power");
+        break;
+
+    case AvgSpeed: return QString("Average Speed");
+        break;
+
+    case AvgHeartRate: return QString("Average Heartrate");
+        break;
+
+    case AvgCadence: return QString("Average Cadence");
+        break;
+
+    case AvgWattsLap: return QString("Lap Power");
+        break;
+
+    case AvgSpeedLap: return QString("Lap Speed");
+        break;
+
+    case AvgHeartRateLap: return QString("Lap Heartrate");
+        break;
+
+    case AvgCadenceLap: return QString("Lap Cadence");
+        break;
+
     case LRBalance: return QString("Left/Right Balance");
         break;
 
@@ -1120,6 +1240,12 @@ RealtimeDataSession::RealtimeDataSession(double CP, double WPRIME, double TAU) :
     // Joules
     setJoules(0.0);
 
+    // Averages
+    sumAvgWatts = sumAvgSpeed = sumAvgCadence = sumAvgHeartRate = 0.0;
+    nAvgWatts = nAvgSpeed = nAvgCadence = nAvgHeartRate = 0;
+    sumAvgWattsLap = sumAvgSpeedLap = sumAvgCadenceLap = sumAvgHeartRateLap = 0.0;
+    nAvgWattsLap = nAvgSpeedLap = nAvgCadenceLap = nAvgHeartRateLap = 0;
+
     // W'bal
     wbalr = 0;
     wbal = WPRIME;
@@ -1128,6 +1254,8 @@ RealtimeDataSession::RealtimeDataSession(double CP, double WPRIME, double TAU) :
 void RealtimeDataSession::newLap()
 {
     // Initialize derived series data for the lap
+    sumAvgWattsLap = sumAvgSpeedLap = sumAvgCadenceLap = sumAvgHeartRateLap = 0.0;
+    nAvgWattsLap = nAvgSpeedLap = nAvgCadenceLap = nAvgHeartRateLap = 0;
 }
 
 void RealtimeDataSession::updateDerived()
@@ -1138,6 +1266,26 @@ void RealtimeDataSession::updateDerived()
     // Joules
     //
     setJoules(getJoules() + getWatts()/5000.0);
+
+    //
+    // Averages
+    //
+    sumAvgWatts += getWatts();
+    setAvgWatts(sumAvgWatts/nAvgWatts++);
+    sumAvgSpeed += getSpeed();
+    setAvgSpeed(sumAvgSpeed/nAvgSpeed++);
+    sumAvgCadence += getCadence();
+    setAvgCadence(sumAvgCadence/nAvgCadence++);
+    sumAvgHeartRate += getHr();
+    setAvgHeartRate(sumAvgHeartRate/nAvgHeartRate++);
+    sumAvgWattsLap += getWatts();
+    setAvgWattsLap(sumAvgWattsLap/nAvgWattsLap++);
+    sumAvgSpeedLap += getSpeed();
+    setAvgSpeedLap(sumAvgSpeedLap/nAvgSpeedLap++);
+    sumAvgCadenceLap += getCadence();
+    setAvgCadenceLap(sumAvgCadenceLap/nAvgCadenceLap++);
+    sumAvgHeartRateLap += getHr();
+    setAvgHeartRateLap(sumAvgHeartRateLap/nAvgHeartRateLap++);
 
     //
     // W'bal on the fly using Dave Waterworth's reformulation

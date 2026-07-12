@@ -123,6 +123,16 @@ public:
     void setLatitude(double);
     void setLongitude(double);
     void setAltitude(double);
+
+    void setAvgWatts(double);
+    void setAvgSpeed(double);
+    void setAvgCadence(double);
+    void setAvgHeartRate(double);
+    void setAvgWattsLap(double);
+    void setAvgSpeedLap(double);
+    void setAvgCadenceLap(double);
+    void setAvgHeartRateLap(double);
+
     void setCoreTemp(double,double,double);
     const char *getName() const;
 
@@ -194,6 +204,15 @@ public:
     double getLongitude() const;
     double getAltitude() const;
 
+    double getAvgWatts() const;
+    double getAvgSpeed() const;
+    double getAvgCadence() const;
+    double getAvgHeartRate() const;
+    double getAvgWattsLap() const;
+    double getAvgSpeedLap() const;
+    double getAvgCadenceLap() const;
+    double getAvgHeartRateLap() const;
+
     void setTrainerStatusAvailable(bool status);
     bool getTrainerStatusAvailable() const;
     void setTrainerReady(bool status);
@@ -251,6 +270,8 @@ private:
     long lapMsecs;
     long lapMsecsRemaining;
     long ergMsecsRemaining;
+    double avgWatts, avgSpeed, avgCadence, avgHeartRate;
+    double avgWattsLap, avgSpeedLap, avgCadenceLap, avgHeartRateLap;
 
     bool trainerStatusAvailable;
     bool trainerReady;
@@ -317,8 +338,15 @@ public:
 
 private:
     double CP, WPRIME, TAU;
+
     Vaminator vaminator;
+
     double wbalr, wbal;
+
+    double sumAvgWatts, sumAvgSpeed, sumAvgCadence, sumAvgHeartRate;
+    int nAvgWatts, nAvgSpeed, nAvgCadence, nAvgHeartRate;
+    double sumAvgWattsLap, sumAvgSpeedLap, sumAvgCadenceLap, sumAvgHeartRateLap;
+    int nAvgWattsLap, nAvgSpeedLap, nAvgCadenceLap, nAvgHeartRateLap;
 };
 
 #endif
