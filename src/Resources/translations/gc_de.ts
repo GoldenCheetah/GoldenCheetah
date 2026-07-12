@@ -391,27 +391,27 @@ Sie müssen diesen möglicherweise manuell deaktivieren.</translation>
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="1235"/>
         <source>Date</source>
-        <translation type="unfinished">Datum</translation>
+        <translation>Datum</translation>
     </message>
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="1238"/>
         <source>Time</source>
-        <translation type="unfinished">Zeit</translation>
+        <translation>Zeit</translation>
     </message>
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="1241"/>
         <source>Last updated</source>
-        <translation type="unfinished">Zuletzt aktualisiert</translation>
+        <translation>Zuletzt aktualisiert</translation>
     </message>
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="1323"/>
         <source>Planned</source>
-        <translation type="unfinished">Geplant</translation>
+        <translation>Geplant</translation>
     </message>
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="1326"/>
         <source>Unsaved changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht gespeicherte Änderungen</translation>
     </message>
 </context>
 <context>
@@ -1423,7 +1423,7 @@ Gerät gefunden.
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="95"/>
         <source> ***Adapter/Device must be connected*** </source>
-        <translation type="unfinished"></translation>
+        <translation>***Adapter/Gerät muss angeschlossen sein***</translation>
     </message>
 </context>
 <context>
@@ -12111,7 +12111,7 @@ $SPORT
 
 ### Copyright
 $COPYRIGHT</source>
-        <translation type="unfinished">## $NAME von $AUTHOR
+        <translation>## $NAME von $AUTHOR
 
 $SPORT
 
@@ -12297,7 +12297,7 @@ $COPYRIGHT</translation>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2871"/>
         <source>Summary rows in activities list</source>
-        <translation type="unfinished"></translation>
+        <translation>Zusammenfassungszeilen in der Aktivitätenliste</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2963"/>
@@ -15391,7 +15391,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="113"/>
         <source>HTML Chart</source>
-        <translation type="unfinished"></translation>
+        <translation>HTML-Diagramm</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="114"/>
@@ -17716,37 +17716,37 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Train/HtmlChart.cpp" line="70"/>
         <source>Show Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Editor anzeigen</translation>
     </message>
     <message>
         <location filename="../../Train/HtmlChart.cpp" line="74"/>
         <source>Show Config</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfiguration anzeigen</translation>
     </message>
     <message>
         <location filename="../../Train/HtmlChart.cpp" line="78"/>
         <source>Show Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel anzeigen</translation>
     </message>
     <message>
         <location filename="../../Train/HtmlChart.cpp" line="121"/>
         <source>Add</source>
-        <translation type="unfinished">Hinzufügen</translation>
+        <translation>Hinzufügen</translation>
     </message>
     <message>
         <location filename="../../Train/HtmlChart.cpp" line="122"/>
         <source>Remove</source>
-        <translation type="unfinished">Entfernen</translation>
+        <translation>Entfernen</translation>
     </message>
     <message>
         <location filename="../../Train/HtmlChart.cpp" line="129"/>
         <source>Key</source>
-        <translation type="unfinished">Schlüssel</translation>
+        <translation>Schlüssel</translation>
     </message>
     <message>
         <location filename="../../Train/HtmlChart.cpp" line="129"/>
         <source>Value</source>
-        <translation type="unfinished">Wert</translation>
+        <translation>Wert</translation>
     </message>
 </context>
 <context>
@@ -18464,7 +18464,7 @@ Ziehen Sie .svg-Dateien hierher, um Symbole hinzuzufügen.</translation>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1802"/>
         <source>Unknown</source>
-        <translation type="unfinished">Unbekannt</translation>
+        <translation>Unbekannt</translation>
     </message>
     <message>
         <source>Diary</source>
@@ -29110,7 +29110,7 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="940"/>
         <source>d</source>
-        <translation type="unfinished">t</translation>
+        <translation>t</translation>
     </message>
 </context>
 <context>
@@ -29226,22 +29226,22 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1153"/>
         <source>%1 days early (%2)</source>
-        <translation type="unfinished">%1 Tage zu früh (→ %2)</translation>
+        <translation>%1 Tage zu früh (→ %2)</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1155"/>
         <source>1 day early (%1)</source>
-        <translation type="unfinished">1 Tag zu früh (%1)</translation>
+        <translation>1 Tag zu früh (%1)</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1157"/>
         <source>1 day late (%1)</source>
-        <translation type="unfinished">1 Tag zu spät (%1)</translation>
+        <translation>1 Tag zu spät (%1)</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1159"/>
         <source>%1 days late (%2)</source>
-        <translation type="unfinished">%1 Tage zu spät (%2)</translation>
+        <translation>%1 Tage zu spät (%2)</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1167"/>
@@ -30835,7 +30835,7 @@ Sie können Python unter Optionen -&gt; Allgemein deaktivieren, wenn Sie es nich
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="708"/>
         <source>VAM</source>
-        <translation type="unfinished">Aufstiegsrate (VAM)</translation>
+        <translation>Aufstiegsrate (VAM)</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="711"/>
@@ -31070,12 +31070,12 @@ Sie können Python unter Optionen -&gt; Allgemein deaktivieren, wenn Sie es nich
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="846"/>
         <source>Right PCO</source>
-        <translation type="unfinished"></translation>
+        <translation>Rechter PCO</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="848"/>
         <source>Left PCO</source>
-        <translation type="unfinished"></translation>
+        <translation>Linker PCO</translation>
     </message>
     <message>
         <source>CoreTemp</source>
