@@ -91,6 +91,38 @@ void RealtimeData::setWbal(double wbal)
 {
     this->wbal = wbal;
 }
+void RealtimeData::setBikeScore(double bikeScore)
+{
+    this->bikeScore = bikeScore;
+}
+void RealtimeData::setBikeStress(double bikeStress)
+{
+    this->bikeStress = bikeStress;
+}
+void RealtimeData::setXPower(double xPower)
+{
+    this->xPower = xPower;
+}
+void RealtimeData::setIsoPower(double isoPower)
+{
+    this->isoPower = isoPower;
+}
+void RealtimeData::setRI(double rI)
+{
+    this->rI = rI;
+}
+void RealtimeData::setIF(double iF)
+{
+    this->iF = iF;
+}
+void RealtimeData::setSkibaVI(double skibaVI)
+{
+    this->skibaVI = skibaVI;
+}
+void RealtimeData::setVI(double vI)
+{
+    this->vI = vI;
+}
 void RealtimeData::setVirtualSpeed(double speed)
 {
     this->virtualSpeed = speed;
@@ -268,6 +300,38 @@ double RealtimeData::getJoules() const
 double RealtimeData::getWbal() const
 {
     return wbal;
+}
+double RealtimeData::getBikeScore() const
+{
+    return bikeScore;
+}
+double RealtimeData::getBikeStress() const
+{
+    return bikeStress;
+}
+double RealtimeData::getXPower() const
+{
+    return xPower;
+}
+double RealtimeData::getIsoPower() const
+{
+    return isoPower;
+}
+double RealtimeData::getRI() const
+{
+    return rI;
+}
+double RealtimeData::getIF() const
+{
+    return iF;
+}
+double RealtimeData::getSkibaVI() const
+{
+    return skibaVI;
+}
+double RealtimeData::getVI() const
+{
+    return vI;
 }
 double RealtimeData::getVirtualSpeed() const
 {
@@ -539,6 +603,30 @@ double RealtimeData::value(DataSeries series) const
         break;
 
     case Wbal: return wbal;
+        break;
+
+    case BikeScore: return bikeScore;
+        break;
+
+    case BikeStress: return bikeStress;
+        break;
+
+    case IsoPower: return isoPower;
+        break;
+
+    case XPower: return xPower;
+        break;
+
+    case RI: return rI;
+        break;
+
+    case IF: return iF;
+        break;
+
+    case SkibaVI: return skibaVI;
+        break;
+
+    case VI: return vI;
         break;
 
     case Speed: return speed;
@@ -986,6 +1074,30 @@ QString RealtimeData::seriesSymbol(DataSeries series)
     case Wbal: return QString("W' bal");
         break;
 
+    case BikeStress: return QString("BikeStress");
+        break;
+
+    case BikeScore: return QString("BikeScore");
+        break;
+
+    case XPower: return QString("XPower");
+        break;
+
+    case IsoPower: return QString("Iso Power");
+        break;
+
+    case IF: return QString("Intensity Factor");
+        break;
+
+    case RI: return QString("Relative Intensity");
+        break;
+
+    case SkibaVI: return QString("Skiba Variability Index");
+        break;
+
+    case VI: return QString("Variability Index");
+        break;
+
     case Distance: return QString("Distance");
         break;
 
@@ -1249,6 +1361,16 @@ RealtimeDataSession::RealtimeDataSession(double CP, double WPRIME, double TAU) :
     // W'bal
     wbalr = 0;
     wbal = WPRIME;
+
+    // Coggan Metrics
+    rolling.resize(150); // enough for 30 seconds at 5hz
+    rolling.fill(0.00);
+    sum = rollingSum = 0.0;
+    count = index = 0;
+
+    // Skiba Metrics
+    rsum = ewma = xsum = 0.0;
+    rcount = 0;
 }
 
 void RealtimeDataSession::newLap()
@@ -1305,4 +1427,79 @@ void RealtimeDataSession::updateDerived()
     // VAM
     //
     setVAM(vaminator.Push(getAltitude(), getMsecs(), getRouteDistance()));
+
+    //
+    // Coggan Metrics
+    //
+
+    // Update sum of watts for last 30 seconds
+    sum += value(RealtimeData::Watts);
+    sum -= rolling[index];
+    rolling[index] = value(RealtimeData::Watts);
+
+    // raise average to the 4th power
+    rollingSum += pow(sum/150,4); // raise rolling average to 4th power
+    count ++;
+
+    // move index on/round
+    index = (index >= 149) ? 0 : index+1;
+
+    // calculate IsoPower
+    double np = pow(rollingSum / (count), 0.25);
+    setIsoPower(np);
+
+    // carry on and calculate IF
+    double rif = CP ? np / CP : 0.0;
+    setIF(rif);
+
+    // now TSS
+    double normWork = np * (value(RealtimeData::Time) / 1000); // msecs
+    double rawTSS = normWork * rif;
+    double workInAnHourAtCP = CP * 3600;
+    double tss = rawTSS / workInAnHourAtCP * 100.0;
+    setBikeStress(tss);
+
+    // VI is all that is left!
+    double ap = value(RealtimeData::AvgWatts);
+    double vi = ap ? np / ap : 0.0;
+    setVI(vi);
+
+    //
+    // Skiba Metrics
+    //
+
+    static const double exp = 2.0f / ((25.0f / 0.2f) + 1.0f);
+    static const double rem = 1.0f - exp;
+
+    rcount++;
+
+    if (rcount < 125) {
+
+        // get up to speed
+        rsum += value(RealtimeData::Watts);
+        ewma = rsum / rcount;
+
+    } else {
+
+        // we're up to speed
+        ewma = (value(RealtimeData::Watts) * exp) + (ewma * rem);
+    }
+
+    xsum += pow(ewma, 4.0f);
+    double xpower = pow(xsum / rcount, 0.25f);
+    setXPower(xpower);
+
+    // carry on and calculate RI
+    double ri = CP ? xpower / CP : 0.0;
+    setRI(ri);
+
+    // now BikeScore
+    double normWorkBS = xpower * (value(RealtimeData::Time) / 1000); // msecs
+    double rawBS = normWorkBS * ri;
+    double bikescore = rawBS / workInAnHourAtCP * 100.0;
+    setBikeScore(bikescore);
+
+    // VI is all that is left!
+    double svi = ap ? xpower / ap : 0.0;
+    setSkibaVI(svi);
 }

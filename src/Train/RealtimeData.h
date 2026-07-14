@@ -95,9 +95,15 @@ public:
     void setRouteDistance(double);
     void setDistanceRemaining(double);
     void setVAM(double);
-    void setBikeScore(long);
+    void setXPower(double);
+    void setBikeScore(double);
+    void setRI(double);
+    void setSkibaVI(double);
+    void setIsoPower(double);
+    void setBikeStress(double);
+    void setIF(double);
+    void setVI(double);
     void setJoules(double);
-    void setXPower(long);
     void setLap(long);
     void setLapDistance(double distance);
     void setLapDistanceRemaining(double distance);
@@ -180,6 +186,14 @@ public:
     double getRouteDistance() const;
     double getDistanceRemaining() const;
     double getVAM() const;
+    double getXPower() const;
+    double getBikeScore() const;
+    double getRI() const;
+    double getSkibaVI() const;
+    double getIsoPower() const;
+    double getBikeStress() const;
+    double getIF() const;
+    double getVI() const;
     long getLap() const;
     double getLapDistance() const;
     double getLapDistanceRemaining() const;
@@ -263,6 +277,8 @@ private:
     double virtualSpeed;
     double wbal;
     double joules;
+    double xPower, bikeScore, rI, skibaVI;
+    double isoPower, bikeStress, iF, vI;
     double hhb, o2hb;
     double rer;
     long lap;
@@ -347,6 +363,15 @@ private:
     int nAvgWatts, nAvgSpeed, nAvgCadence, nAvgHeartRate;
     double sumAvgWattsLap, sumAvgSpeedLap, sumAvgCadenceLap, sumAvgHeartRateLap;
     int nAvgWattsLap, nAvgSpeedLap, nAvgCadenceLap, nAvgHeartRateLap;
+
+    // for keeping track of rolling averages (max 30s at 5hz)
+    // used by IsoPower and XPower
+    QVector<double> rolling;
+    double sum, rollingSum;
+    int count, index; // index into rolling (circular buffer)
+    // used by XPower algorithm
+    double rsum, ewma, xsum;
+    int rcount;
 };
 
 #endif
