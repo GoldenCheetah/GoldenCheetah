@@ -140,6 +140,7 @@ public:
     void setAvgHeartRateLap(double);
 
     void setCoreTemp(double,double,double);
+    void setHeatLoad(double);
     const char *getName() const;
 
     // new muscle oxygen stuff
@@ -165,6 +166,7 @@ public:
     double getCoreTemp() const;
     double getSkinTemp() const;
     double getHeatStrain() const;
+    double getHeatLoad() const;
 
     double getWatts() const;
     double getAltWatts() const;
@@ -264,6 +266,7 @@ private:
     double temp;
     double skinTemp, coreTemp;
     double heatStrain;
+    double heatLoad;
 
     std::chrono::high_resolution_clock::time_point wheelRpmSampleTime;
 
@@ -345,14 +348,18 @@ public:
     }
 };
 
+class Context;
+
 class RealtimeDataSession : public RealtimeData
 {
 public:
-    RealtimeDataSession(double CP, double WPRIME, double TAU);
+    RealtimeDataSession(Context* context, double CP, double WPRIME, double TAU);
+    ~RealtimeDataSession();
     void newLap();
     void updateDerived();
 
 private:
+    Context* context;
     double CP, WPRIME, TAU;
 
     Vaminator vaminator;
@@ -372,6 +379,10 @@ private:
     // used by XPower algorithm
     double rsum, ewma, xsum;
     int rcount;
+
+    // Heat Load Estimate for the athlete, preserve between sessions, and reset when local date changes
+    qint64 heatLoadMSec;
+    QDateTime heatLoadLocalDate;
 };
 
 #endif

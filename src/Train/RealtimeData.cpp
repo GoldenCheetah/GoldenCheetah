@@ -19,6 +19,9 @@
 
 #include "RealtimeData.h"
 #include "RideFile.h"
+#include "Settings.h"
+#include "Context.h"
+#include "Athlete.h"
 
 #include <QtDebug>
 
@@ -40,7 +43,7 @@ RealtimeData::RealtimeData()
     rppb = rppe = rpppb = rpppe = 0.0;
     lppb = lppe = lpppb = lpppe = 0.0;
     coreTemp = skinTemp = 0.0;
-    heatStrain = 0.0;
+    heatStrain = heatLoad = 0.0;
     latitude = longitude = altitude = 0.0;
     rf = rmv = vo2 = vco2 = tv = feo2 = 0.0;
     routeDistance = distanceRemaining = VAMValue = 0.0;
@@ -264,6 +267,9 @@ void RealtimeData::setCoreTemp(double core, double skin, double heatStrain) {
     this->coreTemp = core;
     this->skinTemp = skin;
     this->heatStrain = heatStrain;
+}
+void RealtimeData::setHeatLoad(double heatLoad) {
+    this->heatLoad = heatLoad;
 }
 
 const char *
@@ -755,6 +761,8 @@ double RealtimeData::value(DataSeries series) const
         break;
     case HeatStrain: return heatStrain;
         break;
+    case HeatLoad: return heatLoad;
+        break;
 
     case None:
     default:
@@ -1242,6 +1250,8 @@ QString RealtimeData::seriesSymbol(DataSeries series)
         break;
     case HeatStrain: return QString("Heat Strain");
         break;
+    case HeatLoad: return QString("Estimated Heat Load");
+        break;
 
     case RightPCO: return QString("Right PCO");
         break;
@@ -1341,11 +1351,13 @@ double RealtimeData::getTemp() const { return temp; }
 double RealtimeData::getCoreTemp() const { return coreTemp; }
 double RealtimeData::getSkinTemp() const { return skinTemp; }
 double RealtimeData::getHeatStrain() const { return heatStrain; }
+double RealtimeData::getHeatLoad() const { return heatLoad; }
 
 //
 // RealtimeDataSession
 //
-RealtimeDataSession::RealtimeDataSession(double CP, double WPRIME, double TAU) : CP(CP), WPRIME(WPRIME), TAU(TAU)
+RealtimeDataSession::RealtimeDataSession(Context* context, double CP, double WPRIME, double TAU) :
+                                         context(context), CP(CP), WPRIME(WPRIME), TAU(TAU)
 {
     // Initialize derived series data for the session
 
@@ -1371,6 +1383,27 @@ RealtimeDataSession::RealtimeDataSession(double CP, double WPRIME, double TAU) :
     // Skiba Metrics
     rsum = ewma = xsum = 0.0;
     rcount = 0;
+
+    // Heat Load Estimation - we want to preserve the heat load across sessions,
+    // resetting if local midnight passes while not running
+    setHeatLoad(appsettings->cvalue(context->athlete->cyclist, GC_REALTIMEDATA_HEATLOAD, "").toDouble());
+    heatLoadMSec = appsettings->cvalue(context->athlete->cyclist, GC_REALTIMEDATA_HEATLOAD_MSEC, "").toULongLong();
+    heatLoadLocalDate = QDateTime::fromString(appsettings->cvalue(context->athlete->cyclist, GC_REALTIMEDATA_HEATLOAD_LOCALDATE, "").toString(), Qt::ISODate);
+    if(heatLoadLocalDate.date().dayOfYear() != QDateTime::currentDateTime().date().dayOfYear()) {
+        qDebug()<<"resetting heat load at " << QDateTime::currentDateTime() << "heatLoadLocalDate" << heatLoadLocalDate;
+        setHeatLoad(0.0);
+        heatLoadMSec = 0;
+        heatLoadLocalDate = QDateTime::currentDateTime();
+    }
+}
+
+RealtimeDataSession::~RealtimeDataSession()
+{
+    // Heat Load Estimation - we want to preserve the heat load across sessions,
+    // resetting if local midnight passes while not running
+    appsettings->setCValue(context->athlete->cyclist, GC_REALTIMEDATA_HEATLOAD, getHeatLoad());
+    appsettings->cvalue(context->athlete->cyclist, GC_REALTIMEDATA_HEATLOAD_MSEC, heatLoadMSec);
+    appsettings->cvalue(context->athlete->cyclist, GC_REALTIMEDATA_HEATLOAD_LOCALDATE, heatLoadLocalDate.toString(Qt::ISODate));
 }
 
 void RealtimeDataSession::newLap()
@@ -1379,6 +1412,10 @@ void RealtimeDataSession::newLap()
     sumAvgWattsLap = sumAvgSpeedLap = sumAvgCadenceLap = sumAvgHeartRateLap = 0.0;
     nAvgWattsLap = nAvgSpeedLap = nAvgCadenceLap = nAvgHeartRateLap = 0;
 }
+
+#define HEATLOAD_OFFSET 0.9596
+#define HEATLOAD_MULT 35.92
+#define HEATLOAD_EXP 1.324
 
 void RealtimeDataSession::updateDerived()
 {
@@ -1502,4 +1539,28 @@ void RealtimeDataSession::updateDerived()
     // VI is all that is left!
     double svi = ap ? xpower / ap : 0.0;
     setSkibaVI(svi);
+
+    // Heat Load Estimate
+    double heatStrain = getHeatStrain();
+    QDateTime currentTime = QDateTime::currentDateTimeUtc();
+    qint64 msecEpoc = currentTime.toMSecsSinceEpoch();
+
+    if(heatLoadMSec != 0 && heatStrain > HEATLOAD_OFFSET) //don't try to calculate a negative effective heat strain
+    {
+        //(HSI-AOC_Off)^AOC_EXP*TIME/AOC_Mult
+
+        qint64 deltaMSec = msecEpoc - heatLoadMSec;
+        double deltamin = deltaMSec / (1000.0 * 60.0); //msec to minutes
+
+        double newLoad = pow(heatStrain-HEATLOAD_OFFSET, HEATLOAD_EXP) * deltamin / HEATLOAD_MULT;
+
+        if(newLoad > 0)
+            setHeatLoad(getHeatLoad() + newLoad);
+
+        //qDebug()<<"newLoad is "<< newLoad << "a" << a << "b" << b << "heatStrain" << heatStrain << "c" << c << "deltamin" << deltamin << "heatLoad" << getHeatLoad();
+
+        if(getHeatLoad() >= 10.0)
+            setHeatLoad(10.0);
+    }
+    heatLoadMSec = msecEpoc;
 }

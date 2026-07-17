@@ -80,7 +80,7 @@
 #endif
 
 TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(context),
-    bicycle(context), rtData(0, 0, 0)
+    bicycle(context), rtData(context, 0, 0, 0)
 {
     // Athlete
     FTP=285; // default to 285 if zones are not set
@@ -94,7 +94,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
 
     TAU = appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toInt();
 
-    rtData = RealtimeDataSession(FTP, WPRIME, TAU);
+    rtData = RealtimeDataSession(context, FTP, WPRIME, TAU);
 
     QWidget *c = new QWidget;
     //c->setContentsMargins(0,0,0,0); // bit of space is useful
@@ -1416,7 +1416,7 @@ void TrainSidebar::Start()       // when start button is pressed
         session_elapsed_msec = 0;
         lap_time.start();
         lap_elapsed_msec = 0;
-        rtData = RealtimeDataSession(FTP, WPRIME, TAU);
+        rtData = RealtimeDataSession(context, FTP, WPRIME, TAU);
         
         resetTextAudioEmitTracking();
 
@@ -1667,7 +1667,7 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     session_time.restart();
     lap_elapsed_msec = 0;
     lap_time.restart();
-    rtData = RealtimeDataSession(FTP, WPRIME, TAU);
+    rtData = RealtimeDataSession(context, FTP, WPRIME, TAU);
     displayWorkoutDistance = displayDistance = 0;
     displayLapDistance = 0;
     displayLapDistanceRemaining = -1;
