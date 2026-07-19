@@ -352,6 +352,10 @@
 #define GC_SIM_BICYCLE_Tk                     "<athlete-preferences>sim_bicycle/Tk"
 #define GC_SIM_BICYCLE_ACTUALTRAINERALTITUDEM "<athlete-preferences>sim_bicycle/ActualTrainerAltitudeM"
 
+#define GC_REALTIMEDATA_HEATLOAD              "<athlete-preferences>RealtimeData/HeatLoad"
+#define GC_REALTIMEDATA_HEATLOAD_MSEC         "<athlete-preferences>RealtimeData/HeatLoadMSec"
+#define GC_REALTIMEDATA_HEATLOAD_LOCALDATE    "<athlete-preferences>RealtimeData/HeatLoadLocalDate"
+
 #define GC_RWGPSUSER                    "<athlete-private>rwgps/user"
 #define GC_RWGPSPASS                    "<athlete-private>rwgps/pass"
 #define GC_RWGPS_AUTH_TOKEN             "<athlete-private>rwgps/auth_token"

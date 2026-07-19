@@ -55,8 +55,6 @@
 #include "PhysicsUtility.h"
 #include "BicycleSim.h"
 
-#include <queue>
-
 // Status settings
 #define RT_MODE_ERGO        0x0001        // load generation modes
 #define RT_MODE_SPIN        0x0002        // spinscan like modes
@@ -91,51 +89,6 @@ class RealtimeData;
 class MultiDeviceDialog;
 class TrainBottom;
 class DeviceTreeView;
-
-// Class implements queue for tracking altitude across time for
-// past minute. This is used to derive a vertical meters per minute
-// value that is retuned by each push.
-// A route location change of more than 50 meters in a second is
-// considered a 'skip' and clears the vam queue.
-// New data is accepted only every second.
-class Vaminator {
-    std::deque<std::tuple<double, double, double>> q;
-
-public:
-    Vaminator() {}
-    double Push(double altitude, double sessionMS, double routeLocationKM) {
-
-        bool fDoPush = true;
-        if (!q.empty()) {
-            // a seek is more than 50 meters in a second
-            double routeDelta = routeLocationKM - std::get<2>(q.back());
-            if (fabs(routeDelta) > (50. / 1000.)) {
-                q.clear(); // make empty
-            } else {
-                // Pop elements more than 1 minute back
-                double startTimeMS = std::get<1>(q.front());
-                while ((sessionMS - startTimeMS) > (60. * 1000.)) {
-                    q.pop_front();
-                    if (q.empty())
-                        break;
-                    startTimeMS = std::get<1>(q.front());
-                }
-
-                fDoPush = q.empty() || sessionMS - 1000. >= std::get<1>(q.back());
-            }
-        }
-
-        // Push element if its > 1 second ahead of newest
-        if (fDoPush)
-            q.push_back(std::make_tuple( altitude, sessionMS, routeLocationKM ));
-
-        double vertDeltaM = std::get<0>(q.back()) - std::get<0>(q.front());
-        double timeDeltaHour = (std::get<1>(q.back()) - std::get<1>(q.front())) / (1000. * 60. * 60);
-
-        // Require 1 second of time data before posting non-zero value.
-        return (timeDeltaHour > (1./3600.)) ? vertDeltaM / timeDeltaHour : 0.;
-    }
-};
 
 class TrainSidebar : public GcWindow
 {
@@ -300,6 +253,7 @@ class TrainSidebar : public GcWindow
 
         int FTP; // current FTP / CP
         int WPRIME; // current W'
+        int TAU; // current W'bal Tau
 
         QList<DeviceConfiguration> Devices;
         QList<int> activeDevices;
@@ -329,12 +283,9 @@ class TrainSidebar : public GcWindow
 
         void maintainLapDistanceState();
 
-        Vaminator vaminator;
+        RealtimeDataSession rtData;
 
-        // for non-zero average calcs
-        int pwrcount, cadcount, hrcount, spdcount, lodcount, grdcount; // for NZ average calc
         int status;
-        int displaymode;
 
         QString codeWorkoutKey;     // traindb-key of the workout in the case of a code-workout; empty otherwise
         QString codeWorkoutTitle;   // title of the workout in the case of a code-workout; empty otherwise
@@ -386,7 +337,6 @@ class TrainSidebar : public GcWindow
         QCheckBox   *recordSelector;
         QSharedPointer<QFileSystemWatcher> watcher;
         bool calibrating;
-        double wbalr, wbal;
 };
 
 class MultiDeviceDialog : public QDialog

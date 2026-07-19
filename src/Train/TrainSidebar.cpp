@@ -80,7 +80,7 @@
 #endif
 
 TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(context),
-    bicycle(context)
+    bicycle(context), rtData(context, 0, 0, 0)
 {
     // Athlete
     FTP=285; // default to 285 if zones are not set
@@ -91,6 +91,10 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
         FTP = context->athlete->zones("Bike")->getCP(range);
         WPRIME = context->athlete->zones("Bike")->getWprime(range);
     }
+
+    TAU = appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toInt();
+
+    rtData = RealtimeDataSession(context, FTP, WPRIME, TAU);
 
     QWidget *c = new QWidget;
     //c->setContentsMargins(0,0,0,0); // bit of space is useful
@@ -390,12 +394,6 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
 
     displayTemp = 0;
     displayWorkoutLap = 0;
-    pwrcount = 0;
-    cadcount = 0;
-    hrcount = 0;
-    spdcount = 0;
-    lodcount = 0;
-    wbalr = wbal = 0;
     load_msecs = total_msecs = lap_msecs = 0;
     displayWorkoutDistance = displayDistance = displayPower = displayHeartRate =
     displaySpeed = displayCadence = slope = load = 0;
@@ -796,6 +794,8 @@ TrainSidebar::configChanged(qint32 why)
         FTP = context->athlete->zones("Bike")->getCP(range);
         WPRIME = context->athlete->zones("Bike")->getWprime(range);
     }
+
+    TAU = appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toInt();
 
     if (why & CONFIG_ZONES) {
         Library::refreshWorkouts(context);
@@ -1416,8 +1416,7 @@ void TrainSidebar::Start()       // when start button is pressed
         session_elapsed_msec = 0;
         lap_time.start();
         lap_elapsed_msec = 0;
-        wbalr = 0;
-        wbal = WPRIME;
+        rtData = RealtimeDataSession(context, FTP, WPRIME, TAU);
         
         resetTextAudioEmitTracking();
 
@@ -1662,19 +1661,13 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
 
     // Re-enable gui elements
     // reset counters etc
-    pwrcount = 0;
-    cadcount = 0;
-    hrcount = 0;
-    spdcount = 0;
-    lodcount = 0;
     displayTemp = 0;
     displayWorkoutLap = 0;
-    wbalr = 0;
-    wbal = WPRIME;
     session_elapsed_msec = 0;
     session_time.restart();
     lap_elapsed_msec = 0;
     lap_time.restart();
+    rtData = RealtimeDataSession(context, FTP, WPRIME, TAU);
     displayWorkoutDistance = displayDistance = 0;
     displayLapDistance = 0;
     displayLapDistanceRemaining = -1;
@@ -1808,7 +1801,6 @@ void TrainSidebar::Disconnect()
 
 void TrainSidebar::guiUpdate()           // refreshes the telemetry
 {
-    RealtimeData rtData;
     rtData.setLap(displayWorkoutLap);
     rtData.mode = mode;
 
@@ -2178,24 +2170,8 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
             rtData.setVirtualSpeed(vs);
 
-            // W'bal on the fly
-            // using Dave Waterworth's reformulation
-            double TAU = appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toInt();
-
-            // any watts expended in last 200msec?
-            double JOULES = double(rtData.getWatts() - FTP) / 5.00f;
-            if (JOULES < 0) JOULES = 0;
-
-            // running total of replenishment
-            wbalr += JOULES * exp((total_msecs/1000.00f) / TAU);
-            wbal = WPRIME - (wbalr * exp((-total_msecs/1000.00f) / TAU));
-
-            rtData.setWbal(wbal);
-
-            // VAMinator
-            displayVAM = vaminator.Push(displayAltitude, session_time.elapsed(), displayWorkoutDistance);
-            if (!GlobalContext::context()->useMetricUnits) displayVAM *= (1. / 0.3048);
-            rtData.setVAM(displayVAM);
+            // Update Derived data series
+            rtData.updateDerived();
 
             // go update the displays...
             context->notifyTelemetryUpdate(rtData); // signal everyone to update telemetry
@@ -2230,10 +2206,6 @@ void TrainSidebar::resetLapTimer()
     lap_time.restart();
     lap_elapsed_msec = 0;
     displayLapDistance = 0;
-    pwrcount  = 0;
-    cadcount  = 0;
-    hrcount   = 0;
-    spdcount  = 0;
     this->resetTextAudioEmitTracking();
     this->maintainLapDistanceState();
 }

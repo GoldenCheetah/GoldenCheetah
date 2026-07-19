@@ -95,9 +95,15 @@ public:
     void setRouteDistance(double);
     void setDistanceRemaining(double);
     void setVAM(double);
-    void setBikeScore(long);
-    void setJoules(long);
-    void setXPower(long);
+    void setXPower(double);
+    void setBikeScore(double);
+    void setRI(double);
+    void setSkibaVI(double);
+    void setIsoPower(double);
+    void setBikeStress(double);
+    void setIF(double);
+    void setVI(double);
+    void setJoules(double);
     void setLap(long);
     void setLapDistance(double distance);
     void setLapDistanceRemaining(double distance);
@@ -123,7 +129,18 @@ public:
     void setLatitude(double);
     void setLongitude(double);
     void setAltitude(double);
+
+    void setAvgWatts(double);
+    void setAvgSpeed(double);
+    void setAvgCadence(double);
+    void setAvgHeartRate(double);
+    void setAvgWattsLap(double);
+    void setAvgSpeedLap(double);
+    void setAvgCadenceLap(double);
+    void setAvgHeartRateLap(double);
+
     void setCoreTemp(double,double,double);
+    void setHeatLoad(double);
     const char *getName() const;
 
     // new muscle oxygen stuff
@@ -149,6 +166,7 @@ public:
     double getCoreTemp() const;
     double getSkinTemp() const;
     double getHeatStrain() const;
+    double getHeatLoad() const;
 
     double getWatts() const;
     double getAltWatts() const;
@@ -157,6 +175,7 @@ public:
     long getTime() const;
     double getSpeed() const;
     double getWbal() const;
+    double getJoules() const;
     double getVirtualSpeed() const;
     double getWheelRpm() const;
     std::chrono::high_resolution_clock::time_point getWheelRpmSampleTime() const;
@@ -169,6 +188,14 @@ public:
     double getRouteDistance() const;
     double getDistanceRemaining() const;
     double getVAM() const;
+    double getXPower() const;
+    double getBikeScore() const;
+    double getRI() const;
+    double getSkibaVI() const;
+    double getIsoPower() const;
+    double getBikeStress() const;
+    double getIF() const;
+    double getVI() const;
     long getLap() const;
     double getLapDistance() const;
     double getLapDistanceRemaining() const;
@@ -192,6 +219,15 @@ public:
     double getLatitude() const;
     double getLongitude() const;
     double getAltitude() const;
+
+    double getAvgWatts() const;
+    double getAvgSpeed() const;
+    double getAvgCadence() const;
+    double getAvgHeartRate() const;
+    double getAvgWattsLap() const;
+    double getAvgSpeedLap() const;
+    double getAvgCadenceLap() const;
+    double getAvgHeartRateLap() const;
 
     void setTrainerStatusAvailable(bool status);
     bool getTrainerStatusAvailable() const;
@@ -230,6 +266,7 @@ private:
     double temp;
     double skinTemp, coreTemp;
     double heatStrain;
+    double heatLoad;
 
     std::chrono::high_resolution_clock::time_point wheelRpmSampleTime;
 
@@ -242,6 +279,9 @@ private:
     double lapDistanceRemaining;
     double virtualSpeed;
     double wbal;
+    double joules;
+    double xPower, bikeScore, rI, skibaVI;
+    double isoPower, bikeStress, iF, vI;
     double hhb, o2hb;
     double rer;
     long lap;
@@ -249,6 +289,8 @@ private:
     long lapMsecs;
     long lapMsecsRemaining;
     long ergMsecsRemaining;
+    double avgWatts, avgSpeed, avgCadence, avgHeartRate;
+    double avgWattsLap, avgSpeedLap, avgCadenceLap, avgHeartRateLap;
 
     bool trainerStatusAvailable;
     bool trainerReady;
@@ -256,6 +298,91 @@ private:
     bool trainerCalibRequired;
     bool trainerConfigRequired;
     bool trainerBrakeFault;
+};
+
+// Class implements queue for tracking altitude across time for
+// past minute. This is used to derive a vertical meters per minute
+// value that is retuned by each push.
+// A route location change of more than 50 meters in a second is
+// considered a 'skip' and clears the vam queue.
+// New data is accepted only every second.
+
+#include <queue>
+
+class Vaminator {
+    std::deque<std::tuple<double, double, double>> q;
+
+public:
+    Vaminator() {}
+    double Push(double altitude, double sessionMS, double routeLocationKM) {
+
+        bool fDoPush = true;
+        if (!q.empty()) {
+            // a seek is more than 50 meters in a second
+            double routeDelta = routeLocationKM - std::get<2>(q.back());
+            if (fabs(routeDelta) > (50. / 1000.)) {
+                q.clear(); // make empty
+            } else {
+                // Pop elements more than 1 minute back
+                double startTimeMS = std::get<1>(q.front());
+                while ((sessionMS - startTimeMS) > (60. * 1000.)) {
+                    q.pop_front();
+                    if (q.empty())
+                        break;
+                    startTimeMS = std::get<1>(q.front());
+                }
+
+                fDoPush = q.empty() || sessionMS - 1000. >= std::get<1>(q.back());
+            }
+        }
+
+        // Push element if its > 1 second ahead of newest
+        if (fDoPush)
+            q.push_back(std::make_tuple( altitude, sessionMS, routeLocationKM ));
+
+        double vertDeltaM = std::get<0>(q.back()) - std::get<0>(q.front());
+        double timeDeltaHour = (std::get<1>(q.back()) - std::get<1>(q.front())) / (1000. * 60. * 60);
+
+        // Require 1 second of time data before posting non-zero value.
+        return (timeDeltaHour > (1./3600.)) ? vertDeltaM / timeDeltaHour : 0.;
+    }
+};
+
+class Context;
+
+class RealtimeDataSession : public RealtimeData
+{
+public:
+    RealtimeDataSession(Context* context, double CP, double WPRIME, double TAU);
+    ~RealtimeDataSession();
+    void newLap();
+    void updateDerived();
+
+private:
+    Context* context;
+    double CP, WPRIME, TAU;
+
+    Vaminator vaminator;
+
+    double wbalr, wbal;
+
+    double sumAvgWatts, sumAvgSpeed, sumAvgCadence, sumAvgHeartRate;
+    int nAvgWatts, nAvgSpeed, nAvgCadence, nAvgHeartRate;
+    double sumAvgWattsLap, sumAvgSpeedLap, sumAvgCadenceLap, sumAvgHeartRateLap;
+    int nAvgWattsLap, nAvgSpeedLap, nAvgCadenceLap, nAvgHeartRateLap;
+
+    // for keeping track of rolling averages (max 30s at 5hz)
+    // used by IsoPower and XPower
+    QVector<double> rolling;
+    double sum, rollingSum;
+    int count, index; // index into rolling (circular buffer)
+    // used by XPower algorithm
+    double rsum, ewma, xsum;
+    int rcount;
+
+    // Heat Load Estimate for the athlete, preserve between sessions, and reset when local date changes
+    qint64 heatLoadMSec;
+    QDateTime heatLoadLocalDate;
 };
 
 #endif

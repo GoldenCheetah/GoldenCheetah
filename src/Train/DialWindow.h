@@ -116,33 +116,16 @@ class DialWindow : public GcChartWindow
         bool isNewLap;
 
         // for keeping track of rolling averages (max 30s at 5hz)
-        // used by IsoPower and XPower
         QVector<double> rolling;
         double rollingSum;
         int index; // index into rolling (circular buffer)
 
-
-        // VI/RI makes us track AP too
-        int apcount;
-        int apsum;
-
-        // used by XPower algorithm
-        double rsum, ewma;
-
-        //heat load estimate (don't reset in resetValues, but preserve between sessions, and reset when local date changes)
-        //note: each athelete has it's own set of DialWindows if more than one athlete is loaded at the same time
-        double heatLoad;
-        qint64 heatLoadMSec;
-        QDateTime heatLoadLocalDate;
-        bool isRunning = false;
-
         void resetValues() {
 
             rolling.fill(0.00);
-            rsum = ewma = 0.0f;
             rollingSum = index = 0;
-            apcount = count = sum = instantValue = avg30 =
-            apsum = avgLap = avgTotal = lapNumber = 0;
+            count = sum = instantValue = avg30 =
+            avgLap = avgTotal = lapNumber = 0;
             telemetryUpdate(RealtimeData());
         }
 
