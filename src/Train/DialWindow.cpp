@@ -111,13 +111,6 @@ DialWindow::DialWindow(Context *context) :
 
     // set to zero
     resetValues();
-
-
-    //do this on init, but not in resetValues as we want to preserve the heat load across sessions, resetting if local midnight passes while not running
-    heatLoadMSec = 0;
-    heatLoad = 0;
-    heatLoadLocalDate = QDateTime::currentDateTime();
-    isRunning = false;
 }
 
 void
@@ -131,14 +124,12 @@ void
 DialWindow::start()
 {
     resetValues();
-    isRunning = true;
 }
 
 void
 DialWindow::stop()
 {
     resetValues();
-    isRunning = false;
 }
 
 void
@@ -334,168 +325,30 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 
     // COGGAN Metrics
     case RealtimeData::IsoPower:
+        valueLabel->setText(QString("%1").arg(round(rtData.getIsoPower())));
+        break;
     case RealtimeData::IF:
+        valueLabel->setText(QString("%1").arg(rtData.getIF(), 0, 'f', 3));
+        break;
     case RealtimeData::BikeStress:
+        valueLabel->setText(QString("%1").arg(rtData.getBikeStress(), 0, 'f', 1));
+        break;
     case RealtimeData::VI:
-        {
-
-        // Update sum of watts for last 30 seconds
-        sum += rtData.value(RealtimeData::Watts);
-        sum -= rolling[index];
-        rolling[index] = rtData.value(RealtimeData::Watts);
-
-        // raise average to the 4th power
-        rollingSum += pow(sum/150,4); // raise rolling average to 4th power
-        count ++;
-
-        // move index on/round
-        index = (index >= 149) ? 0 : index+1;
-
-        // calculate IsoPower
-        double np = pow(rollingSum / (count), 0.25);
-
-        if (series == RealtimeData::IsoPower) {
-            // We only wanted IsoPower so thats it
-            valueLabel->setText(QString("%1").arg(round(np)));
-
-        } else {
-
-            double rif, cp;
-            // carry on and calculate IF
-            if (context->athlete->zones("Bike")) {
-
-                // get cp for today
-                int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
-                if (zonerange >= 0) cp = context->athlete->zones("Bike")->getCP(zonerange);
-                else cp = 0;
-
-            } else {
-                cp = 0;
-            }
-
-            if (cp) rif = np / cp;
-            else rif = 0;
-
-            if (series == RealtimeData::IF) {
-
-                // we wanted IF so thats it
-                valueLabel->setText(QString("%1").arg(rif, 0, 'f', 3));
-
-            } else {
-
-                double normWork = np * (rtData.value(RealtimeData::Time) / 1000); // msecs
-                double rawTSS = normWork * rif;
-                double workInAnHourAtCP = cp * 3600;
-                double tss = rawTSS / workInAnHourAtCP * 100.0;
-
-                if (series == RealtimeData::BikeStress) {
-
-                    valueLabel->setText(QString("%1").arg(tss, 0, 'f', 1));
-
-                } else {
-
-                    // track average power for VI
-                    apsum += rtData.value(RealtimeData::Watts);
-                    apcount++;
-
-                    double ap = apsum ? apsum / apcount : 0;
-
-                    // VI is all that is left!
-                    valueLabel->setText(QString("%1").arg(ap ? np / ap : 0, 0, 'f', 3));
-
-                }
-
-            }
-
-        }
-
-        }
+        valueLabel->setText(QString("%1").arg(rtData.getVI(), 0, 'f', 3));
         break;
 
     // SKIBA Metrics
     case RealtimeData::XPower:
+        valueLabel->setText(QString("%1").arg(round(rtData.getXPower())));
+        break;
     case RealtimeData::RI:
+        valueLabel->setText(QString("%1").arg(rtData.getRI(), 0, 'f', 3));
+        break;
     case RealtimeData::BikeScore:
+        valueLabel->setText(QString("%1").arg(rtData.getBikeScore(), 0, 'f', 1));
+        break;
     case RealtimeData::SkibaVI:
-        {
-
-        static const double exp = 2.0f / ((25.0f / 0.2f) + 1.0f);
-        static const double rem = 1.0f - exp;
-
-        count++;
-
-        if (count < 125) {
-
-            // get up to speed
-            rsum += rtData.value(RealtimeData::Watts);
-            ewma = rsum / count;
-
-        } else {
-
-            // we're up to speed
-            ewma = (rtData.value(RealtimeData::Watts) * exp) + (ewma * rem);
-        }
-
-        sum += pow(ewma, 4.0f);
-        double xpower = pow(sum / count, 0.25f);
-
-        if (series == RealtimeData::XPower) {
-
-            // We wanted XPower!
-            valueLabel->setText(QString("%1").arg(round(xpower)));
-
-        } else {
-
-            double rif, cp;
-            // carry on and calculate IF
-            if (context->athlete->zones("Bike")) {
-
-                // get cp for today
-                int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
-                if (zonerange >= 0) cp = context->athlete->zones("Bike")->getCP(zonerange);
-                else cp = 0;
-
-            } else {
-                cp = 0;
-            }
-
-            if (cp) rif = xpower / cp;
-            else rif = 0;
-
-            if (series == RealtimeData::RI) {
-
-                // we wanted IF so thats it
-                valueLabel->setText(QString("%1").arg(rif, 0, 'f', 3));
-
-            } else {
-
-                double normWork = xpower * (rtData.value(RealtimeData::Time) / 1000); // msecs
-                double rawTSS = normWork * rif;
-                double workInAnHourAtCP = cp * 3600;
-                double tss = rawTSS / workInAnHourAtCP * 100.0;
-
-                if (series == RealtimeData::BikeScore) {
-
-                    valueLabel->setText(QString("%1").arg(tss, 0, 'f', 1));
-
-                } else {
-
-                    // track average power for Relative Intensity
-                    apsum += rtData.value(RealtimeData::Watts);
-                    apcount++;
-
-                    double ap = apsum ? apsum / apcount : 0;
-
-                    // RI is all that is left!
-                    valueLabel->setText(QString("%1").arg(ap ? xpower / ap : 0, 0, 'f', 3));
-
-                }
-
-            }
-
-        }
-
-        }
+        valueLabel->setText(QString("%1").arg(rtData.getSkibaVI(), 0, 'f', 3));
         break;
 
     case RealtimeData::Load:
@@ -573,41 +426,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         break;
 
     case RealtimeData::HeatLoad:
-        {
-            double heatStrain = rtData.getHeatStrain();
-            QDateTime currentTime = QDateTime::currentDateTimeUtc();
-            qint64 msecEpoc = currentTime.toMSecsSinceEpoch();
-
-            //qDebug()<<"reset check time isRunning" << isRunning << "at" << QDateTime::currentDateTime() << "heatLoadLocalDate" << heatLoadLocalDate << "DOY" << heatLoadLocalDate.date().dayOfYear();
-            if(!isRunning && heatLoadLocalDate.date().dayOfYear() != QDateTime::currentDateTime().date().dayOfYear())
-            {
-                qDebug()<<"resetting heat load at " << QDateTime::currentDateTime() << "heatLoadLocalDate" << heatLoadLocalDate;
-                heatLoadMSec = 0;
-                heatLoad = 0;
-                heatLoadLocalDate = QDateTime::currentDateTime();
-            }
-
-            if(heatLoadMSec != 0 && heatStrain > HEATLOAD_OFFSET) //don't try to calculate a negative effective heat strain
-            {
-                //(HSI-AOC_Off)^AOC_EXP*TIME/AOC_Mult
-
-                qint64 deltaMSec = msecEpoc - heatLoadMSec;
-                double deltamin = deltaMSec / (1000.0 * 60.0); //msec to minutes
-
-                double newLoad = pow(heatStrain-HEATLOAD_OFFSET, HEATLOAD_EXP) * deltamin / HEATLOAD_MULT;
-
-                if(newLoad > 0)
-                    heatLoad += newLoad;
-
-                //qDebug()<<"newLoad is "<< newLoad << "a" << a << "b" << b << "heatStrain" << heatStrain << "c" << c << "deltamin" << deltamin << "heatLoad" << heatLoad;
-
-                if(heatLoad >= 10.0)
-                    heatLoad = 10.0;
-            }
-            heatLoadMSec = msecEpoc;
-
-            valueLabel->setText(QString("%1").arg(heatLoad, 0, 'f', 3)); //HACK, three DP for extra details
-        }
+        valueLabel->setText(QString("%1").arg(rtData.getHeatLoad(), 0, 'f', 3)); //HACK, three DP for extra details
         break;
 
     default:
