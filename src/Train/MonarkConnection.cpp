@@ -111,10 +111,14 @@ void MonarkConnection::run()
         QByteArray data = m_serial->readAll();
 
         // Set up polling
-        connect(m_timer, SIGNAL(timeout()), this, SLOT(requestAll()),Qt::DirectConnection);
+        if (!connect(m_timer, SIGNAL(timeout()), this, SLOT(requestAll()),Qt::DirectConnection)) {
+            qFatal("Failed to connect m_timer in MonarkConnection");
+        }
 
         // Set up initial model detection
-        connect(startupTimer, SIGNAL(timeout()), this, SLOT(identifyModel()),Qt::DirectConnection);
+        if (!connect(startupTimer, SIGNAL(timeout()), this, SLOT(identifyModel()),Qt::DirectConnection)) {
+            qFatal("Failed to connect startupTimer in MonarkConnection");
+        }
     }
 
     m_timer->setInterval(1000);
@@ -145,9 +149,9 @@ void MonarkConnection::requestAll()
     if ((m_loadToWrite != m_load) && m_mode == MONARK_MODE_WATT && canDoLoad())
     {
         QString cmd = QString("power %1\r").arg(m_loadToWrite);
-        m_serial->write(cmd.toStdString().c_str());
-        if (!m_serial->waitForBytesWritten(500))
+        if (m_serial->write(cmd.toStdString().c_str()) == -1 || !m_serial->waitForBytesWritten(500))
         {
+            qWarning() << "Failed to write to serial port " << m_serialPortName << " error: " << m_serial->errorString();
             // failure to write to device, bail out
             this->exit(-1);
         }
@@ -158,9 +162,9 @@ void MonarkConnection::requestAll()
     if ((m_kpToWrite != m_kp) && m_mode == MONARK_MODE_KP && canDoKp())
     {
         QString cmd = QString("kp %1\r").arg(QString::number(m_kpToWrite, 'f', 1 ));
-        m_serial->write(cmd.toStdString().c_str());
-        if (!m_serial->waitForBytesWritten(500))
+        if (m_serial->write(cmd.toStdString().c_str()) == -1 || !m_serial->waitForBytesWritten(500))
         {
+            qWarning() << "Failed to write to serial port " << m_serialPortName << " error: " << m_serial->errorString();
             // failure to write to device, bail out
             this->exit(-1);
         }
@@ -175,9 +179,9 @@ void MonarkConnection::requestAll()
         unsigned int load = (m_kpToWrite * m_cadence) * 0.98;
 
         QString cmd = QString("power %1\r").arg(load);
-        m_serial->write(cmd.toStdString().c_str());
-        if (!m_serial->waitForBytesWritten(500))
+        if (m_serial->write(cmd.toStdString().c_str()) == -1 || !m_serial->waitForBytesWritten(500))
         {
+            qWarning() << "Failed to write to serial port " << m_serialPortName << " error: " << m_serial->errorString();
             // failure to write to device, bail out
             this->exit(-1);
         }
@@ -191,10 +195,9 @@ void MonarkConnection::requestPower()
 {
     // Discard any existing data
     m_serial->readAll();
-
-    m_serial->write("power\r");
-    if (!m_serial->waitForBytesWritten(500))
+    if (m_serial->write("power\r") == -1 || !m_serial->waitForBytesWritten(500))
     {
+        qWarning() << "Failed to write to serial port " << m_serialPortName << " error: " << m_serial->errorString();
         // failure to write to device, bail out
         this->exit(-1);
     }
@@ -209,10 +212,9 @@ void MonarkConnection::requestPulse()
 {
     // Discard any existing data
     m_serial->readAll();
-
-    m_serial->write("pulse\r");
-    if (!m_serial->waitForBytesWritten(500))
+    if (m_serial->write("pulse\r") == -1 || !m_serial->waitForBytesWritten(500))
     {
+        qWarning() << "Failed to write to serial port " << m_serialPortName << " error: " << m_serial->errorString();
         // failure to write to device, bail out
         this->exit(-1);
     }
@@ -227,10 +229,9 @@ void MonarkConnection::requestCadence()
 {
     // Discard any existing data
     m_serial->readAll();
-
-    m_serial->write("pedal\r");
-    if (!m_serial->waitForBytesWritten(500))
+    if (m_serial->write("pedal\r") == -1 || !m_serial->waitForBytesWritten(500))
     {
+        qWarning() << "Failed to write to serial port " << m_serialPortName << " error: " << m_serial->errorString();
         // failure to write to device, bail out
         this->exit(-1);
     }
@@ -245,10 +246,9 @@ int MonarkConnection::readConfiguredLoad()
 {
     // Discard any existing data
     m_serial->readAll();
-
-    m_serial->write("B\r");
-    if (!m_serial->waitForBytesWritten(500))
+    if (m_serial->write("B\r") == -1 || !m_serial->waitForBytesWritten(500))
     {
+        qWarning() << "Failed to write to serial port " << m_serialPortName << " error: " << m_serial->errorString();
         // failure to write to device, bail out
         this->exit(-1);
     }
@@ -265,9 +265,9 @@ void MonarkConnection::identifyModel()
 
     QString servo = "";
 
-    m_serial->write("id\r");
-    if (!m_serial->waitForBytesWritten(500))
+    if (m_serial->write("id\r") == -1 || !m_serial->waitForBytesWritten(500))
     {
+        qWarning() << "Failed to write to serial port " << m_serialPortName << " error: " << m_serial->errorString();
         // failure to write to device, bail out
         this->exit(-1);
     }
@@ -275,9 +275,9 @@ void MonarkConnection::identifyModel()
 
     if (m_id.toLower().startsWith("novo"))
     {
-        m_serial->write("servo\r");
-        if (!m_serial->waitForBytesWritten(500))
+        if (m_serial->write("servo\r") == -1 || !m_serial->waitForBytesWritten(500))
         {
+            qWarning() << "Failed to write to serial port " << m_serialPortName << " error: " << m_serial->errorString();
             // failure to write to device, bail out
             this->exit(-1);
         }
@@ -337,7 +337,7 @@ void MonarkConnection::configurePort(QSerialPort *serialPort)
 
     // Send empty \r after configuring port, otherwise first command might not
     // be interpreted correctly
-    serialPort->write("\r");
+    (void)serialPort->write("\r");
 }
 
 bool MonarkConnection::canDoLoad()
@@ -399,7 +399,9 @@ bool MonarkConnection::discover(QString portName)
         QByteArray data = sp.readAll();
 
         // Read id from bike
-        sp.write("id\r");
+        if (sp.write("id\r") == -1) {
+            qWarning() << "Failed to write to serial port " << portName << " error: " << sp.errorString();
+        }
         sp.waitForBytesWritten(-1);
 
         QByteArray id;

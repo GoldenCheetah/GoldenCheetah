@@ -364,7 +364,10 @@ bool AbsWattagePage::SaveWorkout()
     }
     // open the file
     QFile f(filename);
-    f.open(QIODevice::WriteOnly | QIODevice::Text);
+    if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qWarning() << "Failed to open workout file for writing:" << filename;
+        return false;
+    }
     QTextStream stream(&f);
     // create the header
     SaveWorkoutHeader(stream,f.fileName(),QString("golden cheetah"),QString("MINUTES WATTS"));
@@ -506,7 +509,10 @@ bool RelWattagePage::SaveWorkout()
     }
     // open the file
     QFile f(filename);
-    f.open(QIODevice::WriteOnly | QIODevice::Text);
+    if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qWarning() << "Failed to open workout file for writing:" << filename;
+        return false;
+    }
     QTextStream stream(&f);
     // create the header
     SaveWorkoutHeader(stream,f.fileName(),QString("golden cheetah"),QString("MINUTES PERCENT"));
@@ -608,7 +614,10 @@ bool GradientPage::SaveWorkout()
     }
     // open the file
     QFile f(filename);
-    f.open(QIODevice::WriteOnly | QIODevice::Text);
+    if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qWarning() << "Failed to open workout file for writing:" << filename;
+        return false;
+    }
     QTextStream stream(&f);
     // create the header
     SaveWorkoutHeader(stream,f.fileName(),QString("golden cheetah"),QString("DISTANCE GRADE WIND"));
@@ -768,7 +777,10 @@ bool ImportPage::SaveWorkout()
     }
     // open the file
     QFile f(filename);
-    f.open(QIODevice::WriteOnly | QIODevice::Text);
+    if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qWarning() << "Failed to open workout file for writing:" << filename;
+        return false;
+    }
     QTextStream stream(&f);
     // create the header
     SaveWorkoutHeader(stream,f.fileName(),QString("golden cheetah"),QString("DISTANCE GRADE WIND"));

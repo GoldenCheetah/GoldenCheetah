@@ -176,7 +176,10 @@ CloudService::compressRide(RideFile*ride, QByteArray &data, QString name)
 {
     // compress via a temporary file
     QTemporaryFile tempfile;
-    tempfile.open();
+    if (!tempfile.open()) {
+        qWarning() << "Failed to open temp file for ride compression";
+        return;
+    }
     tempfile.close();
 
     // write as file type requested
@@ -202,14 +205,20 @@ CloudService::compressRide(RideFile*ride, QByteArray &data, QString name)
 
     if (result == true) {
         // read the ride file
-        jsonFile.open(QFile::ReadOnly);
+        if (!jsonFile.open(QFile::ReadOnly)) {
+            qWarning() << "Failed to open ride file for reading";
+            return;
+        }
         data = jsonFile.readAll();
         jsonFile.close();
 
         if (uploadCompression == zip) {
             // create a temp zip file
             QTemporaryFile zipFile;
-            zipFile.open();
+            if (!zipFile.open()) {
+                qWarning() << "Failed to open temp zip file";
+                return;
+            }
             zipFile.close();
 
             // add files using zip writer
@@ -222,7 +231,10 @@ CloudService::compressRide(RideFile*ride, QByteArray &data, QString name)
 
             // now read in the zipfile
             QFile zip(zipname);
-            zip.open(QFile::ReadOnly);
+            if (!zip.open(QFile::ReadOnly)) {
+                qWarning() << "Failed to open zip file for reading";
+                return;
+            }
             data = zip.readAll();
             zip.close();
         } else if (uploadCompression == gzip) {
@@ -251,8 +263,14 @@ CloudService::uncompressRide(QByteArray *data, QString name, QStringList &errors
     if (name.endsWith(".zip")) {
         // write out to a zip file first
         QTemporaryFile zipfile;
-        zipfile.open();
-        zipfile.write(*data);
+        if (!zipfile.open()) {
+            errors << tr("Failed to open temporary zip file.");
+            return NULL;
+        }
+        if (zipfile.write(*data) == -1) {
+            errors << tr("Failed to write to temporary zip file.");
+            return NULL;
+        }
         zipfile.close();
 
         // open zip
@@ -274,8 +292,15 @@ CloudService::uncompressRide(QByteArray *data, QString name, QStringList &errors
 
     // uncompress and write a file
     QFile file(tmp);
-    file.open(QFile::WriteOnly);
-    file.write(jsonData);
+    if (!file.open(QFile::WriteOnly)) {
+        errors << tr("Failed to open temporary file for writing.");
+        return NULL;
+    }
+    if (file.write(jsonData) == -1) {
+        errors << tr("Failed to write to temporary file.");
+        file.close();
+        return NULL;
+    }
     file.close();
 
     // read the file in using the correct ridefile reader
@@ -406,7 +431,9 @@ CloudServiceUploadDialog::CloudServiceUploadDialog(QWidget *parent, Context *con
     }
 
     // get notification when done
-    connect(store, SIGNAL(writeComplete(QString,QString)), this, SLOT(completed(QString,QString)));
+    if (!connect(store, SIGNAL(writeComplete(QString,QString)), this, SLOT(completed(QString,QString)))) {
+        qFatal("Failed to connect writeComplete signal in CloudServiceUploadDialog");
+    }
 
 }
 
@@ -427,7 +454,9 @@ CloudServiceUploadDialog::completed(QString file, QString message)
     progress->setMaximum(1);
     progress->setValue(1);
     okcancel->setText(tr("OK"));
-    connect(okcancel, SIGNAL(clicked()), this, SLOT(accept()));
+    if (!connect(okcancel, SIGNAL(clicked()), this, SLOT(accept()))) {
+        qFatal("Failed to connect okcancel clicked signal in CloudServiceUploadDialog");
+    }
 }
 
 CloudServiceDialog::CloudServiceDialog(QWidget *parent, CloudService *store, QString title, QString pathname, bool dironly) :
@@ -481,12 +510,24 @@ CloudServiceDialog::CloudServiceDialog(QWidget *parent, CloudService *store, QSt
     layout->addLayout(buttons);
 
     // want selection or not ?
-    connect(create, SIGNAL(clicked()), this, SLOT(createFolderClicked()));
-    connect(cancel, SIGNAL(clicked()), this, SLOT(reject()));
-    connect(open, SIGNAL(clicked()), this, SLOT(accept()));
-    connect(pathEdit, SIGNAL(returnPressed()), this, SLOT(returnPressed()));
-    connect(folders, SIGNAL(itemSelectionChanged()), this, SLOT(folderSelectionChanged()));
-    connect(files, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), this, SLOT(fileDoubleClicked(QTreeWidgetItem*,int)));
+    if (!connect(create, SIGNAL(clicked()), this, SLOT(createFolderClicked()))) {
+        qFatal("Failed to connect create clicked signal in CloudServiceDialog");
+    }
+    if (!connect(cancel, SIGNAL(clicked()), this, SLOT(reject()))) {
+        qFatal("Failed to connect cancel clicked signal in CloudServiceDialog");
+    }
+    if (!connect(open, SIGNAL(clicked()), this, SLOT(accept()))) {
+        qFatal("Failed to connect open clicked signal in CloudServiceDialog");
+    }
+    if (!connect(pathEdit, SIGNAL(returnPressed()), this, SLOT(returnPressed()))) {
+        qFatal("Failed to connect pathEdit returnPressed signal in CloudServiceDialog");
+    }
+    if (!connect(folders, SIGNAL(itemSelectionChanged()), this, SLOT(folderSelectionChanged()))) {
+        qFatal("Failed to connect folders itemSelectionChanged signal in CloudServiceDialog");
+    }
+    if (!connect(files, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), this, SLOT(fileDoubleClicked(QTreeWidgetItem*,int)))) {
+        qFatal("Failed to connect files itemDoubleClicked signal in CloudServiceDialog");
+    }
 
     // trap return key pressed for a file dialog
     installEventFilter(this);
@@ -701,8 +742,12 @@ FolderNameDialog::FolderNameDialog(QWidget *parent) : QDialog(parent)
     buttons->addWidget(create);
     layout->addLayout(buttons);
 
-    connect(cancel, SIGNAL(clicked()), this, SLOT(reject()));
-    connect(create, SIGNAL(clicked()), this, SLOT(accept()));
+    if (!connect(cancel, SIGNAL(clicked()), this, SLOT(reject()))) {
+        qFatal("Failed to connect cancel clicked signal in FolderNameDialog");
+    }
+    if (!connect(create, SIGNAL(clicked()), this, SLOT(accept()))) {
+        qFatal("Failed to connect create clicked signal in FolderNameDialog");
+    }
 }
 
 CloudServiceSyncDialog::CloudServiceSyncDialog(Context *context, CloudService *store)
@@ -745,8 +790,12 @@ CloudServiceSyncDialog::CloudServiceSyncDialog(Context *context, CloudService *s
     QVBoxLayout *syncLayout = new QVBoxLayout(sync);
 
     // notification when upload/download completes
-    connect (store, SIGNAL(writeComplete(QString,QString)), this, SLOT(completedWrite(QString,QString)));
-    connect (store, SIGNAL(readComplete(QByteArray*,QString,QString)), this, SLOT(completedRead(QByteArray*,QString,QString)));
+    if (!connect (store, SIGNAL(writeComplete(QString,QString)), this, SLOT(completedWrite(QString,QString)))) {
+        qFatal("Failed to connect writeComplete signal in CloudServiceSyncDialog");
+    }
+    if (!connect (store, SIGNAL(readComplete(QByteArray*,QString,QString)), this, SLOT(completedRead(QByteArray*,QString,QString)))) {
+        qFatal("Failed to connect readComplete signal in CloudServiceSyncDialog");
+    }
 
     // combo box
     athleteCombo = new QComboBox(this);

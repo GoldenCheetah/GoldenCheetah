@@ -172,14 +172,16 @@ LocalFileStore::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     };
 
     QFile file(path+"/"+remotename);
-    if (file.open(QIODevice::WriteOnly) ) {
-        file.write(data);
-        file.close();
-    } else {
+    if (!file.open(QIODevice::WriteOnly) ) {
         emit writeComplete("", tr("Write to folder %1 failed").arg(path));  // required for single upload to get to an end
         return false;
-    };
-
+    }
+    if (file.write(data) == -1) {
+        emit writeComplete("", tr("Write to folder %1 failed").arg(path));
+        file.close();
+        return false;
+    }
+    file.close();
     emit writeComplete("", tr("Completed."));
 
     return true;
