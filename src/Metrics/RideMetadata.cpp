@@ -1343,15 +1343,14 @@ FormField::editFinished()
     // update everything, because metric changes like CP
     // need to flush through. For interval metadata we
     // don't force a recalculation since its counter-productive
-    // user can save the activity if they really want the changes
-    // to be reflected now
-    if (changed && definition.interval == false) {
+    // but still mark the item as dirty so changes can be saved.
+    if (changed) {
 
         // we actually edited it !
-        setLinkedDefault(text);
+        if (definition.interval == false) setLinkedDefault(text);
 
         // and update !
-        ourRideItem->notifyRideMetadataChanged();
+        if (definition.interval == false) ourRideItem->notifyRideMetadataChanged();
 
         // rideFile is now dirty!
         ourRideItem->setDirty(true);
