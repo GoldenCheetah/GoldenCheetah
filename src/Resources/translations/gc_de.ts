@@ -29159,7 +29159,7 @@ Möchten Sie fortfahren?</translation>
         <location filename="../../Gui/PlanAdherence.cpp" line="1009"/>
         <location filename="../../Gui/PlanAdherence.cpp" line="1123"/>
         <source>Upcoming</source>
-        <translation>Bevorstehend</translation>
+        <translation>Demnächst</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1008"/>
@@ -29211,7 +29211,7 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1139"/>
         <source>1 day earlier (→ %1)</source>
-        <translation>%1 Tage früher (→ %2)</translation>
+        <translation>1 Tag früher (→ %1)</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1141"/>
@@ -29226,7 +29226,7 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1153"/>
         <source>%1 days early (%2)</source>
-        <translation>%1 Tage zu früh (→ %2)</translation>
+        <translation>%1 Tage zu früh (%2)</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1155"/>
@@ -29329,7 +29329,7 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1219"/>
         <source>Planned activities that were not completed</source>
-        <translation>Planned activities that were not completed</translation>
+        <translation>Geplante Aktivitäten, die nicht abgeschlossen wurden</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1220"/>
@@ -29344,7 +29344,7 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1221"/>
         <source>Total Shift Days</source>
-        <translation>Verschibungstage insgesamt</translation>
+        <translation>Verschiebungstage insgesamt</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1221"/>
@@ -29354,7 +29354,7 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1239"/>
         <source>No activities found</source>
-        <translation>Keine Aktivitäts gefunden</translation>
+        <translation>Keine Aktivitäten gefunden</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1240"/>
@@ -29364,7 +29364,7 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1241"/>
         <source>Try selecting a different month, adjusting your filters, or creating a new activity.</source>
-        <translation>Versuchen Sie, einen anderen Monat auszuwählen, Ihre Filter anzupassen oder eine neue Aktivität zu erstellen.</translation>
+        <translation>Versuchen Sie einen anderen Monat auszuwählen, Ihre Filter anzupassen oder eine neue Aktivität zu erstellen.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanAdherence.cpp" line="1318"/>
@@ -30587,7 +30587,7 @@ Python wird in den Einstellungen deaktiviert.</translation>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1796"/>
         <source>When</source>
-        <translation>Wenn</translation>
+        <translation type="unfinished">Wann</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1800"/>
