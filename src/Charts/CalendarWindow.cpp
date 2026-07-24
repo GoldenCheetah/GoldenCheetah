@@ -940,6 +940,7 @@ CalendarWindow::mkControls
     controlsTabs->addTab(centerLayoutInWidget(entriesForm, false), tr("Calendar Entries"));
     controlsTabs->addTab(multiMetricSelector, tr("Summary"));
 
+    connect(measureTimeEdit, &QTimeEdit::timeChanged, this, &CalendarWindow::setMeasureTime);
     connect(startHourSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setStartHour);
     connect(endHourSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setEndHour);
     connect(minVisibleMinsSpin, &QSpinBox::valueChanged, this, &CalendarWindow::setMinVisibleMins);
