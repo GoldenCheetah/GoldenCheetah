@@ -6510,48 +6510,48 @@ ddd, dd MMM yyyy</translation>
 <context>
     <name>Calendar</name>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="2013"/>
+        <location filename="../../Gui/Calendar.cpp" line="2021"/>
         <source>Previous Month</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="2014"/>
+        <location filename="../../Gui/Calendar.cpp" line="2022"/>
         <source>Next Month</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="2015"/>
+        <location filename="../../Gui/Calendar.cpp" line="2023"/>
         <source>Today</source>
         <translation type="unfinished">Dnes</translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="2035"/>
+        <location filename="../../Gui/Calendar.cpp" line="2043"/>
         <source>Filters applied</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="2043"/>
+        <location filename="../../Gui/Calendar.cpp" line="2051"/>
         <source>Day</source>
         <translation type="unfinished">Den</translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="2049"/>
+        <location filename="../../Gui/Calendar.cpp" line="2057"/>
         <source>Week</source>
         <translation type="unfinished">Týden</translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="2054"/>
+        <location filename="../../Gui/Calendar.cpp" line="2062"/>
         <source>Month</source>
         <translation type="unfinished">Měsíc</translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="2391"/>
-        <location filename="../../Gui/Calendar.cpp" line="2560"/>
+        <location filename="../../Gui/Calendar.cpp" line="2399"/>
+        <location filename="../../Gui/Calendar.cpp" line="2576"/>
         <source>Season: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="2479"/>
+        <location filename="../../Gui/Calendar.cpp" line="2495"/>
         <source>Week %1 (%2 - %3)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6729,46 +6729,46 @@ ddd, dd MMM yyyy</translation>
 <context>
     <name>CalendarDayView</name>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="1717"/>
+        <location filename="../../Gui/Calendar.cpp" line="1725"/>
         <source>
 (%1 days earlier)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="1719"/>
+        <location filename="../../Gui/Calendar.cpp" line="1727"/>
         <source>
 (%1 day earlier)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="1721"/>
+        <location filename="../../Gui/Calendar.cpp" line="1729"/>
         <source>Valid since</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="1733"/>
+        <location filename="../../Gui/Calendar.cpp" line="1741"/>
         <source>No measure available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="1740"/>
-        <location filename="../../Gui/Calendar.cpp" line="1775"/>
+        <location filename="../../Gui/Calendar.cpp" line="1748"/>
+        <location filename="../../Gui/Calendar.cpp" line="1783"/>
         <source>Add Measure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="1750"/>
-        <location filename="../../Gui/Calendar.cpp" line="1775"/>
+        <location filename="../../Gui/Calendar.cpp" line="1758"/>
+        <location filename="../../Gui/Calendar.cpp" line="1783"/>
         <source>Edit Measure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="1784"/>
+        <location filename="../../Gui/Calendar.cpp" line="1792"/>
         <source>Start Date</source>
         <translation type="unfinished">Datum začátkku</translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="1816"/>
+        <location filename="../../Gui/Calendar.cpp" line="1824"/>
         <source>Comment</source>
         <translation type="unfinished">Poznámka</translation>
     </message>
@@ -6823,238 +6823,243 @@ ddd, dd MMM yyyy</translation>
 <context>
     <name>CalendarWindow</name>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="396"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="397"/>
         <source>Delete Activity</source>
         <translation type="unfinished">Smazat aktivitu</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="396"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="397"/>
         <source>Are you sure you want to delete %1?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="838"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="856"/>
         <source>Day</source>
         <translation type="unfinished">Den</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="839"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="857"/>
         <source>Week</source>
         <translation type="unfinished">Týden</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="840"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="858"/>
         <source>Month</source>
         <translation type="unfinished">Měsíc</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="856"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="875"/>
         <source>mins</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="858"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="877"/>
         <source>Always</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="859"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="878"/>
         <source>If upcoming or missed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="860"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="879"/>
         <source>If upcoming</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="861"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="880"/>
         <source>Never</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="862"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="881"/>
         <source>Day View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="864"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="883"/>
         <source>Week View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="866"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="885"/>
         <source>Month View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="871"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="890"/>
         <source>Show Label</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="884"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="903"/>
         <source>Available Metrics</source>
         <translation type="unfinished">Dostupné metriky</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="884"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="903"/>
         <source>Selected Metrics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="890"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="909"/>
         <source>Calendar Basics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="891"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="910"/>
         <source>Startup View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="892"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="911"/>
         <source>First Day of Week</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="893"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="912"/>
         <source>Minimum Display Duration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="895"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="914"/>
         <source>Default Times</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="896"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="915"/>
+        <source>New Measure Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/CalendarWindow.cpp" line="916"/>
         <source>Default Start Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="897"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="917"/>
         <source>Default End Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="899"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="919"/>
         <source>Summary Options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="900"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="920"/>
         <source>Include Planned</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="901"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="921"/>
         <source>Show Summary In</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="907"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="927"/>
         <source>Main Line</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="908"/>
-        <location filename="../../Charts/CalendarWindow.cpp" line="916"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="928"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="936"/>
         <source>Field</source>
         <translation type="unfinished">Pole</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="909"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="929"/>
         <source>Fallback Field</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="911"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="931"/>
         <source>Metric Line</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="912"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="932"/>
         <source>Metric</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="915"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="935"/>
         <source>Detail Line (Day and Week View only)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="919"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="939"/>
         <source>General</source>
         <translation type="unfinished">Obecné</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="920"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="940"/>
         <source>Calendar Entries</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="921"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="941"/>
         <source>Summary</source>
         <translation type="unfinished">Souhrn</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1285"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1305"/>
         <source>Unnamed %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1287"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1307"/>
         <source>&lt;unknown&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1449"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1469"/>
         <source>day</source>
         <translation type="unfinished">den</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1451"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1471"/>
         <source>days</source>
         <translation type="unfinished">dny</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1456"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1476"/>
         <source>week</source>
         <translation type="unfinished">týden</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1458"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1478"/>
         <source>weeks</source>
         <translation type="unfinished">týdny</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1463"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1483"/>
         <source>month</source>
         <translation type="unfinished">měsíc</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1465"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1485"/>
         <source>months</source>
         <translation type="unfinished">měsíce</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1541"/>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1560"/>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1578"/>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1657"/>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1683"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1561"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1580"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1598"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1677"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1703"/>
         <source>Failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1578"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1598"/>
         <source>No matching activity found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1740"/>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1745"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1760"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1765"/>
         <source>Paste failed: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -24720,17 +24725,17 @@ Nebyly nalezeny žádné jízdy k importu.
 <context>
     <name>MultiDeviceDialog</name>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="3071"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="3043"/>
         <source>Multiple Device Configuration</source>
         <translation>Konfigurace s více zařízeními</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="3126"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="3098"/>
         <source>Cancel</source>
         <translation type="unfinished">Zrušit</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="3129"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="3101"/>
         <source>Apply</source>
         <translation type="unfinished">Použít</translation>
     </message>
@@ -30122,337 +30127,337 @@ You can disable Python in Options &gt; General if you don&apos;t need it.</sourc
 <context>
     <name>RealtimeData</name>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="651"/>
+        <location filename="../../Train/RealtimeData.cpp" line="854"/>
         <source>None</source>
         <translation>Žádný</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="654"/>
+        <location filename="../../Train/RealtimeData.cpp" line="857"/>
         <source>Time</source>
         <translation>Čas</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="657"/>
+        <location filename="../../Train/RealtimeData.cpp" line="860"/>
         <source>Lap</source>
         <translation>Úsek</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="660"/>
+        <location filename="../../Train/RealtimeData.cpp" line="863"/>
         <source>Lap Time</source>
         <translation>Čas úseku</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="663"/>
+        <location filename="../../Train/RealtimeData.cpp" line="866"/>
         <source>Lap Time Remaining</source>
         <translation>Zbývající čas úseku</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="666"/>
+        <location filename="../../Train/RealtimeData.cpp" line="869"/>
         <source>Section Time Remaining</source>
         <translation>Zbývající čas sekce</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="669"/>
+        <location filename="../../Train/RealtimeData.cpp" line="872"/>
         <source>BikeStress</source>
         <translation>BikeStress</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="675"/>
+        <location filename="../../Train/RealtimeData.cpp" line="878"/>
         <source>kJoules</source>
         <translation>kJoules</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="678"/>
+        <location filename="../../Train/RealtimeData.cpp" line="881"/>
         <source>W&apos; bal</source>
         <translation>W&apos; poměr</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="681"/>
+        <location filename="../../Train/RealtimeData.cpp" line="884"/>
         <source>XPower</source>
         <translation>XVýkon</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="684"/>
+        <location filename="../../Train/RealtimeData.cpp" line="887"/>
         <source>Iso Power</source>
         <translation>IsoVýkon</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="687"/>
+        <location filename="../../Train/RealtimeData.cpp" line="890"/>
         <source>Intensity Factor</source>
         <translation>Faktor intenzity</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="690"/>
+        <location filename="../../Train/RealtimeData.cpp" line="893"/>
         <source>Relative Intensity</source>
         <translation>Relativní intenzita</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="693"/>
+        <location filename="../../Train/RealtimeData.cpp" line="896"/>
         <source>Skiba Variability Index</source>
         <translation>Skiba index variability</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="696"/>
+        <location filename="../../Train/RealtimeData.cpp" line="899"/>
         <source>Variability Index</source>
         <translation>Index variability</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="699"/>
+        <location filename="../../Train/RealtimeData.cpp" line="902"/>
         <source>Distance</source>
         <translation>Vzdálenost</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="702"/>
+        <location filename="../../Train/RealtimeData.cpp" line="905"/>
         <source>Route Distance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="705"/>
+        <location filename="../../Train/RealtimeData.cpp" line="908"/>
         <source>Distance Remaining</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="708"/>
+        <location filename="../../Train/RealtimeData.cpp" line="911"/>
         <source>VAM</source>
         <translation type="unfinished">VAM</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="711"/>
+        <location filename="../../Train/RealtimeData.cpp" line="914"/>
         <source>Alternate Power</source>
         <translation>Alternativní výkon</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="714"/>
+        <location filename="../../Train/RealtimeData.cpp" line="917"/>
         <source>Power</source>
         <translation>Výkon</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="717"/>
+        <location filename="../../Train/RealtimeData.cpp" line="920"/>
         <source>Speed</source>
         <translation>Rychlost</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="720"/>
+        <location filename="../../Train/RealtimeData.cpp" line="923"/>
         <source>Virtual Speed</source>
         <translation>Virtuální rychlost</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="723"/>
+        <location filename="../../Train/RealtimeData.cpp" line="926"/>
         <source>Cadence</source>
         <translation>Kadence</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="726"/>
+        <location filename="../../Train/RealtimeData.cpp" line="929"/>
         <source>Heart Rate</source>
         <translation>Tepová frekvence</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="729"/>
+        <location filename="../../Train/RealtimeData.cpp" line="932"/>
         <source>Target Power</source>
         <translation>Cílový výkon</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="732"/>
+        <location filename="../../Train/RealtimeData.cpp" line="935"/>
         <source>Average Power</source>
         <translation>Průměrný výkon</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="735"/>
+        <location filename="../../Train/RealtimeData.cpp" line="938"/>
         <source>Average Speed</source>
         <translation>Průměrná rychlost</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="738"/>
+        <location filename="../../Train/RealtimeData.cpp" line="941"/>
         <source>Average Heartrate</source>
         <translation>Průměrná tepová frekvence</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="741"/>
+        <location filename="../../Train/RealtimeData.cpp" line="944"/>
         <source>Average Cadence</source>
         <translation>Průměrná kadence</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="744"/>
+        <location filename="../../Train/RealtimeData.cpp" line="947"/>
         <source>Lap Power</source>
         <translation>Výkon na úseku</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="747"/>
+        <location filename="../../Train/RealtimeData.cpp" line="950"/>
         <source>Lap Speed</source>
         <translation>Rychlost na úseku</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="750"/>
+        <location filename="../../Train/RealtimeData.cpp" line="953"/>
         <source>Lap Heartrate</source>
         <translation>TF na úseku</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="753"/>
+        <location filename="../../Train/RealtimeData.cpp" line="956"/>
         <source>Lap Cadence</source>
         <translation>Kadence na úseku</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="756"/>
+        <location filename="../../Train/RealtimeData.cpp" line="959"/>
         <source>Left/Right Balance</source>
         <translation>Levá/pravá poměr</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="759"/>
+        <location filename="../../Train/RealtimeData.cpp" line="962"/>
         <source>Total Hb Mass</source>
         <translation>Celková Hb hmotnost</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="762"/>
+        <location filename="../../Train/RealtimeData.cpp" line="965"/>
         <source>Hb O2 Saturation</source>
         <translation>Hb O2 Saturace</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="765"/>
+        <location filename="../../Train/RealtimeData.cpp" line="968"/>
         <source>Deoxy Hb</source>
         <translation>Deoxy Hb</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="768"/>
+        <location filename="../../Train/RealtimeData.cpp" line="971"/>
         <source>Oxy Hb</source>
         <translation>Oxy Hb</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="771"/>
+        <location filename="../../Train/RealtimeData.cpp" line="974"/>
         <source>Left Torque Effectiveness</source>
         <translation>Levá efektivita šlapání</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="774"/>
+        <location filename="../../Train/RealtimeData.cpp" line="977"/>
         <source>Right Torque Effectiveness</source>
         <translation>Pravá efektivita šlapání</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="777"/>
+        <location filename="../../Train/RealtimeData.cpp" line="980"/>
         <source>Left Pedal Smoothness</source>
         <translation>Levá plynulost šlapání</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="780"/>
+        <location filename="../../Train/RealtimeData.cpp" line="983"/>
         <source>Right Pedal Smoothness</source>
         <translation>Pravá plynulost šlapání</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="783"/>
+        <location filename="../../Train/RealtimeData.cpp" line="986"/>
         <source>Right Power Phase Start</source>
         <translation type="unfinished">Pravá fáze výkonu začátek</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="786"/>
+        <location filename="../../Train/RealtimeData.cpp" line="989"/>
         <source>Right Power Phase End</source>
         <translation type="unfinished">Pravá fáze výkonu konec</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="789"/>
+        <location filename="../../Train/RealtimeData.cpp" line="992"/>
         <source>Right Power Phase Peak Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="792"/>
+        <location filename="../../Train/RealtimeData.cpp" line="995"/>
         <source>Right Power Phase Peak End</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="795"/>
+        <location filename="../../Train/RealtimeData.cpp" line="998"/>
         <source>Slope</source>
         <translation>Sklon</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="798"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1001"/>
         <source>Lap Distance</source>
         <translation>Vzdálenost úseku</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="801"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1004"/>
         <source>Lap Distance Remaining</source>
         <translation>Zbývající vzdálenost úseku</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="804"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1007"/>
         <source>Latitude</source>
         <translation>Zeměpisná šířka</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="807"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1010"/>
         <source>Longitude</source>
         <translation>Zeměpisná délka</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="810"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1013"/>
         <source>Altitude</source>
         <translation>Nadmořská výška</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="813"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1016"/>
         <source>Respiratory Frequency</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="816"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1019"/>
         <source>Ventilation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="819"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1022"/>
         <source>VO2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="822"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1025"/>
         <source>VCO2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="825"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1028"/>
         <source>Respiratory Exchange Ratio</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="828"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1031"/>
         <source>Tidal Volume</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="831"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1034"/>
         <source>Fraction O2 Expired</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="834"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1037"/>
         <source>Temperature</source>
         <translation type="unfinished">Teplota</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="837"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1040"/>
         <source>Core Temp</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="839"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1042"/>
         <source>Skin Temp</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="841"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1044"/>
         <source>Heat Strain</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="843"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1046"/>
         <source>Estimated Heat Load</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="846"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1049"/>
         <source>Right PCO</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="848"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1051"/>
         <source>Left PCO</source>
         <translation type="unfinished"></translation>
     </message>
@@ -32930,12 +32935,12 @@ Automatic import from defined directories is completed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Metrics/RideMetadata.cpp" line="1678"/>
+        <location filename="../../Metrics/RideMetadata.cpp" line="1677"/>
         <source>Problem Saving Meta Data</source>
         <translation>Problém při ukladání metadat</translation>
     </message>
     <message>
-        <location filename="../../Metrics/RideMetadata.cpp" line="1679"/>
+        <location filename="../../Metrics/RideMetadata.cpp" line="1678"/>
         <source>File: %1 cannot be opened for &apos;Writing&apos;. Please check file properties.</source>
         <translation>Soubor: %1 nelze otevřít pro zápis. Prosím zkontrolujte vlastnosti souboru.</translation>
     </message>
@@ -36360,25 +36365,25 @@ tab.</source>
 <context>
     <name>TrainSidebar</name>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="252"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="256"/>
         <source>Save workout data</source>
         <translation>Uložit data cvičení</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="258"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="262"/>
         <source>Devices</source>
         <translation>Zařízení</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="261"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="266"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="310"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="320"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="265"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="270"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="314"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="324"/>
         <source>Menu</source>
         <translation>Menu</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="265"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="269"/>
         <source>Workouts</source>
         <translation>Cvičení</translation>
     </message>
@@ -36387,77 +36392,77 @@ tab.</source>
         <translation type="obsolete">Filtrovat...</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="302"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="306"/>
         <source>Workout Info</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="309"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="313"/>
         <source>Media</source>
         <translation>Média</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="319"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="323"/>
         <source>VideoSync</source>
         <translation>VideoSync</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="506"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="504"/>
         <source>Import Workout from File</source>
         <translation>Importovat cvičení ze souboru</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="507"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="505"/>
         <source>Get Workouts from TrainerDay</source>
         <translation>Stáhnout cvičení z TrainerDay</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="509"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="507"/>
         <source>Create Workout via Wizard</source>
         <translation>Vytvořit cvičení pomocí průvodce</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="510"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="508"/>
         <source>Scan for Workouts</source>
         <translation>Vyhledat cvičení</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="534"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="532"/>
         <source>Delete selected Workout</source>
         <translation>Odstranit zvolené cvičení</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="537"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="535"/>
         <source>Delete %1 selected Workouts</source>
         <translation>Odstranit %1 zvolených cvičení</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="561"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="559"/>
         <source>Train mode active</source>
         <translation>Tréninkový mód aktivní</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="561"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="559"/>
         <source>Please stop the train mode before closing the window or application.</source>
         <translation>Prosím zastavte tréninkový mód než zavřete okno nebo ukončíte aplikaci.</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="635"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="633"/>
         <source>Remove reference to selected video</source>
         <translation>Odstranit referenci pro zvolené video</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="650"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="648"/>
         <source>Import VideoSync from File</source>
         <translation>Importovat VideoSync ze souboru</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="651"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="649"/>
         <source>Scan for VideoSyncs</source>
         <translation>Vyhledat VideoSyncy</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="664"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="662"/>
         <source>Delete selected VideoSync</source>
         <translation>Odstranit vybraný VideoSync</translation>
     </message>
@@ -36504,26 +36509,26 @@ tab.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2251"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2223"/>
         <source>Recalibrating steering..</source>
         <translation>Probíhá rekalibrace řízení..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2544"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2548"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2617"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2668"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2672"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2516"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2520"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2589"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2640"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2644"/>
         <source>Requesting calibration..</source>
         <translation>Žádám o kalibraci..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2555"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2527"/>
         <source>Calibrating...</source>
         <translation>Kalibrování...</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2559"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2531"/>
         <source>Calibrating...
 Current speed %1 kph
 Increase speed to %2 kph</source>
@@ -36532,14 +36537,14 @@ Aktuální rychlost %1 km/h
 Zvyšte rychlost na %2 km/h</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2563"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2535"/>
         <source>Calibrating...
 Stop pedalling until speed drops to 0</source>
         <translation>Kalibrování...
 Přestaňte šlapat, než se rychlost sníží na 0</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2568"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2540"/>
         <source>Calibration completed successfully!
 Spindown %1 ms
 Zero Offset %2</source>
@@ -36548,30 +36553,30 @@ Setrvačník zastavený po %1 ms
 Ofset od nuly %2</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2576"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2643"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2695"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2548"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2615"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2667"/>
         <source>Calibration failed!</source>
         <translation>Kalibrace selhala!</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2584"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2556"/>
         <source>Calibration Failed: Loosen Roller</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2592"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2564"/>
         <source>Calibration Failed: Tighten Roller</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2611"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2662"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2583"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2634"/>
         <source>Unclip or stop pedalling to begin calibration..</source>
         <translation>Vycvakněte nebo přestaňte šlapat pro začátek kalibrace..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2630"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2602"/>
         <source>Calibrating...
 Unclip or stop pedalling until process is completed..
 Torque %1</source>
@@ -36580,7 +36585,7 @@ Vycvakněte nebo přestaňte šlapat než bude proces dokončen..
 Točivý moment %1</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2635"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2607"/>
         <source>Calibration completed successfully!
 Zero Offset %1
 Torque %2</source>
@@ -36589,7 +36594,7 @@ Ofset od nuly %1
 Točivý moment %2</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2682"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2654"/>
         <source>Calibrating...
 Unclip or stop pedalling until process is completed..
 Zero Offset %1</source>
@@ -36598,7 +36603,7 @@ Vycvakněte nebo přestaňte šlapat než bude proces dokončen..
 Ofset od nuly %1</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2687"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2659"/>
         <source>Calibration completed successfully!
 Zero Offset %1
 Slope %2</source>
@@ -36607,90 +36612,90 @@ Ofset od nuly %1
 Sklon %2</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2716"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2688"/>
         <source>Give the pedal a kick to start calibration...
 The motor will run until calibration is complete.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2718"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2690"/>
         <source>Allow wheel speed to settle, DO NOT PEDAL...
 The motor will run until calibration is complete.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2723"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2695"/>
         <source>Calibrating... DO NOT PEDAL, remain seated...
 Gathering enough samples to calculate average: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2730"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2702"/>
         <source>Calibrating... DO NOT PEDAL, remain seated...
 Waiting for value to stabilize (max %1s): %2 (%3W @ %4kph)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2745"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2717"/>
         <source>Calibration completed successfully!
 Final calibration value %1 (%2W @ %3kph)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2757"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2729"/>
         <source>Calibration failed! Do not pedal while calibration is taking place.
 Allow wheel to run freely.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2803"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2775"/>
         <source>Fast forward..</source>
         <translation>Rychle dopředu..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2836"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2808"/>
         <source>Rewind..</source>
         <translation>Přetočit..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2866"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2838"/>
         <source>Next Lap..</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2899"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2871"/>
         <source>Back Lap..</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2925"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2897"/>
         <source>Increasing intensity..</source>
         <translation>Zvyšování intenzity..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2951"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2923"/>
         <source>Decreasing intensity..</source>
         <translation>Sniřování intenzity..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="621"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="619"/>
         <source>Import Video from File</source>
         <translation>Importovat video ze souboru</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="508"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="506"/>
         <source>Get Workouts from Strava Routes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="622"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="620"/>
         <source>Scan for Videos</source>
         <translation>Vyhledat videa</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="1114"/>
         <location filename="../../Train/TrainSidebar.cpp" line="1186"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="3206"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="3178"/>
         <source>Delete</source>
         <translation>Smazat</translation>
     </message>
@@ -36705,71 +36710,71 @@ Allow wheel to run freely.</source>
         <translation>Pozastaveno..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1478"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1477"/>
         <source>Starting..</source>
         <translation>Žačínání..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1686"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1679"/>
         <source>Stopped..</source>
         <translation>Zastaveno..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1778"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1771"/>
         <source>Connected..</source>
         <translation>Připojeno..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1802"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1795"/>
         <source>Disconnected..</source>
         <translation>Odpojeno..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2224"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2200"/>
         <source>New lap..</source>
         <translation>Nový úsek..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2258"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2230"/>
         <source>No Devices Configured</source>
         <translation>Není nakonfigurováno žádné zařízení</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2258"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2230"/>
         <source>Please configure a device in Preferences.</source>
         <translation>Prosím nakonfigurujte zařízení v preferencích.</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2506"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2478"/>
         <source>Exiting calibration..</source>
         <translation>Ukončení kalibrace..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2521"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2493"/>
         <source>Calibration not supported for this device.</source>
         <translation>Kalibrace na tomto zařízení není podporována.</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2528"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2500"/>
         <source>Calibrating...
 Press F3 on Controller when done.</source>
         <translation>Kalibrování...
 Stiskněte F3 na ovladači, jakmile bude dokončena.</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="3158"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="3176"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="3130"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="3148"/>
         <source>Add Device</source>
         <translation>Přidat zařízení</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="3163"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="3181"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="3135"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="3153"/>
         <source>Delete Device</source>
         <translation>Odstranit zařízení</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="3204"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="3176"/>
         <source>Are you sure you want to delete this device?</source>
         <translation>Jste si jistí, že chcete smazat toto zařízení?</translation>
     </message>
