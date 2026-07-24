@@ -265,7 +265,7 @@ QString HtmlTrainingBridge::getConfig()
     obj["max_power_w"] = maxPower;
     obj["max_hr_bpm"] = maxHr;
 
-    obj["is_dark_background"] = GCColor::isDark(GColor(CPLOTBACKGROUND));
+    obj["is_dark_background"] = GCColor::isDark(GColor(CTRAINPLOTBACKGROUND));
 
     return QString::fromUtf8(QJsonDocument(obj).toJson(QJsonDocument::Compact));
 }
