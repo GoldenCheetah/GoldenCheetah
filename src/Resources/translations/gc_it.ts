@@ -6545,48 +6545,48 @@ ddd, dd MMM yyyy</translation>
 <context>
     <name>Calendar</name>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="2013"/>
+        <location filename="../../Gui/Calendar.cpp" line="2021"/>
         <source>Previous Month</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="2014"/>
+        <location filename="../../Gui/Calendar.cpp" line="2022"/>
         <source>Next Month</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="2015"/>
+        <location filename="../../Gui/Calendar.cpp" line="2023"/>
         <source>Today</source>
         <translation type="unfinished">Oggi</translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="2035"/>
+        <location filename="../../Gui/Calendar.cpp" line="2043"/>
         <source>Filters applied</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="2043"/>
+        <location filename="../../Gui/Calendar.cpp" line="2051"/>
         <source>Day</source>
         <translation type="unfinished">Giorno</translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="2049"/>
+        <location filename="../../Gui/Calendar.cpp" line="2057"/>
         <source>Week</source>
         <translation type="unfinished">Settimana</translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="2054"/>
+        <location filename="../../Gui/Calendar.cpp" line="2062"/>
         <source>Month</source>
         <translation type="unfinished">Mese</translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="2391"/>
-        <location filename="../../Gui/Calendar.cpp" line="2560"/>
+        <location filename="../../Gui/Calendar.cpp" line="2399"/>
+        <location filename="../../Gui/Calendar.cpp" line="2576"/>
         <source>Season: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="2479"/>
+        <location filename="../../Gui/Calendar.cpp" line="2495"/>
         <source>Week %1 (%2 - %3)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6764,46 +6764,46 @@ ddd, dd MMM yyyy</translation>
 <context>
     <name>CalendarDayView</name>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="1717"/>
+        <location filename="../../Gui/Calendar.cpp" line="1725"/>
         <source>
 (%1 days earlier)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="1719"/>
+        <location filename="../../Gui/Calendar.cpp" line="1727"/>
         <source>
 (%1 day earlier)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="1721"/>
+        <location filename="../../Gui/Calendar.cpp" line="1729"/>
         <source>Valid since</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="1733"/>
+        <location filename="../../Gui/Calendar.cpp" line="1741"/>
         <source>No measure available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="1740"/>
-        <location filename="../../Gui/Calendar.cpp" line="1775"/>
+        <location filename="../../Gui/Calendar.cpp" line="1748"/>
+        <location filename="../../Gui/Calendar.cpp" line="1783"/>
         <source>Add Measure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="1750"/>
-        <location filename="../../Gui/Calendar.cpp" line="1775"/>
+        <location filename="../../Gui/Calendar.cpp" line="1758"/>
+        <location filename="../../Gui/Calendar.cpp" line="1783"/>
         <source>Edit Measure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="1784"/>
+        <location filename="../../Gui/Calendar.cpp" line="1792"/>
         <source>Start Date</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Calendar.cpp" line="1816"/>
+        <location filename="../../Gui/Calendar.cpp" line="1824"/>
         <source>Comment</source>
         <translation type="unfinished">Commento</translation>
     </message>
@@ -6858,238 +6858,243 @@ ddd, dd MMM yyyy</translation>
 <context>
     <name>CalendarWindow</name>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="396"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="397"/>
         <source>Delete Activity</source>
         <translation type="unfinished">Cancella Attività</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="396"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="397"/>
         <source>Are you sure you want to delete %1?</source>
         <translation type="unfinished">Sei sicuro di voler cancellare %1?</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="838"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="856"/>
         <source>Day</source>
         <translation type="unfinished">Giorno</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="839"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="857"/>
         <source>Week</source>
         <translation type="unfinished">Settimana</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="840"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="858"/>
         <source>Month</source>
         <translation type="unfinished">Mese</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="856"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="875"/>
         <source>mins</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="858"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="877"/>
         <source>Always</source>
         <translation type="unfinished">Sempre</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="859"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="878"/>
         <source>If upcoming or missed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="860"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="879"/>
         <source>If upcoming</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="861"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="880"/>
         <source>Never</source>
         <translation type="unfinished">Mai</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="862"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="881"/>
         <source>Day View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="864"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="883"/>
         <source>Week View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="866"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="885"/>
         <source>Month View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="871"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="890"/>
         <source>Show Label</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="884"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="903"/>
         <source>Available Metrics</source>
         <translation type="unfinished">Misure Disponibili</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="884"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="903"/>
         <source>Selected Metrics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="890"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="909"/>
         <source>Calendar Basics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="891"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="910"/>
         <source>Startup View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="892"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="911"/>
         <source>First Day of Week</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="893"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="912"/>
         <source>Minimum Display Duration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="895"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="914"/>
         <source>Default Times</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="896"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="915"/>
+        <source>New Measure Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/CalendarWindow.cpp" line="916"/>
         <source>Default Start Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="897"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="917"/>
         <source>Default End Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="899"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="919"/>
         <source>Summary Options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="900"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="920"/>
         <source>Include Planned</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="901"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="921"/>
         <source>Show Summary In</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="907"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="927"/>
         <source>Main Line</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="908"/>
-        <location filename="../../Charts/CalendarWindow.cpp" line="916"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="928"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="936"/>
         <source>Field</source>
         <translation type="unfinished">Campo</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="909"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="929"/>
         <source>Fallback Field</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="911"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="931"/>
         <source>Metric Line</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="912"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="932"/>
         <source>Metric</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="915"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="935"/>
         <source>Detail Line (Day and Week View only)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="919"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="939"/>
         <source>General</source>
         <translation type="unfinished">Generale</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="920"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="940"/>
         <source>Calendar Entries</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="921"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="941"/>
         <source>Summary</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1285"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1305"/>
         <source>Unnamed %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1287"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1307"/>
         <source>&lt;unknown&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1449"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1469"/>
         <source>day</source>
         <translation type="unfinished">giorno</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1451"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1471"/>
         <source>days</source>
         <translation type="unfinished">giorni</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1456"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1476"/>
         <source>week</source>
         <translation type="unfinished">settimana</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1458"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1478"/>
         <source>weeks</source>
         <translation type="unfinished">settimane</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1463"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1483"/>
         <source>month</source>
         <translation type="unfinished">mese</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1465"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1485"/>
         <source>months</source>
         <translation type="unfinished">mesi</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1541"/>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1560"/>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1578"/>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1657"/>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1683"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1561"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1580"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1598"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1677"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1703"/>
         <source>Failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1578"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1598"/>
         <source>No matching activity found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1740"/>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1745"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1760"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1765"/>
         <source>Paste failed: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -25146,17 +25151,17 @@ Nessuna uscita in bici trovata da importare.
 <context>
     <name>MultiDeviceDialog</name>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="3071"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="3043"/>
         <source>Multiple Device Configuration</source>
         <translation>Configurazione Disposistivi Multipli</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="3126"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="3098"/>
         <source>Cancel</source>
         <translation>Cancella</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="3129"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="3101"/>
         <source>Apply</source>
         <translation>Applica</translation>
     </message>
@@ -30570,337 +30575,337 @@ You can disable Python in Options &gt; General if you don&apos;t need it.</sourc
 <context>
     <name>RealtimeData</name>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="651"/>
+        <location filename="../../Train/RealtimeData.cpp" line="854"/>
         <source>None</source>
         <translation>Nessuno</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="654"/>
+        <location filename="../../Train/RealtimeData.cpp" line="857"/>
         <source>Time</source>
         <translation>Tempo</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="657"/>
+        <location filename="../../Train/RealtimeData.cpp" line="860"/>
         <source>Lap</source>
         <translation>Giro</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="660"/>
+        <location filename="../../Train/RealtimeData.cpp" line="863"/>
         <source>Lap Time</source>
         <translation>Tempo Giro</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="663"/>
+        <location filename="../../Train/RealtimeData.cpp" line="866"/>
         <source>Lap Time Remaining</source>
         <translation>Tempo Rimanente sul Giro</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="666"/>
+        <location filename="../../Train/RealtimeData.cpp" line="869"/>
         <source>Section Time Remaining</source>
         <translation>Tempo Rimanente sulla Sezione</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="669"/>
+        <location filename="../../Train/RealtimeData.cpp" line="872"/>
         <source>BikeStress</source>
         <translation>BikeStress</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="675"/>
+        <location filename="../../Train/RealtimeData.cpp" line="878"/>
         <source>kJoules</source>
         <translation>KJoule</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="678"/>
+        <location filename="../../Train/RealtimeData.cpp" line="881"/>
         <source>W&apos; bal</source>
         <translation>W&apos;bal</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="681"/>
+        <location filename="../../Train/RealtimeData.cpp" line="884"/>
         <source>XPower</source>
         <translation>XPower</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="684"/>
+        <location filename="../../Train/RealtimeData.cpp" line="887"/>
         <source>Iso Power</source>
         <translation>Potenza Normalizzata</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="687"/>
+        <location filename="../../Train/RealtimeData.cpp" line="890"/>
         <source>Intensity Factor</source>
         <translation>Fattore di Intensità</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="690"/>
+        <location filename="../../Train/RealtimeData.cpp" line="893"/>
         <source>Relative Intensity</source>
         <translation>Intensità Relativa</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="693"/>
+        <location filename="../../Train/RealtimeData.cpp" line="896"/>
         <source>Skiba Variability Index</source>
         <translation>Indice di Variabilità di Skiba</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="696"/>
+        <location filename="../../Train/RealtimeData.cpp" line="899"/>
         <source>Variability Index</source>
         <translation>Indice di Variabilità</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="699"/>
+        <location filename="../../Train/RealtimeData.cpp" line="902"/>
         <source>Distance</source>
         <translation>Distanza</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="702"/>
+        <location filename="../../Train/RealtimeData.cpp" line="905"/>
         <source>Route Distance</source>
         <translation>Distanza Percorso</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="705"/>
+        <location filename="../../Train/RealtimeData.cpp" line="908"/>
         <source>Distance Remaining</source>
         <translation>Distanza Rimanente</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="708"/>
+        <location filename="../../Train/RealtimeData.cpp" line="911"/>
         <source>VAM</source>
         <translation type="unfinished">VAM</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="711"/>
+        <location filename="../../Train/RealtimeData.cpp" line="914"/>
         <source>Alternate Power</source>
         <translation>Potenza Alternata</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="714"/>
+        <location filename="../../Train/RealtimeData.cpp" line="917"/>
         <source>Power</source>
         <translation>Potenza</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="717"/>
+        <location filename="../../Train/RealtimeData.cpp" line="920"/>
         <source>Speed</source>
         <translation>Velocità</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="720"/>
+        <location filename="../../Train/RealtimeData.cpp" line="923"/>
         <source>Virtual Speed</source>
         <translation>Velocità Virtuale</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="723"/>
+        <location filename="../../Train/RealtimeData.cpp" line="926"/>
         <source>Cadence</source>
         <translation>Cadenza</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="726"/>
+        <location filename="../../Train/RealtimeData.cpp" line="929"/>
         <source>Heart Rate</source>
         <translation>Frequenza Cardiaca</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="729"/>
+        <location filename="../../Train/RealtimeData.cpp" line="932"/>
         <source>Target Power</source>
         <translation>Potenza Prefissata</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="732"/>
+        <location filename="../../Train/RealtimeData.cpp" line="935"/>
         <source>Average Power</source>
         <translation>Potenza Media</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="735"/>
+        <location filename="../../Train/RealtimeData.cpp" line="938"/>
         <source>Average Speed</source>
         <translation>Velocità Media</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="738"/>
+        <location filename="../../Train/RealtimeData.cpp" line="941"/>
         <source>Average Heartrate</source>
         <translation>Frequenza cardiaca Media</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="741"/>
+        <location filename="../../Train/RealtimeData.cpp" line="944"/>
         <source>Average Cadence</source>
         <translation>Cadenza Media</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="744"/>
+        <location filename="../../Train/RealtimeData.cpp" line="947"/>
         <source>Lap Power</source>
         <translation>Potenza per Giro</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="747"/>
+        <location filename="../../Train/RealtimeData.cpp" line="950"/>
         <source>Lap Speed</source>
         <translation>Velocità per Giro</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="750"/>
+        <location filename="../../Train/RealtimeData.cpp" line="953"/>
         <source>Lap Heartrate</source>
         <translation>Frequenza Cardiaca per Giro</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="753"/>
+        <location filename="../../Train/RealtimeData.cpp" line="956"/>
         <source>Lap Cadence</source>
         <translation>Cadenza per Giro</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="756"/>
+        <location filename="../../Train/RealtimeData.cpp" line="959"/>
         <source>Left/Right Balance</source>
         <translation>Bilanciamento Sinistra/Destra</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="759"/>
+        <location filename="../../Train/RealtimeData.cpp" line="962"/>
         <source>Total Hb Mass</source>
         <translation>Massa Hb totale</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="762"/>
+        <location filename="../../Train/RealtimeData.cpp" line="965"/>
         <source>Hb O2 Saturation</source>
         <translation>Sturazione O2 Hb</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="765"/>
+        <location filename="../../Train/RealtimeData.cpp" line="968"/>
         <source>Deoxy Hb</source>
         <translation>Hb deossigenata</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="768"/>
+        <location filename="../../Train/RealtimeData.cpp" line="971"/>
         <source>Oxy Hb</source>
         <translation>Hb Ossigenata</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="771"/>
+        <location filename="../../Train/RealtimeData.cpp" line="974"/>
         <source>Left Torque Effectiveness</source>
         <translation>Efficacità coppia torcente sinistra</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="774"/>
+        <location filename="../../Train/RealtimeData.cpp" line="977"/>
         <source>Right Torque Effectiveness</source>
         <translation>Efficacità coppia torcente destra</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="777"/>
+        <location filename="../../Train/RealtimeData.cpp" line="980"/>
         <source>Left Pedal Smoothness</source>
         <translation>Omogeneità pedale sinistro</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="780"/>
+        <location filename="../../Train/RealtimeData.cpp" line="983"/>
         <source>Right Pedal Smoothness</source>
         <translation>Omogeneità pedale destro</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="783"/>
+        <location filename="../../Train/RealtimeData.cpp" line="986"/>
         <source>Right Power Phase Start</source>
         <translation>Inizio Fase Potenza destra</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="786"/>
+        <location filename="../../Train/RealtimeData.cpp" line="989"/>
         <source>Right Power Phase End</source>
         <translation>Fine Fase Potenza destra</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="789"/>
+        <location filename="../../Train/RealtimeData.cpp" line="992"/>
         <source>Right Power Phase Peak Start</source>
         <translation>Inizio Fase Picco Potenza destra</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="792"/>
+        <location filename="../../Train/RealtimeData.cpp" line="995"/>
         <source>Right Power Phase Peak End</source>
         <translation>Fine Fase Picco Potenza destra</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="795"/>
+        <location filename="../../Train/RealtimeData.cpp" line="998"/>
         <source>Slope</source>
         <translation>Pendenza</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="798"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1001"/>
         <source>Lap Distance</source>
         <translation>Distanza Giro</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="801"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1004"/>
         <source>Lap Distance Remaining</source>
         <translation>Distanza Rimanente sul Giro</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="804"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1007"/>
         <source>Latitude</source>
         <translation>Latitudine</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="807"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1010"/>
         <source>Longitude</source>
         <translation>Longitudine</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="810"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1013"/>
         <source>Altitude</source>
         <translation>Quota</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="813"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1016"/>
         <source>Respiratory Frequency</source>
         <translation>Frequenza Respiratoria</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="816"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1019"/>
         <source>Ventilation</source>
         <translation>Ventilazione</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="819"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1022"/>
         <source>VO2</source>
         <translation>VO2</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="822"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1025"/>
         <source>VCO2</source>
         <translation>VCO2</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="825"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1028"/>
         <source>Respiratory Exchange Ratio</source>
         <translation>Rapporto Scambio Repiratorio</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="828"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1031"/>
         <source>Tidal Volume</source>
         <translation>Volume Corrente</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="831"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1034"/>
         <source>Fraction O2 Expired</source>
         <translation>Frazione O2 Espirato</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="834"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1037"/>
         <source>Temperature</source>
         <translation type="unfinished">Temperatura</translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="837"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1040"/>
         <source>Core Temp</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="839"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1042"/>
         <source>Skin Temp</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="841"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1044"/>
         <source>Heat Strain</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="843"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1046"/>
         <source>Estimated Heat Load</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="846"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1049"/>
         <source>Right PCO</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/RealtimeData.cpp" line="848"/>
+        <location filename="../../Train/RealtimeData.cpp" line="1051"/>
         <source>Left PCO</source>
         <translation type="unfinished"></translation>
     </message>
@@ -33370,12 +33375,12 @@ Automatic import from defined directories is completed.</source>
         <translation>Bicicletta</translation>
     </message>
     <message>
-        <location filename="../../Metrics/RideMetadata.cpp" line="1678"/>
+        <location filename="../../Metrics/RideMetadata.cpp" line="1677"/>
         <source>Problem Saving Meta Data</source>
         <translation>Problema durante salvataggio Metadati</translation>
     </message>
     <message>
-        <location filename="../../Metrics/RideMetadata.cpp" line="1679"/>
+        <location filename="../../Metrics/RideMetadata.cpp" line="1678"/>
         <source>File: %1 cannot be opened for &apos;Writing&apos;. Please check file properties.</source>
         <translation>File: %1 non può essere aperto per &apos;Scrittura&apos;. Si prega di verificare le proprietà del file.</translation>
     </message>
@@ -36954,25 +36959,25 @@ della bicicletta virtuale.</translation>
 <context>
     <name>TrainSidebar</name>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="252"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="256"/>
         <source>Save workout data</source>
         <translation>Salva dati allenamento</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="258"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="262"/>
         <source>Devices</source>
         <translation>Dispositivi</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="261"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="266"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="310"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="320"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="265"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="270"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="314"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="324"/>
         <source>Menu</source>
         <translation>Menù</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="265"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="269"/>
         <source>Workouts</source>
         <translation>Allenamenti</translation>
     </message>
@@ -36981,77 +36986,77 @@ della bicicletta virtuale.</translation>
         <translation type="vanished">Filtro...</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="302"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="306"/>
         <source>Workout Info</source>
         <translation>Info Allenamento</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="309"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="313"/>
         <source>Media</source>
         <translation>Multimedia</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="319"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="323"/>
         <source>VideoSync</source>
         <translation>VideoSync</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="506"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="504"/>
         <source>Import Workout from File</source>
         <translation>Importa Allenamento da file</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="507"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="505"/>
         <source>Get Workouts from TrainerDay</source>
         <translation>Ottieni gli allenamenti da TrainerDay</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="509"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="507"/>
         <source>Create Workout via Wizard</source>
         <translation>Genera un allenamento via Wizard</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="510"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="508"/>
         <source>Scan for Workouts</source>
         <translation>Scansiona per nuovi allenamenti</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="534"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="532"/>
         <source>Delete selected Workout</source>
         <translation>Cancella allenamenti selezionati</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="537"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="535"/>
         <source>Delete %1 selected Workouts</source>
         <translation>Cancella %1 allenamenti selezionati</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="561"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="559"/>
         <source>Train mode active</source>
         <translation>Modalità Allenamento attiva</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="561"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="559"/>
         <source>Please stop the train mode before closing the window or application.</source>
         <translation>Si prega di terminare la modalità allenamento prima di chiudere la finestra o l&apos;applicazione.</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="635"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="633"/>
         <source>Remove reference to selected video</source>
         <translation>Rimuovi il riferimento al video selezionato</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="650"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="648"/>
         <source>Import VideoSync from File</source>
         <translation>Importa VideoSync da file</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="651"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="649"/>
         <source>Scan for VideoSyncs</source>
         <translation>Scansiona per VideoSync</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="664"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="662"/>
         <source>Delete selected VideoSync</source>
         <translation>Cancella VideoSync selezionati</translation>
     </message>
@@ -37102,26 +37107,26 @@ della bicicletta virtuale.</translation>
         <translation>Comincia tra %1</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2251"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2223"/>
         <source>Recalibrating steering..</source>
         <translation>Ricalibratura sterzo..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2544"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2548"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2617"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2668"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2672"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2516"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2520"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2589"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2640"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2644"/>
         <source>Requesting calibration..</source>
         <translation>Sto richiedendo calibrazione..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2555"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2527"/>
         <source>Calibrating...</source>
         <translation>Sto calibrando...</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2559"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2531"/>
         <source>Calibrating...
 Current speed %1 kph
 Increase speed to %2 kph</source>
@@ -37130,14 +37135,14 @@ Velocità attuale %1 km/h
 Incremento velocità %2 km/h</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2563"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2535"/>
         <source>Calibrating...
 Stop pedalling until speed drops to 0</source>
         <translation>Sto calibrando...
 Smeti di pedalare fino a che la velocità scende a 0</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2568"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2540"/>
         <source>Calibration completed successfully!
 Spindown %1 ms
 Zero Offset %2</source>
@@ -37146,30 +37151,30 @@ Spindown %1 ms
 Zero Offset %2</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2576"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2643"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2695"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2548"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2615"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2667"/>
         <source>Calibration failed!</source>
         <translation>Calibrazione non riuscita!</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2584"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2556"/>
         <source>Calibration Failed: Loosen Roller</source>
         <translation>Calibrazione non riuscita: rullo non stretto</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2592"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2564"/>
         <source>Calibration Failed: Tighten Roller</source>
         <translation>Calibrazione non riuscita: stringi rullo</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2611"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2662"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2583"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2634"/>
         <source>Unclip or stop pedalling to begin calibration..</source>
         <translation>Sgancia o smetti di pedalare per iniziare la calibrazione..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2630"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2602"/>
         <source>Calibrating...
 Unclip or stop pedalling until process is completed..
 Torque %1</source>
@@ -37178,7 +37183,7 @@ Sgancia o smetti di pedalare fino al completamento del processo..
 Coppia Torcente %1</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2635"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2607"/>
         <source>Calibration completed successfully!
 Zero Offset %1
 Torque %2</source>
@@ -37187,7 +37192,7 @@ Zero Offset %1
 Coppia Torcente %2</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2682"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2654"/>
         <source>Calibrating...
 Unclip or stop pedalling until process is completed..
 Zero Offset %1</source>
@@ -37196,7 +37201,7 @@ Sgancia o smetti di pedalare fino al completamento del processo..
 Zero Offset %1</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2687"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2659"/>
         <source>Calibration completed successfully!
 Zero Offset %1
 Slope %2</source>
@@ -37205,96 +37210,96 @@ Zero Offset %1
 Inclinazione %2</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2716"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2688"/>
         <source>Give the pedal a kick to start calibration...
 The motor will run until calibration is complete.</source>
         <translation>Pedala per cominciare la calibrazione...
 Il motore gira fini al completamento della calibrazione.</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2718"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2690"/>
         <source>Allow wheel speed to settle, DO NOT PEDAL...
 The motor will run until calibration is complete.</source>
         <translation>Consenti alla velocità della ruota di stabilizzarsi, NON PEDALARE...
 Il motore gira fino al completatmento della calibrazione.</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2723"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2695"/>
         <source>Calibrating... DO NOT PEDAL, remain seated...
 Gathering enough samples to calculate average: %1</source>
         <translation>Calibrazione... NON PEDALARE, rimani seduto...
 Raccolta di campioni sufficienti per il calcolo della media: %1</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2730"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2702"/>
         <source>Calibrating... DO NOT PEDAL, remain seated...
 Waiting for value to stabilize (max %1s): %2 (%3W @ %4kph)</source>
         <translation>Calibrazione... NON PEDALARE, rimani seduto...
 In attesa che il valore si stabilizzi (max %1s): %2 (%3W @ %4kph)</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2745"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2717"/>
         <source>Calibration completed successfully!
 Final calibration value %1 (%2W @ %3kph)</source>
         <translation>Calibrazione completata con successo!
 Valore finale della calibrazione %1 (%2W @ %3kph)</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2757"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2729"/>
         <source>Calibration failed! Do not pedal while calibration is taking place.
 Allow wheel to run freely.</source>
         <translation>Calibrazione fallita! Non pedalare mentre procede la calibrazione.
 Permetti alla ruota di girare liberamente.</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2803"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2775"/>
         <source>Fast forward..</source>
         <translation>Avanti veloce..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2836"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2808"/>
         <source>Rewind..</source>
         <translation>Indietro..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2866"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2838"/>
         <source>Next Lap..</source>
         <translation>Nuovo giro..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2899"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2871"/>
         <source>Back Lap..</source>
         <translation>Giro indietro..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2925"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2897"/>
         <source>Increasing intensity..</source>
         <translation>Intensità in aumento..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2951"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2923"/>
         <source>Decreasing intensity..</source>
         <translation>Intensità in diminuzione..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="621"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="619"/>
         <source>Import Video from File</source>
         <translation>Importa Video da file</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="508"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="506"/>
         <source>Get Workouts from Strava Routes</source>
         <translation>Ottieni Allenamenti dai Percorsi Strava</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="622"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="620"/>
         <source>Scan for Videos</source>
         <translation>Scansiona per Video</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="1114"/>
         <location filename="../../Train/TrainSidebar.cpp" line="1186"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="3206"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="3178"/>
         <source>Delete</source>
         <translation>Cancella</translation>
     </message>
@@ -37309,71 +37314,71 @@ Permetti alla ruota di girare liberamente.</translation>
         <translation>In pausa..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1478"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1477"/>
         <source>Starting..</source>
         <translation>Sto iniziando..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1686"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1679"/>
         <source>Stopped..</source>
         <translation>Fermato..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1778"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1771"/>
         <source>Connected..</source>
         <translation>Connesso..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1802"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1795"/>
         <source>Disconnected..</source>
         <translation>Disconnesso..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2224"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2200"/>
         <source>New lap..</source>
         <translation>Nuovo giro..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2258"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2230"/>
         <source>No Devices Configured</source>
         <translation>Nessun Dispositivo Configurato</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2258"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2230"/>
         <source>Please configure a device in Preferences.</source>
         <translation>SI prega di configurare un dispositivo nelle Preferenze.</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2506"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2478"/>
         <source>Exiting calibration..</source>
         <translation>Uscita calibrazione..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2521"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2493"/>
         <source>Calibration not supported for this device.</source>
         <translation>Calibrazione non supportata da questo strumento.</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2528"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2500"/>
         <source>Calibrating...
 Press F3 on Controller when done.</source>
         <translation>Calibrazione in corso...
 Premi F3 sul Controller quando finito.</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="3158"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="3176"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="3130"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="3148"/>
         <source>Add Device</source>
         <translation>Aggiungi Dispositivo</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="3163"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="3181"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="3135"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="3153"/>
         <source>Delete Device</source>
         <translation>Cancella Dispositivo</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="3204"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="3176"/>
         <source>Are you sure you want to delete this device?</source>
         <translation>Sei sicuro di voler cancellare questo dispositivo?</translation>
     </message>

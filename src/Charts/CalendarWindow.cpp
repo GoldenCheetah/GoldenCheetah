@@ -294,6 +294,7 @@ CalendarWindow::CalendarWindow(Context *context)
 
     calendar = new Calendar(QDate::currentDate(), static_cast<Qt::DayOfWeek>(getFirstDayOfWeek()), context->athlete->measures);
 
+    setMeasureTime(QTime(6, 30, 0));
     setStartHour(8);
     setEndHour(21);
     setMinVisibleMins(0);
@@ -502,6 +503,23 @@ CalendarWindow::setFirstDayOfWeek
 {
     firstDayOfWeekCombo->setCurrentIndex(std::min(static_cast<int>(Qt::Sunday), std::max(static_cast<int>(Qt::Monday), fdw)) - 1);
     calendar->setFirstDayOfWeek(static_cast<Qt::DayOfWeek>(fdw));
+}
+
+
+QTime
+CalendarWindow::getMeasureTime
+() const
+{
+    return measureTimeEdit->time();
+}
+
+
+void
+CalendarWindow::setMeasureTime
+(QTime time)
+{
+    measureTimeEdit->setTime(time);
+    calendar->setMeasureTime(time);
 }
 
 
@@ -844,6 +862,7 @@ CalendarWindow::mkControls
         firstDayOfWeekCombo->addItem(locale.dayName(i, QLocale::LongFormat));
     }
     firstDayOfWeekCombo->setCurrentIndex(locale.firstDayOfWeek() - 1);
+    measureTimeEdit = new QTimeEdit();
     startHourSpin = new QSpinBox();
     startHourSpin->setSuffix(":00");
     startHourSpin->setMinimum(0);
@@ -893,6 +912,7 @@ CalendarWindow::mkControls
     generalForm->addRow(tr("Minimum Display Duration"), minVisibleMinsSpin);
     generalForm->addItem(new QSpacerItem(0, 20 * dpiYFactor));
     generalForm->addRow(new QLabel(HLO + tr("Default Times") + HLC));
+    generalForm->addRow(tr("New Measure Time"), measureTimeEdit);
     generalForm->addRow(tr("Default Start Time"), startHourSpin);
     generalForm->addRow(tr("Default End Time"), endHourSpin);
     generalForm->addItem(new QSpacerItem(0, 20 * dpiYFactor));
