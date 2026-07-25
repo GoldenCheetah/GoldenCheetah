@@ -2424,8 +2424,8 @@ genericnext:
         if (0 == local_timestamp) {
             // ZWift FIT files are not reporting local timestamp
             rideFile->setStartTime(t.addSecs(timestamp));
-        } else {
-            // adjust start time to time zone of the ride
+        } else if (abs(local_timestamp-timestamp) < 93600) {
+            // adjust start time to time zone of the ride when lower than 26hr
             rideFile->setStartTime(t.addSecs(local_timestamp - timestamp));
         }
     }
