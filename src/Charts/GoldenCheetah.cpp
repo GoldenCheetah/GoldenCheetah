@@ -1102,7 +1102,8 @@ GcChartWindow::exportChartToCloudDB()
          chart.ChartType.toInt() == GcWindowTypes::MetadataWindow ||
          chart.ChartType.toInt() == GcWindowTypes::Summary ||
          chart.ChartType.toInt() == GcWindowTypes::RideEditor ||
-         chart.ChartType.toInt() == GcWindowTypes::Diary ||
+         chart.ChartType.toInt() == GcWindowTypes::Diary || chart.ChartType.toInt() == GcWindowTypes::Calendar ||
+         chart.ChartType.toInt() == GcWindowTypes::Agenda || chart.ChartType.toInt() == GcWindowTypes::PlanAdherence ||
          chart.ChartType.toInt() == GcWindowTypes::ActivityNavigator ||
          chart.ChartType.toInt() == GcWindowTypes::DateRangeSummary ||
          chart.ChartType.toInt() == GcWindowTypes::GoogleMap ||
