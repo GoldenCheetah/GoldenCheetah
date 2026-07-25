@@ -159,7 +159,8 @@ if (defined(GC_WANT_X11)) {
 ### LANGUAGE SUPPORT
 ###=================
 
-TRANSLATIONS = Resources/translations/gc_fr.ts \
+TRANSLATIONS = Resources/translations/gc_en.ts \
+               Resources/translations/gc_fr.ts \
                Resources/translations/gc_ja.ts \
                Resources/translations/gc_it.ts \
                Resources/translations/gc_pt-br.ts \

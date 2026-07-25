@@ -101,6 +101,7 @@
         <file>images/addchart.png</file>
         <file>images/library.png</file>
         <file>images/tile-edit.png</file>
+        <file>translations/gc_en.qm</file>
         <file>translations/gc_fr.qm</file>
         <file>translations/gc_ja.qm</file>
         <file>translations/gc_it.qm</file>
