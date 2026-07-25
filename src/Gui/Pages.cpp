@@ -1674,12 +1674,12 @@ CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
     exportButton = new QPushButton(tr("Export"));
     exportButton->setEnabled(false);
     importButton = new QPushButton(tr("Import"));
-    importButton->setEnabled(false);
+    importButton->setEnabled(true);
 #ifdef GC_HAS_CLOUD_DB
     uploadButton = new QPushButton(tr("Upload"));
     uploadButton->setEnabled(false);
     downloadButton = new QPushButton(tr("Download"));
-    downloadButton->setEnabled(false);
+    downloadButton->setEnabled(true);
 #endif
 
     ActionButtonBox *actionButtons = new ActionButtonBox(ActionButtonBox::AddDeleteGroup | ActionButtonBox::EditGroup);
@@ -1703,10 +1703,8 @@ CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
             bool selected = table->currentItem() != nullptr;
             actionButtons->setButtonEnabled(ActionButtonBox::Edit, selected);
             exportButton->setEnabled(selected);
-            importButton->setEnabled(selected);
 #ifdef GC_HAS_CLOUD_DB
             uploadButton->setEnabled(selected);
-            downloadButton->setEnabled(selected);
 #endif
         });
     connect(actionButtons, &ActionButtonBox::addRequested, this, &CustomMetricsPage::addClicked);
