@@ -1390,7 +1390,7 @@ RealtimeDataSession::RealtimeDataSession(Context* context, double CP, double WPR
     heatLoadMSec = appsettings->cvalue(context->athlete->cyclist, GC_REALTIMEDATA_HEATLOAD_MSEC, "").toULongLong();
     heatLoadLocalDate = QDateTime::fromString(appsettings->cvalue(context->athlete->cyclist, GC_REALTIMEDATA_HEATLOAD_LOCALDATE, "").toString(), Qt::ISODate);
     if(heatLoadLocalDate.date().dayOfYear() != QDateTime::currentDateTime().date().dayOfYear()) {
-        qDebug()<<"resetting heat load at " << QDateTime::currentDateTime() << "heatLoadLocalDate" << heatLoadLocalDate;
+        //qDebug()<<"resetting heat load at " << QDateTime::currentDateTime() << "heatLoadLocalDate" << heatLoadLocalDate;
         setHeatLoad(0.0);
         heatLoadMSec = 0;
         heatLoadLocalDate = QDateTime::currentDateTime();
