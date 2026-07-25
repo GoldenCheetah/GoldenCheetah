@@ -253,6 +253,7 @@ public:
 
     bool setDay(const QDate &date);
     void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
+    void setMeasureTime(QTime time);
     void setStartHour(int hour);
     void setEndHour(int hour);
     void setSummaryVisible(bool visible);
@@ -297,6 +298,7 @@ private:
     CalendarOverview *dayDateSelector;
     QTabWidget *measureTabs;
     CalendarDayTable *dayTable;
+    QTime measureTime;
 
     bool measureDialog(const QDateTime &when, MeasuresGroup * const measuresGroup, bool update);
     void updateMeasures(const QDate &date);
@@ -380,6 +382,7 @@ public slots:
     void setView(CalendarView view);
     void activateDateRange(const DateRange &dr, bool allowKeepMonth = false, bool canHavePhasesOrEvents = false);
     void setFirstDayOfWeek(Qt::DayOfWeek firstDayOfWeek);
+    void setMeasureTime(QTime time);
     void setStartHour(int hour);
     void setEndHour(int hour);
     void setSummaryDayVisible(bool visible);

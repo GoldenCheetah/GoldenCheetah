@@ -1598,6 +1598,14 @@ CalendarDayView::setFirstDayOfWeek
 
 
 void
+CalendarDayView::setMeasureTime
+(QTime time)
+{
+    measureTime = time;
+}
+
+
+void
 CalendarDayView::setStartHour
 (int hour)
 {
@@ -1739,7 +1747,7 @@ CalendarDayView::updateMeasures
         if (buttonType == 0) {
             QPushButton *addButton = new QPushButton(tr("Add Measure"));
             connect(addButton, &QPushButton::clicked, this, [this, date, measuresGroup]() {
-                if (measureDialog(QDateTime(date, QTime::currentTime()), measuresGroup, false)) {
+                if (measureDialog(QDateTime(date, measureTime), measuresGroup, false)) {
                     QTimer::singleShot(0, this, [this, date]() {
                         updateMeasures(date);
                     });
@@ -2407,6 +2415,14 @@ Calendar::setFirstDayOfWeek
     } else if (currentView() == CalendarView::Month) {
         setDate(fitToMonth(currentDate, false), true);
     }
+}
+
+
+void
+Calendar::setMeasureTime
+(QTime time)
+{
+    dayView->setMeasureTime(time);
 }
 
 

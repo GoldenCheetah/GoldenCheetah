@@ -77,6 +77,7 @@ class CalendarWindow : public GcChartWindow
 
     Q_PROPERTY(int defaultView READ getDefaultView WRITE setDefaultView USER true)
     Q_PROPERTY(int firstDayOfWeek READ getFirstDayOfWeek WRITE setFirstDayOfWeek USER true)
+    Q_PROPERTY(QTime measureTime READ getMeasureTime WRITE setMeasureTime USER true)
     Q_PROPERTY(int startHour READ getStartHour WRITE setStartHour USER true)
     Q_PROPERTY(int endHour READ getEndHour WRITE setEndHour USER true)
     Q_PROPERTY(int minVisibleMins READ getMinVisibleMins WRITE setMinVisibleMins USER true)
@@ -96,6 +97,7 @@ class CalendarWindow : public GcChartWindow
 
         int getDefaultView() const;
         int getFirstDayOfWeek() const;
+        QTime getMeasureTime() const;
         int getStartHour() const;
         int getEndHour() const;
         int getMinVisibleMins() const;
@@ -117,6 +119,7 @@ class CalendarWindow : public GcChartWindow
     public slots:
         void setDefaultView(int view);
         void setFirstDayOfWeek(int fdw);
+        void setMeasureTime(QTime time);
         void setStartHour(int hour);
         void setEndHour(int hour);
         void setMinVisibleMins(int mins);
@@ -143,6 +146,7 @@ class CalendarWindow : public GcChartWindow
         QPalette palette;
         QComboBox *defaultViewCombo;
         QComboBox *firstDayOfWeekCombo;
+        QTimeEdit *measureTimeEdit;
         QSpinBox *startHourSpin;
         QSpinBox *endHourSpin;
         QSpinBox *minVisibleMinsSpin;

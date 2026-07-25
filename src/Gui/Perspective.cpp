@@ -292,6 +292,7 @@ Perspective::importChart(QMap<QString,QString>properties, bool select)
                 if (QString(p.typeName()) == "int") chart->setProperty(prop.key().toLatin1(), prop.value().toInt());
                 if (QString(p.typeName()) == "double") chart->setProperty(prop.key().toLatin1(), prop.value().toDouble());
                 if (QString(p.typeName()) == "QDate") chart->setProperty(prop.key().toLatin1(), QDate::fromString(prop.value()));
+                if (QString(p.typeName()) == "QTime") chart->setProperty(prop.key().toLatin1(), QTime::fromString(prop.value(), "hh:mm:ss"));
                 if (QString(p.typeName()) == "QString") chart->setProperty(prop.key().toLatin1(), Utils::jsonunprotect(prop.value()));
                 if (QString(p.typeName()) == "bool") chart->setProperty(prop.key().toLatin1(), prop.value().toInt());
                 if (QString(p.typeName()) == "LTMSettings") {
@@ -1634,6 +1635,7 @@ Perspective::toXml(QTextStream &out)
                 if (QString(p.typeName()) == "int") out<<p.read(chart).toInt();
                 if (QString(p.typeName()) == "double") out<<p.read(chart).toDouble();
                 if (QString(p.typeName()) == "QDate") out<<p.read(chart).toDate().toString();
+                if (QString(p.typeName()) == "QTime") out<<p.read(chart).toTime().toString("hh:mm:ss");
                 if (QString(p.typeName()) == "QString") out<<Utils::xmlprotect(p.read(chart).toString());
                 if (QString(p.typeName()) == "bool") out<<p.read(chart).toBool();
                 if (QString(p.typeName()) == "LTMSettings") {
