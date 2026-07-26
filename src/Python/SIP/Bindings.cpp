@@ -1052,25 +1052,31 @@ Bindings::seasonMetrics(bool all, QString filter, bool compare) const
         // only return compares if its actually active
         if (context->isCompareDateRanges) {
 
-            // how many to return?
-            int count=0;
-            foreach(CompareDateRange p, context->compareDateRanges) if (p.isChecked()) count++;
+            // Take ONE consistent snapshot of the checked compare date
+            // ranges. The list is built from this snapshot only, so its
+            // size can never change underneath us even if the user toggles
+            // a checkbox in the Compare pane while this (background) call
+            // is still running -- previously this counted checked items
+            // once, then independently re-walked context->compareDateRanges
+            // and re-evaluated isChecked() again to fill the list, which
+            // could desync the count from the actual number of items
+            // visited and cause PyList_SET_ITEM to write out of bounds.
+            QList<CompareDateRange> checked;
+            foreach(CompareDateRange p, context->compareDateRanges) if (p.isChecked()) checked << p;
 
             // cool we can return a list of intervals to compare
-            PyObject* list = PyList_New(count);
-            int idx = 0;
+            PyObject* list = PyList_New(checked.count());
 
             // create a dict for each and add to list
-            foreach(CompareDateRange p, context->compareDateRanges) {
-                if (p.isChecked()) {
+            for (int idx = 0; idx < checked.count(); idx++) {
+                const CompareDateRange &p = checked[idx];
 
-                    // create a tuple (metrics, color)
-                    PyObject* sm = seasonMetrics(all, DateRange(p.start, p.end), filter);
-                    PyObject* tuple = Py_BuildValue("(Os)", sm, p.color.name().toUtf8().constData());
-                    Py_DECREF(sm);
-                    // add to back and move on
-                    PyList_SET_ITEM(list, idx++, tuple);
-                }
+                // create a tuple (metrics, color)
+                PyObject* sm = seasonMetrics(all, DateRange(p.start, p.end), filter);
+                PyObject* tuple = Py_BuildValue("(Os)", sm, p.color.name().toUtf8().constData());
+                Py_DECREF(sm);
+                // add to back and move on
+                PyList_SET_ITEM(list, idx, tuple);
             }
 
             return list;
@@ -1126,12 +1132,21 @@ Bindings::seasonMetrics(bool all, DateRange range, QString filter) const
 
     specification.setFilterSet(fs);
 
-    // we need to count rides that are in range...
-    int rides = 0;
+    // Take ONE consistent snapshot of the rides that match the filter/date-range
+    // criteria. Every list below is built from this snapshot only, so its size
+    // can never change underneath us even if rideCache is mutated by the GUI
+    // thread while this (background) call is still running. Previously this
+    // function counted matching rides once, then independently re-walked the
+    // live rideCache once for date/time/color and again once PER METRIC and
+    // PER META FIELD -- any concurrent mutation between those walks could
+    // desync the count from the actual number of items visited, causing
+    // PyList_SET_ITEM to write out of bounds and abort() the process.
+    QVector<RideItem*> snapshot;
     foreach(RideItem *ride, context->athlete->rideCache->rides()) {
         if (!specification.pass(ride)) continue;
-        if (all || range.pass(ride->dateTime.date())) rides++;
+        if (all || range.pass(ride->dateTime.date())) snapshot.append(ride);
     }
+    const int rides = snapshot.count();
 
     PyObject* dict = PyDict_New();
     if (dict == NULL) return dict;
@@ -1145,36 +1160,31 @@ Bindings::seasonMetrics(bool all, DateRange range, QString filter) const
     PyObject* timelist = PyList_New(rides);
     PyObject* colorlist = PyList_New(rides);
 
-    int idx = 0;
-    foreach(RideItem *ride, context->athlete->rideCache->rides()) {
-        if (!specification.pass(ride)) continue;
-        if (all || range.pass(ride->dateTime.date())) {
+    for (int idx = 0; idx < rides; idx++) {
+        RideItem *ride = snapshot[idx];
 
-            QDate d = ride->dateTime.date();
-            PyList_SET_ITEM(datelist, idx, PyDate_FromDate(d.year(), d.month(), d.day()));
+        QDate d = ride->dateTime.date();
+        PyList_SET_ITEM(datelist, idx, PyDate_FromDate(d.year(), d.month(), d.day()));
 
-            QTime t = ride->dateTime.time();
-            PyList_SET_ITEM(timelist, idx, PyTime_FromTime(t.hour(), t.minute(), t.second(), t.msec()*10));
+        QTime t = ride->dateTime.time();
+        PyList_SET_ITEM(timelist, idx, PyTime_FromTime(t.hour(), t.minute(), t.second(), t.msec()*10));
 
-            // apply item color, remembering that 1,1,1 means use default (reverse in this case)
-            QString color;
+        // apply item color, remembering that 1,1,1 means use default (reverse in this case)
+        QString color;
 
-            if (ride->color == QColor(1,1,1,1)) {
+        if (ride->color == QColor(1,1,1,1)) {
 
-                // use the inverted color, not plot marker as that hideous
-                QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
+            // use the inverted color, not plot marker as that hideous
+            QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
 
-                // white is jarring on a dark background!
-                if (col==QColor(Qt::white)) col=QColor(127,127,127);
+            // white is jarring on a dark background!
+            if (col==QColor(Qt::white)) col=QColor(127,127,127);
 
-                color = col.name();
-            } else
-                color = ride->color.name();
+            color = col.name();
+        } else
+            color = ride->color.name();
 
-            PyList_SET_ITEM(colorlist, idx, PyUnicode_FromString(color.toUtf8().constData()));
-
-            idx++;
-        }
+        PyList_SET_ITEM(colorlist, idx, PyUnicode_FromString(color.toUtf8().constData()));
     }
 
     PyDict_SetItemString_Steal(dict, "date", datelist);
@@ -1197,12 +1207,9 @@ Bindings::seasonMetrics(bool all, DateRange range, QString filter) const
         // set a list of metric values
         PyObject* metriclist = PyList_New(rides);
 
-        int idx = 0;
-        foreach(RideItem *item, context->athlete->rideCache->rides()) {
-            if (!specification.pass(item)) continue;
-            if (all || range.pass(item->dateTime.date())) {
-                PyList_SET_ITEM(metriclist, idx++, PyFloat_FromDouble(item->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion()) + (useMetricUnits ? 0.0f : metric->conversionSum())));
-            }
+        for (int idx = 0; idx < rides; idx++) {
+            RideItem *item = snapshot[idx];
+            PyList_SET_ITEM(metriclist, idx, PyFloat_FromDouble(item->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion()) + (useMetricUnits ? 0.0f : metric->conversionSum())));
         }
 
         // add to the dict
@@ -1221,12 +1228,9 @@ Bindings::seasonMetrics(bool all, DateRange range, QString filter) const
         // Create a string list
         PyObject* metalist = PyList_New(rides);
 
-        int idx = 0;
-        foreach(RideItem *item, context->athlete->rideCache->rides()) {
-            if (!specification.pass(item)) continue;
-            if (all || range.pass(item->dateTime.date())) {
-                PyList_SET_ITEM(metalist, idx++, PyUnicode_FromString(item->getText(field.name, "").toUtf8().constData()));
-            }
+        for (int idx = 0; idx < rides; idx++) {
+            RideItem *item = snapshot[idx];
+            PyList_SET_ITEM(metalist, idx, PyUnicode_FromString(item->getText(field.name, "").toUtf8().constData()));
         }
 
         // add to the dict
@@ -1248,25 +1252,31 @@ Bindings::seasonIntervals(QString type, bool compare) const
         // only return compares if its actually active
         if (context->isCompareDateRanges) {
 
-            // how many to return?
-            int count=0;
-            foreach(CompareDateRange p, context->compareDateRanges) if (p.isChecked()) count++;
+            // Take ONE consistent snapshot of the checked compare date
+            // ranges. The list is built from this snapshot only, so its
+            // size can never change underneath us even if the user toggles
+            // a checkbox in the Compare pane while this (background) call
+            // is still running -- previously this counted checked items
+            // once, then independently re-walked context->compareDateRanges
+            // and re-evaluated isChecked() again to fill the list, which
+            // could desync the count from the actual number of items
+            // visited and cause PyList_SET_ITEM to write out of bounds.
+            QList<CompareDateRange> checked;
+            foreach(CompareDateRange p, context->compareDateRanges) if (p.isChecked()) checked << p;
 
             // cool we can return a list of intervals to compare
-            PyObject* list = PyList_New(count);
-            int idx = 0;
+            PyObject* list = PyList_New(checked.count());
 
             // create a dict for each and add to list
-            foreach(CompareDateRange p, context->compareDateRanges) {
-                if (p.isChecked()) {
+            for (int idx = 0; idx < checked.count(); idx++) {
+                const CompareDateRange &p = checked[idx];
 
-                    // create a tuple (metrics, color)
-                    PyObject* si = seasonIntervals(DateRange(p.start, p.end), type);
-                    PyObject* tuple = Py_BuildValue("(Os)", si, p.color.name().toUtf8().constData());
-                    Py_DECREF(si);
-                    // add to back and move on
-                    PyList_SET_ITEM(list, idx++, tuple);
-                }
+                // create a tuple (metrics, color)
+                PyObject* si = seasonIntervals(DateRange(p.start, p.end), type);
+                PyObject* tuple = Py_BuildValue("(Os)", si, p.color.name().toUtf8().constData());
+                Py_DECREF(si);
+                // add to back and move on
+                PyList_SET_ITEM(list, idx, tuple);
             }
 
             return list;
@@ -1302,9 +1312,6 @@ Bindings::seasonIntervals(DateRange range, QString type) const
     if (context == NULL || context->athlete == NULL || context->athlete->rideCache == NULL) return NULL;
 
     const RideMetricFactory &factory = RideMetricFactory::instance();
-    int intervals = 0;
-
-    // how many interval to return in the currently selected date range ?
 
     // apply any global filters
     Specification specification;
@@ -1314,19 +1321,21 @@ Bindings::seasonIntervals(DateRange range, QString type) const
     if (python->perspective) fs.addFilter(python->perspective->isFiltered(), python->perspective->filterlist(DateRange(QDate(1,1,1970),QDate(31,12,3000))));
     specification.setFilterSet(fs);
 
-    // we need to count intervals that are in range...
-    intervals = 0;
+    // Take ONE consistent snapshot of matching (ride, interval) pairs.
+    // Every list below is built from this snapshot only, so its size
+    // can never drift even if the GUI thread mutates rideCache/intervals
+    // while this background call is still running.
+    struct Pair { RideItem *ride; IntervalItem *interval; };
+    QVector<Pair> snapshot;
     foreach(RideItem *ride, context->athlete->rideCache->rides()) {
         if (!specification.pass(ride)) continue;
         if (!range.pass(ride->dateTime.date())) continue;
-
-        if (type.isEmpty()) intervals += ride->intervals().count();
-        else {
-            foreach(IntervalItem *item, ride->intervals())
-                if (type == RideFileInterval::typeDescription(item->type))
-                    intervals++;
+        foreach(IntervalItem *item, ride->intervals()) {
+            if (type.isEmpty() || type == RideFileInterval::typeDescription(item->type))
+                snapshot.append({ride, item});
         }
     }
+    const int intervals = snapshot.count();
 
     PyObject* dict = PyDict_New();
     if (dict == NULL) return dict;
@@ -1342,42 +1351,26 @@ Bindings::seasonIntervals(DateRange range, QString type) const
     PyObject* typelist = PyList_New(intervals);
     PyObject* colorlist = PyList_New(intervals);
 
-    int idx=0;
-    foreach(RideItem *ride, context->athlete->rideCache->rides()) {
-        if (!specification.pass(ride)) continue;
-        if (range.pass(ride->dateTime.date())) {
-            foreach(IntervalItem *item, ride->intervals())
-                if (type.isEmpty() || type == RideFileInterval::typeDescription(item->type)) {
+    for (int idx = 0; idx < intervals; idx++) {
+        RideItem *ride = snapshot[idx].ride;
+        IntervalItem *item = snapshot[idx].interval;
 
-                    // DATE
-                    QDate d = ride->dateTime.date();
-                    PyList_SET_ITEM(datelist, idx, PyDate_FromDate(d.year(), d.month(), d.day()));
+        QDate d = ride->dateTime.date();
+        PyList_SET_ITEM(datelist, idx, PyDate_FromDate(d.year(), d.month(), d.day()));
 
-                    // TIME - time offsets by time of interval
-                    QTime t = ride->dateTime.time().addSecs(item->start);
-                    PyList_SET_ITEM(timelist, idx, PyTime_FromTime(t.hour(), t.minute(), t.second(), t.msec()*10));
+        QTime t = ride->dateTime.time().addSecs(item->start);
+        PyList_SET_ITEM(timelist, idx, PyTime_FromTime(t.hour(), t.minute(), t.second(), t.msec()*10));
 
-                    // NAME
-                    PyList_SET_ITEM(namelist, idx, PyUnicode_FromString(item->name.toUtf8().constData()));
+        PyList_SET_ITEM(namelist, idx, PyUnicode_FromString(item->name.toUtf8().constData()));
+        PyList_SET_ITEM(typelist, idx, PyUnicode_FromString(RideFileInterval::typeDescription(item->type).toUtf8().constData()));
 
-                    // TYPE
-                    PyList_SET_ITEM(typelist, idx, PyUnicode_FromString(RideFileInterval::typeDescription(item->type).toUtf8().constData()));
-
-                    // apply item color, remembering that 1,1,1 means use default (reverse in this case)
-                    QString color;
-                    if (item->color == QColor(1,1,1,1)) {
-                        // use the inverted color, not plot marker as that hideous
-                        QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
-                        // white is jarring on a dark background!
-                        if (col==QColor(Qt::white)) col=QColor(127,127,127);
-                        color = col.name();
-                    } else
-                        color = item->color.name();
-                    PyList_SET_ITEM(colorlist, idx, PyUnicode_FromString(color.toUtf8().constData()));
-
-                    idx++;
-                }
-        }
+        QString color;
+        if (item->color == QColor(1,1,1,1)) {
+            QColor col = GCColor::invertColor(GColor(CPLOTBACKGROUND));
+            if (col == QColor(Qt::white)) col = QColor(127,127,127);
+            color = col.name();
+        } else color = item->color.name();
+        PyList_SET_ITEM(colorlist, idx, PyUnicode_FromString(color.toUtf8().constData()));
     }
 
     PyDict_SetItemString_Steal(dict, "date", datelist);
@@ -1389,32 +1382,23 @@ Bindings::seasonIntervals(DateRange range, QString type) const
     //
     // METRICS
     //
-    for(int i=0; i<factory.metricCount();i++) {
-
-        // set a list of metric values
+    bool useMetricUnits = GlobalContext::context()->useMetricUnits;
+    for (int i = 0; i < factory.metricCount(); i++) {
         PyObject* metriclist = PyList_New(intervals);
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = SpecialFields::getInstance().internalName(factory.rideMetric(symbol)->name());
-        name = name.replace(" ","_");
-        name = name.replace("'","_");
+        QString name = SpecialFields::getInstance().internalName(metric->name());
+        name = name.replace(" ", "_").replace("'", "_");
 
-        bool useMetricUnits = GlobalContext::context()->useMetricUnits;
-
-        int index=0;
-        foreach(RideItem *item, context->athlete->rideCache->rides()) {
-            if (!specification.pass(item)) continue;
-            if (range.pass(item->dateTime.date())) {
-
-                foreach(IntervalItem *interval, item->intervals()) {
-                    if (type.isEmpty() || type == RideFileInterval::typeDescription(interval->type))
-                        PyList_SET_ITEM(metriclist, index++, PyFloat_FromDouble(interval->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion()) + (useMetricUnits ? 0.0f : metric->conversionSum())));
-                }
-            }
+        for (int idx = 0; idx < intervals; idx++) {
+            IntervalItem *interval = snapshot[idx].interval;
+            PyList_SET_ITEM(metriclist, idx,
+                PyFloat_FromDouble(interval->metrics()[i] *
+                    (useMetricUnits ? 1.0f : metric->conversion()) +
+                    (useMetricUnits ? 0.0f : metric->conversionSum())));
         }
 
-        // add to the dict
         PyDict_SetItemString_Steal(dict, name.toUtf8().constData(), metriclist);
     }
 
@@ -1439,14 +1423,22 @@ Bindings::activityIntervals(QString type, PyObject* activity) const
     if (ride == NULL) return NULL;
 
     const RideMetricFactory &factory = RideMetricFactory::instance();
-    int intervals = 0;
 
-    // how many interval to return in the currently selected RideItem ?
-
-    // we need to count intervals that are of requested type
-    intervals = 0;
-    if (type.isEmpty()) intervals = ride->intervals().count();
-    else foreach(IntervalItem *item, ride->intervals()) if (type == RideFileInterval::typeDescription(item->type)) intervals++;
+    // Take ONE consistent snapshot of the intervals on this ride that match
+    // "type". Every list below is built from this snapshot only, so its size
+    // can never change underneath us even if the interval list on this ride
+    // is mutated (added/removed/recalculated) while this (background) call
+    // is still running. Previously this function counted matching intervals
+    // once, then independently re-walked the live ride->intervals() list
+    // once for start/stop/name/type/color/selected and again once PER
+    // METRIC -- any concurrent mutation between those walks could desync
+    // the count from the actual number of items visited, causing
+    // PyList_SET_ITEM to write out of bounds and abort() the process.
+    QVector<IntervalItem*> snapshot;
+    foreach(IntervalItem *item, ride->intervals())
+        if (type.isEmpty() || type == RideFileInterval::typeDescription(item->type))
+            snapshot.append(item);
+    const int intervals = snapshot.count();
 
     PyObject* dict = PyDict_New();
     if (dict == NULL) return dict;
@@ -1463,39 +1455,36 @@ Bindings::activityIntervals(QString type, PyObject* activity) const
     PyObject* colorlist = PyList_New(intervals);
     PyObject* selectedlist = PyList_New(intervals);
 
-    int idx=0;
-    foreach(IntervalItem *item, ride->intervals())
-        if (type.isEmpty() || type == RideFileInterval::typeDescription(item->type)) {
+    for (int idx = 0; idx < intervals; idx++) {
+        IntervalItem *item = snapshot[idx];
 
-            // START
-            PyList_SET_ITEM(startlist, idx, PyFloat_FromDouble(item->start));
+        // START
+        PyList_SET_ITEM(startlist, idx, PyFloat_FromDouble(item->start));
 
-            // STOP
-            PyList_SET_ITEM(stoplist, idx, PyFloat_FromDouble(item->stop));
+        // STOP
+        PyList_SET_ITEM(stoplist, idx, PyFloat_FromDouble(item->stop));
 
-            // NAME
-            PyList_SET_ITEM(namelist, idx, PyUnicode_FromString(item->name.toUtf8().constData()));
+        // NAME
+        PyList_SET_ITEM(namelist, idx, PyUnicode_FromString(item->name.toUtf8().constData()));
 
-            // TYPE
-            PyList_SET_ITEM(typelist, idx, PyUnicode_FromString(RideFileInterval::typeDescription(item->type).toUtf8().constData()));
+        // TYPE
+        PyList_SET_ITEM(typelist, idx, PyUnicode_FromString(RideFileInterval::typeDescription(item->type).toUtf8().constData()));
 
-            // apply item color, remembering that 1,1,1 means use default (reverse in this case)
-            QString color;
-            if (item->color == QColor(1,1,1,1)) {
-                // use the inverted color, not plot marker as that hideous
-                QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
-                // white is jarring on a dark background!
-                if (col==QColor(Qt::white)) col=QColor(127,127,127);
-                color = col.name();
-            } else
-                color = item->color.name();
-            PyList_SET_ITEM(colorlist, idx, PyUnicode_FromString(color.toUtf8().constData()));
+        // apply item color, remembering that 1,1,1 means use default (reverse in this case)
+        QString color;
+        if (item->color == QColor(1,1,1,1)) {
+            // use the inverted color, not plot marker as that hideous
+            QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
+            // white is jarring on a dark background!
+            if (col==QColor(Qt::white)) col=QColor(127,127,127);
+            color = col.name();
+        } else
+            color = item->color.name();
+        PyList_SET_ITEM(colorlist, idx, PyUnicode_FromString(color.toUtf8().constData()));
 
-            // SELECTED
-            PyList_SET_ITEM(selectedlist, idx, PyBool_FromLong(item->selected));
-
-            idx++;
-        }
+        // SELECTED
+        PyList_SET_ITEM(selectedlist, idx, PyBool_FromLong(item->selected));
+    }
 
     PyDict_SetItemString_Steal(dict, "start", startlist);
     PyDict_SetItemString_Steal(dict, "stop", stoplist);
@@ -1507,6 +1496,7 @@ Bindings::activityIntervals(QString type, PyObject* activity) const
     //
     // METRICS
     //
+    bool useMetricUnits = GlobalContext::context()->useMetricUnits;
     for(int i=0; i<factory.metricCount();i++) {
 
         // set a list of metric values
@@ -1518,12 +1508,9 @@ Bindings::activityIntervals(QString type, PyObject* activity) const
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
-        bool useMetricUnits = GlobalContext::context()->useMetricUnits;
-
-        int index=0;
-        foreach(IntervalItem *item, ride->intervals()) {
-            if (type.isEmpty() || type == RideFileInterval::typeDescription(item->type))
-                PyList_SET_ITEM(metriclist, index++, PyFloat_FromDouble(item->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion()) + (useMetricUnits ? 0.0f : metric->conversionSum())));
+        for (int idx = 0; idx < intervals; idx++) {
+            IntervalItem *item = snapshot[idx];
+            PyList_SET_ITEM(metriclist, idx, PyFloat_FromDouble(item->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion()) + (useMetricUnits ? 0.0f : metric->conversionSum())));
         }
 
         // add to the dict
@@ -1896,22 +1883,28 @@ Bindings::activityMeanmax(bool compare) const
         // only return compares if its actually active
         if (context->isCompareIntervals) {
 
-            // how many to return?
-            int count = 0;
-            foreach(CompareInterval p, context->compareIntervals) if (p.isChecked()) count++;
-            PyObject* list = PyList_New(count);
+            // Take ONE consistent snapshot of the checked compare intervals.
+            // The list is built from this snapshot only, so its size can
+            // never change underneath us even if the user toggles a
+            // checkbox in the Compare pane while this (background) call is
+            // still running -- previously this counted checked items once,
+            // then independently re-walked context->compareIntervals and
+            // re-evaluated isChecked() again to fill the list, which could
+            // desync the count from the actual number of items visited and
+            // cause PyList_SET_ITEM to write out of bounds.
+            QList<CompareInterval> checked;
+            foreach(CompareInterval p, context->compareIntervals) if (p.isChecked()) checked << p;
+            PyObject* list = PyList_New(checked.count());
 
             // create a dict for each and add to list as tuple (meanmax, color)
-            long idx = 0;
-            foreach(CompareInterval p, context->compareIntervals) {
-                if (p.isChecked()) {
+            for (int idx = 0; idx < checked.count(); idx++) {
+                const CompareInterval &p = checked[idx];
 
-                    // create a tuple (meanmax, color)
-                    PyObject* am = activityMeanmax(p.rideItem);
-                    PyObject* tuple = Py_BuildValue("(Os)", am, p.color.name().toUtf8().constData());
-                    Py_DECREF(am);
-                    PyList_SET_ITEM(list, idx++, tuple);
-                }
+                // create a tuple (meanmax, color)
+                PyObject* am = activityMeanmax(p.rideItem);
+                PyObject* tuple = Py_BuildValue("(Os)", am, p.color.name().toUtf8().constData());
+                Py_DECREF(am);
+                PyList_SET_ITEM(list, idx, tuple);
             }
 
             return list;
@@ -1949,25 +1942,31 @@ Bindings::seasonMeanmax(bool all, QString filter, bool compare) const
         // only return compares if its actually active
         if (context->isCompareDateRanges) {
 
-            // how many to return?
-            int count=0;
-            foreach(CompareDateRange p, context->compareDateRanges) if (p.isChecked()) count++;
+            // Take ONE consistent snapshot of the checked compare date
+            // ranges. The list is built from this snapshot only, so its
+            // size can never change underneath us even if the user toggles
+            // a checkbox in the Compare pane while this (background) call
+            // is still running -- previously this counted checked items
+            // once, then independently re-walked context->compareDateRanges
+            // and re-evaluated isChecked() again to fill the list, which
+            // could desync the count from the actual number of items
+            // visited and cause PyList_SET_ITEM to write out of bounds.
+            QList<CompareDateRange> checked;
+            foreach(CompareDateRange p, context->compareDateRanges) if (p.isChecked()) checked << p;
 
             // cool we can return a list of meanaxes to compare
-            PyObject* list = PyList_New(count);
-            int idx = 0;
+            PyObject* list = PyList_New(checked.count());
 
             // create a dict for each and add to list
-            foreach(CompareDateRange p, context->compareDateRanges) {
-                if (p.isChecked()) {
+            for (int idx = 0; idx < checked.count(); idx++) {
+                const CompareDateRange &p = checked[idx];
 
-                    // create a tuple (meanmax, color)
-                    PyObject* sm = seasonMeanmax(all, DateRange(p.start, p.end), filter);
-                    PyObject* tuple = Py_BuildValue("(Os)", sm, p.color.name().toUtf8().constData());
-                    Py_DECREF(sm);
-                    // add to back and move on
-                    PyList_SET_ITEM(list, idx++, tuple);
-                }
+                // create a tuple (meanmax, color)
+                PyObject* sm = seasonMeanmax(all, DateRange(p.start, p.end), filter);
+                PyObject* tuple = Py_BuildValue("(Os)", sm, p.color.name().toUtf8().constData());
+                Py_DECREF(sm);
+                // add to back and move on
+                PyList_SET_ITEM(list, idx, tuple);
             }
 
             return list;
@@ -2394,25 +2393,31 @@ Bindings::seasonPeaks(QString series, int duration, bool all, QString filter, bo
         // only return compares if its actually active
         if (context->isCompareDateRanges) {
 
-            // how many to return?
-            int count=0;
-            foreach(CompareDateRange p, context->compareDateRanges) if (p.isChecked()) count++;
+            // Take ONE consistent snapshot of the checked compare date
+            // ranges. The list is built from this snapshot only, so its
+            // size can never change underneath us even if the user toggles
+            // a checkbox in the Compare pane while this (background) call
+            // is still running -- previously this counted checked items
+            // once, then independently re-walked context->compareDateRanges
+            // and re-evaluated isChecked() again to fill the list, which
+            // could desync the count from the actual number of items
+            // visited and cause PyList_SET_ITEM to write out of bounds.
+            QList<CompareDateRange> checked;
+            foreach(CompareDateRange p, context->compareDateRanges) if (p.isChecked()) checked << p;
 
             // cool we can return a list of intervals to compare
-            PyObject* list = PyList_New(count);
-            int idx = 0;
+            PyObject* list = PyList_New(checked.count());
 
             // create a dict for each and add to list
-            foreach(CompareDateRange p, context->compareDateRanges) {
-                if (p.isChecked()) {
+            for (int idx = 0; idx < checked.count(); idx++) {
+                const CompareDateRange &p = checked[idx];
 
-                    // create a tuple (peaks, color)
-                    PyObject* sp = seasonPeaks(all, DateRange(p.start, p.end), filter, seriesList, durations);
-                    PyObject* tuple = Py_BuildValue("(Os)", sp, p.color.name().toUtf8().constData());
-                    Py_DECREF(sp);
-                    // add to back and move on
-                    PyList_SET_ITEM(list, idx++, tuple);
-                }
+                // create a tuple (peaks, color)
+                PyObject* sp = seasonPeaks(all, DateRange(p.start, p.end), filter, seriesList, durations);
+                PyObject* tuple = Py_BuildValue("(Os)", sp, p.color.name().toUtf8().constData());
+                Py_DECREF(sp);
+                // add to back and move on
+                PyList_SET_ITEM(list, idx, tuple);
             }
 
             return list;
@@ -2476,32 +2481,36 @@ Bindings::seasonPeaks(bool all, DateRange range, QString filter, QList<RideFile:
     }
     specification.setFilterSet(fs);
 
-    // how many pass?
-    int size=0;
+    if (context->athlete == NULL || context->athlete->rideCache == NULL) return ans;
+
+    // Take ONE consistent snapshot of the rides that match the filter/date-range
+    // criteria. Every list below is built from this snapshot only, so its size
+    // can never change underneath us even if rideCache is mutated by the GUI
+    // thread while this (background) call is still running. Previously this
+    // function counted matching rides once, then independently re-walked the
+    // live rideCache once for the datetime list and again once PER SERIES x
+    // DURATION combination -- any concurrent mutation between those walks
+    // could desync the count from the actual number of items visited,
+    // causing PyList_SET_ITEM to write out of bounds and abort() the process.
+    QVector<RideItem*> snapshot;
     foreach(RideItem *item, context->athlete->rideCache->rides()) {
 
         // apply filters
         if (!specification.pass(item)) continue;
 
         // do we want this one ?
-        if (all || range.pass(item->dateTime.date()))  size++;
+        if (all || range.pass(item->dateTime.date())) snapshot.append(item);
     }
+    const int size = snapshot.count();
 
     // dates first
     PyObject* datetimelist = PyList_New(size);
 
-    // fill with values for date
-    int i=0;
-    foreach(RideItem *item, context->athlete->rideCache->rides()) {
-        // apply filters
-        if (!specification.pass(item)) continue;
-
-        if (all || range.pass(item->dateTime.date())) {
-            // add datetime to the list
-            QDate d = item->dateTime.date();
-            QTime t = item->dateTime.time();
-            PyList_SET_ITEM(datetimelist, i++, PyDateTime_FromDateAndTime(d.year(), d.month(), d.day(), t.hour(), t.minute(), t.second(), t.msec()*10));
-        }
+    for (int i = 0; i < size; i++) {
+        RideItem *item = snapshot[i];
+        QDate d = item->dateTime.date();
+        QTime t = item->dateTime.time();
+        PyList_SET_ITEM(datetimelist, i, PyDateTime_FromDateAndTime(d.year(), d.month(), d.day(), t.hour(), t.minute(), t.second(), t.msec()*10));
     }
 
     // add to the dict
@@ -2519,19 +2528,12 @@ Bindings::seasonPeaks(bool all, DateRange range, QString filter, QList<RideFile:
 
             // fill with values
             // get the value for the series and duration requested, although this is called
-            int index=0;
-            foreach(RideItem *item, context->athlete->rideCache->rides()) {
+            for (int index = 0; index < size; index++) {
+                RideItem *item = snapshot[index];
 
-                // apply filters
-                if (!specification.pass(item)) continue;
-
-                // do we want this one ?
-                if (all || range.pass(item->dateTime.date())) {
-
-                    // for each series/duration independently its pretty quick since it lseeks to
-                    // the actual value, so /should't/ be too expensive.........
-                    PyList_SET_ITEM(list, index++, PyFloat_FromDouble(RideFileCache::best(item->context, item->fileName, pseries, pduration)));
-                }
+                // for each series/duration independently its pretty quick since it lseeks to
+                // the actual value, so /should't/ be too expensive.........
+                PyList_SET_ITEM(list, index, PyFloat_FromDouble(RideFileCache::best(item->context, item->fileName, pseries, pduration)));
             }
 
             // add to the dict
