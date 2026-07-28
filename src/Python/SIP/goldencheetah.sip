@@ -387,7 +387,7 @@ public:
 
     // working with intervals
     QString intervalType(int type=1) const;
-    PyObject* seasonIntervals(QString type=QString(), bool compare=false) /TransferBack/;
+    PyObject* seasonIntervals(QString type=QString(), bool all=false, bool compare=false) /TransferBack/;
     PyObject* activityIntervals(QString type=QString(), PyObject* activity=NULL) /TransferBack/;
 
     // editing data
