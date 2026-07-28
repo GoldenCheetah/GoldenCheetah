@@ -206,8 +206,8 @@ RTool::RTool()
             // all=FALSE, compare=FALSE
             { "GC.season", (DL_FUNC) &RTool::season, 2 },
             { "GC.season.metrics", (DL_FUNC) &RTool::metrics, 3 },
-            // type=any, compare=FALSE
-            { "GC.season.intervals", (DL_FUNC) &RTool::seasonIntervals, 2 },
+            // all=FALSE, type=any, compare=FALSE
+            { "GC.season.intervals", (DL_FUNC) &RTool::seasonIntervals, 3 },
             { "GC.season.meanmax", (DL_FUNC) &RTool::seasonMeanmax, 3 },
             { "GC.season.peaks", (DL_FUNC) &RTool::seasonPeaks, 5 },
             // return a data.frame of pmc series (all=FALSE, metric="BikeStress", type="Actual")
@@ -304,7 +304,7 @@ RTool::RTool()
                                // season
                                "GC.season <- function(all=FALSE, compare=FALSE) { .Call(\"GC.season\", all, compare) }\n"
                                "GC.season.metrics <- function(all=FALSE, filter=\"\", compare=FALSE) { .Call(\"GC.season.metrics\", all, filter, compare) }\n"
-                               "GC.season.intervals <- function(type=NULL, compare=FALSE) { .Call(\"GC.season.intervals\", type, compare) }\n"
+                               "GC.season.intervals <- function(all=FALSE, type=NULL, compare=FALSE) { .Call(\"GC.season.intervals\", all, type, compare) }\n"
                                "GC.season.pmc <- function(all=FALSE, metric=\"BikeStress\", type=\"Actual\") { .Call(\"GC.season.pmc\", all, metric, type) }\n"
                                "GC.season.measures <- function(all=FALSE, group=\"Body\") { .Call(\"GC.season.measures\", all, group) }\n"
                                "GC.season.meanmax <- function(all=FALSE, filter=\"\", compare=FALSE) { .Call(\"GC.season.meanmax\", all, filter, compare) }\n"
@@ -1363,8 +1363,10 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
 }
 
 SEXP
-RTool::dfForDateRangeIntervals(DateRange range, QStringList types)
+RTool::dfForDateRangeIntervals(bool all, DateRange range, QStringList types)
 {
+    // construct the date range and then get a ridefilecache
+    if (all) range = DateRange(QDate(1900,01,01), QDate(2100,01,01));
     const RideMetricFactory &factory = RideMetricFactory::instance();
     int intervals = 0;
     int metrics = factory.metricCount();
@@ -1692,19 +1694,20 @@ RTool::season(SEXP pAll, SEXP pCompare)
 }
 
 SEXP
-RTool::seasonIntervals(SEXP pTypes, SEXP pCompare)
+RTool::seasonIntervals(SEXP pAll, SEXP pTypes, SEXP pCompare)
 {
-    // p1 - type of intervals to get (vector of strings)
-    // p2 - compare mode (true or false)
+    // p1 - all=TRUE|FALSE - return all intervals or just within
+    //                       the currently selected date range
+    pAll = Rf_coerceVector(pAll, LGLSXP);
+    bool all = LOGICAL(pAll)[0];
+
+    // p2 - type of intervals to get (vector of strings)
     pTypes = Rf_coerceVector(pTypes, STRSXP);
     QStringList types;
     for(int i=0; i<Rf_length(pTypes); i++)
         types << QString(CHAR(STRING_ELT(pTypes,i)));
 
-    //pType = Rf_coerceVector(pAll, LGLSXP);
-    //bool all = LOGICAL(pAll)[0];
-
-    // p2 - all=TRUE|FALSE - return list of compares (or current if not active)
+    // p3 - compare mode (true or false)
     pCompare = Rf_coerceVector(pCompare, LGLSXP);
     bool compare = LOGICAL(pCompare)[0];
 
@@ -1740,7 +1743,7 @@ RTool::seasonIntervals(SEXP pTypes, SEXP pCompare)
                     PROTECT(namedlist=Rf_allocVector(VECSXP, 2));
 
                     // add the ride
-                    SEXP df = rtool->dfForDateRangeIntervals(DateRange(p.start, p.end), types);
+                    SEXP df = rtool->dfForDateRangeIntervals(all, DateRange(p.start, p.end), types);
                     SET_VECTOR_ELT(namedlist, 0, df);
 
                     // add the color
@@ -1780,7 +1783,7 @@ RTool::seasonIntervals(SEXP pTypes, SEXP pCompare)
 
             // add the metrics
             DateRange range = rtool->context->currentDateRange();
-            SEXP df = rtool->dfForDateRangeIntervals(range, types);
+            SEXP df = rtool->dfForDateRangeIntervals(all, range, types);
             SET_VECTOR_ELT(namedlist, 0, df);
 
             // add the color
@@ -1801,9 +1804,9 @@ RTool::seasonIntervals(SEXP pTypes, SEXP pCompare)
 
     } else if (rtool->context && rtool->context->athlete && rtool->context->athlete->rideCache) {
 
-        // just a datafram of metrics
+        // just a datafram of intervals
         DateRange range = rtool->context->currentDateRange();
-        return rtool->dfForDateRangeIntervals(range, types);
+        return rtool->dfForDateRangeIntervals(all, range, types);
 
     }
 
