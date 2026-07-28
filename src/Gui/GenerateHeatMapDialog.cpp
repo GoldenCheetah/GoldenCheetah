@@ -259,7 +259,10 @@ GenerateHeatMapDialog::generateNow()
                     .arg(i.value());
     }
     QFile filehtml(dirName->text() + "/HeatMap.htm");
-    filehtml.open(QIODevice::WriteOnly | QIODevice::Text);
+    if (!filehtml.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        status->setText(tr("Failed to open output file for writing."));
+        return;
+    }
     QTextStream outhtml(&filehtml);
     outhtml << "<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>Heatmaps</title>\n";
     outhtml << "<style>\n";
