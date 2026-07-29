@@ -1241,7 +1241,7 @@ Bindings::seasonMetrics(bool all, DateRange range, QString filter) const
 }
 
 PyObject*
-Bindings::seasonIntervals(QString type, bool compare) const
+Bindings::seasonIntervals(QString type, bool all, bool compare) const
 {
     Context *context = python->contexts.value(threadid()).context;
     if (context == NULL) return NULL;
@@ -1272,7 +1272,7 @@ Bindings::seasonIntervals(QString type, bool compare) const
                 const CompareDateRange &p = checked[idx];
 
                 // create a tuple (metrics, color)
-                PyObject* si = seasonIntervals(DateRange(p.start, p.end), type);
+                PyObject* si = seasonIntervals(all, DateRange(p.start, p.end), type);
                 PyObject* tuple = Py_BuildValue("(Os)", si, p.color.name().toUtf8().constData());
                 Py_DECREF(si);
                 // add to back and move on
@@ -1288,7 +1288,7 @@ Bindings::seasonIntervals(QString type, bool compare) const
 
             // create a tuple (metrics, color)
             DateRange range = context->currentDateRange();
-            PyObject* si = seasonIntervals(range, type);
+            PyObject* si = seasonIntervals(all, range, type);
             PyObject* tuple = Py_BuildValue("(Os)", si, "#FF00FF");
             Py_DECREF(si);
             // add to back and move on
@@ -1301,12 +1301,12 @@ Bindings::seasonIntervals(QString type, bool compare) const
 
         // just a dict of metrics
         DateRange range = context->currentDateRange();
-        return seasonIntervals(range, type);
+        return seasonIntervals(all, range, type);
     }
 }
 
 PyObject*
-Bindings::seasonIntervals(DateRange range, QString type) const
+Bindings::seasonIntervals(bool all, DateRange range, QString type) const
 {
     Context *context = python->contexts.value(threadid()).context;
     if (context == NULL || context->athlete == NULL || context->athlete->rideCache == NULL) return NULL;
@@ -1329,7 +1329,7 @@ Bindings::seasonIntervals(DateRange range, QString type) const
     QVector<Pair> snapshot;
     foreach(RideItem *ride, context->athlete->rideCache->rides()) {
         if (!specification.pass(ride)) continue;
-        if (!range.pass(ride->dateTime.date())) continue;
+        if (!all && !range.pass(ride->dateTime.date())) continue;
         foreach(IntervalItem *item, ride->intervals()) {
             if (type.isEmpty() || type == RideFileInterval::typeDescription(item->type))
                 snapshot.append({ride, item});

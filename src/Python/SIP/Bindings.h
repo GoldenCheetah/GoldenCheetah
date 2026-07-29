@@ -108,7 +108,7 @@ class Bindings {
 
         // working with intervals
         QString intervalType(int type) const;
-        PyObject* seasonIntervals(QString type=QString(), bool compare=false) const;
+        PyObject* seasonIntervals(QString type=QString(), bool all=false, bool compare=false) const;
         PyObject* activityIntervals(QString type=QString(), PyObject* activity=NULL) const;
 
         // editing data
@@ -140,7 +140,7 @@ class Bindings {
         // get a dict populated with metrics and metadata
         PyObject* activityMetrics(RideItem* item) const;
         PyObject* seasonMetrics(bool all, DateRange range, QString filter) const;
-        PyObject* seasonIntervals(DateRange range, QString type) const;
+        PyObject* seasonIntervals(bool all, DateRange range, QString type) const;
 
         // get a dict populated with meanmax data
         PyObject* activityMeanmax(const RideItem* item) const;

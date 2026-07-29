@@ -8432,7 +8432,6 @@ static void *findSlot(PyObject *self, sipPySlotType st)
     PyTypeObject *py_type = Py_TYPE(self);
 
     /* See if it is a wrapper. */
-    /* TODO: will this always be TRUE? */
     if (PyObject_TypeCheck((PyObject *)py_type, &sipWrapperType_Type))
     {
         const sipClassTypeDef *ctd;
@@ -8440,6 +8439,19 @@ static void *findSlot(PyObject *self, sipPySlotType st)
         ctd = (sipClassTypeDef *)((sipWrapperType *)(py_type))->wt_td;
 
         slot = findSlotInClass(ctd, st);
+    }
+    else
+    {
+        sipEnumTypeDef *etd;
+
+        /* If it is not a wrapper then it must be an enum. */
+        etd = (sipEnumTypeDef *)sip_enum_get_generated_type(
+                (PyObject *)py_type);
+
+        assert(etd != NULL);
+        assert(etd->etd_pyslots != NULL);
+
+        slot = findSlotInSlotList(etd->etd_pyslots, st);
     }
 
     return slot;
