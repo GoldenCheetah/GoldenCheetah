@@ -364,7 +364,7 @@ private:
 
     Vaminator vaminator;
 
-    double wbalr, wbal;
+    double wbalr;
 
     double sumAvgWatts, sumAvgSpeed, sumAvgCadence, sumAvgHeartRate;
     int nAvgWatts, nAvgSpeed, nAvgCadence, nAvgHeartRate;

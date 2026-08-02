@@ -1372,7 +1372,6 @@ RealtimeDataSession::RealtimeDataSession(Context* context, double CP, double WPR
 
     // W'bal
     wbalr = 0;
-    wbal = WPRIME;
 
     // Coggan Metrics
     rolling.resize(150); // enough for 30 seconds at 5hz
@@ -1454,11 +1453,12 @@ void RealtimeDataSession::updateDerived()
     double joules = double(getWatts() - CP) / 5.00f;
     if (joules < 0) joules = 0;
 
-    // running total of replenishment
-    wbalr += joules * exp((getMsecs()/1000.00f) / TAU);
-    wbal = WPRIME - (wbalr * exp((-getMsecs()/1000.00f) / TAU));
+    // replenishment factor, extracted to avoid exp() recomputation
+    double replenishmentFactor = exp((getMsecs()/1000.00f) / TAU);
 
-    setWbal(wbal);
+    // running total of replenishment
+    wbalr += joules * replenishmentFactor;
+    setWbal(WPRIME - wbalr / replenishmentFactor);
 
     //
     // VAM
