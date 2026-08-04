@@ -405,12 +405,12 @@ Puede que sea necesario deshabilitarlo de forma manual.</translation>
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="1323"/>
         <source>Planned</source>
-        <translation type="unfinished">Programado</translation>
+        <translation>Programado</translation>
     </message>
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="1326"/>
         <source>Unsaved changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambios no guardados</translation>
     </message>
 </context>
 <context>
@@ -1422,7 +1422,7 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="95"/>
         <source> ***Adapter/Device must be connected*** </source>
-        <translation type="unfinished"></translation>
+        <translation> ***El dispositivo ha de estar conectado*** </translation>
     </message>
 </context>
 <context>
@@ -7020,7 +7020,7 @@ ddd, dd MMM yyyy</source>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="915"/>
         <source>New Measure Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Nueva medida de tiempo</translation>
     </message>
     <message>
         <location filename="../../Charts/CalendarWindow.cpp" line="916"/>
@@ -12350,7 +12350,7 @@ $COPYRIGHT</translation>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2871"/>
         <source>Summary rows in activities list</source>
-        <translation type="unfinished"></translation>
+        <translation>Filas de resumen en la lista de actividades</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2963"/>
@@ -15449,7 +15449,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="113"/>
         <source>HTML Chart</source>
-        <translation type="unfinished"></translation>
+        <translation>Gráfico HTML</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="117"/>
@@ -17770,37 +17770,37 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/HtmlChart.cpp" line="70"/>
         <source>Show Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar editor</translation>
     </message>
     <message>
         <location filename="../../Train/HtmlChart.cpp" line="74"/>
         <source>Show Config</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar configuración</translation>
     </message>
     <message>
         <location filename="../../Train/HtmlChart.cpp" line="78"/>
         <source>Show Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar título</translation>
     </message>
     <message>
         <location filename="../../Train/HtmlChart.cpp" line="121"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Añadir</translation>
     </message>
     <message>
         <location filename="../../Train/HtmlChart.cpp" line="122"/>
         <source>Remove</source>
-        <translation type="unfinished">Eliminar</translation>
+        <translation>Eliminar</translation>
     </message>
     <message>
         <location filename="../../Train/HtmlChart.cpp" line="129"/>
         <source>Key</source>
-        <translation type="unfinished">Clave</translation>
+        <translation>Clave</translation>
     </message>
     <message>
         <location filename="../../Train/HtmlChart.cpp" line="129"/>
         <source>Value</source>
-        <translation type="unfinished">Valor</translation>
+        <translation>Valor</translation>
     </message>
 </context>
 <context>
@@ -18423,7 +18423,7 @@ Arrastre y suelte ficheros SVG aquí para añadir iconos.</translation>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1802"/>
         <source>Unknown</source>
-        <translation type="unfinished">Desconocido</translation>
+        <translation>Desconocido</translation>
     </message>
     <message>
         <source>Diary</source>
@@ -30821,7 +30821,7 @@ Si no necesita Python, puese deshabilitarlo en Opciones-&gt;General.</translatio
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="911"/>
         <source>VAM</source>
-        <translation type="unfinished">VAM</translation>
+        <translation>VAM</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="914"/>
@@ -31056,12 +31056,12 @@ Si no necesita Python, puese deshabilitarlo en Opciones-&gt;General.</translatio
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="1049"/>
         <source>Right PCO</source>
-        <translation type="unfinished"></translation>
+        <translation>PCO derecha</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="1051"/>
         <source>Left PCO</source>
-        <translation type="unfinished"></translation>
+        <translation>PCO izquierda</translation>
     </message>
     <message>
         <source>CoreTemp</source>
