@@ -76,6 +76,10 @@ CloudService::newCloudServiceEntry()
 bool
 CloudService::upload(QWidget *parent, Context *context, CloudService *store, RideItem *item)
 {
+    if (item->planned) {
+        QMessageBox::critical(parent, tr("Upload"), tr("Planned activity upload is not supported"));
+        return false;
+    }
 
     // open a dialog to do it
     CloudServiceUploadDialog uploader(parent, context, store, item);

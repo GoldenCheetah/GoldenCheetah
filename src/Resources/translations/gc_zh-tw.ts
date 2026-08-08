@@ -1151,72 +1151,72 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
 <context>
     <name>AddPerspectiveDialog</name>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1877"/>
+        <location filename="../../Gui/Perspective.cpp" line="1879"/>
         <source>Edit Perspective</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1878"/>
+        <location filename="../../Gui/Perspective.cpp" line="1880"/>
         <source>Add Perspective</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1887"/>
+        <location filename="../../Gui/Perspective.cpp" line="1889"/>
         <source>Perspective Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1895"/>
+        <location filename="../../Gui/Perspective.cpp" line="1897"/>
         <source>Switch expression</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1896"/>
+        <location filename="../../Gui/Perspective.cpp" line="1898"/>
         <source>Activities filter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1901"/>
+        <location filename="../../Gui/Perspective.cpp" line="1903"/>
         <source>Don&apos;t switch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1902"/>
+        <location filename="../../Gui/Perspective.cpp" line="1904"/>
         <source>Erg Workout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1903"/>
+        <location filename="../../Gui/Perspective.cpp" line="1905"/>
         <source>Slope Workout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1904"/>
+        <location filename="../../Gui/Perspective.cpp" line="1906"/>
         <source>Video Workout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1905"/>
+        <location filename="../../Gui/Perspective.cpp" line="1907"/>
         <source>Map Workout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1907"/>
+        <location filename="../../Gui/Perspective.cpp" line="1909"/>
         <source>Switch for</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1911"/>
+        <location filename="../../Gui/Perspective.cpp" line="1913"/>
         <source>OK</source>
         <translation type="unfinished">OK</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1912"/>
+        <location filename="../../Gui/Perspective.cpp" line="1914"/>
         <source>Add</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1913"/>
+        <location filename="../../Gui/Perspective.cpp" line="1915"/>
         <source>Cancel</source>
         <translation type="unfinished">取消</translation>
     </message>
@@ -6998,62 +6998,62 @@ ddd, dd MMM yyyy</source>
         <translation type="unfinished">總結</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1305"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1306"/>
         <source>Unnamed %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1307"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1308"/>
         <source>&lt;unknown&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1469"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1470"/>
         <source>day</source>
         <translation type="unfinished">日</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1471"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1472"/>
         <source>days</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1476"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1477"/>
         <source>week</source>
         <translation type="unfinished">週</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1478"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1479"/>
         <source>weeks</source>
         <translation type="unfinished">週</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1483"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1484"/>
         <source>month</source>
         <translation type="unfinished">月</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1485"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1486"/>
         <source>months</source>
         <translation type="unfinished">月</translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1561"/>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1580"/>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1598"/>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1677"/>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1703"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1562"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1581"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1599"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1678"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1704"/>
         <source>Failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1598"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1599"/>
         <source>No matching activity found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1760"/>
-        <location filename="../../Charts/CalendarWindow.cpp" line="1765"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1761"/>
+        <location filename="../../Charts/CalendarWindow.cpp" line="1766"/>
         <source>Paste failed: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7847,17 +7847,27 @@ Are you sure?</source>
 <context>
     <name>CloudService</name>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="241"/>
+        <location filename="../../Cloud/CloudService.cpp" line="80"/>
+        <source>Upload</source>
+        <translation type="unfinished">上傳</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/CloudService.cpp" line="80"/>
+        <source>Planned activity upload is not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/CloudService.cpp" line="245"/>
         <source>expected compressed activity file.</source>
         <translation>應為活動紀錄壓縮檔案</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="300"/>
+        <location filename="../../Cloud/CloudService.cpp" line="304"/>
         <source>HTTP</source>
         <translation type="unfinished">HTTP</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="300"/>
+        <location filename="../../Cloud/CloudService.cpp" line="304"/>
         <source>SSL error(s) has occurred: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7870,17 +7880,17 @@ Are you sure?</source>
 <context>
     <name>CloudServiceAutoDownloadWidget</name>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="2053"/>
+        <location filename="../../Cloud/CloudService.cpp" line="2057"/>
         <source>Downloading</source>
         <translation>下載中</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="2054"/>
+        <location filename="../../Cloud/CloudService.cpp" line="2058"/>
         <source>Checking</source>
         <translation>檢查中</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="2090"/>
+        <location filename="../../Cloud/CloudService.cpp" line="2094"/>
         <source>Last 30 days</source>
         <translation>過去30日</translation>
     </message>
@@ -7888,43 +7898,43 @@ Are you sure?</source>
 <context>
     <name>CloudServiceDialog</name>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="449"/>
-        <location filename="../../Cloud/CloudService.cpp" line="651"/>
+        <location filename="../../Cloud/CloudService.cpp" line="453"/>
+        <location filename="../../Cloud/CloudService.cpp" line="655"/>
         <source>Folder</source>
         <translation>檔案夾</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="456"/>
+        <location filename="../../Cloud/CloudService.cpp" line="460"/>
         <source>Name</source>
         <translation>名稱</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="457"/>
+        <location filename="../../Cloud/CloudService.cpp" line="461"/>
         <source>Type</source>
         <translation>種類</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="458"/>
+        <location filename="../../Cloud/CloudService.cpp" line="462"/>
         <source>Modified</source>
         <translation>已編輯</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="473"/>
+        <location filename="../../Cloud/CloudService.cpp" line="477"/>
         <source>Create Folder</source>
         <translation>新增檔案夾</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="474"/>
+        <location filename="../../Cloud/CloudService.cpp" line="478"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="475"/>
+        <location filename="../../Cloud/CloudService.cpp" line="479"/>
         <source>Open</source>
         <translation>開啟</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="664"/>
+        <location filename="../../Cloud/CloudService.cpp" line="668"/>
         <source>d MMM yyyy</source>
         <translation>yyyy年M月d日</translation>
     </message>
@@ -7932,176 +7942,176 @@ Are you sure?</source>
 <context>
     <name>CloudServiceSyncDialog</name>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="711"/>
+        <location filename="../../Cloud/CloudService.cpp" line="715"/>
         <source>Synchronise </source>
         <translation>同步 </translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="719"/>
-        <location filename="../../Cloud/CloudService.cpp" line="919"/>
+        <location filename="../../Cloud/CloudService.cpp" line="723"/>
+        <location filename="../../Cloud/CloudService.cpp" line="923"/>
         <source>Sync with </source>
         <translation>同步</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="720"/>
+        <location filename="../../Cloud/CloudService.cpp" line="724"/>
         <source>Unable to connect, check your configuration in preferences.</source>
         <translation>無法連接，請檢查你的配置設定。</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="739"/>
-        <location filename="../../Cloud/CloudService.cpp" line="769"/>
-        <location filename="../../Cloud/CloudService.cpp" line="1122"/>
-        <location filename="../../Cloud/CloudService.cpp" line="1234"/>
-        <location filename="../../Cloud/CloudService.cpp" line="1328"/>
-        <location filename="../../Cloud/CloudService.cpp" line="1395"/>
-        <location filename="../../Cloud/CloudService.cpp" line="1495"/>
+        <location filename="../../Cloud/CloudService.cpp" line="743"/>
+        <location filename="../../Cloud/CloudService.cpp" line="773"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1126"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1238"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1332"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1399"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1499"/>
         <source>Download</source>
         <translation>下載</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="740"/>
-        <location filename="../../Cloud/CloudService.cpp" line="1204"/>
-        <location filename="../../Cloud/CloudService.cpp" line="1238"/>
-        <location filename="../../Cloud/CloudService.cpp" line="1610"/>
+        <location filename="../../Cloud/CloudService.cpp" line="744"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1208"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1242"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1614"/>
         <source>Upload</source>
         <translation>上傳</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="741"/>
-        <location filename="../../Cloud/CloudService.cpp" line="1242"/>
-        <location filename="../../Cloud/CloudService.cpp" line="1440"/>
+        <location filename="../../Cloud/CloudService.cpp" line="745"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1246"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1444"/>
         <source>Synchronize</source>
         <translation>同步</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="756"/>
+        <location filename="../../Cloud/CloudService.cpp" line="760"/>
         <source>From:</source>
         <translation>從：</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="757"/>
+        <location filename="../../Cloud/CloudService.cpp" line="761"/>
         <source>To:</source>
         <translation>至：</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="767"/>
+        <location filename="../../Cloud/CloudService.cpp" line="771"/>
         <source>Refresh List</source>
         <translation>刷新列表</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="768"/>
+        <location filename="../../Cloud/CloudService.cpp" line="772"/>
         <source>Close</source>
         <translation>關閉</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="771"/>
-        <location filename="../../Cloud/CloudService.cpp" line="798"/>
-        <location filename="../../Cloud/CloudService.cpp" line="828"/>
+        <location filename="../../Cloud/CloudService.cpp" line="775"/>
+        <location filename="../../Cloud/CloudService.cpp" line="802"/>
+        <location filename="../../Cloud/CloudService.cpp" line="832"/>
         <source>Select all</source>
         <translation>選擇所有</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="777"/>
+        <location filename="../../Cloud/CloudService.cpp" line="781"/>
         <source>Workout Name</source>
         <translation>訓練課表名稱</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="778"/>
-        <location filename="../../Cloud/CloudService.cpp" line="805"/>
-        <location filename="../../Cloud/CloudService.cpp" line="844"/>
+        <location filename="../../Cloud/CloudService.cpp" line="782"/>
+        <location filename="../../Cloud/CloudService.cpp" line="809"/>
+        <location filename="../../Cloud/CloudService.cpp" line="848"/>
         <source>Date</source>
         <translation>日期</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="779"/>
-        <location filename="../../Cloud/CloudService.cpp" line="806"/>
-        <location filename="../../Cloud/CloudService.cpp" line="845"/>
+        <location filename="../../Cloud/CloudService.cpp" line="783"/>
+        <location filename="../../Cloud/CloudService.cpp" line="810"/>
+        <location filename="../../Cloud/CloudService.cpp" line="849"/>
         <source>Time</source>
         <translation>時間</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="780"/>
-        <location filename="../../Cloud/CloudService.cpp" line="809"/>
+        <location filename="../../Cloud/CloudService.cpp" line="784"/>
+        <location filename="../../Cloud/CloudService.cpp" line="813"/>
         <source>Exists</source>
         <translation>已存在</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="781"/>
-        <location filename="../../Cloud/CloudService.cpp" line="810"/>
-        <location filename="../../Cloud/CloudService.cpp" line="849"/>
+        <location filename="../../Cloud/CloudService.cpp" line="785"/>
+        <location filename="../../Cloud/CloudService.cpp" line="814"/>
+        <location filename="../../Cloud/CloudService.cpp" line="853"/>
         <source>Status</source>
         <translation>狀態</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="782"/>
-        <location filename="../../Cloud/CloudService.cpp" line="850"/>
+        <location filename="../../Cloud/CloudService.cpp" line="786"/>
+        <location filename="../../Cloud/CloudService.cpp" line="854"/>
         <source>Workout Id</source>
         <translation>訓練課表ID</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="804"/>
+        <location filename="../../Cloud/CloudService.cpp" line="808"/>
         <source>File</source>
         <translation>檔案</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="807"/>
-        <location filename="../../Cloud/CloudService.cpp" line="846"/>
+        <location filename="../../Cloud/CloudService.cpp" line="811"/>
+        <location filename="../../Cloud/CloudService.cpp" line="850"/>
         <source>Duration</source>
         <translation>持續時間</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="808"/>
-        <location filename="../../Cloud/CloudService.cpp" line="847"/>
+        <location filename="../../Cloud/CloudService.cpp" line="812"/>
+        <location filename="../../Cloud/CloudService.cpp" line="851"/>
         <source>Distance</source>
         <translation>距離</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="831"/>
+        <location filename="../../Cloud/CloudService.cpp" line="835"/>
         <source>Keep all do not delete</source>
         <translation>全部保留不刪除</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="832"/>
+        <location filename="../../Cloud/CloudService.cpp" line="836"/>
         <source>Keep %1 but delete Local</source>
         <translation>保留%1 刪除本地檔案</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="833"/>
+        <location filename="../../Cloud/CloudService.cpp" line="837"/>
         <source>Keep Local but delete %1</source>
         <translation>保留本地檔案 刪除%1</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="843"/>
+        <location filename="../../Cloud/CloudService.cpp" line="847"/>
         <source>Source</source>
         <translation>來源</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="848"/>
+        <location filename="../../Cloud/CloudService.cpp" line="852"/>
         <source>Action</source>
         <translation>動作</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="870"/>
+        <location filename="../../Cloud/CloudService.cpp" line="874"/>
         <source>Initial</source>
         <translation>未開始</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="872"/>
+        <location filename="../../Cloud/CloudService.cpp" line="876"/>
         <source>Overwrite existing files</source>
         <translation>覆寫現有檔案</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="921"/>
+        <location filename="../../Cloud/CloudService.cpp" line="925"/>
         <source>One of your activities has unsaved changes.</source>
         <translation>1個活動紀錄尚未存檔。</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="923"/>
+        <location filename="../../Cloud/CloudService.cpp" line="927"/>
         <source>%1 of your activities have unsaved changes.</source>
         <translation>%1個活動紀錄尚未存檔。</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="925"/>
+        <location filename="../../Cloud/CloudService.cpp" line="929"/>
         <source>Changes in activities which are not saved, will not be synchronized. 
 
 This may lead to inconsistencies between your local GoldenCheetah activities and the uploaded activities. We recommend to save the changed activities before proceeding.</source>
@@ -8110,119 +8120,119 @@ This may lead to inconsistencies between your local GoldenCheetah activities and
 這可能導致本地活動紀錄和上傳的活動紀錄不一致，建議在繼續前保存修改的活動紀錄。</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="972"/>
+        <location filename="../../Cloud/CloudService.cpp" line="976"/>
         <source>km</source>
         <translation type="unfinished">km</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="972"/>
+        <location filename="../../Cloud/CloudService.cpp" line="976"/>
         <source>mi</source>
         <translation type="unfinished">mi</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="1041"/>
-        <location filename="../../Cloud/CloudService.cpp" line="1104"/>
-        <location filename="../../Cloud/CloudService.cpp" line="1150"/>
-        <location filename="../../Cloud/CloudService.cpp" line="1196"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1045"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1108"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1154"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1200"/>
         <source>MMM d, yyyy</source>
         <translation>yyyy年M月d日</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="1229"/>
-        <location filename="../../Cloud/CloudService.cpp" line="1338"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1233"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1342"/>
         <source>Abort</source>
         <translation>停止</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="1289"/>
-        <location filename="../../Cloud/CloudService.cpp" line="1303"/>
-        <location filename="../../Cloud/CloudService.cpp" line="1317"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1293"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1307"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1321"/>
         <source>%1 of %2 selected</source>
         <translation>已選中%2個中的%1個</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="1394"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1398"/>
         <source>Processed %1 of %2</source>
         <translation>已處理%2個中的%1個</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="1396"/>
-        <location filename="../../Cloud/CloudService.cpp" line="1477"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1400"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1481"/>
         <source>Downloading</source>
         <translation>下載中</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="1404"/>
-        <location filename="../../Cloud/CloudService.cpp" line="1578"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1408"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1582"/>
         <source>Uploading</source>
         <translation>上傳中</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="1424"/>
-        <location filename="../../Cloud/CloudService.cpp" line="1598"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1428"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1602"/>
         <source>Parse failure</source>
         <translation>解譯失敗</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="1439"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1443"/>
         <source>Sync complete</source>
         <translation>同步完成</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="1451"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1455"/>
         <source>Processed %1 of %2 successfully</source>
         <translation>成功處理%2個中的%1個</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="1469"/>
-        <location filename="../../Cloud/CloudService.cpp" line="1570"/>
-        <location filename="../../Cloud/CloudService.cpp" line="1668"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1473"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1574"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1672"/>
         <source>File exists</source>
         <translation>檔案已存在</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="1479"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1483"/>
         <source>Downloaded %1 of %2</source>
         <translation>已下載%2個中的%1個</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="1494"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1498"/>
         <source>Downloads complete</source>
         <translation>下載完成</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="1505"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1509"/>
         <source>Downloaded %1 of %2 successfully</source>
         <translation>成功下載%2個中的%1個</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="1522"/>
-        <location filename="../../Cloud/CloudService.cpp" line="1632"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1526"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1636"/>
         <source>Aborted</source>
         <translation>已停止</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="1540"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1544"/>
         <source>Saved</source>
         <translation>已儲存</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="1580"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1584"/>
         <source>Uploaded %1 of %2</source>
         <translation>已上傳%2個中的%1個</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="1609"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1613"/>
         <source>Uploads complete</source>
         <translation>上傳完成</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="1620"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1624"/>
         <source>Uploaded %1 of %2 successfully</source>
         <translation>成功上傳%2個中的%1個</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="1640"/>
+        <location filename="../../Cloud/CloudService.cpp" line="1644"/>
         <source>Completed.</source>
         <translation>完成。</translation>
     </message>
@@ -8230,27 +8240,27 @@ This may lead to inconsistencies between your local GoldenCheetah activities and
 <context>
     <name>CloudServiceUploadDialog</name>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="329"/>
+        <location filename="../../Cloud/CloudService.cpp" line="333"/>
         <source>Uploading %1 bytes...</source>
         <translation>正在上傳%1位元組...</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="337"/>
+        <location filename="../../Cloud/CloudService.cpp" line="341"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="354"/>
+        <location filename="../../Cloud/CloudService.cpp" line="358"/>
         <source>Upload to </source>
         <translation>上傳至</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="355"/>
+        <location filename="../../Cloud/CloudService.cpp" line="359"/>
         <source>The activity you want to upload has unsaved changes.</source>
         <translation>上傳之活動紀錄有未儲存的修改。</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="356"/>
+        <location filename="../../Cloud/CloudService.cpp" line="360"/>
         <source>Unsaved changes in activities will be uploaded as well. 
 
 This may lead to inconsistencies between your local activities and the uploaded activities if you do not save the activity in GoldenCheetah. We recommend to save the changed activity before proceeding.</source>
@@ -8259,17 +8269,17 @@ This may lead to inconsistencies between your local activities and the uploaded 
 若未在本地儲存修改，這可能導致本地活動紀錄和上傳的活動紀錄不一致。建議在繼續前儲存修改的活動紀錄。</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="396"/>
+        <location filename="../../Cloud/CloudService.cpp" line="400"/>
         <source>Upload Failed</source>
         <translation>上傳失敗</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="397"/>
+        <location filename="../../Cloud/CloudService.cpp" line="401"/>
         <source>Unable to upload, check your configuration in preferences.</source>
         <translation>無法上傳，請檢查你的配置設定。</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="429"/>
+        <location filename="../../Cloud/CloudService.cpp" line="433"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
@@ -9078,74 +9088,74 @@ Do you want to apply and restart GoldenCheetah?</source>
         <translation type="vanished">刪除</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1739"/>
-        <location filename="../../Gui/Pages.cpp" line="1743"/>
+        <location filename="../../Gui/Pages.cpp" line="1737"/>
+        <location filename="../../Gui/Pages.cpp" line="1741"/>
         <source>User Metrics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1739"/>
+        <location filename="../../Gui/Pages.cpp" line="1737"/>
         <source>Duplicate Symbol: %1, one metric will be discarded</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1743"/>
+        <location filename="../../Gui/Pages.cpp" line="1741"/>
         <source>Duplicate Name: %1, one metric will not be acessible in formulas</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1769"/>
+        <location filename="../../Gui/Pages.cpp" line="1767"/>
         <source>Are you sure you want to delete this metric?</source>
         <translation>你想要刪除此計測單位：</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1771"/>
+        <location filename="../../Gui/Pages.cpp" line="1769"/>
         <source>Remove</source>
         <translation>移除</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1875"/>
+        <location filename="../../Gui/Pages.cpp" line="1873"/>
         <source>Export Metric</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1875"/>
+        <location filename="../../Gui/Pages.cpp" line="1873"/>
         <source>GoldenCheetah Metric File (*.gmetric)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1886"/>
+        <location filename="../../Gui/Pages.cpp" line="1884"/>
         <source>Select Metric file to import</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1886"/>
+        <location filename="../../Gui/Pages.cpp" line="1884"/>
         <source>GoldenCheetah Metric Files (*.gmetric)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1889"/>
-        <location filename="../../Gui/Pages.cpp" line="1907"/>
+        <location filename="../../Gui/Pages.cpp" line="1887"/>
+        <location filename="../../Gui/Pages.cpp" line="1905"/>
         <source>Import Metric</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1889"/>
+        <location filename="../../Gui/Pages.cpp" line="1887"/>
         <source>No Metric file selected!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1907"/>
+        <location filename="../../Gui/Pages.cpp" line="1905"/>
         <source>No Metric found in the selected file!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2009"/>
+        <location filename="../../Gui/Pages.cpp" line="2007"/>
         <source>Download Metric</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2009"/>
+        <location filename="../../Gui/Pages.cpp" line="2007"/>
         <source>No valid Metric found!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9423,32 +9433,32 @@ Do you want to apply and restart GoldenCheetah?</source>
         <translation type="vanished">下</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3458"/>
+        <location filename="../../Gui/Pages.cpp" line="3456"/>
         <source>Field</source>
         <translation>欄位</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3459"/>
+        <location filename="../../Gui/Pages.cpp" line="3457"/>
         <source>Value</source>
         <translation>數値</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3460"/>
+        <location filename="../../Gui/Pages.cpp" line="3458"/>
         <source>Linked field</source>
         <translation>連結欄位</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3461"/>
+        <location filename="../../Gui/Pages.cpp" line="3459"/>
         <source>Default Value</source>
         <translation>預設值</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3540"/>
+        <location filename="../../Gui/Pages.cpp" line="3538"/>
         <source>New</source>
         <translation>新建</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3542"/>
+        <location filename="../../Gui/Pages.cpp" line="3540"/>
         <source>New (%1)</source>
         <translation>新建 (%1)</translation>
     </message>
@@ -12132,42 +12142,42 @@ $COPYRIGHT</source>
         <translation type="vanished">+</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2826"/>
+        <location filename="../../Gui/Pages.cpp" line="2824"/>
         <source>Text</source>
         <translation>文字</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2827"/>
+        <location filename="../../Gui/Pages.cpp" line="2825"/>
         <source>Textbox</source>
         <translation>文字方塊</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2828"/>
+        <location filename="../../Gui/Pages.cpp" line="2826"/>
         <source>ShortText</source>
         <translation>簡短字串</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2829"/>
+        <location filename="../../Gui/Pages.cpp" line="2827"/>
         <source>Integer</source>
         <translation>整數</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2830"/>
+        <location filename="../../Gui/Pages.cpp" line="2828"/>
         <source>Double</source>
         <translation>雙精度</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2831"/>
+        <location filename="../../Gui/Pages.cpp" line="2829"/>
         <source>Date</source>
         <translation>日期</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2832"/>
+        <location filename="../../Gui/Pages.cpp" line="2830"/>
         <source>Time</source>
         <translation>時間</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2833"/>
+        <location filename="../../Gui/Pages.cpp" line="2831"/>
         <source>Checkbox</source>
         <translation>核取方塊</translation>
     </message>
@@ -12180,57 +12190,57 @@ $COPYRIGHT</source>
         <translation type="vanished">新增</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2888"/>
+        <location filename="../../Gui/Pages.cpp" line="2886"/>
         <source>&lt;h3&gt;Manage allowed values&lt;/h3&gt;If the list is empty, any value is accepted. A list containing &lt;tt&gt;*&lt;/tt&gt; as its only entry indicates previous values for the same field will be used to autocomplete input.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2817"/>
+        <location filename="../../Gui/Pages.cpp" line="2815"/>
         <source>Screen Tab</source>
         <translation>頁籤</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2818"/>
+        <location filename="../../Gui/Pages.cpp" line="2816"/>
         <source>Field</source>
         <translation>欄位</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2819"/>
+        <location filename="../../Gui/Pages.cpp" line="2817"/>
         <source>Type</source>
         <translation>種類</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2820"/>
+        <location filename="../../Gui/Pages.cpp" line="2818"/>
         <source>Values</source>
         <translation>數值</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2821"/>
+        <location filename="../../Gui/Pages.cpp" line="2819"/>
         <source>Summary</source>
         <translation type="unfinished">總結</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2822"/>
+        <location filename="../../Gui/Pages.cpp" line="2820"/>
         <source>Interval</source>
         <translation type="unfinished">區段</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2823"/>
+        <location filename="../../Gui/Pages.cpp" line="2821"/>
         <source>Expression</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2871"/>
+        <location filename="../../Gui/Pages.cpp" line="2869"/>
         <source>Summary rows in activities list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2963"/>
+        <location filename="../../Gui/Pages.cpp" line="2961"/>
         <source>New</source>
         <translation>新建</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2965"/>
+        <location filename="../../Gui/Pages.cpp" line="2963"/>
         <source>New (%1)</source>
         <translation>新建 (%1)</translation>
     </message>
@@ -13614,17 +13624,17 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>FolderNameDialog</name>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="688"/>
+        <location filename="../../Cloud/CloudService.cpp" line="692"/>
         <source>Folder Name</source>
         <translation>檔案夾名稱</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="695"/>
+        <location filename="../../Cloud/CloudService.cpp" line="699"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../../Cloud/CloudService.cpp" line="696"/>
+        <location filename="../../Cloud/CloudService.cpp" line="700"/>
         <source>Create</source>
         <translation>建立</translation>
     </message>
@@ -14503,18 +14513,18 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation>匯出圖表失敗，請確認權限</translation>
     </message>
     <message>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="1112"/>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="1119"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="1114"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="1121"/>
         <source>Upload not possible</source>
         <translation>上傳失敗</translation>
     </message>
     <message>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="1112"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="1114"/>
         <source>Standard charts without configuration cannot be uploaded to the GoldenCheetah Cloud.</source>
         <translation>無法上傳無配置項之基本圖表至GoldenCheetah雲</translation>
     </message>
     <message>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="1119"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="1121"/>
         <source>Charts containing user defined metrics cannot be uploaded to the GoldenCheetah Cloud.</source>
         <translation>無法上傳帶使用者自定計測量之圖表至GoldenCheetah雲</translation>
     </message>
@@ -14879,17 +14889,17 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>GcWindowDialog</name>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1306"/>
+        <location filename="../../Gui/Perspective.cpp" line="1307"/>
         <source>Chart Setup</source>
         <translation>圖表設置</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1365"/>
+        <location filename="../../Gui/Perspective.cpp" line="1366"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1366"/>
+        <location filename="../../Gui/Perspective.cpp" line="1367"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
@@ -17884,81 +17894,81 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>IconsPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2344"/>
+        <location filename="../../Gui/Pages.cpp" line="2342"/>
         <source>Field</source>
         <translation type="unfinished">欄位</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2344"/>
+        <location filename="../../Gui/Pages.cpp" line="2342"/>
         <source>Value</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2344"/>
+        <location filename="../../Gui/Pages.cpp" line="2342"/>
         <source>Icon</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2377"/>
+        <location filename="../../Gui/Pages.cpp" line="2375"/>
         <source>Download Default</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2378"/>
+        <location filename="../../Gui/Pages.cpp" line="2376"/>
         <source>Import</source>
         <translation type="unfinished">匯入</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2379"/>
+        <location filename="../../Gui/Pages.cpp" line="2377"/>
         <source>Export</source>
         <translation type="unfinished">匯出</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2402"/>
-        <location filename="../../Gui/Pages.cpp" line="2411"/>
-        <location filename="../../Gui/Pages.cpp" line="2417"/>
+        <location filename="../../Gui/Pages.cpp" line="2400"/>
+        <location filename="../../Gui/Pages.cpp" line="2409"/>
+        <location filename="../../Gui/Pages.cpp" line="2415"/>
         <source>Icon Bundle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2402"/>
-        <location filename="../../Gui/Pages.cpp" line="2411"/>
+        <location filename="../../Gui/Pages.cpp" line="2400"/>
+        <location filename="../../Gui/Pages.cpp" line="2409"/>
         <source>Bundle file %1 cannot be imported.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2406"/>
+        <location filename="../../Gui/Pages.cpp" line="2404"/>
         <source>Import Icons</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2406"/>
-        <location filename="../../Gui/Pages.cpp" line="2415"/>
+        <location filename="../../Gui/Pages.cpp" line="2404"/>
+        <location filename="../../Gui/Pages.cpp" line="2413"/>
         <source>Zip Files (*.zip)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2415"/>
+        <location filename="../../Gui/Pages.cpp" line="2413"/>
         <source>Export Icons</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2417"/>
+        <location filename="../../Gui/Pages.cpp" line="2415"/>
         <source>Bundle file %1 cannot be created.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2547"/>
+        <location filename="../../Gui/Pages.cpp" line="2545"/>
         <source>Complex Icon</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2547"/>
+        <location filename="../../Gui/Pages.cpp" line="2545"/>
         <source>The selected icon %1 appears to be complex and could impact performance. Are you sure you want to use this icon?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2695"/>
+        <location filename="../../Gui/Pages.cpp" line="2693"/>
         <source>No icons available.
 Drag and drop .svg files here to add icons.</source>
         <translation type="unfinished"></translation>
@@ -17975,37 +17985,37 @@ Drag and drop .svg files here to add icons.</source>
 <context>
     <name>ImportChartDialog</name>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1731"/>
+        <location filename="../../Gui/Perspective.cpp" line="1733"/>
         <source>Import Charts</source>
         <translation>匯入圖表</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1737"/>
+        <location filename="../../Gui/Perspective.cpp" line="1739"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1738"/>
+        <location filename="../../Gui/Perspective.cpp" line="1740"/>
         <source>Import</source>
         <translation>匯入</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1749"/>
+        <location filename="../../Gui/Perspective.cpp" line="1751"/>
         <source>View</source>
         <translation>檢視</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1750"/>
+        <location filename="../../Gui/Perspective.cpp" line="1752"/>
         <source>Title</source>
         <translation>名稱</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1777"/>
+        <location filename="../../Gui/Perspective.cpp" line="1779"/>
         <source>Plan</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1802"/>
+        <location filename="../../Gui/Perspective.cpp" line="1804"/>
         <source>Unknown</source>
         <translation type="unfinished">未知</translation>
     </message>
@@ -18014,17 +18024,17 @@ Drag and drop .svg files here to add icons.</source>
         <translation type="vanished">日記</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1778"/>
+        <location filename="../../Gui/Perspective.cpp" line="1780"/>
         <source>Trends</source>
         <translation>趨勢</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1776"/>
+        <location filename="../../Gui/Perspective.cpp" line="1778"/>
         <source>Activities</source>
         <translation>活動紀錄</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1779"/>
+        <location filename="../../Gui/Perspective.cpp" line="1781"/>
         <source>Train</source>
         <translation>訓練</translation>
     </message>
@@ -18521,7 +18531,7 @@ Drag and drop .svg files here to add icons.</source>
 <context>
     <name>IntervalsPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3610"/>
+        <location filename="../../Gui/Pages.cpp" line="3608"/>
         <source>Enable interval auto-discovery</source>
         <translation>啟用區段自動偵測</translation>
     </message>
@@ -18702,7 +18712,7 @@ Drag and drop .svg files here to add icons.</source>
 <context>
     <name>KeywordsPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2122"/>
+        <location filename="../../Gui/Pages.cpp" line="2120"/>
         <source>Field</source>
         <translation>欄位</translation>
     </message>
@@ -18723,33 +18733,33 @@ Drag and drop .svg files here to add icons.</source>
         <translation type="vanished">下</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2179"/>
+        <location filename="../../Gui/Pages.cpp" line="2177"/>
         <source>&lt;h3&gt;Alternative Keywords&lt;/h3&gt;Add additional keyword to have the same color</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2130"/>
+        <location filename="../../Gui/Pages.cpp" line="2128"/>
         <source>Keyword</source>
         <translation>關鍵字</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2131"/>
+        <location filename="../../Gui/Pages.cpp" line="2129"/>
         <source>Color</source>
         <translation>色彩</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2132"/>
+        <location filename="../../Gui/Pages.cpp" line="2130"/>
         <source>Related Notes Words</source>
         <translation>備註關鍵字</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2269"/>
-        <location filename="../../Gui/Pages.cpp" line="2275"/>
+        <location filename="../../Gui/Pages.cpp" line="2267"/>
+        <location filename="../../Gui/Pages.cpp" line="2273"/>
         <source>New</source>
         <translation>新建</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2277"/>
+        <location filename="../../Gui/Pages.cpp" line="2275"/>
         <source>New (%1)</source>
         <translation>新建 (%1)</translation>
     </message>
@@ -23653,56 +23663,56 @@ Closing of athlete window not possible while background activity import is in pr
 <context>
     <name>MeasuresConfigPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3656"/>
-        <location filename="../../Gui/Pages.cpp" line="3670"/>
+        <location filename="../../Gui/Pages.cpp" line="3654"/>
+        <location filename="../../Gui/Pages.cpp" line="3668"/>
         <source>Symbol</source>
         <translation type="unfinished">符號</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3657"/>
-        <location filename="../../Gui/Pages.cpp" line="3671"/>
+        <location filename="../../Gui/Pages.cpp" line="3655"/>
+        <location filename="../../Gui/Pages.cpp" line="3669"/>
         <source>Name</source>
         <translation type="unfinished">名稱</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3654"/>
+        <location filename="../../Gui/Pages.cpp" line="3652"/>
         <source>Groups</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3672"/>
+        <location filename="../../Gui/Pages.cpp" line="3670"/>
         <source>Metric Units</source>
         <translation type="unfinished">公制單位</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3673"/>
+        <location filename="../../Gui/Pages.cpp" line="3671"/>
         <source>Imperial Units</source>
         <translation type="unfinished">英制單位</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3674"/>
+        <location filename="../../Gui/Pages.cpp" line="3672"/>
         <source>Units Factor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3675"/>
+        <location filename="../../Gui/Pages.cpp" line="3673"/>
         <source>CSV Headers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3814"/>
-        <location filename="../../Gui/Pages.cpp" line="3927"/>
+        <location filename="../../Gui/Pages.cpp" line="3812"/>
+        <location filename="../../Gui/Pages.cpp" line="3925"/>
         <source>New</source>
         <translation type="unfinished">新建</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3816"/>
-        <location filename="../../Gui/Pages.cpp" line="3929"/>
+        <location filename="../../Gui/Pages.cpp" line="3814"/>
+        <location filename="../../Gui/Pages.cpp" line="3927"/>
         <source>New (%1)</source>
         <translation type="unfinished">新建 (%1)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3848"/>
+        <location filename="../../Gui/Pages.cpp" line="3846"/>
         <source>Fields in Group &lt;i&gt;%1&lt;/i&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -23715,22 +23725,22 @@ Closing of athlete window not possible while background activity import is in pr
         <translation type="obsolete">刪除</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3685"/>
+        <location filename="../../Gui/Pages.cpp" line="3683"/>
         <source>Saved changes take effect after restart</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3792"/>
+        <location filename="../../Gui/Pages.cpp" line="3790"/>
         <source>Are you sure you want to remove Measures customizations and reset to default configuration?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3793"/>
+        <location filename="../../Gui/Pages.cpp" line="3791"/>
         <source>This action takes effect immediately and cannot be reverted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3794"/>
+        <location filename="../../Gui/Pages.cpp" line="3792"/>
         <source>Reset</source>
         <translation type="unfinished">重置</translation>
     </message>
@@ -24343,27 +24353,27 @@ You will be able to import or download data before merging or joining the data a
 <context>
     <name>MetadataPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2063"/>
+        <location filename="../../Gui/Pages.cpp" line="2061"/>
         <source>Fields</source>
         <translation>欄位</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2064"/>
+        <location filename="../../Gui/Pages.cpp" line="2062"/>
         <source>Colour Keywords</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2065"/>
+        <location filename="../../Gui/Pages.cpp" line="2063"/>
         <source>Icons</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2066"/>
+        <location filename="../../Gui/Pages.cpp" line="2064"/>
         <source>Defaults</source>
         <translation>預設</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2067"/>
+        <location filename="../../Gui/Pages.cpp" line="2065"/>
         <source>Processors &amp;&amp; Automation</source>
         <translation type="unfinished"></translation>
     </message>
@@ -27966,198 +27976,198 @@ Do you want to continue?</source>
         <translation type="unfinished">圖表種類有誤 (%1)。</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="852"/>
+        <location filename="../../Gui/Perspective.cpp" line="853"/>
         <source>Are you sure you want to remove the chart?</source>
         <translation type="unfinished">你確定要移除此圖表？</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="853"/>
+        <location filename="../../Gui/Perspective.cpp" line="854"/>
         <source>Remove</source>
         <translation type="unfinished">移除</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1460"/>
+        <location filename="../../Gui/Perspective.cpp" line="1461"/>
         <source>Ride Log</source>
         <translation type="unfinished"> 騎乘記錄</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1461"/>
+        <location filename="../../Gui/Perspective.cpp" line="1462"/>
         <source>Aerobic Power</source>
         <translation type="unfinished">有氧功率輸出</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1462"/>
+        <location filename="../../Gui/Perspective.cpp" line="1463"/>
         <source>Anaerobic Power</source>
         <translation type="unfinished">無氧功率輸出</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1463"/>
+        <location filename="../../Gui/Perspective.cpp" line="1464"/>
         <source>Cadence</source>
         <translation type="unfinished">迴轉數</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1464"/>
+        <location filename="../../Gui/Perspective.cpp" line="1465"/>
         <source>Calendar</source>
         <translation type="unfinished">行事曆</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1465"/>
+        <location filename="../../Gui/Perspective.cpp" line="1466"/>
         <source>CP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1466"/>
+        <location filename="../../Gui/Perspective.cpp" line="1467"/>
         <source>Details</source>
         <translation type="unfinished">詳細資訊</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1467"/>
+        <location filename="../../Gui/Perspective.cpp" line="1468"/>
         <source>Distance</source>
         <translation type="unfinished">距離</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1468"/>
+        <location filename="../../Gui/Perspective.cpp" line="1469"/>
         <source>Edit</source>
         <translation type="unfinished">編輯</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1469"/>
+        <location filename="../../Gui/Perspective.cpp" line="1470"/>
         <source>Elapsed Time</source>
         <translation type="unfinished">歷時</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1470"/>
+        <location filename="../../Gui/Perspective.cpp" line="1471"/>
         <source>Heartrate</source>
         <translation type="unfinished">心率</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1471"/>
+        <location filename="../../Gui/Perspective.cpp" line="1472"/>
         <source>Lap</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1472"/>
+        <location filename="../../Gui/Perspective.cpp" line="1473"/>
         <source>Map</source>
         <translation type="unfinished">地圖</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1473"/>
+        <location filename="../../Gui/Perspective.cpp" line="1474"/>
         <source>Performance</source>
         <translation type="unfinished">個人表現</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1474"/>
+        <location filename="../../Gui/Perspective.cpp" line="1475"/>
         <source>PMC</source>
         <translation type="unfinished">PMC</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1475"/>
+        <location filename="../../Gui/Perspective.cpp" line="1476"/>
         <source>Power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1476"/>
+        <location filename="../../Gui/Perspective.cpp" line="1477"/>
         <source>QA</source>
         <translation type="unfinished">象限分析</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1477"/>
+        <location filename="../../Gui/Perspective.cpp" line="1478"/>
         <source>Ride</source>
         <translation type="unfinished">騎乘記錄</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1478"/>
+        <location filename="../../Gui/Perspective.cpp" line="1479"/>
         <source>Speed</source>
         <translation type="unfinished">速度</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1479"/>
+        <location filename="../../Gui/Perspective.cpp" line="1480"/>
         <source>Summary</source>
         <translation type="unfinished">總結</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1480"/>
+        <location filename="../../Gui/Perspective.cpp" line="1481"/>
         <source>Target Power</source>
         <translation type="unfinished">目標功率</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1481"/>
+        <location filename="../../Gui/Perspective.cpp" line="1482"/>
         <source>Time and Distance</source>
         <translation type="unfinished">時間與距離</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1482"/>
+        <location filename="../../Gui/Perspective.cpp" line="1483"/>
         <source>Time In Zone</source>
         <translation type="unfinished">區間時間</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1483"/>
+        <location filename="../../Gui/Perspective.cpp" line="1484"/>
         <source>W&apos; In Zone</source>
         <translation type="unfinished">W&apos;區間時間</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1484"/>
+        <location filename="../../Gui/Perspective.cpp" line="1485"/>
         <source>Sustained In Zone</source>
         <translation type="unfinished">區間持續時間</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1485"/>
+        <location filename="../../Gui/Perspective.cpp" line="1486"/>
         <source>Training Mix</source>
         <translation type="unfinished">各項訓練</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1486"/>
+        <location filename="../../Gui/Perspective.cpp" line="1487"/>
         <source>Navigator</source>
         <translation type="unfinished">領航員</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1487"/>
+        <location filename="../../Gui/Perspective.cpp" line="1488"/>
         <source>W/kg</source>
         <translation type="unfinished">w/kg</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1488"/>
+        <location filename="../../Gui/Perspective.cpp" line="1489"/>
         <source>Workout</source>
         <translation type="unfinished">訓練課表</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1489"/>
+        <location filename="../../Gui/Perspective.cpp" line="1490"/>
         <source>Stress</source>
         <translation type="unfinished">壓力</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1490"/>
+        <location filename="../../Gui/Perspective.cpp" line="1491"/>
         <source>Scatter</source>
         <translation type="unfinished">分佈圖</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1491"/>
-        <location filename="../../Gui/Perspective.cpp" line="1493"/>
+        <location filename="../../Gui/Perspective.cpp" line="1492"/>
+        <location filename="../../Gui/Perspective.cpp" line="1494"/>
         <source>HrPw</source>
         <translation type="unfinished">心跳功率反應</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1492"/>
+        <location filename="../../Gui/Perspective.cpp" line="1493"/>
         <source>Activity Log</source>
         <translation type="unfinished">活動紀錄</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1494"/>
+        <location filename="../../Gui/Perspective.cpp" line="1495"/>
         <source>Tracker</source>
         <translation type="unfinished">追蹤器</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1495"/>
+        <location filename="../../Gui/Perspective.cpp" line="1496"/>
         <source>CP History</source>
         <translation type="unfinished">CP歷程</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1496"/>
+        <location filename="../../Gui/Perspective.cpp" line="1497"/>
         <source>Library</source>
         <translation type="unfinished">資料庫</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1497"/>
+        <location filename="../../Gui/Perspective.cpp" line="1498"/>
         <source>CV</source>
         <translation type="unfinished">臨界速度</translation>
     </message>
@@ -29194,77 +29204,77 @@ on and that its display says, &quot;Host&quot;</source>
 <context>
     <name>ProcessorPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3038"/>
-        <location filename="../../Gui/Pages.cpp" line="3203"/>
+        <location filename="../../Gui/Pages.cpp" line="3036"/>
+        <location filename="../../Gui/Pages.cpp" line="3201"/>
         <source>None</source>
         <translation type="unfinished">無</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3038"/>
-        <location filename="../../Gui/Pages.cpp" line="3203"/>
+        <location filename="../../Gui/Pages.cpp" line="3036"/>
+        <location filename="../../Gui/Pages.cpp" line="3201"/>
         <source>On Import</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3038"/>
-        <location filename="../../Gui/Pages.cpp" line="3203"/>
+        <location filename="../../Gui/Pages.cpp" line="3036"/>
+        <location filename="../../Gui/Pages.cpp" line="3201"/>
         <source>On Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3041"/>
+        <location filename="../../Gui/Pages.cpp" line="3039"/>
         <source>Processor</source>
         <translation>處理</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3042"/>
-        <location filename="../../Gui/Pages.cpp" line="3195"/>
-        <location filename="../../Gui/Pages.cpp" line="3210"/>
+        <location filename="../../Gui/Pages.cpp" line="3040"/>
+        <location filename="../../Gui/Pages.cpp" line="3193"/>
+        <location filename="../../Gui/Pages.cpp" line="3208"/>
         <source>Automation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3064"/>
+        <location filename="../../Gui/Pages.cpp" line="3062"/>
         <source>Hide Core Processors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3079"/>
+        <location filename="../../Gui/Pages.cpp" line="3077"/>
         <source>&lt;center&gt;&lt;h1&gt;No Processor selected&lt;/h1&gt;&lt;/center&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3190"/>
+        <location filename="../../Gui/Pages.cpp" line="3188"/>
         <source>Core Processor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3190"/>
+        <location filename="../../Gui/Pages.cpp" line="3188"/>
         <source>Custom Python Processor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3198"/>
+        <location filename="../../Gui/Pages.cpp" line="3196"/>
         <source>Automated execution only</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3212"/>
+        <location filename="../../Gui/Pages.cpp" line="3210"/>
         <source>Use as Filter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3217"/>
+        <location filename="../../Gui/Pages.cpp" line="3215"/>
         <source>Default Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3218"/>
+        <location filename="../../Gui/Pages.cpp" line="3216"/>
         <source>Description</source>
         <translation type="unfinished">説明</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3321"/>
+        <location filename="../../Gui/Pages.cpp" line="3319"/>
         <source>Are you sure you want to delete %1?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -29959,12 +29969,12 @@ Python disabled in preferences.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Python/PythonEmbed.cpp" line="341"/>
+        <location filename="../../Python/PythonEmbed.cpp" line="339"/>
         <source>Python not available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Python/PythonEmbed.cpp" line="342"/>
+        <location filename="../../Python/PythonEmbed.cpp" line="340"/>
         <source>GoldenCheetah was built with Python 3.%1 but could not initialize Python.
 
 Please ensure Python 3.%1 is installed and in your PATH.
