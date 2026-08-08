@@ -263,17 +263,13 @@ main(int argc, char *argv[])
     bool help = false;
 
     // honour command line switches
-    QString arg;
     for(int i = 0; i < sargs.length();) {
-        arg = sargs[i];
+        const QString &arg = sargs[i];
         i++;
-
         // help, usage or version requested, basic information
         if (arg == "--help" || arg == "--usage" || arg == "--version") {
-
             help = true;
             fprintf(stderr, "GoldenCheetah %s (%d)\n", VERSION_STRING, VERSION_LATEST);
-
         }
 
         // help or usage requrested, additional information
@@ -308,14 +304,12 @@ main(int argc, char *argv[])
 
         // version requested, additional information
         } else if (arg == "--version") {
-
             QString html = GcCrashDialog::versionHTML();
             html.replace("</td><td>", ": "); // to maintain colums in one line
             QString text = QTextDocumentFragment::fromHtml(html).toPlainText();
             QByteArray ba = text.toLocal8Bit();
             const char *c_str = ba.data();
             fprintf(stderr, "\n%s\n\n", c_str);
-
         } else if (arg == "--server") {
 #ifdef GC_WANT_HTTP
             nogui = server = true;
@@ -326,7 +320,6 @@ main(int argc, char *argv[])
 
 #ifdef GC_WANT_PYTHON
         } else if (arg == "--no-python") {
-
             noPy = true;
 #endif
 #ifdef GC_WANT_R
@@ -359,32 +352,15 @@ main(int argc, char *argv[])
             exit(1);
 #endif
         } else {
-
             // not switches !
             args << arg;
         }
     }
-
-    #if 0 // quick hack to get list of metrics and descriptions
-    RideMetricFactory::instance().initialize();
-
-    const RideMetricFactory &factory = RideMetricFactory::instance();
-    QHashIterator<QString,RideMetric*> it(factory.metricHash());
-    it.toFront();
-    while(it.hasNext()) {
-        it.next();
-        fprintf(stderr, "%s|%s\n",
-                it.value()->name().toUtf8().data(),
-                it.value()->description().toUtf8().data());
-    }
-    exit(0);
-    #endif
-
     // help or version printed so just exit now
     if (help) {
         exit(0);
     }
-
+    
     //
     // INITIALISE ONE TIME OBJECTS
     //
@@ -428,7 +404,7 @@ main(int argc, char *argv[])
 
     // read defaults
     initPowerProfile();
-
+    
     // output colors as configured so we can cut and paste into Colors.cpp
     // uncomment when developers working on theme colors
     //GCColor::dumpColors();
@@ -471,7 +447,6 @@ main(int argc, char *argv[])
     appsettings->setValue(GC_FONT_DEFAULT_SIZE, font.pointSizeF());
     appsettings->setValue(GC_FONT_CHARTLABELS_SIZE, font.pointSizeF() * 0.8);
 
-
     // what filestores are registered (whilst we refactor)
     //qDebug()<<"Cloud services registered:"<<CloudServiceFactory::instance().serviceNames();
 
@@ -479,31 +454,9 @@ main(int argc, char *argv[])
     // OPEN FIRST MAINWINDOW
     //
     do {
-
         // lets not restart endlessly
         restarting = false;
-
-        // we reload R if we are restarting to get that, but
-        // only if it failed
-#ifdef GC_WANT_R
-        // create the singleton in the main thread
-        // will be shared by all athletes and all charts (!!)
-        if (noR) {
-            rtool = NULL;
-        } else if (rtool == NULL && appsettings->value(NULL, GC_EMBED_R, true).toBool()) {
-            rtool = new RTool();
-            if (rtool->failed == true) rtool=NULL;
-        }
-#endif
-
-#ifdef GC_WANT_PYTHON
-        bool embed = appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool();
-        if (embed && noPy == false && python == NULL) {
-            python = new PythonEmbed(); // initialise python in this thread ?
-            if (python->loaded == false) python=NULL;
-        }
-#endif
-
+        
         //this is the path within the current directory where GC will look for
         //files to allow USB stick support
         QString localLibraryPath="Library/GoldenCheetah";
@@ -553,7 +506,7 @@ main(int argc, char *argv[])
                 home.cd(libraryPath);
             }
         }
-
+        
         // set global root directory
         gcroot = home.canonicalPath();
         appsettings->initializeQSettingsGlobal(gcroot);
@@ -565,6 +518,28 @@ main(int argc, char *argv[])
         qSetMessagePattern(debugFormat);
         QLoggingCategory::setFilterRules(debugRules.replace(";", "\n")); // accept ; as separator like QT_LOGGING_RULES
 
+#ifdef GC_WANT_R
+        // we reload R if we are restarting to get that, but
+        // only if it failed
+
+        // create the singleton in the main thread
+        // will be shared by all athletes and all charts (!!)
+        if (noR) {
+            rtool = NULL;
+        } else if (rtool == NULL && appsettings->value(NULL, GC_EMBED_R, true).toBool()) {
+            rtool = new RTool();
+            if (rtool->failed == true) rtool=NULL;
+        }
+#endif
+
+#ifdef GC_WANT_PYTHON
+        bool embed = appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool();
+        if (embed && noPy == false && python == NULL) {
+            python = new PythonEmbed(); // initialise python in this thread ?
+            if (python->loaded == false) python=NULL;
+        }
+#endif
+
         // Language setting (default to system locale)
         QVariant lang = appsettings->value(NULL, GC_LANG, QLocale::system().name());
 
@@ -573,7 +548,7 @@ main(int argc, char *argv[])
         if (!qtTranslator.load("qt_" + lang.toString(), QLibraryInfo::path(QLibraryInfo::TranslationsPath)))
             qDebug()<<"Failed to load Qt translator for "<<lang.toString();
         application->installTranslator(&qtTranslator);
-
+        
         // Load specific translation, try from GCROOT otherwise from binary
         QTranslator gcTranslator;
         QString translation_file = "/gc_" + lang.toString() + ".qm";
@@ -593,7 +568,7 @@ main(int argc, char *argv[])
         // migration
         appsettings->migrateQSettingsSystem(); // colors must be setup before migration can take place, but reading has to be from the migrated ones
         GCColor::readConfig();
-
+        
         // Initialize metrics once the translator is installed
         RideMetricFactory::instance().initialize();
 
@@ -768,7 +743,7 @@ main(int argc, char *argv[])
                 terminate(0);
             }
         }
-
+        
         ret=application->exec();
 
         // close trainDB
