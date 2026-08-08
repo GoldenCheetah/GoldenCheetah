@@ -7892,12 +7892,12 @@ Sind sie sicher?</translation>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="80"/>
         <source>Upload</source>
-        <translation type="unfinished">Hochladen</translation>
+        <translation>Hochladen</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="80"/>
         <source>Planned activity upload is not supported</source>
-        <translation type="unfinished"></translation>
+        <translation>Das Hochladen der geplanten Aktivität wird nicht unterstützt</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="245"/>
@@ -30602,7 +30602,7 @@ Python wird in den Einstellungen deaktiviert.</translation>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1796"/>
         <source>When</source>
-        <translation type="unfinished">Wann</translation>
+        <translation>Wann</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarItemDelegates.cpp" line="1800"/>
