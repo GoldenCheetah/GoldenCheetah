@@ -31,6 +31,7 @@
 #include "TrainDB.h"
 #include "Library.h"
 #include "CloudService.h"
+#include "IconManager.h"
 
 #include <QDebug>
 #include <QMessageBox>
@@ -460,6 +461,21 @@ GcUpgrade::upgrade(const QDir &home)
                         QVariant data = appsettings->value(nullptr, DataProcessor::configKeyApply(legacyId));
                         appsettings->setValue(DataProcessor::configKeyAutomation(id), data);
                     }
+                }
+            }
+        }
+    }
+
+    if (last < VERSION38_RC1) {
+        if (IconManager::instance().listIconFiles().count() == 0) {
+            if (QMessageBox::question(nullptr,
+                                      tr("Download Default Icons"),
+                                      tr("Version 3.8 uses icons for sports and subsports. The default icons are distributed separately. Would you like to download the default icon set now?<br><br>You can also download the icons later under <code>Preferences > Data Fields > Icons</code>."),
+                                      QMessageBox::Yes | QMessageBox::No,
+                                      QMessageBox::Yes) == QMessageBox::Yes) {
+                QUrl url(QString("%1/icons.zip").arg(VERSION_CONFIG_PREFIX));
+                if (! IconManager::instance().importBundle(url)) {
+                    QMessageBox::warning(nullptr, tr("Icons Failed to Install"), tr("Bundle file %1 cannot be imported.").arg(url.toString()));
                 }
             }
         }
