@@ -7945,12 +7945,12 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="80"/>
         <source>Upload</source>
-        <translation type="unfinished"></translation>
+        <translation>Cargar</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="80"/>
         <source>Planned activity upload is not supported</source>
-        <translation type="unfinished"></translation>
+        <translation>La carga de actividades programadas no está permitida</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="245"/>
