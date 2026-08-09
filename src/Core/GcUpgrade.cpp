@@ -466,19 +466,23 @@ GcUpgrade::upgrade(const QDir &home)
         }
     }
 
-    if (last < VERSION38_RC1) {
-        if (IconManager::instance().listIconFiles().count() == 0) {
-            if (QMessageBox::question(nullptr,
-                                      tr("Download Default Icons"),
-                                      tr("Version 3.8 uses icons for sports and subsports. The default icons are distributed separately. Would you like to download the default icon set now?<br><br>You can also download the icons later under <code>Preferences > Data Fields > Icons</code>."),
-                                      QMessageBox::Yes | QMessageBox::No,
-                                      QMessageBox::Yes) == QMessageBox::Yes) {
-                QUrl url(QString("%1/icons.zip").arg(VERSION_CONFIG_PREFIX));
-                if (! IconManager::instance().importBundle(url)) {
-                    QMessageBox::warning(nullptr, tr("Icons Failed to Install"), tr("Bundle file %1 cannot be imported.").arg(url.toString()));
-                }
+    // Prompt for default icons only when:
+    // none are installed and the dialog hasn't been answered,
+    // or we're upgrading from a version older than 3.8.
+    int numIcons = IconManager::instance().listIconFiles().count();
+    bool passedDefaultIconsQuestion = appsettings->value(nullptr, GC_PASSED_DIALOG_DEFAULT_ICONS, false).toBool();
+    if (numIcons == 0 && (! passedDefaultIconsQuestion || last < VERSION38_RC1)) {
+        if (QMessageBox::question(nullptr,
+                                  tr("Download Default Icons"),
+                                  tr("Version 3.8 uses icons for sports and subsports. The default icons are distributed separately. Would you like to download the default icon set now?<br><br>You can also download the icons later under <code>Preferences > Data Fields > Icons</code>."),
+                                  QMessageBox::Yes | QMessageBox::No,
+                                  QMessageBox::Yes) == QMessageBox::Yes) {
+            QUrl url(QString("%1/icons.zip").arg(VERSION_CONFIG_PREFIX));
+            if (! IconManager::instance().importBundle(url)) {
+                QMessageBox::warning(nullptr, tr("Icons Failed to Install"), tr("Bundle file %1 cannot be imported.").arg(url.toString()));
             }
         }
+        appsettings->setValue(GC_PASSED_DIALOG_DEFAULT_ICONS, true);
     }
 
     //----------------------------------------------------------------------

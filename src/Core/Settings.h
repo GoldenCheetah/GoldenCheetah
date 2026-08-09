@@ -165,6 +165,7 @@
 #define GC_LAST_VERSION_CHECKED         "<global-general>lastVersionChecked"
 #define GC_LAST_VERSION_CHECK_DATE      "<global-general>lastVersionCheckDate"
 #define GC_STARTUP_VIEW                 "<global-general>startupView"
+#define GC_PASSED_DIALOG_DEFAULT_ICONS  "<global-general>passedDialogDefaultIcons"
 
 
 
