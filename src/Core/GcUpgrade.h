@@ -130,7 +130,7 @@
 #define VERSION36_BUILD   5000 // released 5/8/23
 #define VERSION37_BUILD   5005 // released 28/3/25
 #define VERSION37_SP1     5006 // released 20/11/25
-#define VERSION38_RC1     5013 // RC1 (JUL 2026) - latest snapshot 25/7/26
+#define VERSION38_RC1     5013 // RC1 (JUL 2026) - latest snapshot 9/8/26
 
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG
