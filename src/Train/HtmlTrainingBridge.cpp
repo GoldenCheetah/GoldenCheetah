@@ -70,27 +70,6 @@ static QJsonArray toJsonArrayD(const QList<double> &xs)
     return a;
 }
 
-static double deg2rad(double deg)
-{
-    return deg * M_PI / 180.0;
-}
-
-static double haversineDistance(double lat1, double lon1, double lat2, double lon2)
-{
-    if (lat1 == lat2 && lon1 == lon2) return 0.0;
-
-    double dLat = deg2rad(lat2 - lat1);
-    double dLon = deg2rad(lon2 - lon1);
-    double lat1_rad = deg2rad(lat1);
-    double lat2_rad = deg2rad(lat2);
-
-    double a = sin(dLat / 2) * sin(dLat / 2) +
-               cos(lat1_rad) * cos(lat2_rad) *
-               sin(dLon / 2) * sin(dLon / 2);
-
-    return 6371.0 * 2.0 * atan2(sqrt(a), sqrt(1.0 - a));
-}
-
 HtmlTrainingBridge::HtmlTrainingBridge(Context *context, QObject *parent)
     : QObject(parent),
       m_context(context),
@@ -425,6 +404,7 @@ void HtmlTrainingBridge::onErgFileSelected(ErgFile *file)
             return;
         }
 
+        const double routeStartMeters = points[0].x;
         double cumulativeDistanceMeters = 0.0;
         double markerIntervalMeters = 5000.0;
         double nextMarkerMeters = markerIntervalMeters;
@@ -442,7 +422,7 @@ void HtmlTrainingBridge::onErgFileSelected(ErgFile *file)
         // huge slope spikes caused by near-zero distance pairs.
         const double MIN_SEGMENT_METERS = 5.0;
         double segStartEle = points[0].y;
-        double segAccumulatedM = 0.0;
+        double segStartDist = points[0].x;
 
         QJsonArray currentLineCoords;
         QJsonArray startCoord;
@@ -455,10 +435,8 @@ void HtmlTrainingBridge::onErgFileSelected(ErgFile *file)
             const ErgFilePoint &p1 = points[i - 1];
             const ErgFilePoint &p2 = points[i];
 
-            const double distKm = haversineDistance(p1.lat, p1.lon, p2.lat, p2.lon);
-            const double distM = distKm * 1000.0;
-            cumulativeDistanceMeters += distM;
-            segAccumulatedM += distM;
+            cumulativeDistanceMeters = (p2.x > routeStartMeters) ? (p2.x - routeStartMeters) : 0.0;
+            double segAccumulatedM = (p2.x > segStartDist) ? (p2.x - segStartDist) : 0.0;
 
             QJsonArray pointCoord;
             pointCoord.append(p2.lon);
@@ -500,7 +478,7 @@ void HtmlTrainingBridge::onErgFileSelected(ErgFile *file)
                 features.append(lineFeature);
 
                 segStartEle = p2.y;
-                segAccumulatedM = 0.0;
+                segStartDist = p2.x;
 
                 currentLineCoords = QJsonArray();
                 currentLineCoords.append(pointCoord);
@@ -508,6 +486,7 @@ void HtmlTrainingBridge::onErgFileSelected(ErgFile *file)
 
             while (cumulativeDistanceMeters >= nextMarkerMeters) {
                 double ratio = 1.0;
+                const double distM = p2.x - p1.x;
                 if (distM > 0.0) {
                     ratio = (nextMarkerMeters - (cumulativeDistanceMeters - distM)) / distM;
                 }
