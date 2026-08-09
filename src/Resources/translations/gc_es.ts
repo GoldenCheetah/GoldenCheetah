@@ -15027,180 +15027,200 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>GcUpgrade</name>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="253"/>
-        <location filename="../../Core/GcUpgrade.cpp" line="269"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="254"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="270"/>
         <source>Metric</source>
         <translation>Métrica</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="255"/>
-        <location filename="../../Core/GcUpgrade.cpp" line="282"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="256"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="283"/>
         <source>Aerobic TISS</source>
         <translation>TISS aeróbico</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="256"/>
-        <location filename="../../Core/GcUpgrade.cpp" line="278"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="257"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="279"/>
         <source>Anaerobic TISS</source>
         <translation>TISS anaeróbico</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="493"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="513"/>
         <source>Start creating of: Directories... </source>
         <translation>Comienza creación de directorios... </translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="501"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="521"/>
         <source>Error: Creation of subdirectories failed</source>
         <translation>Error: falló la creación de subdirectorios</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="504"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="524"/>
         <source>Creation of subdirectories successful</source>
         <translation>Creación de subdirectorios finalizada</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="531"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="551"/>
         <source>Start copying of: Configuration files... </source>
         <translation>Comienza copiado de archivos de configuración... </translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="642"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="662"/>
         <source>%1 media and workout files moved to subdirectory: \%2 - %3 failed</source>
         <translation>%1 archivos de medios y entrenamientos movidos al subdirectorio: \%2 - fallaron %3</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="846"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="866"/>
         <source>-&gt; Error: Deletion of copied file &apos;%1&apos; failed</source>
         <translation>-&gt; Error: falló la eliminación de archivo copiado &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="855"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="875"/>
         <source>-&gt; Error moving file : </source>
         <translation>-&gt; Error moviendo archivo: </translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="544"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="564"/>
         <source>%1 configuration files moved to subdirectory: %2 - %3 failed</source>
         <translation>%1 archivos de configuración movidos al subdirectorio: %2 - fallaron %3</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="286"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="287"/>
         <source>TSS</source>
         <translation>TSS</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="385"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="386"/>
         <source>Upgrade to v3.6</source>
         <translation>Actualizar a v3.6</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="386"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="387"/>
         <source>We are about to upgrade your data and layouts to v3.6, please note Ride Summary chart was deprecated, and to use v3.5 again you will need to restore a backup</source>
         <translation>Vamos a actualizar a la versión 3.6. Tenga en cuenta que el panel de resumen de la actividad (ride summary) ha sido eliminado, por lo que para volver a usar la versión 3.5 ha de hacer una copia de seguridad</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="550"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="476"/>
+        <source>Download Default Icons</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Core/GcUpgrade.cpp" line="477"/>
+        <source>Since version 3.8, GoldenCheetah supports icons for sports and subsports. The default icons are distributed separately. Would you like to download them now?&lt;br&gt;&lt;br&gt;You can also download the icons later under &lt;code&gt;Preferences &gt; Data Fields &gt; Icons&lt;/code&gt;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Core/GcUpgrade.cpp" line="482"/>
+        <source>Icons Failed to Install</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Core/GcUpgrade.cpp" line="482"/>
+        <source>Bundle file %1 cannot be imported.</source>
+        <translation type="unfinished">El conjunto de ficheros %1 no se ha podido importar.</translation>
+    </message>
+    <message>
+        <location filename="../../Core/GcUpgrade.cpp" line="570"/>
         <source>Start copying of: Calendar files...</source>
         <translation>Comienza copiado de archivos de calendario...</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="563"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="583"/>
         <source>%1 calendar files moved to subdirectory: %2 - %3 failed</source>
         <translation>%1 archivos de calendario movidos al subdirectorio: %2 - fallaron %3</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="569"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="589"/>
         <source>Start copying of: Log files...</source>
         <translation>Comienza copiado de archivos de registro...</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="582"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="602"/>
         <source>%1 log files moved to subdirectory: %2 - %3 failed</source>
         <translation>%1 archivos de registro movidos al subdirectorio: %2 - fallaron %3</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="590"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="610"/>
         <source>Start copying of: Activity files (.JSON / .GC)...</source>
         <translation>Comienza copiado de archivos de actividad (.JSON / .GC)...</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="602"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="622"/>
         <source>%1 activity (.JSON, .GC) files moved to subdirectory: %2 - %3 failed</source>
         <translation>%1 archivos de actividades (.JSON, .GC) movidos al subdirectorio: %2 - fallaron %3</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="609"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="629"/>
         <source>Start copying of: Activity files (.BAK)...</source>
         <translation>Comienza copia de archivos de actividades (.BAK)...</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="621"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="641"/>
         <source>%1 activity backup (.BAK) files moved to subdirectory: %2 - %3 failed</source>
         <translation>%1 archivos de respaldo de actividades (.BAK) movidos al subdirectorio: %2 - fallaron %3</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="627"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="647"/>
         <source>Start copying of: Media and Workout files... </source>
         <translation>Comienza copia de archivos de medios y entrenamientos... </translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="686"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="706"/>
         <source>Start conversion of native activity files to GoldenCheetah .JSON format...</source>
         <translation>Comienza la conversión de archivos de actividad nativos a formato GoldenCheetah .JSON...</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="740"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="760"/>
         <source>-&gt; Information: Activity %1 - Successfully converted to .JSON</source>
         <translation>-&gt; Información: actividad %1 convertida exitosamente a .JSON</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="752"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="772"/>
         <source>-&gt; Error: Activity %1 - Conversion errors: </source>
         <translation>-&gt; Error: actividad %1 - Errores de conversión: </translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="754"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="774"/>
         <source>......... message(s) of .JSON conversion): </source>
         <translation>........ mensaje(s) de conversión a JSON: </translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="764"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="784"/>
         <source>-&gt; Error: Activity %1 - Invalid File Name (expected format &apos;YYYY_MM_DD_HH_MM_SS.%2&apos;)</source>
         <translation>-&gt; Error: actividad %1 - Nombre de archivo inválido (formato esperado &apos;YYYY_MM_DD_HH_MM_SS.%2&apos;)</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="770"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="790"/>
         <source>-&gt; Error: Activity %1 - Problem reading file</source>
         <translation>-&gt; Error: actividad %1 - Problemas leyendo archivo</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="777"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="797"/>
         <source>%1 activity files converted to .JSON and stored in subdirectory: %2 - %3 failed</source>
         <translation>%1 archivos de actividad convertidos a .JSON y almacenados en subdirectorio: %2 - fallaron %3</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="780"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="800"/>
         <source>%1 converted activity source files moved to subdirectory: %2 - %3 failed</source>
         <translation>%1 archivos de actividad convertidos movidos al subdirectorio: %2 - fallaron %3</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="785"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="805"/>
         <source>Summary: No errors detected - upgrade successful</source>
         <translation>Resumen: sin errores detectados - actualización exitosa</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="788"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="808"/>
         <source>Summary: %1 errors detected - please check log details before proceeding</source>
         <translation>Resumen: %1 errores detectados - por favor, verifique los detalles en el registro antes de continuar</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="791"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="811"/>
         <source>&lt;center&gt;&lt;br&gt;After choosing &apos;Proceed to Athlete&apos;, the system will open the athlete window using the converted data. Depending on the errors this might lead to follow-up errors and incomplete athlete data. You may either fix the error(s) in your directory directly, or go back to your last backup and correct the error(s) in the source data. &lt;br&gt;The upgrade process will be done again each time you open the athlete, until the conversion was successful - and had no more errors.&lt;/center&gt;</source>
         <translation>&lt;center&gt;&lt;br&gt;Después de elegir &apos;Continuar con el atleta&apos; el sistema abrirá la ventana del atleta usando los datos convertidos. Dependiendo de los errores, durante la conversión se pueden producir otros errores y datos incompletos. Usted puede corregir los errores en su directorio directamente o volver al último respaldo y corregir los errores en los datos originales. &lt;br&gt;El proceso de actualización será repetido cada vez que abra el atleta hasta que la conversión sea exitosa y no se reporten errores.&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="798"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="818"/>
         <source>&lt;center&gt;&lt;br&gt;Latest information about possible upgrade problems and concepts to resolve them are available in the&lt;br&gt;&lt;a href= &quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki/Upgrade_v3.2_Troubleshooting_Guide&quot; target=&quot;_blank&quot;&gt;Upgrade v3.2 Troubleshooting Guide&lt;a&gt;</source>
         <translation>&lt;center&gt;&lt;br&gt;La información más actualizada sobre posibles errores de actualización y ayuda para resolverlos está disponible en&lt;br&gt;&lt;a href= &quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki/Upgrade_v3.11_Troubleshooting_Guide&quot; target=&quot;_blank&quot;&gt;Upgrade v3.11 Troubleshooting Guide&lt;a&gt; {3.2_?} {3.2 ?}</translation>
     </message>
@@ -15208,32 +15228,32 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>GcUpgradeExecuteDialog</name>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="903"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="923"/>
         <source>Athlete %1</source>
         <translation>Atleta %1</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="920"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="940"/>
         <source>&lt;center&gt;&lt;h2&gt;Upgrade of Athlete:&lt;br&gt;%1&lt;br&gt;&lt;/h2&gt;&lt;/center&gt;</source>
         <translation>&lt;center&gt;&lt;h2&gt;Actualización del atleta:&lt;br&gt;%1&lt;br&gt;&lt;/h2&gt;&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="925"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="945"/>
         <source>&lt;center&gt;&lt;b&gt;Backup your &apos;Athlete&apos; data first!&lt;br&gt;&lt;b&gt;Please read carefully before proceeding!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;With Version 3.2 the &apos;Athlete&apos; directory has been refactored by adding a set of subdirectories which hold the different types of GoldenCheetah files.&lt;br&gt;&lt;br&gt;The new structure is:&lt;br&gt;-&gt; Activity files: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Configuration files: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Download files: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Import files: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Backups of Activity files: &lt;samp&gt;/bak&lt;/samp&gt;&lt;br&gt;-&gt; Workout related files: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Cache files: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Calendar files: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Log files: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Temp files: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;-&gt; Temp for Activities: &lt;samp&gt;/tempActivities&lt;/samp&gt;&lt;br&gt;-&gt; Train View recordings: &lt;samp&gt;/recordings&lt;/samp&gt;&lt;br&gt;-&gt; Quarantined files: &lt;samp&gt;/quarantine&lt;/samp&gt;&lt;br&gt;&lt;br&gt;The upgrade process will create the new directory structure and move the existing files to the new directories as needed. During the upgrade all activity files will be converted to GoldenCheetah&apos;s native file format .JSON and moved to the &lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt; folder. The source files are moved to the &lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;Starting with version 3.2 all downloads from devices or imported activity files will be converted to GoldenCheetah&apos;s file format during import/download. The original files will be stored - depending on the source - in &lt;samp&gt;/downloads&lt;/samp&gt; or &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Please make sure that you have done a backup of your athlete data before proceeding with the upgrade. We can&apos;t take responsibility for any loss of data during the process. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</source>
         <translation>&lt;center&gt;&lt;b&gt;¡Como primera medida haga una copia de seguridad de sus datos de atleta!&lt;br&gt;&lt;b&gt;¡Por favor, lea cuidadosamente antes de continuar!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;Con la versión 3.2 el directorio del atleta ha sido reestructurado agregando un conjunto de subdirectorios que almacenan los diferentes tipos de archivos de GoldenCheetah.&lt;br&gt;&lt;br&gt;La nueva estructura es:&lt;br&gt;-&gt; Archivos de actividades: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de configuración: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de descarga: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de importación: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de entrenamientos: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de caché: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de calendario: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de registro: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Archivos temporales: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;&lt;br&gt;El proceso de actualización creará la nueva estructura de directorios y moverá los archivos existentes a los nuevos directorios. Durante la actualización todos los archivos de actividad serán convertidos al formato nativo GoldenCheetah .JSON y movidos al directorio&lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt;. Los archivos originales se moverán al directorio &lt;samp&gt;/imports&lt;/samp&gt;.&lt;br&gt;&lt;br&gt;Comenzando con la version 3.2 todos los archivos descargados desde cualquier dispositivo o importados serán convertidos al formato GoldenCheetah .JSON durante el proceso. Los archivos originales se almacenaran, dependiendo del origen, en el directorio &lt;samp&gt;/downloads&lt;/samp&gt; o &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt;r.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Por favor asegúrese de tener resguardo de sus datos de atleta antes de continuar con la actualización. No podemos hacernos responsables de cualquier pérdida de datos durante el proceso. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="964"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="984"/>
         <source>&lt;center&gt;Please backup the athlete directory:&lt;/center&gt;</source>
         <translation>&lt;center&gt;Por favor, haga una copia de seguridad de la carpeta del atleta:&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="982"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="1002"/>
         <source>Accept conditions and proceed with Upgrade</source>
         <translation>Aceptar las condiciones y continuar con la actualización</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="985"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="1005"/>
         <source>Abort Upgrade</source>
         <translation>Cancelar actualización</translation>
     </message>
@@ -15241,32 +15261,32 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>GcUpgradeLogDialog</name>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="1002"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="1022"/>
         <source>Athlete %1</source>
         <translation>Atleta %1</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="1018"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="1038"/>
         <source>&lt;h1&gt;Upgrade log: GoldenCheetah v3.2&lt;/h1&gt;</source>
         <translation>&lt;h1&gt;Registro de actualización: GoldenCheetah v3.2&lt;/h1&gt;</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="1042"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="1062"/>
         <source>Proceed to Athlete</source>
         <translation>Continuar con el atleta</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="1044"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="1064"/>
         <source>Save Upgrade Report...</source>
         <translation>Guardar reporte de actualización...</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="1071"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="1091"/>
         <source>Save Log</source>
         <translation>Guardar registro</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="1071"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="1091"/>
         <source>Text File (*.txt)</source>
         <translation>Archivo de texto (*.txt)</translation>
     </message>
