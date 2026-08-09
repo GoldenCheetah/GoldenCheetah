@@ -474,7 +474,7 @@ GcUpgrade::upgrade(const QDir &home)
     if (numIcons == 0 && (! passedDefaultIconsQuestion || last < VERSION38_RC1)) {
         if (QMessageBox::question(nullptr,
                                   tr("Download Default Icons"),
-                                  tr("Version 3.8 uses icons for sports and subsports. The default icons are distributed separately. Would you like to download the default icon set now?<br><br>You can also download the icons later under <code>Preferences > Data Fields > Icons</code>."),
+                                  tr("Since version 3.8, GoldenCheetah supports icons for sports and subsports. The default icons are distributed separately. Would you like to download them now?<br><br>You can also download the icons later under <code>Preferences > Data Fields > Icons</code>."),
                                   QMessageBox::Yes | QMessageBox::No,
                                   QMessageBox::Yes) == QMessageBox::Yes) {
             QUrl url(QString("%1/icons.zip").arg(VERSION_CONFIG_PREFIX));
