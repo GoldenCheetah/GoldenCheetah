@@ -15102,22 +15102,22 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="476"/>
         <source>Download Default Icons</source>
-        <translation type="unfinished"></translation>
+        <translation>Iconos por omisión</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="477"/>
         <source>Since version 3.8, GoldenCheetah supports icons for sports and subsports. The default icons are distributed separately. Would you like to download them now?&lt;br&gt;&lt;br&gt;You can also download the icons later under &lt;code&gt;Preferences &gt; Data Fields &gt; Icons&lt;/code&gt;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Desde la versión 3.8 GoldenCheetah admite iconos por deporte y especialidad. Los iconos por omisión se distribuyen por separado. ¿Desea descargarlos ahora?&lt;br&gt;&lt;br&gt;También puede descargar los iconos más tarde en &lt;code&gt;Preferencias &gt; Campos de datos &gt; Iconos&lt;/code&gt;.</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="482"/>
         <source>Icons Failed to Install</source>
-        <translation type="unfinished"></translation>
+        <translation>Falló la instalación de los iconos</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="482"/>
         <source>Bundle file %1 cannot be imported.</source>
-        <translation type="unfinished">El conjunto de ficheros %1 no se ha podido importar.</translation>
+        <translation>El conjunto de ficheros %1 no se ha podido importar.</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="570"/>
