@@ -954,7 +954,7 @@ ZonePage::saveClicked()
         QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->zones_[i]->fileName());
         context->athlete->zones_[i]->read(zonesFile);
         if (i != "Bike" && context->athlete->zones_[i]->getRangeSize() == 0) { // No Power zones
-            // Start with Cycling Power zones for backward compatibilty
+            // Start with Cycling Power zones for backward compatibility
             QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + Zones().fileName());
             if (zonesFile.exists()) context->athlete->zones_[i]->read(zonesFile);
         }
@@ -2301,7 +2301,7 @@ HrZonePage::saveClicked()
         QFile hrzonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->hrzones_[i]->fileName());
         context->athlete->hrzones_[i]->read(hrzonesFile);
         if (context->athlete->hrzones_[i]->getRangeSize() == 0) { // No HR zones
-            // Start with Cycling HR zones for backward compatibilty
+            // Start with Cycling HR zones for backward compatibility
             QFile hrzonesFile(context->athlete->home->config().canonicalPath() + "/" + HrZones().fileName());
             if (hrzonesFile.exists()) context->athlete->hrzones_[i]->read(hrzonesFile);
         }
