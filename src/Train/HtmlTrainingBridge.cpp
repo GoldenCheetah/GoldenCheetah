@@ -70,11 +70,6 @@ static QJsonArray toJsonArrayD(const QList<double> &xs)
     return a;
 }
 
-static double deg2rad(double deg)
-{
-    return deg * M_PI / 180.0;
-}
-
 HtmlTrainingBridge::HtmlTrainingBridge(Context *context, QObject *parent)
     : QObject(parent),
       m_context(context),
@@ -440,8 +435,8 @@ void HtmlTrainingBridge::onErgFileSelected(ErgFile *file)
             const ErgFilePoint &p1 = points[i - 1];
             const ErgFilePoint &p2 = points[i];
 
-            cumulativeDistanceMeters = std::max(0.0, p2.x - routeStartMeters);
-            double segAccumulatedM = std::max(0.0, p2.x - segStartDist);
+            cumulativeDistanceMeters = (p2.x > routeStartMeters) ? (p2.x - routeStartMeters) : 0.0;
+            double segAccumulatedM = (p2.x > segStartDist) ? (p2.x - segStartDist) : 0.0;
 
             QJsonArray pointCoord;
             pointCoord.append(p2.lon);
