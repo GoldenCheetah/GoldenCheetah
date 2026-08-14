@@ -117,11 +117,12 @@
 // 5011 - V3.8 DEVELOPMENT 2603 (MAR 2026)
 // 5012 - V3.8 DEVELOPMENT 2605 (MAY 2026)
 // 5013 - V3.8 RC1
+// 5014 - V3.8 RC2
 
 #define VERSION3_BUILD    3010 // released
 #define VERSION3_SP1      3030 // released
 #define VERSION3_SP2      3032 // released
-#define VERSION31_UPG     3100 // first build with 3.1 upgrade process
+#define VERSION31_BUILD   3100 // first build with 3.1 upgrade process
 #define VERSION311_BUILD  3101 // first build with 3.1 upgrade process
 #define VERSION32_BUILD   3200 // released
 #define VERSION33_BUILD   3933 // development release
@@ -130,14 +131,11 @@
 #define VERSION36_BUILD   5000 // released 5/8/23
 #define VERSION37_BUILD   5005 // released 28/3/25
 #define VERSION37_SP1     5006 // released 20/11/25
-#define VERSION38_RC1     5013 // RC1 (JUL 2026) - latest snapshot 9/8/26
-
-// will keep changing during testing and before final release
-#define VERSION31_BUILD VERSION31_UPG
+#define VERSION38_RC2     5014 // RC2 (AGO 2026) - latest snapshot 14/8/26
 
 // the next two will with each build/release
-#define VERSION_LATEST 5013
-#define VERSION_STRING "V3.8-RC1"
+#define VERSION_LATEST 5014
+#define VERSION_STRING "V3.8-RC2"
 #define GC_VERSION VERSION_STRING // To force version string on non-tagged ci builds
 
 // default config for this release cycle

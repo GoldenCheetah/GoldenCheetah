@@ -471,7 +471,7 @@ GcUpgrade::upgrade(const QDir &home)
     // or we're upgrading from a version older than 3.8.
     int numIcons = IconManager::instance().listIconFiles().count();
     bool passedDefaultIconsQuestion = appsettings->value(nullptr, GC_PASSED_DIALOG_DEFAULT_ICONS, false).toBool();
-    if (numIcons == 0 && (! passedDefaultIconsQuestion || last < VERSION38_RC1)) {
+    if (numIcons == 0 && (! passedDefaultIconsQuestion || last < VERSION38_RC2)) {
         if (QMessageBox::question(nullptr,
                                   tr("Download Default Icons"),
                                   tr("Since version 3.8, GoldenCheetah supports icons for sports and subsports. The default icons are distributed separately. Would you like to download them now?<br><br>You can also download the icons later under <code>Preferences > Data Fields > Icons</code>."),
