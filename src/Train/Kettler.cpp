@@ -85,6 +85,8 @@ bool Kettler::discover(QString portName)
     QSerialPort sp;
 
     sp.setPortName(portName);
+    
+    // qDebug() << "Kettler::discover(" << portName << ") open";
 
     if (sp.open(QSerialPort::ReadWrite))
     {
@@ -97,17 +99,26 @@ bool Kettler::discover(QString portName)
         sp.write("ID\r\n");
         sp.waitForBytesWritten(500);
 
-        QByteArray reply = sp.readAll();
-
+        QByteArray reply;
+        int i;
+        for (i=0; i<6; i++)
+        {
+            if (!sp.waitForReadyRead(i?50:500)) break;
+            reply.append(sp.readAll());
+        }
         reply.append('\0');
+        // qDebug() << "Kettler::discover, i " << i << ", reply " << reply; 
 
         QString replyString(reply);
-        if (replyString.startsWith("ACK") || replyString.startsWith("RUN"))
+        if (replyString.startsWith("ACK") || replyString.startsWith("RUN")
+                || replyString.startsWith("HT1P\r\n")) /* HT1P: Kettler Golf E 7961-600 with computer M9816 */
         {
             found = true;
         }
     }
 
+    // qDebug() << "Kettler::discover close";
+    
     sp.close();
 
     return found;

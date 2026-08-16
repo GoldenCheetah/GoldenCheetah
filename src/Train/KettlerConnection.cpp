@@ -30,7 +30,7 @@ KettlerConnection::KettlerConnection() :
     m_timer(0),
     m_load(0),
     m_loadToWrite(0),
-    m_shouldWriteLoad(false)
+    m_needsUppercase(false)
 {
 }
 
@@ -175,7 +175,7 @@ void KettlerConnection::requestAll()
 
     if ((m_loadToWrite != m_load))
     {
-        QString cmd = QString("pw %1\r\n").arg(m_loadToWrite);
+        QString cmd = QString(m_needsUppercase?"PW %1\r\n":"pw %1\r\n").arg(m_loadToWrite);
         m_serial->write(cmd.toStdString().c_str());
         if (!m_serial->waitForBytesWritten(500))
         {
@@ -203,7 +203,7 @@ void KettlerConnection::initializePcConnection()
         keepTrying = (--maxRetries != 0);
 
         // Set kettler into PC-mode, reply should be ACK or RUN
-        m_serial->write("cd\r\n");
+        m_serial->write(m_needsUppercase?"CD\r\n":"cd\r\n");
 
         if (!m_serial->waitForBytesWritten(500))
         {
@@ -220,8 +220,12 @@ void KettlerConnection::initializePcConnection()
             {
                 keepTrying = false;
             }
+            else if (!m_needsUppercase && QString(data).startsWith("ERROR\r\n"))
+            {
+                m_needsUppercase = true;
+            }
         }
-
+        // qDebug() << "KettlerConnection::initializePcConnection, data " << data << ", m_needsUpperCase " << m_needsUppercase << ", keepTrying " << keepTrying;
 
     } while (keepTrying);
 
@@ -231,7 +235,6 @@ void KettlerConnection::initializePcConnection()
 void KettlerConnection::setLoad(unsigned int load)
 {
     m_loadToWrite = load;
-    m_shouldWriteLoad = true;
 }
 
 /*

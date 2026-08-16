@@ -49,7 +49,7 @@ private:
     QMutex m_mutex;
     unsigned int m_load;
     unsigned int m_loadToWrite;
-    bool m_shouldWriteLoad;
+    bool m_needsUppercase;
 
 signals:
     void pulse(quint32);
