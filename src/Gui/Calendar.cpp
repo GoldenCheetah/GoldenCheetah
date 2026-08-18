@@ -1831,7 +1831,8 @@ CalendarDayView::measureDialog
     }
 
     for (i = 0; i < valuesEdit.count(); ++i) {
-        measure.values[i] = valuesEdit[i]->value();
+        const double unitsFactor = (metricUnits ? 1.0 : unitsFactors[i]);
+        measure.values[i] = valuesEdit[i]->value() / unitsFactor;
     }
     measure.when = when;
     measure.comment = commentEdit->toPlainText();
