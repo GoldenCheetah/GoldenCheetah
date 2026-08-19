@@ -56,6 +56,9 @@ signals:
     void cadence(quint32);
     void power(quint32);
     void speed(double);
+
+public:
+    static QByteArray sendCmdReadReply(QSerialPort * serialPort, QByteArray cmd, int timeoutMs = 500);
 };
 
 #endif // _GC_KettlerConnection_h
