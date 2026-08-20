@@ -131,7 +131,7 @@
 #define VERSION36_BUILD   5000 // released 5/8/23
 #define VERSION37_BUILD   5005 // released 28/3/25
 #define VERSION37_SP1     5006 // released 20/11/25
-#define VERSION38_RC2     5014 // RC2 (AGO 2026) - latest snapshot 14/8/26
+#define VERSION38_RC2     5014 // RC2 (AGO 2026) - latest snapshot 20/8/26
 
 // the next two will with each build/release
 #define VERSION_LATEST 5014
