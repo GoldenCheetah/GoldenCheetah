@@ -49,13 +49,16 @@ private:
     QMutex m_mutex;
     unsigned int m_load;
     unsigned int m_loadToWrite;
-    bool m_shouldWriteLoad;
+    bool m_needsUppercase;
 
 signals:
     void pulse(quint32);
     void cadence(quint32);
     void power(quint32);
     void speed(double);
+
+public:
+    static QByteArray sendCmdReadReply(QSerialPort * serialPort, QByteArray cmd, int timeoutMs = 500);
 };
 
 #endif // _GC_KettlerConnection_h

@@ -23,6 +23,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QRegularExpression>
+#include <QElapsedTimer>
 
 KettlerConnection::KettlerConnection() :
     m_serial(0),
@@ -30,7 +31,7 @@ KettlerConnection::KettlerConnection() :
     m_timer(0),
     m_load(0),
     m_loadToWrite(0),
-    m_shouldWriteLoad(false)
+    m_needsUppercase(false)
 {
 }
 
@@ -175,7 +176,7 @@ void KettlerConnection::requestAll()
 
     if ((m_loadToWrite != m_load))
     {
-        QString cmd = QString("pw %1\r\n").arg(m_loadToWrite);
+        QString cmd = QString(m_needsUppercase?"PW %1\r\n":"pw %1\r\n").arg(m_loadToWrite);
         m_serial->write(cmd.toStdString().c_str());
         if (!m_serial->waitForBytesWritten(500))
         {
@@ -203,25 +204,15 @@ void KettlerConnection::initializePcConnection()
         keepTrying = (--maxRetries != 0);
 
         // Set kettler into PC-mode, reply should be ACK or RUN
-        m_serial->write("cd\r\n");
-
-        if (!m_serial->waitForBytesWritten(500))
+        QByteArray data = sendCmdReadReply(m_serial,m_needsUppercase?"CD\r\n":"cd\r\n");
+        if (data.contains("ACK") || data.contains("RUN"))
         {
-            // failure to write to device, bail out
-            this->exit(-1);
+            keepTrying = false;
         }
-
-        QByteArray data;
-
-        if (m_serial->waitForReadyRead(500))
+        else if (!m_needsUppercase && data=="ERROR\r\n")
         {
-            data = m_serial->readAll();
-            if (QString(data).contains("ACK") || QString(data).contains("RUN"))
-            {
-                keepTrying = false;
-            }
+            m_needsUppercase = true;
         }
-
 
     } while (keepTrying);
 
@@ -231,7 +222,6 @@ void KettlerConnection::initializePcConnection()
 void KettlerConnection::setLoad(unsigned int load)
 {
     m_loadToWrite = load;
-    m_shouldWriteLoad = true;
 }
 
 /*
@@ -248,4 +238,48 @@ void KettlerConnection::configurePort(QSerialPort *serialPort)
     serialPort->setDataBits(QSerialPort::Data8);
     serialPort->setFlowControl(QSerialPort::NoFlowControl);
     serialPort->setParity(QSerialPort::NoParity);
+}
+
+QByteArray KettlerConnection::sendCmdReadReply (QSerialPort * serialPort, QByteArray cmd, int timeoutMs)
+{
+    QByteArray data;
+
+    if (!serialPort)
+    {
+        qWarning() << "KettlerConnection::sendCmdReadReply" << cmd << "serial port null";
+        return data;
+    }
+
+    // Discard any existing data
+    serialPort->readAll();
+
+    // Start timer. Note that timeoutMs is the maximum allocated time for the entire communication, including the sending of the command.
+    QElapsedTimer timer;
+    timer.start();
+
+    // Send command string to bike
+    serialPort->write(cmd);
+    if (!serialPort->waitForBytesWritten(timeoutMs))
+    {
+        qWarning() << "KettlerConnection::sendCmdReadReply" << cmd << "write failed";
+        return data;
+    }
+
+    int nrReads = 0;
+    for (;;)
+    {
+        int elapsed = static_cast<int>(timer.elapsed());
+        int wait = timeoutMs - elapsed;
+        if (wait <= 0)
+            break;
+        if (!serialPort->waitForReadyRead(wait))
+            break;
+
+        data.append(serialPort->readAll());
+        nrReads++;
+        if (data.endsWith("\r\n"))
+            break;
+    }
+    qDebug() << "KettlerConnection::sendCmdReadReply" << cmd << nrReads << data;
+    return data;
 }
