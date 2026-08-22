@@ -175,24 +175,85 @@ HtmlChart::HtmlChart(Context *context) : GcChartWindow(context), context(context
 <head>
     <meta charset="utf-8">
     <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
-    <style>body{font-family:sans-serif;padding:12px;color:#333}</style>
+    <style>
+        body { font-family: sans-serif; padding: 12px; color: #333; }
+        #telemetry-data { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; margin-top: 16px; }
+        #telemetry-data div { padding: 8px; background: #f4f6f8; border-radius: 6px; border: 1px solid #d2d6dc; word-wrap: break-word; }
+    </style>
 </head>
 <body>
     <h2>GC WebChannel</h2>
-    <div>Speed: <b id="speed">0.0</b> km/h</div>
-    <div>Power: <b id="power">0</b> W</div>
-    <div>HR: <b id="hr">0</b> bpm</div>
+    <h3>Workout: <b id="workout-name"></b> (<b id="workout-type"></b>)</h3>
+    <h4><b id="workout-description"></b></h4>
+    <h4>Dark: <b id="dark"></b></h4>
+    <div>Filename: <b id="workout-filename"></b></div>
+    <div>Orig. Filename: <b id="workout-origfilename"></b></div>
+    <div>Duration: <b id="workout-duration">0</b> secs.</div>
+    <div>Tags: <b id="workout-tags"></b></div>
+    <h3>Telemetry</h3>
+    <div id="telemetry-data"></div>
     <div>State: <b id="state">Stopped</b></div>
     <script>
         if (typeof QWebChannel !== 'undefined') {
             new QWebChannel(qt.webChannelTransport, function(channel) {
                 window.gc = channel.objects.gc;
+
+                if (window.gc.getPlannedRoute) {
+                    window.gc.getPlannedRoute(function(route) {
+                        if (route) {
+                            var d = typeof route === 'string' ? JSON.parse(route) : route;
+                            document.getElementById("workout-name").innerText = d.workout.name;
+                            document.getElementById("workout-description").innerText = d.workout.description;
+                            document.getElementById("workout-type").innerText = d.workout.type;
+                            document.getElementById("workout-filename").innerText = d.workout.filename;
+                            document.getElementById("workout-origfilename").innerText = d.workout.originalFilename;
+                            document.getElementById("workout-duration").innerText = (d.workout.duration_msecs / 1000 || 0).toFixed(1);;
+                            document.getElementById("workout-tags").innerText = d.workout.tags;
+                        }
+                    });
+                }
+
+                if (window.gc.getConfig) {
+                    window.gc.getConfig(function(config) {
+                        if (config) {
+                            var d = typeof config === 'string' ? JSON.parse(config) : config;
+                            document.getElementById("dark").innerText = d.is_dark_background;
+                        }
+                    });
+                }
+
                 if (window.gc.telemetry) {
+                    var telContainer = document.getElementById("telemetry-data");
                     window.gc.telemetry.connect(function(payload) {
                         var d = typeof payload === 'string' ? JSON.parse(payload) : payload;
-                        document.getElementById("speed").innerText = (d.speed_kmh || 0).toFixed(1);
-                        document.getElementById("power").innerText = Math.round(d.power_w || 0);
-                        document.getElementById("hr").innerText = Math.round(d.hr_bpm || 0);
+
+                        for (var key in d) {
+                            if (d.hasOwnProperty(key)) {
+                                var safeId = key.replace(/[^A-Za-z0-9_-]/g, "");
+                                var el = document.getElementById("tel-" + safeId);
+                                if (!el) {
+                                    var div = document.createElement("div");
+                                    var label = document.createTextNode(key + ': ');
+                                    div.appendChild(label);
+                                    el = document.createElement("b");
+                                    el.id = "tel-" + safeId;
+                                    div.appendChild(el);
+                                    telContainer.appendChild(div);
+                                }
+
+                                var val = d[key];
+                                if (typeof val === 'number') {
+                                    // Generic formatting for numeric values
+                                    if (key.toLowerCase().includes('msec')) {
+                                        el.innerText = (val / 1000).toFixed(1) + " s";
+                                    } else {
+                                        el.innerText = Number.isInteger(val) ? val : val.toFixed(2);
+                                    }
+                                } else {
+                                    el.innerText = val;
+                                }
+                            }
+                        }
                     });
                 }
                 if (window.gc.stateChanged) {
