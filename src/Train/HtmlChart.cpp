@@ -202,13 +202,14 @@ HtmlChart::HtmlChart(Context *context) : GcChartWindow(context), context(context
                     window.gc.getPlannedRoute(function(route) {
                         if (route) {
                             var d = typeof route === 'string' ? JSON.parse(route) : route;
-                            document.getElementById("workout-name").innerText = d.workout.name;
-                            document.getElementById("workout-description").innerText = d.workout.description;
-                            document.getElementById("workout-type").innerText = d.workout.type;
-                            document.getElementById("workout-filename").innerText = d.workout.filename;
-                            document.getElementById("workout-origfilename").innerText = d.workout.originalFilename;
-                            document.getElementById("workout-duration").innerText = (d.workout.duration_msecs / 1000 || 0).toFixed(1);;
-                            document.getElementById("workout-tags").innerText = d.workout.tags;
+                            var workout = (d && d.workout) ? d.workout : {};
+                            document.getElementById("workout-name").innerText = workout.name || "";
+                            document.getElementById("workout-description").innerText = workout.description || "";
+                            document.getElementById("workout-type").innerText = workout.type || "";
+                            document.getElementById("workout-filename").innerText = workout.filename || "";
+                            document.getElementById("workout-origfilename").innerText = workout.originalFilename || workout.filename || "";
+                            document.getElementById("workout-duration").innerText = (((workout.duration_msecs || 0) / 1000) || 0).toFixed(1);
+                            document.getElementById("workout-tags").innerText = Array.isArray(workout.tags) ? workout.tags.join(", ") : (workout.tags || "");
                         }
                     });
                 }
