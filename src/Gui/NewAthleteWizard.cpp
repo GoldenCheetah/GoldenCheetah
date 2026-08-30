@@ -24,6 +24,7 @@
 #include "GcUpgrade.h"
 #include "Athlete.h"
 #include "Colors.h"
+#include "Context.h"
 
 #include <QFormLayout>
 #include <QDialogButtonBox>
@@ -111,6 +112,7 @@ NewAthleteWizard::done
                 } else {
                     appsettings->setValue(GC_UNIT, GC_UNIT_IMPERIAL);
                 }
+                GlobalContext::context()->notifyConfigChanged(CONFIG_UNITS);
 
                 appsettings->setCValue(name, GC_DOB, field("user.dob").toDate());
                 appsettings->setCValue(name, GC_WEIGHT, field("user.weight").toDouble() * (useMetricUnits ? 1.0 : KG_PER_LB));
@@ -225,6 +227,7 @@ NewAthletePageUser::NewAthletePageUser
     unitCombo = new QComboBox();
     unitCombo->addItem(tr("Metric"));
     unitCombo->addItem(tr("Imperial"));
+    unitCombo->setCurrentIndex(GlobalContext::context()->useMetricUnits ? 0 : 1);
     registerField("user.unit", unitCombo);
 
     weight = new QDoubleSpinBox();
@@ -232,7 +235,7 @@ NewAthletePageUser::NewAthletePageUser
     weight->setMinimum(20.0);
     weight->setDecimals(1);
     weight->setSuffix(" " + (unitCombo->currentIndex() == 0 ? tr("kg") : tr("lb")));
-    weight->setValue(75); // default
+    weight->setValue(75 * (unitCombo->currentIndex() == 0 ? 1.0 : LB_PER_KG)); // default
     registerField("user.weight", weight, "value", SIGNAL(valueChanged(double)));
 
     height = new QDoubleSpinBox();
@@ -240,7 +243,7 @@ NewAthletePageUser::NewAthletePageUser
     height->setMinimum(30.0);
     height->setDecimals(1);
     height->setSuffix(" " + (unitCombo->currentIndex() == 0 ? tr("cm") : tr("in")));
-    height->setValue(175); // default
+    height->setValue(175 * (unitCombo->currentIndex() == 0 ? 1.0 : INCH_PER_CM)); // default
     registerField("user.height", height, "value", SIGNAL(valueChanged(double)));
 
     bio = new QTextEdit();
