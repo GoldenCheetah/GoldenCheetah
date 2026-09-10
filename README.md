@@ -32,7 +32,7 @@ GoldenCheetah is free for everyone to use and modify, released under the GPL v2 
 Golden Cheetah install and build instructions are documented
 for each platform;
 
-INSTALL-WIN32   For building on Microsoft Windows
+INSTALL-WINDOWS For building on Microsoft Windows
 
 INSTALL-LINUX   For building on Linux
 
