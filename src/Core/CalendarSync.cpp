@@ -116,12 +116,6 @@ CalendarSync::SyncResults::overall
                + events.skip
                + plannedActivities.skip
                + actualActivities.skip;
-    ret.msg =   tech.msg
-              + seasons.msg
-              + phases.msg
-              + events.msg
-              + plannedActivities.msg
-              + actualActivities.msg;
     return ret;
 }
 
@@ -572,7 +566,6 @@ CalendarSync::syncActivity
     if (rideItem && rideItem->ride()) {
         QString titleField = appsettings->cvalue(context->athlete->cyclist, GC_CALDAV_TITLE, "Workout Code").toString();
         QString descriptionField = appsettings->cvalue(context->athlete->cyclist, GC_CALDAV_DESCRIPTION, "Calendar Text").toString();
-        QString error;
         CalDAV::CalEntry calEntry;
         calEntry.title = rideItem->ride()->getTag(titleField, "");
         if (calEntry.title.isEmpty()) {
@@ -582,6 +575,16 @@ CalendarSync::syncActivity
                 calEntry.title = tr("Unknown Activity");
             }
         }
+        if (rideItem->ride()->id().isEmpty()) {
+            if (! rideItem->isDirty()) {
+                rideItem->ride()->setId(QUuid::createUuid().toString());
+                context->mainWindow->saveSilent(context, rideItem);
+            } else {
+                errors << tr("%1: Can't add id to activity with unsaved changes. Save and retry").arg(calEntry.title);
+                return false;
+            }
+        }
+        QString error;
         if (rideItem->planned) {
             if (rideItem->hasLinkedActivity()) {
                 calEntry.title = tr("Completed: %1").arg(calEntry.title);

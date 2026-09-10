@@ -839,61 +839,10 @@ GcUpgrade::upgradeLate(Context *context)
     }
 
     //////////////////////////////////////////////////////////////////////////////
-    // Add unique ids to all RideFiles and SeasonEvents
+    // Add unique ids to all SeasonEvents
     // Never overwrite
     bool idsEnriched = appsettings->cvalue(context->athlete->home->root().dirName(), GC_UPGRADE_ID_ENRICHED, false).toBool();
     if (! idsEnriched) {
-        // Enrich Activities
-        QStringList idFormats;
-        idFormats << "json";
-        idFormats << "gc";
-        QRegularExpression idSuffixes(QStringLiteral("^(%1)$").arg(idFormats.join("|")), QRegularExpression::CaseInsensitiveOption);
-
-        int actEnriched = 0;
-        int actFailed = 0;
-        QStringList actual = context->athlete->home->activities().entryList(QDir::Files);
-        for (QString &entry : actual) {
-            entry = "activities/" + entry;
-        }
-        QStringList planned = context->athlete->home->planned().entryList(QDir::Files);
-        for (QString &entry : planned) {
-            entry = "planned/" + entry;
-        }
-        QStringList activities = actual + planned;
-        for (const QString &activityFileName : activities) {
-            QFileInfo activityFileInfo(context->athlete->home->root().canonicalPath() + "/" + activityFileName);
-            if (! idSuffixes.match(activityFileInfo.suffix()).hasMatch()) {
-                continue;
-            }
-
-            QStringList errors;
-            QFile activityFile(activityFileInfo.absoluteFilePath());
-            RideFile *ride = RideFileFactory::instance().openRideFile(context, activityFile, errors);
-            if (ride) {
-                if (ride->idNeedsSaving()) {
-                    ride->setId(QUuid::createUuid().toString());
-
-                    RideFileReader *reader = RideFileFactory::instance().readerForSuffix(activityFileInfo.suffix());
-                    if (reader && reader->hasWrite()) {
-                        QFile target(activityFileInfo.absoluteFilePath());
-                        if (reader->writeRideFile(context, ride, target)) {
-                            ++actEnriched;
-                        } else {
-                            ++actFailed;
-                            qDebug() << "GcUpgrade: Failed to write id for activity" << activityFileName;
-                        }
-                    } else {
-                        ++actFailed;
-                        qDebug() << "GcUpgrade: No writable reader for activity" << activityFileName;
-                    }
-                }
-                delete ride;
-            } else {
-                ++actFailed;
-                qDebug() << "GcUpgrade: Failed to open activity" << activityFileName << "-" << errors.join("; ");
-            }
-        }
-
         // Enrich SeasonEvents
         bool seEnriched = false;
         bool seSuccess = true;
@@ -907,13 +856,10 @@ GcUpgrade::upgradeLate(Context *context)
         // Log and set repetition prevention marker if successful
         qDebug() << "GcUpgrade: id enrichment for athlete"
                  << context->athlete->home->root().dirName()
-                 << "- Activities:"
-                 << actEnriched << "updated,"
-                 << actFailed << "failed"
                  << "- SeasonEvents:"
                  << "enriched" << seEnriched
                  << "success" << seSuccess;
-        if (actFailed == 0 && seSuccess) {
+        if (seSuccess) {
             appsettings->setCValue(context->athlete->home->root().dirName(), GC_UPGRADE_ID_ENRICHED, true);
         }
     }

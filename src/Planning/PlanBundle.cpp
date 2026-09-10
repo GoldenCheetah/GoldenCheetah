@@ -610,6 +610,7 @@ PlanBundleReader::cleanAndCopyActivity
         scaleOverride(rideFile->metricOverrides, "coggan_np", baselinePower, cp);
         scaleOverride(rideFile->metricOverrides, "skiba_xpower", baselinePower, cp);
     }
+    rideFile->setId(QUuid::createUuid().toString());
 
     QString targetPath = context->athlete->home->planned().canonicalPath() + "/" + targetFileName;
     QFile targetFile(targetPath);
@@ -1085,6 +1086,7 @@ updateTags
     rideFile->setTag("Change History", "");
     QString targetFileName = rideFile->startTime().toString("yyyy_MM_dd_HH_mm_ss") + ".json";
     rideFile->setTag("Filename", targetFileName);
+    rideFile->setId("");
     return targetFileName;
 }
 

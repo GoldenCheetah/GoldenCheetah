@@ -2019,6 +2019,7 @@ RideCache::copyPlannedRideFile
     }
 
     newRide->setStartTime(QDateTime(newDate, sourceItem->dateTime.time()));
+    newRide->setId(QUuid::createUuid().toString());
     newRide->setTag("Year", newDateTime.toString("yyyy"));
     newRide->setTag("Month", newDateTime.toString("MMMM"));
     newRide->setTag("Weekday", newDateTime.toString("ddd"));

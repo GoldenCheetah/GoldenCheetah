@@ -73,7 +73,6 @@ RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
             weight_(0), totalCount(0), totalTemp(0), dstale(true)
 {
     id_ = QUuid::createUuid().toString();
-    idNeedsSaving_ = true;
 
     command = new RideFileCommand(this);
 
@@ -99,7 +98,6 @@ RideFile::RideFile(RideFile *p) :
     calibrations_ = p->calibrations_;
     context = p->context;
     id_ = QUuid::createUuid().toString();
-    idNeedsSaving_ = true;
 
     command = new RideFileCommand(this);
     minPoint = new RideFilePoint();
@@ -114,7 +112,6 @@ RideFile::RideFile() :
     weight_(0), totalCount(0), totalTemp(0), dstale(true)
 {
     id_ = QUuid::createUuid().toString();
-    idNeedsSaving_ = true;
 
     command = new RideFileCommand(this);
 
@@ -155,13 +152,6 @@ void
 RideFile::setId(const QString &value)
 {
     id_ = value;
-    idNeedsSaving_ = false;
-}
-
-bool
-RideFile::idNeedsSaving() const
-{
-    return idNeedsSaving_ || id_.trimmed().isEmpty();
 }
 
 unsigned int

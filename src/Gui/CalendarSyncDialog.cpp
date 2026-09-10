@@ -31,8 +31,8 @@ CalendarSyncDialog::CalendarSyncDialog
 : QDialog(parent), context(context), syncObjects(syncObjects), cloudServiceName(cloudServiceName)
 {
     setWindowTitle(tr("Synchronize to '%1'").arg(cloudServiceName));
-    setMinimumSize(600 * dpiXFactor, 600 * dpiYFactor);
-    resize(600 * dpiXFactor, 600 * dpiYFactor);
+    setMinimumSize(800 * dpiXFactor, 600 * dpiYFactor);
+    resize(800 * dpiXFactor, 600 * dpiYFactor);
 
     QLabel *titleLabel = new QLabel("<h3>" + tr("Synchronize to %1").arg(cloudServiceName) + "</h3>");
     titleLabel->setAlignment(Qt::AlignCenter);
@@ -46,11 +46,11 @@ CalendarSyncDialog::CalendarSyncDialog
         whatLabel->setText("<h5>" + tr("Event %1").arg(syncObjects.events[0]->name) + "</h5>");
     } else if (syncObjects.root == CalDAV::EntryType::PlannedActivity) {
         QLocale locale;
-        QList<RideItem*> activities = syncObjects.plannedActivities + syncObjects.actualActivities;
+        QList<RideItem*> activities = syncObjects.plannedActivities;
         whatLabel->setText("<h5>" + tr("Planned Activity %1").arg(locale.toString(activities[0]->dateTime), QLocale::ShortFormat) + "</h5>");
     } else if (syncObjects.root == CalDAV::EntryType::ActualActivity) {
         QLocale locale;
-        QList<RideItem*> activities = syncObjects.plannedActivities + syncObjects.actualActivities;
+        QList<RideItem*> activities = syncObjects.actualActivities;
         whatLabel->setText("<h5>" + tr("Actual Activity %1").arg(locale.toString(activities[0]->dateTime), QLocale::ShortFormat) + "</h5>");
     }
 
