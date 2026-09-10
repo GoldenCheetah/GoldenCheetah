@@ -147,9 +147,6 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     autoImportConfig = new RideAutoImportConfig(home->config());
     autoImport = NULL;
 
-    // Search / filter
-    namedSearches = new NamedSearches(this); // must be before navigator
-
     // Metadata
     rideCache = NULL; // let metadata know we don't have a ridecache yet
 
@@ -253,7 +250,6 @@ Athlete::~Athlete()
     delete davCalendar;
 #endif
 
-    delete namedSearches;
     delete routes;
     delete seasons;
     delete measures;

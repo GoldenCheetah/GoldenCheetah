@@ -249,7 +249,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     // GC signal
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
-    connect(context->athlete, SIGNAL(namedSearchesChanged()), this, SLOT(resetFilters()));
+    connect(GlobalContext::context(), &GlobalContext::namedSearchesChanged, this, &LTMSidebar::resetFilters);
     connect(context, SIGNAL(presetsChanged()), this, SLOT(presetsChanged()));
     connect(context, SIGNAL(presetSelected(int)), this, SLOT(presetSelected(int)));
 
@@ -841,7 +841,7 @@ LTMSidebar::filterTreeWidgetSelectionChanged()
 
             int index = filterTree->invisibleRootItem()->indexOfChild(item);
 
-            NamedSearch ns = context->athlete->namedSearches->get(index);
+            NamedSearch ns = NamedSearches::getInstance().get(index);
             QStringList errors, results;
 
             switch(ns.type) {
@@ -1033,7 +1033,7 @@ LTMSidebar::resetFilters()
         delete allFilters->takeChild(0);
     }
 
-    foreach(NamedSearch ns, context->athlete->namedSearches->getList()) {
+    foreach(NamedSearch ns, NamedSearches::getInstance().getList()) {
         
         QTreeWidgetItem *add = new QTreeWidgetItem(allFilters, 0);
 
@@ -1085,7 +1085,7 @@ LTMSidebar::deleteFilter()
 
         // now delete!
         delete allFilters->takeChild(index);
-        context->athlete->namedSearches->deleteNamedSearch(index);
+        NamedSearches::getInstance().deleteNamedSearch(index);
     }
     active = false;
 }

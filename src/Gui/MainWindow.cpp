@@ -2153,9 +2153,6 @@ MainWindow::removeAthleteTab(AthleteTab *tab)
     // cancel ridecache refresh if its in progress
     tab->context->athlete->rideCache->cancel();
 
-    // save the named searches
-    tab->context->athlete->namedSearches->write();
-
     // clear the clipboard if neccessary
     QApplication::clipboard()->setText("");
 

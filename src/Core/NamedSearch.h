@@ -34,11 +34,16 @@ class NamedSearch
 {
 	public:
         enum Type { search=0, filter=1 };
-        NamedSearch() : type(search), count(0) {}
+        NamedSearch() : type(search) {}
+
+        // we need to check the searches are functionally the same, so strip the whitespace for the search text before comparison
+        bool operator==(const NamedSearch& ns) const {
+            return (name == ns.name && type == ns.type &&
+                text.simplified().remove(' ') == ns.text.simplified().remove(' '));
+        }
 
         QString name; // name, typically users name them by year e.g. "2011 Season"
         int type;
-        int count;   // how many times has it been used (not counting in charts) ?
         QString text;
 };
 
@@ -47,25 +52,33 @@ class NamedSearches : public QObject {
     Q_OBJECT;
 
     public:
-        NamedSearches(Athlete *athlete) : athlete(athlete) { 
-            home = athlete->home->config();
-            read();
+
+        // Singleton pattern
+        static NamedSearches& getInstance() {
+            static NamedSearches instance;
+            return instance;
         }
-        void read();
+        ~NamedSearches() {}
+        NamedSearches(NamedSearches const&) = delete;
+        void operator=(NamedSearches const&) = delete;
+
         void write();
 
-        QList<NamedSearch> &getList() { return list; }
-        NamedSearch get(QString name);
-        NamedSearch get(int index);
-        void deleteNamedSearch(int index);
+        const QList<NamedSearch> &getList() const { return list; }
+        NamedSearch get(const QString& name) const;
+        NamedSearch get(int index) const;
+        bool deleteNamedSearch(int index);
+        void appendNamedSearch(const NamedSearch& x);
+        bool updateNamedSearch(int index, const NamedSearch& x);
+        bool swapNamedSearch(int newIndex, int index);
 
-    signals:
-        void changed();
 
 
     private:
-        Athlete *athlete;
-        QDir home;
+
+        NamedSearches() { read(); }
+        void read();
+
         QList<NamedSearch> list;
 };
 
@@ -88,8 +101,6 @@ protected:
     QString buffer;
     NamedSearch namedSearch;
     QList<NamedSearch> result;
-    int loadcount;
-
 };
 
 class EditNamedSearches : public QDialog
@@ -100,7 +111,6 @@ class EditNamedSearches : public QDialog
     public:
         EditNamedSearches(QWidget *parent, Context *context);
         void closeEvent(QCloseEvent* event); // write away on save
-        void writeSearches();
 
     public slots:
         void reject(); // write away on close
