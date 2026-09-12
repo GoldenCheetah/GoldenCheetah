@@ -24,11 +24,12 @@
 
 #include "CloudService.h"
 
+class Context;
 
 namespace CalDAVAuth {
     QString setting(CloudService *cloudService, CloudService::CloudServiceSetting key);
     QString collectionUrl(CloudService *cloudService);
-    bool isConfigured(CloudService *cloudService);
+    bool isConfigured(CloudService *cloudService, Context *context = nullptr);
     void applyAuth(CloudService *cloudService, QNetworkRequest &request);
 }
 
