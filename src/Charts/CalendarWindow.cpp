@@ -34,6 +34,9 @@
 #include "FilterSimilarDialog.h"
 #include "SeasonDialogs.h"
 #include "SaveDialogs.h"
+#include "CalendarSync.h"
+#include "CloudService.h"
+#include "CalendarSyncDialog.h"
 
 #define HLO "<h4>"
 #define HLC "</h4>"
@@ -292,7 +295,7 @@ CalendarWindow::CalendarWindow(Context *context)
 {
     mkControls();
 
-    calendar = new Calendar(QDate::currentDate(), static_cast<Qt::DayOfWeek>(getFirstDayOfWeek()), context->athlete->measures);
+    calendar = new Calendar(QDate::currentDate(), static_cast<Qt::DayOfWeek>(getFirstDayOfWeek()), context->athlete->measures, this);
 
     setMeasureTime(QTime(6, 30, 0));
     setStartHour(8);
@@ -437,6 +440,32 @@ CalendarWindow::CalendarWindow(Context *context)
     connect(calendar, &Calendar::addPhase, this, &CalendarWindow::addPhase);
     connect(calendar, &Calendar::editPhase, this, &CalendarWindow::editPhase);
     connect(calendar, &Calendar::delPhase, this, &CalendarWindow::delPhase);
+    connect(calendar, QOverload<QString, CalendarEntry>::of(&Calendar::syncToRemote), this, [this, context](QString cloudServiceName, CalendarEntry entry) {
+        CalendarSync::SyncObjects objects;
+        if (entry.type == ENTRY_TYPE_EVENT) {
+            objects = context->athlete->calendarSync->buildObjects(getSeasonEvent(entry));
+        } else if (entry.type == ENTRY_TYPE_PHASE) {
+            objects = context->athlete->calendarSync->buildObjects(getPhase(entry));
+        }
+        CalendarSyncDialog *dialog = new CalendarSyncDialog(context, objects, cloudServiceName, this);
+        dialog->setWindowModality(Qt::WindowModal);
+        dialog->setAttribute(Qt::WA_DeleteOnClose);
+        dialog->open();
+    });
+    connect(calendar, QOverload<QString>::of(&Calendar::syncToRemote), this, [this, context](QString cloudServiceName) {
+        if (context->currentSeason() != nullptr) {
+            CalendarSync::SyncObjects objects;
+            if (context->currentSeason()->getType() < 100) {
+                objects = context->athlete->calendarSync->buildObjects(context->currentSeason());
+            } else {
+                objects = context->athlete->calendarSync->buildObjects(static_cast<Phase const *>(context->currentSeason()));
+            }
+            CalendarSyncDialog *dialog = new CalendarSyncDialog(context, objects, cloudServiceName, this);
+            dialog->setWindowModality(Qt::WindowModal);
+            dialog->setAttribute(Qt::WA_DeleteOnClose);
+            dialog->open();
+        }
+    });
     connect(calendar, &Calendar::saveChanges, this, [this](const CalendarEntry &entry) {
         RideItem *item = getRideItem(entry, false);
         if (item != nullptr) {
@@ -768,6 +797,28 @@ CalendarWindow::setSummaryMetrics
 (const QStringList &summaryMetrics)
 {
     multiMetricSelector->setSymbols(summaryMetrics);
+}
+
+
+QList<CloudCalendarLister::CloudCalendarStatus>
+CalendarWindow::getCloudCalendarStatus
+() const
+{
+    QList<CloudCalendarStatus> ret;
+    for (QString name : CloudServiceFactory::instance().serviceNames()) {
+        CloudService const *s = CloudServiceFactory::instance().service(name);
+        if (s == nullptr || s->type() != CloudService::Calendar) {
+            continue;
+        }
+        CloudService *service = CloudServiceFactory::instance().newService(name, context);
+        bool serviceActive = service->getSetting(service->activeSettingName(), false).toBool();
+        bool serviceConfigured = context->athlete->calendarSync->isConfigured(service);
+        delete service;
+        if (serviceActive) {
+            ret << CloudCalendarStatus { name, serviceActive, serviceConfigured };
+        }
+    }
+    return ret;
 }
 
 
@@ -1293,6 +1344,76 @@ CalendarWindow::getRideItem
 }
 
 
+Phase*
+CalendarWindow::getPhase
+(const CalendarEntry &entry, Season **season, int *idx) const
+{
+    Phase *ret = nullptr;
+    if (entry.type != ENTRY_TYPE_PHASE) {
+        return ret;
+    }
+    Season const *currentSeason = context->currentSeason();
+    if (currentSeason == nullptr) {
+        return ret;
+    }
+    Season *phaseSeason = nullptr;
+    for (Season &s : context->athlete->seasons->seasons) {
+        if (s.id() == currentSeason->id()) {
+            phaseSeason = &s;
+            break;
+        }
+    }
+    if (phaseSeason == nullptr) {
+        return ret;
+    }
+    if (season != nullptr) {
+        *season = phaseSeason;
+    }
+    int i = 0;
+    for (Phase &phase : phaseSeason->phases) {
+        if (entry.reference == phase.id().toString()) {
+            ret = &phase;
+            if (idx != nullptr) {
+                *idx = i;
+            }
+            break;
+        }
+        ++i;
+    }
+    return ret;
+}
+
+
+SeasonEvent*
+CalendarWindow::getSeasonEvent
+(const CalendarEntry &entry, Season **season, int *idx) const
+{
+    if (entry.type != ENTRY_TYPE_EVENT) {
+        return nullptr;
+    }
+    for (Season &s : context->athlete->seasons->seasons) {
+        int i = 0;
+        for (SeasonEvent &event : s.events) {
+            QString evId = event.id;
+            if (evId.isEmpty()) { // Fallback if no id is set: use memory address
+                evId = QString("0x%1").arg(reinterpret_cast<quintptr>(&event), 0, 16);
+            }
+            if (entry.reference == evId) {
+                if (season != nullptr) {
+                    *season = &s;
+                }
+                if (idx != nullptr) {
+                    *idx = i;
+                }
+                return &event;
+            }
+            ++i;
+        }
+    }
+    return nullptr;
+}
+
+
 QString
 CalendarWindow::getPrimary
 (RideItem const * const rideItem) const
@@ -1520,6 +1641,14 @@ void
 CalendarWindow::updateActivitiesIfInRange
 (RideItem *rideItem)
 {
+    if (   ! rideItem
+        || ! context
+        || ! context->athlete
+        || ! context->athlete->rideCache
+        || ! context->athlete->rideCache->rides().contains(rideItem)) {
+        return;
+    }
+
     if (calendar->currentView() == CalendarView::Day) {
         if (rideItem->dateTime.date() == calendar->selectedDate()) {
             updateActivities();
@@ -1539,10 +1668,10 @@ CalendarWindow::updateSeason
 {
     if (season == nullptr) {
         DateRange dr(QDate(), QDate(), "");
-        calendar->activateDateRange(dr, allowKeepMonth, false);
+        calendar->activateDateRange(dr, allowKeepMonth, DateRangeDesc { false, false});
     } else {
         DateRange dr(DateRange(season->getStart(), season->getEnd(), season->getName()));
-        calendar->activateDateRange(dr, allowKeepMonth, season->canHavePhasesOrEvents());
+        calendar->activateDateRange(dr, allowKeepMonth, DateRangeDesc { season->getType() < 100, season->canHavePhasesOrEvents() });
     }
 }
 
@@ -1804,33 +1933,13 @@ void
 CalendarWindow::editEvent
 (const CalendarEntry &entry)
 {
-    if (entry.type != ENTRY_TYPE_EVENT) {
-        return;
-    }
     Season *season = nullptr;
-    SeasonEvent *seasonEvent = nullptr;
-    for (Season &s : context->athlete->seasons->seasons) {
-        for (SeasonEvent &event : s.events) {
-            QString evId = event.id;
-            if (evId.isEmpty()) {
-                evId = QString("0x%1").arg(reinterpret_cast<quintptr>(&event), 0, 16);
-            }
-            if (entry.reference == evId) {
-                season = &s;
-                seasonEvent = &event;
-                break;
-            }
+    SeasonEvent *seasonEvent = getSeasonEvent(entry, &season);
+    if (seasonEvent != nullptr) {
+        EditSeasonEventDialog dialog(context, seasonEvent, *season);
+        if (dialog.exec()) {
+            context->athlete->seasons->writeSeasons();
         }
-        if (seasonEvent != nullptr) {
-            break;
-        }
-    }
-    if (seasonEvent == nullptr) {
-        return;
-    }
-    EditSeasonEventDialog dialog(context, seasonEvent, *season);
-    if (dialog.exec()) {
-        context->athlete->seasons->writeSeasons();
     }
 }
 
@@ -1839,28 +1948,12 @@ void
 CalendarWindow::delEvent
 (const CalendarEntry &entry)
 {
-    if (entry.type != ENTRY_TYPE_EVENT) {
-        return;
-    }
-    bool done = false;
-    for (Season &s : context->athlete->seasons->seasons) {
-        int idx = 0;
-        for (SeasonEvent &event : s.events) {
-            QString evId = event.id;
-            if (evId.isEmpty()) {
-                evId = QString("0x%1").arg(reinterpret_cast<quintptr>(&event), 0, 16);
-            }
-            if (entry.reference == evId) {
-                s.events.removeAt(idx);
-                context->athlete->seasons->writeSeasons();
-                done = true;
-                break;
-            }
-            ++idx;
-        }
-        if (done) {
-            break;
-        }
+    Season *eventSeason = nullptr;
+    int idx = -1;
+    SeasonEvent *delEvent = getSeasonEvent(entry, &eventSeason, &idx);
+    if (delEvent != nullptr && idx >= 0) {
+        eventSeason->events.removeAt(idx);
+        context->athlete->seasons->writeSeasons();
     }
 }
 
@@ -1913,30 +2006,12 @@ void
 CalendarWindow::editPhase
 (const CalendarEntry &entry)
 {
-    if (entry.type != ENTRY_TYPE_PHASE) {
-        return;
-    }
-    Season const *currentSeason = context->currentSeason();
-    if (currentSeason == nullptr) {
-        return;
-    }
     Season *phaseSeason = nullptr;
-    for (Season &s : context->athlete->seasons->seasons) {
-        if (s.id() == currentSeason->id()) {
-            phaseSeason = &s;
-            break;
-        }
-    }
-    if (phaseSeason == nullptr) {
-        return;
-    }
-    for (Phase &editPhase : phaseSeason->phases) {
-        if (entry.reference == editPhase.id().toString()) {
-            EditPhaseDialog dialog(context, &editPhase, *phaseSeason);
-            if (dialog.exec()) {
-                context->athlete->seasons->writeSeasons();
-            }
-            break;
+    Phase *editPhase = getPhase(entry, &phaseSeason);
+    if (editPhase != nullptr) {
+        EditPhaseDialog dialog(context, editPhase, *phaseSeason);
+        if (dialog.exec()) {
+            context->athlete->seasons->writeSeasons();
         }
     }
 }
@@ -1946,31 +2021,12 @@ void
 CalendarWindow::delPhase
 (const CalendarEntry &entry)
 {
-    if (entry.type != ENTRY_TYPE_PHASE) {
-        return;
-    }
-    Season const *currentSeason = context->currentSeason();
-    if (currentSeason == nullptr) {
-        return;
-    }
     Season *phaseSeason = nullptr;
-    for (Season &s : context->athlete->seasons->seasons) {
-        if (s.id() == currentSeason->id()) {
-            phaseSeason = &s;
-            break;
-        }
-    }
-    if (phaseSeason == nullptr) {
-        return;
-    }
-    int idx = 0;
-    for (Phase &editPhase : phaseSeason->phases) {
-        if (entry.reference == editPhase.id().toString()) {
-            phaseSeason->phases.removeAt(idx);
-            context->athlete->seasons->writeSeasons();
-            break;
-        }
-        ++idx;
+    int idx = -1;
+    Phase *delPhase = getPhase(entry, &phaseSeason, &idx);
+    if (delPhase != nullptr && idx >= 0) {
+        phaseSeason->phases.removeAt(idx);
+        context->athlete->seasons->writeSeasons();
     }
 }
 
@@ -1979,28 +2035,9 @@ void
 CalendarWindow::exportPlan
 (const CalendarEntry &entry)
 {
-    if (entry.type != ENTRY_TYPE_PHASE) {
-        return;
-    }
-    Season const *currentSeason = context->currentSeason();
-    if (currentSeason == nullptr) {
-        return;
-    }
-    Season *phaseSeason = nullptr;
-    for (Season &s : context->athlete->seasons->seasons) {
-        if (s.id() == currentSeason->id()) {
-            phaseSeason = &s;
-            break;
-        }
-    }
-    if (phaseSeason == nullptr) {
-        return;
-    }
-    for (Phase &editPhase : phaseSeason->phases) {
-        if (entry.reference == editPhase.id().toString()) {
-            ExportPlanWizard wizard(context, &editPhase);
-            wizard.exec();
-            break;
-        }
+    Phase *phase = getPhase(entry);
+    if (phase != nullptr) {
+        ExportPlanWizard wizard(context, phase);
+        wizard.exec();
     }
 }

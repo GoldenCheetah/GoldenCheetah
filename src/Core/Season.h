@@ -35,7 +35,7 @@ class SeasonEvent
     public:
         static QStringList priorityList();
 
-        SeasonEvent(QString name, QDate date, int priority=0, QString description="", QString id="") : name(name), date(date), priority(priority), description(description), id(id) {}
+        SeasonEvent(QString name, QDate date, int priority=0, QString description="", QString id="");
 
         QString name;
         QDate date;

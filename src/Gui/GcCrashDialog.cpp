@@ -26,6 +26,7 @@
 #include "RideMetric.h"
 #include <QtSql>
 #include <qwt_plot_curve.h>
+#include <libical/ical.h>
 
 #ifdef Q_CC_GNU
 #define COMPILER "GCC"
@@ -38,10 +39,6 @@
 #endif
 
 #include "VideoWindow.h"
-
-#ifdef GC_HAVE_ICAL
-#include "ICalendar.h"
-#endif
 
 #ifdef GC_HAVE_D2XX
 #include "D2XX.h"
@@ -179,11 +176,7 @@ QString GcCrashDialog::versionHTML()
     #endif
 
     // -- ICAL ----
-    QString ical = "none";
-
-    #ifdef GC_HAVE_ICAL
-    ical = ICAL_VERSION;
-    #endif
+    QString ical = ICAL_VERSION;
 
     // -- USBXPRESS ----
     QString usbxpress = "none";

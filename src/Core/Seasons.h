@@ -52,11 +52,11 @@ class Seasons : public QObject
 class SeasonParser
 {
 public:
-    static QList<Season> readSeasons(QFile * const file);
+    static QList<Season> readSeasons(QFile * const file, bool *idEnriched = nullptr);
     static bool serialize(QString filename, QList<Season> seasons);
 
 private:
-    static Season parseSeason(QXmlStreamReader &reader);
+    static Season parseSeason(QXmlStreamReader &reader, bool *idEnriched = nullptr);
     static Phase parsePhase(QXmlStreamReader &reader);
     static QDate parseDate(QString);
     static SeasonOffset parseOffset(QString offsetStr);

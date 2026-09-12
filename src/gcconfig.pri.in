@@ -31,6 +31,32 @@
 #GSL_INCLUDES = /usr/include
 #GSL_LIBS = -L/usr/lib -lgsl -lgslcblas -lm
 
+
+###############################################################################
+# LIBICAL CONFIGURATION - REQUIRED
+###############################################################################
+#
+# Homepage: https://github.com/libical/libical
+# RECOMMENDED INSTALLATION:
+#  Linux:   sudo apt-get install libical-dev
+#  macOS:   brew install libical
+#  Windows: vcpkg install libical
+#
+# Set path to the root of the libical installation
+# If you installed in /usr/local/libical then set
+# ICAL_INSTALL = /usr/local/libical
+# This will automatically set:
+# ICAL_INCLUDE = $${ICAL_INSTALL}/include
+# ICAL_LIBS    = $${ICAL_INSTALL}/lib/libical.a
+# You may override the INCLUDE and LIB files if you like.
+# You *must* define ICAL_INSTALL to use this feature.
+###############################################################################
+#
+#ICAL_INSTALL = 
+#ICAL_INCLUDE = 
+#ICAL_LIBS    = 
+
+
 # If you have conflicts with min/max macros defined in windows.h
 # then uncomment the following line.
 #DEFINES += NOMINMAX
@@ -161,20 +187,6 @@ contains(DEFINES, "GC_WANT_PYTHON") {
 #D2XX_INCLUDE = 
 #D2XX_LIBS    =
 
-# If you want support for downloading from iCal calendars you will need libical
-#     http://sourceforge.net/projects/freeassociation/
-# Set path to the root of the libical installation
-# If you installed in /usr/local/libical then set
-# ICAL_INSTALL = /usr/local/libical
-# This will automatically set:
-# ICAL_INCLUDE = $${ICAL_INSTALL}/include 
-# ICAL_LIBS    = $${ICAL_INSTALL}/lib/libical.a
-# You may override the INCLUDE and LIB files if you like.
-# You *must* define ICAL_INSTALL to use this feature.
-#ICAL_INSTALL = 
-#ICAL_INCLUDE = 
-#ICAL_LIBS    =
-
 # If you want support for using USB1 sticks in Train View on Windows
 # then install the SiLabs USBXpress Software Development Kit (SDK)
 #     http://www.silabs.com/products/mcu/Pages/USBXpress.aspx
@@ -299,6 +311,15 @@ DEFINES += GC_VIDEO_NONE             # dont add any video playback support
 #DEFINES +=GC_CLOUD_DB_BASIC_AUTH=
 #DEFINES +=GC_CLOUD_DB_APP_NAME=
 #CloudDB = active
+
+
+# Using the Google Calendar
+# requires a valid OAuth 2.0 Client ID from the Google Cloud Console with the following scopes:
+# - .../auth/calendar.calendarlist.readonly
+# - .../auth/calendar.events
+#DEFINES += GC_WANT_GOOGLECAL
+#DEFINES += GC_GOOGLECAL_CLIENT_ID=\\\"xxxxxxxxxxxxxxxxxxxx\\\"
+#DEFINES += GC_GOOGLECAL_CLIENT_SECRET=\\\"xxxxxxxxxxxxxxxxxxxx\\\"
 
 
 # TrainerDay API key for downloading workouts

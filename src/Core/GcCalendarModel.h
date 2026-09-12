@@ -47,9 +47,6 @@
 #include "Athlete.h"
 #include "RideItem.h"
 #include "RideMetadata.h"
-#ifdef GC_HAVE_ICAL
-#include "ICalendar.h"
-#endif
 #include "Colors.h"
 #include "Settings.h"
 
@@ -187,9 +184,6 @@ public:
         connect(model, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(refresh()));
         connect(model, SIGNAL(rowsMoved(QModelIndex,int,int,QModelIndex,int)), this, SLOT(refresh()));
         connect(model, SIGNAL(rowsRemoved(QModelIndex,int,int)), this, SLOT(refresh()));
-#ifdef GC_HAVE_ICAL
-        connect(context->athlete->rideCalendar, SIGNAL(dataChanged()), this, SLOT(refresh()));
-#endif
         refresh();
     }
 
@@ -258,12 +252,6 @@ public:
                 }
             }
 
-#ifdef GC_HAVE_ICAL
-            // added planned workouts
-            for (int k= context->athlete->rideCalendar->data(date(proxyIndex), EventCountRole).toInt(); k>0; k--)
-                colors.append(GColor(CCALPLANNED));
-#endif
-
             return QVariant::fromValue<QList<QColor> >(colors);
             }
             break;
@@ -281,12 +269,6 @@ public:
                         colors << QColor(Qt::black);
                 }
             }
-
-#ifdef GC_HAVE_ICAL
-            // added planned workouts
-            for (int k= context->athlete->rideCalendar->data(date(proxyIndex), EventCountRole).toInt(); k>0; k--)
-                colors.append(Qt::black);
-#endif
 
             return QVariant::fromValue<QList<QColor> >(colors);
             }
@@ -330,14 +312,6 @@ public:
                     filenames << sourceModel()->data(index(i, filenameIndex, QModelIndex())).toString();
             }
 
-#ifdef GC_HAVE_ICAL
-            // fold in planned workouts
-            if (context->athlete->rideCalendar->data(date(proxyIndex), EventCountRole).toInt()) {
-                foreach(QString x, context->athlete->rideCalendar->data(date(proxyIndex), Qt::DisplayRole).toStringList())
-                    filenames << "calendar";
-            }
-#endif
-
             return filenames;
             }
 
@@ -353,14 +327,6 @@ public:
                     strings << sourceModel()->data(index(i, textIndex, QModelIndex())).toString();
             }
 
-#ifdef GC_HAVE_ICAL
-            // fold in planned workouts
-            if (context->athlete->rideCalendar->data(date(proxyIndex), EventCountRole).toInt()) {
-                QStringList planned;
-                planned = context->athlete->rideCalendar->data(date(proxyIndex), Qt::DisplayRole).toStringList();
-                strings << planned;
-            }
-#endif
             return strings;
             }
             break;

@@ -175,7 +175,7 @@ Seasons::writeSeasons()
 
 QList<Season>
 SeasonParser::readSeasons
-(QFile * const file)
+(QFile * const file, bool *idEnriched)
 {
     QList<Season> seasons;
     if (! file->open(QFile::ReadOnly | QFile::Text)) {
@@ -192,7 +192,7 @@ SeasonParser::readSeasons
         if (reader.tokenType() == QXmlStreamReader::StartElement) {
             QString elemName = reader.name().toString();
             if (elemName == "season") {
-                season = parseSeason(reader);
+                season = parseSeason(reader, idEnriched);
                 if (seasons.size() >= 1 && seasons[seasons.size() - 1].getEnd() == QDate()) {
                     // only set end date for previous season if
                     // it is not null
@@ -332,7 +332,7 @@ SeasonParser::serialize(QString filename, QList<Season> Seasons)
 
 Season
 SeasonParser::parseSeason
-(QXmlStreamReader &reader)
+(QXmlStreamReader &reader, bool *idEnriched)
 {
     Season season;
     QString text;
@@ -382,6 +382,10 @@ SeasonParser::parseSeason
                 int priority = attributes.value("priority").toString().toInt();
                 QString description = Utils::unprotect(attributes.value("description").toString());
                 QString id = attributes.value("id").toString();
+                if (idEnriched != nullptr && id.isEmpty()) {
+                    *idEnriched = true;
+                    // default constructed id (see SeasonEvent::SeasonEvent) will be used, dont overwrite
+                }
                 season.events.append(SeasonEvent(Utils::unprotect(text), date, priority, description, id));
             } else if (elemName == "season") {
                 break;

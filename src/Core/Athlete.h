@@ -37,9 +37,6 @@ class PaceZones;
 class RideFile;
 class ErgFile;
 class RideMetadata;
-class CalendarDownload;
-class ICalendar;
-class CalDAV;
 class Seasons;
 class RideNavigator;
 class NamedSearches;
@@ -63,6 +60,7 @@ class AthleteTab;
 class Leaf;
 class DataFilterRuntime;
 class CloudServiceAutoDownload;
+class CalendarSync;
 class Banister;
 
 class Athlete : public QObject
@@ -99,6 +97,8 @@ class Athlete : public QObject
         // cloud download
         CloudServiceAutoDownload *cloudAutoDownload;
 
+        CalendarSync *calendarSync = nullptr;
+
         // Estimates
         PDEstimate getPDEstimateFor(QDate, QString model, bool wpk, QString sport) const;
         PDEstimate getPDEstimateClosestFor(QDate date, QString model, bool wpk, QString sport) const;
@@ -117,13 +117,6 @@ class Athlete : public QObject
         // note ride can override if passed
         double getWeight(QDate date, RideFile *ride=NULL);
         double getHeight(RideFile *ride=NULL);
-
-        // athlete's calendar
-        CalendarDownload *calendarDownload;
-#ifdef GC_HAVE_ICAL
-        ICalendar *rideCalendar;
-        CalDAV *davCalendar;
-#endif
 
         // Athlete's autoimport handling
         RideImportWizard *autoImport;
