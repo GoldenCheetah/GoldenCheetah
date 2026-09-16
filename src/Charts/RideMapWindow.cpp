@@ -490,6 +490,9 @@ RideMapWindow::rideSelected()
 
     RideItem * ride = myRideItem;
 
+    // don't select deleted rides (!!)
+    if (ride && context->athlete->rideCache->isInDeleteList(ride)) return;
+
     // set/unset blank then decide what to do next
     if (!ride || !ride->ride() || !ride->ride()->dataPoints().count()) setIsBlank(true);
     else setIsBlank(false);
