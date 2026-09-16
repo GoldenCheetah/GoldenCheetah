@@ -1505,7 +1505,9 @@ RPEOverviewItem::setData(RideItem *item)
 void
 MetricOverviewItem::setData(RideItem *item)
 {
-    if (rideItem) disconnect(rideItem, SIGNAL(rideMetadataChanged()), this, SLOT(metadataChanged()));
+    // only disconnect active rides, don't disconnect deleted rides !!
+    if (rideItem && !(parent->context->athlete->rideCache->isInDeleteList(rideItem)))
+        disconnect(rideItem, SIGNAL(rideMetadataChanged()), this, SLOT(metadataChanged()));
     if (item) connect(item, SIGNAL(rideMetadataChanged()), this, SLOT(metadataChanged()));
 
     rideItem = item;
@@ -1843,7 +1845,9 @@ TopNOverviewItem::setDateRange(DateRange dr)
 void
 MetaOverviewItem::setData(RideItem *item)
 {
-    if (rideItem) disconnect(rideItem, SIGNAL(rideMetadataChanged()), this, SLOT(metadataChanged()));
+    // only disconnect active rides, don't disconnect deleted rides !!
+    if (rideItem && !(parent->context->athlete->rideCache->isInDeleteList(rideItem)))
+        disconnect(rideItem, SIGNAL(rideMetadataChanged()), this, SLOT(metadataChanged()));
     if (item) connect(item, SIGNAL(rideMetadataChanged()), this, SLOT(metadataChanged()));
 
     rideItem = item;

@@ -155,6 +155,9 @@ class RideCache : public QObject
         bool updateFromWorkout(RideItem *item, bool autoSave = false);
         bool updateFromWorkoutAfter(const QDate &when, bool autoSave = false);
 
+        bool isInDeleteList(RideItem* x) const { return deletelist.contains(x); }
+        void addToDeleteList(RideItem* x) { deletelist.append(x); }
+
     public slots:
 
         // restore / dump cache to disk (json)
@@ -202,8 +205,6 @@ class RideCache : public QObject
         friend class ::LTMPlot; // get weekly performances
         friend class ::Banister; // get weekly performances
         friend class ::Leaf; // get weekly performances
-        friend class ::RideItem; // adds to deletelist in destructor
-        friend class ::NavigationModel; // checks deletelist during redo/undo
         friend class ::RideCacheRefreshThread;
 
         Context *context;
