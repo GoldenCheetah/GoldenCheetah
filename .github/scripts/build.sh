@@ -22,7 +22,7 @@ main() {
       make clean || true
       git clean -fdX
       local artifacts=(
-        GoldenCheetah_v3.8_arm64.dmg
+        GoldenCheetah_v3.9_arm64.dmg
         src/GoldenCheetah.app
       )
       rm -rf -- "${artifacts[@]}"

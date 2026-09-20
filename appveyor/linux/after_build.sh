@@ -79,6 +79,6 @@ if [ ! -x ./GoldenCheetah*.AppImage ]; then
 fi
 
 echo "Renaming AppImage file to version number ready for deploy"
-mv GoldenCheetah*.AppImage ../GoldenCheetah_v3.8_x64.AppImage
+mv GoldenCheetah*.AppImage ../GoldenCheetah_v3.9_x64.AppImage
 
 exit
