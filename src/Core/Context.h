@@ -84,6 +84,7 @@ class GlobalContext : public QObject
 
         static GlobalContext *context();
 
+        void notifyNamedSearchesChanged() { namedSearchesChanged(); }
         void notifyConfigChanged(qint32);
 
         // metadata etc
@@ -106,6 +107,8 @@ class GlobalContext : public QObject
         // realtime signals global widgets that aren't athlete specific
         void start();
         void stop();
+
+        void namedSearchesChanged();
 
     private:
         // singleton pattern

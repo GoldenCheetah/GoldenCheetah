@@ -247,7 +247,7 @@ void SearchBox::clearClicked()
 
 void SearchBox::checkMenu()
 {
-    if (context->athlete->namedSearches->getList().count() || text() != "") toolButton->show();
+    if (NamedSearches::getInstance().getList().count() || text() != "") toolButton->show();
     else toolButton->hide();
 }
 
@@ -255,9 +255,9 @@ void SearchBox::setMenu()
 {
     dropMenu->clear();
     if (text() != "") dropMenu->addAction(tr("Add to Named Filters"));
-    if (context->athlete->namedSearches->getList().count()) {
+    if (NamedSearches::getInstance().getList().count()) {
         if (text() != "") dropMenu->addSeparator();
-        foreach(NamedSearch x, context->athlete->namedSearches->getList()) {
+        foreach(NamedSearch x, NamedSearches::getInstance().getList()) {
             dropMenu->addAction(x.name);
         }
         dropMenu->addSeparator();
@@ -284,7 +284,7 @@ void SearchBox::runMenu(QAction *x)
         selector->show();
 
     } else {
-        NamedSearch get = context->athlete->namedSearches->get(x->text());
+        NamedSearch get = NamedSearches::getInstance().get(x->text());
         if (get.name == x->text()) {
             setMode(static_cast<SearchBox::SearchBoxMode>(get.type));
             setText(get.text);
@@ -363,9 +363,7 @@ SearchBox::addNamed()
         x.name = text;
         x.text = this->text();
         x.type = mode;
-        x.count = 0;
-        context->athlete->namedSearches->getList().append(x);
-        context->athlete->namedSearches->write();
+        NamedSearches::getInstance().appendNamedSearch(x);
     }
 }
 
