@@ -4838,8 +4838,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             }
 
             // lets get the xdata series - only if the item is already open to avoid accidentally
-            // iterating over all ride data, same approach as in the samples function below
-            if (m == NULL || !m->isOpen() || m->ride(false) == NULL) {
+            // iterating over all ride data except when used in a Trends chart, same approach as
+            // in the samples function below
+            if (d.from==QDate() && d.to==QDate() && (m == NULL || !m->isOpen() || m->ride(false) == NULL)) {
                 return Result(0);
 
             } else {
@@ -4874,8 +4875,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             QString name = *(leaf->fparms[0]->lvalue.s);
 
             // lets get the xdata series - only if the item is already open to avoid accidentally
-            // iterating over all ride data, same approach as in the samples function below
-            if (m == NULL || !m->isOpen() || m->ride(false) == NULL) {
+            // iterating over all ride data except when used in a Trends chart, same approach as
+            // in the samples function below
+            if (d.from==QDate() && d.to==QDate() && (m == NULL || !m->isOpen() || m->ride(false) == NULL)) {
                 return Result(0);
 
             } else {
@@ -4908,8 +4910,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             // nothing to return -- note we check if the ride is open
             // this is to avoid misuse outside of a filter when working
-            // with a specific ride.
-            if (m == NULL || !m->isOpen() || m->ride(false) == NULL || m->ride(false)->dataPoints().count() == 0) {
+            // with a specific ride, but it is allowed in Trends charts.
+            if (d.from==QDate() && d.to==QDate() && (m == NULL || !m->isOpen() || m->ride(false) == NULL || m->ride(false)->dataPoints().count() == 0)) {
                 return Result(0);
 
             } else {

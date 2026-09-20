@@ -822,11 +822,9 @@ PlanBundle::exportBundle
             zipWriter.close();
             return false;
         }
-        if (copied.second > 0) {
-            if (! packDir(workoutDir, "workouts", zipWriter)) {
-                zipWriter.close();
-                return false;
-            }
+        if (! packDir(workoutDir, "workouts", zipWriter)) {
+            zipWriter.close();
+            return false;
         }
 
         QList<QString> savedFiles = metadata.save(baseDir);
@@ -1031,23 +1029,21 @@ packDir
 (const QDir &workDir, const QString &dirName, ZipWriter &zipWriter)
 {
     QStringList fileNames = workDir.entryList(QDir::Files);
-    bool ret = fileNames.count() > 0;
-    if (ret) {
-        zipWriter.setCreationPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner |
-                                         QFileDevice::ReadGroup | QFileDevice::ExeGroup |
-                                         QFileDevice::ReadOther | QFileDevice::ExeOther);
-        zipWriter.addDirectory(dirName + "/");
-        for (const QString &fileName : fileNames) {
-            QString fullPath = workDir.filePath(fileName);
-            QFile file(fullPath);
-            zipWriter.setCreationPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner |
-                                             QFileDevice::ReadGroup |
-                                             QFileDevice::ReadOther);
-            zipWriter.addFile(dirName + "/" + fileName, &file);
-        }
-        if (zipWriter.status() != ZipWriter::NoError) {
-            ret = false;
-        }
+    bool ret = true;
+    zipWriter.setCreationPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner |
+                                     QFileDevice::ReadGroup | QFileDevice::ExeGroup |
+                                     QFileDevice::ReadOther | QFileDevice::ExeOther);
+    zipWriter.addDirectory(dirName + "/");
+    for (const QString &fileName : fileNames) {
+        QString fullPath = workDir.filePath(fileName);
+        QFile file(fullPath);
+        zipWriter.setCreationPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner |
+                                         QFileDevice::ReadGroup |
+                                         QFileDevice::ReadOther);
+        zipWriter.addFile(dirName + "/" + fileName, &file);
+    }
+    if (zipWriter.status() != ZipWriter::NoError) {
+        ret = false;
     }
     return ret;
 }

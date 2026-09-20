@@ -384,4 +384,4 @@ echo "Creating dmg file..."
 hdiutil create -volname GoldenCheetah -srcfolder GoldenCheetah.app -ov -format UDZO GoldenCheetah.dmg
 
 echo "Renaming dmg file to branch and build number ready for deploy"
-mv GoldenCheetah.dmg ../GoldenCheetah_v3.8_x64.dmg
+mv GoldenCheetah.dmg ../GoldenCheetah_v3.9_x64.dmg

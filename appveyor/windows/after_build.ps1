@@ -39,10 +39,10 @@ Get-Content "..\..\COPYING" | Add-Content license.txt
 Copy-Item "..\Resources\win32\gc.ico" .
 
 # Installer script
-Copy-Item "..\Resources\win32\GC3.8-Master-W64-QT6.nsi" .
+Copy-Item "..\Resources\win32\GC3.9-Master-W64-QT6.nsi" .
 
 # Build the installer
-& makensis .\GC3.8-Master-W64-QT6.nsi
-Move-Item "GoldenCheetah_v3.8_64bit_Windows.exe" "..\..\GoldenCheetah_v3.8_x64.exe"
+& makensis .\GC3.9-Master-W64-QT6.nsi
+Move-Item "GoldenCheetah_v3.9_64bit_Windows.exe" "..\..\GoldenCheetah_v3.9_x64.exe"
 
 Set-Location ..\..

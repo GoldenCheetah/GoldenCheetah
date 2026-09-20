@@ -5,6 +5,7 @@
 ## About 
 
 GoldenCheetah is a desktop application for cyclists and triathletes and coaches
+* Plan activities, forecast and track progress
 * Analyse using summary metrics like BikeStress, TRIMP or RPE
 * Extract insight via models like Critical Power and W'bal
 * Track and predict performance using models like Banister and PMC
@@ -18,11 +19,12 @@ GoldenCheetah provides tools for users to develop their own own metrics, models 
 * A high-performance and powerful built-in scripting language
 * Local Python runtime or embedding a user installed runtime 
 * Embedded user installed R runtime 
+* User programmable realtime HTML chart for Train View
 
 GoldenCheetah supports community sharing via the Cloud
 * Upload and download user developed metrics
 * Upload and download user, Python or R charts
-* Import indoor workouts from the ErgDB
+* Import indoor workouts from the TrainerDay
 * Share anonymised data with researchers via the OpenData initiative
 
 GoldenCheetah is free for everyone to use and modify, released under the GPL v2 open source license with pre-built binaries for Mac, Windows and Linux.
@@ -32,7 +34,7 @@ GoldenCheetah is free for everyone to use and modify, released under the GPL v2 
 Golden Cheetah install and build instructions are documented
 for each platform;
 
-INSTALL-WIN32   For building on Microsoft Windows
+INSTALL-WINDOWS For building on Microsoft Windows
 
 INSTALL-LINUX   For building on Linux
 
@@ -40,7 +42,7 @@ INSTALL-MAC     For building on Apple MacOS
 
 Windows/macOS/Linux on AppVeyor: [![Build status](https://ci.appveyor.com/api/projects/status/i6dwn4m8oyu52ihi?svg=true)](https://ci.appveyor.com/project/Joern-R/goldencheetah-knhd8)
 
-Official release builds, snapshots and development builds are all available from http://www.goldencheetah.org
+Official release builds, snapshots and development builds are all available from https://www.goldencheetah.org
 
 ## NOTIO Fork
 
