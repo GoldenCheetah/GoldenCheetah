@@ -455,7 +455,7 @@ CalendarWindow::CalendarWindow(Context *context)
     connect(calendar, QOverload<QString>::of(&Calendar::syncToRemote), this, [this, context](QString cloudServiceName) {
         if (context->currentSeason() != nullptr) {
             CalendarSync::SyncObjects objects;
-            if (context->currentSeason()->getType() < 100) {
+            if (context->currentSeason()->getType() < Phase::phase) {
                 objects = context->athlete->calendarSync->buildObjects(context->currentSeason());
             } else {
                 objects = context->athlete->calendarSync->buildObjects(static_cast<Phase const *>(context->currentSeason()));
@@ -1671,7 +1671,7 @@ CalendarWindow::updateSeason
         calendar->activateDateRange(dr, allowKeepMonth, DateRangeDesc { false, false});
     } else {
         DateRange dr(DateRange(season->getStart(), season->getEnd(), season->getName()));
-        calendar->activateDateRange(dr, allowKeepMonth, DateRangeDesc { season->getType() < 100, season->canHavePhasesOrEvents() });
+        calendar->activateDateRange(dr, allowKeepMonth, DateRangeDesc { season->getType() < Phase::phase, season->canHavePhasesOrEvents() });
     }
 }
 
