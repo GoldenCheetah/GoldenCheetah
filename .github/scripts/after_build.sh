@@ -407,7 +407,7 @@ EOF
 
   log "Preparing dmg contents"
 
-  local DMG_NAME=GoldenCheetah_v3.8_arm64.dmg
+  local DMG_NAME=GoldenCheetah_v3.9_arm64.dmg
   rm -rf dmg_staging
   mkdir -p dmg_staging
   ln -s /Applications dmg_staging/Applications

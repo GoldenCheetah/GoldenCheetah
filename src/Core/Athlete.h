@@ -39,7 +39,6 @@ class ErgFile;
 class RideMetadata;
 class Seasons;
 class RideNavigator;
-class NamedSearches;
 class RideFileCache;
 class RideItem;
 class IntervalItem;
@@ -127,9 +126,6 @@ class Athlete : public QObject
         void loadCharts(); // load charts.xml
         void translateDefaultCharts(QList<LTMSettings>&charts);
 
-        // named filters / queries
-        NamedSearches *namedSearches;
-
         // DataFilter global storage/cache
         QMap<QString,Result> dfcache;
 
@@ -143,7 +139,6 @@ class Athlete : public QObject
         // zones etc
         void notifyZonesChanged() { zonesChanged(); }
         void notifySeasonsChanged() { seasonsChanged(); }
-        void notifyNamedSearchesChanged() { namedSearchesChanged(); }
 
         // import rides from athlete specific directory
         void importFilesWhenOpeningAthlete();
@@ -151,7 +146,6 @@ class Athlete : public QObject
     signals:
         void zonesChanged();
         void seasonsChanged();
-        void namedSearchesChanged();
 
     public slots:
         void checkCPX(RideItem*ride);
