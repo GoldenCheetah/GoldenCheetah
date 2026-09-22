@@ -279,6 +279,24 @@ public:
             value += trimpk8 * time8;
         }
 
+        if (trimpk.size()>8) {
+            assert(deps.contains("time_in_zone_H9"));
+            const RideMetric *time9Metric = deps.value("time_in_zone_H9");
+            assert(time9Metric);
+            double time9 = time9Metric->value(true);
+            double trimpk9 = trimpk[8];
+            value += trimpk9 * time9;
+        }
+
+        if (trimpk.size()>9) {
+            assert(deps.contains("time_in_zone_H10"));
+            const RideMetric *time10Metric = deps.value("time_in_zone_H10");
+            assert(time10Metric);
+            double time10 = time10Metric->value(true);
+            double trimpk10 = trimpk[9];
+            value += trimpk10 * time10;
+        }
+
         // When time in zone is 0 fallback to Average HR for zone id,
         // since it could have been overridden, and assign time_riding
         // if available or workout_time to that zone.
