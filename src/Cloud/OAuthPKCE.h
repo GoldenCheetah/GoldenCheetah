@@ -50,14 +50,6 @@ public:
     void setAuthorizationUrl(const QString &url);
     void setTokenUrl(const QString &url);
     void setClientId(const QString &clientId);
-    // Optional. Google's "Desktop app" OAuth client type requires
-    // client_secret in the token exchange even when using PKCE - a
-    // well-documented Google-specific quirk that contradicts PKCE's own
-    // point (letting public clients skip a secret entirely), but omitting
-    // it gets a 400 from Google's token endpoint after an otherwise-
-    // successful authorize step. Leave unset for genuine public-PKCE
-    // providers (e.g. Tredict) that don't need this.
-    void setClientSecret(const QString &clientSecret);
     void setScope(const QString &scope);
     void setCallbackPath(const QString &path);
     void setTimeout(int seconds);
@@ -83,8 +75,7 @@ public:
         QString &newAccessToken,
         QString &newRefreshToken,
         int &expiresIn,
-        QString &errorString,
-        const QString &clientSecret = QString()
+        QString &errorString
     );
 
 private:
@@ -94,7 +85,6 @@ private:
     QString authorizationUrl_;
     QString tokenUrl_;
     QString clientId_;
-    QString clientSecret_;
     QString scope_;
     QString callbackPath_;
     int timeout_;

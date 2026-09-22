@@ -380,11 +380,6 @@
 #define GC_DVPASS                       "<athlete-private>dv/pass"
 #define GC_DVRESOLVEDURL                "<athlete-private>dv/resolved_url"
 #define GC_DVCALENDARNAME               "<athlete-private>dv/calendar_name"
-#define GC_GOOGLECAL_TOKEN              "<athlete-private>googlecal/token"
-#define GC_GOOGLECAL_RESOLVEDURL        "<athlete-private>googlecal/resolved_url"
-#define GC_GOOGLECAL_CALENDARNAME       "<athlete-private>googlecal/calendar_name"
-#define GC_GOOGLECAL_REFRESH_TOKEN      "<athlete-private>googlecal/refresh_token"
-#define GC_GOOGLECAL_LAST_REFRESH       "<athlete-private>googlecal/last_refresh"
 
 //Dropbox oauth keys
 #define GC_DROPBOX_TOKEN                "<athlete-private>dropbox/token"

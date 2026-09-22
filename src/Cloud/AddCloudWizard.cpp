@@ -25,16 +25,10 @@
 #include "Colors.h"
 #include "CloudService.h"
 #include "CalDAVDiscovery.h"
-#ifdef GC_WANT_GOOGLECAL
-#include "GoogleCalendarDiscovery.h"
-#endif
 #include "OAuthDialog.h"
-#include "OAuthPKCE.h"
-#include "Secrets.h"
 
 #include <QMessageBox>
 #include <QPixmap>
-#include <QPointer>
 #include <QRegExp>
 #include <QInputDialog>
 
@@ -86,18 +80,6 @@ AddCloudWizard::AddCloudWizard(Context *context, QString sname, bool sync) : QWi
 
     done = false;
 }
-
-
-void
-AddCloudWizard::reject()
-{
-    QAbstractButton *cancelButton = button(QWizard::CancelButton);
-    if (cancelButton && ! cancelButton->isEnabled()) {
-        return;
-    }
-    QWizard::reject();
-}
-
 
 /*----------------------------------------------------------------------
  * Wizard Pages
@@ -348,54 +330,7 @@ AddAuth::doAuth()
     // so they are up-to-date before we perform an OAUTH process
     updateServiceSettings();
 
-    if (wizard->cloudService->id() == "Google Calendar") {
-#ifdef GC_WANT_GOOGLECAL
-        OAuthPKCE oauth;
-        oauth.setAuthorizationUrl("https://accounts.google.com/o/oauth2/v2/auth");
-        oauth.setTokenUrl("https://oauth2.googleapis.com/token");
-        oauth.setClientId(GC_GOOGLECAL_CLIENT_ID);
-        oauth.setClientSecret(GC_GOOGLECAL_CLIENT_SECRET);
-        oauth.setScope("https://www.googleapis.com/auth/calendar");
-
-        QMap<QString,QString> extraParams;
-        extraParams.insert("access_type", "offline");
-        extraParams.insert("prompt", "consent");
-        oauth.setExtraAuthParams(extraParams);
-
-        QPointer<AddAuth> guard(this);
-        bool ok = oauth.execute();
-        if (! guard) {
-            return;
-        }
-
-        if (ok) {
-            wizard->cloudService->setSetting(cname, oauth.accessToken());
-
-            QString refreshKey = wizard->cloudService->settings.value(CloudService::Local3, "");
-            QString lastRefreshKey = wizard->cloudService->settings.value(CloudService::Local4, "");
-            if (refreshKey != "") {
-                wizard->cloudService->setSetting(refreshKey, oauth.refreshToken());
-            }
-            if (lastRefreshKey != "") {
-                wizard->cloudService->setSetting(lastRefreshKey, QDateTime::currentDateTime());
-            }
-
-            token->setText(oauth.accessToken());
-
-            QString info = QString(tr("Google Calendar authorization was successful."));
-            QMessageBox information(QMessageBox::Information, tr("Information"), info);
-            information.exec();
-        } else {
-            QMessageBox err;
-            err.setText(tr("Google Authorisation Failed"));
-            err.setDetailedText(oauth.errorString());
-            err.setIcon(QMessageBox::Warning);
-            err.exec();
-        }
-#else
-        return;
-#endif
-    } else if (wizard->cloudService->capabilities() & CloudService::OAuth) {
+    if (wizard->cloudService->capabilities() & CloudService::OAuth) {
         OAuthDialog *oauthDialog = new OAuthDialog(wizard->context, OAuthDialog::NONE, wizard->cloudService);
         if (oauthDialog->sslLibMissing()) {
             delete oauthDialog;
@@ -424,35 +359,14 @@ AddAuth::discoverCalendars()
 {
     updateServiceSettings();
 
-    QPointer<AddAuth> guard(this);
-
     QList<CalDAVDiscovery::CalendarInfo> found;
     QString error;
 
-    QAbstractButton *cancelButton = wizard->button(QWizard::CancelButton);
-    if (cancelButton) {
-        cancelButton->setEnabled(false);
-    }
-    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-    bool ok = false;
-    if (wizard->cloudService->id() == "Google Calendar") {
-#ifdef GC_WANT_GOOGLECAL
-        ok = GoogleCalendarDiscovery::listCalendars(wizard->cloudService, &found, &error);
-#else
-        error = tr("Google Calendar not enabled in this build");
-#endif
-    } else {
-        ok = CalDAVDiscovery::discoverCalendars(wizard->cloudService, &found, &error);
-    }
-    QGuiApplication::restoreOverrideCursor();
-    if (cancelButton) {
-        cancelButton->setEnabled(true);
-    }
-    if (! guard) {
-        return;
-    }
+    setCursor(Qt::WaitCursor);
+    bool ok = CalDAVDiscovery::discoverCalendars(wizard->cloudService, &found, &error);
+    unsetCursor();
 
-    if (! ok || found.isEmpty()) {
+    if (!ok || found.isEmpty()) {
         QMessageBox err;
         err.setText(tr("No Calendars Found"));
         err.setDetailedText(error);
@@ -462,22 +376,17 @@ AddAuth::discoverCalendars()
     }
 
     QStringList names;
-    for (const CalDAVDiscovery::CalendarInfo &c : found) {
-        names << c.displayName;
-    }
+    foreach(const CalDAVDiscovery::CalendarInfo &c, found) names << c.displayName;
 
     bool selected = false;
     QString choice = QInputDialog::getItem(this, tr("Choose Calendar"), tr("Calendar:"), names, 0, false, &selected);
-    if (! selected) {
-        return;
-    }
+    if (!selected) return;
 
     int index = names.indexOf(choice);
-    if (index < 0) {
-        return;
-    }
+    if (index < 0) return;
 
     calendar->setText(found.at(index).displayName);
+
     resolvedCalendarUrl = found.at(index).url;
 }
 

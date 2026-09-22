@@ -313,15 +313,6 @@ DEFINES += GC_VIDEO_NONE             # dont add any video playback support
 #CloudDB = active
 
 
-# Using the Google Calendar
-# requires a valid OAuth 2.0 Client ID from the Google Cloud Console with the following scopes:
-# - .../auth/calendar.calendarlist.readonly
-# - .../auth/calendar.events
-#DEFINES += GC_WANT_GOOGLECAL
-#DEFINES += GC_GOOGLECAL_CLIENT_ID=\\\"xxxxxxxxxxxxxxxxxxxx\\\"
-#DEFINES += GC_GOOGLECAL_CLIENT_SECRET=\\\"xxxxxxxxxxxxxxxxxxxx\\\"
-
-
 # TrainerDay API key for downloading workouts
 # API keys can be requested here: https://trainerday.com/api/
 #DEFINES += GC_WANT_TRAINERDAY_API

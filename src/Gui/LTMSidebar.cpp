@@ -613,11 +613,12 @@ LTMSidebar::buildDateRangeMenu
         if (Context::isValid(context)) {
             for (QString name : CloudServiceFactory::instance().serviceNames()) {
                 std::pair<bool, bool> serviceStatus = getCalendarServiceStatus(name);
-                if (! serviceStatus.first || ! serviceStatus.second) {
+                if (! serviceStatus.first) {
                     continue;
                 }
                 QString label = tr("Sync phase to '%1'").arg(name) % ellipsis;
                 QAction *action = menu.addAction(label);
+                action->setEnabled(serviceStatus.second);
                 connect(action, &QAction::triggered, this, [this, phase, name]() {
                     CalendarSync::SyncObjects objects = context->athlete->calendarSync->buildObjects(phase);
                     CalendarSyncDialog *dialog = new CalendarSyncDialog(context, objects, name, this);
@@ -643,18 +644,21 @@ LTMSidebar::buildDateRangeMenu
         if (Context::isValid(context)) {
             for (QString name : CloudServiceFactory::instance().serviceNames()) {
                 std::pair<bool, bool> serviceStatus = getCalendarServiceStatus(name);
-                if (! serviceStatus.first || ! serviceStatus.second) {
+                if (! serviceStatus.first) {
                     continue;
                 }
                 QString label = tr("Sync season to '%1'").arg(name) % ellipsis;
                 QAction *action = menu.addAction(label);
-                connect(action, &QAction::triggered, this, [this, season, name]() {
-                    CalendarSync::SyncObjects objects = context->athlete->calendarSync->buildObjects(season);
-                    CalendarSyncDialog *dialog = new CalendarSyncDialog(context, objects, name, this);
-                    dialog->setWindowModality(Qt::WindowModal);
-                    dialog->setAttribute(Qt::WA_DeleteOnClose);
-                    dialog->open();
-                });
+                action->setEnabled(serviceStatus.second);
+                if (serviceStatus.second) {
+                    connect(action, &QAction::triggered, this, [this, season, name]() {
+                        CalendarSync::SyncObjects objects = context->athlete->calendarSync->buildObjects(season);
+                        CalendarSyncDialog *dialog = new CalendarSyncDialog(context, objects, name, this);
+                        dialog->setWindowModality(Qt::WindowModal);
+                        dialog->setAttribute(Qt::WA_DeleteOnClose);
+                        dialog->open();
+                    });
+                }
             }
         }
     }
@@ -709,7 +713,7 @@ LTMSidebar::eventPopup(QPoint pos)
         bool hasSep = false;
         for (QString name : CloudServiceFactory::instance().serviceNames()) {
             std::pair<bool, bool> serviceStatus = getCalendarServiceStatus(name);
-            if (! serviceStatus.first || ! serviceStatus.second) {
+            if (! serviceStatus.first) {
                 continue;
             }
             const QString ellipsis = QStringLiteral("...");
@@ -719,6 +723,7 @@ LTMSidebar::eventPopup(QPoint pos)
                 hasSep = true;
             }
             QAction *action = menu.addAction(label);
+            action->setEnabled(serviceStatus.second);
             connect(action, &QAction::triggered, this, [this, seasonEvent, name]() {
                 CalendarSync::SyncObjects objects = context->athlete->calendarSync->buildObjects(seasonEvent);
                 CalendarSyncDialog *dialog = new CalendarSyncDialog(context, objects, name, this);

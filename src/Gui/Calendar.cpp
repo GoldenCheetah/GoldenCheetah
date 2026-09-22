@@ -313,7 +313,7 @@ CalendarBaseTable::buildContextMenu
             cloudCalendars = cloudCalendarLister->getCloudCalendarStatus();
             bool hasSep = false;
             for (const CloudCalendarLister::CloudCalendarStatus &cloudCalendar : cloudCalendars) {
-                if (! cloudCalendar.serviceActive || ! cloudCalendar.serviceConfigured) {
+                if (! cloudCalendar.serviceActive) {
                     continue;
                 }
                 if (! hasSep) {
@@ -331,6 +331,7 @@ CalendarBaseTable::buildContextMenu
                         action = contextMenu->addAction(tr("Sync phase to '%1'").arg(cloudCalendar.name) % ellipsis, this, [this, cloudCalendar]() { emit syncToRemote(cloudCalendar.name); });
                     }
                 }
+                action->setEnabled(cloudCalendar.serviceConfigured);
             }
         }
     }

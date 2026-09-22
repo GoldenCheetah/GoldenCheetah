@@ -33,7 +33,7 @@ class CalDAVCloud : public CloudService {
 
         int type() const { return CloudService::Calendar; }
 
-        int capabilities() const { return UserPass; }
+        int capabilities() const { return UserPass | Upload | Query; }
 
         QString id() const { return "CalDAV Calendar"; }
         QString uiName() const { return "CalDAV Calendar"; }

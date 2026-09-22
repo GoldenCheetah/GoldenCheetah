@@ -46,7 +46,6 @@ OAuthPKCE::~OAuthPKCE()
 void OAuthPKCE::setAuthorizationUrl(const QString &url) { authorizationUrl_ = url; }
 void OAuthPKCE::setTokenUrl(const QString &url) { tokenUrl_ = url; }
 void OAuthPKCE::setClientId(const QString &clientId) { clientId_ = clientId; }
-void OAuthPKCE::setClientSecret(const QString &clientSecret) { clientSecret_ = clientSecret; }
 void OAuthPKCE::setScope(const QString &scope) { scope_ = scope; }
 void OAuthPKCE::setCallbackPath(const QString &path) { callbackPath_ = path; }
 void OAuthPKCE::setTimeout(int seconds) { timeout_ = seconds; }
@@ -257,9 +256,6 @@ OAuthPKCE::exchangeCodeForTokens(const QString &code, const QString &codeVerifie
     params.addQueryItem("grant_type", "authorization_code");
     params.addQueryItem("code", code);
     params.addQueryItem("client_id", clientId_);
-    if (! clientSecret_.isEmpty()) {
-        params.addQueryItem("client_secret", clientSecret_);
-    }
     params.addQueryItem("code_verifier", codeVerifier);
     params.addQueryItem("redirect_uri", redirectUri);
 
@@ -312,17 +308,13 @@ bool
 OAuthPKCE::refreshAccessToken(const QString &tokenUrl, const QString &clientId,
                                const QString &currentRefreshToken,
                                QString &newAccessToken, QString &newRefreshToken,
-                               int &expiresIn, QString &error,
-                               const QString &clientSecret)
+                               int &expiresIn, QString &error)
 {
     QNetworkAccessManager nam;
     QUrlQuery params;
     params.addQueryItem("grant_type", "refresh_token");
     params.addQueryItem("refresh_token", currentRefreshToken);
     params.addQueryItem("client_id", clientId);
-    if (! clientSecret.isEmpty()) {
-        params.addQueryItem("client_secret", clientSecret);
-    }
 
     QUrl url(tokenUrl);
     QNetworkRequest request(url);

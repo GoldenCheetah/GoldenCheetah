@@ -326,16 +326,6 @@ HEADERS     += Cloud/CalDAV.h Cloud/CalDAVCloud.h Cloud/CalDAVAuth.h Cloud/CalDA
 SOURCES     += Cloud/CalDAV.cpp Cloud/CalDAVCloud.cpp Cloud/CalDAVAuth.cpp Cloud/CalDAVDiscovery.cpp
 
 
-###============================
-### OPTIONAL => Google Calendar
-###============================
-
-contains(DEFINES, "GC_WANT_GOOGLECAL") {
-	HEADERS     += Cloud/GoogleCalDAVCloud.h Cloud/GoogleCalendarDiscovery.h
-	SOURCES     += Cloud/GoogleCalDAVCloud.cpp Cloud/GoogleCalendarDiscovery.cpp
-}
-
-
 ###===================
 ### OPTIONAL => LIBUSB
 ###===================
