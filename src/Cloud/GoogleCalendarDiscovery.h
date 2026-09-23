@@ -16,21 +16,18 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _Gc_CalDAVAuth_h
-#define _Gc_CalDAVAuth_h
+#ifndef _Gc_GoogleCalendarDiscovery_h
+#define _Gc_GoogleCalendarDiscovery_h
 
 #include <QString>
-#include <QNetworkRequest>
+#include <QList>
 
 #include "CloudService.h"
+#include "CalDAVDiscovery.h"
 
-class Context;
-
-namespace CalDAVAuth {
-    QString setting(CloudService *cloudService, CloudService::CloudServiceSetting key);
-    QString collectionUrl(CloudService *cloudService);
-    bool isConfigured(CloudService *cloudService, Context *context = nullptr);
-    void applyAuth(CloudService *cloudService, QNetworkRequest &request);
-}
+class GoogleCalendarDiscovery {
+public:
+    static bool listCalendars(CloudService *cloudService, QList<CalDAVDiscovery::CalendarInfo> *results, QString *errorOut = nullptr);
+};
 
 #endif
