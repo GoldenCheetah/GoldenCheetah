@@ -27,6 +27,10 @@
 #include "Units.h"
 #include "HelpWhatsThis.h"
 #include "ErgFile.h"
+#include "CloudService.h"
+#include "PlanWizards.h"
+#include "CalendarSync.h"
+#include "CalendarSyncDialog.h"
 
 #include "GcWindowRegistry.h" // for GcWinID types
 #include "Perspective.h" // for GcWindowDialog
@@ -43,9 +47,6 @@
 // seasons support
 #include "Season.h"
 #include "Seasons.h"
-#ifdef GC_HAVE_ICAL
-#include "CalDAV.h" // upload Events to remote calendar
-#endif
 
 // named searchs
 #include "FreeSearch.h"
@@ -561,7 +562,7 @@ LTMSidebar::dateRangePopup()
 
 void
 LTMSidebar::buildDateRangeMenu
-(QMenu &menu, QTreeWidgetItem *item, bool asGlobal) const
+(QMenu &menu, QTreeWidgetItem *item, bool asGlobal)
 {
     bool isAbsUserSeason = false;
     bool isRelUserSeason = false;
@@ -569,7 +570,7 @@ LTMSidebar::buildDateRangeMenu
     bool isPhase = false;
     bool isNone = true;
     Season *season = nullptr;
-    Season *phase = nullptr;
+    Phase *phase = nullptr;
     if (item != nullptr) {
         if (item->type() >= Season::season && item->type() < Phase::phase) {
             season = &seasons->seasons[allDateRanges->indexOfChild(item)];
@@ -581,7 +582,9 @@ LTMSidebar::buildDateRangeMenu
             }
         } else if (item->type() >= Phase::phase) {
             season = &seasons->seasons[allDateRanges->indexOfChild(item->parent())];
-            phase = &seasons->seasons[item->parent()->indexOfChild(item)];
+            if (season->phases.count() > item->parent()->indexOfChild(item)) {
+                phase = &season->phases[item->parent()->indexOfChild(item)];
+            }
             if (season != nullptr && phase != nullptr) {
                 isPhase = true;
                 isNone = false;
@@ -602,6 +605,29 @@ LTMSidebar::buildDateRangeMenu
             menu.addSeparator();
             menu.addAction(tr("Add season") % ellipsis, this, &LTMSidebar::addRange);
         }
+        menu.addSeparator();
+        menu.addAction(tr("Export plan") % ellipsis, this, [this]() {
+            ExportPlanWizard wizard(context, nullptr);
+            wizard.exec();
+        });
+        if (Context::isValid(context)) {
+            for (QString name : CloudServiceFactory::instance().serviceNames()) {
+                std::pair<bool, bool> serviceStatus = getCalendarServiceStatus(name);
+                if (! serviceStatus.first) {
+                    continue;
+                }
+                QString label = tr("Sync phase to '%1'").arg(name) % ellipsis;
+                QAction *action = menu.addAction(label);
+                action->setEnabled(serviceStatus.second);
+                connect(action, &QAction::triggered, this, [this, phase, name]() {
+                    CalendarSync::SyncObjects objects = context->athlete->calendarSync->buildObjects(phase);
+                    CalendarSyncDialog *dialog = new CalendarSyncDialog(context, objects, name, this);
+                    dialog->setWindowModality(Qt::WindowModal);
+                    dialog->setAttribute(Qt::WA_DeleteOnClose);
+                    dialog->open();
+                });
+            }
+        }
     } else {
         menu.addAction(tr("Edit season") % ellipsis, this, &LTMSidebar::editRange)->setEnabled(isAbsUserSeason || isRelUserSeason);
         menu.addAction(tr("Delete season"), this, &LTMSidebar::deleteRange)->setEnabled(isAbsUserSeason || isRelUserSeason);
@@ -610,6 +636,31 @@ LTMSidebar::buildDateRangeMenu
         menu.addAction(tr("Add event") % ellipsis, this, &LTMSidebar::addEvent)->setEnabled(isAbsUserSeason);
         menu.addSeparator();
         menu.addAction(tr("Add season") % ellipsis, this, &LTMSidebar::addRange);
+        menu.addSeparator();
+        menu.addAction(tr("Export plan") % ellipsis, this, [this]() {
+            ExportPlanWizard wizard(context, nullptr);
+            wizard.exec();
+        });
+        if (Context::isValid(context)) {
+            for (QString name : CloudServiceFactory::instance().serviceNames()) {
+                std::pair<bool, bool> serviceStatus = getCalendarServiceStatus(name);
+                if (! serviceStatus.first) {
+                    continue;
+                }
+                QString label = tr("Sync season to '%1'").arg(name) % ellipsis;
+                QAction *action = menu.addAction(label);
+                action->setEnabled(serviceStatus.second);
+                if (serviceStatus.second) {
+                    connect(action, &QAction::triggered, this, [this, season, name]() {
+                        CalendarSync::SyncObjects objects = context->athlete->calendarSync->buildObjects(season);
+                        CalendarSyncDialog *dialog = new CalendarSyncDialog(context, objects, name, this);
+                        dialog->setWindowModality(Qt::WindowModal);
+                        dialog->setAttribute(Qt::WA_DeleteOnClose);
+                        dialog->open();
+                    });
+                }
+            }
+        }
     }
 }
 
@@ -644,6 +695,44 @@ LTMSidebar::eventPopup(QPoint pos)
     QAction *addEvent = new QAction(tr("Add event"), eventTree);
     menu.addAction(addEvent);
     connect(addEvent, SIGNAL(triggered(void)), this, SLOT(addEvent(void)));
+
+    if (    item != nullptr
+        && allEvents->indexOfChild(item) != -1
+        && Context::isValid(context)
+        && dateRangeTree->selectedItems().count()) {
+        // if a phase is selected (rather than a season), get the season this phase belongs to
+        QTreeWidgetItem *selectedDateRange = dateRangeTree->selectedItems().first();
+        if (selectedDateRange->parent() != nullptr) {
+            selectedDateRange = selectedDateRange->parent();
+        }
+        int seasonindex = allDateRanges->indexOfChild(selectedDateRange);
+        QTreeWidgetItem *ours = eventTree->selectedItems().first();
+        int index = allEvents->indexOfChild(ours);
+        SeasonEvent *seasonEvent = &seasons->seasons[seasonindex].events[index];
+
+        bool hasSep = false;
+        for (QString name : CloudServiceFactory::instance().serviceNames()) {
+            std::pair<bool, bool> serviceStatus = getCalendarServiceStatus(name);
+            if (! serviceStatus.first) {
+                continue;
+            }
+            const QString ellipsis = QStringLiteral("...");
+            QString label = tr("Sync event to '%1'").arg(name) % ellipsis;
+            if (! hasSep) {
+                menu.addSeparator();
+                hasSep = true;
+            }
+            QAction *action = menu.addAction(label);
+            action->setEnabled(serviceStatus.second);
+            connect(action, &QAction::triggered, this, [this, seasonEvent, name]() {
+                CalendarSync::SyncObjects objects = context->athlete->calendarSync->buildObjects(seasonEvent);
+                CalendarSyncDialog *dialog = new CalendarSyncDialog(context, objects, name, this);
+                dialog->setWindowModality(Qt::WindowModal);
+                dialog->setAttribute(Qt::WA_DeleteOnClose);
+                dialog->open();
+            });
+        }
+    }
 
     // execute the menu
     menu.exec(eventTree->mapToGlobal(pos));
@@ -1293,13 +1382,6 @@ LTMSidebar::addEvent()
 
         active = true;
 
-#ifdef GC_HAVE_ICAL
-        // upload to remote calendar if configured
-        if (context->athlete->davCalendar->getConfig())
-            if (!context->athlete->davCalendar->upload(&myevent))
-                QMessageBox::warning(this, tr("Add Event"), tr("The new event could not be uploaded to your remote calendar."));
-#endif
-
         seasons->seasons[seasonindex].events.append(myevent);
 
         QTreeWidgetItem *add = new QTreeWidgetItem(allEvents);
@@ -1744,4 +1826,20 @@ LTMSidebar::resetPreset()
     // load and tell the world to reset
     context->athlete->loadCharts();
     context->notifyPresetsChanged(); 
+}
+
+
+std::pair<bool, bool>
+LTMSidebar::getCalendarServiceStatus
+(const QString &name) const
+{
+    CloudService const *s = CloudServiceFactory::instance().service(name);
+    if (s == nullptr || s->type() != CloudService::Calendar) {
+        return std::make_pair(false, false);;
+    }
+    CloudService *service = CloudServiceFactory::instance().newService(name, context);
+    bool serviceActive = service->getSetting(service->activeSettingName(), false).toBool();
+    bool serviceConfigured = context->athlete->calendarSync->isConfigured(service);
+    delete service;
+    return std::make_pair(serviceActive, serviceConfigured);
 }

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011 Mark Liversedge (liversedge@gmail.com)
+ * Copyright (c) 2026 Joachim Kohlhammer (joachim.kohlhammer@gmx.de)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -20,30 +21,19 @@
 #define _Gc_CalDAV_h
 #include "GoldenCheetah.h"
 
-#include <QObject>
+#include <libical/ical.h>
 
-// send receive HTTPS requests
+#include <QObject>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QSslSocket>
+#include <QUuid>
+#include <QHash>
 
-// diag messages
-#include <QMessageBox>
-
-// set user and password
-#include <QAuthenticator>
 #include "Context.h"
 #include "Athlete.h"
-
-// work with calDAV protocol
-// ...
-
-// GC Settings and Ride Metrics
 #include "Settings.h"
-
-// update main ride calendar
-#include "ICalendar.h"
 
 // rideitem
 #include "RideItem.h"
@@ -53,69 +43,79 @@
 // SeasonEvent
 #include "Season.h"
 
-// create a UUID
-#include <QUuid>
+#include "CloudService.h"
+#include "CalDAVAuth.h"
 
 class CalDAV : public QObject
 {
     Q_OBJECT
-    G_OBJECT
 
 public:
-    enum action { Options, PropFind, Put, Get, Events, Report, None };
-    typedef enum action ActionType;
 
-    enum type { Standard, Webcal };
-    typedef enum type CalDAVType;
+    enum class EntryType : int {
+        Season = 0,
+        Phase,
+        Event,
+        PlannedActivity,
+        ActualActivity
+    };
 
-    CalDAV(Context *context);
+    struct CalEntry {
+        QString title;
+        QString description;
+        QDateTime start;
+        QDateTime end;
+        bool allDay = false;
+        QString id;
+        EntryType type;
+
+        inline static const QString idSuffix = "@goldencheetah.org";
+
+        QString getScopedId() const;
+        static bool getIdParts(QString input, EntryType * const entryType, QString * const idPart, QString * const originalId);
+    };
+
+    CalDAV(Context *context, CloudService *cloudService);
+
+    bool upload(const CalEntry &calEntry);
+    bool remove(const CalEntry &calEntry);
+    bool remove(QString id);
+    bool list();
+    bool isConfigured() const;
+    bool uploadBlocking(const CalEntry &calEntry, QString *errorOut = nullptr);
+    bool removeBlocking(QString id, QString *errorOut = nullptr);
+    bool listBlocking(QStringList *namesOut, QString *errorOut = nullptr);
+
+signals:
+
+    void uploadFinished(QString id, bool success, QString errorString);
+    void listFinished(QStringList resourceNames, bool success, QString errorString);
 
 public slots:
 
-    // Query CalDAV server Options
-    //bool options(); // not used
-
-    // Query CalDAV server Options
-    //bool propfind(); // not used
-
-    // authentication (and refresh all events)
-    // -- parameter ignoreErrors run the function in a "stealth" mode - ignoring any error message which might occur e.g. missing configuration
-    bool download(bool ignoreErrors=false);
-
-    // Query CalDAV server for events ...
-    //bool report(); // not used
-
-    // Upload ride as a VEVENT
-    bool upload(RideItem *rideItem);
-    // Upload SeasonEvent as a VEVENT
-    bool upload(SeasonEvent *seasonEvent);
-    // Upload a VEVENT
-    bool upload(QByteArray vcardtext);
-
-    // Catch NAM signals ...
     void requestReply(QNetworkReply *reply);
-    void userpass(QNetworkReply*r,QAuthenticator*a);
-    void sslErrors(QNetworkReply*,QList<QSslError>);
-
-    // enable aynchronous up/download for Google
-    // since access token is temporarily valid only, it needs refresh before access to Google CALDAV
-    bool doDownload();
-    bool doUpload();
-
-    bool getConfig();
+    void sslErrors(QNetworkReply*, QList<QSslError>);
 
 private:
 
+    enum class Op { Put, Delete, List };
+
+    struct RequestContext {
+        Op op;
+        QString id; // resource id, without prefix/suffix; unused for List
+    };
+
+    bool put(QString id, QByteArray vcardtext);
+
+    QString collectionUrl() const;          // CalDAVAuth::collectionUrl(cloudService)
+    QString resourceUrl(QString id) const;  // collectionUrl() + id + ".ics"
+    void applyAuth(QNetworkRequest &request) const; // CalDAVAuth::applyAuth(cloudService, request)
+
     Context *context;
+    CloudService *cloudService;
     QNetworkAccessManager *nam;
-    CalDAVType calDavType;
-    QString url; QString calID;
-    QString googleCalDAVurl;
-    bool ignoreDownloadErrors;
 
-    ActionType mode;
-    QString fileName;
-    QByteArray vcardtext;
-
+    QHash<QNetworkReply*, RequestContext> inFlight;
 };
+
 #endif

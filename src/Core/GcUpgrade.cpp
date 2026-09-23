@@ -32,8 +32,10 @@
 #include "Library.h"
 #include "CloudService.h"
 #include "IconManager.h"
+#include "Seasons.h"
 
 #include <QDebug>
+#include <QUuid>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QScrollBar>
@@ -834,6 +836,32 @@ GcUpgrade::upgradeLate(Context *context)
         // user can only select "Accept" to end with the upgrade step
         return 0;
 
+    }
+
+    //////////////////////////////////////////////////////////////////////////////
+    // Add unique ids to all SeasonEvents
+    // Never overwrite
+    bool idsEnriched = appsettings->cvalue(context->athlete->home->root().dirName(), GC_UPGRADE_ID_ENRICHED, false).toBool();
+    if (! idsEnriched) {
+        // Enrich SeasonEvents
+        bool seEnriched = false;
+        bool seSuccess = true;
+        QString seasonsFilename = context->athlete->home->config().canonicalPath() + "/seasons.xml";
+        QFile seasonsFile(seasonsFilename);
+        QList<Season> seasons = SeasonParser::readSeasons(&seasonsFile, &seEnriched);
+        if (seEnriched) {
+            seSuccess = SeasonParser::serialize(seasonsFilename, seasons);
+        }
+
+        // Log and set repetition prevention marker if successful
+        qDebug() << "GcUpgrade: id enrichment for athlete"
+                 << context->athlete->home->root().dirName()
+                 << "- SeasonEvents:"
+                 << "enriched" << seEnriched
+                 << "success" << seSuccess;
+        if (seSuccess) {
+            appsettings->setCValue(context->athlete->home->root().dirName(), GC_UPGRADE_ID_ENRICHED, true);
+        }
     }
 
     if (trainDB->needsUpgrade()) {

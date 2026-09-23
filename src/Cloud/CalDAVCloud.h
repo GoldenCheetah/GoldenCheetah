@@ -17,23 +17,10 @@
  */
 
 
-
-//
-// Calendars are still downloaded and managed using the old code
-// See CalDAV.cpp and CalendarDownload.cpp
-//
-// This is a stub service to use the configuration framework provided
-// by the CloudService API to make it seamless for users
-//
-// As part of v4 planning development we may revisit this and refactor
-// this class to support open/read/write etc
-//
-
 #ifndef GC_CalDAVCloud_h
 #define GC_CalDAVCloud_h
 
 #include "CloudService.h"
-#include "CalDAV.h"
 
 class QNetworkReply;
 class QNetworkAccessManager;
@@ -45,44 +32,21 @@ class CalDAVCloud : public CloudService {
     public:
 
         int type() const { return CloudService::Calendar; }
-        int capabilities() const { return OAuth; }
 
-        QString id() const {
-            switch(variant) {
-            case CalDAV::Webcal: return "Web Calendar";
-            default:
-            case CalDAV::Standard: return "CalDAV Calendar";
-            }
-        }
+        int capabilities() const { return UserPass | Upload | Query; }
 
-        QString uiName() const {
-            switch(variant) {
-            case CalDAV::Webcal: return "Web Calendar";
-            default:
-            case CalDAV::Standard: return "CalDAV Calendar";
-            }
-        }
-
-        QString description() const {
-            switch(variant) {
-            case CalDAV::Webcal: return tr("Web Calendar using iCal format as a web resource");
-            default:
-            case CalDAV::Standard: return tr("Generic CalDAV Calendar such as Apple iCloud calendar");
-            }
-        }
+        QString id() const { return "CalDAV Calendar"; }
+        QString uiName() const { return "CalDAV Calendar"; }
+        QString description() const { return tr("Generic CalDAV Calendar such as Nextcloud or Apple iCloud"); }
 
         QImage logo() const;
 
-        // we can be instantiated as a generic CalDAV service or a Webcal
-        // CalDAV service. We don't have separate implementations, so at startup
-        // we register one of each with the cloud service factory
-        CalDAVCloud(Context *context, CalDAV::type variant);
-        CloudService *clone(Context *context) { return new CalDAVCloud(context, variant); }
+        CalDAVCloud(Context *context);
+        CloudService *clone(Context *context) { return new CalDAVCloud(context); }
         ~CalDAVCloud();
 
     private:
         Context *context;
-        CalDAV::type variant;
 
 };
 #endif

@@ -20,54 +20,18 @@
 #include "CalDAVCloud.h"
 #include "Athlete.h"
 #include "Settings.h"
-#include "mvjson.h"
-#include <QByteArray>
-#include <QHttpMultiPart>
-#include <QJsonDocument>
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QJsonValue>
 
-
-#ifndef CALDAV_DEBUG
-#define CALDAV_DEBUG false
-#endif
-#ifdef Q_CC_MSVC
-#define printd(fmt, ...) do {                                                \
-    if (CALDAV_DEBUG) {                                 \
-        printf("[%s:%d %s] " fmt , __FILE__, __LINE__,        \
-               __FUNCTION__, __VA_ARGS__);                    \
-        fflush(stdout);                                       \
-    }                                                         \
-} while(0)
-#else
-#define printd(fmt, args...)                                            \
-    do {                                                                \
-        if (CALDAV_DEBUG) {                                       \
-            printf("[%s:%d %s] " fmt , __FILE__, __LINE__,              \
-                   __FUNCTION__, ##args);                               \
-            fflush(stdout);                                             \
-        }                                                               \
-    } while(0)
-#endif
-
-CalDAVCloud::CalDAVCloud(Context *context, CalDAV::type variant) : CloudService(context), context(context), variant(variant) {
+CalDAVCloud::CalDAVCloud(Context *context) : CloudService(context), context(context) {
 
     // config
-    if (variant == CalDAV::Webcal) {
-        settings.insert(URL, GC_WEBCAL_URL);
-    } else {
-        settings.insert(URL, GC_DVURL);
-        settings.insert(Username, GC_DVUSER);
-        settings.insert(Password, GC_DVPASS);
-    }
+    settings.insert(URL, GC_DVURL);
+    settings.insert(Username, GC_DVUSER);
+    settings.insert(Password, GC_DVPASS);
+    settings.insert(Local1, GC_DVRESOLVEDURL);
+    settings.insert(Local2, GC_DVCALENDARNAME);
 }
 
 CalDAVCloud::~CalDAVCloud() {
-    // We need to save the variant for compatibility with older code
-    // until CalDAV code is fully integrated in the Cloud Services framework
-    settings.insert(Local1, GC_DVCALDAVTYPE);
-    setSetting(GC_DVCALDAVTYPE, variant);
     CloudServiceFactory::instance().saveSettings(this, context);
 }
 
@@ -77,10 +41,8 @@ QImage CalDAVCloud::logo() const
 }
 
 static bool addCalDAVCloud() {
-    CloudServiceFactory::instance().addService(new CalDAVCloud(NULL, CalDAV::Standard));
-    CloudServiceFactory::instance().addService(new CalDAVCloud(NULL, CalDAV::Webcal));
+    CloudServiceFactory::instance().addService(new CalDAVCloud(NULL));
     return true;
 }
 
 static bool add = addCalDAVCloud();
-

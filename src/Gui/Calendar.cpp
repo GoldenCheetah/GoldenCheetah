@@ -36,6 +36,7 @@
 #include "Colors.h"
 #include "Settings.h"
 #include "Context.h"
+#include "CalendarSync.h"
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -150,16 +151,18 @@ CalendarOverview::drawEntries
 // CalendarBaseTable
 
 CalendarBaseTable::CalendarBaseTable
-(QWidget *parent)
-: QTableWidget(parent)
+(CloudCalendarLister const * const cloudCalendarLister, QWidget *parent)
+: QTableWidget(parent), cloudCalendarLister(cloudCalendarLister)
 {
 }
 
 
 QMenu*
 CalendarBaseTable::buildContextMenu
-(const CalendarDay &day, CalendarEntry const * const entryPtr, const QTime &time, bool canHavePhasesEvents)
+(const CalendarDay &day, CalendarEntry const * const entryPtr, const QTime &time, bool isInDateRange, const DateRangeDesc &drDesc)
 {
+    bool canAddSync = false;
+    QString syncEntity;
     QMenu *contextMenu = new QMenu();
     const QString ellipsis = QStringLiteral("...");
     if (entryPtr != nullptr) {
@@ -216,17 +219,21 @@ CalendarBaseTable::buildContextMenu
             contextMenu->addAction(tr("Delete planned activity"), this, [this, entry]() { emit delActivity(entry); });
             break;
         case ENTRY_TYPE_EVENT:
-            if (canHavePhasesEvents) {
+            if (isInDateRange && drDesc.canHavePhasesOrEvents) {
+                canAddSync = true;
+                syncEntity = tr("event");
                 contextMenu->addAction(tr("Edit event") % ellipsis, this, [this, entry]() { emit editEvent(entry); });
                 contextMenu->addAction(tr("Delete event"), this, [this, entry]() { emit delEvent(entry); });
             }
             break;
         case ENTRY_TYPE_PHASE:
-            if (canHavePhasesEvents) {
+            canAddSync = true;
+            syncEntity = tr("phase");
+            if (isInDateRange && drDesc.canHavePhasesOrEvents) {
                 contextMenu->addAction(tr("Edit phase") % ellipsis, this, [this, entry]() { emit editPhase(entry); });
                 contextMenu->addAction(tr("Delete phase") % ellipsis, this, [this, entry]() { emit delPhase(entry); });
                 contextMenu->addSeparator();
-                contextMenu->addAction(tr("Export schedule") % ellipsis, this, [this, entry]() { emit exportPlan(entry); });
+                contextMenu->addAction(tr("Export plan") % ellipsis, this, [this, entry]() { emit exportPlan(entry); });
             }
             break;
         default:
@@ -235,6 +242,7 @@ CalendarBaseTable::buildContextMenu
     } else {
         bool canAddActivity;
         bool canAddPlanned;
+        canAddSync = isInDateRange;
         if (time.isValid()) {
             canAddActivity =    day.date < QDate::currentDate()
                              || (   day.date == QDate::currentDate()
@@ -275,7 +283,7 @@ CalendarBaseTable::buildContextMenu
                 });
             }
         }
-        if (canHavePhasesEvents) {
+        if (isInDateRange && drDesc.canHavePhasesOrEvents) {
             contextMenu->addSeparator();
             contextMenu->addAction(tr("Add phase") % ellipsis, this, [this, day]() { emit addPhase(day.date); });
             contextMenu->addAction(tr("Add event") % ellipsis, this, [this, day]() { emit addEvent(day.date); });
@@ -299,6 +307,34 @@ CalendarBaseTable::buildContextMenu
             }
         }
     }
+    if (canAddSync) {
+        QList<CloudCalendarLister::CloudCalendarStatus> cloudCalendars;
+        if (cloudCalendarLister != nullptr) {
+            cloudCalendars = cloudCalendarLister->getCloudCalendarStatus();
+            bool hasSep = false;
+            for (const CloudCalendarLister::CloudCalendarStatus &cloudCalendar : cloudCalendars) {
+                if (! cloudCalendar.serviceActive) {
+                    continue;
+                }
+                if (! hasSep) {
+                    contextMenu->addSeparator();
+                    hasSep = true;
+                }
+                QAction *action;
+                if (entryPtr != nullptr) {
+                    CalendarEntry entry = *entryPtr; // Prevent dereferencing of dangling pointer in lambdas
+                    action = contextMenu->addAction(tr("Sync %1 to '%2'").arg(syncEntity).arg(cloudCalendar.name) % ellipsis, this, [this, cloudCalendar, entry]() { emit syncToRemote(cloudCalendar.name, entry); });
+                } else {
+                    if (drDesc.isSeason) {
+                        action = contextMenu->addAction(tr("Sync season to '%1'").arg(cloudCalendar.name) % ellipsis, this, [this, cloudCalendar]() { emit syncToRemote(cloudCalendar.name); });
+                    } else {
+                        action = contextMenu->addAction(tr("Sync phase to '%1'").arg(cloudCalendar.name) % ellipsis, this, [this, cloudCalendar]() { emit syncToRemote(cloudCalendar.name); });
+                    }
+                }
+                action->setEnabled(cloudCalendar.serviceConfigured);
+            }
+        }
+    }
     return contextMenu;
 }
 
@@ -307,8 +343,8 @@ CalendarBaseTable::buildContextMenu
 // CalendarDayTable
 
 CalendarDayTable::CalendarDayTable
-(const QDate &date, CalendarDayTableType type, Qt::DayOfWeek firstDayOfWeek, QWidget *parent)
-: CalendarBaseTable(parent), type(type)
+(const QDate &date, CalendarDayTableType type, Qt::DayOfWeek firstDayOfWeek, CloudCalendarLister const * const cloudCalendarLister, QWidget *parent)
+: CalendarBaseTable(cloudCalendarLister, parent), type(type)
 {
     int numDays = type == CalendarDayTableType::Day ? 1 : 7;
     dragTimer.setSingleShot(true);
@@ -506,13 +542,13 @@ CalendarDayTable::fillEntries
 
 void
 CalendarDayTable::limitDateRange
-(const DateRange &dr, bool canHavePhasesOrEvents)
+(const DateRange &dr, const DateRangeDesc &drDesc)
 {
     if (dr.from.isValid() && dr.to.isValid() && dr.from > dr.to) {
         return;
     }
-    this->canHavePhasesOrEvents = canHavePhasesOrEvents;
     this->dr = dr;
+    this->drDesc = drDesc;
     if (! dr.pass(selectedDate())) {
         if (dr.pass(lastVisibleDay())) {
             setDay(lastVisibleDay());
@@ -886,7 +922,7 @@ CalendarDayTable::makeHeaderMenu
     if (entryIdx >= 0) {
         entry = &day.headlineEntries[entryIdx];
     }
-    return buildContextMenu(day, entry, QTime(), isInDateRange(day.date) && canHavePhasesOrEvents);
+    return buildContextMenu(day, entry, QTime(), isInDateRange(day.date), drDesc);
 }
 
 
@@ -904,7 +940,7 @@ CalendarDayTable::makeActivityMenu
     if (entryIdx >= 0) {
         entry = &day.entries[entryIdx];
     }
-    return buildContextMenu(day, entry, time, isInDateRange(day.date) && canHavePhasesOrEvents);
+    return buildContextMenu(day, entry, time, isInDateRange(day.date), drDesc);
 }
 
 
@@ -946,15 +982,15 @@ CalendarDayTable::clearRelated
 // CalendarMonthTable
 
 CalendarMonthTable::CalendarMonthTable
-(Qt::DayOfWeek firstDayOfWeek, QWidget *parent)
-: CalendarMonthTable(QDate::currentDate(), firstDayOfWeek, parent)
+(Qt::DayOfWeek firstDayOfWeek, CloudCalendarLister const * const cloudCalendarLister, QWidget *parent)
+: CalendarMonthTable(QDate::currentDate(), firstDayOfWeek, cloudCalendarLister, parent)
 {
 }
 
 
 CalendarMonthTable::CalendarMonthTable
-(const QDate &dateInMonth, Qt::DayOfWeek firstDayOfWeek, QWidget *parent)
-: CalendarBaseTable(parent)
+(const QDate &dateInMonth, Qt::DayOfWeek firstDayOfWeek, CloudCalendarLister const * const cloudCalendarLister, QWidget *parent)
+: CalendarBaseTable(cloudCalendarLister, parent)
 {
     dragTimer.setSingleShot(true);
     setAcceptDrops(true);
@@ -1132,13 +1168,13 @@ CalendarMonthTable::selectedDate
 
 void
 CalendarMonthTable::limitDateRange
-(const DateRange &dr, bool allowKeepMonth, bool canHavePhasesOrEvents)
+(const DateRange &dr, bool allowKeepMonth, const DateRangeDesc &drDesc)
 {
     if (dr.from.isValid() && dr.to.isValid() && dr.from > dr.to) {
         return;
     }
     this->dr = dr;
-    this->canHavePhasesOrEvents = canHavePhasesOrEvents;
+    this->drDesc = drDesc;
     if (currentItem() != nullptr && isInDateRange(currentItem()->data(DateRole).toDate())) {
         setMonth(currentItem()->data(DateRole).toDate());
     } else if (isInDateRange(QDate::currentDate())) {
@@ -1504,7 +1540,7 @@ CalendarMonthTable::showContextMenu
     } else if (headlineEntryIdx >= 0) {
         entry = &day.headlineEntries[headlineEntryIdx];
     }
-    QMenu *contextMenu = buildContextMenu(day, entry, QTime(), isInDateRange(day.date) && canHavePhasesOrEvents);
+    QMenu *contextMenu = buildContextMenu(day, entry, QTime(), isInDateRange(day.date), drDesc);
     contextMenu->exec(viewport()->mapToGlobal(pos));
     delete contextMenu;
     if (pressedIndex.isValid()) {
@@ -1521,7 +1557,7 @@ CalendarMonthTable::showContextMenu
 // CalendarDayView
 
 CalendarDayView::CalendarDayView
-(const QDate &dateInMonth, Measures * const athleteMeasures, QWidget *parent)
+(const QDate &dateInMonth, Measures * const athleteMeasures, CloudCalendarLister const * const cloudCalendarLister, QWidget *parent)
 : QWidget(parent), athleteMeasures(athleteMeasures)
 {
     dayDateSelector = new CalendarOverview();
@@ -1536,7 +1572,7 @@ CalendarDayView::CalendarDayView
     leftPaneLayout->addWidget(measureTabs, 1);
     dayLeftPane->setFixedWidth(dayDateSelector->sizeHint().width() + leftPaneLayout->contentsMargins().left() + leftPaneLayout->contentsMargins().right());
 
-    dayTable = new CalendarDayTable(dateInMonth);
+    dayTable = new CalendarDayTable(dateInMonth, CalendarDayTableType::Day, Qt::Monday, cloudCalendarLister);
 
     QHBoxLayout *dayLayout = new QHBoxLayout(this);
     dayLayout->addWidget(dayLeftPane);
@@ -1577,6 +1613,8 @@ CalendarDayView::CalendarDayView
     connect(dayTable, &CalendarDayTable::addEvent, this, &CalendarDayView::addEvent);
     connect(dayTable, &CalendarDayTable::editEvent, this, &CalendarDayView::editEvent);
     connect(dayTable, &CalendarDayTable::delEvent, this, &CalendarDayView::delEvent);
+    connect(dayTable, QOverload<QString, CalendarEntry>::of(&CalendarDayTable::syncToRemote), this, QOverload<QString, CalendarEntry>::of(&CalendarDayView::syncToRemote));
+    connect(dayTable, QOverload<QString>::of(&CalendarDayTable::syncToRemote), this, QOverload<QString>::of(&CalendarDayView::syncToRemote));
 }
 
 
@@ -1640,10 +1678,10 @@ CalendarDayView::fillEntries
 
 void
 CalendarDayView::limitDateRange
-(const DateRange &dr, bool canHavePhasesOrEvents)
+(const DateRange &dr, const DateRangeDesc &drDesc)
 {
     dayDateSelector->limitDateRange(dr);
-    dayTable->limitDateRange(dr, canHavePhasesOrEvents);
+    dayTable->limitDateRange(dr, drDesc);
 }
 
 
@@ -1862,10 +1900,10 @@ CalendarDayView::measureDialog
 // CalendarWeekView
 
 CalendarWeekView::CalendarWeekView
-(const QDate &date, QWidget *parent)
+(const QDate &date, CloudCalendarLister const * const cloudCalendarLister, QWidget *parent)
 : QWidget(parent)
 {
-    weekTable = new CalendarDayTable(date, CalendarDayTableType::Week);
+    weekTable = new CalendarDayTable(date, CalendarDayTableType::Week, Qt::Monday, cloudCalendarLister);
 
     QHBoxLayout *weekLayout = new QHBoxLayout(this);
     weekLayout->addWidget(weekTable);
@@ -1897,6 +1935,8 @@ CalendarWeekView::CalendarWeekView
     connect(weekTable, &CalendarDayTable::addEvent, this, &CalendarWeekView::addEvent);
     connect(weekTable, &CalendarDayTable::editEvent, this, &CalendarWeekView::editEvent);
     connect(weekTable, &CalendarDayTable::delEvent, this, &CalendarWeekView::delEvent);
+    connect(weekTable, QOverload<QString, CalendarEntry>::of(&CalendarDayTable::syncToRemote), this, QOverload<QString, CalendarEntry>::of(&CalendarWeekView::syncToRemote));
+    connect(weekTable, QOverload<QString>::of(&CalendarDayTable::syncToRemote), this, QOverload<QString>::of(&CalendarWeekView::syncToRemote));
 
     setDay(date);
 }
@@ -1952,9 +1992,9 @@ CalendarWeekView::fillEntries
 
 void
 CalendarWeekView::limitDateRange
-(const DateRange &dr, bool canHavePhasesOrEvents)
+(const DateRange &dr, const DateRangeDesc &drDesc)
 {
-    weekTable->limitDateRange(dr, canHavePhasesOrEvents);
+    weekTable->limitDateRange(dr, drDesc);
 }
 
 
@@ -2002,15 +2042,15 @@ CalendarWeekView::selectedDate
 // Calendar
 
 Calendar::Calendar
-(const QDate &dateInMonth, Qt::DayOfWeek firstDayOfWeek, Measures * const athleteMeasures, QWidget *parent)
+(const QDate &dateInMonth, Qt::DayOfWeek firstDayOfWeek, Measures * const athleteMeasures, CloudCalendarLister const * const cloudCalendarLister, QWidget *parent)
 : QWidget(parent)
 {
     qRegisterMetaType<CalendarDay>("CalendarDay");
     qRegisterMetaType<CalendarSummary>("CalendarSummary");
 
-    dayView = new CalendarDayView(dateInMonth, athleteMeasures);
-    weekView = new CalendarWeekView(dateInMonth);
-    monthView = new CalendarMonthTable(dateInMonth, firstDayOfWeek);
+    dayView = new CalendarDayView(dateInMonth, athleteMeasures, cloudCalendarLister);
+    weekView = new CalendarWeekView(dateInMonth, cloudCalendarLister);
+    monthView = new CalendarMonthTable(dateInMonth, firstDayOfWeek, cloudCalendarLister);
 
     viewStack = new QStackedWidget();
     viewStack->addWidget(dayView);
@@ -2100,6 +2140,8 @@ Calendar::Calendar
     connect(dayView, &CalendarDayView::addEvent, this, &Calendar::addEvent);
     connect(dayView, &CalendarDayView::editEvent, this, &Calendar::editEvent);
     connect(dayView, &CalendarDayView::delEvent, this, &Calendar::delEvent);
+    connect(dayView, QOverload<QString, CalendarEntry>::of(&CalendarDayView::syncToRemote), this, QOverload<QString, CalendarEntry>::of(&Calendar::syncToRemote));
+    connect(dayView, QOverload<QString>::of(&CalendarDayView::syncToRemote), this, QOverload<QString>::of(&Calendar::syncToRemote));
 
     connect(weekView, &CalendarWeekView::dayChanged, this, [this](const QDate &date) {
         if (currentView() == CalendarView::Week) {
@@ -2134,6 +2176,8 @@ Calendar::Calendar
     connect(weekView, &CalendarWeekView::addEvent, this, &Calendar::addEvent);
     connect(weekView, &CalendarWeekView::editEvent, this, &Calendar::editEvent);
     connect(weekView, &CalendarWeekView::delEvent, this, &Calendar::delEvent);
+    connect(weekView, QOverload<QString, CalendarEntry>::of(&CalendarWeekView::syncToRemote), this, QOverload<QString, CalendarEntry>::of(&Calendar::syncToRemote));
+    connect(weekView, QOverload<QString>::of(&CalendarWeekView::syncToRemote), this, QOverload<QString>::of(&Calendar::syncToRemote));
 
     connect(monthView, &CalendarMonthTable::entryDblClicked, this, [this](const CalendarDay &day, int entryIdx) {
         viewActivity(day.entries[entryIdx]);
@@ -2172,6 +2216,8 @@ Calendar::Calendar
     connect(monthView, &CalendarMonthTable::addEvent, this, &Calendar::addEvent);
     connect(monthView, &CalendarMonthTable::editEvent, this, &Calendar::editEvent);
     connect(monthView, &CalendarMonthTable::delEvent, this, &Calendar::delEvent);
+    connect(monthView, QOverload<QString, CalendarEntry>::of(&CalendarDayTable::syncToRemote), this, QOverload<QString, CalendarEntry>::of(&Calendar::syncToRemote));
+    connect(monthView, QOverload<QString>::of(&CalendarDayTable::syncToRemote), this, QOverload<QString>::of(&Calendar::syncToRemote));
     connect(monthView, &CalendarMonthTable::monthChanged, this, [this](const QDate &month, const QDate &firstVisible, const QDate &lastVisible) {
         if (currentView() == CalendarView::Month) {
             emit monthChanged(month, firstVisible, lastVisible);
@@ -2382,16 +2428,16 @@ Calendar::isInDateRange
 
 void
 Calendar::activateDateRange
-(const DateRange &dr, bool allowKeepMonth, bool canHavePhasesOrEvents)
+(const DateRange &dr, bool allowKeepMonth, const DateRangeDesc &drDesc)
 {
     if (dateRange == dr) {
         return;
     }
     QDate currentDate = selectedDate();
     dateRange = dr;
-    monthView->limitDateRange(dr, allowKeepMonth, canHavePhasesOrEvents);
-    weekView->limitDateRange(dr, canHavePhasesOrEvents);
-    dayView->limitDateRange(dr, canHavePhasesOrEvents);
+    monthView->limitDateRange(dr, allowKeepMonth, drDesc);
+    weekView->limitDateRange(dr, drDesc);
+    dayView->limitDateRange(dr, drDesc);
     if (currentView() == CalendarView::Day || currentView() == CalendarView::Week) {
         setDate(currentDate, false);
     } else if (currentView() == CalendarView::Month) {

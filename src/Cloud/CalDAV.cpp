@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2010 Mark Liversedge (liversedge@gmail.com)
+ * Copyright (c) 2026 Joachim Kohlhammer (joachim.kohlhammer@gmx.de)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -16,548 +17,479 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "Secrets.h"
-
 #include "CalDAV.h"
-#include "MainWindow.h"
-#include "Athlete.h"
-#include "CloudService.h"
 
-CalDAV::CalDAV(Context *context) : context(context), mode(None)
+#include <QBuffer>
+#include <QDomDocument>
+#include <QByteArray>
+#include <QEventLoop>
+
+static QStringList extractResourceNames(const QString &document);
+static icalcomponent *createEvent(const CalDAV::CalEntry &calEntry);
+
+
+//////////////////////////////////////////////////////////////////////////////
+// CalDAV::CalEntry
+
+QString
+CalDAV::CalEntry::getScopedId
+() const
+{
+    QString calId;
+    if (id.isEmpty()) {
+        return id;
+    } else if (type == EntryType::Season) {
+        calId = "season-" + id;
+    } else if (type == EntryType::Phase) {
+        calId = "phase-" + id;
+    } else if (type == EntryType::Event) {
+        calId = "event-" + id;
+    } else if (type == EntryType::PlannedActivity) {
+        calId = "plannedActivity-" + id;
+    } else if (type == EntryType::ActualActivity) {
+        calId = "actualActivity-" + id;
+    } else {
+        calId = "UNKNOWN-" + id;
+    }
+    return calId + idSuffix;
+}
+
+
+bool
+CalDAV::CalEntry::getIdParts
+(QString input, EntryType * const entryType, QString * const idPart, QString * const originalId)
+{
+    *originalId = QUrl::fromPercentEncoding(input.toUtf8());
+    if (! originalId->endsWith(CalDAV::CalEntry::idSuffix)) {
+        return false;
+    }
+    QString work = originalId->chopped(idSuffix.length());
+    int index = work.indexOf('-');
+    if (index != -1) {
+        QString typePart = work.sliced(0, index);
+        if (typePart == "season") {
+            *entryType = EntryType::Season;
+        } else if (typePart == "phase") {
+            *entryType = EntryType::Phase;
+        } else if (typePart == "event") {
+            *entryType = EntryType::Event;
+        } else if (typePart == "plannedActivity") {
+            *entryType = EntryType::PlannedActivity;
+        } else if (typePart == "actualActivity") {
+            *entryType = EntryType::ActualActivity;
+        } else {
+            return false;
+        }
+        *idPart = work.sliced(index + 1);
+        return true;
+    }
+    return false;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// CalDAV
+
+CalDAV::CalDAV
+(Context *context, CloudService *cloudService)
+: context(context), cloudService(cloudService)
 {
     nam = new QNetworkAccessManager(this);
-    connect(nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestReply(QNetworkReply*)));
-
-    connect(nam, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)), this,
-            SLOT(userpass(QNetworkReply*,QAuthenticator*)));
-    connect(nam, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this,
-            SLOT(sslErrors(QNetworkReply*,QList<QSslError>)));
-
-    googleCalDAVurl = "https://apidata.googleusercontent.com/caldav/v2/%1/events/";
-
-    getConfig();
+    connect(nam, &QNetworkAccessManager::finished, this, &CalDAV::requestReply);
+    connect(nam, &QNetworkAccessManager::sslErrors, this, &CalDAV::sslErrors);
 }
 
 
 bool
-CalDAV::getConfig() {
-
-    int t = appsettings->cvalue(context->athlete->cyclist, GC_DVCALDAVTYPE, "0").toInt();
-    if (t == 0) {
-        calDavType = Standard;
-    }
-
-    if (calDavType == Standard) {
-        url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
-    }
-
-    // check if we have an useful URL (not space and not the Google Default without CalID
-    if (url == "" && calDavType == Standard) {
-        return false;
-    }
-
-    return true;
-}
-
-
-//
-// GET event directory listing
-//
-
-bool
-CalDAV::download(bool ignoreErrors)
+CalDAV::isConfigured
+() const
 {
-    ignoreDownloadErrors = ignoreErrors;
-    mode = Events;
-
-    if (!getConfig()) {
-        if (!ignoreDownloadErrors) {
-             QMessageBox::warning(context->mainWindow, tr("Missing Preferences"), tr("CalID or CalDAV Url is missing in preferences"));
-        }
-        mode = None;
-        return false;
-    }
-
-    if (calDavType == Standard) {
-        return doDownload();
-    }
-    return true;
+    return CalDAVAuth::isConfigured(cloudService);
 }
+
 
 bool
-CalDAV::doDownload()
+CalDAV::uploadBlocking
+(const CalEntry &calEntry, QString *errorOut)
 {
+    QLocale locale;
+    QEventLoop loop;
+    bool ok = false;
+    QString err;
+    const QString calId = calEntry.getScopedId();
 
-    QNetworkRequest request = QNetworkRequest(QUrl(url));
+    QMetaObject::Connection conn = connect(this, &CalDAV::uploadFinished, this, [&](QString id, bool success, QString errorString) {
+            if (id != calId) {
+                return;
+            }
+            ok = success;
+            err = errorString;
+            loop.quit();
+        }, Qt::QueuedConnection);
+    upload(calEntry);
 
-    QByteArray *queryText = new QByteArray( "<?xml version=\"1.0\" encoding=\"utf-8\" ?>"
-                                            "<C:calendar-query xmlns:D=\"DAV:\""
-                                            "                 xmlns:C=\"urn:ietf:params:xml:ns:caldav\">"
-                                            " <D:prop>"
-                                            "   <D:getetag/>"
-                                            "   <C:calendar-data/>"
-                                            " </D:prop>"
-                                            " <C:filter>"
-                                            "   <C:comp-filter name=\"VCALENDAR\">"
-                                            "     <C:comp-filter name=\"VEVENT\">"
-                                            "       <C:time-range end=\"20200101T000000Z\" start=\"20000101T000000Z\"/>"
-                                            "     </C:comp-filter>"
-                                            "   </C:comp-filter>"
-                                            " </C:filter>"
-                                            "</C:calendar-query>\r\n");
+    loop.exec();
+    disconnect(conn);
 
-    request.setRawHeader("Depth", "0");
-    request.setRawHeader("Content-Type", "application/xml; charset=\"utf-8\"");
-    request.setRawHeader("Content-Length", (QString("%1").arg(queryText->size())).toLatin1());
-
-    QBuffer *query = new QBuffer(queryText);
-
-    mode = Events;
-    QNetworkReply *reply = nam->sendCustomRequest(request, "REPORT", query);
-    if (reply->error() != QNetworkReply::NoError) {
-        if (!ignoreDownloadErrors) {
-            QMessageBox::warning(context->mainWindow, tr("CalDAV REPORT url error"), reply->errorString());
-        }
-        mode = None;
-        return false;
+    if (errorOut) {
+        *errorOut = err;
     }
-    return true;
+    return ok;
 }
 
+
+bool
+CalDAV::removeBlocking
+(QString id, QString *errorOut)
+{
+    QEventLoop loop;
+    bool ok = false;
+    QString err;
+
+    QMetaObject::Connection conn = connect(this, &CalDAV::uploadFinished, this, [&](QString replyId, bool success, QString errorString) {
+            if (replyId != id) {
+                return;
+            }
+            ok = success;
+            err = errorString;
+            loop.quit();
+        }, Qt::QueuedConnection);
+
+    remove(id);
+
+    loop.exec();
+    disconnect(conn);
+
+    if (errorOut) {
+        *errorOut = err;
+    }
+    return ok;
+}
+
+
+bool
+CalDAV::listBlocking
+(QStringList *namesOut, QString *errorOut)
+{
+    QEventLoop loop;
+    bool ok = false;
+    QString err;
+    QStringList names;
+
+    QMetaObject::Connection conn = connect(this, &CalDAV::listFinished, this, [&](QStringList resourceNames, bool success, QString errorString) {
+            names = resourceNames;
+            ok = success;
+            err = errorString;
+            loop.quit();
+        }, Qt::QueuedConnection);
+
+    list();
+
+    loop.exec();
+    disconnect(conn);
+
+    if (namesOut) {
+        *namesOut = names;
+    }
+    if (errorOut) {
+        *errorOut = err;
+    }
+    return ok;
+}
+
+
+QString
+CalDAV::collectionUrl
+() const
+{
+    return CalDAVAuth::collectionUrl(cloudService);
+}
+
+
+QString
+CalDAV::resourceUrl
+(QString id) const
+{
+    return collectionUrl() + id + ".ics";
+}
+
+
+void
+CalDAV::applyAuth
+(QNetworkRequest &request) const
+{
+    CalDAVAuth::applyAuth(cloudService, request);
+}
+
+
 //
-// Get OPTIONS available
+// utility function to create a VCALENDAR from a single (planned) RideItem
 //
-//bool
-//CalDAV::options()
-//{
-//    QString url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
-//    if (url == "") return false; // not configured
 
-//    QNetworkRequest request = QNetworkRequest(QUrl(url));
-
-
-//    QByteArray *queryText = new QByteArray("<?xml version=\"1.0\" encoding=\"utf-8\" ?>"
-//                                           "<D:options xmlns:D=\"DAV:\">"
-//                                           "  <C:calendar-home-set xmlns:C=\"urn:ietf:params:xml:ns:caldav\"/>"
-//                                           "</D:options>");
-
-//    request.setRawHeader("Depth", "0");
-//    request.setRawHeader("Content-Type", "text/xml; charset=\"utf-8\"");
-//    request.setRawHeader("Content-Length", (QString("%1").arg(queryText->size())).toLatin1());
-
-//    QBuffer *query = new QBuffer(queryText);
-
-//    mode = Options;
-//    QNetworkReply *reply = nam->sendCustomRequest(request, "OPTIONS", query);
-//    if (reply->error() != QNetworkReply::NoError) {
-//        QMessageBox::warning(context->mainWindow, tr("CalDAV OPTIONS url error"), reply->errorString());
-//        mode = None;
-//        return false;
-//    }
-//    return true;
-//}
-
-//
-// Get URI Properties via PROPFIND
-//
-//bool
-//CalDAV::propfind()
-//{
-//    QString url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
-//    if (url == "") return false; // not configured
-
-//    QNetworkRequest request = QNetworkRequest(QUrl(url));
-
-
-//    QByteArray *queryText = new QByteArray( "<?xml version=\"1.0\" encoding=\"utf-8\" ?>"
-//                                            "<D:propfind xmlns:D=\"DAV:\""
-//                                            "                 xmlns:C=\"urn:ietf:params:xml:ns:caldav\">"
-//                                            "  <D:prop>"
-//                                            "    <D:displayname/>"
-//                                            "    <C:calendar-timezone/> "
-//                                            "    <C:supported-calendar-component-set/> "
-//                                            "  </D:prop>"
-//                                            "</D:propfind>\r\n");
-
-//    request.setRawHeader("Content-Type", "text/xml; charset=\"utf-8\"");
-//    request.setRawHeader("Content-Length", (QString("%1").arg(queryText->size())).toLatin1());
-//    request.setRawHeader("Depth", "0");
-
-//    QBuffer *query = new QBuffer(queryText);
-
-//    mode = PropFind;
-//    QNetworkReply *reply = nam->sendCustomRequest(request, "PROPFIND" , query);
-//    if (reply->error() != QNetworkReply::NoError) {
-//        QMessageBox::warning(context->mainWindow, tr("CalDAV OPTIONS url error"), reply->errorString());
-//        mode = None;
-//        return false;
-//    }
-//    return true;
-//}
-
-
-////
-//// REPORT of "all" VEVENTS
-////
-//bool
-//CalDAV::report()
-//{
-//    QString url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
-//    if (url == "") return false; // not configured
-
-//    QNetworkRequest request = QNetworkRequest(QUrl(url));
-//    QByteArray *queryText = new QByteArray("<x1:calendar-query xmlns:x1=\"urn:ietf:params:xml:ns:caldav\">"
-//                     "<x0:prop xmlns:x0=\"DAV:\">"
-//                     "<x0:getetag/>"
-//                     "<x1:calendar-data/>"
-//                     "</x0:prop>"
-//                     "<x1:filter>"
-//                     "<x1:comp-filter name=\"VCALENDAR\">"
-//                     "<x1:comp-filter name=\"VEVENT\">"
-//                     "<x1:time-range end=\"21001231\" start=\"20000101T000000Z\"/>"
-//                     "</x1:comp-filter>"
-//                     "</x1:comp-filter>"
-//                     "</x1:filter>"
-//                     "</x1:calendar-query>");
-
-//    QBuffer *query = new QBuffer(queryText);
-
-//    mode = Report;
-//    QNetworkReply *reply = nam->sendCustomRequest(request, "REPORT", query);
-//    if (reply->error() != QNetworkReply::NoError) {
-//        QMessageBox::warning(context->mainWindow, tr("CalDAV REPORT url error"), reply->errorString());
-//        mode = None;
-//        return false;
-//    }
-//    return true;
-//}
-
-// utility function to create a VCALENDAR from a single RideItem
-static
-icalcomponent *createEvent(RideItem *rideItem)
+static icalcomponent*
+createEvent
+(const CalDAV::CalEntry &calEntry)
 {
     // calendar
     icalcomponent *root = icalcomponent_new(ICAL_VCALENDAR_COMPONENT);
 
     // calendar version
+    icalproperty *prodid = icalproperty_new_prodid("-//GoldenCheetah//GoldenCheetah Calendar//EN");
+    icalcomponent_add_property(root, prodid);
+
     icalproperty *version = icalproperty_new_version("2.0");
     icalcomponent_add_property(root, version);
 
-
     icalcomponent *event = icalcomponent_new(ICAL_VEVENT_COMPONENT);
 
-    //
-    // Unique ID
-    //
-    QString id = rideItem->ride()->id();
-    if (id == "") {
-        id = QUuid::createUuid().toString() + "@" + "goldencheetah.org";
-        rideItem->ride()->setId(id);
-        rideItem->notifyRideMetadataChanged();
-        rideItem->setDirty(true); // need to save this!
-    }
-    icalproperty *uid = icalproperty_new_uid(id.toLatin1());
+    icalproperty *uid = icalproperty_new_uid(calEntry.getScopedId().toLatin1());
     icalcomponent_add_property(event, uid);
 
-    //
-    // START DATE
-    //
-    struct icaltimetype atime;
-    QDateTime utc = rideItem->dateTime.toUTC();
-    atime.year = utc.date().year();
-    atime.month = utc.date().month();
-    atime.day = utc.date().day();
-    atime.hour = utc.time().hour();
-    atime.minute = utc.time().minute();
-    atime.second = utc.time().second();
-    //atime.is_utc = 1; // this is UTC is_utc is redundant but kept for completeness
-    atime.is_date = 0; // this is a date AND time
-    atime.is_daylight = 0; // no daylight savings - its UTC
-    atime.zone = icaltimezone_get_utc_timezone(); // set UTC timezone
-    icalproperty *dtstart = icalproperty_new_dtstart(atime);
-    icalcomponent_add_property(event, dtstart);
+    // DTSTAMP is always a UTC DATE-TIME.
+    // It is NOT the event's start time.
+    const QDateTime nowUtc = QDateTime::currentDateTimeUtc();
 
-    //
-    // DURATION
-    //
+    struct icaltimetype stamp = icaltime_null_time();
+    stamp.year = nowUtc.date().year();
+    stamp.month = nowUtc.date().month();
+    stamp.day = nowUtc.date().day();
+    stamp.hour = nowUtc.time().hour();
+    stamp.minute = nowUtc.time().minute();
+    stamp.second = nowUtc.time().second();
+    stamp.is_date = 0;
+    stamp.is_daylight = 0;
+    stamp.zone = icaltimezone_get_utc_timezone();
 
-    // override values?
-    QMap<QString,QString> lookup;
-    lookup = rideItem->ride()->metricOverrides.value("workout_time");
-    int secs = lookup.value("value", "0.0").toDouble();
+    icalcomponent_add_property(event, icalproperty_new_dtstamp(stamp));
 
-    // from last - first timestamp?
-    if (!rideItem->ride()->dataPoints().isEmpty() && rideItem->ride()->dataPoints().last() != NULL) {
-        if (!secs) secs = rideItem->ride()->dataPoints().last()->secs;
+    if (calEntry.allDay) {
+        // ALL-DAY EVENT - Date only; DTEND is exclusive
+        const QDate startDate = calEntry.start.date();
+        const QDate endDate = calEntry.end.addDays(1).date();
+
+        struct icaltimetype start = icaltime_null_time();
+        start.year = startDate.year();
+        start.month = startDate.month();
+        start.day = startDate.day();
+        start.is_date = 1;
+        icalcomponent_add_property(event, icalproperty_new_dtstart(start));
+
+        struct icaltimetype end = icaltime_null_time();
+        end.year = endDate.year();
+        end.month = endDate.month();
+        end.day = endDate.day();
+        end.is_date = 1;
+        icalcomponent_add_property(event, icalproperty_new_dtend(end));
+    } else {
+        // TIMED EVENT - Store as UTC DATE-TIME values.
+        const QDateTime startUtc = calEntry.start.toUTC();
+        const QDateTime endUtc = calEntry.end.toUTC();
+
+        struct icaltimetype start = icaltime_null_time();
+        start.year = startUtc.date().year();
+        start.month = startUtc.date().month();
+        start.day = startUtc.date().day();
+        start.hour = startUtc.time().hour();
+        start.minute = startUtc.time().minute();
+        start.second = startUtc.time().second();
+        start.is_date = 0;
+        start.is_daylight = 0;
+        start.zone = icaltimezone_get_utc_timezone();
+        icalcomponent_add_property(event, icalproperty_new_dtstart(start));
+
+        struct icaltimetype end = icaltime_null_time();
+        end.year = endUtc.date().year();
+        end.month = endUtc.date().month();
+        end.day = endUtc.date().day();
+        end.hour = endUtc.time().hour();
+        end.minute = endUtc.time().minute();
+        end.second = endUtc.time().second();
+        end.is_date = 0;
+        end.is_daylight = 0;
+        end.zone = icaltimezone_get_utc_timezone();
+        icalcomponent_add_property(event, icalproperty_new_dtend(end));
     }
 
-    // ok, got secs so now create in vcard
-    struct icaldurationtype dur;
-    dur.is_neg = 0;
-    dur.days = dur.weeks = 0;
-    dur.hours = secs/3600;
-    dur.minutes = secs%3600/60;
-    dur.seconds = secs%60;
-    icalcomponent_set_duration(event, dur);
+    icalcomponent_set_summary(event, calEntry.title.toUtf8().constData());
+    icalcomponent_set_description(event, calEntry.description.toUtf8().constData());
 
-    // set title & description
-    QString title = rideItem->ride()->getTag("Title", ""); // *new* 'special' metadata field
-    if (title == "") title = rideItem->ride()->getTag("Sport", "") + " Workout";
-    icalcomponent_set_summary(event, title.toLatin1());
-
-    // set description using standard stuff
-    icalcomponent_set_description(event, rideItem->ride()->getTag("Calendar Text", "").toLatin1());
+    icalproperty *categories = icalproperty_new_categories("GC-PLANNED-WORKOUT");
+    icalcomponent_add_property(event, categories);
+    icalproperty *transp = icalproperty_new_transp(ICAL_TRANSP_OPAQUE);
+    icalcomponent_add_property(event, transp);
 
     // put the event into root
     icalcomponent_add_component(root, event);
     return root;
 }
 
-// utility function to create a VCALENDAR from a single SeasonEvent
-static
-icalcomponent *createEvent(SeasonEvent *seasonEvent)
+
+static QStringList
+extractResourceNames
+(const QString &document)
 {
-    // calendar
-    icalcomponent *root = icalcomponent_new(ICAL_VCALENDAR_COMPONENT);
+    QStringList names;
 
-    // calendar version
-    icalproperty *version = icalproperty_new_version("2.0");
-    icalcomponent_add_property(root, version);
-
-
-    icalcomponent *event = icalcomponent_new(ICAL_VEVENT_COMPONENT);
-
-    //
-    // Unique ID
-    //
-    QString id = seasonEvent->id;
-    if (id == "") {
-        id = QUuid::createUuid().toString() + "@" + "goldencheetah.org";
-        seasonEvent->id = id;
-    }
-    icalproperty *uid = icalproperty_new_uid(id.toLatin1());
-    icalcomponent_add_property(event, uid);
-
-    //
-    // START DATE
-    //
-    struct icaltimetype atime;
-    atime.year = seasonEvent->date.year();
-    atime.month = seasonEvent->date.month();
-    atime.day = seasonEvent->date.day();
-    atime.hour = 0;
-    atime.minute = 0;
-    atime.second = 0;
-    //atime.is_utc = 1; // this is UTC is_utc is redundant but kept for completeness
-    atime.is_date = 1; // this is a date
-    atime.is_daylight = 0; // no daylight savings - its UTC
-    atime.zone = icaltimezone_get_utc_timezone(); // set UTC timezone
-    icalproperty *dtstart = icalproperty_new_dtstart(atime);
-    icalcomponent_add_property(event, dtstart);
-
-    //
-    // PRIORITY
-    //
-    if (seasonEvent->priority > 0) {
-        icalproperty* priority = icalproperty_new_priority(seasonEvent->priority);
-        icalcomponent_add_property(event, priority);
-    }
-
-
-    // set title & description
-    icalcomponent_set_summary(event, seasonEvent->name.toLatin1());
-    icalcomponent_set_description(event, seasonEvent->description.toLatin1());
-
-    // put the event into root
-    icalcomponent_add_component(root, event);
-    return root;
-}
-
-// extract <calendar-data> entries and concatenate
-// into a single string. This is from a query response
-// where the VEVENTS are embedded within an XML document
-static QString extractComponents(QString document)
-{
-    QString returning = "";
-
-    // parse the document and extract the multistatus node (there is only one of those)
     QDomDocument doc;
-    if (document == "" || bool(doc.setContent(document)) == false) return "";
+    if (document.isEmpty() || ! doc.setContent(document)) {
+        return names;
+    }
+
     QDomNode multistatus = doc.documentElement();
-    if (multistatus.isNull())  return "";
-
-    // Google Calendar retains the namespace prefix in the results
-    // Apple MobileMe doesn't. This means the element names will
-    // possibly need a prefix...
-    // Google CalDav API V2 does not deliver C: but caldav: as a prefix
-    // so try both - just in case - to get the data
-
-    QString Dprefix = "";
-    QString Cprefix = "";
-    QString Cprefix_Google = "";
-    if (multistatus.nodeName().startsWith("D:")) {
-        Dprefix = "D:";
-        Cprefix = "C:";
-        Cprefix_Google = "caldav:";
+    if (multistatus.isNull()) {
+        return names;
     }
 
-    // read all the responses within the multistatus
-    for (QDomNode response = multistatus.firstChildElement(Dprefix + "response");
-         response.nodeName() == (Dprefix + "response"); response = response.nextSiblingElement(Dprefix + "response")) {
-
-        // skate over the nest of crap to get at the calendar-data
-        QDomNode propstat = response.firstChildElement(Dprefix + "propstat");
-        QDomNode prop = propstat.firstChildElement(Dprefix + "prop");
-        QDomNode calendardata = prop.firstChildElement(Cprefix + "calendar-data");
-        if (calendardata.isNull()) {
-            calendardata = prop.firstChildElement(Cprefix_Google + "calendar-data");
-        };
-
-        // extract the calendar entry - top and tail the other crap
-        QString text = calendardata.toElement().text();
-        int start = text.indexOf("BEGIN:VEVENT");
-        int stop = text.indexOf("END:VEVENT");
-
-        if (start == -1 || stop == -1) continue;
-
-        returning += text.mid(start, stop-start+10) + "\n";
+    QString prefix;
+    if (multistatus.nodeName().contains(":")) {
+        prefix = multistatus.nodeName().section(':', 0, 0) + ":";
     }
-    return returning;
+
+    for (QDomNode response = multistatus.firstChildElement(prefix + "response"); ! response.isNull() && response.nodeName() == (prefix + "response"); response = response.nextSiblingElement(prefix + "response")) {
+        QDomNode href = response.firstChildElement(prefix + "href");
+        if (href.isNull()) {
+            continue;
+        }
+
+        QString path = href.toElement().text();
+        QString name = path.section('/', -1, -1, QString::SectionSkipEmpty);
+        if (name.endsWith(".ics", Qt::CaseInsensitive)) {
+            name.chop(4);
+        }
+        if (! name.isEmpty()) {
+            names << name;
+        }
+    }
+
+    return names;
 }
 
-//
-// PUT a ride item
-//
 
 bool
-CalDAV::upload(RideItem *rideItem)
+CalDAV::upload
+(const CalEntry &calEntry)
 {
-    // is this a valid ride?
-    if (!rideItem || !rideItem->ride()) return false;
+    QString calId = calEntry.getScopedId();
+    if (calId.isEmpty()) {
+        emit uploadFinished(QString(), false, tr("Missing id"));
+        return false;
+    }
 
-    fileName = rideItem->fileName;
-    // create the ICal event
-    icalcomponent *vcard = createEvent(rideItem);
+    icalcomponent *vcard = createEvent(calEntry);
     QByteArray vcardtext(icalcomponent_as_ical_string(vcard));
     icalcomponent_free(vcard);
 
-    return upload(vcardtext);
+    return put(calId, vcardtext);
 }
 
-//
-// PUT a SeasonEvent
-//
 
 bool
-CalDAV::upload(SeasonEvent *seasonEvent)
+CalDAV::remove
+(const CalEntry &calEntry)
 {
-    fileName = seasonEvent->id;
-    // create the ICal event
-    icalcomponent *vcard = createEvent(seasonEvent);
-    QByteArray vcardtxt(icalcomponent_as_ical_string(vcard));
-    icalcomponent_free(vcard);
-
-    return upload(vcardtxt);
-}
-
-bool
-CalDAV::upload(QByteArray vcardtxt)
-{
-    if (!getConfig()) {
-        QMessageBox::warning(context->mainWindow, tr("Missing Preferences"), tr("CalID or CalDAV Url is missing in preferences"));
+    QString calId = calEntry.getScopedId();
+    if (calId.isEmpty()) {
         return false;
     }
-    mode = Put;
-    vcardtext = vcardtxt;
-    if (calDavType == Standard) {
-        return doUpload();
-    }
-    return true;
+    return remove(calId);
 }
 
 
 bool
-CalDAV::doUpload()
+CalDAV::put
+(QString id, QByteArray vcardtext)
 {
-    // if URL does not end with "/" - just  add it (for convenience)
-    if (!url.endsWith("/")) {
-        url += "/";
+    if (! isConfigured()) {
+        emit uploadFinished(id, false, tr("CalDAV URL, username or password is missing in preferences"));
+        return false;
     }
-    // lets upload to calendar
-    url += fileName;
-    url += ".ics";
 
-    // form the request
-    QNetworkRequest request = QNetworkRequest(QUrl(url));
-    request.setRawHeader("Content-Type", "text/calendar");
-    request.setRawHeader("Content-Length", "xxxx");
+    QNetworkRequest request = QNetworkRequest(QUrl(resourceUrl(id)));
+    request.setRawHeader("Content-Type", "text/calendar; charset=\"utf-8\"");
+    request.setRawHeader("Content-Length", QString::number(vcardtext.size()).toLatin1());
+    applyAuth(request);
 
-    mode = Put;
     QNetworkReply *reply = nam->put(request, vcardtext);
-    if (reply->error() != QNetworkReply::NoError) {
-        mode = None;
-        QMessageBox::warning(context->mainWindow, tr("CalDAV Calendar url error"), reply->errorString());
-        return false;
-    }
+    inFlight.insert(reply, { Op::Put, id });
     return true;
 }
 
-//
-// All queries/commands respond here
-//
-void
-CalDAV::requestReply(QNetworkReply *reply)
-{
-    QString response = reply->readAll();
 
-    if (reply->error() != QNetworkReply::NoError) {
-        if (!(mode == Events && ignoreDownloadErrors)) {
-            QMessageBox::warning(context->mainWindow, tr("CalDAV Calendar API reply error"), reply->errorString());
+bool
+CalDAV::remove
+(QString id)
+{
+    if (! isConfigured()) {
+        emit uploadFinished(id, false, tr("CalDAV URL, username or password is missing in preferences"));
+        return false;
+    }
+
+    QNetworkRequest request = QNetworkRequest(QUrl(resourceUrl(id)));
+    applyAuth(request);
+
+    QNetworkReply *reply = nam->deleteResource(request);
+    inFlight.insert(reply, { Op::Delete, id });
+    return true;
+}
+
+
+bool
+CalDAV::list()
+{
+    if (! isConfigured()) {
+        emit listFinished(QStringList(), false, tr("CalDAV URL, username or password is missing in preferences"));
+        return false;
+    }
+
+    QByteArray body = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>"
+                       "<D:propfind xmlns:D=\"DAV:\">"
+                       " <D:prop>"
+                       "   <D:getetag/>"
+                       " </D:prop>"
+                       "</D:propfind>\r\n";
+
+    QNetworkRequest request = QNetworkRequest(QUrl(collectionUrl()));
+    request.setRawHeader("Depth", "1");
+    request.setRawHeader("Content-Type", "application/xml; charset=\"utf-8\"");
+    request.setRawHeader("Content-Length", QString::number(body.size()).toLatin1());
+    applyAuth(request);
+
+    QNetworkReply *reply = nam->sendCustomRequest(request, "PROPFIND", body);
+    inFlight.insert(reply, { Op::List, QString() });
+    return true;
+}
+
+
+void
+CalDAV::requestReply
+(QNetworkReply *reply)
+{
+    RequestContext ctx = inFlight.take(reply);
+    QString response = QString::fromUtf8(reply->readAll());
+    bool ok = (reply->error() == QNetworkReply::NoError);
+    QString err = ok ? QString() : reply->errorString();
+
+    switch (ctx.op) {
+    case Op::Put:
+    case Op::Delete:
+        emit uploadFinished(ctx.id, ok, err);
+        break;
+    case Op::List:
+        if (ok) {
+            emit listFinished(extractResourceNames(response), true, QString());
+        } else {
+            emit listFinished(QStringList(), false, err);
         }
-        mode = None;
-        return; // silently
+        break;
     }
 
-    switch (mode) {
-    case Report:
-    case Events:
-        context->athlete->rideCalendar->refreshRemote(extractComponents(response));
-        mode = None;
-        break;
-    default:
-    case Options:
-    case PropFind:
-        //nothing at the moment
-        mode = None;
-        break;
-    case Put:
-        //refresh local calendar
-        mode = None;
-        download(false);
-        break;
-    }
+    reply->deleteLater();
 }
 
-//
-// Provide user credentials, called when receive a 401
-//
-void
-CalDAV::userpass(QNetworkReply*,QAuthenticator*a)
-{
-    QString user = appsettings->cvalue(context->athlete->cyclist, GC_DVUSER, "").toString();
-    QString pass = appsettings->cvalue(context->athlete->cyclist, GC_DVPASS, "").toString();
-    a->setUser(user);
-    a->setPassword(pass);
-}
 
-//
-// Trap SSL errors
-//
 void
-CalDAV::sslErrors(QNetworkReply* reply ,QList<QSslError> errors)
+CalDAV::sslErrors
+(QNetworkReply *reply, QList<QSslError> errors)
 {
-    if (!(mode == Events && ignoreDownloadErrors)) {
-        mode = None;
-        CloudService::sslErrors(context->mainWindow, reply, errors);
-    }
+    CloudService::sslErrors(context->mainWindow, reply, errors);
 }

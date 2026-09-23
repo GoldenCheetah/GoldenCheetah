@@ -699,7 +699,6 @@ GSettings::upgradeAthlete(QString athlete) {
     migrateCValue(athlete, GC_NAVHEADINGS);
     migrateCValue(athlete, GC_NAVGROUPBY);
     migrateCValue(athlete, GC_SORTBY);
-    migrateCValue(athlete, GC_WEBCAL_URL);
     migrateCValue(athlete, GC_USE_CP_FOR_FTP);
 
     migrateAndRenameCValue(athlete, "bavigator/headingwidths", GC_NAVHEADINGWIDTHS);
@@ -725,7 +724,6 @@ GSettings::upgradeAthlete(QString athlete) {
     migrateCValue(athlete, GC_DVURL);
     migrateCValue(athlete, GC_DVUSER);
     migrateCValue(athlete, GC_DVPASS);
-    migrateCValue(athlete, GC_DVCALDAVTYPE);
     migrateCValue(athlete, GC_STRAVA_TOKEN);
     migrateCValue(athlete, GC_CYCLINGANALYTICS_TOKEN);
 

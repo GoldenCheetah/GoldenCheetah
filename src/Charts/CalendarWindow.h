@@ -32,6 +32,7 @@
 #include "Season.h"
 #include "Calendar.h"
 #include "CalendarData.h"
+#include "CalendarSync.h"
 
 
 struct LinkEntry {
@@ -71,7 +72,7 @@ class LinkDialog : public QDialog
 };
 
 
-class CalendarWindow : public GcChartWindow
+class CalendarWindow : public GcChartWindow, public CloudCalendarLister
 {
     Q_OBJECT
 
@@ -115,6 +116,8 @@ class CalendarWindow : public GcChartWindow
         QString getTertiaryField() const;
         QString getSummaryMetrics() const;
         QStringList getSummaryMetricsList() const;
+
+        QList<CloudCalendarStatus> getCloudCalendarStatus() const override;
 
     public slots:
         void setDefaultView(int view);
@@ -170,6 +173,8 @@ class CalendarWindow : public GcChartWindow
         QList<CalendarSummary> getSummaries(const QDate &firstDay, const QDate &lastDay, int timeBucketSize = 7) const;
         QHash<QDate, QList<CalendarEntry>> getPhasesEvents(const Season &season, const QDate &firstDay, const QDate &lastDay) const;
         RideItem *getRideItem(const CalendarEntry &entry, bool linked = false);
+        Phase *getPhase(const CalendarEntry &entry, Season **season = nullptr, int *idx = nullptr) const;
+        SeasonEvent *getSeasonEvent(const CalendarEntry &entry, Season **season = nullptr, int *idx = nullptr) const;
         QString getPrimary(RideItem const * const rideItem) const;
         QTime findFreeSlot(RideItem *sourceItem, QDate newDate, QTime time);
         QTime findFreeSlot(QList<std::pair<QTime, int>> busySlots, QTime targetTime, int requiredDurationSeconds) const;

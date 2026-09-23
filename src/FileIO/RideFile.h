@@ -358,7 +358,8 @@ class RideFile : public QObject // QObject to emit signals
         const QString &fileFormat() const { return fileFormat_; }
         void setFileFormat(const QString &value) { fileFormat_ = value; }
         const QString id() const { return id_; }
-        void setId(const QString &value) { id_ = value; }
+
+        void setId(const QString &value);
 
         // Working with INTERVALS
         void addInterval(RideFileInterval::IntervalType type, double start, double stop, const QString &name, QColor color=Qt::black, bool test=false) {
@@ -468,7 +469,7 @@ class RideFile : public QObject // QObject to emit signals
 
     private:
 
-        QString id_; // global uuid@goldencheetah.org
+        QString id_;
         QDateTime startTime_;  // time of day that the ride started
         double recIntSecs_;    // recording interval in seconds
         QVector<RideFilePoint*> dataPoints_;

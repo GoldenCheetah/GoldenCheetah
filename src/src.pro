@@ -306,23 +306,24 @@ contains(DEFINES, "GC_WANT_R") {
 
 
 ###=================
-### OPTIONAL => ICAL
+### REQUIRED => ICAL
 ###=================
 
+# we will work out the rest if you tell us where it is installed
 !isEmpty(ICAL_INSTALL) {
-
-    # we will work out the rest if you tell use where it is installed
     isEmpty(ICAL_INCLUDE) { ICAL_INCLUDE = $${ICAL_INSTALL}/include }
     isEmpty(ICAL_LIBS)    { ICAL_LIBS    = -L$${ICAL_INSTALL}/lib -lical }
-
-    DEFINES     += GC_HAVE_ICAL
-    INCLUDEPATH += $${ICAL_INCLUDE}
-    LIBS        += $${ICAL_LIBS}
-
-    # add caldav and calendar functions
-    HEADERS     += Core/ICalendar.h Cloud/CalDAV.h Cloud/CalDAVCloud.h
-    SOURCES     += Core/ICalendar.cpp Cloud/CalDAV.cpp Cloud/CalDAVCloud.cpp
 }
+isEmpty(ICAL_INCLUDE) | isEmpty(ICAL_LIBS) {
+    error("libical is a mandatory dependency. Please set ICAL_INSTALL (or ICAL_INCLUDE and ICAL_LIBS) in gcconfig.pri.")
+}
+DEFINES     += GC_HAVE_ICAL
+INCLUDEPATH += $${ICAL_INCLUDE}
+LIBS        += $${ICAL_LIBS}
+
+# add caldav and calendar functions
+HEADERS     += Cloud/CalDAV.h Cloud/CalDAVCloud.h Cloud/CalDAVAuth.h Cloud/CalDAVDiscovery.h
+SOURCES     += Cloud/CalDAV.cpp Cloud/CalDAVCloud.cpp Cloud/CalDAVAuth.cpp Cloud/CalDAVDiscovery.cpp
 
 
 ###===================
@@ -587,7 +588,7 @@ HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPl
            Charts/TreeMapWindow.h Charts/ZoneScaleDraw.h Charts/CalendarWindow.h Charts/AgendaWindow.h Charts/PlanAdherenceWindow.h
 
 # cloud services
-HEADERS += Cloud/CalendarDownload.h Cloud/CloudService.h \
+HEADERS += Cloud/CloudService.h \
            Cloud/LocalFileStore.h Cloud/OAuthDialog.h \
            Cloud/WithingsDownload.h Cloud/Strava.h Cloud/CyclingAnalytics.h Cloud/RideWithGPS.h \
            Cloud/TrainingsTageBuch.h Cloud/Selfloops.h Cloud/SportsPlusHealth.h \
@@ -599,7 +600,7 @@ HEADERS += Core/Athlete.h Core/Context.h Core/DataFilter.h Core/FreeSearch.h Cor
            Core/IdleTimer.h Core/IntervalItem.h Core/NamedSearch.h Core/RideCache.h Core/RideCacheModel.h Core/RideDB.h \
            Core/RideItem.h Core/Route.h Core/RouteParser.h Core/Season.h Core/SeasonDialogs.h Core/Seasons.h Core/Secrets.h Core/Settings.h \
            Core/Specification.h Core/TimeUtils.h Core/Units.h Core/UserData.h Core/Utils.h \
-           Core/Measures.h Core/Quadtree.h Core/SplineLookup.h
+           Core/Measures.h Core/Quadtree.h Core/SplineLookup.h Core/CalendarSync.h
 
 # device and file IO or edit
 HEADERS += FileIO/ArchiveFile.h FileIO/AthleteBackup.h  FileIO/Bin2RideFile.h FileIO/BinRideFile.h \
@@ -631,7 +632,7 @@ HEADERS += Gui/AboutDialog.h Gui/AddIntervalDialog.h Gui/AnalysisSidebar.h Gui/C
            Gui/MetricOverrideDialog.h Gui/PlanWizards.h \
            Gui/Calendar.h Gui/Agenda.h Gui/CalendarData.h Gui/CalendarItemDelegates.h \
            Gui/PlanAdherence.h \
-           Gui/IconManager.h Gui/FilterSimilarDialog.h
+           Gui/IconManager.h Gui/FilterSimilarDialog.h Gui/CalendarSyncDialog.h
 
 # metrics and models
 HEADERS += Metrics/Banister.h Metrics/CPSolver.h Metrics/Estimator.h Metrics/ExtendedCriticalPower.h Metrics/HrZones.h Metrics/PaceZones.h \
@@ -699,7 +700,7 @@ SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts
            Charts/TreeMapWindow.cpp Charts/CalendarWindow.cpp Charts/AgendaWindow.cpp Charts/PlanAdherenceWindow.cpp
 
 ## Cloud Services / Web resources
-SOURCES += Cloud/CalendarDownload.cpp Cloud/CloudService.cpp \
+SOURCES += Cloud/CloudService.cpp \
            Cloud/LocalFileStore.cpp Cloud/OAuthDialog.cpp \
            Cloud/WithingsDownload.cpp Cloud/Strava.cpp Cloud/CyclingAnalytics.cpp Cloud/RideWithGPS.cpp \
            Cloud/TrainingsTageBuch.cpp Cloud/Selfloops.cpp Cloud/SportsPlusHealth.cpp \
@@ -711,7 +712,7 @@ SOURCES += Core/Athlete.cpp Core/Context.cpp Core/DataFilter.cpp Core/FreeSearch
            Core/IntervalItem.cpp Core/main.cpp Core/NamedSearch.cpp Core/RideCache.cpp Core/RideCacheModel.cpp Core/RideItem.cpp \
            Core/Route.cpp Core/RouteParser.cpp Core/Season.cpp Core/SeasonDialogs.cpp Core/Seasons.cpp Core/Settings.cpp Core/Specification.cpp \
            Core/TimeUtils.cpp Core/Units.cpp Core/UserData.cpp Core/Utils.cpp \
-           Core/Measures.cpp Core/Quadtree.cpp Core/SplineLookup.cpp
+           Core/Measures.cpp Core/Quadtree.cpp Core/SplineLookup.cpp Core/CalendarSync.cpp
 
 ## File and Device IO and Editing
 SOURCES += FileIO/ArchiveFile.cpp FileIO/AthleteBackup.cpp FileIO/Bin2RideFile.cpp FileIO/BinRideFile.cpp \
@@ -746,7 +747,7 @@ SOURCES += Gui/AboutDialog.cpp Gui/AddIntervalDialog.cpp Gui/AnalysisSidebar.cpp
            Gui/MetricOverrideDialog.cpp Gui/PlanWizards.cpp \
            Gui/Calendar.cpp Gui/Agenda.cpp Gui/CalendarData.cpp Gui/CalendarItemDelegates.cpp \
            Gui/PlanAdherence.cpp \
-           Gui/IconManager.cpp Gui/FilterSimilarDialog.cpp
+           Gui/IconManager.cpp Gui/FilterSimilarDialog.cpp Gui/CalendarSyncDialog.cpp
 
 ## Models and Metrics
 SOURCES += Metrics/aBikeScore.cpp Metrics/aCoggan.cpp Metrics/AerobicDecoupling.cpp Metrics/Banister.cpp Metrics/BasicRideMetrics.cpp \

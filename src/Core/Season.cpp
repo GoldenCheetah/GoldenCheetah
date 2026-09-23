@@ -25,6 +25,16 @@
 // SeasonEvent
 //
 
+SeasonEvent::SeasonEvent
+(QString name, QDate date, int priority, QString description, QString id)
+: name(name), date(date), priority(priority), description(description), id(id)
+{
+    if (this->id.isEmpty()) {
+        this->id = QUuid::createUuid().toString();
+    }
+}
+
+
 QStringList
 SeasonEvent::priorityList()
 {

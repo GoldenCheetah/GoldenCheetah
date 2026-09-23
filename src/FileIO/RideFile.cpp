@@ -33,6 +33,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QUuid>
 
 #include <QtXml/QtXml>
 #include <algorithm> // for std::lower_bound
@@ -71,6 +72,8 @@ RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
             data(NULL), wprime_(NULL),
             weight_(0), totalCount(0), totalTemp(0), dstale(true)
 {
+    id_ = QUuid::createUuid().toString();
+
     command = new RideFileCommand(this);
 
     minPoint = new RideFilePoint();
@@ -94,6 +97,7 @@ RideFile::RideFile(RideFile *p) :
     intervals_ = p->intervals_;
     calibrations_ = p->calibrations_;
     context = p->context;
+    id_ = QUuid::createUuid().toString();
 
     command = new RideFileCommand(this);
     minPoint = new RideFilePoint();
@@ -107,6 +111,8 @@ RideFile::RideFile() :
     wstale(true), recIntSecs_(0.0), data(NULL), wprime_(NULL),
     weight_(0), totalCount(0), totalTemp(0), dstale(true)
 {
+    id_ = QUuid::createUuid().toString();
+
     command = new RideFileCommand(this);
 
     minPoint = new RideFilePoint();
@@ -140,6 +146,12 @@ RideFile::~RideFile()
 
 void RideFile::setStartTime(const QDateTime &value) {
     startTime_ = value;
+}
+
+void
+RideFile::setId(const QString &value)
+{
+    id_ = value;
 }
 
 unsigned int

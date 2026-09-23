@@ -13,9 +13,11 @@ class TestSeasonParser: public QObject
 private slots:
     void readSeasons() {
         QFile file("seasons.xml");
-        QList<Season> seasons = SeasonParser::readSeasons(&file);
+        bool idEnriched = false;
+        QList<Season> seasons = SeasonParser::readSeasons(&file, &idEnriched);
 
         QCOMPARE(seasons.size(), 5);
+        QCOMPARE(idEnriched, true);
 
         int sx = 0;
 
@@ -95,7 +97,7 @@ private slots:
         QCOMPARE(seasons[sx].events[0].date, QDate(2024, 10, 19));
         QCOMPARE(seasons[sx].events[0].priority, 1);
         QCOMPARE(seasons[sx].events[0].description, "Description");
-        QCOMPARE(seasons[sx].events[0].id, "");
+        QCOMPARE_NE(seasons[sx].events[0].id, "");
         QCOMPARE(seasons[sx].phases.size(), 5);
         QCOMPARE(seasons[sx].phases[0].getName(), "Phase");
         QCOMPARE(seasons[sx].phases[0].getAbsoluteStart(), QDate(2024, 1, 25));
