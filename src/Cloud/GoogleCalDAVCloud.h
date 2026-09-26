@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Mark Liversedge (liversedge@gmail.com)
+ * Copyright (c) 2026 Joachim Kohlhammer (joachim.kohlhammer@gmx.de)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -16,37 +16,30 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-
-#ifndef GC_CalDAVCloud_h
-#define GC_CalDAVCloud_h
+#ifndef GC_GoogleCalDAVCloud_h
+#define GC_GoogleCalDAVCloud_h
 
 #include "CloudService.h"
 
-class QNetworkReply;
-class QNetworkAccessManager;
-
-class CalDAVCloud : public CloudService {
-
+class GoogleCalDAVCloud : public CloudService {
     Q_OBJECT
 
     public:
+        GoogleCalDAVCloud(Context *context);
+        ~GoogleCalDAVCloud();
 
-        int type() const { return CloudService::Calendar; }
+        CloudService *clone(Context *context);
 
-        int capabilities() const { return UserPass; }
-
-        QString id() const { return "CalDAV Calendar"; }
-        QString uiName() const { return "CalDAV Calendar"; }
-        QString description() const { return tr("Generic CalDAV Calendar such as Nextcloud or Apple iCloud"); }
+        int type() const;
+        int capabilities() const;
+        QString id() const;
+        QString uiName() const;
+        QString description() const;
 
         QImage logo() const;
 
-        CalDAVCloud(Context *context);
-        CloudService *clone(Context *context) { return new CalDAVCloud(context); }
-        ~CalDAVCloud();
-
     private:
         Context *context;
-
 };
+
 #endif

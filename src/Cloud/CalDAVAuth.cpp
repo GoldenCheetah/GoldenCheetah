@@ -18,6 +18,11 @@
 
 #include "CalDAVAuth.h"
 
+#include "OAuthPKCE.h"
+#include "Context.h"
+#include "Secrets.h"
+
+#include <QDateTime>
 
 QString
 CalDAVAuth::setting
@@ -42,12 +47,65 @@ CalDAVAuth::collectionUrl
 }
 
 
+static bool
+refreshOAuthAccessToken
+(CloudService *cloudService, Context *context, QString *errorOut)
+{
+    static const QString tokenUrl = "https://oauth2.googleapis.com/token";
+    static const QString clientId = GC_GOOGLECAL_CLIENT_ID;
+    static const QString clientSecret = GC_GOOGLECAL_CLIENT_SECRET;
+
+    QString refreshToken = CalDAVAuth::setting(cloudService, CloudService::Local3);
+    if (refreshToken.isEmpty()) {
+        if (errorOut) {
+            *errorOut = QObject::tr("Not signed in - use Authorise to sign in to Google Calendar");
+        }
+        return false;
+    }
+
+    QString newAccess, newRefresh, error;
+    int expiresIn = 0;
+    if (! OAuthPKCE::refreshAccessToken(tokenUrl, clientId, refreshToken, newAccess, newRefresh, expiresIn, error, clientSecret)) {
+        if (errorOut) {
+            *errorOut = error;
+        }
+        return false;
+    }
+
+    QString accessKey = cloudService->settings.value(CloudService::OAuthToken, "");
+    QString refreshKey = cloudService->settings.value(CloudService::Local3, "");
+    QString lastRefreshKey = cloudService->settings.value(CloudService::Local4, "");
+
+    if (! accessKey.isEmpty() && ! newAccess.isEmpty()) {
+        cloudService->setSetting(accessKey, newAccess);
+    }
+    if (! refreshKey.isEmpty() && ! newRefresh.isEmpty()) {
+        cloudService->setSetting(refreshKey, newRefresh);
+    }
+    if (! lastRefreshKey.isEmpty()) {
+        cloudService->setSetting(lastRefreshKey, QDateTime::currentDateTime());
+    }
+
+    if (context) {
+        CloudServiceFactory::instance().saveSettings(cloudService, context);
+    }
+
+    return true;
+}
+
+
 bool
 CalDAVAuth::isConfigured
-(CloudService *cloudService)
+(CloudService *cloudService, Context *context)
 {
     if (! cloudService) {
         return false;
+    }
+
+    if (cloudService->capabilities() & CloudService::OAuth) {
+        bool ok = refreshOAuthAccessToken(cloudService, context, nullptr);
+        QString calendarUrl = setting(cloudService, CloudService::Local1);
+        return ok && ! calendarUrl.isEmpty();
     }
 
     QString url = setting(cloudService, CloudService::Local1);
@@ -65,6 +123,15 @@ CalDAVAuth::applyAuth
 (CloudService *cloudService, QNetworkRequest &request)
 {
     if (! cloudService) {
+        return;
+    }
+
+    if (cloudService->capabilities() & CloudService::OAuth) {
+        QString accessToken = setting(cloudService, CloudService::OAuthToken);
+        if (accessToken.isEmpty()) {
+            return;
+        }
+        request.setRawHeader("Authorization", ("Bearer " + accessToken).toUtf8());
         return;
     }
 

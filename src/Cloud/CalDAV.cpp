@@ -104,7 +104,7 @@ bool
 CalDAV::isConfigured
 () const
 {
-    return CalDAVAuth::isConfigured(cloudService);
+    return CalDAVAuth::isConfigured(cloudService, context);
 }
 
 

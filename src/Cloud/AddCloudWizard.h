@@ -45,6 +45,8 @@ public:
     AddCloudWizard(Context *context, QString sname="", bool sync=false);
     QSize sizeHint() const { return QSize(600,650); }
 
+    void reject() override;
+
     Context *context;
     bool done; // have we finished?
 
