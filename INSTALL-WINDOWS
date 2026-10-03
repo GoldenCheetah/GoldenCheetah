@@ -5,7 +5,7 @@
                                      Joern Rischmueller
                                         Ale Martinez
 
-                                       September 2026
+                                       October 2026
 
 
 This instruction will guide  you through a standard build of GoldenCheetah (without external
@@ -65,6 +65,10 @@ You need:
   -- Install the vcpkg from https://vcpkg.io and use it to install gsl
      >vcpkg install gsl
 
+- Mandatory ICAL library
+  -- Use vcpkg to install libical
+     >vcpkg install libical
+
 Building from command line without additional dependencies:
 
 For this build, I am installing all source code,... into the directory: c:\coding
@@ -89,6 +93,14 @@ For this build, I am installing all source code,... into the directory: c:\codin
      New
      GSL_INCLUDES = c:\vcpkg\installed\x64-windows\include
      GSL_LIBS = -LC:\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas
+
+     Default
+     #ICAL_INSTALL =
+     #ICAL_INCLUDE =
+     #ICAL_LIBS    =
+     New
+     ICAL_INSTALL = c:\vcpkg\installed\x64-windows
+     ICAL_LIBS = -LC:\vcpkg\installed\x64-windows\lib -llibical
 
      Default                                        New
      #DEFINES += NOMINMAX                           DEFINES += NOMINMAX

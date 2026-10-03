@@ -49,7 +49,7 @@
 # ICAL_INCLUDE = $${ICAL_INSTALL}/include
 # ICAL_LIBS    = $${ICAL_INSTALL}/lib/libical.a
 # You may override the INCLUDE and LIB files if you like.
-# You *must* define ICAL_INSTALL to use this feature.
+# You *must* define ICAL_INSTALL since it is a mandatory dependency from v3.9
 ###############################################################################
 #
 #ICAL_INSTALL = 

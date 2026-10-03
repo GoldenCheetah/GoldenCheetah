@@ -6,8 +6,8 @@
                                      John Ehrlinger
                                      Ale Martinez
 
-                                        Mar 2025
-                                      Version 3.7
+                                        Oct 2026
+                                      Version 3.9
 
 A walkthrough of building GoldenCheetah from scratch on Ubuntu linux 22.04
 This walkthrough should be largely the same for any Debian derivative Linux
@@ -22,13 +22,13 @@ CONTENTS
    - QT
    - OpenGL
    - gsl
+   - libical
 
 2. ADDING OPTIONAL DEPENDENCIES
    - FTDI D2XX
    - SRMIO
    - liboauth
    - Qt6 Video  - Video playback in training mode
-   - libical - Diary window and CalDAV support (external calendar integration)
    - libusb  - If you want support for using USB2 sticks in Train View
    - R       - If you want R charts
    - Python  - If you want Python charts, scripts and data processors
@@ -72,6 +72,10 @@ Install GSL development libraries
 ---------------------------------
 sudo apt-get -qq install libgsl-dev
 
+Install ICAL library for CalDAV Calendar sync
+---------------------------------------------
+sudo apt-get -qq install libical-dev
+
 Get latest GOLDEN CHEETAH source files
 --------------------------------------
 $ mkdir -p ~/Projects
@@ -101,6 +105,11 @@ Uncomment below and configure the location of the GNU scientific library, this i
 
 #GSL_INCLUDES = /usr/include
 #GSL_LIBS = -lgsl -lgslcblas -lm
+
+Configure libical, this is a mandatory dependency.
+ICAL_INSTALL = /usr
+ICAL_INCLUDE = /usr/include
+ICAL_LIBS    = -lical
 
 Uncomment the following lines to use flex and bison:
 
@@ -213,24 +222,6 @@ $ qmake
 $ make
 
 You now have SRM support built in.
-
-LIBICAL - Diary integration with Google or MobileMe calendars
--------------------------------------------------------------
-
-$ sudo apt-get install libical-dev
-
-$ cd ~/Projects/GoldenCheetah/src
-$ vi gcconfig.pri
-
-ICAL_INSTALL = /usr
-ICAL_INCLUDE = /usr/include
-ICAL_LIBS    = -lical
-
-$ make clean
-$ qmake
-$ make
-
-You should now have diary functions.
 
 Qt6 Video - Video playback in Realtime
 --------------------------------------
