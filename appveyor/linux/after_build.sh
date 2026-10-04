@@ -2,7 +2,7 @@
 set -ev
 
 # Python version configuration - update this when upgrading Python
-PYTHON_APPIMAGE_VERSION="3.11.16"
+PYTHON_APPIMAGE_VERSION="3.11.17"
 
 ### This script should be run from GoldenCheetah src directory after build
 cd src
