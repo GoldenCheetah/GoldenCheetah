@@ -187,7 +187,12 @@ AbstractView::setSidebar(QWidget *sidebar)
         // if the sidebar widget is already attached to another view's splitter,
         // it is moved to the new position within this view's splitter
         splitter->insertWidget(0, sidebar);
-    } 
+
+        // a shared sidebar (see LTMSidebar) is kept hidden while it isn't
+        // embedded anywhere; make sure it is actually shown now that it is
+        // properly parented into this view's splitter
+        sidebar->show();
+    }
 
     configChanged(CONFIG_APPEARANCE);
 }

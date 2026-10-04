@@ -256,6 +256,15 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 
     // setup colors
     configChanged(CONFIG_APPEARANCE);
+
+    // This sidebar is shared between TrendsView and PlanView (see LTMSidebarView)
+    // and is only reparented into the current view's splitter when that view's
+    // showEvent() calls setSidebar() -- see AbstractView::setSidebar(). Until
+    // then it is just a bare child of MainWindow, not managed by any layout, so
+    // if the application happens to start on a different view (e.g. Analysis)
+    // it would otherwise render as a stray overlapping widget at (0,0), on top
+    // of the menu bar. Keep it hidden until setSidebar() embeds and shows it.
+    hide();
 }
 
 void
