@@ -8,6 +8,7 @@ equals(GC_UNITTESTS, active) {
 	SUBDIRS += Core/seasonOffset \
 			   Core/season \
 			   Core/seasonParser \
+			   Core/phaseMesocycle \
 			   Core/units \
 			   Core/utils \
 			   Core/signalSafety \

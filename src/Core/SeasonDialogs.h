@@ -84,6 +84,7 @@ class EditSeasonDialog : public QDialog
 
         QDoubleSpinBox *seedEdit;
         QDoubleSpinBox *lowEdit;
+        QTextEdit *descriptionEdit;
 
         QLabel *statusLabel;
         QLabel *warningLabel;
@@ -115,6 +116,9 @@ class EditSeasonEventDialog : public QDialog
         QLineEdit *nameEdit;
         QDateEdit *dateEdit;
         QComboBox *priorityEdit;
+        QSpinBox *targetLTSEdit;
+        QSpinBox *targetCPEdit;
+        QSpinBox *targetFTPEdit;
         QTextEdit *descriptionEdit;
 };
 
@@ -141,6 +145,7 @@ class EditPhaseDialog : public QDialog
         QDateEdit *fromEdit, *toEdit;
         QDoubleSpinBox *seedEdit;
         QDoubleSpinBox *lowEdit;
+        QTextEdit *descriptionEdit;
 };
 
 

@@ -26,8 +26,8 @@
 //
 
 SeasonEvent::SeasonEvent
-(QString name, QDate date, int priority, QString description, QString id)
-: name(name), date(date), priority(priority), description(description), id(id)
+(QString name, QDate date, int priority, QString description, QString id, int targetLTS, int targetCP, int targetFTP)
+: name(name), date(date), priority(priority), description(description), id(id), targetLTS(targetLTS), targetCP(targetCP), targetFTP(targetFTP)
 {
     if (this->id.isEmpty()) {
         this->id = QUuid::createUuid().toString();
@@ -358,6 +358,39 @@ int Season::getType() const
 }
 
 
+bool Season::isMacrocycle() const
+{
+    QList<Phase>::const_iterator it = std::find_if(phases.cbegin(), phases.cend(), [](const Phase &phase) {
+        return phase.getType() == Phase::mesocycle;
+    });
+    return isAbsolute() && it != phases.cend();
+}
+
+
+void Season::setModelType(Season::ModelType modeltype)
+{
+    _model = modeltype;
+}
+
+
+Season::ModelType Season::getModelType() const
+{
+    return _model;
+}
+
+
+void Season::setFirstDayOfWeek(Qt::DayOfWeek dow)
+{
+    _firstDayOfWeek = dow;
+}
+
+
+Qt::DayOfWeek Season::getFirstDayOfWeek() const
+{
+    return _firstDayOfWeek;
+}
+
+
 void Season::setAbsoluteStart(QDate start)
 {
     _offsetStart = SeasonOffset();
@@ -530,6 +563,889 @@ bool Season::LessThanForStarts(const Season &a, const Season &b)
 
 
 //////////////////////////////////////////////////////////////
+// Mesocycle
+
+Microcycle::Microcycle
+(int freq, int load, float intensity, int time, const QString &description)
+{
+    setFrequency(freq);
+    setLoad(load);
+    setIntensity(intensity);
+    setTime(time);
+    setDescription(description);
+}
+
+bool
+Microcycle::setFrequency
+(int freq)
+{
+    if (freq < 0) {
+        return false;
+    }
+    this->freq = freq;
+    return true;
+}
+
+
+int
+Microcycle::getFrequency
+() const
+{
+    return freq;
+}
+
+
+bool
+Microcycle::setLoad
+(int load)
+{
+    if (load < 0) {
+        return false;
+    }
+    this->load = load;
+    return true;
+}
+
+
+int
+Microcycle::getLoad
+() const
+{
+    return load;
+}
+
+
+bool
+Microcycle::setIntensity
+(float intensity)
+{
+    if (intensity < 0.0f) {
+        return false;
+    }
+    this->intensity = intensity;
+    return true;
+}
+
+
+float
+Microcycle::getIntensity
+() const
+{
+    return intensity;
+}
+
+
+bool
+Microcycle::setTime
+(int time)
+{
+    if (time < 0) {
+        return false;
+    }
+    this->time = time;
+    return true;
+}
+
+
+int
+Microcycle::getTime
+() const
+{
+    return time;
+}
+
+
+void
+Microcycle::setDescription
+(const QString &description)
+{
+    this->desc = description;
+}
+
+
+QString
+Microcycle::getDescription
+() const
+{
+    return desc;
+}
+
+
+//////////////////////////////////////////////////////////////
+// Slot
+
+
+QString
+Slot::statusToString
+(Slot::StatusType status)
+{
+    switch (status) {
+        case StatusType::generated:
+            return QStringLiteral("generated");
+        case StatusType::adjusted:
+            return QStringLiteral("adjusted");
+        default:
+            return QStringLiteral("generated");
+    }
+}
+
+
+Slot::StatusType
+Slot::stringToStatus
+(const QString &str)
+{
+    if (str == QStringLiteral("generated")) {
+        return StatusType::generated;
+    } else if (str == QStringLiteral("adjusted")) {
+        return StatusType::adjusted;
+    }
+    return StatusType::generated;
+}
+
+
+Slot::Slot
+(int dayOffset, const QString &sport, const StatusType status, int load, float intensity, int time, const QString &description)
+{
+    setDayOffset(dayOffset);
+    setSport(sport);
+    setStatus(status);
+    setLoad(load);
+    setIntensity(intensity);
+    setTime(time);
+    setDescription(description);
+}
+
+
+bool
+Slot::setDayOffset
+(int offset)
+{
+    if (offset < 0) {
+        return false;
+    }
+    this->dayOffset = offset;
+    return true;
+
+}
+
+
+int
+Slot::getDayOffset
+() const
+{
+    return dayOffset;
+}
+
+
+bool
+Slot::setSport
+(const QString &sport)
+{
+    this->sport = sport;
+    return true;
+}
+
+
+QString
+Slot::getSport
+() const
+{
+    return sport;
+}
+
+
+bool
+Slot::setStatus
+(const Slot::StatusType &status)
+{
+    this->status = status;
+    return true;
+}
+
+
+Slot::StatusType
+Slot::getStatus
+() const
+{
+    return status;
+}
+
+
+bool
+Slot::setLoad
+(int load)
+{
+    if (load < 0) {
+        return false;
+    }
+    this->load = load;
+    return true;
+}
+
+
+int
+Slot::getLoad
+() const
+{
+    return load;
+}
+
+
+bool
+Slot::hasLoad
+() const
+{
+    return load > 0;
+}
+
+bool
+Slot::setIntensity
+(float intensity)
+{
+    if (intensity < 0) {
+        return false;
+    }
+    this->intensity = intensity;
+    return true;
+}
+
+
+float
+Slot::getIntensity
+() const
+{
+    return intensity;
+}
+
+
+bool
+Slot::hasIntensity
+() const
+{
+    return intensity > 0.0f;
+}
+
+
+bool
+Slot::setTime
+(int time)
+{
+    if (time < 0) {
+        return false;
+    }
+    this->time = time;
+    return true;
+}
+
+
+int
+Slot::getTime
+() const
+{
+    return time;
+}
+
+
+bool
+Slot::hasTime
+() const
+{
+    return time > 0;
+}
+
+
+bool
+Slot::setDescription
+(const QString &description)
+{
+    this->description = description;
+    return true;
+}
+
+
+QString
+Slot::getDescription
+() const
+{
+    return description;
+}
+
+
+bool
+Slot::hasDescription
+() const
+{
+    return ! description.isEmpty();
+}
+
+
+const QVarLengthArray<QString, 1>&
+Slot::getActivities
+() const
+{
+    return activityIds;
+}
+
+
+bool
+Slot::hasActivity
+(const QString &id) const
+{
+    return activityIds.contains(id);
+}
+
+
+void
+Slot::addActivity
+(const QString &id)
+{
+    if (! id.isEmpty() && ! activityIds.contains(id)) {
+        activityIds.append(id);
+    }
+}
+
+
+void
+Slot::setActivities
+(const QStringList &ids)
+{
+    activityIds.clear();
+    for (const QString &id : ids) {
+        activityIds.append(id);
+    }
+}
+
+
+bool
+Slot::removeActivity
+(const QString &id)
+{
+    return activityIds.removeOne(id);
+}
+
+
+void
+Slot::clearActivities
+()
+{
+    activityIds.clear();
+}
+
+
+//////////////////////////////////////////////////////////////
+// Mesocycle
+
+bool
+Mesocycle::setStart
+(const QDate &date)
+{
+    if (date.isValid()) {
+        start = date;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+void
+Mesocycle::setTargetLTS
+(int targetLTS)
+{
+    this->targetLTS = std::max(0, targetLTS);
+}
+
+
+int
+Mesocycle::getTargetLTS
+() const
+{
+    return targetLTS;
+}
+
+
+void
+Mesocycle::setTargetCP
+(int targetCP)
+{
+    this->targetCP = std::max(0, targetCP);
+}
+
+
+int
+Mesocycle::getTargetCP
+() const
+{
+    return targetCP;
+}
+
+
+void
+Mesocycle::setTargetFTP
+(int targetFTP)
+{
+    this->targetFTP = std::max(0, targetFTP);
+}
+
+
+int
+Mesocycle::getTargetFTP
+() const {
+    return targetFTP;
+}
+
+
+int
+Mesocycle::toMicrocycle
+(const QDate &date) const
+{
+    return toMicrocycle(start.daysTo(date));
+}
+
+
+int
+Mesocycle::toMicrocycle
+(int offset) const
+{
+    int maxIndex = getMaxMicrocycles() - 1;
+    if (maxIndex < 0) {
+        return 0;
+    }
+    return std::clamp(offset / 7, 0, maxIndex);
+}
+
+
+bool
+Mesocycle::setMaxMicrocycles
+(int maxMicrocycles)
+{
+    if (maxMicrocycles > 0) {
+        this->maxMicrocycles = maxMicrocycles;
+        microcycles.erase(microcycles.upperBound(maxMicrocycles - 1), microcycles.end());
+        const int maxOffset = maxMicrocycles * 7;
+        slots_.removeIf([maxOffset](const Slot &slot) {
+            return slot.getDayOffset() >= maxOffset;
+        });
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+int
+Mesocycle::getMaxMicrocycles
+() const
+{
+    return maxMicrocycles;
+}
+
+
+bool
+Mesocycle::hasMicrocycle
+(int microcycle) const
+{
+    return microcycle >= 0 && microcycle < getMaxMicrocycles();
+}
+
+
+Microcycle*
+Mesocycle::getMicrocycle
+(int microcycle)
+{
+    if (hasMicrocycle(microcycle)) {
+        return &microcycles[microcycle];
+    }
+    return nullptr;
+}
+
+
+Microcycle const*
+Mesocycle::getMicrocycle
+(int microcycle) const
+{
+    if (! hasMicrocycle(microcycle)) {
+        return nullptr;
+    }
+    QMap<int, Microcycle>::const_iterator it = microcycles.constFind(microcycle);
+    if (it != microcycles.constEnd()) {
+        return &it.value();
+    }
+    return &dummyMicrocycle;
+}
+
+
+int
+Mesocycle::getMicrocyclesFrequency
+() const
+{
+    return std::accumulate(microcycles.cbegin(), microcycles.cend(), 0, [](int total, const Microcycle &microcycle) {
+        return total + microcycle.getFrequency();
+    });
+}
+
+
+int
+Mesocycle::getMicrocyclesLoad
+() const
+{
+    return std::accumulate(microcycles.cbegin(), microcycles.cend(), 0, [](int total, const Microcycle &microcycle) {
+        return total + microcycle.getLoad();
+    });
+}
+
+
+float
+Mesocycle::getMicrocyclesIntensity
+() const
+{
+    float weightedSum = 0.0f;
+    float totalLoad = 0.0f;
+    for (const Microcycle &microcycle : microcycles) {
+        weightedSum += microcycle.getIntensity() * microcycle.getLoad();
+        totalLoad += microcycle.getLoad();
+    }
+    return totalLoad > 0.0f ? weightedSum / totalLoad : 0.0f;
+}
+
+
+int
+Mesocycle::getMicrocyclesTime
+() const
+{
+    return std::accumulate(microcycles.cbegin(), microcycles.cend(), 0, [](int total, const Microcycle &microcycle) {
+        return total + microcycle.getTime();
+    });
+}
+
+
+int
+Mesocycle::getSlottedFrequency
+() const
+{
+    return slots_.count();
+}
+
+
+int
+Mesocycle::getSlottedFrequency
+(const QString &sport) const
+{
+    return std::count_if(slots_.cbegin(), slots_.cend(), [sport](const Slot &slot) {
+        return sport == slot.getSport();
+    });
+}
+
+
+int
+Mesocycle::getSlottedFrequency
+(int microcycle) const
+{
+    return std::count_if(slots_.cbegin(), slots_.cend(), [this, microcycle](const Slot &slot) {
+        return microcycle == toMicrocycle(slot.getDayOffset());
+    });
+}
+
+
+int
+Mesocycle::getSlottedFrequency
+(int microcycle, const QString &sport) const
+{
+    return std::count_if(slots_.cbegin(), slots_.cend(), [this, microcycle, sport](const Slot &slot) {
+        return microcycle == toMicrocycle(slot.getDayOffset()) && sport == slot.getSport();
+    });
+}
+
+
+int
+Mesocycle::getSlottedLoad
+() const
+{
+    return std::accumulate(slots_.cbegin(), slots_.cend(), 0, [](int total, const Slot &slot) {
+        return total + slot.getLoad();
+    });
+}
+
+
+int
+Mesocycle::getSlottedLoad
+(const QString &sport) const
+{
+    return std::accumulate(slots_.cbegin(), slots_.cend(), 0, [sport](int total, const Slot &slot) {
+        return sport == slot.getSport() ? total + slot.getLoad() : total;
+    });
+}
+
+
+int
+Mesocycle::getSlottedLoad
+(int microcycle) const
+{
+    return std::accumulate(slots_.cbegin(), slots_.cend(), 0, [this, microcycle](int total, const Slot &slot) {
+        return microcycle == toMicrocycle(slot.getDayOffset()) ? total + slot.getLoad() : total;
+    });
+}
+
+
+int
+Mesocycle::getSlottedLoad
+(int microcycle, const QString &sport) const
+{
+    return std::accumulate(slots_.cbegin(), slots_.cend(), 0, [this, microcycle, sport](int total, const Slot &slot) {
+        return microcycle == toMicrocycle(slot.getDayOffset()) && sport == slot.getSport() ? total + slot.getLoad() : total;
+    });
+}
+
+
+float
+Mesocycle::getSlottedIntensity
+() const
+{
+    float weightedSum = 0.0f;
+    float totalLoad = 0.0f;
+    for (const Slot &slot : slots_) {
+        weightedSum += slot.getIntensity() * slot.getLoad();
+        totalLoad += slot.getLoad();
+    }
+    return totalLoad > 0.0f ? weightedSum / totalLoad : 0.0f;
+}
+
+
+float
+Mesocycle::getSlottedIntensity
+(const QString &sport) const
+{
+    float weightedSum = 0.0f;
+    float totalLoad = 0.0f;
+    for (const Slot &slot : slots_) {
+        if (sport == slot.getSport()) {
+            weightedSum += slot.getIntensity() * slot.getLoad();
+            totalLoad += slot.getLoad();
+        }
+    }
+    return totalLoad > 0.0f ? weightedSum / totalLoad : 0.0f;
+}
+
+
+float
+Mesocycle::getSlottedIntensity
+(int microcycle) const
+{
+    float weightedSum = 0.0f;
+    float totalLoad = 0.0f;
+    for (const Slot &slot : slots_) {
+        if (microcycle == toMicrocycle(slot.getDayOffset())) {
+            weightedSum += slot.getIntensity() * slot.getLoad();
+            totalLoad += slot.getLoad();
+        }
+    }
+    return totalLoad > 0.0f ? weightedSum / totalLoad : 0.0f;
+}
+
+
+float
+Mesocycle::getSlottedIntensity
+(int microcycle, const QString &sport) const
+{
+    float weightedSum = 0.0f;
+    float totalLoad = 0.0f;
+    for (const Slot &slot : slots_) {
+        if (microcycle == toMicrocycle(slot.getDayOffset()) && sport == slot.getSport()) {
+            weightedSum += slot.getIntensity() * slot.getLoad();
+            totalLoad += slot.getLoad();
+        }
+    }
+    return totalLoad > 0.0f ? weightedSum / totalLoad : 0.0f;
+}
+
+
+int
+Mesocycle::getSlottedTime
+() const
+{
+    return std::accumulate(slots_.cbegin(), slots_.cend(), 0, [](int total, const Slot &slot) {
+        return total + slot.getTime();
+    });
+}
+
+
+int
+Mesocycle::getSlottedTime
+(const QString &sport) const
+{
+    return std::accumulate(slots_.cbegin(), slots_.cend(), 0, [sport](int total, const Slot &slot) {
+        return sport == slot.getSport() ? total + slot.getTime() : total;
+    });
+}
+
+
+int
+Mesocycle::getSlottedTime
+(int microcycle) const
+{
+    return std::accumulate(slots_.cbegin(), slots_.cend(), 0, [this, microcycle](int total, const Slot &slot) {
+        return microcycle == toMicrocycle(slot.getDayOffset()) ? total + slot.getTime() : total;
+    });
+}
+
+
+int
+Mesocycle::getSlottedTime
+(int microcycle, const QString &sport) const
+{
+    return std::accumulate(slots_.cbegin(), slots_.cend(), 0, [this, microcycle, sport](int total, const Slot &slot) {
+        return microcycle == toMicrocycle(slot.getDayOffset()) && sport == slot.getSport() ? total + slot.getTime() : total;
+    });
+}
+
+
+bool
+Mesocycle::hasSlot
+(const QDate &when, const QString &sport) const
+{
+    return hasSlot(start.daysTo(when), sport);
+}
+
+
+bool
+Mesocycle::hasSlot
+(int offset, const QString &sport) const
+{
+    return std::any_of(slots_.cbegin(), slots_.cend(), [offset, &sport](const Slot &slot) {
+        return slot.getDayOffset() == offset && slot.getSport() == sport;
+    });
+}
+
+
+Slot*
+Mesocycle::getSlot
+(const QDate &when, const QString &sport)
+{
+    return getSlot(start.daysTo(when), sport);
+}
+
+
+Slot const *
+Mesocycle::getSlot
+(const QDate &when, const QString &sport) const
+{
+    return getSlot(start.daysTo(when), sport);
+}
+
+
+Slot*
+Mesocycle::getSlot
+(int offset, const QString &sport)
+{
+    QList<Slot>::iterator it = std::find_if(slots_.begin(), slots_.end(), [offset, &sport](const Slot &slot) {
+        return slot.getDayOffset() == offset && slot.getSport() == sport;
+    });
+    return it != slots_.end() ? &(*it) : nullptr;
+}
+
+
+Slot const *
+Mesocycle::getSlot
+(int offset, const QString &sport) const
+{
+    QList<Slot>::const_iterator it = std::find_if(slots_.begin(), slots_.end(), [offset, &sport](const Slot &slot) {
+        return slot.getDayOffset() == offset && slot.getSport() == sport;
+    });
+    return it != slots_.end() ? &(*it) : nullptr;
+}
+
+
+Slot*
+Mesocycle::addSlot
+(const QDate &when, const QString &sport)
+{
+    return addSlot(start.daysTo(when), sport);
+}
+
+
+Slot*
+Mesocycle::addSlot
+(int offset, const QString &sport)
+{
+    if (Slot *existing = getSlot(offset, sport)) {
+        return existing;
+    }
+    if (offset < 0 || offset >= getMaxMicrocycles() * 7 || sport.isEmpty()) {
+        return nullptr;
+    }
+    slots_.append(Slot(offset, sport));
+    return &slots_.last();
+}
+
+
+void
+Mesocycle::delSlot
+(int offset, const QString &sport)
+{
+    slots_.removeIf([offset, &sport](const Slot &slot) {
+        return slot.getDayOffset() == offset && slot.getSport() == sport;
+    });
+}
+
+
+QMap<QString, QList<int>>
+Mesocycle::getSlotSportOffsets
+() const
+{
+    QMap<QString, QList<int>> ret;
+    for (const Slot &slot : slots_) {
+        ret[slot.getSport()].append(slot.getDayOffset());
+    }
+    for (QMap<QString, QList<int>>::iterator it = ret.begin(); it != ret.end(); ++it) {
+        std::sort(it->begin(), it->end());
+    }
+    return ret;
+}
+
+
+QMap<QString, QList<QDate>>
+Mesocycle::getSlotSportDates
+() const
+{
+    QMap<QString, QList<QDate>> ret;
+    const QMap<QString, QList<int>> offsets = getSlotSportOffsets();
+    for (QMap<QString, QList<int>>::const_iterator it = offsets.cbegin(); it != offsets.cend(); ++it) {
+        QList<QDate> dates;
+        dates.reserve(it.value().size());
+        for (int offset : it.value()) {
+            dates.append(start.addDays(offset));
+        }
+        ret.insert(it.key(), dates);
+    }
+    return ret;
+}
+
+
+QMap<int, QList<QString>>
+Mesocycle::getSlotOffsetSports
+() const
+{
+    QMap<int, QList<QString>> ret;
+    for (const Slot &slot : slots_) {
+        ret[slot.getDayOffset()].append(slot.getSport());
+    }
+    return ret;
+}
+
+
+QMap<QDate, QList<QString>>
+Mesocycle::getSlotDateSports
+() const
+{
+    QMap<QDate, QList<QString>> ret;
+    for (const Slot &slot : slots_) {
+        ret[start.addDays(slot.getDayOffset())].append(slot.getSport());
+    }
+    return ret;
+}
+
+
+//////////////////////////////////////////////////////////////
 // Phase
 //
 
@@ -559,4 +1475,95 @@ Phase::Phase(QString _name, QDate start, QDate end) : Season()
     name = _name;
     _absoluteStart = start;
     _absoluteEnd = end;
+}
+
+
+void
+Phase::setType(int _type)
+{
+    if (_type != getType() && _type >= PhaseType::phase) {
+        if (getType() != PhaseType::mesocycle) {
+            Season::setType(_type);
+        }
+        if (getType() == PhaseType::mesocycle) {
+            Mesocycle *meso = addMesocycle();
+        }
+    }
+    if (getType() == PhaseType::mesocycle) {
+        Mesocycle *meso = getMesocycle();
+        meso->setMaxMicrocycles(numMicrocycles());
+        meso->setStart(getStart());
+    }
+}
+
+
+void
+Phase::setAbsoluteStart(QDate _start)
+{
+    Season::setAbsoluteStart(_start);
+    if (hasMesocycle()) {
+        getMesocycle()->setMaxMicrocycles(numMicrocycles());
+        getMesocycle()->setStart(getStart());
+    }
+}
+
+
+void
+Phase::setAbsoluteEnd(QDate _end)
+{
+    Season::setAbsoluteEnd(_end);
+    if (hasMesocycle()) {
+        getMesocycle()->setMaxMicrocycles(numMicrocycles());
+    }
+}
+
+
+bool
+Phase::hasMesocycle
+() const
+{
+    return _mesocycle.has_value();
+}
+
+
+Mesocycle*
+Phase::getMesocycle
+()
+{
+    if (_mesocycle.has_value()) {
+        return &_mesocycle.value();
+    } else {
+        return nullptr;
+    }
+}
+
+
+Mesocycle const *
+Phase::getMesocycle
+() const
+{
+    if (_mesocycle.has_value()) {
+        return &_mesocycle.value();
+    } else {
+        return nullptr;
+    }
+}
+
+
+int
+Phase::numMicrocycles
+() const
+{
+    return getStart().daysTo(getEnd()) / 7 + 1;
+}
+
+
+Mesocycle*
+Phase::addMesocycle
+()
+{
+    _mesocycle.emplace();
+    _mesocycle->setStart(getStart());
+    _mesocycle->setMaxMicrocycles(numMicrocycles());
+    return &_mesocycle.value();
 }
