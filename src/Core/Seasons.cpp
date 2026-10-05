@@ -304,7 +304,6 @@ SeasonParser::serialize(QString filename, QList<Season> Seasons)
                     out<<QString("\t\t\t\t</microcycles>\n");
                     QMap<int, QList<QString>> slotMap = meso->getSlotOffsetSports();
                     if (slotMap.count() > 0) {
-#warning ADD DESCRIPTION (?), LINKS TO PLANNED ACTIVITIES
                         out<<QString("\t\t\t\t<slots>\n");
                         for (const std::pair<const int&, const QList<QString>&> &pair : slotMap.asKeyValueRange()) {
                             int offset = pair.first;
