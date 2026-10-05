@@ -171,6 +171,8 @@ EditSeasonDialog::EditSeasonDialog
     lowEdit->setWrapping(true);
     lowEdit->setAlignment(Qt::AlignLeft);
 
+    descriptionEdit = new QTextEdit();
+
     QDialogButtonBox *buttonBox = new QDialogButtonBox();
     applyButton = buttonBox->addButton(tr("&OK"), QDialogButtonBox::AcceptRole);
     QPushButton *cancelButton = buttonBox->addButton(tr("&Cancel"), QDialogButtonBox::RejectRole);
@@ -183,6 +185,7 @@ EditSeasonDialog::EditSeasonDialog
     formLayout->addRow(tr("As of today"), statusLabel);
     formLayout->addRow(tr("Starting LTS"), seedEdit);
     formLayout->addRow(tr("Lowest SB"), lowEdit);
+    formLayout->addRow(tr("Description"), descriptionEdit);
     formLayout->addRow(warningLabel);
     formLayout->addRow(buttonBox);
 
@@ -325,6 +328,7 @@ EditSeasonDialog::transferUIToSeason
     season.setType(typeCombo->itemData(typeCombo->currentIndex()).toInt());
     season.setSeed(seedEdit->value());
     season.setLow(lowEdit->value());
+    season.setDescription(descriptionEdit->toPlainText());
 
     int years;
     int months;
@@ -424,6 +428,7 @@ EditSeasonDialog::transferSeasonToUI
 
     seedEdit->setValue(season.getSeed());
     lowEdit->setValue(season.getLow());
+    descriptionEdit->setText(season.getDescription());
 }
 
 
@@ -479,19 +484,36 @@ EditSeasonEventDialog::EditSeasonEventDialog(Context *context, SeasonEvent *even
     QLabel *seasonLabel = new QLabel();
     seasonLabel->setText(season.getName());
 
-    nameEdit = new QLineEdit(this);
+    nameEdit = new QLineEdit();
     nameEdit->setText(event->name);
 
-    dateEdit = new QDateEdit(this);
+    dateEdit = new QDateEdit();
     dateEdit->setDateRange(season.getStart(), season.getEnd());
     dateEdit->setDate(event->date);
     dateEdit->setCalendarPopup(true);
 
-    priorityEdit = new QComboBox(this);
+    priorityEdit = new QComboBox();
     foreach(QString priority, SeasonEvent::priorityList()) priorityEdit->addItem(priority);
     priorityEdit->setCurrentIndex(event->priority);
 
-    descriptionEdit = new QTextEdit(this);
+    targetLTSEdit = new QSpinBox();
+    targetLTSEdit->setMinimum(0);
+    targetLTSEdit->setMaximum(200);
+    targetLTSEdit->setValue(event->targetLTS);
+
+    targetCPEdit = new QSpinBox();
+    targetCPEdit->setMinimum(0);
+    targetCPEdit->setMaximum(500);
+    targetCPEdit->setSuffix(" " + tr("W"));
+    targetCPEdit->setValue(event->targetCP);
+
+    targetFTPEdit = new QSpinBox();
+    targetFTPEdit->setMinimum(0);
+    targetFTPEdit->setMaximum(500);
+    targetFTPEdit->setSuffix(" " + tr("W"));
+    targetFTPEdit->setValue(event->targetFTP);
+
+    descriptionEdit = new QTextEdit();
     descriptionEdit->setText(event->description);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox();
@@ -503,6 +525,9 @@ EditSeasonEventDialog::EditSeasonEventDialog(Context *context, SeasonEvent *even
     formLayout->addRow(tr("Name"), nameEdit);
     formLayout->addRow(tr("Date"), dateEdit);
     formLayout->addRow(tr("Priority"), priorityEdit);
+    formLayout->addRow(tr("Target LTS"), targetLTSEdit);
+    formLayout->addRow(tr("Target CP"), targetCPEdit);
+    formLayout->addRow(tr("Target FTP"), targetFTPEdit);
     formLayout->addRow(tr("Description"), descriptionEdit);
     formLayout->addRow(buttonBox);
 
@@ -523,6 +548,9 @@ EditSeasonEventDialog::applyClicked()
     event->date = dateEdit->date();
     event->priority = priorityEdit->currentIndex();
     event->description = descriptionEdit->toPlainText();
+    event->targetLTS = targetLTSEdit->value();
+    event->targetCP = targetCPEdit->value();
+    event->targetFTP = targetFTPEdit->value();
     accept();
 }
 
@@ -587,6 +615,9 @@ EditPhaseDialog::EditPhaseDialog(Context *context, Phase *phase, Season &season)
     lowEdit->setAlignment(Qt::AlignLeft);
     lowEdit->setValue(phase->getLow());
 
+    descriptionEdit = new QTextEdit();
+    descriptionEdit->setText(phase->getDescription());
+
     QDialogButtonBox *buttonBox = new QDialogButtonBox();
     applyButton = buttonBox->addButton(tr("&OK"), QDialogButtonBox::AcceptRole);
     QPushButton *cancelButton = buttonBox->addButton(tr("&Cancel"), QDialogButtonBox::RejectRole);
@@ -599,6 +630,7 @@ EditPhaseDialog::EditPhaseDialog(Context *context, Phase *phase, Season &season)
     formLayout->addRow(tr("To"), toEdit);
     formLayout->addRow(tr("Starting LTS"), seedEdit);
     formLayout->addRow(tr("Lowest SB"), lowEdit);
+    formLayout->addRow(tr("Description"), descriptionEdit);
     formLayout->addRow(buttonBox);
 
     // connect up slots
@@ -622,6 +654,7 @@ EditPhaseDialog::applyClicked()
     phase->setAbsoluteEnd(toEdit->date());
     phase->setSeed(seedEdit->value());
     phase->setLow(lowEdit->value());
+    phase->setDescription(descriptionEdit->toPlainText());
     accept();
 }
 

@@ -1,0 +1,89 @@
+<seasons>
+  <season>
+    <phase>
+      <name>Mesocycle-1</name>
+      <startdate>2026-01-05</startdate>
+      <enddate>2026-01-25</enddate>
+      <type>121</type>
+      <id>{a4d28e7c-bf42-4a04-8928-c18671c698bc}</id>
+      <seed>0</seed>
+      <low>-50</low>
+      <description>Description</description>
+      <mesocycle>
+        <targetCP>300</targetCP>
+        <targetFTP>301</targetFTP>
+        <targetLTS>100</targetLTS>
+        <microcycles>
+          <microcycle frequency="5" load="140" intensity="0.5" time="18000" description="My goals for microcycle 1" />
+          <microcycle frequency="4" load="150" intensity="0.4" time="18001" description="My goals for microcycle 2" />
+          <microcycle frequency="3" load="160" intensity="0.3" time="18002" description="My goals for microcycle 3" />
+          <microcycle frequency="2" load="170" intensity="0.2" time="18003" description="My goals for microcycle 4" />
+        </microcycles>
+        <slots>
+          <slot dayoffset="1" sport="Bike" load="25" intensity="0.25" status="generated" time="19001" description="Slot-1" activityIds="{UUID1} {UUID2}" />
+          <slot dayoffset="3" sport="Bike" load="30" intensity="0.3" status="badValue" time="19002" description="Slot-2" />
+          <slot dayoffset="4" sport="Bike" load="35" intensity="0.35" status="adjusted" time="19003" description="Slot-3" activityIds="{UUID4}" />
+          <slot dayoffset="1" sport="Run" load="40" intensity="0.4" status="" time="19004" description="Slot-4" />
+        </slots>
+      </mesocycle>
+    </phase>
+    <phase>
+      <name>Mesocycle-2</name>
+      <startdate>2026-02-02</startdate>
+      <enddate>2026-04-19</enddate>
+      <type>121</type>
+      <id>{96489889-ba6e-4006-a7ea-2f9bb7be0620}</id>
+      <seed>0</seed>
+      <low>-50</low>
+      <mesocycle>
+        <targetCP>badCP</targetCP>
+        <targetFTP>badFTP</targetFTP>
+        <targetLTS>badLTS</targetLTS>
+        <microcycles>
+          <microcycle frequency="5" load="150" intensity="0.7" time="bad" />
+          <microcycle load="160" intensity="0.7" time="" />
+          <microcycle frequency="-5" load="160" intensity="0.7" time="-1" />
+          <microcycle frequency="bad" load="170" intensity="0.7" time="1800" />
+          <microcycle frequency="5" intensity="0.7" />
+          <microcycle frequency="5" load="-190" intensity="0.7" />
+          <microcycle frequency="5" load="bad" intensity="0.7" />
+          <microcycle frequency="5" load="210" />
+          <microcycle frequency="5" load="220" intensity="-0.7" />
+          <microcycle frequency="5" load="220" intensity="bad" />
+          <microcycle frequency="5" load="230" intensity="0.7" />
+        </microcycles>
+        <slots>
+          <slot dayoffset="bad" sport="Bike" load="30" status="badValue" />
+          <slot dayoffset="-1" sport="Bike" load="25" status="generated" />
+          <slot dayoffset="0" sport="" load="40" status="" />
+          <slot dayoffset="3" sport="Bike" load="-30" status="adjusted" />
+          <slot dayoffset="4" sport="Bike" load="bad" status="adjusted" />
+          <slot dayoffset="5" sport="Bike" load="50" status="adjusted" />
+          <slot dayoffset="5" sport="Bike" load="55" status="adjusted" />
+          <slot dayoffset="100" sport="Bike" load="35" status="adjusted" />
+        </slots>
+      </mesocycle>
+    </phase>
+    <phase>
+      <name>non-Meso</name>
+      <startdate>2026-01-20</startdate>
+      <enddate>2026-02-10</enddate>
+      <type>100</type>
+      <id>{a7147da0-de38-41de-9bee-e50562f1dd5f}</id>
+      <seed>0</seed>
+      <low>-50</low>
+    </phase>
+    <name>Macrocycle</name>
+    <type>0</type>
+    <id>{fa549d73-7d8b-4df4-a16e-0ce50f92d131}</id>
+    <seed>0</seed>
+    <low>-50</low>
+    <startdate>2026-01-01</startdate>
+    <enddate>2026-12-31</enddate>
+    <firstDayOfWeek>3</firstDayOfWeek>
+    <model>skiba</model>
+    <event date="2026-02-10" priority="1" description="Description" id="{bf53a06a-bf02-4d74-83ac-594e31fd4e42}" targetLTS="105" targetCP="300" targetFTP="301">"Event-1"</event>
+    <event date="2026-02-10" priority="1" description="Description" id="{e7a4daee-5877-432c-b11a-781fe9684dda}" targetLTS="bad" targetCP="bad" targetFTP="bad">"Event-2"</event>
+    <event date="2026-02-10" priority="1" description="Description" id="{ae37cfb9-9b2e-4869-b9b9-5dccd0780c8f}">"Event-3"</event>
+  </season>
+</seasons>

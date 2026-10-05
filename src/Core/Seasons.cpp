@@ -248,21 +248,101 @@ SeasonParser::serialize(QString filename, QList<Season> Seasons)
 
             // Phases
             foreach (Phase phase, season.phases) {
-                out<<QString("\t\t<phase>\n"
+                out<<QString("\t\t<phase>\n");
+                out<<QString(
                       "\t\t\t<name>%1</name>\n"
                       "\t\t\t<startdate>%2</startdate>\n"
                       "\t\t\t<enddate>%3</enddate>\n"
                       "\t\t\t<type>%4</type>\n"
                       "\t\t\t<id>%5</id>\n"
                       "\t\t\t<seed>%6</seed>\n"
-                      "\t\t\t<low>%7</low>\n"
-                      "\t\t</phase>\n") .arg(Utils::xmlprotect(phase.getName()))
-                                             .arg(phase.getAbsoluteStart().toString("yyyy-MM-dd"))
-                                             .arg(phase.getEnd().toString("yyyy-MM-dd"))
-                                             .arg(phase.getType())
-                                             .arg(phase.id().toString())
-                                             .arg(phase.getSeed())
-                                             .arg(phase.getLow());
+                      "\t\t\t<low>%7</low>\n")
+                            .arg(Utils::xmlprotect(phase.getName()))
+                            .arg(phase.getAbsoluteStart().toString("yyyy-MM-dd"))
+                            .arg(phase.getEnd().toString("yyyy-MM-dd"))
+                            .arg(phase.getType())
+                            .arg(phase.id().toString())
+                            .arg(phase.getSeed())
+                            .arg(phase.getLow());
+                if (! phase.getDescription().isEmpty()) {
+                    out<<QString("\t\t\t<description>%1</description>\n")
+                                .arg(Utils::xmlprotect(phase.getDescription()));
+                }
+                if (phase.hasMesocycle()) {
+                    Mesocycle *meso = phase.getMesocycle();
+                    out<<QString("\t\t\t<mesocycle>\n");
+                    out<<QString("\t\t\t\t<mesointent>\n");
+                    if (meso->getTargetCP() > 0) {
+                        out<<QString("\t\t\t\t\t<targetCP>%1</targetCP>\n").arg(meso->getTargetCP());
+                    }
+                    if (meso->getTargetFTP() > 0) {
+                        out<<QString("\t\t\t\t\t<targetFTP>%1</targetFTP>\n").arg(meso->getTargetFTP());
+                    }
+                    if (meso->getTargetLTS() > 0) {
+                        out<<QString("\t\t\t\t\t<targetLTS>%1</targetLTS>\n").arg(meso->getTargetLTS());
+                    }
+                    out<<QString("\t\t\t\t</mesointent>\n");
+                    out<<QString("\t\t\t\t<microcycles>\n");
+                    for (int i = 0; i < meso->getMaxMicrocycles(); ++i) {
+                        Microcycle dummy;
+                        Microcycle *micro = meso->getMicrocycle(i);
+                        if (micro == nullptr) {
+                            micro = &dummy;
+                        }
+                        out<<QString("\t\t\t\t\t<microcycle frequency=\"%1\" load=\"%2\" intensity=\"%3\"")
+                                    .arg(micro->getFrequency())
+                                    .arg(micro->getLoad())
+                                    .arg(micro->getIntensity());
+                        if (micro->getTime() > 0) {
+                            out<<QString(" time=\"%1\"").arg(micro->getTime());
+                        }
+                        if (! micro->getDescription().isEmpty()) {
+                            out<<QString(" description=\"%1\"").arg(Utils::xmlprotect(micro->getDescription()));
+                        }
+                        out<<QString(" />\n");
+                    }
+                    out<<QString("\t\t\t\t</microcycles>\n");
+                    QMap<int, QList<QString>> slotMap = meso->getSlotOffsetSports();
+                    if (slotMap.count() > 0) {
+                        out<<QString("\t\t\t\t<slots>\n");
+                        for (const std::pair<const int&, const QList<QString>&> &pair : slotMap.asKeyValueRange()) {
+                            int offset = pair.first;
+                            for (const QString &sport : pair.second) {
+                                Slot const *slot = meso->getSlot(offset, sport);
+                                out<<QString("\t\t\t\t\t<slot dayoffset=\"%1\" sport=\"%2\" status=\"%3\"")
+                                            .arg(slot->getDayOffset())
+                                            .arg(Utils::xmlprotect(slot->getSport()))
+                                            .arg(Utils::xmlprotect(Slot::statusToString(slot->getStatus())));
+                                if (slot->hasLoad()) {
+                                    out<<QString(" load=\"%1\"").arg(slot->getLoad());
+                                }
+                                if (slot->hasIntensity()) {
+                                    out<<QString(" intensity=\"%1\"").arg(slot->getIntensity());
+                                }
+                                if (slot->hasTime()) {
+                                    out<<QString(" time=\"%1\"").arg(slot->getTime());
+                                }
+                                if (slot->hasDescription()) {
+                                    out<<QString(" description=\"%1\"").arg(Utils::xmlprotect(slot->getDescription()));
+                                }
+                                if (slot->getActivities().count() > 0) {
+                                    QString ids;
+                                    for (const QString &id : slot->getActivities()) {
+                                        if (! ids.isEmpty()) {
+                                            ids += u' ';
+                                        }
+                                        ids += id;
+                                    }
+                                    out<<QString(" activityIds=\"%1\"").arg(Utils::xmlprotect(ids));
+                                }
+                                out<<QString(" />\n");
+                            }
+                        }
+                        out<<QString("\t\t\t\t</slots>\n");
+                    }
+                    out<<QString("\t\t\t</mesocycle>\n");
+                }
+                out<<QString("\t\t</phase>\n");
             }
 
             // season infos
@@ -270,11 +350,20 @@ SeasonParser::serialize(QString filename, QList<Season> Seasons)
                   "\t\t<type>%2</type>\n"
                   "\t\t<id>%3</id>\n"
                   "\t\t<seed>%4</seed>\n"
-                  "\t\t<low>%5</low>\n") .arg(Utils::xmlprotect(season.getName()))
+                  "\t\t<low>%5</low>\n"
+                  "\t\t<firstDayOfWeek>%6</firstDayOfWeek>\n"
+                  ) .arg(Utils::xmlprotect(season.getName()))
                                          .arg(season.getType())
                                          .arg(season.id().toString())
                                          .arg(season.getSeed())
-                                         .arg(season.getLow());
+                                         .arg(season.getLow())
+                                         .arg(season.getFirstDayOfWeek());
+            if (! season.getDescription().isEmpty()) {
+                out<<QString("\t\t<description>%1</description>\n").arg(Utils::xmlprotect(season.getDescription()));
+            }
+            if (season.getModelType() != Season::ModelType::none) {
+                out<<QString("\t\t<model>%1</model>\n").arg(Season::modelToString(season.getModelType()));
+            }
             if (season.getAbsoluteStart().isValid()) {
                 out<<QString("\t\t<startdate>%1</startdate>\n").arg(season.getAbsoluteStart().toString("yyyy-MM-dd"));
             }
@@ -300,21 +389,23 @@ SeasonParser::serialize(QString filename, QList<Season> Seasons)
                                                                .arg(season.getLength().getDays());
             }
 
-            // load profile
-            for (int i=9; i<season.load().count(); i++)
-                out <<QString("\t<load>%1</load>\n").arg(season.load()[i]);
-
-
-
             foreach(SeasonEvent x, season.events) {
 
-                out<<QString("\t\t<event date=\"%1\" priority=\"%3\" description=\"%4\" id=\"%5\">\"%2\"</event>\n")
+                out<<QString("\t\t<event date=\"%1\" priority=\"%2\" description=\"%3\" id=\"%4\"")
                             .arg(x.date.toString("yyyy-MM-dd"))
-                            .arg(Utils::xmlprotect(x.name))
                             .arg(x.priority)
                             .arg(Utils::xmlprotect(x.description))
                             .arg(x.id);
-
+                if (x.targetCP > 0) {
+                    out<<QString(" targetCP=\"%1\"").arg(x.targetCP);
+                }
+                if (x.targetFTP > 0) {
+                    out<<QString(" targetFTP=\"%1\"").arg(x.targetFTP);
+                }
+                if (x.targetLTS > 0) {
+                    out<<QString(" targetLTS=\"%1\"").arg(x.targetLTS);
+                }
+                out<<QString(">\"%1\"</event>\n").arg(Utils::xmlprotect(x.name));
             }
             out <<QString("\t</season>\n");
         }
@@ -369,14 +460,16 @@ SeasonParser::parseSeason
                 season.setType(text.toInt());
             } else if (elemName == "id") {
                 season.setId(QUuid(text));
-            } else if (elemName == "load") {
-                season.load().resize(loadcount + 1);
-                season.load()[loadcount] = text.toInt();
-                loadcount++;
             } else if (elemName == "low") {
                 season.setLow(text.toInt());
             } else if (elemName == "seed") {
                 season.setSeed(text.toInt());
+            } else if (elemName == "description") {
+                season.setDescription(Utils::unprotect(text));
+            } else if (elemName == "firstDayOfWeek") {
+                season.setFirstDayOfWeek(static_cast<Qt::DayOfWeek>(std::clamp(text.toInt(), 1, 7)));
+            } else if (elemName == "model") {
+                season.setModelType(Season::modelFromString(text));
             } else if (elemName == "event") {
                 QDate date = parseDate(attributes.value("date").toString());
                 int priority = attributes.value("priority").toString().toInt();
@@ -386,7 +479,10 @@ SeasonParser::parseSeason
                     *idEnriched = true;
                     // default constructed id (see SeasonEvent::SeasonEvent) will be used, dont overwrite
                 }
-                season.events.append(SeasonEvent(Utils::unprotect(text), date, priority, description, id));
+                int targetCP = std::max(0, attributes.value("targetCP").toInt());
+                int targetFTP = std::max(0, attributes.value("targetFTP").toInt());
+                int targetLTS = std::max(0, attributes.value("targetLTS").toInt());
+                season.events.append(SeasonEvent(Utils::unprotect(text), date, priority, description, id, targetLTS, targetCP, targetFTP));
             } else if (elemName == "season") {
                 break;
             }
@@ -396,39 +492,209 @@ SeasonParser::parseSeason
 }
 
 
-Phase
-SeasonParser::parsePhase
-(QXmlStreamReader &reader)
+void
+SeasonParser::parseMicrocycles
+(QXmlStreamReader &reader, Mesocycle &meso)
 {
-    Phase phase;
+    int idx = -1;
+    while (! reader.atEnd()) {
+        reader.readNext();
+        if (reader.tokenType() == QXmlStreamReader::StartElement) {
+            if (reader.name().toString() == "microcycle") {
+                ++idx;
+                Microcycle *microcycle = meso.getMicrocycle(idx);
+                microcycle->setDescription(Utils::unprotect(reader.attributes().value("description").toString()));
+                microcycle->setFrequency(reader.attributes().value("frequency").toString().toInt());
+                microcycle->setLoad(reader.attributes().value("load").toString().toInt());
+                microcycle->setIntensity(reader.attributes().value("intensity").toString().toFloat());
+                microcycle->setTime(reader.attributes().value("time").toInt());
+            }
+        } else if (reader.tokenType() == QXmlStreamReader::EndElement) {
+            if (reader.name().toString() == "microcycles") {
+                break;
+            }
+        }
+    }
+}
+
+
+void
+SeasonParser::parseSlots
+(QXmlStreamReader &reader, Mesocycle &meso)
+{
+    while (! reader.atEnd()) {
+        reader.readNext();
+        if (reader.tokenType() == QXmlStreamReader::StartElement) {
+            if (reader.name().toString() == "slot") {
+                bool ok = false;
+                bool allOk = true;
+                int offset = reader.attributes().value("dayoffset").toString().toInt(&ok);
+                QString sport = Utils::unprotect(reader.attributes().value("sport").toString());
+                Slot::StatusType status = Slot::StatusType::generated;
+                int load = 0;
+                float intensity = 0.0f;
+                int time = 0;
+                QString desc;
+                QStringList activityIds;
+                if (reader.attributes().hasAttribute("status")) {
+                    status = Slot::stringToStatus(reader.attributes().value("status").toString());
+                    allOk &= ok;
+                }
+                Slot tmpSlot(offset, sport, status);
+                if (allOk && reader.attributes().hasAttribute("load")) {
+                    load = reader.attributes().value("load").toString().toInt(&ok);
+                    allOk &= ok;
+                    if (ok) {
+                        allOk &= tmpSlot.setLoad(load);
+                    }
+                }
+                if (reader.attributes().hasAttribute("intensity")) {
+                    intensity = reader.attributes().value("intensity").toString().toFloat(&ok);
+                    allOk &= ok;
+                    if (ok) {
+                        allOk &= tmpSlot.setIntensity(intensity);
+                    }
+                }
+                if (reader.attributes().hasAttribute("time")) {
+                    time = reader.attributes().value("time").toString().toInt(&ok);
+                    allOk &= ok;
+                    if (ok) {
+                        allOk &= tmpSlot.setIntensity(time);
+                    }
+                }
+                if (reader.attributes().hasAttribute("description")) {
+                    desc = Utils::unprotect(reader.attributes().value("description").toString());
+                    allOk &= ok;
+                    if (ok) {
+                        allOk &= tmpSlot.setDescription(desc);
+                    }
+                }
+                if (reader.attributes().hasAttribute("activityIds")) {
+                    QString activityStr = Utils::unprotect(reader.attributes().value("activityIds").toString());
+                    activityIds = activityStr.split(u' ');
+                }
+                if (allOk && offset >= 0 && ! sport.isEmpty()) {
+                    Slot *slot = meso.addSlot(offset, sport);
+                    if (slot != nullptr) {
+                        slot->setStatus(status);
+                        slot->setLoad(load);
+                        slot->setIntensity(intensity);
+                        slot->setTime(time);
+                        slot->setDescription(desc);
+                        slot->setActivities(activityIds);
+                    }
+                }
+            }
+        } else if (reader.tokenType() == QXmlStreamReader::EndElement) {
+            if (reader.name().toString() == "slots") {
+                break;
+            }
+        }
+    }
+}
+
+
+void
+SeasonParser::parseMesocycleRaw
+(QXmlStreamReader &reader, Mesocycle &meso)
+{
     QString text;
     while (! reader.atEnd()) {
         reader.readNext();
         if (reader.tokenType() == QXmlStreamReader::StartElement) {
+            QString elemName = reader.name().toString();
+            if (elemName == "microcycles") {
+                parseMicrocycles(reader, meso);
+            } else if (elemName == "slots") {
+                parseSlots(reader, meso);
+            } else {
+                text = "";
+            }
+        } else if (reader.tokenType() == QXmlStreamReader::Characters) {
+            text = reader.text().toString().trimmed();
+        } else if (reader.tokenType() == QXmlStreamReader::EndElement) {
+            QString elemName = reader.name().toString();
+            if (elemName == "targetCP") {
+                meso.setTargetCP(std::max(0, text.toInt()));
+            } else if (elemName == "targetFTP") {
+                meso.setTargetFTP(std::max(0, text.toInt()));
+            } else if (elemName == "targetLTS") {
+                meso.setTargetLTS(std::max(0, text.toInt()));
+            } else if (reader.name().toString() == "mesocycle") {
+                break;
+            }
+        }
+    }
+}
+
+
+Phase
+SeasonParser::parsePhase
+(QXmlStreamReader &reader)
+{
+    QString name;
+    QDate start, end;
+    int type = Phase::phase;
+    QUuid id;
+    int seed = 0;
+    int low = -50;
+    QString description;
+
+    QString text;
+    bool hasMesoElement = false;
+    Mesocycle meso;
+    meso.setStart(QDate(1, 1, 2000));
+    meso.setMaxMicrocycles(1000);
+    while (! reader.atEnd()) {
+        reader.readNext();
+        if (reader.tokenType() == QXmlStreamReader::StartElement) {
+            QString elemName = reader.name().toString();
+            if (elemName == "mesocycle") {
+                hasMesoElement = true;
+                parseMesocycleRaw(reader, meso);
+                continue;
+            }
             text = "";
         } else if (reader.tokenType() == QXmlStreamReader::Characters) {
             text = reader.text().toString().trimmed();
         } else if (reader.tokenType() == QXmlStreamReader::EndElement) {
             QString elemName = reader.name().toString();
             if (elemName == "name") {
-                phase.setName(Utils::unprotect(text));
+                name = Utils::unprotect(text);
             } else if (elemName == "startdate") {
-                phase.setAbsoluteStart(parseDate(text));
+                start = parseDate(text);
             } else if (elemName == "enddate") {
-                phase.setAbsoluteEnd(parseDate(text));
+                end = parseDate(text);
             } else if (elemName == "type") {
-                phase.setType(text.toInt());
+                type = text.toInt();
             } else if (elemName == "id") {
-                phase.setId(QUuid(text));
+                id = QUuid(text);
             } else if (elemName == "low") {
-                phase.setLow(text.toInt());
+                low = text.toInt();
             } else if (elemName == "seed") {
-                phase.setSeed(text.toInt());
+                seed = text.toInt();
+            } else if (elemName == "description") {
+                description = Utils::unprotect(text);
             } else if (elemName == "phase") {
                 break;
             }
         }
     }
+
+    Phase phase(name, start, end);
+    phase.setId(id);
+    phase.setLow(low);
+    phase.setSeed(seed);
+    phase.setDescription(description);
+    phase.setType(hasMesoElement ? Phase::mesocycle : type);
+
+    if (hasMesoElement) {
+        Mesocycle *m = phase.getMesocycle();
+        *m = meso;
+        phase.setType(Phase::mesocycle);
+        m = phase.getMesocycle();
+    }
+
     return phase;
 }
 

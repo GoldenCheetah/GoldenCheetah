@@ -61,6 +61,9 @@ private:
     static QDate parseDate(QString);
     static SeasonOffset parseOffset(QString offsetStr);
     static SeasonLength parseLength(QString lengthStr);
+    static void parseMicrocycles(QXmlStreamReader &reader, Mesocycle &meso);
+    static void parseSlots(QXmlStreamReader &reader, Mesocycle &meso);
+    static void parseMesocycleRaw(QXmlStreamReader &reader, Mesocycle &meso);
 };
 
 #endif //Seasons

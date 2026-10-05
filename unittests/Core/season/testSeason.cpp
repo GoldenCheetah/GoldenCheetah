@@ -12,6 +12,19 @@ public:
     }
 
 private slots:
+    void seasonEvent() {
+        QRegularExpression uuidRegex("^\\{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\\}$");
+        SeasonEvent event("TestEvent", reference);
+        QCOMPARE(event.name, "TestEvent");
+        QCOMPARE(event.date, reference);
+        QCOMPARE(event.priority, 0);
+        QCOMPARE(event.description, "");
+        QVERIFY(uuidRegex.match(event.id).hasMatch());
+        QCOMPARE(event.targetLTS, 0);
+        QCOMPARE(event.targetCP, 0);
+        QCOMPARE(event.targetFTP, 0);
+    }
+
     void builtInAllDates() {
         Season season;
         season.setName("All Dates");
