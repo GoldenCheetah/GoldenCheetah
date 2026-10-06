@@ -541,7 +541,7 @@ bool
 Season::hasPhaseOrEvent
 () const
 {
-    return phases.length() == 0 && events.length() == 0;
+    return phases.length() > 0 || events.length() > 0;
 }
 
 

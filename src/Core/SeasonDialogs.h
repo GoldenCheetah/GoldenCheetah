@@ -63,7 +63,6 @@ class EditSeasonDialog : public QDialog
         QLineEdit *nameEdit;
         QComboBox *typeCombo;
 
-
         QComboBox *startCombo;
         QStackedWidget *startValueStack;
         QDateEdit *startAbsoluteEdit;
@@ -88,6 +87,9 @@ class EditSeasonDialog : public QDialog
 
         QLabel *statusLabel;
         QLabel *warningLabel;
+
+        QDate firstChildStart;
+        QDate lastChildEnd;
 
         void transferUIToSeason(Season &season) const;
         void transferSeasonToUI(const Season &season);

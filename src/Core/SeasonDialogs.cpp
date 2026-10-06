@@ -36,6 +36,27 @@ EditSeasonDialog::EditSeasonDialog
 {
     setWindowTitle(tr("Edit Date Range"));
 
+    if (season->hasPhaseOrEvent()) {
+        for (const Phase &phase : season->phases) {
+            if (! firstChildStart.isValid()) {
+                firstChildStart = phase.getStart();
+                lastChildEnd = phase.getEnd();
+            } else {
+                firstChildStart = std::min(firstChildStart, phase.getStart());
+                lastChildEnd = std::max(lastChildEnd, phase.getEnd());
+            }
+        }
+        for (const SeasonEvent &event : season->events) {
+            if (! firstChildStart.isValid()) {
+                firstChildStart = event.date;
+                lastChildEnd = event.date;
+            } else {
+                firstChildStart = std::min(firstChildStart, event.date);
+                lastChildEnd = std::max(lastChildEnd, event.date);
+            }
+        }
+    }
+
     nameEdit = new QLineEdit();
 
     typeCombo = new QComboBox();
@@ -52,6 +73,9 @@ EditSeasonDialog::EditSeasonDialog
 
     startAbsoluteEdit = new QDateEdit();
     startAbsoluteEdit->setCalendarPopup(true);
+    if (firstChildStart.isValid()) {
+        startAbsoluteEdit->setMaximumDate(firstChildStart);
+    }
     startValueStack->addWidget(startAbsoluteEdit);
 
     QWidget *startRelative = new QWidget();
@@ -106,6 +130,9 @@ EditSeasonDialog::EditSeasonDialog
 
     endAbsoluteEdit = new QDateEdit();
     endAbsoluteEdit->setCalendarPopup(true);
+    if (lastChildEnd.isValid()) {
+        endAbsoluteEdit->setMinimumDate(lastChildEnd);
+    }
     endValueStack->addWidget(endAbsoluteEdit);
 
     QWidget *endRelative = new QWidget();
@@ -183,6 +210,13 @@ EditSeasonDialog::EditSeasonDialog
     formLayout->addRow(startCombo, startValueStack);
     formLayout->addRow(endCombo, endValueStack);
     formLayout->addRow(tr("As of today"), statusLabel);
+    if (firstChildStart.isValid()) {
+        QLocale locale;
+        formLayout->addRow(tr("Phases && Events cover"),
+                           new QLabel(tr("%1 - %2")
+                                        .arg(locale.toString(firstChildStart, QLocale::NarrowFormat))
+                                        .arg(locale.toString(lastChildEnd, QLocale::NarrowFormat))));
+    }
     formLayout->addRow(tr("Starting LTS"), seedEdit);
     formLayout->addRow(tr("Lowest SB"), lowEdit);
     formLayout->addRow(tr("Description"), descriptionEdit);
@@ -264,7 +298,7 @@ EditSeasonDialog::updateAllowedCombinations
     }
 
     // Disable relative ranges if Phases or Events are associated with this season
-    if (! season->hasPhaseOrEvent()) {
+    if (season->hasPhaseOrEvent()) {
         setEnabledItem(startCombo, relative, false);
         setEnabledItem(endCombo, relative, false);
         setEnabledItem(endCombo, ytd, false);
@@ -309,11 +343,21 @@ EditSeasonDialog::updateTimeRange
     transferUIToSeason(season);
     QDate start = season.getStart();
     QDate end = season.getEnd();
-    statusLabel->setText(tr("%1 - %2").arg(start.toString(tr("dd MMM yyyy"))).arg(end.toString(tr("dd MMM yyyy"))));
+    QLocale locale;
+    statusLabel->setText(tr("%1 - %2").arg(locale.toString(start, QLocale::NarrowFormat)).arg(locale.toString(end, QLocale::NarrowFormat)));
+    QStringList warningTexts;
     if (start > end) {
-        warningLabel->setText(tr("<b>WARNING</b> Start is after end, season will be empty"));
-    } else {
+        warningTexts << tr("The start date is after the end date, so the season will be empty");
+    }
+    if (firstChildStart.isValid() && (start > firstChildStart || end < lastChildEnd)) {
+        warningTexts << tr("The season range must cover all of its phases and events");
+    }
+    if (warningTexts.isEmpty()) {
         warningLabel->clear();
+        applyButton->setEnabled(true);
+    } else {
+        warningLabel->setText("<b>" + tr("WARNING") + "</b><br>" + warningTexts.join("<br>"));
+        applyButton->setEnabled(false);
     }
 }
 
