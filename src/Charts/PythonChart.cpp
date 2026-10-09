@@ -187,18 +187,18 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
             // lets run it
             //qDebug()<<"RUN:" << line;
 
+
             // set the context for the call
             if (pythonHost->chart()) {
                 python->canvas = pythonHost->chart()->canvas;
                 python->chart = pythonHost->chart();
                 python->perspective = pythonHost->chart()->myPerspective;
             }
-
             try {
+
 
                 // replace $$ with chart identifier (to avoid shared data)
                 line = line.replace("$$", chartid);
-
                 bool readOnly = pythonHost->readOnly();
                 QList<RideFile *> editedRideFiles;
                 python->cancelled = false;
@@ -266,18 +266,18 @@ PythonConsole::currentLine()
 
 void PythonConsole::mousePressEvent(QMouseEvent *e)
 {
-    Q_UNUSED(e)
+    QTextEdit::mousePressEvent(e);
     setFocus();
 }
 
 void PythonConsole::mouseDoubleClickEvent(QMouseEvent *e)
 {
-    Q_UNUSED(e)
+    QTextEdit::mouseDoubleClickEvent(e);
 }
 
 void PythonConsole::contextMenuEvent(QContextMenuEvent *e)
 {
-    Q_UNUSED(e)
+    QTextEdit::contextMenuEvent(e);
 }
 
 PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(context), context(context), ridesummary(ridesummary)
@@ -578,9 +578,9 @@ void
 PythonChart::execScript(PythonChart *chart)
 {
     QString line = chart->script->toPlainText();
-
     // replace $$ with chart identifier (to avoid shared data)
     line = line.replace("$$", chart->console->chartid);
+
 
     python->runline(ScriptContext(chart->context), line);
 }
