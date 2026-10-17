@@ -33,7 +33,15 @@
 
 #include "Context.h"
 #include "CloudService.h"
+#include "WahooClient.h"
 
+/*
+*   Wahoo Cloud access is implemented through Wahoo, which depends on CloudService
+*   CloudService pulls in a lot of dependencies, thus unit testing Wahoo directly is
+*   practically impossible.
+*   Therefore another class WahooClient is responsible for the API interactions.
+*   It can be tested using a mock QNetworkReply class.
+*/
 class Wahoo : public CloudService {
     Q_OBJECT
 
@@ -67,15 +75,18 @@ class Wahoo : public CloudService {
         void onSslErrors(QNetworkReply *reply, const QList<QSslError>&error);
 
     private:
-        QByteArray getNetworkResponse(QUrl url, QStringList &errors, QUrlQuery params = {});
-
-    private:
         // Has a QMainWindow as parent, so Qt takes care of the deletion
         Context *context;
 
         // Initialized with parent(this) in the constructor
         // so Qt will delete it
         QNetworkAccessManager *nam = nullptr;
+
+        // To allow unit testing without depending on CloudService,
+        // which otherwise would pull in a lot of GoldenCheetah classes
+        // that would have to be mocked, use a seperate class that interacts
+        // with the API
+        WahooClient client_;
 
         // QNetworkReply* is released in Wahoo::readFileCompleted
         // QByteArray* is released in CloudServiceAutoDownload::readComplete

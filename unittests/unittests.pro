@@ -5,7 +5,8 @@ exists(unittests.pri) {
 }
 
 equals(GC_UNITTESTS, active) {
-	SUBDIRS += Core/seasonOffset \
+	SUBDIRS += Cloud/wahoo \
+			   Core/seasonOffset \
 			   Core/season \
 			   Core/seasonParser \
 			   Core/phaseMesocycle \

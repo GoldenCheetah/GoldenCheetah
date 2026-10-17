@@ -37,7 +37,7 @@
 #include <QEventLoop>
 
 #ifndef WAHOO_DEBUG
-#define WAHOO_DEBUG true
+#define WAHOO_DEBUG false
 #endif
 #ifdef Q_CC_MSVC
 #define printd(fmt, ...) do {                                                \
@@ -71,6 +71,7 @@ Wahoo::Wahoo(Context *context) : CloudService(context), context(context)
     if (context) {
         nam = new QNetworkAccessManager(this);
         auto discard = QObject::connect(nam, &QNetworkAccessManager::sslErrors, this, &Wahoo::onSslErrors);
+        client_.setNam(nam);
     }
 
     // Set CloudService properties
@@ -134,64 +135,6 @@ Wahoo::close()
     return true;
 }
 
-QJsonObject
-network2Json (const QByteArray &replyData, QStringList &errors)
-{
-    // Convert network response to JSON objects
-    QJsonParseError parseError;
-    QJsonDocument document = QJsonDocument::fromJson(replyData, &parseError);
-
-    if (parseError.error != QJsonParseError::NoError) {
-        errors << QObject::tr("JSON parser error: %1").arg(parseError.errorString());
-        return QJsonObject{};
-    }
-
-    const QJsonObject jsonRoot = document.object();
-    if (jsonRoot.isEmpty()) {
-        errors << QObject::tr("JSON root object empty.");
-    }
-    return jsonRoot;
-}
-
-QByteArray
-Wahoo::getNetworkResponse(QUrl url, QStringList &errors, QUrlQuery params)
-{
-    QString token = getSetting(GC_WAHOO_TOKEN, "").toString();
-    if (token.isEmpty()) {
-        errors << tr("You must authorize with Wahoo first.");
-        return QByteArray{};
-    }
-
-    url.setQuery(params);
-    QNetworkRequest request(url);
-
-    request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
-    request.setRawHeader("Accept", "application/json;charset=UTF-8");
-    if (nam == nullptr) {
-        errors << tr("getNetworkResponse with QNetworkAccessManager nam uninitialized.");
-        return QByteArray{};
-    }
-
-    using NetworkReply = QScopedPointer<QNetworkReply, QScopedPointerDeleteLater>;
-    NetworkReply reply (nam->get(request));
-    if (reply == nullptr) {
-        errors << QObject::tr("Error getting network request pointer.");
-        return QByteArray{};
-    }
-
-    QEventLoop loop;
-    auto discard = QObject::connect(reply.get(), &QNetworkReply::finished, &loop, &QEventLoop::quit);
-    loop.exec();
-
-    if (reply->error() != QNetworkReply::NoError) {
-        errors << QObject::tr("Network error reading Wahoo workouts. ") << reply->errorString();;
-        return QByteArray{};
-    }
-
-    QByteArray replyData = reply->readAll();
-    return replyData;
-}
-
 QList<CloudServiceEntry*>
 Wahoo::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
 {
@@ -199,91 +142,22 @@ Wahoo::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
         qPrintable(path), qPrintable(from.toString()), qPrintable(to.toString()));
 
     QList<CloudServiceEntry*> results;
-    // Get workouts
+    QString token = getSetting(GC_WAHOO_TOKEN, "").toString();
 
-    // How many workouts at a time to fetch
-    const int pageSize {30};
+    auto entries = client_.fetchWorkouts(token, errors, from, to);
+    if (!errors.isEmpty()) return results;
 
-    // The position of the first workout to start looking at
-    int offset {0};
-
-    // How many workouts the api has
-    // This will be set to the correct number
-    // when the json is available
-    int resultCount {INT_MAX};
-
-    while (offset < resultCount) {
-        QUrl url{WAHOO_URL + "/v1/workouts"};
-
-        QUrlQuery params;
-        params.addQueryItem("page", QString("%1").arg(offset/pageSize+1));
-        params.addQueryItem("per_page", QString("%1").arg(pageSize));
-
-        const QByteArray replyData = getNetworkResponse(url, errors, params);
-        const QJsonObject root = network2Json(replyData, errors);
-        if (!errors.empty()) return results;
-
-        const QJsonValue total = root.value("total");
-        if (total.type() != QJsonValue::Double) {
-            errors << tr("Cannot parse total value of JSON root.");
-            return results;
-        }
-
-        // toInt is a qint64, which is a signed type
-        resultCount = total.toInt();
-        if (resultCount <= 0) {
-            errors << tr("Invalid value for total value of Wahoo API response: ");
-            errors << total.toVariant().toString();
-            return results;
-        }
-
-        const QJsonArray workouts = root.value("workouts").toArray();
-        if (workouts.isEmpty()) {
-            errors << tr("Cannot find workouts in JSON data.");
-            printd("Network response: %s\n", qPrintable(replyData));
-            return results;
-        }
-
-        for (const QJsonValue &workoutValue : workouts) {
-            QJsonObject workout = workoutValue.toObject();
-            QString dateStr = workout.value("starts").toString();
-            QDateTime startDate = QDateTime::fromString(dateStr, Qt::ISODate).toLocalTime();
-
-            // Activities are sorted by date from newest to oldest
-            // Only look at activities between from and to
-            // readdir is called from CloudServiceAutoDownload
-            // with from = 30 back from now and to = todday
-            if (!startDate.isValid()) continue;
-            if (startDate < from) return results;
-            if (startDate > to) continue;
-
-            // By calling CloudService::newCloudServiceEntry
-            // the CloudServiceEntry ptr will be added to CloudService::list_
-            // CloudService will clean up the entries in its list_ object in its destructor
-            // so this class doesn't have to call delete on *add
-            CloudServiceEntry *add = CloudService::newCloudServiceEntry();
-
-            add->id = workout["id"].toVariant().toString();
-            add->label = workout["name"].toString();
-            add->isDir = false;
-
-            QJsonObject summary = workout["workout_summary"].toObject();
-
-            // distance in km
-            add->distance = summary["distance_accum"].toVariant().toDouble() / 1000.0;
-            // total duration in secs
-            add->duration = summary["duration_total_accum"].toVariant().toDouble();
-
-            if (startDate.isValid()) {
-                add->name = startDate.toString("yyyy_MM_dd_HH_mm_ss") + ".fit";
-                results << add;
-                printd("\nAdding name %s\n \twith id: %s \n", qPrintable(add->name), qPrintable(add->id));
-                printd("\t distance: %f \n \t duration: %ld", add->distance, add->duration);
-            }
-        }
-        // next page
-        offset += pageSize;
+    for (const auto &entry : entries) {
+        CloudServiceEntry *add = newCloudServiceEntry();
+        add->id = entry.id;
+        add->label = entry.label;
+        add->isDir = entry.isDir;
+        add->distance = entry.distance;
+        add->duration = entry.duration;
+        add->name = entry.name;
+        results << add;
     }
+
     return results;
 }
 
@@ -292,40 +166,13 @@ Wahoo::readFile(QByteArray *data, QString remotename, QString remoteid)
 {
     printd("Get remotename: %s, remoteid: %s", qPrintable(remotename), qPrintable(remoteid));
     QStringList errors;
+    QString token = getSetting(GC_WAHOO_TOKEN, "").toString();
 
-    // Get the requested file, first the workout_summary JSON object
-    QString requestUrl = QString(WAHOO_URL + "/v1/workouts/%1/workout_summary").arg(remoteid);
-
-    const QByteArray replyData = getNetworkResponse(requestUrl, errors);
-    if (!errors.isEmpty()) {
+    QNetworkReply *reply = client_.startFileDownload(token, remoteid, errors);
+    if (reply == nullptr || !errors.isEmpty()) {
         qWarning() << "NetworkResponse error in Wahoo::readFile: " << errors;
-        printd("Tried to fetch %s.\n", qPrintable(requestUrl));
         return false;
     }
-
-    const QJsonObject workoutSummary = network2Json(replyData, errors);
-
-    // The workout_summary has a file object, which has a url value which points to the file
-    const QJsonValue file = workoutSummary.value("file").toObject().value("url");
-    const QString url = file.toString();
-    if (url.isEmpty()) {
-        qWarning() << "Wahoo API did not return a file URL.";
-        printd("Wahoo API response: %s\n", qPrintable(replyData));
-        return false;
-    }
-    printd("Download url: %s", qPrintable(url));
-
-    // Download file
-    QNetworkRequest request(url);
-
-    if (nam == nullptr) {
-        qWarning() << "Wahoo::readFile called with nam == nullptr,"
-                << "which means its constructor was called with a nullptr context.";
-        return false;
-    }
-    // Network reply is needed until readFileCompleted,
-    // don't delete it in this function
-    QNetworkReply *reply = nam->get(request);
 
     // insert into reply map and buffers
     CloudService::mapReply(reply, remotename);
@@ -359,7 +206,7 @@ Wahoo::readFileCompleted()
 
         // This calls CloudService::readComplete,
         // which deletes the QByteArray *data
-        CloudService::notifyReadComplete(buffers.value(reply), CloudService::replyName(reply), tr("Completed."));
+        notifyReadComplete(buffers.value(reply), CloudService::replyName(reply), tr("Completed."));
     }
 
     // reply is no longer needed
