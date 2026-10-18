@@ -109,7 +109,17 @@ Wahoo::open(QStringList &errors)
     QString newAccess;
     QString newRefresh;
     QString err;
-    int expiresIn;
+
+    // Prevent uneccessary refresh requests. Refresh tokens are valid 2h
+    // 120 sec will be enough, so the limit is 7000 sec from the last refresh
+    QDateTime lastRefresh =  getSetting(GC_WAHOO_LAST_REFRESH).toDateTime();
+
+    // Convert 2h in seconds and subtract 120
+    constexpr int maxTokenAgeSec = 7200 - 120;
+    auto expires = lastRefresh.addSecs(maxTokenAgeSec);
+    if (QDateTime::currentDateTime().toLocalTime() < expires) {return true; }
+
+    int expiresIn{0};
     if (!OAuthPKCE::refreshAccessToken(
             WAHOO_URL + "/oauth/token",
             GC_WAHOO_CLIENT_ID,
