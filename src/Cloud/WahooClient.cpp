@@ -83,7 +83,7 @@ WahooClient::getNetworkResponse(QUrl url, const QString &token, QStringList &err
 
     using NetworkReply = QScopedPointer<QNetworkReply, QScopedPointerDeleteLater>;
     NetworkReply reply(namGet(request));
-    if (reply == nullptr) {
+    if (reply != nullptr && reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() != 200) {
         // Find out what went wrong
         switch(reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt()){
             case 400:
