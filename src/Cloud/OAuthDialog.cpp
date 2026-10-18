@@ -372,6 +372,31 @@ OAuthDialog::urlChanged(const QUrl &url)
 
             // now get the final token - but ignore errors
             manager = new QNetworkAccessManager(this);
+
+            if (site == WAHOO) {
+                // Wahoo only allows 10 tokens per User. To prevent reaching this limit,
+                // delete previous tokens before requesting a new one.
+                QString oldToken = service->getSetting(GC_WAHOO_REFRESH_TOKEN, "").toString();
+                if (!oldToken.isEmpty()) {
+                    // Refresh token
+                    QStringList errors;
+                    service->open(errors);
+                    oldToken = service->getSetting(GC_WAHOO_TOKEN, "").toString();
+                    if (!errors.isEmpty()) {qDebug() << errors.join("."); }
+
+                    // Deauthorize app
+                    QUrl deleteUrl = QString("https://api.wahooligan.com/v1/permissions");
+                    QNetworkRequest deleteRequest(deleteUrl);
+                    deleteRequest.setRawHeader(QByteArray("Authorization"), QByteArray("Bearer ") + oldToken.toUtf8());
+                    QNetworkReply *deleteReply = manager->deleteResource(deleteRequest);
+
+                    QEventLoop loop;
+                    connect(deleteReply, SIGNAL(finished()), &loop, SLOT(quit()));
+                    loop.exec();
+
+                    deleteReply->deleteLater();
+                }
+            }
             connect(manager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
             connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(networkRequestFinished(QNetworkReply*)));
 
