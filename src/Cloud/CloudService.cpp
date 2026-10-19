@@ -741,9 +741,10 @@ CloudServiceSyncDialog::CloudServiceSyncDialog(Context *context, CloudService *s
     QWidget * download = new QWidget(this);
     QWidget * sync = new QWidget(this);
     tabs->addTab(download, tr("Download"));
-    if (store->capabilities() & CloudService::Upload) tabs->addTab(upload, tr("Upload"));
+    tabs->addTab(upload, tr("Upload"));
+    tabs->setTabVisible(1, store->capabilities() & CloudService::Upload);
     tabs->addTab(sync, tr("Synchronize"));
-    tabs->setCurrentIndex(2);
+    tabs->setCurrentIndex(tabs->count()-1);
     QVBoxLayout *downloadLayout = new QVBoxLayout(download);
     QVBoxLayout *uploadLayout = new QVBoxLayout(upload);
     QVBoxLayout *syncLayout = new QVBoxLayout(sync);
