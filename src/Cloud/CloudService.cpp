@@ -766,6 +766,7 @@ CloudServiceSyncDialog::CloudServiceSyncDialog(Context *context, CloudService *s
     from->setCalendarPopup(true);
     to = new QDateEdit(this);
     to->setDate(QDate::currentDate());
+    to->setTime(QTime(23,59,59)); // Lets include all activities for the date
     to->setCalendarPopup(true);
 
     // Buttons
