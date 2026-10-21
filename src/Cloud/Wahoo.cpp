@@ -38,7 +38,7 @@
 
 QImage Wahoo::logo() const
 {
-    printd("Logo requested.");
+    printd("Logo requested.\n");
     return QImage("images/services/wahoo.png");
 }
 
@@ -73,7 +73,7 @@ Wahoo::Wahoo(Context *context) : CloudService(context), context(context)
 bool
 Wahoo::open(QStringList &errors)
 {
-    printd("Wahoo::open.\n");
+    printd("\nWahoo::open.\n");
     // Get last refresh token
     QString refreshToken = getSetting(GC_WAHOO_REFRESH_TOKEN, "").toString();
     if (refreshToken.isEmpty()) {
@@ -117,14 +117,14 @@ Wahoo::open(QStringList &errors)
 bool
 Wahoo::close()
 {
-    printd("Wahoo::close.\n");
+    printd("\nWahoo::close.\n");
     return true;
 }
 
 QList<CloudServiceEntry*>
 Wahoo::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
 {
-    printd("Wahoo::readdir path: (%s), from: (%s), to: (%s)\n",
+    printd("\nWahoo::readdir path: (%s), from: (%s), to: (%s)\n",
         qPrintable(path), qPrintable(from.toString()), qPrintable(to.toString()));
 
     QList<CloudServiceEntry*> results;
@@ -149,13 +149,13 @@ Wahoo::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
 bool
 Wahoo::readFile(QByteArray *data, QString remotename, QString remoteid)
 {
-    printd("Get remotename: %s, remoteid: %s", qPrintable(remotename), qPrintable(remoteid));
+    printd("\nGet remotename: %s, remoteid: %s\n", qPrintable(remotename), qPrintable(remoteid));
     
     const QString token = getToken();
     QStringList errors;
     QNetworkReply *reply = client_.startFileDownload(token, remoteid, errors);
     if (reply == nullptr || !errors.isEmpty()) {
-        qWarning() << "NetworkResponse error in Wahoo::readFile: " << errors;
+        printd("\nNetworkResponse error in Wahoo::readFile: %s\n", qPrintable(errors.join(". ")));
         return false;
     }
 
@@ -203,11 +203,11 @@ Wahoo::readyRead()
 void
 Wahoo::readFileCompleted()
 {
-    printd("Wahoo::readFileCompleted.");
+    printd("\nWahoo::readFileCompleted.\n");
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
 
     if (reply != nullptr && reply->error() == QNetworkReply::NoError) {
-        printd("received %lld bytes\n", static_cast<long long>(buffers.value(reply)->size()));
+        printd("\nreceived %lld bytes\n", static_cast<long long>(buffers.value(reply)->size()));
 
         // This calls CloudService::readComplete,
         // which deletes the QByteArray *data

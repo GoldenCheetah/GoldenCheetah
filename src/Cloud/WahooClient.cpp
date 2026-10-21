@@ -44,12 +44,14 @@ network2Json(const QByteArray &replyData, QStringList &errors)
 
     if (parseError.error != QJsonParseError::NoError) {
         errors << QObject::tr("JSON parser error: %1").arg(parseError.errorString());
+        printd("\nJSON parser error for %s\n", qPrintable(document.toJson()));
         return QJsonObject{};
     }
 
     const QJsonObject jsonRoot = document.object();
     if (jsonRoot.isEmpty()) {
         errors << QObject::tr("JSON root object empty.");
+        printd("\nNo JSON root object in %s\n", qPrintable(document.toJson()));
     }
     return jsonRoot;
 }
@@ -69,6 +71,7 @@ WahooClient::getNetworkResponse(QUrl url, const QString &token, QStringList &err
     request.setRawHeader("Accept", "application/json;charset=UTF-8");
 
     using NetworkReply = QScopedPointer<QNetworkReply, QScopedPointerDeleteLater>;
+    printd("\nQuerying %s\n", qPrintable(url.toString()));
     NetworkReply reply(namGet(request));
     if (reply != nullptr && reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() != 200) {
         // Find out what went wrong
@@ -117,7 +120,6 @@ WahooClient::getNetworkResponse(QUrl url, const QString &token, QStringList &err
     }
 
     if (!errors.isEmpty()) {
-        qDebug() << "Errors in NetworkRequest: " << errors;
         return QByteArray{};
     }
     
@@ -137,7 +139,7 @@ WahooClient::getNetworkResponse(QUrl url, const QString &token, QStringList &err
 QList<WahooWorkoutEntry>
 WahooClient::fetchWorkouts(const QString &token, QStringList &errors, const QDateTime &from, const QDateTime &to)
 {
-    printd("WahooClient::fetchWorkouts from: (%s), to: (%s)\n",
+    printd("\nWahooClient::fetchWorkouts from: (%s), to: (%s)\n",
         qPrintable(from.toString()), qPrintable(to.toString()));
 
     QList<WahooWorkoutEntry> results;
@@ -162,12 +164,13 @@ WahooClient::fetchWorkouts(const QString &token, QStringList &errors, const QDat
         const QByteArray replyData = getNetworkResponse(url, token, errors, params);
         const QJsonObject root = network2Json(replyData, errors);
         if (!errors.empty()) {
-            qDebug() << "Error in fetchWorkouts: " << errors;
+            printd("\nErrors in fetchWorkouts: %s\n", qPrintable(errors.join(".")));
             return results; 
         }
 
         const QJsonValue total = root.value("total");
         if (total.type() != QJsonValue::Double) {
+            printd("Error parsing total value. replyData: %s\n", qPrintable(replyData));
             errors << QObject::tr("Cannot parse total value of JSON root.");
             return results;
         }
@@ -177,12 +180,14 @@ WahooClient::fetchWorkouts(const QString &token, QStringList &errors, const QDat
         if (resultCount < 0) {
             errors << QObject::tr("Invalid value for total value of Wahoo API response: ");
             errors << total.toVariant().toString();
+            printd("\ntotal is invalid: %s\n", qPrintable(total.toVariant().toString()));
             return results;
         }
 
         const QJsonArray workouts = root.value("workouts").toArray();
         if (workouts.isEmpty()) {
             // No current workouts in the API, we are already done here.
+            printd("\nWorkouts is empty.\n");
             return results;
         }
 
@@ -190,6 +195,7 @@ WahooClient::fetchWorkouts(const QString &token, QStringList &errors, const QDat
             QJsonObject workout = workoutValue.toObject();
             QString dateStr = workout.value("starts").toString();
             QDateTime startDate = QDateTime::fromString(dateStr, Qt::ISODate).toLocalTime();
+            printd("\nstartDate: %s\n", qPrintable(startDate.toString()));
 
             if (!startDate.isValid()) {continue; }
             // "from" is always a date before "to".
@@ -228,14 +234,15 @@ WahooClient::fetchWorkouts(const QString &token, QStringList &errors, const QDat
 QNetworkReply*
 WahooClient::startFileDownload(const QString &token, const QString &remoteId, QStringList &errors)
 {
-    printd("WahooClient::startFileDownload remoteId: %s", qPrintable(remoteId));
+    printd("\nWahooClient::startFileDownload remoteId: %s\n", qPrintable(remoteId));
 
     // First get the download URL from the API, which is in the workout_summary Json object
     QString requestUrl = QString(WAHOO_URL + "/v1/workouts/%1/workout_summary").arg(remoteId);
 
     const QByteArray replyData = getNetworkResponse(requestUrl, token, errors);
     if (!errors.isEmpty()) {
-        printd("Tried to fetch %s.\n", qPrintable(requestUrl));
+        printd("\nTried to fetch %s.\nErrors: %s\n. replyData: %s\n", 
+            qPrintable(requestUrl), qPrintable(errors.join(".")), qPrintable(replyData));
         return nullptr;
     }
 
@@ -249,7 +256,7 @@ WahooClient::startFileDownload(const QString &token, const QString &remoteId, QS
         printd("Wahoo API response: %s\n", qPrintable(replyData));
         return nullptr;
     }
-    printd("Download url: %s", qPrintable(url));
+    printd("\nDownload url: %s\n", qPrintable(url));
 
     // Now get the actual file
     QNetworkRequest request(url);
