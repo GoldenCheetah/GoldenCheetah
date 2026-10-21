@@ -105,6 +105,7 @@
 #define GC_START_HTTP                   "<system>starthttp"
 #define GC_EMBED_R                      "<system>embedR"
 #define GC_EMBED_PYTHON                 "<system>embedPython"
+#define GC_PYTHON_USER_LIBRARY_PATHS    "<system>python/user_library_paths"
 
 #define GC_SETTINGS_LAST                "<system>mainwindow/lastOpened"
 #define GC_SETTINGS_MAIN_GEOM           "<system>mainwindow/geometry"
