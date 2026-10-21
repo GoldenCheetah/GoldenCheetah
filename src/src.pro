@@ -146,6 +146,9 @@ macx {
 
     HEADERS += Train/VideoWindow.h
     SOURCES += Train/VideoWindow.cpp
+
+    HEADERS += Train/VideoHtmlWindow.h
+    SOURCES += Train/VideoHtmlWindow.cpp
 }
 
 
