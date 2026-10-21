@@ -36,27 +36,6 @@
 #include <QUrlQuery>
 #include <QEventLoop>
 
-#ifndef WAHOO_DEBUG
-#define WAHOO_DEBUG false
-#endif
-#ifdef Q_CC_MSVC
-#define printd(fmt, ...) do {                                                \
-    if (WAHOO_DEBUG) {                                 \
-        printf("[%s:%d %s] \n" fmt , __FILE__, __LINE__,        \
-               __FUNCTION__, __VA_ARGS__);                    \
-        fflush(stdout);                                       \
-    }                                                         \
-} while(0)
-#else
-#define printd(fmt, args...)                                            \
-    do {                                                                \
-        if (WAHOO_DEBUG) {                                       \
-            printf("[%s:%d %s] \n" fmt , __FILE__, __LINE__,              \
-                   __FUNCTION__, ##args);                               \
-            fflush(stdout);                                             \
-        }                                                               \
-    } while(0)
-#endif
 
 const static QString WAHOO_URL = "https://api.wahooligan.com";
 

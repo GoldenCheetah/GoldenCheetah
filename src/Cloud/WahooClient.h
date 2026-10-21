@@ -28,6 +28,16 @@
 #include <QJsonObject>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QLoggingCategory>
+
+// Declare a logging category gcWahoo
+Q_DECLARE_LOGGING_CATEGORY(gcWahoo)
+
+#ifdef Q_CC_MSVC
+#define printd(fmt, ...) qCDebug(gcWahoo, fmt, __VA_ARGS__);
+#else
+#define printd(fmt, args...) qCDebug(gcWahoo, fmt, ##args);
+#endif
 
 // This makes including CloudService.h obsolete,
 // thus avoiding dependencies which cause trouble in testing
