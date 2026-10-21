@@ -22,12 +22,14 @@
 #include <QString>
 #include <QStringList>
 #include <QByteArray>
+#include <QMap>
 #include <QDateTime>
 #include <QUrl>
 #include <QUrlQuery>
 #include <QJsonObject>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QSharedPointer>
 #include <QLoggingCategory>
 
 // Declare a logging category gcWahoo
@@ -38,6 +40,8 @@ Q_DECLARE_LOGGING_CATEGORY(gcWahoo)
 #else
 #define printd(fmt, args...) qCDebug(gcWahoo, fmt, ##args);
 #endif
+
+inline constexpr QStringView WAHOO_URL = u"https://api.wahooligan.com";
 
 // This makes including CloudService.h obsolete,
 // thus avoiding dependencies which cause trouble in testing
@@ -72,14 +76,26 @@ class WahooClient {
                                               const QDateTime &to);
 
         // Resolves workout_summary to get file download url and returns the active QNetworkReply* for download
-        QNetworkReply* startFileDownload(const QString &token,
+        QNetworkReply *startFileDownload(const QString &token,
                                          const QString &remoteId,
                                          QStringList &errors);
 
+        QNetworkReply *sendFile(const QString &token,
+                                QByteArray &data,
+                                const QString &remotename,
+                                const QString &remoteid);
+
+        QString checkUpload(QNetworkReply *reply, const QString &token);
+
     protected:
-        virtual QNetworkReply* namGet(QNetworkRequest &request)
+        virtual QNetworkReply *namGet(QNetworkRequest &request)
         {
             return nam_ != nullptr ? nam_->get(request) : nullptr;
+        }
+
+        virtual QNetworkReply *namPost(QNetworkRequest &request, QByteArray &body)
+        {
+            return nam_ != nullptr ? nam_->post(request, body) : nullptr;
         }
 
         virtual QByteArray getNetworkResponse(QUrl url,

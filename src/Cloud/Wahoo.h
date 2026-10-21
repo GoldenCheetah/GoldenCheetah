@@ -56,13 +56,14 @@ class Wahoo : public CloudService {
         CloudService *clone(Context *context) override { return new Wahoo(context); }
         ~Wahoo() = default;
 
-        int capabilities() const override { return OAuth | Download | Query; }
+        int capabilities() const override { return OAuth | Upload | Download | Query; }
         int type() const override { return Activities; }
 
         bool open(QStringList &errors) override;
         bool close() override;
 
         bool readFile(QByteArray *data, QString remotename, QString remoteid) override;
+        bool writeFile(QByteArray &data, QString remotename, RideFile *ride) override;
 
         QList<CloudServiceEntry*> readdir(QString path, QStringList &errors, QDateTime from, QDateTime to) override;
 
@@ -70,9 +71,13 @@ class Wahoo : public CloudService {
 
         void readyRead();
         void readFileCompleted();
+        void writeFileCompleted();
 
     private slots:
         void onSslErrors(QNetworkReply *reply, const QList<QSslError>&error);
+
+    private:
+        QString getToken();
 
     private:
         // Has a QMainWindow as parent, so Qt takes care of the deletion

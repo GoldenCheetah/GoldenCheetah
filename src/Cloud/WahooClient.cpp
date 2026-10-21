@@ -20,6 +20,13 @@
 
 #include <QEventLoop>
 #include <QScopedPointer>
+#include <QVariant>
+#include <QUrlQuery>
+#include <QNetworkRequest>
+#include <QTimeZone>
+#include <QTimer>
+#include <QThread>
+#include <QByteArray>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonParseError>
@@ -103,15 +110,17 @@ WahooClient::getNetworkResponse(QUrl url, const QString &token, QStringList &err
             case 503:
                 errors << QObject::tr("The Wahoo API is temporarily offline for maintenance. Try again later.");
                 break;
-            default:
-                errors << QObject::tr("Something with the API is wrong, the status code is %1").arg(
-                    reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString()
-                );
         }
-        errors << QObject::tr("Error getting network request pointer.");
-        return QByteArray{};
+
+    } else if (reply == nullptr){
+        errors << "Nullptr in getNetworkRequest.";
     }
 
+    if (!errors.isEmpty()) {
+        qDebug() << "Errors in NetworkRequest: " << errors;
+        return QByteArray{};
+    }
+    
     QEventLoop loop;
     auto discard = QObject::connect(reply.get(), &QNetworkReply::finished, &loop, &QEventLoop::quit);
     loop.exec();
@@ -152,7 +161,10 @@ WahooClient::fetchWorkouts(const QString &token, QStringList &errors, const QDat
 
         const QByteArray replyData = getNetworkResponse(url, token, errors, params);
         const QJsonObject root = network2Json(replyData, errors);
-        if (!errors.empty()) return results;
+        if (!errors.empty()) {
+            qDebug() << "Error in fetchWorkouts: " << errors;
+            return results; 
+        }
 
         const QJsonValue total = root.value("total");
         if (total.type() != QJsonValue::Double) {
@@ -174,21 +186,21 @@ WahooClient::fetchWorkouts(const QString &token, QStringList &errors, const QDat
             return results;
         }
 
-        for (const QJsonValue &workoutValue : workouts) {
+        for (const auto &workoutValue : workouts) {
             QJsonObject workout = workoutValue.toObject();
             QString dateStr = workout.value("starts").toString();
             QDateTime startDate = QDateTime::fromString(dateStr, Qt::ISODate).toLocalTime();
 
-            if (!startDate.isValid()) continue;
+            if (!startDate.isValid()) {continue; }
             // "from" is always a date before "to".
             // if the startDate is older than "from", we are done,
             // because the API always returns workouts with startDates sorted
             // from today to the oldest workout.
-            if (startDate < from) return results;
+            if (startDate < from) { return results; }
 
             // Maybe this isn't strictly needed, because CloudService always calls this
             // with "to" being today, but if its there, we should account for it.
-            if (startDate > to) continue;
+            if (startDate > to) {continue; }
 
             WahooWorkoutEntry entry;
             entry.id = workout["id"].toVariant().toString();
@@ -242,4 +254,84 @@ WahooClient::startFileDownload(const QString &token, const QString &remoteId, QS
     // Now get the actual file
     QNetworkRequest request(url);
     return namGet(request);
+}
+
+QNetworkReply *WahooClient::sendFile(const QString &token, QByteArray &data,
+                                     const QString &remotename,
+                                     const QString &remoteid) {
+    printd("\nWahooClient::sendFile with token %s, remotename %s, id %s\n",
+        qPrintable(token), qPrintable(remotename), qPrintable(remoteid));
+
+    // Prepare a QUrlQuery
+    const QUrl url = QUrl(WAHOO_URL + "/v1/workout_file_uploads");
+    const QString fileField = QStringLiteral("data:application/vnd.fit;base64,%1").arg(data.toBase64());
+    printd("\nfileField.size: %lli", data.toBase64().size());
+
+    QUrlQuery form;
+    form.addQueryItem(QStringLiteral("workout_file_upload[file]"), fileField);
+    form.addQueryItem(QStringLiteral("workout_file_upload[filename]"), remotename);
+    form.addQueryItem(QStringLiteral("workout_file_upload[time_zone]"), QTimeZone::systemTimeZoneId());
+    form.addQueryItem(QStringLiteral("workout_file_upload[workout_name]"), remoteid);
+
+    QByteArray body = form.toString(QUrl::FullyEncoded).toUtf8();
+    
+    // Create a QNetworkRequest
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", QString("Bearer %1").arg(token).toLatin1());
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/x-www-form-urlencoded"));
+    
+    printd("\nCalling API with %s\n", qPrintable(request.url().toString()));
+    QNetworkReply *reply = namPost(request, body);
+    return reply;
+}
+
+QString WahooClient::checkUpload(QNetworkReply *reply, const QString &token) {
+    printd("\nWahooClient::checkUpload.\n");
+
+    // Do we have a network error?
+    if (reply->error() != QNetworkReply::NoError) {
+        printd("\nNetwork reply error. \n%s\n", qPrintable(reply->readAll()));
+        return reply->errorString();
+    }
+
+    // Can it be converted to a Json?
+    const auto response = reply->readAll();
+    printd("\nNetwork response in checkUpload. Response: \n%s\n", qPrintable( response));
+    
+    QStringList errors;
+    QJsonObject root = network2Json(response, errors);
+    if (!errors.empty()) { 
+        printd("\nNetwork response returned errors. \n%s\n", qPrintable(errors.join(". ")));
+        return errors.join(". "); 
+    }
+
+    // Has the json a non empty error value?
+    const QJsonValue jsonError = root.value("error");
+    if (!jsonError.isNull()) { 
+        printd("\nJson error is non empty. \n%s\n", qPrintable(jsonError.toString()));
+        return jsonError.toString(); 
+    }
+
+    // Get the upload token
+    const QString uploadToken = root.value("token").toString();
+    
+    // Wait until status complete
+    while(errors.isEmpty()) {
+        QUrl url = QUrl(QString(WAHOO_URL + "/v1/workout_file_uploads/%1").arg(uploadToken));
+        printd("\nCalling %s\n", qPrintable(url.toString()));
+
+        auto replyData = getNetworkResponse(url, token, errors);
+        printd("\n Network reply is: \n%s\n", qPrintable(replyData));
+        QThread::sleep(1);
+
+        root = network2Json(replyData, errors);
+
+        const QJsonValue total = root.value("status");
+        if (total.toString() == "complete") {
+            printd("\ncheckUpload Completed.\n")
+            return "Completed.";
+        }
+    }
+    printd("\nReturning with errors:\n%s", qPrintable(errors.join(".")));
+    return errors.join(".");
 }

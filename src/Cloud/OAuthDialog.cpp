@@ -186,7 +186,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         urlstr = QString("https://api.wahooligan.com/oauth/authorize?");
         urlstr.append("client_id=").append(GC_WAHOO_CLIENT_ID).append("&");
         urlstr.append("redirect_uri=https://www.goldencheetah.org/&");
-        urlstr.append("scope=user_read%20workouts_read&");
+        urlstr.append("scope=user_read%20workouts_read%20workouts_write&");
         urlstr.append("response_type=code&code_challenge=").append(codeChallenge).append("&");
         urlstr.append("code_challenge_method=S256");
 

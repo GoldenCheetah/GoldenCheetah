@@ -8,6 +8,7 @@
 #include <QScopedPointer>
 #include <QJsonDocument>
 #include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QTest>
 
 #include "WahooClient.h"
@@ -25,10 +26,20 @@ class WahooClientTest : public WahooClient
     }
 
     protected:
-        QNetworkReply* namGet(QNetworkRequest &request) override
+        QNetworkReply *namGet(QNetworkRequest &request) override
         {
             QNetworkReply *reply = new MockReply(messageIn_, httpStatusCode_, request);
             QTimer::singleShot(0, reply, [reply]() {
+                emit reply->readyRead();
+                emit reply->finished();
+            });
+            return reply;
+        }
+
+        QNetworkReply *namPost(QNetworkRequest &request, QByteArray &body) override
+        {
+            QNetworkReply *reply = new MockReply(body, httpStatusCode_, request);
+                        QTimer::singleShot(0, reply, [reply]() {
                 emit reply->readyRead();
                 emit reply->finished();
             });
@@ -52,15 +63,22 @@ class TestWahoo : public QObject
         void testReaddirEmpty();
         void testReaddirSingle();
         void testReaddirTwo();
+        void testReaddirToday();
         void testReadFile();
         void testStatusError();
+        void testSendFile();
+        void testCheckUpload();
+
+    private:
+        const QTimeZone berlinZone = QTimeZone(QByteArray("Europe/Berlin"));
+};
 
 void
 TestWahoo::testReaddirEmpty()
 {
    QString emptyResponse = R"json({
                                 "workouts": [],
-                                "total": 0,
+                                "total": 1,
                                 "page": 1,
                                 "per_page": 30,
                                 "order": "descending",
@@ -213,6 +231,53 @@ TestWahoo::testReaddirTwo()
     QCOMPARE(result.size(), 0);
 }
 
+void 
+TestWahoo::testReaddirToday()
+{
+    QString todayRide = R"json({
+                            "workouts": [
+                                {
+                                "id": 1,
+                                "starts": "2026-10-18T09:00:00.000Z",
+                                "minutes": 12,
+                                "name": "Friday afternoon",
+                                "plan_id": null,
+                                "plan_ids": [],
+                                "route_id": null,
+                                "workout_token": "123",
+                                "workout_type_id": 40,
+                                "workout_summary": null,
+                                "created_at": "2026-10-18T10:41:55.000Z",
+                                "updated_at": "2026-10-18T10:41:55.000Z"
+                                }
+                            ],
+                            "total": 1,
+                            "page": 1,
+                            "per_page": 1,
+                            "order": "descending",
+                            "sort": "starts"
+                            })json";
+    QDateTime from = QDateTime(QDate(std::chrono::year_month_day(
+        std::chrono::year(2026),
+        std::chrono::month(9),
+        std::chrono::day(18))), QTime());
+        from.setTimeZone(berlinZone);
+
+    QDateTime to = QDateTime(QDate(std::chrono::year_month_day(
+        std::chrono::year(2026),
+        std::chrono::month(10),
+        std::chrono::day(18))), QTime(11, 00, 01));
+        to.setTimeZone(berlinZone);
+
+    WahooClientTest client(todayRide);
+    QStringList errors;
+    QList<WahooWorkoutEntry> result = client.fetchWorkouts("test_token", errors, from, to);
+    QVERIFY2(errors.isEmpty(), qPrintable(errors.join("&&")));
+    QCOMPARE(result.size(), 1);
+    QCOMPARE(result.at(0).id, "1");
+    QCOMPARE(result.at(0).name, "2026_10_18_11_00_00.fit");
+}
+
 void
 TestWahoo::testReadFile()
 {
@@ -249,6 +314,104 @@ TestWahoo::testStatusError()
     QList<WahooWorkoutEntry> result = client.fetchWorkouts("test_token", errors, now, now);
     QVERIFY(!errors.isEmpty());
     QCOMPARE(errors.at(0), "The API key test_token is revoked.");
+}
+
+void
+TestWahoo::testSendFile()
+{
+    QByteArray fileData = "Data";
+    const QByteArray base64String = fileData.toBase64(QByteArray::Base64UrlEncoding);
+    QString apiResponse = R"json({
+                            "id": 5,
+                            "user_id": 1,
+                            "token": "fRa2HvZ1N0WxuHw",
+                            "status": "pending",
+                            "time_zone": null,
+                            "workout_id": null,
+                            "workout_summary_id": null,
+                            "workout_file_id": null,
+                            "workout_name": "test",
+                            "error": null,
+                            "target_workout_id": null,
+                            "created_at": "2018-10-23T20:43:50.000Z",
+                            "updated_at": "2018-10-23T20:43:50.000Z"
+                        })json";
+    WahooClientTest client(apiResponse);
+    auto *reply = client.sendFile("test_token", fileData, "test", "5");
+    
+    auto result = reply->readAll();
+    QUrlQuery received;
+    received.setQuery(QString::fromUtf8(result));
+
+    QCOMPARE(
+        received.queryItemValue(
+            QStringLiteral("workout_file_upload[file]")
+        ),
+        /* Data base64 encoded is RGF0YQ==*/
+        QStringLiteral("data:application/vnd.fit;base64,RGF0YQ==")
+    );
+
+    QCOMPARE(
+        received.queryItemValue(
+            QStringLiteral("workout_file_upload[filename]")
+        ),
+        QStringLiteral("test")
+    );
+
+    QCOMPARE(
+        received.queryItemValue(
+            QStringLiteral("workout_file_upload[time_zone]")
+        ),
+        QTimeZone::systemTimeZoneId()
+    );
+    reply->deleteLater();
+}
+
+void
+TestWahoo::testCheckUpload()
+{
+    QString success = R"json({
+                            "id": 5,
+                            "user_id": 1,
+                            "token": "fRa2HvZ1N0WxuHw",
+                            "status": "complete",
+                            "time_zone": null,
+                            "workout_id": null,
+                            "workout_summary_id": null,
+                            "workout_file_id": null,
+                            "workout_name": null,
+                            "error": null,
+                            "target_workout_id": null,
+                            "created_at": "2018-10-23T20:43:50.000Z",
+                            "updated_at": "2018-10-23T20:43:50.000Z"
+                        })json";
+    WahooClientTest client(success);
+    QNetworkRequest request = QNetworkRequest(QUrl("https://upload.com/test"));
+    QNetworkReply *reply = new MockReply(success.toUtf8(), 200, request);
+    QString result = client.checkUpload(reply, "test");
+    QCOMPARE(result, "Completed.");
+    reply->deleteLater();
+
+    QString error = R"json(
+                            {
+                                "id": 5,
+                                "user_id": 1,
+                                "token": "fRa2HvZ1N0WxuHw",
+                                "status": "error",
+                                "time_zone": null,
+                                "workout_id": null,
+                                "workout_summary_id": null,
+                                "workout_file_id": null,
+                                "workout_name": null,
+                                "error": "My API error",
+                                "target_workout_id": null,
+                                "created_at": "2018-10-23T20:43:50.000Z",
+                                "updated_at": "2018-10-23T20:43:50.000Z"
+                            }
+    )json";
+    reply = new MockReply(error.toUtf8(), 200, request);
+    result = client.checkUpload(reply, "test");
+    QCOMPARE(result, "My API error");
 }
 
 QTEST_MAIN(TestWahoo)
