@@ -112,7 +112,7 @@ TestWahoo::testReaddirSingle()
                                 "route_id": null,
                                 "workout_token": "123",
                                 "workout_type_id": 40,
-                                "workout_summary": null,
+                                "workout_summary": {"file" : []},
                                 "created_at": "2026-09-30T20:41:55.000Z",
                                 "updated_at": "2026-09-30T20:41:55.000Z"
                                 }
@@ -159,7 +159,7 @@ TestWahoo::testReaddirTwo()
                                 "route_id": null,
                                 "workout_token": "123",
                                 "workout_type_id": 40,
-                                "workout_summary": null
+                                "workout_summary": {"file": []}
                                 },
                                 {
                                 "id": 2,
@@ -171,7 +171,7 @@ TestWahoo::testReaddirTwo()
                                 "route_id": null,
                                 "workout_token": "123",
                                 "workout_type_id": 40,
-                                "workout_summary": null
+                                "workout_summary": {"file": []}
                                 }
                             ],
                             "total": 2,
@@ -246,7 +246,7 @@ TestWahoo::testReaddirToday()
                                 "route_id": null,
                                 "workout_token": "123",
                                 "workout_type_id": 40,
-                                "workout_summary": null,
+                                "workout_summary": {"file": []},
                                 "created_at": "2026-10-18T10:41:55.000Z",
                                 "updated_at": "2026-10-18T10:41:55.000Z"
                                 }

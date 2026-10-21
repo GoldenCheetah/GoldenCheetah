@@ -214,6 +214,11 @@ WahooClient::fetchWorkouts(const QString &token, QStringList &errors, const QDat
             entry.isDir = false;
 
             QJsonObject summary = workout["workout_summary"].toObject();
+
+            // Sometimes the Wahoo API has "ghost" entries with empty summary objects
+            // Don't add these entries
+            if (!summary.contains("file")) {continue; }
+
             // distance_accum is in meters, while CloudServiceEntry wants the distance in km
             entry.distance = summary["distance_accum"].toVariant().toDouble() / 1000.0;
 
