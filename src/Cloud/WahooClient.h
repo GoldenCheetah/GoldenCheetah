@@ -82,8 +82,7 @@ class WahooClient {
 
         QNetworkReply *sendFile(const QString &token,
                                 QByteArray &data,
-                                const QString &remotename,
-                                const QString &remoteid);
+                                const QString &remotename);
 
         QString checkUpload(QNetworkReply *reply, const QString &token);
 

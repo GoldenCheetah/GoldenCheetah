@@ -175,9 +175,8 @@ Wahoo::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     printd("\nWahoo::writeFile called for %s\n", qPrintable(remotename));
 
     const QString token = getToken();
-    printd("\nGot token %s\n", qPrintable(token));
 
-    QNetworkReply *reply = client_.sendFile(token, data, remotename, ride->id());
+    QNetworkReply *reply = client_.sendFile(token, data, remotename);
     if (reply == nullptr) {
         printd("\nGot network reply with nullptr, exiting writeFile.\n");
         return false; 
@@ -225,7 +224,6 @@ Wahoo::writeFileCompleted()
     auto *reply = static_cast<QNetworkReply*>(QObject::sender());
     
     const QString token = getToken();
-    printd("\nGot token %s\n", qPrintable(token));
     QString result = client_.checkUpload(reply, token);
     
     CloudService::notifyWriteComplete(replyName(reply), result);

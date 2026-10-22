@@ -269,10 +269,9 @@ WahooClient::startFileDownload(const QString &token, const QString &remoteId, QS
 }
 
 QNetworkReply *WahooClient::sendFile(const QString &token, QByteArray &data,
-                                     const QString &remotename,
-                                     const QString &remoteid) {
-    printd("\nWahooClient::sendFile with token %s, remotename %s, id %s\n",
-        qPrintable(token), qPrintable(remotename), qPrintable(remoteid));
+                                     const QString &remotename) {
+    printd("\nWahooClient::sendFile with remotename %s\n",
+        qPrintable(remotename));
 
     // Prepare a QUrlQuery
     const QUrl url = QUrl(WAHOO_URL + "/v1/workout_file_uploads");
@@ -283,7 +282,7 @@ QNetworkReply *WahooClient::sendFile(const QString &token, QByteArray &data,
     form.addQueryItem(QStringLiteral("workout_file_upload[file]"), fileField);
     form.addQueryItem(QStringLiteral("workout_file_upload[filename]"), remotename);
     form.addQueryItem(QStringLiteral("workout_file_upload[time_zone]"), QTimeZone::systemTimeZoneId());
-    form.addQueryItem(QStringLiteral("workout_file_upload[workout_name]"), remoteid);
+    form.addQueryItem(QStringLiteral("workout_file_upload[workout_name]"), remotename);
 
     QByteArray body = form.toString(QUrl::FullyEncoded).toUtf8();
     

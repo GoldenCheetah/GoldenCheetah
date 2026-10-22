@@ -337,7 +337,7 @@ TestWahoo::testSendFile()
                             "updated_at": "2018-10-23T20:43:50.000Z"
                         })json";
     WahooClientTest client(apiResponse);
-    auto *reply = client.sendFile("test_token", fileData, "test", "5");
+    auto *reply = client.sendFile("test_token", fileData, "test");
     
     auto result = reply->readAll();
     QUrlQuery received;
