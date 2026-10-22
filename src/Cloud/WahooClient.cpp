@@ -286,6 +286,11 @@ QNetworkReply *WahooClient::sendFile(const QString &token, QByteArray &data,
 
     QByteArray body = form.toString(QUrl::FullyEncoded).toUtf8();
     
+    // The QByteArray doesn't encode '+' characters, this causes
+    // incomplete fit files and incorrect start times
+    // Manually replace the '+' character with the correct encoding
+    body.replace('+', QByteArrayView("%2B"));
+
     // Create a QNetworkRequest
     QNetworkRequest request(url);
     request.setRawHeader("Authorization", QString("Bearer %1").arg(token).toLatin1());
