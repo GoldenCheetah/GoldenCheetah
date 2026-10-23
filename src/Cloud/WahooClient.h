@@ -22,7 +22,6 @@
 #include <QString>
 #include <QStringList>
 #include <QByteArray>
-#include <QMap>
 #include <QDateTime>
 #include <QUrl>
 #include <QUrlQuery>
@@ -41,7 +40,7 @@ Q_DECLARE_LOGGING_CATEGORY(gcWahoo)
 #define printd(fmt, args...) qCDebug(gcWahoo, fmt, ##args);
 #endif
 
-inline constexpr QStringView WAHOO_URL = u"https://api.wahooligan.com";
+const inline QString WAHOO_URL = QStringLiteral("https://api.wahooligan.com");
 
 // This makes including CloudService.h obsolete,
 // thus avoiding dependencies which cause trouble in testing
