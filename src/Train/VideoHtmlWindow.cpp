@@ -10,11 +10,17 @@
 #include "HtmlTrainingBridge.h"
 
 #include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QUrl>
 #include <QPainter>
+#include <QLabel>
+#include <QResizeEvent>
+#include <QShowEvent>
+#include <QVideoFrame>
+#include <QWebEngineSettings>
 
 #include <QMediaMetaData>
-#include <QtMath>   // for qPow
+#include <QtMath>
 
 #if defined(GC_VIDEO_QT6)
 
@@ -40,9 +46,11 @@ void VideoHtmlWindow::VideoSurfaceWidget::paintEvent(QPaintEvent *)
     p.fillRect(rect(), Qt::black);
 
     if (!frame.isNull()) {
-        QImage scaled = frame.scaled(size(),
-                                     Qt::KeepAspectRatioByExpanding,
-                                     Qt::SmoothTransformation);
+        Qt::AspectRatioMode mode = m_keepAspectRatio
+            ? Qt::KeepAspectRatio
+            : Qt::KeepAspectRatioByExpanding;
+
+        QImage scaled = frame.scaled(size(), mode, Qt::SmoothTransformation);
         QPoint topLeft((width()  - scaled.width())  / 2,
                        (height() - scaled.height()) / 2);
         p.drawImage(topLeft, scaled);
@@ -84,7 +92,6 @@ void VideoHtmlWindow::telemetryUpdate(const RealtimeData &rtd)
     if (state != Playing)
         return;
 
-    // Push the same route distance the video uses into the HTML overlay
     auto pushRouteKmToHtml = [this](double km) {
         if (!htmlOverlay || !htmlOverlay->page())
             return;
@@ -98,11 +105,9 @@ void VideoHtmlWindow::telemetryUpdate(const RealtimeData &rtd)
         htmlOverlay->page()->runJavaScript(js);
     };
 
-    // ---------- VideoSync-driven rate / seek ----------
     if (context->currentVideoSyncFile()) {
         QVector<VideoSyncFilePoint> points = context->currentVideoSyncFile()->Points;
         if (points.count() < 2) {
-            // Still update HTML rider even if sync file is too short
             pushRouteKmToHtml(rtd.getRouteDistance());
             return;
         }
@@ -120,7 +125,6 @@ void VideoHtmlWindow::telemetryUpdate(const RealtimeData &rtd)
                (curPosition < points.count() - 1))
             curPosition++;
 
-        // Keep HTML map / elevation rider locked to the same distance
         pushRouteKmToHtml(currentDistance);
 
         VideoSyncFilePoint syncPrev = VideoSyncPointAdjust(points[curPosition - 1]);
@@ -163,7 +167,6 @@ void VideoHtmlWindow::telemetryUpdate(const RealtimeData &rtd)
         else
             rate = (float)(rtd.getSpeed() / ghostKph);
 
-        // Hard seek if more than 5 s out of sync
         if (fabs(video_time_shift_ms) > 5000.0f) {
             mp->setPosition((qint64)(ghostSecs * 1000.0));
         } else {
@@ -180,7 +183,6 @@ void VideoHtmlWindow::telemetryUpdate(const RealtimeData &rtd)
             currentVideoRate = rate;
         }
     } else {
-        // No videosync: still keep HTML rider on route distance
         pushRouteKmToHtml(rtd.getRouteDistance());
     }
 #else
@@ -199,6 +201,9 @@ VideoHtmlWindow::VideoHtmlWindow(Context *context)
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartTrain_VideoPlayer));
 
     setProperty("color", QColor(Qt::black));
+    setWidthFactor(1.0);
+    setHeightFactor(1.0);
+    setResizable(true);
 
 #if defined(GC_VIDEO_QT6)
 
@@ -216,6 +221,10 @@ VideoHtmlWindow::VideoHtmlWindow(Context *context)
     showTitleBtn->setChecked(true);
     controlsLayout->addWidget(showTitleBtn);
 
+    keepAspectRatioBtn = new QCheckBox(tr("Keep aspect ratio (no crop)"), controls);
+    keepAspectRatioBtn->setChecked(true);
+    controlsLayout->addWidget(keepAspectRatioBtn);
+
     QPushButton *applyBtn = new QPushButton(tr("Apply HTML"), controls);
     controlsLayout->addWidget(applyBtn);
     connect(applyBtn, &QPushButton::clicked, this, &VideoHtmlWindow::applyHtml);
@@ -223,8 +232,9 @@ VideoHtmlWindow::VideoHtmlWindow(Context *context)
     controlsLayout->addStretch();
     setControls(controls);
 
-    connect(showEditorBtn, &QCheckBox::stateChanged, this, &VideoHtmlWindow::showEditorChanged);
-    connect(showTitleBtn,  &QCheckBox::stateChanged, this, &VideoHtmlWindow::showTitleChanged);
+    connect(showEditorBtn, &QCheckBox::checkStateChanged, this, &VideoHtmlWindow::showEditorChanged);
+    connect(showTitleBtn,  &QCheckBox::checkStateChanged, this, &VideoHtmlWindow::showTitleChanged);
+    connect(keepAspectRatioBtn, &QCheckBox::checkStateChanged, this, &VideoHtmlWindow::keepAspectRatioChanged);
 
     // ------------------------------------------------------------------
     // Main layout – splitter (video area + optional editor)
@@ -233,6 +243,7 @@ VideoHtmlWindow::VideoHtmlWindow(Context *context)
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setSpacing(0);
     setChartLayout(mainLayout);
+
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setMinimumSize(400, 300);
 
@@ -241,7 +252,6 @@ VideoHtmlWindow::VideoHtmlWindow(Context *context)
     splitter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     splitter->setMinimumSize(320, 240);
 
-    // ----- Video + HTML overlay -----
     container = new QWidget(this);
     splitter->addWidget(container);
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -282,14 +292,12 @@ VideoHtmlWindow::VideoHtmlWindow(Context *context)
     htmlOverlay->raise();
     htmlOverlay->show();
 
-    // ----- WebChannel -----
     m_webChannel = new QWebChannel(this);
     if (context->getHtmlTrainingBridge()) {
         m_webChannel->registerObject(QStringLiteral("gc"), context->getHtmlTrainingBridge());
     }
     htmlOverlay->page()->setWebChannel(m_webChannel);
 
-    // ----- Source editor (hidden by default) -----
     sourceEditor = new QPlainTextEdit(this);
     sourceEditor->setPlaceholderText(tr("HTML / CSS / JavaScript source…"));
     sourceEditor->setTabStopDistance(4 * sourceEditor->fontMetrics().horizontalAdvance(' '));
@@ -300,7 +308,6 @@ VideoHtmlWindow::VideoHtmlWindow(Context *context)
     splitter->setStretchFactor(1, 0);
     splitter->setSizes({1000, 0});
 
-    // Default HTML
     htmlSource = R"(
 <!DOCTYPE html>
 <html>
@@ -369,6 +376,17 @@ new QWebChannel(qt.webChannelTransport, function(channel) {
 }
 
 
+QSize VideoHtmlWindow::sizeHint() const
+{
+    return QSize(1200, 800);
+}
+
+QSize VideoHtmlWindow::minimumSizeHint() const
+{
+    return QSize(400, 300);
+}
+
+
 // ---------------------------------------------------------------
 // Property / editor helpers
 // ---------------------------------------------------------------
@@ -421,7 +439,7 @@ void VideoHtmlWindow::setEditorVisible(bool visible)
 #endif
 }
 
-void VideoHtmlWindow::showEditorChanged(int state)
+void VideoHtmlWindow::showEditorChanged(Qt::CheckState state)
 {
 #if defined(GC_VIDEO_QT6)
     if (!sourceEditor || !splitter) return;
@@ -432,6 +450,16 @@ void VideoHtmlWindow::showEditorChanged(int state)
     else
         splitter->setSizes({1000, 0});
 #endif
+}
+
+void VideoHtmlWindow::showTitleChanged(Qt::CheckState state)
+{
+    setTitleVisible(state == Qt::Checked);
+}
+
+void VideoHtmlWindow::keepAspectRatioChanged(Qt::CheckState state)
+{
+    setKeepAspectRatio(state == Qt::Checked);
 }
 
 bool VideoHtmlWindow::isTitleVisible() const
@@ -455,11 +483,30 @@ void VideoHtmlWindow::setTitleVisible(bool visible)
 #endif
 }
 
-void VideoHtmlWindow::showTitleChanged(int state)
+bool VideoHtmlWindow::isKeepAspectRatio() const
 {
-    setTitleVisible(state == Qt::Checked);
+#if defined(GC_VIDEO_QT6)
+    return m_keepAspectRatio;
+#else
+    return true;
+#endif
 }
 
+void VideoHtmlWindow::setKeepAspectRatio(bool keep)
+{
+#if defined(GC_VIDEO_QT6)
+    m_keepAspectRatio = keep;
+    if (keepAspectRatioBtn) {
+        keepAspectRatioBtn->blockSignals(true);
+        keepAspectRatioBtn->setChecked(keep);
+        keepAspectRatioBtn->blockSignals(false);
+    }
+    if (videoSurface)
+        videoSurface->setKeepAspectRatio(keep);
+#else
+    Q_UNUSED(keep);
+#endif
+}
 
 // ---------------------------------------------------------------
 // Destructor
@@ -600,7 +647,6 @@ void VideoHtmlWindow::seekPlayback(long ms)
     if (!hasActiveVideo())
         return;
 
-    // With a videosync file, distance is driven by telemetryUpdate
     if (context->currentVideoSyncFile())
         return;
 
