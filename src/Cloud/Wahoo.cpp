@@ -36,33 +36,9 @@
 #include <QUrlQuery>
 #include <QEventLoop>
 
-#ifndef WAHOO_DEBUG
-#define WAHOO_DEBUG false
-#endif
-#ifdef Q_CC_MSVC
-#define printd(fmt, ...) do {                                                \
-    if (WAHOO_DEBUG) {                                 \
-        printf("[%s:%d %s] \n" fmt , __FILE__, __LINE__,        \
-               __FUNCTION__, __VA_ARGS__);                    \
-        fflush(stdout);                                       \
-    }                                                         \
-} while(0)
-#else
-#define printd(fmt, args...)                                            \
-    do {                                                                \
-        if (WAHOO_DEBUG) {                                       \
-            printf("[%s:%d %s] \n" fmt , __FILE__, __LINE__,              \
-                   __FUNCTION__, ##args);                               \
-            fflush(stdout);                                             \
-        }                                                               \
-    } while(0)
-#endif
-
-const static QString WAHOO_URL = "https://api.wahooligan.com";
-
 QImage Wahoo::logo() const
 {
-    printd("Logo requested.");
+    printd("Logo requested.\n");
     return QImage("images/services/wahoo.png");
 }
 
@@ -90,14 +66,14 @@ Wahoo::Wahoo(Context *context) : CloudService(context), context(context)
     // First argument is the enum CloudServiceSetting (i.e. the "type")
     // The second is the name of the setting
     CloudService::settings.insert(OAuthToken, GC_WAHOO_TOKEN);
-    CloudService::settings.insert(OAuthToken, GC_WAHOO_REFRESH_TOKEN);
-    CloudService::settings.insert(Local1, GC_WAHOO_LAST_REFRESH);
+    CloudService::settings.insert(Local1, GC_WAHOO_REFRESH_TOKEN);
+    CloudService::settings.insert(Local2, GC_WAHOO_LAST_REFRESH);
 }
 
 bool
 Wahoo::open(QStringList &errors)
 {
-    printd("Wahoo::open.\n");
+    printd("\nWahoo::open.\n");
     // Get last refresh token
     QString refreshToken = getSetting(GC_WAHOO_REFRESH_TOKEN, "").toString();
     if (refreshToken.isEmpty()) {
@@ -109,7 +85,17 @@ Wahoo::open(QStringList &errors)
     QString newAccess;
     QString newRefresh;
     QString err;
-    int expiresIn;
+
+    // Prevent uneccessary refresh requests. Refresh tokens are valid 2h
+    // 120 sec will be enough, so the limit is 7000 sec from the last refresh
+    QDateTime lastRefresh =  getSetting(GC_WAHOO_LAST_REFRESH).toDateTime();
+
+    // Convert 2h in seconds and subtract 120
+    constexpr int maxTokenAgeSec = 7200 - 120;
+    auto expires = lastRefresh.addSecs(maxTokenAgeSec);
+    if (QDateTime::currentDateTime().toLocalTime() < expires) {return true; }
+
+    int expiresIn{0};
     if (!OAuthPKCE::refreshAccessToken(
             WAHOO_URL + "/oauth/token",
             GC_WAHOO_CLIENT_ID,
@@ -131,20 +117,19 @@ Wahoo::open(QStringList &errors)
 bool
 Wahoo::close()
 {
-    printd("Wahoo::close.\n");
+    printd("\nWahoo::close.\n");
     return true;
 }
 
 QList<CloudServiceEntry*>
 Wahoo::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
 {
-    printd("Wahoo::readdir path: (%s), from: (%s), to: (%s)\n",
+    printd("\nWahoo::readdir path: (%s), from: (%s), to: (%s)\n",
         qPrintable(path), qPrintable(from.toString()), qPrintable(to.toString()));
 
     QList<CloudServiceEntry*> results;
-    QString token = getSetting(GC_WAHOO_TOKEN, "").toString();
-
-    auto entries = client_.fetchWorkouts(token, errors, from, to);
+    const QString token = getToken();
+    QList<WahooWorkoutEntry> entries = client_.fetchWorkouts(token, errors, from, to);
     if (!errors.isEmpty()) return results;
 
     for (const auto &entry : entries) {
@@ -164,13 +149,13 @@ Wahoo::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
 bool
 Wahoo::readFile(QByteArray *data, QString remotename, QString remoteid)
 {
-    printd("Get remotename: %s, remoteid: %s", qPrintable(remotename), qPrintable(remoteid));
+    printd("\nGet remotename: %s, remoteid: %s\n", qPrintable(remotename), qPrintable(remoteid));
+    
+    const QString token = getToken();
     QStringList errors;
-    QString token = getSetting(GC_WAHOO_TOKEN, "").toString();
-
     QNetworkReply *reply = client_.startFileDownload(token, remoteid, errors);
     if (reply == nullptr || !errors.isEmpty()) {
-        qWarning() << "NetworkResponse error in Wahoo::readFile: " << errors;
+        printd("\nNetworkResponse error in Wahoo::readFile: %s\n", qPrintable(errors.join(". ")));
         return false;
     }
 
@@ -180,6 +165,25 @@ Wahoo::readFile(QByteArray *data, QString remotename, QString remoteid)
 
     auto completedFunc = QObject::connect(reply, &QNetworkReply::finished, this, &Wahoo::readFileCompleted);
     auto readyFunc = QObject::connect(reply, &QNetworkReply::readyRead, this, &Wahoo::readyRead);
+
+    return true;
+}
+
+bool
+Wahoo::writeFile(QByteArray &data, QString remotename, RideFile *ride)
+{
+    printd("\nWahoo::writeFile called for %s\n", qPrintable(remotename));
+
+    const QString token = getToken();
+
+    QNetworkReply *reply = client_.sendFile(token, data, remotename);
+    if (reply == nullptr) {
+        printd("\nGot network reply with nullptr, exiting writeFile.\n");
+        return false; 
+    }
+
+    CloudService::mapReply(reply, remotename);
+    connect(reply, &QNetworkReply::finished, this, &Wahoo::writeFileCompleted);
 
     return true;
 }
@@ -198,11 +202,11 @@ Wahoo::readyRead()
 void
 Wahoo::readFileCompleted()
 {
-    printd("Wahoo::readFileCompleted.");
+    printd("\nWahoo::readFileCompleted.\n");
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
 
     if (reply != nullptr && reply->error() == QNetworkReply::NoError) {
-        printd("received %lld bytes\n", static_cast<long long>(buffers.value(reply)->size()));
+        printd("\nreceived %lld bytes\n", static_cast<long long>(buffers.value(reply)->size()));
 
         // This calls CloudService::readComplete,
         // which deletes the QByteArray *data
@@ -214,10 +218,37 @@ Wahoo::readFileCompleted()
 }
 
 void
+Wahoo::writeFileCompleted()
+{
+    printd("\nWahoo writeFileCompleted.\n");
+    auto *reply = static_cast<QNetworkReply*>(QObject::sender());
+    
+    const QString token = getToken();
+    QString result = client_.checkUpload(reply, token);
+    
+    CloudService::notifyWriteComplete(replyName(reply), result);
+    printd("\nReturning writeFileCompleted with status: %s\n", qPrintable(result));
+}
+
+void
 Wahoo::onSslErrors(QNetworkReply *reply, const QList<QSslError>&errors)
 {
     // Redirect error handling to CloudService
     CloudService::sslErrors(context->mainWindow, reply, errors);
+}
+
+QString
+Wahoo::getToken()
+{
+    printd("\nWahoo::getToken\n");
+    QStringList errors;
+    open(errors);
+    if (!errors.empty()) {
+        printd("\nAuthorization failed. %s\n", qPrintable(errors.join(".")));
+        return "";
+    }
+
+    return getSetting(GC_WAHOO_TOKEN, "").toString();
 }
 
 static bool addWahoo() {
