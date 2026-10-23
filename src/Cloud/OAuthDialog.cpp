@@ -179,7 +179,34 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         urlstr.append("code_challenge_method=S256");
 
     } else if (site == WAHOO) {
+        // Wahoo only allows 10 tokens per User. To prevent reaching this limit,
+        // delete previous tokens before requesting a new one.
+        QString oldToken = service->getSetting(GC_WAHOO_REFRESH_TOKEN, "").toString();
+        if (!oldToken.isEmpty()) {
+            // Refresh token
+            QStringList errors;
+            service->open(errors);
+            oldToken = service->getSetting(GC_WAHOO_TOKEN, "").toString();
+            if (!errors.isEmpty()) {qDebug() << errors.join("."); }
 
+            // Deauthorize app
+            QUrl deleteUrl = QString("https://api.wahooligan.com/v1/permissions");
+            QNetworkRequest deleteRequest(deleteUrl);
+            deleteRequest.setRawHeader(QByteArray("Authorization"), QByteArray("Bearer ") + oldToken.toUtf8());
+            QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+            QNetworkReply *deleteReply = manager->deleteResource(deleteRequest);
+
+            QEventLoop loop;
+            connect(deleteReply, SIGNAL(finished()), &loop, SLOT(quit()));
+            loop.exec();
+            if (deleteReply->error() == QNetworkReply::NoError) {
+                // Overwrite old token settings
+                service->setSetting(GC_WAHOO_TOKEN, "");
+                service->setSetting(GC_WAHOO_REFRESH_TOKEN, "");
+                service->setSetting(GC_WAHOO_LAST_REFRESH, 0);
+            }
+            deleteReply->deleteLater();
+        }
         codeVerifier = OAuthPKCE::generateCodeVerifier();
         QString codeChallenge = OAuthPKCE::computeCodeChallenge(codeVerifier);
 
@@ -372,31 +399,6 @@ OAuthDialog::urlChanged(const QUrl &url)
 
             // now get the final token - but ignore errors
             manager = new QNetworkAccessManager(this);
-
-            if (site == WAHOO) {
-                // Wahoo only allows 10 tokens per User. To prevent reaching this limit,
-                // delete previous tokens before requesting a new one.
-                QString oldToken = service->getSetting(GC_WAHOO_REFRESH_TOKEN, "").toString();
-                if (!oldToken.isEmpty()) {
-                    // Refresh token
-                    QStringList errors;
-                    service->open(errors);
-                    oldToken = service->getSetting(GC_WAHOO_TOKEN, "").toString();
-                    if (!errors.isEmpty()) {qDebug() << errors.join("."); }
-
-                    // Deauthorize app
-                    QUrl deleteUrl = QString("https://api.wahooligan.com/v1/permissions");
-                    QNetworkRequest deleteRequest(deleteUrl);
-                    deleteRequest.setRawHeader(QByteArray("Authorization"), QByteArray("Bearer ") + oldToken.toUtf8());
-                    QNetworkReply *deleteReply = manager->deleteResource(deleteRequest);
-
-                    QEventLoop loop;
-                    connect(deleteReply, SIGNAL(finished()), &loop, SLOT(quit()));
-                    loop.exec();
-
-                    deleteReply->deleteLater();
-                }
-            }
             connect(manager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
             connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(networkRequestFinished(QNetworkReply*)));
 

@@ -120,6 +120,8 @@ WahooClient::getNetworkResponse(QUrl url, const QString &token, QStringList &err
     }
 
     if (!errors.isEmpty()) {
+        // Get the details
+        printd("\nError Data: %s\n", qPrintable(reply->readAll()));
         return QByteArray{};
     }
     
