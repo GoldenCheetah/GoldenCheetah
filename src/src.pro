@@ -5,7 +5,7 @@
 #                                                                             #
 ###############################################################################
 
-!versionAtLeast(QT_VERSION, 6.5.3):error("Use at least Qt version 6.5.3")
+!versionAtLeast(QT_VERSION, 6.8.3):error("Use at least Qt version 6.8.3")
 
 ###==========================
 ### IMPORT USER CONFIGURATION
@@ -471,7 +471,7 @@ SOURCES +=  $$HTPATH/httpglobal.cpp \
 ## CloudDB is only supported on QT6.5.3 or higher ##
 ##------------------------------------------------##
 
-notsupported = "INFO: CloudDB requires version QT >= 6.5.3, no support for"
+notsupported = "INFO: CloudDB requires version QT >= 6.8.3, no support for"
 notsupported += $${QT_VERSION}
 
 equals(CloudDB, active) {

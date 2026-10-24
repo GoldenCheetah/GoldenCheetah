@@ -135,13 +135,8 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     garminHWMarkedit->setValue(garminHWMark.toInt());
 
     connect(garminSmartRecord,
-#if QT_VERSION < QT_VERSION_CHECK(6,7,0)
-            &QCheckBox::stateChanged,
-            this, [this](int state) { garminHWMarkedit->setEnabled(state); });
-#else
             QOverload<Qt::CheckState>::of(&QCheckBox::checkStateChanged),
             this, [this](Qt::CheckState state) { garminHWMarkedit->setEnabled(state); });
-#endif
 
     garminSmartRecord->setCheckState(! (isGarminSmartRecording.toInt() > 0) ? Qt::Checked : Qt::Unchecked);
     garminSmartRecord->setCheckState(isGarminSmartRecording.toInt() > 0 ? Qt::Checked : Qt::Unchecked);
@@ -202,13 +197,8 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 
     connect(rBrowseButton, SIGNAL(clicked()), this, SLOT(browseRDir()));
     connect(embedR,
-#if QT_VERSION < QT_VERSION_CHECK(6,7,0)
-            &QCheckBox::stateChanged,
-            this, [this](int state) { rDirectorySel->setEnabled(state); });
-#else
             QOverload<Qt::CheckState>::of(&QCheckBox::checkStateChanged),
             this, [this](Qt::CheckState state) { rDirectorySel->setEnabled(state); });
-#endif
 
     embedR->setChecked(appsettings->value(NULL, GC_EMBED_R, true).toBool());
 #endif
@@ -231,13 +221,8 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 
     connect(pythonBrowseButton, SIGNAL(clicked()), this, SLOT(browsePythonDir()));
     connect(embedPython,
-#if QT_VERSION < QT_VERSION_CHECK(6,7,0)
-            &QCheckBox::stateChanged,
-            this, [this](int state) { pythonDirectorySel->setEnabled(state); });
-#else
             QOverload<Qt::CheckState>::of(&QCheckBox::checkStateChanged),
             this, [this](Qt::CheckState state) { pythonDirectorySel->setEnabled(state); });
-#endif
 
     embedPython->setChecked(appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool());
 #endif
