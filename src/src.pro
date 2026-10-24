@@ -139,6 +139,8 @@ macx {
     # otherwise we have a blank videowindow, it will do nothing
     HEADERS += Train/VideoWindow.h
     SOURCES += Train/VideoWindow.cpp
+    HEADERS += Train/VideoHtmlWindow.h
+    SOURCES += Train/VideoHtmlWindow.cpp
 } else {
     # not on mac we need our own full screen support and segment control button
     HEADERS += Gui/QTFullScreen.h
@@ -146,6 +148,9 @@ macx {
 
     HEADERS += Train/VideoWindow.h
     SOURCES += Train/VideoWindow.cpp
+
+    HEADERS += Train/VideoHtmlWindow.h
+    SOURCES += Train/VideoHtmlWindow.cpp
 }
 
 
