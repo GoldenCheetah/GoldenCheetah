@@ -188,9 +188,6 @@ Info: A pre-compiled set of the dependencies for the Windows version of GoldenCh
 - USB2 support via libusb
   -- Is part of the official build - the build uses the pre-compiled release 1.2.6.0
 
-- Video Playback via VLC
-  -- Is part of the official build as .dll - the build uses the pre-compiled release 2.2.1
-
 - Resampling via libsamplerate
   -- Is part of the official build as .dll - the build uses
 

@@ -134,20 +134,13 @@ macx {
     # on mac we use native buttons and video, but have native fullscreen support
     LIBS    += -lobjc -framework IOKit -framework AppKit
 
-    # GC_VIDEO_QT6 will enable Qt6 video support,
-    # GC_VIDEO_VLC will enable VLC video support,
-    # otherwise we have a blank videowindow, it will do nothing
-    HEADERS += Train/VideoWindow.h
-    SOURCES += Train/VideoWindow.cpp
 } else {
+
     # not on mac we need our own full screen support and segment control button
     HEADERS += Gui/QTFullScreen.h
     SOURCES += Gui/QTFullScreen.cpp
 
-    HEADERS += Train/VideoWindow.h
-    SOURCES += Train/VideoWindow.cpp
 }
-
 
 
 # X11
@@ -395,22 +388,6 @@ contains(DEFINES, "GC_WANT_GOOGLECAL") {
 
     SOURCES += Train/USBXpress.cpp
     HEADERS += Train/USBXpress.h
-}
-
-
-###=============================================================
-### OPTIONAL => VLC [Windows, Unix and OSX]
-###=============================================================
-
-!isEmpty(VLC_INSTALL) {
-
-    # we will work out the rest if you tell use where it is installed
-    isEmpty(VLC_INCLUDE) { VLC_INCLUDE = $${VLC_INSTALL}/include }
-    isEmpty(VLC_LIBS)    { VLC_LIBS    = -L$${VLC_INSTALL}/lib -lvlc }
-
-    DEFINES     += GC_HAVE_VLC
-    INCLUDEPATH += $${VLC_INCLUDE}
-    LIBS        += $${VLC_LIBS}
 }
 
 
@@ -690,8 +667,8 @@ HEADERS += Train/TrainBottom.h Train/TrainDB.h Train/TrainSidebar.h \
            Train/InfoWidget.h Train/PowerInfoWidget.h Train/PowerZonesWidget.h Train/RatingWidget.h \
            Train/ErgOverview.h Train/Shy.h \
            Train/WorkoutTagWrapper.h \
-           Train/MenuProvider.h Train/WorkoutMenuProvider.h
-
+           Train/MenuProvider.h Train/WorkoutMenuProvider.h \
+           Train/VideoWindow.h
 
 ###=============
 ### SOURCE FILES
@@ -808,7 +785,8 @@ SOURCES += Train/TrainBottom.cpp Train/TrainDB.cpp Train/TrainSidebar.cpp \
            Train/InfoWidget.cpp Train/PowerInfoWidget.cpp Train/PowerZonesWidget.cpp Train/RatingWidget.cpp \
            Train/ErgOverview.cpp Train/Shy.cpp \
            Train/WorkoutTagWrapper.cpp \
-           Train/WorkoutMenuProvider.cpp
+           Train/WorkoutMenuProvider.cpp \
+           Train/VideoWindow.cpp
 
 ## Crash Handling
 win32-msvc* {

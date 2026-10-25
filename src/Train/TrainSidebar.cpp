@@ -75,7 +75,7 @@
 #include "TrainDB.h"
 #include "Library.h"
 
-#if defined(GC_HAVE_VLC)||defined(GC_VIDEO_QT6) // RLV currently only support for VLC
+#if defined(GC_VIDEO_QT6)
 #define USE_RLV
 #endif
 
@@ -336,9 +336,6 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     // get rid of annoying focus rectangle for sidebar components
 #if !defined GC_VIDEO_NONE
     mediaTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
-#if defined GC_HAVE_VLC // not on OSX at present
-    videosyncTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
-#endif
 #endif
     workoutTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
     deviceTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
