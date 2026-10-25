@@ -1282,7 +1282,7 @@ void RideFile::updateMin(RideFilePoint* point)
        minPoint->headwind = point->headwind;
     if (point->slope<minPoint->slope)
        minPoint->slope = point->slope;
-    if (point->temp != NA && point->temp<minPoint->temp)
+    if (static_cast<int>(point->temp) != NA && point->temp<minPoint->temp)
        minPoint->temp = point->temp;
     if (minPoint->lte == 0 || point->lte<minPoint->lte)
        minPoint->lte = point->lte;
@@ -1361,7 +1361,7 @@ void RideFile::updateMax(RideFilePoint* point)
        maxPoint->headwind = point->headwind;
     if (point->slope>maxPoint->slope)
        maxPoint->slope = point->slope;
-    if (point->temp != NA && point->temp>maxPoint->temp)
+    if (static_cast<int>(point->temp) != NA && point->temp>maxPoint->temp)
        maxPoint->temp = point->temp;
     if (point->lte>maxPoint->lte)
        maxPoint->lte = point->lte;
@@ -1429,7 +1429,7 @@ void RideFile::updateAvg(RideFilePoint* point)
         totalPoint->lat += point->lat;
         totalPoint->headwind += point->headwind;
         totalPoint->slope += point->slope;
-        totalPoint->temp += point->temp == NA ? 0 : point->temp;
+        totalPoint->temp += static_cast<int>(point->temp) == NA ? 0 : point->temp;
         totalPoint->lte += point->lte;
         totalPoint->rte += point->rte;
         totalPoint->lps += point->lps;
@@ -1455,7 +1455,7 @@ void RideFile::updateAvg(RideFilePoint* point)
         totalPoint->tcore += point->tcore;
 
         ++totalCount;
-        if (point->temp != NA) ++totalTemp;
+        if (static_cast<int>(point->temp) != NA) ++totalTemp;
     }
 
     // todo : division only for last after last point
@@ -1694,8 +1694,8 @@ void RideFile::appendOrUpdatePoint(double secs, double cad, double hr, double km
     dataPresent.lat      |= (lat != 0);
     dataPresent.headwind |= (headwind != 0);
     dataPresent.slope    |= (slope != 0);
-    dataPresent.temp     |= (temp != NA);
-    dataPresent.lrbalance|= (lrbalance != 0 && lrbalance != NA);
+    dataPresent.temp     |= (static_cast<int>(temp) != NA);
+    dataPresent.lrbalance|= (lrbalance != 0 && static_cast<int>(lrbalance) != NA);
     dataPresent.lte      |= (lte != 0);
     dataPresent.rte      |= (rte != 0);
     dataPresent.lps      |= (lps != 0);
@@ -1764,9 +1764,9 @@ RideFile::updatePoint(RideFilePoint *point, const RideFilePoint *oldPoint){
         point->headwind = oldPoint->headwind;
     if (point->slope == 0 && oldPoint->slope != 0)
         point->slope = oldPoint->slope;
-    if (point->temp == RideFile::NA && oldPoint->temp != RideFile::NA)
+    if (static_cast<int>(point->temp) == RideFile::NA && static_cast<int>(oldPoint->temp) != RideFile::NA)
         point->temp = oldPoint->temp;
-    if (point->lrbalance == RideFile::NA && oldPoint->lrbalance != RideFile::NA)
+    if (static_cast<int>(point->lrbalance) == RideFile::NA && static_cast<int>(oldPoint->lrbalance) != RideFile::NA)
         point->lrbalance = oldPoint->lrbalance;
 
     if (point->lte == 0 && oldPoint->lte != 0)
@@ -2127,7 +2127,7 @@ RideFile::getPointValue(int index, SeriesType series) const
 QVariant
 RideFile::getPointFromValue(double value, SeriesType series) const
 {
-    if ((series==RideFile::temp || series==RideFile::lrbalance) && value == RideFile::NA)
+    if ((series==RideFile::temp || series==RideFile::lrbalance) && static_cast<int>(value) == RideFile::NA)
         return "";
     else if (series==RideFile::wattsKg)
         return "";
@@ -2750,7 +2750,7 @@ RideFile::recalculateDerivedSeries(bool force)
             rear = xdataValue(p, idx, "GEARS", "REAR", RideFile::REPEAT);
         }
 
-        if (front != RideFile::NA && rear != RideFile::NA) {
+        if (static_cast<int>(front) != RideFile::NA && static_cast<int>(rear) != RideFile::NA) {
             // gear data were part of XDATA series, use it
             setDataPresent(RideFile::gear, true);
             p->gear = front / rear;

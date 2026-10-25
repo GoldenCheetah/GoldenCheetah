@@ -79,7 +79,7 @@ ToolsRhoEstimator::ToolsRhoEstimator(Context *context, QWidget *parent) : QDialo
   }
   // Use Average Temp from current activity when available
   if (context && context->rideItem() &&
-      context->rideItem()->getForSymbol("average_temp", GlobalContext::context()->useMetricUnits) != RideFile::NA) {
+      static_cast<int>(context->rideItem()->getForSymbol("average_temp", GlobalContext::context()->useMetricUnits)) != RideFile::NA) {
     tempSpinBox->setValue(context->rideItem()->getForSymbol("average_temp", GlobalContext::context()->useMetricUnits));
   }
   tempSpinBox->setWrapping(false);

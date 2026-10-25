@@ -466,7 +466,7 @@ public:
                     returning = sourceModel()->data(mapToSource(proxyIndex), role);
 
                     // -255 temperature means not present
-                    if (mapToSource(proxyIndex).column() == tempIndex && returning.toDouble() == RideFile::NA) {
+                    if (mapToSource(proxyIndex).column() == tempIndex && returning.toInt() == RideFile::NA) {
                          returning = "";
                     }
                 }

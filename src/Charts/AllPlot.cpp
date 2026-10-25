@@ -546,7 +546,6 @@ AllPlotObject::setUserData(QList<UserData*>user)
         add.name = userdata->name;
         add.units = userdata->units;
         add.curve = new QwtPlotGappedCurve(userdata->name, 3);
-        //add.curve->setNAValue(RideFile::NA);
         add.curve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
         add.curve->setYAxis(QwtAxisId(QwtAxis::YRight, 4 + k)); // for now.
         add.curve->attach(plot);
@@ -2043,7 +2042,7 @@ AllPlot::recalc(AllPlotObject *objects)
                 if (!objects->windArray.empty()) totalWind   += objects->windArray[i];
                 if (!objects->torqueArray.empty()) totalTorque   += objects->torqueArray[i];
                 if (!objects->tempArray.empty() ) {
-                    if (objects->tempArray[i] == RideFile::NA) {
+                    if (static_cast<int>(objects->tempArray[i]) == RideFile::NA) {
                         dp.temp = (i>0 && !list.empty()?list.back().temp:0.0);
                         totalTemp   += dp.temp;
                     }
@@ -2053,7 +2052,7 @@ AllPlot::recalc(AllPlotObject *objects)
                 }
 
                 if (!objects->balanceArray.empty()) {
-                    if (objects->balanceArray[i] == RideFile::NA) {
+                    if (static_cast<int>(objects->balanceArray[i]) == RideFile::NA) {
                         dp.lrbalance = 50.0;
                         totalBalance   += dp.lrbalance;
                     }
@@ -2131,7 +2130,7 @@ AllPlot::recalc(AllPlotObject *objects)
                 totalRPPPB  -= dp.rpppb;
                 totalLPPPE  -= dp.lpppe;
                 totalRPPPE  -= dp.rpppe;
-                totalBalance   -= (dp.lrbalance>RideFile::NA?dp.lrbalance:50.0);
+                totalBalance   -= (static_cast<int>(dp.lrbalance)>RideFile::NA ? dp.lrbalance : 50.0);
 
                 for(int k=0; k<utotals.count(); k++) utotals[k] -= dp.user[k];
 
@@ -2324,13 +2323,13 @@ AllPlot::recalc(AllPlotObject *objects)
             objects->smoothDistance.append(GlobalContext::context()->useMetricUnits ? dp->km : dp->km * MILES_PER_KM);
             objects->smoothAltitude.append(GlobalContext::context()->useMetricUnits ? dp->alt : dp->alt * FEET_PER_METER);
             objects->smoothSlope.append(dp->slope);
-            if (dp->temp == RideFile::NA && !objects->smoothTemp.empty())
+            if (static_cast<int>(dp->temp) == RideFile::NA && !objects->smoothTemp.empty())
                 dp->temp = objects->smoothTemp.last();
             objects->smoothTemp.append(GlobalContext::context()->useMetricUnits ? dp->temp : dp->temp * FAHRENHEIT_PER_CENTIGRADE + FAHRENHEIT_ADD_CENTIGRADE);
             objects->smoothWind.append(GlobalContext::context()->useMetricUnits ? dp->headwind : dp->headwind * MILES_PER_KM);
             objects->smoothTorque.append(dp->nm);
 
-            if (dp->lrbalance == RideFile::NA) {
+            if (static_cast<int>(dp->lrbalance) == RideFile::NA) {
                 objects->smoothBalanceL.append(50);
                 objects->smoothBalanceR.append(50);
             }

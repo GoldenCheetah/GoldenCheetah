@@ -746,7 +746,7 @@ class SwimStroke : public RideMetric {
 
     void aggregateWith(const RideMetric &other) override {
         // anything different than the first one, other than rest, indicates mixed
-        if (value(true) != other.value(true) && other.value(true) != rest) setValue(mixed);
+        if (value(true) != other.value(true) && static_cast<int>(other.value(true)) != rest) setValue(mixed);
     }
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->isSwim; }

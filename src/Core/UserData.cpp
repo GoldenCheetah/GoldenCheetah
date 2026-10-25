@@ -61,7 +61,7 @@ bool
 UserData::isEmpty()
 {
     foreach(double v, vector)
-        if (v != RideFile::NA && v != RideFile::NIL)
+        if (static_cast<int>(v) != RideFile::NA && static_cast<int>(v) != RideFile::NIL)
             return false;
     return true;
 }

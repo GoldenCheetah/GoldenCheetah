@@ -1708,7 +1708,7 @@ PowerHist::setData(Specification specification, QString totalMetric, QString dis
         double v = x->getForSymbol(distMetric, GlobalContext::context()->useMetricUnits);
 
         // ignore no temp files
-        if ((distMetric == "average_temp" || distMetric == "max_temp") && v == RideFile::NA) continue;
+        if ((distMetric == "average_temp" || distMetric == "max_temp") && static_cast<int>(v) == RideFile::NA) continue;
 
         // clean up dodgy values
         if (std::isnan(v) || std::isinf(v)) v = 0;
@@ -1746,7 +1746,7 @@ PowerHist::setData(Specification specification, QString totalMetric, QString dis
         double v = x->getForSymbol(distMetric, GlobalContext::context()->useMetricUnits);
 
         // ignore no temp files
-        if ((distMetric == "average_temp" || distMetric == "max_temp") && v == RideFile::NA) continue;
+        if ((distMetric == "average_temp" || distMetric == "max_temp") && static_cast<int>(v) == RideFile::NA) continue;
 
         // clean up dodgy values
         if (std::isnan(v) || std::isinf(v)) v = 0;

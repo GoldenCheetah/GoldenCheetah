@@ -152,7 +152,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
     if (series == RealtimeData::HeartRate ||
         series == RealtimeData::Watts  ||
         series == RealtimeData::AltWatts  ||
-        (series == RealtimeData::LRBalance && value != RideFile::NA)  ||
+        (series == RealtimeData::LRBalance && static_cast<int>(value) != RideFile::NA)  ||
         series == RealtimeData::Cadence ||
         series == RealtimeData::CoreTemp) {
 
@@ -241,7 +241,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
     case RealtimeData::LRBalance:
         {
           double left = 0; double right = 0;
-          if (value == RideFile::NA) { // no LR Balance provided - so use previous logic
+          if (static_cast<int>(value) == RideFile::NA) { // no LR Balance provided - so use previous logic
               double tot = rtData.getWatts() + rtData.getAltWatts();
               left = rtData.getWatts() / tot * 100.00f;
               right = 100.00 - left;

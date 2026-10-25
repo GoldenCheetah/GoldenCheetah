@@ -89,7 +89,7 @@ pointType(const RideFilePoint *point, int type, int side, bool metric, double cr
         case MODEL_SLOPE : return point->slope;
         case MODEL_TEMP : return point->temp;
 
-        case MODEL_LRBALANCE : return !side || point->lrbalance == RideFile::NA  ? point->lrbalance : (100 - point->lrbalance);
+        case MODEL_LRBALANCE : return !side || static_cast<int>(point->lrbalance) == RideFile::NA  ? point->lrbalance : (100 - point->lrbalance);
         case MODEL_TE : return side ? point->rte : point->lte;
         case MODEL_PS : return side ? point->rps : point->lps;
 
@@ -975,12 +975,12 @@ ScatterPlot::skipValues(double xv, double yv, ScatterSettings *settings) {
          && settings->ignore && (int(xv) == 0 || yv == 0.0f)) return true;
 
     // Temp 0 values are relevant
-    if ((settings->x == MODEL_TEMP && xv == RideFile::NA) || (settings->y == MODEL_TEMP && yv == RideFile::NA)) return true;
+    if ((settings->x == MODEL_TEMP && static_cast<int>(xv) == RideFile::NA) || (settings->y == MODEL_TEMP && static_cast<int>(yv) == RideFile::NA)) return true;
 
     // LR Balance : if skip 0% skip also 100%
     if ((settings->x == MODEL_LRBALANCE && settings->ignore && xv == 100) || (settings->y == MODEL_LRBALANCE && settings->ignore && yv == 100)) return true;
 
-    if ((settings->x == MODEL_LRBALANCE && xv == RideFile::NA) || (settings->y == MODEL_LRBALANCE && yv == RideFile::NA)) return true;
+    if ((settings->x == MODEL_LRBALANCE && static_cast<int>(xv) == RideFile::NA) || (settings->y == MODEL_LRBALANCE && static_cast<int>(yv) == RideFile::NA)) return true;
 
     return false;
 }

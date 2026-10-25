@@ -2285,7 +2285,7 @@ RTool::dfForActivity(RideFile *f, int split, QString join)
                 for(int j=index; j<stop; j++) {
                     RideFilePoint *p = f->dataPoints()[j];
                     double val = f->xdataValue(p, idx, it.value()->name, series, xjoin);
-                    REAL(vector)[j-index] = (val == RideFile::NA) ? NA_REAL : val;
+                    REAL(vector)[j-index] = (static_cast<int>(val) == RideFile::NA) ? NA_REAL : val;
                 }
 
                 // add to the list
@@ -3971,7 +3971,7 @@ RTool::dfForActivityXData(RideFile*f, QString name)
         int idx = 0;
         foreach(XDataPoint* p, xds->datapoints) {
             double val = p->number[valueIdx];
-            REAL(vector)[idx++] = (val == RideFile::NA) ? NA_REAL : val;
+            REAL(vector)[idx++] = (static_cast<int>(val) == RideFile::NA) ? NA_REAL : val;
         }
 
         // add to the list
