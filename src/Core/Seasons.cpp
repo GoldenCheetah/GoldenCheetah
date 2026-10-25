@@ -169,6 +169,95 @@ Seasons::writeSeasons()
 }
 
 
+Season const *
+Seasons::getSeason
+(const QString &id) const
+{
+    for (const Season &season : seasons) {
+        if (season.idString() == id) {
+            return &season;
+        }
+    }
+    return nullptr;
+}
+
+
+bool
+Seasons::editMacroPlan
+(const QString &seasonId, const std::function<void(Season &)> &edit)
+{
+    Season *season = findSeason(seasonId);
+    if (season == nullptr || ! season->isMacrocycle()) {
+        return false;
+    }
+    edit(*season);
+    emit macroPlanChanged(seasonId);
+    return true;
+}
+
+
+bool
+Seasons::editMacroPlan
+(const QString &seasonId, const QString &phaseId, const std::function<void(Mesocycle &)> &edit)
+{
+    Season *season = findSeason(seasonId);
+    if (season == nullptr || ! season->isMacrocycle()) {
+        return false;
+    }
+    for (Phase &phase : season->phases) {
+        if (phase.idString() != phaseId) {
+            continue;
+        }
+        Mesocycle *meso = phase.getMesocycle();
+        if (meso == nullptr) {
+            return false;
+        }
+        edit(*meso);
+        emit macroPlanChanged(seasonId);
+        return true;
+    }
+    return false;
+}
+
+
+QList<Season const *>
+Seasons::seededSeasons
+(const QDate &until) const
+{
+    QMap<QDate, Season const *> byStart;
+    for (const Season &season : seasons) {
+        if (! season.getSeed()) {
+            continue;
+        }
+        const QDate start = season.getStart();
+        if (! start.isValid() || (until.isValid() && start > until)) {
+            continue;
+        }
+        const auto existing = byStart.constFind(start);
+        // later wins, but a macrocycle is never replaced by a non-macrocycle
+        if (   existing == byStart.constEnd()
+            || ! (*existing)->isMacrocycle()
+            || season.isMacrocycle()) {
+            byStart.insert(start, &season);
+        }
+    }
+    return byStart.values();
+}
+
+
+Season*
+Seasons::findSeason
+(const QString &id)
+{
+    for (Season &season : seasons) {
+        if (season.idString() == id) {
+            return &season;
+        }
+    }
+    return nullptr;
+}
+
+
 //
 // SeasonParser
 //
@@ -254,16 +343,12 @@ SeasonParser::serialize(QString filename, QList<Season> Seasons)
                       "\t\t\t<startdate>%2</startdate>\n"
                       "\t\t\t<enddate>%3</enddate>\n"
                       "\t\t\t<type>%4</type>\n"
-                      "\t\t\t<id>%5</id>\n"
-                      "\t\t\t<seed>%6</seed>\n"
-                      "\t\t\t<low>%7</low>\n")
+                      "\t\t\t<id>%5</id>\n")
                             .arg(Utils::xmlprotect(phase.getName()))
                             .arg(phase.getAbsoluteStart().toString("yyyy-MM-dd"))
                             .arg(phase.getEnd().toString("yyyy-MM-dd"))
                             .arg(phase.getType())
-                            .arg(phase.id().toString())
-                            .arg(phase.getSeed())
-                            .arg(phase.getLow());
+                            .arg(phase.idString());
                 if (! phase.getDescription().isEmpty()) {
                     out<<QString("\t\t\t<description>%1</description>\n")
                                 .arg(Utils::xmlprotect(phase.getDescription()));
@@ -350,13 +435,11 @@ SeasonParser::serialize(QString filename, QList<Season> Seasons)
                   "\t\t<type>%2</type>\n"
                   "\t\t<id>%3</id>\n"
                   "\t\t<seed>%4</seed>\n"
-                  "\t\t<low>%5</low>\n"
-                  "\t\t<firstDayOfWeek>%6</firstDayOfWeek>\n"
+                  "\t\t<firstDayOfWeek>%5</firstDayOfWeek>\n"
                   ) .arg(Utils::xmlprotect(season.getName()))
                                          .arg(season.getType())
-                                         .arg(season.id().toString())
+                                         .arg(season.idString())
                                          .arg(season.getSeed())
-                                         .arg(season.getLow())
                                          .arg(season.getFirstDayOfWeek());
             if (! season.getDescription().isEmpty()) {
                 out<<QString("\t\t<description>%1</description>\n").arg(Utils::xmlprotect(season.getDescription()));
@@ -460,8 +543,6 @@ SeasonParser::parseSeason
                 season.setType(text.toInt());
             } else if (elemName == "id") {
                 season.setId(QUuid(text));
-            } else if (elemName == "low") {
-                season.setLow(text.toInt());
             } else if (elemName == "seed") {
                 season.setSeed(text.toInt());
             } else if (elemName == "description") {
@@ -637,7 +718,6 @@ SeasonParser::parsePhase
     int type = Phase::phase;
     QUuid id;
     int seed = 0;
-    int low = -50;
     QString description;
 
     QString text;
@@ -669,10 +749,6 @@ SeasonParser::parsePhase
                 type = text.toInt();
             } else if (elemName == "id") {
                 id = QUuid(text);
-            } else if (elemName == "low") {
-                low = text.toInt();
-            } else if (elemName == "seed") {
-                seed = text.toInt();
             } else if (elemName == "description") {
                 description = Utils::unprotect(text);
             } else if (elemName == "phase") {
@@ -683,8 +759,6 @@ SeasonParser::parsePhase
 
     Phase phase(name, start, end);
     phase.setId(id);
-    phase.setLow(low);
-    phase.setSeed(seed);
     phase.setDescription(description);
     phase.setType(hasMesoElement ? Phase::mesocycle : type);
 

@@ -10,6 +10,7 @@ equals(GC_UNITTESTS, active) {
 			   Core/season \
 			   Core/seasonParser \
 			   Core/phaseMesocycle \
+			   Core/seasons \
 			   Core/units \
 			   Core/utils \
 			   Core/signalSafety \

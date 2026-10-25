@@ -632,14 +632,7 @@ AgendaWindow::getPhases
     QList<AgendaEntry> futurePhases;
     for (const Phase &phase : season.phases) {
         if (phase.getAbsoluteStart().isValid() && phase.getAbsoluteEnd().isValid()) {
-            QString phaseType;
-            switch (phase.getType()) {
-            case Phase::camp:
-                phaseType = Phase::types[5];
-                break;
-            default:
-                phaseType = Phase::types[static_cast<int>(phase.getType()) - static_cast<int>(Phase::phase)];
-            }
+            QString phaseType = phase.getTypeString();
             AgendaEntry entry;
             entry.primary = phase.getName();
             entry.iconFile = ":images/breeze/network-mobile-100.svg";

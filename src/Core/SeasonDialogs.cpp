@@ -20,6 +20,8 @@
 #include "Seasons.h"
 #include "Athlete.h"
 #include "Colors.h"
+#include "ActionButtonBox.h"
+#include "RideMetadata.h"
 
 #include <QString>
 #include <QFormLayout>
@@ -35,6 +37,7 @@ EditSeasonDialog::EditSeasonDialog
 : QDialog(context->mainWindow, Qt::Dialog), context(context), season(season)
 {
     setWindowTitle(tr("Edit Date Range"));
+    setMinimumSize(400 * dpiXFactor, 600 * dpiYFactor);
 
     if (season->hasPhaseOrEvent()) {
         for (const Phase &phase : season->phases) {
@@ -191,14 +194,8 @@ EditSeasonDialog::EditSeasonDialog
     seedEdit->setWrapping(true);
     seedEdit->setAlignment(Qt::AlignLeft);
 
-    lowEdit = new QDoubleSpinBox();
-    lowEdit->setDecimals(0);
-    lowEdit->setRange(-500, 0);
-    lowEdit->setSingleStep(1.0);
-    lowEdit->setWrapping(true);
-    lowEdit->setAlignment(Qt::AlignLeft);
-
     descriptionEdit = new QTextEdit();
+    descriptionEdit->setPlaceholderText(tr("Description..."));
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox();
     applyButton = buttonBox->addButton(tr("&OK"), QDialogButtonBox::AcceptRole);
@@ -218,8 +215,8 @@ EditSeasonDialog::EditSeasonDialog
                                         .arg(locale.toString(lastChildEnd, QLocale::NarrowFormat))));
     }
     formLayout->addRow(tr("Starting LTS"), seedEdit);
-    formLayout->addRow(tr("Lowest SB"), lowEdit);
-    formLayout->addRow(tr("Description"), descriptionEdit);
+    formLayout->addItem(new QSpacerItem(0, 10 * dpiYFactor, QSizePolicy::Ignored, QSizePolicy::Fixed));
+    formLayout->addRow(descriptionEdit);
     formLayout->addRow(warningLabel);
     formLayout->addRow(buttonBox);
 
@@ -371,7 +368,6 @@ EditSeasonDialog::transferUIToSeason
     season.setName(nameEdit->text());
     season.setType(typeCombo->itemData(typeCombo->currentIndex()).toInt());
     season.setSeed(seedEdit->value());
-    season.setLow(lowEdit->value());
     season.setDescription(descriptionEdit->toPlainText());
 
     int years;
@@ -471,7 +467,6 @@ EditSeasonDialog::transferSeasonToUI
     }
 
     seedEdit->setValue(season.getSeed());
-    lowEdit->setValue(season.getLow());
     descriptionEdit->setText(season.getDescription());
 }
 
@@ -524,9 +519,7 @@ EditSeasonEventDialog::EditSeasonEventDialog(Context *context, SeasonEvent *even
     QDialog(context->mainWindow, Qt::Dialog), context(context), event(event)
 {
     setWindowTitle(tr("Edit Event"));
-
-    QLabel *seasonLabel = new QLabel();
-    seasonLabel->setText(season.getName());
+    setMinimumSize(400 * dpiXFactor, 300 * dpiYFactor);
 
     nameEdit = new QLineEdit();
     nameEdit->setText(event->name);
@@ -558,6 +551,7 @@ EditSeasonEventDialog::EditSeasonEventDialog(Context *context, SeasonEvent *even
     targetFTPEdit->setValue(event->targetFTP);
 
     descriptionEdit = new QTextEdit();
+    descriptionEdit->setPlaceholderText(tr("Description..."));
     descriptionEdit->setText(event->description);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox();
@@ -565,14 +559,21 @@ EditSeasonEventDialog::EditSeasonEventDialog(Context *context, SeasonEvent *even
     QPushButton *cancelButton = buttonBox->addButton(tr("&Cancel"), QDialogButtonBox::RejectRole);
 
     QFormLayout *formLayout = newQFormLayout(this);
-    formLayout->addRow(tr("Season"), seasonLabel);
+    formLayout->addRow(new QLabel("<h4>" + tr("Season %1").arg(season.getName()) + "</h4>"));
+    formLayout->addItem(new QSpacerItem(0, 10 * dpiYFactor, QSizePolicy::Ignored, QSizePolicy::Fixed));
     formLayout->addRow(tr("Name"), nameEdit);
     formLayout->addRow(tr("Date"), dateEdit);
     formLayout->addRow(tr("Priority"), priorityEdit);
-    formLayout->addRow(tr("Target LTS"), targetLTSEdit);
-    formLayout->addRow(tr("Target CP"), targetCPEdit);
-    formLayout->addRow(tr("Target FTP"), targetFTPEdit);
-    formLayout->addRow(tr("Description"), descriptionEdit);
+
+    formLayout->addItem(new QSpacerItem(0, 10 * dpiYFactor, QSizePolicy::Ignored, QSizePolicy::Fixed));
+    formLayout->addRow(new QLabel("<h5>" + tr("Target values")  + "</h5>"));
+    formLayout->addRow(tr("LTS"), targetLTSEdit);
+    formLayout->addRow(tr("CP"), targetCPEdit);
+    formLayout->addRow(tr("FTP"), targetFTPEdit);
+
+    formLayout->addItem(new QSpacerItem(0, 10 * dpiYFactor, QSizePolicy::Ignored, QSizePolicy::Fixed));
+    formLayout->addRow(descriptionEdit);
+    formLayout->addItem(new QSpacerItem(0, 10 * dpiYFactor, QSizePolicy::Ignored, QSizePolicy::Fixed));
     formLayout->addRow(buttonBox);
 
     // connect up slots
@@ -618,6 +619,7 @@ EditPhaseDialog::EditPhaseDialog(Context *context, Phase *phase, Season &season)
     QDialog(context->mainWindow, Qt::Dialog), context(context), phase(phase)
 {
     setWindowTitle(tr("Edit Date Range"));
+    setMinimumSize(400 * dpiXFactor, 400 * dpiYFactor);
 
     QLabel *seasonLabel = new QLabel();
     seasonLabel->setText(season.getName());
@@ -631,7 +633,16 @@ EditPhaseDialog::EditPhaseDialog(Context *context, Phase *phase, Season &season)
     typeEdit->addItem(tr("Base"),  Phase::base);
     typeEdit->addItem(tr("Build"), Phase::build);
     typeEdit->addItem(tr("Camp"), Phase::camp);
+    typeEdit->addItem(tr("Mesocycle"), Phase::mesocycle);
     typeEdit->setCurrentIndex(typeEdit->findData(phase->getType()));
+
+    QStandardItemModel *model = qobject_cast<QStandardItemModel *>(typeEdit->model());
+    if (model) {
+        QStandardItem *item = model->item(typeEdit->findData(Phase::mesocycle));
+        if (item) {
+            item->setFlags(item->flags() & ~Qt::ItemIsEnabled);
+        }
+    }
 
     fromEdit = new QDateEdit();
     fromEdit->setDateRange(season.getStart(), phase->getEnd().isValid() ? phase->getEnd().addDays(-1) : season.getEnd());
@@ -643,38 +654,30 @@ EditPhaseDialog::EditPhaseDialog(Context *context, Phase *phase, Season &season)
     toEdit->setDate(phase->getEnd());
     toEdit->setCalendarPopup(true);
 
-    seedEdit = new QDoubleSpinBox();
-    seedEdit->setDecimals(0);
-    seedEdit->setRange(0.0, 300.0);
-    seedEdit->setSingleStep(1.0);
-    seedEdit->setWrapping(true);
-    seedEdit->setAlignment(Qt::AlignLeft);
-    seedEdit->setValue(phase->getSeed());
-
-    lowEdit = new QDoubleSpinBox();
-    lowEdit->setDecimals(0);
-    lowEdit->setRange(-500, 0);
-    lowEdit->setSingleStep(1.0);
-    lowEdit->setWrapping(true);
-    lowEdit->setAlignment(Qt::AlignLeft);
-    lowEdit->setValue(phase->getLow());
-
     descriptionEdit = new QTextEdit();
+    descriptionEdit->setPlaceholderText(tr("Description..."));
     descriptionEdit->setText(phase->getDescription());
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox();
     applyButton = buttonBox->addButton(tr("&OK"), QDialogButtonBox::AcceptRole);
     QPushButton *cancelButton = buttonBox->addButton(tr("&Cancel"), QDialogButtonBox::RejectRole);
 
+    if (phase->getType() == Phase::mesocycle || phase->hasMesocycle()) {
+        typeEdit->setEnabled(false);
+        fromEdit->setEnabled(false);
+        toEdit->setEnabled(false);
+    }
+
     QFormLayout *formLayout = newQFormLayout(this);
-    formLayout->addRow(tr("Season"), seasonLabel);
+    formLayout->addRow(new QLabel("<h4>" + tr("Season %1").arg(season.getName()) + "</h4>"));
+    formLayout->addItem(new QSpacerItem(0, 10 * dpiYFactor, QSizePolicy::Ignored, QSizePolicy::Fixed));
     formLayout->addRow(tr("Name"), nameEdit);
     formLayout->addRow(tr("Type"), typeEdit);
     formLayout->addRow(tr("From"), fromEdit);
     formLayout->addRow(tr("To"), toEdit);
-    formLayout->addRow(tr("Starting LTS"), seedEdit);
-    formLayout->addRow(tr("Lowest SB"), lowEdit);
-    formLayout->addRow(tr("Description"), descriptionEdit);
+    formLayout->addItem(new QSpacerItem(0, 10 * dpiYFactor, QSizePolicy::Ignored, QSizePolicy::Fixed));
+    formLayout->addRow(descriptionEdit);
+    formLayout->addItem(new QSpacerItem(0, 10 * dpiYFactor, QSizePolicy::Ignored, QSizePolicy::Fixed));
     formLayout->addRow(buttonBox);
 
     // connect up slots
@@ -696,8 +699,6 @@ EditPhaseDialog::applyClicked()
     phase->setType(typeEdit->itemData(typeEdit->currentIndex()).toInt());
     phase->setAbsoluteStart(fromEdit->date());
     phase->setAbsoluteEnd(toEdit->date());
-    phase->setSeed(seedEdit->value());
-    phase->setLow(lowEdit->value());
     phase->setDescription(descriptionEdit->toPlainText());
     accept();
 }

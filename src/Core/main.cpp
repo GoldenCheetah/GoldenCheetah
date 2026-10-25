@@ -247,7 +247,7 @@ main(int argc, char *argv[])
 #endif
 #ifdef GC_DEBUG
     bool debug = true;
-    QString debugFormat = QString("[%{time h:mm:ss.zzz}] %{type}: %{message} (%{file}:%{line})");
+    QString debugFormat = QString("[%{time h:mm:ss.zzz}] %{type} [%{function}]: %{message} (%{file}:%{line})");
 #else
     bool debug = false;
     QString debugFormat = QString("[%{time h:mm:ss.zzz}] %{type}: %{message}");
