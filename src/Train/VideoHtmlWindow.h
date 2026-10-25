@@ -68,9 +68,9 @@ protected:
     void showEvent(QShowEvent *e) override;
 
 private slots:
-    void showEditorChanged(Qt::CheckState state);
-    void showTitleChanged(Qt::CheckState state);
-    void keepAspectRatioChanged(Qt::CheckState state);
+    void showEditorChanged(int state);
+    void showTitleChanged(int state);
+    void keepAspectRatioChanged(int state);
 
 private:
 #if defined(GC_VIDEO_QT6)

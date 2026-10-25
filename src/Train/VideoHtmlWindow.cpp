@@ -232,9 +232,9 @@ VideoHtmlWindow::VideoHtmlWindow(Context *context)
     controlsLayout->addStretch();
     setControls(controls);
 
-    connect(showEditorBtn, &QCheckBox::checkStateChanged, this, &VideoHtmlWindow::showEditorChanged);
-    connect(showTitleBtn,  &QCheckBox::checkStateChanged, this, &VideoHtmlWindow::showTitleChanged);
-    connect(keepAspectRatioBtn, &QCheckBox::checkStateChanged, this, &VideoHtmlWindow::keepAspectRatioChanged);
+    connect(showEditorBtn, &QCheckBox::stateChanged, this, &VideoHtmlWindow::showEditorChanged);
+    connect(showTitleBtn,  &QCheckBox::stateChanged, this, &VideoHtmlWindow::showTitleChanged);
+    connect(keepAspectRatioBtn, &QCheckBox::stateChanged, this, &VideoHtmlWindow::keepAspectRatioChanged);
 
     // ------------------------------------------------------------------
     // Main layout – splitter (video area + optional editor)
@@ -439,7 +439,7 @@ void VideoHtmlWindow::setEditorVisible(bool visible)
 #endif
 }
 
-void VideoHtmlWindow::showEditorChanged(Qt::CheckState state)
+void VideoHtmlWindow::showEditorChanged(int state)
 {
 #if defined(GC_VIDEO_QT6)
     if (!sourceEditor || !splitter) return;
@@ -452,12 +452,12 @@ void VideoHtmlWindow::showEditorChanged(Qt::CheckState state)
 #endif
 }
 
-void VideoHtmlWindow::showTitleChanged(Qt::CheckState state)
+void VideoHtmlWindow::showTitleChanged(int state)
 {
     setTitleVisible(state == Qt::Checked);
 }
 
-void VideoHtmlWindow::keepAspectRatioChanged(Qt::CheckState state)
+void VideoHtmlWindow::keepAspectRatioChanged(int state)
 {
     setKeepAspectRatio(state == Qt::Checked);
 }
