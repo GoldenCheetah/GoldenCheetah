@@ -668,7 +668,7 @@ HEADERS += Train/TrainBottom.h Train/TrainDB.h Train/TrainSidebar.h \
            Train/ErgOverview.h Train/Shy.h \
            Train/WorkoutTagWrapper.h \
            Train/MenuProvider.h Train/WorkoutMenuProvider.h \
-           Train/VideoWindow.h
+           Train/VideoWindow.h Train/VideoHtmlWindow.h
 
 ###=============
 ### SOURCE FILES
@@ -786,7 +786,7 @@ SOURCES += Train/TrainBottom.cpp Train/TrainDB.cpp Train/TrainSidebar.cpp \
            Train/ErgOverview.cpp Train/Shy.cpp \
            Train/WorkoutTagWrapper.cpp \
            Train/WorkoutMenuProvider.cpp \
-           Train/VideoWindow.cpp
+           Train/VideoWindow.cpp Train/VideoHtmlWindow.cpp
 
 ## Crash Handling
 win32-msvc* {
