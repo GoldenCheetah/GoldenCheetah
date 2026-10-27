@@ -513,7 +513,7 @@ class TotalDistance : public RideMetric {
                 km = it.last()->km - it.first()->km;
             else km = RideFile::NA;
 
-            if (km != RideFile::NA && item->ride()->areDataPresent()->kph)
+            if (static_cast<int>(km) != RideFile::NA && item->ride()->areDataPresent()->kph)
                 km += it.first()->kph / 3600.0 * item->ride()->recIntSecs();
 
         } else {
@@ -1838,7 +1838,7 @@ struct AvgTemp : public RideMetric {
 
     // override to special case NA
     QString toString(bool useMetricUnits) const {
-        if (value() == RideFile::NA) return "-";
+        if (static_cast<int>(value()) == RideFile::NA) return "-";
         return RideMetric::toString(useMetricUnits);
     }
 
@@ -1868,7 +1868,7 @@ struct AvgTemp : public RideMetric {
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->temp != RideFile::NA) {
+            if (static_cast<int>(point->temp) != RideFile::NA) {
                 total += point->temp;
                 ++count;
             }
@@ -2407,7 +2407,7 @@ class MaxTemp : public RideMetric {
 
     // override to special case NA
     QString toString(bool useMetricUnits) const {
-        if (value() == RideFile::NA) return "-";
+        if (static_cast<int>(value()) == RideFile::NA) return "-";
         return RideMetric::toString(useMetricUnits);
     }
 
@@ -2424,7 +2424,7 @@ class MaxTemp : public RideMetric {
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->temp != RideFile::NA && point->temp > max) max = point->temp;
+            if (static_cast<int>(point->temp) != RideFile::NA && point->temp > max) max = point->temp;
         }
 
         setValue(max);
@@ -2463,7 +2463,7 @@ class MinTemp : public RideMetric {
 
     // override to special case NA
     QString toString(bool useMetricUnits) const {
-        if (value() == RideFile::NA) return "-";
+        if (static_cast<int>(value()) == RideFile::NA) return "-";
         return RideMetric::toString(useMetricUnits);
     }
 
@@ -2480,7 +2480,7 @@ class MinTemp : public RideMetric {
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->temp != RideFile::NA && point->temp < min) min = point->temp;
+            if (static_cast<int>(point->temp) != RideFile::NA && point->temp < min) min = point->temp;
         }
 
         setValue(min < 10000 ? min : (double)(RideFile::NA));
@@ -2852,7 +2852,7 @@ class AvgLTE : public RideMetric {
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
 
-            if (point->lte && point->watts > 0.0f && point->cad && point->lrbalance != RideFile::NA) {
+            if (point->lte && point->watts > 0.0f && point->cad && static_cast<int>(point->lrbalance) != RideFile::NA) {
                 samples ++;
                 total += point->lte;
             }
@@ -2906,7 +2906,7 @@ class AvgRTE : public RideMetric {
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->rte && point->watts > 0.0f && point->cad && point->lrbalance != RideFile::NA) {
+            if (point->rte && point->watts > 0.0f && point->cad && static_cast<int>(point->lrbalance) != RideFile::NA) {
                 samples ++;
                 total += point->rte;
             }
@@ -2960,7 +2960,7 @@ class AvgLPS : public RideMetric {
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->lps && point->watts > 0.0f && point->cad && point->lrbalance != RideFile::NA) {
+            if (point->lps && point->watts > 0.0f && point->cad && static_cast<int>(point->lrbalance) != RideFile::NA) {
                 samples ++;
                 total += point->lps;
             }
@@ -3014,7 +3014,7 @@ class AvgRPS : public RideMetric {
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->rps && point->watts > 0.0f && point->cad && point->lrbalance != RideFile::NA) {
+            if (point->rps && point->watts > 0.0f && point->cad && static_cast<int>(point->lrbalance) != RideFile::NA) {
                 samples ++;
                 total += point->rps;
             }

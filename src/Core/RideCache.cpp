@@ -797,7 +797,7 @@ RideCache::getAggregate(QString name, Specification spec, bool useMetricUnits, b
         bool aggZero = metric->aggregateZero();
 
         // set aggZero to false and value to zero if is temperature and -255
-        if (metric->symbol() == "average_temp" && value == RideFile::NA) {
+        if (metric->symbol() == "average_temp" && static_cast<int>(value) == RideFile::NA) {
             value = 0;
             aggZero = false;
         }

@@ -81,12 +81,11 @@ protected:
     void showEvent(QShowEvent *e) override;
 
 private slots:
-    void showEditorChanged(int state);
-    void showTitleChanged(int state);
-    void keepAspectRatioChanged(int state);
+    void showEditorChanged(Qt::CheckState state);
+    void showTitleChanged(Qt::CheckState state);
+    void keepAspectRatioChanged(Qt::CheckState state);
 
 private:
-#if defined(GC_VIDEO_QT6)
     class VideoSurfaceWidget : public QWidget
     {
     public:
@@ -131,7 +130,6 @@ private:
     float currentVideoRate = 1.0f;
     double videoSyncTimeAdjustFactor = 1.0;
     double videoSyncDistanceAdjustFactor = 1.0;
-#endif
 };
 
 #endif // _GC_VideoHtmlWindow_h

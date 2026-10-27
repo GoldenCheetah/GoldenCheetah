@@ -35,7 +35,6 @@
 #include <QMediaMetaData>
 #include <QtMath>
 
-#if defined(GC_VIDEO_QT6)
 
 // ---------------------------------------------------------------
 // Simple widget that paints the latest video frame
@@ -70,13 +69,11 @@ void VideoHtmlWindow::VideoSurfaceWidget::paintEvent(QPaintEvent *)
     }
 }
 
-#endif // GC_VIDEO_QT6
 
 
 // ---------------------------------------------------------------
 // Helper: VideoSync
 // ---------------------------------------------------------------
-#if defined(GC_VIDEO_QT6)
 
 VideoSyncFilePoint VideoHtmlWindow::VideoSyncPointAdjust(const VideoSyncFilePoint &vsfp) const
 {
@@ -91,7 +88,6 @@ bool VideoHtmlWindow::hasActiveVideo() const
     return mp && mp->playbackState() != QMediaPlayer::StoppedState;
 }
 
-#endif
 
 
 // ---------------------------------------------------------------
@@ -99,7 +95,6 @@ bool VideoHtmlWindow::hasActiveVideo() const
 // ---------------------------------------------------------------
 void VideoHtmlWindow::telemetryUpdate(const RealtimeData &rtd)
 {
-#if defined(GC_VIDEO_QT6)
     if (!isVisible() || !hasActiveVideo())
         return;
     if (state != Playing)
@@ -198,9 +193,6 @@ void VideoHtmlWindow::telemetryUpdate(const RealtimeData &rtd)
     } else {
         pushRouteKmToHtml(rtd.getRouteDistance());
     }
-#else
-    Q_UNUSED(rtd);
-#endif
 }
 
 
@@ -218,7 +210,6 @@ VideoHtmlWindow::VideoHtmlWindow(Context *context)
     setHeightFactor(1.0);
     setResizable(true);
 
-#if defined(GC_VIDEO_QT6)
 
     // ------------------------------------------------------------------
     // Chart Settings (controls panel)
@@ -245,9 +236,9 @@ VideoHtmlWindow::VideoHtmlWindow(Context *context)
     controlsLayout->addStretch();
     setControls(controls);
 
-    connect(showEditorBtn, &QCheckBox::stateChanged, this, &VideoHtmlWindow::showEditorChanged);
-    connect(showTitleBtn,  &QCheckBox::stateChanged, this, &VideoHtmlWindow::showTitleChanged);
-    connect(keepAspectRatioBtn, &QCheckBox::stateChanged, this, &VideoHtmlWindow::keepAspectRatioChanged);
+    connect(showEditorBtn, &QCheckBox::checkStateChanged, this, &VideoHtmlWindow::showEditorChanged);
+    connect(showTitleBtn,  &QCheckBox::checkStateChanged, this, &VideoHtmlWindow::showTitleChanged);
+    connect(keepAspectRatioBtn, &QCheckBox::checkStateChanged, this, &VideoHtmlWindow::keepAspectRatioChanged);
 
     // ------------------------------------------------------------------
     // Main layout – splitter (video area + optional editor)
@@ -380,12 +371,6 @@ new QWebChannel(qt.webChannelTransport, function(channel) {
     if (context->isRunning)
         startPlayback();
 
-#else
-    QVBoxLayout *fallback = new QVBoxLayout();
-    setChartLayout(fallback);
-    fallback->addWidget(new QLabel(tr("VideoHtmlWindow requires Qt6 video support (GC_VIDEO_QT6)")));
-    init = false;
-#endif
 }
 
 
@@ -405,56 +390,41 @@ QSize VideoHtmlWindow::minimumSizeHint() const
 // ---------------------------------------------------------------
 QString VideoHtmlWindow::getHtml() const
 {
-#if defined(GC_VIDEO_QT6)
     if (sourceEditor) return sourceEditor->toPlainText();
     return htmlSource;
-#else
-    return QString();
-#endif
 }
 
 void VideoHtmlWindow::setHtml(const QString &text)
 {
-#if defined(GC_VIDEO_QT6)
     htmlSource = text;
     if (sourceEditor) sourceEditor->setPlainText(text);
     applyHtml();
-#endif
 }
 
 void VideoHtmlWindow::applyHtml()
 {
-#if defined(GC_VIDEO_QT6)
     if (!htmlOverlay) return;
     htmlSource = sourceEditor ? sourceEditor->toPlainText() : htmlSource;
     htmlOverlay->page()->setHtml(htmlSource, QUrl("qrc:/"));
-#endif
 }
 
 bool VideoHtmlWindow::isEditorVisible() const
 {
-#if defined(GC_VIDEO_QT6)
     return showEditorBtn && showEditorBtn->isChecked();
-#else
-    return false;
-#endif
 }
 
 void VideoHtmlWindow::setEditorVisible(bool visible)
 {
-#if defined(GC_VIDEO_QT6)
     if (showEditorBtn) {
         showEditorBtn->blockSignals(true);
         showEditorBtn->setChecked(visible);
         showEditorBtn->blockSignals(false);
     }
     showEditorChanged(visible ? Qt::Checked : Qt::Unchecked);
-#endif
 }
 
-void VideoHtmlWindow::showEditorChanged(int state)
+void VideoHtmlWindow::showEditorChanged(Qt::CheckState state)
 {
-#if defined(GC_VIDEO_QT6)
     if (!sourceEditor || !splitter) return;
     bool show = (state == Qt::Checked);
     sourceEditor->setVisible(show);
@@ -462,52 +432,40 @@ void VideoHtmlWindow::showEditorChanged(int state)
         splitter->setSizes({700, 300});
     else
         splitter->setSizes({1000, 0});
-#endif
 }
 
-void VideoHtmlWindow::showTitleChanged(int state)
+void VideoHtmlWindow::showTitleChanged(Qt::CheckState state)
 {
     setTitleVisible(state == Qt::Checked);
 }
 
-void VideoHtmlWindow::keepAspectRatioChanged(int state)
+void VideoHtmlWindow::keepAspectRatioChanged(Qt::CheckState state)
 {
     setKeepAspectRatio(state == Qt::Checked);
 }
 
 bool VideoHtmlWindow::isTitleVisible() const
 {
-#if defined(GC_VIDEO_QT6)
     return showTitleBtn && showTitleBtn->isChecked();
-#else
-    return true;
-#endif
 }
 
 void VideoHtmlWindow::setTitleVisible(bool visible)
 {
-#if defined(GC_VIDEO_QT6)
     if (showTitleBtn) {
         showTitleBtn->blockSignals(true);
         showTitleBtn->setChecked(visible);
         showTitleBtn->blockSignals(false);
     }
     GcChartWindow::setShowTitle(visible);
-#endif
 }
 
 bool VideoHtmlWindow::isKeepAspectRatio() const
 {
-#if defined(GC_VIDEO_QT6)
     return m_keepAspectRatio;
-#else
-    return true;
-#endif
 }
 
 void VideoHtmlWindow::setKeepAspectRatio(bool keep)
 {
-#if defined(GC_VIDEO_QT6)
     m_keepAspectRatio = keep;
     if (keepAspectRatioBtn) {
         keepAspectRatioBtn->blockSignals(true);
@@ -516,9 +474,6 @@ void VideoHtmlWindow::setKeepAspectRatio(bool keep)
     }
     if (videoSurface)
         videoSurface->setKeepAspectRatio(keep);
-#else
-    Q_UNUSED(keep);
-#endif
 }
 
 // ---------------------------------------------------------------
@@ -526,10 +481,8 @@ void VideoHtmlWindow::setKeepAspectRatio(bool keep)
 // ---------------------------------------------------------------
 VideoHtmlWindow::~VideoHtmlWindow()
 {
-#if defined(GC_VIDEO_QT6)
     if (mp)
         mp->stop();
-#endif
 }
 
 
@@ -540,7 +493,6 @@ void VideoHtmlWindow::resizeEvent(QResizeEvent *e)
 {
     GcChartWindow::resizeEvent(e);
 
-#if defined(GC_VIDEO_QT6)
     if (container) {
         QRect r = container->rect();
         if (videoSurface) videoSurface->setGeometry(r);
@@ -550,14 +502,12 @@ void VideoHtmlWindow::resizeEvent(QResizeEvent *e)
             htmlOverlay->raise();
         }
     }
-#endif
 }
 
 void VideoHtmlWindow::showEvent(QShowEvent *e)
 {
     GcChartWindow::showEvent(e);
 
-#if defined(GC_VIDEO_QT6)
     if (container) {
         QRect r = container->rect();
         if (videoSurface) videoSurface->setGeometry(r);
@@ -567,7 +517,6 @@ void VideoHtmlWindow::showEvent(QShowEvent *e)
             htmlOverlay->raise();
         }
     }
-#endif
 }
 
 
@@ -576,7 +525,6 @@ void VideoHtmlWindow::showEvent(QShowEvent *e)
 // ---------------------------------------------------------------
 void VideoHtmlWindow::startPlayback()
 {
-#if defined(GC_VIDEO_QT6)
     if (!mp) return;
 
     float rate = 1.0f;
@@ -623,40 +571,32 @@ void VideoHtmlWindow::startPlayback()
 
     curPosition = 1;
     state = Playing;
-#endif
 }
 
 void VideoHtmlWindow::stopPlayback()
 {
-#if defined(GC_VIDEO_QT6)
     if (!mp) return;
     mp->stop();
     state = None;
     currentVideoRate = 1.0f;
-#endif
 }
 
 void VideoHtmlWindow::pausePlayback()
 {
-#if defined(GC_VIDEO_QT6)
     if (!mp) return;
     mp->pause();
     state = Paused;
-#endif
 }
 
 void VideoHtmlWindow::resumePlayback()
 {
-#if defined(GC_VIDEO_QT6)
     if (!mp) return;
     mp->play();
     state = Playing;
-#endif
 }
 
 void VideoHtmlWindow::seekPlayback(long ms)
 {
-#if defined(GC_VIDEO_QT6)
     if (!hasActiveVideo())
         return;
 
@@ -664,14 +604,10 @@ void VideoHtmlWindow::seekPlayback(long ms)
         return;
 
     mp->setPosition(ms);
-#else
-    Q_UNUSED(ms);
-#endif
 }
 
 void VideoHtmlWindow::mediaSelected(QString filename)
 {
-#if defined(GC_VIDEO_QT6)
     if (!mp) return;
     if (filename.isEmpty()) return;
 
@@ -679,7 +615,4 @@ void VideoHtmlWindow::mediaSelected(QString filename)
 
     if (context && context->isRunning)
         startPlayback();
-#else
-    Q_UNUSED(filename);
-#endif
 }

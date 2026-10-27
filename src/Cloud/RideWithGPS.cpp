@@ -176,7 +176,7 @@ RideWithGPS::writeFile(QByteArray &, QString remotename, RideFile *ride)
         //data += ",\"d\":";
         //data += QString("%1").arg(point->km);
 
-        if ( ride->areDataPresent()->temp && point->temp != RideFile::NA) {
+        if ( ride->areDataPresent()->temp && static_cast<int>(point->temp) != RideFile::NA) {
             data += ",\"T\":";
             data += QString("%1").arg(point->temp);
         }

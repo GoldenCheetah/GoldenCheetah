@@ -680,7 +680,7 @@ Bindings::xdata(QString name, QString series, QString join, PyObject* activity, 
     for(int i=0; i<pCount && it.hasNext(); i++) {
         struct RideFilePoint *point = it.next();
         double val = f->xdataValue(point, idx, name, series, xjoin);
-        ds->data[i] = (val == RideFile::NA) ? sqrt(-1) : val; // NA => NaN
+        ds->data[i] = (static_cast<int>(val) == RideFile::NA) ? sqrt(-1) : val; // NA => NaN
     }
 
     return ds;

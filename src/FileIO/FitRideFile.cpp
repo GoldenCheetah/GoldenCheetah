@@ -3294,7 +3294,7 @@ genericnext:
                         0.0, // headwind
                         prevPoint->slope + (deltaSlope * weight),
                         temperature,
-                        (lrbalance!=RideFile::NA && prevPoint->lrbalance!=RideFile::NA) ? prevPoint->lrbalance + (deltaLeftRightBalance * weight) : RideFile::NA, // interpolate between valid values only
+                        (static_cast<int>(lrbalance)!=RideFile::NA && static_cast<int>(prevPoint->lrbalance)!=RideFile::NA) ? prevPoint->lrbalance + (deltaLeftRightBalance * weight) : RideFile::NA, // interpolate between valid values only
                         prevPoint->lte + (deltaLeftTE * weight),
                         prevPoint->rte + (deltaRightTE * weight),
                         prevPoint->lps + (deltaLeftPS * weight),
@@ -5395,10 +5395,10 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
     foreach (const RideFilePoint *point, ride->dataPoints()) {
         int type = 0;
         // Temperature and lrbalance can be NA
-        if ( ride->areDataPresent()->temp && point->temp != RideFile::NA) {
+        if ( ride->areDataPresent()->temp && static_cast<int>(point->temp) != RideFile::NA) {
             type += 1;
         }
-        if ( ride->areDataPresent()->lrbalance && point->lrbalance != RideFile::NA) {
+        if ( ride->areDataPresent()->lrbalance && static_cast<int>(point->lrbalance) != RideFile::NA) {
             type += 2;
         }
 

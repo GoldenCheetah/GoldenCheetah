@@ -194,12 +194,6 @@ QString GcCrashDialog::versionHTML()
     #endif
     #endif
 
-    // -- VLC ----
-    QString vlc = "none";
-    #ifdef GC_HAVE_VLC
-    vlc = libvlc_get_version();
-    #endif
-
     #ifdef GC_HAVE_SAMPLERATE
     QString src = QString(src_get_version()).mid(14,6);
     #else
@@ -251,7 +245,6 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">ICAL</td><td>%9</td></tr>"
             "<tr><td colspan=\"2\">USBXPRESS</td><td>%10</td></tr>"
             "<tr><td colspan=\"2\">LIBUSB</td><td>%11</td></tr>"
-            "<tr><td colspan=\"2\">VLC</td><td>%12</td></tr>"
             "<tr><td colspan=\"2\">VIDEO</td><td>%13</td></tr>"
             "<tr><td colspan=\"2\">SAMPLERATE</td><td>%14</td></tr>"
             "<tr><td colspan=\"2\">SSL</td><td>%15</td></tr>"
@@ -270,11 +263,8 @@ QString GcCrashDialog::versionHTML()
             .arg(ical)
             .arg(usbxpress)
             .arg(libusb)
-            .arg(vlc)
 #if defined GC_VIDEO_QT6
             .arg("qt6")
-#elif defined GC_VIDEO_VLC
-            .arg("vlc")
 #else
             .arg("none")
 #endif

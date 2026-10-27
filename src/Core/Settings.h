@@ -449,6 +449,11 @@
 #define GC_NOLIO_ATHLETE_ID            "<athlete-private>nolio_athlete_id"
 #define GC_NOLIO_ATHLETE_NAME          "<athlete-private>nolio_athlete_name"
 
+// Wahoo
+#define GC_WAHOO_TOKEN                 "<athlete-private>wahoo_token"
+#define GC_WAHOO_REFRESH_TOKEN         "<athlete-private>wahoo_refresh_token"
+#define GC_WAHOO_LAST_REFRESH          "<athlete-private>wahoo_last_refresh"
+
 // --------------------------------------------------------------------------------
 #include <QSettings>
 #include <QFileInfo>

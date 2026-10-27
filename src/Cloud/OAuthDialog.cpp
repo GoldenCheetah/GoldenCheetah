@@ -52,6 +52,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         if (service->id() == "RideWithGPS") site = this->site = RIDEWITHGPS;
         if (service->id() == "Azum") site = this->site = AZUM;
         if (service->id() == "Tredict") site = this->site = TREDICT;
+        if (service->id() == "Wahoo") site = this->site = WAHOO;
     }
 
     // check if SSL is available - if not - message and end
@@ -176,12 +177,52 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         urlstr.append("redirect_uri=http://localhost/callback&");
         urlstr.append("code_challenge=").append(codeChallenge).append("&");
         urlstr.append("code_challenge_method=S256");
+
+    } else if (site == WAHOO) {
+        // Wahoo only allows 10 tokens per User. To prevent reaching this limit,
+        // delete previous tokens before requesting a new one.
+        QString oldToken = service->getSetting(GC_WAHOO_REFRESH_TOKEN, "").toString();
+        if (!oldToken.isEmpty()) {
+            // Refresh token
+            QStringList errors;
+            service->open(errors);
+            oldToken = service->getSetting(GC_WAHOO_TOKEN, "").toString();
+            if (!errors.isEmpty()) {qDebug() << errors.join("."); }
+
+            // Deauthorize app
+            QUrl deleteUrl = QString("https://api.wahooligan.com/v1/permissions");
+            QNetworkRequest deleteRequest(deleteUrl);
+            deleteRequest.setRawHeader(QByteArray("Authorization"), QByteArray("Bearer ") + oldToken.toUtf8());
+            QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+            QNetworkReply *deleteReply = manager->deleteResource(deleteRequest);
+
+            QEventLoop loop;
+            connect(deleteReply, SIGNAL(finished()), &loop, SLOT(quit()));
+            loop.exec();
+            if (deleteReply->error() == QNetworkReply::NoError) {
+                // Overwrite old token settings
+                service->setSetting(GC_WAHOO_TOKEN, "");
+                service->setSetting(GC_WAHOO_REFRESH_TOKEN, "");
+                service->setSetting(GC_WAHOO_LAST_REFRESH, 0);
+            }
+            deleteReply->deleteLater();
+        }
+        codeVerifier = OAuthPKCE::generateCodeVerifier();
+        QString codeChallenge = OAuthPKCE::computeCodeChallenge(codeVerifier);
+
+        urlstr = QString("https://api.wahooligan.com/oauth/authorize?");
+        urlstr.append("client_id=").append(GC_WAHOO_CLIENT_ID).append("&");
+        urlstr.append("redirect_uri=https://www.goldencheetah.org/&");
+        urlstr.append("scope=user_read%20workouts_read%20workouts_write&");
+        urlstr.append("response_type=code&code_challenge=").append(codeChallenge).append("&");
+        urlstr.append("code_challenge_method=S256");
+
     }
 
     //
     // STEP 1: LOGIN AND AUTHORISE THE APPLICATION
     //
-    if (site == NOLIO || site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == WITHINGS || site == AZUM || site == TREDICT) {
+    if (site == NOLIO || site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == WITHINGS || site == AZUM || site == TREDICT || site == WAHOO) {
         url = QUrl(urlstr);
         view->setUrl(url);
         // connects
@@ -216,7 +257,7 @@ OAuthDialog::urlChanged(const QUrl &url)
     QString authheader;
 
     // sites that use this scheme
-    if (site == NOLIO || site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == XERT || site == RIDEWITHGPS || site == WITHINGS || site == AZUM || site == TREDICT) {
+    if (site == NOLIO || site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == XERT || site == RIDEWITHGPS || site == WITHINGS || site == AZUM || site == TREDICT || site == WAHOO) {
 
         if (url.toString().startsWith("http://www.goldencheetah.org/?state=&code=") ||
                 url.toString().contains("blank.html?code=") ||
@@ -338,6 +379,14 @@ OAuthDialog::urlChanged(const QUrl &url)
                 params.addQueryItem("client_id", GC_TREDICT_CLIENT_ID);
                 params.addQueryItem("code_verifier", codeVerifier);
                 params.addQueryItem("redirect_uri", "http://localhost/callback");
+
+            } else if (site == WAHOO) {
+                view->stop();
+                urlstr = QString("https://api.wahooligan.com/oauth/token");
+                params.addQueryItem("client_id", GC_WAHOO_CLIENT_ID);
+                params.addQueryItem("redirect_uri", "https://www.goldencheetah.org/");
+                params.addQueryItem("grant_type", "authorization_code");
+                params.addQueryItem("code_verifier", codeVerifier);
             }
 
             // all services will need us to send the temporary code received
@@ -536,6 +585,14 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
             service->setSetting(GC_TREDICT_REFRESH_TOKEN, refresh_token);
             service->setSetting(GC_TREDICT_LAST_REFRESH, QDateTime::currentDateTime());
             QString info = QString(tr("Tredict authorization was successful."));
+            QMessageBox information(QMessageBox::Information, tr("Information"), info);
+            information.exec();
+
+        } else if (site == WAHOO) {
+            service->setSetting(GC_WAHOO_TOKEN, access_token);
+            service->setSetting(GC_WAHOO_REFRESH_TOKEN, refresh_token);
+            service->setSetting(GC_WAHOO_LAST_REFRESH, QDateTime::currentDateTime());
+            QString info = QString(tr("Wahoo authorization was successful."));
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
 

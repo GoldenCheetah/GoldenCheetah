@@ -19,7 +19,7 @@
 
 // Web based services that offer an API typically require you to sign
 // up to a terms of service and will provide an access token or 'secret'
-// to use when making calls. 
+// to use when making calls.
 //
 // Because these are registered to the GoldenCheetah project they are
 // not made public. If you want to build with these services enabled
@@ -122,4 +122,20 @@
 
 #ifndef GC_TRAINERDAY_API_KEY
 #define GC_TRAINERDAY_API_KEY "__GC_TRAINERDAY_API_KEY__"
+#endif
+
+/*
+Wahoo (PKCE)
+This Client_ID is only for a Sandbox App.
+token limits:
+    25 / 5 min.
+    100 / hour
+    250 / day
+A Client_ID for a Production App can have
+    200 / 5 min.
+    1000 / hour
+    5000 / day
+*/
+#ifndef GC_WAHOO_CLIENT_ID
+#define GC_WAHOO_CLIENT_ID "wDFQfVdNlmn0UhsXyk_DBOo7Gjo4pMKcqBvfTnzThts"
 #endif
