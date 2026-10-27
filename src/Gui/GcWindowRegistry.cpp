@@ -245,13 +245,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::WebPageWindow: returning = new WebPageWindow(context); break;
     case GcWindowTypes::LiveMapWebPageWindow: returning = new LiveMapWebPageWindow(context); break;
     case GcWindowTypes::HtmlTraining: returning = new HtmlChart(context); break;
-    case GcWindowTypes::VideoHtml:                                 // ← add this block
-        #ifdef GC_VIDEO_QT6
-            returning = new VideoHtmlWindow(context);
-        #else
-            returning = new GcChartWindow(context);   // fallback if no Qt6 video
-        #endif
-        break;
+    case GcWindowTypes::VideoHtml: returning = new VideoHtmlWindow(context); break;
     case GcWindowTypes::ElevationChart: returning = new ElevationChartWindow(context); break;
     case GcWindowTypes::RouteSegment: returning = new GcChartWindow(context); break; // Deprecated
 

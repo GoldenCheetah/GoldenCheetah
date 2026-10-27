@@ -73,7 +73,6 @@ private slots:
     void keepAspectRatioChanged(Qt::CheckState state);
 
 private:
-#if defined(GC_VIDEO_QT6)
     class VideoSurfaceWidget : public QWidget
     {
     public:
@@ -118,7 +117,6 @@ private:
     float currentVideoRate = 1.0f;
     double videoSyncTimeAdjustFactor = 1.0;
     double videoSyncDistanceAdjustFactor = 1.0;
-#endif
 };
 
 #endif // _GC_VideoHtmlWindow_h
