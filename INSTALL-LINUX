@@ -28,7 +28,6 @@ CONTENTS
    - FTDI D2XX
    - SRMIO
    - liboauth
-   - Qt6 Video  - Video playback in training mode
    - libusb  - If you want support for using USB2 sticks in Train View
    - R       - If you want R charts
    - Python  - If you want Python charts, scripts and data processors
@@ -222,19 +221,6 @@ $ qmake
 $ make
 
 You now have SRM support built in.
-
-Qt6 Video - Video playback in Realtime
---------------------------------------
-
-$ cd ~/Projects/GoldenCheetah/src
-$ vi gcconfig.pri
-
-Uncomment the line
-#DEFINES += GC_VIDEO_QT6
-
-$ make clean
-$ qmake
-$ make
 
 LIBUSB - for using USB2 sticks in Train View on Linux or Windows
 ----------------------------------------------------------------

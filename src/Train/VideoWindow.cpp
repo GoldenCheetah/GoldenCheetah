@@ -28,9 +28,7 @@
 #include "VideoLayoutParser.h"
 #include "HelpWhatsThis.h"
 
-#if defined(GC_VIDEO_QT6)
 #include <QMediaMetaData>
-#endif
 
 class Lock
 {
@@ -61,7 +59,6 @@ VideoWindow::VideoWindow(Context *context)  :
 
     init = true; // assume initialisation was ok ...
 
-#if defined(GC_VIDEO_QT6)
     // USE QT VIDEO PLAYER
     wd = new QVideoWidget(this);
     wd->show();
@@ -72,9 +69,7 @@ VideoWindow::VideoWindow(Context *context)  :
     mp->setAudioOutput(new QAudioOutput);
     container = wd;
     layout->addWidget(container);
-#endif
 
-#if defined(GC_VIDEO_QT6)
     if (init) {
     // Read the video layouts just to list the names for the layout selector
         readVideoLayout(-1);
@@ -108,7 +103,6 @@ VideoWindow::VideoWindow(Context *context)  :
         // Instantiate a layout as initial default
         layoutChanged();
     }
-#endif
 
     setControls(c);
 
@@ -135,11 +129,9 @@ VideoWindow::~VideoWindow()
 
     stopPlayback();
 
-#if defined(GC_VIDEO_QT6)
     // QT MEDIA
     delete mp;
     delete wd;
-#endif
 }
 
 // Note: This method should only be called under state lock.
@@ -148,10 +140,8 @@ bool VideoWindow::hasActiveVideo() const
     if (state == PlaybackState::None)
         return false;
 
-#ifdef GC_VIDEO_QT6
     if (mp->playbackState() != QMediaPlayer::StoppedState)
         return true;
-#endif
 
     return false;
 }
@@ -263,14 +253,12 @@ void VideoWindow::startPlayback()
 {
     Lock lock(stateLock);
 
-#ifdef GC_VIDEO_QT6
     // open the media object
     float rate = 1.0f;
     if (context->currentVideoSyncFile() && context->currentVideoSyncFile()->Points.count() > 1)
         rate = 0.1f;
     mp->setPlaybackRate(rate);
     mp->play();
-#endif
 
     // Compute VideoSync unit correction factors.
     videoSyncTimeAdjustFactor = 1.;
@@ -313,7 +301,7 @@ void VideoWindow::startPlayback()
         // query for media's actual frame rate.
 
         // This issue occurs on almost all tacx virtual rides.
-#if defined(GC_VIDEO_QT6)
+
         double videoSyncFrameRate = currentVideoSyncFile->videoFrameRate();
         if (videoSyncFrameRate > 0.) {
             bool ok=false;
@@ -336,7 +324,6 @@ void VideoWindow::startPlayback()
                 }
             }
         }
-#endif
     }
 
     state = PlaybackState::Playing;
@@ -376,9 +363,7 @@ void VideoWindow::stopPlayback()
         p_meterWidget->hide();
     }
 
-#if defined(GC_VIDEO_QT6)
     mp->stop();
-#endif
 }
 
 void VideoWindow::pausePlayback()
@@ -389,9 +374,7 @@ void VideoWindow::pausePlayback()
 
     state = PlaybackState::Paused;
 
-#if defined(GC_VIDEO_QT6)
     mp->pause();
-#endif
 }
 
 void VideoWindow::resumePlayback()
@@ -400,9 +383,7 @@ void VideoWindow::resumePlayback()
     if (!hasActiveVideo())
         return;
 
-#if defined(GC_VIDEO_QT6)
     mp->play();
-#endif
 
     state = PlaybackState::Playing;
 }
@@ -612,11 +593,6 @@ void VideoWindow::telemetryUpdate(const RealtimeData &rtd)
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
         p_meterWidget->update();
 
-#ifdef GC_VIDEO_NONE
-    Q_UNUSED(rtd)
-#endif
-
-#if defined (GC_VIDEO_QT6)
     if (PlaybackState::Playing != state)
         return;
 
@@ -713,7 +689,6 @@ void VideoWindow::telemetryUpdate(const RealtimeData &rtd)
             currentVideoRate = rate;
         }
     }
-#endif
 
 }
 
@@ -723,10 +698,6 @@ void VideoWindow::seekPlayback(long ms)
     if (!hasActiveVideo())
         return;
 
-#ifdef GC_VIDEO_NONE
-    Q_UNUSED(ms)
-#endif
-
     // when we selected a videosync file in training mode (rlv...)
     if (context->currentVideoSyncFile())
     {
@@ -734,26 +705,16 @@ void VideoWindow::seekPlayback(long ms)
     }
     else
     {
-#if defined(GC_VIDEO_QT6)
         mp->setPosition(ms);
-#else
-        Q_UNUSED(ms)
-#endif
     }
 }
 
 void VideoWindow::mediaSelected(QString filename)
 {
-#ifdef GC_VIDEO_NONE
-    Q_UNUSED(filename);
-#endif
-
-#ifdef GC_VIDEO_QT6
     // QT MEDIA
     if (filename != "")
         mp->setSource(QUrl::fromLocalFile(filename));
 
-#endif
     if(context->isRunning) startPlayback();
 }
 

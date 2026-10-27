@@ -63,33 +63,29 @@ Replace-InFile $gcconfig "#SAMPLERATE_LIBS = /usr/local/lib/libsamplerate.a" "SA
 # 11. HTPATH
 Replace-InFile $gcconfig "#HTPATH = ../httpserver" "HTPATH = ../httpserver"
 
-# 12. Video
-Replace-InFile $gcconfig "DEFINES \+= GC_VIDEO_NONE" "#DEFINES += GC_VIDEO_NONE"
-Replace-InFile $gcconfig "#DEFINES \+= GC_VIDEO_QT6" "DEFINES += GC_VIDEO_QT6"
-
-# 13. R Support
+# 12. R Support
 Replace-InFile $gcconfig "#DEFINES \+= GC_WANT_R" "DEFINES += GC_WANT_R"
 
-# 14. Python Support
+# 13. Python Support
 Replace-InFile $gcconfig "#DEFINES \+= GC_WANT_PYTHON" "DEFINES += GC_WANT_PYTHON"
 Replace-InFile $gcconfig "#PYTHONINCLUDES =" "PYTHONINCLUDES = -ICore -I`"$(python -c "import sys; print(sys.prefix)")\include`""
 Replace-InFile $gcconfig "#PYTHONLIBS =" "PYTHONLIBS = -L`"$(python -c "import sys; print(sys.prefix)")\libs`" -lpython311"
 
-# 15. GSL Support
+# 14. GSL Support
 Replace-InFile $gcconfig "#  GSL_INCLUDES = c:\\vcpkg\\installed\\x64-windows\\include" "GSL_INCLUDES = c:\tools\vcpkg\installed\x64-windows\include"
 Replace-InFile $gcconfig "#  GSL_LIBS = -LC:\\vcpkg\\installed\\x64-windows\\lib -lgsl -lgslcblas" "GSL_LIBS = -Lc:\tools\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas"
 
-# 16. CloudDB
+# 15. CloudDB
 Replace-InFile $gcconfig "#CloudDB = active" "CloudDB = active"
 
-# 17. Train Robot
+# 16. Train Robot
 Replace-InFile $gcconfig "#DEFINES \+= GC_WANT_ROBOT" "DEFINES += GC_WANT_ROBOT"
 
-# 18. TrainerDay
+# 17. TrainerDay
 Replace-InFile $gcconfig "#DEFINES \+= GC_WANT_TRAINERDAY_API" "DEFINES += GC_WANT_TRAINERDAY_API"
 Replace-InFile $gcconfig "#DEFINES \+= GC_TRAINERDAY_API_PAGESIZE=25" "DEFINES += GC_TRAINERDAY_API_PAGESIZE=25"
 
-# 19. Math Defines and Nominmax
+# 18. Math Defines and Nominmax
 Add-Content $gcconfig "DEFINES += _MATH_DEFINES_DEFINED"
 Replace-InFile $gcconfig "#DEFINES \+= NOMINMAX" "DEFINES += NOMINMAX"
 

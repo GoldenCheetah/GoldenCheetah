@@ -263,11 +263,7 @@ QString GcCrashDialog::versionHTML()
             .arg(ical)
             .arg(usbxpress)
             .arg(libusb)
-#if defined GC_VIDEO_QT6
             .arg("qt6")
-#else
-            .arg("none")
-#endif
             .arg(src)
             .arg(QSslSocket::supportsSsl() ? "yes" : "none")
 #ifdef GC_WANT_R

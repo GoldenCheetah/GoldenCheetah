@@ -277,10 +277,6 @@ macx {
 #DEFINES += GC_NOKIA_CLIENT_ID=\\\"xxxxxxxxxxxxxxx\\\"
 #DEFINES += GC_NOKIA_CLIENT_SECRET=\\\"xxxxxxxxxxxxxxx\\\"
 
-# What video playback do you want?
-DEFINES += GC_VIDEO_NONE             # dont add any video playback support
-#DEFINES += GC_VIDEO_QT6             # qt6 videowidget
-
 
 # Using the GoldenCheetah/CloudDB feature (with a private CloudDB instance)
 # requires that you have a running instance of CloudDB on Google App Engine

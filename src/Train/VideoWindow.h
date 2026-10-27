@@ -22,25 +22,10 @@
 #include "GoldenCheetah.h"
 #include "MeterWidget.h"
 
-// We need to determine what options the user has chosen
-// for compiling, options are:
-// GC_VIDEO_NONE
-// GC_VIDEO_QT6
-//
-// If the user hasn't set one of the above then use none
-#if !defined GC_VIDEO_NONE && !defined GC_VIDEO_QT6
-#define GC_VIDEO_NONE
-#endif
-
-//----------------------------------------------------------------------
-// Now options are set lets pull in the headers we need then
-//----------------------------------------------------------------------
-
-#if defined(GC_VIDEO_QT6) // QT6 Video Stuff
+// QT6 Video Stuff
 #include <QVideoWidget>
 #include <QMediaPlayer>
 #include <QAudioOutput>
-#endif
 
 // QT stuff etc
 #include <QtGui>
@@ -137,11 +122,9 @@ class VideoWindow : public GcChartWindow
         void readVideoLayout(int x, bool useDefault=false);
         void showMeters();
 
-#if defined(GC_VIDEO_QT6)
         // QT native
         QVideoWidget *wd;
         QMediaPlayer *mp;
-#endif
 
         QWidget *container;
         QComboBox *layoutSelector;

@@ -75,9 +75,6 @@
 #include "TrainDB.h"
 #include "Library.h"
 
-#if defined(GC_VIDEO_QT6)
-#define USE_RLV
-#endif
 
 TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(context),
     bicycle(context), rtData(context, 0, 0, 0)
@@ -111,7 +108,6 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     lastAppliedIntensity = 100;
     bpmTelemetry = wattsTelemetry = kphTelemetry = rpmTelemetry = -1;
 
-#if !defined GC_VIDEO_NONE
     videoModel = trainDB->getVideoModel();
 
     vsortModel = new QSortFilterProxyModel(this);
@@ -148,7 +144,6 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     mediaTree->verticalScrollBar()->setStyle(cde);
 #endif
 
-#ifdef USE_RLV
     videosyncModel = trainDB->getVideoSyncModel();
 
     vssortModel = new QSortFilterProxyModel(this);
@@ -185,9 +180,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     videosyncTree->verticalScrollBar()->setStyle(cdevideosync);
 #endif
 
-#endif //USE_RLV
 
-#endif //GC_VIDEO_NONE
 
     deviceTree = new DeviceTreeView;
     deviceTree->setFrameStyle(QFrame::NoFrame);
@@ -309,7 +302,6 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     cl->addWidget(trainSplitter);
 
 
-#if !defined GC_VIDEO_NONE
     mediaItem = new GcSplitterItem(tr("Media"), iconFromPNG(":images/sidebar/movie.png"), this);
     QAction *moreMediaAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
     mediaItem->addAction(moreMediaAct);
@@ -319,7 +311,6 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     mediaTree->setWhatsThis(helpMediaTree->getWhatsThisText(HelpWhatsThis::SideBarTrainView_Media));
     trainSplitter->addWidget(mediaItem);
 
-#ifdef USE_RLV
     videosyncItem = new GcSplitterItem(tr("VideoSync"), iconFromPNG(":images/sidebar/sync.png"), this);
     QAction *moreVideoSyncAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
     videosyncItem->addAction(moreVideoSyncAct);
@@ -328,15 +319,11 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     HelpWhatsThis *helpVideosyncTree = new HelpWhatsThis(videosyncTree);
     videosyncTree->setWhatsThis(helpVideosyncTree->getWhatsThisText(HelpWhatsThis::SideBarTrainView_VideoSync));
     trainSplitter->addWidget(videosyncItem);
-#endif //USE_RLV
-#endif //GC_VIDEO_NONE
     trainSplitter->prepare(context->athlete->cyclist, "train");
 
 #ifdef Q_OS_MAC
     // get rid of annoying focus rectangle for sidebar components
-#if !defined GC_VIDEO_NONE
     mediaTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
-#endif
     workoutTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
     deviceTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
@@ -346,16 +333,12 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     connect(deviceTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(deviceTreeMenuPopup(const QPoint &)));
     connect(deviceTree,SIGNAL(itemMoved(int, int)), this, SLOT(moveDevices(int, int)));
 
-#if !defined GC_VIDEO_NONE
     connect(mediaTree->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
                             this, SLOT(mediaTreeWidgetSelectionChanged()));
     connect(context, SIGNAL(selectMedia(QString)), this, SLOT(selectVideo(QString)));
-#ifdef USE_RLV
     connect(videosyncTree->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
                             this, SLOT(videosyncTreeWidgetSelectionChanged()));
     connect(context, SIGNAL(selectVideoSync(QString)), this, SLOT(selectVideoSync(QString)));
-#endif //USE_RLV
-#endif //GC_VIDEO_NONE
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(selectWorkout(QString)), this, SLOT(selectWorkout(QString)));
     connect(context, SIGNAL(selectWorkout(int)), this, SLOT(selectWorkout(int)));
@@ -425,16 +408,12 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
 TrainSidebar::~TrainSidebar
 ()
 {
-#if !defined GC_VIDEO_NONE
     if (videoModel != nullptr) {
         delete videoModel;
     }
-#ifdef USE_RLV
     if (videosyncModel != nullptr) {
         delete videosyncModel;
     }
-#endif
-#endif
     if (workoutModel != nullptr) {
         delete workoutModel;
     }
@@ -445,24 +424,20 @@ TrainSidebar::refresh()
 {
     int row;
 
-#if !defined GC_VIDEO_NONE
     // remember selection
     row = mediaTree->currentIndex().row();
     QString videoPath = mediaTree->model()->data(mediaTree->model()->index(row, TdbVideoModelIdx::filepath)).toString();
 
-#ifdef USE_RLV
     // refresh data
     QAbstractTableModel *oldVideoModel = videoModel;
     videoModel = trainDB->getVideoModel();
     vsortModel->setSourceModel(videoModel);
     videoModel->setParent(this);
     delete oldVideoModel;
-#endif
 
     // restore selection
     selectVideo(videoPath);
 
-#ifdef USE_RLV
     // remember selection
     row = videosyncTree->currentIndex().row();
     QString videosyncPath = videosyncTree->model()->data(videosyncTree->model()->index(row, TdbVideosyncModelIdx::filepath)).toString();
@@ -476,9 +451,7 @@ TrainSidebar::refresh()
 
     // restore selection
     selectVideoSync(videosyncPath);
-#endif // USE_RLV
 
-#endif // GC_VIDEO_NONE
 
     row = workoutTree->currentIndex().row();
     QString workoutPath = workoutTree->model()->data(workoutTree->model()->index(row, TdbWorkoutModelIdx::filepath)).toString();
@@ -684,12 +657,8 @@ TrainSidebar::configChanged(qint32 why)
     useSimulatedSpeed = appsettings->value(this, TRAIN_USESIMULATEDSPEED, false).toBool();
 
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
-#if !defined GC_VIDEO_NONE
     mediaTree->setStyleSheet(GCColor::stylesheet(true));
-#ifdef USE_RLV
     videosyncTree->setStyleSheet(GCColor::stylesheet(true));
-#endif
-#endif
     workoutTree->setStyleSheet(GCColor::stylesheet(true));
     workoutInfo->setStyleSheet(GCColor::stylesheet(true));
     deviceTree->setStyleSheet(GCColor::stylesheet(true));
@@ -931,22 +900,18 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
             adjustIntensity(100);
             setLabels();
 
-#if !defined GC_VIDEO_NONE
             QWidget *focusWidget = QApplication::focusWidget();
             // Try to select matching media and videosync files
             QString workoutName = QFileInfo(filename).baseName();
             mediaTree->setFocus();
             mediaTree->keyboardSearch(workoutName);
-#ifdef USE_RLV
             videosyncTree->setFocus();
             videosyncTree->keyboardSearch(workoutName);
-#endif
             if (focusWidget != nullptr) {
                 focusWidget->setFocus();
             } else {
                 workoutTree->setFocus();
             }
-#endif
         } else {
 
             // couldn't parse fall back to ERG mode
@@ -1306,12 +1271,8 @@ void TrainSidebar::Start()       // when start button is pressed
         load_period.restart();
         load_timer->start(LOADRATE);
 
-#if !defined GC_VIDEO_NONE
         mediaTree->setEnabled(false);
-#ifdef USE_RLV
         videosyncTree->setEnabled(false);
-#endif
-#endif
 
         // tell the world
         context->notifyUnPause();
@@ -1332,13 +1293,9 @@ void TrainSidebar::Start()       // when start button is pressed
         load_timer->stop();
         load_msecs += load_period.restart();
 
-#if !defined GC_VIDEO_NONE
         // enable media tree so we can change movie - mid workout
         mediaTree->setEnabled(true);
-#ifdef USE_RLV
         videosyncTree->setEnabled(true);
-#endif
-#endif
 
         // tell the world
         context->notifyPause();
@@ -1371,12 +1328,8 @@ void TrainSidebar::Start()       // when start button is pressed
 
         // Stop users from selecting different devices
         // media or workouts whilst a workout is in progress
-#if !defined GC_VIDEO_NONE
         mediaTree->setEnabled(false);
-#ifdef USE_RLV
         videosyncTree->setEnabled(false);
-#endif
-#endif
         workoutTree->setEnabled(false);
         deviceTree->setEnabled(false);
 
@@ -1493,12 +1446,8 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
         load_period.restart();
         load_timer->start(LOADRATE);
 
-#if !defined GC_VIDEO_NONE
         mediaTree->setEnabled(false);
-#ifdef USE_RLV
         videosyncTree->setEnabled(false);
-#endif
-#endif
 
         // tell the world
         context->notifyUnPause();
@@ -1514,12 +1463,8 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
         load_msecs += load_period.restart();
 
         // enable media tree so we can change movie
-#if !defined GC_VIDEO_NONE
         mediaTree->setEnabled(true);
-#ifdef USE_RLV
         videosyncTree->setEnabled(true);
-#endif
-#endif
 
         // tell the world
         context->notifyPause();
@@ -1539,12 +1484,8 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
 
     // Stop users from selecting different devices
     // media or workouts whilst a workout is in progress
-#if !defined GC_VIDEO_NONE
     mediaTree->setEnabled(true);
-#ifdef USE_RLV
     videosyncTree->setEnabled(true);
-#endif
-#endif
     workoutTree->setEnabled(true);
     deviceTree->setEnabled(true);
 

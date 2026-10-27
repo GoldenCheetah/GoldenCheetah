@@ -51,10 +51,6 @@ main() {
    # Robot
    s|#\(DEFINES += GC_WANT_ROBOT.*\)|\1|
 
-   # Qt6 VIDEO
-   s|\(DEFINES += GC_VIDEO_NONE.*\)|#\1|
-   s|#\(DEFINES += GC_VIDEO_QT6.*\)|\1|
-
    # Enable R embedding
    s|#\(DEFINES += GC_WANT_R.*\)|\1|
 

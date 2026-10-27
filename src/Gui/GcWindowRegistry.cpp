@@ -217,11 +217,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::Scatter: returning = new ScatterWindow(context); break;
     case GcWindowTypes::TreeMap: returning = new TreeMapWindow(context); break;
     case GcWindowTypes::WeeklySummary: returning = NULL; break; // deprecated
-#ifdef GC_VIDEO_NONE
-    case GcWindowTypes::VideoPlayer: returning = new GcChartWindow(context); break;
-#else
     case GcWindowTypes::VideoPlayer: returning = new VideoWindow(context); break;
-#endif
     case GcWindowTypes::DialWindow: returning = new DialWindow(context); break;
     case GcWindowTypes::MetadataWindow: returning = new MetadataWindow(context); break;
     case GcWindowTypes::RealtimeControls: returning = new GcChartWindow(context); break;
