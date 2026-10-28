@@ -266,9 +266,12 @@ FitlogParser::distanceBetween(double lat1, double lon1, double lat2, double lon2
         lon1 *= DEG2RAD;
         lon2 *= DEG2RAD;
 
-        distance = acos(cos(lat1)*cos(lon1)*cos(lat2)*cos(lon2) +
-                        cos(lat1)*sin(lon1)*cos(lat2)*sin(lon2) +
-                        sin(lat1)*sin(lat2)) * EARTH_RADIUS;
+        // rounding can push the argument just above 1.0 for points a few
+        // centimeters apart, and acos() would then return NaN
+        double c = cos(lat1)*cos(lon1)*cos(lat2)*cos(lon2) +
+                   cos(lat1)*sin(lon1)*cos(lat2)*sin(lon2) +
+                   sin(lat1)*sin(lat2);
+        distance = acos(qBound(-1.0, c, 1.0)) * EARTH_RADIUS;
 
     }
     return distance;

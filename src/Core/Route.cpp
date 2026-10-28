@@ -305,7 +305,7 @@ RouteSegment::distance(double lat1, double lon1, double lat2, double lon2) {
       _dist = 0;
   else {
       _dist = sin(deg2rad(lat1)) * sin(deg2rad(lat2)) + cos(deg2rad(lat1)) * cos(deg2rad(lat2)) * cos(deg2rad(_theta));
-      _dist = acos(_dist) * 6371;
+      _dist = acos(qBound(-1.0, _dist, 1.0)) * 6371; // avoid NaN for very close points
   }
   return (_dist);
 }
