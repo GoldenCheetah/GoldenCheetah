@@ -32,6 +32,7 @@
 
 #include "Context.h"
 #include "Season.h"
+#include "StyledItemDelegates.h"
 
 
 class EditSeasonDialog : public QDialog
@@ -82,7 +83,6 @@ class EditSeasonDialog : public QDialog
         QSpinBox *endDurationDaysEdit;
 
         QDoubleSpinBox *seedEdit;
-        QDoubleSpinBox *lowEdit;
         QTextEdit *descriptionEdit;
 
         QLabel *statusLabel;
@@ -145,8 +145,6 @@ class EditPhaseDialog : public QDialog
         QLineEdit *nameEdit;
         QComboBox *typeEdit;
         QDateEdit *fromEdit, *toEdit;
-        QDoubleSpinBox *seedEdit;
-        QDoubleSpinBox *lowEdit;
         QTextEdit *descriptionEdit;
 };
 

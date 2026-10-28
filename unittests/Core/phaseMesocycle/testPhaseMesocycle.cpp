@@ -587,6 +587,25 @@ private slots:
         QCOMPARE(dates[ref1.addDays(6)][1], "Run");
     }
 
+    void mesoSlottedSports() {
+        Mesocycle mesocycle;
+        mesocycle.setStart(ref1);
+        mesocycle.setMaxMicrocycles(4);
+        mesocycle.addSlot(1, "Bike");
+        mesocycle.addSlot(1, "Run");
+        mesocycle.addSlot(2, "Bike");
+        mesocycle.addSlot(3, "Bke");
+        mesocycle.addSlot(3, "Rn");
+        mesocycle.addSlot(7, "Bike");
+
+        QSet<QString> uniqueSports = mesocycle.getSlottedSports();
+        QCOMPARE(uniqueSports.count(), 4);
+        QVERIFY(uniqueSports.contains("Bike"));
+        QVERIFY(uniqueSports.contains("Bke"));
+        QVERIFY(uniqueSports.contains("Run"));
+        QVERIFY(uniqueSports.contains("Rn"));
+    }
+
 
     //////////////////////////////////////////////////////////////////////////////
     // Mesocycle in Phase

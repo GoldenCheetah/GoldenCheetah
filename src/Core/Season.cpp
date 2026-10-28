@@ -358,6 +358,12 @@ int Season::getType() const
 }
 
 
+QString Season::getTypeString() const
+{
+    return types[std::clamp(static_cast<int>(type), static_cast<int>(Season::season), static_cast<int>(Season::temporary))];
+}
+
+
 bool Season::isMacrocycle() const
 {
     QList<Phase>::const_iterator it = std::find_if(phases.cbegin(), phases.cend(), [](const Phase &phase) {
@@ -522,6 +528,22 @@ Season::isYtd
 () const
 {
     return _ytd;
+}
+
+
+void
+Season::setSeed
+(int x)
+{
+    _seed = x;
+}
+
+
+int
+Season::getSeed
+() const
+{
+    return _seed;
 }
 
 
@@ -1445,6 +1467,18 @@ Mesocycle::getSlotDateSports
 }
 
 
+QSet<QString>
+Mesocycle::getSlottedSports
+() const
+{
+    QSet<QString> ret;
+    for (const Slot &slot : slots_) {
+        ret.insert(slot.getSport());
+    }
+    return ret;
+}
+
+
 //////////////////////////////////////////////////////////////
 // Phase
 //
@@ -1457,7 +1491,8 @@ static QList<QString> _setPhaseTypes()
               << "Base"
               << "Build"
               << "Peak"
-              << "Camp";
+              << "Camp"
+              << "Mesocycle";
     return returning;
 }
 QList<QString> Phase::types = _setPhaseTypes();
@@ -1494,6 +1529,22 @@ Phase::setType(int _type)
         meso->setMaxMicrocycles(numMicrocycles());
         meso->setStart(getStart());
     }
+}
+
+
+QString
+Phase::getTypeString() const
+{
+    switch (type) {
+    case Phase::camp:
+        return types[5];
+    case Phase::mesocycle:
+        return types[6];
+    default:
+        int typeIdx = std::clamp(static_cast<int>(type), static_cast<int>(Phase::phase), static_cast<int>(Phase::peak));
+        return Phase::types[typeIdx - static_cast<int>(Phase::phase)];
+    }
+
 }
 
 

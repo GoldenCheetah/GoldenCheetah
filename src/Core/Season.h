@@ -21,6 +21,7 @@
 
 #include <QString>
 #include <QDate>
+#include <QMap>
 #include <QCoreApplication>
 #include <QUuid>
 
@@ -180,9 +181,11 @@ class Season
 
         void setId(QUuid x) { _id = x; }
         QUuid id() const { return _id; }
+        QString idString() const { return _id.toString(); }
 
         virtual void setType(int _type);
         int getType() const;
+        virtual QString getTypeString() const;
 
         bool isMacrocycle() const;
 
@@ -227,11 +230,8 @@ class Season
         void setYtd();
         bool isYtd() const;
 
-        void setSeed(int x) { _seed = x; }
-        int getSeed() const { return _seed; }
-
-        void setLow(int x) { _low = x; }
-        int getLow() const { return _low; }
+        void setSeed(int x);
+        int getSeed() const;
 
         void setDescription(const QString &desc) { _description = desc; }
         QString getDescription() const { return _description; }
@@ -256,7 +256,6 @@ class Season
         SeasonLength _length; // length (relative season)
         bool _ytd = false;
         int _seed = 0;
-        int _low = -50; // low point for SB .. default to -50
         QString _description;
 
         ModelType _model = ModelType::none;
@@ -416,6 +415,7 @@ public:
     QMap<QString, QList<QDate>> getSlotSportDates() const;
     QMap<int, QList<QString>> getSlotOffsetSports() const;
     QMap<QDate, QList<QString>> getSlotDateSports() const;
+    QSet<QString> getSlottedSports() const;
 
 private:
     QDate start;
@@ -441,6 +441,7 @@ class Phase : public Season
         Phase(QString _name, QDate _start, QDate _end);
 
         void setType(int _type) override;
+        QString getTypeString() const override;
         void setAbsoluteStart(QDate _start) override;
         void setAbsoluteEnd(QDate _end) override;
 

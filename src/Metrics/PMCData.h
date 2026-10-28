@@ -28,79 +28,161 @@
 
 #include <QtCore>
 #include <QList>
-#include <QDateTime>
-#include <QTreeWidgetItem>
+#include <QMap>
+#include <QHash>
+#include <QSet>
+
+
+#undef DEV_GNUPLOT
 
 class Context;
+class Season;
 
 class PMCData : public QObject {
 
     Q_OBJECT
 
     public:
+        using SeriesT = QVector<double>;
+
+        enum class SeriesType : char {
+            Actual,
+            Planned,
+            Expected,
+            MacroExpectedTarget,
+            MacroExpectedSlotted
+        };
+        enum class ValueType : char {
+            Stress,
+            Lts,
+            Sts,
+            Sb,
+            Rr
+        };
+        struct SeriesKey {
+            SeriesType series;
+            ValueType value;
+            QString sport;
+
+            explicit SeriesKey(SeriesType s, ValueType v, QString sport = "") noexcept
+                : series(s), value(v), sport(std::move(sport)) {}
+
+            [[nodiscard]] SeriesKey withSeries(SeriesType newSeries) const {
+                return SeriesKey(newSeries, value, sport);
+            }
+            [[nodiscard]] SeriesKey withValue(ValueType newValue) const {
+                return SeriesKey(series, newValue, sport);
+            }
+            [[nodiscard]] SeriesKey withSport(const QString &newSport) const {
+                return SeriesKey(series, value, newSport);
+            }
+            bool operator==(const SeriesKey &other) const noexcept {
+                return    series == other.series
+                       && value == other.value
+                       && sport == other.sport;
+            }
+            friend inline size_t qHash(const SeriesKey& key, size_t seed = 0) noexcept {
+                return qHashMulti(seed, key.series, key.value, key.sport);
+            }
+        };
+
 
         // create a PMC data series for the athlete
         // for ALL date ranges
-        PMCData(Context *, Specification specification, QString metricName, int stsDays=-1, int ltsDays=-1);
-        PMCData(Context *, Specification specification, Leaf *expr, DataFilterRuntime *df, int stsDays=-1, int ltsDays=-1);
+        // fullScope: individual series per sports and macroSeries
+        PMCData(Context *, Specification specification, QString metricName, int stsDays=-1, int ltsDays=-1, bool fullScope = false);
+        PMCData(Context *, Specification specification, Leaf *expr, DataFilterRuntime *df, int stsDays=-1, int ltsDays=-1, bool fullScope = false);
 
         // set parameters
         void setStsDays(int x) { stsDays_ = x; invalidate(); }
         void setLtsDays(int x) { ltsDays_ = x; invalidate(); }
         void setSpecification(Specification x) { specification_ = x; invalidate(); }
 
-        // get parameters
         QString &metricName() { return metricName_; }
         const RideMetric *metric() { return metric_; }
         int &stsDays() { return stsDays_; }
         int &ltsDays() { return ltsDays_; }
         Specification &specification() { return specification_; }
 
-        // data accessors
         QDate &start() { return start_; }
         QDate &end() { return end_; }
         int &days() { return days_; }
 
+        // name used for activities without a sport
+        static QString otherSport() { return tr("Other"); }
+
+        // sports for which at least one series with data exists (sorted)
+        QStringList sports();
+
         // get arrays
-        QVector<double> &stress() { return stress_; }
-        QVector<double> &lts() { return lts_; }
-        QVector<double> &sts() { return sts_; }
-        QVector<double> &sb() { return sb_; }
-        QVector<double> &rr() { return rr_; }
+        SeriesT stress(const QString &sport = "") { return data(SeriesKey(SeriesType::Actual, ValueType::Stress, sport)); }
+        SeriesT lts(const QString &sport = "") {  return data(SeriesKey(SeriesType::Actual, ValueType::Lts, sport)); }
+        SeriesT sts(const QString &sport = "") {  return data(SeriesKey(SeriesType::Actual, ValueType::Sts, sport)); }
+        SeriesT sb(const QString &sport = "") {  return data(SeriesKey(SeriesType::Actual, ValueType::Sb, sport)); }
+        SeriesT rr(const QString &sport = "") {  return data(SeriesKey(SeriesType::Actual, ValueType::Rr, sport)); }
 
-        QVector<double> &plannedStress() { return planned_stress_; }
-        QVector<double> &plannedLts() { return planned_lts_; }
-        QVector<double> &plannedSts() { return planned_sts_; }
-        QVector<double> &plannedSb() { return planned_sb_; }
-        QVector<double> &plannedRr() { return planned_rr_; }
+        SeriesT plannedStress(const QString &sport = "") { return data(SeriesKey(SeriesType::Planned, ValueType::Stress, sport)); }
+        SeriesT plannedLts(const QString &sport = "") {  return data(SeriesKey(SeriesType::Planned, ValueType::Lts, sport)); }
+        SeriesT plannedSts(const QString &sport = "") {  return data(SeriesKey(SeriesType::Planned, ValueType::Sts, sport)); }
+        SeriesT plannedSb(const QString &sport = "") {  return data(SeriesKey(SeriesType::Planned, ValueType::Sb, sport)); }
+        SeriesT plannedRr(const QString &sport = "") {  return data(SeriesKey(SeriesType::Planned, ValueType::Rr, sport)); }
 
-        QVector<double> &expectedStress() { return expected_stress_; }
-        QVector<double> &expectedLts() { return expected_lts_; }
-        QVector<double> &expectedSts() { return expected_sts_; }
-        QVector<double> &expectedSb() { return expected_sb_; }
-        QVector<double> &expectedRr() { return expected_rr_; }
+        SeriesT expectedStress(const QString &sport = "") { return data(SeriesKey(SeriesType::Expected, ValueType::Stress, sport)); }
+        SeriesT expectedLts(const QString &sport = "") { return data(SeriesKey(SeriesType::Expected, ValueType::Lts, sport)); }
+        SeriesT expectedSts(const QString &sport = "") { return data(SeriesKey(SeriesType::Expected, ValueType::Sts, sport)); }
+        SeriesT expectedSb(const QString &sport = "") { return data(SeriesKey(SeriesType::Expected, ValueType::Sb, sport)); }
+        SeriesT expectedRr(const QString &sport = "") { return data(SeriesKey(SeriesType::Expected, ValueType::Rr, sport)); }
+
+        SeriesT macroExpectedTargetStress() { return data(SeriesKey(SeriesType::MacroExpectedTarget, ValueType::Stress)); }
+        SeriesT macroExpectedTargetLts() { return data(SeriesKey(SeriesType::MacroExpectedTarget, ValueType::Lts)); }
+        SeriesT macroExpectedTargetSts() { return data(SeriesKey(SeriesType::MacroExpectedTarget, ValueType::Sts)); }
+        SeriesT macroExpectedTargetSb() { return data(SeriesKey(SeriesType::MacroExpectedTarget, ValueType::Sb)); }
+        SeriesT macroExpectedTargetRr() { return data(SeriesKey(SeriesType::MacroExpectedTarget, ValueType::Rr)); }
+
+        SeriesT macroExpectedSlottedStress(const QString &sport = "") { return data(SeriesKey(SeriesType::MacroExpectedSlotted, ValueType::Stress, sport)); }
+        SeriesT macroExpectedSlottedLts(const QString &sport = "") { return data(SeriesKey(SeriesType::MacroExpectedSlotted, ValueType::Lts, sport)); }
+        SeriesT macroExpectedSlottedSts(const QString &sport = "") { return data(SeriesKey(SeriesType::MacroExpectedSlotted, ValueType::Sts, sport)); }
+        SeriesT macroExpectedSlottedSb(const QString &sport = "") { return data(SeriesKey(SeriesType::MacroExpectedSlotted, ValueType::Sb, sport)); }
+        SeriesT macroExpectedSlottedRr(const QString &sport = "") { return data(SeriesKey(SeriesType::MacroExpectedSlotted, ValueType::Rr, sport)); }
+
+        // returns the series, or a temporary all-zero series if there is none
+        SeriesT data(const SeriesKey &key);
 
         // index into the arrays
         int indexOf(QDate) ;
 
         // get value for date (refresh if needed)
-        double lts(QDate);
-        double sts(QDate);
-        double stress(QDate);
-        double sb(QDate);
-        double rr(QDate);
+        double stress(QDate, const QString &sport = "");
+        double lts(QDate, const QString &sport = "");
+        double sts(QDate, const QString &sport = "");
+        double sb(QDate, const QString &sport = "");
+        double rr(QDate, const QString &sport = "");
 
-        double plannedLts(QDate);
-        double plannedSts(QDate);
-        double plannedStress(QDate);
-        double plannedSb(QDate);
-        double plannedRr(QDate);
+        double plannedStress(QDate, const QString &sport = "");
+        double plannedLts(QDate, const QString &sport = "");
+        double plannedSts(QDate, const QString &sport = "");
+        double plannedSb(QDate, const QString &sport = "");
+        double plannedRr(QDate, const QString &sport = "");
 
-        double expectedLts(QDate);
-        double expectedSts(QDate);
-        double expectedStress(QDate);
-        double expectedSb(QDate);
-        double expectedRr(QDate);
+        double expectedStress(QDate, const QString &sport = "");
+        double expectedLts(QDate, const QString &sport = "");
+        double expectedSts(QDate, const QString &sport = "");
+        double expectedSb(QDate, const QString &sport = "");
+        double expectedRr(QDate, const QString &sport = "");
+
+        double macroExpectedTargetStress(QDate);
+        double macroExpectedTargetLts(QDate);
+        double macroExpectedTargetSts(QDate);
+        double macroExpectedTargetSb(QDate);
+        double macroExpectedTargetRr(QDate);
+
+        double macroExpectedSlottedStress(QDate, const QString &sport = "");
+        double macroExpectedSlottedLts(QDate, const QString &sport = "");
+        double macroExpectedSlottedSts(QDate, const QString &sport = "");
+        double macroExpectedSlottedSb(QDate, const QString &sport = "");
+        double macroExpectedSlottedRr(QDate, const QString &sport = "");
+
+        double data(const QDate &date, const SeriesKey &key);
 
         // colour coding the 4 series for RAG reporting
         static QColor ltsColor(double, QColor defaultColor);
@@ -114,6 +196,12 @@ class PMCData : public QObject {
         static QString sbDescription();
         static QString rrDescription();
 
+#if defined(DEV_GNUPLOT)
+        QString gnuplotScript(SeriesType series, const QDate &from, const QDate &to, const QString &sport = QString());
+        void printGnuplot(SeriesType series, const QDate &from, const QDate &to, const QString &sport = QString());
+        bool writeGnuplot(const QString &fileName, SeriesType series, const QDate &from, const QDate &to, const QString &sport = QString());
+#endif
+
     public slots:
 
         // as underlying ride data changes the
@@ -123,29 +211,65 @@ class PMCData : public QObject {
 
     private:
 
+        // day index -> seed value; a seed resets LTS and STS of the series on that day
+        using SeedMap = QMap<int, double>;
+
         // who we for ?
         Context *context;
         Specification specification_;
 
-        bool fromDataFilter;
-        Leaf *expr;
+        bool fullScope = false;
+
+        bool fromDataFilter = false;
+        Leaf *expr = nullptr;
 
         // parameters
         QString metricName_;
-        const RideMetric *metric_; // the input parameter
+        const RideMetric *metric_ = nullptr; // the input parameter
         int stsDays_, ltsDays_;
-        bool useDefaults;
+        bool useDefaults = false;
 
         // data
         QDate start_, end_;
-        int days_;
-        QVector<double> stress_, lts_, sts_, sb_, rr_;
-        QVector<double> planned_stress_, planned_lts_, planned_sts_, planned_sb_, planned_rr_;
-        QVector<double> expected_stress_, expected_lts_, expected_sts_, expected_sb_, expected_rr_;
+        int days_ = 0;
+        using SeriesGroupT = QHash<QString, SeriesT>;
+        using AllSeriesT = QHash<SeriesKey, SeriesT>;
+        AllSeriesT seriesData;
 
-        bool isstale; // needs refreshing
+        bool isstale = true;      // needs refreshing
+        bool macroStale = true;   // macro series need refreshing
 
-        void calculateMetrics(int days, const QVector<double> &stress, QVector<double> &lts, QVector<double> &sts, QVector<double> &sb, QVector<double> &rr) const;
+        double lte_ = 0.0;
+        double ste_ = 0.0;
+        bool sbToday_ = false;
+        void updateDecay();
+
+        bool macroMetricMatches(const Season *season) const;
+
+        // activities and slots without a sport are accounted to otherSport()
+        QString normalizeSport(const QString &sport) const;
+
+        SeriesT buildEmptySeries(int size) const;
+        void eraseSeries(SeriesType series);
+
+        // day index of the seed of a season, -1 if it has no seed or lies outside the range
+        int seedOffset(const Season &season) const;
+
+        SeedMap seedsFor(SeriesType series) const;
+
+        // moves the stress series into seriesData and derives lts/sts/sb/rr
+        void commitSeries(SeriesType series, SeriesT globalStress, SeriesGroupT &sportStress);
+
+        // derives lts/sts/sb/rr for an existing stress series
+        void deriveSeries(SeriesType series, const QString &sport, const SeedMap &seeds);
+
+        void calculateMetrics(int days, const SeriesT &stress, const SeedMap &seeds, SeriesT &lts, SeriesT &sts, SeriesT &sb, SeriesT &rr) const;
+
+        bool fillMacro();
+        void connectMacroSignals();
+
+        QDate minValid(const QDate &date1, const QDate &date2) const;
+        QDate maxValid(const QDate &date1, const QDate &date2) const;
 };
 
-#endif // _GC_StressCalculator_h
+#endif // _GC_PMCData_h

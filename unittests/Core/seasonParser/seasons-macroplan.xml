@@ -7,7 +7,6 @@
       <type>121</type>
       <id>{a4d28e7c-bf42-4a04-8928-c18671c698bc}</id>
       <seed>0</seed>
-      <low>-50</low>
       <description>Description</description>
       <mesocycle>
         <targetCP>300</targetCP>
@@ -34,7 +33,6 @@
       <type>121</type>
       <id>{96489889-ba6e-4006-a7ea-2f9bb7be0620}</id>
       <seed>0</seed>
-      <low>-50</low>
       <mesocycle>
         <targetCP>badCP</targetCP>
         <targetFTP>badFTP</targetFTP>
@@ -71,13 +69,11 @@
       <type>100</type>
       <id>{a7147da0-de38-41de-9bee-e50562f1dd5f}</id>
       <seed>0</seed>
-      <low>-50</low>
     </phase>
     <name>Macrocycle</name>
     <type>0</type>
     <id>{fa549d73-7d8b-4df4-a16e-0ce50f92d131}</id>
     <seed>0</seed>
-    <low>-50</low>
     <startdate>2026-01-01</startdate>
     <enddate>2026-12-31</enddate>
     <firstDayOfWeek>3</firstDayOfWeek>

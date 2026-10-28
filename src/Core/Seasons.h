@@ -24,6 +24,7 @@
 #include <QFile>
 #include <QXmlStreamReader>
 #include <QDate>
+#include <functional>
 
 #include "Season.h"
 
@@ -41,11 +42,20 @@ class Seasons : public QObject
         void writeSeasons();
         QList<Season> seasons;
 
+        Season const *getSeason(const QString &id) const;
+        bool editMacroPlan(const QString &seasonId, const std::function<void(Season &)> &edit);
+        bool editMacroPlan(const QString &seasonId, const QString &phaseId, const std::function<void(Mesocycle &)> &edit);
+
+        QList<Season const *> seededSeasons(const QDate &until = QDate()) const;
+
     signals:
         void seasonsChanged();
+        void macroPlanChanged(QString seasonId);
 
     private:
         QDir home;
+
+        Season *findSeason(const QString &id);
 };
 
 
