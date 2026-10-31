@@ -3914,7 +3914,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     list << "";
                 else {
                     if (e && m) {
-                        if (wantname) list << e->name();
+                        if (wantname)
+                            if (e->name().startsWith("BikeScore")) list << QString("BikeScore");
+                            else list << e->name();
                         else if (wantunit) list << e->units(GlobalContext::context()->useMetricUnits);
                         else {
                             // get metric value then convert to string
