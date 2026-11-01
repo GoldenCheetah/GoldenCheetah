@@ -168,9 +168,7 @@ public slots:
 signals:
     void editingFinished(bool accepted);
     void pathChanged(QString path);
-#ifdef Q_OS_MACOS
     void browseRequested();
-#endif
 
 private:
     bool delegateMode = false;
