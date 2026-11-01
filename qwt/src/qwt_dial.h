@@ -51,8 +51,6 @@ class QWT_EXPORT QwtDial : public QwtAbstractSlider
 {
     Q_OBJECT
 
-    Q_ENUMS( Shadow Mode Direction )
-
     Q_PROPERTY( int lineWidth READ lineWidth WRITE setLineWidth )
     Q_PROPERTY( Shadow frameShadow READ frameShadow WRITE setFrameShadow )
     Q_PROPERTY( Mode mode READ mode WRITE setMode )
@@ -81,6 +79,7 @@ class QWT_EXPORT QwtDial : public QwtAbstractSlider
         //! QFrame::Sunken
         Sunken = QFrame::Sunken
     };
+    Q_ENUM( Shadow )
 
     //! Mode controlling whether the needle or the scale is rotating
     enum Mode
@@ -91,6 +90,7 @@ class QWT_EXPORT QwtDial : public QwtAbstractSlider
         //! The needle is fixed, the scales are rotating
         RotateScale
     };
+    Q_ENUM( Mode )
 
     explicit QwtDial( QWidget* parent = NULL );
     virtual ~QwtDial();

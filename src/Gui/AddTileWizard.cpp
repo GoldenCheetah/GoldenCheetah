@@ -42,7 +42,7 @@ AddTileWizard::AddTileWizard(Context *context, ChartSpace *space, OverviewScope 
     HelpWhatsThis *help = new HelpWhatsThis(this);
     if (scope & OverviewScope::ANALYSIS) this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Overview));
     else this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Chart_Overview));
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     setWizardStyle(QWizard::ModernStyle);
 #endif
 

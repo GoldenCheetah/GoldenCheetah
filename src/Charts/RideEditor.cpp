@@ -287,7 +287,7 @@ RideEditor::configChanged(qint32)
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
     table->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
     table->verticalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
     table->horizontalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
@@ -3074,7 +3074,7 @@ void XDataEditor::configChanged()
     verticalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
     verticalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
     horizontalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
 #endif

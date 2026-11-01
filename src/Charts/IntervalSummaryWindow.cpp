@@ -42,7 +42,7 @@ IntervalSummaryWindow::IntervalSummaryWindow(Context *context) : context(context
     verticalScrollBar()->setStyle(cde);
 #endif
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
     connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));

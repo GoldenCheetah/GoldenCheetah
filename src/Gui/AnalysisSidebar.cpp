@@ -82,7 +82,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
 
     activityHistory = new QWidget(this);
     activityHistory->setContentsMargins(0,0,0,0);
-#ifndef Q_OS_MAC // not on mac thanks
+#ifndef Q_OS_MACOS // not on mac thanks
     activityHistory->setStyleSheet("padding: 0px; border: 0px; margin: 0px;");
 #endif
     QVBoxLayout *activityLayout = new QVBoxLayout(activityHistory);

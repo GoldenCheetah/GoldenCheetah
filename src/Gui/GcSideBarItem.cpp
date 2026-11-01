@@ -293,7 +293,7 @@ GcSplitterHandle::init(QString title, Qt::Orientation orientation,
     if (metal) setFixedHeight(bigHandle);
     else setFixedHeight(smallHandle);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     //titleLabel->setFixedHeight(16);
     titleLabel->setYOff(1);
     //font.setPointSize(11);

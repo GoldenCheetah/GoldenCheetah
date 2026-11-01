@@ -58,7 +58,7 @@ static const double MINIMUM_R2_FIT = 0.75f;
 
 MergeActivityWizard::MergeActivityWizard(Context *context) : QWizard(context->mainWindow), context(context)
 {
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     setWizardStyle(QWizard::ModernStyle);
 #endif
     setWindowTitle(tr("Combine Activities"));
@@ -1102,7 +1102,7 @@ MergeAdjust::MergeAdjust(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     spanSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
     spanSlider->setLowerValue(0);
     spanSlider->setUpperValue(15);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     // BUG in QMacStyle and painting of spanSlider
     // so we use a plain style to avoid it, but only
     // on a MAC, since win and linux are fine
@@ -1112,7 +1112,7 @@ MergeAdjust::MergeAdjust(MergeActivityWizard *parent) : QWizardPage(parent), wiz
 
     fullPlot = new AllPlot(this, NULL, wizard->context);
     fullPlot->setPaintBrush(0);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     fullPlot->setFixedHeight(300);
 #else
     fullPlot->setFixedHeight(300);

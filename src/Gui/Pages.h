@@ -468,7 +468,7 @@ class ColorsPage : public QWidget
 
         // General stuff
         QCheckBox *antiAliased;
-#ifndef Q_OS_MAC // they do scrollbars nicely
+#ifndef Q_OS_MACOS // they do scrollbars nicely
         QCheckBox *macForms;
         QCheckBox *rideScroll;
         QCheckBox *rideHead;
@@ -492,7 +492,7 @@ class ColorsPage : public QWidget
 
         struct {
             bool alias;
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
             bool macForms, scroll, head;
 #endif
             double line;

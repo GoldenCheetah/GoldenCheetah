@@ -107,7 +107,7 @@ LTMWindow::LTMWindow(Context *context) :
     plotLayout->addWidget(ltmPlot);
     plotLayout->addLayout(span);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     // BUG in QMacStyle and painting of spanSlider
     // so we use a plain style to avoid it, but only
     // on a MAC, since win and linux are fine
@@ -550,7 +550,7 @@ LTMWindow::configChanged(qint32)
     t2label2->setPalette(palette);
     RMSElabel->setPalette(whitepalette);
 
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
     banT1->setStyleSheet(AbstractView::ourStyleSheet());
     banT2->setStyleSheet(AbstractView::ourStyleSheet());
     banCombo->setStyleSheet(AbstractView::ourStyleSheet());

@@ -462,7 +462,7 @@ void
 RideMapWindow::configChanged(qint32 value)
 {
     setProperty("color", GColor(CPLOTBACKGROUND));
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
     overlayIntervals->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
 

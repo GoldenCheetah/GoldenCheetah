@@ -161,7 +161,7 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
 
         // TOTAL METRIC
         totalMetricTree = new QTreeWidget;
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
         totalMetricTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
         totalMetricTree->setColumnCount(2);
@@ -175,7 +175,7 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
 
         // ALL METRIC
         distMetricTree = new QTreeWidget;
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
         distMetricTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
         distMetricTree->setColumnCount(2);

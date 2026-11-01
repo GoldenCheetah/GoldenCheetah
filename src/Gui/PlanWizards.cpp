@@ -33,7 +33,7 @@
 #define HLC "</span>"
 
 #define ICON_COLOR QColor("#F79130")
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
 #define ICON_SIZE 250
 #define ICON_MARGIN 0
 #define ICON_TYPE QWizard::BackgroundPixmap
@@ -401,7 +401,7 @@ RepeatPlanWizard::RepeatPlanWizard
     setMinimumSize(800 * dpiXFactor, 750 * dpiYFactor);
     setModal(true);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     setWizardStyle(QWizard::MacStyle);
 #else
     setWizardStyle(QWizard::ModernStyle);
@@ -1118,7 +1118,7 @@ $COPYRIGHT)");
     _description.rangeStart = QDate::currentDate();
     _description.rangeEnd = QDate::currentDate();
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     setWizardStyle(QWizard::MacStyle);
 #else
     setWizardStyle(QWizard::ModernStyle);
@@ -1982,7 +1982,7 @@ ImportPlanWizard::ImportPlanWizard
     setMinimumSize(800 * dpiXFactor, 750 * dpiYFactor);
     setModal(true);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     setWizardStyle(QWizard::MacStyle);
 #else
     setWizardStyle(QWizard::ModernStyle);

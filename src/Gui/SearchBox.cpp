@@ -53,7 +53,7 @@ SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
     // tool button
     toolButton = new QToolButton(this);
     QIcon toolB = iconFromPNG(":images/sidebar/extra.png", QSize(BUTTON_SIZE*dpiXFactor, BUTTON_SIZE*dpiYFactor));
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     toolButton->setStyleSheet("QToolButton { background: transparent; }");
 #else
     toolButton->setStyleSheet("QToolButton { border: none; padding: 0px; background-color: none; }");
@@ -80,7 +80,7 @@ SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
     completer = new DataFilterCompleter(QStringList(), parent);
     setCompleter(completer);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
     setObjectName("SearchBox");
@@ -166,7 +166,7 @@ void SearchBox::resizeEvent(QResizeEvent *)
     searchButton->move(3*dpiXFactor, 6*dpiYFactor);
     setTextMargins(0, 0, frameWidth + tsz.width(), 0);
     clearButton->move(rect().right() - frameWidth - tsz.width() - cbz.width() - 3*dpiXFactor, 6*dpiYFactor);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     toolButton->move(rect().right() - frameWidth - tsz.width() - 3*dpiXFactor, 3*dpiYFactor);
 #else
     toolButton->move(rect().right() - frameWidth - tsz.width() - 3*dpiXFactor, 6*dpiYFactor);

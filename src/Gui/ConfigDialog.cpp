@@ -40,7 +40,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     setAttribute(Qt::WA_DeleteOnClose);
     configdialog_ptr = this;
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     QToolBar *head = addToolBar(tr("Preferences"));
     setMinimumSize(650,540);
     setUnifiedTitleAndToolBarOnMac(true);

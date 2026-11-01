@@ -567,7 +567,7 @@ class SeasonsPage : public QWidget
         QLineEdit *nameEdit;
         QComboBox *typeEdit;
         QDateEdit *fromEdit, *toEdit;
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
         QToolButton *upButton, *downButton;
 #else
         QPushButton *upButton, *downButton;

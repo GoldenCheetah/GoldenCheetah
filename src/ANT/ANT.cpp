@@ -835,7 +835,7 @@ Q_UNUSED(name);
     if (QFileInfo(sysFile).exists() || QFileInfo(sysFileSerial).exists()) return true;
 #endif
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     // On MAC we only support the SILabs Virtual Com Port Drivers
     // which will leave a device file /dev/cu.ANTUSBStick.slabvcp
     if (name == "/dev/cu.ANTUSBStick.slabvcp") return true;

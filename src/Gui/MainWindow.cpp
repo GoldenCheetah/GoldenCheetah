@@ -89,7 +89,7 @@
 #include "Perspective.h"
 #include "PerspectiveDialog.h"
 
-#if !defined(Q_OS_MAC)
+#if !defined(Q_OS_MACOS)
 #include "QTFullScreen.h" // not mac!
 #endif
 
@@ -185,7 +185,7 @@ MainWindow::MainWindow(const QDir &home)
         QNetworkProxy::setApplicationProxy(listOfProxies.first());
     }
 
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
     fullScreen = new QTFullScreen(this);
 #endif
 
@@ -379,7 +379,7 @@ MainWindow::MainWindow(const QDir &home)
     head->addWidget(forward);
     head->addWidget(perspectiveSelector);
     head->addStretch();
-#ifdef Q_OS_MAC // no menu on mac, so lets have some breathing space
+#ifdef Q_OS_MACOS // no menu on mac, so lets have some breathing space
     head->setFixedHeight(searchBox->height() + (20 *dpiXFactor * 2));
 #else
     head->setFixedHeight(searchBox->height() + (16 *dpiXFactor));
@@ -429,7 +429,7 @@ MainWindow::MainWindow(const QDir &home)
     blockTabbarUpdates = false;
     tabbar = new DragBar(this);
     tabbar->setTabsClosable(true);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     tabbar->setDocumentMode(true);
 #endif
 
@@ -642,7 +642,7 @@ MainWindow::MainWindow(const QDir &home)
     }
 
 #endif
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
     optionsMenu->addSeparator();
 #endif
     // options are always at the end of the tools menu
@@ -663,7 +663,7 @@ MainWindow::MainWindow(const QDir &home)
 
     // VIEW MENU
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
     viewMenu->addAction(tr("Toggle Full Screen"), QKeySequence("F11"), this, SLOT(toggleFullScreen()));
 #endif
     showhideViewbar = viewMenu->addAction(tr("Show View Sidebar"), QKeySequence("F2"), this, SLOT(showViewbar(bool)));
@@ -1045,7 +1045,7 @@ MainWindow::toggleStyle()
 void
 MainWindow::toggleFullScreen()
 {
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
     if (fullScreen) fullScreen->toggle();
     else qDebug()<<"no fullscreen support compiled in.";
 #endif
@@ -1420,7 +1420,7 @@ MainWindow::setToolButtons()
     //if (styleSelector->isSegmentSelected(select) == false)
         //styleSelector->setSegmentSelected(select, true);
 
-#ifdef Q_OS_MAC // bizarre issue with searchbox focus on tab voew change
+#ifdef Q_OS_MACOS // bizarre issue with searchbox focus on tab voew change
     searchBox->clearFocus();
 #endif
 }
@@ -2398,7 +2398,7 @@ MainWindow::switchAthleteTab(int index)
 
     setUpdatesEnabled(false);
 
-#ifdef Q_OS_MAC // close buttons on the left on Mac
+#ifdef Q_OS_MACOS // close buttons on the left on Mac
     // Only have close button on current tab (prettier)
     for(int i=0; i<tabbar->count(); i++) tabbar->tabButton(i, QTabBar::LeftSide)->hide();
     tabbar->tabButton(index, QTabBar::LeftSide)->show();

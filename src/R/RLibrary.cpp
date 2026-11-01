@@ -330,7 +330,7 @@ RLibrary::load()
     name = QString("bin/i386/R.dll");
 #endif
 #endif
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     if (home == "") home= "/Library/Frameworks/R.framework/Resources";
     name += "lib/libR.dylib";
 #endif

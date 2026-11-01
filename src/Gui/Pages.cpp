@@ -1317,7 +1317,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 
     antiAliased = new QCheckBox(tr("Antialias"));
     antiAliased->setChecked(appsettings->value(this, GC_ANTIALIAS, true).toBool());
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
     macForms = new QCheckBox(tr("Mac styled Forms"));
     macForms->setChecked(appsettings->value(this, GC_MAC_FORMS, true).toBool());
     rideScroll = new QCheckBox(tr("Activity Scrollbar"));
@@ -1370,7 +1370,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     QFormLayout *rForm = newQFormLayout();
     rForm->addRow(tr("Line Width"), lineWidth);
     rForm->addRow("", antiAliased);
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
     rForm->addRow("", macForms);
     rForm->addRow("", rideScroll);
     rForm->addRow("", rideHead);    // add to prevent memory leak...
@@ -1430,7 +1430,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 
     // save initial values
     b4.alias = antiAliased->isChecked();
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
     b4.macForms = macForms->isChecked();
     b4.scroll = rideScroll->isChecked();
     b4.head = rideHead->isChecked();
@@ -1534,7 +1534,7 @@ ColorsPage::resetClicked()
     fontscale->setValue(defaults.fontscaleindex);
     lineWidth->setValue(defaults.linewidth);
     antiAliased->setChecked(defaults.antialias);
-#ifndef Q_OS_MAC // they do scrollbars nicely
+#ifndef Q_OS_MACOS // they do scrollbars nicely
     macForms->setChecked(defaults.macForms);
     rideHead->setChecked(defaults.head);
     rideScroll->setChecked(defaults.scrollbar);
@@ -1550,7 +1550,7 @@ ColorsPage::saveClicked()
     appsettings->setValue(GC_ANTIALIAS, antiAliased->isChecked());
     appsettings->setValue(GC_FONT_SCALE, scalefactors[fontscale->value()]);
     appsettings->setValue(GC_FONT_DEFAULT, def->font().family());
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
     appsettings->setValue(GC_MAC_FORMS, macForms->isChecked());
     appsettings->setValue(GC_RIDESCROLL, rideScroll->isChecked());
     appsettings->setValue(GC_RIDEHEAD, rideHead->isChecked());
@@ -1587,7 +1587,7 @@ ColorsPage::saveClicked()
 
     // did we change anything ?
     if(b4.alias != antiAliased->isChecked() ||
-#ifndef Q_OS_MAC // not needed on mac
+#ifndef Q_OS_MACOS // not needed on mac
        b4.scroll != rideScroll->isChecked() ||
        b4.head != rideHead->isChecked() ||
 #endif

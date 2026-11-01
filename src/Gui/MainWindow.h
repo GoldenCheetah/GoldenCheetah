@@ -41,7 +41,7 @@
 
 #include "SplashScreen.h"
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
 // What versions are supported by this SDK?
 #include <AvailabilityMacros.h>
 #endif
@@ -310,7 +310,7 @@ class MainWindow : public QMainWindow
         NewSideBar *sidebar;
         AthleteView *athleteView;
 
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
         QTFullScreen *fullScreen;
 #endif
 

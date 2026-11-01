@@ -104,8 +104,6 @@ class QWT_EXPORT QwtPicker : public QObject, public QwtEventPattern
 {
     Q_OBJECT
 
-    Q_ENUMS( RubberBand DisplayMode ResizeMode )
-
     Q_PROPERTY( bool isEnabled READ isEnabled WRITE setEnabled )
     Q_PROPERTY( ResizeMode resizeMode READ resizeMode WRITE setResizeMode )
 
@@ -153,6 +151,7 @@ class QWT_EXPORT QwtPicker : public QObject, public QwtEventPattern
          */
         UserRubberBand = 100
     };
+    Q_ENUM( RubberBand )
 
     /*!
        \brief Display mode
@@ -169,6 +168,7 @@ class QWT_EXPORT QwtPicker : public QObject, public QwtEventPattern
         //! Display only when the selection is active
         ActiveOnly
     };
+    Q_ENUM( DisplayMode )
 
     /*!
        Controls what to do with the selected points of an active
@@ -186,6 +186,7 @@ class QWT_EXPORT QwtPicker : public QObject, public QwtEventPattern
         //! All points remain unchanged.
         KeepSize
     };
+    Q_ENUM( ResizeMode )
 
     explicit QwtPicker( QWidget* parent );
     explicit QwtPicker( RubberBand rubberBand,

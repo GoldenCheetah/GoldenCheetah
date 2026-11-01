@@ -210,7 +210,7 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
 
     // Deployed Python location
     QString deployedPython = QCoreApplication::applicationDirPath();
-#if defined(Q_OS_MAC)
+#if defined(Q_OS_MACOS)
     deployedPython += "/../Frameworks/Python.framework/Versions/Current";
 #elif defined(Q_OS_LINUX)
     deployedPython += QString("/opt/python3.%1").arg(PYTHON3_VERSION);

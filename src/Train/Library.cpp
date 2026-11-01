@@ -335,13 +335,13 @@ LibrarySearchDialog::LibrarySearchDialog(Context *context) : context(context)
     findVideoSyncs->setChecked(true);
     actionButtons = new ActionButtonBox(ActionButtonBox::AddDeleteGroup);
     removeRef = new QPushButton("-", this);
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
     removeRef->setFixedSize(20*dpiXFactor,20*dpiYFactor);
     removeRef->setStyleSheet("QPushButton { padding: 0px; }");
 #endif
 
     searchPathTable = new QTreeWidget(this);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     // get rid of annoying focus rectangle
     searchPathTable->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
@@ -361,7 +361,7 @@ LibrarySearchDialog::LibrarySearchDialog(Context *context) : context(context)
     }
 
     refTable = new QTreeWidget(this);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     // get rid of annoying focus rectangle
     refTable->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
@@ -845,7 +845,7 @@ WorkoutImportDialog::WorkoutImportDialog(Context *context, QStringList files) :
                     "via the context menu options")); // TODO : how to manage videosync files
 
     fileTable = new QTreeWidget(this);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     // get rid of annoying focus rectangle
     fileTable->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif

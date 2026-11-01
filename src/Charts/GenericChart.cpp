@@ -99,7 +99,7 @@ GenericChart::configChanged(qint32)
     setPalette(palette); // propagates to children
 
     // set style sheets
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
     stackFrame->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
     setUpdatesEnabled(true);

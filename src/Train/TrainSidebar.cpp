@@ -61,7 +61,7 @@
 
 // Media selection helper
 #include "VideoWindow.h"
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
 #include <CoreServices/CoreServices.h>
 #include <QStyle>
 #include <QStyleFactory>
@@ -135,7 +135,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     mediaTree->header()->setFocusPolicy(Qt::NoFocus);
     mediaTree->setFrameStyle(QFrame::NoFrame);
     mediaTree->setRootIsDecorated(false);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     mediaTree->header()->setSortIndicatorShown(false); // blue looks nasty
     mediaTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
@@ -171,7 +171,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     videosyncTree->header()->setFocusPolicy(Qt::NoFocus);
     videosyncTree->setFrameStyle(QFrame::NoFrame);
     videosyncTree->setRootIsDecorated(false);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     videosyncTree->header()->setSortIndicatorShown(false); // blue looks nasty
     videosyncTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
@@ -228,7 +228,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     workoutTree->header()->setFocusPolicy(Qt::NoFocus);
     workoutTree->setFrameStyle(QFrame::NoFrame);
     workoutTree->setRootIsDecorated(false);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     workoutTree->header()->setSortIndicatorShown(false); // blue looks nasty
     workoutTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
@@ -321,7 +321,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     trainSplitter->addWidget(videosyncItem);
     trainSplitter->prepare(context->athlete->cyclist, "train");
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     // get rid of annoying focus rectangle for sidebar components
     mediaTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
     workoutTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
@@ -398,7 +398,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     // a workout using basic keyboard controls
     context->mainWindow->installEventFilter(this);
 
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
     //toolbarButtons->hide();
 #endif
 
@@ -1745,7 +1745,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
     // get latest telemetry from devices
     if ((status&RT_RUNNING) || (status&RT_CONNECTED)) {
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
         // On a Mac prevent the screensaver from kicking in
         // this is apparently the 'supported' mechanism for
         // disabling the screen saver on a Mac instead of
@@ -2115,7 +2115,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             context->notifyTelemetryUpdate(rtData); // signal everyone to update telemetry
         }
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
         if (suspendSreensaverSuccess == kIOReturnSuccess)
         {
             // Re-enable screen saver

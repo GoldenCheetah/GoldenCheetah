@@ -42,7 +42,7 @@ NewAthleteWizard::NewAthleteWizard
     setWindowTitle(tr("Welcome to Goldencheetah"));
     setMinimumSize(800 * dpiXFactor, 650 * dpiYFactor);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     setWizardStyle(QWizard::MacStyle);
     QPixmap bgImage = QPixmap(":/images/gc-blank.png");
     setPixmap(QWizard::BackgroundPixmap, bgImage);

@@ -78,7 +78,7 @@ class LTMPopup : public QWidget
 
 // some geometry stuff to make Mac displays nice
 // but sensible defaults for Win and Linux
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
 #define SMALLFONT 11
 #define LISTWIDTH 180
 #else

@@ -60,7 +60,7 @@ StravaRoutesDownload::StravaRoutesDownload(Context *context) : QDialog(context->
     // Filelist Widget
 
     files = new QTreeWidget;
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     files->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
     files->headerItem()->setText(0, tr(""));

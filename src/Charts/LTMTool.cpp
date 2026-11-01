@@ -141,7 +141,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     presetLayout->setSpacing(5 *dpiXFactor);
 
     charts = new QTreeWidget;
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     charts->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
     charts->headerItem()->setText(0, tr("Charts"));
@@ -1933,7 +1933,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     metricLayout->addWidget(stressWidget);
     metricLayout->addWidget(banisterWidget);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     metricTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
     metricTree->setColumnCount(1);

@@ -227,7 +227,7 @@ DateSettingsEdit::DateSettingsEdit(QWidget *parent) : parent(parent), active(fal
     mainLayout->setSpacing(5 *dpiXFactor);
 
     QFont sameFont;
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     sameFont.setPointSize(sameFont.pointSize() + 2);
 #endif
 

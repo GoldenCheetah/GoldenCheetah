@@ -136,7 +136,7 @@ ComparePane::ComparePane(Context *context, QWidget *parent, CompareMode mode) : 
     layout->addWidget(scrollArea);
 
     table = new QTableWidget(this);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     table->setAttribute(Qt::WA_MacShowFocusRect, 0);
     table->horizontalHeader()->setSortIndicatorShown(false); // blue looks nasty
 #endif

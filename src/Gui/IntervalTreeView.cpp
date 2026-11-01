@@ -35,7 +35,7 @@ IntervalTreeView::IntervalTreeView(Context *context) : context(context)
     setDefaultDropAction(Qt::MoveAction);
     setDragDropOverwriteMode(false);
     setDropIndicatorShown(true);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
 #ifdef Q_OS_WIN

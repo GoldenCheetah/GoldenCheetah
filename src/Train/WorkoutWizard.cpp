@@ -806,7 +806,7 @@ WorkoutWizard::WorkoutWizard(Context *context) :QWizard(context->mainWindow)
     setPage(WW_ImportPage, new ImportPage());
     this->setStartId(WW_WorkoutTypePage);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     setWizardStyle(QWizard::MacStyle);
 #else
     setWizardStyle(QWizard::ModernStyle);

@@ -104,7 +104,7 @@ class MultiMetricSelector : public QWidget
         QLineEdit *filterEdit;
         QListWidget *availList;
         QListWidget *selectedList;
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
         QToolButton *selectButton;
         QToolButton *unselectButton;
 #else

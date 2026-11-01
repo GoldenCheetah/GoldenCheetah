@@ -20,7 +20,7 @@
 #define ACTIONBUTTONBOX_H
 
 #include <QPushButton>
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
 #include <QToolButton>
 #endif
 #include <QHBoxLayout>
@@ -78,7 +78,7 @@ class ActionButtonBox : public QWidget {
 
     private:
         QHBoxLayout *layout;
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
         QPushButton *up = nullptr;
         QPushButton *down = nullptr;
 #else

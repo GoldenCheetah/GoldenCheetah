@@ -180,7 +180,7 @@ AthleteConfig::AthleteConfig(QDir home, Context *context) :
     QColor tabselect = std.color(QPalette::Text);
     if (GColor(CPLOTBACKGROUND) == std.color(QPalette::Base)) tabselect = GColor(CPLOTMARKER);
 
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
     QString styling = QString("QTabWidget { background: %1; }"
                           "QTabWidget::pane { border: 0px; }"
                           "QTabBar::tab { background: %1; "

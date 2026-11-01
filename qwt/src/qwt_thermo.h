@@ -47,9 +47,6 @@ class QWT_EXPORT QwtThermo : public QwtAbstractScale
 {
     Q_OBJECT
 
-    Q_ENUMS( ScalePosition )
-    Q_ENUMS( OriginMode )
-
     Q_PROPERTY( Qt::Orientation orientation
         READ orientation WRITE setOrientation )
     Q_PROPERTY( ScalePosition scalePosition
@@ -81,6 +78,7 @@ class QWT_EXPORT QwtThermo : public QwtAbstractScale
         //! The scale is left of a vertical or above of a horizontal slider
         TrailingScale
     };
+    Q_ENUM( ScalePosition )
 
     /*!
        Origin mode. This property specifies where the beginning of the liquid
@@ -99,6 +97,7 @@ class QWT_EXPORT QwtThermo : public QwtAbstractScale
         //! The origin is specified using the origin() property
         OriginCustom
     };
+    Q_ENUM( OriginMode )
 
     explicit QwtThermo( QWidget* parent = NULL );
     virtual ~QwtThermo();

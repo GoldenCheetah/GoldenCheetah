@@ -3552,7 +3552,7 @@ SeasonsPage::SeasonsPage(QWidget *parent, Context *context) : QWidget(parent), c
 
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
     upButton = new QToolButton(this);
     downButton = new QToolButton(this);
     upButton->setArrowType(Qt::UpArrow);
@@ -3586,7 +3586,7 @@ SeasonsPage::SeasonsPage(QWidget *parent, Context *context) : QWidget(parent), c
     seasons->setUniformRowHeights(true);
     seasons->setIndentation(0);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     //seasons->header()->resizeSection(0,160); // tab
     //seasons->header()->resizeSection(1,80); // name
     //seasons->header()->resizeSection(2,130); // type

@@ -41,7 +41,6 @@ class QXT_GUI_EXPORT QxtSpanSlider : public QSlider
     Q_PROPERTY(int upperPosition READ upperPosition WRITE setUpperPosition)
     Q_PROPERTY(bool showRail READ showRail WRITE setShowRail)
     Q_PROPERTY(HandleMovementMode handleMovementMode READ handleMovementMode WRITE setHandleMovementMode)
-    Q_ENUMS(HandleMovementMode)
 
 public:
     explicit QxtSpanSlider(QWidget* parent = 0);
@@ -54,6 +53,7 @@ public:
         NoCrossing,
         NoOverlapping
     };
+    Q_ENUM(HandleMovementMode)
 
     enum SpanHandle
     {

@@ -45,7 +45,7 @@
 #define MANDATORY " *"
 #define TRADEMARK "<sup>TM</sup>"
 #define ICON_COLOR QColor("#F79130")
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
 #define ICON_SIZE 250
 #define ICON_MARGIN 0
 #define ICON_TYPE QWizard::BackgroundPixmap
@@ -77,7 +77,7 @@ ManualActivityWizard::ManualActivityWizard
     setMinimumSize(800 * dpiXFactor, 650 * dpiYFactor);
     setModal(true);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     setWizardStyle(QWizard::MacStyle);
 #else
     setWizardStyle(QWizard::ModernStyle);
@@ -477,7 +477,7 @@ ManualActivityPageWorkout::ManualActivityPageWorkout
     workoutTree->header()->setFocusPolicy(Qt::NoFocus);
     workoutTree->setFrameStyle(QFrame::NoFrame);
     workoutTree->setRootIsDecorated(false);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     workoutTree->header()->setSortIndicatorShown(false); // blue looks nasty
     workoutTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif

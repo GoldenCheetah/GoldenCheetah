@@ -210,7 +210,7 @@ GcUpgrade::upgrade(const QDir &home)
 #if 0 // this is no longer required, but keeping in case we need to reinstate- XXX fixme
         QString theme = "Flat";
         QColor chromeColor = QColor(0xec,0xec,0xec);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
         // Yosemite or earlier
         if (QSysInfo::MacintoshVersion >= 12) {
 

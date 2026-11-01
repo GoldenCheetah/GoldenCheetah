@@ -314,7 +314,7 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, Context *context) : QDialo
     setWindowFlags(windowFlags() | Qt::Tool);
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowModality(Qt::NonModal);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     setMinimumSize(350*dpiXFactor,400*dpiYFactor);
 #else
     setMinimumSize(450*dpiXFactor,400*dpiYFactor);
@@ -348,7 +348,7 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, Context *context) : QDialo
     // Selection List
     searchList = new QTreeWidget(this);
     layout->addWidget(searchList);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     searchList->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
     searchList->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -361,7 +361,7 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, Context *context) : QDialo
     searchList->setHeaderLabels(headings);
     searchList->header()->setMinimumSectionSize(30*dpiXFactor);
     searchList->header()->resizeSection(0, 30*dpiXFactor);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     searchList->header()->resizeSection(1, 120);
 #else
     searchList->header()->resizeSection(1, 150*dpiXFactor);

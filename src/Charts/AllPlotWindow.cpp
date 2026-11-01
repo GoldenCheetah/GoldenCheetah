@@ -624,7 +624,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     scrollRight->setFixedWidth(16*dpiXFactor);
     scrollRight->setContentsMargins(0,0,0,0);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     // BUG in QMacStyle and painting of spanSlider
     // so we use a plain style to avoid it, but only
     // on a MAC, since win and linux are fine
@@ -695,7 +695,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     controlsLayout->setRowStretch(0, 10);
     controlsLayout->setRowStretch(1, 1);
     controlsLayout->setContentsMargins(0,0,0,0);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     // macs  dpscing is weird
     //controlsLayout->setSpacing(5 *dpiXFactor);
 #else
@@ -824,7 +824,7 @@ AllPlotWindow::configChanged(qint32 state)
     setPalette(palette); // propagates to children
 
     // set style sheets
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
     allPlotFrame->setStyleSheet(AbstractView::ourStyleSheet());
     comparePlotFrame->setStyleSheet(AbstractView::ourStyleSheet());
     seriesstackFrame->setStyleSheet(AbstractView::ourStyleSheet());

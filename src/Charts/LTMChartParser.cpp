@@ -141,7 +141,7 @@ ChartTreeView::ChartTreeView(Context *context) : context(context)
 {
     setDragDropMode(QAbstractItemView::InternalMove);
     setDragDropOverwriteMode(true);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
 

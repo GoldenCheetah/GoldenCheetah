@@ -22,7 +22,7 @@
 
 #include <QFontMetrics>
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
 static int spacing_=12;
 #else
 static int spacing_=8;

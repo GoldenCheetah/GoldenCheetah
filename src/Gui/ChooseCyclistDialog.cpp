@@ -44,7 +44,7 @@ static void recursiveDelete(QDir dir)
     }
 
     // on a mac .DS_Store gets created and we should wipe it
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     if (QFileInfo(dir.absolutePath() + "/.DS_Store").exists()) dir.remove(".DS_Store");
 #endif
 }

@@ -339,7 +339,7 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
     dataTable->setColumnWidth(0,50*dpiXFactor);
     dataTable->resizeColumnToContents(1);
     dataTable->resizeColumnToContents(2);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     dataTable->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
     setLayout(fullLayout);

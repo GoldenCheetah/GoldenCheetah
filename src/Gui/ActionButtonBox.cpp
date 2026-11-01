@@ -29,7 +29,7 @@ ActionButtonBox::ActionButtonBox
     layout->setSpacing(2 * dpiXFactor);
     layout->setContentsMargins(0, 0, 0, 0);
     if (standardButtons.testFlag(StandardButtonGroup::UpDownGroup)) {
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
         up = new QPushButton(tr("Up"));
         down = new QPushButton(tr("Down"));
 #else
@@ -69,7 +69,7 @@ ActionButtonBox::ActionButtonBox
     if (standardButtons.testFlag(StandardButtonGroup::AddDeleteGroup)) {
         add = new QPushButton(tr("+"));
         del = new QPushButton(tr("-"));
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
         add->setText(tr("Add"));
         del->setText(tr("Delete"));
 #else

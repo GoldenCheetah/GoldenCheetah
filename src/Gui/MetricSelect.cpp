@@ -224,7 +224,7 @@ MultiMetricSelector::MultiMetricSelector
     selectedLayout->addWidget(selectedList);
     selectedLayout->addWidget(actionButtons);
 
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
     unselectButton = new QToolButton(this);
     unselectButton->setArrowType(Qt::LeftArrow);
     unselectButton->setFixedSize(20 * dpiXFactor, 20 * dpiYFactor);

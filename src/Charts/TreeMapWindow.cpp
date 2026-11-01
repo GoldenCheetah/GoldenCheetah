@@ -99,7 +99,7 @@ TreeMapWindow::TreeMapWindow(Context *context) :
 
     // metric selector .. just ride metrics
     metricTree = new QTreeWidget;
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     metricTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
     metricTree->setColumnCount(1);

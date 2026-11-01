@@ -210,7 +210,7 @@ void GCColor::setupColors()
 #ifdef GC_HAVE_DWM
         { tr("Gui"), tr("Toolbar and Sidebar"), "CCHROME", QColor(1,1,1) },
 #else
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
         { tr("Gui"), tr("Sidebar background"), "CCHROME", QColor(213,213,213) },
 #else
         { tr("Gui"), tr("Sidebar background"), "CCHROME", QColor(0xec,0xec,0xec) },
@@ -565,7 +565,7 @@ GCColor::css(bool ridesummary)
 	           ".tooltip { position: relative; display: inline-block; } "
 		   ".tooltip .tooltiptext { visibility: hidden; background-color: %2; color: %1; text-align: center; padding: %4px 0; border-radius: %5px; position: absolute; z-index: 1; width: %6px; margin-left: -%7px; top: 100%; left: 50%; opacity: 0; transition: opacity 0.3s; } "
 		   ".tooltip:hover .tooltiptext { visibility: visible; opacity: 1; } "
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
                    "::-webkit-scrollbar-thumb { border-radius: 4px; background-color: rgba(0,0,0,0.5);  "
                    "-webkit-box-shadow: inset 0 0 1px rgba(255,255,255,0.6); }"
                    "::-webkit-scrollbar { width: 9; background-color: %2; } "
@@ -611,7 +611,7 @@ GCColor::stylesheet(bool train)
                    "QTableWidget::item:hover { color: black; background-color: lightGray; }"
                    "QLabel { color: %2; background-color: %1; }"
                    "QFrame { background-color: %1; }"
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
                    "QHeaderView { background-color: %1; color: %2; }"
                    "QHeaderView::section { background-color: %1; color: %2; border: 0px ; }"
 #endif

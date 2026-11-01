@@ -50,7 +50,7 @@ AddDeviceWizard::AddDeviceWizard(Context *context) : QWizard(context->mainWindow
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Training_AddDeviceWizard));
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     setWizardStyle(QWizard::ModernStyle);
 #endif
 
@@ -525,7 +525,7 @@ AddFirmware::AddFirmware(AddDeviceWizard *parent) : QWizardPage(parent), parent(
                   "GoldenCheetah.\n\n"
                   "On windows it is typically installed in C:\\Windows\\system32 "
                   "and is called 'FortiusSWPID1942Renum.hex'.\n\n"
-#if defined Q_OS_LINUX || defined Q_OS_MAC
+#if defined Q_OS_LINUX || defined Q_OS_MACOS
                   "On Linux and Apple computers you will need to "
                   "extract it from the VR Software CD."
                   "The file we need is within the 'data2.cab' file, "

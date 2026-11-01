@@ -66,7 +66,7 @@ CloudDBTelemetryClient::upsertTelemetry() {
     os = "Windows";
 #endif
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     os = "macOS";
 #endif
 

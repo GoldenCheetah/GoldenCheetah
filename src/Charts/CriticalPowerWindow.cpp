@@ -716,7 +716,7 @@ CriticalPowerWindow::configChanged(qint32)
     CPSlider->setPalette(whitepalette);
 
 
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
     QString style = QString("QSpinBox { background: %1; }").arg(GCColor::alternateColor(GColor(CPLOTBACKGROUND)).name());
     CPEdit->setStyleSheet(style);
     //CPLabel->setStyleSheet(style);

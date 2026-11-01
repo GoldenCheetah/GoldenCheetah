@@ -52,7 +52,7 @@
 // Main wizard - if passed a service name we are in edit mode, not add mode.
 AddCloudWizard::AddCloudWizard(Context *context, QString sname, bool sync) : QWizard(context->mainWindow), context(context), service(sname), fsync(sync)
 {
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     setWizardStyle(QWizard::ModernStyle);
 #endif
 

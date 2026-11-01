@@ -44,7 +44,7 @@ TrainerDayDownloadDialog::TrainerDayDownloadDialog(Context *context) : QDialog(c
     legacy->setLayout(legacyLayout);
 
     files = new QTreeWidget;
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     files->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
     files->headerItem()->setText(0, tr(""));

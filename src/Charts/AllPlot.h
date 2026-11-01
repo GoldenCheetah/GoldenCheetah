@@ -81,7 +81,7 @@ class CurveColors : public QObject
             slider->setMaximum(100); // %age
             slider->setShowRail(false); // no rail please
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
             // BUG in QMacStyle and painting of spanSlider
             // so we use a plain style to avoid it, but only
             // on a MAC, since win and linux are fine

@@ -325,7 +325,7 @@ Perspective::configChanged(qint32)
 {
     SSS;
     // update scroll bar
-//#ifndef Q_OS_MAC
+//#ifndef Q_OS_MACOS
     tileArea->verticalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
 //#endif
     QPalette palette;
@@ -1740,7 +1740,7 @@ ImportChartDialog::ImportChartDialog(Context *context, QList<QMap<QString,QStrin
     import = new QPushButton(tr("Import"), this);
 
     // set table
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     table->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
     table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

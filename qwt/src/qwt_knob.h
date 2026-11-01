@@ -43,8 +43,6 @@ class QWT_EXPORT QwtKnob : public QwtAbstractSlider
 {
     Q_OBJECT
 
-    Q_ENUMS ( KnobStyle MarkerStyle )
-
     Q_PROPERTY( KnobStyle knobStyle READ knobStyle WRITE setKnobStyle )
     Q_PROPERTY( int knobWidth READ knobWidth WRITE setKnobWidth )
     Q_PROPERTY( Qt::Alignment alignment READ alignment WRITE setAlignment )
@@ -83,6 +81,7 @@ class QWT_EXPORT QwtKnob : public QwtAbstractSlider
          */
         Styled
     };
+    Q_ENUM ( KnobStyle )
 
     /*!
         \brief Marker type
@@ -118,6 +117,7 @@ class QWT_EXPORT QwtKnob : public QwtAbstractSlider
          */
         Notch
     };
+    Q_ENUM ( MarkerStyle )
 
     explicit QwtKnob( QWidget* parent = NULL );
     virtual ~QwtKnob();

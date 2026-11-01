@@ -31,8 +31,6 @@ class QWT_EXPORT QwtSlider : public QwtAbstractSlider
 {
     Q_OBJECT
 
-    Q_ENUMS( ScalePosition BackgroundStyle )
-
     Q_PROPERTY( Qt::Orientation orientation
         READ orientation WRITE setOrientation )
     Q_PROPERTY( ScalePosition scalePosition READ scalePosition
@@ -62,6 +60,7 @@ class QWT_EXPORT QwtSlider : public QwtAbstractSlider
         //! The scale is left of a vertical or above a horizontal slider
         TrailingScale
     };
+    Q_ENUM( ScalePosition )
 
     explicit QwtSlider( QWidget* parent = NULL );
     explicit QwtSlider( Qt::Orientation, QWidget* parent = NULL );

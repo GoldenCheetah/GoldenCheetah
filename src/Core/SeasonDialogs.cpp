@@ -724,7 +724,7 @@ SeasonTreeView::SeasonTreeView(Context *context) : context(context)
     setDragDropMode(QAbstractItemView::DragDrop);
     setDefaultDropAction(Qt::MoveAction);
     setDragDropOverwriteMode(true);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
 

@@ -88,7 +88,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     dateRangeTree->setIndentation(10);
     dateRangeTree->expandItem(allDateRanges);
     dateRangeTree->setContextMenuPolicy(Qt::CustomContextMenu);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     dateRangeTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
 #ifdef Q_OS_WIN
@@ -121,7 +121,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     eventTree->setContextMenuPolicy(Qt::CustomContextMenu);
     eventTree->horizontalScrollBar()->setDisabled(true);
     eventTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     eventTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
 #ifdef Q_OS_WIN
@@ -156,7 +156,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     chartTree->setContextMenuPolicy(Qt::CustomContextMenu);
     chartTree->horizontalScrollBar()->setDisabled(true);
     chartTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     chartTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
 #ifdef Q_OS_WIN
@@ -193,7 +193,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     filterTree->setContextMenuPolicy(Qt::CustomContextMenu);
     filterTree->horizontalScrollBar()->setDisabled(true);
     filterTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     filterTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
 #ifdef Q_OS_WIN
@@ -858,7 +858,7 @@ LTMSidebar::autoFilterChanged()
             tree->setContextMenuPolicy(Qt::CustomContextMenu);
             tree->horizontalScrollBar()->setDisabled(true);
             tree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
             tree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
 #ifdef Q_OS_WIN

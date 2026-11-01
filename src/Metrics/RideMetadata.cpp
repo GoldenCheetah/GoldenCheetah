@@ -67,7 +67,7 @@ RideMetadata::RideMetadata(Context *context, bool singlecolumn) :
         tabs->setContentsMargins(0,0,0,0);
 
         // better styling on Linux with fusion controls
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
         QStyle *fusion = QStyleFactory::create(OS_STYLE);
         tabs->setStyle(fusion);
 #endif
@@ -425,7 +425,7 @@ RideMetadata::configChanged(qint32)
 
         // only change base if moved away from white plots
         // which is a Mac thing
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
         if (GColor(CPLOTBACKGROUND) != Qt::white)
 #endif
         {
@@ -492,7 +492,7 @@ RideMetadata::configChanged(qint32)
         // tab bar look reasonably modern
         QString styling = QString("QTabWidget { background: %1; }"
                               "QTabWidget::pane { border: 0px; }"
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
                               "QLineEdit { border: 0px; background-color: %7; color: %6; }"
                               "QDateEdit { border: 0px; background-color: %7; color: %6; }"
                               "QTimeEdit { border: 0px; background-color: %7; color: %6; }"
@@ -514,7 +514,7 @@ RideMetadata::configChanged(qint32)
                               .arg(2*dpiXFactor)                                          // 4 padding
                               .arg(75*dpiXFactor)                                         // 5 tab minimum width
                               .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())     // 6 tab text color
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
                               .arg( GCColor::alternateColor(GColor(CPLOTBACKGROUND)).name()) // 7 lineedit background
 #endif
                             ;

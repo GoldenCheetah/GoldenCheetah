@@ -26,7 +26,7 @@
 
 #include <QFontDatabase>
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
 int OperatingSystem = OSX;
 #elif defined Q_OS_WIN32
 int OperatingSystem = WINDOWS;
@@ -346,7 +346,7 @@ GSettings::migrateQSettingsSystem() {
 
     bool migrateMac = false;
     QStringList currentKeys = systemsettings->allKeys();
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     migrateMac = true;
 #endif
     if (currentKeys.size() == 0 || (migrateMac && currentKeys.size() == 1)) {
@@ -751,7 +751,7 @@ static QString fontfamilyfallback[] = {
     "Calibri",
     "Microsoft Sans Serif",
 #endif
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     "SF Pro Display",
     "PT Sans",
     "Helvetica Neue",
@@ -769,7 +769,7 @@ static QString fontfamilyfallback[] = {
 
 
 // font selection and scaling uses slightly smaller fonts on MacOS
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
 #define FONTROWS 48
 #else
 #define FONTROWS 43

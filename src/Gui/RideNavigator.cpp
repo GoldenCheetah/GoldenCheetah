@@ -294,7 +294,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : GcChartWindow(
     QStyle *cde = QStyleFactory::create(OS_STYLE);
     tableView->verticalScrollBar()->setStyle(cde);
 #endif
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     tableView->header()->setSortIndicatorShown(false); // blue looks nasty
     tableView->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
@@ -365,7 +365,7 @@ RideNavigator::configChanged(qint32 state)
 {
     bool hasCalendarText = GlobalContext::context()->rideMetadata->hasCalendarText();
 
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
     tableView->setStyleSheet(AbstractView::ourStyleSheet());
     if (mainwindow) {
         if (appsettings->value(this, GC_RIDESCROLL, true).toBool() == false) {
@@ -846,7 +846,7 @@ RideNavigator::setColumnWidth(int x, bool resized, int logicalIndex, int oldWidt
 
     active = true;
 
-#if !defined (Q_OS_MAC)
+#if !defined (Q_OS_MACOS)
     if (tableView->verticalScrollBar()->isVisible())
         x -= tableView->verticalScrollBar()->width()
                 + 0 ; // !! no longer account for content margins of 3,3,3,3 was + 6
@@ -1364,7 +1364,7 @@ ActivityTreeView::ActivityTreeView
     setDragDropOverwriteMode(false);
     setDropIndicatorShown(true);
     setUniformRowHeights(false);
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
 }

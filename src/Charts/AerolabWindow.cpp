@@ -329,7 +329,7 @@ AerolabWindow::configChanged(qint32)
 
   // only change base if moved away from white plots
   // which is a Mac thing
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
   if (GColor(CPLOTBACKGROUND) != Qt::white)
 #endif
   {
@@ -363,7 +363,7 @@ AerolabWindow::configChanged(qint32)
   constantAlt->setPalette(palette);
   commentEdit->setPalette(palette);
 
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
     aerolab->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
 }

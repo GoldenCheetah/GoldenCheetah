@@ -53,7 +53,7 @@ PlanningWindow::configChanged(qint32)
 
     // only change base if moved away from white plots
     // which is a Mac thing
-#ifndef Q_OS_MAC
+#ifndef Q_OS_MACOS
     if (GColor(CTRENDPLOTBACKGROUND) != Qt::white)
 #endif
     {
@@ -62,7 +62,7 @@ PlanningWindow::configChanged(qint32)
         palette.setColor(QPalette::Window, GColor(CTRAINPLOTBACKGROUND));
     }
 
-#ifndef Q_OS_MAC // the scrollers appear when needed on Mac, we'll keep that
+#ifndef Q_OS_MACOS // the scrollers appear when needed on Mac, we'll keep that
     //code->setStyleSheet(TabView::ourStyleSheet());
 #endif
 
