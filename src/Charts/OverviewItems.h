@@ -598,7 +598,6 @@ class BubbleViz : public QObject, public QGraphicsItem
 {
     // need to be a qobject for metaproperties
     Q_OBJECT
-    Q_INTERFACES(QGraphicsItem)
 
     // want a meta property for property animation
     Q_PROPERTY(int transition READ getTransition WRITE setTransition)
@@ -802,7 +801,6 @@ class VScrollBar : public QGraphicsItem
 class Routeline : public QObject, public QGraphicsItem
 {
     Q_OBJECT
-    Q_INTERFACES(QGraphicsItem)
     Q_PROPERTY(int transition READ getTransition WRITE setTransition)
 
     public:
@@ -844,7 +842,6 @@ class Routeline : public QObject, public QGraphicsItem
 class ProgressBar : public QObject, public QGraphicsItem
 {
     Q_OBJECT
-    Q_INTERFACES(QGraphicsItem)
     Q_PROPERTY(double value READ getCurrentValue WRITE setCurrentValue)
 
     public:
@@ -882,7 +879,6 @@ class ProgressBar : public QObject, public QGraphicsItem
 class Button : public QObject, public QGraphicsItem
 {
     Q_OBJECT
-    Q_INTERFACES(QGraphicsItem)
 
     public:
         Button(QGraphicsItem *parent, QString text);

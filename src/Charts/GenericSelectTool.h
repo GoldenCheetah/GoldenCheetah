@@ -85,7 +85,6 @@ class GenericSelectTool : public QObject, public QGraphicsItem
 {
 
     Q_OBJECT
-    Q_INTERFACES(QGraphicsItem)
 
     static constexpr double gl_linemarker = 7;
     static constexpr double gl_scattermarker = 10;

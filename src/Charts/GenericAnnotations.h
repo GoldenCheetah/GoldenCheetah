@@ -42,8 +42,6 @@ class GenericAnnotation
 // annotations, and calls them to paint on the plot
 class GenericAnnotationController : public QGraphicsItem
 {
-    Q_INTERFACES(QGraphicsItem)
-
     public:
 
         GenericAnnotationController(GenericPlot *plot);
