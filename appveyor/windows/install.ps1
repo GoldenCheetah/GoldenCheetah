@@ -15,9 +15,7 @@ vcpkg install gsl:x64-windows
 
 # Get R
 if (-not (Test-Path 'C:\R')) {
-  # Lets use 4.1 until 4.2 issues are fixed
-  #$rurl = $(ConvertFrom-JSON $(Invoke-WebRequest https://rversions.r-pkg.org/r-release-win).Content).URL
-  $rurl = "https://cran.r-project.org/bin/windows/base/old/4.1.3/R-4.1.3-win.exe"
+  $rurl = "https://cran-archive.r-project.org/bin/windows/base/old/4.1.3/R-4.1.3-win.exe"
   Start-FileDownload $rurl "R-win.exe"
   Start-Process -FilePath .\R-win.exe -ArgumentList "/VERYSILENT /DIR=C:\R" -NoNewWindow -Wait
 }
