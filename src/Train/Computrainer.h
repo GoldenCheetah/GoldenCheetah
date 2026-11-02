@@ -59,6 +59,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/types.h>
+#include <atomic>
 
 
 /* Some CT Microcontroller / Protocol Constants */
@@ -167,23 +168,23 @@ private:
     // Mutex for controlling accessing private data
     QMutex pvars;
 
-    // INBOUND TELEMETRY - all volatile since it is updated by the run() thread
-    volatile double devicePower;            // current output power in Watts
-    volatile double deviceHeartRate;        // current heartrate in BPM
-    volatile double deviceCadence;          // current cadence in RPM
-    volatile double deviceSpeed;            // current speed in KPH
-    volatile double deviceRRC;              // calibrated Rolling Resistance
-    volatile bool   deviceCalibrated;       // is it calibrated?
-    volatile uint8_t spinScan[24];           // SS values only in SS_MODE
-    volatile int    deviceButtons;          // Button status
-    volatile bool   deviceHRConnected;      // HR jack is connected
-    volatile bool   deviceCADConnected;     // Cadence jack is connected
-    volatile int    deviceStatus;           // Device status running, paused, disconnected
+    // INBOUND TELEMETRY - all std::atomic since it is updated by the run() thread
+    std::atomic<double> devicePower;            // current output power in Watts
+    std::atomic<double> deviceHeartRate;        // current heartrate in BPM
+    std::atomic<double> deviceCadence;          // current cadence in RPM
+    std::atomic<double> deviceSpeed;            // current speed in KPH
+    std::atomic<double> deviceRRC;              // calibrated Rolling Resistance
+    std::atomic<bool>   deviceCalibrated;       // is it calibrated?
+    std::atomic<uint8_t> spinScan[24];           // SS values only in SS_MODE
+    std::atomic<int>    deviceButtons;          // Button status
+    std::atomic<bool>   deviceHRConnected;      // HR jack is connected
+    std::atomic<bool>   deviceCADConnected;     // Cadence jack is connected
+    std::atomic<int>    deviceStatus;           // Device status running, paused, disconnected
 
-    // OUTBOUND COMMANDS - all volatile since it is updated by the GUI thread
-    volatile int mode;
-    volatile double load;
-    volatile double gradient;
+    // OUTBOUND COMMANDS - all std::atomic since it is updated by the GUI thread
+    std::atomic<int> mode;
+    std::atomic<double> load;
+    std::atomic<double> gradient;
 
     // i/o message holder
     uint8_t buf[7];

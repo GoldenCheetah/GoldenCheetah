@@ -52,6 +52,7 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <limits>
+#include <atomic>
 
 /* Device operation mode */
 #define FT_IDLE        0x00
@@ -150,28 +151,28 @@ private:
     // Mutex for controlling accessing private data
     mutable QMutex pvars;
 
-    // INBOUND TELEMETRY - all volatile since it is updated by the run() thread
-    volatile double devicePower;            // current output power in Watts
-    volatile double deviceForce_N;          // current output force in Newtons
-    volatile double deviceHeartRate;        // current heartrate in BPM
-    volatile double deviceCadence;          // current cadence in RPM
-    volatile double deviceSpeed;            // current speed in KPH
-    volatile double deviceDistance;         // odometer in meters
-    volatile int    deviceButtons;          // Button status
-    volatile int    deviceStatus;           // Device status running, paused, disconnected
-    volatile int    deviceSteering;            // Steering angle
+    // INBOUND TELEMETRY - all std::atomic since it is updated by the run() thread
+    std::atomic<double> devicePower;            // current output power in Watts
+    std::atomic<double> deviceForce_N;          // current output force in Newtons
+    std::atomic<double> deviceHeartRate;        // current heartrate in BPM
+    std::atomic<double> deviceCadence;          // current cadence in RPM
+    std::atomic<double> deviceSpeed;            // current speed in KPH
+    std::atomic<double> deviceDistance;         // odometer in meters
+    std::atomic<int>    deviceButtons;          // Button status
+    std::atomic<int>    deviceStatus;           // Device status running, paused, disconnected
+    std::atomic<int>    deviceSteering;            // Steering angle
     
-    // OUTBOUND COMMANDS - all volatile since it is updated by the GUI thread
-    volatile int mode;
-    volatile double load;
-    volatile double gradient;
-    volatile double brakeCalibrationForce_N;
-    volatile double brakeCalibrationFactor;
-    volatile double powerScaleFactor;
-    volatile double weight;
-    volatile double windSpeed;
-    volatile double rollingResistance;
-    volatile double windResistance;
+    // OUTBOUND COMMANDS - all std::atomic since it is updated by the GUI thread
+    std::atomic<int> mode;
+    std::atomic<double> load;
+    std::atomic<double> gradient;
+    std::atomic<double> brakeCalibrationForce_N;
+    std::atomic<double> brakeCalibrationFactor;
+    std::atomic<double> powerScaleFactor;
+    std::atomic<double> weight;
+    std::atomic<double> windSpeed;
+    std::atomic<double> rollingResistance;
+    std::atomic<double> windResistance;
 
     // Model version
     unsigned int motorBrakeFirmwareVersion;

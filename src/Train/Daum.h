@@ -27,6 +27,7 @@
 #include <QMutex>
 #include <QSerialPort>
 #include "RealtimeController.h"
+#include <atomic>
 
 /*
  * This class add support for some Daum devices that are connected
@@ -101,13 +102,13 @@ private:
     bool paused_;
 
     // inbound
-    volatile int devicePower_;
-    volatile double deviceHeartRate_;
-    volatile double deviceCadence_;
-    volatile double deviceSpeed_;
+    std::atomic<int> devicePower_;
+    std::atomic<double> deviceHeartRate_;
+    std::atomic<double> deviceCadence_;
+    std::atomic<double> deviceSpeed_;
 
     // outbound
-    volatile int load_, loadToWrite_;
+    std::atomic<int> load_, loadToWrite_;
     const bool forceUpdate_;
     const QString profile_;
 

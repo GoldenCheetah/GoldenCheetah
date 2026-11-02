@@ -51,6 +51,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/types.h>
+#include <atomic>
 
 /* Device operation mode */
 #define IM_IDLE        0x00
@@ -137,23 +138,23 @@ private:
     // Mutex for controlling accessing private data
     QMutex pvars;
 
-    // INBOUND TELEMETRY - all volatile since it is updated by the run() thread
-    volatile double devicePower;            // current output power in Watts
-    volatile double deviceHeartRate;        // current heartrate in BPM
-    volatile double deviceCadence;          // current cadence in RPM
-    volatile double deviceSpeed;            // current speed in kph
-    volatile double deviceDistance;         // odometer in meters
-    volatile int    deviceButtons;          // Button status
-    volatile int    deviceStatus;           // Device status running, paused, disconnected
-    volatile int    deviceSteering;         // Steering angle
+    // INBOUND TELEMETRY - all std::atomic since it is updated by the run() thread
+    std::atomic<double> devicePower;            // current output power in Watts
+    std::atomic<double> deviceHeartRate;        // current heartrate in BPM
+    std::atomic<double> deviceCadence;          // current cadence in RPM
+    std::atomic<double> deviceSpeed;            // current speed in kph
+    std::atomic<double> deviceDistance;         // odometer in meters
+    std::atomic<int>    deviceButtons;          // Button status
+    std::atomic<int>    deviceStatus;           // Device status running, paused, disconnected
+    std::atomic<int>    deviceSteering;         // Steering angle
 
-    // OUTBOUND COMMANDS - all volatile since it is updated by the GUI thread
-    volatile int mode;
-    volatile double load;
-    volatile double gradient;
-    volatile double brakeCalibrationFactor;
-    volatile double powerScaleFactor;
-    volatile double weight;
+    // OUTBOUND COMMANDS - all std::atomic since it is updated by the GUI thread
+    std::atomic<int> mode;
+    std::atomic<double> load;
+    std::atomic<double> gradient;
+    std::atomic<double> brakeCalibrationFactor;
+    std::atomic<double> powerScaleFactor;
+    std::atomic<double> weight;
 
     // I/O Buffer
     uint8_t buf[21];

@@ -31,6 +31,7 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QThread>
+#include <atomic>
 
 
 enum class LibraryBatchImportConfirmation {
@@ -134,7 +135,7 @@ class LibrarySearch : public QThread
         void foundWorkout(QString);
 
     private:
-        volatile bool aborted;
+        std::atomic<bool> aborted;
         QString path;
         bool findMedia, findWorkout, findVideoSync;
 };
