@@ -29,18 +29,19 @@ GoldenCheetah supports community sharing via the Cloud
 
 GoldenCheetah is free for everyone to use and modify, released under the GPL v2 open source license with pre-built binaries for Mac, Windows and Linux.
 
-## Installing 
+## Installing from oource:
 
-Golden Cheetah install and build instructions are documented
-for each platform;
+Golden Cheetah build instructions are documented for each platform:
 
 INSTALL-WINDOWS For building on Microsoft Windows
 
 INSTALL-LINUX   For building on Linux
 
-INSTALL-MAC     For building on Apple MacOS
+INSTALL-MAC     For building on Apple macOS
 
-Windows/macOS/Linux on AppVeyor: [![Build status](https://ci.appveyor.com/api/projects/status/i6dwn4m8oyu52ihi?svg=true)](https://ci.appveyor.com/project/Joern-R/goldencheetah-knhd8)
+Windows/macOS/Linux x64 ci builds: [![Build status](https://ci.appveyor.com/api/projects/status/i6dwn4m8oyu52ihi?svg=true)](https://ci.appveyor.com/project/Joern-R/goldencheetah-knhd8)
+
+macOS arm64 ci builds: [![build](https://github.com/GoldenCheetah/GoldenCheetah/actions/workflows/ci.yml/badge.svg)](https://github.com/GoldenCheetah/GoldenCheetah/actions/workflows/ci.yml)
 
 Official release builds, snapshots and development builds are all available from https://www.goldencheetah.org
 
