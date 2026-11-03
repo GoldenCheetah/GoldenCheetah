@@ -29,7 +29,7 @@ GoldenCheetah supports community sharing via the Cloud
 
 GoldenCheetah is free for everyone to use and modify, released under the GPL v2 open source license with pre-built binaries for Mac, Windows and Linux.
 
-## Installing from oource:
+## Installing
 
 Golden Cheetah build instructions are documented for each platform:
 
