@@ -1,5 +1,11 @@
 blank_issues_enabled: false
 contact_links:
+    - name: Troubleshooting Guide
+      url: https://github.com/GoldenCheetah/GoldenCheetah/wiki/FAQ#troubleshooting
+      about: Please read this section of the wiki if you have problems using GoldenCheetah.
+    - name: Frequently Asked Questions
+      url: https://github.com/GoldenCheetah/GoldenCheetah/wiki/FAQ
+      about: Please read this before asking questions about GoldenCheetah.
     - name: GoldenCheetah Users Forum
       url: https://groups.google.com/forum/#!forum/golden-cheetah-users
       about: Please ask and answer technical support questions here.
