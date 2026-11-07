@@ -175,6 +175,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Mark Buller");
     contributors.append("Mark Liversedge");
     contributors.append("Mark Rages");
+    contributors.append("Matthew Brewer");
     contributors.append("Michael Puchowicz");
     contributors.append("Michel Dagenais");
     contributors.append("Miguel Angel Quiles");
@@ -200,6 +201,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Satoru Kurashiki");
     contributors.append("Scott Conover");
     contributors.append("Sean Rhea");
+    contributors.append("Simon Boettger");
     contributors.append("Simon Brewer");
     contributors.append("Stefan Schake");
     contributors.append("Stephan Lips");
