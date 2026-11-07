@@ -28,7 +28,6 @@
 #include <qelapsedtimer.h>
 #endif
 
-
 static inline double qwtVector2Radians( double vx, double vy )
 {
     if ( vx == 0.0 )
@@ -182,7 +181,7 @@ namespace
             m_y1 = m_y0 + m_numRows * m_dy;
 
             m_entries = ( Entry* )::calloc( m_numRows * m_numColumns, sizeof( Entry ) );
-            if ( m_entries == NULL )
+            if ( m_entries == nullptr )
             {
                 qWarning() << "QwtPlotVectorField: raster for filtering too fine - running out of memory";
             }
@@ -241,16 +240,7 @@ class QwtPlotVectorField::PrivateData
 {
   public:
     PrivateData()
-        : pen( Qt::black )
-        , brush( Qt::black )
-        , indicatorOrigin( QwtPlotVectorField::OriginHead )
-        , magnitudeScaleFactor( 1.0 )
-        , rasterSize( 20, 20 )
-        , minArrowLength( 0.0 )
-        , maxArrowLength( std::numeric_limits< short >::max() )
-        , magnitudeModes( MagnitudeAsLength )
     {
-        colorMap = NULL;
         symbol = new QwtVectorFieldThinArrow();
     }
 
@@ -260,12 +250,12 @@ class QwtPlotVectorField::PrivateData
         delete symbol;
     }
 
-    QPen pen;
-    QBrush brush;
+    QPen pen = { Qt::black };
+    QBrush brush = Qt::black;
 
-    IndicatorOrigin indicatorOrigin;
-    QwtVectorFieldSymbol* symbol;
-    QwtColorMap* colorMap;
+    IndicatorOrigin indicatorOrigin = OriginHead;
+    QwtVectorFieldSymbol* symbol = nullptr;
+    QwtColorMap* colorMap = nullptr;
 
     /*
         Stores the range of magnitudes to be used for the color map.
@@ -275,15 +265,24 @@ class QwtPlotVectorField::PrivateData
     QwtInterval magnitudeRange;
     QwtInterval boundingMagnitudeRange;
 
-    qreal magnitudeScaleFactor;
-    QSizeF rasterSize;
+    qreal magnitudeScaleFactor = 1.0;
+    QSizeF rasterSize = { 20.0, 20.0 };
 
-    double minArrowLength;
-    double maxArrowLength;
+    double minArrowLength = 0.0;
+    double maxArrowLength = std::numeric_limits< short >::max();
 
     PaintAttributes paintAttributes;
-    MagnitudeModes magnitudeModes;
+    MagnitudeModes magnitudeModes = MagnitudeAsLength;
 };
+
+/*!
+   Constructor
+   \param title Title of the curve
+ */
+QwtPlotVectorField::QwtPlotVectorField( const QString& title )
+    : QwtPlotVectorField( QwtText( title ) )
+{
+}
 
 /*!
    Constructor
@@ -291,38 +290,19 @@ class QwtPlotVectorField::PrivateData
  */
 QwtPlotVectorField::QwtPlotVectorField( const QwtText& title )
     : QwtPlotSeriesItem( title )
+    , m_data( new PrivateData )
 {
-    init();
-}
+    setItemAttribute( QwtPlotItem::Legend );
+    setItemAttribute( QwtPlotItem::AutoScale );
 
-/*!
-   Constructor
-   \param title Title of the curve
- */
-QwtPlotVectorField::QwtPlotVectorField( const QString& title )
-    : QwtPlotSeriesItem( QwtText( title ) )
-{
-    init();
+    setData( new QwtVectorFieldData() );
+
+    setZ( 20.0 );
 }
 
 //! Destructor
 QwtPlotVectorField::~QwtPlotVectorField()
 {
-    delete m_data;
-}
-
-/*!
-   \brief Initialize data members
- */
-void QwtPlotVectorField::init()
-{
-    setItemAttribute( QwtPlotItem::Legend );
-    setItemAttribute( QwtPlotItem::AutoScale );
-
-    m_data = new PrivateData;
-    setData( new QwtVectorFieldData() );
-
-    setZ( 20.0 );
 }
 
 /*!
@@ -570,7 +550,7 @@ void QwtPlotVectorField::setSamples( QwtVectorFieldData* data )
  */
 void QwtPlotVectorField::setColorMap( QwtColorMap* colorMap )
 {
-    if ( colorMap == NULL )
+    if ( colorMap == nullptr )
         return;
 
     if ( colorMap != m_data->colorMap )
@@ -860,7 +840,7 @@ void QwtPlotVectorField::drawSymbols( QPainter* painter,
     {
         // user input error, can't draw without color map
         // TODO: Discuss! Without colormap, silently fall back to uniform colors?
-        if ( m_data->colorMap == NULL)
+        if ( m_data->colorMap == nullptr)
             return;
     }
     else

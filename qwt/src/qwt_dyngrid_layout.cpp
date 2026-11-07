@@ -15,22 +15,17 @@
 class QwtDynGridLayout::PrivateData
 {
   public:
-    PrivateData()
-        : isDirty( true )
-    {
-    }
-
     void updateLayoutCache();
 
     mutable QList< QLayoutItem* > itemList;
 
-    uint maxColumns;
-    uint numRows;
-    uint numColumns;
+    uint maxColumns = 0;
+    uint numRows = 0;
+    uint numColumns = 0;
 
     Qt::Orientations expanding;
 
-    bool isDirty;
+    bool isDirty = true;
     QVector< QSize > itemSizeHints;
 };
 
@@ -57,9 +52,8 @@ void QwtDynGridLayout::PrivateData::updateLayoutCache()
 
 QwtDynGridLayout::QwtDynGridLayout( QWidget* parent, int margin, int spacing )
     : QLayout( parent )
+    , m_data( new PrivateData )
 {
-    init();
-
     setSpacing( spacing );
     setContentsMargins( margin, margin, margin, margin );
 }
@@ -69,18 +63,9 @@ QwtDynGridLayout::QwtDynGridLayout( QWidget* parent, int margin, int spacing )
  */
 
 QwtDynGridLayout::QwtDynGridLayout( int spacing )
+    : m_data( new PrivateData )
 {
-    init();
     setSpacing( spacing );
-}
-
-/*!
-   Initialize the layout with default values.
- */
-void QwtDynGridLayout::init()
-{
-    m_data = new QwtDynGridLayout::PrivateData;
-    m_data->maxColumns = m_data->numRows = m_data->numColumns = 0;
 }
 
 //! Destructor
@@ -88,7 +73,6 @@ void QwtDynGridLayout::init()
 QwtDynGridLayout::~QwtDynGridLayout()
 {
     qDeleteAll( m_data->itemList );
-    delete m_data;
 }
 
 //! Invalidate all internal caches
@@ -157,7 +141,7 @@ uint QwtDynGridLayout::itemCount() const
 QLayoutItem* QwtDynGridLayout::itemAt( int index ) const
 {
     if ( index < 0 || index >= m_data->itemList.count() )
-        return NULL;
+        return nullptr;
 
     return m_data->itemList.at( index );
 }
@@ -172,7 +156,7 @@ QLayoutItem* QwtDynGridLayout::itemAt( int index ) const
 QLayoutItem* QwtDynGridLayout::takeAt( int index )
 {
     if ( index < 0 || index >= m_data->itemList.count() )
-        return NULL;
+        return nullptr;
 
     m_data->isDirty = true;
     return m_data->itemList.takeAt( index );

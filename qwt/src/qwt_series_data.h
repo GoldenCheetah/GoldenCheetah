@@ -171,7 +171,7 @@ class QwtArraySeriesData : public QwtSeriesData< T >
     const QVector< T > samples() const;
 
     //! \return Number of samples
-    virtual size_t size() const QWT_OVERRIDE;
+    size_t size() const override;
 
     /*!
        \return Sample at a specific position
@@ -179,7 +179,7 @@ class QwtArraySeriesData : public QwtSeriesData< T >
        \param index Index
        \return Sample at position index
      */
-    virtual T sample( size_t index ) const QWT_OVERRIDE;
+    T sample( size_t index ) const override;
 
   protected:
     //! Vector of samples

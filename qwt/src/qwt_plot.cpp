@@ -70,10 +70,10 @@ static void qwtSetTabOrder(
         QWidget* proxy2 = to->focusProxy();
 
         from->setFocusPolicy( Qt::TabFocus );
-        from->setFocusProxy( NULL);
+        from->setFocusProxy( nullptr);
 
         to->setFocusPolicy( Qt::TabFocus );
-        to->setFocusProxy( NULL);
+        to->setFocusProxy( nullptr);
 
         QWidget::setTabOrder( from, to );
 
@@ -115,9 +115,8 @@ class QwtPlot::PrivateData
    \param parent Parent widget
  */
 QwtPlot::QwtPlot( QWidget* parent )
-    : QFrame( parent )
+    : QwtPlot( QwtText(), parent )
 {
-    initPlot( QwtText() );
 }
 
 /*!
@@ -127,29 +126,8 @@ QwtPlot::QwtPlot( QWidget* parent )
  */
 QwtPlot::QwtPlot( const QwtText& title, QWidget* parent )
     : QFrame( parent )
+    , m_data( new PrivateData )
 {
-    initPlot( title );
-}
-
-//! Destructor
-QwtPlot::~QwtPlot()
-{
-    setAutoReplot( false );
-    detachItems( QwtPlotItem::Rtti_PlotItem, autoDelete() );
-
-    delete m_data->layout;
-    deleteAxesData();
-    delete m_data;
-}
-
-/*!
-   \brief Initializes a QwtPlot instance
-   \param title Title text
- */
-void QwtPlot::initPlot( const QwtText& title )
-{
-    m_data = new PrivateData;
-
     m_data->layout = new QwtPlotLayout;
     m_data->autoReplot = false;
 
@@ -158,7 +136,7 @@ void QwtPlot::initPlot( const QwtText& title )
     m_data->titleLabel->setObjectName( "QwtPlotTitle" );
     m_data->titleLabel->setFont( QFont( fontInfo().family(), 14, QFont::Bold ) );
 
-    QwtText text( title );
+    auto text = title;
     text.setRenderFlags( Qt::AlignCenter | Qt::TextWordWrap );
     m_data->titleLabel->setText( text );
 
@@ -171,7 +149,7 @@ void QwtPlot::initPlot( const QwtText& title )
     m_data->footerLabel->setText( footer );
 
     // legend
-    m_data->legend = NULL;
+    m_data->legend = nullptr;
 
     // axes
     initAxesData();
@@ -212,6 +190,17 @@ void QwtPlot::initPlot( const QwtText& title )
 
     qwtEnableLegendItems( this, true );
 }
+
+//! Destructor
+QwtPlot::~QwtPlot()
+{
+    setAutoReplot( false );
+    detachItems( QwtPlotItem::Rtti_PlotItem, autoDelete() );
+
+    delete m_data->layout;
+    deleteAxesData();
+}
+
 
 /*!
    \brief Set the drawing canvas of the plot widget
@@ -806,11 +795,6 @@ void QwtPlot::drawItems( QPainter* painter, const QRectF& canvasRect,
             painter->setRenderHint( QPainter::Antialiasing,
                 item->testRenderHint( QwtPlotItem::RenderAntialiased ) );
 
-#if QT_VERSION < 0x050100
-            painter->setRenderHint( QPainter::HighQualityAntialiasing,
-                item->testRenderHint( QwtPlotItem::RenderAntialiased ) );
-#endif
-
             item->draw( painter,
                 mapTable.map( xAxis ), mapTable.map( yAxis ), canvasRect );
 
@@ -1001,7 +985,7 @@ void QwtPlot::insertLegend( QwtAbstractLegend* legend,
                 }
             }
 
-            QWidget* previousInChain = NULL;
+            QWidget* previousInChain = nullptr;
             switch ( m_data->layout->legendPosition() )
             {
                 case LeftLegend:
@@ -1059,7 +1043,7 @@ void QwtPlot::updateLegend()
  */
 void QwtPlot::updateLegend( const QwtPlotItem* plotItem )
 {
-    if ( plotItem == NULL )
+    if ( plotItem == nullptr )
         return;
 
     QList< QwtLegendData > legendData;
@@ -1181,7 +1165,7 @@ QVariant QwtPlot::itemToInfo( QwtPlotItem* plotItem ) const
         return qvariant_cast<QwtPlotItem *>( itemInfo );
    \endcode
    \param itemInfo Plot item
-   \return A plot item, when successful, otherwise a NULL pointer.
+   \return A plot item, when successful, otherwise a nullptr.
    \sa itemToInfo()
  */
 QwtPlotItem* QwtPlot::infoToItem( const QVariant& itemInfo ) const
@@ -1189,7 +1173,7 @@ QwtPlotItem* QwtPlot::infoToItem( const QVariant& itemInfo ) const
     if ( itemInfo.canConvert< QwtPlotItem* >() )
         return qvariant_cast< QwtPlotItem* >( itemInfo );
 
-    return NULL;
+    return nullptr;
 }
 
 #include "moc_qwt_plot.cpp"

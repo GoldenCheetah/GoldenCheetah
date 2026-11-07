@@ -14,6 +14,8 @@
 #include "qwt_plot.h"
 #include "qwt_axis_id.h"
 
+#include <memory>
+
 /*!
    \brief Layout engine for QwtPlot.
 
@@ -103,7 +105,7 @@ class QWT_EXPORT QwtPlotLayout
     Q_DISABLE_COPY(QwtPlotLayout)
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QwtPlotLayout::Options )

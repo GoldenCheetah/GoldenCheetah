@@ -23,7 +23,7 @@
 
 namespace
 {
-    class Zoomer : public QwtPlotZoomer
+    class Zoomer final : public QwtPlotZoomer
     {
       public:
         Zoomer( QWidget* canvas )
@@ -34,7 +34,7 @@ namespace
         }
 
       protected:
-        virtual QwtText trackerTextF( const QPointF& pos ) const QWT_OVERRIDE
+        QwtText trackerTextF( const QPointF& pos ) const override
         {
             const QDateTime dt = QwtDate::toDateTime( pos.x() );
 
@@ -55,7 +55,7 @@ namespace
         }
     };
 
-    class DateScaleDraw : public QwtDateScaleDraw
+    class DateScaleDraw final : public QwtDateScaleDraw
     {
       public:
         DateScaleDraw( Qt::TimeSpec timeSpec )
@@ -74,7 +74,7 @@ namespace
         }
     };
 
-    class ZoneItem : public QwtPlotZoneItem
+    class ZoneItem final : public QwtPlotZoneItem
     {
       public:
         ZoneItem( const QString& title )
@@ -123,14 +123,8 @@ Plot::Plot( QWidget* parent )
 
     setAxisTitle( QwtAxis::YLeft, QString( "Price [EUR]" ) );
 
-#if 0
-    QwtLegend* legend = new QwtLegend;
-    legend->setDefaultItemMode( QwtLegendData::Checkable );
-    insertLegend( legend, QwtPlot::RightLegend );
-#else
     Legend* legend = new Legend;
     insertLegend( legend, QwtPlot::RightLegend );
-#endif
 
     populate();
 
@@ -148,8 +142,7 @@ Plot::Plot( QWidget* parent )
     QwtPlotPanner* panner = new QwtPlotPanner( canvas() );
     panner->setMouseButton( Qt::MiddleButton );
 
-    connect( legend, SIGNAL(checked(QwtPlotItem*,bool,int)),
-        SLOT(showItem(QwtPlotItem*,bool)) );
+    connect( legend, &Legend::checked, this, &Plot::showItem );
 }
 
 void Plot::populate()
@@ -208,7 +201,7 @@ void Plot::populate()
         marker->setLinePen( colors[ i % numColors ], 0, Qt::DashLine );
         marker->setVisible( false );
 
-#if QT_VERSION >= 0x050e00
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
         QDateTime dt = QDate( 2010, 1, 1 ).startOfDay();
 #else
         QDateTime dt( QDate( 2010, 1, 1 ) );

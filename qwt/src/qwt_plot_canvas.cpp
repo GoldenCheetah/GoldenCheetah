@@ -18,18 +18,13 @@
 class QwtPlotCanvas::PrivateData
 {
   public:
-    PrivateData()
-        : backingStore( NULL )
-    {
-    }
-
     ~PrivateData()
     {
         delete backingStore;
     }
 
     QwtPlotCanvas::PaintAttributes paintAttributes;
-    QPixmap* backingStore;
+    QPixmap* backingStore = nullptr;
 };
 
 /*!
@@ -41,9 +36,8 @@ class QwtPlotCanvas::PrivateData
 QwtPlotCanvas::QwtPlotCanvas( QwtPlot* plot )
     : QFrame( plot )
     , QwtPlotAbstractCanvas( this )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
-
     setPaintAttribute( QwtPlotCanvas::BackingStore, true );
     setPaintAttribute( QwtPlotCanvas::Opaque, true );
     setPaintAttribute( QwtPlotCanvas::HackStyledBackground, true );
@@ -56,7 +50,6 @@ QwtPlotCanvas::QwtPlotCanvas( QwtPlot* plot )
 //! Destructor
 QwtPlotCanvas::~QwtPlotCanvas()
 {
-    delete m_data;
 }
 
 /*!
@@ -83,23 +76,18 @@ void QwtPlotCanvas::setPaintAttribute( PaintAttribute attribute, bool on )
         {
             if ( on )
             {
-                if ( m_data->backingStore == NULL )
+                if ( m_data->backingStore == nullptr )
                     m_data->backingStore = new QPixmap();
 
                 if ( isVisible() )
                 {
-#if QT_VERSION >= 0x050000
                     *m_data->backingStore = grab( rect() );
-#else
-                    *m_data->backingStore =
-                        QPixmap::grabWidget( this, rect() );
-#endif
                 }
             }
             else
             {
                 delete m_data->backingStore;
-                m_data->backingStore = NULL;
+                m_data->backingStore = nullptr;
             }
             break;
         }
@@ -181,7 +169,7 @@ void QwtPlotCanvas::paintEvent( QPaintEvent* event )
     painter.setClipRegion( event->region() );
 
     if ( testPaintAttribute( QwtPlotCanvas::BackingStore ) &&
-        m_data->backingStore != NULL )
+        m_data->backingStore != nullptr )
     {
         QPixmap& bs = *m_data->backingStore;
         if ( bs.size() != size() * QwtPainter::devicePixelRatio( &bs ) )

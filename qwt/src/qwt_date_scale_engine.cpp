@@ -719,16 +719,13 @@ class QwtDateScaleEngine::PrivateData
   public:
     explicit PrivateData( Qt::TimeSpec spec )
         : timeSpec( spec )
-        , utcOffset( 0 )
-        , week0Type( QwtDate::FirstThursday )
-        , maxWeeks( 4 )
     {
     }
 
     Qt::TimeSpec timeSpec;
-    int utcOffset;
-    QwtDate::Week0Type week0Type;
-    int maxWeeks;
+    int utcOffset = 0;
+    QwtDate::Week0Type week0Type = QwtDate::FirstThursday;
+    int maxWeeks = 4;
 };
 
 
@@ -746,14 +743,13 @@ class QwtDateScaleEngine::PrivateData
  */
 QwtDateScaleEngine::QwtDateScaleEngine( Qt::TimeSpec timeSpec )
     : QwtLinearScaleEngine( 10 )
+    , m_data( new PrivateData( timeSpec ) )
 {
-    m_data = new PrivateData( timeSpec );
 }
 
 //! Destructor
 QwtDateScaleEngine::~QwtDateScaleEngine()
 {
-    delete m_data;
 }
 
 /*!
@@ -1115,11 +1111,7 @@ QDateTime QwtDateScaleEngine::alignDate(
 
     if ( dateTime.timeSpec() == Qt::OffsetFromUTC )
     {
-#if QT_VERSION >= 0x050200
         dt.setOffsetFromUtc( 0 );
-#else
-        dt.setUtcOffset( 0 );
-#endif
     }
 
     switch( intervalType )
@@ -1277,11 +1269,7 @@ QDateTime QwtDateScaleEngine::alignDate(
 
     if ( dateTime.timeSpec() == Qt::OffsetFromUTC )
     {
-#if QT_VERSION >= 0x050200
         dt.setOffsetFromUtc( dateTime.offsetFromUtc() );
-#else
-        dt.setUtcOffset( dateTime.utcOffset() );
-#endif
     }
 
     return dt;
@@ -1309,11 +1297,7 @@ QDateTime QwtDateScaleEngine::toDateTime( double value ) const
     if ( m_data->timeSpec == Qt::OffsetFromUTC )
     {
         dt = dt.addSecs( m_data->utcOffset );
-#if QT_VERSION >= 0x050200
         dt.setOffsetFromUtc( m_data->utcOffset );
-#else
-        dt.setUtcOffset( m_data->utcOffset );
-#endif
     }
 
     return dt;

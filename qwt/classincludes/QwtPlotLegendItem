@@ -1,1 +1,1 @@
-#include "qwt_plot_legenditem.h"
+#include "qwt_plot_legenditem.h" // IWYU pragma: export

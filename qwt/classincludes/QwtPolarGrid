@@ -1,1 +1,1 @@
-#include "qwt_polar_grid.h"
+#include "qwt_polar_grid.h" // IWYU pragma: export

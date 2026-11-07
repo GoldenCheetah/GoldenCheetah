@@ -11,7 +11,9 @@
 #define QWT_WIDGET_OVERLAY_H
 
 #include "qwt_global.h"
+
 #include <qwidget.h>
+#include <memory>
 
 class QPainter;
 class QRegion;
@@ -114,7 +116,7 @@ class QWT_EXPORT QwtWidgetOverlay : public QWidget
     };
 
     explicit QwtWidgetOverlay( QWidget* );
-    virtual ~QwtWidgetOverlay();
+    ~QwtWidgetOverlay() override;
 
     void setMaskMode( MaskMode );
     MaskMode maskMode() const;
@@ -122,14 +124,14 @@ class QWT_EXPORT QwtWidgetOverlay : public QWidget
     void setRenderMode( RenderMode );
     RenderMode renderMode() const;
 
-    virtual bool eventFilter( QObject*, QEvent*) QWT_OVERRIDE;
+    bool eventFilter( QObject*, QEvent*) override;
 
   public Q_SLOTS:
     void updateOverlay();
 
   protected:
-    virtual void paintEvent( QPaintEvent* ) QWT_OVERRIDE;
-    virtual void resizeEvent( QResizeEvent* ) QWT_OVERRIDE;
+    void paintEvent( QPaintEvent* ) override;
+    void resizeEvent( QResizeEvent* ) override;
 
     virtual QRegion maskHint() const;
 
@@ -145,7 +147,7 @@ class QWT_EXPORT QwtWidgetOverlay : public QWidget
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

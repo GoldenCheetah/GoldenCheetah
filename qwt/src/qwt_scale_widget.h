@@ -18,6 +18,7 @@
 #include <qfont.h>
 #include <qcolor.h>
 #include <qstring.h>
+#include <memory>
 
 class QPainter;
 class QwtTransform;
@@ -48,9 +49,10 @@ class QWT_EXPORT QwtScaleWidget : public QWidget
 
     Q_DECLARE_FLAGS( LayoutFlags, LayoutFlag )
 
-    explicit QwtScaleWidget( QWidget* parent = NULL );
-    explicit QwtScaleWidget( QwtScaleDraw::Alignment, QWidget* parent = NULL );
-    virtual ~QwtScaleWidget();
+    explicit QwtScaleWidget( QWidget* parent = nullptr );
+    explicit QwtScaleWidget( QwtScaleDraw::Alignment, QWidget* parent = nullptr );
+
+    ~QwtScaleWidget() override;
 
   Q_SIGNALS:
     //! Signal emitted, whenever the scale division changes
@@ -100,8 +102,8 @@ class QWT_EXPORT QwtScaleWidget : public QWidget
     QwtInterval colorBarInterval() const;
     const QwtColorMap* colorMap() const;
 
-    virtual QSize sizeHint() const QWT_OVERRIDE;
-    virtual QSize minimumSizeHint() const QWT_OVERRIDE;
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
 
     int titleHeightForWidth( int width ) const;
     int dimForLength( int length, const QFont& scaleFont ) const;
@@ -116,9 +118,9 @@ class QWT_EXPORT QwtScaleWidget : public QWidget
     QRectF colorBarRect( const QRectF& ) const;
 
   protected:
-    virtual void paintEvent( QPaintEvent* ) QWT_OVERRIDE;
-    virtual void resizeEvent( QResizeEvent* ) QWT_OVERRIDE;
-    virtual void changeEvent( QEvent* ) QWT_OVERRIDE;
+    void paintEvent( QPaintEvent* ) override;
+    void resizeEvent( QResizeEvent* ) override;
+    void changeEvent( QEvent* ) override;
 
     void draw( QPainter* ) const;
 
@@ -126,10 +128,8 @@ class QWT_EXPORT QwtScaleWidget : public QWidget
     void layoutScale( bool update_geometry = true );
 
   private:
-    void initScale( QwtScaleDraw::Alignment );
-
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QwtScaleWidget::LayoutFlags )

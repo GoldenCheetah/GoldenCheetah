@@ -12,6 +12,7 @@
 
 #include "qwt_global.h"
 #include <qwidget.h>
+#include <memory>
 
 class QCursor;
 class QPixmap;
@@ -38,7 +39,7 @@ class QWT_EXPORT QwtPanner : public QWidget
 
   public:
     explicit QwtPanner( QWidget* parent );
-    virtual ~QwtPanner();
+    ~QwtPanner() override;
 
     void setEnabled( bool );
     bool isEnabled() const;
@@ -59,7 +60,7 @@ class QWT_EXPORT QwtPanner : public QWidget
 
     bool isOrientationEnabled( Qt::Orientation ) const;
 
-    virtual bool eventFilter( QObject*, QEvent* ) QWT_OVERRIDE;
+    bool eventFilter( QObject*, QEvent* ) override;
 
   Q_SIGNALS:
     /*!
@@ -86,7 +87,7 @@ class QWT_EXPORT QwtPanner : public QWidget
     virtual void widgetKeyPressEvent( QKeyEvent* );
     virtual void widgetKeyReleaseEvent( QKeyEvent* );
 
-    virtual void paintEvent( QPaintEvent* ) QWT_OVERRIDE;
+    void paintEvent( QPaintEvent* ) override;
 
     virtual QBitmap contentsMask() const;
     virtual QPixmap grab() const;
@@ -97,7 +98,7 @@ class QWT_EXPORT QwtPanner : public QWidget
 #endif
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

@@ -15,7 +15,9 @@
 #include "qwt_interval.h"
 #include "qwt_scale_map.h"
 #include "qwt_point_polar.h"
+
 #include <qframe.h>
+#include <memory>
 
 class QwtRoundScaleDraw;
 class QwtScaleEngine;
@@ -81,10 +83,10 @@ class QWT_EXPORT QwtPolarPlot : public QFrame, public QwtPolarItemDict
         ExternalLegend
     };
 
-    explicit QwtPolarPlot( QWidget* parent = NULL );
-    QwtPolarPlot( const QwtText& title, QWidget* parent = NULL );
+    explicit QwtPolarPlot( QWidget* parent = nullptr );
+    QwtPolarPlot( const QwtText& title, QWidget* parent = nullptr );
 
-    virtual ~QwtPolarPlot();
+    ~QwtPolarPlot() override;
 
     void setTitle( const QString& );
     void setTitle( const QwtText& );
@@ -196,8 +198,8 @@ class QWT_EXPORT QwtPolarPlot : public QFrame, public QwtPolarItemDict
     void setAzimuthOrigin( double );
 
   protected:
-    virtual bool event( QEvent* ) QWT_OVERRIDE;
-    virtual void resizeEvent( QResizeEvent* ) QWT_OVERRIDE;
+    bool event( QEvent* ) override;
+    void resizeEvent( QResizeEvent* ) override;
 
     virtual void updateLayout();
 
@@ -210,10 +212,8 @@ class QWT_EXPORT QwtPolarPlot : public QFrame, public QwtPolarItemDict
     friend class QwtPolarItem;
     void attachItem( QwtPolarItem*, bool );
 
-    void initPlot( const QwtText& );
-
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

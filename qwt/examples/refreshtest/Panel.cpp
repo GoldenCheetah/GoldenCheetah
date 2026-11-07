@@ -54,27 +54,31 @@ Panel::Panel( QWidget* parent )
 
     setSettings( Settings() );
 
-    connect( m_numPoints, SIGNAL(valueChanged(int)), SLOT(edited()) );
-    connect( m_updateInterval, SIGNAL(valueChanged(int)), SLOT(edited()) );
-    connect( m_curveWidth, SIGNAL(valueChanged(int)), SLOT(edited()) );
+    void (QSpinBox::*spinValueChanged)(int) = &QSpinBox::valueChanged;
+    void (QComboBox::*comboValueChanged)(int) = &QComboBox::currentIndexChanged;
 
-    connect( m_paintCache, SIGNAL(stateChanged(int)), SLOT(edited()) );
-    connect( m_paintOnScreen, SIGNAL(stateChanged(int)), SLOT(edited()) );
-    connect( m_immediatePaint, SIGNAL(stateChanged(int)), SLOT(edited()) );
+    connect( m_numPoints, spinValueChanged, this, &Panel::edited );
+
+    connect( m_updateInterval, spinValueChanged, this, &Panel::edited );
+    connect( m_curveWidth, spinValueChanged, this, &Panel::edited );
+
+    connect( m_paintCache, &QCheckBox::clicked, this, &Panel::edited );
+    connect( m_paintOnScreen, &QCheckBox::clicked, this, &Panel::edited );
+    connect( m_immediatePaint, &QCheckBox::clicked, this, &Panel::edited );
 #ifndef QWT_NO_OPENGL
-    connect( m_openGL, SIGNAL(stateChanged(int)), SLOT(edited()) );
+    connect( m_openGL, &QCheckBox::clicked, this, &Panel::edited );
 #endif
 
-    connect( m_curveAntialiasing, SIGNAL(stateChanged(int)), SLOT(edited()) );
-    connect( m_curveClipping, SIGNAL(stateChanged(int)), SLOT(edited()) );
-    connect( m_curveWeeding, SIGNAL(currentIndexChanged(int)), SLOT(edited()) );
-    connect( m_lineSplitting, SIGNAL(stateChanged(int)), SLOT(edited()) );
-    connect( m_curveFilled, SIGNAL(stateChanged(int)), SLOT(edited()) );
+    connect( m_curveAntialiasing, &QCheckBox::clicked, this, &Panel::edited );
+    connect( m_curveClipping, &QCheckBox::clicked, this, &Panel::edited );
+    connect( m_curveWeeding, comboValueChanged, this, &Panel::edited );
+    connect( m_lineSplitting, &QCheckBox::clicked, this, &Panel::edited );
+    connect( m_curveFilled, &QCheckBox::clicked, this, &Panel::edited );
 
-    connect( m_updateType, SIGNAL(currentIndexChanged(int)), SLOT(edited()) );
-    connect( m_gridStyle, SIGNAL(currentIndexChanged(int)), SLOT(edited()) );
-    connect( m_curveType, SIGNAL(currentIndexChanged(int)), SLOT(edited()) );
-    connect( m_curvePen, SIGNAL(currentIndexChanged(int)), SLOT(edited()) );
+    connect( m_updateType, comboValueChanged, this, &Panel::edited );
+    connect( m_gridStyle, comboValueChanged, this, &Panel::edited );
+    connect( m_curveType, comboValueChanged, this, &Panel::edited );
+    connect( m_curvePen, comboValueChanged, this, &Panel::edited );
 }
 
 QWidget* Panel::createPlotTab( QWidget* parent )

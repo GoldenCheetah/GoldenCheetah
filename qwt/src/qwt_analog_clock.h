@@ -64,8 +64,8 @@ class QWT_EXPORT QwtAnalogClock : public QwtDial
         NHands
     };
 
-    explicit QwtAnalogClock( QWidget* parent = NULL );
-    virtual ~QwtAnalogClock();
+    explicit QwtAnalogClock( QWidget* parent = nullptr );
+    ~QwtAnalogClock() override;
 
     void setHand( Hand, QwtDialNeedle* );
 
@@ -77,8 +77,8 @@ class QWT_EXPORT QwtAnalogClock : public QwtDial
     void setTime( const QTime& );
 
   protected:
-    virtual void drawNeedle( QPainter*, const QPointF&, double radius,
-        double direction, QPalette::ColorGroup ) const QWT_OVERRIDE;
+    void drawNeedle( QPainter*, const QPointF&, double radius,
+        double direction, QPalette::ColorGroup ) const override;
 
     virtual void drawHand( QPainter*, Hand, const QPointF&,
         double radius, double direction, QPalette::ColorGroup ) const;

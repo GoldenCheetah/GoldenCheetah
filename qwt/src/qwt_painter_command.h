@@ -109,19 +109,19 @@ class QWT_EXPORT QwtPainterCommand
 
     QwtPainterCommand& operator=(const QwtPainterCommand& );
 
-    Type type() const;
+    inline Type type() const;
 
     QPainterPath* path();
-    const QPainterPath* path() const;
+    inline const QPainterPath* path() const;
 
     PixmapData* pixmapData();
-    const PixmapData* pixmapData() const;
+    inline const PixmapData* pixmapData() const;
 
     ImageData* imageData();
-    const ImageData* imageData() const;
+    inline const ImageData* imageData() const;
 
     StateData* stateData();
-    const StateData* stateData() const;
+    inline const StateData* stateData() const;
 
   private:
     void copy( const QwtPainterCommand& );

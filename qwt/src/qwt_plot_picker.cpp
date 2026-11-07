@@ -17,14 +17,8 @@
 class QwtPlotPicker::PrivateData
 {
   public:
-    PrivateData():
-        xAxisId( -1 ),
-        yAxisId( -1 )
-    {
-    }
-
-    QwtAxisId xAxisId;
-    QwtAxisId yAxisId;
+    QwtAxisId xAxisId = -1;
+    QwtAxisId yAxisId = -1;
 };
 
 /*!
@@ -42,9 +36,8 @@ class QwtPlotPicker::PrivateData
 
 QwtPlotPicker::QwtPlotPicker( QWidget* canvas )
     : QwtPicker( canvas )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
-
     if ( !canvas )
         return;
 
@@ -97,8 +90,8 @@ QwtPlotPicker::QwtPlotPicker( QWidget* canvas )
  */
 QwtPlotPicker::QwtPlotPicker( QwtAxisId xAxisId, QwtAxisId yAxisId, QWidget* canvas )
     : QwtPicker( canvas )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
     m_data->xAxisId = xAxisId;
     m_data->yAxisId = yAxisId;
 }
@@ -120,8 +113,8 @@ QwtPlotPicker::QwtPlotPicker( QwtAxisId xAxisId, QwtAxisId yAxisId, QWidget* can
 QwtPlotPicker::QwtPlotPicker( QwtAxisId xAxisId, QwtAxisId yAxisId,
         RubberBand rubberBand, DisplayMode trackerMode, QWidget* canvas )
     : QwtPicker( rubberBand, trackerMode, canvas )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
     m_data->xAxisId = xAxisId;
     m_data->yAxisId = yAxisId;
 }
@@ -129,7 +122,6 @@ QwtPlotPicker::QwtPlotPicker( QwtAxisId xAxisId, QwtAxisId yAxisId,
 //! Destructor
 QwtPlotPicker::~QwtPlotPicker()
 {
-    delete m_data;
 }
 
 //! \return Observed plot canvas
@@ -235,7 +227,7 @@ QwtAxisId QwtPlotPicker::yAxis() const
  */
 QwtText QwtPlotPicker::trackerText( const QPoint& pos ) const
 {
-    if ( plot() == NULL )
+    if ( plot() == nullptr )
         return QwtText();
 
     return trackerTextF( invTransform( pos ) );

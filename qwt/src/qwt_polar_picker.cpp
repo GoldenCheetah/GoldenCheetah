@@ -13,10 +13,6 @@
 #include "qwt_picker_machine.h"
 #include "qwt_point_polar.h"
 
-class QwtPolarPicker::PrivateData
-{
-};
-
 /*!
    \brief Create a polar plot picker
    \param canvas Plot canvas to observe, also the parent object
@@ -24,7 +20,6 @@ class QwtPolarPicker::PrivateData
 
 QwtPolarPicker::QwtPolarPicker( QwtPolarCanvas* canvas )
     : QwtPicker( canvas )
-    , m_data( NULL )
 {
 }
 
@@ -43,7 +38,6 @@ QwtPolarPicker::QwtPolarPicker( QwtPolarCanvas* canvas )
 QwtPolarPicker::QwtPolarPicker(
         RubberBand rubberBand, DisplayMode trackerMode, QwtPolarCanvas* canvas )
     : QwtPicker( rubberBand, trackerMode, canvas )
-    , m_data( NULL )
 {
 }
 
@@ -71,7 +65,7 @@ QwtPolarPlot* QwtPolarPicker::plot()
     if ( w )
         return w->plot();
 
-    return NULL;
+    return nullptr;
 }
 
 //! \return Plot widget, containing the observed plot canvas
@@ -81,7 +75,7 @@ const QwtPolarPlot* QwtPolarPicker::plot() const
     if ( w )
         return w->plot();
 
-    return NULL;
+    return nullptr;
 }
 
 /*!
@@ -208,7 +202,7 @@ bool QwtPolarPicker::end( bool ok )
 QwtPointPolar QwtPolarPicker::invTransform( const QPoint& pos ) const
 {
     QwtPointPolar polarPos;
-    if ( canvas() == NULL )
+    if ( canvas() == nullptr )
         return QwtPointPolar();
 
     return canvas()->invTransform( pos );

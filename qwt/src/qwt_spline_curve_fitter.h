@@ -26,15 +26,15 @@ class QWT_EXPORT QwtSplineCurveFitter : public QwtCurveFitter
 {
   public:
     QwtSplineCurveFitter();
-    virtual ~QwtSplineCurveFitter();
+    ~QwtSplineCurveFitter() override;
 
     void setSpline( QwtSpline* );
 
     const QwtSpline* spline() const;
     QwtSpline* spline();
 
-    virtual QPolygonF fitCurve( const QPolygonF& ) const QWT_OVERRIDE;
-    virtual QPainterPath fitCurvePath( const QPolygonF& ) const QWT_OVERRIDE;
+    QPolygonF fitCurve( const QPolygonF& ) const override;
+    QPainterPath fitCurvePath( const QPolygonF& ) const override;
 
   private:
     QwtSpline* m_spline;

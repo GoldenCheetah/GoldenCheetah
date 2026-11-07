@@ -33,7 +33,7 @@ class QWT_EXPORT QwtPolarPanner : public QwtPanner
 
   public:
     explicit QwtPolarPanner( QwtPolarCanvas* );
-    virtual ~QwtPolarPanner();
+    ~QwtPolarPanner() override;
 
     QwtPolarPlot* plot();
     const QwtPolarPlot* plot() const;
@@ -45,7 +45,7 @@ class QWT_EXPORT QwtPolarPanner : public QwtPanner
     virtual void movePlot( int dx, int dy );
 
   protected:
-    virtual void widgetMousePressEvent( QMouseEvent* ) QWT_OVERRIDE;
+    void widgetMousePressEvent( QMouseEvent* ) override;
 };
 
 #endif

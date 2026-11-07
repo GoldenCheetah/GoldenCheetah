@@ -22,9 +22,7 @@
 
 static QBitmap qwtBorderMask( const QWidget* canvas, const QSize& size )
 {
-#if QT_VERSION >= 0x050000
     const qreal pixelRatio = QwtPainter::devicePixelRatio( canvas );
-#endif
 
     const QRect r( 0, 0, size.width(), size.height() );
 
@@ -39,12 +37,8 @@ static QBitmap qwtBorderMask( const QWidget* canvas, const QSize& size )
         if ( canvas->contentsRect() == canvas->rect() )
             return QBitmap();
 
-#if QT_VERSION >= 0x050000
-        QBitmap mask( size* pixelRatio );
+        QBitmap mask( size * pixelRatio );
         mask.setDevicePixelRatio( pixelRatio );
-#else
-        QBitmap mask( size );
-#endif
         mask.fill( Qt::color0 );
 
         QPainter painter( &mask );
@@ -53,12 +47,8 @@ static QBitmap qwtBorderMask( const QWidget* canvas, const QSize& size )
         return mask;
     }
 
-#if QT_VERSION >= 0x050000
     QImage image( size* pixelRatio, QImage::Format_ARGB32_Premultiplied );
     image.setDevicePixelRatio( pixelRatio );
-#else
-    QImage image( size, QImage::Format_ARGB32_Premultiplied );
-#endif
     image.fill( Qt::color0 );
 
     QPainter painter( &image );
@@ -122,9 +112,8 @@ class QwtPlotPanner::PrivateData
  */
 QwtPlotPanner::QwtPlotPanner( QWidget* canvas )
     : QwtPanner( canvas )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData();
-
     connect( this, SIGNAL(panned(int,int)),
         SLOT(moveCanvas(int,int)) );
 }
@@ -132,7 +121,6 @@ QwtPlotPanner::QwtPlotPanner( QWidget* canvas )
 //! Destructor
 QwtPlotPanner::~QwtPlotPanner()
 {
-    delete m_data;
 }
 
 /*!
@@ -213,7 +201,7 @@ void QwtPlotPanner::moveCanvas( int dx, int dy )
         return;
 
     QwtPlot* plot = this->plot();
-    if ( plot == NULL )
+    if ( plot == nullptr )
         return;
 
     const bool doAutoReplot = plot->autoReplot();

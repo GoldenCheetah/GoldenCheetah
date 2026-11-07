@@ -12,6 +12,8 @@
 #include "qwt_global.h"
 #include "qwt_curve_fitter.h"
 
+#include <memory>
+
 /*!
    \brief A simple curve fitter for polar points
 
@@ -25,17 +27,17 @@ class QWT_EXPORT QwtPolarFitter : public QwtCurveFitter
 {
   public:
     QwtPolarFitter( int stepCount = 5 );
-    virtual ~QwtPolarFitter();
+    ~QwtPolarFitter() override;
 
     void setStepCount( int size );
     int stepCount() const;
 
-    virtual QPolygonF fitCurve( const QPolygonF& ) const QWT_OVERRIDE;
-    virtual QPainterPath fitCurvePath( const QPolygonF& ) const QWT_OVERRIDE;
+    QPolygonF fitCurve( const QPolygonF& ) const override;
+    QPainterPath fitCurvePath( const QPolygonF& ) const override;
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

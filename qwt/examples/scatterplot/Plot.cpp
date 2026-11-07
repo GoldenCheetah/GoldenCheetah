@@ -16,7 +16,7 @@
 
 namespace
 {
-    class DistancePicker : public QwtPlotPicker
+    class DistancePicker final : public QwtPlotPicker
     {
       public:
         DistancePicker( QWidget* canvas )
@@ -27,7 +27,7 @@ namespace
             setRubberBand( QwtPlotPicker::PolygonRubberBand );
         }
 
-        virtual QwtText trackerTextF( const QPointF& pos ) const QWT_OVERRIDE
+        QwtText trackerTextF( const QPointF& pos ) const override
         {
             QwtText text;
 
@@ -50,7 +50,7 @@ namespace
 
 Plot::Plot( QWidget* parent )
     : QwtPlot( parent )
-    , m_curve( NULL )
+    , m_curve( nullptr )
 {
     canvas()->setStyleSheet(
         "border: 2px solid Black;"
@@ -69,7 +69,7 @@ Plot::Plot( QWidget* parent )
 
     m_curve->attach( this );
 
-    setSymbol( NULL );
+    setSymbol( nullptr );
 
     // panning with the left mouse button
     (void )new QwtPlotPanner( canvas() );
@@ -88,7 +88,7 @@ void Plot::setSymbol( QwtSymbol* symbol )
 {
     m_curve->setSymbol( symbol );
 
-    if ( symbol == NULL )
+    if ( symbol == nullptr )
     {
         m_curve->setStyle( QwtPlotCurve::Dots );
     }

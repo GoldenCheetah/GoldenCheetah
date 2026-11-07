@@ -20,7 +20,7 @@ static QPointF qwtIntersection(
     const QLineF line2( p21, p22 );
 
     QPointF pos;
-#if QT_VERSION >= 0x050e00
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
     if ( line1.intersects( line2, &pos ) == QLineF::NoIntersection )
 #else
     if ( line1.intersect( line2, &pos ) == QLineF::NoIntersection )
@@ -55,18 +55,10 @@ const QPalette& QwtCompassRose::palette() const
 class QwtSimpleCompassRose::PrivateData
 {
   public:
-    PrivateData()
-        : width( 0.2 )
-        , numThorns( 8 )
-        , numThornLevels( -1 )
-        , shrinkFactor( 0.9 )
-    {
-    }
-
-    double width;
-    int numThorns;
-    int numThornLevels;
-    double shrinkFactor;
+    double width = 0.2;
+    int numThorns = 8;
+    int numThornLevels = -1;
+    double shrinkFactor = 0.9;
 };
 
 /*!
@@ -75,10 +67,9 @@ class QwtSimpleCompassRose::PrivateData
    \param numThorns Number of thorns
    \param numThornLevels Number of thorn levels
  */
-QwtSimpleCompassRose::QwtSimpleCompassRose(
-    int numThorns, int numThornLevels )
+QwtSimpleCompassRose::QwtSimpleCompassRose( int numThorns, int numThornLevels )
+    : m_data( new PrivateData() )
 {
-    m_data = new PrivateData();
     m_data->numThorns = numThorns;
     m_data->numThornLevels = numThornLevels;
 
@@ -95,7 +86,6 @@ QwtSimpleCompassRose::QwtSimpleCompassRose(
 //! Destructor
 QwtSimpleCompassRose::~QwtSimpleCompassRose()
 {
-    delete m_data;
 }
 
 /*!

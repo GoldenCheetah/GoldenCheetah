@@ -23,7 +23,7 @@
 
 namespace
 {
-    class MyZoomer : public QwtPlotZoomer
+    class MyZoomer final : public QwtPlotZoomer
     {
       public:
         MyZoomer( QWidget* canvas )
@@ -32,7 +32,7 @@ namespace
             setTrackerMode( AlwaysOn );
         }
 
-        virtual QwtText trackerTextF( const QPointF& pos ) const QWT_OVERRIDE
+        QwtText trackerTextF( const QPointF& pos ) const override
         {
             QColor bg( Qt::white );
             bg.setAlpha( 200 );
@@ -43,7 +43,7 @@ namespace
         }
     };
 
-    class SpectrogramData : public QwtRasterData
+    class SpectrogramData final : public QwtRasterData
     {
       public:
         SpectrogramData()
@@ -58,7 +58,7 @@ namespace
             m_intervals[ Qt::ZAxis ] = QwtInterval( 0.0, 10.0 );
         }
 
-        virtual QwtInterval interval( Qt::Axis axis ) const QWT_OVERRIDE
+        QwtInterval interval( Qt::Axis axis ) const override
         {
             if ( axis >= 0 && axis <= 2 )
                 return m_intervals[ axis ];
@@ -66,7 +66,7 @@ namespace
             return QwtInterval();
         }
 
-        virtual double value( double x, double y ) const QWT_OVERRIDE
+        double value( double x, double y ) const override
         {
             const double c = 0.842;
             //const double c = 0.33;
@@ -176,9 +176,8 @@ namespace
         }
 
       protected:
-        virtual QImage renderImage(
-            const QwtScaleMap& xMap, const QwtScaleMap& yMap,
-            const QRectF& area, const QSize& imageSize ) const QWT_OVERRIDE
+        QImage renderImage( const QwtScaleMap& xMap, const QwtScaleMap& yMap,
+            const QRectF& area, const QSize& imageSize ) const override
         {
             QElapsedTimer t;
             t.start();
@@ -383,11 +382,7 @@ void Plot::drawItems( QPainter* painter, const QRectF& canvasRect,
 void Plot::printPlot()
 {
     QPrinter printer( QPrinter::HighResolution );
-#if QT_VERSION >= 0x050300
     printer.setPageOrientation( QPageLayout::Landscape );
-#else
-    printer.setOrientation( QPrinter::Landscape );
-#endif
     printer.setOutputFileName( "spectrogram.pdf" );
 
     QPrintDialog dialog( &printer );

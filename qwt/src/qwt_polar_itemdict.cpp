@@ -16,7 +16,7 @@ class QwtPolarItemDict::PrivateData
       public:
         void insertItem( QwtPolarItem* item )
         {
-            if ( item == NULL )
+            if ( item == nullptr )
                 return;
 
             // Unfortunately there is no inSort operation
@@ -40,7 +40,7 @@ class QwtPolarItemDict::PrivateData
 
         void removeItem( QwtPolarItem* item )
         {
-            if ( item == NULL )
+            if ( item == nullptr )
                 return;
 
             int i = 0;
@@ -69,8 +69,8 @@ class QwtPolarItemDict::PrivateData
    \sa setAutoDelete, attachItem
  */
 QwtPolarItemDict::QwtPolarItemDict()
+    : m_data( new PrivateData )
 {
-    m_data = new QwtPolarItemDict::PrivateData;
     m_data->autoDelete = true;
 }
 
@@ -83,7 +83,6 @@ QwtPolarItemDict::QwtPolarItemDict()
 QwtPolarItemDict::~QwtPolarItemDict()
 {
     detachItems( QwtPolarItem::Rtti_PolarItem, m_data->autoDelete );
-    delete m_data;
 }
 
 /*!
@@ -149,7 +148,7 @@ void QwtPolarItemDict::detachItems( int rtti, bool autoDelete )
 
         if ( rtti == QwtPolarItem::Rtti_PolarItem || item->rtti() == rtti )
         {
-            item->attach( NULL );
+            item->attach( nullptr );
             if ( autoDelete )
                 delete item;
         }

@@ -89,7 +89,7 @@ Overloading event callbacks of QwtPlot has no effect when an event is posted to 
 class MyPlot: public QwtPlot
 {
 public:
-    MyPlot(QWidget *parent = NULL);
+    MyPlot(QWidget *parent = nullptr);
     
     virtual bool eventFilter(QObject *obj, QEvent *event)
 };

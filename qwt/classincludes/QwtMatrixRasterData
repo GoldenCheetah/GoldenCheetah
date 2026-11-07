@@ -1,1 +1,1 @@
-#include "qwt_matrix_raster_data.h"
+#include "qwt_matrix_raster_data.h" // IWYU pragma: export

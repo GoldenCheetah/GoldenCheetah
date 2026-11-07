@@ -12,7 +12,7 @@ class QwtCompass;
 class CompassGrid : public QFrame
 {
   public:
-    CompassGrid( QWidget* parent = NULL );
+    CompassGrid( QWidget* parent = nullptr );
 
   private:
     QwtCompass* createCompass( int pos );

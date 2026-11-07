@@ -169,14 +169,13 @@ class QwtRasterData::PrivateData
 
 //! Constructor
 QwtRasterData::QwtRasterData()
+    : m_data( new PrivateData )
 {
-    m_data = new PrivateData();
 }
 
 //! Destructor
 QwtRasterData::~QwtRasterData()
 {
-    delete m_data;
 }
 
 /*!

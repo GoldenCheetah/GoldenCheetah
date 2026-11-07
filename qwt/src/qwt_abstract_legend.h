@@ -36,8 +36,8 @@ class QWT_EXPORT QwtAbstractLegend : public QFrame
     Q_OBJECT
 
   public:
-    explicit QwtAbstractLegend( QWidget* parent = NULL );
-    virtual ~QwtAbstractLegend();
+    explicit QwtAbstractLegend( QWidget* parent = nullptr );
+    ~QwtAbstractLegend() override;
 
     /*!
        Render the legend into a given rectangle.

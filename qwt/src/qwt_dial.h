@@ -16,6 +16,8 @@
 #include <qframe.h>
 #include <qpalette.h>
 
+#include <memory>
+
 class QwtDialNeedle;
 class QwtRoundScaleDraw;
 class QwtAbstractScaleDraw;
@@ -79,6 +81,7 @@ class QWT_EXPORT QwtDial : public QwtAbstractSlider
         //! QFrame::Sunken
         Sunken = QFrame::Sunken
     };
+
     Q_ENUM( Shadow )
 
     //! Mode controlling whether the needle or the scale is rotating
@@ -90,10 +93,11 @@ class QWT_EXPORT QwtDial : public QwtAbstractSlider
         //! The needle is fixed, the scales are rotating
         RotateScale
     };
+
     Q_ENUM( Mode )
 
-    explicit QwtDial( QWidget* parent = NULL );
-    virtual ~QwtDial();
+    explicit QwtDial( QWidget* parent = nullptr );
+    ~QwtDial() override;
 
     void setFrameShadow( Shadow );
     Shadow frameShadow() const;
@@ -124,8 +128,8 @@ class QWT_EXPORT QwtDial : public QwtAbstractSlider
 
     virtual QRect scaleInnerRect() const;
 
-    virtual QSize sizeHint() const QWT_OVERRIDE;
-    virtual QSize minimumSizeHint() const QWT_OVERRIDE;
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
 
     void setScaleDraw( QwtRoundScaleDraw* );
 
@@ -133,9 +137,9 @@ class QWT_EXPORT QwtDial : public QwtAbstractSlider
     const QwtRoundScaleDraw* scaleDraw() const;
 
   protected:
-    virtual void wheelEvent( QWheelEvent* ) QWT_OVERRIDE;
-    virtual void paintEvent( QPaintEvent* ) QWT_OVERRIDE;
-    virtual void changeEvent( QEvent* ) QWT_OVERRIDE;
+    void wheelEvent( QWheelEvent* ) override;
+    void paintEvent( QPaintEvent* ) override;
+    void changeEvent( QEvent* ) override;
 
     virtual void drawFrame( QPainter* );
     virtual void drawContents( QPainter* ) const;
@@ -152,18 +156,18 @@ class QWT_EXPORT QwtDial : public QwtAbstractSlider
     virtual void drawNeedle( QPainter*, const QPointF&,
         double radius, double direction, QPalette::ColorGroup ) const;
 
-    virtual double scrolledTo( const QPoint& ) const QWT_OVERRIDE;
-    virtual bool isScrollPosition( const QPoint& ) const QWT_OVERRIDE;
+    double scrolledTo( const QPoint& ) const override;
+    bool isScrollPosition( const QPoint& ) const override;
 
-    virtual void sliderChange() QWT_OVERRIDE;
-    virtual void scaleChange() QWT_OVERRIDE;
+    void sliderChange() override;
+    void scaleChange() override;
 
   private:
     void setAngleRange( double angle, double span );
     void drawNeedle( QPainter* ) const;
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

@@ -14,7 +14,7 @@ class Plot : public QwtPlot
     Q_OBJECT
 
   public:
-    Plot( QWidget* parent = NULL );
+    Plot( QWidget* parent = nullptr );
 
   public Q_SLOTS:
     void setTransformation( QwtTransform* );

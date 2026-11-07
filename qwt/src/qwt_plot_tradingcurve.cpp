@@ -31,27 +31,27 @@ static inline bool qwtIsSampleInside( const QwtOHLCSample& sample,
 class QwtPlotTradingCurve::PrivateData
 {
   public:
-    PrivateData()
-        : symbolStyle( QwtPlotTradingCurve::CandleStick )
-        , symbolExtent( 0.6 )
-        , minSymbolWidth( 2.0 )
-        , maxSymbolWidth( -1.0 )
-        , paintAttributes( QwtPlotTradingCurve::ClipSymbols )
-    {
-        symbolBrush[0] = QBrush( Qt::white );
-        symbolBrush[1] = QBrush( Qt::black );
-    }
-
-    QwtPlotTradingCurve::SymbolStyle symbolStyle;
-    double symbolExtent;
-    double minSymbolWidth;
-    double maxSymbolWidth;
+    SymbolStyle symbolStyle = CandleStick;
+    double symbolExtent = 0.6;
+    double minSymbolWidth = 2.0;
+    double maxSymbolWidth = -1.0;
 
     QPen symbolPen;
-    QBrush symbolBrush[2]; // Increasing/Decreasing
 
-    QwtPlotTradingCurve::PaintAttributes paintAttributes;
+    // Increasing/Decreasing
+    QBrush symbolBrush[2] = { Qt::white, Qt::black };
+
+    PaintAttributes paintAttributes = ClipSymbols;
 };
+
+/*!
+   Constructor
+   \param title Title of the curve
+ */
+QwtPlotTradingCurve::QwtPlotTradingCurve( const QString& title )
+    : QwtPlotTradingCurve( QwtText( title ) )
+{
+}
 
 /*!
    Constructor
@@ -59,36 +59,18 @@ class QwtPlotTradingCurve::PrivateData
  */
 QwtPlotTradingCurve::QwtPlotTradingCurve( const QwtText& title )
     : QwtPlotSeriesItem( title )
+    , m_data( new PrivateData )
 {
-    init();
-}
+    setItemAttribute( QwtPlotItem::Legend, true );
+    setItemAttribute( QwtPlotItem::AutoScale, true );
 
-/*!
-   Constructor
-   \param title Title of the curve
- */
-QwtPlotTradingCurve::QwtPlotTradingCurve( const QString& title )
-    : QwtPlotSeriesItem( QwtText( title ) )
-{
-    init();
+    setData( new QwtTradingChartData() );
+    setZ( 19.0 );
 }
 
 //! Destructor
 QwtPlotTradingCurve::~QwtPlotTradingCurve()
 {
-    delete m_data;
-}
-
-//! Initialize internal members
-void QwtPlotTradingCurve::init()
-{
-    setItemAttribute( QwtPlotItem::Legend, true );
-    setItemAttribute( QwtPlotItem::AutoScale, true );
-
-    m_data = new PrivateData;
-    setData( new QwtTradingChartData() );
-
-    setZ( 19.0 );
 }
 
 //! \return QwtPlotItem::Rtti_PlotTradingCurve

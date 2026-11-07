@@ -1,1 +1,1 @@
-#include "qwt_painter_command.h"
+#include "qwt_painter_command.h" // IWYU pragma: export

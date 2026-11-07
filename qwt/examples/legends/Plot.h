@@ -16,14 +16,14 @@ class Plot : public QwtPlot
     Q_OBJECT
 
   public:
-    Plot( QWidget* parent = NULL );
-    virtual ~Plot();
+    Plot( QWidget* parent = nullptr );
+    ~Plot() override;
 
   public Q_SLOTS:
     void applySettings( const Settings& );
 
   public:
-    virtual void replot() QWT_OVERRIDE;
+    void replot() override;
 
   private:
     void insertCurve();

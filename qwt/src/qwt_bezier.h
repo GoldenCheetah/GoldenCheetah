@@ -33,7 +33,7 @@ class QWT_EXPORT QwtBezier
     ~QwtBezier();
 
     void setTolerance( double tolerance );
-    double tolerance() const;
+    inline double tolerance() const;
 
     QPolygonF toPolygon( const QPointF& p1, const QPointF& cp1,
         const QPointF& cp2, const QPointF& p2 ) const;

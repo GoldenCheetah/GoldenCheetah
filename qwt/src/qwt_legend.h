@@ -15,6 +15,7 @@
 #include "qwt_legend_data.h"
 
 #include <qvariant.h>
+#include <memory>
 
 class QScrollBar;
 
@@ -33,8 +34,8 @@ class QWT_EXPORT QwtLegend : public QwtAbstractLegend
     Q_OBJECT
 
   public:
-    explicit QwtLegend( QWidget* parent = NULL );
-    virtual ~QwtLegend();
+    explicit QwtLegend( QWidget* parent = nullptr );
+    ~QwtLegend() override;
 
     void setMaxColumns( uint numColums );
     uint maxColumns() const;
@@ -50,22 +51,22 @@ class QWT_EXPORT QwtLegend : public QwtAbstractLegend
 
     QVariant itemInfo( const QWidget* ) const;
 
-    virtual bool eventFilter( QObject*, QEvent* ) QWT_OVERRIDE;
+    bool eventFilter( QObject*, QEvent* ) override;
 
-    virtual QSize sizeHint() const QWT_OVERRIDE;
-    virtual int heightForWidth( int w ) const QWT_OVERRIDE;
+    QSize sizeHint() const override;
+    int heightForWidth( int w ) const override;
 
     QScrollBar* horizontalScrollBar() const;
     QScrollBar* verticalScrollBar() const;
 
-    virtual void renderLegend( QPainter*,
-        const QRectF&, bool fillBackground ) const QWT_OVERRIDE;
+    void renderLegend( QPainter*,
+        const QRectF&, bool fillBackground ) const override;
 
     virtual void renderItem( QPainter*,
         const QWidget*, const QRectF&, bool fillBackground ) const;
 
-    virtual bool isEmpty() const QWT_OVERRIDE;
-    virtual int scrollExtent( Qt::Orientation ) const QWT_OVERRIDE;
+    bool isEmpty() const override;
+    int scrollExtent( Qt::Orientation ) const override;
 
   Q_SIGNALS:
     /*!
@@ -98,8 +99,8 @@ class QWT_EXPORT QwtLegend : public QwtAbstractLegend
     void checked( const QVariant& itemInfo, bool on, int index );
 
   public Q_SLOTS:
-    virtual void updateLegend( const QVariant&,
-        const QList< QwtLegendData >& ) QWT_OVERRIDE;
+    void updateLegend( const QVariant&,
+        const QList< QwtLegendData >& ) override;
 
   protected Q_SLOTS:
     void itemClicked();
@@ -113,7 +114,7 @@ class QWT_EXPORT QwtLegend : public QwtAbstractLegend
     void updateTabOrder();
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

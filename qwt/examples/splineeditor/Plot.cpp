@@ -61,7 +61,7 @@ namespace
 
         SplineFitter( Mode mode )
             : QwtCurveFitter( QwtCurveFitter::Path )
-            , m_spline(NULL)
+            , m_spline(nullptr)
         {
             switch( mode )
             {
@@ -112,7 +112,7 @@ namespace
 
         void setClosing( bool on )
         {
-            if ( m_spline == NULL )
+            if ( m_spline == nullptr )
                 return;
 
             m_spline->setBoundaryType(
@@ -182,12 +182,12 @@ namespace
             m_spline->setParametrization( type );
         }
 
-        virtual QPolygonF fitCurve( const QPolygonF& points ) const QWT_OVERRIDE
+        QPolygonF fitCurve( const QPolygonF& points ) const override
         {
             return m_spline->polygon( points, 0.5 );
         }
 
-        virtual QPainterPath fitCurvePath( const QPolygonF& points ) const QWT_OVERRIDE
+        QPainterPath fitCurvePath( const QPolygonF& points ) const override
         {
             return m_spline->painterPath( points );
         }
@@ -195,7 +195,7 @@ namespace
       private:
         void setBoundaryConditions( int condition, double value = 0.0 )
         {
-            if ( m_spline == NULL )
+            if ( m_spline == nullptr )
                 return;
 
             // always the same at both ends
@@ -260,8 +260,8 @@ Plot::Plot( bool parametric, QWidget* parent )
     legend->setDefaultItemMode( QwtLegendData::Checkable );
     insertLegend( legend, QwtPlot::RightLegend );
 
-    connect( legend, SIGNAL(checked(const QVariant&,bool,int)),
-        SLOT(legendChecked(const QVariant&,bool)) );
+    connect( legend, &QwtLegend::checked,
+        this, &Plot::legendChecked );
 
     // Avoid jumping when label with 3 digits
     // appear/disappear when scrolling vertically
@@ -385,8 +385,8 @@ Plot::Plot( bool parametric, QWidget* parent )
     // ------------------------------------
 
     ScalePicker* scalePicker = new ScalePicker( this );
-    connect( scalePicker, SIGNAL(clicked(int,double)),
-        this, SLOT(updateMarker(int,double)) );
+    connect( scalePicker, &ScalePicker::clicked,
+        this, &Plot::updateMarker );
 
     // ------------------------------------
     // The canvas picker handles all mouse and key
@@ -412,8 +412,8 @@ Plot::Plot( bool parametric, QWidget* parent )
     plotLayout()->setAlignCanvasToScale( QwtAxis::YLeft, true );
     plotLayout()->setCanvasMargin( m_wheel->width() + 4, QwtAxis::YRight );
 
-    connect( m_wheel, SIGNAL(valueChanged(double)),
-        SLOT(scrollLeftAxis(double)) );
+    connect( m_wheel, &QwtWheel::valueChanged,
+        this, &Plot::scrollLeftAxis );
 
     // we need the resize events, to lay out the wheel
     canvas()->installEventFilter( this );
@@ -554,7 +554,7 @@ void Plot::setOverlaying( bool on )
         if ( curve == m_curve )
             continue;
 
-        QwtSymbol* symbol = NULL;
+        QwtSymbol* symbol = nullptr;
 
         if ( !on )
         {
@@ -576,11 +576,7 @@ void Plot::setOverlaying( bool on )
 void Plot::printPlot()
 {
     QPrinter printer( QPrinter::HighResolution );
-#if QT_VERSION >= 0x050300
     printer.setPageOrientation( QPageLayout::Landscape );
-#else
-    printer.setOrientation( QPrinter::Landscape );
-#endif
     printer.setOutputFileName( "spline.pdf" );
 
     QPrintDialog dialog( &printer );

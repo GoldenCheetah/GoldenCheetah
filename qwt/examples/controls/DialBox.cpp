@@ -31,10 +31,10 @@ DialBox::DialBox( QWidget* parent, int type )
     layout->addWidget( m_dial, 10 );
     layout->addWidget( m_label );
 
-    connect( m_dial, SIGNAL(valueChanged(double)),
-        this, SLOT(setNum(double)) );
+    connect( m_dial, &QwtDial::valueChanged,
+        this, &DialBox::showValue );
 
-    setNum( m_dial->value() );
+    showValue( m_dial->value() );
 }
 
 QwtDial* DialBox::createDial( int type ) const
@@ -165,12 +165,10 @@ QwtDial* DialBox::createDial( int type ) const
     return dial;
 }
 
-void DialBox::setNum( double v )
+void DialBox::showValue( double v )
 {
     QString text;
     text.setNum( v, 'f', 2 );
 
     m_label->setText( text );
 }
-
-#include "moc_DialBox.cpp"

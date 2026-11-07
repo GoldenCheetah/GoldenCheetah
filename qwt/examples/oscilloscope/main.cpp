@@ -21,14 +21,14 @@ int main( int argc, char* argv[] )
     samplingThread.setAmplitude( window.amplitude() );
     samplingThread.setInterval( window.signalInterval() );
 
-    window.connect( &window, SIGNAL(frequencyChanged(double)),
-        &samplingThread, SLOT(setFrequency(double)) );
+    window.connect( &window, &MainWindow::frequencyChanged,
+        &samplingThread, &SamplingThread::setFrequency );
 
-    window.connect( &window, SIGNAL(amplitudeChanged(double)),
-        &samplingThread, SLOT(setAmplitude(double)) );
+    window.connect( &window, &MainWindow::amplitudeChanged,
+        &samplingThread, &SamplingThread::setAmplitude );
 
-    window.connect( &window, SIGNAL(signalIntervalChanged(double)),
-        &samplingThread, SLOT(setInterval(double)) );
+    window.connect( &window, &MainWindow::signalIntervalChanged,
+        &samplingThread, &SamplingThread::setInterval );
 
     window.show();
 

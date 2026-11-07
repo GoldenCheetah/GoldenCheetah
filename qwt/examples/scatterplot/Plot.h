@@ -15,7 +15,7 @@ class Plot : public QwtPlot
     Q_OBJECT
 
   public:
-    Plot( QWidget* parent = NULL );
+    Plot( QWidget* parent = nullptr );
 
     void setSymbol( QwtSymbol* );
     void setSamples( const QVector< QPointF >& samples );

@@ -14,21 +14,19 @@ class QwtSamplingThread::PrivateData
 {
   public:
     QElapsedTimer timer;
-    double msecsInterval;
+    double msecsInterval = 1e3; // 1 second;
 };
 
 //! Constructor
 QwtSamplingThread::QwtSamplingThread( QObject* parent )
     : QThread( parent )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
-    m_data->msecsInterval = 1e3; // 1 second
 }
 
 //! Destructor
 QwtSamplingThread::~QwtSamplingThread()
 {
-    delete m_data;
 }
 
 /*!

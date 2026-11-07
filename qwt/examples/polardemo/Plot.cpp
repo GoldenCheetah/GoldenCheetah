@@ -31,7 +31,7 @@ namespace
         {
         }
 
-        virtual size_t size() const QWT_OVERRIDE
+        size_t size() const override
         {
             return m_size;
         }
@@ -42,7 +42,7 @@ namespace
         size_t m_size;
     };
 
-    class SpiralData : public Data
+    class SpiralData final : public Data
     {
       public:
         SpiralData( const QwtInterval& radialInterval,
@@ -51,7 +51,7 @@ namespace
         {
         }
 
-        virtual QwtPointPolar sample( size_t i ) const QWT_OVERRIDE
+        QwtPointPolar sample( size_t i ) const override
         {
             const double stepA = 4 * m_azimuthInterval.width() / m_size;
             const double a = m_azimuthInterval.minValue() + i * stepA;
@@ -62,7 +62,7 @@ namespace
             return QwtPointPolar( a, r );
         }
 
-        virtual QRectF boundingRect() const QWT_OVERRIDE
+        QRectF boundingRect() const override
         {
             if ( cachedBoundingRect.width() < 0.0 )
                 cachedBoundingRect = qwtBoundingRect( *this );
@@ -80,7 +80,7 @@ namespace
         {
         }
 
-        virtual QwtPointPolar sample( size_t i ) const QWT_OVERRIDE
+        QwtPointPolar sample( size_t i ) const override
         {
             const double stepA = m_azimuthInterval.width() / m_size;
             const double a = m_azimuthInterval.minValue() + i * stepA;
@@ -91,7 +91,7 @@ namespace
             return QwtPointPolar( a, r );
         }
 
-        virtual QRectF boundingRect() const QWT_OVERRIDE
+        QRectF boundingRect() const override
         {
             if ( cachedBoundingRect.width() < 0.0 )
                 cachedBoundingRect = qwtBoundingRect( *this );

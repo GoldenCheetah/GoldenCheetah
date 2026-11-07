@@ -15,8 +15,6 @@ class QwtDateScaleDraw::PrivateData
   public:
     explicit PrivateData( Qt::TimeSpec spec )
         : timeSpec( spec )
-        , utcOffset( 0 )
-        , week0Type( QwtDate::FirstThursday )
     {
         dateFormats[ QwtDate::Millisecond ] = "hh:mm:ss:zzz\nddd dd MMM yyyy";
         dateFormats[ QwtDate::Second ] = "hh:mm:ss\nddd dd MMM yyyy";
@@ -29,8 +27,10 @@ class QwtDateScaleDraw::PrivateData
     }
 
     Qt::TimeSpec timeSpec;
-    int utcOffset;
-    QwtDate::Week0Type week0Type;
+
+    int utcOffset = 0;
+    QwtDate::Week0Type week0Type = QwtDate::FirstThursday;
+
     QString dateFormats[ QwtDate::Year + 1 ];
 };
 
@@ -46,14 +46,13 @@ class QwtDateScaleDraw::PrivateData
    \sa setTimeSpec(), setWeek0Type()
  */
 QwtDateScaleDraw::QwtDateScaleDraw( Qt::TimeSpec timeSpec )
+    : m_data( new PrivateData( timeSpec ) )
 {
-    m_data = new PrivateData( timeSpec );
 }
 
 //! Destructor
 QwtDateScaleDraw::~QwtDateScaleDraw()
 {
-    delete m_data;
 }
 
 /*!
@@ -272,11 +271,7 @@ QDateTime QwtDateScaleDraw::toDateTime( double value ) const
     if ( m_data->timeSpec == Qt::OffsetFromUTC )
     {
         dt = dt.addSecs( m_data->utcOffset );
-#if QT_VERSION >= 0x050200
         dt.setOffsetFromUtc( m_data->utcOffset );
-#else
-        dt.setUtcOffset( m_data->utcOffset );
-#endif
     }
 
     return dt;

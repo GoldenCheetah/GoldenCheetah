@@ -111,19 +111,11 @@ static void qwtDrawPanel( QPainter* painter, const QRectF& rect,
 class QwtColumnSymbol::PrivateData
 {
   public:
-    PrivateData()
-        : style( QwtColumnSymbol::Box )
-        , frameStyle( QwtColumnSymbol::Raised )
-        , palette( Qt::gray )
-        , lineWidth( 2 )
-    {
-    }
+    Style style = Box;
+    FrameStyle frameStyle = Raised;
 
-    QwtColumnSymbol::Style style;
-    QwtColumnSymbol::FrameStyle frameStyle;
-
-    QPalette palette;
-    int lineWidth;
+    QPalette palette = Qt::gray;
+    int lineWidth = 2;
 };
 
 /*!
@@ -133,15 +125,14 @@ class QwtColumnSymbol::PrivateData
    \sa setStyle(), style(), Style
  */
 QwtColumnSymbol::QwtColumnSymbol( Style style )
+    : m_data( new PrivateData )
 {
-    m_data = new PrivateData();
     m_data->style = style;
 }
 
 //! Destructor
 QwtColumnSymbol::~QwtColumnSymbol()
 {
-    delete m_data;
 }
 
 /*!

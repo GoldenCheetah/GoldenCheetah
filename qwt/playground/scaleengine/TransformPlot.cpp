@@ -22,7 +22,7 @@ namespace
         {
         }
 
-        virtual ~TransformData()
+        ~TransformData() override
         {
             delete m_transform;
         }
@@ -32,7 +32,7 @@ namespace
             return m_transform;
         }
 
-        virtual double y( double x ) const QWT_OVERRIDE
+        double y( double x ) const override
         {
             const double min = 10.0;
             const double max = 1000.0;
@@ -64,8 +64,8 @@ TransformPlot::TransformPlot( QWidget* parent )
     legend->setDefaultItemMode( QwtLegendData::Checkable );
     insertLegend( legend, QwtPlot::RightLegend );
 
-    connect( legend, SIGNAL(checked(const QVariant&,bool,int)),
-        this, SLOT(legendChecked(const QVariant&,bool)) );
+    connect( legend, &QwtLegend::checked,
+        this, &TransformPlot::legendChecked );
 }
 
 void TransformPlot::insertTransformation(

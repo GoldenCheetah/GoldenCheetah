@@ -14,5 +14,5 @@
 class DialTab : public QWidget
 {
   public:
-    DialTab( QWidget* parent = NULL );
+    DialTab( QWidget* parent = nullptr );
 };

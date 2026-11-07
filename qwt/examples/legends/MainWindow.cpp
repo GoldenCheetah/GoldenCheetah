@@ -51,8 +51,8 @@ MainWindow::MainWindow( QWidget* parent )
 
     updatePlot();
 
-    connect( m_panel, SIGNAL(edited()), SLOT(updatePlot()) );
-    connect( btnExport, SIGNAL(clicked()), SLOT(exportPlot()) );
+    connect( m_panel, &Panel::edited, this, &MainWindow::updatePlot );
+    connect( btnExport, &QToolButton::clicked, this, &MainWindow::exportPlot );
 }
 
 void MainWindow::updatePlot()
@@ -65,5 +65,3 @@ void MainWindow::exportPlot()
     QwtPlotRenderer renderer;
     renderer.exportTo( m_plot, "legends.pdf" );
 }
-
-#include "moc_MainWindow.cpp"

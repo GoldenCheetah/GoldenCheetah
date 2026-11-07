@@ -32,16 +32,17 @@ namespace
             QToolButton* btnExport = new QToolButton();
             btnExport->setText( "Export" );
             btnExport->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
-            connect( btnExport, SIGNAL(clicked()), plot, SLOT(exportPlot()) );
+            connect( btnExport, &QToolButton::clicked, plot, &TVPlot::exportPlot );
 
             QToolBar* toolBar = new QToolBar( this );
             toolBar->addWidget( typeBox );
             toolBar->addWidget( btnExport );
             addToolBar( toolBar );
 
+            void (QComboBox::*comboValueChanged)(int) = &QComboBox::currentIndexChanged;
+
             plot->setMode( typeBox->currentIndex() );
-            connect( typeBox, SIGNAL(currentIndexChanged(int)),
-                plot, SLOT(setMode(int)) );
+            connect( typeBox, comboValueChanged, plot, &TVPlot::setMode );
         }
     };
 }

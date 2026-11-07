@@ -14,6 +14,7 @@
 #include "qwt_abstract_scale_draw.h"
 
 #include <qpoint.h>
+#include <memory>
 
 /*!
    \brief A class for drawing round scales
@@ -32,32 +33,27 @@ class QWT_EXPORT QwtRoundScaleDraw : public QwtAbstractScaleDraw
 {
   public:
     QwtRoundScaleDraw();
-    virtual ~QwtRoundScaleDraw();
+    ~QwtRoundScaleDraw() override;
 
     void setRadius( double radius );
     double radius() const;
 
-    void moveCenter( double x, double y );
+    inline void moveCenter( double x, double y );
     void moveCenter( const QPointF& );
     QPointF center() const;
 
     void setAngleRange( double angle1, double angle2 );
 
-    virtual double extent( const QFont& ) const QWT_OVERRIDE;
+    double extent( const QFont& ) const override;
 
   protected:
-    virtual void drawTick( QPainter*,
-        double value, double len ) const QWT_OVERRIDE;
-
-    virtual void drawBackbone(
-        QPainter* ) const QWT_OVERRIDE;
-
-    virtual void drawLabel(
-        QPainter*, double value ) const QWT_OVERRIDE;
+    void drawTick( QPainter*, double value, double len ) const override;
+    void drawBackbone( QPainter* ) const override;
+    void drawLabel( QPainter*, double value ) const override;
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 //! Move the center of the scale draw, leaving the radius unchanged

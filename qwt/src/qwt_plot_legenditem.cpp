@@ -21,27 +21,27 @@
 
 namespace
 {
-    class LayoutItem QWT_FINAL : public QLayoutItem
+    class LayoutItem final : public QLayoutItem
     {
       public:
         LayoutItem( const QwtPlotLegendItem*, const QwtPlotItem* );
-        virtual ~LayoutItem();
+        ~LayoutItem() override;
 
         const QwtPlotItem* plotItem() const;
 
         void setData( const QwtLegendData& );
         const QwtLegendData& data() const;
 
-        virtual Qt::Orientations expandingDirections() const QWT_OVERRIDE;
-        virtual QRect geometry() const QWT_OVERRIDE;
-        virtual bool hasHeightForWidth() const QWT_OVERRIDE;
-        virtual int heightForWidth( int ) const QWT_OVERRIDE;
-        virtual bool isEmpty() const QWT_OVERRIDE;
-        virtual QSize maximumSize() const QWT_OVERRIDE;
-        virtual int minimumHeightForWidth( int ) const QWT_OVERRIDE;
-        virtual QSize minimumSize() const QWT_OVERRIDE;
-        virtual void setGeometry( const QRect& ) QWT_OVERRIDE;
-        virtual QSize sizeHint() const QWT_OVERRIDE;
+        Qt::Orientations expandingDirections() const override;
+        QRect geometry() const override;
+        bool hasHeightForWidth() const override;
+        int heightForWidth( int ) const override;
+        bool isEmpty() const override;
+        QSize maximumSize() const override;
+        int minimumHeightForWidth( int ) const override;
+        QSize minimumSize() const override;
+        void setGeometry( const QRect& ) override;
+        QSize sizeHint() const override;
 
       private:
 
@@ -133,15 +133,7 @@ class QwtPlotLegendItem::PrivateData
 {
   public:
     PrivateData()
-        : itemMargin( 4 )
-        , itemSpacing( 4 )
-        , borderRadius( 0.0 )
-        , borderPen( Qt::NoPen )
-        , backgroundBrush( Qt::NoBrush )
-        , backgroundMode( QwtPlotLegendItem::LegendBackground )
-        , canvasAlignment( Qt::AlignRight | Qt::AlignBottom )
     {
-        canvasOffset[ 0 ] = canvasOffset[1] = 10;
         layout = new QwtDynGridLayout();
         layout->setMaxColumns( 2 );
 
@@ -156,27 +148,26 @@ class QwtPlotLegendItem::PrivateData
 
     QFont font;
     QPen textPen;
-    int itemMargin;
-    int itemSpacing;
+    int itemMargin = 4;
+    int itemSpacing = 4;
 
-    double borderRadius;
-    QPen borderPen;
-    QBrush backgroundBrush;
-    QwtPlotLegendItem::BackgroundMode backgroundMode;
+    double borderRadius = 0.0;
+    QPen borderPen = Qt::NoPen;
+    QBrush backgroundBrush = Qt::NoBrush;
+    BackgroundMode backgroundMode = LegendBackground;
 
-    int canvasOffset[2];
-    Qt::Alignment canvasAlignment;
+    int canvasOffset[2] = { 10, 10 };
+    Qt::Alignment canvasAlignment = Qt::AlignRight | Qt::AlignBottom;
 
     QMap< const QwtPlotItem*, QList< LayoutItem* > > map;
-    QwtDynGridLayout* layout;
+    QwtDynGridLayout* layout = nullptr;
 };
 
 //! Constructor
 QwtPlotLegendItem::QwtPlotLegendItem()
     : QwtPlotItem( QwtText( "Legend" ) )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
-
     setItemInterest( QwtPlotItem::LegendInterest, true );
     setZ( 100.0 );
 }
@@ -185,7 +176,6 @@ QwtPlotLegendItem::QwtPlotLegendItem()
 QwtPlotLegendItem::~QwtPlotLegendItem()
 {
     clearLegend();
-    delete m_data;
 }
 
 //! \return QwtPlotItem::Rtti_PlotLegend
@@ -280,7 +270,7 @@ void QwtPlotLegendItem::setMargin( int margin )
 int QwtPlotLegendItem::margin() const
 {
     int left;
-    m_data->layout->getContentsMargins( &left, NULL, NULL, NULL );
+    m_data->layout->getContentsMargins( &left, nullptr, nullptr, nullptr );
 
     return left;
 }
@@ -697,7 +687,7 @@ QRect QwtPlotLegendItem::geometry( const QRectF& canvasRect ) const
 void QwtPlotLegendItem::updateLegend( const QwtPlotItem* plotItem,
     const QList< QwtLegendData >& data )
 {
-    if ( plotItem == NULL )
+    if ( plotItem == nullptr )
         return;
 
     QList< LayoutItem* > layoutItems;

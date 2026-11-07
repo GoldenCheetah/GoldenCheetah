@@ -16,7 +16,7 @@ class CanvasPicker : public QObject
 {
   public:
     CanvasPicker( bool sortedX, QwtPlot* plot );
-    virtual bool eventFilter( QObject*, QEvent* ) QWT_OVERRIDE;
+    bool eventFilter( QObject*, QEvent* ) override;
 
   private:
     void select( const QPointF& );

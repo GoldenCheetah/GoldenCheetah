@@ -87,8 +87,8 @@ class QWT_EXPORT QwtPickerTrackerMachine : public QwtPickerMachine
   public:
     QwtPickerTrackerMachine();
 
-    virtual QList< Command > transition(
-        const QwtEventPattern&, const QEvent* ) QWT_OVERRIDE;
+    QList< Command > transition(
+        const QwtEventPattern&, const QEvent* ) override;
 };
 
 /*!
@@ -104,8 +104,8 @@ class QWT_EXPORT QwtPickerClickPointMachine : public QwtPickerMachine
   public:
     QwtPickerClickPointMachine();
 
-    virtual QList< Command > transition(
-        const QwtEventPattern&, const QEvent* ) QWT_OVERRIDE;
+    QList< Command > transition(
+        const QwtEventPattern&, const QEvent* ) override;
 };
 
 /*!
@@ -120,8 +120,8 @@ class QWT_EXPORT QwtPickerDragPointMachine : public QwtPickerMachine
   public:
     QwtPickerDragPointMachine();
 
-    virtual QList< Command > transition(
-        const QwtEventPattern&, const QEvent* ) QWT_OVERRIDE;
+    QList< Command > transition(
+        const QwtEventPattern&, const QEvent* ) override;
 };
 
 /*!
@@ -142,8 +142,8 @@ class QWT_EXPORT QwtPickerClickRectMachine : public QwtPickerMachine
   public:
     QwtPickerClickRectMachine();
 
-    virtual QList< Command > transition(
-        const QwtEventPattern&, const QEvent* ) QWT_OVERRIDE;
+    QList< Command > transition(
+        const QwtEventPattern&, const QEvent* ) override;
 };
 
 /*!
@@ -163,8 +163,8 @@ class QWT_EXPORT QwtPickerDragRectMachine : public QwtPickerMachine
   public:
     QwtPickerDragRectMachine();
 
-    virtual QList< Command > transition(
-        const QwtEventPattern&, const QEvent* ) QWT_OVERRIDE;
+    QList< Command > transition(
+        const QwtEventPattern&, const QEvent* ) override;
 };
 
 /*!
@@ -187,8 +187,8 @@ class QWT_EXPORT QwtPickerDragLineMachine : public QwtPickerMachine
   public:
     QwtPickerDragLineMachine();
 
-    virtual QList< Command > transition(
-        const QwtEventPattern&, const QEvent* ) QWT_OVERRIDE;
+    QList< Command > transition(
+        const QwtEventPattern&, const QEvent* ) override;
 };
 
 /*!
@@ -207,8 +207,8 @@ class QWT_EXPORT QwtPickerPolygonMachine : public QwtPickerMachine
   public:
     QwtPickerPolygonMachine();
 
-    virtual QList< Command > transition(
-        const QwtEventPattern&, const QEvent* ) QWT_OVERRIDE;
+    QList< Command > transition(
+        const QwtEventPattern&, const QEvent* ) override;
 };
 
 #endif

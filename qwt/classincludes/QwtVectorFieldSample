@@ -1,1 +1,1 @@
-#include "qwt_samples.h"
+#include "qwt_samples.h" // IWYU pragma: export

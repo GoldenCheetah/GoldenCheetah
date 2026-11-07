@@ -19,19 +19,11 @@
 class QwtRoundScaleDraw::PrivateData
 {
   public:
-    PrivateData()
-        : center( 50.0, 50.0 )
-        , radius( 50.0 )
-        , startAngle( -135.0 )
-        , endAngle( 135.0 )
-    {
-    }
+    QPointF center = { 50.0, 50.0 };
+    double radius = 50.0;
 
-    QPointF center;
-    double radius;
-
-    double startAngle;
-    double endAngle;
+    double startAngle = -135.0;
+    double endAngle = 135.0;
 };
 
 /*!
@@ -42,9 +34,8 @@ class QwtRoundScaleDraw::PrivateData
    The angle range is set to [-135, 135].
  */
 QwtRoundScaleDraw::QwtRoundScaleDraw()
+    : m_data( new PrivateData )
 {
-    m_data = new QwtRoundScaleDraw::PrivateData;
-
     setRadius( 50 );
     scaleMap().setPaintInterval( m_data->startAngle, m_data->endAngle );
 }
@@ -52,7 +43,6 @@ QwtRoundScaleDraw::QwtRoundScaleDraw()
 //! Destructor
 QwtRoundScaleDraw::~QwtRoundScaleDraw()
 {
-    delete m_data;
 }
 
 /*!

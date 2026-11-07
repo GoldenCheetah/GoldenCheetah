@@ -42,37 +42,28 @@ static inline bool qwtHasBackingStore( const QwtPlotCanvas* canvas )
 class QwtPlotDirectPainter::PrivateData
 {
   public:
-    PrivateData()
-        : hasClipping( false )
-        , seriesItem( NULL )
-        , from( 0 )
-        , to( 0 )
-    {
-    }
+    Attributes attributes;
 
-    QwtPlotDirectPainter::Attributes attributes;
-
-    bool hasClipping;
+    bool hasClipping = false;
     QRegion clipRegion;
 
     QPainter painter;
 
-    QwtPlotSeriesItem* seriesItem;
-    int from;
-    int to;
+    QwtPlotSeriesItem* seriesItem = nullptr;
+    int from = 0;
+    int to = 0;
 };
 
 //! Constructor
 QwtPlotDirectPainter::QwtPlotDirectPainter( QObject* parent )
     : QObject( parent )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
 }
 
 //! Destructor
 QwtPlotDirectPainter::~QwtPlotDirectPainter()
 {
-    delete m_data;
 }
 
 /*!
@@ -172,7 +163,7 @@ QRegion QwtPlotDirectPainter::clipRegion() const
 void QwtPlotDirectPainter::drawSeries(
     QwtPlotSeriesItem* seriesItem, int from, int to )
 {
-    if ( seriesItem == NULL || seriesItem->plot() == NULL )
+    if ( seriesItem == nullptr || seriesItem->plot() == nullptr )
         return;
 
     QWidget* canvas = seriesItem->plot()->canvas();
@@ -201,9 +192,6 @@ void QwtPlotDirectPainter::drawSeries(
     bool immediatePaint = true;
     if ( !canvas->testAttribute( Qt::WA_WState_InPaintEvent ) )
     {
-#if QT_VERSION < 0x050000
-        if ( !canvas->testAttribute( Qt::WA_PaintOutsidePaintEvent ) )
-#endif
         immediatePaint = false;
     }
 
@@ -256,7 +244,7 @@ void QwtPlotDirectPainter::drawSeries(
         canvas->repaint(clipRegion);
         canvas->removeEventFilter( this );
 
-        m_data->seriesItem = NULL;
+        m_data->seriesItem = nullptr;
     }
 }
 

@@ -14,6 +14,8 @@
 #include "qwt_axis_id.h"
 #include "qwt_magnifier.h"
 
+#include <memory>
+
 class QwtPlot;
 
 /*!
@@ -33,7 +35,7 @@ class QWT_EXPORT QwtPlotMagnifier : public QwtMagnifier
 
   public:
     explicit QwtPlotMagnifier( QWidget* );
-    virtual ~QwtPlotMagnifier();
+    ~QwtPlotMagnifier() override;
 
     void setAxisEnabled( QwtAxisId, bool on );
     bool isAxisEnabled( QwtAxisId ) const;
@@ -45,11 +47,11 @@ class QWT_EXPORT QwtPlotMagnifier : public QwtMagnifier
     const QwtPlot* plot() const;
 
   public Q_SLOTS:
-    virtual void rescale( double factor ) QWT_OVERRIDE;
+    void rescale( double factor ) override;
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

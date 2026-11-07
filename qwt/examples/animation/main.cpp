@@ -11,17 +11,8 @@
 #include <QApplication>
 
 #ifndef QWT_NO_OPENGL
-    #if QT_VERSION < 0x050000
-        #include <qgl.h>
-    #endif
-
-    #if QT_VERSION >= 0x050400
-        #include <QwtPlotOpenGLCanvas>
-        typedef QwtPlotOpenGLCanvas Canvas;
-    #else
-        #include <QwtPlotGLCanvas>
-        typedef QwtPlotGLCanvas Canvas;
-    #endif
+    #include <QwtPlotOpenGLCanvas>
+    typedef QwtPlotOpenGLCanvas Canvas;
 #else
     #include <QwtPlotCanvas>
     typedef QwtPlotCanvas Canvas;

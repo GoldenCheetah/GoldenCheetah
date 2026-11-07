@@ -56,7 +56,8 @@ MainWindow::MainWindow()
 
     addToolBar( toolBar );
 
-    connect( btnLoad, SIGNAL(clicked()), this, SLOT(loadSVG()) );
+    connect( btnLoad, &QToolButton::clicked,
+        this, &MainWindow::openFileDialog );
 
 #if 0
     QPainterPath path;
@@ -69,10 +70,10 @@ MainWindow::~MainWindow()
 {
 }
 
-void MainWindow::loadSVG()
+void MainWindow::openFileDialog()
 {
     QString dir = "/home1/uwe/qwt/qwt/tests/svg";
-    const QString fileName = QFileDialog::getOpenFileName( NULL,
+    const QString fileName = QFileDialog::getOpenFileName( nullptr,
         "Load a Scaleable Vector Graphic (SVG) Document",
         dir, "SVG Files (*.svg)" );
 
@@ -113,5 +114,3 @@ void MainWindow::loadPath( const QPainterPath& path )
     m_canvas[0]->setSvg( buf.data() );
     m_canvas[1]->setSvg( buf.data() );
 }
-
-#include "moc_MainWindow.cpp"

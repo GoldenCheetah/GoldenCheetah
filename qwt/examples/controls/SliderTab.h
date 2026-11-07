@@ -16,9 +16,9 @@ class QBoxLayout;
 class SliderTab : public QWidget
 {
   public:
-    SliderTab( QWidget* parent = NULL );
+    SliderTab( QWidget* parent = nullptr );
 
   private:
     QBoxLayout* createLayout( Qt::Orientation,
-        QWidget* widget = NULL );
+        QWidget* widget = nullptr );
 };

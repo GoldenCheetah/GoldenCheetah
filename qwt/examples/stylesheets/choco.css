@@ -14,7 +14,7 @@ QwtPlotCanvas
     background-color: Tan;
 }
 
-QwtPlotGLCanvas
+QwtPlotOpenGLCanvas
 {
     border: 1px solid White;
     background-color: Tan;

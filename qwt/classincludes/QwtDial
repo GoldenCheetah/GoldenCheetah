@@ -1,1 +1,1 @@
-#include "qwt_dial.h"
+#include "qwt_dial.h" // IWYU pragma: export

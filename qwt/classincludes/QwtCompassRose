@@ -1,1 +1,1 @@
-#include "qwt_compass_rose.h"
+#include "qwt_compass_rose.h" // IWYU pragma: export

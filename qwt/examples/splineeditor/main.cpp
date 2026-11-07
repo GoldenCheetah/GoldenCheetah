@@ -30,6 +30,13 @@ namespace
         PlotTab( bool parametric,  QWidget* parent )
             : QMainWindow( parent )
         {
+            void ( QComboBox::*comboActivated )( const QString& ) = 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+                &QComboBox::textActivated;
+#else
+                &QComboBox::activated;
+#endif
+
             Plot* plot = new Plot( parametric, this );
             setCentralWidget( plot );
 
@@ -38,15 +45,15 @@ namespace
 #ifndef QT_NO_PRINTER
             ToolButton* btnPrint = new ToolButton( "Print" );
             toolBar->addWidget( btnPrint );
-            QObject::connect( btnPrint, SIGNAL(clicked()),
-                plot, SLOT(printPlot()) );
+            QObject::connect( btnPrint, &QToolButton::clicked,
+                plot, &Plot::printPlot );
 #endif
 
             ToolButton* btnOverlay = new ToolButton( "Overlay" );
             btnOverlay->setCheckable( true );
             toolBar->addWidget( btnOverlay );
-            QObject::connect( btnOverlay, SIGNAL(toggled(bool)),
-                plot, SLOT(setOverlaying(bool)) );
+            QObject::connect( btnOverlay, &QToolButton::toggled,
+                plot, &Plot::setOverlaying );
 
             if ( parametric )
             {
@@ -57,13 +64,9 @@ namespace
                 parameterBox->addItem( "Chordal" );
                 parameterBox->addItem( "Manhattan" );
                 toolBar->addWidget( parameterBox );
-#if QT_VERSION >= 0x060000
-                connect( parameterBox, SIGNAL(textActivated(const QString&)),
-                    plot, SLOT(setParametric(const QString&)) );
-#else
-                connect( parameterBox, SIGNAL(activated(const QString&)),
-                    plot, SLOT(setParametric(const QString&)) );
-#endif
+
+                connect( parameterBox, comboActivated,
+                    plot, &Plot::setParametric );
 
                 parameterBox->setCurrentIndex( 2 ); // chordal
                 plot->setParametric( parameterBox->currentText() );
@@ -71,8 +74,8 @@ namespace
                 ToolButton* btnClosed = new ToolButton( "Closed" );
                 btnClosed->setCheckable( true );
                 toolBar->addWidget( btnClosed );
-                QObject::connect( btnClosed, SIGNAL(toggled(bool)),
-                    plot, SLOT(setClosed(bool)) );
+                QObject::connect( btnClosed, &QToolButton::toggled,
+                    plot, &Plot::setClosed );
             }
 
             QComboBox* boundaryBox = new QComboBox();
@@ -84,13 +87,8 @@ namespace
             boundaryBox->addItem( "Not a Knot" );
 
             toolBar->addWidget( boundaryBox );
-#if QT_VERSION >= 0x060000
-            connect( boundaryBox, SIGNAL(textActivated(const QString&)),
-                plot, SLOT(setBoundaryCondition(const QString&)) );
-#else
-            connect( boundaryBox, SIGNAL(activated(const QString&)),
-                plot, SLOT(setBoundaryCondition(const QString&)) );
-#endif
+            connect( boundaryBox, comboActivated,
+                plot, &Plot::setBoundaryCondition );
 
             addToolBar( toolBar );
         }

@@ -15,7 +15,7 @@ class Plot : public QwtPolarPlot
     Q_OBJECT
 
   public:
-    Plot( QWidget* = NULL );
+    Plot( QWidget* = nullptr );
     QwtPolarSpectrogram* spectrogram();
 
   public Q_SLOTS:

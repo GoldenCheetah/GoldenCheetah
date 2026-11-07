@@ -12,10 +12,10 @@ class ScrollBar : public QScrollBar
     Q_OBJECT
 
   public:
-    ScrollBar( QWidget* parent = NULL );
-    ScrollBar( Qt::Orientation, QWidget* parent = NULL );
+    ScrollBar( QWidget* parent = nullptr );
+    ScrollBar( Qt::Orientation, QWidget* parent = nullptr );
     ScrollBar( double minBase, double maxBase,
-        Qt::Orientation o, QWidget* parent = NULL );
+        Qt::Orientation o, QWidget* parent = nullptr );
 
     void setInverted( bool );
     bool isInverted() const;
@@ -41,15 +41,15 @@ class ScrollBar : public QScrollBar
     int mapToTick( double ) const;
     double mapFromTick( int ) const;
 
-  private Q_SLOTS:
-    void catchValueChanged( int value );
-    void catchSliderMoved( int value );
-
   private:
     void init();
 
+    void catchValueChanged( int value );
+    void catchSliderMoved( int value );
+
     bool m_inverted;
-    double m_minBase;
-    double m_maxBase;
-    int m_baseTicks;
+
+    double m_minBase = 0.0;
+    double m_maxBase = 1.0;
+    int m_baseTicks = 1000000;
 };

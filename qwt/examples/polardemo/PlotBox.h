@@ -13,12 +13,9 @@ class QwtPolarMagnifier;
 
 class PlotBox : public QWidget
 {
-    Q_OBJECT
-
   public:
-    PlotBox( QWidget* parent = NULL );
+    PlotBox( QWidget* parent = nullptr );
 
-  private Q_SLOTS:
     void enableZoomMode( bool on );
     void printDocument();
     void exportDocument();

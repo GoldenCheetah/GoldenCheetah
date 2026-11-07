@@ -22,28 +22,28 @@
 class QWT_EXPORT QwtPoint3D
 {
   public:
-    QwtPoint3D();
-    QwtPoint3D( double x, double y, double z );
-    QwtPoint3D( const QPointF& );
+    inline QwtPoint3D();
+    inline QwtPoint3D( double x, double y, double z );
+    inline QwtPoint3D( const QPointF& );
 
-    bool isNull()    const;
+    inline bool isNull()    const;
 
-    double x() const;
-    double y() const;
-    double z() const;
+    inline double x() const;
+    inline double y() const;
+    inline double z() const;
 
-    double& rx();
-    double& ry();
-    double& rz();
+    inline double& rx();
+    inline double& ry();
+    inline double& rz();
 
-    void setX( double x );
-    void setY( double y );
-    void setZ( double y );
+    inline void setX( double x );
+    inline void setY( double y );
+    inline void setZ( double y );
 
-    QPointF toPoint() const;
+    inline QPointF toPoint() const;
 
-    bool operator==( const QwtPoint3D& ) const;
-    bool operator!=( const QwtPoint3D& ) const;
+    inline bool operator==( const QwtPoint3D& ) const;
+    inline bool operator!=( const QwtPoint3D& ) const;
 
   private:
     double m_x;

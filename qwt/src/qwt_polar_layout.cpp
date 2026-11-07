@@ -88,12 +88,6 @@ void QwtPolarLayout::LayoutData::init(
 class QwtPolarLayout::PrivateData
 {
   public:
-    PrivateData()
-        : margin( 0 )
-        , spacing( 0 )
-    {
-    }
-
     QRectF titleRect;
     QRectF legendRect;
     QRectF canvasRect;
@@ -101,10 +95,10 @@ class QwtPolarLayout::PrivateData
     QwtPolarLayout::LayoutData layoutData;
 
     QwtPolarPlot::LegendPosition legendPos;
-    double legendRatio;
+    double legendRatio = 0.33;
 
-    unsigned int margin;
-    unsigned int spacing;
+    unsigned int margin = 0;
+    unsigned int spacing = 0;
 };
 
 /*!
@@ -112,9 +106,8 @@ class QwtPolarLayout::PrivateData
  */
 
 QwtPolarLayout::QwtPolarLayout()
+    : m_data( new PrivateData )
 {
-    m_data = new PrivateData;
-
     setLegendPosition( QwtPolarPlot::BottomLegend );
     invalidate();
 }
@@ -122,7 +115,6 @@ QwtPolarLayout::QwtPolarLayout()
 //! Destructor
 QwtPolarLayout::~QwtPolarLayout()
 {
-    delete m_data;
 }
 
 /*!

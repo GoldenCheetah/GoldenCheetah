@@ -36,11 +36,8 @@ else {
 QMAKE_RPATHDIR *= $${QWT_OUT_ROOT}/lib
 qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt)
 
-greaterThan(QT_MAJOR_VERSION, 4) {
-
-    QT += printsupport
-    QT += concurrent
-}
+QT += printsupport
+QT += concurrent
 
 greaterThan(QT_MAJOR_VERSION, 5) {
 

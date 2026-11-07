@@ -18,42 +18,28 @@
 class QwtPlotRescaler::AxisData
 {
   public:
-    AxisData()
-        : aspectRatio( 1.0 )
-        , expandingDirection( QwtPlotRescaler::ExpandUp )
-    {
-    }
-
-    double aspectRatio;
+    double aspectRatio = 1.0;
     QwtInterval intervalHint;
-    QwtPlotRescaler::ExpandingDirection expandingDirection;
+    ExpandingDirection expandingDirection = ExpandUp;
     mutable QwtScaleDiv scaleDiv;
 };
 
 class QwtPlotRescaler::PrivateData
 {
   public:
-    PrivateData()
-        : referenceAxis( QwtAxis::XBottom )
-        , rescalePolicy( QwtPlotRescaler::Expanding )
-        , isEnabled( false )
-        , inReplot( 0 )
-    {
-    }
-
     QwtPlotRescaler::AxisData* axisData( QwtAxisId axisId )
     {
         if ( !QwtAxis::isValid( axisId ) )
-            return NULL;
+            return nullptr;
 
         return &( m_axisDataMap[ axisId.pos ][ axisId.id ] );
     }
 
-    QwtAxisId referenceAxis;
-    RescalePolicy rescalePolicy;
-    bool isEnabled;
+    QwtAxisId referenceAxis = QwtAxis::XBottom;
+    RescalePolicy rescalePolicy = Expanding;
+    bool isEnabled = false;
 
-    mutable int inReplot;
+    mutable int inReplot = 0;
 
   private:
     QMap< int, QwtPlotRescaler::AxisData > m_axisDataMap[QwtAxis::AxisPositions];
@@ -71,8 +57,8 @@ class QwtPlotRescaler::PrivateData
 QwtPlotRescaler::QwtPlotRescaler( QWidget* canvas,
         QwtAxisId referenceAxis, RescalePolicy policy )
     : QObject( canvas )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
     m_data->referenceAxis = referenceAxis;
     m_data->rescalePolicy = policy;
 
@@ -82,7 +68,6 @@ QwtPlotRescaler::QwtPlotRescaler( QWidget* canvas,
 //! Destructor
 QwtPlotRescaler::~QwtPlotRescaler()
 {
-    delete m_data;
 }
 
 /*!

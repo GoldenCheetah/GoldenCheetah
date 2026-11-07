@@ -6,6 +6,7 @@
 #pragma once
 
 #include <QRect>
+#include <memory>
 
 class SignalData
 {
@@ -30,5 +31,5 @@ class SignalData
     Q_DISABLE_COPY( SignalData )
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };

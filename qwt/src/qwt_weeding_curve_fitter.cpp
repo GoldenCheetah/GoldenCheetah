@@ -18,14 +18,8 @@
 class QwtWeedingCurveFitter::PrivateData
 {
   public:
-    PrivateData()
-        : tolerance( 1.0 )
-        , chunkSize( 0 )
-    {
-    }
-
-    double tolerance;
-    uint chunkSize;
+    double tolerance = 1.0;
+    uint chunkSize = 0;
 };
 
 class QwtWeedingCurveFitter::Line
@@ -49,15 +43,14 @@ class QwtWeedingCurveFitter::Line
  */
 QwtWeedingCurveFitter::QwtWeedingCurveFitter( double tolerance )
     : QwtCurveFitter( QwtCurveFitter::Polygon )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
     setTolerance( tolerance );
 }
 
 //! Destructor
 QwtWeedingCurveFitter::~QwtWeedingCurveFitter()
 {
-    delete m_data;
 }
 
 /*!

@@ -12,8 +12,9 @@
 
 #include "qwt_global.h"
 #include "qwt_raster_data.h"
+#include <memory>
 
-#if QT_VERSION < 0x060000
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 template< typename T > class QVector;
 #endif
 
@@ -54,13 +55,13 @@ class QWT_EXPORT QwtMatrixRasterData : public QwtRasterData
     };
 
     QwtMatrixRasterData();
-    virtual ~QwtMatrixRasterData();
+    ~QwtMatrixRasterData() override;
 
     void setResampleMode(ResampleMode mode);
     ResampleMode resampleMode() const;
 
     void setInterval( Qt::Axis, const QwtInterval& );
-    virtual QwtInterval interval( Qt::Axis axis) const QWT_OVERRIDE QWT_FINAL;
+    QwtInterval interval( Qt::Axis axis) const override final;
 
     void setValueMatrix( const QVector< double >& values, int numColumns );
     const QVector< double > valueMatrix() const;
@@ -70,15 +71,15 @@ class QWT_EXPORT QwtMatrixRasterData : public QwtRasterData
     int numColumns() const;
     int numRows() const;
 
-    virtual QRectF pixelHint( const QRectF& ) const QWT_OVERRIDE;
+    QRectF pixelHint( const QRectF& ) const override;
 
-    virtual double value( double x, double y ) const QWT_OVERRIDE;
+    double value( double x, double y ) const override;
 
   private:
     void update();
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

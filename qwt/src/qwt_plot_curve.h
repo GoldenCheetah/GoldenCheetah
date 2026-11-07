@@ -14,6 +14,7 @@
 #include "qwt_plot_seriesitem.h"
 
 #include <qstring.h>
+#include <memory>
 #include <QColor>
 
 class QwtScaleMap;
@@ -238,9 +239,9 @@ class QWT_EXPORT QwtPlotCurve
     explicit QwtPlotCurve( const QString& title = QString() );
     explicit QwtPlotCurve( const QwtText& title );
 
-    virtual ~QwtPlotCurve();
+    ~QwtPlotCurve() override;
 
-    virtual int rtti() const QWT_OVERRIDE;
+    int rtti() const override;
 
     void setPaintAttribute( PaintAttribute, bool on = true );
     bool testPaintAttribute( PaintAttribute ) const;
@@ -272,15 +273,15 @@ class QWT_EXPORT QwtPlotCurve
     void setSamples( const QVector< QPointF >& );
     void setSamples( QwtSeriesData< QPointF >* );
 
-    virtual int closestPoint( const QPointF& pos, double* dist = NULL ) const;
+    virtual int closestPoint( const QPointF& pos, double* dist = nullptr ) const;
     virtual int adjacentPoint( Qt::Orientation orientation, qreal value ) const;
 
     qreal interpolatedValueAt( Qt::Orientation, double ) const;
 
-    double minXValue() const;
-    double maxXValue() const;
-    double minYValue() const;
-    double maxYValue() const;
+    inline double minXValue() const;
+    inline double maxXValue() const;
+    inline double minYValue() const;
+    inline double maxYValue() const;
 
     void setCurveAttribute( CurveAttribute, bool on = true );
     bool testCurveAttribute( CurveAttribute ) const;
@@ -307,16 +308,13 @@ class QWT_EXPORT QwtPlotCurve
     void setCurveFitter( QwtCurveFitter* );
     QwtCurveFitter* curveFitter() const;
 
-    virtual void drawSeries( QPainter*,
+    void drawSeries( QPainter*,
         const QwtScaleMap& xMap, const QwtScaleMap& yMap,
-        const QRectF& canvasRect, int from, int to ) const QWT_OVERRIDE;
+        const QRectF& canvasRect, int from, int to ) const override;
 
-    virtual QwtGraphic legendIcon( int index, const QSizeF& ) const QWT_OVERRIDE;
+    QwtGraphic legendIcon( int index, const QSizeF& ) const override;
 
   protected:
-
-    void init();
-
     virtual void drawCurve( QPainter*, int style,
         const QwtScaleMap& xMap, const QwtScaleMap& yMap,
         const QRectF& canvasRect, int from, int to ) const;
@@ -350,7 +348,7 @@ class QWT_EXPORT QwtPlotCurve
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 class QwtZone {

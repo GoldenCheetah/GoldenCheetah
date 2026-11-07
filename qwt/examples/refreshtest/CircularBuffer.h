@@ -17,10 +17,10 @@ class CircularBuffer : public QwtSeriesData< QPointF >
     void setReferenceTime( double );
     double referenceTime() const;
 
-    virtual size_t size() const QWT_OVERRIDE;
-    virtual QPointF sample( size_t index ) const QWT_OVERRIDE;
+    size_t size() const override;
+    QPointF sample( size_t index ) const override;
 
-    virtual QRectF boundingRect() const QWT_OVERRIDE;
+    QRectF boundingRect() const override;
 
     void setFunction( double ( * y )( double ) );
 

@@ -28,8 +28,8 @@ namespace
 
       protected:
 
-        virtual void drawNeedle( QPainter* painter,
-            double length, QPalette::ColorGroup colorGroup ) const QWT_OVERRIDE
+        void drawNeedle( QPainter* painter,
+            double length, QPalette::ColorGroup colorGroup ) const override
         {
             double triangleSize = length * 0.1;
             double pos = length - 2.0;

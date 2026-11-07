@@ -112,12 +112,12 @@ class QWT_EXPORT QwtSplineParametrization
 
     virtual double valueIncrement( const QPointF&, const QPointF& ) const;
 
-    static double valueIncrementX( const QPointF&, const QPointF& );
-    static double valueIncrementY( const QPointF&, const QPointF& );
-    static double valueIncrementUniform( const QPointF&, const QPointF& );
-    static double valueIncrementChordal( const QPointF&, const QPointF& );
-    static double valueIncrementCentripetal( const QPointF&, const QPointF& );
-    static double valueIncrementManhattan( const QPointF&, const QPointF& );
+    static inline double valueIncrementX( const QPointF&, const QPointF& );
+    static inline double valueIncrementY( const QPointF&, const QPointF& );
+    static inline double valueIncrementUniform( const QPointF&, const QPointF& );
+    static inline double valueIncrementChordal( const QPointF&, const QPointF& );
+    static inline double valueIncrementCentripetal( const QPointF&, const QPointF& );
+    static inline double valueIncrementManhattan( const QPointF&, const QPointF& );
 
   private:
     const int m_type;

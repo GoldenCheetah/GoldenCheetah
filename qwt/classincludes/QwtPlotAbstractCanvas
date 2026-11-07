@@ -1,1 +1,1 @@
-#include "qwt_plot_abstract_canvas.h"
+#include "qwt_plot_abstract_canvas.h" // IWYU pragma: export

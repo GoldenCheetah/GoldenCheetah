@@ -13,6 +13,8 @@
 #include "qwt_global.h"
 #include "qwt_abstract_scale.h"
 
+#include <memory>
+
 /*!
    \brief An abstract base class for slider widgets with a scale
 
@@ -47,8 +49,8 @@ class QWT_EXPORT QwtAbstractSlider : public QwtAbstractScale
     Q_PROPERTY( bool invertedControls READ invertedControls WRITE setInvertedControls )
 
   public:
-    explicit QwtAbstractSlider( QWidget* parent = NULL );
-    virtual ~QwtAbstractSlider();
+    explicit QwtAbstractSlider( QWidget* parent = nullptr );
+    ~QwtAbstractSlider() override;
 
     void setValid( bool );
     bool isValid() const;
@@ -119,11 +121,11 @@ class QWT_EXPORT QwtAbstractSlider : public QwtAbstractScale
     void sliderMoved( double value );
 
   protected:
-    virtual void mousePressEvent( QMouseEvent* ) QWT_OVERRIDE;
-    virtual void mouseReleaseEvent( QMouseEvent* ) QWT_OVERRIDE;
-    virtual void mouseMoveEvent( QMouseEvent* ) QWT_OVERRIDE;
-    virtual void keyPressEvent( QKeyEvent* ) QWT_OVERRIDE;
-    virtual void wheelEvent( QWheelEvent* ) QWT_OVERRIDE;
+    void mousePressEvent( QMouseEvent* ) override;
+    void mouseReleaseEvent( QMouseEvent* ) override;
+    void mouseMoveEvent( QMouseEvent* ) override;
+    void keyPressEvent( QKeyEvent* ) override;
+    void wheelEvent( QWheelEvent* ) override;
 
     /*!
        \brief Determine what to do when the user presses a mouse button.
@@ -148,7 +150,7 @@ class QWT_EXPORT QwtAbstractSlider : public QwtAbstractScale
 
     void incrementValue( int stepCount );
 
-    virtual void scaleChange() QWT_OVERRIDE;
+    void scaleChange() override;
 
   protected:
     virtual void sliderChange();
@@ -161,7 +163,7 @@ class QWT_EXPORT QwtAbstractSlider : public QwtAbstractScale
     double boundedValue( double ) const;
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

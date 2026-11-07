@@ -28,63 +28,16 @@
 #include <qpaintengine.h>
 #include <qapplication.h>
 
-#if QT_VERSION >= 0x060000
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #include <qscreen.h>
 #else
 #include <qdesktopwidget.h>
-#endif
-
-#if QT_VERSION < 0x050000
-
-#ifdef Q_WS_X11
-#include <qx11info_x11.h>
-#endif
-
 #endif
 
 #include <cstring>
 
 bool QwtPainter::m_polylineSplitting = true;
 bool QwtPainter::m_roundingAlignment = true;
-
-static inline bool qwtIsRasterPaintEngineBuggy()
-{
-#if 0
-    static int isBuggy = -1;
-    if ( isBuggy < 0 )
-    {
-        // auto detect bug of the raster paint engine,
-        // fixed with: https://codereview.qt-project.org/#/c/99456/
-
-        QImage image( 2, 3, QImage::Format_ARGB32 );
-        image.fill( 0u );
-
-        QPolygonF p;
-        p += QPointF(0, 1);
-        p += QPointF(0, 0);
-        p += QPointF(1, 0 );
-        p += QPointF(1, 2 );
-
-        QPainter painter( &image );
-        painter.drawPolyline( p );
-        painter.end();
-
-        isBuggy = ( image.pixel( 1, 1 ) == 0 ) ? 1 : 0;
-    }
-
-    return isBuggy == 1;
-#endif
-
-#if QT_VERSION < 0x050000
-    return true;
-#elif QT_VERSION < 0x050100
-    return false;
-#elif QT_VERSION < 0x050400
-    return true;
-#else
-    return false;
-#endif
-}
 
 static inline bool qwtIsClippingNeeded(
     const QPainter* painter, QRectF& clipRect )
@@ -130,35 +83,10 @@ static inline void qwtDrawPolyline( QPainter* painter,
 
         const int splitSize = 6;
 
-        if ( pen.width() <= 1 && pen.isSolid() && qwtIsRasterPaintEngineBuggy()
-            && !( painter->renderHints() & QPainter::Antialiasing ) )
+        for ( int i = 0; i < pointCount; i += splitSize )
         {
-            int k = 0;
-
-            for ( int i = k + 1; i < pointCount; i++ )
-            {
-                const QPointF& p1 = points[i - 1];
-                const QPointF& p2 = points[i];
-
-                const bool isBad = ( qAbs( p2.y() - p1.y() ) <= 1 )
-                    && qAbs( p2.x() - p1.x() ) <= 1;
-
-                if ( isBad || ( i - k >= splitSize ) )
-                {
-                    painter->drawPolyline( points + k, i - k + 1 );
-                    k = i;
-                }
-            }
-
-            painter->drawPolyline( points + k, pointCount - k );
-        }
-        else
-        {
-            for ( int i = 0; i < pointCount; i += splitSize )
-            {
-                const int n = qMin( splitSize + 1, pointCount - i );
-                painter->drawPolyline( points + i, n );
-            }
+            const int n = qMin( splitSize + 1, pointCount - i );
+            painter->drawPolyline( points + i, n );
         }
     }
     else
@@ -175,7 +103,7 @@ static inline QSize qwtScreenResolution()
         /*
             We might have screens with different resolutions. TODO ...
          */
-#if QT_VERSION >= 0x060000
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
         QScreen* screen = QGuiApplication::primaryScreen();
         if ( screen )
         {
@@ -1369,7 +1297,7 @@ void QwtPainter::drawBackgound( QPainter* painter,
 int QwtPainter::horizontalAdvance(
     const QFontMetrics& fontMetrics, const QString& text )
 {
-#if QT_VERSION >= 0x050b00
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
     return fontMetrics.horizontalAdvance( text );
 #else
     return fontMetrics.width( text );
@@ -1387,7 +1315,7 @@ int QwtPainter::horizontalAdvance(
 qreal QwtPainter::horizontalAdvance(
     const QFontMetricsF& fontMetrics, const QString& text )
 {
-#if QT_VERSION >= 0x050b00
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
     return fontMetrics.horizontalAdvance( text );
 #else
     return fontMetrics.width( text );
@@ -1404,7 +1332,7 @@ qreal QwtPainter::horizontalAdvance(
 int QwtPainter::horizontalAdvance(
     const QFontMetrics& fontMetrics, QChar ch )
 {
-#if QT_VERSION >= 0x050b00
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
     return fontMetrics.horizontalAdvance( ch );
 #else
     return fontMetrics.width( ch );
@@ -1421,7 +1349,7 @@ int QwtPainter::horizontalAdvance(
 qreal QwtPainter::horizontalAdvance(
     const QFontMetricsF& fontMetrics, QChar ch )
 {
-#if QT_VERSION >= 0x050b00
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
     return fontMetrics.horizontalAdvance( ch );
 #else
     return fontMetrics.width( ch );
@@ -1439,19 +1367,19 @@ qreal QwtPainter::horizontalAdvance(
  */
 QFont QwtPainter::scaledFont( const QFont& font, const QPaintDevice* paintDevice )
 {
-    if ( paintDevice == NULL )
+    if ( paintDevice == nullptr )
     {
-#if QT_VERSION < 0x060000
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         paintDevice = QApplication::desktop();
 #else
         class PaintDevice : public QPaintDevice
         {
-            virtual QPaintEngine* paintEngine() const QWT_OVERRIDE
+            QPaintEngine* paintEngine() const override
             {
-                return NULL;
+                return nullptr;
             }
 
-            virtual int metric( PaintDeviceMetric metric ) const QWT_OVERRIDE
+            int metric( PaintDeviceMetric metric ) const override
             {
                 if ( metric == PdmDpiY )
                 {
@@ -1482,23 +1410,11 @@ qreal QwtPainter::devicePixelRatio( const QPaintDevice* paintDevice )
 {
     qreal pixelRatio = 0.0;
 
-#if QT_VERSION >= 0x050100
     if ( paintDevice )
-    {
-#if QT_VERSION >= 0x050600
         pixelRatio = paintDevice->devicePixelRatioF();
-#else
-        pixelRatio = paintDevice->devicePixelRatio();
-#endif
-    }
-#else
-    Q_UNUSED( paintDevice )
-#endif
 
-#if QT_VERSION >= 0x050000
     if ( pixelRatio == 0.0 && qApp )
         pixelRatio = qApp->devicePixelRatio();
-#endif
 
     if ( pixelRatio == 0.0 )
         pixelRatio = 1.0;
@@ -1514,16 +1430,10 @@ qreal QwtPainter::devicePixelRatio( const QPaintDevice* paintDevice )
  */
 QPixmap QwtPainter::backingStore( QWidget* widget, const QSize& size )
 {
-    QPixmap pm;
-
-#if QT_VERSION >= 0x050000
     const qreal pixelRatio = QwtPainter::devicePixelRatio( widget );
 
-    pm = QPixmap( size * pixelRatio );
-    pm.setDevicePixelRatio( pixelRatio );
-#else
-    pm = QPixmap( size );
-#endif
+    QPixmap pixmap( size * pixelRatio );
+    pixmap.setDevicePixelRatio( pixelRatio );
 
 #ifdef Q_WS_X11
     if ( widget && isX11GraphicsSystem() )
@@ -1531,9 +1441,7 @@ QPixmap QwtPainter::backingStore( QWidget* widget, const QSize& size )
         if ( pm.x11Info().screen() != widget->x11Info().screen() )
             pm.x11SetScreen( widget->x11Info().screen() );
     }
-#else
-    Q_UNUSED( widget )
 #endif
 
-    return pm;
+    return pixmap;
 }

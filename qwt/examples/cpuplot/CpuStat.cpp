@@ -216,7 +216,7 @@ void CpuStat::lookUp( double values[NValues] ) const
             if ( line.startsWith( "cpu " ) )
             {
                 const QStringList valueList =
-#if QT_VERSION >= 0x050f00
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
                     line.split( " ",  Qt::SkipEmptyParts );
 #else
                     line.split( " ",  QString::SkipEmptyParts );

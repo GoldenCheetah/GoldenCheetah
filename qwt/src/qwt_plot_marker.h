@@ -13,6 +13,8 @@
 #include "qwt_global.h"
 #include "qwt_plot_item.h"
 
+#include <memory>
+
 class QString;
 class QRectF;
 class QwtText;
@@ -69,9 +71,9 @@ class QWT_EXPORT QwtPlotMarker : public QwtPlotItem
     explicit QwtPlotMarker( const QString& title );
     explicit QwtPlotMarker( const QwtText& title );
 
-    virtual ~QwtPlotMarker();
+    ~QwtPlotMarker() override;
 
-    virtual int rtti() const QWT_OVERRIDE;
+    int rtti() const override;
 
     double xValue() const;
     double yValue() const;
@@ -104,14 +106,13 @@ class QWT_EXPORT QwtPlotMarker : public QwtPlotItem
     void setSpacing( int );
     int spacing() const;
 
-    virtual void draw( QPainter*,
+    void draw( QPainter*,
         const QwtScaleMap& xMap, const QwtScaleMap& yMap,
-        const QRectF& ) const QWT_OVERRIDE;
+        const QRectF& ) const override;
 
-    virtual QRectF boundingRect() const QWT_OVERRIDE;
+    QRectF boundingRect() const override;
 
-    virtual QwtGraphic legendIcon(
-        int index, const QSizeF& ) const QWT_OVERRIDE;
+    QwtGraphic legendIcon( int index, const QSizeF& ) const override;
 
   protected:
     virtual void drawLines( QPainter*,
@@ -126,7 +127,7 @@ class QWT_EXPORT QwtPlotMarker : public QwtPlotItem
   private:
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

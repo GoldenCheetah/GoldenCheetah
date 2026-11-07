@@ -13,6 +13,8 @@
 #include "qwt_polar_item.h"
 #include "qwt_point_polar.h"
 
+#include <memory>
+
 class QRect;
 class QwtText;
 class QwtSymbol;
@@ -37,9 +39,9 @@ class QWT_EXPORT QwtPolarMarker : public QwtPolarItem
 {
   public:
     explicit QwtPolarMarker();
-    virtual ~QwtPolarMarker();
+    ~QwtPolarMarker() override;
 
-    virtual int rtti() const QWT_OVERRIDE;
+    int rtti() const override;
 
     void setPosition( const QwtPointPolar& );
     QwtPointPolar position() const;
@@ -53,16 +55,16 @@ class QWT_EXPORT QwtPolarMarker : public QwtPolarItem
     void setLabelAlignment( Qt::Alignment );
     Qt::Alignment labelAlignment() const;
 
-    virtual void draw( QPainter* painter,
+    void draw( QPainter* painter,
         const QwtScaleMap& azimuthMap, const QwtScaleMap& radialMap,
         const QPointF& pole, double radius,
-        const QRectF& canvasRect ) const QWT_OVERRIDE;
+        const QRectF& canvasRect ) const override;
 
-    virtual QwtInterval boundingInterval( int scaleId ) const QWT_OVERRIDE;
+    QwtInterval boundingInterval( int scaleId ) const override;
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

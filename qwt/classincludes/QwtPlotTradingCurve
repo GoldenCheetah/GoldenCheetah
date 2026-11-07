@@ -1,1 +1,1 @@
-#include "qwt_plot_tradingcurve.h"
+#include "qwt_plot_tradingcurve.h" // IWYU pragma: export

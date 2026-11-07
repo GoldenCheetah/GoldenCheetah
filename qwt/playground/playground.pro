@@ -19,16 +19,9 @@ contains(QWT_CONFIG, QwtPlot) {
         vectorfield \
         symbols
 
-    greaterThan(QT_MAJOR_VERSION, 4) {
-        qtHaveModule(svg) {
-            # we only need SVG support from Qt, but not from Qwt
-            CONFIG += svgexamples
-        }
-    }
-    else {
-        contains(QWT_CONFIG, QwtSvg) {
-            CONFIG += svgexamples
-        }
+    qtHaveModule(svg) {
+        # we only need SVG support from Qt, but not from Qwt
+        CONFIG += svgexamples
     }
 
     svgexamples {

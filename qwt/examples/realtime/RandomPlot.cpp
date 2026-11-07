@@ -29,7 +29,7 @@ namespace
             setRubberBandPen( QPen( Qt::red ) );
         }
 
-        virtual QwtText trackerTextF( const QPointF& pos ) const QWT_OVERRIDE
+        QwtText trackerTextF( const QPointF& pos ) const override
         {
             QColor bg( Qt::white );
 
@@ -38,7 +38,7 @@ namespace
             return text;
         }
 
-        virtual void rescale() QWT_OVERRIDE
+        void rescale() override
         {
             QwtScaleWidget* scaleWidget = plot()->axisWidget( yAxis() );
             QwtScaleDraw* sd = scaleWidget->scaleDraw();
@@ -113,7 +113,7 @@ void RandomPlot::append( int timeout, int count )
     if ( !m_timer )
     {
         m_timer = new QTimer( this );
-        connect( m_timer, SIGNAL(timeout()), SLOT(appendPoint()) );
+        connect( m_timer, &QTimer::timeout, this, &RandomPlot::appendPoint );
     }
 
     m_timerCount = count;

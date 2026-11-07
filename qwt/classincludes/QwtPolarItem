@@ -1,1 +1,1 @@
-#include "qwt_polar_item.h"
+#include "qwt_polar_item.h" // IWYU pragma: export

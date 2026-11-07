@@ -39,17 +39,17 @@ class QWT_EXPORT QwtScaleMap
     void setPaintInterval( double p1, double p2 );
     void setScaleInterval( double s1, double s2 );
 
-    double transform( double s ) const;
-    double invTransform( double p ) const;
+    inline double transform( double s ) const;
+    inline double invTransform( double p ) const;
 
-    double p1() const;
-    double p2() const;
+    inline double p1() const;
+    inline double p2() const;
 
-    double s1() const;
-    double s2() const;
+    inline double s1() const;
+    inline double s2() const;
 
-    double pDist() const;
-    double sDist() const;
+    inline double pDist() const;
+    inline double sDist() const;
 
     static QRectF transform( const QwtScaleMap&,
         const QwtScaleMap&, const QRectF& );
@@ -63,7 +63,7 @@ class QWT_EXPORT QwtScaleMap
     static QPointF invTransform( const QwtScaleMap&,
         const QwtScaleMap&, const QPointF& );
 
-    bool isInverting() const;
+    inline bool isInverting() const;
 
   private:
     void updateFactor();

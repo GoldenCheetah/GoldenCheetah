@@ -16,7 +16,7 @@ class ScrollData
 {
   public:
     ScrollData()
-        : scrollBar( NULL )
+        : scrollBar( nullptr )
         , position( ScrollZoomer::OppositeToScale )
         , mode( Qt::ScrollBarAsNeeded )
     {
@@ -34,9 +34,9 @@ class ScrollData
 
 ScrollZoomer::ScrollZoomer( QWidget* canvas )
     : QwtPlotZoomer( canvas )
-    , m_cornerWidget( NULL )
-    , m_hScrollData( NULL )
-    , m_vScrollData( NULL )
+    , m_cornerWidget( nullptr )
+    , m_hScrollData( nullptr )
+    , m_vScrollData( nullptr )
     , m_inZoom( false )
 {
     for ( int axisPos = 0; axisPos < QwtAxis::AxisPositions; axisPos++ )
@@ -118,13 +118,13 @@ ScrollBar* ScrollZoomer::scrollBar( Qt::Orientation orientation )
     ScrollBar*& sb = ( orientation == Qt::Vertical )
         ? m_vScrollData->scrollBar : m_hScrollData->scrollBar;
 
-    if ( sb == NULL )
+    if ( sb == nullptr )
     {
         sb = new ScrollBar( orientation, canvas() );
         sb->hide();
-        connect( sb,
-            SIGNAL(valueChanged(Qt::Orientation,double,double)),
-            SLOT(scrollBarMoved(Qt::Orientation,double,double)) );
+
+        connect( sb, &ScrollBar::valueChanged,
+            this, &ScrollZoomer::scrollBarMoved );
     }
     return sb;
 }
@@ -240,15 +240,15 @@ bool ScrollZoomer::eventFilter( QObject* object, QEvent* event )
 
                 if ( child == m_cornerWidget )
                 {
-                    m_cornerWidget = NULL;
+                    m_cornerWidget = nullptr;
                 }
                 else if ( child == m_hScrollData->scrollBar )
                 {
-                    m_hScrollData->scrollBar = NULL;
+                    m_hScrollData->scrollBar = nullptr;
                 }
                 else if ( child == m_vScrollData->scrollBar )
                 {
-                    m_vScrollData->scrollBar = NULL;
+                    m_vScrollData->scrollBar = nullptr;
                 }
                 break;
             }
@@ -375,7 +375,7 @@ void ScrollZoomer::updateScrollBars()
 
     if ( showHScrollBar && showVScrollBar )
     {
-        if ( m_cornerWidget == NULL )
+        if ( m_cornerWidget == nullptr )
         {
             m_cornerWidget = new QWidget( canvas() );
             m_cornerWidget->setAutoFillBackground( true );

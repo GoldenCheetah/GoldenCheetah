@@ -12,16 +12,12 @@ class QPainterPath;
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
-
   public:
     MainWindow();
-    virtual ~MainWindow();
-
-  private Q_SLOTS:
-    void loadSVG();
+    ~MainWindow() override;
 
   private:
+    void openFileDialog();
     void loadSVG( const QString& );
     void loadPath( const QPainterPath& );
 

@@ -22,7 +22,7 @@
 class Knob : public QWidget
 {
   public:
-    Knob( const QString& title, double min, double max, QWidget* parent = NULL )
+    Knob( const QString& title, double min, double max, QWidget* parent = nullptr )
         : QWidget( parent )
     {
         m_knob = new QwtKnob( this );
@@ -47,7 +47,7 @@ class Knob : public QWidget
             QSizePolicy::MinimumExpanding );
     }
 
-    virtual QSize sizeHint() const QWT_OVERRIDE
+    QSize sizeHint() const override
     {
         QSize sz1 = m_knob->sizeHint();
         QSize sz2 = m_label->sizeHint();
@@ -72,7 +72,7 @@ class Knob : public QWidget
     }
 
   protected:
-    virtual void resizeEvent( QResizeEvent* event ) QWT_OVERRIDE
+    void resizeEvent( QResizeEvent* event ) override
     {
         const QSize sz = event->size();
 
@@ -96,7 +96,7 @@ class Knob : public QWidget
 class Thermo : public QWidget
 {
   public:
-    Thermo( const QString& title, QWidget* parent = NULL )
+    Thermo( const QString& title, QWidget* parent = nullptr )
         : QWidget( parent )
     {
         m_thermo = new QwtThermo( this );

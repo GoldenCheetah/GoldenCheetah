@@ -23,9 +23,8 @@ class TextItem : public QwtPlotItem
         m_text = text;
     }
 
-    virtual void draw( QPainter* painter,
-        const QwtScaleMap&, const QwtScaleMap&,
-        const QRectF& canvasRect ) const QWT_OVERRIDE
+    void draw( QPainter* painter, const QwtScaleMap&, const QwtScaleMap&,
+        const QRectF& canvasRect ) const override
     {
         const int margin = 5;
         const QRectF textRect =
@@ -84,14 +83,13 @@ class RectItem : public QwtPlotItem
         }
     }
 
-    virtual QRectF boundingRect() const QWT_OVERRIDE
+    QRectF boundingRect() const override
     {
         return m_rect;
     }
 
-    virtual void draw( QPainter* painter,
-        const QwtScaleMap& xMap, const QwtScaleMap& yMap,
-        const QRectF& ) const QWT_OVERRIDE
+    void draw( QPainter* painter, const QwtScaleMap& xMap, const QwtScaleMap& yMap,
+        const QRectF& ) const override
     {
         if ( m_rect.isValid() )
         {

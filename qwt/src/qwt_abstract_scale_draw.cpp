@@ -22,30 +22,16 @@
 class QwtAbstractScaleDraw::PrivateData
 {
   public:
-    PrivateData():
-        spacing( 4.0 ),
-        penWidthF( 0.0 ),
-        minExtent( 0.0 )
-    {
-        components = QwtAbstractScaleDraw::Backbone
-            | QwtAbstractScaleDraw::Ticks
-            | QwtAbstractScaleDraw::Labels;
-
-        tickLength[QwtScaleDiv::MinorTick] = 4.0;
-        tickLength[QwtScaleDiv::MediumTick] = 6.0;
-        tickLength[QwtScaleDiv::MajorTick] = 8.0;
-    }
-
-    ScaleComponents components;
+    ScaleComponents components = Backbone | Ticks | Labels;;
 
     QwtScaleMap map;
     QwtScaleDiv scaleDiv;
 
-    double spacing;
-    double tickLength[QwtScaleDiv::NTickTypes];
-    qreal penWidthF;
+    double spacing = 4.0;
+    double tickLength[QwtScaleDiv::NTickTypes] = { 4.0, 6.0, 8.0 };
+    qreal penWidthF = 0.0;
 
-    double minExtent;
+    double minExtent = 0.0;
 
     QMap< double, QwtText > labelCache;
 };
@@ -58,14 +44,13 @@ class QwtAbstractScaleDraw::PrivateData
    set to 4, the tick lengths are set to 4,6 and 8 pixels
  */
 QwtAbstractScaleDraw::QwtAbstractScaleDraw()
+    : m_data( new PrivateData )
 {
-    m_data = new QwtAbstractScaleDraw::PrivateData;
 }
 
 //! Destructor
 QwtAbstractScaleDraw::~QwtAbstractScaleDraw()
 {
-    delete m_data;
 }
 
 /*!

@@ -117,27 +117,38 @@ Panel::Panel( QWidget* parent )
     layout->addWidget( curveBox );
     layout->addStretch( 10 );
 
-    connect( m_legend.checkBox,
-        SIGNAL(stateChanged(int)), SIGNAL(edited()) );
-    connect( m_legend.positionBox,
-        SIGNAL(currentIndexChanged(int)), SIGNAL(edited()) );
+    void (QSpinBox::*spinValueChanged)(int) = &QSpinBox::valueChanged;
+    void (QComboBox::*comboValueChanged)(int) = &QComboBox::currentIndexChanged;
 
-    connect( m_legendItem.checkBox,
-        SIGNAL(stateChanged(int)), SIGNAL(edited()) );
-    connect( m_legendItem.numColumnsBox,
-        SIGNAL(valueChanged(int)), SIGNAL(edited()) );
-    connect( m_legendItem.hAlignmentBox,
-        SIGNAL(currentIndexChanged(int)), SIGNAL(edited()) );
-    connect( m_legendItem.vAlignmentBox,
-        SIGNAL(currentIndexChanged(int)), SIGNAL(edited()) );
-    connect( m_legendItem.backgroundBox,
-        SIGNAL(currentIndexChanged(int)), SIGNAL(edited()) );
-    connect( m_curve.numCurves,
-        SIGNAL(valueChanged(int)), SIGNAL(edited()) );
-    connect( m_legendItem.sizeBox,
-        SIGNAL(valueChanged(int)), SIGNAL(edited()) );
-    connect( m_curve.title,
-        SIGNAL(textEdited(const QString&)), SIGNAL(edited()) );
+    connect( m_legend.checkBox, &QCheckBox::clicked,
+        this, &Panel::edited );
+
+    connect( m_legend.positionBox, &QComboBox::currentTextChanged,
+        this, &Panel::edited );
+
+    connect( m_legendItem.checkBox, &QCheckBox::clicked,
+        this, &Panel::edited );
+
+    connect( m_legendItem.numColumnsBox, spinValueChanged,
+        this, &Panel::edited );
+
+    connect( m_legendItem.hAlignmentBox, comboValueChanged,
+        this, &Panel::edited );
+
+    connect( m_legendItem.vAlignmentBox, comboValueChanged,
+        this, &Panel::edited );
+
+    connect( m_legendItem.backgroundBox, comboValueChanged,
+        this, &Panel::edited );
+
+    connect( m_curve.numCurves, spinValueChanged,
+        this, &Panel::edited );
+
+    connect( m_legendItem.sizeBox, spinValueChanged,
+        this, &Panel::edited );
+
+    connect( m_curve.title, &QLineEdit::textEdited,
+        this, &Panel::edited );
 }
 
 void Panel::setSettings( const Settings& settings)

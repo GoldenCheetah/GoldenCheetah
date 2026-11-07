@@ -14,6 +14,7 @@
 #include "qwt_plot.h"
 
 #include <qobject.h>
+#include <memory>
 
 class QwtPlot;
 class QwtInterval;
@@ -83,7 +84,7 @@ class QWT_EXPORT QwtPlotRescaler : public QObject
         QwtAxisId referenceAxis = QwtAxis::XBottom,
         RescalePolicy = Expanding );
 
-    virtual ~QwtPlotRescaler();
+    ~QwtPlotRescaler() override;
 
     void setEnabled( bool );
     bool isEnabled() const;
@@ -111,7 +112,7 @@ class QWT_EXPORT QwtPlotRescaler : public QObject
     QwtPlot* plot();
     const QwtPlot* plot() const;
 
-    virtual bool eventFilter( QObject*, QEvent* ) QWT_OVERRIDE;
+    bool eventFilter( QObject*, QEvent* ) override;
 
     void rescale() const;
 
@@ -137,8 +138,9 @@ class QWT_EXPORT QwtPlotRescaler : public QObject
     double pixelDist( QwtAxisId, const QSize& ) const;
 
     class AxisData;
+
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

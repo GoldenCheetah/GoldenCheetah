@@ -14,6 +14,8 @@
 #include "qwt_polar_item.h"
 #include "qwt_polar_plot.h"
 
+#include <memory>
+
 class QPainter;
 class QPen;
 class QwtScaleMap;
@@ -103,9 +105,9 @@ class QWT_EXPORT QwtPolarGrid : public QwtPolarItem
     Q_DECLARE_FLAGS( GridAttributes, GridAttribute )
 
     explicit QwtPolarGrid();
-    virtual ~QwtPolarGrid();
+    ~QwtPolarGrid() override;
 
-    virtual int rtti() const QWT_OVERRIDE;
+    int rtti() const override;
 
     void setDisplayFlag( DisplayFlag, bool on = true );
     bool testDisplayFlag( DisplayFlag ) const;
@@ -147,15 +149,15 @@ class QWT_EXPORT QwtPolarGrid : public QwtPolarItem
     const QwtRoundScaleDraw* azimuthScaleDraw() const;
     QwtRoundScaleDraw* azimuthScaleDraw();
 
-    virtual void draw( QPainter* p,
+    void draw( QPainter*,
         const QwtScaleMap& azimuthMap, const QwtScaleMap& radialMap,
         const QPointF& pole, double radius,
-        const QRectF& rect ) const QWT_OVERRIDE;
+        const QRectF& rect ) const override;
 
-    virtual void updateScaleDiv( const QwtScaleDiv& azimuthMap,
-        const QwtScaleDiv& radialMap, const QwtInterval& ) QWT_OVERRIDE;
+    void updateScaleDiv( const QwtScaleDiv& azimuthMap,
+        const QwtScaleDiv& radialMap, const QwtInterval& ) override;
 
-    virtual int marginHint() const QWT_OVERRIDE;
+    int marginHint() const override;
 
   protected:
     void drawRays( QPainter*, const QRectF&,
@@ -174,7 +176,7 @@ class QWT_EXPORT QwtPolarGrid : public QwtPolarItem
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QwtPolarGrid::DisplayFlags )

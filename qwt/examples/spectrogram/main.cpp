@@ -20,7 +20,7 @@ namespace
     class MainWindow : public QMainWindow
     {
       public:
-        MainWindow( QWidget* = NULL );
+        MainWindow( QWidget* = nullptr );
     };
 }
 
@@ -32,11 +32,13 @@ MainWindow::MainWindow( QWidget* parent )
 
     setCentralWidget( plot );
 
+    void (QComboBox::*comboValueChanged)(int) = &QComboBox::currentIndexChanged;
+
 #ifndef QT_NO_PRINTER
     QToolButton* btnPrint = new QToolButton();
     btnPrint->setText( "Print" );
     btnPrint->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
-    connect( btnPrint, SIGNAL(clicked()), plot, SLOT(printPlot()) );
+    connect( btnPrint, &QToolButton::clicked, plot, &Plot::printPlot );
 #endif
 
     QComboBox* mapBox = new QComboBox();
@@ -47,8 +49,8 @@ MainWindow::MainWindow( QWidget* parent )
     mapBox->addItem( "Sat.+Value" );
     mapBox->addItem( "Alpha" );
     mapBox->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-    connect( mapBox, SIGNAL(currentIndexChanged(int)),
-        plot, SLOT(setColorMap(int)) );
+    connect( mapBox, comboValueChanged,
+        plot, &Plot::setColorMap );
 
 
     QComboBox* colorTableBox = new QComboBox();
@@ -56,23 +58,24 @@ MainWindow::MainWindow( QWidget* parent )
     colorTableBox->addItem( "256" );
     colorTableBox->addItem( "1024" );
     colorTableBox->addItem( "16384" );
-    connect( colorTableBox, SIGNAL(currentIndexChanged(int)),
-        plot, SLOT(setColorTableSize(int)) );
+    connect( colorTableBox, comboValueChanged,
+        plot, &Plot::setColorTableSize );
 
     QSlider* slider = new QSlider( Qt::Horizontal );
     slider->setRange( 0, 255 );
     slider->setValue( 255 );
-    connect( slider, SIGNAL(valueChanged(int)), plot, SLOT(setAlpha(int)) );
+    connect( slider, &QSlider::valueChanged,
+        plot, &Plot::setAlpha );
 
     QCheckBox* btnSpectrogram = new QCheckBox( "Spectrogram" );
     btnSpectrogram->setChecked( true );
-    connect( btnSpectrogram, SIGNAL(toggled(bool)),
-        plot, SLOT(showSpectrogram(bool)) );
+    connect( btnSpectrogram, &QCheckBox::toggled,
+        plot, &Plot::showSpectrogram );
 
     QCheckBox* btnContour = new QCheckBox( "Contour" );
     btnContour->setChecked( false );
-    connect( btnContour, SIGNAL(toggled(bool)),
-        plot, SLOT(showContour(bool)) );
+    connect( btnContour, &QCheckBox::toggled,
+        plot, &Plot::showContour );
 
     QToolBar* toolBar = new QToolBar();
 
@@ -95,8 +98,8 @@ MainWindow::MainWindow( QWidget* parent )
 
     addToolBar( toolBar );
 
-    connect( plot, SIGNAL(rendered(const QString&)),
-        statusBar(), SLOT(showMessage(const QString&)),
+    connect( plot, &Plot::rendered,
+        this, [ this ]( const QString &text ) { statusBar()->showMessage( text ); },
         Qt::QueuedConnection );
 }
 

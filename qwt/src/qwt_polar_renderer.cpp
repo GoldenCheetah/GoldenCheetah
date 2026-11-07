@@ -25,43 +25,15 @@
 #ifndef QWT_NO_SVG
 #ifdef QT_SVG_LIB
 #define QWT_FORMAT_SVG 1
+#include <qsvggenerator.h>
 #endif
-#endif
-
-#ifndef QT_NO_PRINTER
-#define QWT_FORMAT_PDF 1
 #endif
 
 #ifndef QT_NO_PDF
 
-// QPdfWriter::setResolution() has been introduced with
-// Qt 5.3. Guess it is o.k. to stay with QPrinter for older
-// versions.
-
-#if QT_VERSION >= 0x050300
-
-#ifndef QWT_FORMAT_PDF
 #define QWT_FORMAT_PDF 1
-#endif
-
-#define QWT_PDF_WRITER 1
-
-#endif
-#endif
-
-#ifndef QT_NO_PRINTER
-// postscript support has been dropped in Qt5
-#if QT_VERSION < 0x050000
-#define QWT_FORMAT_POSTSCRIPT 1
-#endif
-#endif
-
-#if QWT_FORMAT_SVG
-#include <qsvggenerator.h>
-#endif
-
-#if QWT_PDF_WRITER
 #include <qpdfwriter.h>
+
 #endif
 
 static inline double qwtDistance(
@@ -75,12 +47,7 @@ static inline double qwtDistance(
 class QwtPolarRenderer::PrivateData
 {
   public:
-    PrivateData()
-        : plot( NULL )
-    {
-    }
-
-    QwtPolarPlot* plot;
+    QwtPolarPlot* plot = nullptr;
 };
 
 /*!
@@ -89,14 +56,13 @@ class QwtPolarRenderer::PrivateData
  */
 QwtPolarRenderer::QwtPolarRenderer( QObject* parent )
     : QObject( parent )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
 }
 
 //! Destructor
 QwtPolarRenderer::~QwtPolarRenderer()
 {
-    delete m_data;
 }
 
 /*!
@@ -139,7 +105,7 @@ void QwtPolarRenderer::renderDocument( QwtPolarPlot* plot,
     const QString& fileName, const QString& format,
     const QSizeF& sizeMM, int resolution )
 {
-    if ( plot == NULL || sizeMM.isEmpty() || resolution <= 0 )
+    if ( plot == nullptr || sizeMM.isEmpty() || resolution <= 0 )
         return;
 
     QString title = plot->title().text();
@@ -155,7 +121,6 @@ void QwtPolarRenderer::renderDocument( QwtPolarPlot* plot,
     if ( format == "pdf" )
     {
 #if QWT_FORMAT_PDF
-#if QWT_PDF_WRITER
         QPdfWriter pdfWriter( fileName );
         pdfWriter.setPageSize( QPageSize( sizeMM, QPageSize::Millimeter ) );
         pdfWriter.setTitle( title );
@@ -163,36 +128,6 @@ void QwtPolarRenderer::renderDocument( QwtPolarPlot* plot,
         pdfWriter.setResolution( resolution );
 
         QPainter painter( &pdfWriter );
-        render( plot, &painter, documentRect );
-
-#else
-        QPrinter printer;
-        printer.setOutputFormat( QPrinter::PdfFormat );
-        printer.setColorMode( QPrinter::Color );
-        printer.setFullPage( true );
-        printer.setPaperSize( sizeMM, QPrinter::Millimeter );
-        printer.setDocName( title );
-        printer.setOutputFileName( fileName );
-        printer.setResolution( resolution );
-
-        QPainter painter( &printer );
-        render( plot, &painter, documentRect );
-#endif
-#endif
-    }
-    else if ( format == "ps" )
-    {
-#if QWT_FORMAT_POSTSCRIPT
-        QPrinter printer;
-        printer.setColorMode( QPrinter::Color );
-        printer.setFullPage( true );
-        printer.setPaperSize( sizeMM, QPrinter::Millimeter );
-        printer.setDocName( title );
-        printer.setOutputFileName( fileName );
-        printer.setOutputFormat( QPrinter::PostScriptFormat );
-        printer.setResolution( resolution );
-
-        QPainter painter( &printer );
         render( plot, &painter, documentRect );
 #endif
     }
@@ -326,7 +261,7 @@ void QwtPolarRenderer::renderTo(
 void QwtPolarRenderer::render( QwtPolarPlot* plot,
     QPainter* painter, const QRectF& plotRect ) const
 {
-    if ( plot == NULL || painter == NULL || !painter->isActive() ||
+    if ( plot == nullptr || painter == nullptr || !painter->isActive() ||
         !plotRect.isValid() || plot->size().isNull() )
     {
         return;
@@ -378,7 +313,7 @@ void QwtPolarRenderer::render( QwtPolarPlot* plot,
 
     layout->invalidate();
 
-    m_data->plot = NULL;
+    m_data->plot = nullptr;
 }
 
 /*!
@@ -430,7 +365,7 @@ void QwtPolarRenderer::renderLegend( const QwtPolarPlot* plot,
 bool QwtPolarRenderer::exportTo( QwtPolarPlot* plot,
     const QString& documentName, const QSizeF& sizeMM, int resolution )
 {
-    if ( plot == NULL )
+    if ( plot == nullptr )
         return false;
 
     QString fileName = documentName;
@@ -469,8 +404,8 @@ bool QwtPolarRenderer::exportTo( QwtPolarPlot* plot,
     }
 
     fileName = QFileDialog::getSaveFileName(
-        NULL, tr( "Export File Name" ), fileName,
-        filter.join( ";;" ), NULL, QFileDialog::DontConfirmOverwrite );
+        nullptr, tr( "Export File Name" ), fileName,
+        filter.join( ";;" ), nullptr, QFileDialog::DontConfirmOverwrite );
 #endif
     if ( fileName.isEmpty() )
         return false;

@@ -105,7 +105,7 @@ static inline void qwtDrawSvgSymbols( QPainter* painter,
     const QPointF* points, int numPoints,
     QSvgRenderer* renderer, const QwtSymbol& symbol )
 {
-    if ( renderer == NULL || !renderer->isValid() )
+    if ( renderer == nullptr || !renderer->isValid() )
         return;
 
     const QRectF viewBox = renderer->viewBoxF();
@@ -770,64 +770,49 @@ static inline void qwtDrawHexagonSymbols( QPainter* painter,
 class QwtSymbol::PrivateData
 {
   public:
-    PrivateData( QwtSymbol::Style st, const QBrush& br,
-            const QPen& pn, const QSize& sz )
-        : style( st )
-        , size( sz )
-        , brush( br )
-        , pen( pn )
-        , isPinPointEnabled( false )
+    PrivateData( Style style )
+        : style( style )
     {
-        cache.policy = QwtSymbol::AutoCache;
-#ifndef QWT_NO_SVG
-        svg.renderer = NULL;
-#endif
     }
 
-    ~PrivateData()
-    {
-#ifndef QWT_NO_SVG
-        delete svg.renderer;
-#endif
-    }
+    Style style = NoSymbol;
 
-    Style style;
     QSize size;
-    QBrush brush;
-    QPen pen;
+    QBrush brush = Qt::gray;
+    QPen pen = QPen( Qt::black, 0 );
 
-    bool isPinPointEnabled;
+    bool isPinPointEnabled = false;
     QPointF pinPoint;
 
-    struct Path
+    struct
     {
         QPainterPath path;
         QwtGraphic graphic;
 
     } path;
 
-    struct Pixmap
+    struct
     {
         QPixmap pixmap;
 
     } pixmap;
 
-    struct Graphic
+    struct
     {
         QwtGraphic graphic;
 
     } graphic;
 
 #ifndef QWT_NO_SVG
-    struct SVG
+    struct
     {
-        QSvgRenderer* renderer;
+        std::unique_ptr< QSvgRenderer > renderer;
     } svg;
 #endif
 
-    struct PaintCache
+    struct
     {
-        QwtSymbol::CachePolicy policy;
+        CachePolicy policy = AutoCache;
         QPixmap pixmap;
 
     } cache;
@@ -841,9 +826,8 @@ class QwtSymbol::PrivateData
    black outline with zero width, no size and style 'NoSymbol'.
  */
 QwtSymbol::QwtSymbol( Style style )
+    : m_data( new PrivateData( style ) )
 {
-    m_data = new PrivateData( style, QBrush( Qt::gray ),
-        QPen( Qt::black, 0 ), QSize() );
 }
 
 /*!
@@ -855,10 +839,13 @@ QwtSymbol::QwtSymbol( Style style )
 
    \sa setStyle(), setBrush(), setPen(), setSize()
  */
-QwtSymbol::QwtSymbol( QwtSymbol::Style style, const QBrush& brush,
-    const QPen& pen, const QSize& size )
+QwtSymbol::QwtSymbol( QwtSymbol::Style style,
+        const QBrush& brush, const QPen& pen, const QSize& size )
+    : QwtSymbol( style )
 {
-    m_data = new PrivateData( style, brush, pen, size );
+    m_data->brush = brush;
+    m_data->pen = pen;
+    m_data->size = size;
 }
 
 /*!
@@ -875,17 +862,17 @@ QwtSymbol::QwtSymbol( QwtSymbol::Style style, const QBrush& brush,
    \sa setPath(), setBrush(), setPen(), setSize()
  */
 
-QwtSymbol::QwtSymbol( const QPainterPath& path,
-    const QBrush& brush, const QPen& pen )
+QwtSymbol::QwtSymbol( const QPainterPath& path, const QBrush& brush, const QPen& pen )
+    : QwtSymbol( QwtSymbol::Path )
 {
-    m_data = new PrivateData( QwtSymbol::Path, brush, pen, QSize() );
-    setPath( path );
+    m_data->brush = brush;
+    m_data->pen = pen;
+    m_data->path.path = path;
 }
 
 //! Destructor
 QwtSymbol::~QwtSymbol()
 {
-    delete m_data;
 }
 
 /*!
@@ -1044,8 +1031,8 @@ const QwtGraphic& QwtSymbol::graphic() const
 void QwtSymbol::setSvgDocument( const QByteArray& svgDocument )
 {
     m_data->style = QwtSymbol::SvgDocument;
-    if ( m_data->svg.renderer == NULL )
-        m_data->svg.renderer = new QSvgRenderer();
+    if ( m_data->svg.renderer == nullptr )
+        m_data->svg.renderer.reset( new QSvgRenderer() );
 
     m_data->svg.renderer->load( svgDocument );
 }
@@ -1389,7 +1376,7 @@ void QwtSymbol::drawSymbols( QPainter* painter,
 
         if ( m_data->cache.pixmap.isNull() )
         {
-            m_data->cache.pixmap = QwtPainter::backingStore( NULL, br.size() );
+            m_data->cache.pixmap = QwtPainter::backingStore( nullptr, br.size() );
             m_data->cache.pixmap.fill( Qt::transparent );
 
             QPainter p( &m_data->cache.pixmap );
@@ -1620,7 +1607,7 @@ void QwtSymbol::renderSymbols( QPainter* painter,
         {
 #ifndef QWT_NO_SVG
             qwtDrawSvgSymbols( painter, points, numPoints,
-                m_data->svg.renderer, *this );
+                m_data->svg.renderer.get(), *this );
 #endif
             break;
         }

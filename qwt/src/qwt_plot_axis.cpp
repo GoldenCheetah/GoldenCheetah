@@ -20,16 +20,7 @@ namespace
     {
       public:
         AxisData()
-            : isVisible( true )
-            , doAutoScale( true )
-            , minValue( 0.0 )
-            , maxValue( 1000.0 )
-            , stepSize( 0.0 )
-            , maxMajor( 8 )
-            , maxMinor( 5 )
-            , isValid( false )
-            , scaleEngine( new QwtLinearScaleEngine() )
-            , scaleWidget( NULL )
+            : scaleEngine( new QwtLinearScaleEngine() )
         {
         }
 
@@ -59,21 +50,21 @@ namespace
             scaleWidget->setTitle( text );
         }
 
-        bool isVisible;
-        bool doAutoScale;
+        bool isVisible = true;
+        bool doAutoScale = true;
 
-        double minValue;
-        double maxValue;
-        double stepSize;
+        double minValue = 0.0;
+        double maxValue = 1000.0;
+        double stepSize = 0.0;
 
-        int maxMajor;
-        int maxMinor;
+        int maxMajor = 8;
+        int maxMinor = 5;
 
-        bool isValid;
+        bool isValid = false;
 
         QwtScaleDiv scaleDiv;
-        QwtScaleEngine* scaleEngine;
-        QwtScaleWidget* scaleWidget;
+        QwtScaleEngine* scaleEngine = nullptr;
+        QwtScaleWidget* scaleWidget = nullptr;
     };
 }
 
@@ -169,7 +160,7 @@ void QwtPlot::initAxesData()
 void QwtPlot::deleteAxesData()
 {
     delete m_scaleData;
-    m_scaleData = NULL;
+    m_scaleData = nullptr;
 }
 
 void QwtPlot::setAxesCount( int axisPos, int count )
@@ -216,7 +207,7 @@ bool QwtPlot::isAxisValid( QwtAxisId axisId ) const
 }
 
 /*!
-   \return Scale widget of the specified axis, or NULL if axisId is invalid.
+   \return Scale widget of the specified axis, or nullptr if axisId is invalid.
    \param axisId Axis
  */
 const QwtScaleWidget* QwtPlot::axisWidget( QwtAxisId axisId ) const
@@ -224,11 +215,11 @@ const QwtScaleWidget* QwtPlot::axisWidget( QwtAxisId axisId ) const
     if ( isAxisValid( axisId ) )
         return m_scaleData->axisData( axisId ).scaleWidget;
 
-    return NULL;
+    return nullptr;
 }
 
 /*!
-   \return Scale widget of the specified axis, or NULL if axisId is invalid.
+   \return Scale widget of the specified axis, or nullptr if axisId is invalid.
    \param axisId Axis
  */
 QwtScaleWidget* QwtPlot::axisWidget( QwtAxisId axisId )
@@ -236,7 +227,7 @@ QwtScaleWidget* QwtPlot::axisWidget( QwtAxisId axisId )
     if ( isAxisValid( axisId ) )
         return m_scaleData->axisData( axisId ).scaleWidget;
 
-    return NULL;
+    return nullptr;
 }
 
 /*!
@@ -249,7 +240,7 @@ QwtScaleWidget* QwtPlot::axisWidget( QwtAxisId axisId )
  */
 void QwtPlot::setAxisScaleEngine( QwtAxisId axisId, QwtScaleEngine* scaleEngine )
 {
-    if ( isAxisValid( axisId ) && scaleEngine != NULL )
+    if ( isAxisValid( axisId ) && scaleEngine != nullptr )
     {
         AxisData& d = m_scaleData->axisData( axisId );
 
@@ -273,7 +264,7 @@ QwtScaleEngine* QwtPlot::axisScaleEngine( QwtAxisId axisId )
     if ( isAxisValid( axisId ) )
         return m_scaleData->axisData( axisId ).scaleEngine;
     else
-        return NULL;
+        return nullptr;
 }
 
 /*!
@@ -285,7 +276,7 @@ const QwtScaleEngine* QwtPlot::axisScaleEngine( QwtAxisId axisId ) const
     if ( isAxisValid( axisId ) )
         return m_scaleData->axisData( axisId ).scaleEngine;
     else
-        return NULL;
+        return nullptr;
 }
 /*!
    \return \c True, if autoscaling is enabled
@@ -374,12 +365,12 @@ const QwtScaleDiv& QwtPlot::axisScaleDiv( QwtAxisId axisId ) const
    \brief Return the scale draw of a specified axis
 
    \param axisId Axis
-   \return Specified scaleDraw for axis, or NULL if axis is invalid.
+   \return Specified scaleDraw for axis, or nullptr if axis is invalid.
  */
 const QwtScaleDraw* QwtPlot::axisScaleDraw( QwtAxisId axisId ) const
 {
     if ( !isAxisValid( axisId ) )
-        return NULL;
+        return nullptr;
 
     return axisWidget( axisId )->scaleDraw();
 }
@@ -388,12 +379,12 @@ const QwtScaleDraw* QwtPlot::axisScaleDraw( QwtAxisId axisId ) const
    \brief Return the scale draw of a specified axis
 
    \param axisId Axis
-   \return Specified scaleDraw for axis, or NULL if axis is invalid.
+   \return Specified scaleDraw for axis, or nullptr if axis is invalid.
  */
 QwtScaleDraw* QwtPlot::axisScaleDraw( QwtAxisId axisId )
 {
     if ( !isAxisValid( axisId ) )
-        return NULL;
+        return nullptr;
 
     return axisWidget( axisId )->scaleDraw();
 }

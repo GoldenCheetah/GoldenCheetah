@@ -1,1 +1,1 @@
-#include "qwt_plot_intervalcurve.h"
+#include "qwt_plot_intervalcurve.h" // IWYU pragma: export

@@ -1,1 +1,1 @@
-#include "qwt_plot_directpainter.h"
+#include "qwt_plot_directpainter.h" // IWYU pragma: export

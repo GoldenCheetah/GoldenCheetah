@@ -17,27 +17,25 @@ class Legend : public QwtAbstractLegend
     Q_OBJECT
 
   public:
-    explicit Legend( QWidget* parent = NULL );
-    virtual ~Legend();
+    explicit Legend( QWidget* parent = nullptr );
+    ~Legend() override;
 
-    virtual void renderLegend( QPainter*,
-        const QRectF&, bool fillBackground ) const QWT_OVERRIDE;
+    void renderLegend( QPainter*,
+        const QRectF&, bool fillBackground ) const override;
 
-    virtual bool isEmpty() const QWT_OVERRIDE;
+    bool isEmpty() const override;
 
-    virtual int scrollExtent( Qt::Orientation ) const QWT_OVERRIDE;
+    int scrollExtent( Qt::Orientation ) const override;
 
   Q_SIGNALS:
     void checked( QwtPlotItem* plotItem, bool on, int index );
 
   public Q_SLOTS:
-    virtual void updateLegend( const QVariant&,
-        const QList< QwtLegendData >& ) QWT_OVERRIDE;
-
-  private Q_SLOTS:
-    void handleClick( const QModelIndex& );
+    void updateLegend( const QVariant&,
+        const QList< QwtLegendData >& ) override;
 
   private:
+    void handleClick( const QModelIndex& );
     void updateItem( QStandardItem*, const QwtLegendData& );
 
     LegendTreeView* m_treeView;

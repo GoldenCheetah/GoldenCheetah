@@ -16,16 +16,12 @@ class QwtKnob;
 
 class KnobBox : public QWidget
 {
-    Q_OBJECT
-
   public:
     KnobBox( QWidget* parent, int knobType );
 
-  private Q_SLOTS:
-    void setNum( double v );
-
   private:
     QwtKnob* createKnob( int knobType ) const;
+    void showValue( double );
 
     QwtKnob* m_knob;
     QLabel* m_label;

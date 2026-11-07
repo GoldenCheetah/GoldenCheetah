@@ -36,7 +36,7 @@ namespace
         {
         }
 
-        virtual double y( double x ) const QWT_OVERRIDE
+        double y( double x ) const override
         {
             return m_y( x );
         }
@@ -78,10 +78,10 @@ namespace
     class Plot : public QwtPlot
     {
       public:
-        Plot( QWidget* parent = NULL );
+        Plot( QWidget* parent = nullptr );
 
       protected:
-        virtual void resizeEvent( QResizeEvent* ) QWT_OVERRIDE;
+        void resizeEvent( QResizeEvent* ) override;
 
       private:
         void populate();

@@ -1,1 +1,1 @@
-#include "qwt_wheel.h"
+#include "qwt_wheel.h" // IWYU pragma: export

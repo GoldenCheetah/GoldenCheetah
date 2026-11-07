@@ -24,14 +24,13 @@ class QwtPlotMagnifier::PrivateData
  */
 QwtPlotMagnifier::QwtPlotMagnifier( QWidget* canvas )
     : QwtMagnifier( canvas )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData();
 }
 
 //! Destructor
 QwtPlotMagnifier::~QwtPlotMagnifier()
 {
-    delete m_data;
 }
 
 /*!
@@ -105,7 +104,7 @@ const QwtPlot* QwtPlotMagnifier::plot() const
 void QwtPlotMagnifier::rescale( double factor )
 {
     QwtPlot* plt = plot();
-    if ( plt == NULL )
+    if ( plt == nullptr )
         return;
 
     factor = qAbs( factor );

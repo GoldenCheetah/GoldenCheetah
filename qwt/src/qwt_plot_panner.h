@@ -14,6 +14,8 @@
 #include "qwt_panner.h"
 #include "qwt_axis_id.h"
 
+#include <memory>
+
 class QwtPlot;
 
 /*!
@@ -35,7 +37,7 @@ class QWT_EXPORT QwtPlotPanner : public QwtPanner
 
   public:
     explicit QwtPlotPanner( QWidget* );
-    virtual ~QwtPlotPanner();
+    ~QwtPlotPanner() override;
 
     QWidget* canvas();
     const QWidget* canvas() const;
@@ -50,12 +52,12 @@ class QWT_EXPORT QwtPlotPanner : public QwtPanner
     virtual void moveCanvas( int dx, int dy );
 
   protected:
-    virtual QBitmap contentsMask() const QWT_OVERRIDE;
-    virtual QPixmap grab() const QWT_OVERRIDE;
+    QBitmap contentsMask() const override;
+    QPixmap grab() const override;
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

@@ -20,13 +20,13 @@ class Canvas : public QWidget
         VectorGraphic
     };
 
-    Canvas( Mode, QWidget* parent = NULL );
-    virtual ~Canvas();
+    Canvas( Mode, QWidget* parent = nullptr );
+    ~Canvas() override;
 
     void setSvg( const QByteArray& );
 
   protected:
-    virtual void paintEvent( QPaintEvent* ) QWT_OVERRIDE;
+    void paintEvent( QPaintEvent* ) override;
 
   private:
     void render( QPainter*, const QRect& ) const;

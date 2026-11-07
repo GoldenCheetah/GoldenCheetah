@@ -42,7 +42,7 @@ class Counter : public QWidget
 {
   public:
     Counter( const QString& prefix, const QString& suffix,
-            int min, int max, int step, QWidget* parent = NULL )
+            int min, int max, int step, QWidget* parent = nullptr )
         : QWidget( parent )
     {
         QHBoxLayout* layout = new QHBoxLayout( this );
@@ -81,11 +81,20 @@ MainWindow::MainWindow()
 
     setCentralWidget( m_plot );
 
-    connect( m_startAction, SIGNAL(toggled(bool)), this, SLOT(appendPoints(bool)) );
-    connect( m_clearAction, SIGNAL(triggered()), m_plot, SLOT(clear()) );
-    connect( m_symbolType, SIGNAL(toggled(bool)), m_plot, SLOT(showSymbols(bool)) );
-    connect( m_plot, SIGNAL(running(bool)), this, SLOT(showRunning(bool)) );
-    connect( m_plot, SIGNAL(elapsed(int)), this, SLOT(showElapsed(int)) );
+    connect( m_startAction, &QAction::toggled,
+        this, &MainWindow::appendPoints );
+
+    connect( m_clearAction, &QAction::triggered,
+        m_plot, &RandomPlot::clear );
+
+    connect( m_symbolType, &QCheckBox::toggled,
+        m_plot, &RandomPlot::showSymbols );
+
+    connect( m_plot, &RandomPlot::running,
+        this, &MainWindow::showRunning );
+
+    connect( m_plot, &RandomPlot::elapsed,
+        this, &MainWindow::showElapsed );
 
     initWhatsThis();
 
@@ -203,5 +212,3 @@ void MainWindow::initWhatsThis()
     m_startAction->setWhatsThis( text4 );
     m_clearAction->setWhatsThis( text5 );
 }
-
-#include "moc_MainWindow.cpp"

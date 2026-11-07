@@ -14,6 +14,7 @@
 #include "qwt_plot_item.h"
 
 #include <qstring.h>
+#include <memory>
 
 /*!
    \brief A plot item, which displays
@@ -32,24 +33,21 @@ class QWT_EXPORT QwtPlotGraphicItem : public QwtPlotItem
     explicit QwtPlotGraphicItem( const QString& title = QString() );
     explicit QwtPlotGraphicItem( const QwtText& title );
 
-    virtual ~QwtPlotGraphicItem();
+    ~QwtPlotGraphicItem() override;
 
     void setGraphic( const QRectF& rect, const QwtGraphic& );
     QwtGraphic graphic() const;
 
-    virtual QRectF boundingRect() const QWT_OVERRIDE;
+    QRectF boundingRect() const override;
 
-    virtual void draw( QPainter*,
-        const QwtScaleMap& xMap, const QwtScaleMap& yMap,
-        const QRectF& canvasRect ) const QWT_OVERRIDE;
+    void draw( QPainter*, const QwtScaleMap& xMap, const QwtScaleMap& yMap,
+        const QRectF& canvasRect ) const override;
 
-    virtual int rtti() const QWT_OVERRIDE;
+    int rtti() const override;
 
   private:
-    void init();
-
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

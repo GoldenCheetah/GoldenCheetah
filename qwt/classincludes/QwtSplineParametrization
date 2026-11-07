@@ -1,1 +1,1 @@
-#include "qwt_spline_parametrization.h"
+#include "qwt_spline_parametrization.h" // IWYU pragma: export

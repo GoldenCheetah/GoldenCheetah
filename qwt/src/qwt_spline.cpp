@@ -102,7 +102,7 @@ namespace QwtSplineC1P
     {
       public:
         inline ControlPointsStore():
-            m_cp( NULL )
+            m_cp( nullptr )
         {
         }
 
@@ -435,18 +435,9 @@ class QwtSpline::PrivateData
 {
   public:
     PrivateData()
-        : boundaryType( QwtSpline::ConditionalBoundaries )
     {
         parametrization = new QwtSplineParametrization(
             QwtSplineParametrization::ParameterChordal );
-
-        // parabolic runout at both ends
-
-        boundaryConditions[0].type = QwtSpline::Clamped3;
-        boundaryConditions[0].value = 0.0;
-
-        boundaryConditions[1].type = QwtSpline::Clamped3;
-        boundaryConditions[1].value = 0.0;
     }
 
     ~PrivateData()
@@ -454,13 +445,14 @@ class QwtSpline::PrivateData
         delete parametrization;
     }
 
-    QwtSplineParametrization* parametrization;
-    QwtSpline::BoundaryType boundaryType;
+    QwtSplineParametrization* parametrization = nullptr;
+
+    BoundaryType boundaryType = ConditionalBoundaries;
 
     struct
     {
-        int type;
-        double value;
+        int type = Clamped3; 
+        double value = 0.0;
 
     } boundaryConditions[2];
 };
@@ -538,14 +530,13 @@ QPolygonF QwtSpline::polygon( const QPolygonF& points, double tolerance ) const
    \sa setParametrization(), setBoundaryType()
  */
 QwtSpline::QwtSpline()
+    : m_data( new PrivateData )
 {
-    m_data = new PrivateData;
 }
 
 //! Destructor
 QwtSpline::~QwtSpline()
 {
-    delete m_data;
 }
 
 /*!
@@ -591,7 +582,7 @@ void QwtSpline::setParametrization( int type )
  */
 void QwtSpline::setParametrization( QwtSplineParametrization* parametrization )
 {
-    if ( ( parametrization != NULL ) && ( m_data->parametrization != parametrization ) )
+    if ( ( parametrization != nullptr ) && ( m_data->parametrization != parametrization ) )
     {
         delete m_data->parametrization;
         m_data->parametrization = parametrization;

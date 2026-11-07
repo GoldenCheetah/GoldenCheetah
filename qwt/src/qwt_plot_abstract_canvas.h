@@ -11,7 +11,8 @@
 #define QWT_PLOT_ABSTRACT_CANVAS_H
 
 #include "qwt_global.h"
-#include <qframe.h>
+#include <qwidget.h>
+#include <memory>
 
 class QwtPlot;
 
@@ -46,7 +47,6 @@ class QWT_EXPORT QwtPlotAbstractCanvas
         ItemFocusIndicator
     };
 
-    explicit QwtPlotAbstractCanvas( QWidget* canvasWidget );
     virtual ~QwtPlotAbstractCanvas();
 
     QwtPlot* plot();
@@ -59,8 +59,7 @@ class QWT_EXPORT QwtPlotAbstractCanvas
     double borderRadius() const;
 
   protected:
-    QWidget* canvasWidget();
-    const QWidget* canvasWidget() const;
+    explicit QwtPlotAbstractCanvas( QWidget* );
 
     virtual void drawFocusIndicator( QPainter* );
     virtual void drawBorder( QPainter* );
@@ -78,87 +77,7 @@ class QWT_EXPORT QwtPlotAbstractCanvas
     Q_DISABLE_COPY(QwtPlotAbstractCanvas)
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
-
-/*!
-   \brief Base class of QwtPlotOpenGLCanvas and QwtPlotGLCanvas
- */
-class QWT_EXPORT QwtPlotAbstractGLCanvas : public QwtPlotAbstractCanvas
-{
-  public:
-    /*!
-       \brief Paint attributes
-
-       The default setting enables BackingStore and Opaque.
-
-       \sa setPaintAttribute(), testPaintAttribute()
-     */
-    enum PaintAttribute
-    {
-        /*!
-           \brief Paint double buffered reusing the content
-                 of the pixmap buffer when possible.
-
-           Using a backing store might improve the performance
-           significantly, when working with widget overlays ( like rubber bands ).
-           Disabling the cache might improve the performance for
-           incremental paints (using QwtPlotDirectPainter ).
-
-           \sa backingStore(), invalidateBackingStore()
-         */
-        BackingStore = 1,
-
-        /*!
-           When ImmediatePaint is set replot() calls repaint()
-           instead of update().
-
-           \sa replot(), QWidget::repaint(), QWidget::update()
-         */
-        ImmediatePaint = 8,
-    };
-
-    //! Paint attributes
-    Q_DECLARE_FLAGS( PaintAttributes, PaintAttribute )
-
-    explicit QwtPlotAbstractGLCanvas( QWidget* canvasWidget );
-    virtual ~QwtPlotAbstractGLCanvas();
-
-    void setPaintAttribute( PaintAttribute, bool on = true );
-    bool testPaintAttribute( PaintAttribute ) const;
-
-    void setFrameStyle( int style );
-    int frameStyle() const;
-
-    void setFrameShadow( QFrame::Shadow );
-    QFrame::Shadow frameShadow() const;
-
-    void setFrameShape( QFrame::Shape );
-    QFrame::Shape frameShape() const;
-
-    void setLineWidth( int );
-    int lineWidth() const;
-
-    void setMidLineWidth( int );
-    int midLineWidth() const;
-
-    int frameWidth() const;
-    QRect frameRect() const;
-
-    //! Invalidate the internal backing store
-    virtual void invalidateBackingStore() = 0;
-
-  protected:
-    void replot();
-    void draw( QPainter* );
-
-  private:
-    virtual void clearBackingStore() = 0;
-
-    class PrivateData;
-    PrivateData* m_data;
-};
-
-Q_DECLARE_OPERATORS_FOR_FLAGS( QwtPlotAbstractGLCanvas::PaintAttributes )
 
 #endif

@@ -1,1 +1,1 @@
-#include "qwt_point_mapper.h"
+#include "qwt_point_mapper.h" // IWYU pragma: export

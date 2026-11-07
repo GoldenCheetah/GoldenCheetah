@@ -12,6 +12,8 @@
 #include "qwt_global.h"
 #include "qwt_magnifier.h"
 
+#include <memory>
+
 class QwtPolarPlot;
 class QwtPolarCanvas;
 
@@ -33,7 +35,7 @@ class QWT_EXPORT QwtPolarMagnifier : public QwtMagnifier
 
   public:
     explicit QwtPolarMagnifier( QwtPolarCanvas* );
-    virtual ~QwtPolarMagnifier();
+    ~QwtPolarMagnifier() override;
 
     void setUnzoomKey( int key, int modifiers );
     void getUnzoomKey( int& key, int& modifiers ) const;
@@ -45,15 +47,15 @@ class QWT_EXPORT QwtPolarMagnifier : public QwtMagnifier
     const QwtPolarCanvas* canvas() const;
 
   public Q_SLOTS:
-    virtual void rescale( double factor ) QWT_OVERRIDE;
+    void rescale( double factor ) override;
     void unzoom();
 
   protected:
-    virtual void widgetKeyPressEvent( QKeyEvent* ) QWT_OVERRIDE;
+    void widgetKeyPressEvent( QKeyEvent* ) override;
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

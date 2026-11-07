@@ -14,5 +14,5 @@
 class KnobTab : public QWidget
 {
   public:
-    KnobTab( QWidget* parent = NULL );
+    KnobTab( QWidget* parent = nullptr );
 };

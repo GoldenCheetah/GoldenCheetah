@@ -41,11 +41,8 @@ class QwtPolarCurve::PrivateData
 {
   public:
     PrivateData()
-        : style( QwtPolarCurve::Lines )
-        , curveFitter( NULL )
     {
         symbol = new QwtSymbol();
-        pen = QPen( Qt::black );
     }
 
     ~PrivateData()
@@ -54,19 +51,21 @@ class QwtPolarCurve::PrivateData
         delete curveFitter;
     }
 
-    QwtPolarCurve::CurveStyle style;
-    const QwtSymbol* symbol;
-    QPen pen;
-    QwtCurveFitter* curveFitter;
+    CurveStyle style = Lines;
+    const QwtSymbol* symbol = nullptr;
+    QPen pen = { Qt::black };
+    QwtCurveFitter* curveFitter = nullptr;
 
-    QwtPolarCurve::LegendAttributes legendAttributes;
+    LegendAttributes legendAttributes;
 };
 
-//! Constructor
-QwtPolarCurve::QwtPolarCurve()
-    : QwtPolarItem( QwtText() )
+/*!
+   Constructor
+   \param title title of the curve
+ */
+QwtPolarCurve::QwtPolarCurve( const QString& title )
+    : QwtPolarCurve( QwtText( title ) )
 {
-    init();
 }
 
 /*!
@@ -75,38 +74,19 @@ QwtPolarCurve::QwtPolarCurve()
  */
 QwtPolarCurve::QwtPolarCurve( const QwtText& title )
     : QwtPolarItem( title )
+    , m_data( new PrivateData )
 {
-    init();
-}
+    setItemAttribute( QwtPolarItem::AutoScale );
+    setItemAttribute( QwtPolarItem::Legend );
+    setZ( 20.0 );
 
-/*!
-   Constructor
-   \param title title of the curve
- */
-QwtPolarCurve::QwtPolarCurve( const QString& title )
-    : QwtPolarItem( QwtText( title ) )
-{
-    init();
+    setRenderHint( RenderAntialiased, true );
 }
 
 //! Destructor
 QwtPolarCurve::~QwtPolarCurve()
 {
     delete m_series;
-    delete m_data;
-}
-
-//! Initialize data members
-void QwtPolarCurve::init()
-{
-    m_data = new PrivateData;
-    m_series = NULL;
-
-    setItemAttribute( QwtPolarItem::AutoScale );
-    setItemAttribute( QwtPolarItem::Legend );
-    setZ( 20.0 );
-
-    setRenderHint( RenderAntialiased, true );
 }
 
 //! \return QwtPolarCurve::Rtti_PolarCurve
@@ -239,7 +219,7 @@ void QwtPolarCurve::setData( QwtSeriesData< QwtPointPolar >* data )
 
    A curve fitter interpolates the curve points. F.e QwtPolarFitter
    adds equidistant points so that the connection gets rounded instead
-   of having straight lines. If curveFitter is NULL fitting is disabled.
+   of having straight lines. If curveFitter is a nullptr fitting is disabled.
 
    \sa curveFitter()
  */

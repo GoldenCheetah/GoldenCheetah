@@ -25,7 +25,7 @@ namespace
             parent->installEventFilter( this );
         }
 
-        virtual bool eventFilter( QObject* object, QEvent* event ) QWT_OVERRIDE
+        bool eventFilter( QObject* object, QEvent* event ) override
         {
             if ( event->type() == QEvent::Wheel && !m_ignoreWheelEvent )
             {
@@ -33,7 +33,7 @@ namespace
 
                 const QPoint pos = wheelRect().center();
 
-#if QT_VERSION >= 0x050c00
+#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
                 QWheelEvent wheelEvent(
                     pos, mapToGlobal( pos ),
                     we->pixelDelta(), we->angleDelta(),
@@ -100,11 +100,11 @@ WheelBox::WheelBox( const QString& title,
     vLayout->addLayout( hLayout, 10 );
     vLayout->addWidget( m_label, 0, Qt::AlignTop | Qt::AlignHCenter );
 
-    connect( m_wheel, SIGNAL(valueChanged(double)),
-        m_number, SLOT(display(double)) );
+    connect( m_wheel, &QwtWheel::valueChanged,
+        m_number, [ this ]( double value ) { m_number->display( value ); } );
 
-    connect( m_wheel, SIGNAL(valueChanged(double)),
-        this, SIGNAL(valueChanged(double)) );
+    connect( m_wheel, &QwtWheel::valueChanged,
+        this, &WheelBox::valueChanged );
 }
 
 void WheelBox::setTheme( const QColor& color )

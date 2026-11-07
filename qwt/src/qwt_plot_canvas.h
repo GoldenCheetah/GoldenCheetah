@@ -14,6 +14,7 @@
 #include "qwt_plot_abstract_canvas.h"
 
 #include <qframe.h>
+#include <memory>
 
 class QwtPlot;
 class QPixmap;
@@ -24,7 +25,7 @@ class QPainterPath;
 
    Canvas is the widget where all plot items are displayed
 
-   \sa QwtPlot::setCanvas(), QwtPlotGLCanvas, QwtPlotOpenGLCanvas
+   \sa QwtPlot::setCanvas(), QwtPlotOpenGLCanvas
  */
 class QWT_EXPORT QwtPlotCanvas : public QFrame, public QwtPlotAbstractCanvas
 {
@@ -101,8 +102,8 @@ class QWT_EXPORT QwtPlotCanvas : public QFrame, public QwtPlotAbstractCanvas
 
     Q_DECLARE_FLAGS( PaintAttributes, PaintAttribute )
 
-    explicit QwtPlotCanvas( QwtPlot* = NULL );
-    virtual ~QwtPlotCanvas();
+    explicit QwtPlotCanvas( QwtPlot* = nullptr );
+    ~QwtPlotCanvas() override;
 
     void setPaintAttribute( PaintAttribute, bool on = true );
     bool testPaintAttribute( PaintAttribute ) const;
@@ -110,7 +111,7 @@ class QWT_EXPORT QwtPlotCanvas : public QFrame, public QwtPlotAbstractCanvas
     const QPixmap* backingStore() const;
     Q_INVOKABLE void invalidateBackingStore();
 
-    virtual bool event( QEvent* ) QWT_OVERRIDE;
+    bool event( QEvent* ) override;
 
     Q_INVOKABLE QPainterPath borderPath( const QRect& ) const;
 
@@ -118,14 +119,14 @@ class QWT_EXPORT QwtPlotCanvas : public QFrame, public QwtPlotAbstractCanvas
     void replot();
 
   protected:
-    virtual void paintEvent( QPaintEvent* ) QWT_OVERRIDE;
-    virtual void resizeEvent( QResizeEvent* ) QWT_OVERRIDE;
+    void paintEvent( QPaintEvent* ) override;
+    void resizeEvent( QResizeEvent* ) override;
 
-    virtual void drawBorder( QPainter* ) QWT_OVERRIDE;
+    void drawBorder( QPainter* ) override;
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QwtPlotCanvas::PaintAttributes )

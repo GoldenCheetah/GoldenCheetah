@@ -13,8 +13,6 @@ class Plot;
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
-
   public:
     enum RescaleMode
     {
@@ -26,11 +24,10 @@ class MainWindow : public QMainWindow
 
     MainWindow();
 
-  private Q_SLOTS:
+  private:
     void setRescaleMode( int );
     void showRatio( double, double );
 
-  private:
     QWidget* createPanel( QWidget* );
     Plot* createPlot( QWidget* );
 

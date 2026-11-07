@@ -16,7 +16,7 @@ namespace
     class MainWindow : public QMainWindow
     {
       public:
-        MainWindow( QWidget* = NULL );
+        MainWindow( QWidget* = nullptr );
 
     };
 }
@@ -37,21 +37,25 @@ MainWindow::MainWindow( QWidget* parent )
     QToolButton* btnExport = new QToolButton( toolBar );
     btnExport->setText( "Export" );
     btnExport->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
-    connect( btnExport, SIGNAL(clicked()), chart, SLOT(exportChart()) );
+    connect( btnExport, &QToolButton::clicked,
+        chart, &BarChart::exportChart );
 
     QToolButton* btnScreenshot = new QToolButton( toolBar );
     btnScreenshot->setText( "Screenshot" );
     btnScreenshot->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
-    connect( btnScreenshot, SIGNAL(clicked()), chart, SLOT(doScreenShot()) );
+    connect( btnScreenshot, &QToolButton::clicked,
+        chart, &BarChart::doScreenShot );
 
     toolBar->addWidget( orientationBox );
     toolBar->addWidget( btnExport );
     toolBar->addWidget( btnScreenshot );
     addToolBar( toolBar );
 
+    void (QComboBox::*comboValueChanged)(int) = &QComboBox::currentIndexChanged;
+
     chart->setOrientation( orientationBox->currentIndex() );
-    connect( orientationBox, SIGNAL(currentIndexChanged(int)),
-        chart, SLOT(setOrientation(int)) );
+    connect( orientationBox, comboValueChanged,
+        chart, &BarChart::setOrientation );
 }
 
 int main( int argc, char* argv[] )

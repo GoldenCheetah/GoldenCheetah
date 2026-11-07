@@ -1,1 +1,1 @@
-#include "qwt_polar_magnifier.h"
+#include "qwt_polar_magnifier.h" // IWYU pragma: export

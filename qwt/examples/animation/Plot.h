@@ -15,10 +15,10 @@
 class Plot : public QwtPlot
 {
   public:
-    Plot( QWidget* = NULL);
+    Plot( QWidget* = nullptr );
 
   protected:
-    virtual void timerEvent( QTimerEvent* ) QWT_OVERRIDE;
+    void timerEvent( QTimerEvent* ) override;
 
   private:
     void updateCurves();

@@ -1,1 +1,1 @@
-#include "qwt_sampling_thread.h"
+#include "qwt_sampling_thread.h" // IWYU pragma: export

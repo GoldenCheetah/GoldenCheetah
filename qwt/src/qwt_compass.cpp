@@ -26,9 +26,8 @@ class QwtCompassScaleDraw::PrivateData
    Initializes a label map for multiples of 45 degrees
  */
 QwtCompassScaleDraw::QwtCompassScaleDraw()
+    : m_data( new PrivateData )
 {
-    m_data = new PrivateData;
-
     enableComponent( QwtAbstractScaleDraw::Backbone, false );
     enableComponent( QwtAbstractScaleDraw::Ticks, false );
 
@@ -61,8 +60,8 @@ QwtCompassScaleDraw::QwtCompassScaleDraw()
    \param map Value to label map
  */
 QwtCompassScaleDraw::QwtCompassScaleDraw( const QMap< double, QString >& map )
+    : m_data( new PrivateData )
 {
-    m_data = new PrivateData;
     m_data->labelMap = map;
 
     enableComponent( QwtAbstractScaleDraw::Backbone, false );
@@ -72,7 +71,6 @@ QwtCompassScaleDraw::QwtCompassScaleDraw( const QMap< double, QString >& map )
 //!  Destructor
 QwtCompassScaleDraw::~QwtCompassScaleDraw()
 {
-    delete m_data;
 }
 
 /*!
@@ -134,7 +132,7 @@ class QwtCompass::PrivateData
 {
   public:
     PrivateData():
-        rose( NULL )
+        rose( nullptr )
     {
     }
 
@@ -157,9 +155,8 @@ class QwtCompass::PrivateData
  */
 QwtCompass::QwtCompass( QWidget* parent )
     : QwtDial( parent )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
-
     setScaleDraw( new QwtCompassScaleDraw() );
 
     setOrigin( 270.0 );
@@ -175,9 +172,7 @@ QwtCompass::QwtCompass( QWidget* parent )
 //!  Destructor
 QwtCompass::~QwtCompass()
 {
-    delete m_data;
 }
-
 
 /*!
    Draw the contents of the scale

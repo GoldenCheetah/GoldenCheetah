@@ -13,7 +13,7 @@ class QwtScaleWidget;
 class PlotWindow : public QWidget
 {
   public:
-    PlotWindow( QWidget* = NULL );
+    PlotWindow( QWidget* = nullptr );
 
     Plot* plot() { return m_plot; }
 

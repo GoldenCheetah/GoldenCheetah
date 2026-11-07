@@ -1,1 +1,1 @@
-#include "qwt_plot_scaleitem.h"
+#include "qwt_plot_scaleitem.h" // IWYU pragma: export

@@ -6,6 +6,7 @@
 #include "MainWindow.h"
 #include "Plot.h"
 #include "Panel.h"
+#include "Settings.h"
 
 #include <QStatusBar>
 #include <QLabel>
@@ -32,8 +33,8 @@ MainWindow::MainWindow( QWidget* parent )
 
     applySettings( panel->settings() );
 
-    connect( panel, SIGNAL(settingsChanged(const Settings&)),
-        this, SLOT(applySettings(const Settings&)) );
+    connect( panel, &Panel::settingsChanged,
+        this, &MainWindow::applySettings );
 }
 
 bool MainWindow::eventFilter( QObject* object, QEvent* event )
@@ -78,5 +79,3 @@ void MainWindow::applySettings( const Settings& settings )
     m_plot->canvas()->removeEventFilter( this );
     m_plot->canvas()->installEventFilter( this );
 }
-
-#include "moc_MainWindow.cpp"

@@ -12,7 +12,7 @@ class Plot : public QwtPlot
     Q_OBJECT
 
   public:
-    Plot( QWidget* = NULL );
+    Plot( QWidget* = nullptr );
 
   public Q_SLOTS:
     void setMode( int );

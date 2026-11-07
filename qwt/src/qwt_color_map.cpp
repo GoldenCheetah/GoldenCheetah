@@ -61,8 +61,7 @@ static inline QRgb qwtHsvToRgb( int h, int s, int v, int a )
 class QwtLinearColorMap::ColorStops
 {
   public:
-    ColorStops():
-        m_doAlpha( false )
+    ColorStops()
     {
         m_stops.reserve( 256 );
     }
@@ -127,8 +126,9 @@ class QwtLinearColorMap::ColorStops
     };
 
     inline int findUpper( double pos ) const;
+
     QVector< ColorStop > m_stops;
-    bool m_doAlpha;
+    bool m_doAlpha = false;
 };
 
 void QwtLinearColorMap::ColorStops::insert( double pos, const QColor& color )
@@ -339,7 +339,7 @@ class QwtLinearColorMap::PrivateData
 {
   public:
     ColorStops colorStops;
-    QwtLinearColorMap::Mode mode;
+    QwtLinearColorMap::Mode mode = ScaledColors;
 };
 
 /*!
@@ -348,12 +348,10 @@ class QwtLinearColorMap::PrivateData
 
    \param format Preferred format of the color map
  */
-QwtLinearColorMap::QwtLinearColorMap( QwtColorMap::Format format ):
-    QwtColorMap( format )
+QwtLinearColorMap::QwtLinearColorMap( QwtColorMap::Format format )
+    : QwtColorMap( format )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
-    m_data->mode = ScaledColors;
-
     setColorInterval( Qt::blue, Qt::yellow );
 }
 
@@ -367,16 +365,14 @@ QwtLinearColorMap::QwtLinearColorMap( QwtColorMap::Format format ):
 QwtLinearColorMap::QwtLinearColorMap( const QColor& color1,
         const QColor& color2, QwtColorMap::Format format )
     : QwtColorMap( format )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
-    m_data->mode = ScaledColors;
     setColorInterval( color1, color2 );
 }
 
 //! Destructor
 QwtLinearColorMap::~QwtLinearColorMap()
 {
-    delete m_data;
 }
 
 /*!
@@ -538,15 +534,14 @@ class QwtAlphaColorMap::PrivateData
  */
 QwtAlphaColorMap::QwtAlphaColorMap( const QColor& color )
     : QwtColorMap( QwtColorMap::RGB )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
     setColor( color );
 }
 
 //! Destructor
 QwtAlphaColorMap::~QwtAlphaColorMap()
 {
-    delete m_data;
 }
 
 /*!
@@ -722,14 +717,13 @@ void QwtHueColorMap::PrivateData::updateTable()
  */
 QwtHueColorMap::QwtHueColorMap( QwtColorMap::Format format )
     : QwtColorMap( format )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
 }
 
 //! Destructor
 QwtHueColorMap::~QwtHueColorMap()
 {
-    delete m_data;
 }
 
 /*!
@@ -970,14 +964,13 @@ class QwtSaturationValueColorMap::PrivateData
    \sa setHueInterval(), setSaturation(), setValue(), setValue()
  */
 QwtSaturationValueColorMap::QwtSaturationValueColorMap()
+    : m_data( new PrivateData )
 {
-    m_data = new PrivateData;
 }
 
 //! Destructor
 QwtSaturationValueColorMap::~QwtSaturationValueColorMap()
 {
-    delete m_data;
 }
 
 /*!

@@ -13,6 +13,8 @@
 #include "qwt_point_polar.h"
 #include <qframe.h>
 
+#include <memory>
+
 class QPainter;
 class QwtPolarPlot;
 
@@ -50,7 +52,7 @@ class QWT_EXPORT QwtPolarCanvas : public QFrame
     Q_DECLARE_FLAGS( PaintAttributes, PaintAttribute )
 
     explicit QwtPolarCanvas( QwtPolarPlot* );
-    virtual ~QwtPolarCanvas();
+    ~QwtPolarCanvas() override;
 
     QwtPolarPlot* plot();
     const QwtPolarPlot* plot() const;
@@ -65,12 +67,12 @@ class QWT_EXPORT QwtPolarCanvas : public QFrame
     QPoint transform( const QwtPointPolar& ) const;
 
   protected:
-    virtual void paintEvent( QPaintEvent* ) QWT_OVERRIDE;
-    virtual void resizeEvent( QResizeEvent* ) QWT_OVERRIDE;
+    void paintEvent( QPaintEvent* ) override;
+    void resizeEvent( QResizeEvent* ) override;
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QwtPolarCanvas::PaintAttributes )

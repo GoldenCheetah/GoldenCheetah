@@ -11,6 +11,7 @@
 #define QWT_VECTOR_FIELD_SYMBOL_H
 
 #include "qwt_global.h"
+#include <memory>
 
 class QPainter;
 class QPainterPath;
@@ -62,16 +63,16 @@ class QWT_EXPORT QwtVectorFieldArrow : public QwtVectorFieldSymbol
 {
   public:
     QwtVectorFieldArrow( qreal headWidth = 6.0, qreal tailWidth = 1.0 );
-    virtual ~QwtVectorFieldArrow() QWT_OVERRIDE;
+    ~QwtVectorFieldArrow() override;
 
-    virtual void setLength( qreal length ) QWT_OVERRIDE;
-    virtual qreal length() const QWT_OVERRIDE;
+    void setLength( qreal length ) override;
+    qreal length() const override;
 
-    virtual void paint( QPainter* ) const QWT_OVERRIDE;
+    void paint( QPainter* ) const override;
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 /*!
@@ -82,16 +83,16 @@ class QWT_EXPORT QwtVectorFieldThinArrow : public QwtVectorFieldSymbol
 {
   public:
     QwtVectorFieldThinArrow( qreal headWidth = 6.0 );
-    virtual ~QwtVectorFieldThinArrow() QWT_OVERRIDE;
+    ~QwtVectorFieldThinArrow() override;
 
-    virtual void setLength( qreal length ) QWT_OVERRIDE;
-    virtual qreal length() const QWT_OVERRIDE;
+    void setLength( qreal length ) override;
+    qreal length() const override;
 
-    virtual void paint( QPainter* ) const QWT_OVERRIDE;
+    void paint( QPainter* ) const override;
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

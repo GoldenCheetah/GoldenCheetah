@@ -12,7 +12,7 @@ class SamplingThread : public QwtSamplingThread
     Q_OBJECT
 
   public:
-    SamplingThread( QObject* parent = NULL );
+    SamplingThread( QObject* parent = nullptr );
 
     double frequency() const;
     double amplitude() const;
@@ -22,7 +22,7 @@ class SamplingThread : public QwtSamplingThread
     void setFrequency( double );
 
   protected:
-    virtual void sample( double elapsed ) QWT_OVERRIDE;
+    void sample( double elapsed ) override;
 
   private:
     virtual double value( double timeStamp ) const;

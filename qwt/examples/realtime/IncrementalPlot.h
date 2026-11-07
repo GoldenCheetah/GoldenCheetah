@@ -15,8 +15,8 @@ class IncrementalPlot : public QwtPlot
     Q_OBJECT
 
   public:
-    IncrementalPlot( QWidget* parent = NULL );
-    virtual ~IncrementalPlot();
+    IncrementalPlot( QWidget* parent = nullptr );
+    ~IncrementalPlot() override;
 
     void appendPoint( const QPointF& );
     void clearPoints();

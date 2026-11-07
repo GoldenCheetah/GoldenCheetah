@@ -134,14 +134,14 @@ namespace
         const QwtScaleMap& m_intervalMap;
 
         const bool m_inverting;
-        bool m_pending;
+        bool m_pending = false;
 
         // all ints are in paint device coordinates
 
         int m_intvMin, m_intvMax;   // interval boundaries of the canvas
         int m_valueMin, m_valueMax; // value boundaries of the canvas
 
-        int m_value; // value of the last sample being processed
+        int m_value = 0; // value of the last sample being processed
 
         struct
         {
@@ -171,8 +171,6 @@ namespace
         , m_valueMap( m_vertical ? xMap : yMap )
         , m_intervalMap( m_vertical ? yMap : xMap )
         , m_inverting( m_intervalMap.isInverting() )
-        , m_pending( false )
-        , m_value( 0 )
     {
         QRectF r = rect; 
         if ( !m_vertical )
@@ -481,30 +479,18 @@ static void qwtDrawTube(
 class QwtPlotIntervalCurve::PrivateData
 {
   public:
-    PrivateData():
-        style( QwtPlotIntervalCurve::Tube ),
-        symbol( NULL ),
-        pen( Qt::black ),
-        brush( Qt::white )
-    {
-        paintAttributes = QwtPlotIntervalCurve::ClipPolygons;
-        paintAttributes |= QwtPlotIntervalCurve::ClipSymbol;
-
-        pen.setCapStyle( Qt::FlatCap );
-    }
-
     ~PrivateData()
     {
         delete symbol;
     }
 
-    QwtPlotIntervalCurve::CurveStyle style;
-    const QwtIntervalSymbol* symbol;
+    CurveStyle style = Tube;
+    const QwtIntervalSymbol* symbol = nullptr;
 
-    QPen pen;
-    QBrush brush;
+    QPen pen = QPen( Qt::black, 1, Qt::SolidLine, Qt::FlatCap, Qt::BevelJoin );
+    QBrush brush = QBrush( Qt::white );
 
-    QwtPlotIntervalCurve::PaintAttributes paintAttributes;
+    PaintAttributes paintAttributes = ClipPolygons | ClipSymbol;
 };
 
 /*!
@@ -513,8 +499,14 @@ class QwtPlotIntervalCurve::PrivateData
  */
 QwtPlotIntervalCurve::QwtPlotIntervalCurve( const QwtText& title )
     : QwtPlotSeriesItem( title )
+    , m_data( new PrivateData )
 {
-    init();
+    setItemAttribute( QwtPlotItem::Legend, true );
+    setItemAttribute( QwtPlotItem::AutoScale, true );
+
+    setData( new QwtIntervalSeriesData() );
+
+    setZ( 19.0 );
 }
 
 /*!
@@ -522,27 +514,13 @@ QwtPlotIntervalCurve::QwtPlotIntervalCurve( const QwtText& title )
    \param title Title of the curve
  */
 QwtPlotIntervalCurve::QwtPlotIntervalCurve( const QString& title )
-    : QwtPlotSeriesItem( QwtText( title ) )
+    : QwtPlotIntervalCurve( QwtText( title ) )
 {
-    init();
 }
 
 //! Destructor
 QwtPlotIntervalCurve::~QwtPlotIntervalCurve()
 {
-    delete m_data;
-}
-
-//! Initialize internal members
-void QwtPlotIntervalCurve::init()
-{
-    setItemAttribute( QwtPlotItem::Legend, true );
-    setItemAttribute( QwtPlotItem::AutoScale, true );
-
-    m_data = new PrivateData;
-    setData( new QwtIntervalSeriesData() );
-
-    setZ( 19.0 );
 }
 
 //! \return QwtPlotItem::Rtti_PlotIntervalCurve
@@ -648,7 +626,7 @@ void QwtPlotIntervalCurve::setSymbol( const QwtIntervalSymbol* symbol )
 }
 
 /*!
-   \return Current symbol or NULL, when no symbol has been assigned
+   \return Current symbol or a nullptr, when no symbol has been assigned
    \sa setSymbol()
  */
 const QwtIntervalSymbol* QwtPlotIntervalCurve::symbol() const

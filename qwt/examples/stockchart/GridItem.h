@@ -21,9 +21,9 @@ class GridItem : public QwtPlotItem
     typedef QFlags< GridAttribute > GridAttributes;
 
     explicit GridItem();
-    virtual ~GridItem();
+    ~GridItem() override;
 
-    virtual int rtti() const QWT_OVERRIDE;
+    int rtti() const override;
 
     void setGridAttribute( GridAttribute, bool on = true );
     bool testGridAttribute( GridAttribute ) const;
@@ -46,12 +46,12 @@ class GridItem : public QwtPlotItem
     void setPalette( const QPalette& );
     QPalette palette() const;
 
-    virtual void draw( QPainter*,
+    void draw( QPainter*,
         const QwtScaleMap& xMap, const QwtScaleMap& yMap,
-        const QRectF& rect ) const QWT_OVERRIDE;
+        const QRectF& rect ) const override;
 
-    virtual void updateScaleDiv(
-        const QwtScaleDiv& xMap, const QwtScaleDiv& yMap ) QWT_OVERRIDE;
+    void updateScaleDiv(
+        const QwtScaleDiv& xMap, const QwtScaleDiv& yMap ) override;
 
   protected:
     virtual QBrush brush( int row, int column, const QRectF& ) const;

@@ -1,1 +1,1 @@
-#include "qwt_abstract_scale_draw.h"
+#include "qwt_abstract_scale_draw.h" // IWYU pragma: export

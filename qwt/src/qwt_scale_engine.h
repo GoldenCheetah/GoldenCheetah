@@ -13,6 +13,8 @@
 #include "qwt_global.h"
 #include "qwt_scale_div.h"
 
+#include <memory>
+
 class QwtInterval;
 class QwtTransform;
 
@@ -138,7 +140,7 @@ class QWT_EXPORT QwtScaleEngine
     Q_DISABLE_COPY(QwtScaleEngine)
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 /*!
@@ -152,14 +154,14 @@ class QWT_EXPORT QwtLinearScaleEngine : public QwtScaleEngine
 {
   public:
     explicit QwtLinearScaleEngine( uint base = 10 );
-    virtual ~QwtLinearScaleEngine();
+    ~QwtLinearScaleEngine() override;
 
-    virtual void autoScale( int maxNumSteps,
-        double& x1, double& x2, double& stepSize ) const QWT_OVERRIDE;
+    void autoScale( int maxNumSteps,
+        double& x1, double& x2, double& stepSize ) const override;
 
-    virtual QwtScaleDiv divideScale( double x1, double x2,
+    QwtScaleDiv divideScale( double x1, double x2,
         int maxMajorSteps, int maxMinorSteps,
-        double stepSize = 0.0 ) const QWT_OVERRIDE;
+        double stepSize = 0.0 ) const override;
 
 
   protected:
@@ -192,14 +194,14 @@ class QWT_EXPORT QwtLogScaleEngine : public QwtScaleEngine
 {
   public:
     explicit QwtLogScaleEngine( uint base = 10 );
-    virtual ~QwtLogScaleEngine();
+    ~QwtLogScaleEngine() override;
 
-    virtual void autoScale( int maxNumSteps,
-        double& x1, double& x2, double& stepSize ) const QWT_OVERRIDE;
+    void autoScale( int maxNumSteps,
+        double& x1, double& x2, double& stepSize ) const override;
 
-    virtual QwtScaleDiv divideScale( double x1, double x2,
+    QwtScaleDiv divideScale( double x1, double x2,
         int maxMajorSteps, int maxMinorSteps,
-        double stepSize = 0.0 ) const QWT_OVERRIDE;
+        double stepSize = 0.0 ) const override;
 
   protected:
     QwtInterval align( const QwtInterval&, double stepSize ) const;

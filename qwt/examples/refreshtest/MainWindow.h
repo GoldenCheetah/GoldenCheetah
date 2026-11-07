@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <QwtGlobal>
 #include <QMainWindow>
 
 class Plot;
@@ -14,16 +13,13 @@ class Settings;
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
-
   public:
-    MainWindow( QWidget* parent = NULL );
-    virtual bool eventFilter( QObject*, QEvent* ) QWT_OVERRIDE;
-
-  private Q_SLOTS:
-    void applySettings( const Settings& );
+    MainWindow( QWidget* parent = nullptr );
+    bool eventFilter( QObject*, QEvent* ) override;
 
   private:
+    void applySettings( const Settings& );
+
     Plot* m_plot;
     QLabel* m_frameCount;
 };

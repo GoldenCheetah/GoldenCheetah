@@ -1,1 +1,1 @@
-#include "qwt_system_clock.h"
+#include "qwt_system_clock.h" // IWYU pragma: export

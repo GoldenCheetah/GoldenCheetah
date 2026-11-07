@@ -16,15 +16,12 @@ class QwtSlider;
 
 class SliderBox : public QWidget
 {
-    Q_OBJECT
   public:
-    SliderBox( int sliderType, QWidget* parent = NULL );
-
-  private Q_SLOTS:
-    void setNum( double v );
+    SliderBox( int sliderType, QWidget* parent = nullptr );
 
   private:
     QwtSlider* createSlider( int sliderType ) const;
+    void showValue( double v );
 
     QwtSlider* m_slider;
     QLabel* m_label;

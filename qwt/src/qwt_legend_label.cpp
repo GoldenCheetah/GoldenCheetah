@@ -37,20 +37,13 @@ static QSize buttonShift( const QwtLegendLabel* w )
 class QwtLegendLabel::PrivateData
 {
   public:
-    PrivateData()
-        : itemMode( QwtLegendData::ReadOnly )
-        , isDown( false )
-        , spacing( Margin )
-    {
-    }
-
-    QwtLegendData::Mode itemMode;
+    QwtLegendData::Mode itemMode = QwtLegendData::ReadOnly;
     QwtLegendData legendData;
-    bool isDown;
+    bool isDown = false;
 
     QPixmap icon;
 
-    int spacing;
+    int spacing = Margin;
 };
 
 /*!
@@ -91,8 +84,8 @@ const QwtLegendData& QwtLegendLabel::data() const
  */
 QwtLegendLabel::QwtLegendLabel( QWidget* parent )
     : QwtTextLabel( parent )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
     setMargin( Margin );
     setIndent( Margin );
 }
@@ -100,8 +93,6 @@ QwtLegendLabel::QwtLegendLabel( QWidget* parent )
 //! Destructor
 QwtLegendLabel::~QwtLegendLabel()
 {
-    delete m_data;
-    m_data = NULL;
 }
 
 /*!

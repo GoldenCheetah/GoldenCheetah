@@ -211,7 +211,7 @@ bool QwtEventPattern::mouseMatch( MousePatternCode code,
 bool QwtEventPattern::mouseMatch( const MousePattern& pattern,
     const QMouseEvent* event ) const
 {
-    if ( event == NULL )
+    if ( event == nullptr )
         return false;
 
     const MousePattern mousePattern( event->button(), event->modifiers() );
@@ -257,7 +257,7 @@ bool QwtEventPattern::keyMatch( KeyPatternCode code,
 bool QwtEventPattern::keyMatch(
     const KeyPattern& pattern, const QKeyEvent* event ) const
 {
-    if ( event == NULL )
+    if ( event == nullptr )
         return false;
 
     const KeyPattern keyPattern( event->key(), event->modifiers() );

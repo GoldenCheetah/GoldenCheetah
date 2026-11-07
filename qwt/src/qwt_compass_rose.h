@@ -12,6 +12,7 @@
 
 #include "qwt_global.h"
 #include <qpalette.h>
+#include <memory>
 
 class QPainter;
 
@@ -53,7 +54,7 @@ class QWT_EXPORT QwtSimpleCompassRose : public QwtCompassRose
 {
   public:
     QwtSimpleCompassRose( int numThorns = 8, int numThornLevels = -1 );
-    virtual ~QwtSimpleCompassRose();
+    ~QwtSimpleCompassRose() override;
 
     void setWidth( double );
     double width() const;
@@ -67,9 +68,9 @@ class QWT_EXPORT QwtSimpleCompassRose : public QwtCompassRose
     void setShrinkFactor( double factor );
     double shrinkFactor() const;
 
-    virtual void draw( QPainter*,
+    void draw( QPainter*,
         const QPointF& center, double radius, double north,
-        QPalette::ColorGroup = QPalette::Active ) const QWT_OVERRIDE;
+        QPalette::ColorGroup = QPalette::Active ) const override;
 
     static void drawRose( QPainter*, const QPalette&,
         const QPointF& center, double radius, double north, double width,
@@ -77,7 +78,7 @@ class QWT_EXPORT QwtSimpleCompassRose : public QwtCompassRose
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

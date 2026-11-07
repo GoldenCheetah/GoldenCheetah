@@ -53,13 +53,8 @@ static QRect qwtItemRect( int renderFlags,
 class QwtPlotTextLabel::PrivateData
 {
   public:
-    PrivateData()
-        : margin( 5 )
-    {
-    }
-
     QwtText text;
-    int margin;
+    int margin = 5;
 
     QPixmap pixmap;
 };
@@ -81,9 +76,8 @@ class QwtPlotTextLabel::PrivateData
 
 QwtPlotTextLabel::QwtPlotTextLabel()
     : QwtPlotItem( QwtText( "Label" ) )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
-
     setItemAttribute( QwtPlotItem::AutoScale, false );
     setItemAttribute( QwtPlotItem::Legend, false );
 
@@ -93,7 +87,6 @@ QwtPlotTextLabel::QwtPlotTextLabel()
 //! Destructor
 QwtPlotTextLabel::~QwtPlotTextLabel()
 {
-    delete m_data;
 }
 
 //! \return QwtPlotItem::Rtti_PlotTextLabel
@@ -218,20 +211,14 @@ void QwtPlotTextLabel::draw( QPainter* painter,
         pixmapRect.setRight( qwtCeil( rect.right() ) + pw );
         pixmapRect.setBottom( qwtCeil( rect.bottom() ) + pw );
 
-#if QT_VERSION >= 0x050000
         const qreal pixelRatio = QwtPainter::devicePixelRatio( painter->device() );
         const QSize scaledSize = pixmapRect.size() * pixelRatio;
-#else
-        const QSize scaledSize = pixmapRect.size();
-#endif
 
         if ( m_data->pixmap.isNull() ||
             ( scaledSize != m_data->pixmap.size() ) )
         {
             m_data->pixmap = QPixmap( scaledSize );
-#if QT_VERSION >= 0x050000
             m_data->pixmap.setDevicePixelRatio( pixelRatio );
-#endif
             m_data->pixmap.fill( Qt::transparent );
 
             const QRect r( pw, pw,

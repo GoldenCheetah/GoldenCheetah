@@ -30,10 +30,10 @@ class QWT_EXPORT QwtPixelMatrix : public QBitArray
     void setRect( const QRect& rect );
     QRect rect() const;
 
-    bool testPixel( int x, int y ) const;
-    bool testAndSetPixel( int x, int y, bool on );
+    inline bool testPixel( int x, int y ) const;
+    inline bool testAndSetPixel( int x, int y, bool on );
 
-    int index( int x, int y ) const;
+    inline int index( int x, int y ) const;
 
   private:
     QRect m_rect;

@@ -1,1 +1,1 @@
-#include "qwt_transform.h"
+#include "qwt_transform.h" // IWYU pragma: export

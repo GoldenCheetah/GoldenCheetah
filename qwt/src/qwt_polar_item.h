@@ -15,6 +15,8 @@
 #include "qwt_graphic.h"
 #include "qwt_interval.h"
 
+#include <memory>
+
 class QString;
 class QRect;
 class QPointF;
@@ -163,7 +165,7 @@ class QWT_EXPORT QwtPolarItem
     Q_DISABLE_COPY( QwtPolarItem )
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QwtPolarItem::ItemAttributes )

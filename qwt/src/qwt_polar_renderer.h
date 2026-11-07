@@ -10,8 +10,10 @@
 #define QWT_POLAR_RENDERER_H
 
 #include "qwt_global.h"
+
 #include <qobject.h>
 #include <qsize.h>
+#include <memory>
 
 class QwtPolarPlot;
 class QRectF;
@@ -37,8 +39,8 @@ class QWT_EXPORT QwtPolarRenderer : public QObject
     Q_OBJECT
 
   public:
-    explicit QwtPolarRenderer( QObject* parent = NULL );
-    virtual ~QwtPolarRenderer();
+    explicit QwtPolarRenderer( QObject* parent = nullptr );
+    ~QwtPolarRenderer() override;
 
     void renderDocument( QwtPolarPlot*, const QString& format,
         const QSizeF& sizeMM, int resolution = 85 );
@@ -72,7 +74,7 @@ class QWT_EXPORT QwtPolarRenderer : public QObject
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

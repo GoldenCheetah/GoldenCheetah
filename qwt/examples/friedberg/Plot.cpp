@@ -46,8 +46,8 @@ namespace
             setMinorPen( Qt::gray, 0, Qt::DotLine );
         }
 
-        virtual void updateScaleDiv( const QwtScaleDiv& xScaleDiv,
-            const QwtScaleDiv& yScaleDiv ) QWT_OVERRIDE
+        void updateScaleDiv( const QwtScaleDiv& xScaleDiv,
+            const QwtScaleDiv& yScaleDiv ) override
         {
             QwtScaleDiv scaleDiv( xScaleDiv.lowerBound(),
                 xScaleDiv.upperBound() );
@@ -77,7 +77,7 @@ namespace
             setSpacing( 15 );
         }
 
-        virtual QwtText label( double value ) const QWT_OVERRIDE
+        QwtText label( double value ) const override
         {
             const int month = int( value / 30 ) + 1;
             return QLocale::system().monthName( month, QLocale::LongFormat );
@@ -228,7 +228,7 @@ void Plot::setMode( int style )
     if ( style == Tube )
     {
         m_intervalCurve->setStyle( QwtPlotIntervalCurve::Tube );
-        m_intervalCurve->setSymbol( NULL );
+        m_intervalCurve->setSymbol( nullptr );
         m_intervalCurve->setRenderHint( QwtPlotItem::RenderAntialiased, true );
     }
     else
@@ -256,8 +256,6 @@ void Plot::setUseLines()
 
     m_intervalCurve->setPaintAttribute( QwtPlotIntervalCurve::TubeAsLines, useLines );
     replot();
-
-    qDebug() << useLines;
 }
 
 void Plot::exportPlot()

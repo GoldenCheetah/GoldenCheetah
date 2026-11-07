@@ -46,8 +46,7 @@ Knob::Knob( const QString& title, double min, double max, QWidget* parent )
     setSizePolicy( QSizePolicy::MinimumExpanding,
         QSizePolicy::MinimumExpanding );
 
-    connect( m_knob, SIGNAL(valueChanged(double)),
-        this, SIGNAL(valueChanged(double)) );
+    connect( m_knob, &QwtKnob::valueChanged, this, &Knob::valueChanged );
 }
 
 QSize Knob::sizeHint() const

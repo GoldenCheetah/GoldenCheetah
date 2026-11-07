@@ -1,1 +1,1 @@
-#include "qwt_pixel_matrix.h"
+#include "qwt_pixel_matrix.h" // IWYU pragma: export

@@ -11,7 +11,9 @@
 #define QWT_ABSTRACT_SCALE_H
 
 #include "qwt_global.h"
+
 #include <qwidget.h>
+#include <memory>
 
 class QwtScaleEngine;
 class QwtAbstractScaleDraw;
@@ -46,8 +48,8 @@ class QWT_EXPORT QwtAbstractScale : public QWidget
     Q_PROPERTY( double scaleStepSize READ scaleStepSize WRITE setScaleStepSize )
 
   public:
-    explicit QwtAbstractScale( QWidget* parent = NULL );
-    virtual ~QwtAbstractScale();
+    explicit QwtAbstractScale( QWidget* parent = nullptr );
+    ~QwtAbstractScale() override;
 
     void setScale( double lowerBound, double upperBound );
     void setScale( const QwtInterval& );
@@ -85,7 +87,7 @@ class QWT_EXPORT QwtAbstractScale : public QWidget
     const QwtScaleMap& scaleMap() const;
 
   protected:
-    virtual void changeEvent( QEvent* ) QWT_OVERRIDE;
+    void changeEvent( QEvent* ) override;
 
     void rescale( double lowerBound,
         double upperBound, double stepSize );
@@ -100,7 +102,7 @@ class QWT_EXPORT QwtAbstractScale : public QWidget
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

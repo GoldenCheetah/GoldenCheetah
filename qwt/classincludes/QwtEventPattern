@@ -1,1 +1,1 @@
-#include "qwt_event_pattern.h"
+#include "qwt_event_pattern.h" // IWYU pragma: export

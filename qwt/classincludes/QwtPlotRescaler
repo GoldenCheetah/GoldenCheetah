@@ -1,1 +1,1 @@
-#include "qwt_plot_rescaler.h"
+#include "qwt_plot_rescaler.h" // IWYU pragma: export

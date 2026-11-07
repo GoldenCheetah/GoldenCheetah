@@ -11,6 +11,7 @@
 #define QWT_POINT_MAPPER_H
 
 #include "qwt_global.h"
+#include <memory>
 
 class QwtScaleMap;
 template< typename T > class QwtSeriesData;
@@ -102,7 +103,7 @@ class QWT_EXPORT QwtPointMapper
     Q_DISABLE_COPY(QwtPointMapper)
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QwtPointMapper::TransformationFlags )

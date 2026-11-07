@@ -30,7 +30,7 @@ const QwtPlot* CanvasPicker::plot() const
 
 bool CanvasPicker::eventFilter( QObject* object, QEvent* event )
 {
-    if ( plot() == NULL || object != plot()->canvas() )
+    if ( plot() == nullptr || object != plot()->canvas() )
         return false;
 
     switch( event->type() )
@@ -59,7 +59,7 @@ bool CanvasPicker::eventFilter( QObject* object, QEvent* event )
 
 void CanvasPicker::select( const QPointF& pos )
 {
-    QwtPlotCurve* curve = NULL;
+    QwtPlotCurve* curve = nullptr;
     double dist = 10e10;
     int index = -1;
 
@@ -84,7 +84,7 @@ void CanvasPicker::select( const QPointF& pos )
         }
     }
 
-    m_selectedCurve = NULL;
+    m_selectedCurve = nullptr;
     m_selectedPoint = -1;
 
     if ( curve && dist < 10 ) // 10 pixels tolerance

@@ -13,6 +13,8 @@
 #include "qwt_global.h"
 #include "qwt_plot_seriesitem.h"
 
+#include <memory>
+
 /*!
    \brief Abstract base class for bar chart items
 
@@ -60,7 +62,7 @@ class QWT_EXPORT QwtPlotAbstractBarChart : public QwtPlotSeriesItem
     };
 
     explicit QwtPlotAbstractBarChart( const QwtText& title );
-    virtual ~QwtPlotAbstractBarChart();
+    ~QwtPlotAbstractBarChart() override;
 
     void setLayoutPolicy( LayoutPolicy );
     LayoutPolicy layoutPolicy() const;
@@ -77,10 +79,10 @@ class QWT_EXPORT QwtPlotAbstractBarChart : public QwtPlotSeriesItem
     void setBaseline( double );
     double baseline() const;
 
-    virtual void getCanvasMarginHint(
+    void getCanvasMarginHint(
         const QwtScaleMap& xMap, const QwtScaleMap& yMap,
         const QRectF& canvasRect, double& left, double& top,
-        double& right, double& bottom) const QWT_OVERRIDE;
+        double& right, double& bottom) const override;
 
 
   protected:
@@ -90,7 +92,7 @@ class QWT_EXPORT QwtPlotAbstractBarChart : public QwtPlotSeriesItem
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

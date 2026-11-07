@@ -35,7 +35,7 @@ namespace
     class Plot : public QwtPlot
     {
       public:
-        Plot( QWidget* parent = NULL )
+        Plot( QWidget* parent = nullptr )
             : QwtPlot( parent )
         {
             QwtPlotCanvas* canvas = new QwtPlotCanvas();
@@ -45,7 +45,7 @@ namespace
             setCanvas( canvas );
         }
 
-        virtual QSize sizeHint() const QWT_OVERRIDE
+        QSize sizeHint() const override
         {
             return minimumSizeHint();
         }
@@ -55,8 +55,7 @@ namespace
 class PlotMatrix::PrivateData
 {
   public:
-    PrivateData():
-        inScaleSync( false )
+    PrivateData()
     {
         isAxisEnabled[QwtAxis::XBottom] = true;
         isAxisEnabled[QwtAxis::XTop] = false;
@@ -66,13 +65,14 @@ class PlotMatrix::PrivateData
 
     bool isAxisEnabled[QwtAxis::AxisPositions];
     QVector< QwtPlot* > plotWidgets;
-    mutable bool inScaleSync;
+
+    mutable bool inScaleSync = false;
 };
 
 PlotMatrix::PlotMatrix( int numRows, int numColumns, QWidget* parent )
     : QFrame( parent )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData();
     m_data->plotWidgets.resize( numRows * numColumns );
 
     QGridLayout* layout = new QGridLayout( this );
@@ -88,10 +88,12 @@ PlotMatrix::PlotMatrix( int numRows, int numColumns, QWidget* parent )
 
             for ( int axisPos = 0; axisPos < QwtAxis::AxisPositions; axisPos++ )
             {
-                connect( plot->axisWidget( axisPos ),
-                    SIGNAL(scaleDivChanged()), SLOT(scaleDivChanged()),
-                    Qt::QueuedConnection );
+                auto scaleWidget = plot->axisWidget( axisPos );
+
+                connect( scaleWidget, &QwtScaleWidget::scaleDivChanged,
+                    this, &PlotMatrix::syncScales, Qt::QueuedConnection );
             }
+
             m_data->plotWidgets[row * numColumns + col] = plot;
         }
     }
@@ -101,7 +103,6 @@ PlotMatrix::PlotMatrix( int numRows, int numColumns, QWidget* parent )
 
 PlotMatrix::~PlotMatrix()
 {
-    delete m_data;
 }
 
 int PlotMatrix::numRows() const
@@ -127,7 +128,7 @@ QwtPlot* PlotMatrix::plotAt( int row, int column )
     if ( index < m_data->plotWidgets.size() )
         return m_data->plotWidgets[index];
 
-    return NULL;
+    return nullptr;
 }
 
 const QwtPlot* PlotMatrix::plotAt( int row, int column ) const
@@ -136,7 +137,7 @@ const QwtPlot* PlotMatrix::plotAt( int row, int column ) const
     if ( index < m_data->plotWidgets.size() )
         return m_data->plotWidgets[index];
 
-    return NULL;
+    return nullptr;
 }
 
 void PlotMatrix::setAxisVisible( int axis, bool tf )
@@ -178,14 +179,14 @@ void PlotMatrix::setAxisScale( int axis, int rowOrColumn,
     }
 }
 
-void PlotMatrix::scaleDivChanged()
+void PlotMatrix::syncScales()
 {
     if ( m_data->inScaleSync )
         return;
 
     m_data->inScaleSync = true;
 
-    QwtPlot* plt = NULL;
+    QwtPlot* plt = nullptr;
     int axisId = -1;
     int rowOrColumn = -1;
 
@@ -422,5 +423,3 @@ void PlotMatrix::alignScaleBorder( int rowOrColumn, int axis )
         }
     }
 }
-
-#include "moc_PlotMatrix.cpp"

@@ -28,8 +28,8 @@ PlotBox::PlotBox( QWidget* parent )
 
     SettingsEditor* settingsEditor = new SettingsEditor();
     settingsEditor->showSettings( m_plot->settings() );
-    connect( settingsEditor, SIGNAL(edited(const PlotSettings&)),
-        m_plot, SLOT(applySettings(const PlotSettings&)) );
+    connect( settingsEditor, &SettingsEditor::edited,
+        m_plot, &Plot::applySettings );
 
     QHBoxLayout* layout = new QHBoxLayout( this );
     layout->addWidget( settingsEditor, 0 );
@@ -48,11 +48,7 @@ void PlotBox::printDocument()
     }
 
     printer.setCreator( "polar plot demo example" );
-#if QT_VERSION >= 0x050300
     printer.setPageOrientation( QPageLayout::Landscape );
-#else
-    printer.setOrientation( QPrinter::Landscape );
-#endif
 
     QPrintDialog dialog( &printer );
     if ( dialog.exec() )
@@ -75,5 +71,3 @@ void PlotBox::enableZoomMode( bool on )
     m_panner->setEnabled( on );
     m_zoomer->setEnabled( on );
 }
-
-#include "moc_PlotBox.cpp"

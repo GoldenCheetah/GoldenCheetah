@@ -74,8 +74,7 @@ TVPlot::TVPlot( QWidget* parent )
 
     populate();
 
-    connect( legend, SIGNAL(checked(const QVariant&,bool,int)),
-        SLOT(showItem(const QVariant&,bool)) );
+    connect( legend, &QwtLegend::checked, this, &TVPlot::showItem );
 
     replot(); // creating the legend items
 
@@ -142,7 +141,7 @@ void TVPlot::setMode( int mode )
         if ( mode < 3 )
         {
             histogram->setStyle( static_cast< QwtPlotHistogram::HistogramStyle >( mode ) );
-            histogram->setSymbol( NULL );
+            histogram->setSymbol( nullptr );
 
             QPen pen( Qt::black, 0 );
             if ( mode == QwtPlotHistogram::Lines )

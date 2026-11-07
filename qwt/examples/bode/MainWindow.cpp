@@ -90,7 +90,8 @@ MainWindow::MainWindow( QWidget* parent )
     btnZoom->setCheckable( true );
     btnZoom->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
     toolBar->addWidget( btnZoom );
-    connect( btnZoom, SIGNAL(toggled(bool)), SLOT(enableZoomMode(bool)) );
+    connect( btnZoom, &QToolButton::toggled,
+        this, &MainWindow::enableZoomMode );
 
 #ifndef QT_NO_PRINTER
     QToolButton* btnPrint = new QToolButton( toolBar );
@@ -98,7 +99,8 @@ MainWindow::MainWindow( QWidget* parent )
     btnPrint->setIcon( QPixmap( print_xpm ) );
     btnPrint->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
     toolBar->addWidget( btnPrint );
-    connect( btnPrint, SIGNAL(clicked()), SLOT(print()) );
+    connect( btnPrint, &QToolButton::clicked,
+        this, &MainWindow::print );
 #endif
 
     QToolButton* btnExport = new QToolButton( toolBar );
@@ -106,7 +108,8 @@ MainWindow::MainWindow( QWidget* parent )
     btnExport->setIcon( QPixmap( print_xpm ) );
     btnExport->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
     toolBar->addWidget( btnExport );
-    connect( btnExport, SIGNAL(clicked()), SLOT(exportDocument()) );
+    connect( btnExport, &QToolButton::clicked,
+        this, &MainWindow::exportDocument );
 
     toolBar->addSeparator();
 
@@ -128,26 +131,25 @@ MainWindow::MainWindow( QWidget* parent )
     ( void )toolBar->addWidget( hBox );
 
     addToolBar( toolBar );
-#ifndef QT_NO_STATUSBAR
     ( void )statusBar();
-#endif
 
     enableZoomMode( false );
     showInfo();
 
-    connect( cntDamp, SIGNAL(valueChanged(double)),
-        m_plot, SLOT(setDamp(double)) );
+    connect( cntDamp, &QwtCounter::valueChanged,
+        m_plot, &Plot::setDamp );
 
-    connect( m_picker, SIGNAL(moved(const QPoint&)),
-        SLOT(moved(const QPoint&)) );
-    connect( m_picker, SIGNAL(selected(const QPolygon&)),
-        SLOT(selected(const QPolygon&)) );
+    connect( m_picker, &QwtPicker::moved,
+        this, &MainWindow::moved );
+
+    connect( m_picker, &QwtPicker::selected,
+        this, &MainWindow::showInfo );
 }
-
-#ifndef QT_NO_PRINTER
 
 void MainWindow::print()
 {
+#ifndef QT_NO_PRINTER
+
     QPrinter printer( QPrinter::HighResolution );
 
     QString docName = m_plot->title().text();
@@ -158,11 +160,7 @@ void MainWindow::print()
     }
 
     printer.setCreator( "Bode example" );
-#if QT_VERSION >= 0x050300
     printer.setPageOrientation( QPageLayout::Landscape );
-#else
-    printer.setOrientation( QPrinter::Landscape );
-#endif
 
     QPrintDialog dialog( &printer );
     if ( dialog.exec() )
@@ -179,9 +177,8 @@ void MainWindow::print()
 
         renderer.renderTo( m_plot, printer );
     }
-}
-
 #endif
+}
 
 void MainWindow::exportDocument()
 {
@@ -204,19 +201,15 @@ void MainWindow::enableZoomMode( bool on )
     showInfo();
 }
 
-void MainWindow::showInfo( QString text )
+void MainWindow::showInfo()
 {
-    if ( text.isEmpty() )
-    {
-        if ( m_picker->rubberBand() )
-            text = "Cursor Pos: Press left mouse button in plot region";
-        else
-            text = "Zoom: Press mouse button and drag";
-    }
+    QString text;
+    if ( m_picker->isEnabled() )
+        text = "Cursor Pos: Press left mouse button in plot region";
+    else
+        text = "Zoom: Press mouse button and drag";
 
-#ifndef QT_NO_STATUSBAR
     statusBar()->showMessage( text );
-#endif
 }
 
 void MainWindow::moved( const QPoint& pos )
@@ -228,12 +221,5 @@ void MainWindow::moved( const QPoint& pos )
     info = info.arg( m_plot->invTransform( YLeft, pos.y() ) );
     info = info.arg( m_plot->invTransform( YRight, pos.y() ) );
 
-    showInfo( info );
+    statusBar()->showMessage( info );
 }
-
-void MainWindow::selected( const QPolygon& )
-{
-    showInfo();
-}
-
-#include "moc_MainWindow.cpp"

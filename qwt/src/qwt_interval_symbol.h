@@ -12,6 +12,7 @@
 
 #include "qwt_global.h"
 #include <qnamespace.h>
+#include <memory>
 
 class QPainter;
 class QPen;
@@ -82,7 +83,7 @@ class QWT_EXPORT QwtIntervalSymbol
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

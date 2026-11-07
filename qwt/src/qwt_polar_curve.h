@@ -14,6 +14,8 @@
 #include "qwt_point_polar.h"
 #include "qwt_series_data.h"
 
+#include <memory>
+
 class QPainter;
 class QwtSymbol;
 class QwtCurveFitter;
@@ -74,23 +76,21 @@ class QWT_EXPORT QwtPolarCurve : public QwtPolarItem
 
     Q_DECLARE_FLAGS( LegendAttributes, LegendAttribute )
 
-
-    explicit QwtPolarCurve();
+    explicit QwtPolarCurve( const QString& title = QString() );
     explicit QwtPolarCurve( const QwtText& title );
-    explicit QwtPolarCurve( const QString& title );
 
-    virtual ~QwtPolarCurve();
+    ~QwtPolarCurve() override;
 
-    virtual int rtti() const QWT_OVERRIDE;
+    int rtti() const override;
 
     void setLegendAttribute( LegendAttribute, bool on = true );
     bool testLegendAttribute( LegendAttribute ) const;
 
     void setData( QwtSeriesData< QwtPointPolar >* data );
-    const QwtSeriesData< QwtPointPolar >* data() const;
+    inline const QwtSeriesData< QwtPointPolar >* data() const;
 
     size_t dataSize() const;
-    QwtPointPolar sample( int i ) const;
+    inline QwtPointPolar sample( int i ) const;
 
     void setPen( const QPen& );
     const QPen& pen() const;
@@ -104,23 +104,19 @@ class QWT_EXPORT QwtPolarCurve : public QwtPolarItem
     void setCurveFitter( QwtCurveFitter* );
     QwtCurveFitter* curveFitter() const;
 
-    virtual void draw( QPainter* p,
+    void draw( QPainter*,
         const QwtScaleMap& azimuthMap, const QwtScaleMap& radialMap,
         const QPointF& pole, double radius,
-        const QRectF& canvasRect ) const QWT_OVERRIDE;
+        const QRectF& canvasRect ) const override;
 
-    virtual void draw( QPainter* p,
+    virtual void draw( QPainter*,
         const QwtScaleMap& azimuthMap, const QwtScaleMap& radialMap,
         const QPointF& pole, int from, int to ) const;
 
-    virtual QwtInterval boundingInterval( int scaleId ) const QWT_OVERRIDE;
-
-    virtual QwtGraphic legendIcon( int index, const QSizeF& ) const QWT_OVERRIDE;
+    QwtInterval boundingInterval( int scaleId ) const override;
+    QwtGraphic legendIcon( int index, const QSizeF& ) const override;
 
   protected:
-
-    void init();
-
     virtual void drawCurve( QPainter*, int style,
         const QwtScaleMap& azimuthMap, const QwtScaleMap& radialMap,
         const QPointF& pole, int from, int to ) const;
@@ -134,10 +130,10 @@ class QWT_EXPORT QwtPolarCurve : public QwtPolarItem
         const QPointF& pole, int from, int to ) const;
 
   private:
-    QwtSeriesData< QwtPointPolar >* m_series;
+    QwtSeriesData< QwtPointPolar >* m_series = nullptr;
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 //! \return the the curve data

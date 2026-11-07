@@ -14,5 +14,5 @@
 class WheelTab : public QWidget
 {
   public:
-    WheelTab( QWidget* parent = NULL );
+    WheelTab( QWidget* parent = nullptr );
 };

@@ -1,1 +1,1 @@
-#include "qwt_axis.h"
+#include "qwt_axis.h" // IWYU pragma: export

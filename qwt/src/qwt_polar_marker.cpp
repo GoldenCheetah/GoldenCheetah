@@ -20,7 +20,6 @@ class QwtPolarMarker::PrivateData
 {
   public:
     PrivateData()
-        : align( Qt::AlignCenter )
     {
         symbol = new QwtSymbol();
     }
@@ -31,7 +30,7 @@ class QwtPolarMarker::PrivateData
     }
 
     QwtText label;
-    Qt::Alignment align;
+    Qt::Alignment align = Qt::AlignCenter;
     QPen pen;
     const QwtSymbol* symbol;
 
@@ -41,9 +40,8 @@ class QwtPolarMarker::PrivateData
 //! Sets alignment to Qt::AlignCenter, and style to NoLine
 QwtPolarMarker::QwtPolarMarker()
     : QwtPolarItem( QwtText( "Marker" ) )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
-
     setItemAttribute( QwtPolarItem::AutoScale );
     setZ( 30.0 );
 }
@@ -51,7 +49,6 @@ QwtPolarMarker::QwtPolarMarker()
 //! Destructor
 QwtPolarMarker::~QwtPolarMarker()
 {
-    delete m_data;
 }
 
 //! \return QwtPolarItem::Rtti_PlotMarker

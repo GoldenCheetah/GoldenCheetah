@@ -19,24 +19,16 @@ class QPolygon;
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
-
   public:
     MainWindow( QWidget* parent = 0 );
 
-  private Q_SLOTS:
-    void moved( const QPoint& );
-    void selected( const QPolygon& );
-
-#ifndef QT_NO_PRINTER
+  private:
     void print();
-#endif
-
     void exportDocument();
     void enableZoomMode( bool );
 
-  private:
-    void showInfo( QString text = QString() );
+    void moved( const QPoint& );
+    void showInfo();
 
     Plot* m_plot;
 

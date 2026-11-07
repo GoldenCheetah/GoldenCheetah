@@ -17,7 +17,7 @@ class Panel : public QTabWidget
     Q_OBJECT
 
   public:
-    Panel( QWidget* = NULL );
+    Panel( QWidget* = nullptr );
 
     Settings settings() const;
     void setSettings( const Settings& );
@@ -25,10 +25,9 @@ class Panel : public QTabWidget
   Q_SIGNALS:
     void settingsChanged( const Settings& );
 
-  private Q_SLOTS:
+  private:
     void edited();
 
-  private:
     QWidget* createPlotTab( QWidget* );
     QWidget* createCanvasTab( QWidget* );
     QWidget* createCurveTab( QWidget* );
@@ -41,6 +40,7 @@ class Panel : public QTabWidget
     CheckBox* m_paintCache;
     CheckBox* m_paintOnScreen;
     CheckBox* m_immediatePaint;
+
 #ifndef QWT_NO_OPENGL
     CheckBox* m_openGL;
 #endif

@@ -15,7 +15,7 @@ class SettingsEditor : public QFrame
     Q_OBJECT
 
   public:
-    SettingsEditor( QWidget* parent = NULL );
+    SettingsEditor( QWidget* parent = nullptr );
 
     void showSettings( const PlotSettings& );
     PlotSettings settings() const;
@@ -23,10 +23,8 @@ class SettingsEditor : public QFrame
   Q_SIGNALS:
     void edited( const PlotSettings& );
 
-  private Q_SLOTS:
-    void edited();
-
   private:
+    void updateSettings();
     void updateEditor();
     QString label( int flag ) const;
 

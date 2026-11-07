@@ -29,10 +29,10 @@ WheelBox::WheelBox( Qt::Orientation orientation, int type, QWidget* parent )
     layout->addWidget( box );
     layout->addWidget( m_label );
 
-    setNum( m_wheel->value() );
+    showValue( m_wheel->value() );
 
-    connect( m_wheel, SIGNAL(valueChanged(double)),
-        this, SLOT(setNum(double)) );
+    connect( m_wheel, &QwtWheel::valueChanged,
+        this, &WheelBox::showValue );
 }
 
 QWidget* WheelBox::createBox( Qt::Orientation orientation, int type )
@@ -170,8 +170,8 @@ QWidget* WheelBox::createBox( Qt::Orientation orientation, int type )
     m_thermo->setScale( min, max );
     m_thermo->setValue( m_wheel->value() );
 
-    connect( m_wheel, SIGNAL(valueChanged(double)),
-        m_thermo, SLOT(setValue(double)) );
+    connect( m_wheel, &QwtWheel::valueChanged,
+        m_thermo, &QwtThermo::setValue );
 
     QWidget* box = new QWidget();
 
@@ -188,12 +188,10 @@ QWidget* WheelBox::createBox( Qt::Orientation orientation, int type )
     return box;
 }
 
-void WheelBox::setNum( double v )
+void WheelBox::showValue( double v )
 {
     QString text;
     text.setNum( v, 'f', 2 );
 
     m_label->setText( text );
 }
-
-#include "moc_WheelBox.cpp"

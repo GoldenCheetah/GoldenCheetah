@@ -14,7 +14,6 @@ class QwtPlotCurve;
 
 class CpuPlot : public QwtPlot
 {
-    Q_OBJECT
   public:
     enum CpuData
     {
@@ -33,13 +32,11 @@ class CpuPlot : public QwtPlot
     }
 
   protected:
-    void timerEvent( QTimerEvent* ) QWT_OVERRIDE;
-
-  private Q_SLOTS:
-    void legendChecked( const QVariant&, bool on );
+    void timerEvent( QTimerEvent* ) override;
 
   private:
     void showCurve( QwtPlotItem*, bool on );
+    void legendChecked( const QVariant&, bool on );
 
     struct
     {

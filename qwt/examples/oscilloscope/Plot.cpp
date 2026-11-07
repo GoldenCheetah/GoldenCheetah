@@ -20,10 +20,10 @@
 
 namespace
 {
-    class Canvas : public QwtPlotCanvas
+    class Canvas final : public QwtPlotCanvas
     {
       public:
-        Canvas( QwtPlot* plot = NULL )
+        Canvas( QwtPlot* plot = nullptr )
             : QwtPlotCanvas( plot )
         {
             /*
@@ -38,15 +38,6 @@ namespace
 
             if ( QwtPainter::isX11GraphicsSystem() )
             {
-#if QT_VERSION < 0x050000
-                /*
-                    Qt::WA_PaintOutsidePaintEvent works on X11 and has a
-                    nice effect on the performance.
-                 */
-
-                setAttribute( Qt::WA_PaintOutsidePaintEvent, true );
-#endif
-
                 /*
                     Disabling the backing store of Qt improves the performance
                     for the direct painter even more, but the canvas becomes
@@ -86,7 +77,7 @@ namespace
         }
     };
 
-    class CurveData : public QwtSeriesData< QPointF >
+    class CurveData final : public QwtSeriesData< QPointF >
     {
       public:
         const SignalData& values() const
@@ -99,17 +90,17 @@ namespace
             return SignalData::instance();
         }
 
-        virtual QPointF sample( size_t index ) const QWT_OVERRIDE
+        QPointF sample( size_t index ) const override
         {
             return SignalData::instance().value( index );
         }
 
-        virtual size_t size() const QWT_OVERRIDE
+        size_t size() const override
         {
             return SignalData::instance().size();
         }
 
-        virtual QRectF boundingRect() const QWT_OVERRIDE
+        QRectF boundingRect() const override
         {
             return SignalData::instance().boundingRect();
         }

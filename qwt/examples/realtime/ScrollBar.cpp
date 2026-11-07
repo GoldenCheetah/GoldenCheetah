@@ -32,13 +32,10 @@ ScrollBar::ScrollBar( double minBase, double maxBase,
 void ScrollBar::init()
 {
     m_inverted = orientation() == Qt::Vertical;
-    m_baseTicks = 1000000;
-    m_minBase = 0.0;
-    m_maxBase = 1.0;
     moveSlider( m_minBase, m_maxBase );
 
-    connect( this, SIGNAL(sliderMoved(int)), SLOT(catchSliderMoved(int)) );
-    connect( this, SIGNAL(valueChanged(int)), SLOT(catchValueChanged(int)) );
+    connect( this, &QScrollBar::sliderMoved, this, &ScrollBar::catchSliderMoved );
+    connect( this, &QScrollBar::valueChanged, this, &ScrollBar::catchValueChanged );
 }
 
 void ScrollBar::setInverted( bool inverted )

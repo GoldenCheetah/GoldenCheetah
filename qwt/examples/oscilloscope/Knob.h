@@ -19,9 +19,9 @@ class Knob : public QWidget
 
   public:
     Knob( const QString& title,
-        double min, double max, QWidget* parent = NULL );
+        double min, double max, QWidget* parent = nullptr );
 
-    virtual QSize sizeHint() const QWT_OVERRIDE;
+    QSize sizeHint() const override;
 
     void setValue( double value );
     double value() const;
@@ -33,7 +33,7 @@ class Knob : public QWidget
     double valueChanged( double );
 
   protected:
-    virtual void resizeEvent( QResizeEvent* ) QWT_OVERRIDE;
+    void resizeEvent( QResizeEvent* ) override;
 
   private:
     QwtKnob* m_knob;

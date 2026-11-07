@@ -22,7 +22,7 @@
 
 Plot::Plot( QWidget* parent )
     : QwtPlot( parent )
-    , m_mapItem( NULL )
+    , m_mapItem( nullptr )
     , m_mapRect( 0.0, 0.0, 100.0, 100.0 ) // something
 {
 #if DEBUG_SCALE
@@ -58,10 +58,10 @@ Plot::Plot( QWidget* parent )
 
 #ifndef QT_NO_FILEDIALOG
 
-void Plot::loadSVG()
+void Plot::openFileDialog()
 {
     QString dir;
-    const QString fileName = QFileDialog::getOpenFileName( NULL,
+    const QString fileName = QFileDialog::getOpenFileName( nullptr,
         "Load a Scaleable Vector Graphic (SVG) Map",
         dir, "SVG Files (*.svg)" );
 
@@ -73,7 +73,7 @@ void Plot::loadSVG()
 
 void Plot::loadSVG( const QString& fileName )
 {
-    if ( m_mapItem == NULL )
+    if ( m_mapItem == nullptr )
     {
         m_mapItem = new QwtPlotGraphicItem();
         m_mapItem->attach( this );

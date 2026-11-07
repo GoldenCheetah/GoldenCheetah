@@ -19,7 +19,7 @@ class QwtPlotDict::PrivateData
       public:
         void insertItem( QwtPlotItem* item )
         {
-            if ( item == NULL )
+            if ( item == nullptr )
                 return;
 
             QList< QwtPlotItem* >::iterator it =
@@ -29,7 +29,7 @@ class QwtPlotDict::PrivateData
 
         void removeItem( QwtPlotItem* item )
         {
-            if ( item == NULL )
+            if ( item == nullptr )
                 return;
 
             QList< QwtPlotItem* >::iterator it =
@@ -57,7 +57,7 @@ class QwtPlotDict::PrivateData
     };
 
     ItemList itemList;
-    bool autoDelete;
+    bool autoDelete = true;
 };
 
 /*!
@@ -67,9 +67,8 @@ class QwtPlotDict::PrivateData
    \sa setAutoDelete(), QwtPlotItem::attach()
  */
 QwtPlotDict::QwtPlotDict()
+    : m_data( new PrivateData )
 {
-    m_data = new QwtPlotDict::PrivateData;
-    m_data->autoDelete = true;
 }
 
 /*!
@@ -81,7 +80,6 @@ QwtPlotDict::QwtPlotDict()
 QwtPlotDict::~QwtPlotDict()
 {
     detachItems( QwtPlotItem::Rtti_PlotItem, m_data->autoDelete );
-    delete m_data;
 }
 
 /*!
@@ -147,7 +145,7 @@ void QwtPlotDict::detachItems( int rtti, bool autoDelete )
 
         if ( rtti == QwtPlotItem::Rtti_PlotItem || item->rtti() == rtti )
         {
-            item->attach( NULL );
+            item->attach( nullptr );
             if ( autoDelete )
                 delete item;
         }

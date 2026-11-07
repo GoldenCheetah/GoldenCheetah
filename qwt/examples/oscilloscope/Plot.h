@@ -18,21 +18,21 @@ class Plot : public QwtPlot
     Q_OBJECT
 
   public:
-    Plot( QWidget* = NULL );
-    virtual ~Plot();
+    Plot( QWidget* = nullptr );
+    ~Plot() override;
 
     void start();
-    virtual void replot() QWT_OVERRIDE;
+    void replot() override;
 
-    virtual bool eventFilter( QObject*, QEvent* ) QWT_OVERRIDE;
+    bool eventFilter( QObject*, QEvent* ) override;
 
   public Q_SLOTS:
     void setIntervalLength( double );
 
   protected:
-    virtual void showEvent( QShowEvent* ) QWT_OVERRIDE;
-    virtual void resizeEvent( QResizeEvent* ) QWT_OVERRIDE;
-    virtual void timerEvent( QTimerEvent* ) QWT_OVERRIDE;
+    void showEvent( QShowEvent* ) override;
+    void resizeEvent( QResizeEvent* ) override;
+    void timerEvent( QTimerEvent* ) override;
 
   private:
     void updateCurve();

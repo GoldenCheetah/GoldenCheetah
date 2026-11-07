@@ -30,27 +30,27 @@
 class QWT_EXPORT QwtSplinePolynomial
 {
   public:
-    QwtSplinePolynomial( double c3 = 0.0, double c2 = 0.0, double c1 = 0.0 );
+    inline QwtSplinePolynomial( double c3 = 0.0, double c2 = 0.0, double c1 = 0.0 );
 
-    bool operator==( const QwtSplinePolynomial& ) const;
-    bool operator!=( const QwtSplinePolynomial& ) const;
+    inline bool operator==( const QwtSplinePolynomial& ) const;
+    inline bool operator!=( const QwtSplinePolynomial& ) const;
 
-    double valueAt( double x ) const;
-    double slopeAt( double x ) const;
-    double curvatureAt( double x ) const;
+    inline double valueAt( double x ) const;
+    inline double slopeAt( double x ) const;
+    inline double curvatureAt( double x ) const;
 
-    static QwtSplinePolynomial fromSlopes(
+    static inline QwtSplinePolynomial fromSlopes(
         const QPointF& p1, double m1,
         const QPointF& p2, double m2 );
 
-    static QwtSplinePolynomial fromSlopes(
+    static inline QwtSplinePolynomial fromSlopes(
         double x, double y, double m1, double m2 );
 
-    static QwtSplinePolynomial fromCurvatures(
+    static inline QwtSplinePolynomial fromCurvatures(
         const QPointF& p1, double cv1,
         const QPointF& p2, double cv2 );
 
-    static QwtSplinePolynomial fromCurvatures(
+    static inline QwtSplinePolynomial fromCurvatures(
         double dx, double dy, double cv1, double cv2 );
 
   public:

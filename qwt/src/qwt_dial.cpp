@@ -75,36 +75,24 @@ static inline double qwtBoundedAngle( double min, double angle, double max )
 class QwtDial::PrivateData
 {
   public:
-    PrivateData()
-        : frameShadow( Sunken )
-        , lineWidth( 0 )
-        , mode( RotateNeedle )
-        , origin( 90.0 )
-        , minScaleArc( 0.0 )
-        , maxScaleArc( 0.0 )
-        , needle( NULL )
-        , arcOffset( 0.0 )
-        , mouseOffset( 0.0 )
-    {
-    }
-
     ~PrivateData()
     {
         delete needle;
     }
-    Shadow frameShadow;
-    int lineWidth;
 
-    QwtDial::Mode mode;
+    Shadow frameShadow = Sunken;
+    int lineWidth = 0;
 
-    double origin;
-    double minScaleArc;
-    double maxScaleArc;
+    QwtDial::Mode mode = RotateNeedle;
 
-    QwtDialNeedle* needle;
+    double origin = 90.0;
+    double minScaleArc = 0.0;
+    double maxScaleArc = 0.0;
 
-    double arcOffset;
-    double mouseOffset;
+    QwtDialNeedle* needle = nullptr;
+
+    double arcOffset = 0.0;
+    double mouseOffset = 0.0;
 
     QPixmap pixmapCache;
 };
@@ -123,9 +111,8 @@ class QwtDial::PrivateData
  */
 QwtDial::QwtDial( QWidget* parent )
     : QwtAbstractSlider( parent )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
-
     setFocusPolicy( Qt::TabFocus );
 
     QPalette p = palette();
@@ -158,7 +145,6 @@ QwtDial::QwtDial( QWidget* parent )
 //!  Destructor
 QwtDial::~QwtDial()
 {
-    delete m_data;
 }
 
 /*!
@@ -476,7 +462,7 @@ void QwtDial::drawScale( QPainter* painter,
     const QPointF& center, double radius ) const
 {
     QwtRoundScaleDraw* sd = const_cast< QwtRoundScaleDraw* >( scaleDraw() );
-    if ( sd == NULL )
+    if ( sd == nullptr )
         return;
 
     sd->setRadius( radius );
@@ -828,7 +814,7 @@ void QwtDial::changeEvent( QEvent* event )
  */
 void QwtDial::wheelEvent( QWheelEvent* event )
 {
-#if QT_VERSION < 0x050e00
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
     const QPoint wheelPos = event->pos();
 #else
     const QPoint wheelPos = event->position().toPoint();

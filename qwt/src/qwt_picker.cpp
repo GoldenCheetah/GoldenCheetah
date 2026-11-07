@@ -65,7 +65,7 @@ static inline QRegion qwtMaskRegion( const QLine& l, int penWidth )
 
 namespace
 {
-    class Rubberband QWT_FINAL : public QwtWidgetOverlay
+    class Rubberband final : public QwtWidgetOverlay
     {
       public:
         Rubberband( QwtPicker* picker, QWidget* parent )
@@ -76,13 +76,13 @@ namespace
         }
 
       protected:
-        virtual void drawOverlay( QPainter* painter ) const QWT_OVERRIDE
+        void drawOverlay( QPainter* painter ) const override
         {
             painter->setPen( m_picker->rubberBandPen() );
             m_picker->drawRubberBand( painter );
         }
 
-        virtual QRegion maskHint() const QWT_OVERRIDE
+        QRegion maskHint() const override
         {
             return m_picker->rubberBandMask();
         }
@@ -90,7 +90,7 @@ namespace
         QwtPicker* m_picker;
     };
 
-    class Tracker QWT_FINAL : public QwtWidgetOverlay
+    class Tracker final : public QwtWidgetOverlay
     {
       public:
         Tracker( QwtPicker* picker, QWidget* parent )
@@ -101,13 +101,13 @@ namespace
         }
 
       protected:
-        virtual void drawOverlay( QPainter* painter ) const QWT_OVERRIDE
+        void drawOverlay( QPainter* painter ) const override
         {
             painter->setPen( m_picker->trackerPen() );
             m_picker->drawTracker( painter );
         }
 
-        virtual QRegion maskHint() const QWT_OVERRIDE
+        QRegion maskHint() const override
         {
             return m_picker->trackerMask();
         }
@@ -119,42 +119,27 @@ namespace
 class QwtPicker::PrivateData
 {
   public:
-    PrivateData():
-        enabled( false ),
-        stateMachine( NULL ),
-        resizeMode( QwtPicker::Stretch ),
-        rubberBand( QwtPicker::NoRubberBand ),
-        trackerMode( QwtPicker::AlwaysOff ),
-        isActive( false ),
-        trackerPosition( -1, -1 ),
-        mouseTracking( false ),
-        openGL( false )
-    {
-    }
+    bool enabled = false;
+    bool mouseTracking = false; // used to save previous value
+    bool openGL = false;
+    bool isActive = false;
 
-    bool enabled;
+    QwtPickerMachine* stateMachine = nullptr;
 
-    QwtPickerMachine* stateMachine;
+    QwtPicker::ResizeMode resizeMode = QwtPicker::Stretch;
 
-    QwtPicker::ResizeMode resizeMode;
-
-    QwtPicker::RubberBand rubberBand;
+    QwtPicker::RubberBand rubberBand = QwtPicker::NoRubberBand;
     QPen rubberBandPen;
 
-    QwtPicker::DisplayMode trackerMode;
+    QwtPicker::DisplayMode trackerMode = QwtPicker::AlwaysOff;
     QPen trackerPen;
     QFont trackerFont;
 
     QPolygon pickedPoints;
-    bool isActive;
-    QPoint trackerPosition;
-
-    bool mouseTracking; // used to save previous value
+    QPoint trackerPosition = QPoint( -1, -1 );
 
     QPointer< Rubberband > rubberBandOverlay;
     QPointer< Tracker > trackerOverlay;
-
-    bool openGL;
 };
 
 /*!
@@ -166,10 +151,9 @@ class QwtPicker::PrivateData
    \param parent Parent widget, that will be observed
  */
 
-QwtPicker::QwtPicker( QWidget* parent ):
-    QObject( parent )
+QwtPicker::QwtPicker( QWidget* parent )
+    : QwtPicker( NoRubberBand, AlwaysOff, parent )
 {
-    init( parent, NoRubberBand, AlwaysOff );
 }
 
 /*!
@@ -180,30 +164,10 @@ QwtPicker::QwtPicker( QWidget* parent ):
    \param parent Parent widget, that will be observed
  */
 QwtPicker::QwtPicker( RubberBand rubberBand,
-    DisplayMode trackerMode, QWidget* parent ):
-    QObject( parent )
+        DisplayMode trackerMode, QWidget* parent )
+    : QObject( parent )
+    , m_data( new PrivateData() )
 {
-    init( parent, rubberBand, trackerMode );
-}
-
-//! Destructor
-QwtPicker::~QwtPicker()
-{
-    setMouseTracking( false );
-
-    delete m_data->stateMachine;
-    delete m_data->rubberBandOverlay;
-    delete m_data->trackerOverlay;
-
-    delete m_data;
-}
-
-//! Initialize the picker - used by the constructors
-void QwtPicker::init( QWidget* parent,
-    RubberBand rubberBand, DisplayMode trackerMode )
-{
-    m_data = new PrivateData;
-
     m_data->rubberBand = rubberBand;
 
     if ( parent )
@@ -220,6 +184,17 @@ void QwtPicker::init( QWidget* parent,
 
     setTrackerMode( trackerMode );
 }
+
+//! Destructor
+QwtPicker::~QwtPicker()
+{
+    setMouseTracking( false );
+
+    delete m_data->stateMachine;
+    delete m_data->rubberBandOverlay;
+    delete m_data->trackerOverlay;
+}
+
 
 /*!
    Set a state machine and delete the previous one
@@ -266,7 +241,7 @@ QWidget* QwtPicker::parentWidget()
     if ( obj && obj->isWidgetType() )
         return static_cast< QWidget* >( obj );
 
-    return NULL;
+    return nullptr;
 }
 
 //! Return the parent widget, where the selection happens
@@ -276,7 +251,7 @@ const QWidget* QwtPicker::parentWidget() const
     if ( obj && obj->isWidgetType() )
         return static_cast< const QWidget* >( obj );
 
-    return NULL;
+    return nullptr;
 }
 
 /*!
@@ -923,7 +898,7 @@ bool QwtPicker::eventFilter( QObject* object, QEvent* event )
                    Adding/deleting additional event filters inside of an event filter
                    is not safe dues to the implementation in Qt ( changing a list while iterating ).
                    So we create the overlays in a way, that they don't install en event filter
-                   ( parent set to NULL ) and do the resizing here.
+                   ( parent set to nullptr ) and do the resizing here.
                  */
                 if ( m_data->trackerOverlay )
                     m_data->trackerOverlay->resize( re->size() );
@@ -1099,7 +1074,7 @@ void QwtPicker::widgetMouseDoubleClickEvent( QMouseEvent* mouseEvent )
  */
 void QwtPicker::widgetWheelEvent( QWheelEvent* wheelEvent )
 {
-#if QT_VERSION < 0x050e00
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
     const QPoint wheelPos = wheelEvent->pos();
 #else
     const QPoint wheelPos = wheelEvent->position().toPoint();
@@ -1379,12 +1354,7 @@ void QwtPicker::remove()
 {
     if ( m_data->isActive && !m_data->pickedPoints.isEmpty() )
     {
-#if QT_VERSION >= 0x050100
         const QPoint pos = m_data->pickedPoints.takeLast();
-#else
-        const QPoint pos = m_data->pickedPoints.last();
-        m_data->pickedPoints.resize( m_data->pickedPoints.count() - 1 );
-#endif
 
         updateDisplay();
         Q_EMIT removed( pos );
@@ -1533,7 +1503,7 @@ void QwtPicker::updateDisplay()
     {
         if ( rw.isNull() )
         {
-            rw = new Rubberband( this, NULL ); // NULL -> no extra event filter
+            rw = new Rubberband( this, nullptr ); // nullptr -> no extra event filter
             rw->setObjectName( "PickerRubberBand" );
             rw->setParent( w );
             rw->resize( w->size() );
@@ -1555,7 +1525,7 @@ void QwtPicker::updateDisplay()
             {
                 rw->hide();
                 rw->deleteLater();
-                rw = NULL;
+                rw = nullptr;
             }
         }
         else
@@ -1569,7 +1539,7 @@ void QwtPicker::updateDisplay()
     {
         if ( tw.isNull() )
         {
-            tw = new Tracker( this, NULL ); // NULL -> no extra event filter
+            tw = new Tracker( this, nullptr ); // nullptr -> no extra event filter
             tw->setObjectName( "PickerTracker" );
             tw->setParent( w );
             tw->resize( w->size() );
@@ -1586,7 +1556,7 @@ void QwtPicker::updateDisplay()
             {
                 tw->hide();
                 tw->deleteLater();
-                tw = NULL;
+                tw = nullptr;
             }
         }
         else

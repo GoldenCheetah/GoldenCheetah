@@ -13,12 +13,7 @@
 class QwtPolarFitter::PrivateData
 {
   public:
-    PrivateData()
-        : stepCount( 5 )
-    {
-    }
-
-    int stepCount;
+    int stepCount = 5;
 };
 
 /*!
@@ -29,15 +24,14 @@ class QwtPolarFitter::PrivateData
  */
 QwtPolarFitter::QwtPolarFitter( int stepCount )
     : QwtCurveFitter( QwtPolarFitter::Polygon )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
     m_data->stepCount = stepCount;
 }
 
 //! Destructor
 QwtPolarFitter::~QwtPolarFitter()
 {
-    delete m_data;
 }
 
 /*!

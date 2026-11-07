@@ -58,35 +58,20 @@ static double qwtToDegrees( double value )
 class QwtKnob::PrivateData
 {
   public:
-    PrivateData()
-        : knobStyle( QwtKnob::Raised )
-        , markerStyle( QwtKnob::Notch )
-        , borderWidth( 2 )
-        , borderDist( 4 )
-        , scaleDist( 4 )
-        , maxScaleTicks( 11 )
-        , knobWidth( 0 )
-        , alignment( Qt::AlignCenter )
-        , markerSize( 8 )
-        , totalAngle( 270.0 )
-        , mouseOffset( 0.0 )
-    {
-    }
+    KnobStyle knobStyle = Raised;
+    MarkerStyle markerStyle = Notch;
 
-    QwtKnob::KnobStyle knobStyle;
-    QwtKnob::MarkerStyle markerStyle;
+    int borderWidth = 2;
+    int borderDist = 4;
+    int scaleDist = 4;
+    int maxScaleTicks = 11;
+    int knobWidth = 0;
+    Qt::Alignment alignment = Qt::AlignCenter;
+    int markerSize = 8;
 
-    int borderWidth;
-    int borderDist;
-    int scaleDist;
-    int maxScaleTicks;
-    int knobWidth;
-    Qt::Alignment alignment;
-    int markerSize;
+    double totalAngle = 270.0;
 
-    double totalAngle;
-
-    double mouseOffset;
+    double mouseOffset = 0.0;
 };
 
 /*!
@@ -102,9 +87,8 @@ class QwtKnob::PrivateData
  */
 QwtKnob::QwtKnob( QWidget* parent )
     : QwtAbstractSlider( parent )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
-
     setScaleDraw( new QwtRoundScaleDraw() );
 
     setTotalAngle( 270.0 );
@@ -119,7 +103,6 @@ QwtKnob::QwtKnob( QWidget* parent )
 //! Destructor
 QwtKnob::~QwtKnob()
 {
-    delete m_data;
 }
 
 /*!

@@ -11,7 +11,9 @@
 
 #include "qwt_global.h"
 #include "qwt_polar_item.h"
+
 #include <qlist.h>
+#include <memory>
 
 typedef QList< QwtPolarItem* >::ConstIterator QwtPolarItemIterator;
 typedef QList< QwtPolarItem* > QwtPolarItemList;
@@ -45,7 +47,7 @@ class QWT_EXPORT QwtPolarItemDict
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

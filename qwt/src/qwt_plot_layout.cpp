@@ -1126,9 +1126,8 @@ class QwtPlotLayout::PrivateData
  */
 
 QwtPlotLayout::QwtPlotLayout()
+    : m_data( new PrivateData )
 {
-    m_data = new PrivateData;
-
     setLegendPosition( QwtPlot::BottomLegend );
     setCanvasMargin( 4 );
     setAlignCanvasToScales( false );
@@ -1139,7 +1138,6 @@ QwtPlotLayout::QwtPlotLayout()
 //! Destructor
 QwtPlotLayout::~QwtPlotLayout()
 {
-    delete m_data;
 }
 
 /*!

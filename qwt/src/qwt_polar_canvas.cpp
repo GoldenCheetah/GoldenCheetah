@@ -15,6 +15,7 @@
 #include <qpixmap.h>
 #include <qstyle.h>
 #include <qstyleoption.h>
+
 #ifdef Q_WS_X11
 #include <qx11info_x11.h>
 #endif
@@ -29,7 +30,7 @@ static inline void qwtDrawStyledBackground(
 
 static QWidget* qwtBackgroundWidget( QWidget* w )
 {
-    if ( w->parentWidget() == NULL )
+    if ( w->parentWidget() == nullptr )
         return w;
 
     if ( w->autoFillBackground() )
@@ -59,26 +60,20 @@ static QWidget* qwtBackgroundWidget( QWidget* w )
 class QwtPolarCanvas::PrivateData
 {
   public:
-    PrivateData()
-        : backingStore( NULL )
-    {
-    }
-
     ~PrivateData()
     {
         delete backingStore;
     }
 
     QwtPolarCanvas::PaintAttributes paintAttributes;
-    QPixmap* backingStore;
+    QPixmap* backingStore = nullptr;
 };
 
 //! Constructor
 QwtPolarCanvas::QwtPolarCanvas( QwtPolarPlot* plot )
     : QFrame( plot )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
-
 #ifndef QT_NO_CURSOR
     setCursor( Qt::CrossCursor );
 #endif
@@ -90,7 +85,6 @@ QwtPolarCanvas::QwtPolarCanvas( QwtPolarPlot* plot )
 //! Destructor
 QwtPolarCanvas::~QwtPolarCanvas()
 {
-    delete m_data;
 }
 
 //! \return Parent plot widget
@@ -131,23 +125,19 @@ void QwtPolarCanvas::setPaintAttribute( PaintAttribute attribute, bool on )
         {
             if ( on )
             {
-                if ( m_data->backingStore == NULL )
+                if ( m_data->backingStore == nullptr )
                     m_data->backingStore = new QPixmap();
 
                 if ( isVisible() )
                 {
                     const QRect cr = contentsRect();
-#if QT_VERSION >= 0x050000
                     *m_data->backingStore = grab( cr );
-#else
-                    *m_data->backingStore = QPixmap::grabWidget( this, cr );
-#endif
                 }
             }
             else
             {
                 delete m_data->backingStore;
-                m_data->backingStore = NULL;
+                m_data->backingStore = nullptr;
             }
             break;
         }
@@ -189,7 +179,7 @@ void QwtPolarCanvas::paintEvent( QPaintEvent* event )
     painter.setClipRegion( event->region() );
 
     if ( ( m_data->paintAttributes & BackingStore )
-        && m_data->backingStore != NULL )
+        && m_data->backingStore != nullptr )
     {
         QPixmap& bs = *m_data->backingStore;
         if ( bs.size() != size() )

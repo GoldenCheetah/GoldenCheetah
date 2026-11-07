@@ -16,43 +16,27 @@
 class QwtMagnifier::PrivateData
 {
   public:
-    PrivateData()
-        : isEnabled( false )
-        , wheelFactor( 0.9 )
-        , wheelModifiers( Qt::NoModifier )
-        , mouseFactor( 0.95 )
-        , mouseButton( Qt::RightButton )
-        , mouseButtonModifiers( Qt::NoModifier )
-        , keyFactor( 0.9 )
-        , zoomInKey( Qt::Key_Plus )
-        , zoomInKeyModifiers( Qt::NoModifier )
-        , zoomOutKey( Qt::Key_Minus )
-        , zoomOutKeyModifiers( Qt::NoModifier )
-        , mousePressed( false )
-        , hasMouseTracking( false )
-    {
-    }
+    bool isEnabled = false;
 
-    bool isEnabled;
+    double wheelFactor = 0.9;
+    Qt::KeyboardModifiers wheelModifiers = Qt::NoModifier;
 
-    double wheelFactor;
-    Qt::KeyboardModifiers wheelModifiers;
+    double mouseFactor = 0.95;
 
-    double mouseFactor;
+    Qt::MouseButton mouseButton = Qt::RightButton;
+    Qt::KeyboardModifiers mouseButtonModifiers = Qt::NoModifier;
 
-    Qt::MouseButton mouseButton;
-    Qt::KeyboardModifiers mouseButtonModifiers;
+    double keyFactor = 0.9;
 
-    double keyFactor;
+    int zoomInKey = Qt::Key_Plus;
+    Qt::KeyboardModifiers zoomInKeyModifiers = Qt::NoModifier;
 
-    int zoomInKey;
-    Qt::KeyboardModifiers zoomInKeyModifiers;
+    int zoomOutKey = Qt::Key_Minus;
+    Qt::KeyboardModifiers zoomOutKeyModifiers = Qt::NoModifier;
 
-    int zoomOutKey;
-    Qt::KeyboardModifiers zoomOutKeyModifiers;
+    bool mousePressed = false;
+    bool hasMouseTracking = false;
 
-    bool mousePressed;
-    bool hasMouseTracking;
     QPoint mousePos;
 };
 
@@ -62,9 +46,8 @@ class QwtMagnifier::PrivateData
  */
 QwtMagnifier::QwtMagnifier( QWidget* parent )
     : QObject( parent )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData();
-
     if ( parent )
     {
         if ( parent->focusPolicy() == Qt::NoFocus )
@@ -77,7 +60,6 @@ QwtMagnifier::QwtMagnifier( QWidget* parent )
 //! Destructor
 QwtMagnifier::~QwtMagnifier()
 {
-    delete m_data;
 }
 
 /*!
@@ -364,7 +346,7 @@ bool QwtMagnifier::eventFilter( QObject* object, QEvent* event )
  */
 void QwtMagnifier::widgetMousePressEvent( QMouseEvent* mouseEvent )
 {
-    if ( parentWidget() == NULL )
+    if ( parentWidget() == nullptr )
         return;
 
     if ( ( mouseEvent->button() != m_data->mouseButton ) ||
@@ -437,13 +419,9 @@ void QwtMagnifier::widgetWheelEvent( QWheelEvent* wheelEvent )
 
     if ( m_data->wheelFactor != 0.0 )
     {
-#if QT_VERSION < 0x050000
-        const int wheelDelta = wheelEvent->delta();
-#else
         const QPoint delta = wheelEvent->angleDelta();
         const int wheelDelta = ( qAbs( delta.x() ) > qAbs( delta.y() ) )
             ? delta.x() : delta.y();
-#endif
 
         /*
             A positive delta indicates that the wheel was

@@ -1,1 +1,1 @@
-#include "qwt_magnifier.h"
+#include "qwt_magnifier.h" // IWYU pragma: export

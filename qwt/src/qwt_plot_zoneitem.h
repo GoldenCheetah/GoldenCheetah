@@ -14,6 +14,7 @@
 #include "qwt_plot_item.h"
 
 #include <qnamespace.h>
+#include <memory>
 
 class QwtInterval;
 class QPen;
@@ -35,9 +36,9 @@ class QWT_EXPORT QwtPlotZoneItem :
 {
   public:
     explicit QwtPlotZoneItem();
-    virtual ~QwtPlotZoneItem();
+    ~QwtPlotZoneItem() override;
 
-    virtual int rtti() const QWT_OVERRIDE;
+    int rtti() const override;
 
     void setOrientation( Qt::Orientation );
     Qt::Orientation orientation() const;
@@ -53,15 +54,14 @@ class QWT_EXPORT QwtPlotZoneItem :
     void setBrush( const QBrush& );
     const QBrush& brush() const;
 
-    virtual void draw( QPainter*,
-        const QwtScaleMap&, const QwtScaleMap&,
-        const QRectF& canvasRect ) const QWT_OVERRIDE;
+    void draw( QPainter*, const QwtScaleMap&, const QwtScaleMap&,
+        const QRectF& canvasRect ) const override;
 
-    virtual QRectF boundingRect() const QWT_OVERRIDE;
+    QRectF boundingRect() const override;
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

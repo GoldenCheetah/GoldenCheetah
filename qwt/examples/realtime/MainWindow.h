@@ -15,20 +15,17 @@ class QAction;
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
   public:
     MainWindow();
 
-  private Q_SLOTS:
+  private:
     void showRunning( bool );
     void appendPoints( bool );
     void showElapsed( int );
 
-  private:
     QToolBar* toolBar();
     void initWhatsThis();
 
-  private:
     Counter* m_randomCount;
     Counter* m_timerCount;
     QCheckBox* m_symbolType;

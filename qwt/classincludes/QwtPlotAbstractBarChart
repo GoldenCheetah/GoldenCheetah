@@ -1,1 +1,1 @@
-#include "qwt_plot_abstract_barchart.h"
+#include "qwt_plot_abstract_barchart.h" // IWYU pragma: export

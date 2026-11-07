@@ -25,10 +25,10 @@ class QWT_EXPORT QwtSplineBasis : public QwtSpline
 {
   public:
     QwtSplineBasis();
-    virtual ~QwtSplineBasis();
+    ~QwtSplineBasis() override;
 
-    virtual QPainterPath painterPath( const QPolygonF& ) const QWT_OVERRIDE;
-    virtual uint locality() const QWT_OVERRIDE;
+    QPainterPath painterPath( const QPolygonF& ) const override;
+    uint locality() const override;
 };
 
 #endif

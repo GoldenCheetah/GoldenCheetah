@@ -12,6 +12,7 @@
 
 #include "qwt_global.h"
 #include <qobject.h>
+#include <memory>
 
 class QRegion;
 class QwtPlotSeriesItem;
@@ -72,7 +73,7 @@ class QWT_EXPORT QwtPlotDirectPainter : public QObject
 
     Q_DECLARE_FLAGS( Attributes, Attribute )
 
-    explicit QwtPlotDirectPainter( QObject* parent = NULL );
+    explicit QwtPlotDirectPainter( QObject* parent = nullptr );
     virtual ~QwtPlotDirectPainter();
 
     void setAttribute( Attribute, bool on );
@@ -87,11 +88,11 @@ class QWT_EXPORT QwtPlotDirectPainter : public QObject
     void drawSeries( QwtPlotSeriesItem*, int from, int to );
     void reset();
 
-    virtual bool eventFilter( QObject*, QEvent* ) QWT_OVERRIDE;
+    bool eventFilter( QObject*, QEvent* ) override;
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QwtPlotDirectPainter::Attributes )

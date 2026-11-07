@@ -14,6 +14,7 @@
 #include "qwt_event_pattern.h"
 
 #include <qobject.h>
+#include <memory>
 
 class QwtPickerMachine;
 class QwtWidgetOverlay;
@@ -151,6 +152,7 @@ class QWT_EXPORT QwtPicker : public QObject, public QwtEventPattern
          */
         UserRubberBand = 100
     };
+
     Q_ENUM( RubberBand )
 
     /*!
@@ -168,6 +170,7 @@ class QWT_EXPORT QwtPicker : public QObject, public QwtEventPattern
         //! Display only when the selection is active
         ActiveOnly
     };
+
     Q_ENUM( DisplayMode )
 
     /*!
@@ -186,13 +189,14 @@ class QWT_EXPORT QwtPicker : public QObject, public QwtEventPattern
         //! All points remain unchanged.
         KeepSize
     };
+
     Q_ENUM( ResizeMode )
 
     explicit QwtPicker( QWidget* parent );
     explicit QwtPicker( RubberBand rubberBand,
         DisplayMode trackerMode, QWidget* );
 
-    virtual ~QwtPicker();
+    ~QwtPicker() override;
 
     void setStateMachine( QwtPickerMachine* );
     const QwtPickerMachine* stateMachine() const;
@@ -219,7 +223,7 @@ class QWT_EXPORT QwtPicker : public QObject, public QwtEventPattern
     bool isEnabled() const;
     bool isActive() const;
 
-    virtual bool eventFilter( QObject*, QEvent* ) QWT_OVERRIDE;
+    bool eventFilter( QObject*, QEvent* ) override;
 
     QWidget* parentWidget();
     const QWidget* parentWidget() const;
@@ -329,12 +333,10 @@ class QWT_EXPORT QwtPicker : public QObject, public QwtEventPattern
     QRect trackerRect( const QSize& ) const;
 
   private:
-    void init( QWidget*, RubberBand rubberBand, DisplayMode trackerMode );
-
     void setMouseTracking( bool );
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

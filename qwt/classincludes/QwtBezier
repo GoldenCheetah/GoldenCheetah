@@ -1,1 +1,1 @@
-#include "qwt_bezier.h"
+#include "qwt_bezier.h" // IWYU pragma: export

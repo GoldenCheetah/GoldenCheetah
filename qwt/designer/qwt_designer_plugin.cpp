@@ -10,11 +10,7 @@
 #include <qglobal.h>
 #include <QtPlugin>
 
-#if QT_VERSION >= 0x050600
 #include <QtUiPlugin/QDesignerCustomWidgetInterface>
-#else
-#include <QDesignerCustomWidgetInterface>
-#endif
 
 #ifndef NO_QWT_PLOT
 #include "qwt_plot.h"
@@ -44,17 +40,17 @@ namespace
     class CustomWidgetInterface : public QDesignerCustomWidgetInterface
     {
       public:
-        virtual QString group() const QWT_OVERRIDE { return "Qwt Widgets"; }
-        virtual bool isContainer() const QWT_OVERRIDE { return false; }
-        virtual bool isInitialized() const QWT_OVERRIDE { return true; }
+        QString group() const override { return "Qwt Widgets"; }
+        bool isContainer() const override { return false; }
+        bool isInitialized() const override { return true; }
 
-        virtual QIcon icon() const QWT_OVERRIDE { return m_icon; }
-        virtual QString codeTemplate() const QWT_OVERRIDE { return m_codeTemplate; }
-        virtual QString domXml() const QWT_OVERRIDE { return m_domXml; }
-        virtual QString includeFile() const QWT_OVERRIDE { return m_include; }
-        virtual QString name() const QWT_OVERRIDE { return m_name; }
-        virtual QString toolTip() const { return m_toolTip; }
-        virtual QString whatsThis() const QWT_OVERRIDE { return m_whatsThis; }
+        QIcon icon() const override { return m_icon; }
+        QString codeTemplate() const override { return m_codeTemplate; }
+        QString domXml() const override { return m_domXml; }
+        QString includeFile() const override { return m_include; }
+        QString name() const override { return m_name; }
+        QString toolTip() const override { return m_toolTip; }
+        QString whatsThis() const override { return m_whatsThis; }
 
       protected:
         QString m_name;
@@ -92,7 +88,7 @@ namespace
                 "</widget>\n";
         }
 
-        virtual QWidget* createWidget( QWidget* parent ) QWT_OVERRIDE
+        QWidget* createWidget( QWidget* parent ) override
         {
             return new QwtPlot( parent );
         }
@@ -126,7 +122,7 @@ namespace
                 "</widget>\n";
         }
 
-        virtual QWidget* createWidget( QWidget* parent ) QWT_OVERRIDE
+        QWidget* createWidget( QWidget* parent ) override
         {
             return new QwtPolarPlot( parent );
         }
@@ -163,7 +159,7 @@ namespace
                 "</widget>\n";
         }
 
-        virtual QWidget* createWidget( QWidget* parent ) QWT_OVERRIDE
+        QWidget* createWidget( QWidget* parent ) override
         {
             return new QwtAnalogClock( parent );
         }
@@ -200,7 +196,7 @@ namespace
                 "</widget>\n";
         }
 
-        virtual QWidget* createWidget( QWidget* parent ) QWT_OVERRIDE
+        QWidget* createWidget( QWidget* parent ) override
         {
             QwtCompass* compass = new QwtCompass( parent );
 
@@ -233,7 +229,7 @@ namespace
                 "</widget>\n";
         }
 
-        virtual QWidget* createWidget( QWidget* parent ) QWT_OVERRIDE
+        QWidget* createWidget( QWidget* parent ) override
         {
             return new QwtCounter( parent );
         }
@@ -270,7 +266,7 @@ namespace
                 "</widget>\n";
         }
 
-        virtual QWidget* createWidget( QWidget* parent ) QWT_OVERRIDE
+        QWidget* createWidget( QWidget* parent ) override
         {
             QwtDial* dial = new QwtDial( parent );
             dial->setNeedle( new QwtDialSimpleNeedle(
@@ -310,7 +306,7 @@ namespace
                 "</widget>\n";
         }
 
-        virtual QWidget* createWidget( QWidget* parent ) QWT_OVERRIDE
+        QWidget* createWidget( QWidget* parent ) override
         {
             return new QwtKnob( parent );
         }
@@ -344,7 +340,7 @@ namespace
                 "</widget>\n";
         }
 
-        virtual QWidget* createWidget( QWidget* parent ) QWT_OVERRIDE
+        QWidget* createWidget( QWidget* parent ) override
         {
             return new QwtScaleWidget( QwtScaleDraw::LeftScale, parent );
         }
@@ -378,7 +374,7 @@ namespace
                 "</widget>\n";
         }
 
-        virtual QWidget* createWidget( QWidget* parent ) QWT_OVERRIDE
+        QWidget* createWidget( QWidget* parent ) override
         {
             return new QwtSlider( parent );
         }
@@ -411,7 +407,7 @@ namespace
                 "</widget>\n";
         }
 
-        virtual QWidget* createWidget( QWidget* parent ) QWT_OVERRIDE
+        QWidget* createWidget( QWidget* parent ) override
         {
             return new QwtTextLabel( QwtText( "Label" ), parent );
         }
@@ -443,7 +439,7 @@ namespace
                 "</widget>\n";
         }
 
-        virtual QWidget* createWidget( QWidget* parent ) QWT_OVERRIDE
+        QWidget* createWidget( QWidget* parent ) override
         {
             return new QwtThermo( parent );
         }
@@ -469,7 +465,7 @@ namespace
                 "</widget>\n";
         }
 
-        virtual QWidget* createWidget( QWidget* parent ) QWT_OVERRIDE
+        QWidget* createWidget( QWidget* parent ) override
         {
             return new QwtWheel( parent );
         }
@@ -487,9 +483,7 @@ namespace
         Q_OBJECT
         Q_INTERFACES( QDesignerCustomWidgetCollectionInterface )
 
-#if QT_VERSION >= 0x050000
         Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QDesignerCustomWidgetCollectionInterface" )
-#endif
 
       public:
         WidgetCollectionInterface()
@@ -516,12 +510,12 @@ namespace
             m_plugins += new TextLabelInterface();
         }
 
-        virtual ~WidgetCollectionInterface() QWT_OVERRIDE
+        ~WidgetCollectionInterface() override
         {
             qDeleteAll( m_plugins );
         }
 
-        QList< QDesignerCustomWidgetInterface* > customWidgets() const
+        QList< QDesignerCustomWidgetInterface* > customWidgets() const override
         {
             return m_plugins;
         }
@@ -530,9 +524,5 @@ namespace
         QList< QDesignerCustomWidgetInterface* > m_plugins;
     };
 }
-
-#if QT_VERSION < 0x050000
-Q_EXPORT_PLUGIN2( QwtDesignerPlugin, WidgetCollectionInterface )
-#endif
 
 #include "qwt_designer_plugin.moc"

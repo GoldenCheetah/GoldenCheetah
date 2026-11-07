@@ -1,1 +1,1 @@
-#include "qwt_abstract_legend.h"
+#include "qwt_abstract_legend.h" // IWYU pragma: export

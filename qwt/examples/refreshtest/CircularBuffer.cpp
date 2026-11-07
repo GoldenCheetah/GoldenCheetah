@@ -7,7 +7,7 @@
 #include <QwtMath>
 
 CircularBuffer::CircularBuffer( double interval, size_t numPoints )
-    : m_y( NULL )
+    : m_y( nullptr )
     , m_referenceTime( 0.0 )
     , m_startIndex( 0 )
     , m_offset( 0.0 )

@@ -11,7 +11,9 @@
 
 #include "qwt_global.h"
 #include "qwt_polar_item.h"
+
 #include <qimage.h>
+#include <memory>
 
 class QwtRasterData;
 class QwtColorMap;
@@ -47,7 +49,7 @@ class QWT_EXPORT QwtPolarSpectrogram : public QwtPolarItem
     Q_DECLARE_FLAGS( PaintAttributes, PaintAttribute )
 
     explicit QwtPolarSpectrogram();
-    virtual ~QwtPolarSpectrogram();
+    ~QwtPolarSpectrogram() override;
 
     void setData( QwtRasterData* data );
     const QwtRasterData* data() const;
@@ -58,14 +60,14 @@ class QWT_EXPORT QwtPolarSpectrogram : public QwtPolarItem
     void setPaintAttribute( PaintAttribute, bool on = true );
     bool testPaintAttribute( PaintAttribute ) const;
 
-    virtual int rtti() const QWT_OVERRIDE;
+    int rtti() const override;
 
-    virtual void draw( QPainter* painter,
+    void draw( QPainter*,
         const QwtScaleMap& azimuthMap, const QwtScaleMap& radialMap,
         const QPointF& pole, double radius,
-        const QRectF& canvasRect ) const QWT_OVERRIDE;
+        const QRectF& canvasRect ) const override;
 
-    virtual QwtInterval boundingInterval( int scaleId ) const QWT_OVERRIDE;
+    QwtInterval boundingInterval( int scaleId ) const override;
 
   protected:
     virtual QImage renderImage(
@@ -83,7 +85,7 @@ class QWT_EXPORT QwtPolarSpectrogram : public QwtPolarItem
         const QPointF& pole, TileInfo* ) const;
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QwtPolarSpectrogram::PaintAttributes )

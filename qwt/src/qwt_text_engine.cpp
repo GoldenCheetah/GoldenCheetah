@@ -149,14 +149,13 @@ QwtTextEngine::~QwtTextEngine()
 
 //! Constructor
 QwtPlainTextEngine::QwtPlainTextEngine()
+    : m_data( new PrivateData )
 {
-    m_data = new PrivateData;
 }
 
 //! Destructor
 QwtPlainTextEngine::~QwtPlainTextEngine()
 {
-    delete m_data;
 }
 
 /*!

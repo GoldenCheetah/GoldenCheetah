@@ -30,9 +30,8 @@ class QwtPlotGraphicItem::PrivateData
    \param title Title
  */
 QwtPlotGraphicItem::QwtPlotGraphicItem( const QString& title )
-    : QwtPlotItem( QwtText( title ) )
+    : QwtPlotGraphicItem( QwtText( title ) )
 {
-    init();
 }
 
 /*!
@@ -46,25 +45,19 @@ QwtPlotGraphicItem::QwtPlotGraphicItem( const QString& title )
  */
 QwtPlotGraphicItem::QwtPlotGraphicItem( const QwtText& title )
     : QwtPlotItem( title )
+    , m_data( new PrivateData )
 {
-    init();
-}
-
-//! Destructor
-QwtPlotGraphicItem::~QwtPlotGraphicItem()
-{
-    delete m_data;
-}
-
-void QwtPlotGraphicItem::init()
-{
-    m_data = new PrivateData();
     m_data->boundingRect = QwtPlotItem::boundingRect();
 
     setItemAttribute( QwtPlotItem::AutoScale, true );
     setItemAttribute( QwtPlotItem::Legend, false );
 
     setZ( 8.0 );
+}
+
+//! Destructor
+QwtPlotGraphicItem::~QwtPlotGraphicItem()
+{
 }
 
 //! \return QwtPlotItem::Rtti_PlotGraphic

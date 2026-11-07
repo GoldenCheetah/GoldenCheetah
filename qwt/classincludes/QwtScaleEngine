@@ -1,1 +1,1 @@
-#include "qwt_scale_engine.h"
+#include "qwt_scale_engine.h" // IWYU pragma: export

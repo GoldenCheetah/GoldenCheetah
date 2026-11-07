@@ -14,6 +14,8 @@
 #include "qwt_dial.h"
 #include "qwt_round_scale_draw.h"
 
+#include <memory>
+
 class QwtCompassRose;
 class QString;
 template< class Key, class T > class QMap;
@@ -35,16 +37,16 @@ class QWT_EXPORT QwtCompassScaleDraw : public QwtRoundScaleDraw
     explicit QwtCompassScaleDraw();
     explicit QwtCompassScaleDraw( const QMap< double, QString >& map );
 
-    virtual ~QwtCompassScaleDraw();
+    ~QwtCompassScaleDraw() override;
 
     void setLabelMap( const QMap< double, QString >& map );
     QMap< double, QString > labelMap() const;
 
-    virtual QwtText label( double value ) const QWT_OVERRIDE;
+    QwtText label( double value ) const override;
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 /*!
@@ -63,8 +65,8 @@ class QWT_EXPORT QwtCompass : public QwtDial
     Q_OBJECT
 
   public:
-    explicit QwtCompass( QWidget* parent = NULL );
-    virtual ~QwtCompass();
+    explicit QwtCompass( QWidget* parent = nullptr );
+    ~QwtCompass() override;
 
     void setRose( QwtCompassRose* rose );
     const QwtCompassRose* rose() const;
@@ -74,14 +76,14 @@ class QWT_EXPORT QwtCompass : public QwtDial
     virtual void drawRose( QPainter*, const QPointF& center,
         double radius, double north, QPalette::ColorGroup ) const;
 
-    virtual void drawScaleContents( QPainter*,
-        const QPointF& center, double radius ) const QWT_OVERRIDE;
+    void drawScaleContents( QPainter*,
+        const QPointF& center, double radius ) const override;
 
-    virtual void keyPressEvent( QKeyEvent* ) QWT_OVERRIDE;
+    void keyPressEvent( QKeyEvent* ) override;
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

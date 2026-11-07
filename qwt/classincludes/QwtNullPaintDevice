@@ -1,1 +1,1 @@
-#include "qwt_null_paintdevice.h"
+#include "qwt_null_paintdevice.h" // IWYU pragma: export

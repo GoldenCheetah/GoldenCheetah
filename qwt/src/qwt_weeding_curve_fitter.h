@@ -11,6 +11,7 @@
 #define QWT_WEEDING_CURVE_FITTER_H
 
 #include "qwt_curve_fitter.h"
+#include <memory>
 
 /*!
    \brief A curve fitter implementing Douglas and Peucker algorithm
@@ -39,7 +40,7 @@ class QWT_EXPORT QwtWeedingCurveFitter : public QwtCurveFitter
 {
   public:
     explicit QwtWeedingCurveFitter( double tolerance = 1.0 );
-    virtual ~QwtWeedingCurveFitter();
+    ~QwtWeedingCurveFitter() override;
 
     void setTolerance( double );
     double tolerance() const;
@@ -47,8 +48,8 @@ class QWT_EXPORT QwtWeedingCurveFitter : public QwtCurveFitter
     void setChunkSize( uint );
     uint chunkSize() const;
 
-    virtual QPolygonF fitCurve( const QPolygonF& ) const QWT_OVERRIDE;
-    virtual QPainterPath fitCurvePath( const QPolygonF& ) const QWT_OVERRIDE;
+    QPolygonF fitCurve( const QPolygonF& ) const override;
+    QPainterPath fitCurvePath( const QPolygonF& ) const override;
 
   private:
     virtual QPolygonF simplify( const QPolygonF& ) const;
@@ -56,7 +57,7 @@ class QWT_EXPORT QwtWeedingCurveFitter : public QwtCurveFitter
     class Line;
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

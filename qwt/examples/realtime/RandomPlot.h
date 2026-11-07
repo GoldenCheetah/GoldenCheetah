@@ -15,9 +15,9 @@ class RandomPlot : public IncrementalPlot
     Q_OBJECT
 
   public:
-    RandomPlot( QWidget* parent = NULL );
+    RandomPlot( QWidget* parent = nullptr );
 
-    virtual QSize sizeHint() const QWT_OVERRIDE;
+    QSize sizeHint() const override;
 
   Q_SIGNALS:
     void running( bool );

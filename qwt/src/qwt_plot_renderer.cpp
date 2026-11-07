@@ -23,51 +23,29 @@
 #include <qpainterpath.h>
 #include <qtransform.h>
 #include <qprinter.h>
-#include <qfiledialog.h>
 #include <qfileinfo.h>
 #include <qimagewriter.h>
 #include <qvariant.h>
 #include <qmargins.h>
 
+#ifndef QT_NO_FILEDIALOG
+#include <qfiledialog.h>
+#endif
+
+#ifndef QT_NO_MESSAGEBOX
+#include <qmessagebox.h>
+#endif
+
 #ifndef QWT_NO_SVG
 #ifdef QT_SVG_LIB
 #define QWT_FORMAT_SVG 1
-#endif
-#endif
-
-#ifndef QT_NO_PRINTER
-#define QWT_FORMAT_PDF 1
-#endif
-
-#ifndef QT_NO_PDF
-
-// QPdfWriter::setResolution() has been introduced with
-// Qt 5.3. Guess it is o.k. to stay with QPrinter for older
-// versions.
-
-#if QT_VERSION >= 0x050300
-
-#ifndef QWT_FORMAT_PDF
-#define QWT_FORMAT_PDF 1
-#endif
-
-#define QWT_PDF_WRITER 1
-
-#endif
-#endif
-
-#ifndef QT_NO_PRINTER
-// postscript support has been dropped in Qt5
-#if QT_VERSION < 0x050000
-#define QWT_FORMAT_POSTSCRIPT 1
-#endif
-#endif
-
-#if QWT_FORMAT_SVG
 #include <qsvggenerator.h>
 #endif
 
-#if QWT_PDF_WRITER
+#endif
+
+#ifndef QT_NO_PDF
+#define QWT_FORMAT_PDF 1
 #include <qpdfwriter.h>
 #endif
 
@@ -117,7 +95,7 @@ static QPainterPath qwtCanvasClip(
 static inline QFont qwtResolvedFont( const QWidget* widget )
 {
     QFont font = widget->font();
-#if QT_VERSION >= 0x060000
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     font.setResolveMask( QFont::AllPropertiesResolved );
 #else
     font.resolve( QFont::AllPropertiesResolved );
@@ -129,14 +107,8 @@ static inline QFont qwtResolvedFont( const QWidget* widget )
 class QwtPlotRenderer::PrivateData
 {
   public:
-    PrivateData()
-        : discardFlags( QwtPlotRenderer::DiscardNone )
-        , layoutFlags( QwtPlotRenderer::DefaultLayout )
-    {
-    }
-
-    QwtPlotRenderer::DiscardFlags discardFlags;
-    QwtPlotRenderer::LayoutFlags layoutFlags;
+    DiscardFlags discardFlags = DiscardNone;
+    LayoutFlags layoutFlags = DefaultLayout;
 };
 
 /*!
@@ -145,14 +117,13 @@ class QwtPlotRenderer::PrivateData
  */
 QwtPlotRenderer::QwtPlotRenderer( QObject* parent )
     : QObject( parent )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
 }
 
 //! Destructor
 QwtPlotRenderer::~QwtPlotRenderer()
 {
-    delete m_data;
 }
 
 /*!
@@ -257,11 +228,13 @@ QwtPlotRenderer::LayoutFlags QwtPlotRenderer::layoutFlags() const
    \param fileName Path of the file, where the document will be stored
    \param sizeMM Size for the document in millimeters.
    \param resolution Resolution in dots per Inch (dpi)
+
+   \return wether document was rendered successfully.
  */
-void QwtPlotRenderer::renderDocument( QwtPlot* plot,
+bool QwtPlotRenderer::renderDocument( QwtPlot* plot,
     const QString& fileName, const QSizeF& sizeMM, int resolution )
 {
-    renderDocument( plot, fileName,
+    return renderDocument( plot, fileName,
         QFileInfo( fileName ).suffix(), sizeMM, resolution );
 }
 
@@ -288,14 +261,15 @@ void QwtPlotRenderer::renderDocument( QwtPlot* plot,
    \param sizeMM Size for the document in millimeters.
    \param resolution Resolution in dots per Inch (dpi)
 
+   \return wether document was rendered successfully.
    \sa renderTo(), render(), QwtPainter::setRoundingAlignment()
  */
-void QwtPlotRenderer::renderDocument( QwtPlot* plot,
+bool QwtPlotRenderer::renderDocument( QwtPlot* plot,
     const QString& fileName, const QString& format,
     const QSizeF& sizeMM, int resolution )
 {
-    if ( plot == NULL || sizeMM.isEmpty() || resolution <= 0 )
-        return;
+    if ( plot == nullptr || sizeMM.isEmpty() || resolution <= 0 )
+        return false;
 
     QString title = plot->title().text();
     if ( title.isEmpty() )
@@ -310,8 +284,6 @@ void QwtPlotRenderer::renderDocument( QwtPlot* plot,
     if ( fmt == QLatin1String( "pdf" ) )
     {
 #if QWT_FORMAT_PDF
-
-#if QWT_PDF_WRITER
         QPdfWriter pdfWriter( fileName );
         pdfWriter.setPageSize( QPageSize( sizeMM, QPageSize::Millimeter ) );
         pdfWriter.setTitle( title );
@@ -320,35 +292,8 @@ void QwtPlotRenderer::renderDocument( QwtPlot* plot,
 
         QPainter painter( &pdfWriter );
         render( plot, &painter, documentRect );
-#else
-        QPrinter printer;
-        printer.setOutputFormat( QPrinter::PdfFormat );
-        printer.setColorMode( QPrinter::Color );
-        printer.setFullPage( true );
-        printer.setPaperSize( sizeMM, QPrinter::Millimeter );
-        printer.setDocName( title );
-        printer.setOutputFileName( fileName );
-        printer.setResolution( resolution );
 
-        QPainter painter( &printer );
-        render( plot, &painter, documentRect );
-#endif
-#endif
-    }
-    else if ( fmt == QLatin1String( "ps" ) )
-    {
-#if QWT_FORMAT_POSTSCRIPT
-        QPrinter printer;
-        printer.setOutputFormat( QPrinter::PostScriptFormat );
-        printer.setColorMode( QPrinter::Color );
-        printer.setFullPage( true );
-        printer.setPaperSize( sizeMM, QPrinter::Millimeter );
-        printer.setDocName( title );
-        printer.setOutputFileName( fileName );
-        printer.setResolution( resolution );
-
-        QPainter painter( &printer );
-        render( plot, &painter, documentRect );
+        return true;
 #endif
     }
     else if ( fmt == QLatin1String( "svg" ) )
@@ -362,6 +307,8 @@ void QwtPlotRenderer::renderDocument( QwtPlot* plot,
 
         QPainter painter( &generator );
         render( plot, &painter, documentRect );
+
+        return true;
 #endif
     }
     else
@@ -381,9 +328,11 @@ void QwtPlotRenderer::renderDocument( QwtPlot* plot,
             render( plot, &painter, imageRect );
             painter.end();
 
-            image.save( fileName, format.toLatin1() );
+            return image.save( fileName, format.toLatin1() );
         }
     }
+
+    return false;
 }
 
 /*!
@@ -842,7 +791,7 @@ void QwtPlotRenderer::renderCanvas( const QwtPlot* plot,
 
         QPen pen;
         pen.setColor( qwtScalePenColor( plot ) );
-        pen.setWidth( qwtScalePenWidth( plot ) );
+        pen.setWidthF( qwtScalePenWidth( plot ) );
         pen.setJoinStyle( Qt::MiterJoin );
 
         painter->setPen( pen );
@@ -1068,7 +1017,7 @@ bool QwtPlotRenderer::updateCanvasMargins( QwtPlot* plot,
 bool QwtPlotRenderer::exportTo( QwtPlot* plot, const QString& documentName,
     const QSizeF& sizeMM, int resolution )
 {
-    if ( plot == NULL )
+    if ( plot == nullptr )
         return false;
 
     QString fileName = documentName;
@@ -1085,9 +1034,6 @@ bool QwtPlotRenderer::exportTo( QwtPlot* plot, const QString& documentName,
 #endif
 #if QWT_FORMAT_SVG
     filter += QString( "SVG " ) + tr( "Documents" ) + " (*.svg)";
-#endif
-#if QWT_FORMAT_POSTSCRIPT
-    filter += QString( "Postscript " ) + tr( "Documents" ) + " (*.ps)";
 #endif
 
     if ( imageFormats.size() > 0 )
@@ -1107,15 +1053,27 @@ bool QwtPlotRenderer::exportTo( QwtPlot* plot, const QString& documentName,
     }
 
     fileName = QFileDialog::getSaveFileName(
-        NULL, tr( "Export File Name" ), fileName,
-        filter.join( ";;" ), NULL, QFileDialog::DontConfirmOverwrite );
+        nullptr, tr( "Export File Name" ), fileName,
+        filter.join( ";;" ), nullptr, QFileDialog::DontConfirmOverwrite );
 #endif
     if ( fileName.isEmpty() )
         return false;
 
-    renderDocument( plot, fileName, sizeMM, resolution );
+    const bool ok = renderDocument( plot, fileName, sizeMM, resolution );
 
-    return true;
+#ifndef QT_NO_MESSAGEBOX
+    if ( !ok )
+    {
+        QString text = "Failed to export to ";
+        text += fileName;
+        text += ". The problem may be an unsupported file extension.";
+
+        QMessageBox::warning( nullptr, "Export Failure",
+            text, QMessageBox::Ok, QMessageBox::NoButton );
+    }
+#endif
+
+    return ok;
 }
 
 #include "moc_qwt_plot_renderer.cpp"

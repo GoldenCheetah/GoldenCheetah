@@ -35,15 +35,15 @@ namespace
             layout->addWidget( tunerBox );
             layout->addWidget( amplifierBox );
 
-            connect( tunerBox, SIGNAL(fieldChanged(double)),
-                amplifierBox, SLOT(setMaster(double)) );
+            connect( tunerBox, &TunerBox::fieldChanged,
+                amplifierBox, &AmplifierBox::setMaster );
 
-            tunerBox->setFreq( 90.0 );
+            tunerBox->setFrequency( 90.0 );
 
             setPalette( QPalette( QColor( 192, 192, 192 ) ) );
         }
 
-        virtual void resizeEvent( QResizeEvent* ) QWT_OVERRIDE
+        void resizeEvent( QResizeEvent* ) override
         {
             // Qt 4.7.1: QGradient::StretchToDeviceMode is buggy on X11
 

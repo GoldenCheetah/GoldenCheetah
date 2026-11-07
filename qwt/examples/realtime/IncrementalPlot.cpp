@@ -14,10 +14,10 @@
 
 namespace
 {
-    class CurveData : public QwtArraySeriesData< QPointF >
+    class CurveData final : public QwtArraySeriesData< QPointF >
     {
       public:
-        virtual QRectF boundingRect() const QWT_OVERRIDE
+        QRectF boundingRect() const override
         {
             if ( cachedBoundingRect.width() < 0.0 )
                 cachedBoundingRect = qwtBoundingRect( *this );
@@ -41,15 +41,12 @@ namespace
 
 IncrementalPlot::IncrementalPlot( QWidget* parent )
     : QwtPlot( parent )
-    , m_curve( NULL )
+    , m_curve( nullptr )
 {
     m_directPainter = new QwtPlotDirectPainter( this );
 
     if ( QwtPainter::isX11GraphicsSystem() )
     {
-#if QT_VERSION < 0x050000
-        canvas()->setAttribute( Qt::WA_PaintOutsidePaintEvent, true );
-#endif
         canvas()->setAttribute( Qt::WA_PaintOnScreen, true );
     }
 
@@ -117,7 +114,7 @@ void IncrementalPlot::showSymbols( bool on )
     {
         m_curve->setPen( Qt::white );
         m_curve->setStyle( QwtPlotCurve::Dots );
-        m_curve->setSymbol( NULL );
+        m_curve->setSymbol( nullptr );
     }
 
     replot();

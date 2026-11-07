@@ -1,1 +1,1 @@
-#include "qwt_spline_polynomial.h"
+#include "qwt_spline_polynomial.h" // IWYU pragma: export

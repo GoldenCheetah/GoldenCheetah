@@ -1,0 +1,189 @@
+From 678989e055821b1aadaec14d7f38b2aa143e97d5 Mon Sep 17 00:00:00 2001
+From: Alejandro Martinez <amtriathlon@gmail.com>
+Date: Sat, 7 Nov 2026 15:04:46 -0300
+Subject: [PATCH] GoldenCheetah patch
+
+- Colored Zones in qwt_plot_curve (QwtZone)
+- Disabled the emitting of Layout Requests on geometry changes of
+  QwtScaleWidget - without this, CPU utilization was up to 100%
+- Move qwtconfig.pri to qwtconfig.pri.in with static build
+  and disabling optional components for faster builds.
+This patch is intended to be applied after pulling an update
+from https://sourceforge.net/p/qwt/git/ci/qwt-multiaxes/tree
+and before to copy to GoldenCheetah repo qwt folder.
+---
+ qwtconfig.pri => qwtconfig.pri.in | 10 ++++-----
+ src/qwt_plot_curve.cpp            | 34 +++++++++++++++++++++++++++++++
+ src/qwt_plot_curve.h              | 13 ++++++++++++
+ src/qwt_scale_widget.cpp          |  2 +-
+ 4 files changed, 53 insertions(+), 6 deletions(-)
+ rename qwtconfig.pri => qwtconfig.pri.in (97%)
+
+diff --git a/qwtconfig.pri b/qwtconfig.pri.in
+similarity index 97%
+rename from qwtconfig.pri
+rename to qwtconfig.pri.in
+index a7e688f..cfc04f9 100644
+--- a/qwtconfig.pri
++++ b/qwtconfig.pri.in
+@@ -72,7 +72,7 @@ QWT_INSTALL_FEATURES  = $${QWT_INSTALL_PREFIX}/features
+ # it will be a static library.
+ ######################################################################
+ 
+-QWT_CONFIG           += QwtDll
++#QWT_CONFIG           += QwtDll
+ 
+ ######################################################################
+ # QwtPlot enables all classes, that are needed to use the QwtPlot
+@@ -137,7 +137,7 @@ win32 {
+ # Otherwise you have to build them from the examples directory.
+ ######################################################################
+ 
+-QWT_CONFIG     += QwtExamples
++#QWT_CONFIG     += QwtExamples
+ 
+ ######################################################################
+ # The playground is primarily intended for the Qwt development
+@@ -148,14 +148,14 @@ QWT_CONFIG     += QwtExamples
+ # Otherwise you have to build them from the playground directory.
+ ######################################################################
+ 
+-QWT_CONFIG     += QwtPlayground
++#QWT_CONFIG     += QwtPlayground
+ 
+ ######################################################################
+ # If you want to auto build the tests, enable the line below
+ # Otherwise you have to build them from the tests directory.
+ ######################################################################
+ 
+-QWT_CONFIG     += QwtTests
++#QWT_CONFIG     += QwtTests
+ 
+ ######################################################################
+ # When Qt has been built as framework qmake wants
+@@ -164,7 +164,7 @@ QWT_CONFIG     += QwtTests
+ 
+ macx:!static:CONFIG(qt_framework, qt_framework|qt_no_framework) {
+ 
+-    QWT_CONFIG += QwtFramework
++    #QWT_CONFIG += QwtFramework
+ }
+ 
+ ######################################################################
+diff --git a/src/qwt_plot_curve.cpp b/src/qwt_plot_curve.cpp
+index 151dc44..21b8e78 100644
+--- a/src/qwt_plot_curve.cpp
++++ b/src/qwt_plot_curve.cpp
+@@ -99,6 +99,8 @@ class QwtPlotCurve::PrivateData
+     PaintAttributes paintAttributes = ClipPolygons | FilterPoints;;
+ 
+     LegendAttributes legendAttributes;
++
++    QVector<QwtZone>zones;
+ };
+ 
+ /*!
+@@ -902,6 +904,29 @@ void QwtPlotCurve::fillCurve( QPainter* painter,
+     painter->setPen( Qt::NoPen );
+     painter->setBrush( brush );
+ 
++    // if we have zones we need to process the polygon point by point...
++    double avg=(yMap.invTransform(polygon[0].y())+yMap.invTransform(polygon[1].y())) / 2.00;
++
++    if (m_data->zones.count()>0 && polygon.count() == 4) {
++
++        // we need to set color based upon zone
++        double alpha = m_data->brush.color().alphaF();
++        QColor color = m_data->brush.color();
++
++        if (avg < 1) color=Qt::black;
++        else {
++            for(int i=0; i<m_data->zones.count(); i++) {
++                if (avg < m_data->zones[i].lim) {
++                    color = m_data->zones[i].color;
++                    color.setAlphaF(alpha);
++                    break;
++                }
++            }
++        }
++        brush.setColor(color);
++        painter->setBrush(brush);
++    }
++
+     QwtPainter::drawPolygon( painter, polygon );
+ 
+     painter->restore();
+@@ -1027,6 +1052,15 @@ double QwtPlotCurve::baseline() const
+     return m_data->baseline;
+ }
+ 
++void QwtPlotCurve::setZones(QVector<QwtZone> zones)
++{
++    m_data->zones = zones;
++}
++
++QVector<QwtZone> &QwtPlotCurve::zones() {
++    return m_data->zones;
++}
++
+ /*!
+    Find the closest curve point for a specific position
+ 
+diff --git a/src/qwt_plot_curve.h b/src/qwt_plot_curve.h
+index 8b86888..e4c5c7b 100644
+--- a/src/qwt_plot_curve.h
++++ b/src/qwt_plot_curve.h
+@@ -15,10 +15,12 @@
+ 
+ #include <qstring.h>
+ #include <memory>
++#include <QColor>
+ 
+ class QwtScaleMap;
+ class QwtSymbol;
+ class QwtCurveFitter;
++class QwtZone;
+ template< typename T > class QwtSeriesData;
+ class QwtText;
+ class QPainter;
+@@ -291,6 +293,9 @@ class QWT_EXPORT QwtPlotCurve
+     void setBrush( const QBrush& );
+     const QBrush& brush() const;
+ 
++    void setZones(QVector<QwtZone>);
++    QVector<QwtZone> &zones();
++
+     void setBaseline( double );
+     double baseline() const;
+ 
+@@ -346,6 +351,14 @@ class QWT_EXPORT QwtPlotCurve
+     std::unique_ptr< PrivateData > m_data;
+ };
+ 
++class QwtZone {
++public:
++    QwtZone(double l, QColor c) : lim(l), color(c) {}
++    QwtZone() : lim(0), color(QColor(Qt::black)) {}
++    double lim;     // less than this?
++    QColor color;   // make it this color then
++};
++
+ //! boundingRect().left()
+ inline double QwtPlotCurve::minXValue() const
+ {
+diff --git a/src/qwt_scale_widget.cpp b/src/qwt_scale_widget.cpp
+index f4335bd..a8a5d47 100644
+--- a/src/qwt_scale_widget.cpp
++++ b/src/qwt_scale_widget.cpp
+@@ -572,7 +572,7 @@ void QwtScaleWidget::layoutScale( bool update_geometry )
+     {
+         updateGeometry();
+ 
+-#if 1
++#if 0
+         /*
+             for some reason updateGeometry does not send a LayoutRequest event
+             when the parent is not visible and has no layout
+-- 
+2.24.0.windows.2
+

@@ -34,7 +34,7 @@ namespace
     class Clock : public QwtAnalogClock
     {
       public:
-        Clock( QWidget* parent = NULL )
+        Clock( QWidget* parent = nullptr )
             : QwtAnalogClock( parent )
         {
 #if 0
@@ -63,7 +63,8 @@ namespace
             }
 
             QTimer* timer = new QTimer( this );
-            timer->connect( timer, SIGNAL(timeout()), this, SLOT(setCurrentTime()) );
+            connect( timer, &QTimer::timeout,
+                this, &QwtAnalogClock::setCurrentTime );
             timer->start( 1000 );
         }
     };
@@ -71,7 +72,7 @@ namespace
     class Speedo : public SpeedoMeter
     {
       public:
-        Speedo( QWidget* parent = NULL )
+        Speedo( QWidget* parent = nullptr )
             : SpeedoMeter( parent )
         {
             setScaleStepSize( 20.0 );
@@ -82,7 +83,7 @@ namespace
         }
 
       protected:
-        virtual void timerEvent( QTimerEvent* event ) QWT_OVERRIDE
+        void timerEvent( QTimerEvent* event ) override
         {
             if ( event->timerId() == m_timerId )
             {
@@ -126,7 +127,7 @@ namespace
     class AttitudeInstrument : public AttitudeIndicator
     {
       public:
-        AttitudeInstrument( QWidget* parent = NULL )
+        AttitudeInstrument( QWidget* parent = nullptr )
             : AttitudeIndicator( parent )
         {
             scaleDraw()->setPenWidthF( 3 );
@@ -134,7 +135,7 @@ namespace
         }
 
       protected:
-        virtual void timerEvent( QTimerEvent* event ) QWT_OVERRIDE
+        void timerEvent( QTimerEvent* event ) override
         {
             if ( event->timerId() == m_timerId )
             {
@@ -207,7 +208,7 @@ CockpitGrid::CockpitGrid( QWidget* parent )
 
 QwtDial* CockpitGrid::createDial( int pos )
 {
-    QwtDial* dial = NULL;
+    QwtDial* dial = nullptr;
 
     switch( pos )
     {

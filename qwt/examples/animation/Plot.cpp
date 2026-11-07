@@ -58,7 +58,7 @@ class Curve1 : public Curve
         setTransformation( transform );
     }
 
-    virtual QPolygonF points( double phase ) const QWT_OVERRIDE
+    QPolygonF points( double phase ) const override
     {
         QPolygonF points;
 
@@ -86,7 +86,7 @@ class Curve2 : public Curve
     }
 
   private:
-    virtual QPolygonF points( double phase ) const QWT_OVERRIDE
+    QPolygonF points( double phase ) const override
     {
         QPolygonF points;
 
@@ -120,7 +120,7 @@ class Curve3 : public Curve
     }
 
   private:
-    virtual QPolygonF points( double phase ) const QWT_OVERRIDE
+    QPolygonF points( double phase ) const override
     {
         QPolygonF points;
 
@@ -154,7 +154,7 @@ class Curve4 : public Curve
     }
 
   private:
-    virtual QPolygonF points( double phase ) const QWT_OVERRIDE
+    QPolygonF points( double phase ) const override
     {
         const double speed = 0.05;
 

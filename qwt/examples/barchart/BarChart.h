@@ -14,7 +14,7 @@ class BarChart : public QwtPlot
     Q_OBJECT
 
   public:
-    BarChart( QWidget* = NULL );
+    BarChart( QWidget* = nullptr );
 
   public Q_SLOTS:
     void setMode( int );

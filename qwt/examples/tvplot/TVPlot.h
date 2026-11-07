@@ -12,7 +12,7 @@ class TVPlot : public QwtPlot
     Q_OBJECT
 
   public:
-    TVPlot( QWidget* = NULL );
+    TVPlot( QWidget* = nullptr );
 
   public Q_SLOTS:
     void setMode( int );
@@ -20,7 +20,5 @@ class TVPlot : public QwtPlot
 
   private:
     void populate();
-
-  private Q_SLOTS:
     void showItem( const QVariant&, bool on );
 };

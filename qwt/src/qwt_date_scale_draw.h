@@ -14,6 +14,8 @@
 #include "qwt_scale_draw.h"
 #include "qwt_date.h"
 
+#include <memory>
+
 /*!
    \brief A class for drawing datetime scales
 
@@ -53,7 +55,7 @@ class QWT_EXPORT QwtDateScaleDraw : public QwtScaleDraw
 {
   public:
     explicit QwtDateScaleDraw( Qt::TimeSpec = Qt::LocalTime );
-    virtual ~QwtDateScaleDraw();
+    ~QwtDateScaleDraw() override;
 
     void setDateFormat( QwtDate::IntervalType, const QString& );
     QString dateFormat( QwtDate::IntervalType ) const;
@@ -67,7 +69,7 @@ class QWT_EXPORT QwtDateScaleDraw : public QwtScaleDraw
     void setWeek0Type( QwtDate::Week0Type );
     QwtDate::Week0Type week0Type() const;
 
-    virtual QwtText label( double ) const QWT_OVERRIDE;
+    QwtText label( double ) const override;
 
     QDateTime toDateTime( double ) const;
 
@@ -80,7 +82,7 @@ class QWT_EXPORT QwtDateScaleDraw : public QwtScaleDraw
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

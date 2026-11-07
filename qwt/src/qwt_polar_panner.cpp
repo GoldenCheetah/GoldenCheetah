@@ -44,7 +44,7 @@ QwtPolarPlot* QwtPolarPanner::plot()
     if ( c )
         return c->plot();
 
-    return NULL;
+    return nullptr;
 }
 
 //! \return observed plot
@@ -54,7 +54,7 @@ const QwtPolarPlot* QwtPolarPanner::plot() const
     if ( c )
         return c->plot();
 
-    return NULL;
+    return nullptr;
 }
 
 /*!
@@ -68,7 +68,7 @@ const QwtPolarPlot* QwtPolarPanner::plot() const
 void QwtPolarPanner::movePlot( int dx, int dy )
 {
     QwtPolarPlot* plot = QwtPolarPanner::plot();
-    if ( plot == NULL || ( dx == 0 && dy == 0 ) )
+    if ( plot == nullptr || ( dx == 0 && dy == 0 ) )
         return;
 
     const QwtScaleMap map = plot->scaleMap( QwtPolar::Radius );

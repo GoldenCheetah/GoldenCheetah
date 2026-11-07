@@ -47,7 +47,9 @@ QWidget* MainWindow::createPanel( QWidget* parent )
     rescaleBox->insertItem( Expanding, "Expanding" );
     rescaleBox->insertItem( Fitting, "Fitting" );
 
-    connect( rescaleBox, SIGNAL(activated(int)), SLOT(setRescaleMode(int)) );
+    void ( QComboBox::*comboActivated )( int ) = &QComboBox::activated; // for Qt5
+
+    connect( rescaleBox, comboActivated, this, &MainWindow::setRescaleMode );
 
     m_rescaleInfo = new QLabel( panel );
     m_rescaleInfo->setSizePolicy(
@@ -76,8 +78,7 @@ Plot* MainWindow::createPlot( QWidget* parent )
     for ( int axisPos = 0; axisPos < QwtAxis::AxisPositions; axisPos++ )
         m_rescaler->setIntervalHint( axisPos, QwtInterval( 0.0, 1000.0 ) );
 
-    connect( plot, SIGNAL(resized(double,double)),
-        SLOT(showRatio(double,double)) );
+    connect( plot, &Plot::resized, this, &MainWindow::showRatio );
     return plot;
 }
 
@@ -149,5 +150,3 @@ void MainWindow::showRatio( double xRatio, double yRatio )
     const QString msg = QString( "%1, %2" ).arg( xRatio ).arg( yRatio );
     statusBar()->showMessage( msg );
 }
-
-#include "moc_MainWindow.cpp"

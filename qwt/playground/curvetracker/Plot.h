@@ -14,7 +14,7 @@ class Plot : public QwtPlot
     Q_OBJECT
 
   public:
-    Plot( QWidget* = NULL );
+    Plot( QWidget* = nullptr );
 
   private:
     void insertCurve( const QString& title,

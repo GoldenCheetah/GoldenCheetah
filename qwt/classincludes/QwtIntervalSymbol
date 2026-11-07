@@ -1,1 +1,1 @@
-#include "qwt_interval_symbol.h"
+#include "qwt_interval_symbol.h" // IWYU pragma: export

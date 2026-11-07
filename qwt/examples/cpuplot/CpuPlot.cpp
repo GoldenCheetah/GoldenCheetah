@@ -26,7 +26,7 @@ namespace
             : baseTime( base )
         {
         }
-        virtual QwtText label( double v ) const QWT_OVERRIDE
+        QwtText label( double v ) const override
         {
             QTime upTime = baseTime.addSecs( static_cast< int >( v ) );
             return upTime.toString();
@@ -43,14 +43,14 @@ namespace
             setZ( 0.0 );
         }
 
-        virtual int rtti() const QWT_OVERRIDE
+        int rtti() const override
         {
             return QwtPlotItem::Rtti_PlotUserItem;
         }
 
-        virtual void draw( QPainter* painter,
+        void draw( QPainter* painter,
             const QwtScaleMap&, const QwtScaleMap& yMap,
-            const QRectF& canvasRect ) const QWT_OVERRIDE
+            const QRectF& canvasRect ) const override
         {
             QColor c( Qt::white );
             QRectF r = canvasRect;
@@ -168,8 +168,8 @@ CpuPlot::CpuPlot( QWidget* parent )
 
     ( void )startTimer( 1000 ); // 1 second
 
-    connect( legend, SIGNAL(checked(const QVariant&,bool,int)),
-        SLOT(legendChecked(const QVariant&,bool)) );
+    connect( legend, &QwtLegend::checked,
+        this, &CpuPlot::legendChecked );
 }
 
 void CpuPlot::timerEvent( QTimerEvent* )
@@ -233,5 +233,3 @@ void CpuPlot::showCurve( QwtPlotItem* item, bool on )
 
     replot();
 }
-
-#include "moc_CpuPlot.cpp"

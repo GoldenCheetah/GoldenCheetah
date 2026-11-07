@@ -12,6 +12,7 @@
 
 #include "qwt_global.h"
 #include <qpushbutton.h>
+#include <memory>
 
 /*!
    \brief Arrow Button
@@ -23,18 +24,18 @@
 class QWT_EXPORT QwtArrowButton : public QPushButton
 {
   public:
-    explicit QwtArrowButton ( int num, Qt::ArrowType, QWidget* parent = NULL );
-    virtual ~QwtArrowButton();
+    explicit QwtArrowButton ( int num, Qt::ArrowType, QWidget* parent = nullptr );
+    ~QwtArrowButton() override;
 
     Qt::ArrowType arrowType() const;
     int num() const;
 
-    virtual QSize sizeHint() const QWT_OVERRIDE;
-    virtual QSize minimumSizeHint() const QWT_OVERRIDE;
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
 
   protected:
-    virtual void paintEvent( QPaintEvent*) QWT_OVERRIDE;
-    virtual void keyPressEvent( QKeyEvent* ) QWT_OVERRIDE;
+    void paintEvent( QPaintEvent*) override;
+    void keyPressEvent( QKeyEvent* ) override;
 
     virtual void drawButtonLabel( QPainter* );
     virtual void drawArrow( QPainter*,
@@ -45,7 +46,7 @@ class QWT_EXPORT QwtArrowButton : public QPushButton
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

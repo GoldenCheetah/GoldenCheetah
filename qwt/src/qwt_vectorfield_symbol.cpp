@@ -72,14 +72,13 @@ class QwtVectorFieldArrow::PrivateData
     \sa setLength()
  */
 QwtVectorFieldArrow::QwtVectorFieldArrow( qreal headWidth, qreal tailWidth )
+    : m_data( new PrivateData( headWidth, tailWidth ) )
 {
-    m_data = new PrivateData( headWidth, tailWidth );
 }
 
 //! Destructor
 QwtVectorFieldArrow::~QwtVectorFieldArrow()
 {
-    delete m_data;
 }
 
 void QwtVectorFieldArrow::setLength( qreal length )
@@ -126,21 +125,20 @@ class QwtVectorFieldThinArrow::PrivateData
     \sa setLength()
  */
 QwtVectorFieldThinArrow::QwtVectorFieldThinArrow( qreal headWidth )
+    : m_data( new PrivateData( headWidth ) )
 {
-    m_data = new PrivateData( headWidth );
 }
 
 //! \brief Destructor
 QwtVectorFieldThinArrow::~QwtVectorFieldThinArrow()
 {
-    delete m_data;
 }
 
 void QwtVectorFieldThinArrow::setLength( qreal length )
 {
     m_data->length = length;
 
-    const qreal headWidth = qMin( m_data->headWidth, length / 3.0 );
+    const qreal headWidth = qMin< qreal >( m_data->headWidth, length / 3.0 );
 
     QPainterPath& path = m_data->path;
 

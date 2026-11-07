@@ -34,7 +34,7 @@ static QRegion qwtAlphaMask( const QImage& image, const QRegion& region )
     QRegion mask;
     QRect rect;
 
-#if QT_VERSION >= 0x050800
+#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
     for ( QRegion::const_iterator it = region.cbegin();
         it != region.cend(); ++it )
     {
@@ -93,13 +93,6 @@ static QRegion qwtAlphaMask( const QImage& image, const QRegion& region )
 class QwtWidgetOverlay::PrivateData
 {
   public:
-    PrivateData()
-        : maskMode( QwtWidgetOverlay::MaskHint )
-        , renderMode( QwtWidgetOverlay::AutoRenderMode )
-        , rgbaBuffer( NULL )
-    {
-    }
-
     ~PrivateData()
     {
         resetRgbaBuffer();
@@ -110,13 +103,13 @@ class QwtWidgetOverlay::PrivateData
         if ( rgbaBuffer )
         {
             std::free( rgbaBuffer );
-            rgbaBuffer = NULL;
+            rgbaBuffer = nullptr;
         }
     }
 
-    MaskMode maskMode;
-    RenderMode renderMode;
-    uchar* rgbaBuffer;
+    MaskMode maskMode = MaskHint;
+    RenderMode renderMode = AutoRenderMode;
+    uchar* rgbaBuffer = nullptr;
 };
 
 /*!
@@ -125,9 +118,8 @@ class QwtWidgetOverlay::PrivateData
  */
 QwtWidgetOverlay::QwtWidgetOverlay( QWidget* widget )
     : QWidget( widget )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
-
     setAttribute( Qt::WA_TransparentForMouseEvents );
     setAttribute( Qt::WA_NoSystemBackground );
     setFocusPolicy( Qt::NoFocus );
@@ -142,7 +134,6 @@ QwtWidgetOverlay::QwtWidgetOverlay( QWidget* widget )
 //! Destructor
 QwtWidgetOverlay::~QwtWidgetOverlay()
 {
-    delete m_data;
 }
 
 /*!
@@ -292,7 +283,7 @@ void QwtWidgetOverlay::paintEvent( QPaintEvent* event )
         }
         else
         {
-#if QT_VERSION >= 0x050800
+#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
             for ( QRegion::const_iterator it = clipRegion.cbegin();
                 it != clipRegion.cend(); ++it )
             {

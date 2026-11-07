@@ -1,0 +1,17 @@
+Qwt 6.4.0
+=========
+
+- support for < Qt 5.6 dropped
+
+  Qt 5.6 is considered as relevant because it is
+  the latest version relased un der LGPL V2.
+
+- c++11
+
+  with dropping Qt4 the complete code base could finally
+  make use of c++11
+
+- QwtPlotGLCanvas removed
+
+  Use QwtPlotOpenGLCanvas ( using QOpenGLWidget ) instead.
+  The code of QwtPlotAbstractGLCanvas has been moved to QwtPlotOpenGLCanvas.

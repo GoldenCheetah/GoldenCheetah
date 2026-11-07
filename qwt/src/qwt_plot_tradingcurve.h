@@ -13,6 +13,8 @@
 #include "qwt_global.h"
 #include "qwt_plot_seriesitem.h"
 
+#include <memory>
+
 /*!
    \brief QwtPlotTradingCurve illustrates movements in the price of a
          financial instrument over time.
@@ -103,9 +105,9 @@ class QWT_EXPORT QwtPlotTradingCurve
     explicit QwtPlotTradingCurve( const QString& title = QString() );
     explicit QwtPlotTradingCurve( const QwtText& title );
 
-    virtual ~QwtPlotTradingCurve();
+    ~QwtPlotTradingCurve() override;
 
-    virtual int rtti() const QWT_OVERRIDE;
+    int rtti() const override;
 
     void setPaintAttribute( PaintAttribute, bool on = true );
     bool testPaintAttribute( PaintAttribute ) const;
@@ -133,18 +135,13 @@ class QWT_EXPORT QwtPlotTradingCurve
     void setMaxSymbolWidth( double );
     double maxSymbolWidth() const;
 
-    virtual void drawSeries( QPainter*,
-        const QwtScaleMap& xMap, const QwtScaleMap& yMap,
-        const QRectF& canvasRect, int from, int to ) const QWT_OVERRIDE;
+    void drawSeries( QPainter*, const QwtScaleMap& xMap, const QwtScaleMap& yMap,
+        const QRectF& canvasRect, int from, int to ) const override;
 
-    virtual QRectF boundingRect() const QWT_OVERRIDE;
-
-    virtual QwtGraphic legendIcon( int index, const QSizeF& ) const QWT_OVERRIDE;
+    QRectF boundingRect() const override;
+    QwtGraphic legendIcon( int index, const QSizeF& ) const override;
 
   protected:
-
-    void init();
-
     virtual void drawSymbols( QPainter*,
         const QwtScaleMap& xMap, const QwtScaleMap& yMap,
         const QRectF& canvasRect, int from, int to ) const;
@@ -165,7 +162,7 @@ class QWT_EXPORT QwtPlotTradingCurve
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QwtPlotTradingCurve::PaintAttributes )

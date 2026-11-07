@@ -1,1 +1,1 @@
-#include "qwt_knob.h"
+#include "qwt_knob.h" // IWYU pragma: export

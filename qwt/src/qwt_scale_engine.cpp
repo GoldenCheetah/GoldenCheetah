@@ -186,31 +186,21 @@ double QwtScaleArithmetic::divideInterval(
 class QwtScaleEngine::PrivateData
 {
   public:
-    PrivateData():
-        attributes( QwtScaleEngine::NoAttribute ),
-        lowerMargin( 0.0 ),
-        upperMargin( 0.0 ),
-        referenceValue( 0.0 ),
-        base( 10 ),
-        transform( NULL )
-    {
-    }
-
     ~PrivateData()
     {
         delete transform;
     }
 
-    QwtScaleEngine::Attributes attributes;
+    Attributes attributes = NoAttribute;
 
-    double lowerMargin;
-    double upperMargin;
+    double lowerMargin = 0.0;
+    double upperMargin = 0.0;
 
-    double referenceValue;
+    double referenceValue = 0.0;
 
-    uint base;
+    uint base = 10;
 
-    QwtTransform* transform;
+    QwtTransform* transform = nullptr;
 };
 
 /*!
@@ -220,8 +210,8 @@ class QwtScaleEngine::PrivateData
    \sa setBase()
  */
 QwtScaleEngine::QwtScaleEngine( uint base )
+    : m_data( new PrivateData )
 {
-    m_data = new PrivateData;
     setBase( base );
 }
 
@@ -229,7 +219,6 @@ QwtScaleEngine::QwtScaleEngine( uint base )
 //! Destructor
 QwtScaleEngine::~QwtScaleEngine ()
 {
-    delete m_data;
 }
 
 /*!
@@ -257,14 +246,14 @@ void QwtScaleEngine::setTransformation( QwtTransform* transform )
 /*!
    Create and return a clone of the transformation
    of the engine. When the engine has no special transformation
-   NULL is returned, indicating no transformation.
+   nullptr is returned, indicating no transformation.
 
    \return A clone of the transformation
    \sa setTransformation()
  */
 QwtTransform* QwtScaleEngine::transformation() const
 {
-    QwtTransform* transform = NULL;
+    QwtTransform* transform = nullptr;
     if ( m_data->transform )
         transform = m_data->transform->copy();
 

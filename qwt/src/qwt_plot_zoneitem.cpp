@@ -19,16 +19,14 @@ class QwtPlotZoneItem::PrivateData
 {
   public:
     PrivateData()
-        : orientation( Qt::Vertical )
-        , pen( Qt::NoPen )
     {
         QColor c( Qt::darkGray );
         c.setAlpha( 100 );
         brush = QBrush( c );
     }
 
-    Qt::Orientation orientation;
-    QPen pen;
+    Qt::Orientation orientation = Qt::Vertical;
+    QPen pen = Qt::NoPen;
     QBrush brush;
     QwtInterval interval;
 };
@@ -49,9 +47,8 @@ class QwtPlotZoneItem::PrivateData
  */
 QwtPlotZoneItem::QwtPlotZoneItem()
     : QwtPlotItem( QwtText( "Zone" ) )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
-
     setItemAttribute( QwtPlotItem::AutoScale, false );
     setItemAttribute( QwtPlotItem::Legend, false );
 
@@ -61,7 +58,6 @@ QwtPlotZoneItem::QwtPlotZoneItem()
 //! Destructor
 QwtPlotZoneItem::~QwtPlotZoneItem()
 {
-    delete m_data;
 }
 
 //! \return QwtPlotItem::Rtti_PlotZone

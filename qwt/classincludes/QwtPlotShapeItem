@@ -1,1 +1,1 @@
-#include "qwt_plot_shapeitem.h"
+#include "qwt_plot_shapeitem.h" // IWYU pragma: export

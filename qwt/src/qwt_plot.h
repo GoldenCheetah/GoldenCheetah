@@ -15,6 +15,7 @@
 #include "qwt_plot_dict.h"
 
 #include <qframe.h>
+#include <memory>
 
 class QwtPlotLayout;
 class QwtAbstractLegend;
@@ -106,10 +107,10 @@ class QWT_EXPORT QwtPlot : public QFrame, public QwtPlotDict
         TopLegend
     };
 
-    explicit QwtPlot( QWidget* = NULL );
-    explicit QwtPlot( const QwtText& title, QWidget* = NULL );
+    explicit QwtPlot( QWidget* = nullptr );
+    explicit QwtPlot( const QwtText& title, QWidget* = nullptr );
 
-    virtual ~QwtPlot();
+    ~QwtPlot() override;
 
     void setAutoReplot( bool = true );
     bool autoReplot() const;
@@ -216,8 +217,8 @@ class QWT_EXPORT QwtPlot : public QFrame, public QwtPlotDict
 
     // Misc
 
-    virtual QSize sizeHint() const QWT_OVERRIDE;
-    virtual QSize minimumSizeHint() const QWT_OVERRIDE;
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
 
     virtual void updateLayout();
     virtual void drawCanvas( QPainter* );
@@ -229,8 +230,8 @@ class QWT_EXPORT QwtPlot : public QFrame, public QwtPlotDict
         const QwtScaleMapTable&, const QRectF& canvasRect,
         double& left, double& top, double& right, double& bottom) const;
 
-    virtual bool event( QEvent* ) QWT_OVERRIDE;
-    virtual bool eventFilter( QObject*, QEvent* ) QWT_OVERRIDE;
+    bool event( QEvent* ) override;
+    bool eventFilter( QObject*, QEvent* ) override;
 
     virtual void drawItems( QPainter*, const QRectF&,
         const QwtScaleMapTable& ) const;
@@ -288,7 +289,7 @@ class QWT_EXPORT QwtPlot : public QFrame, public QwtPlotDict
 
   protected:
 
-    virtual void resizeEvent( QResizeEvent* ) QWT_OVERRIDE;
+    void resizeEvent( QResizeEvent* ) override;
 
   private Q_SLOTS:
     void updateLegendItems( const QVariant& itemInfo,
@@ -302,13 +303,11 @@ class QWT_EXPORT QwtPlot : public QFrame, public QwtPlotDict
     void deleteAxesData();
     void updateScaleDiv();
 
-    void initPlot( const QwtText& title );
-
     class ScaleData;
     ScaleData* m_scaleData;
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

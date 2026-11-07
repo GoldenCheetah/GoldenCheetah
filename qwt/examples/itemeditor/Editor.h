@@ -33,7 +33,7 @@ class Editor : public QObject
     };
 
     Editor( QwtPlot* );
-    virtual ~Editor();
+    ~Editor() override;
 
     const QwtPlot* plot() const;
     QwtPlot* plot();
@@ -44,7 +44,7 @@ class Editor : public QObject
     void drawOverlay( QPainter* ) const;
     QRegion maskHint() const;
 
-    virtual bool eventFilter( QObject*, QEvent*) QWT_OVERRIDE;
+    bool eventFilter( QObject*, QEvent*) override;
 
     void setMode( Mode mode );
     Mode mode() const;

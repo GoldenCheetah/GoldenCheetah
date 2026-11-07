@@ -15,6 +15,7 @@
 
 #include <qobject.h>
 #include <qsize.h>
+#include <memory>
 
 class QwtPlot;
 class QwtScaleMap;
@@ -93,8 +94,8 @@ class QWT_EXPORT QwtPlotRenderer : public QObject
 
     Q_DECLARE_FLAGS( LayoutFlags, LayoutFlag )
 
-    explicit QwtPlotRenderer( QObject* = NULL );
-    virtual ~QwtPlotRenderer();
+    explicit QwtPlotRenderer( QObject* = nullptr );
+    ~QwtPlotRenderer() override;
 
     void setDiscardFlag( DiscardFlag flag, bool on = true );
     bool testDiscardFlag( DiscardFlag flag ) const;
@@ -108,10 +109,10 @@ class QWT_EXPORT QwtPlotRenderer : public QObject
     void setLayoutFlags( LayoutFlags flags );
     LayoutFlags layoutFlags() const;
 
-    void renderDocument( QwtPlot*, const QString& fileName,
+    bool renderDocument( QwtPlot*, const QString& fileName,
         const QSizeF& sizeMM, int resolution = 85 );
 
-    void renderDocument( QwtPlot*,
+    bool renderDocument( QwtPlot*,
         const QString& fileName, const QString& format,
         const QSizeF& sizeMM, int resolution = 85 );
 
@@ -158,7 +159,7 @@ class QWT_EXPORT QwtPlotRenderer : public QObject
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QwtPlotRenderer::DiscardFlags )

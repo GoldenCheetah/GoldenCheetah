@@ -24,7 +24,7 @@ class Plot : public QwtPlot
         AlphaMap
     };
 
-    Plot( QWidget* = NULL );
+    Plot( QWidget* = nullptr );
 
   Q_SIGNALS:
     void rendered( const QString& status );
@@ -42,8 +42,8 @@ class Plot : public QwtPlot
 #endif
 
   private:
-    virtual void drawItems( QPainter*, const QRectF&,
-        const QwtScaleMapTable &mapTable ) const QWT_OVERRIDE;
+    void drawItems( QPainter*, const QRectF&,
+        const QwtScaleMapTable &) const override;
 
     QwtPlotSpectrogram* m_spectrogram;
 

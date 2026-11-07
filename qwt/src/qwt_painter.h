@@ -37,11 +37,11 @@ class QWT_EXPORT QwtPainter
 {
   public:
     static void setPolylineSplitting( bool );
-    static bool polylineSplitting();
+    static inline bool polylineSplitting();
 
     static void setRoundingAlignment( bool );
-    static bool roundingAlignment();
-    static bool roundingAlignment( const QPainter* );
+    static inline bool roundingAlignment();
+    static inline bool roundingAlignment( const QPainter* );
 
     static void drawText( QPainter*, qreal x, qreal y, const QString& );
     static void drawText( QPainter*, const QPointF&, const QString& );
@@ -62,9 +62,9 @@ class QWT_EXPORT QwtPainter
     static void drawEllipse( QPainter*, const QRectF& );
     static void drawPie( QPainter*, const QRectF& r, int a, int alen );
 
-    static void drawLine( QPainter*, qreal x1, qreal y1, qreal x2, qreal y2 );
+    static inline void drawLine( QPainter*, qreal x1, qreal y1, qreal x2, qreal y2 );
     static void drawLine( QPainter*, const QPointF& p1, const QPointF& p2 );
-    static void drawLine( QPainter*, const QLineF& );
+    static inline void drawLine( QPainter*, const QLineF& );
 
     static void drawPolygon( QPainter*, const QPolygonF& );
     static void drawPolyline( QPainter*, const QPolygonF& );
@@ -75,12 +75,12 @@ class QWT_EXPORT QwtPainter
     static void drawPolyline( QPainter*, const QPoint*, int pointCount );
 
     static void drawPoint( QPainter*, const QPoint& );
-    static void drawPoints( QPainter*, const QPolygon& );
+    static inline void drawPoints( QPainter*, const QPolygon& );
     static void drawPoints( QPainter*, const QPoint*, int pointCount );
 
-    static void drawPoint( QPainter*, qreal x, qreal y );
+    static inline void drawPoint( QPainter*, qreal x, qreal y );
     static void drawPoint( QPainter*, const QPointF& );
-    static void drawPoints( QPainter*, const QPolygonF& );
+    static inline void drawPoints( QPainter*, const QPolygonF& );
     static void drawPoints( QPainter*, const QPointF*, int pointCount );
 
     static void drawPath( QPainter*, const QPainterPath& );
@@ -117,7 +117,7 @@ class QWT_EXPORT QwtPainter
     static QPixmap backingStore( QWidget*, const QSize& );
     static qreal devicePixelRatio( const QPaintDevice* );
 
-    static qreal effectivePenWidth( const QPen& );
+    static inline qreal effectivePenWidth( const QPen& );
 
     static int horizontalAdvance( const QFontMetrics&, const QString& );
     static qreal horizontalAdvance( const QFontMetricsF&, const QString& );
@@ -125,7 +125,7 @@ class QWT_EXPORT QwtPainter
     static int horizontalAdvance( const QFontMetrics&, QChar );
     static qreal horizontalAdvance( const QFontMetricsF&, QChar );
 
-    static QFont scaledFont( const QFont&, const QPaintDevice* = NULL );
+    static QFont scaledFont( const QFont&, const QPaintDevice* = nullptr );
 
   private:
     static bool m_polylineSplitting;

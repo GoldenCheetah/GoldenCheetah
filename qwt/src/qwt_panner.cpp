@@ -35,21 +35,6 @@ static QVector< QwtPicker* > qwtActivePickers( QWidget* w )
 class QwtPanner::PrivateData
 {
   public:
-    PrivateData()
-        : button( Qt::LeftButton )
-        , buttonModifiers( Qt::NoModifier )
-        , abortKey( Qt::Key_Escape )
-        , abortKeyModifiers( Qt::NoModifier )
-#ifndef QT_NO_CURSOR
-        , cursor( NULL )
-        , restoreCursor( NULL )
-        , hasCursor( false )
-#endif
-        , isEnabled( false )
-        , orientations( Qt::Vertical | Qt::Horizontal )
-    {
-    }
-
     ~PrivateData()
     {
 #ifndef QT_NO_CURSOR
@@ -58,11 +43,11 @@ class QwtPanner::PrivateData
 #endif
     }
 
-    Qt::MouseButton button;
-    Qt::KeyboardModifiers buttonModifiers;
+    Qt::MouseButton button = Qt::LeftButton;
+    Qt::KeyboardModifiers buttonModifiers = Qt::NoModifier;
 
-    int abortKey;
-    Qt::KeyboardModifiers abortKeyModifiers;
+    int abortKey = Qt::Key_Escape;
+    Qt::KeyboardModifiers abortKeyModifiers = Qt::NoModifier;
 
     QPoint initialPos;
     QPoint pos;
@@ -71,12 +56,12 @@ class QwtPanner::PrivateData
     QBitmap contentsMask;
 
 #ifndef QT_NO_CURSOR
-    QCursor* cursor;
-    QCursor* restoreCursor;
-    bool hasCursor;
+    QCursor* cursor = nullptr;
+    QCursor* restoreCursor = nullptr;
+    bool hasCursor = false;
 #endif
-    bool isEnabled;
-    Qt::Orientations orientations;
+    bool isEnabled = false;
+    Qt::Orientations orientations = Qt::Vertical | Qt::Horizontal;
 };
 
 /*!
@@ -86,9 +71,8 @@ class QwtPanner::PrivateData
  */
 QwtPanner::QwtPanner( QWidget* parent )
     : QWidget( parent )
+    , m_data( new PrivateData() )
 {
-    m_data = new PrivateData();
-
     setAttribute( Qt::WA_TransparentForMouseEvents );
     setAttribute( Qt::WA_NoSystemBackground );
     setFocusPolicy( Qt::NoFocus );
@@ -100,7 +84,6 @@ QwtPanner::QwtPanner( QWidget* parent )
 //! Destructor
 QwtPanner::~QwtPanner()
 {
-    delete m_data;
 }
 
 /*!
@@ -305,11 +288,7 @@ QBitmap QwtPanner::contentsMask() const
  */
 QPixmap QwtPanner::grab() const
 {
-#if QT_VERSION >= 0x050000
     return parentWidget()->grab( parentWidget()->rect() );
-#else
-    return QPixmap::grabWidget( parentWidget() );
-#endif
 }
 
 /*!
@@ -329,7 +308,7 @@ QPixmap QwtPanner::grab() const
  */
 bool QwtPanner::eventFilter( QObject* object, QEvent* event )
 {
-    if ( object == NULL || object != parentWidget() )
+    if ( object == nullptr || object != parentWidget() )
         return false;
 
     switch ( event->type() )
@@ -387,7 +366,7 @@ void QwtPanner::widgetMousePressEvent( QMouseEvent* mouseEvent )
     }
 
     QWidget* w = parentWidget();
-    if ( w == NULL )
+    if ( w == nullptr )
         return;
 
 #ifndef QT_NO_CURSOR
@@ -511,7 +490,7 @@ void QwtPanner::showCursor( bool on )
         return;
 
     QWidget* w = parentWidget();
-    if ( w == NULL || m_data->cursor == NULL )
+    if ( w == nullptr || m_data->cursor == nullptr )
         return;
 
     m_data->hasCursor = on;
@@ -531,7 +510,7 @@ void QwtPanner::showCursor( bool on )
         {
             w->setCursor( *m_data->restoreCursor );
             delete m_data->restoreCursor;
-            m_data->restoreCursor = NULL;
+            m_data->restoreCursor = nullptr;
         }
         else
             w->unsetCursor();

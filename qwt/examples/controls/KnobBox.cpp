@@ -31,10 +31,10 @@ KnobBox::KnobBox( QWidget* parent, int knobType )
     layout->addWidget( m_label );
     layout->addStretch( 10 );
 
-    connect( m_knob, SIGNAL(valueChanged(double)),
-        this, SLOT(setNum(double)) );
+    connect( m_knob, &QwtKnob::valueChanged,
+        this, &KnobBox::showValue );
 
-    setNum( m_knob->value() );
+    showValue( m_knob->value() );
 }
 
 QwtKnob* KnobBox::createKnob( int knobType ) const
@@ -121,12 +121,10 @@ QwtKnob* KnobBox::createKnob( int knobType ) const
     return knob;
 }
 
-void KnobBox::setNum( double v )
+void KnobBox::showValue( double v )
 {
     QString text;
     text.setNum( v, 'f', 2 );
 
     m_label->setText( text );
 }
-
-#include "moc_KnobBox.cpp"

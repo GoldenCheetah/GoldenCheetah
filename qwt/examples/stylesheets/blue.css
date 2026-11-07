@@ -30,7 +30,7 @@ QwtPlotCanvas
     background-color: #616d7e;
 }
 
-QwtPlotGLCanvas
+QwtPlotOpenGLCanvas
 {
     border: 1px solid white;
     background-color: #616d7e;

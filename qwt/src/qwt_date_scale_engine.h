@@ -14,6 +14,8 @@
 #include "qwt_date.h"
 #include "qwt_scale_engine.h"
 
+#include <memory>
+
 /*!
    \brief A scale engine for date/time values
 
@@ -43,7 +45,7 @@ class QWT_EXPORT QwtDateScaleEngine : public QwtLinearScaleEngine
 {
   public:
     explicit QwtDateScaleEngine( Qt::TimeSpec = Qt::LocalTime );
-    virtual ~QwtDateScaleEngine();
+    ~QwtDateScaleEngine() override;
 
     void setTimeSpec( Qt::TimeSpec );
     Qt::TimeSpec timeSpec() const;
@@ -57,14 +59,12 @@ class QWT_EXPORT QwtDateScaleEngine : public QwtLinearScaleEngine
     void setMaxWeeks( int );
     int maxWeeks() const;
 
-    virtual void autoScale(
-        int maxNumSteps, double& x1, double& x2,
-        double& stepSize ) const QWT_OVERRIDE;
+    void autoScale( int maxNumSteps, double& x1, double& x2,
+        double& stepSize ) const override;
 
-    virtual QwtScaleDiv divideScale(
-        double x1, double x2,
+    QwtScaleDiv divideScale( double x1, double x2,
         int maxMajorSteps, int maxMinorSteps,
-        double stepSize = 0.0 ) const QWT_OVERRIDE;
+        double stepSize = 0.0 ) const override;
 
     virtual QwtDate::IntervalType intervalType(
         const QDateTime&, const QDateTime&, int maxSteps ) const;
@@ -82,7 +82,7 @@ class QWT_EXPORT QwtDateScaleEngine : public QwtLinearScaleEngine
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

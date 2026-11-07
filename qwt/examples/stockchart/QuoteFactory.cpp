@@ -803,7 +803,7 @@ static t_Data2010 daimlerData[] =
 
 QVector< QwtOHLCSample > QuoteFactory::samples2010( Stock stock )
 {
-    const t_Data2010* data = NULL;
+    const t_Data2010* data = nullptr;
     int numSamples = 0;
 
     switch( stock )

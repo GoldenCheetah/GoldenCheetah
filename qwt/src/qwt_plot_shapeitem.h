@@ -14,6 +14,7 @@
 #include "qwt_plot_item.h"
 
 #include <qstring.h>
+#include <memory>
 
 class QPainterPath;
 class QPolygonF;
@@ -73,7 +74,7 @@ class QWT_EXPORT QwtPlotShapeItem : public QwtPlotItem
     explicit QwtPlotShapeItem( const QString& title = QString() );
     explicit QwtPlotShapeItem( const QwtText& title );
 
-    virtual ~QwtPlotShapeItem();
+    ~QwtPlotShapeItem() override;
 
     void setPaintAttribute( PaintAttribute, bool on = true );
     bool testPaintAttribute( PaintAttribute ) const;
@@ -97,22 +98,20 @@ class QWT_EXPORT QwtPlotShapeItem : public QwtPlotItem
     void setRenderTolerance( double );
     double renderTolerance() const;
 
-    virtual QRectF boundingRect() const QWT_OVERRIDE;
+    QRectF boundingRect() const override;
 
-    virtual void draw( QPainter*,
-        const QwtScaleMap& xMap, const QwtScaleMap& yMap,
-        const QRectF& canvasRect ) const QWT_OVERRIDE;
+    void draw( QPainter*, const QwtScaleMap& xMap, const QwtScaleMap& yMap,
+        const QRectF& canvasRect ) const override;
 
-    virtual QwtGraphic legendIcon(
-        int index, const QSizeF& ) const QWT_OVERRIDE;
+    QwtGraphic legendIcon( int index, const QSizeF& ) const override;
 
-    virtual int rtti() const QWT_OVERRIDE;
+    int rtti() const override;
 
   private:
     void init();
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

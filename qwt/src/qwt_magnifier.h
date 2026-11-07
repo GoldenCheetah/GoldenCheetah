@@ -12,6 +12,7 @@
 
 #include "qwt_global.h"
 #include <qobject.h>
+#include <memory>
 
 class QWidget;
 class QMouseEvent;
@@ -30,7 +31,7 @@ class QWT_EXPORT QwtMagnifier : public QObject
 
   public:
     explicit QwtMagnifier( QWidget* );
-    virtual ~QwtMagnifier();
+    ~QwtMagnifier() override;
 
     QWidget* parentWidget();
     const QWidget* parentWidget() const;
@@ -62,7 +63,7 @@ class QWT_EXPORT QwtMagnifier : public QObject
     void setZoomOutKey( int key, Qt::KeyboardModifiers = Qt::NoModifier );
     void getZoomOutKey( int& key, Qt::KeyboardModifiers& ) const;
 
-    virtual bool eventFilter( QObject*, QEvent* ) QWT_OVERRIDE;
+    bool eventFilter( QObject*, QEvent* ) override;
 
   protected:
     /*!
@@ -80,7 +81,7 @@ class QWT_EXPORT QwtMagnifier : public QObject
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

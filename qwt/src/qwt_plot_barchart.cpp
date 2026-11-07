@@ -19,20 +19,23 @@
 class QwtPlotBarChart::PrivateData
 {
   public:
-    PrivateData()
-        : symbol( NULL )
-        , legendMode( QwtPlotBarChart::LegendChartTitle )
-    {
-    }
-
     ~PrivateData()
     {
         delete symbol;
     }
 
-    QwtColumnSymbol* symbol;
-    QwtPlotBarChart::LegendMode legendMode;
+    QwtColumnSymbol* symbol = nullptr;
+    QwtPlotBarChart::LegendMode legendMode = QwtPlotBarChart::LegendChartTitle;
 };
+
+/*!
+   Constructor
+   \param title Title of the curve
+ */
+QwtPlotBarChart::QwtPlotBarChart( const QString& title )
+    : QwtPlotBarChart( QwtText( title ) )
+{
+}
 
 /*!
    Constructor
@@ -40,30 +43,14 @@ class QwtPlotBarChart::PrivateData
  */
 QwtPlotBarChart::QwtPlotBarChart( const QwtText& title )
     : QwtPlotAbstractBarChart( title )
+    , m_data( new PrivateData )
 {
-    init();
-}
-
-/*!
-   Constructor
-   \param title Title of the curve
- */
-QwtPlotBarChart::QwtPlotBarChart( const QString& title )
-    : QwtPlotAbstractBarChart( QwtText( title ) )
-{
-    init();
+    setData( new QwtPointSeriesData() );
 }
 
 //! Destructor
 QwtPlotBarChart::~QwtPlotBarChart()
 {
-    delete m_data;
-}
-
-void QwtPlotBarChart::init()
-{
-    m_data = new PrivateData;
-    setData( new QwtPointSeriesData() );
 }
 
 //! \return QwtPlotItem::Rtti_PlotBarChart
@@ -126,7 +113,7 @@ void QwtPlotBarChart::setSamples( QwtSeriesData< QPointF >* data )
 
    The bar chart will take the ownership of the symbol, hence the previously
    set symbol will be delete by setting a new one. If \p symbol is
-   \c NULL no symbol will be drawn.
+   \c nullptr no symbol will be drawn.
 
    \param symbol Symbol
    \sa symbol()
@@ -144,7 +131,7 @@ void QwtPlotBarChart::setSymbol( QwtColumnSymbol* symbol )
 }
 
 /*!
-   \return Current symbol or NULL, when no symbol has been assigned
+   \return Current symbol or nullptr, when no symbol has been assigned
    \sa setSymbol()
  */
 const QwtColumnSymbol* QwtPlotBarChart::symbol() const
@@ -346,7 +333,7 @@ void QwtPlotBarChart::drawBar( QPainter* painter,
         specialSymbol( sampleIndex, sample );
 
     const QwtColumnSymbol* sym = specialSym;
-    if ( sym == NULL )
+    if ( sym == nullptr )
         sym = m_data->symbol;
 
     if ( sym )
@@ -372,7 +359,7 @@ void QwtPlotBarChart::drawBar( QPainter* painter,
    \param sampleIndex Index of the sample represented by the bar
    \param sample Value of the sample
 
-   \return NULL, indicating to use the default symbol
+   \return nullptr, indicating to use the default symbol
  */
 QwtColumnSymbol* QwtPlotBarChart::specialSymbol(
     int sampleIndex, const QPointF& sample ) const
@@ -380,7 +367,7 @@ QwtColumnSymbol* QwtPlotBarChart::specialSymbol(
     Q_UNUSED( sampleIndex );
     Q_UNUSED( sample );
 
-    return NULL;
+    return nullptr;
 }
 
 /*!

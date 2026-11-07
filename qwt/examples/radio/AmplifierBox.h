@@ -20,13 +20,13 @@ class AmplifierBox : public QFrame
     Q_OBJECT
 
   public:
-    AmplifierBox( QWidget* = NULL );
+    AmplifierBox( QWidget* = nullptr );
 
   public Q_SLOTS:
     void setMaster( double v );
 
   protected:
-    virtual void timerEvent( QTimerEvent* ) QWT_OVERRIDE;
+    void timerEvent( QTimerEvent* ) override;
 
   private:
     Knob* m_knobVolume;

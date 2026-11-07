@@ -19,9 +19,6 @@ class QwtPlotSpectroCurve::PrivateData
 {
   public:
     PrivateData()
-        : colorRange( 0.0, 1000.0 )
-        , penWidth( 0.0 )
-        , paintAttributes( QwtPlotSpectroCurve::ClipPoints )
     {
         colorMap = new QwtLinearColorMap();
     }
@@ -32,11 +29,20 @@ class QwtPlotSpectroCurve::PrivateData
     }
 
     QwtColorMap* colorMap;
-    QwtInterval colorRange;
+    QwtInterval colorRange = QwtInterval( 0.0, 1000.0 );
     QVector< QRgb > colorTable;
-    double penWidth;
-    QwtPlotSpectroCurve::PaintAttributes paintAttributes;
+    double penWidth = 0.0;
+    PaintAttributes paintAttributes = QwtPlotSpectroCurve::ClipPoints;
 };
+
+/*!
+   Constructor
+   \param title Title of the curve
+ */
+QwtPlotSpectroCurve::QwtPlotSpectroCurve( const QString& title )
+    : QwtPlotSpectroCurve( QwtText( title ) )
+{
+}
 
 /*!
    Constructor
@@ -44,38 +50,19 @@ class QwtPlotSpectroCurve::PrivateData
  */
 QwtPlotSpectroCurve::QwtPlotSpectroCurve( const QwtText& title )
     : QwtPlotSeriesItem( title )
+    , m_data( new PrivateData )
 {
-    init();
-}
+    setItemAttribute( QwtPlotItem::Legend );
+    setItemAttribute( QwtPlotItem::AutoScale );
 
-/*!
-   Constructor
-   \param title Title of the curve
- */
-QwtPlotSpectroCurve::QwtPlotSpectroCurve( const QString& title )
-    : QwtPlotSeriesItem( QwtText( title ) )
-{
-    init();
+    setData( new QwtPoint3DSeriesData() );
+
+    setZ( 20.0 );
 }
 
 //! Destructor
 QwtPlotSpectroCurve::~QwtPlotSpectroCurve()
 {
-    delete m_data;
-}
-
-/*!
-   \brief Initialize data members
- */
-void QwtPlotSpectroCurve::init()
-{
-    setItemAttribute( QwtPlotItem::Legend );
-    setItemAttribute( QwtPlotItem::AutoScale );
-
-    m_data = new PrivateData;
-    setData( new QwtPoint3DSeriesData() );
-
-    setZ( 20.0 );
 }
 
 //! \return QwtPlotItem::Rtti_PlotSpectroCurve

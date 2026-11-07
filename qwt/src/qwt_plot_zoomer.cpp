@@ -81,10 +81,10 @@ static QRectF qwtExpandedZoomRect( const QRectF& zoomRect, const QSizeF& minSize
 class QwtPlotZoomer::PrivateData
 {
   public:
-    uint zoomRectIndex;
+    uint zoomRectIndex = -1;
     QStack< QRectF > zoomStack;
 
-    int maxStackDepth;
+    int maxStackDepth = -1;
 };
 
 /*!
@@ -108,6 +108,7 @@ class QwtPlotZoomer::PrivateData
  */
 QwtPlotZoomer::QwtPlotZoomer( QWidget* canvas, bool doReplot )
     : QwtPlotPicker( canvas )
+    , m_data( new PrivateData )
 {
     if ( canvas )
         init( doReplot );
@@ -133,6 +134,7 @@ QwtPlotZoomer::QwtPlotZoomer( QWidget* canvas, bool doReplot )
 QwtPlotZoomer::QwtPlotZoomer( QwtAxisId xAxisId, QwtAxisId yAxisId,
         QWidget* canvas, bool doReplot )
     : QwtPlotPicker( xAxisId, yAxisId, canvas )
+    , m_data( new PrivateData )
 {
     if ( canvas )
         init( doReplot );
@@ -141,10 +143,6 @@ QwtPlotZoomer::QwtPlotZoomer( QwtAxisId xAxisId, QwtAxisId yAxisId,
 //! Init the zoomer, used by the constructors
 void QwtPlotZoomer::init( bool doReplot )
 {
-    m_data = new PrivateData;
-
-    m_data->maxStackDepth = -1;
-
     setTrackerMode( ActiveOnly );
     setRubberBand( RectRubberBand );
     setStateMachine( new QwtPickerDragRectMachine() );
@@ -157,7 +155,6 @@ void QwtPlotZoomer::init( bool doReplot )
 
 QwtPlotZoomer::~QwtPlotZoomer()
 {
-    delete m_data;
 }
 
 /*!
@@ -235,7 +232,7 @@ QRectF QwtPlotZoomer::zoomBase() const
 void QwtPlotZoomer::setZoomBase( bool doReplot )
 {
     QwtPlot* plt = plot();
-    if ( plt == NULL )
+    if ( plt == nullptr )
         return;
 
     if ( doReplot )

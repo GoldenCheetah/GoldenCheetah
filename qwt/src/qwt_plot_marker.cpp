@@ -20,62 +20,47 @@
 class QwtPlotMarker::PrivateData
 {
   public:
-    PrivateData()
-        : labelAlignment( Qt::AlignCenter )
-        , labelOrientation( Qt::Horizontal )
-        , spacing( 2 )
-        , symbol( NULL )
-        , style( QwtPlotMarker::NoLine )
-        , xValue( 0.0 )
-        , yValue( 0.0 )
-    {
-    }
-
     ~PrivateData()
     {
         delete symbol;
     }
 
     QwtText label;
-    Qt::Alignment labelAlignment;
-    Qt::Orientation labelOrientation;
-    int spacing;
+    Qt::Alignment labelAlignment = Qt::AlignCenter;
+    Qt::Orientation labelOrientation = Qt::Horizontal;
+    int spacing = 2;
 
     QPen pen;
-    const QwtSymbol* symbol;
-    LineStyle style;
+    const QwtSymbol* symbol = nullptr;
+    LineStyle style = NoLine;
 
-    double xValue;
-    double yValue;
+    double xValue = 0.0;
+    double yValue = 0.0;
 };
 
 //! Sets alignment to Qt::AlignCenter, and style to QwtPlotMarker::NoLine
 QwtPlotMarker::QwtPlotMarker()
+    : QwtPlotMarker( QwtText() )
 {
-    m_data = new PrivateData;
-    setZ( 30.0 );
 }
 
 //! Sets alignment to Qt::AlignCenter, and style to QwtPlotMarker::NoLine
 QwtPlotMarker::QwtPlotMarker( const QString& title )
-    : QwtPlotItem( QwtText( title ) )
+    : QwtPlotMarker( QwtText( title ) )
 {
-    m_data = new PrivateData;
-    setZ( 30.0 );
 }
 
 //! Sets alignment to Qt::AlignCenter, and style to QwtPlotMarker::NoLine
 QwtPlotMarker::QwtPlotMarker( const QwtText& title )
     : QwtPlotItem( title )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
     setZ( 30.0 );
 }
 
 //! Destructor
 QwtPlotMarker::~QwtPlotMarker()
 {
-    delete m_data;
 }
 
 //! \return QwtPlotItem::Rtti_PlotMarker
@@ -203,7 +188,7 @@ void QwtPlotMarker::drawLines( QPainter* painter,
 void QwtPlotMarker::drawSymbol( QPainter* painter,
     const QRectF& canvasRect, const QPointF& pos ) const
 {
-    if ( m_data->symbol == NULL )
+    if ( m_data->symbol == nullptr )
         return;
 
     const QwtSymbol& symbol = *m_data->symbol;

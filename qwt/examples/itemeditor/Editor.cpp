@@ -60,12 +60,12 @@ namespace
         }
 
       protected:
-        virtual void drawOverlay( QPainter* painter ) const QWT_OVERRIDE
+        void drawOverlay( QPainter* painter ) const override
         {
             m_editor->drawOverlay( painter );
         }
 
-        virtual QRegion maskHint() const QWT_OVERRIDE
+        QRegion maskHint() const override
         {
             return m_editor->maskHint();
         }
@@ -78,7 +78,7 @@ namespace
 Editor::Editor( QwtPlot* plot ):
     QObject( plot ),
     m_isEnabled( false ),
-    m_overlay( NULL ),
+    m_overlay( nullptr ),
     m_mode( Mask )
 {
     setEnabled( true );
@@ -129,7 +129,7 @@ void Editor::setEnabled( bool on )
             plot->canvas()->removeEventFilter( this );
 
             delete m_overlay;
-            m_overlay = NULL;
+            m_overlay = nullptr;
         }
     }
 }
@@ -151,7 +151,7 @@ bool Editor::eventFilter( QObject* object, QEvent* event )
                 const QMouseEvent* mouseEvent =
                     dynamic_cast< QMouseEvent* >( event );
 
-                if ( m_overlay == NULL &&
+                if ( m_overlay == nullptr &&
                     mouseEvent->button() == Qt::LeftButton  )
                 {
                     const bool accepted = pressed( mouseEvent->pos() );
@@ -190,7 +190,7 @@ bool Editor::eventFilter( QObject* object, QEvent* event )
                     released( mouseEvent->pos() );
 
                     delete m_overlay;
-                    m_overlay = NULL;
+                    m_overlay = nullptr;
                 }
 
                 break;
@@ -221,7 +221,7 @@ bool Editor::pressed( const QPoint& pos )
 
 bool Editor::moved( const QPoint& pos )
 {
-    if ( plot() == NULL )
+    if ( plot() == nullptr )
         return false;
 
     const QwtScaleMap xMap = plot()->canvasMap( m_editedItem->xAxis() );
@@ -252,8 +252,8 @@ void Editor::released( const QPoint& pos )
 QwtPlotShapeItem* Editor::itemAt( const QPoint& pos ) const
 {
     const QwtPlot* plot = this->plot();
-    if ( plot == NULL )
-        return NULL;
+    if ( plot == nullptr )
+        return nullptr;
 
     // translate pos into the plot coordinates
 
@@ -284,7 +284,7 @@ QwtPlotShapeItem* Editor::itemAt( const QPoint& pos ) const
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 QRegion Editor::maskHint() const
@@ -295,7 +295,7 @@ QRegion Editor::maskHint() const
 QRegion Editor::maskHint( QwtPlotShapeItem* shapeItem ) const
 {
     const QwtPlot* plot = this->plot();
-    if ( plot == NULL || shapeItem == NULL )
+    if ( plot == nullptr || shapeItem == nullptr )
         return QRegion();
 
     const QwtScaleMap xMap = plot->canvasMap( shapeItem->xAxis() );
@@ -311,7 +311,7 @@ QRegion Editor::maskHint( QwtPlotShapeItem* shapeItem ) const
 void Editor::drawOverlay( QPainter* painter ) const
 {
     const QwtPlot* plot = this->plot();
-    if ( plot == NULL || m_editedItem == NULL )
+    if ( plot == nullptr || m_editedItem == nullptr )
         return;
 
     const QwtScaleMap xMap = plot->canvasMap( m_editedItem->xAxis() );
@@ -327,7 +327,7 @@ void Editor::drawOverlay( QPainter* painter ) const
 void Editor::raiseItem( QwtPlotShapeItem* shapeItem )
 {
     const QwtPlot* plot = this->plot();
-    if ( plot == NULL || shapeItem == NULL )
+    if ( plot == nullptr || shapeItem == nullptr )
         return;
 
     const QwtPlotItemList items = plot->itemList();
@@ -348,7 +348,7 @@ void Editor::raiseItem( QwtPlotShapeItem* shapeItem )
 
 void Editor::setItemVisible( QwtPlotShapeItem* item, bool on )
 {
-    if ( plot() == NULL || item == NULL || item->isVisible() == on )
+    if ( plot() == nullptr || item == nullptr || item->isVisible() == on )
         return;
 
     const bool doAutoReplot = plot()->autoReplot();

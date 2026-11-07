@@ -25,7 +25,7 @@ namespace
         {
         }
 
-        virtual double transform( double value ) const QWT_OVERRIDE
+        double transform( double value ) const override
         {
             const double v1 = m_position - m_range;
             const double v2 = v1 + 2 * m_range;
@@ -54,7 +54,7 @@ namespace
             return v;
         }
 
-        virtual double invTransform( double value ) const QWT_OVERRIDE
+        double invTransform( double value ) const override
         {
             const double v1 = m_position - m_range;
             const double v2 = v1 + 2 * m_powRange;
@@ -82,7 +82,7 @@ namespace
             return v;
         }
 
-        virtual QwtTransform* copy() const QWT_OVERRIDE
+        QwtTransform* copy() const override
         {
             return new TransformPos( m_position, m_range, m_factor );
         }
@@ -125,8 +125,8 @@ MainWindow::MainWindow( QWidget* parent ):
 
     setCentralWidget( splitter );
 
-    connect( m_transformPlot, SIGNAL(selected(QwtTransform*)),
-        m_plot, SLOT(setTransformation(QwtTransform*)) );
+    connect( m_transformPlot, &TransformPlot::selected,
+        m_plot, &Plot::setTransformation );
 }
 
 #include "moc_MainWindow.cpp"

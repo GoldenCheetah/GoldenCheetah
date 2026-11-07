@@ -12,7 +12,7 @@ class AttitudeIndicator : public QwtDial
     Q_OBJECT
 
   public:
-    AttitudeIndicator( QWidget* parent = NULL );
+    AttitudeIndicator( QWidget* parent = nullptr );
 
     double angle() const { return value(); }
     double gradient() const { return m_gradient; }
@@ -22,13 +22,13 @@ class AttitudeIndicator : public QwtDial
     void setAngle( double angle ) { setValue( angle ); }
 
   protected:
-    virtual void keyPressEvent( QKeyEvent* ) QWT_OVERRIDE;
+    void keyPressEvent( QKeyEvent* ) override;
 
-    virtual void drawScale( QPainter*,
-        const QPointF& center, double radius ) const QWT_OVERRIDE;
+    void drawScale( QPainter*,
+        const QPointF& center, double radius ) const override;
 
-    virtual void drawScaleContents( QPainter* painter,
-        const QPointF& center, double radius ) const QWT_OVERRIDE;
+    void drawScaleContents( QPainter* painter,
+        const QPointF& center, double radius ) const override;
 
   private:
     double m_gradient;

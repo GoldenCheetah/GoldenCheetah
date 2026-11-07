@@ -46,39 +46,33 @@ static inline double qwtBicubicInterpolate(
 class QwtMatrixRasterData::PrivateData
 {
   public:
-    PrivateData()
-        : resampleMode( QwtMatrixRasterData::NearestNeighbour )
-        , numColumns(0)
-    {
-    }
-
     inline double value(int row, int col) const
     {
         return values.data()[ row * numColumns + col ];
     }
 
     QwtInterval intervals[3];
-    QwtMatrixRasterData::ResampleMode resampleMode;
+    ResampleMode resampleMode = NearestNeighbour;
 
     QVector< double > values;
-    int numColumns;
-    int numRows;
 
-    double dx;
-    double dy;
+    int numColumns = 0;
+    int numRows = 0;
+
+    double dx = 0.0;
+    double dy = 0.0;
 };
 
 //! Constructor
 QwtMatrixRasterData::QwtMatrixRasterData()
+    : m_data( new PrivateData() )
 {
-    m_data = new PrivateData();
     update();
 }
 
 //! Destructor
 QwtMatrixRasterData::~QwtMatrixRasterData()
 {
-    delete m_data;
 }
 
 /*!

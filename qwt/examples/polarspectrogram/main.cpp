@@ -16,7 +16,7 @@ namespace
     class ToolButton : public QToolButton
     {
       public:
-        ToolButton( const QString& text, QWidget* parent = NULL )
+        ToolButton( const QString& text, QWidget* parent = nullptr )
             : QToolButton( parent )
         {
             setText( text );
@@ -27,7 +27,7 @@ namespace
     class MainWindow : public QMainWindow
     {
       public:
-        MainWindow( QWidget* = NULL );
+        MainWindow( QWidget* = nullptr );
     };
 }
 
@@ -56,10 +56,10 @@ MainWindow::MainWindow( QWidget* parent )
 
     Plot* plot = plotWindow->plot();
 
-    connect( btnExport, SIGNAL(clicked()), plot, SLOT(exportDocument()) );
-    connect( btnGrid, SIGNAL(toggled(bool)), plot, SLOT(showGrid(bool)) );
-    connect( btnRotate, SIGNAL(clicked()), plot, SLOT(rotate()) );
-    connect( btnMirror, SIGNAL(clicked()), plot, SLOT(mirror()) );
+    connect( btnExport, &ToolButton::clicked, plot, &Plot::exportDocument );
+    connect( btnGrid, &ToolButton::toggled, plot, &Plot::showGrid );
+    connect( btnRotate, &ToolButton::clicked, plot, &Plot::rotate );
+    connect( btnMirror, &ToolButton::clicked, plot, &Plot::mirror );
 }
 
 int main( int argc, char* argv[] )

@@ -62,7 +62,8 @@ SettingsEditor::SettingsEditor( QWidget* parent )
     for ( int i = 0; i < PlotSettings::NumFlags; i++ )
     {
         m_checkBox[i]->setText( label( i ) );
-        connect( m_checkBox[i], SIGNAL(clicked()), this, SLOT(edited()) );
+        connect( m_checkBox[i], &QCheckBox::clicked,
+            this, &SettingsEditor::updateSettings );
     }
 }
 
@@ -84,7 +85,7 @@ PlotSettings SettingsEditor::settings() const
     return s;
 }
 
-void SettingsEditor::edited()
+void SettingsEditor::updateSettings()
 {
     updateEditor();
     Q_EMIT edited( settings() );

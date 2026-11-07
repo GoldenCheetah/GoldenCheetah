@@ -31,7 +31,7 @@ class QWT_EXPORT QwtPolarPicker : public QwtPicker
 
   public:
     explicit QwtPolarPicker( QwtPolarCanvas* );
-    virtual ~QwtPolarPicker();
+    ~QwtPolarPicker() override;
 
     explicit QwtPolarPicker(
         RubberBand rubberBand, DisplayMode trackerMode,
@@ -81,18 +81,15 @@ class QWT_EXPORT QwtPolarPicker : public QwtPicker
   protected:
     QwtPointPolar invTransform( const QPoint& ) const;
 
-    virtual QwtText trackerText( const QPoint& ) const QWT_OVERRIDE;
+    QwtText trackerText( const QPoint& ) const override;
     virtual QwtText trackerTextPolar( const QwtPointPolar& ) const;
 
-    virtual void move( const QPoint& ) QWT_OVERRIDE;
-    virtual void append( const QPoint& ) QWT_OVERRIDE;
-    virtual bool end( bool ok = true ) QWT_OVERRIDE;
+    void move( const QPoint& ) override;
+    void append( const QPoint& ) override;
+    bool end( bool ok = true ) override;
 
   private:
-    virtual QPainterPath pickArea() const QWT_OVERRIDE;
-
-    class PrivateData;
-    PrivateData* m_data;
+    QPainterPath pickArea() const override;
 };
 
 #endif

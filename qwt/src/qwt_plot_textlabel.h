@@ -13,7 +13,7 @@
 #include "qwt_global.h"
 #include "qwt_plot_item.h"
 
-class QwtText;
+#include <memory>
 
 /*!
    \brief A plot item, which displays a text label
@@ -48,9 +48,9 @@ class QWT_EXPORT QwtPlotTextLabel : public QwtPlotItem
 {
   public:
     QwtPlotTextLabel();
-    virtual ~QwtPlotTextLabel();
+    ~QwtPlotTextLabel() override;
 
-    virtual int rtti() const QWT_OVERRIDE;
+    int rtti() const override;
 
     void setText( const QwtText& );
     QwtText text() const;
@@ -61,15 +61,14 @@ class QWT_EXPORT QwtPlotTextLabel : public QwtPlotItem
     virtual QRectF textRect( const QRectF&, const QSizeF& ) const;
 
   protected:
-    virtual void draw( QPainter*,
-        const QwtScaleMap&, const QwtScaleMap&,
-        const QRectF&) const QWT_OVERRIDE;
+    void draw( QPainter*, const QwtScaleMap&, const QwtScaleMap&,
+        const QRectF&) const override;
 
     void invalidateCache();
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

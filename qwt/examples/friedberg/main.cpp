@@ -16,7 +16,7 @@ namespace
     class MainWindow : public QMainWindow
     {
       public:
-        MainWindow( QWidget* parent = NULL )
+        MainWindow( QWidget* parent = nullptr )
             : QMainWindow( parent )
         {
             Plot* plot = new Plot();
@@ -31,7 +31,8 @@ namespace
             QToolButton* btnExport = new QToolButton();
             btnExport->setText( "Export" );
             btnExport->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
-            connect( btnExport, SIGNAL(clicked()), plot, SLOT(exportPlot()) );
+            connect( btnExport, &QToolButton::clicked,
+                plot, &Plot::exportPlot );
 
             QToolBar* toolBar = new QToolBar();
             toolBar->addWidget( typeBox );
@@ -41,17 +42,20 @@ namespace
             QToolButton* btnLines = new QToolButton();
             btnLines->setText( "Lines" );
             btnLines->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
-            connect( btnLines, SIGNAL(clicked()), plot, SLOT(setUseLines()) );
+            connect( btnLines, &QToolButton::clicked,
+                plot, &Plot::setUseLines );
 
             toolBar->addWidget( btnLines );
 #endif
 
             addToolBar( toolBar );
 
-            plot->setMode( typeBox->currentIndex() );
+            void (QComboBox::*comboValueChanged)(int) =
+                &QComboBox::currentIndexChanged;
 
-            connect( typeBox, SIGNAL(currentIndexChanged(int)),
-                plot, SLOT(setMode(int)) );
+            plot->setMode( typeBox->currentIndex() );
+            connect( typeBox, comboValueChanged,
+                plot, &Plot::setMode );
         }
     };
 }

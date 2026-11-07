@@ -1,1 +1,1 @@
-#include "qwt_text.h"
+#include "qwt_text.h" // IWYU pragma: export

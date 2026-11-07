@@ -70,39 +70,25 @@ static QwtScaleDraw::Alignment qwtScaleDrawAlignment(
 class QwtSlider::PrivateData
 {
   public:
-    PrivateData()
-        : repeatTimerId( 0 )
-        , updateInterval( 150 )
-        , stepsIncrement( 0 )
-        , pendingValueChange( false )
-        , borderWidth( 2 )
-        , spacing( 4 )
-        , scalePosition( QwtSlider::TrailingScale )
-        , hasTrough( true )
-        , hasGroove( false )
-        , mouseOffset( 0 )
-    {
-    }
-
-    int repeatTimerId;
-    bool timerTick;
-    int updateInterval;
-    int stepsIncrement;
-    bool pendingValueChange;
+    int repeatTimerId = 0;
+    bool timerTick = false;
+    int updateInterval = 150;
+    int stepsIncrement = 0;
+    bool pendingValueChange = false;
 
     QRect sliderRect;
 
     QSize handleSize;
-    int borderWidth;
-    int spacing;
+    int borderWidth = 2;
+    int spacing = 4;
 
     Qt::Orientation orientation;
-    QwtSlider::ScalePosition scalePosition;
+    ScalePosition scalePosition = TrailingScale;
 
-    bool hasTrough;
-    bool hasGroove;
+    bool hasTrough = true;
+    bool hasGroove = false;
 
-    int mouseOffset;
+    int mouseOffset = 0;
 
     mutable QSize sizeHintCache;
 };
@@ -114,12 +100,11 @@ class QwtSlider::PrivateData
 
    \param parent Parent widget
 
-   \sa setOrientation(), setScalePosition(), setBackgroundStyle()
+   \sa setOrientation(), setScalePosition()
  */
 QwtSlider::QwtSlider( QWidget* parent )
-    : QwtAbstractSlider( parent )
+    : QwtSlider( Qt::Vertical, parent )
 {
-    initSlider( Qt::Vertical );
 }
 
 /*!
@@ -135,18 +120,10 @@ QwtSlider::QwtSlider( QWidget* parent )
  */
 QwtSlider::QwtSlider( Qt::Orientation orientation, QWidget* parent )
     : QwtAbstractSlider( parent )
+    , m_data( new PrivateData )
 {
-    initSlider( orientation );
-}
+    m_data->orientation = orientation;
 
-//! Destructor
-QwtSlider::~QwtSlider()
-{
-    delete m_data;
-}
-
-void QwtSlider::initSlider( Qt::Orientation orientation )
-{
     if ( orientation == Qt::Vertical )
         setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Expanding );
     else
@@ -154,16 +131,17 @@ void QwtSlider::initSlider( Qt::Orientation orientation )
 
     setAttribute( Qt::WA_WState_OwnSizePolicy, false );
 
-    m_data = new QwtSlider::PrivateData;
-
-    m_data->orientation = orientation;
-
     scaleDraw()->setAlignment(
         qwtScaleDrawAlignment( orientation, m_data->scalePosition ) );
     scaleDraw()->setLength( 100 );
 
     setScale( 0.0, 100.0 );
     setValue( 0.0 );
+}
+
+//! Destructor
+QwtSlider::~QwtSlider()
+{
 }
 
 /*!
@@ -344,7 +322,7 @@ QSize QwtSlider::handleSize() const
 void QwtSlider::setScaleDraw( QwtScaleDraw* scaleDraw )
 {
     const QwtScaleDraw* previousScaleDraw = this->scaleDraw();
-    if ( scaleDraw == NULL || scaleDraw == previousScaleDraw )
+    if ( scaleDraw == nullptr || scaleDraw == previousScaleDraw )
         return;
 
     if ( previousScaleDraw )
@@ -423,7 +401,7 @@ void QwtSlider::drawSlider(
         innerRect = sliderRect.adjusted( bw, bw, -bw, -bw );
 
         painter->fillRect( innerRect, palette().brush( QPalette::Mid ) );
-        qDrawShadePanel( painter, sliderRect, palette(), true, bw, NULL );
+        qDrawShadePanel( painter, sliderRect, palette(), true, bw, nullptr );
     }
 
     if ( m_data->hasGroove )

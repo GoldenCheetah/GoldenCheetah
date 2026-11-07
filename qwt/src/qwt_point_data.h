@@ -25,8 +25,8 @@ class QwtPointArrayData : public QwtSeriesData< QPointF >
     QwtPointArrayData( const QVector< T >& x, const QVector< T >& y );
     QwtPointArrayData( const T* x, const T* y, size_t size );
 
-    virtual size_t size() const QWT_OVERRIDE;
-    virtual QPointF sample( size_t index ) const QWT_OVERRIDE;
+    size_t size() const override;
+    QPointF sample( size_t index ) const override;
 
     const QVector< T >& xData() const;
     const QVector< T >& yData() const;
@@ -45,8 +45,8 @@ class QwtCPointerData : public QwtSeriesData< QPointF >
   public:
     QwtCPointerData( const T* x, const T* y, size_t size );
 
-    virtual size_t size() const QWT_OVERRIDE;
-    virtual QPointF sample( size_t index ) const QWT_OVERRIDE;
+    size_t size() const override;
+    QPointF sample( size_t index ) const override;
 
     const T* xData() const;
     const T* yData() const;
@@ -70,8 +70,8 @@ class QwtValuePointData : public QwtSeriesData< QPointF >
     QwtValuePointData( const QVector< T >& y );
     QwtValuePointData( const T* y, size_t size );
 
-    virtual size_t size() const QWT_OVERRIDE;
-    virtual QPointF sample( size_t index ) const QWT_OVERRIDE;
+    size_t size() const override;
+    QPointF sample( size_t index ) const override;
 
     const QVector< T >& yData() const;
 
@@ -91,8 +91,8 @@ class QwtCPointerValueData : public QwtSeriesData< QPointF >
   public:
     QwtCPointerValueData( const T* y, size_t size );
 
-    virtual size_t size() const QWT_OVERRIDE;
-    virtual QPointF sample( size_t index ) const QWT_OVERRIDE;
+    size_t size() const override;
+    QPointF sample( size_t index ) const override;
 
     const T* yData() const;
 
@@ -161,13 +161,13 @@ class QWT_EXPORT QwtSyntheticPointData : public QwtSeriesData< QPointF >
         const QwtInterval& = QwtInterval() );
 
     void setSize( size_t size );
-    virtual size_t size() const QWT_OVERRIDE;
+    size_t size() const override;
 
     void setInterval( const QwtInterval& );
     QwtInterval interval() const;
 
-    virtual QRectF boundingRect() const QWT_OVERRIDE;
-    virtual QPointF sample( size_t index ) const QWT_OVERRIDE;
+    QRectF boundingRect() const override;
+    QPointF sample( size_t index ) const override;
 
     /*!
        Calculate a y value for a x value
@@ -178,7 +178,7 @@ class QWT_EXPORT QwtSyntheticPointData : public QwtSeriesData< QPointF >
     virtual double y( double x ) const = 0;
     virtual double x( uint index ) const;
 
-    virtual void setRectOfInterest( const QRectF& ) QWT_OVERRIDE;
+    void setRectOfInterest( const QRectF& ) override;
     QRectF rectOfInterest() const;
 
   private:

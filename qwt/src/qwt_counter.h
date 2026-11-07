@@ -12,6 +12,7 @@
 
 #include "qwt_global.h"
 #include <qwidget.h>
+#include <memory>
 
 /*!
    \brief The Counter Widget
@@ -79,8 +80,8 @@ class QWT_EXPORT QwtCounter : public QWidget
         ButtonCnt
     };
 
-    explicit QwtCounter( QWidget* parent = NULL );
-    virtual ~QwtCounter();
+    explicit QwtCounter( QWidget* parent = nullptr );
+    ~QwtCounter() override;
 
     void setValid( bool );
     bool isValid() const;
@@ -97,7 +98,7 @@ class QWT_EXPORT QwtCounter : public QWidget
     void setIncSteps( QwtCounter::Button, int numSteps );
     int incSteps( QwtCounter::Button ) const;
 
-    virtual QSize sizeHint() const QWT_OVERRIDE;
+    QSize sizeHint() const override;
 
     double singleStep() const;
     void setSingleStep( double stepSize );
@@ -139,9 +140,9 @@ class QWT_EXPORT QwtCounter : public QWidget
     void valueChanged ( double value );
 
   protected:
-    virtual bool event( QEvent* ) QWT_OVERRIDE;
-    virtual void wheelEvent( QWheelEvent* ) QWT_OVERRIDE;
-    virtual void keyPressEvent( QKeyEvent* ) QWT_OVERRIDE;
+    bool event( QEvent* ) override;
+    void wheelEvent( QWheelEvent* ) override;
+    void keyPressEvent( QKeyEvent* ) override;
 
   private Q_SLOTS:
     void btnReleased();
@@ -150,12 +151,11 @@ class QWT_EXPORT QwtCounter : public QWidget
 
   private:
     void incrementValue( int numSteps );
-    void initCounter();
     void updateButtons();
     void showNumber( double );
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

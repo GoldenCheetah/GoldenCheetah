@@ -13,12 +13,14 @@
 #include "qwt_global.h"
 #include "qwt_plot_seriesitem.h"
 
+#include <memory>
+
 class QwtColumnSymbol;
 class QwtColumnRect;
 class QColor;
 class QPolygonF;
 
-#if QT_VERSION < 0x060000
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 template< typename T > class QVector;
 #endif
 
@@ -81,9 +83,10 @@ class QWT_EXPORT QwtPlotHistogram
 
     explicit QwtPlotHistogram( const QString& title = QString() );
     explicit QwtPlotHistogram( const QwtText& title );
-    virtual ~QwtPlotHistogram();
 
-    virtual int rtti() const QWT_OVERRIDE;
+    ~QwtPlotHistogram() override;
+
+    int rtti() const override;
 
     void setPen( const QColor&,
         qreal width = 0.0, Qt::PenStyle = Qt::SolidLine );
@@ -106,14 +109,13 @@ class QWT_EXPORT QwtPlotHistogram
     void setSymbol( const QwtColumnSymbol* );
     const QwtColumnSymbol* symbol() const;
 
-    virtual void drawSeries( QPainter*,
+    void drawSeries( QPainter*,
         const QwtScaleMap& xMap, const QwtScaleMap& yMap,
-        const QRectF& canvasRect, int from, int to ) const QWT_OVERRIDE;
+        const QRectF& canvasRect, int from, int to ) const override;
 
-    virtual QRectF boundingRect() const QWT_OVERRIDE;
+    QRectF boundingRect() const override;
 
-    virtual QwtGraphic legendIcon(
-        int index, const QSizeF& ) const QWT_OVERRIDE;
+    QwtGraphic legendIcon( int index, const QSizeF& ) const override;
 
   protected:
     virtual QwtColumnRect columnRect( const QwtIntervalSample&,
@@ -135,11 +137,10 @@ class QWT_EXPORT QwtPlotHistogram
         int from, int to ) const;
 
   private:
-    void init();
     void flushPolygon( QPainter*, double baseLine, QPolygonF& ) const;
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

@@ -16,9 +16,11 @@ namespace
     class MainWindow : public QMainWindow
     {
       public:
-        MainWindow( QWidget* parent = NULL )
+        MainWindow( QWidget* parent = nullptr )
             : QMainWindow( parent )
         {
+            void (QComboBox::*comboValueChanged)(int) = &QComboBox::currentIndexChanged;
+
             Plot* plot = new Plot( this );
             setCentralWidget( plot );
 
@@ -31,7 +33,7 @@ namespace
             QToolButton* btnExport = new QToolButton();
             btnExport->setText( "Export" );
             btnExport->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
-            connect( btnExport, SIGNAL(clicked()), plot, SLOT(exportPlot()) );
+            connect( btnExport, &QToolButton::clicked, plot, &Plot::exportPlot );
 
             QToolBar* toolBar = new QToolBar();
             toolBar->addWidget( typeBox );
@@ -39,8 +41,7 @@ namespace
             addToolBar( toolBar );
 
             plot->setMode( typeBox->currentIndex() );
-            connect( typeBox, SIGNAL(currentIndexChanged(int)),
-                plot, SLOT(setMode(int)) );
+            connect( typeBox, comboValueChanged, plot, &Plot::setMode );
         }
     };
 }

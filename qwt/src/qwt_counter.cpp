@@ -21,34 +21,21 @@
 class QwtCounter::PrivateData
 {
   public:
-    PrivateData()
-        : minimum( 0.0 )
-        , maximum( 0.0 )
-        , singleStep( 1.0 )
-        , isValid( false )
-        , value( 0.0 )
-        , wrapping( false )
-    {
-        increment[Button1] = 1;
-        increment[Button2] = 10;
-        increment[Button3] = 100;
-    }
+    QwtArrowButton* buttonDown[ButtonCnt] = {};
+    QwtArrowButton* buttonUp[ButtonCnt] = {};
+    QLineEdit* valueEdit = nullptr;
 
-    QwtArrowButton* buttonDown[ButtonCnt];
-    QwtArrowButton* buttonUp[ButtonCnt];
-    QLineEdit* valueEdit;
+    int increment[ButtonCnt] = { 1, 10, 100 };
+    int numButtons = 0;
 
-    int increment[ButtonCnt];
-    int numButtons;
+    double minimum = 0.0;
+    double maximum = 0.0;
+    double singleStep = 1.0;
 
-    double minimum;
-    double maximum;
-    double singleStep;
+    bool isValid = false;
+    double value = 0.0;
 
-    bool isValid;
-    double value;
-
-    bool wrapping;
+    bool wrapping = false;
 };
 
 /*!
@@ -64,22 +51,15 @@ class QwtCounter::PrivateData
  */
 QwtCounter::QwtCounter( QWidget* parent )
     : QWidget( parent )
+    , m_data( new PrivateData )
 {
-    initCounter();
-}
-
-void QwtCounter::initCounter()
-{
-    m_data = new PrivateData;
-
     QHBoxLayout* layout = new QHBoxLayout( this );
     layout->setSpacing( 0 );
     layout->setContentsMargins( QMargins() );
 
     for ( int i = ButtonCnt - 1; i >= 0; i-- )
     {
-        QwtArrowButton* btn =
-            new QwtArrowButton( i + 1, Qt::DownArrow, this );
+        auto btn = new QwtArrowButton( i + 1, Qt::DownArrow, this );
         btn->setFocusPolicy( Qt::NoFocus );
         layout->addWidget( btn );
 
@@ -100,8 +80,7 @@ void QwtCounter::initCounter()
 
     for ( int i = 0; i < ButtonCnt; i++ )
     {
-        QwtArrowButton* btn =
-            new QwtArrowButton( i + 1, Qt::UpArrow, this );
+        auto btn = new QwtArrowButton( i + 1, Qt::UpArrow, this );
         btn->setFocusPolicy( Qt::NoFocus );
         layout->addWidget( btn );
 
@@ -116,8 +95,7 @@ void QwtCounter::initCounter()
     setSingleStep( 0.001 );
     setValue( 0.0 );
 
-    setSizePolicy(
-        QSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed ) );
+    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
 
     setFocusProxy( m_data->valueEdit );
     setFocusPolicy( Qt::StrongFocus );
@@ -126,7 +104,6 @@ void QwtCounter::initCounter()
 //! Destructor
 QwtCounter::~QwtCounter()
 {
-    delete m_data;
 }
 
 /*!
@@ -607,7 +584,7 @@ void QwtCounter::wheelEvent( QWheelEvent* event )
             increment = m_data->increment[2];
     }
 
-#if QT_VERSION < 0x050e00
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
     const QPoint wheelPos = event->pos();
     const int wheelDelta = event->delta();
 #else

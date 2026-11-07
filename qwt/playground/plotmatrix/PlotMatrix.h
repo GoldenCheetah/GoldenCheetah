@@ -6,16 +6,15 @@
 #pragma once
 
 #include <QFrame>
+#include <memory>
 
 class QwtPlot;
 
 class PlotMatrix : public QFrame
 {
-    Q_OBJECT
-
   public:
-    PlotMatrix( int rows, int columns, QWidget* parent = NULL );
-    virtual ~PlotMatrix();
+    PlotMatrix( int rows, int columns, QWidget* parent = nullptr );
+    ~PlotMatrix() override;
 
     int numRows() const;
     int numColumns() const;
@@ -32,13 +31,11 @@ class PlotMatrix : public QFrame
   protected:
     void updateLayout();
 
-  private Q_SLOTS:
-    void scaleDivChanged();
-
   private:
+    void syncScales();
     void alignAxes( int rowOrColumn, int axis );
     void alignScaleBorder( int rowOrColumn, int axis );
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };

@@ -16,15 +16,12 @@ class QwtDial;
 
 class DialBox : public QWidget
 {
-    Q_OBJECT
   public:
     DialBox( QWidget* parent, int type );
 
-  private Q_SLOTS:
-    void setNum( double v );
-
   private:
     QwtDial* createDial( int type ) const;
+    void showValue( double v );
 
     QwtDial* m_dial;
     QLabel* m_label;

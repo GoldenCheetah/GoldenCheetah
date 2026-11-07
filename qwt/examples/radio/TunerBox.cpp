@@ -78,9 +78,10 @@ TunerBox::TunerBox( QWidget* parent ):
     m_wheelFrequency->setTotalAngle( 3600.0 );
     m_wheelFrequency->setFixedHeight( 30 );
 
-
-    connect( m_wheelFrequency, SIGNAL(valueChanged(double)), SLOT(adjustFreq(double)) );
-    connect( m_sliderFrequency, SIGNAL(valueChanged(double)), SLOT(adjustFreq(double)) );
+    connect( m_wheelFrequency, &QwtWheel::valueChanged,
+        this, &TunerBox::adjustFrequency );
+    connect( m_sliderFrequency, &QwtSlider::valueChanged,
+        this, &TunerBox::adjustFrequency );
 
     QVBoxLayout* mainLayout = new QVBoxLayout( this );
     mainLayout->setContentsMargins( 10, 10, 10, 10 );
@@ -96,24 +97,25 @@ TunerBox::TunerBox( QWidget* parent ):
     mainLayout->addLayout( hLayout );
 }
 
-void TunerBox::adjustFreq( double frq )
+void TunerBox::adjustFrequency( double value )
 {
     const double factor = 13.0 / ( 108 - 87.5 );
 
-    const double x = ( frq - 87.5 ) * factor;
+    const double x = ( value - 87.5 ) * factor;
     const double field = qwtSqr( std::sin( x ) * std::cos( 4.0 * x ) );
 
     m_thermoTune->setValue( field );
 
-    if ( m_sliderFrequency->value() != frq )
-        m_sliderFrequency->setValue( frq );
-    if ( m_wheelFrequency->value() != frq )
-        m_wheelFrequency->setValue( frq );
+    if ( m_sliderFrequency->value() != value )
+        m_sliderFrequency->setValue( value );
+
+    if ( m_wheelFrequency->value() != value )
+        m_wheelFrequency->setValue( value );
 
     Q_EMIT fieldChanged( field );
 }
 
-void TunerBox::setFreq( double frq )
+void TunerBox::setFrequency( double frq )
 {
     m_wheelFrequency->setValue( frq );
 }

@@ -13,6 +13,8 @@
 #include "qwt_global.h"
 #include "qwt_plot_picker.h"
 
+#include <memory>
+
 class QSizeF;
 template< typename T > class QStack;
 
@@ -84,7 +86,7 @@ class QWT_EXPORT QwtPlotZoomer : public QwtPlotPicker
     explicit QwtPlotZoomer( QwtAxisId xAxis, QwtAxisId yAxis,
         QWidget*, bool doReplot = true );
 
-    virtual ~QwtPlotZoomer();
+    ~QwtPlotZoomer() override;
 
     virtual void setZoomBase( bool doReplot = true );
     virtual void setZoomBase( const QRectF& );
@@ -123,20 +125,20 @@ class QWT_EXPORT QwtPlotZoomer : public QwtPlotPicker
 
     virtual QSizeF minZoomSize() const;
 
-    virtual void widgetMouseReleaseEvent( QMouseEvent* ) QWT_OVERRIDE;
-    virtual void widgetKeyPressEvent( QKeyEvent* ) QWT_OVERRIDE;
+    void widgetMouseReleaseEvent( QMouseEvent* ) override;
+    void widgetKeyPressEvent( QKeyEvent* ) override;
 
-    virtual void begin() QWT_OVERRIDE;
-    virtual bool end( bool ok = true ) QWT_OVERRIDE;
-    virtual bool accept( QPolygon& ) const QWT_OVERRIDE;
+    void begin() override;
+    bool end( bool ok = true ) override;
+    bool accept( QPolygon& ) const override;
 
-    virtual void axesChanged() QWT_OVERRIDE;
+    virtual void axesChanged() override;
 
   private:
     void init( bool doReplot );
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

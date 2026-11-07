@@ -15,6 +15,8 @@
 #include <qpaintdevice.h>
 #include <qpaintengine.h>
 
+#include <memory>
+
 /*!
    \brief A null paint device doing nothing
 
@@ -70,14 +72,14 @@ class QWT_EXPORT QwtNullPaintDevice : public QPaintDevice
     };
 
     QwtNullPaintDevice();
-    virtual ~QwtNullPaintDevice();
+    ~QwtNullPaintDevice() override;
 
     void setMode( Mode );
     Mode mode() const;
 
-    virtual QPaintEngine* paintEngine() const QWT_OVERRIDE;
+    QPaintEngine* paintEngine() const override;
 
-    virtual int metric( PaintDeviceMetric ) const QWT_OVERRIDE;
+    int metric( PaintDeviceMetric ) const override;
 
     virtual void drawRects(const QRect*, int );
     virtual void drawRects(const QRectF*, int );
@@ -121,7 +123,7 @@ class QWT_EXPORT QwtNullPaintDevice : public QPaintDevice
     PaintEngine* m_engine;
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

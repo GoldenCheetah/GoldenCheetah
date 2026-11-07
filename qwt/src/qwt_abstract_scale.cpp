@@ -19,10 +19,7 @@
 class QwtAbstractScale::PrivateData
 {
   public:
-    PrivateData():
-        maxMajor( 5 ),
-        maxMinor( 3 ),
-        stepSize( 0.0 )
+    PrivateData()
     {
         scaleEngine = new QwtLinearScaleEngine();
         scaleDraw = new QwtScaleDraw();
@@ -37,9 +34,9 @@ class QwtAbstractScale::PrivateData
     QwtScaleEngine* scaleEngine;
     QwtAbstractScaleDraw* scaleDraw;
 
-    int maxMajor;
-    int maxMinor;
-    double stepSize;
+    int maxMajor = 5;
+    int maxMinor = 3;
+    double stepSize = 0.0;
 };
 
 /*!
@@ -56,15 +53,14 @@ class QwtAbstractScale::PrivateData
 
 QwtAbstractScale::QwtAbstractScale( QWidget* parent )
     : QWidget( parent )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
     rescale( 0.0, 100.0, m_data->stepSize );
 }
 
 //! Destructor
 QwtAbstractScale::~QwtAbstractScale()
 {
-    delete m_data;
 }
 
 /*!
@@ -276,10 +272,10 @@ double QwtAbstractScale::scaleStepSize() const
  */
 void QwtAbstractScale::setAbstractScaleDraw( QwtAbstractScaleDraw* scaleDraw )
 {
-    if ( scaleDraw == NULL || scaleDraw == m_data->scaleDraw )
+    if ( scaleDraw == nullptr || scaleDraw == m_data->scaleDraw )
         return;
 
-    if ( m_data->scaleDraw != NULL )
+    if ( m_data->scaleDraw != nullptr )
         scaleDraw->setScaleDiv( m_data->scaleDraw->scaleDiv() );
 
     delete m_data->scaleDraw;
@@ -315,7 +311,7 @@ const QwtAbstractScaleDraw* QwtAbstractScale::abstractScaleDraw() const
  */
 void QwtAbstractScale::setScaleEngine( QwtScaleEngine* scaleEngine )
 {
-    if ( scaleEngine != NULL && scaleEngine != m_data->scaleEngine )
+    if ( scaleEngine != nullptr && scaleEngine != m_data->scaleEngine )
     {
         delete m_data->scaleEngine;
         m_data->scaleEngine = scaleEngine;

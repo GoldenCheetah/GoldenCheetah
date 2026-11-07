@@ -16,7 +16,7 @@ namespace
     class MainWindow : public QMainWindow
     {
       public:
-        MainWindow( QWidget* = NULL );
+        MainWindow( QWidget* = nullptr );
     };
 }
 
@@ -41,20 +41,20 @@ MainWindow::MainWindow( QWidget* parent )
     QToolButton* btnExport = new QToolButton( toolBar );
     btnExport->setText( "Export" );
     btnExport->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
-    connect( btnExport, SIGNAL(clicked()), chart, SLOT(exportChart()) );
+    connect( btnExport, &QToolButton::clicked, chart, &BarChart::exportChart );
 
     toolBar->addWidget( typeBox );
     toolBar->addWidget( orientationBox );
     toolBar->addWidget( btnExport );
     addToolBar( toolBar );
 
-    chart->setMode( typeBox->currentIndex() );
-    connect( typeBox, SIGNAL(currentIndexChanged(int)),
-        chart, SLOT(setMode(int)) );
+    void (QComboBox::*comboValueChanged)(int) = &QComboBox::currentIndexChanged;
 
+    chart->setMode( typeBox->currentIndex() );
     chart->setOrientation( orientationBox->currentIndex() );
-    connect( orientationBox, SIGNAL(currentIndexChanged(int)),
-        chart, SLOT(setOrientation(int)) );
+
+    connect( typeBox, comboValueChanged, chart, &BarChart::setMode );
+    connect( orientationBox, comboValueChanged, chart, &BarChart::setOrientation );
 }
 
 int main( int argc, char* argv[] )

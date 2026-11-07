@@ -16,13 +16,11 @@ class Plot : public QwtPlot
     Q_OBJECT
 
   public:
-    Plot( bool parametric, QWidget* parent = NULL );
+    Plot( bool parametric, QWidget* parent = nullptr );
 
-    virtual bool eventFilter( QObject*, QEvent* ) QWT_OVERRIDE;
+    bool eventFilter( QObject*, QEvent* ) override;
 
   public Q_SLOTS:
-    void updateMarker( int axis, double base );
-    void legendChecked( const QVariant&, bool on );
     void setOverlaying( bool );
     void setParametric( const QString& );
     void setBoundaryCondition( const QString& );
@@ -32,11 +30,11 @@ class Plot : public QwtPlot
     void printPlot();
 #endif
 
-  private Q_SLOTS:
-    void scrollLeftAxis( double );
-
   private:
     void showCurve( QwtPlotItem*, bool on );
+    void updateMarker( int axis, double base );
+    void scrollLeftAxis( double );
+    void legendChecked( const QVariant&, bool on );
 
     QwtPlotMarker* m_marker;
     QwtPlotCurve* m_curve;

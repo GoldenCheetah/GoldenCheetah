@@ -1,1 +1,1 @@
-#include "qwt_widget_overlay.h"
+#include "qwt_widget_overlay.h" // IWYU pragma: export

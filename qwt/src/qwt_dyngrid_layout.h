@@ -12,6 +12,7 @@
 
 #include "qwt_global.h"
 #include <qlayout.h>
+#include <memory>
 
 template< typename T > class QList;
 
@@ -31,9 +32,9 @@ class QWT_EXPORT QwtDynGridLayout : public QLayout
     explicit QwtDynGridLayout( QWidget*, int margin = 0, int spacing = -1 );
     explicit QwtDynGridLayout( int spacing = -1 );
 
-    virtual ~QwtDynGridLayout();
+    ~QwtDynGridLayout() override;
 
-    virtual void invalidate() QWT_OVERRIDE;
+    void invalidate() override;
 
     void setMaxColumns( uint maxColumns );
     uint maxColumns() const;
@@ -41,26 +42,26 @@ class QWT_EXPORT QwtDynGridLayout : public QLayout
     uint numRows () const;
     uint numColumns () const;
 
-    virtual void addItem( QLayoutItem* ) QWT_OVERRIDE;
+    void addItem( QLayoutItem* ) override;
 
-    virtual QLayoutItem* itemAt( int index ) const QWT_OVERRIDE;
-    virtual QLayoutItem* takeAt( int index ) QWT_OVERRIDE;
-    virtual int count() const QWT_OVERRIDE;
+    QLayoutItem* itemAt( int index ) const override;
+    QLayoutItem* takeAt( int index ) override;
+    int count() const override;
 
     void setExpandingDirections( Qt::Orientations );
-    virtual Qt::Orientations expandingDirections() const QWT_OVERRIDE;
+    Qt::Orientations expandingDirections() const override;
     QList< QRect > layoutItems( const QRect&, uint numColumns ) const;
 
     virtual int maxItemWidth() const;
 
-    virtual void setGeometry( const QRect& ) QWT_OVERRIDE;
+    void setGeometry( const QRect& ) override;
 
-    virtual bool hasHeightForWidth() const QWT_OVERRIDE;
-    virtual int heightForWidth( int ) const QWT_OVERRIDE;
+    bool hasHeightForWidth() const override;
+    int heightForWidth( int ) const override;
 
-    virtual QSize sizeHint() const QWT_OVERRIDE;
+    QSize sizeHint() const override;
 
-    virtual bool isEmpty() const QWT_OVERRIDE;
+    bool isEmpty() const override;
     uint itemCount() const;
 
     virtual uint columnsForWidth( int width ) const;
@@ -74,11 +75,10 @@ class QWT_EXPORT QwtDynGridLayout : public QLayout
         QVector< int >& rowHeight, QVector< int >& colWidth ) const;
 
   private:
-    void init();
     int maxRowWidth( int numColumns ) const;
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

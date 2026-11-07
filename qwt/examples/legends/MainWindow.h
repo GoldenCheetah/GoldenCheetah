@@ -12,16 +12,13 @@ class Panel;
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
-
   public:
     MainWindow( QWidget* parent = 0 );
 
-  private Q_SLOTS:
+  private:
     void updatePlot();
     void exportPlot();
 
-  private:
     Plot* m_plot;
     Panel* m_panel;
 };

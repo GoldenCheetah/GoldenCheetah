@@ -30,19 +30,13 @@ namespace
     class AxisData
     {
       public:
-        AxisData()
-            : isVisible( false )
-            , scaleDraw( NULL )
-        {
-        }
-
         ~AxisData()
         {
             delete scaleDraw;
         }
 
-        bool isVisible;
-        mutable QwtAbstractScaleDraw* scaleDraw;
+        bool isVisible = false;
+        mutable QwtAbstractScaleDraw* scaleDraw = nullptr;
         QPen pen;
         QFont font;
     };
@@ -50,14 +44,8 @@ namespace
     class GridData
     {
       public:
-        GridData()
-            : isVisible( true )
-            , isMinorVisible( false )
-        {
-        }
-
-        bool isVisible;
-        bool isMinorVisible;
+        bool isVisible = true;
+        bool isMinorVisible = false;
         QwtScaleDiv scaleDiv;
 
         QPen majorPen;
@@ -83,9 +71,8 @@ class QwtPolarGrid::PrivateData
  */
 QwtPolarGrid::QwtPolarGrid()
     : QwtPolarItem( QwtText( "Grid" ) )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
-
     for ( int axisId = 0; axisId < QwtPolar::AxesCount; axisId++ )
     {
         AxisData& axis = m_data->axisData[axisId];
@@ -156,7 +143,6 @@ QwtPolarGrid::QwtPolarGrid()
 //! Destructor
 QwtPolarGrid::~QwtPolarGrid()
 {
-    delete m_data;
 }
 
 //! \return QwtPlotItem::Rtti_PolarGrid
@@ -891,7 +877,7 @@ void QwtPolarGrid::updateScaleDraws(
             if ( transform )
                 scaleDraw->setTransformation( transform->copy() );
             else
-                scaleDraw->setTransformation( NULL );
+                scaleDraw->setTransformation( nullptr );
         }
         else
         {
@@ -929,7 +915,7 @@ void QwtPolarGrid::updateScaleDraws(
             if ( transform )
                 scaleDraw->setTransformation( transform->copy() );
             else
-                scaleDraw->setTransformation( NULL );
+                scaleDraw->setTransformation( nullptr );
         }
     }
 }
@@ -1062,7 +1048,7 @@ int QwtPolarGrid::marginHint() const
    Returns the scale draw of a specified axis
 
    \param axisId axis index ( QwtPolar::AxisLeft <= axisId <= QwtPolar::AxisBottom)
-   \return specified scaleDraw for axis, or NULL if axis is invalid.
+   \return specified scaleDraw for axis, or nullptr if axis is invalid.
    \sa azimuthScaleDraw()
  */
 const QwtScaleDraw* QwtPolarGrid::scaleDraw( int axisId ) const
@@ -1070,14 +1056,14 @@ const QwtScaleDraw* QwtPolarGrid::scaleDraw( int axisId ) const
     if ( axisId >= QwtPolar::AxisLeft && axisId <= QwtPolar::AxisBottom )
         return static_cast< QwtScaleDraw* >( m_data->axisData[axisId].scaleDraw );
 
-    return NULL;
+    return nullptr;
 }
 
 /*!
    Returns the scale draw of a specified axis
 
    \param axisId axis index ( QwtPolar::AxisLeft <= axisId <= QwtPolar::AxisBottom)
-   \return specified scaleDraw for axis, or NULL if axis is invalid.
+   \return specified scaleDraw for axis, or nullptr if axis is invalid.
    \sa setScaleDraw(), azimuthScaleDraw()
  */
 QwtScaleDraw* QwtPolarGrid::scaleDraw( int axisId )
@@ -1085,7 +1071,7 @@ QwtScaleDraw* QwtPolarGrid::scaleDraw( int axisId )
     if ( axisId >= QwtPolar::AxisLeft && axisId <= QwtPolar::AxisBottom )
         return static_cast< QwtScaleDraw* >( m_data->axisData[axisId].scaleDraw );
 
-    return NULL;
+    return nullptr;
 }
 
 /*!

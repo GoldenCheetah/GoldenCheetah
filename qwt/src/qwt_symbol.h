@@ -15,6 +15,7 @@
 #include <qpolygon.h>
 #include <qpen.h>
 #include <qbrush.h>
+#include <memory>
 
 class QPainter;
 class QSize;
@@ -210,8 +211,8 @@ class QWT_EXPORT QwtSymbol
 #endif
 
     void drawSymbol( QPainter*, const QRectF& ) const;
-    void drawSymbol( QPainter*, const QPointF& ) const;
-    void drawSymbols( QPainter*, const QPolygonF& ) const;
+    inline void drawSymbol( QPainter*, const QPointF& ) const;
+    inline void drawSymbols( QPainter*, const QPolygonF& ) const;
     void drawSymbols( QPainter*,
         const QPointF*, int numPoints ) const;
 
@@ -226,7 +227,7 @@ class QWT_EXPORT QwtSymbol
     Q_DISABLE_COPY(QwtSymbol)
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 /*!

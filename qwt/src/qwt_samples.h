@@ -20,12 +20,12 @@
 class QWT_EXPORT QwtIntervalSample
 {
   public:
-    QwtIntervalSample();
-    QwtIntervalSample( double, const QwtInterval& );
-    QwtIntervalSample( double value, double min, double max );
+    inline QwtIntervalSample();
+    inline QwtIntervalSample( double, const QwtInterval& );
+    inline QwtIntervalSample( double value, double min, double max );
 
-    bool operator==( const QwtIntervalSample& ) const;
-    bool operator!=( const QwtIntervalSample& ) const;
+    inline bool operator==( const QwtIntervalSample& ) const;
+    inline bool operator!=( const QwtIntervalSample& ) const;
 
     //! Value
     double value;
@@ -73,13 +73,13 @@ inline bool QwtIntervalSample::operator!=( const QwtIntervalSample& other ) cons
 class QWT_EXPORT QwtSetSample
 {
   public:
-    QwtSetSample();
-    explicit QwtSetSample( double, const QVector< double >& = QVector< double >( ) );
+    inline QwtSetSample();
+    inline explicit QwtSetSample( double, const QVector< double >& = QVector< double >( ) );
 
-    bool operator==( const QwtSetSample& other ) const;
-    bool operator!=( const QwtSetSample& other ) const;
+    inline bool operator==( const QwtSetSample& other ) const;
+    inline bool operator!=( const QwtSetSample& other ) const;
 
-    double added() const;
+    inline double added() const;
 
     //! value
     double value;
@@ -143,13 +143,13 @@ inline double QwtSetSample::added() const
 class QWT_EXPORT QwtOHLCSample
 {
   public:
-    QwtOHLCSample( double time = 0.0,
+    inline QwtOHLCSample( double time = 0.0,
         double open = 0.0, double high = 0.0,
         double low = 0.0, double close = 0.0 );
 
-    QwtInterval boundingInterval() const;
+    inline QwtInterval boundingInterval() const;
 
-    bool isValid() const;
+    inline bool isValid() const;
 
     /*!
        Time of the sample, usually a number representing
@@ -243,15 +243,15 @@ inline QwtInterval QwtOHLCSample::boundingInterval() const
 class QWT_EXPORT QwtVectorFieldSample
 {
   public:
-    QwtVectorFieldSample( double x = 0.0, double y = 0.0,
+    inline QwtVectorFieldSample( double x = 0.0, double y = 0.0,
         double vx = 0.0, double vy = 0.0 );
 
-    QwtVectorFieldSample( const QPointF& pos,
+    inline QwtVectorFieldSample( const QPointF& pos,
         double vx = 0.0, double vy = 0.0 );
 
-    QPointF pos() const;
+    inline QPointF pos() const;
 
-    bool isNull() const;
+    inline bool isNull() const;
 
     //! x coordinate of the position
     double x;

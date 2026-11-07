@@ -534,25 +534,19 @@ static inline QPolygonF qwtToPointsFilteredF(
 class QwtPointMapper::PrivateData
 {
   public:
-    PrivateData()
-        : boundingRect( qwtInvalidRect )
-    {
-    }
-
-    QRectF boundingRect;
+    QRectF boundingRect = qwtInvalidRect;
     QwtPointMapper::TransformationFlags flags;
 };
 
 //! Constructor
 QwtPointMapper::QwtPointMapper()
+    : m_data( new PrivateData )
 {
-    m_data = new PrivateData();
 }
 
 //! Destructor
 QwtPointMapper::~QwtPointMapper()
 {
-    delete m_data;
 }
 
 /*!

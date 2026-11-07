@@ -14,6 +14,8 @@
 #include "qwt_plot_abstract_canvas.h"
 
 #include <qopenglwidget.h>
+#include <qframe.h>
+#include <memory>
 
 class QwtPlot;
 
@@ -31,7 +33,7 @@ class QwtPlot;
         Performance is worse, than rendering straight to a QOpenGLWidget, but is usually
         better integrated into a desktop application.
  */
-class QWT_EXPORT QwtPlotOpenGLCanvas : public QOpenGLWidget, public QwtPlotAbstractGLCanvas
+class QWT_EXPORT QwtPlotOpenGLCanvas : public QOpenGLWidget, public QwtPlotAbstractCanvas
 {
     Q_OBJECT
 
@@ -45,31 +47,83 @@ class QWT_EXPORT QwtPlotOpenGLCanvas : public QOpenGLWidget, public QwtPlotAbstr
     Q_PROPERTY( double borderRadius READ borderRadius WRITE setBorderRadius )
 
   public:
-    explicit QwtPlotOpenGLCanvas( QwtPlot* = NULL );
-    explicit QwtPlotOpenGLCanvas( int samples, QwtPlot* = NULL);
-    virtual ~QwtPlotOpenGLCanvas();
+    /*!
+       \brief Paint attributes
 
-    Q_INVOKABLE virtual void invalidateBackingStore() QWT_OVERRIDE;
+       The default setting enables BackingStore and Opaque.
+
+       \sa setPaintAttribute(), testPaintAttribute()
+     */
+    enum PaintAttribute
+    {
+        /*!
+           \brief Paint double buffered ( using QOpenGLFramebufferObject )
+           \sa backingStore(), invalidateBackingStore()
+         */
+        BackingStore = 1,
+
+        /*!
+           When ImmediatePaint is set replot() calls repaint()
+           instead of update().
+
+           \sa replot(), QWidget::repaint(), QWidget::update()
+         */
+        ImmediatePaint = 8,
+    };
+
+    //! Paint attributes
+    Q_DECLARE_FLAGS( PaintAttributes, PaintAttribute )
+
+    explicit QwtPlotOpenGLCanvas( QwtPlot* = nullptr );
+    explicit QwtPlotOpenGLCanvas( int samples, QwtPlot* = nullptr);
+
+    ~QwtPlotOpenGLCanvas() override;
+
+    void setPaintAttribute( PaintAttribute, bool on = true );
+    bool testPaintAttribute( PaintAttribute ) const;
+
+    void setFrameStyle( int style );
+    int frameStyle() const;
+
+    void setFrameShadow( QFrame::Shadow );
+    QFrame::Shadow frameShadow() const;
+
+    void setFrameShape( QFrame::Shape );
+    QFrame::Shape frameShape() const;
+
+    void setLineWidth( int );
+    int lineWidth() const;
+
+    void setMidLineWidth( int );
+    int midLineWidth() const;
+
+    int frameWidth() const;
+    QRect frameRect() const;
+
+    Q_INVOKABLE void invalidateBackingStore();
     Q_INVOKABLE QPainterPath borderPath( const QRect& ) const;
 
-    virtual bool event( QEvent* ) QWT_OVERRIDE;
+    bool event( QEvent* ) override;
 
   public Q_SLOTS:
     void replot();
 
   protected:
-    virtual void paintEvent( QPaintEvent* ) QWT_OVERRIDE;
+    void paintEvent( QPaintEvent* ) override;
 
-    virtual void initializeGL() QWT_OVERRIDE;
-    virtual void paintGL() QWT_OVERRIDE;
-    virtual void resizeGL( int width, int height ) QWT_OVERRIDE;
+    void initializeGL() override;
+    void paintGL() override;
+    void resizeGL( int width, int height ) override;
+
+    void draw( QPainter* );
 
   private:
-    void init();
-    virtual void clearBackingStore() QWT_OVERRIDE;
+    void clearBackingStore();
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS( QwtPlotOpenGLCanvas::PaintAttributes )
 
 #endif

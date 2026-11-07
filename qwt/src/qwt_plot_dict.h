@@ -14,6 +14,7 @@
 #include "qwt_plot_item.h"
 
 #include <qlist.h>
+#include <memory>
 
 typedef QList< QwtPlotItem* > QwtPlotItemList;
 typedef QList< QwtPlotItem* >::ConstIterator QwtPlotItemIterator;
@@ -50,7 +51,7 @@ class QWT_EXPORT QwtPlotDict
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

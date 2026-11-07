@@ -1,1 +1,1 @@
-#include "qwt_polar_picker.h"
+#include "qwt_polar_picker.h" // IWYU pragma: export

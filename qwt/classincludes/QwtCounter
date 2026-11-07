@@ -1,1 +1,1 @@
-#include "qwt_counter.h"
+#include "qwt_counter.h" // IWYU pragma: export

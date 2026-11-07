@@ -12,6 +12,8 @@
 #include "qwt_global.h"
 #include "qwt_polar_plot.h"
 
+#include <memory>
+
 /*!
    \brief Layout class for QwtPolarPlot.
 
@@ -68,7 +70,7 @@ class QWT_EXPORT QwtPolarLayout
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QwtPolarLayout::Options )

@@ -27,7 +27,7 @@ namespace
         CurveBox();
 
       protected:
-        virtual void paintEvent( QPaintEvent* ) QWT_OVERRIDE;
+        void paintEvent( QPaintEvent* ) override;
 
       private:
         void drawCurves( QPainter* );

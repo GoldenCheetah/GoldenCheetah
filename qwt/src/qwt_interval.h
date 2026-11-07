@@ -44,31 +44,31 @@ class QWT_EXPORT QwtInterval
     //! Border flags
     Q_DECLARE_FLAGS( BorderFlags, BorderFlag )
 
-    QwtInterval();
-    QwtInterval( double minValue, double maxValue,
+    inline QwtInterval();
+    inline QwtInterval( double minValue, double maxValue,
         BorderFlags = IncludeBorders );
 
-    void setInterval( double minValue, double maxValue,
+    inline void setInterval( double minValue, double maxValue,
         BorderFlags = IncludeBorders );
 
     QwtInterval normalized() const;
     QwtInterval inverted() const;
     QwtInterval limited( double lowerBound, double upperBound ) const;
 
-    bool operator==( const QwtInterval& ) const;
-    bool operator!=( const QwtInterval& ) const;
+    inline bool operator==( const QwtInterval& ) const;
+    inline bool operator!=( const QwtInterval& ) const;
 
-    void setBorderFlags( BorderFlags );
-    BorderFlags borderFlags() const;
+    inline void setBorderFlags( BorderFlags );
+    inline BorderFlags borderFlags() const;
 
-    double minValue() const;
-    double maxValue() const;
+    inline double minValue() const;
+    inline double maxValue() const;
 
-    double width() const;
-    long double widthL() const;
+    inline double width() const;
+    inline long double widthL() const;
 
-    void setMinValue( double );
-    void setMaxValue( double );
+    inline void setMinValue( double );
+    inline void setMaxValue( double );
 
     bool contains( double value ) const;
     bool contains( const QwtInterval& ) const;
@@ -77,19 +77,19 @@ class QWT_EXPORT QwtInterval
     QwtInterval intersect( const QwtInterval& ) const;
     QwtInterval unite( const QwtInterval& ) const;
 
-    QwtInterval operator|( const QwtInterval& ) const;
-    QwtInterval operator&( const QwtInterval& ) const;
+    inline QwtInterval operator|( const QwtInterval& ) const;
+    inline QwtInterval operator&( const QwtInterval& ) const;
 
     QwtInterval& operator|=( const QwtInterval& );
     QwtInterval& operator&=( const QwtInterval& );
 
     QwtInterval extend( double value ) const;
-    QwtInterval operator|( double ) const;
+    inline QwtInterval operator|( double ) const;
     QwtInterval& operator|=( double );
 
-    bool isValid() const;
-    bool isNull() const;
-    void invalidate();
+    inline bool isValid() const;
+    inline bool isNull() const;
+    inline void invalidate();
 
     QwtInterval symmetrize( double value ) const;
 

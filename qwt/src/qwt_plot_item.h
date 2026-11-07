@@ -12,7 +12,9 @@
 
 #include "qwt_global.h"
 #include "qwt_axis_id.h"
+
 #include <qmetatype.h>
+#include <memory>
 
 class QwtScaleMap;
 class QwtScaleDiv;
@@ -298,7 +300,7 @@ class QWT_EXPORT QwtPlotItem
     Q_DISABLE_COPY(QwtPlotItem)
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QwtPlotItem::ItemAttributes )

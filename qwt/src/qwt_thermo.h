@@ -14,6 +14,8 @@
 #include "qwt_abstract_scale.h"
 #include "qwt_interval.h"
 
+#include <memory>
+
 class QwtScaleDraw;
 class QwtColorMap;
 
@@ -78,6 +80,7 @@ class QWT_EXPORT QwtThermo : public QwtAbstractScale
         //! The scale is left of a vertical or above of a horizontal slider
         TrailingScale
     };
+
     Q_ENUM( ScalePosition )
 
     /*!
@@ -97,10 +100,11 @@ class QWT_EXPORT QwtThermo : public QwtAbstractScale
         //! The origin is specified using the origin() property
         OriginCustom
     };
+
     Q_ENUM( OriginMode )
 
-    explicit QwtThermo( QWidget* parent = NULL );
-    virtual ~QwtThermo();
+    explicit QwtThermo( QWidget* parent = nullptr );
+    ~QwtThermo() override;
 
     void setOrientation( Qt::Orientation );
     Qt::Orientation orientation() const;
@@ -144,8 +148,8 @@ class QWT_EXPORT QwtThermo : public QwtAbstractScale
 
     double value() const;
 
-    virtual QSize sizeHint() const QWT_OVERRIDE;
-    virtual QSize minimumSizeHint() const QWT_OVERRIDE;
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
 
     void setScaleDraw( QwtScaleDraw* );
     const QwtScaleDraw* scaleDraw() const;
@@ -155,11 +159,11 @@ class QWT_EXPORT QwtThermo : public QwtAbstractScale
 
   protected:
     virtual void drawLiquid( QPainter*, const QRect& ) const;
-    virtual void scaleChange() QWT_OVERRIDE;
+    void scaleChange() override;
 
-    virtual void paintEvent( QPaintEvent* ) QWT_OVERRIDE;
-    virtual void resizeEvent( QResizeEvent* ) QWT_OVERRIDE;
-    virtual void changeEvent( QEvent* ) QWT_OVERRIDE;
+    void paintEvent( QPaintEvent* ) override;
+    void resizeEvent( QResizeEvent* ) override;
+    void changeEvent( QEvent* ) override;
 
     QwtScaleDraw* scaleDraw();
 
@@ -171,7 +175,7 @@ class QWT_EXPORT QwtThermo : public QwtAbstractScale
     void layoutThermo( bool );
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

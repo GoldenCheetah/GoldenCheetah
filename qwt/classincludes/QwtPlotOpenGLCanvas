@@ -1,1 +1,1 @@
-#include "qwt_plot_opengl_canvas.h"
+#include "qwt_plot_opengl_canvas.h" // IWYU pragma: export

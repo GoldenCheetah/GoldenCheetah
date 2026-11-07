@@ -11,7 +11,9 @@
 #define QWT_RASTER_DATA_H
 
 #include "qwt_global.h"
+
 #include <qnamespace.h>
+#include <memory>
 
 class QwtInterval;
 class QPolygonF;
@@ -117,10 +119,10 @@ class QWT_EXPORT QwtRasterData
     class ContourPlane;
 
   private:
-    Q_DISABLE_COPY(QwtRasterData)
+    Q_DISABLE_COPY( QwtRasterData )
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QwtRasterData::ConrecFlags )

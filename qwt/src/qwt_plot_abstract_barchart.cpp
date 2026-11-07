@@ -25,20 +25,11 @@ static inline double qwtTransformWidth(
 class QwtPlotAbstractBarChart::PrivateData
 {
   public:
-    PrivateData()
-        : layoutPolicy( QwtPlotAbstractBarChart::AutoAdjustSamples )
-        , layoutHint( 0.5 )
-        , spacing( 10 )
-        , margin( 5 )
-        , baseline( 0.0 )
-    {
-    }
-
-    QwtPlotAbstractBarChart::LayoutPolicy layoutPolicy;
-    double layoutHint;
-    int spacing;
-    int margin;
-    double baseline;
+    LayoutPolicy layoutPolicy = AutoAdjustSamples;
+    double layoutHint = 0.5;
+    int spacing = 10;
+    int margin = 5;
+    double baseline = 0.0;
 };
 
 /*!
@@ -47,9 +38,8 @@ class QwtPlotAbstractBarChart::PrivateData
  */
 QwtPlotAbstractBarChart::QwtPlotAbstractBarChart( const QwtText& title )
     : QwtPlotSeriesItem( title )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
-
     setItemAttribute( QwtPlotItem::Legend, true );
     setItemAttribute( QwtPlotItem::AutoScale, true );
     setItemAttribute( QwtPlotItem::Margins, true );
@@ -59,7 +49,6 @@ QwtPlotAbstractBarChart::QwtPlotAbstractBarChart( const QwtText& title )
 //! Destructor
 QwtPlotAbstractBarChart::~QwtPlotAbstractBarChart()
 {
-    delete m_data;
 }
 
 /*!

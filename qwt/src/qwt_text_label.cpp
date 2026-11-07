@@ -21,14 +21,8 @@
 class QwtTextLabel::PrivateData
 {
   public:
-    PrivateData()
-        : indent( 4 )
-        , margin( 0 )
-    {
-    }
-
-    int indent;
-    int margin;
+    int indent = 4;
+    int margin = 0;
     QwtText text;
 };
 
@@ -37,9 +31,8 @@ class QwtTextLabel::PrivateData
    \param parent Parent widget
  */
 QwtTextLabel::QwtTextLabel( QWidget* parent )
-    : QFrame( parent )
+    : QwtTextLabel( QwtText(), parent )
 {
-    init();
 }
 
 /*!
@@ -49,21 +42,16 @@ QwtTextLabel::QwtTextLabel( QWidget* parent )
  */
 QwtTextLabel::QwtTextLabel( const QwtText& text, QWidget* parent )
     : QFrame( parent )
+    , m_data( new PrivateData )
 {
-    init();
     m_data->text = text;
+
+    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
 }
 
 //! Destructor
 QwtTextLabel::~QwtTextLabel()
 {
-    delete m_data;
-}
-
-void QwtTextLabel::init()
-{
-    m_data = new PrivateData();
-    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
 }
 
 /*!

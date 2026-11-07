@@ -17,27 +17,31 @@
 #include <qopenglframebufferobject.h>
 #include <qopenglpaintdevice.h>
 
+static void qwtUpdateContentsRect( int fw, QwtPlotOpenGLCanvas* canvas )
+{
+    canvas->setContentsMargins( fw, fw, fw, fw );
+    canvas->update();
+}
+
 class QwtPlotOpenGLCanvas::PrivateData
 {
   public:
-    PrivateData()
-        : numFBOSamples( -1 )
-        , isPolished( false )
-        , fboDirty( true )
-        , fbo( NULL )
-    {
-    }
-
     ~PrivateData()
     {
         delete fbo;
     }
 
-    int numFBOSamples;
+    int numFBOSamples = -1;
 
-    bool isPolished;
-    bool fboDirty;
-    QOpenGLFramebufferObject* fbo;
+    bool isPolished = false;
+    bool fboDirty = true;
+    QOpenGLFramebufferObject* fbo = nullptr;
+
+    int frameStyle = QFrame::Panel | QFrame::Sunken;
+    int lineWidth = 2;
+    int midLineWidth = 0;
+
+    PaintAttributes paintAttributes = QwtPlotOpenGLCanvas::BackingStore;
 };
 
 /*!
@@ -47,10 +51,8 @@ class QwtPlotOpenGLCanvas::PrivateData
    \sa QwtPlot::setCanvas()
  */
 QwtPlotOpenGLCanvas::QwtPlotOpenGLCanvas( QwtPlot* plot )
-    : QOpenGLWidget( plot )
-    , QwtPlotAbstractGLCanvas( this )
+    : QwtPlotOpenGLCanvas( -1, plot )
 {
-    init();
 }
 
 /*!
@@ -62,8 +64,11 @@ QwtPlotOpenGLCanvas::QwtPlotOpenGLCanvas( QwtPlot* plot )
  */
 QwtPlotOpenGLCanvas::QwtPlotOpenGLCanvas( int numSamples, QwtPlot* plot )
     : QOpenGLWidget( plot )
-    , QwtPlotAbstractGLCanvas( this )
+    , QwtPlotAbstractCanvas( this )
+    , m_data( new PrivateData )
 {
+    qwtUpdateContentsRect( frameWidth(), this );
+
     if ( numSamples < -1 )
         numSamples = -1;
 
@@ -74,27 +79,183 @@ QwtPlotOpenGLCanvas::QwtPlotOpenGLCanvas( int numSamples, QwtPlot* plot )
         setFormat( fmt );
     }
 
-    init();
-}
-
-void QwtPlotOpenGLCanvas::init()
-{
-    m_data = new PrivateData;
-
 #if 1
     setAttribute( Qt::WA_OpaquePaintEvent, true );
 #endif
 
-    setLineWidth( 2 );
-    setFrameShadow( QFrame::Sunken );
-    setFrameShape( QFrame::Panel );
 }
 
 //! Destructor
 QwtPlotOpenGLCanvas::~QwtPlotOpenGLCanvas()
 {
-    delete m_data;
 }
+
+/*!
+   \brief Changing the paint attributes
+    
+   \param attribute Paint attribute
+   \param on On/Off
+    
+   \sa testPaintAttribute()
+ */ 
+void QwtPlotOpenGLCanvas::setPaintAttribute( PaintAttribute attribute, bool on )
+{   
+    if ( testPaintAttribute( attribute ) == on )
+        return;
+
+    if ( on )
+    {   
+        m_data->paintAttributes |= attribute;
+    }
+    else
+    {
+        m_data->paintAttributes &= ~attribute;
+
+        if ( attribute == BackingStore )
+            clearBackingStore();
+    }
+}
+
+/*!
+   Test whether a paint attribute is enabled
+
+   \param attribute Paint attribute
+   \return true, when attribute is enabled
+   \sa setPaintAttribute()
+ */
+bool QwtPlotOpenGLCanvas::testPaintAttribute( PaintAttribute attribute ) const
+{
+    return m_data->paintAttributes & attribute;
+}
+
+/*!
+   Set the frame style
+
+   \param style The bitwise OR between a shape and a shadow.
+
+   \sa frameStyle(), QFrame::setFrameStyle(),
+      setFrameShadow(), setFrameShape()
+ */
+void QwtPlotOpenGLCanvas::setFrameStyle( int style )
+{
+    if ( style != m_data->frameStyle )
+    {
+        m_data->frameStyle = style;
+        qwtUpdateContentsRect( frameWidth(), this );
+    }
+}
+
+/*!
+   \return The bitwise OR between a frameShape() and a frameShadow()
+   \sa setFrameStyle(), QFrame::frameStyle()
+ */
+int QwtPlotOpenGLCanvas::frameStyle() const
+{
+    return m_data->frameStyle;
+}
+
+/*!
+   Set the frame shadow
+
+   \param shadow Frame shadow
+   \sa frameShadow(), setFrameShape(), QFrame::setFrameShadow()
+ */
+void QwtPlotOpenGLCanvas::setFrameShadow( QFrame::Shadow shadow )
+{
+    setFrameStyle( ( m_data->frameStyle & QFrame::Shape_Mask ) | shadow );
+}
+
+/*!
+   \return Frame shadow
+   \sa setFrameShadow(), QFrame::setFrameShadow()
+ */
+QFrame::Shadow QwtPlotOpenGLCanvas::frameShadow() const
+{
+    return (QFrame::Shadow) ( m_data->frameStyle & QFrame::Shadow_Mask );
+}
+
+/*!
+   Set the frame shape
+
+   \param shape Frame shape
+   \sa frameShape(), setFrameShadow(), QFrame::frameShape()
+ */
+void QwtPlotOpenGLCanvas::setFrameShape( QFrame::Shape shape )
+{
+    setFrameStyle( ( m_data->frameStyle & QFrame::Shadow_Mask ) | shape );
+}
+
+/*!
+   \return Frame shape
+   \sa setFrameShape(), QFrame::frameShape()
+ */
+QFrame::Shape QwtPlotOpenGLCanvas::frameShape() const
+{
+    return (QFrame::Shape) ( m_data->frameStyle & QFrame::Shape_Mask );
+}
+
+/*!
+   Set the frame line width
+
+   The default line width is 2 pixels.
+
+   \param width Line width of the frame
+   \sa lineWidth(), setMidLineWidth()
+ */
+void QwtPlotOpenGLCanvas::setLineWidth( int width )
+{
+    width = qMax( width, 0 );
+    if ( width != m_data->lineWidth )
+    {
+        m_data->lineWidth = qMax( width, 0 );
+        qwtUpdateContentsRect( frameWidth(), this );
+    }
+}
+
+/*!
+   \return Line width of the frame
+   \sa setLineWidth(), midLineWidth()
+ */
+int QwtPlotOpenGLCanvas::lineWidth() const
+{
+    return m_data->lineWidth;
+}
+
+/*!
+   Set the frame mid line width
+
+   The default midline width is 0 pixels.
+
+   \param width Midline width of the frame
+   \sa midLineWidth(), setLineWidth()
+ */
+void QwtPlotOpenGLCanvas::setMidLineWidth( int width )
+{
+    width = qMax( width, 0 );
+    if ( width != m_data->midLineWidth )
+    {
+        m_data->midLineWidth = width;
+        qwtUpdateContentsRect( frameWidth(), this );
+    }
+}
+
+/*!
+   \return Midline width of the frame
+   \sa setMidLineWidth(), lineWidth()
+ */
+int QwtPlotOpenGLCanvas::midLineWidth() const
+{
+    return m_data->midLineWidth;
+}
+
+/*!
+   \return Frame width depending on the style, line width and midline width.
+ */
+int QwtPlotOpenGLCanvas::frameWidth() const
+{
+    return ( frameStyle() != QFrame::NoFrame ) ? m_data->lineWidth : 0;
+}
+
 
 /*!
    Paint event
@@ -152,13 +313,25 @@ bool QwtPlotOpenGLCanvas::event( QEvent* event )
     return ok;
 }
 
+//! \return The rectangle where the frame is drawn in.
+QRect QwtPlotOpenGLCanvas::frameRect() const
+{
+    const int fw = frameWidth();
+    return contentsRect().adjusted( -fw, -fw, fw, fw );
+}
+
 /*!
    Invalidate the paint cache and repaint the canvas
    \sa invalidatePaintCache()
  */
 void QwtPlotOpenGLCanvas::replot()
 {
-    QwtPlotAbstractGLCanvas::replot();
+    invalidateBackingStore();
+
+    if ( testPaintAttribute( QwtPlotOpenGLCanvas::ImmediatePaint ) )
+        repaint( contentsRect() );
+    else
+        update( contentsRect() );
 }
 
 //! Invalidate the internal backing store
@@ -170,7 +343,7 @@ void QwtPlotOpenGLCanvas::invalidateBackingStore()
 void QwtPlotOpenGLCanvas::clearBackingStore()
 {
     delete m_data->fbo;
-    m_data->fbo = NULL;
+    m_data->fbo = nullptr;
 }
 
 /*!
@@ -185,6 +358,22 @@ void QwtPlotOpenGLCanvas::clearBackingStore()
 QPainterPath QwtPlotOpenGLCanvas::borderPath( const QRect& rect ) const
 {
     return canvasBorderPath( rect );
+}
+
+//! Helper function for the derived plot canvas
+void QwtPlotOpenGLCanvas::draw( QPainter* painter )
+{
+#if 0
+    painter->translate( 1, 1 );
+#endif
+
+    if ( testAttribute( Qt::WA_StyledBackground ) )
+        drawStyled( painter, true );
+    else
+        drawUnstyled( painter );
+
+    if ( frameWidth() > 0 )
+        drawBorder( painter );
 }
 
 //! No operation - reserved for some potential use in the future
@@ -224,11 +413,11 @@ void QwtPlotOpenGLCanvas::paintGL()
             if ( m_data->fbo->size() != fboSize )
             {
                 delete m_data->fbo;
-                m_data->fbo = NULL;
+                m_data->fbo = nullptr;
             }
         }
 
-        if ( m_data->fbo == NULL )
+        if ( m_data->fbo == nullptr )
         {
             QOpenGLFramebufferObjectFormat fboFormat;
             fboFormat.setAttachment( QOpenGLFramebufferObject::CombinedDepthStencil );
@@ -254,7 +443,7 @@ void QwtPlotOpenGLCanvas::paintGL()
             m_data->fboDirty = false;
         }
 
-        QOpenGLFramebufferObject::blitFramebuffer( NULL, m_data->fbo );
+        QOpenGLFramebufferObject::blitFramebuffer( nullptr, m_data->fbo );
     }
     else
     {

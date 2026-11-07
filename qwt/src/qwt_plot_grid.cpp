@@ -24,18 +24,10 @@ static inline bool qwtFuzzyGreaterOrEqual( double d1, double d2 )
 class QwtPlotGrid::PrivateData
 {
   public:
-    PrivateData()
-        : xEnabled( true )
-        , yEnabled( true )
-        , xMinEnabled( false )
-        , yMinEnabled( false )
-    {
-    }
-
-    bool xEnabled;
-    bool yEnabled;
-    bool xMinEnabled;
-    bool yMinEnabled;
+    bool xEnabled = true;
+    bool yEnabled = true;
+    bool xMinEnabled = false;
+    bool yMinEnabled = false;
 
     QwtScaleDiv xScaleDiv;
     QwtScaleDiv yScaleDiv;
@@ -47,9 +39,8 @@ class QwtPlotGrid::PrivateData
 //! Enables major grid, disables minor grid
 QwtPlotGrid::QwtPlotGrid()
     : QwtPlotItem( QwtText( "Grid" ) )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
-
     setItemInterest( QwtPlotItem::ScaleInterest, true );
     setZ( 10.0 );
 }
@@ -57,7 +48,6 @@ QwtPlotGrid::QwtPlotGrid()
 //! Destructor
 QwtPlotGrid::~QwtPlotGrid()
 {
-    delete m_data;
 }
 
 //! \return QwtPlotItem::Rtti_PlotGrid

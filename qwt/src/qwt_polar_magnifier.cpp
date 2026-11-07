@@ -17,14 +17,8 @@
 class QwtPolarMagnifier::PrivateData
 {
   public:
-    PrivateData()
-        : unzoomKey( Qt::Key_Home )
-        , unzoomKeyModifiers( Qt::NoModifier )
-    {
-    }
-
-    int unzoomKey;
-    int unzoomKeyModifiers;
+    int unzoomKey = Qt::Key_Home;
+    int unzoomKeyModifiers = Qt::NoModifier;
 };
 
 /*!
@@ -33,14 +27,13 @@ class QwtPolarMagnifier::PrivateData
  */
 QwtPolarMagnifier::QwtPolarMagnifier( QwtPolarCanvas* canvas )
     : QwtMagnifier( canvas )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData();
 }
 
 //! Destructor
 QwtPolarMagnifier::~QwtPolarMagnifier()
 {
-    delete m_data;
 }
 
 /*!
@@ -89,7 +82,7 @@ QwtPolarPlot* QwtPolarMagnifier::plot()
     if ( c )
         return c->plot();
 
-    return NULL;
+    return nullptr;
 }
 
 //! \return observed plot
@@ -99,7 +92,7 @@ const QwtPolarPlot* QwtPolarMagnifier::plot() const
     if ( c )
         return c->plot();
 
-    return NULL;
+    return nullptr;
 }
 
 /*!
@@ -133,7 +126,7 @@ void QwtPolarMagnifier::rescale( double factor )
         return;
 
     QwtPolarPlot* plt = plot();
-    if ( plt == NULL )
+    if ( plt == nullptr )
         return;
 
     QwtPointPolar zoomPos;

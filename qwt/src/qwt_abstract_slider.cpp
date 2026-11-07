@@ -43,38 +43,23 @@ static double qwtAlignToScaleDiv(
 class QwtAbstractSlider::PrivateData
 {
   public:
-    PrivateData()
-        : isScrolling( false )
-        , isTracking( true )
-        , pendingValueChanged( false )
-        , readOnly( false )
-        , totalSteps( 100 )
-        , singleSteps( 1 )
-        , pageSteps( 10 )
-        , stepAlignment( true )
-        , isValid( false )
-        , value( 0.0 )
-        , wrapping( false )
-        , invertedControls( false )
-    {
-    }
+    bool isScrolling = false;
+    bool isTracking = true;
+    bool pendingValueChanged = false;
 
-    bool isScrolling;
-    bool isTracking;
-    bool pendingValueChanged;
+    bool readOnly = false;
 
-    bool readOnly;
+    bool isValid = false;
+    bool wrapping = false;
+    bool invertedControls = false;
 
-    uint totalSteps;
-    uint singleSteps;
-    uint pageSteps;
-    bool stepAlignment;
+    bool stepAlignment = true;
 
-    bool isValid;
-    double value;
+    uint totalSteps = 100;
+    uint singleSteps = 1;
+    uint pageSteps = 10;
 
-    bool wrapping;
-    bool invertedControls;
+    double value = 0.0;
 };
 
 /*!
@@ -90,9 +75,8 @@ class QwtAbstractSlider::PrivateData
  */
 QwtAbstractSlider::QwtAbstractSlider( QWidget* parent )
     : QwtAbstractScale( parent )
+    , m_data( new PrivateData )
 {
-    m_data = new QwtAbstractSlider::PrivateData;
-
     setScale( 0.0, 100.0 );
     setFocusPolicy( Qt::StrongFocus );
 }
@@ -100,7 +84,6 @@ QwtAbstractSlider::QwtAbstractSlider( QWidget* parent )
 //! Destructor
 QwtAbstractSlider::~QwtAbstractSlider()
 {
-    delete m_data;
 }
 
 /*!
@@ -304,13 +287,9 @@ void QwtAbstractSlider::wheelEvent( QWheelEvent* event )
     if ( !m_data->isValid || m_data->isScrolling )
         return;
 
-#if QT_VERSION < 0x050000
-    const int wheelDelta = event->delta();
-#else
     const QPoint delta = event->angleDelta();
     const int wheelDelta = ( qAbs( delta.x() ) > qAbs( delta.y() ) )
         ? delta.x() : delta.y();
-#endif
 
     int numSteps = 0;
 
@@ -676,7 +655,7 @@ double QwtAbstractSlider::incrementedValue(
     const QwtTransform* transformation =
         scaleMap().transformation();
 
-    if ( transformation == NULL )
+    if ( transformation == nullptr )
     {
         const double range = maximum() - minimum();
         value += stepCount * range / m_data->totalSteps;
@@ -761,7 +740,7 @@ double QwtAbstractSlider::alignedValue( double value ) const
 
     double stepSize;
 
-    if ( scaleMap().transformation() == NULL )
+    if ( scaleMap().transformation() == nullptr )
     {
         stepSize = ( maximum() - minimum() ) / m_data->totalSteps;
         if ( stepSize > 0.0 )

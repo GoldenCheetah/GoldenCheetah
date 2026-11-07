@@ -20,8 +20,8 @@ namespace
     class Legend : public QwtLegend
     {
       protected:
-        virtual QWidget* createWidget(
-            const QwtLegendData& legendData ) const QWT_OVERRIDE
+        QWidget* createWidget(
+            const QwtLegendData& legendData ) const override
         {
             QWidget* w = QwtLegend::createWidget( legendData );
             if ( w )

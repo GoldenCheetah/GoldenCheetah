@@ -12,10 +12,8 @@
 
 #define QWT_GLOBAL_STRUT
 
-#if QT_VERSION >= 0x050000
-    #if QT_VERSION >= 0x060000 || !QT_DEPRECATED_SINCE(5, 15)
-        #undef QWT_GLOBAL_STRUT
-    #endif
+#if QT_VERSION >= 0x060000 || !QT_DEPRECATED_SINCE(5, 15)
+    #undef QWT_GLOBAL_STRUT
 #endif
 
 QSize qwtExpandedToGlobalStrut( const QSize& size )

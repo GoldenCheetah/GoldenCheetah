@@ -28,24 +28,24 @@
 class QWT_EXPORT QwtPointPolar
 {
   public:
-    QwtPointPolar();
-    QwtPointPolar( double azimuth, double radius );
+    inline QwtPointPolar();
+    inline QwtPointPolar( double azimuth, double radius );
     QwtPointPolar( const QPointF& );
 
     void setPoint( const QPointF& );
     QPointF toPoint() const;
 
-    bool isValid() const;
-    bool isNull() const;
+    inline bool isValid() const;
+    inline bool isNull() const;
 
-    double radius() const;
-    double azimuth() const;
+    inline double radius() const;
+    inline double azimuth() const;
 
-    double& rRadius();
-    double& rAzimuth();
+    inline double& rRadius();
+    inline double& rAzimuth();
 
-    void setRadius( double );
-    void setAzimuth( double );
+    inline void setRadius( double );
+    inline void setAzimuth( double );
 
     bool operator==( const QwtPointPolar& ) const;
     bool operator!=( const QwtPointPolar& ) const;

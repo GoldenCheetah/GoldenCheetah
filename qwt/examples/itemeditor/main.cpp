@@ -16,7 +16,7 @@ namespace
     class MainWindow : public QMainWindow
     {
       public:
-        MainWindow( QWidget* parent = NULL )
+        MainWindow( QWidget* parent = nullptr )
             : QMainWindow( parent )
         {
             Plot* plot = new Plot( this );
@@ -33,13 +33,17 @@ namespace
             modeBox->setCurrentIndex( 1 );
             modeBox->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
 
-            connect( modeBox, SIGNAL(currentIndexChanged(int)),
-                plot, SLOT(setMode(int)) );
+            void (QComboBox::*comboValueChanged)(int) =
+                &QComboBox::currentIndexChanged;
+
+            connect( modeBox, comboValueChanged,
+                plot, &Plot::setMode );
 
             QToolButton* btnExport = new QToolButton( toolBar );
             btnExport->setText( "Export" );
             btnExport->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
-            connect( btnExport, SIGNAL(clicked()), plot, SLOT(exportPlot()) );
+            connect( btnExport, &QToolButton::clicked,
+                plot, &Plot::exportPlot );
 
             toolBar->addWidget( modeBox );
             toolBar->addWidget( btnExport );

@@ -213,34 +213,12 @@ contains(QWT_CONFIG, QwtPlot) {
 
     contains(QWT_CONFIG, QwtOpenGL) {
 
-        lessThan(QT_MAJOR_VERSION, 6) {
-
-            HEADERS += \
-                qwt_plot_glcanvas.h
-
-            SOURCES += \
-                qwt_plot_glcanvas.cpp
+        greaterThan(QT_MAJOR_VERSION, 5) {
+            QT += openglwidgets
         }
 
-        greaterThan(QT_MAJOR_VERSION, 4) {
-
-            lessThan( QT_MAJOR_VERSION, 6) {
-
-                greaterThan(QT_MINOR_VERSION, 3) {
-
-                    HEADERS += qwt_plot_opengl_canvas.h
-                    SOURCES += qwt_plot_opengl_canvas.cpp
-                }
-            }
-            else {
-                QT += openglwidgets
-
-                HEADERS += qwt_plot_opengl_canvas.h
-                SOURCES += qwt_plot_opengl_canvas.cpp
-            }
-            
-        }
-
+        HEADERS += qwt_plot_opengl_canvas.h
+        SOURCES += qwt_plot_opengl_canvas.cpp
     }
 
     contains(QWT_CONFIG, QwtSvg) {
@@ -289,25 +267,16 @@ contains(QWT_CONFIG, QwtPlot) {
     }
 }
 
-greaterThan(QT_MAJOR_VERSION, 4) {
-
-    QT += printsupport
-    QT += concurrent
-} 
+QT += printsupport
+QT += concurrent
 
 contains(QWT_CONFIG, QwtSvg) {
 
-    greaterThan(QT_MAJOR_VERSION, 4) {
-
-        qtHaveModule(svg) {
-            QT += svg
-        }
-        else {
-            warning("QwtSvg is enabled in qwtconfig.pri, but Qt has not been built with svg support")
-        }
+    qtHaveModule(svg) {
+        QT += svg
     }
     else {
-        QT += svg
+        warning("QwtSvg is enabled in qwtconfig.pri, but Qt has not been built with svg support")
     }
 }
 else {
@@ -317,20 +286,12 @@ else {
 
 contains(QWT_CONFIG, QwtOpenGL) {
 
-   greaterThan(QT_MAJOR_VERSION, 4) {
-
-        qtHaveModule(opengl) {
-            QT += opengl
-        }
-        else {
-            warning("QwtOpenGL is enabled in qwtconfig.pri, but Qt has not been built with opengl support")
-        }
-    }
-    else {
+    qtHaveModule(opengl) {
         QT += opengl
     }
-
-    QT += opengl
+    else {
+        warning("QwtOpenGL is enabled in qwtconfig.pri, but Qt has not been built with opengl support")
+    }
 }
 else {
 

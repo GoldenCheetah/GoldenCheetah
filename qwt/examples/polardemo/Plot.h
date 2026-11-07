@@ -46,7 +46,7 @@ class Plot : public QwtPolarPlot
     Q_OBJECT
 
   public:
-    Plot( QWidget* = NULL );
+    Plot( QWidget* = nullptr );
     PlotSettings settings() const;
 
   public Q_SLOTS:

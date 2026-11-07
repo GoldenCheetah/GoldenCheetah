@@ -14,6 +14,7 @@
 #include "qwt_abstract_scale_draw.h"
 
 #include <qpoint.h>
+#include <memory>
 
 class QTransform;
 class QSizeF;
@@ -55,15 +56,15 @@ class QWT_EXPORT QwtScaleDraw : public QwtAbstractScaleDraw
     };
 
     QwtScaleDraw();
-    virtual ~QwtScaleDraw();
+    ~QwtScaleDraw() override;
 
     void getBorderDistHint( const QFont&, int& start, int& end ) const;
     int minLabelDist( const QFont& ) const;
 
     int minLength( const QFont& ) const;
-    virtual double extent( const QFont& ) const QWT_OVERRIDE;
+    double extent( const QFont& ) const override;
 
-    void move( double x, double y );
+    inline void move( double x, double y );
     void move( const QPointF& );
     void setLength( double length );
 
@@ -94,17 +95,15 @@ class QWT_EXPORT QwtScaleDraw : public QwtAbstractScaleDraw
   protected:
     QTransform labelTransformation( const QPointF&, const QSizeF& ) const;
 
-    virtual void drawTick( QPainter*,
-        double value, double len ) const QWT_OVERRIDE;
-
-    virtual void drawBackbone( QPainter* ) const QWT_OVERRIDE;
-    virtual void drawLabel( QPainter*, double value ) const QWT_OVERRIDE;
+    void drawTick( QPainter*, double value, double len ) const override;
+    void drawBackbone( QPainter* ) const override;
+    void drawLabel( QPainter*, double value ) const override;
 
   private:
     void updateMap();
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 /*!

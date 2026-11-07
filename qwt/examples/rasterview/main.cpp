@@ -17,7 +17,7 @@ namespace
     class MainWindow : public QMainWindow
     {
       public:
-        MainWindow( QWidget* parent = NULL )
+        MainWindow( QWidget* parent = nullptr )
             : QMainWindow( parent )
         {
             Plot* plot = new Plot( this );
@@ -49,8 +49,10 @@ namespace
 
             addToolBar( toolBar );
 
-            connect( modeBox, SIGNAL(activated(int)), plot, SLOT(setResampleMode(int)) );
-            connect( btnExport, SIGNAL(clicked()), plot, SLOT(exportPlot()) );
+            void (QComboBox::*comboValueChanged)(int) = &QComboBox::currentIndexChanged;
+
+            connect( modeBox, comboValueChanged, plot, &Plot::setResampleMode );
+            connect( btnExport, &QToolButton::clicked, plot, &Plot::exportPlot );
         }
     };
 }

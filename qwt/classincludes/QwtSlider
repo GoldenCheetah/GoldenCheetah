@@ -1,1 +1,1 @@
-#include "qwt_slider.h"
+#include "qwt_slider.h" // IWYU pragma: export

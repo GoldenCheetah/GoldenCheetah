@@ -12,6 +12,7 @@
 #include "qwt_column_symbol.h"
 #include "qwt_scale_map.h"
 #include "qwt_graphic.h"
+#include "qwt_text.h"
 
 #include <qstring.h>
 #include <qpainter.h>
@@ -37,24 +38,18 @@ static inline bool qwtIsCombinable( const QwtInterval& d1,
 class QwtPlotHistogram::PrivateData
 {
   public:
-    PrivateData()
-        : baseline( 0.0 )
-        , style( Columns )
-        , symbol( NULL )
-    {
-    }
-
     ~PrivateData()
     {
         delete symbol;
     }
 
-    double baseline;
+    double baseline = 0.0;
 
     QPen pen;
     QBrush brush;
-    QwtPlotHistogram::HistogramStyle style;
-    const QwtColumnSymbol* symbol;
+
+    HistogramStyle style = Columns;
+    const QwtColumnSymbol* symbol = nullptr;
 };
 
 /*!
@@ -63,8 +58,14 @@ class QwtPlotHistogram::PrivateData
  */
 QwtPlotHistogram::QwtPlotHistogram( const QwtText& title )
     : QwtPlotSeriesItem( title )
+    , m_data( new PrivateData )
 {
-    init();
+    setData( new QwtIntervalSeriesData() );
+
+    setItemAttribute( QwtPlotItem::AutoScale, true );
+    setItemAttribute( QwtPlotItem::Legend, true );
+
+    setZ( 20.0 );
 }
 
 /*!
@@ -72,27 +73,13 @@ QwtPlotHistogram::QwtPlotHistogram( const QwtText& title )
    \param title Title of the histogram.
  */
 QwtPlotHistogram::QwtPlotHistogram( const QString& title )
-    : QwtPlotSeriesItem( title )
+    : QwtPlotHistogram( QwtText( title ) )
 {
-    init();
 }
 
 //! Destructor
 QwtPlotHistogram::~QwtPlotHistogram()
 {
-    delete m_data;
-}
-
-//! Initialize data members
-void QwtPlotHistogram::init()
-{
-    m_data = new PrivateData();
-    setData( new QwtIntervalSeriesData() );
-
-    setItemAttribute( QwtPlotItem::AutoScale, true );
-    setItemAttribute( QwtPlotItem::Legend, true );
-
-    setZ( 20.0 );
 }
 
 /*!
@@ -218,7 +205,7 @@ void QwtPlotHistogram::setSymbol( const QwtColumnSymbol* symbol )
 }
 
 /*!
-   \return Current symbol or NULL, when no symbol has been assigned
+   \return Current symbol or a nullptr, when no symbol has been assigned
    \sa setSymbol()
  */
 const QwtColumnSymbol* QwtPlotHistogram::symbol() const

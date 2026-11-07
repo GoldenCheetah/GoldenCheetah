@@ -13,6 +13,8 @@
 #include "qwt_global.h"
 #include "qwt_plot_abstract_barchart.h"
 
+#include <memory>
+
 class QwtColumnRect;
 class QwtColumnSymbol;
 template< typename T > class QwtSeriesData;
@@ -65,9 +67,9 @@ class QWT_EXPORT QwtPlotMultiBarChart
     explicit QwtPlotMultiBarChart( const QString& title = QString() );
     explicit QwtPlotMultiBarChart( const QwtText& title );
 
-    virtual ~QwtPlotMultiBarChart();
+    ~QwtPlotMultiBarChart() override;
 
-    virtual int rtti() const QWT_OVERRIDE;
+    int rtti() const override;
 
     void setBarTitles( const QList< QwtText >& );
     QList< QwtText > barTitles() const;
@@ -84,16 +86,14 @@ class QWT_EXPORT QwtPlotMultiBarChart
 
     void resetSymbolMap();
 
-    virtual void drawSeries( QPainter*,
+    void drawSeries( QPainter*,
         const QwtScaleMap& xMap, const QwtScaleMap& yMap,
-        const QRectF& canvasRect, int from, int to ) const QWT_OVERRIDE;
+        const QRectF& canvasRect, int from, int to ) const override;
 
-    virtual QRectF boundingRect() const QWT_OVERRIDE;
+    QRectF boundingRect() const override;
 
-    virtual QList< QwtLegendData > legendData() const QWT_OVERRIDE;
-
-    virtual QwtGraphic legendIcon(
-        int index, const QSizeF& ) const QWT_OVERRIDE;
+    QList< QwtLegendData > legendData() const override;
+    QwtGraphic legendIcon( int index, const QSizeF& ) const override;
 
   protected:
     QwtColumnSymbol* symbol( int valueIndex );
@@ -120,10 +120,8 @@ class QWT_EXPORT QwtPlotMultiBarChart
         double sampleWidth, const QwtSetSample& ) const;
 
   private:
-    void init();
-
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

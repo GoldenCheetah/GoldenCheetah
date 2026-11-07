@@ -11,7 +11,9 @@
 #define QWT_TEXT_H
 
 #include "qwt_global.h"
+
 #include <qmetatype.h>
+#include <memory>
 
 class QFont;
 class QString;
@@ -204,10 +206,7 @@ class QWT_EXPORT QwtText
 
   private:
     class PrivateData;
-    PrivateData* m_data;
-
-    class LayoutCache;
-    LayoutCache* m_layoutCache;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QwtText::PaintAttributes )

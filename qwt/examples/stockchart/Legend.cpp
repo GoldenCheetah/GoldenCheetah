@@ -48,8 +48,8 @@ class LegendTreeView : public QTreeView
 
     QList< QStandardItem* > itemList( const QwtPlotItem* );
 
-    virtual QSize sizeHint() const QWT_OVERRIDE;
-    virtual QSize minimumSizeHint() const QWT_OVERRIDE;
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
 };
 
 LegendTreeView::LegendTreeView( Legend* legend )
@@ -82,7 +82,7 @@ QStandardItem* LegendTreeView::rootItem( int rtti )
             return item;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 QList< QStandardItem* > LegendTreeView::itemList(
@@ -209,8 +209,8 @@ Legend::Legend( QWidget* parent )
     layout->setContentsMargins( 0, 0, 0, 0 );
     layout->addWidget( m_treeView );
 
-    connect( m_treeView, SIGNAL(clicked(const QModelIndex&)),
-        this, SLOT(handleClick(const QModelIndex&)) );
+    connect( m_treeView, &QTreeView::clicked,
+        this, &Legend::handleClick );
 }
 
 Legend::~Legend()
@@ -291,7 +291,7 @@ void Legend::updateLegend( const QVariant& itemInfo,
 
     if ( !legendData.isEmpty() )
     {
-        if ( rootItem == NULL )
+        if ( rootItem == nullptr )
             rootItem = m_treeView->insertRootItem( plotItem->rtti() );
 
         while ( itemList.size() < legendData.size() )

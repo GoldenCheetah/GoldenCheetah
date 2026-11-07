@@ -1,1 +1,1 @@
-#include "qwt_plot_zoneitem.h"
+#include "qwt_plot_zoneitem.h" // IWYU pragma: export

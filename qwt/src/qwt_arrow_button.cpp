@@ -54,8 +54,8 @@ static QStyleOptionButton styleOpt( const QwtArrowButton* btn )
  */
 QwtArrowButton::QwtArrowButton( int num, Qt::ArrowType arrowType, QWidget* parent )
     : QPushButton( parent )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
     m_data->num = qBound( 1, num, MaxNum );
     m_data->arrowType = arrowType;
 
@@ -78,8 +78,6 @@ QwtArrowButton::QwtArrowButton( int num, Qt::ArrowType arrowType, QWidget* paren
 //! Destructor
 QwtArrowButton::~QwtArrowButton()
 {
-    delete m_data;
-    m_data = NULL;
 }
 
 /*!

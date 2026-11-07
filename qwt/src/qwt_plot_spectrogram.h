@@ -14,6 +14,8 @@
 #include "qwt_raster_data.h"
 #include "qwt_plot_rasteritem.h"
 
+#include <memory>
+
 class QwtColorMap;
 template< typename T > class QList;
 
@@ -53,7 +55,7 @@ class QWT_EXPORT QwtPlotSpectrogram : public QwtPlotRasterItem
     Q_DECLARE_FLAGS( DisplayModes, DisplayMode )
 
     explicit QwtPlotSpectrogram( const QString& title = QString() );
-    virtual ~QwtPlotSpectrogram();
+    ~QwtPlotSpectrogram() override;
 
     void setDisplayMode( DisplayMode, bool on = true );
     bool testDisplayMode( DisplayMode ) const;
@@ -68,8 +70,8 @@ class QWT_EXPORT QwtPlotSpectrogram : public QwtPlotRasterItem
     void setColorTableSize( int numColors );
     int colorTableSize() const;
 
-    virtual QwtInterval interval( Qt::Axis ) const QWT_OVERRIDE;
-    virtual QRectF pixelHint( const QRectF& ) const QWT_OVERRIDE;
+    QwtInterval interval( Qt::Axis ) const override;
+    QRectF pixelHint( const QRectF& ) const override;
 
     void setDefaultContourPen( const QColor&,
         qreal width = 0.0, Qt::PenStyle = Qt::SolidLine );
@@ -84,16 +86,15 @@ class QWT_EXPORT QwtPlotSpectrogram : public QwtPlotRasterItem
     void setContourLevels( const QList< double >& );
     QList< double > contourLevels() const;
 
-    virtual int rtti() const QWT_OVERRIDE;
+    int rtti() const override;
 
-    virtual void draw( QPainter*,
-        const QwtScaleMap& xMap, const QwtScaleMap& yMap,
-        const QRectF& canvasRect ) const QWT_OVERRIDE;
+    void draw( QPainter*, const QwtScaleMap& xMap, const QwtScaleMap& yMap,
+        const QRectF& canvasRect ) const override;
 
   protected:
-    virtual QImage renderImage(
+    QImage renderImage(
         const QwtScaleMap& xMap, const QwtScaleMap& yMap,
-        const QRectF& area, const QSize& imageSize ) const QWT_OVERRIDE;
+        const QRectF& area, const QSize& imageSize ) const override;
 
     virtual QSize contourRasterSize(
         const QRectF&, const QRect& ) const;
@@ -110,7 +111,7 @@ class QWT_EXPORT QwtPlotSpectrogram : public QwtPlotRasterItem
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QwtPlotSpectrogram::DisplayModes )

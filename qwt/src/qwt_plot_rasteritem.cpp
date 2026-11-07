@@ -25,20 +25,13 @@
 class QwtPlotRasterItem::PrivateData
 {
   public:
-    PrivateData()
-        : alpha( -1 )
-        , paintAttributes( QwtPlotRasterItem::PaintInDeviceResolution )
-    {
-        cache.policy = QwtPlotRasterItem::NoCache;
-    }
+    int alpha = -1;
 
-    int alpha;
-
-    QwtPlotRasterItem::PaintAttributes paintAttributes;
+    PaintAttributes paintAttributes = PaintInDeviceResolution;
 
     struct ImageCache
     {
-        QwtPlotRasterItem::CachePolicy policy;
+        CachePolicy policy = NoCache;
         QRectF area;
         QSizeF size;
         QImage image;
@@ -374,9 +367,6 @@ static bool qwtUseCache( QwtPlotRasterItem::CachePolicy policy,
         {
             case QPaintEngine::SVG:
             case QPaintEngine::Pdf:
-#if QT_VERSION < 0x060000
-            case QPaintEngine::PostScript:
-#endif
             case QPaintEngine::MacPrinter:
             case QPaintEngine::Picture:
                 break;
@@ -432,32 +422,24 @@ static void qwtToRgba( const QImage* from, QImage* to,
 
 //! Constructor
 QwtPlotRasterItem::QwtPlotRasterItem( const QString& title )
-    : QwtPlotItem( QwtText( title ) )
+    : QwtPlotRasterItem( QwtText( title ) )
 {
-    init();
 }
 
 //! Constructor
 QwtPlotRasterItem::QwtPlotRasterItem( const QwtText& title )
     : QwtPlotItem( title )
+    , m_data( new PrivateData )
 {
-    init();
+    setItemAttribute( QwtPlotItem::AutoScale, true );
+    setItemAttribute( QwtPlotItem::Legend, false );
+
+    setZ( 8.0 );
 }
 
 //! Destructor
 QwtPlotRasterItem::~QwtPlotRasterItem()
 {
-    delete m_data;
-}
-
-void QwtPlotRasterItem::init()
-{
-    m_data = new PrivateData();
-
-    setItemAttribute( QwtPlotItem::AutoScale, true );
-    setItemAttribute( QwtPlotItem::Legend, false );
-
-    setZ( 8.0 );
 }
 
 /*!
@@ -695,10 +677,8 @@ void QwtPlotRasterItem::draw( QPainter* painter,
 
         auto imageSize = paintRect.size();
 
-#if QT_VERSION >= 0x050000
         const auto pixelRatio = QwtPainter::devicePixelRatio( painter->device() );
         imageSize *= pixelRatio;
-#endif
 
         image = compose(xxMap, yyMap,
             area, paintRect, imageSize.toSize(), doCache);
@@ -706,9 +686,7 @@ void QwtPlotRasterItem::draw( QPainter* painter,
         if ( image.isNull() )
             return;
 
-#if QT_VERSION >= 0x050000
         image.setDevicePixelRatio( pixelRatio );
-#endif
 
         // Remove pixels at the boundaries, when explicitly
         // excluded in the intervals

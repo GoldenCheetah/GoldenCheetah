@@ -12,6 +12,7 @@
 
 #include "qwt_global.h"
 #include "qwt_plot_item.h"
+#include <memory>
 
 class QPainter;
 class QPen;
@@ -34,9 +35,9 @@ class QWT_EXPORT QwtPlotGrid : public QwtPlotItem
 {
   public:
     explicit QwtPlotGrid();
-    virtual ~QwtPlotGrid();
+    ~QwtPlotGrid() override;
 
-    virtual int rtti() const QWT_OVERRIDE;
+    int rtti() const override;
 
     void enableX( bool );
     bool xEnabled() const;
@@ -71,12 +72,12 @@ class QWT_EXPORT QwtPlotGrid : public QwtPlotItem
     void setMinorPen( const QPen& );
     const QPen& minorPen() const;
 
-    virtual void draw( QPainter*,
+    void draw( QPainter*,
         const QwtScaleMap& xMap, const QwtScaleMap& yMap,
-        const QRectF& canvasRect ) const QWT_OVERRIDE;
+        const QRectF& canvasRect ) const override;
 
-    virtual void updateScaleDiv(
-        const QwtScaleDiv& xScaleDiv, const QwtScaleDiv& yScaleDiv ) QWT_OVERRIDE;
+    void updateScaleDiv(
+        const QwtScaleDiv& xScaleDiv, const QwtScaleDiv& yScaleDiv ) override;
 
   private:
     void drawLines( QPainter*, const QRectF&,
@@ -84,7 +85,7 @@ class QWT_EXPORT QwtPlotGrid : public QwtPlotItem
         const QList< double >& ) const;
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

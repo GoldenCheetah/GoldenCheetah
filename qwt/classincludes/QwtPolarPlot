@@ -1,1 +1,1 @@
-#include "qwt_polar_plot.h"
+#include "qwt_polar_plot.h" // IWYU pragma: export

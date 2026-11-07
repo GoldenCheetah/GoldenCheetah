@@ -266,20 +266,13 @@ namespace QwtScaleRendererInt
 class QwtScaleDraw::PrivateData
 {
   public:
-    PrivateData()
-        : len( 0 )
-        , alignment( QwtScaleDraw::BottomScale )
-        , labelRotation( 0.0 )
-    {
-    }
-
     QPointF pos;
-    double len;
+    double len = 0.0;
 
-    Alignment alignment;
+    Alignment alignment = BottomScale;
 
     Qt::Alignment labelAlignment;
-    double labelRotation;
+    double labelRotation = 0.0;
 };
 
 /*!
@@ -290,15 +283,14 @@ class QwtScaleDraw::PrivateData
    The orientation is QwtAbstractScaleDraw::Bottom.
  */
 QwtScaleDraw::QwtScaleDraw()
+    : m_data( new PrivateData )
 {
-    m_data = new QwtScaleDraw::PrivateData;
     setLength( 100 );
 }
 
 //! Destructor
 QwtScaleDraw::~QwtScaleDraw()
 {
-    delete m_data;
 }
 
 /*!

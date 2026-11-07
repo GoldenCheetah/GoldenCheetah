@@ -7,14 +7,11 @@
 
 #include <QwtPlot>
 #include <QwtScaleDiv>
+#include <QVector>
 
 class QwtPlotCurve;
 class QwtPlotIntervalCurve;
 class QwtIntervalSample;
-
-#if QT_VERSION < 0x060000
-template< typename T > class QVector;
-#endif
 
 class Plot : public QwtPlot
 {
@@ -35,7 +32,7 @@ class Plot : public QwtPlot
         BottomToTop
     };
 
-    Plot( QWidget* = NULL );
+    Plot( QWidget* = nullptr );
 
   public Q_SLOTS:
     void setMode( int );

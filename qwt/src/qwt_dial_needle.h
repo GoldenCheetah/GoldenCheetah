@@ -98,8 +98,8 @@ class QWT_EXPORT QwtDialSimpleNeedle : public QwtDialNeedle
     double width() const;
 
   protected:
-    virtual void drawNeedle( QPainter*, double length,
-        QPalette::ColorGroup ) const QWT_OVERRIDE;
+    void drawNeedle( QPainter*, double length,
+        QPalette::ColorGroup ) const override;
 
   private:
     Style m_style;
@@ -141,8 +141,8 @@ class QWT_EXPORT QwtCompassMagnetNeedle : public QwtDialNeedle
         const QColor& light = Qt::white, const QColor& dark = Qt::red );
 
   protected:
-    virtual void drawNeedle( QPainter*,
-        double length, QPalette::ColorGroup ) const QWT_OVERRIDE;
+    void drawNeedle( QPainter*,
+        double length, QPalette::ColorGroup ) const override;
 
   private:
     Style m_style;
@@ -178,8 +178,8 @@ class QWT_EXPORT QwtCompassWindArrow : public QwtDialNeedle
         const QColor& dark = Qt::gray );
 
   protected:
-    virtual void drawNeedle( QPainter*,
-        double length, QPalette::ColorGroup ) const QWT_OVERRIDE;
+    void drawNeedle( QPainter*,
+        double length, QPalette::ColorGroup ) const override;
 
   private:
     Style m_style;

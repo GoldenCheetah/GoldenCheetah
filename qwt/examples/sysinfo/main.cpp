@@ -144,7 +144,7 @@ namespace
     class SystemBox : public QFrame
     {
       public:
-        SystemBox( QWidget* parent = NULL )
+        SystemBox( QWidget* parent = nullptr )
             : QFrame( parent )
         {
             QHBoxLayout* layout = new QHBoxLayout( this );

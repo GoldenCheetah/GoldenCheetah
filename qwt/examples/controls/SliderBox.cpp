@@ -50,7 +50,8 @@ SliderBox::SliderBox( int sliderType, QWidget* parent )
         m_label->fontMetrics(), "10000.9" );
     m_label->setFixedWidth( labelWidth );
 
-    connect( m_slider, SIGNAL(valueChanged(double)), SLOT(setNum(double)) );
+    connect( m_slider, &QwtSlider::valueChanged,
+        this, &SliderBox::showValue );
 
     QBoxLayout* layout;
     if ( m_slider->orientation() == Qt::Horizontal )
@@ -61,7 +62,7 @@ SliderBox::SliderBox( int sliderType, QWidget* parent )
     layout->addWidget( m_slider );
     layout->addWidget( m_label );
 
-    setNum( m_slider->value() );
+    showValue( m_slider->value() );
 }
 
 QwtSlider* SliderBox::createSlider( int sliderType ) const
@@ -178,12 +179,10 @@ QwtSlider* SliderBox::createSlider( int sliderType ) const
     return slider;
 }
 
-void SliderBox::setNum( double v )
+void SliderBox::showValue( double v )
 {
     QString text;
     text.setNum( v, 'f', 2 );
 
     m_label->setText( text );
 }
-
-#include "moc_SliderBox.cpp"

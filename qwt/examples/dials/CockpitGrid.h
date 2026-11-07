@@ -12,7 +12,7 @@ class QwtDial;
 class CockpitGrid : public QFrame
 {
   public:
-    CockpitGrid( QWidget* parent = NULL );
+    CockpitGrid( QWidget* parent = nullptr );
 
   private:
     QwtDial* createDial( int pos );

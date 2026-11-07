@@ -18,7 +18,7 @@ class Panel : public QWidget
     Q_OBJECT
 
   public:
-    Panel( QWidget* parent = NULL );
+    Panel( QWidget* parent = nullptr );
 
     void setSettings( const Settings&);
     Settings settings() const;

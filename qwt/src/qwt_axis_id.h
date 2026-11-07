@@ -56,14 +56,7 @@ inline bool QwtAxisId::isYAxis() const
     return QwtAxis::isYAxis( pos );
 }
 
-#if QT_VERSION < 0x050000
-
-inline uint qHash( const QwtAxisId &axisId ) noexcept
-{
-    return qHash(axisId.pos) ^ qHash(axisId.id);
-}
-
-#elif QT_VERSION < 0x060000
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 
 inline uint qHash( const QwtAxisId& axisId, uint seed = 0 ) noexcept
 {

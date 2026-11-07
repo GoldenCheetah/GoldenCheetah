@@ -20,18 +20,17 @@ class TunerBox : public QFrame
     Q_OBJECT
 
   public:
-    TunerBox( QWidget* = NULL );
+    TunerBox( QWidget* = nullptr );
 
   Q_SIGNALS:
     void fieldChanged( double f );
 
   public Q_SLOTS:
-    void setFreq( double frq );
-
-  private Q_SLOTS:
-    void adjustFreq( double frq );
+    void setFrequency( double frq );
 
   private:
+    void adjustFrequency( double frq );
+
     QwtWheel* m_wheelFrequency;
     TuningThermo* m_thermoTune;
     QwtSlider* m_sliderFrequency;

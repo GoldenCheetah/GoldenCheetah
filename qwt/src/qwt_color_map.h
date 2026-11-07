@@ -12,10 +12,11 @@
 
 #include "qwt_global.h"
 #include <qcolor.h>
+#include <memory>
 
 class QwtInterval;
 
-#if QT_VERSION < 0x060000
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 template< typename T > class QVector;
 #endif
 
@@ -64,7 +65,7 @@ class QWT_EXPORT QwtColorMap
     virtual ~QwtColorMap();
 
     void setFormat( Format );
-    Format format() const;
+    inline Format format() const;
 
     /*!
        Map a value of a given interval into a RGB value.
@@ -78,7 +79,7 @@ class QWT_EXPORT QwtColorMap
     virtual uint colorIndex( int numColors,
         const QwtInterval& interval, double value ) const;
 
-    QColor color( const QwtInterval&, double value ) const;
+    inline QColor color( const QwtInterval&, double value ) const;
     virtual QVector< QRgb > colorTable( int numColors ) const;
     virtual QVector< QRgb > colorTable256() const;
 
@@ -116,7 +117,7 @@ class QWT_EXPORT QwtLinearColorMap : public QwtColorMap
     QwtLinearColorMap( const QColor& from, const QColor& to,
         QwtColorMap::Format = QwtColorMap::RGB );
 
-    virtual ~QwtLinearColorMap();
+    ~QwtLinearColorMap() override;
 
     void setMode( Mode );
     Mode mode() const;
@@ -128,17 +129,17 @@ class QWT_EXPORT QwtLinearColorMap : public QwtColorMap
     QColor color1() const;
     QColor color2() const;
 
-    virtual QRgb rgb( const QwtInterval&,
-        double value ) const QWT_OVERRIDE;
+    QRgb rgb( const QwtInterval&,
+        double value ) const override;
 
-    virtual uint colorIndex( int numColors,
-        const QwtInterval&, double value ) const QWT_OVERRIDE;
+    uint colorIndex( int numColors,
+        const QwtInterval&, double value ) const override;
 
     class ColorStops;
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 /*!
@@ -148,7 +149,7 @@ class QWT_EXPORT QwtAlphaColorMap : public QwtColorMap
 {
   public:
     explicit QwtAlphaColorMap( const QColor& = QColor( Qt::gray ) );
-    virtual ~QwtAlphaColorMap();
+    ~QwtAlphaColorMap() override;
 
     void setAlphaInterval( int alpha1, int alpha2 );
 
@@ -158,12 +159,11 @@ class QWT_EXPORT QwtAlphaColorMap : public QwtColorMap
     void setColor( const QColor& );
     QColor color() const;
 
-    virtual QRgb rgb( const QwtInterval&,
-        double value ) const QWT_OVERRIDE;
+    QRgb rgb( const QwtInterval&, double value ) const override;
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 /*!
@@ -181,7 +181,7 @@ class QWT_EXPORT QwtHueColorMap : public QwtColorMap
 {
   public:
     explicit QwtHueColorMap( QwtColorMap::Format = QwtColorMap::RGB );
-    virtual ~QwtHueColorMap();
+    ~QwtHueColorMap() override;
 
     void setHueInterval( int hue1, int hue2 ); // direction ?
     void setSaturation( int saturation );
@@ -194,12 +194,11 @@ class QWT_EXPORT QwtHueColorMap : public QwtColorMap
     int value() const;
     int alpha() const;
 
-    virtual QRgb rgb( const QwtInterval&,
-        double value ) const QWT_OVERRIDE;
+    QRgb rgb( const QwtInterval&, double value ) const override;
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 /*!
@@ -215,7 +214,7 @@ class QWT_EXPORT QwtSaturationValueColorMap : public QwtColorMap
 {
   public:
     QwtSaturationValueColorMap();
-    virtual ~QwtSaturationValueColorMap();
+    ~QwtSaturationValueColorMap() override;
 
     void setHue( int hue );
     void setSaturationInterval( int sat1, int sat2 );
@@ -229,12 +228,11 @@ class QWT_EXPORT QwtSaturationValueColorMap : public QwtColorMap
     int value2() const;
     int alpha() const;
 
-    virtual QRgb rgb( const QwtInterval&,
-        double value ) const QWT_OVERRIDE;
+    QRgb rgb( const QwtInterval&, double value ) const override;
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 /*!

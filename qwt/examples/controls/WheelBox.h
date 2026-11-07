@@ -17,18 +17,14 @@ class QwtWheel;
 
 class WheelBox : public QWidget
 {
-    Q_OBJECT
   public:
     WheelBox( Qt::Orientation,
-        int type, QWidget* parent = NULL );
-
-  private Q_SLOTS:
-    void setNum( double v );
+        int type, QWidget* parent = nullptr );
 
   private:
+    void showValue( double );
     QWidget* createBox( Qt::Orientation, int type );
 
-  private:
     QwtWheel* m_wheel;
     QwtThermo* m_thermo;
     QLabel* m_label;

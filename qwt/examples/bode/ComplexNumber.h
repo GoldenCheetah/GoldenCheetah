@@ -12,21 +12,22 @@
 class ComplexNumber
 {
   public:
-    ComplexNumber();
-    ComplexNumber( double r, double i = 0.0 );
+    inline ComplexNumber();
+    inline ComplexNumber( double r, double i = 0.0 );
 
-    double real() const;
-    double imag() const;
+    inline double real() const;
+    inline double imag() const;
 
-    friend ComplexNumber operator*(
+    friend inline ComplexNumber operator*(
         const ComplexNumber&, const ComplexNumber& );
 
-    friend ComplexNumber operator+(
+    friend inline ComplexNumber operator+(
         const ComplexNumber&, const ComplexNumber& );
 
-    friend ComplexNumber operator-(
+    friend inline ComplexNumber operator-(
         const ComplexNumber&, const ComplexNumber& );
-    friend ComplexNumber operator/(
+
+    friend inline ComplexNumber operator/(
         const ComplexNumber&, const ComplexNumber& );
 
   private:

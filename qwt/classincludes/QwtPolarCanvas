@@ -1,1 +1,1 @@
-#include "qwt_polar_canvas.h"
+#include "qwt_polar_canvas.h" // IWYU pragma: export

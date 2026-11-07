@@ -14,6 +14,7 @@
 #include "qwt_interval.h"
 
 #include <qnamespace.h>
+#include <memory>
 
 class QPainter;
 class QPalette;
@@ -138,7 +139,7 @@ class QWT_EXPORT QwtColumnSymbol
     Q_DISABLE_COPY(QwtColumnSymbol)
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

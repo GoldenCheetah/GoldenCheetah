@@ -14,11 +14,13 @@
 #include "qwt_picker.h"
 #include "qwt_axis_id.h"
 
+#include <memory>
+
 class QwtPlot;
 class QPointF;
 class QRectF;
 
-#if QT_VERSION < 0x060000
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 template< typename T > class QVector;
 #endif
 
@@ -36,7 +38,7 @@ class QWT_EXPORT QwtPlotPicker : public QwtPicker
 
   public:
     explicit QwtPlotPicker( QWidget* canvas );
-    virtual ~QwtPlotPicker();
+    ~QwtPlotPicker() override;
 
     explicit QwtPlotPicker( QwtAxisId xAxisId, QwtAxisId yAxisId, QWidget* );
 
@@ -105,18 +107,18 @@ class QWT_EXPORT QwtPlotPicker : public QwtPicker
     QPointF invTransform( const QPoint& ) const;
     QPoint transform( const QPointF& ) const;
 
-    virtual QwtText trackerText( const QPoint& ) const QWT_OVERRIDE;
+    QwtText trackerText( const QPoint& ) const override;
     virtual QwtText trackerTextF( const QPointF& ) const;
 
-    virtual void move( const QPoint& ) QWT_OVERRIDE;
-    virtual void append( const QPoint& ) QWT_OVERRIDE;
-    virtual bool end( bool ok = true ) QWT_OVERRIDE;
+    void move( const QPoint& ) override;
+    void append( const QPoint& ) override;
+    bool end( bool ok = true ) override;
 
     virtual void axesChanged();
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

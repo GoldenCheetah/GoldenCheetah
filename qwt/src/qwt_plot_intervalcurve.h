@@ -13,6 +13,8 @@
 #include "qwt_global.h"
 #include "qwt_plot_seriesitem.h"
 
+#include <memory>
+
 class QwtIntervalSymbol;
 template< typename T > class QwtSeriesData;
 
@@ -100,9 +102,9 @@ class QWT_EXPORT QwtPlotIntervalCurve
     explicit QwtPlotIntervalCurve( const QString& title = QString() );
     explicit QwtPlotIntervalCurve( const QwtText& title );
 
-    virtual ~QwtPlotIntervalCurve();
+    ~QwtPlotIntervalCurve() override;
 
-    virtual int rtti() const QWT_OVERRIDE;
+    int rtti() const override;
 
     void setPaintAttribute( PaintAttribute, bool on = true );
     bool testPaintAttribute( PaintAttribute ) const;
@@ -125,14 +127,12 @@ class QWT_EXPORT QwtPlotIntervalCurve
     void setSymbol( const QwtIntervalSymbol* );
     const QwtIntervalSymbol* symbol() const;
 
-    virtual void drawSeries( QPainter*,
+    void drawSeries( QPainter*,
         const QwtScaleMap& xMap, const QwtScaleMap& yMap,
-        const QRectF& canvasRect, int from, int to ) const QWT_OVERRIDE;
+        const QRectF& canvasRect, int from, int to ) const override;
 
-    virtual QRectF boundingRect() const QWT_OVERRIDE;
-
-    virtual QwtGraphic legendIcon(
-        int index, const QSizeF& ) const QWT_OVERRIDE;
+    QRectF boundingRect() const override;
+    QwtGraphic legendIcon( int index, const QSizeF& ) const override;
 
   protected:
 
@@ -148,7 +148,7 @@ class QWT_EXPORT QwtPlotIntervalCurve
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QwtPlotIntervalCurve::PaintAttributes )

@@ -12,6 +12,7 @@
 
 #include "qwt_global.h"
 #include "qwt_plot_abstract_barchart.h"
+#include <memory>
 
 class QwtColumnRect;
 class QwtColumnSymbol;
@@ -71,9 +72,9 @@ class QWT_EXPORT QwtPlotBarChart
     explicit QwtPlotBarChart( const QString& title = QString() );
     explicit QwtPlotBarChart( const QwtText& title );
 
-    virtual ~QwtPlotBarChart();
+    ~QwtPlotBarChart() override;
 
-    virtual int rtti() const QWT_OVERRIDE;
+    int rtti() const override;
 
     void setSamples( const QVector< QPointF >& );
     void setSamples( const QVector< double >& );
@@ -85,11 +86,11 @@ class QWT_EXPORT QwtPlotBarChart
     void setLegendMode( LegendMode );
     LegendMode legendMode() const;
 
-    virtual void drawSeries( QPainter*,
+    void drawSeries( QPainter*,
         const QwtScaleMap& xMap, const QwtScaleMap& yMap,
-        const QRectF& canvasRect, int from, int to ) const QWT_OVERRIDE;
+        const QRectF& canvasRect, int from, int to ) const override;
 
-    virtual QRectF boundingRect() const QWT_OVERRIDE;
+    QRectF boundingRect() const override;
 
     virtual QwtColumnSymbol* specialSymbol(
         int sampleIndex, const QPointF& ) const;
@@ -111,14 +112,12 @@ class QWT_EXPORT QwtPlotBarChart
         const QRectF& canvasRect, const QwtInterval& boundingInterval,
         const QPointF& sample ) const;
 
-    QList< QwtLegendData > legendData() const QWT_OVERRIDE;
-    QwtGraphic legendIcon( int index, const QSizeF& ) const QWT_OVERRIDE;
+    QList< QwtLegendData > legendData() const override;
+    QwtGraphic legendIcon( int index, const QSizeF& ) const override;
 
   private:
-    void init();
-
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

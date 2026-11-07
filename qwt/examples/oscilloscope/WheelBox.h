@@ -19,7 +19,7 @@ class WheelBox : public QWidget
   public:
     WheelBox( const QString& title,
         double min, double max, double stepSize,
-        QWidget* parent = NULL );
+        QWidget* parent = nullptr );
 
     void setTheme( const QColor& );
     QColor theme() const;

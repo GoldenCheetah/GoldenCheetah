@@ -50,13 +50,12 @@ class SignalData::PrivateData
 };
 
 SignalData::SignalData()
+    : m_data( new PrivateData )
 {
-    m_data = new PrivateData();
 }
 
 SignalData::~SignalData()
 {
-    delete m_data;
 }
 
 int SignalData::size() const

@@ -14,6 +14,7 @@
 #include "qwt_plot_item.h"
 
 #include <qstring.h>
+#include <memory>
 
 class QwtInterval;
 
@@ -84,7 +85,8 @@ class QWT_EXPORT QwtPlotRasterItem : public QwtPlotItem
 
     explicit QwtPlotRasterItem( const QString& title = QString() );
     explicit QwtPlotRasterItem( const QwtText& title );
-    virtual ~QwtPlotRasterItem();
+
+    ~QwtPlotRasterItem() override;
 
     void setPaintAttribute( PaintAttribute, bool on = true );
     bool testPaintAttribute( PaintAttribute ) const;
@@ -97,14 +99,13 @@ class QWT_EXPORT QwtPlotRasterItem : public QwtPlotItem
 
     void invalidateCache();
 
-    virtual void draw( QPainter*,
-        const QwtScaleMap& xMap, const QwtScaleMap& yMap,
-        const QRectF& canvasRect ) const QWT_OVERRIDE;
+    void draw( QPainter*, const QwtScaleMap& xMap, const QwtScaleMap& yMap,
+        const QRectF& canvasRect ) const override;
 
     virtual QRectF pixelHint( const QRectF& ) const;
 
     virtual QwtInterval interval(Qt::Axis) const;
-    virtual QRectF boundingRect() const QWT_OVERRIDE;
+    QRectF boundingRect() const override;
 
   protected:
     /*!
@@ -135,15 +136,12 @@ class QWT_EXPORT QwtPlotRasterItem : public QwtPlotItem
     explicit QwtPlotRasterItem( const QwtPlotRasterItem& );
     QwtPlotRasterItem& operator=( const QwtPlotRasterItem& );
 
-    void init();
-
     QImage compose( const QwtScaleMap&, const QwtScaleMap&,
         const QRectF& imageArea, const QRectF& paintRect,
         const QSize& imageSize, bool doCache) const;
 
-
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QwtPlotRasterItem::PaintAttributes )

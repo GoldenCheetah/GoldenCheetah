@@ -15,12 +15,12 @@ class Plot : public QwtPlot
     Q_OBJECT
 
   public:
-    Plot( QWidget* = NULL );
+    Plot( QWidget* = nullptr );
 
   public Q_SLOTS:
 
 #ifndef QT_NO_FILEDIALOG
-    void loadSVG();
+    void openFileDialog();
 #endif
 
     void loadSVG( const QString& );

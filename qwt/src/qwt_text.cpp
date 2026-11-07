@@ -19,14 +19,10 @@
 #include <qbrush.h>
 #include <qpainter.h>
 
-#if QT_VERSION >= 0x050200
-
 static QwtText qwtStringToText( const QString& text )
 {
     return QwtText( text );
 }
-
-#endif
 
 namespace
 {
@@ -36,9 +32,7 @@ namespace
         {
             qRegisterMetaType< QwtText >();
 
-#if QT_VERSION >= 0x050200
             QMetaType::registerConverter< QString, QwtText >( qwtStringToText );
-#endif
         }
 
     } qwtRegisterQwtText;
@@ -130,7 +124,7 @@ namespace
         if ( format == QwtText::AutoText )
             return;
 
-        if ( format == QwtText::PlainText && engine == NULL )
+        if ( format == QwtText::PlainText && engine == nullptr )
             return;
 
         EngineMap::const_iterator it = m_map.constFind( format );
@@ -140,14 +134,14 @@ namespace
             m_map.remove( format );
         }
 
-        if ( engine != NULL )
+        if ( engine != nullptr )
             m_map.insert( format, engine );
     }
 
     const QwtTextEngine* TextEngineDict::textEngine(
         QwtText::TextFormat format ) const
     {
-        const QwtTextEngine* e = NULL;
+        const QwtTextEngine* e = nullptr;
 
         EngineMap::const_iterator it = m_map.find( format );
         if ( it != m_map.end() )
@@ -160,50 +154,34 @@ namespace
 class QwtText::PrivateData
 {
   public:
-    PrivateData():
-        renderFlags( Qt::AlignCenter ),
-        borderRadius( 0 ),
-        borderPen( Qt::NoPen ),
-        backgroundBrush( Qt::NoBrush ),
-        textEngine( NULL )
-    {
-    }
-
-    int renderFlags;
+    int renderFlags = Qt::AlignCenter;
     QString text;
     QFont font;
     QColor color;
-    double borderRadius;
-    QPen borderPen;
-    QBrush backgroundBrush;
+    double borderRadius = 0.0;
+    QPen borderPen = Qt::NoPen;
+    QBrush backgroundBrush = Qt::NoBrush;
 
     QwtText::PaintAttributes paintAttributes;
     QwtText::LayoutAttributes layoutAttributes;
 
-    const QwtTextEngine* textEngine;
-};
+    const QwtTextEngine* textEngine = nullptr;
 
-class QwtText::LayoutCache
-{
-  public:
-    void invalidate()
+    struct
     {
-        textSize = QSizeF();
-    }
+        void invalidate() { textSize = QSizeF(); }
 
-    QFont font;
-    QSizeF textSize;
+        QFont usedFont;
+        QSizeF textSize;
+    } cache;
 };
 
 /*!
    Constructor
  */
 QwtText::QwtText()
+    : QwtText( QString(), PlainText )
 {
-    m_data = new PrivateData;
-    m_data->textEngine = textEngine( m_data->text, PlainText );
-
-    m_layoutCache = new LayoutCache;
 }
 
 /*!
@@ -213,36 +191,27 @@ QwtText::QwtText()
    \param textFormat Text format
  */
 QwtText::QwtText( const QString& text, QwtText::TextFormat textFormat )
+    : m_data( new PrivateData )
 {
-    m_data = new PrivateData;
     m_data->text = text;
     m_data->textEngine = textEngine( text, textFormat );
-
-    m_layoutCache = new LayoutCache;
 }
 
 //! Copy constructor
 QwtText::QwtText( const QwtText& other )
+    : m_data( new PrivateData( *other.m_data ) )
 {
-    m_data = new PrivateData;
-    *m_data = *other.m_data;
-
-    m_layoutCache = new LayoutCache;
-    *m_layoutCache = *other.m_layoutCache;
 }
 
 //! Destructor
 QwtText::~QwtText()
 {
-    delete m_data;
-    delete m_layoutCache;
 }
 
 //! Assignment operator
 QwtText& QwtText::operator=( const QwtText& other )
 {
     *m_data = *other.m_data;
-    *m_layoutCache = *other.m_layoutCache;
     return *this;
 }
 
@@ -279,7 +248,7 @@ void QwtText::setText( const QString& text,
 {
     m_data->text = text;
     m_data->textEngine = textEngine( text, textFormat );
-    m_layoutCache->invalidate();
+    m_data->cache.invalidate();
 }
 
 /*!
@@ -306,7 +275,7 @@ void QwtText::setRenderFlags( int renderFlags )
     if ( renderFlags != m_data->renderFlags )
     {
         m_data->renderFlags = renderFlags;
-        m_layoutCache->invalidate();
+        m_data->cache.invalidate();
     }
 }
 
@@ -585,15 +554,16 @@ QSizeF QwtText::textSize( const QFont& defaultFont ) const
 
     const QFont font = QwtPainter::scaledFont( usedFont( defaultFont ) );
 
-    if ( !m_layoutCache->textSize.isValid()
-        || m_layoutCache->font != font )
+    auto& cache = m_data->cache;
+
+    if ( !cache.textSize.isValid() || cache.usedFont != font )
     {
-        m_layoutCache->textSize = m_data->textEngine->textSize(
+        cache.textSize = m_data->textEngine->textSize(
             font, m_data->renderFlags, m_data->text );
-        m_layoutCache->font = font;
+        cache.usedFont = font;
     }
 
-    QSizeF sz = m_layoutCache->textSize;
+    QSizeF sz = cache.textSize;
 
     if ( m_data->layoutAttributes & MinimumLayout )
     {
@@ -703,7 +673,7 @@ const QwtTextEngine* QwtText::textEngine( const QString& text,
    With setTextEngine it is possible to extend Qwt with
    other types of text formats.
 
-   For QwtText::PlainText it is not allowed to assign a engine == NULL.
+   For QwtText::PlainText it is not allowed to assign a nullptr as engine.
 
    \param format Text format
    \param engine Text engine
@@ -722,7 +692,7 @@ void QwtText::setTextEngine( QwtText::TextFormat format,
    textEngine can be used to find out if a text format is supported.
 
    \param format Text format
-   \return The text engine, or NULL if no engine is available.
+   \return The text engine, or nullptr if no engine is available.
  */
 const QwtTextEngine* QwtText::textEngine( QwtText::TextFormat format )
 {

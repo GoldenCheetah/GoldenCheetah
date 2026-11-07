@@ -23,77 +23,49 @@
 class QwtWheel::PrivateData
 {
   public:
-    PrivateData()
-        : orientation( Qt::Horizontal )
-        , viewAngle( 175.0 )
-        , totalAngle( 360.0 )
-        , tickCount( 10 )
-        , wheelBorderWidth( 2 )
-        , borderWidth( 2 )
-        , wheelWidth( 20 )
-        , mouseOffset( 0.0 )
-        , updateInterval( 50 )
-        , mass( 0.0 )
-        , timerId( 0 )
-        , speed( 0.0 )
-        , mouseValue( 0.0 )
-        , flyingValue( 0.0 )
-        , minimum( 0.0 )
-        , maximum( 100.0 )
-        , singleStep( 1.0 )
-        , pageStepCount( 1 )
-        , value( 0.0 )
-        , isScrolling( false )
-        , tracking( true )
-        , stepAlignment( true )
-        , pendingValueChanged( false )
-        , inverted( false )
-        , wrapping( false )
-    {
-    }
+    Qt::Orientation orientation = Qt::Horizontal;
 
-    Qt::Orientation orientation;
-    double viewAngle;
-    double totalAngle;
-    int tickCount;
-    int wheelBorderWidth;
-    int borderWidth;
-    int wheelWidth;
+    double viewAngle = 175.0;
+    double totalAngle = 360.0;
 
-    double mouseOffset;
+    int tickCount = 10;
+    int wheelBorderWidth = 2;
+    int borderWidth = 2;
+    int wheelWidth = 20;
 
-    int updateInterval;
-    double mass;
+    double mouseOffset = 0.0;
+
+    int updateInterval = 50;
+    double mass = 0.0;
 
     // for the flying wheel effect
-    int timerId;
+    int timerId = 0;
     QElapsedTimer timer;
-    double speed;
-    double mouseValue;
-    double flyingValue;
+    double speed = 0.0;
+    double mouseValue = 0.0;
+    double flyingValue = 0.0;
 
-    double minimum;
-    double maximum;
+    double minimum = 0.0;
+    double maximum = 100.0;
 
-    double singleStep;
-    int pageStepCount;
+    double singleStep = 1.0;
+    int pageStepCount = 1;
 
-    double value;
+    double value = 0.0;
 
-    bool isScrolling;
-    bool tracking;
-    bool stepAlignment;
-    bool pendingValueChanged; // when not tracking
-    bool inverted;
-    bool wrapping;
+    bool isScrolling = false;
+    bool tracking = true;
+    bool stepAlignment = true;
+    bool pendingValueChanged = false; // when not tracking
+    bool inverted = false;
+    bool wrapping = false;
 };
 
 //! Constructor
-QwtWheel::QwtWheel( QWidget* parent ):
-    QWidget( parent )
+QwtWheel::QwtWheel( QWidget* parent )
+    : QWidget( parent )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
-
     setFocusPolicy( Qt::StrongFocus );
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
     setAttribute( Qt::WA_WState_OwnSizePolicy, false );
@@ -102,7 +74,6 @@ QwtWheel::QwtWheel( QWidget* parent ):
 //! Destructor
 QwtWheel::~QwtWheel()
 {
-    delete m_data;
 }
 
 /*!
@@ -323,7 +294,7 @@ void QwtWheel::timerEvent( QTimerEvent* event )
  */
 void QwtWheel::wheelEvent( QWheelEvent* event )
 {
-#if QT_VERSION < 0x050e00
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
     const QPoint wheelPos = event->pos();
     const int wheelDelta = event->delta();
 #else

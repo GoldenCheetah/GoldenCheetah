@@ -1,1 +1,1 @@
-#include "qwt_dial_needle.h"
+#include "qwt_dial_needle.h" // IWYU pragma: export

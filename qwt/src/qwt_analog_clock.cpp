@@ -18,7 +18,7 @@
 
 namespace
 {
-    class QwtAnalogClockScaleDraw QWT_FINAL : public QwtRoundScaleDraw
+    class QwtAnalogClockScaleDraw final : public QwtRoundScaleDraw
     {
       public:
         QwtAnalogClockScaleDraw()
@@ -34,7 +34,7 @@ namespace
             setPenWidthF( 1.0 );
         }
 
-        virtual QwtText label( double value ) const QWT_OVERRIDE
+        QwtText label( double value ) const override
         {
             if ( qFuzzyCompare( value + 1.0, 1.0 ) )
                 value = 60.0 * 60.0 * 12.0;
@@ -101,7 +101,7 @@ QwtAnalogClock::QwtAnalogClock( QWidget* parent )
             QwtDialSimpleNeedle::Arrow, true, handColor, knobColor );
         hand->setWidth( width );
 
-        m_hand[i] = NULL;
+        m_hand[i] = nullptr;
         setHand( static_cast< Hand >( i ), hand );
     }
 }
@@ -146,7 +146,7 @@ void QwtAnalogClock::setHand( Hand hand, QwtDialNeedle* needle )
 QwtDialNeedle* QwtAnalogClock::hand( Hand hd )
 {
     if ( hd < 0 || hd >= NHands )
-        return NULL;
+        return nullptr;
 
     return m_hand[hd];
 }

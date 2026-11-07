@@ -100,49 +100,49 @@
  */
 
 //! \return Minimum of a and b.
-QWT_CONSTEXPR inline float qwtMinF( float a, float b )
+constexpr inline float qwtMinF( float a, float b )
 {
     return ( a < b ) ? a : b;
 }
 
 //! \return Minimum of a and b.
-QWT_CONSTEXPR inline double qwtMinF( double a, double b )
+constexpr inline double qwtMinF( double a, double b )
 {
     return ( a < b ) ? a : b;
 }
 
 //! \return Minimum of a and b.
-QWT_CONSTEXPR inline qreal qwtMinF( float a, double b )
+constexpr inline qreal qwtMinF( float a, double b )
 {
     return ( a < b ) ? a : b;
 }
 
 //! \return Minimum of a and b.
-QWT_CONSTEXPR inline qreal qwtMinF( double a, float b )
+constexpr inline qreal qwtMinF( double a, float b )
 {
     return ( a < b ) ? a : b;
 }
 
 //! \return Maximum of a and b.
-QWT_CONSTEXPR inline float qwtMaxF( float a, float b )
+constexpr inline float qwtMaxF( float a, float b )
 {
     return ( a < b ) ? b : a;
 }
 
 //! \return Maximum of a and b.
-QWT_CONSTEXPR inline double qwtMaxF( double a, double b )
+constexpr inline double qwtMaxF( double a, double b )
 {
     return ( a < b ) ? b : a;
 }
 
 //! \return Maximum of a and b.
-QWT_CONSTEXPR inline qreal qwtMaxF( float a, double b )
+constexpr inline qreal qwtMaxF( float a, double b )
 {
     return ( a < b ) ? b : a;
 }
 
 //! \return Maximum of a and b.
-QWT_CONSTEXPR inline qreal qwtMaxF( double a, float b )
+constexpr inline qreal qwtMaxF( double a, float b )
 {
     return ( a < b ) ? b : a;
 }

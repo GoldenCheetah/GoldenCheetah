@@ -1,1 +1,1 @@
-#include "qwt_clipper.h"
+#include "qwt_clipper.h" // IWYU pragma: export

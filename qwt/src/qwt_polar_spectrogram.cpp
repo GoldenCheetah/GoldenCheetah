@@ -34,7 +34,6 @@ class QwtPolarSpectrogram::PrivateData
 {
   public:
     PrivateData()
-        : data( NULL )
     {
         colorMap = new QwtLinearColorMap();
     }
@@ -45,18 +44,17 @@ class QwtPolarSpectrogram::PrivateData
         delete colorMap;
     }
 
-    QwtRasterData* data;
-    QwtColorMap* colorMap;
+    QwtRasterData* data = nullptr;
+    QwtColorMap* colorMap = nullptr;
 
-    QwtPolarSpectrogram::PaintAttributes paintAttributes;
+    PaintAttributes paintAttributes;
 };
 
 //!  Constructor
 QwtPolarSpectrogram::QwtPolarSpectrogram()
     : QwtPolarItem( QwtText( "Spectrogram" ) )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
-
     setItemAttribute( QwtPolarItem::AutoScale );
     setItemAttribute( QwtPolarItem::Legend, false );
 
@@ -66,7 +64,6 @@ QwtPolarSpectrogram::QwtPolarSpectrogram()
 //! Destructor
 QwtPolarSpectrogram::~QwtPolarSpectrogram()
 {
-    delete m_data;
 }
 
 //! \return QwtPolarItem::Rtti_PolarSpectrogram
@@ -233,7 +230,7 @@ QImage QwtPolarSpectrogram::renderImage(
     const QwtScaleMap& azimuthMap, const QwtScaleMap& radialMap,
     const QPointF& pole, const QRect& rect ) const
 {
-    if ( m_data->data == NULL || m_data->colorMap == NULL )
+    if ( m_data->data == nullptr || m_data->colorMap == nullptr )
         return QImage();
 
     QImage image( rect.size(), m_data->colorMap->format() == QwtColorMap::RGB
@@ -292,7 +289,7 @@ QImage QwtPolarSpectrogram::renderImage(
         else
         {
             futures += QtConcurrent::run(
-#if QT_VERSION >= 0x060000
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
                 &QwtPolarSpectrogram::renderTileInfo, this,
 #else
                 this, &QwtPolarSpectrogram::renderTileInfo,

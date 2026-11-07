@@ -83,16 +83,10 @@ static QPainterPath qwtTransformPath( const QwtScaleMap& xMap,
 class QwtPlotShapeItem::PrivateData
 {
   public:
-    PrivateData()
-        : legendMode( QwtPlotShapeItem::LegendColor )
-        , renderTolerance( 0.0 )
-    {
-    }
+    PaintAttributes paintAttributes;
+    LegendMode legendMode = LegendColor;
 
-    QwtPlotShapeItem::PaintAttributes paintAttributes;
-    QwtPlotShapeItem::LegendMode legendMode;
-
-    double renderTolerance;
+    double renderTolerance = 0.0;
     QRectF boundingRect;
 
     QPen pen;
@@ -110,9 +104,8 @@ class QwtPlotShapeItem::PrivateData
    \param title Title
  */
 QwtPlotShapeItem::QwtPlotShapeItem( const QString& title )
-    : QwtPlotItem( QwtText( title ) )
+    : QwtPlotShapeItem( QwtText( title ) )
 {
-    init();
 }
 
 /*!
@@ -126,25 +119,19 @@ QwtPlotShapeItem::QwtPlotShapeItem( const QString& title )
  */
 QwtPlotShapeItem::QwtPlotShapeItem( const QwtText& title )
     : QwtPlotItem( title )
+    , m_data( new PrivateData )
 {
-    init();
-}
-
-//! Destructor
-QwtPlotShapeItem::~QwtPlotShapeItem()
-{
-    delete m_data;
-}
-
-void QwtPlotShapeItem::init()
-{
-    m_data = new PrivateData();
     m_data->boundingRect = QwtPlotItem::boundingRect();
 
     setItemAttribute( QwtPlotItem::AutoScale, true );
     setItemAttribute( QwtPlotItem::Legend, false );
 
     setZ( 8.0 );
+}
+
+//! Destructor
+QwtPlotShapeItem::~QwtPlotShapeItem()
+{
 }
 
 //! \return QwtPlotItem::Rtti_PlotShape

@@ -73,45 +73,29 @@ static QVector< double > qwtTickList( const QwtScaleDiv& scaleDiv )
 class QwtThermo::PrivateData
 {
   public:
-    PrivateData()
-        : orientation( Qt::Vertical )
-        , scalePosition( QwtThermo::TrailingScale )
-        , spacing( 3 )
-        , borderWidth( 2 )
-        , pipeWidth( 10 )
-        , alarmLevel( 0.0 )
-        , alarmEnabled( false )
-        , autoFillPipe( true )
-        , originMode( QwtThermo::OriginMinimum )
-        , origin( 0.0 )
-        , colorMap( NULL )
-        , value( 0.0 )
-    {
-        rangeFlags = QwtInterval::IncludeBorders;
-    }
-
     ~PrivateData()
     {
         delete colorMap;
     }
 
-    Qt::Orientation orientation;
-    QwtThermo::ScalePosition scalePosition;
+    Qt::Orientation orientation = Qt::Vertical;
+    ScalePosition scalePosition = TrailingScale;
 
-    int spacing;
-    int borderWidth;
-    int pipeWidth;
+    int spacing = 3;
+    int borderWidth = 2;
+    int pipeWidth = 10;
 
-    QwtInterval::BorderFlags rangeFlags;
-    double alarmLevel;
-    bool alarmEnabled;
-    bool autoFillPipe;
-    QwtThermo::OriginMode originMode;
-    double origin;
+    QwtInterval::BorderFlags rangeFlags = QwtInterval::IncludeBorders;
 
-    QwtColorMap* colorMap;
+    double alarmLevel = 0.0;
+    bool alarmEnabled = false;
+    bool autoFillPipe = true;
+    OriginMode originMode = OriginMinimum;
+    double origin = 0.0;
 
-    double value;
+    QwtColorMap* colorMap = nullptr;
+
+    double value = 0.0;
 };
 
 /*!
@@ -120,9 +104,8 @@ class QwtThermo::PrivateData
  */
 QwtThermo::QwtThermo( QWidget* parent )
     : QwtAbstractScale( parent )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData;
-
     QSizePolicy policy( QSizePolicy::MinimumExpanding, QSizePolicy::Fixed );
     if ( m_data->orientation == Qt::Vertical )
         policy.transpose();
@@ -136,7 +119,6 @@ QwtThermo::QwtThermo( QWidget* parent )
 //! Destructor
 QwtThermo::~QwtThermo()
 {
-    delete m_data;
 }
 
 /*!
@@ -255,7 +237,7 @@ void QwtThermo::paintEvent( QPaintEvent* event )
     qDrawShadePanel( &painter,
         tRect.adjusted( -bw, -bw, bw, bw ),
         palette(), true, bw,
-        m_data->autoFillPipe ? &brush : NULL );
+        m_data->autoFillPipe ? &brush : nullptr );
 
     drawLiquid( &painter, tRect );
 }
@@ -554,7 +536,7 @@ void QwtThermo::drawLiquid(
 
     QRect liquidRect = fillRect( pipeRect );
 
-    if ( m_data->colorMap != NULL )
+    if ( m_data->colorMap != nullptr )
     {
         const QwtInterval interval = scaleDiv().interval().normalized();
 

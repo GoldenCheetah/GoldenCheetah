@@ -13,6 +13,8 @@
 #include "qwt_global.h"
 #include "qwt_plot_seriesitem.h"
 
+#include <memory>
+
 class QwtVectorFieldSymbol;
 class QwtColorMap;
 class QPen;
@@ -92,7 +94,7 @@ class QWT_EXPORT QwtPlotVectorField
     explicit QwtPlotVectorField( const QString& title = QString() );
     explicit QwtPlotVectorField( const QwtText& title );
 
-    virtual ~QwtPlotVectorField();
+    ~QwtPlotVectorField() override;
 
     void setPaintAttribute( PaintAttribute, bool on = true );
     bool testPaintAttribute( PaintAttribute ) const;
@@ -132,16 +134,14 @@ class QWT_EXPORT QwtPlotVectorField
 
     virtual double arrowLength( double magnitude ) const;
 
-    virtual QRectF boundingRect() const QWT_OVERRIDE;
+    QRectF boundingRect() const override;
 
-    virtual void drawSeries( QPainter*,
-        const QwtScaleMap& xMap, const QwtScaleMap& yMap,
-        const QRectF& canvasRect, int from, int to ) const QWT_OVERRIDE;
+    void drawSeries( QPainter*, const QwtScaleMap& xMap, const QwtScaleMap& yMap,
+        const QRectF& canvasRect, int from, int to ) const override;
 
-    virtual int rtti() const QWT_OVERRIDE;
+    int rtti() const override;
 
-    virtual QwtGraphic legendIcon(
-        int index, const QSizeF& ) const QWT_OVERRIDE;
+    QwtGraphic legendIcon( int index, const QSizeF& ) const override;
 
     void setMagnitudeScaleFactor( double factor );
     double magnitudeScaleFactor() const;
@@ -154,13 +154,11 @@ class QWT_EXPORT QwtPlotVectorField
     virtual void drawSymbol( QPainter*,
         double x, double y, double vx, double vy ) const;
 
-    virtual void dataChanged() QWT_OVERRIDE;
+    void dataChanged() override;
 
   private:
-    void init();
-
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QwtPlotVectorField::PaintAttributes )

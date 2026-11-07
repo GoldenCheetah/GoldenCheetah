@@ -11,7 +11,9 @@
 #define QWT_WHEEL_H
 
 #include "qwt_global.h"
+
 #include <qwidget.h>
+#include <memory>
 
 /*!
    \brief The Wheel Widget
@@ -55,8 +57,8 @@ class QWT_EXPORT QwtWheel : public QWidget
     Q_PROPERTY( int wheelBorderWidth READ wheelBorderWidth WRITE setWheelBorderWidth )
 
   public:
-    explicit QwtWheel( QWidget* parent = NULL );
-    virtual ~QwtWheel();
+    explicit QwtWheel( QWidget* parent = nullptr );
+    ~QwtWheel() override;
 
     double value() const;
 
@@ -148,20 +150,20 @@ class QWT_EXPORT QwtWheel : public QWidget
     void wheelMoved( double value );
 
   protected:
-    virtual void paintEvent( QPaintEvent* ) QWT_OVERRIDE;
-    virtual void mousePressEvent( QMouseEvent* ) QWT_OVERRIDE;
-    virtual void mouseReleaseEvent( QMouseEvent* ) QWT_OVERRIDE;
-    virtual void mouseMoveEvent( QMouseEvent* ) QWT_OVERRIDE;
-    virtual void keyPressEvent( QKeyEvent* ) QWT_OVERRIDE;
-    virtual void wheelEvent( QWheelEvent* ) QWT_OVERRIDE;
-    virtual void timerEvent( QTimerEvent* ) QWT_OVERRIDE;
+    void paintEvent( QPaintEvent* ) override;
+    void mousePressEvent( QMouseEvent* ) override;
+    void mouseReleaseEvent( QMouseEvent* ) override;
+    void mouseMoveEvent( QMouseEvent* ) override;
+    void keyPressEvent( QKeyEvent* ) override;
+    void wheelEvent( QWheelEvent* ) override;
+    void timerEvent( QTimerEvent* ) override;
 
     void stopFlying();
 
     QRect wheelRect() const;
 
-    virtual QSize sizeHint() const QWT_OVERRIDE;
-    virtual QSize minimumSizeHint() const QWT_OVERRIDE;
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
 
     virtual void drawTicks( QPainter*, const QRectF& );
     virtual void drawWheelBackground( QPainter*, const QRectF& );
@@ -173,7 +175,7 @@ class QWT_EXPORT QwtWheel : public QWidget
     double boundedValue( double ) const;
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

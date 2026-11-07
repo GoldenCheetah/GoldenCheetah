@@ -955,16 +955,11 @@ static void qwtSetupEndEquations(
     }
 }
 
-class QwtSplineCubic::PrivateData
-{
-};
-
 /*!
    \brief Constructor
    The default setting is a non closing natural spline with no parametrization.
  */
 QwtSplineCubic::QwtSplineCubic()
-    : m_data( NULL )
 {
     // a natural spline
 

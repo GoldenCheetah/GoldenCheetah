@@ -8,7 +8,7 @@
  *****************************************************************************/
 
 #include "qwt_math.h"
-#if QT_VERSION >= 0x050a00
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
 #include <qrandom.h>
 #endif
 
@@ -47,7 +47,7 @@ double qwtNormalizeDegrees( double degrees )
  */
 quint32 qwtRand()
 {
-#if QT_VERSION >= 0x050a00
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
     return QRandomGenerator::global()->generate();
 #else
     return static_cast< quint32 >( qrand() ); // [0, RAND_MAX ]

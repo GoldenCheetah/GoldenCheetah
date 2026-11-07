@@ -17,16 +17,7 @@
 #include <QwtMath>
 
 #ifndef QWT_NO_OPENGL
-
-#if QT_VERSION >= 0x050400
-#define USE_OPENGL_WIDGET 1
-#endif
-
-#if USE_OPENGL_WIDGET
     #include <QwtPlotOpenGLCanvas>
-#else
-    #include <QwtPlotGLCanvas>
-#endif
 #endif
 
 static double wave( double x )
@@ -132,7 +123,7 @@ void Plot::setSettings( const Settings& s )
                 buffer->setFunction( noise );
                 break;
             default:
-                buffer->setFunction( NULL );
+                buffer->setFunction( nullptr );
         }
 
         buffer->fill( m_interval, s.curve.numPoints );
@@ -156,9 +147,8 @@ void Plot::setSettings( const Settings& s )
 #ifndef QWT_NO_OPENGL
     if ( s.canvas.openGL )
     {
-#if USE_OPENGL_WIDGET
         QwtPlotOpenGLCanvas* plotCanvas = qobject_cast< QwtPlotOpenGLCanvas* >( canvas() );
-        if ( plotCanvas == NULL )
+        if ( plotCanvas == nullptr )
         {
             plotCanvas = new QwtPlotOpenGLCanvas();
             plotCanvas->setPalette( QColor( "NavajoWhite" ) );
@@ -168,27 +158,15 @@ void Plot::setSettings( const Settings& s )
 
             setCanvas( plotCanvas );
         }
-#else
-        QwtPlotGLCanvas* plotCanvas = qobject_cast< QwtPlotGLCanvas* >( canvas() );
-        if ( plotCanvas == NULL )
-        {
-            plotCanvas = new QwtPlotGLCanvas();
-            plotCanvas->setPalette( QColor( "khaki" ) );
-            plotCanvas->setFrameStyle( QFrame::Box | QFrame::Plain );
-            plotCanvas->setLineWidth( 1 );
-
-            setCanvas( plotCanvas );
-        }
-#endif
 
         plotCanvas->setPaintAttribute(
-            QwtPlotAbstractGLCanvas::ImmediatePaint, s.canvas.immediatePaint );
+            QwtPlotOpenGLCanvas::ImmediatePaint, s.canvas.immediatePaint );
     }
     else
 #endif
     {
         QwtPlotCanvas* plotCanvas = qobject_cast< QwtPlotCanvas* >( canvas() );
-        if ( plotCanvas == NULL )
+        if ( plotCanvas == nullptr )
         {
             plotCanvas = new QwtPlotCanvas();
             plotCanvas->setFrameStyle( QFrame::Box | QFrame::Plain );

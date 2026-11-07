@@ -59,16 +59,17 @@ Panel::Panel( QWidget* parent )
     layout->addWidget( new QLabel( "Max Weeks" ), row, 0 );
     layout->addWidget( m_maxWeeks, row, 1 );
 
-    connect( m_startDateTime,
-        SIGNAL(dateTimeChanged(const QDateTime&)), SIGNAL(edited()) );
-    connect( m_endDateTime,
-        SIGNAL(dateTimeChanged(const QDateTime&)), SIGNAL(edited()) );
-    connect( m_maxMajorSteps,
-        SIGNAL(valueChanged(int)), SIGNAL(edited()) );
-    connect( m_maxMinorSteps,
-        SIGNAL(valueChanged(int)), SIGNAL(edited()) );
-    connect( m_maxWeeks,
-        SIGNAL(valueChanged(int)), SIGNAL(edited()) );
+    connect( m_startDateTime, &QDateTimeEdit::dateTimeChanged,
+        this, &Panel::edited );
+
+    connect( m_endDateTime, &QDateTimeEdit::dateTimeChanged,
+        this, &Panel::edited );
+
+    void (QSpinBox::*spinValueChanged)(int) = &QSpinBox::valueChanged;
+
+    connect( m_maxMajorSteps, spinValueChanged, this, &Panel::edited );
+    connect( m_maxMinorSteps, spinValueChanged, this, &Panel::edited );
+    connect( m_maxWeeks, spinValueChanged, this, &Panel::edited );
 }
 
 void Panel::setSettings( const Settings& settings )

@@ -1,1 +1,1 @@
-#include "qwt_plot_vectorfield.h"
+#include "qwt_plot_vectorfield.h" // IWYU pragma: export

@@ -32,15 +32,11 @@ namespace
             btnZoom->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
             btnZoom->setToolTip( zoomHelp );
             btnZoom->setCheckable( true );
-            connect( btnZoom, SIGNAL(toggled(bool)),
-                plotBox, SLOT(enableZoomMode(bool)) );
 
             QToolButton* btnPrint = new QToolButton();
             btnPrint->setText( "Print" );
             btnPrint->setIcon( QPixmap( print_xpm ) );
             btnPrint->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
-            connect( btnPrint, SIGNAL(clicked()),
-                plotBox, SLOT(printDocument()) );
 
             QToolButton* btnExport = new QToolButton();
             btnExport->setText( "Export" );
@@ -52,8 +48,14 @@ namespace
             toolBar->addWidget( btnPrint );
             toolBar->addWidget( btnExport );
 
-            connect( btnExport, SIGNAL(clicked()),
-                plotBox, SLOT(exportDocument()) );
+            connect( btnZoom, &QToolButton::toggled,
+                plotBox, &PlotBox::enableZoomMode );
+
+            connect( btnPrint, &QToolButton::clicked,
+                plotBox, &PlotBox::printDocument );
+
+            connect( btnExport, &QToolButton::clicked,
+                plotBox, &PlotBox::exportDocument );
 
             addToolBar( toolBar );
         }

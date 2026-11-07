@@ -15,23 +15,8 @@
 
 #include <limits>
 
-#if QT_VERSION >= 0x050000
-
-typedef qint64 QwtJulianDay;
-static const QwtJulianDay minJulianDayD = Q_INT64_C( -784350574879 );
-static const QwtJulianDay maxJulianDayD = Q_INT64_C( 784354017364 );
-
-#else
-
-// QDate stores the Julian day as unsigned int, but
-// there is QDate::fromJulianDay( int ). That's why
-// we have the range [ 1, INT_MAX ]
-
-typedef int QwtJulianDay;
-static const QwtJulianDay minJulianDayD = 1;
-static const QwtJulianDay maxJulianDayD = std::numeric_limits< int >::max();
-
-#endif
+static const qint64 minJulianDayD = Q_INT64_C( -784350574879 );
+static const qint64 maxJulianDayD = Q_INT64_C( 784354017364 );
 
 static QString qwtExpandedFormat( const QString& format,
     const QDateTime& dateTime, QwtDate::Week0Type week0Type )
@@ -217,34 +202,7 @@ static inline qint64 qwtFloorDiv( int a, int b )
 
 static inline QDate qwtToDate( int year, int month = 1, int day = 1 )
 {
-#if QT_VERSION >= 0x050000
     return QDate( year, month, day );
-#else
-    if ( year > 100000 )
-    {
-        // code from QDate but using doubles to avoid overflows
-        // for large values
-
-        const int m1 = ( month - 14 ) / 12;
-        const int m2 = ( 367 * ( month - 2 - 12 * m1 ) ) / 12;
-        const double y1 = std::floor( ( 4900.0 + year + m1 ) / 100 );
-
-        const double jd = std::floor( ( 1461.0 * ( year + 4800 + m1 ) ) / 4 ) + m2
-            - std::floor( ( 3 * y1 ) / 4 ) + day - 32075;
-
-        if ( jd > maxJulianDayD )
-        {
-            qWarning() << "qwtToDate: overflow";
-            return QDate();
-        }
-
-        return QDate::fromJulianDay( static_cast< QwtJulianDay >( jd ) );
-    }
-    else
-    {
-        return QDate( year, month, day );
-    }
-#endif
 }
 
 /*!
@@ -271,7 +229,7 @@ QDateTime QwtDate::toDateTime( double value, Qt::TimeSpec timeSpec )
         return QDateTime();
     }
 
-    const QDate d = QDate::fromJulianDay( static_cast< QwtJulianDay >( jd ) );
+    const QDate d = QDate::fromJulianDay( static_cast< qint64 >( jd ) );
 
     const int msecs = static_cast< int >( value - days * msecsPerDay );
 
@@ -644,11 +602,7 @@ int QwtDate::utcOffset( const QDateTime& dateTime )
         }
         case Qt::OffsetFromUTC:
         {
-#if QT_VERSION >= 0x050200
             seconds = dateTime.offsetFromUtc();
-#else
-            seconds = dateTime.utcOffset();
-#endif
             break;
         }
         default:

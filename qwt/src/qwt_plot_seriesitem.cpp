@@ -14,13 +14,17 @@
 class QwtPlotSeriesItem::PrivateData
 {
   public:
-    PrivateData()
-        : orientation( Qt::Vertical )
-    {
-    }
-
-    Qt::Orientation orientation;
+    Qt::Orientation orientation = Qt::Vertical;
 };
+
+/*!
+   Constructor
+   \param title Title of the curve
+ */
+QwtPlotSeriesItem::QwtPlotSeriesItem( const QString& title )
+    : QwtPlotSeriesItem( QwtText( title ) )
+{
+}
 
 /*!
    Constructor
@@ -28,26 +32,14 @@ class QwtPlotSeriesItem::PrivateData
  */
 QwtPlotSeriesItem::QwtPlotSeriesItem( const QwtText& title )
     : QwtPlotItem( title )
+    , m_data( new PrivateData )
 {
-    m_data = new PrivateData();
-    setItemInterest( QwtPlotItem::ScaleInterest, true );
-}
-
-/*!
-   Constructor
-   \param title Title of the curve
- */
-QwtPlotSeriesItem::QwtPlotSeriesItem( const QString& title )
-    : QwtPlotItem( QwtText( title ) )
-{
-    m_data = new PrivateData();
     setItemInterest( QwtPlotItem::ScaleInterest, true );
 }
 
 //! Destructor
 QwtPlotSeriesItem::~QwtPlotSeriesItem()
 {
-    delete m_data;
 }
 
 /*!

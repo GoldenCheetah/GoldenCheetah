@@ -14,6 +14,7 @@
 #include "qwt_null_paintdevice.h"
 
 #include <qmetatype.h>
+#include <memory>
 
 class QwtPainterCommand;
 class QPixmap;
@@ -173,17 +174,17 @@ class QWT_EXPORT QwtGraphic : public QwtNullPaintDevice
     RenderHints renderHints() const;
 
   protected:
-    virtual QSize sizeMetrics() const QWT_OVERRIDE;
+    QSize sizeMetrics() const override;
 
-    virtual void drawPath( const QPainterPath& ) QWT_OVERRIDE;
+    void drawPath( const QPainterPath& ) override;
 
-    virtual void drawPixmap( const QRectF&,
-        const QPixmap&, const QRectF& ) QWT_OVERRIDE;
+    void drawPixmap( const QRectF&,
+        const QPixmap&, const QRectF& ) override;
 
-    virtual void drawImage( const QRectF&, const QImage&,
-        const QRectF&, Qt::ImageConversionFlags ) QWT_OVERRIDE;
+    void drawImage( const QRectF&, const QImage&,
+        const QRectF&, Qt::ImageConversionFlags ) override;
 
-    virtual void updateState( const QPaintEngineState& ) QWT_OVERRIDE;
+    void updateState( const QPaintEngineState& ) override;
 
   private:
     void renderGraphic( QPainter*, QTransform* ) const;
@@ -194,7 +195,7 @@ class QWT_EXPORT QwtGraphic : public QwtNullPaintDevice
     class PathInfo;
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QwtGraphic::RenderHints )

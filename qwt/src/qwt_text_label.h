@@ -14,6 +14,7 @@
 #include "qwt_text.h"
 
 #include <qframe.h>
+#include <memory>
 
 class QString;
 class QPaintEvent;
@@ -32,9 +33,10 @@ class QWT_EXPORT QwtTextLabel : public QFrame
     Q_PROPERTY( QString plainText READ plainText WRITE setPlainText )
 
   public:
-    explicit QwtTextLabel( QWidget* parent = NULL );
-    explicit QwtTextLabel( const QwtText&, QWidget* parent = NULL );
-    virtual ~QwtTextLabel();
+    explicit QwtTextLabel( QWidget* parent = nullptr );
+    explicit QwtTextLabel( const QwtText&, QWidget* parent = nullptr );
+
+    ~QwtTextLabel() override;
 
     void setPlainText( const QString& );
     QString plainText() const;
@@ -55,24 +57,23 @@ class QWT_EXPORT QwtTextLabel : public QFrame
     int margin() const;
     void setMargin( int );
 
-    virtual QSize sizeHint() const QWT_OVERRIDE;
-    virtual QSize minimumSizeHint() const QWT_OVERRIDE;
-    virtual int heightForWidth( int ) const QWT_OVERRIDE;
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
+    int heightForWidth( int ) const override;
 
     QRect textRect() const;
 
     virtual void drawText( QPainter*, const QRectF& );
 
   protected:
-    virtual void paintEvent( QPaintEvent* ) QWT_OVERRIDE;
-    virtual void drawContents( QPainter* );
+    void paintEvent( QPaintEvent* ) override;
+    void drawContents( QPainter* );
 
   private:
-    void init();
     int defaultIndent() const;
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

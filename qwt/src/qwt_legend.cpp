@@ -94,7 +94,7 @@ namespace
 
     QVariant LegendMap::itemInfo( const QWidget* widget ) const
     {
-        if ( widget != NULL )
+        if ( widget != nullptr )
         {
             QWidget* w = const_cast< QWidget* >( widget );
 
@@ -128,20 +128,14 @@ namespace
 class QwtLegend::PrivateData
 {
   public:
-    PrivateData()
-        : itemMode( QwtLegendData::ReadOnly )
-        , view( NULL )
-    {
-    }
-
-    QwtLegendData::Mode itemMode;
+    QwtLegendData::Mode itemMode = QwtLegendData::ReadOnly;
     LegendMap itemMap;
 
     class LegendView;
-    LegendView* view;
+    LegendView* view = nullptr;
 };
 
-class QwtLegend::PrivateData::LegendView QWT_FINAL : public QScrollArea
+class QwtLegend::PrivateData::LegendView final : public QScrollArea
 {
   public:
     explicit LegendView( QWidget * parent ) :
@@ -161,7 +155,7 @@ class QwtLegend::PrivateData::LegendView QWT_FINAL : public QScrollArea
         viewport()->setAutoFillBackground( false );
     }
 
-    virtual bool event( QEvent* event ) QWT_OVERRIDE
+    bool event( QEvent* event ) override
     {
         if ( event->type() == QEvent::PolishRequest )
         {
@@ -189,7 +183,7 @@ class QwtLegend::PrivateData::LegendView QWT_FINAL : public QScrollArea
         return QScrollArea::event( event );
     }
 
-    virtual bool viewportEvent( QEvent* event ) QWT_OVERRIDE
+    bool viewportEvent( QEvent* event ) override
     {
         bool ok = QScrollArea::viewportEvent( event );
 
@@ -227,7 +221,7 @@ class QwtLegend::PrivateData::LegendView QWT_FINAL : public QScrollArea
     {
         const QwtDynGridLayout* tl = qobject_cast< QwtDynGridLayout* >(
             contentsWidget->layout() );
-        if ( tl == NULL )
+        if ( tl == nullptr )
             return;
 
         const QSize visibleSize = viewport()->contentsRect().size();
@@ -257,12 +251,11 @@ class QwtLegend::PrivateData::LegendView QWT_FINAL : public QScrollArea
  */
 QwtLegend::QwtLegend( QWidget* parent )
     : QwtAbstractLegend( parent )
+    , m_data( new PrivateData )
 {
     setFrameStyle( NoFrame );
 
-    m_data = new QwtLegend::PrivateData;
-
-    m_data->view = new QwtLegend::PrivateData::LegendView( this );
+    m_data->view = new PrivateData::LegendView( this );
     m_data->view->setObjectName( "QwtLegendView" );
     m_data->view->setFrameStyle( NoFrame );
 
@@ -280,7 +273,6 @@ QwtLegend::QwtLegend( QWidget* parent )
 //! Destructor
 QwtLegend::~QwtLegend()
 {
-    delete m_data;
 }
 
 /*!
@@ -509,7 +501,7 @@ void QwtLegend::updateTabOrder()
     {
         // set tab focus chain
 
-        QWidget* w = NULL;
+        QWidget* w = nullptr;
 
         for ( int i = 0; i < contentsLayout->count(); i++ )
         {
@@ -583,7 +575,7 @@ bool QwtLegend::eventFilter( QObject* object, QEvent* event )
             {
                 m_data->view->layoutContents();
 
-                if ( parentWidget() && parentWidget()->layout() == NULL )
+                if ( parentWidget() && parentWidget()->layout() == nullptr )
                 {
                     /*
                        We want the parent widget ( usually QwtPlot ) to recalculate
@@ -679,7 +671,7 @@ void QwtLegend::renderLegend( QPainter* painter,
 
     const QwtDynGridLayout* legendLayout =
         qobject_cast< QwtDynGridLayout* >( contentsWidget()->layout() );
-    if ( legendLayout == NULL )
+    if ( legendLayout == nullptr )
         return;
 
     const QMargins m = contentsMargins();
@@ -756,7 +748,7 @@ void QwtLegend::renderItem( QPainter* painter,
         titleRect.setX( iconRect.right() + 2 * label->spacing() );
 
         QFont labelFont = label->font();
-#if QT_VERSION >= 0x060000
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
         labelFont.setResolveMask( QFont::AllPropertiesResolved );
 #else
         labelFont.resolve( QFont::AllPropertiesResolved );
@@ -789,7 +781,7 @@ QWidget* QwtLegend::legendWidget( const QVariant& itemInfo ) const
 {
     const QList< QWidget* > list = m_data->itemMap.legendWidgets( itemInfo );
     if ( list.isEmpty() )
-        return NULL;
+        return nullptr;
 
     return list[0];
 }

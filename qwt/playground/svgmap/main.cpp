@@ -36,7 +36,7 @@ namespace
             toolBar->addWidget( btnLoad );
             addToolBar( toolBar );
 
-            connect( btnLoad, SIGNAL(clicked()), plot, SLOT(loadSVG()) );
+            connect( btnLoad, &QToolButton::clicked, plot, &Plot::openFileDialog );
 #endif
         }
     };

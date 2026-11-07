@@ -19,7 +19,7 @@ class ScalePicker : public QObject
   public:
     ScalePicker( QwtPlot* plot );
 
-    virtual bool eventFilter( QObject*, QEvent* ) QWT_OVERRIDE;
+    bool eventFilter( QObject*, QEvent* ) override;
 
   Q_SIGNALS:
     void clicked( int axis, double value );

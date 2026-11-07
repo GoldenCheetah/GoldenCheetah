@@ -11,7 +11,9 @@
 #define QWT_SAMPLING_THREAD_H
 
 #include "qwt_global.h"
+
 #include <qthread.h>
+#include <memory>
 
 /*!
    \brief A thread collecting samples at regular intervals.
@@ -30,7 +32,7 @@ class QWT_EXPORT QwtSamplingThread : public QThread
     Q_OBJECT
 
   public:
-    virtual ~QwtSamplingThread();
+    ~QwtSamplingThread() override;
 
     double interval() const;
     double elapsed() const;
@@ -40,9 +42,9 @@ class QWT_EXPORT QwtSamplingThread : public QThread
     void stop();
 
   protected:
-    explicit QwtSamplingThread( QObject* parent = NULL );
+    explicit QwtSamplingThread( QObject* parent = nullptr );
 
-    virtual void run() QWT_OVERRIDE;
+    void run() override;
 
     /*!
        Collect a sample
@@ -56,7 +58,7 @@ class QWT_EXPORT QwtSamplingThread : public QThread
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

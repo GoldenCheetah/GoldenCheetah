@@ -20,10 +20,18 @@ CONFIG           -= depend_includepath
 # CONFIG += sanitize
 # CONFIG += pedantic
 
-# older Qt headers result in tons of warnings with modern compilers and flags
-unix:lessThan(QT_MAJOR_VERSION, 5) CONFIG += qtsystemincludes
+# CONFIG += qtsystemincludes
 
-# CONFIG += c++11
+lessThan(QT_MAJOR_VERSION, 6) {
+
+    lessThan(QT_MINOR_VERSION, 15) {
+        # too many warnings from old Qt headers
+        CONFIG += qtsystemincludes
+    }
+
+}
+
+CONFIG += c++11
 
 c++11 {
     CONFIG           += strict_c++
@@ -36,9 +44,6 @@ sanitize {
     #CONFIG *= sanitize_memory
     CONFIG *= sanitize_undefined
 }
-
-# Include the generated moc files in the corresponding cpp file
-# what increases the compile time significantly
 
 # DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 
@@ -73,14 +78,7 @@ linux {
         DEFINES += QT_STRICT_ITERATORS
         # DEFINES += __STRICT_ANSI__
 
-        # Qt headers do not stand pedantic checks, so it's better
-        # to exclude them by declaring them as system includes
-
-        QMAKE_CXXFLAGS += \
-            -isystem $$[QT_INSTALL_HEADERS] \
-            -isystem $$[QT_INSTALL_HEADERS]/QtCore \
-            -isystem $$[QT_INSTALL_HEADERS]/QtGui \
-            -isystem $$[QT_INSTALL_HEADERS]/QtWidgets
+        CONFIG += qtsystemincludes
     }
 
     linux-g++ | linux-g++-64 {
@@ -180,7 +178,18 @@ qtsystemincludes {
 
     QMAKE_CXXFLAGS += \
         -isystem $$[QT_INSTALL_HEADERS]/QtCore \
-        -isystem $$[QT_INSTALL_HEADERS]/QtGui
+        -isystem $$[QT_INSTALL_HEADERS]/QtConcurrent \
+        -isystem $$[QT_INSTALL_HEADERS]/QtGui \
+        -isystem $$[QT_INSTALL_HEADERS]/QtWidgets \
+        -isystem $$[QT_INSTALL_HEADERS]/QtPrintSupport \
+
+    contains(QWT_CONFIG, QwtSvg) {
+        QMAKE_CXXFLAGS += -isystem $$[QT_INSTALL_HEADERS]/QtSvg
+    }
+
+    contains(QWT_CONFIG, QwtOpenGL) {
+        QMAKE_CXXFLAGS += -isystem $$[QT_INSTALL_HEADERS]/QtOpenGL
+    }
 }
 
 ######################################################################

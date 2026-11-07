@@ -13,6 +13,8 @@
 #include "qwt_global.h"
 #include "qwt_scale_div.h"
 
+#include <memory>
+
 class QwtText;
 class QPalette;
 class QPainter;
@@ -132,7 +134,7 @@ class QWT_EXPORT QwtAbstractScaleDraw
     Q_DISABLE_COPY(QwtAbstractScaleDraw)
 
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QwtAbstractScaleDraw::ScaleComponents )

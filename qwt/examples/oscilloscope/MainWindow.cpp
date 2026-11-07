@@ -41,17 +41,17 @@ MainWindow::MainWindow( QWidget* parent )
     layout->addWidget( m_plot, 10 );
     layout->addLayout( vLayout1 );
 
-    connect( m_amplitudeKnob, SIGNAL(valueChanged(double)),
-        SIGNAL(amplitudeChanged(double)) );
+    connect( m_amplitudeKnob, &Knob::valueChanged,
+        this, &MainWindow::amplitudeChanged );
 
-    connect( m_frequencyKnob, SIGNAL(valueChanged(double)),
-        SIGNAL(frequencyChanged(double)) );
+    connect( m_frequencyKnob, &Knob::valueChanged,
+        this, &MainWindow::frequencyChanged );
 
-    connect( m_timerWheel, SIGNAL(valueChanged(double)),
-        SIGNAL(signalIntervalChanged(double)) );
+    connect( m_timerWheel, &WheelBox::valueChanged,
+        this, &MainWindow::signalIntervalChanged );
 
-    connect( m_intervalWheel, SIGNAL(valueChanged(double)),
-        m_plot, SLOT(setIntervalLength(double)) );
+    connect( m_intervalWheel, &WheelBox::valueChanged,
+        m_plot, &Plot::setIntervalLength );
 }
 
 void MainWindow::start()

@@ -13,6 +13,8 @@
 #include "qwt_global.h"
 #include "qwt_plot_seriesitem.h"
 
+#include <memory>
+
 class QwtColorMap;
 
 /*!
@@ -36,9 +38,9 @@ class QWT_EXPORT QwtPlotSpectroCurve
     explicit QwtPlotSpectroCurve( const QString& title = QString() );
     explicit QwtPlotSpectroCurve( const QwtText& title );
 
-    virtual ~QwtPlotSpectroCurve();
+    ~QwtPlotSpectroCurve() override;
 
-    virtual int rtti() const QWT_OVERRIDE;
+    int rtti() const override;
 
     void setPaintAttribute( PaintAttribute, bool on = true );
     bool testPaintAttribute( PaintAttribute ) const;
@@ -53,9 +55,8 @@ class QWT_EXPORT QwtPlotSpectroCurve
     void setColorRange( const QwtInterval& );
     QwtInterval& colorRange() const;
 
-    virtual void drawSeries( QPainter*,
-        const QwtScaleMap& xMap, const QwtScaleMap& yMap,
-        const QRectF& canvasRect, int from, int to ) const QWT_OVERRIDE;
+    void drawSeries( QPainter*, const QwtScaleMap& xMap, const QwtScaleMap& yMap,
+        const QRectF& canvasRect, int from, int to ) const override;
 
     void setPenWidth( double );
     double penWidth() const;
@@ -66,10 +67,8 @@ class QWT_EXPORT QwtPlotSpectroCurve
         const QRectF& canvasRect, int from, int to ) const;
 
   private:
-    void init();
-
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QwtPlotSpectroCurve::PaintAttributes )

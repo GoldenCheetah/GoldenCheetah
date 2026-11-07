@@ -41,9 +41,9 @@ MainWindow::MainWindow( QWidget* parent )
 
     updatePlot();
 
-    connect( m_panel, SIGNAL(edited()), SLOT(updatePlot()) );
-    connect( m_plot->axisWidget( QwtAxis::YLeft ),
-        SIGNAL(scaleDivChanged()), SLOT(updatePanel()) );
+    connect( m_panel, &Panel::edited, this, &MainWindow::updatePlot );
+    connect( m_plot->axisWidget( QwtAxis::YLeft ), &QwtScaleWidget::scaleDivChanged,
+        this, &MainWindow::updatePanel );
 }
 
 void MainWindow::updatePlot()

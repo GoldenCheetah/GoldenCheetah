@@ -1,1 +1,1 @@
-#include "qwt_date.h"
+#include "qwt_date.h" // IWYU pragma: export

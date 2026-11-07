@@ -1,1 +1,1 @@
-#include "qwt_plot_spectrocurve.h"
+#include "qwt_plot_spectrocurve.h" // IWYU pragma: export

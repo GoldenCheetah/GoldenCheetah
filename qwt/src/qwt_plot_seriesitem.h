@@ -15,6 +15,7 @@
 #include "qwt_series_store.h"
 
 #include <qstring.h>
+#include <memory>
 
 class QwtScaleDiv;
 
@@ -28,14 +29,13 @@ class QWT_EXPORT QwtPlotSeriesItem : public QwtPlotItem,
     explicit QwtPlotSeriesItem( const QString& title = QString() );
     explicit QwtPlotSeriesItem( const QwtText& title );
 
-    virtual ~QwtPlotSeriesItem();
+    ~QwtPlotSeriesItem() override;
 
     void setOrientation( Qt::Orientation );
     Qt::Orientation orientation() const;
 
-    virtual void draw( QPainter*,
-        const QwtScaleMap& xMap, const QwtScaleMap& yMap,
-        const QRectF& canvasRect ) const QWT_OVERRIDE;
+    void draw( QPainter*, const QwtScaleMap& xMap, const QwtScaleMap& yMap,
+        const QRectF& canvasRect ) const override;
 
     /*!
        Draw a subset of the samples
@@ -52,17 +52,16 @@ class QWT_EXPORT QwtPlotSeriesItem : public QwtPlotItem,
         const QwtScaleMap& xMap, const QwtScaleMap& yMap,
         const QRectF& canvasRect, int from, int to ) const = 0;
 
-    virtual QRectF boundingRect() const QWT_OVERRIDE;
+    QRectF boundingRect() const override;
 
-    virtual void updateScaleDiv(
-        const QwtScaleDiv&, const QwtScaleDiv& ) QWT_OVERRIDE;
+    void updateScaleDiv( const QwtScaleDiv&, const QwtScaleDiv& ) override;
 
   protected:
-    virtual void dataChanged() QWT_OVERRIDE;
+    void dataChanged() override;
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

@@ -14,6 +14,8 @@
 #include "qwt_text_label.h"
 #include "qwt_legend_data.h"
 
+#include <memory>
+
 class QwtText;
 
 /*!
@@ -24,7 +26,7 @@ class QWT_EXPORT QwtLegendLabel : public QwtTextLabel
     Q_OBJECT
   public:
     explicit QwtLegendLabel( QWidget* parent = 0 );
-    virtual ~QwtLegendLabel();
+    ~QwtLegendLabel() override;
 
     void setData( const QwtLegendData& );
     const QwtLegendData& data() const;
@@ -35,12 +37,12 @@ class QWT_EXPORT QwtLegendLabel : public QwtTextLabel
     void setSpacing( int spacing );
     int spacing() const;
 
-    virtual void setText( const QwtText& ) QWT_OVERRIDE;
+    void setText( const QwtText& ) override;
 
     void setIcon( const QPixmap& );
     QPixmap icon() const;
 
-    virtual QSize sizeHint() const QWT_OVERRIDE;
+    QSize sizeHint() const override;
 
     bool isChecked() const;
 
@@ -64,15 +66,15 @@ class QWT_EXPORT QwtLegendLabel : public QwtTextLabel
     void setDown( bool );
     bool isDown() const;
 
-    virtual void paintEvent( QPaintEvent* ) QWT_OVERRIDE;
-    virtual void mousePressEvent( QMouseEvent* ) QWT_OVERRIDE;
-    virtual void mouseReleaseEvent( QMouseEvent* ) QWT_OVERRIDE;
-    virtual void keyPressEvent( QKeyEvent* ) QWT_OVERRIDE;
-    virtual void keyReleaseEvent( QKeyEvent* ) QWT_OVERRIDE;
+    void paintEvent( QPaintEvent* ) override;
+    void mousePressEvent( QMouseEvent* ) override;
+    void mouseReleaseEvent( QMouseEvent* ) override;
+    void keyPressEvent( QKeyEvent* ) override;
+    void keyReleaseEvent( QKeyEvent* ) override;
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

@@ -14,7 +14,7 @@ class TransformPlot : public QwtPlot
     Q_OBJECT
 
   public:
-    TransformPlot( QWidget* parent = NULL );
+    TransformPlot( QWidget* parent = nullptr );
     void insertTransformation( const QString&,
         const QColor&, QwtTransform* );
 
@@ -23,8 +23,6 @@ class TransformPlot : public QwtPlot
   Q_SIGNALS:
     void selected( QwtTransform* );
 
-  private Q_SLOTS:
-    void legendChecked( const QVariant&, bool on );
-
   private:
+    void legendChecked( const QVariant&, bool on );
 };

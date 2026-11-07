@@ -1,1 +1,1 @@
-#include "qwt_polar_spectrogram.h"
+#include "qwt_polar_spectrogram.h" // IWYU pragma: export

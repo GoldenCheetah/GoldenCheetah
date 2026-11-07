@@ -80,8 +80,8 @@ namespace
 
 Plot::Plot( QWidget* parent )
     : QwtPlot( parent )
-    , m_externalLegend( NULL )
-    , m_legendItem( NULL )
+    , m_externalLegend( nullptr )
+    , m_legendItem( nullptr )
     , m_isDirty( false )
 {
     QwtPlotCanvas* canvas = new QwtPlotCanvas();
@@ -148,19 +148,16 @@ void Plot::applySettings( const Settings& settings )
             if ( legend() )
             {
                 // remove legend controlled by the plot
-                insertLegend( NULL );
+                insertLegend( nullptr );
             }
 
-            if ( m_externalLegend == NULL )
+            if ( m_externalLegend == nullptr )
             {
                 m_externalLegend = new QwtLegend();
                 m_externalLegend->setWindowTitle("Plot Legend");
 
-                connect(
-                    this,
-                    SIGNAL(legendDataChanged(const QVariant&,const QList<QwtLegendData>&)),
-                    m_externalLegend,
-                    SLOT(updateLegend(const QVariant&,const QList<QwtLegendData>&)) );
+                connect( this, &QwtPlot::legendDataChanged,
+                    m_externalLegend, &QwtLegend::updateLegend );
 
                 m_externalLegend->show();
 
@@ -171,9 +168,9 @@ void Plot::applySettings( const Settings& settings )
         else
         {
             delete m_externalLegend;
-            m_externalLegend = NULL;
+            m_externalLegend = nullptr;
 
-            if ( legend() == NULL ||
+            if ( legend() == nullptr ||
                 plotLayout()->legendPosition() != settings.legend.position )
             {
                 insertLegend( new QwtLegend(),
@@ -183,15 +180,15 @@ void Plot::applySettings( const Settings& settings )
     }
     else
     {
-        insertLegend( NULL );
+        insertLegend( nullptr );
 
         delete m_externalLegend;
-        m_externalLegend = NULL;
+        m_externalLegend = nullptr;
     }
 
     if ( settings.legendItem.isEnabled )
     {
-        if ( m_legendItem == NULL )
+        if ( m_legendItem == nullptr )
         {
             m_legendItem = new LegendItem();
             m_legendItem->attach( this );
@@ -224,7 +221,7 @@ void Plot::applySettings( const Settings& settings )
     else
     {
         delete m_legendItem;
-        m_legendItem = NULL;
+        m_legendItem = nullptr;
     }
 
     QwtPlotItemList curveList = itemList( QwtPlotItem::Rtti_PlotCurve );

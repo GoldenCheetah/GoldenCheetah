@@ -1,1 +1,1 @@
-#include "qwt_analog_clock.h"
+#include "qwt_analog_clock.h" // IWYU pragma: export

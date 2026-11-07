@@ -14,6 +14,8 @@
 #include "qwt_plot_item.h"
 #include "qwt_scale_draw.h"
 
+#include <memory>
+
 class QPalette;
 
 /*!
@@ -50,9 +52,9 @@ class QWT_EXPORT QwtPlotScaleItem : public QwtPlotItem
         QwtScaleDraw::Alignment = QwtScaleDraw::BottomScale,
         const double pos = 0.0 );
 
-    virtual ~QwtPlotScaleItem();
+    ~QwtPlotScaleItem() override;
 
-    virtual int rtti() const QWT_OVERRIDE;
+    int rtti() const override;
 
     void setScaleDiv( const QwtScaleDiv& );
     const QwtScaleDiv& scaleDiv() const;
@@ -79,16 +81,16 @@ class QWT_EXPORT QwtPlotScaleItem : public QwtPlotItem
 
     void setAlignment( QwtScaleDraw::Alignment );
 
-    virtual void draw( QPainter*,
+    void draw( QPainter*,
         const QwtScaleMap& xMap, const QwtScaleMap& yMap,
-        const QRectF& canvasRect ) const QWT_OVERRIDE;
+        const QRectF& canvasRect ) const override;
 
-    virtual void updateScaleDiv(
-        const QwtScaleDiv&, const QwtScaleDiv& ) QWT_OVERRIDE;
+    void updateScaleDiv(
+        const QwtScaleDiv&, const QwtScaleDiv& ) override;
 
   private:
     class PrivateData;
-    PrivateData* m_data;
+    std::unique_ptr< PrivateData > m_data;
 };
 
 #endif

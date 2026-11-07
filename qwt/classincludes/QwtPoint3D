@@ -1,1 +1,1 @@
-#include "qwt_point_3d.h"
+#include "qwt_point_3d.h" // IWYU pragma: export

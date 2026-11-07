@@ -24,7 +24,7 @@
 #include <qpainterpath.h>
 #include <qnumeric.h>
 
-#include <climits>
+#include <limits>
 
 static inline QRectF qwtIntersectedClipRect( const QRectF& rect, QPainter* painter )
 {
@@ -76,11 +76,6 @@ class QwtPlotCurve::PrivateData
 {
   public:
     PrivateData()
-        : style( QwtPlotCurve::Lines )
-        , baseline( 0.0 )
-        , symbol( NULL )
-        , pen( Qt::black )
-        , paintAttributes( QwtPlotCurve::ClipPolygons | QwtPlotCurve::FilterPoints )
     {
         curveFitter = new QwtSplineCurveFitter;
     }
@@ -91,19 +86,19 @@ class QwtPlotCurve::PrivateData
         delete curveFitter;
     }
 
-    QwtPlotCurve::CurveStyle style;
-    double baseline;
+    QwtPlotCurve::CurveStyle style = QwtPlotCurve::Lines;
+    double baseline = 0.0;
 
-    const QwtSymbol* symbol;
-    QwtCurveFitter* curveFitter;
+    const QwtSymbol* symbol = nullptr;
+    QwtCurveFitter* curveFitter = nullptr;
 
-    QPen pen;
+    QPen pen = QPen( Qt::black );
     QBrush brush;
 
-    QwtPlotCurve::CurveAttributes attributes;
-    QwtPlotCurve::PaintAttributes paintAttributes;
+    CurveAttributes attributes;
+    PaintAttributes paintAttributes = ClipPolygons | FilterPoints;;
 
-    QwtPlotCurve::LegendAttributes legendAttributes;
+    LegendAttributes legendAttributes;
 
     QVector<QwtZone>zones;
 };
@@ -112,38 +107,30 @@ class QwtPlotCurve::PrivateData
    Constructor
    \param title Title of the curve
  */
-QwtPlotCurve::QwtPlotCurve( const QwtText& title )
-    : QwtPlotSeriesItem( title )
+QwtPlotCurve::QwtPlotCurve( const QString& title )
+    : QwtPlotCurve( QwtText( title ) )
 {
-    init();
 }
 
 /*!
    Constructor
    \param title Title of the curve
  */
-QwtPlotCurve::QwtPlotCurve( const QString& title )
-    : QwtPlotSeriesItem( QwtText( title ) )
+QwtPlotCurve::QwtPlotCurve( const QwtText& title )
+    : QwtPlotSeriesItem( title )
+    , m_data( new PrivateData )
 {
-    init();
+    setItemAttribute( QwtPlotItem::Legend );
+    setItemAttribute( QwtPlotItem::AutoScale );
+
+    setData( new QwtPointSeriesData() );
+
+    setZ( 20.0 );
 }
 
 //! Destructor
 QwtPlotCurve::~QwtPlotCurve()
 {
-    delete m_data;
-}
-
-//! Initialize internal members
-void QwtPlotCurve::init()
-{
-    setItemAttribute( QwtPlotItem::Legend );
-    setItemAttribute( QwtPlotItem::AutoScale );
-
-    m_data = new PrivateData;
-    setData( new QwtPointSeriesData() );
-
-    setZ( 20.0 );
 }
 
 //! \return QwtPlotItem::Rtti_PlotCurve
@@ -263,7 +250,7 @@ QwtPlotCurve::CurveStyle QwtPlotCurve::style() const
 
    The curve will take the ownership of the symbol, hence the previously
    set symbol will be delete by setting a new one. If \p symbol is
-   \c NULL no symbol will be drawn.
+   \c nullptr no symbol will be drawn.
 
    \param symbol Symbol
    \sa symbol()
@@ -283,7 +270,7 @@ void QwtPlotCurve::setSymbol( QwtSymbol* symbol )
 }
 
 /*!
-   \return Current symbol or NULL, when no symbol has been assigned
+   \return Current symbol or nullptr, when no symbol has been assigned
    \sa setSymbol()
  */
 const QwtSymbol* QwtPlotCurve::symbol() const
@@ -847,7 +834,7 @@ bool QwtPlotCurve::testCurveAttribute( CurveAttribute attribute ) const
    Assign a curve fitter
 
    The curve fitter "smooths" the curve points, when the Fitted
-   CurveAttribute is set. setCurveFitter(NULL) also disables curve fitting.
+   CurveAttribute is set. setCurveFitter(nullptr) also disables curve fitting.
 
    The curve fitter operates on the translated points ( = widget coordinates)
    to be functional for logarithmic scales. Obviously this is less performant
@@ -869,7 +856,7 @@ void QwtPlotCurve::setCurveFitter( QwtCurveFitter* curveFitter )
 }
 
 /*!
-   Get the curve fitter. If curve fitting is disabled NULL is returned.
+   Get the curve fitter. If curve fitting is disabled nullptr is returned.
 
    \return Curve fitter
    \sa setCurveFitter(), Fitted
@@ -902,8 +889,6 @@ void QwtPlotCurve::fillCurve( QPainter* painter,
     if ( polygon.count() <= 2 ) // a line can't be filled
         return;
 
-    double avg=(yMap.invTransform(polygon[0].y())+yMap.invTransform(polygon[1].y())) / 2.00;
-
     QBrush brush = m_data->brush;
     if ( !brush.color().isValid() )
         brush.setColor( m_data->pen.color() );
@@ -920,6 +905,8 @@ void QwtPlotCurve::fillCurve( QPainter* painter,
     painter->setBrush( brush );
 
     // if we have zones we need to process the polygon point by point...
+    double avg=(yMap.invTransform(polygon[0].y())+yMap.invTransform(polygon[1].y())) / 2.00;
+
     if (m_data->zones.count()>0 && polygon.count() == 4) {
 
         // we need to set color based upon zone
@@ -1078,7 +1065,7 @@ QVector<QwtZone> &QwtPlotCurve::zones() {
    Find the closest curve point for a specific position
 
    \param pos Position, where to look for the closest curve point
-   \param dist If dist != NULL, closestPoint() returns the distance between
+   \param dist If dist != nullptr, closestPoint() returns the distance between
               the position and the closest curve point in paint device coordinates
    \return Index of the closest curve point, or -1 if none can be found
           ( f.e when the curve has no points )
@@ -1089,7 +1076,7 @@ int QwtPlotCurve::closestPoint( const QPointF& pos, double* dist ) const
 {
     const QwtPlot* plot = this->plot();
 
-    if ( ( plot == NULL ) || !plot->isAxisValid( xAxis() ) || !plot->isAxisValid( yAxis() ) )
+    if ( ( plot == nullptr ) || !plot->isAxisValid( xAxis() ) || !plot->isAxisValid( yAxis() ) )
         return -1;
 
     const size_t numSamples = dataSize();
@@ -1142,7 +1129,7 @@ int QwtPlotCurve::closestPoint( const QPointF& pos, double* dist ) const
 int QwtPlotCurve::adjacentPoint( Qt::Orientation orientation, qreal value ) const
 {
     const QwtSeriesData< QPointF >* data = this->data();
-    if ( data == NULL )
+    if ( data == nullptr )
         return -1;
 
     if ( orientation == Qt::Horizontal )

@@ -19,42 +19,31 @@
 class QwtPlotItem::PrivateData
 {
   public:
-    PrivateData()
-        : plot( NULL )
-        , isVisible( true )
-        , renderThreadCount( 1 )
-        , z( 0.0 )
-        , xAxisId( QwtAxis::XBottom )
-        , yAxisId( QwtAxis::YLeft )
-        , legendIconSize( 8, 8 )
-    {
-    }
+    mutable QwtPlot* plot = nullptr;
 
-    mutable QwtPlot* plot;
+    bool isVisible = true;
 
-    bool isVisible;
-
-    QwtPlotItem::ItemAttributes attributes;
-    QwtPlotItem::ItemInterests interests;
+    ItemAttributes attributes;
+    ItemInterests interests;
 
     QwtPlotItem::RenderHints renderHints;
-    uint renderThreadCount;
+    uint renderThreadCount = 1;
 
-    double z;
+    double z = 0.0;
 
-    QwtAxisId xAxisId;
-    QwtAxisId yAxisId;
+    QwtAxisId xAxisId = QwtAxis::XBottom;
+    QwtAxisId yAxisId = QwtAxis::YLeft;
 
     QwtText title;
-    QSize legendIconSize;
+    QSize legendIconSize = { 8, 8 };
 };
 
 /*!
    Constructor
  */
 QwtPlotItem::QwtPlotItem()
+    : QwtPlotItem( QwtText() )
 {
-    m_data = new PrivateData;
 }
 
 /*!
@@ -62,9 +51,8 @@ QwtPlotItem::QwtPlotItem()
    \param title Title of the item
  */
 QwtPlotItem::QwtPlotItem( const QString& title )
+    : QwtPlotItem( QwtText( title ) )
 {
-    m_data = new PrivateData;
-    m_data->title = title;
 }
 
 /*!
@@ -72,16 +60,15 @@ QwtPlotItem::QwtPlotItem( const QString& title )
    \param title Title of the item
  */
 QwtPlotItem::QwtPlotItem( const QwtText& title )
+    : m_data( new PrivateData )
 {
-    m_data = new PrivateData;
     m_data->title = title;
 }
 
 //! Destroy the QwtPlotItem
 QwtPlotItem::~QwtPlotItem()
 {
-    attach( NULL );
-    delete m_data;
+    attach( nullptr );
 }
 
 /*!
@@ -89,7 +76,7 @@ QwtPlotItem::~QwtPlotItem()
 
    This method will attach a QwtPlotItem to the QwtPlot argument. It will first
    detach the QwtPlotItem from any plot from a previous call to attach (if
-   necessary). If a NULL argument is passed, it will detach from any QwtPlot it
+   necessary). If a nullptr argument is passed, it will detach from any QwtPlot it
    was attached to.
 
    \param plot Plot widget
@@ -113,12 +100,12 @@ void QwtPlotItem::attach( QwtPlot* plot )
    \brief This method detaches a QwtPlotItem from any
           QwtPlot it has been associated with.
 
-   detach() is equivalent to calling attach( NULL )
+   detach() is equivalent to calling attach( nullptr )
    \sa attach()
  */
 void QwtPlotItem::detach()
 {
-    attach( NULL );
+    attach( nullptr );
 }
 
 /*!

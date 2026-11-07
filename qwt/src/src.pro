@@ -14,10 +14,6 @@ include( $${QWT_ROOT}/qwtconfig.pri )
 include( $${QWT_ROOT}/qwtbuild.pri )
 include( $${QWT_ROOT}/qwtfunctions.pri )
 
-# Fix for parallel build race condition where moc_predefs.h is missing
-compiler_moc_header_make_all.depends += compiler_moc_predefs_make_all
-compiler_moc_source_make_all.depends += compiler_moc_predefs_make_all
-
 QWT_OUT_ROOT = $${OUT_PWD}/..
 
 TEMPLATE          = lib
@@ -28,7 +24,7 @@ DESTDIR           = $${QWT_OUT_ROOT}/lib
 contains(QWT_CONFIG, QwtDll) {
 
     CONFIG += dll
-    win32|symbian: DEFINES += QT_DLL QWT_DLL QWT_MAKEDLL
+    win32: DEFINES += QT_DLL QWT_DLL QWT_MAKEDLL
 
     unix:!macx:!android {
         !isEmpty( QMAKE_LFLAGS_SONAME ) {
@@ -83,36 +79,23 @@ contains(QWT_CONFIG, QwtPkgConfig) {
 
     QMAKE_PKGCONFIG_DESTDIR = pkgconfig
 
-    greaterThan(QT_MAJOR_VERSION, 4) {
+    QTLIB_PREFIX = Qt$${QT_MAJOR_VERSION}  # e.g., "Qt5"
+    QMAKE_PKGCONFIG_FILE = $${QTLIB_PREFIX}$${QMAKE_PKGCONFIG_NAME}  # e.g., "Qt5Qwt6"
 
-        QMAKE_PKGCONFIG_FILE = Qt$${QT_MAJOR_VERSION}$${QMAKE_PKGCONFIG_NAME}
-        QMAKE_PKGCONFIG_REQUIRES = Qt5Widgets Qt5Concurrent Qt5PrintSupport
+    # Base Qt library requirements
+    QMAKE_PKGCONFIG_REQUIRES = $${QTLIB_PREFIX}Widgets
+    QMAKE_PKGCONFIG_REQUIRES += $${QTLIB_PREFIX}Concurrent
+    QMAKE_PKGCONFIG_REQUIRES += $${QTLIB_PREFIX}PrintSupport
 
-        contains(QWT_CONFIG, QwtSvg) {
-            QMAKE_PKGCONFIG_REQUIRES += Qt5Svg
-        }
-
-        contains(QWT_CONFIG, QwtOpenGL) {
-            QMAKE_PKGCONFIG_REQUIRES += Qt5OpenGL
-        }
-
-        QMAKE_DISTCLEAN += $${DESTDIR}/$${QMAKE_PKGCONFIG_DESTDIR}/$${QMAKE_PKGCONFIG_FILE}.pc
+    contains(QWT_CONFIG, QwtSvg) {
+        QMAKE_PKGCONFIG_REQUIRES += $${QTLIB_PREFIX}Svg
     }
-    else {
 
-        # there is no QMAKE_PKGCONFIG_FILE fo Qt4
-        QMAKE_PKGCONFIG_REQUIRES = QtGui 
-
-        contains(QWT_CONFIG, QwtSvg) {
-            QMAKE_PKGCONFIG_REQUIRES += QtSvg
-        }
-
-        contains(QWT_CONFIG, QwtOpenGL) {
-            QMAKE_PKGCONFIG_REQUIRES += QtOpenGL
-        }
-
-        QMAKE_DISTCLEAN += $${DESTDIR}/$${QMAKE_PKGCONFIG_DESTDIR}/$${TARGET}.pc
+    contains(QWT_CONFIG, QwtOpenGL) {
+        QMAKE_PKGCONFIG_REQUIRES += $${QTLIB_PREFIX}OpenGL
     }
+
+    QMAKE_DISTCLEAN += $${DESTDIR}/$${QMAKE_PKGCONFIG_DESTDIR}/$${QMAKE_PKGCONFIG_FILE}.pc
 
     QMAKE_DISTCLEAN += $${DESTDIR}/libqwt.prl
 }

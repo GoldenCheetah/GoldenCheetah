@@ -18,16 +18,12 @@
 #include <qpixmap.h>
 #include <qpainterpath.h>
 
-#if QT_VERSION >= 0x050000
-
 #include <qguiapplication.h>
 
 static inline qreal qwtDevicePixelRatio()
 {
     return qGuiApp ? qGuiApp->devicePixelRatio() : 1.0;
 }
-
-#endif
 
 static bool qwtHasScalablePen( const QPainter* painter )
 {
@@ -38,14 +34,6 @@ static bool qwtHasScalablePen( const QPainter* painter )
     if ( pen.style() != Qt::NoPen && pen.brush().style() != Qt::NoBrush )
     {
         scalablePen = !pen.isCosmetic();
-#if QT_VERSION < 0x050000
-        if ( !scalablePen && pen.widthF() == 0.0 )
-        {
-            const QPainter::RenderHints hints = painter->renderHints();
-            if ( hints.testFlag( QPainter::NonCosmeticDefaultPen ) )
-                scalablePen = true;
-        }
-#endif
     }
 
     return scalablePen;
@@ -91,17 +79,7 @@ static inline void qwtExecCommand(
 
             if ( painter->transform().isScaling() )
             {
-                bool isCosmetic = painter->pen().isCosmetic();
-#if QT_VERSION < 0x050000
-                if ( isCosmetic && painter->pen().widthF() == 0.0 )
-                {
-                    QPainter::RenderHints hints = painter->renderHints();
-                    if ( hints.testFlag( QPainter::NonCosmeticDefaultPen ) )
-                        isCosmetic = false;
-                }
-#endif
-
-                if ( isCosmetic )
+                if ( painter->pen().isCosmetic() )
                 {
                     // OpenGL2 seems to be buggy for cosmetic pens.
                     // It interpolates curves in too rough steps then
@@ -329,18 +307,12 @@ class QwtGraphic::PathInfo
 class QwtGraphic::PrivateData
 {
   public:
-    PrivateData()
-        : boundingRect( 0.0, 0.0, -1.0, -1.0 )
-        , pointRect( 0.0, 0.0, -1.0, -1.0 )
-    {
-    }
-
     QSizeF defaultSize;
     QVector< QwtPainterCommand > commands;
     QVector< QwtGraphic::PathInfo > pathInfos;
 
-    QRectF boundingRect;
-    QRectF pointRect;
+    QRectF boundingRect = QRectF( 0.0, 0.0, -1.0, -1.0 );
+    QRectF pointRect = QRectF( 0.0, 0.0, -1.0, -1.0 );
 
     QwtGraphic::CommandTypes commandTypes;
     QwtGraphic::RenderHints renderHints;
@@ -353,9 +325,9 @@ class QwtGraphic::PrivateData
    \sa isNull()
  */
 QwtGraphic::QwtGraphic()
+    : m_data( new PrivateData )
 {
     setMode( QwtNullPaintDevice::PathMode );
-    m_data = new PrivateData;
 }
 
 /*!
@@ -365,15 +337,14 @@ QwtGraphic::QwtGraphic()
    \sa operator=()
  */
 QwtGraphic::QwtGraphic( const QwtGraphic& other )
+    : m_data( new PrivateData( *other.m_data ) )
 {
     setMode( other.mode() );
-    m_data = new PrivateData( *other.m_data );
 }
 
 //! Destructor
 QwtGraphic::~QwtGraphic()
 {
-    delete m_data;
 }
 
 /*!
@@ -623,7 +594,7 @@ qreal QwtGraphic::widthForHeight( qreal height ) const
  */
 void QwtGraphic::render( QPainter* painter ) const
 {
-    renderGraphic( painter, NULL );
+    renderGraphic( painter, nullptr );
 }
 
 void QwtGraphic::renderGraphic( QPainter* painter, QTransform* initialTransform ) const
@@ -743,7 +714,7 @@ void QwtGraphic::render( QPainter* painter, const QRectF& rect,
     }
     else
     {
-        renderGraphic( painter, NULL );
+        renderGraphic( painter, nullptr );
     }
 
     painter->setTransform( transform );
@@ -816,7 +787,6 @@ QPixmap QwtGraphic::toPixmap( qreal devicePixelRatio ) const
 
     const QSizeF sz = defaultSize();
 
-#if QT_VERSION >= 0x050000
     if ( devicePixelRatio <= 0.0 )
         devicePixelRatio = qwtDevicePixelRatio();
 
@@ -825,14 +795,6 @@ QPixmap QwtGraphic::toPixmap( qreal devicePixelRatio ) const
 
     QPixmap pixmap( w, h );
     pixmap.setDevicePixelRatio( devicePixelRatio );
-#else
-    Q_UNUSED( devicePixelRatio )
-
-    const int w = qwtCeil( sz.width() );
-    const int h = qwtCeil( sz.height() );
-
-    QPixmap pixmap( w, h );
-#endif
 
     pixmap.fill( Qt::transparent );
 
@@ -863,7 +825,6 @@ QPixmap QwtGraphic::toPixmap( qreal devicePixelRatio ) const
 QPixmap QwtGraphic::toPixmap( const QSize& size,
     Qt::AspectRatioMode aspectRatioMode, qreal devicePixelRatio ) const
 {
-#if QT_VERSION >= 0x050000
     if ( devicePixelRatio <= 0.0 )
         devicePixelRatio = qwtDevicePixelRatio();
 
@@ -872,10 +833,6 @@ QPixmap QwtGraphic::toPixmap( const QSize& size,
 
     QPixmap pixmap( w, h );
     pixmap.setDevicePixelRatio( devicePixelRatio );
-#else
-    Q_UNUSED( devicePixelRatio )
-    QPixmap pixmap( size );
-#endif
     pixmap.fill( Qt::transparent );
 
     const QRect r( 0, 0, size.width(), size.height() );
@@ -907,7 +864,6 @@ QPixmap QwtGraphic::toPixmap( const QSize& size,
 QImage QwtGraphic::toImage( const QSize& size,
     Qt::AspectRatioMode aspectRatioMode, qreal devicePixelRatio  ) const
 {
-#if QT_VERSION >= 0x050000
     if ( devicePixelRatio <= 0.0 )
         devicePixelRatio = qwtDevicePixelRatio();
 
@@ -916,10 +872,6 @@ QImage QwtGraphic::toImage( const QSize& size,
 
     QImage image( w, h, QImage::Format_ARGB32_Premultiplied );
     image.setDevicePixelRatio( devicePixelRatio );
-#else
-    Q_UNUSED( devicePixelRatio )
-    QImage image( size, QImage::Format_ARGB32_Premultiplied );
-#endif
 
     image.fill( 0 );
 
@@ -957,7 +909,6 @@ QImage QwtGraphic::toImage( qreal devicePixelRatio ) const
 
     const QSizeF sz = defaultSize();
 
-#if QT_VERSION >= 0x050000
     if ( devicePixelRatio <= 0.0 )
         devicePixelRatio = qwtDevicePixelRatio();
 
@@ -966,14 +917,6 @@ QImage QwtGraphic::toImage( qreal devicePixelRatio ) const
 
     QImage image( w, h, QImage::Format_ARGB32 );
     image.setDevicePixelRatio( devicePixelRatio );
-#else
-    Q_UNUSED( devicePixelRatio )
-
-    const int w = qwtCeil( sz.width() );
-    const int h = qwtCeil( sz.height() );
-
-    QImage image( w, h, QImage::Format_ARGB32 );
-#endif
 
     image.fill( 0 );
 
@@ -995,7 +938,7 @@ QImage QwtGraphic::toImage( qreal devicePixelRatio ) const
 void QwtGraphic::drawPath( const QPainterPath& path )
 {
     const QPainter* painter = paintEngine()->painter();
-    if ( painter == NULL )
+    if ( painter == nullptr )
         return;
 
     m_data->commands += QwtPainterCommand( path );
@@ -1035,7 +978,7 @@ void QwtGraphic::drawPixmap( const QRectF& rect,
     const QPixmap& pixmap, const QRectF& subRect )
 {
     const QPainter* painter = paintEngine()->painter();
-    if ( painter == NULL )
+    if ( painter == nullptr )
         return;
 
     m_data->commands += QwtPainterCommand( rect, pixmap, subRect );
@@ -1060,7 +1003,7 @@ void QwtGraphic::drawImage( const QRectF& rect, const QImage& image,
     const QRectF& subRect, Qt::ImageConversionFlags flags )
 {
     const QPainter* painter = paintEngine()->painter();
-    if ( painter == NULL )
+    if ( painter == nullptr )
         return;
 
     m_data->commands += QwtPainterCommand( rect, image, subRect, flags );
@@ -1157,7 +1100,7 @@ void QwtGraphic::setCommands( const QVector< QwtPainterCommand >& commands )
 
     QPainter painter( this );
     for ( int i = 0; i < numCommands; i++ )
-        qwtExecCommand( &painter, cmds[i], noRenderHints, noTransform, NULL );
+        qwtExecCommand( &painter, cmds[i], noRenderHints, noTransform, nullptr );
 
     painter.end();
 }

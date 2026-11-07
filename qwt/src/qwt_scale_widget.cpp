@@ -28,9 +28,8 @@ class QwtScaleWidget::PrivateData
 {
   public:
     PrivateData()
-        : scaleDraw( NULL )
     {
-        colorBar.colorMap = NULL;
+        colorBar.colorMap = new QwtLinearColorMap();
     }
 
     ~PrivateData()
@@ -39,25 +38,26 @@ class QwtScaleWidget::PrivateData
         delete colorBar.colorMap;
     }
 
-    QwtScaleDraw* scaleDraw;
+    QwtScaleDraw* scaleDraw = nullptr;
 
-    int borderDist[2];
-    int minBorderDist[2];
-    int scaleLength;
-    int margin;
+    int borderDist[2] = {};
+    int minBorderDist[2] = {};
+    int scaleLength = 0;
+    int margin = 4;
 
-    int titleOffset;
-    int spacing;
+    int titleOffset = 0;
+    int spacing = 2;
+
     QwtText title;
 
     QwtScaleWidget::LayoutFlags layoutFlags;
 
-    struct t_colorBar
+    struct
     {
-        bool isEnabled;
-        int width;
+        bool isEnabled = false;
+        int width = 10;
         QwtInterval interval;
-        QwtColorMap* colorMap;
+        QwtColorMap* colorMap = nullptr;
     } colorBar;
 };
 
@@ -66,9 +66,8 @@ class QwtScaleWidget::PrivateData
    \param parent Parent widget
  */
 QwtScaleWidget::QwtScaleWidget( QWidget* parent )
-    : QWidget( parent )
+    : QwtScaleWidget( QwtScaleDraw::LeftScale, parent )
 {
-    initScale( QwtScaleDraw::LeftScale );
 }
 
 /*!
@@ -78,31 +77,10 @@ QwtScaleWidget::QwtScaleWidget( QWidget* parent )
  */
 QwtScaleWidget::QwtScaleWidget( QwtScaleDraw::Alignment align, QWidget* parent )
     : QWidget( parent )
+    , m_data( new PrivateData )
 {
-    initScale( align );
-}
-
-//! Destructor
-QwtScaleWidget::~QwtScaleWidget()
-{
-    delete m_data;
-}
-
-//! Initialize the scale
-void QwtScaleWidget::initScale( QwtScaleDraw::Alignment align )
-{
-    m_data = new PrivateData;
-
     if ( align == QwtScaleDraw::RightScale )
         m_data->layoutFlags |= TitleInverted;
-
-    m_data->borderDist[0] = 0;
-    m_data->borderDist[1] = 0;
-    m_data->minBorderDist[0] = 0;
-    m_data->minBorderDist[1] = 0;
-    m_data->margin = 4;
-    m_data->titleOffset = 0;
-    m_data->spacing = 2;
 
     m_data->scaleDraw = new QwtScaleDraw;
     m_data->scaleDraw->setAlignment( align );
@@ -111,23 +89,23 @@ void QwtScaleWidget::initScale( QwtScaleDraw::Alignment align )
     m_data->scaleDraw->setScaleDiv(
         QwtLinearScaleEngine().divideScale( 0.0, 100.0, 10, 5 ) );
 
-    m_data->colorBar.colorMap = new QwtLinearColorMap();
-    m_data->colorBar.isEnabled = false;
-    m_data->colorBar.width = 10;
-
     const int flags = Qt::AlignHCenter
         | Qt::TextExpandTabs | Qt::TextWordWrap;
     m_data->title.setRenderFlags( flags );
     m_data->title.setFont( font() );
 
-    QSizePolicy policy( QSizePolicy::MinimumExpanding,
-        QSizePolicy::Fixed );
+    QSizePolicy policy( QSizePolicy::MinimumExpanding, QSizePolicy::Fixed );
     if ( m_data->scaleDraw->orientation() == Qt::Vertical )
         policy.transpose();
 
     setSizePolicy( policy );
 
     setAttribute( Qt::WA_WState_OwnSizePolicy, false );
+}
+
+//! Destructor
+QwtScaleWidget::~QwtScaleWidget()
+{
 }
 
 /*!
@@ -208,7 +186,7 @@ void QwtScaleWidget::setTitle( const QwtText& title )
  */
 void QwtScaleWidget::setAlignment( QwtScaleDraw::Alignment alignment )
 {
-    if ( m_data->scaleDraw == NULL )
+    if ( m_data->scaleDraw == nullptr )
         return;
 
     m_data->scaleDraw->setAlignment( alignment );
@@ -325,7 +303,7 @@ void QwtScaleWidget::setLabelRotation( double rotation )
  */
 void QwtScaleWidget::setScaleDraw( QwtScaleDraw* scaleDraw )
 {
-    if ( ( scaleDraw == NULL ) || ( scaleDraw == m_data->scaleDraw ) )
+    if ( ( scaleDraw == nullptr ) || ( scaleDraw == m_data->scaleDraw ) )
         return;
 
     const QwtScaleDraw* sd = m_data->scaleDraw;
@@ -334,7 +312,7 @@ void QwtScaleWidget::setScaleDraw( QwtScaleDraw* scaleDraw )
         scaleDraw->setAlignment( sd->alignment() );
         scaleDraw->setScaleDiv( sd->scaleDiv() );
 
-        QwtTransform* transform = NULL;
+        QwtTransform* transform = nullptr;
         if ( sd->scaleMap().transformation() )
             transform = sd->scaleMap().transformation()->copy();
 
@@ -602,7 +580,7 @@ void QwtScaleWidget::layoutScale( bool update_geometry )
 
         if ( QWidget* w = parentWidget() )
         {
-            if ( !w->isVisible() && w->layout() == NULL )
+            if ( !w->isVisible() && w->layout() == nullptr )
             {
                 if ( w->testAttribute( Qt::WA_WState_Polished ) )
                     QApplication::postEvent( w, new QEvent( QEvent::LayoutRequest ) );

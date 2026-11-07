@@ -17,12 +17,6 @@
 class QwtIntervalSymbol::PrivateData
 {
   public:
-    PrivateData()
-        : style( QwtIntervalSymbol::NoSymbol )
-        , width( 6 )
-    {
-    }
-
     bool operator==( const PrivateData& other ) const
     {
         return ( style == other.style )
@@ -31,8 +25,8 @@ class QwtIntervalSymbol::PrivateData
                && ( pen == other.pen );
     }
 
-    QwtIntervalSymbol::Style style;
-    int width;
+    Style style = NoSymbol;
+    int width = 6;
 
     QPen pen;
     QBrush brush;
@@ -45,22 +39,20 @@ class QwtIntervalSymbol::PrivateData
    \sa setStyle(), style(), Style
  */
 QwtIntervalSymbol::QwtIntervalSymbol( Style style )
+    : m_data( new PrivateData() )
 {
-    m_data = new PrivateData();
     m_data->style = style;
 }
 
 //! Copy constructor
 QwtIntervalSymbol::QwtIntervalSymbol( const QwtIntervalSymbol& other )
+    : m_data( new PrivateData( *other.m_data ) )
 {
-    m_data = new PrivateData();
-    *m_data = *other.m_data;
 }
 
 //! Destructor
 QwtIntervalSymbol::~QwtIntervalSymbol()
 {
-    delete m_data;
 }
 
 //! \brief Assignment operator
