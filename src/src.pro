@@ -584,7 +584,7 @@ HEADERS += Cloud/CloudService.h \
            Cloud/WithingsDownload.h Cloud/Strava.h Cloud/CyclingAnalytics.h Cloud/RideWithGPS.h \
            Cloud/TrainingsTageBuch.h Cloud/Selfloops.h Cloud/SportsPlusHealth.h \
            Cloud/AddCloudWizard.h Cloud/Withings.h Cloud/MeasuresDownload.h Cloud/Xert.h \
-           Cloud/Azum.h
+           Cloud/Azum.h Cloud/Garmin.h Cloud/GarminPersonalAPI.h Cloud/GarminMeasuresDownload.h
 
 # core data
 HEADERS += Core/Athlete.h Core/Context.h Core/DataFilter.h Core/FreeSearch.h Core/GcCalendarModel.h Core/GcUpgrade.h \
@@ -696,7 +696,7 @@ SOURCES += Cloud/CloudService.cpp \
            Cloud/WithingsDownload.cpp Cloud/Strava.cpp Cloud/CyclingAnalytics.cpp Cloud/RideWithGPS.cpp \
            Cloud/TrainingsTageBuch.cpp Cloud/Selfloops.cpp Cloud/SportsPlusHealth.cpp \
            Cloud/AddCloudWizard.cpp Cloud/Withings.cpp Cloud/MeasuresDownload.cpp Cloud/Xert.cpp \
-           Cloud/Azum.cpp
+           Cloud/Azum.cpp Cloud/Garmin.cpp Cloud/GarminPersonalAPI.cpp Cloud/GarminMeasuresDownload.cpp
 
 ## Core Data Structures
 SOURCES += Core/Athlete.cpp Core/Context.cpp Core/DataFilter.cpp Core/FreeSearch.cpp Core/GcUpgrade.cpp Core/IdleTimer.cpp \

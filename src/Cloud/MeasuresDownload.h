@@ -24,6 +24,7 @@
 
 #include "WithingsDownload.h"
 #include "TredictMeasuresDownload.h"
+#include "GarminMeasuresDownload.h"
 #include "MeasuresCsvImport.h"
 
 #include <QDialog>
@@ -55,6 +56,7 @@ private:
 
      WithingsDownload *withingsDownload;
      TredictMeasuresDownload *tredictDownload;
+     GarminMeasuresDownload *garminDownload;
      MeasuresCsvImport *csvFileImport;
 
      QPushButton *downloadButton;
@@ -65,6 +67,7 @@ private:
      // withings, tredict, csv file
      QRadioButton *downloadWithings;
      QRadioButton *downloadTredict;
+     QRadioButton *downloadGarmin;
      QRadioButton *downloadCSV;
 
      //  all, from last measure, manual date interval
@@ -81,7 +84,8 @@ private:
      enum source { WITHINGS = 1,
                    TP = 2,
                    CSV = 3,
-                   TREDICT = 4
+                   TREDICT = 4,
+                   GARMIN = 5
                  } ;
 
      enum timeframe { ALL = 1,
@@ -98,6 +102,7 @@ private slots:
 
      void downloadWithingsSettingChanged(bool);
      void downloadTredictSettingChanged(bool);
+     void downloadGarminSettingChanged(bool);
      void downloadCSVSettingChanged(bool);
 
      void downloadProgressStart(int);

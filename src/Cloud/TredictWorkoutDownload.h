@@ -24,7 +24,9 @@
 #include "Settings.h"
 
 #include <QtGui>
+#include <QDialog>
 #include <QTreeWidget>
+#include <QCheckBox>
 #include <QLabel>
 #include <QDateEdit>
 #include <QSslError>

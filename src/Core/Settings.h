@@ -454,6 +454,11 @@
 #define GC_WAHOO_REFRESH_TOKEN         "<athlete-private>wahoo_refresh_token"
 #define GC_WAHOO_LAST_REFRESH          "<athlete-private>wahoo_last_refresh"
 
+// Garmin
+#define GC_GARMIN_API_KEY              "<athlete-private>garmin_api_key"
+#define GC_GARMIN_REFRESH_TOKEN        "<athlete-private>garmin_refresh_token"
+#define GC_GARMIN_LAST_REFRESH         "<athlete-private>garmin_last_refresh"
+
 // --------------------------------------------------------------------------------
 #include <QSettings>
 #include <QFileInfo>
