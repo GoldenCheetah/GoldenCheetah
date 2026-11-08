@@ -31,7 +31,7 @@ class Measure {
     Q_DECLARE_TR_FUNCTIONS(Measure)
 public:
 
-    enum measuresource { Manual, Withings, CSV, Tredict };
+    enum measuresource { Manual, Withings, CSV, Tredict, Garmin };
     typedef enum measuresource MeasureSource;
 
     enum bodymeasuretype { WeightKg = 0, FatKg = 1, MuscleKg = 2, BonesKg = 3, LeanKg = 4, FatPercent = 5 };

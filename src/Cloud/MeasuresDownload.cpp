@@ -44,10 +44,12 @@ MeasuresDownload::MeasuresDownload(Context *context, MeasuresGroup *measuresGrou
     QGroupBox *groupBox1 = new QGroupBox(tr("Choose the download or import source"));
     downloadWithings = new QRadioButton(tr("Withings"));
     downloadTredict = new QRadioButton(tr("Tredict"));
+    downloadGarmin = new QRadioButton(tr("Garmin"));
     downloadCSV = new QRadioButton(tr("Import CSV file"));
     QVBoxLayout *vbox1 = new QVBoxLayout;
     vbox1->addWidget(downloadWithings);
     vbox1->addWidget(downloadTredict);
+    vbox1->addWidget(downloadGarmin);
     vbox1->addWidget(downloadCSV);
     groupBox1->setLayout(vbox1);
     mainLayout->addWidget(groupBox1);
@@ -111,6 +113,7 @@ MeasuresDownload::MeasuresDownload(Context *context, MeasuresGroup *measuresGrou
 
     connect(downloadWithings, SIGNAL(toggled(bool)), this, SLOT(downloadWithingsSettingChanged(bool)));
     connect(downloadTredict, SIGNAL(toggled(bool)), this, SLOT(downloadTredictSettingChanged(bool)));
+    connect(downloadGarmin, SIGNAL(toggled(bool)), this, SLOT(downloadGarminSettingChanged(bool)));
     connect(downloadCSV, SIGNAL(toggled(bool)), this, SLOT(downloadCSVSettingChanged(bool)));
 
     // don't allow options which are not authorized
@@ -120,6 +123,10 @@ MeasuresDownload::MeasuresDownload(Context *context, MeasuresGroup *measuresGrou
     downloadTredict->setEnabled(
         (measuresGroup->getSymbol() == "Body" || measuresGroup->getSymbol() == "Hrv") &&
         (appsettings->cvalue(context->athlete->cyclist, GC_TREDICT_TOKEN, "").toString() != ""));
+
+    downloadGarmin->setEnabled(
+        (measuresGroup->getSymbol() == "Body" || measuresGroup->getSymbol() == "Hrv") &&
+        (appsettings->cvalue(context->athlete->cyclist, GC_GARMIN_API_KEY, "").toString() != ""));
 
     // select the default checked / based on available properties and last selection
     int last_selection = appsettings->cvalue(context->athlete->cyclist, GC_BM_LAST_TYPE, 0).toInt();
@@ -133,6 +140,12 @@ MeasuresDownload::MeasuresDownload(Context *context, MeasuresGroup *measuresGrou
     if (!done && downloadTredict->isEnabled()) {
         if (last_selection == 0 || last_selection == TREDICT) {
             downloadTredict->setChecked(true);
+            done = true;
+        }
+    }
+    if (!done && downloadGarmin->isEnabled()) {
+        if (last_selection == 0 || last_selection == GARMIN) {
+            downloadGarmin->setChecked(true);
             done = true;
         }
     }
@@ -161,6 +174,7 @@ MeasuresDownload::MeasuresDownload(Context *context, MeasuresGroup *measuresGrou
     // initialize the downloaders
     withingsDownload = new WithingsDownload(context);
     tredictDownload = new TredictMeasuresDownload(context);
+    garminDownload = new GarminMeasuresDownload(context);
     csvFileImport = new MeasuresCsvImport(context, this);
 
     // connect the progress bar
@@ -171,6 +185,10 @@ MeasuresDownload::MeasuresDownload(Context *context, MeasuresGroup *measuresGrou
     connect(tredictDownload, SIGNAL(downloadStarted(int)), this, SLOT(downloadProgressStart(int)));
     connect(tredictDownload, SIGNAL(downloadProgress(int)), this, SLOT(downloadProgress(int)));
     connect(tredictDownload, SIGNAL(downloadEnded(int)), this, SLOT(downloadProgressEnd(int)));
+
+    connect(garminDownload, SIGNAL(downloadStarted(int)), this, SLOT(downloadProgressStart(int)));
+    connect(garminDownload, SIGNAL(downloadProgress(int)), this, SLOT(downloadProgress(int)));
+    connect(garminDownload, SIGNAL(downloadEnded(int)), this, SLOT(downloadProgressEnd(int)));
 
     connect(csvFileImport, SIGNAL(downloadStarted(int)), this, SLOT(downloadProgressStart(int)));
     connect(csvFileImport, SIGNAL(downloadProgress(int)), this, SLOT(downloadProgress(int)));
@@ -249,6 +267,11 @@ MeasuresDownload::download() {
            downloadOk = tredictDownload->getHrvMeasures(err, fromDate, toDate, measures);
        else
            downloadOk = tredictDownload->getBodyMeasures(err, fromDate, toDate, measures);
+   } else if (downloadGarmin->isChecked()) {
+       if (measuresGroup->getSymbol() == "Hrv")
+           downloadOk = garminDownload->getHrvMeasures(err, fromDate, toDate, measures);
+       else
+           downloadOk = garminDownload->getBodyMeasures(err, fromDate, toDate, measures);
    } else if (downloadCSV->isChecked()) {
        downloadOk = csvFileImport->getMeasures(measuresGroup, err, fromDate, toDate, measures);
    } else return;
@@ -338,6 +361,14 @@ MeasuresDownload::downloadTredictSettingChanged(bool checked) {
 
     if (checked) {
         appsettings->setCValue(context->athlete->cyclist, GC_BM_LAST_TYPE, TREDICT);
+    }
+}
+
+void
+MeasuresDownload::downloadGarminSettingChanged(bool checked) {
+
+    if (checked) {
+        appsettings->setCValue(context->athlete->cyclist, GC_BM_LAST_TYPE, GARMIN);
     }
 }
 
