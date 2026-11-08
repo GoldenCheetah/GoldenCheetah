@@ -33,7 +33,7 @@ Copy-Item "c:\tools\vcpkg\installed\x64-windows\bin\gsl*.dll" .
 
 # ReadMe, license and icon files
 Copy-Item "..\Resources\win32\ReadMe.txt" .
-"GoldenCheetah is licensed under the GNU General Public License v2" | Set-Content license.txt
+"GoldenCheetah is licensed under the GNU General Public License v3" | Set-Content license.txt
 Add-Content license.txt "" # echo. equivalent
 Get-Content "..\..\COPYING" | Add-Content license.txt
 Copy-Item "..\Resources\win32\gc.ico" .

@@ -27,7 +27,7 @@ GoldenCheetah supports community sharing via the Cloud
 * Import indoor workouts from the TrainerDay
 * Share anonymised data with researchers via the OpenData initiative
 
-GoldenCheetah is free for everyone to use and modify, released under the GPL v2 open source license with pre-built binaries for Mac, Windows and Linux.
+GoldenCheetah is free for everyone to use and modify, released under the GPL v3 open source license with pre-built binaries for Mac, Windows and Linux. Files marked "GPL v2 or later" are distributed under GPL v3 as part of GoldenCheetah.
 
 ## Installing
 
