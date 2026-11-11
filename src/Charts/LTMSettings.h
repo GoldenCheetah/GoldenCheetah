@@ -155,7 +155,7 @@ class MetricDetail {
     RideFile::SeriesType series; // what series are we doing the peak for
 
     // for STRESS
-    int stressType;     // 0-LTS 1-STS 2-SB 3-RR
+    int stressType;     // 0-STS 1-LTS 2-SB 3-RR (see STRESS_* defines above)
 
     // for DAILY MEASURES
     int measureGroup;   // 0-BODY 1-HRV
