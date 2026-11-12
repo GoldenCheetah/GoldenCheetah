@@ -153,7 +153,7 @@ Sie müssen diesen möglicherweise manuell deaktivieren.</translation>
     <message>
         <location filename="../../Gui/AboutDialog.cpp" line="56"/>
         <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;https://www.goldencheetah.org/&quot;&gt;https://www.goldencheetah.org/&lt;/a&gt;.&lt;br&gt;&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Athlete ID %3&lt;br&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;The core body temperature module was developed by the &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; and is patent pending&lt;br&gt;&lt;br&gt;&lt;img src=&quot;:images/services/strava_compatible.png&quot;/&gt;&lt;br&gt;&lt;/center&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Software zur Leistungsanalyse beim Radfahren&lt;br&gt;für Linux, Mac, und Windows&lt;p&gt;GoldenCheetah ist lizenziert unter der&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Der Quellcode ist erhältlich unter&lt;br&gt;&lt;a href=&quot;https://www.goldencheetah.org/&quot;&gt;https://www.goldencheetah.org/&lt;/a&gt;.&lt;br&gt;&lt;p&gt;Aktivitätsdateien und andere Daten sind gespeichert&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Athleten-ID %3&lt;br&gt;&lt;p&gt;Marken werden mit Genehmigung verwendet&lt;br&gt;BikeScore, xPower, SwimScore mit freundlicher Genehmigung von &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed mit freundlicher Genehmigung von Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;Das Kernkörpertemperaturmodul wurde entwickelt von der &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; und ist zum Patent angemeldet&lt;br&gt;&lt;br&gt;&lt;img src=&quot;:images/services/strava_compatible.png&quot;/&gt;&lt;br&gt;&lt;/center&gt;</translation>
     </message>
 </context>
 <context>
@@ -578,47 +578,47 @@ Sie müssen diesen möglicherweise manuell deaktivieren.</translation>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="323"/>
         <source>Calendar</source>
-        <translation type="unfinished">Kalender</translation>
+        <translation>Kalender</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="327"/>
         <source>Discover Calendars</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalender suchen</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="385"/>
         <source>Google Calendar authorization was successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Autorisierung für Google Kalender war erfolgreich.</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="386"/>
         <source>Information</source>
-        <translation type="unfinished">Information</translation>
+        <translation>Information</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="390"/>
         <source>Google Authorisation Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Google-Autorisierung fehlgeschlagen</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="442"/>
         <source>Google Calendar not enabled in this build</source>
-        <translation type="unfinished"></translation>
+        <translation>Google Kalender ist in diesem Build nicht aktiviert</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="457"/>
         <source>No Calendars Found</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Kalender gefunden</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="470"/>
         <source>Choose Calendar</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalender auswählen</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="470"/>
         <source>Calendar:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalender:</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="513"/>
@@ -646,7 +646,7 @@ Sie müssen diesen möglicherweise manuell deaktivieren.</translation>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="120"/>
         <source>Sync activities with services like Today&apos;s Plan, Strava, Dropbox and Google Drive</source>
-        <translation>Synchronisieren von Aktivitäten mit Diensten wie Today&apos;s Plan, Strava, Dropbox und Google Drive</translation>
+        <translation>Synchronisieren von Aktivitäten mit Diensten wie Tredict, Strava, Wahoo, Garmin und Dropbox</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="127"/>
@@ -1472,7 +1472,7 @@ Gerät gefunden.
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="95"/>
         <source> ***Adapter/Device must be connected*** </source>
-        <translation>***Adapter/Gerät muss angeschlossen sein***</translation>
+        <translation> ***Adapter/Gerät muss angeschlossen sein*** </translation>
     </message>
 </context>
 <context>
@@ -6569,14 +6569,14 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Cloud/CalDAV.cpp" line="374"/>
         <source>Missing id</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehlende ID</translation>
     </message>
     <message>
         <location filename="../../Cloud/CalDAV.cpp" line="403"/>
         <location filename="../../Cloud/CalDAV.cpp" line="423"/>
         <location filename="../../Cloud/CalDAV.cpp" line="440"/>
         <source>CalDAV URL, username or password is missing in preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>CalDAV-URL, Benutzername oder Passwort fehlen in den Einstellungen</translation>
     </message>
 </context>
 <context>
@@ -6592,7 +6592,7 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Cloud/CalDAVCloud.h" line="40"/>
         <source>Generic CalDAV Calendar such as Nextcloud or Apple iCloud</source>
-        <translation type="unfinished"></translation>
+        <translation>Generischer CalDAV-Kalender wie z. B. Nextcloud oder Apple iCloud</translation>
     </message>
 </context>
 <context>
@@ -6705,7 +6705,7 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="224"/>
         <source>event</source>
-        <translation type="unfinished"></translation>
+        <translation>Event</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="225"/>
@@ -6715,7 +6715,7 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="231"/>
         <source>phase</source>
-        <translation type="unfinished"></translation>
+        <translation>Phase</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="233"/>
@@ -6730,17 +6730,17 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="326"/>
         <source>Sync %1 to &apos;%2&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 zu &apos;%2&apos; synchronisieren</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="329"/>
         <source>Sync season to &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Saison zu &apos;%1&apos; synchronisieren</translation>
     </message>
     <message>
         <location filename="../../Gui/Calendar.cpp" line="331"/>
         <source>Sync phase to &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Phase zu &apos;%1&apos; synchronisieren</translation>
     </message>
     <message>
         <source>Export schedule</source>
@@ -6941,112 +6941,112 @@ ddd, dd.MMM yyyy</translation>
         <location filename="../../Core/CalendarSync.cpp" line="276"/>
         <location filename="../../Core/CalendarSync.cpp" line="388"/>
         <source>CloudService for CalDAV is not configured</source>
-        <translation type="unfinished"></translation>
+        <translation>CloudService für CalDAV ist nicht konfiguriert</translation>
     </message>
     <message>
         <location filename="../../Core/CalendarSync.cpp" line="515"/>
         <source>Season %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Saison %1</translation>
     </message>
     <message>
         <location filename="../../Core/CalendarSync.cpp" line="537"/>
         <source>Phase %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Phase %1</translation>
     </message>
     <message>
         <location filename="../../Core/CalendarSync.cpp" line="539"/>
         <source>Prep</source>
-        <translation type="unfinished">Vorbereitung</translation>
+        <translation>Vorbereitung</translation>
     </message>
     <message>
         <location filename="../../Core/CalendarSync.cpp" line="541"/>
         <source>Base</source>
-        <translation type="unfinished">Basis</translation>
+        <translation>Basis</translation>
     </message>
     <message>
         <location filename="../../Core/CalendarSync.cpp" line="543"/>
         <source>Build</source>
-        <translation type="unfinished">Aufbau</translation>
+        <translation>Aufbau</translation>
     </message>
     <message>
         <location filename="../../Core/CalendarSync.cpp" line="545"/>
         <source>Camp</source>
-        <translation type="unfinished">Trainingslager</translation>
+        <translation>Trainingslager</translation>
     </message>
     <message>
         <location filename="../../Core/CalendarSync.cpp" line="573"/>
         <source>%1 Activity</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Aktivität</translation>
     </message>
     <message>
         <location filename="../../Core/CalendarSync.cpp" line="575"/>
         <source>Unknown Activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Unbekannte Aktivität</translation>
     </message>
     <message>
         <location filename="../../Core/CalendarSync.cpp" line="583"/>
         <source>%1: Can&apos;t add id to activity with unsaved changes. Save and retry</source>
-        <translation type="unfinished"></translation>
+        <translation>%1: Bei einer Aktivität mit nicht gespeicherten Änderungen kann keine ID hinzugefügt werden. Speichern und erneut versuchen</translation>
     </message>
     <message>
         <location filename="../../Core/CalendarSync.cpp" line="590"/>
         <source>Completed: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Abgeschlossen: %1</translation>
     </message>
     <message>
         <location filename="../../Core/CalendarSync.cpp" line="592"/>
         <source>Planned: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplant: %1</translation>
     </message>
     <message>
         <location filename="../../Core/CalendarSync.cpp" line="595"/>
         <source>Actual: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Beendet: %1</translation>
     </message>
     <message>
         <location filename="../../Core/CalendarSync.cpp" line="608"/>
         <source>invalid ride</source>
-        <translation type="unfinished"></translation>
+        <translation>ungültige Fahrt</translation>
     </message>
     <message>
         <location filename="../../Core/CalendarSync.cpp" line="619"/>
         <source>invalid event</source>
-        <translation type="unfinished"></translation>
+        <translation>ungültiges Event</translation>
     </message>
     <message>
         <location filename="../../Core/CalendarSync.cpp" line="625"/>
         <source>Unnamed Event</source>
-        <translation type="unfinished"></translation>
+        <translation>Unbenanntes Event</translation>
     </message>
     <message>
         <location filename="../../Core/CalendarSync.cpp" line="627"/>
         <source>(Uncategorized)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Unkategorisiert)</translation>
     </message>
     <message>
         <location filename="../../Core/CalendarSync.cpp" line="629"/>
         <source>(Category A)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Kategorie A)</translation>
     </message>
     <message>
         <location filename="../../Core/CalendarSync.cpp" line="631"/>
         <source>(Category B)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Kategorie B)</translation>
     </message>
     <message>
         <location filename="../../Core/CalendarSync.cpp" line="633"/>
         <source>(Category C)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Kategorie C)</translation>
     </message>
     <message>
         <location filename="../../Core/CalendarSync.cpp" line="635"/>
         <source>(Category D)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Kategorie D)</translation>
     </message>
     <message>
         <location filename="../../Core/CalendarSync.cpp" line="637"/>
         <source>(Category E)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Kategorie E)</translation>
     </message>
 </context>
 <context>
@@ -7054,201 +7054,201 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="33"/>
         <source>Synchronize to &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Synchronisieren mit &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="37"/>
         <source>Synchronize to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Synchronisieren mit %1</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="42"/>
         <source>Season %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Saison %1</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="44"/>
         <source>Phase %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Phase %1</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="46"/>
         <source>Event %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Event %1</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="50"/>
         <source>Planned Activity %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplante Aktivität %1</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="54"/>
         <source>Actual Activity %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Beendete Aktivität %1</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="70"/>
         <source>Syncing only affects your CalDAV calendar - no data in GoldenCheetah is changed or deleted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Synchronisierung betrifft ausschließlich Ihren CalDAV-Kalender – es werden keine Daten in GoldenCheetah geändert oder gelöscht.</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="76"/>
         <source>Fields for activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Felder für Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="77"/>
         <source>Title</source>
-        <translation type="unfinished">Titel</translation>
+        <translation>Titel</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="78"/>
         <source>Description</source>
-        <translation type="unfinished">Beschreibung</translation>
+        <translation>Beschreibung</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="80"/>
         <source>Sync strategy</source>
-        <translation type="unfinished"></translation>
+        <translation>Synchronisierungsstrategie</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="81"/>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="396"/>
         <source>Seasons</source>
-        <translation type="unfinished"></translation>
+        <translation>Jahreszeiten</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="82"/>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="397"/>
         <source>Phases</source>
-        <translation type="unfinished"></translation>
+        <translation>Phasen</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="83"/>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="398"/>
         <source>Events</source>
-        <translation type="unfinished">Events</translation>
+        <translation>Events</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="84"/>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="399"/>
         <source>Planned Activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplante Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="85"/>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="400"/>
         <source>Actual Activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Beendete Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="101"/>
         <source>Category</source>
-        <translation type="unfinished">Kategorie</translation>
+        <translation>Kategorie</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="101"/>
         <source>Successes</source>
-        <translation type="unfinished"></translation>
+        <translation>Erfolge</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="101"/>
         <source>Failures</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="101"/>
         <source>Skipped</source>
-        <translation type="unfinished"></translation>
+        <translation>Übersprungen</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="173"/>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="198"/>
         <source>Sync</source>
-        <translation type="unfinished"></translation>
+        <translation>Synchronisieren</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="181"/>
         <source>Synchronisation canceled</source>
-        <translation type="unfinished"></translation>
+        <translation>Synchronisierung abgebrochen</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="181"/>
         <source>Synchronisation completed</source>
-        <translation type="unfinished"></translation>
+        <translation>Synchronisierung abgeschlossen</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="199"/>
         <source>Sync &amp; cleanup</source>
-        <translation type="unfinished"></translation>
+        <translation>Synchronisieren und bereinigen</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="200"/>
         <source>Skip</source>
-        <translation type="unfinished"></translation>
+        <translation>Überspringen</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="201"/>
         <source>Remove all synced entries</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle synchronisierten Einträge entfernen</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="237"/>
         <source>---</source>
-        <translation type="unfinished"></translation>
+        <translation>---</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="252"/>
         <source> / %1 available</source>
-        <translation type="unfinished"></translation>
+        <translation> / %1 verfügbar</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="314"/>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="330"/>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="381"/>
         <source>Cleanup</source>
-        <translation type="unfinished"></translation>
+        <translation>Bereinigung</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="328"/>
         <source>Reading remote calendar</source>
-        <translation type="unfinished"></translation>
+        <translation>Fernkalender auslesen</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="349"/>
         <source>Syncing Seasons</source>
-        <translation type="unfinished"></translation>
+        <translation>Saison synchronisieren</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="351"/>
         <source>Syncing Phases</source>
-        <translation type="unfinished"></translation>
+        <translation>Phasen synchronisieren</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="353"/>
         <source>Syncing Events</source>
-        <translation type="unfinished"></translation>
+        <translation>Events synchronisieren</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="355"/>
         <source>Syncing planned Activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplante Aktivitäten synchronisieren</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="357"/>
         <source>Syncing actual Activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Beendete Aktivitäten synchronisieren</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="383"/>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="402"/>
         <source>Sync Technical</source>
-        <translation type="unfinished"></translation>
+        <translation>Technische Synchronisierung</translation>
     </message>
     <message>
         <location filename="../../Gui/CalendarSyncDialog.cpp" line="395"/>
         <source>Sync Overall</source>
-        <translation type="unfinished"></translation>
+        <translation>Alles synchronisieren</translation>
     </message>
 </context>
 <context>
@@ -11062,12 +11062,12 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="636"/>
         <source>Mesocycle</source>
-        <translation type="unfinished"></translation>
+        <translation>Mesozyklus</translation>
     </message>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="658"/>
         <source>Description...</source>
-        <translation type="unfinished"></translation>
+        <translation>Beschreibung...</translation>
     </message>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="662"/>
@@ -11082,7 +11082,7 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="672"/>
         <source>Season %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Saison %1</translation>
     </message>
 </context>
 <context>
@@ -11203,7 +11203,7 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="130"/>
         <source>Year to Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Jahr bis heute</translation>
     </message>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="183"/>
@@ -11213,7 +11213,7 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="198"/>
         <source>Description...</source>
-        <translation type="unfinished"></translation>
+        <translation>Beschreibung...</translation>
     </message>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="201"/>
@@ -11233,7 +11233,7 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="212"/>
         <source>Phases &amp;&amp; Events cover</source>
-        <translation type="unfinished"></translation>
+        <translation>Datumsbereich für Phasen &amp;&amp; Events</translation>
     </message>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="213"/>
@@ -11244,17 +11244,17 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="347"/>
         <source>The start date is after the end date, so the season will be empty</source>
-        <translation type="unfinished"></translation>
+        <translation>Das Startdatum liegt nach dem Enddatum, daher wird die Saison leer sein</translation>
     </message>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="350"/>
         <source>The season range must cover all of its phases and events</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Saisonbereich muss alle seine Phasen und Events abdecken</translation>
     </message>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="356"/>
         <source>WARNING</source>
-        <translation type="unfinished"></translation>
+        <translation>Warnung</translation>
     </message>
     <message>
         <source>dd MMM yyyy</source>
@@ -11280,17 +11280,17 @@ then click &quot;Rescan&quot; to check again.</source>
         <location filename="../../Core/SeasonDialogs.cpp" line="544"/>
         <location filename="../../Core/SeasonDialogs.cpp" line="550"/>
         <source>W</source>
-        <translation type="unfinished">W</translation>
+        <translation>W</translation>
     </message>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="554"/>
         <source>Description...</source>
-        <translation type="unfinished"></translation>
+        <translation>Beschreibung...</translation>
     </message>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="562"/>
         <source>Season %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Saison %1</translation>
     </message>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="564"/>
@@ -11310,22 +11310,22 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="569"/>
         <source>Target values</source>
-        <translation type="unfinished"></translation>
+        <translation>Zielwert</translation>
     </message>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="570"/>
         <source>LTS</source>
-        <translation type="unfinished"></translation>
+        <translation>LTS</translation>
     </message>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="571"/>
         <source>CP</source>
-        <translation type="unfinished">CP</translation>
+        <translation>CP</translation>
     </message>
     <message>
         <location filename="../../Core/SeasonDialogs.cpp" line="572"/>
         <source>FTP</source>
-        <translation type="unfinished">FTP</translation>
+        <translation>FTP</translation>
     </message>
     <message>
         <source>Description</source>
@@ -15265,6 +15265,207 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     </message>
 </context>
 <context>
+    <name>Garmin</name>
+    <message>
+        <location filename="../../Cloud/Garmin.cpp" line="70"/>
+        <source>You must set a Garmin Personal API key first</source>
+        <translation>Sie müssen zuerst einen Garmin Personal API-Schlüssel festlegen</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Garmin.cpp" line="104"/>
+        <source>Garmin service not initialized</source>
+        <translation>Garmin-Dienst nicht initialisiert</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Garmin.cpp" line="166"/>
+        <source>Completed.</source>
+        <translation>Abgeschlossen.</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Garmin.h" line="39"/>
+        <source>Garmin</source>
+        <translation>Garmin</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Garmin.h" line="40"/>
+        <source>Sync with the Garmin Personal API.</source>
+        <translation>Mit der Garmin Personal API synchronisieren.</translation>
+    </message>
+</context>
+<context>
+    <name>GarminMeasuresDownload</name>
+    <message>
+        <location filename="../../Cloud/GarminMeasuresDownload.cpp" line="67"/>
+        <source>You must set a Garmin Personal API key first</source>
+        <translation>Sie müssen zuerst einen persönlichen Garmin-API-Schlüssel festlegen</translation>
+    </message>
+</context>
+<context>
+    <name>GarminPersonalAPI</name>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="223"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="305"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="341"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="405"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="520"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="603"/>
+        <source>Another Garmin request is already in progress</source>
+        <translation>Eine andere Garmin-Anfrage ist bereits in Bearbeitung</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="230"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="348"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="412"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="527"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="610"/>
+        <source>Invalid date range</source>
+        <translation>Ungültiger Datumsbereich</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="249"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="362"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="428"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="543"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="624"/>
+        <source>Unexpected content type in reply: %1</source>
+        <translation>Unerwarteter Inhaltstyp in der Antwort: %1</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="256"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="369"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="435"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="550"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="631"/>
+        <source>Failed to parse JSON: %1</source>
+        <translation>JSON konnte nicht geparst werden: %1</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="260"/>
+        <source>Invalid JSON: expected an array of activities</source>
+        <translation>Ungültiges JSON: Ein Reihe von Aktivitäten wurde erwartet</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="311"/>
+        <source>Invalid activity id</source>
+        <translation>Ungültige Aktivitäts-ID</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="322"/>
+        <source>Empty download reply</source>
+        <translation>Leere Antwort beim Herunterladen</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="324"/>
+        <source>The reply is not a ZIP archive (content type: %1)</source>
+        <translation>Die Antwort ist kein ZIP-Archiv (Inhaltstyp: %1)</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="373"/>
+        <source>Invalid JSON: expected an object of hrv summaries</source>
+        <translation>Ungültiges JSON: Ein Objekt mit HRV-Zusammenfassungen wurde erwartet</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="439"/>
+        <source>Invalid JSON: expected an object of user summaries</source>
+        <translation>Ungültiges JSON: Ein Objekt mit Benutzerzusammenfassungen wurde erwartet</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="554"/>
+        <source>Invalid JSON: expected an array of sleep summaries</source>
+        <translation>Ungültiges JSON: Ein Reihe von Schlafzusammenfassungen wurde erwartet</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="635"/>
+        <source>Invalid JSON: expected an array of weight summaries</source>
+        <translation>Ungültiges JSON: Ein Reihe von Gewichtszusammenfassungen wurde erwartet</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="811"/>
+        <source>%1 (not retrying before %2)</source>
+        <translation>%1 (kein erneuter Versuch vor %2)</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="843"/>
+        <source>Garmin rejected the API key (HTTP %1). It is invalid, expired or deleted; create a new one in Garmin Connect (%2)</source>
+        <translation>Garmin hat den API-Schlüssel abgelehnt (HTTP %1). Er ist ungültig, abgelaufen oder gelöscht; erstelle Sie einen neuen in Garmin Connect (%2)</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="848"/>
+        <source>Could not obtain an access token: %1</source>
+        <translation>Zugriffstoken konnte nicht abgerufen werden: %1</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="850"/>
+        <source>Could not obtain an access token: the reply could not be understood</source>
+        <translation>Zugriffstoken konnte nicht abgerufen werden: Die Antwort konnte nicht verstanden werden</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="852"/>
+        <source>Could not obtain an access token: the received token is already expired</source>
+        <translation>Zugriffstoken konnte nicht abgerufen werden: Der empfangene Token ist bereits abgelaufen</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="898"/>
+        <source>This build of Qt has no usable TLS support (available backends: %1)</source>
+        <translation>Dieser Qt-Build hat keine verwendbare TLS-Unterstützung (verfügbare Backends: %1)</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="943"/>
+        <source>Could not establish a secure connection to Garmin (%1). Check that the system date and time are correct and whether a proxy, VPN or security software intercepts HTTPS traffic</source>
+        <translation>Es konnte keine sichere Verbindung zu Garmin hergestellt werden (%1). Prüfe Sie, ob Datum und Uhrzeit des Systems korrekt sind und ob ein Proxy, VPN oder eine Sicherheitssoftware den HTTPS-Verkehr abfängt</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="953"/>
+        <source>Request timed out (no data for %1 s)</source>
+        <translation>Zeitüberschreitung der Anfrage (keine Daten für %1 s)</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="954"/>
+        <source>Network error: %1</source>
+        <translation>Netzwerkfehler: %1</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="977"/>
+        <source>Invalid request (HTTP 400)</source>
+        <translation>Ungültige Anfrage (HTTP 400)</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="979"/>
+        <source>Authorization failed (HTTP 401): the token or API key is invalid, expired or revoked</source>
+        <translation>Autorisierung fehlgeschlagen (HTTP 401): Der Token oder API-Schlüssel ist ungültig, abgelaufen oder widerrufen</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="981"/>
+        <source>No access to this resource (HTTP 403)</source>
+        <translation>Kein Zugriff auf diese Ressource (HTTP 403)</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="983"/>
+        <source>Resource not found (HTTP 404)</source>
+        <translation>Ressource nicht gefunden (HTTP 404)</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="985"/>
+        <source>Too many requests (HTTP 429)</source>
+        <translation>Zu viele Anfragen (HTTP 429)</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="987"/>
+        <source>, retry after %1</source>
+        <translation>, erneut versuchen nach %1</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="993"/>
+        <source>Garmin server error (HTTP %1), try again later</source>
+        <translation>Garmin-Serverfehler (HTTP %1), später erneut versuchen</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="995"/>
+        <source>Unexpected reply (HTTP %1): %2</source>
+        <translation>Unerwartete Antwort (HTTP %1): %2</translation>
+    </message>
+</context>
+<context>
     <name>GcCalendarModel</name>
     <message>
         <location filename="../../Core/GcCalendarModel.h" line="109"/>
@@ -15381,7 +15582,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/GcCrashDialog.cpp" line="238"/>
         <source>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;%3&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VIDEO&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SAMPLERATE&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SSL&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;R&lt;/td&gt;&lt;td&gt;%16&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;Python&lt;/td&gt;&lt;td&gt;%18&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LMFIT&lt;/td&gt;&lt;td&gt;7.0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;GSL&lt;/td&gt;&lt;td&gt;%19&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;%3&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VIDEO&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SAMPLERATE&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SSL&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;R&lt;/td&gt;&lt;td&gt;%16&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;Python&lt;/td&gt;&lt;td&gt;%18&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LMFIT&lt;/td&gt;&lt;td&gt;7.0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;GSL&lt;/td&gt;&lt;td&gt;%19&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</source>
@@ -15902,7 +16103,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="115"/>
         <source>Video + HTML</source>
-        <translation type="unfinished"></translation>
+        <translation>Video + HTML</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="116"/>
@@ -16358,7 +16559,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Cloud/GoogleCalDAVCloud.cpp" line="86"/>
         <source>Sync planned workouts to Google Calendar.</source>
-        <translation type="unfinished"></translation>
+        <translation>Synchronisieren Sie geplante Trainingseinheiten mit Google Kalender.</translation>
     </message>
 </context>
 <context>
@@ -18736,7 +18937,7 @@ Ziehen Sie .svg-Dateien hierher, um Symbole hinzuzufügen.</translation>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2586"/>
         <source>Import failed.</source>
-        <translation>Import fehlgeschlagen</translation>
+        <translation>Import fehlgeschlagen.</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2587"/>
@@ -18839,7 +19040,7 @@ Ziehen Sie .svg-Dateien hierher, um Symbole hinzuzufügen.</translation>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2136"/>
         <source>Select a training plan file (%1) to begin</source>
-        <translation>Wählen Sie eine Trainingsplandatei (%1) aus, um zu beginnen.</translation>
+        <translation>Wähle Sie eine Trainingsplan-Datei (%1), um zu beginnen</translation>
     </message>
     <message>
         <location filename="../../Gui/PlanWizards.cpp" line="2203"/>
@@ -19868,12 +20069,12 @@ Ziehen Sie .svg-Dateien hierher, um Symbole hinzuzufügen.</translation>
         <location filename="../../Gui/LTMSidebar.cpp" line="618"/>
         <location filename="../../Gui/LTMSidebar.cpp" line="648"/>
         <source>Export plan</source>
-        <translation type="unfinished">Plan exportieren</translation>
+        <translation>Plan exportieren</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="628"/>
         <source>Sync phase to &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Phase zu &apos;%1&apos; synchronisieren</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="643"/>
@@ -19890,12 +20091,12 @@ Ziehen Sie .svg-Dateien hierher, um Symbole hinzuzufügen.</translation>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="658"/>
         <source>Sync season to &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Saison zu &apos;%1&apos; synchronisieren</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="725"/>
         <source>Sync event to &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Event zu &apos;%1&apos; synchronisieren</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="801"/>
@@ -24475,64 +24676,69 @@ Please check your preference settings.</source>
     </message>
     <message>
         <location filename="../../Cloud/MeasuresDownload.cpp" line="47"/>
+        <source>Garmin</source>
+        <translation>Garmin</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="48"/>
         <source>Import CSV file</source>
         <translation>CSV-Datei importieren</translation>
     </message>
     <message>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="55"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="57"/>
         <source>Choose date range for download</source>
         <translation>Datumsbereich für das Herunterladen auswählen</translation>
     </message>
     <message>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="56"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="58"/>
         <source>From date of first recorded activity to today</source>
         <translation>Ab dem Datum der ersten aufgezeichneten Aktivität bis heute</translation>
     </message>
     <message>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="57"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="59"/>
         <source>From date of last downloaded measurement to today</source>
         <translation>Vom Datum der letzten heruntergeladenen Messung bis heute</translation>
     </message>
     <message>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="58"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="60"/>
         <source>Enter manually:</source>
         <translation>Manuelle Eingabe:</translation>
     </message>
     <message>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="85"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="87"/>
         <source>Discard all existing measures</source>
         <translation>Alle bestehenden Messungen verwerfen</translation>
     </message>
     <message>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="97"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="99"/>
         <source>Download</source>
         <translation>Herunterladen</translation>
     </message>
     <message>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="98"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="100"/>
         <source>Close</source>
         <translation>Schließen</translation>
     </message>
     <message>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="231"/>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="280"/>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="490"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="249"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="303"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="521"/>
         <source>%1 Measures</source>
         <translation>%1 Messwerte</translation>
     </message>
     <message>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="231"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="249"/>
         <source>Invalid date range - please check your input</source>
         <translation>Ungültiger Datumsbereich - bitte prüfen Sie Ihre Eingaben</translation>
     </message>
     <message>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="274"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="297"/>
         <source>Download completed.</source>
         <translation>Herunterladen abgeschlossen.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="280"/>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="490"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="303"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="521"/>
         <source>Downloading of measures failed with error: %1</source>
         <translation>Das Herunterladen von Messungen ist mit einem Fehler fehlgeschlagen:%1</translation>
     </message>
@@ -26009,7 +26215,7 @@ Keine Aktivitäten zum Importieren gefunden.
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="595"/>
         <source>Wahoo authorization was successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wahoo-Autorisierung war erfolgreich.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="603"/>
@@ -26032,7 +26238,7 @@ Keine Aktivitäten zum Importieren gefunden.
     <message>
         <location filename="../../Cloud/OAuthPKCE.cpp" line="137"/>
         <source>Failed to open system browser.</source>
-        <translation>System-Browser konnte nicht gestartet werden: %1</translation>
+        <translation>System-Browser konnte nicht gestartet werden.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthPKCE.cpp" line="237"/>
@@ -26433,7 +26639,7 @@ Keine Aktivitäten zum Importieren gefunden.
     <message>
         <location filename="../../Metrics/PMCData.h" line="112"/>
         <source>Other</source>
-        <translation type="unfinished"></translation>
+        <translation>Andere</translation>
     </message>
 </context>
 <context>
@@ -30730,7 +30936,7 @@ Python wird in den Einstellungen deaktiviert.</translation>
     <message>
         <location filename="../../Python/PythonEmbed.cpp" line="339"/>
         <source>Python not available</source>
-        <translation>Python ist nicht verfügbar.</translation>
+        <translation>Python ist nicht verfügbar</translation>
     </message>
     <message>
         <location filename="../../Python/PythonEmbed.cpp" line="340"/>
@@ -30761,127 +30967,127 @@ Sie können Python unter Optionen -&gt; Allgemein deaktivieren, wenn Sie es nich
     <message>
         <location filename="../../Cloud/CalDAVAuth.cpp" line="61"/>
         <source>Not signed in - use Authorise to sign in to Google Calendar</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht angemeldet – melde Sie sich über „Autorisieren“ bei Google Calendar an</translation>
     </message>
     <message>
         <location filename="../../Cloud/CalDAVDiscovery.cpp" line="88"/>
         <source>.well-known/caldav did not redirect (status %1)</source>
-        <translation type="unfinished"></translation>
+        <translation>.well-known/caldav hat nicht weitergeleitet (Status %1)</translation>
     </message>
     <message>
         <location filename="../../Cloud/CalDAVDiscovery.cpp" line="110"/>
         <source>Server URL, username or password is missing</source>
-        <translation type="unfinished"></translation>
+        <translation>Server-URL, Benutzername oder Passwort fehlt</translation>
     </message>
     <message>
         <location filename="../../Cloud/CalDAVDiscovery.cpp" line="199"/>
         <source>No calendars found - check the URL points at or above your CalDAV calendar home</source>
-        <translation type="unfinished"></translation>
+        <translation>Es wurden keine Kalender gefunden – überprüfen Sie, ob die URL auf Ihre CalDAV-Kalender-Startseite oder eine darüber liegende Ebene verweist</translation>
     </message>
     <message>
         <location filename="../../Cloud/GoogleCalendarDiscovery.cpp" line="45"/>
         <source>No account configured</source>
-        <translation type="unfinished"></translation>
+        <translation>Kein Konto konfiguriert</translation>
     </message>
     <message>
         <location filename="../../Cloud/GoogleCalendarDiscovery.cpp" line="53"/>
         <source>Authorise with Google first</source>
-        <translation type="unfinished"></translation>
+        <translation>Zuerst bei Google autorisieren</translation>
     </message>
     <message>
         <location filename="../../Cloud/GoogleCalendarDiscovery.cpp" line="117"/>
         <source>No writable calendars found in this Google account</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine beschreibbaren Kalender in diesem Google-Konto gefunden</translation>
     </message>
     <message>
         <location filename="../../Cloud/WahooClient.cpp" line="46"/>
         <source>JSON parser error: %1</source>
-        <translation type="unfinished">JSON-Parserfehler: %1</translation>
+        <translation>JSON-Parserfehler: %1</translation>
     </message>
     <message>
         <location filename="../../Cloud/WahooClient.cpp" line="53"/>
         <source>JSON root object empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Das JSON-Wurzelobjekt ist leer.</translation>
     </message>
     <message>
         <location filename="../../Cloud/WahooClient.cpp" line="63"/>
         <source>You must authorize with Wahoo first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Du musst dich zuerst bei Wahoo autorisieren.</translation>
     </message>
     <message>
         <location filename="../../Cloud/WahooClient.cpp" line="80"/>
         <source>Invalid request: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungültige Anfrage: %1</translation>
     </message>
     <message>
         <location filename="../../Cloud/WahooClient.cpp" line="83"/>
         <source>The API key %1 is revoked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der API-Schlüssel %1 wurde widerrufen.</translation>
     </message>
     <message>
         <location filename="../../Cloud/WahooClient.cpp" line="86"/>
         <source>No access to this resource: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kein Zugriff auf diese Ressource: %1</translation>
     </message>
     <message>
         <location filename="../../Cloud/WahooClient.cpp" line="89"/>
         <source>Cannot find %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 nicht gefunden</translation>
     </message>
     <message>
         <location filename="../../Cloud/WahooClient.cpp" line="92"/>
         <source>Method %1 not allowd</source>
-        <translation type="unfinished"></translation>
+        <translation>Methode %1 nicht erlaubt</translation>
     </message>
     <message>
         <location filename="../../Cloud/WahooClient.cpp" line="95"/>
         <source>Format is not json.</source>
-        <translation type="unfinished"></translation>
+        <translation>Das Format ist nicht JSON.</translation>
     </message>
     <message>
         <location filename="../../Cloud/WahooClient.cpp" line="98"/>
         <source>This endpoint doesn&apos;t exist anymore: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Endpunkt existiert nicht mehr: %1</translation>
     </message>
     <message>
         <location filename="../../Cloud/WahooClient.cpp" line="101"/>
         <source>Unprocessable Entity because one or more parameters are missing or the API credentials are not approved.</source>
-        <translation type="unfinished"></translation>
+        <translation>Anfrage nicht verarbeitbar: Ein oder mehrere Parameter fehlen oder die API-Zugangsdaten sind nicht genehmigt.</translation>
     </message>
     <message>
         <location filename="../../Cloud/WahooClient.cpp" line="104"/>
         <source>Too many requests from GoldenCheetah to Wahoo API. Try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zu viele Anfragen von GoldenCheetah an die Wahoo-API. Später erneut versuchen.</translation>
     </message>
     <message>
         <location filename="../../Cloud/WahooClient.cpp" line="111"/>
         <source>Problem with the Wahoo Server. Try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Problem mit dem Wahoo-Server. Später erneut versuchen.</translation>
     </message>
     <message>
         <location filename="../../Cloud/WahooClient.cpp" line="114"/>
         <source>The Wahoo API is temporarily offline for maintenance. Try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Wahoo-API ist wegen Wartungsarbeiten vorübergehend offline. Später erneut versuchen.</translation>
     </message>
     <message>
         <location filename="../../Cloud/WahooClient.cpp" line="133"/>
         <source>Network error reading Wahoo workouts. </source>
-        <translation type="unfinished"></translation>
+        <translation>Netzwerkfehler beim Lesen der Wahoo-Workouts. </translation>
     </message>
     <message>
         <location filename="../../Cloud/WahooClient.cpp" line="176"/>
         <source>Cannot parse total value of JSON root.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Gesamtwert im JSON-Wurzelobjekt konnte nicht gelesen werden.</translation>
     </message>
     <message>
         <location filename="../../Cloud/WahooClient.cpp" line="183"/>
         <source>Invalid value for total value of Wahoo API response: </source>
-        <translation type="unfinished"></translation>
+        <translation>Ungültiger Wert für den Gesamtwert der Wahoo-API-Antwort: </translation>
     </message>
     <message>
         <location filename="../../Cloud/WahooClient.cpp" line="262"/>
         <source>Wahoo API did not return a file URL.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Wahoo-API hat keine Datei-URL zurückgegeben.</translation>
     </message>
 </context>
 <context>
@@ -39285,27 +39491,27 @@ F3 drücken, wenn fertig.</translation>
     <message>
         <location filename="../../Train/VideoHtmlWindow.cpp" line="220"/>
         <source>Show Editor</source>
-        <translation type="unfinished">Editor anzeigen</translation>
+        <translation>Editor anzeigen</translation>
     </message>
     <message>
         <location filename="../../Train/VideoHtmlWindow.cpp" line="224"/>
         <source>Show Title</source>
-        <translation type="unfinished">Titel anzeigen</translation>
+        <translation>Titel anzeigen</translation>
     </message>
     <message>
         <location filename="../../Train/VideoHtmlWindow.cpp" line="228"/>
         <source>Keep aspect ratio (no crop)</source>
-        <translation type="unfinished"></translation>
+        <translation>Seitenverhältnis beibehalten (nicht zuschneiden)</translation>
     </message>
     <message>
         <location filename="../../Train/VideoHtmlWindow.cpp" line="232"/>
         <source>Apply HTML</source>
-        <translation type="unfinished"></translation>
+        <translation>HTML anwenden</translation>
     </message>
     <message>
         <location filename="../../Train/VideoHtmlWindow.cpp" line="306"/>
         <source>HTML / CSS / JavaScript source…</source>
-        <translation type="unfinished"></translation>
+        <translation>HTML / CSS / JavaScript-Quellcode…</translation>
     </message>
 </context>
 <context>
@@ -39787,22 +39993,22 @@ F3 drücken, wenn fertig.</translation>
     <message>
         <location filename="../../Cloud/Wahoo.cpp" line="80"/>
         <source>No authorization token configured.</source>
-        <translation type="unfinished">Kein Autorisierungstoken konfiguriert.</translation>
+        <translation>Kein Autorisierungstoken konfiguriert.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Wahoo.cpp" line="213"/>
         <source>Completed.</source>
-        <translation type="unfinished">Abgeschlossen.</translation>
+        <translation>Abgeschlossen.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Wahoo.h" line="51"/>
         <source>Wahoo</source>
-        <translation type="unfinished"></translation>
+        <translation>Wahoo</translation>
     </message>
     <message>
         <location filename="../../Cloud/Wahoo.h" line="52"/>
         <source>Sync workouts with Wahoo cloud service.</source>
-        <translation type="unfinished"></translation>
+        <translation>Trainings mit dem Wahoo-Cloud-Dienst synchronisieren.</translation>
     </message>
 </context>
 <context>
