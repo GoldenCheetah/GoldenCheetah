@@ -156,9 +156,10 @@ GarminMeasuresDownload::getHrvMeasures(QString &error, QDateTime from, QDateTime
     }
 
     auto listing =
-        garminPersonalAPI->hrvService(
+        garminPersonalAPI->athleteMetrics(
             from.date(),
-            to.date());
+            to.date(),
+            GarminPersonalAPI::Metric::Hrv | GarminPersonalAPI::Metric::UserSummary);
 
     if (listing.hasError()) {
         error = listing.errorText;
@@ -169,7 +170,7 @@ GarminMeasuresDownload::getHrvMeasures(QString &error, QDateTime from, QDateTime
     emit downloadProgress(50);
 
     // HRV object has YYYYMMDD keys with [RMSSD, Baseline] tuples
-    for (auto [day, hrv] : listing.hrvEntries.asKeyValueRange()) {
+    for (auto [day, metrics] : listing.metrics.asKeyValueRange()) {
 
         Measure m;
 
@@ -178,11 +179,13 @@ GarminMeasuresDownload::getHrvMeasures(QString &error, QDateTime from, QDateTime
         m.source = Measure::Garmin;
         m.originalSource = "Garmin";
 
-        printd("hrv (lastNight) : %i", hrv.lastNightAvg);
+        printd("hrv (lastNight) : %i", metrics.hrv.lastNightAvg);
+        printd("hr resting value : %i", metrics.userSummary.hrRestingValue);
 
 
         // RMSSD (ms)
-        m.values[0] = hrv.lastNightAvg;
+        m.values[0] = metrics.hrv.lastNightAvg;
+        m.values[1] = metrics.userSummary.hrRestingValue;
 
         data.append(m);
     }
