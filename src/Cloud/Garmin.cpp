@@ -68,6 +68,7 @@ Garmin::open(QStringList &errors)
     QString key = getSetting(GC_GARMIN_API_KEY, "").toString();
     if (key == "") {
         errors << tr("You must set a Garmin Personal API key first");
+        errors << tr("See https://developer.garmin.com/gc-developer-program/personal/personal-api");
         return false;
     }
     printd("Garmin API key %s\n", key.toStdString().c_str());
