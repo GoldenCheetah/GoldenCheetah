@@ -15,16 +15,17 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#include "GoldenCheetah.h"
+//#include "GoldenCheetah.h"
 
 #include "RealtimeController.h"
 #include "KettlerRacer.h"
+
 
 // Abstract base class for Realtime device controllers
 
 #ifndef _GC_KettlerRacerController_h
 #define _GC_KettlerRacerController_h 1
-
+class Context;
 class KettlerRacerController : public RealtimeController
 {
     Q_DECLARE_TR_FUNCTIONS(KettlerRacerController)
@@ -44,10 +45,12 @@ public:
     // telemetry push pull
     bool doesPush(), doesPull(), doesLoad();
     void getRealtimeData(RealtimeData &rtData);
+    void setGradient (double slope);
     void pushRealtimeData(RealtimeData &rtData);
-
     void setLoad(double);
-    void setMode(int) { return ; }
+    void setMode(int);
+private:
+    int mode = 1;
 };
 
 #endif // _GC_KettlerRacerController_h
