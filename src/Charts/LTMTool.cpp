@@ -2329,8 +2329,8 @@ EditMetricDetailDialog::stressName()
 
     // append type
     switch(stressTypeSelect->currentIndex()) {
-    case 0: metricDetail->bestSymbol += "_lts"; break;
-    case 1: metricDetail->bestSymbol += "_sts"; break;
+    case 0: metricDetail->bestSymbol += "_sts"; break; // STRESS_STS
+    case 1: metricDetail->bestSymbol += "_lts"; break; // STRESS_LTS
     case 2: metricDetail->bestSymbol += "_sb"; break;
     case 3: metricDetail->bestSymbol += "_rr"; break;
     }
