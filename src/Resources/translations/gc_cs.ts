@@ -510,12 +510,12 @@ Může být nezbytné ji vypnout ručně.</translation>
 <context>
     <name>AddAthlete</name>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="623"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="633"/>
         <source>Coached Athletes</source>
         <translation>Trénovaní sportovci</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="624"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="634"/>
         <source>Select Athlete for this account</source>
         <translation>Vyber sportovce pro tento účet</translation>
     </message>
@@ -546,9 +546,13 @@ Může být nezbytné ji vypnout ručně.</translation>
         <translation>URL</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="307"/>
         <source>Key (optional)</source>
-        <translation>Klíč (nepovinný)</translation>
+        <translation type="vanished">Klíč (nepovinný)</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="307"/>
+        <source>User Key</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="308"/>
@@ -619,6 +623,11 @@ Může být nezbytné ji vypnout ručně.</translation>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="513"/>
         <source>%1 Credentials and authorisation</source>
         <translation>%1 Pověření a autorizace</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="588"/>
+        <source>Connection Failed</source>
+        <translation type="unfinished">Spojení selhalo</translation>
     </message>
 </context>
 <context>
@@ -748,58 +757,58 @@ Může být nezbytné ji vypnout ručně.</translation>
 <context>
     <name>AddFinish</name>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="815"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="825"/>
         <source>Done</source>
         <translation>Hotovo</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="816"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="826"/>
         <source>Add Cloud Account</source>
         <translation>Přidat účet v cloudu</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="843"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="853"/>
         <source>URL</source>
         <translation>URL</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="844"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="854"/>
         <source>Key</source>
         <translation>Klíč</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="845"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="855"/>
         <source>Username</source>
         <translation>Uživatelské jméno</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="846"/>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="869"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="856"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="879"/>
         <source>Password</source>
         <translation>Heslo</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="847"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="857"/>
         <source>Token</source>
         <translation>Token</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="848"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="858"/>
         <source>Folder</source>
         <translation>Složka</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="849"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="859"/>
         <source>Athlete ID</source>
         <translation>ID sportovce</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="873"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="883"/>
         <source>Sync on start</source>
         <translation>Synchronizovat při spuštění</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="875"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="885"/>
         <source>Sync on import</source>
         <translation>Synchronizovat při importu</translation>
     </message>
@@ -1369,42 +1378,42 @@ Pokračujte kliknutím na tlačítko Další
 <context>
     <name>AddSettings</name>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="681"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="691"/>
         <source>Cloud Service Settings</source>
         <translation>Nastavení cloudové služby</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="697"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="707"/>
         <source>Folder</source>
         <translation>Složka</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="701"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="711"/>
         <source>Browse</source>
         <translation>Procházet</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="702"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="712"/>
         <source>Sync on startup</source>
         <translation>Synchronizovat při spuštění</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="703"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="713"/>
         <source>Sync on import</source>
         <translation>Synchronizovat při importu</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="721"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="731"/>
         <source>Service Settings</source>
         <translation>Nastavení služby</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="791"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="801"/>
         <source>Connection Failed</source>
         <translation>Spojení selhalo</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="798"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="808"/>
         <source>Choose Athlete Directory</source>
         <translation>Zvolit složku sportovce</translation>
     </message>
@@ -14902,6 +14911,212 @@ Nastavení kroutivého momentu - definuje absolutní hodnotu v psi nebo Nm, o kt
     </message>
 </context>
 <context>
+    <name>Garmin</name>
+    <message>
+        <location filename="../../Cloud/Garmin.cpp" line="70"/>
+        <source>You must set a Garmin Personal API key first</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Garmin.cpp" line="71"/>
+        <source>See https://developer.garmin.com/gc-developer-program/personal/personal-api</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Garmin.cpp" line="105"/>
+        <source>Garmin service not initialized</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Garmin.cpp" line="167"/>
+        <source>Completed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Garmin.h" line="39"/>
+        <source>Garmin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Garmin.h" line="40"/>
+        <source>Sync with the Garmin Personal API.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GarminMeasuresDownload</name>
+    <message>
+        <location filename="../../Cloud/GarminMeasuresDownload.cpp" line="67"/>
+        <source>You must set a Garmin Personal API key first</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GarminPersonalAPI</name>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="223"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="305"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="341"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="405"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="520"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="603"/>
+        <source>Another Garmin request is already in progress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="230"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="348"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="412"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="527"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="610"/>
+        <source>Invalid date range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="249"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="362"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="428"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="543"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="624"/>
+        <source>Unexpected content type in reply: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="256"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="369"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="435"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="550"/>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="631"/>
+        <source>Failed to parse JSON: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="260"/>
+        <source>Invalid JSON: expected an array of activities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="311"/>
+        <source>Invalid activity id</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="322"/>
+        <source>Empty download reply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="324"/>
+        <source>The reply is not a ZIP archive (content type: %1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="373"/>
+        <source>Invalid JSON: expected an object of hrv summaries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="439"/>
+        <source>Invalid JSON: expected an object of user summaries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="554"/>
+        <source>Invalid JSON: expected an array of sleep summaries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="635"/>
+        <source>Invalid JSON: expected an array of weight summaries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="811"/>
+        <source>%1 (not retrying before %2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="843"/>
+        <source>Garmin rejected the API key (HTTP %1). It is invalid, expired or deleted; create a new one in Garmin Connect (%2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="848"/>
+        <source>Could not obtain an access token: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="850"/>
+        <source>Could not obtain an access token: the reply could not be understood</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="852"/>
+        <source>Could not obtain an access token: the received token is already expired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="898"/>
+        <source>This build of Qt has no usable TLS support (available backends: %1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="943"/>
+        <source>Could not establish a secure connection to Garmin (%1). Check that the system date and time are correct and whether a proxy, VPN or security software intercepts HTTPS traffic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="953"/>
+        <source>Request timed out (no data for %1 s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="954"/>
+        <source>Network error: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="977"/>
+        <source>Invalid request (HTTP 400)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="979"/>
+        <source>Authorization failed (HTTP 401): the token or API key is invalid, expired or revoked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="981"/>
+        <source>No access to this resource (HTTP 403)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="983"/>
+        <source>Resource not found (HTTP 404)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="985"/>
+        <source>Too many requests (HTTP 429)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="987"/>
+        <source>, retry after %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="993"/>
+        <source>Garmin server error (HTTP %1), try again later</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/GarminPersonalAPI.cpp" line="995"/>
+        <source>Unexpected reply (HTTP %1): %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>GcCalendarModel</name>
     <message>
         <location filename="../../Core/GcCalendarModel.h" line="109"/>
@@ -24262,64 +24477,69 @@ Closing of athlete window not possible while background activity import is in pr
     </message>
     <message>
         <location filename="../../Cloud/MeasuresDownload.cpp" line="47"/>
+        <source>Garmin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="48"/>
         <source>Import CSV file</source>
         <translation type="unfinished">Import CSV souboru</translation>
     </message>
     <message>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="55"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="57"/>
         <source>Choose date range for download</source>
         <translation type="unfinished">Zvolte časový rozsah ke stažení</translation>
     </message>
     <message>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="56"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="58"/>
         <source>From date of first recorded activity to today</source>
         <translation type="unfinished">Od první nahrané aktivity až dodnes</translation>
     </message>
     <message>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="57"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="59"/>
         <source>From date of last downloaded measurement to today</source>
         <translation type="unfinished">Od data posledního stažení měření až dodnes</translation>
     </message>
     <message>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="58"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="60"/>
         <source>Enter manually:</source>
         <translation type="unfinished">Zadejte ručně:</translation>
     </message>
     <message>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="85"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="87"/>
         <source>Discard all existing measures</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="97"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="99"/>
         <source>Download</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="98"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="100"/>
         <source>Close</source>
         <translation type="unfinished">Zavřít</translation>
     </message>
     <message>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="231"/>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="280"/>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="490"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="249"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="303"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="521"/>
         <source>%1 Measures</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="231"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="249"/>
         <source>Invalid date range - please check your input</source>
         <translation type="unfinished">Neplatný časový rozsah - prosím zkontrolujte co jste zadali</translation>
     </message>
     <message>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="274"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="297"/>
         <source>Download completed.</source>
         <translation type="unfinished">Stahování dokončeno.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="280"/>
-        <location filename="../../Cloud/MeasuresDownload.cpp" line="490"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="303"/>
+        <location filename="../../Cloud/MeasuresDownload.cpp" line="521"/>
         <source>Downloading of measures failed with error: %1</source>
         <translation type="unfinished"></translation>
     </message>

@@ -304,7 +304,7 @@ AddAuth::AddAuth(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
     // labels
     comboLabel = new QLabel("");
     urlLabel = new QLabel(tr("URL"));
-    keyLabel = new QLabel(tr("Key (optional)"));
+    keyLabel = new QLabel(tr("User Key"));
     userLabel = new QLabel(tr("Username"));
     passLabel = new QLabel(tr("Password"));
     authLabel = new QLabel(tr("Authorise"));
@@ -581,7 +581,17 @@ AddAuth::validatePage()
     // just extract edited values
     updateServiceSettings();
 
-    // always move on -- for now.
+    // try to open for early feedback on config errors
+    QStringList errors;
+    if (!wizard->cloudService->open(errors)) {
+        QMessageBox err;
+        err.setText(tr("Connection Failed"));
+        err.setDetailedText(errors.join("\n\n"));
+        err.setIcon(QMessageBox::Warning);
+        err.exec();
+	return false;
+    }
+
     return true;
 }
 

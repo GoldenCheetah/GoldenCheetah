@@ -515,12 +515,12 @@ Sie müssen diesen möglicherweise manuell deaktivieren.</translation>
 <context>
     <name>AddAthlete</name>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="623"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="633"/>
         <source>Coached Athletes</source>
         <translation>Betreute Athleten</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="624"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="634"/>
         <source>Select Athlete for this account</source>
         <translation>Athleten für dieses Benutzerkonto auswählen</translation>
     </message>
@@ -551,9 +551,13 @@ Sie müssen diesen möglicherweise manuell deaktivieren.</translation>
         <translation>URL</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="307"/>
         <source>Key (optional)</source>
-        <translation>Schlüssel (optional)</translation>
+        <translation type="vanished">Schlüssel (optional)</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="307"/>
+        <source>User Key</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="308"/>
@@ -624,6 +628,11 @@ Sie müssen diesen möglicherweise manuell deaktivieren.</translation>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="513"/>
         <source>%1 Credentials and authorisation</source>
         <translation>%1 Anmeldedaten und Autorisierung</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="588"/>
+        <source>Connection Failed</source>
+        <translation type="unfinished">Verbindung nicht möglich</translation>
     </message>
 </context>
 <context>
@@ -753,58 +762,58 @@ Sie müssen diesen möglicherweise manuell deaktivieren.</translation>
 <context>
     <name>AddFinish</name>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="815"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="825"/>
         <source>Done</source>
         <translation>Fertig</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="816"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="826"/>
         <source>Add Cloud Account</source>
         <translation>Cloud-Benutzerkonto hinzufügen</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="843"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="853"/>
         <source>URL</source>
         <translation>URL</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="844"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="854"/>
         <source>Key</source>
         <translation>Schlüssel</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="845"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="855"/>
         <source>Username</source>
         <translation>Benutzername</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="846"/>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="869"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="856"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="879"/>
         <source>Password</source>
         <translation>Passwort</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="847"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="857"/>
         <source>Token</source>
         <translation>Token</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="848"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="858"/>
         <source>Folder</source>
         <translation>Verzeichnis</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="849"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="859"/>
         <source>Athlete ID</source>
         <translation>Athleten-ID</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="873"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="883"/>
         <source>Sync on start</source>
         <translation>Beim Start synchronisieren</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="875"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="885"/>
         <source>Sync on import</source>
         <translation>Beim Import synchronisieren</translation>
     </message>
@@ -1374,42 +1383,42 @@ Gerät gefunden.
 <context>
     <name>AddSettings</name>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="681"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="691"/>
         <source>Cloud Service Settings</source>
         <translation>Clouddienst-Einstellungen</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="697"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="707"/>
         <source>Folder</source>
         <translation>Verzeichnis</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="701"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="711"/>
         <source>Browse</source>
         <translation>Durchsuchen</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="702"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="712"/>
         <source>Sync on startup</source>
         <translation>Beim Start synchronisieren</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="703"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="713"/>
         <source>Sync on import</source>
         <translation>Beim Import synchronisieren</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="721"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="731"/>
         <source>Service Settings</source>
         <translation>Diensteinstellungen</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="791"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="801"/>
         <source>Connection Failed</source>
         <translation>Verbindung nicht möglich</translation>
     </message>
     <message>
-        <location filename="../../Cloud/AddCloudWizard.cpp" line="798"/>
+        <location filename="../../Cloud/AddCloudWizard.cpp" line="808"/>
         <source>Choose Athlete Directory</source>
         <translation>Athletenverzeichnis auswählen</translation>
     </message>
@@ -15272,12 +15281,17 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
         <translation>Sie müssen zuerst einen Garmin Personal API-Schlüssel festlegen</translation>
     </message>
     <message>
-        <location filename="../../Cloud/Garmin.cpp" line="104"/>
+        <location filename="../../Cloud/Garmin.cpp" line="71"/>
+        <source>See https://developer.garmin.com/gc-developer-program/personal/personal-api</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Garmin.cpp" line="105"/>
         <source>Garmin service not initialized</source>
         <translation>Garmin-Dienst nicht initialisiert</translation>
     </message>
     <message>
-        <location filename="../../Cloud/Garmin.cpp" line="166"/>
+        <location filename="../../Cloud/Garmin.cpp" line="167"/>
         <source>Completed.</source>
         <translation>Abgeschlossen.</translation>
     </message>
