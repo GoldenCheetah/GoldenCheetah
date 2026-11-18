@@ -1413,3 +1413,5 @@ BT40Device::sendSimulationParameters() {
         loadService->writeCharacteristic(loadCharacteristic, command);
     }
 }
+
+
