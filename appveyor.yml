@@ -7,8 +7,6 @@ branches:
 
 image:
   - Visual Studio 2022
-  - Ubuntu2204
-  - macos-monterey
 
 environment:
   PYTHON_VERSION: "3.11"
