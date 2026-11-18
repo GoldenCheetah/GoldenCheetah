@@ -29,6 +29,8 @@ KettlerRacerController::KettlerRacerController(TrainSidebar *parent,  DeviceConf
 {
     m_kettlerRacer = new KettlerRacer(this, dc ? dc->portSpec : "");
 
+    m_kettlerRacer->setAthleteWeight(75);
+
     connect(parent->context, SIGNAL(start()),
             m_kettlerRacer, SLOT(gearOverlay_getFocus()),
             Qt::QueuedConnection);

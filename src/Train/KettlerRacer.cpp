@@ -76,7 +76,7 @@ int KettlerRacer::start()
     m_kettlerRacerConnection->start();
     createLabelGears();
     m_kettlerRacerConnection->resetRead();
-    m_kettlerRacerConnection->setPollInterval(1000);
+    m_kettlerRacerConnection->setPollInterval(1000,1);
     return 0;
 }
 
@@ -266,11 +266,17 @@ bool KettlerRacer::discover(QString portName)
 }
 
 //from TrainSidebar::workoutTreeWidgetSelectionChanged()
+//set m_modee and timeer
 void KettlerRacer::setMode(int m)
 {
-    m_kettlerRacerConnection->m_mode=m;
-    if (m==2) m_kettlerRacerConnection->setPollInterval(100);//slope
-    if (m==1) m_kettlerRacerConnection->setPollInterval(1000);//erg
+    if (m==2) {
+        m_kettlerRacerConnection->setPollInterval(100,m);//slope
+        m_gearOverlay->show();
+        return;
+    }
+    m_kettlerRacerConnection->setPollInterval(1000,m);//erg
+    m_gearOverlay->hide();
+    return;
 }
 
 void KettlerRacer::setLoad(double load)

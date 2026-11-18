@@ -63,9 +63,10 @@ void KettlerRacerConnection::setSerialPort(const QString serialPortName)
 //start here (run is running)
 //called from trainsidebar at exercise selection
 //set mode and start polling bike data
-void KettlerRacerConnection::setPollInterval(int interval)
+void KettlerRacerConnection::setPollInterval(int interval, int m)
 {
     conta=0;
+    m_mode=m;
     //ERG
     if (m_mode == 1){
         cmd = "ES1\r\n";//erg mode
@@ -251,7 +252,6 @@ void KettlerRacerConnection::parseES()
     quint32 newHeartrate = m_splits.at( 4 ).toUInt(&ok);
     if (ok){
         emit pulse(newHeartrate);
-        //emit pulse(m_internalSpeed);
     }
     quint32 newCadence = m_splits.at( 5 ).toUInt(&ok);
     if (ok){
@@ -351,7 +351,7 @@ void KettlerRacerConnection::parseGear()
 //from kettlerracer class dragfilter --
 void KettlerRacerConnection::handleKeyPress(int key)
 {
-    // Questo codice viene eseguito nel thread secondario in sicurezza grazie a QueuedConnection
+    // QueuedConnection
     switch (key) {
     case Qt::Key_S:
         m_gearsKeyPressed = 1024;
@@ -359,10 +359,10 @@ void KettlerRacerConnection::handleKeyPress(int key)
     case Qt::Key_W:
         m_gearsKeyPressed = 2048;
         break;
-    case Qt::Key_A:
+    case Qt::Key_D:
         m_gearsKeyPressed = 4096;
         break;
-    case Qt::Key_D:
+    case Qt::Key_A:
         m_gearsKeyPressed = 8192;
         break;
     default:
@@ -371,7 +371,7 @@ void KettlerRacerConnection::handleKeyPress(int key)
 }
 void KettlerRacerConnection::changeGearByAction(GearAction action)
 {
-    // Questa logica ora accetta comandi sia dalla bici che dalla tastiera
+    // gear changing from keyboard and switch
     switch (action) {
     case fdDown: // w o 1024
         m_shiftFront = 0;
@@ -379,10 +379,10 @@ void KettlerRacerConnection::changeGearByAction(GearAction action)
     case fdUp:  // s o 2048
         m_shiftFront = 12;
         break;
-    case rdUp: // a o 4096 (marcia più leggera / pignone più grande)
+    case rdUp: // a o 4096
         if (m_shiftRear < 12) m_shiftRear++;
         break;
-    case rdDown: // d o 8192 (marcia più dura / pignone più piccolo)
+    case rdDown: // d o 8192
         if (m_shiftRear > 1) m_shiftRear--;
         break;
     }
@@ -441,7 +441,7 @@ void KettlerRacerConnection::updateInternalSpeed()
         double sinTheta = m_gradient;
         double F_res_teorica = m_athleteWeight * g * (sinTheta + Crr) + 0.5 * Cda * rho * v_pedalata * v_pedalata;
 
-        // Potenza richiesta ai pedali per spingere quel rapporto a quella cadenza
+        //power to pedal from rapp and cadencee
         double P_res_teorica = F_res_teorica * v_pedalata;
         targetLoad = static_cast<int>(P_res_teorica / chain);
     }
@@ -466,7 +466,7 @@ void KettlerRacerConnection::updateInternalSpeed()
         F_traz = P_ruota / v_calc;
     }
 
-    // Resistenza stradale effettiva basata sulla velocità virtuale attuale
+    // ground rsistance
     double sinTheta = m_gradient;
     double F_res = m_athleteWeight * g * (sinTheta + Crr) + 0.5 * Cda * rho * v * v;
 

@@ -36,7 +36,7 @@ public:
     KettlerRacerConnection();
     ~KettlerRacerConnection();
     void setWeight(double m){m_athleteWeight=m;};
-    void setPollInterval(int interval);
+    void setPollInterval(int interval,int m);
     int pollInterval();
     void setSerialPort(const QString serialPortName);
     bool configurePort(QSerialPort *serialPort);
