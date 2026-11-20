@@ -270,7 +270,7 @@ BT40Device::serviceScanDone()
         connect(service, SIGNAL(characteristicRead(QLowEnergyCharacteristic,QByteArray)), this, SLOT(updateValue(QLowEnergyCharacteristic,QByteArray)));
         connect(service, SIGNAL(descriptorWritten(QLowEnergyDescriptor,QByteArray)), this, SLOT(confirmedDescriptorWrite(QLowEnergyDescriptor,QByteArray)));
         connect(service, SIGNAL(characteristicWritten(QLowEnergyCharacteristic,QByteArray)), this, SLOT(confirmedCharacteristicWrite(QLowEnergyCharacteristic,QByteArray)));
-        connect(service, SIGNAL(error(QLowEnergyService::ServiceError)), this, SLOT(serviceError(QLowEnergyService::ServiceError)));
+        connect(service, SIGNAL(errorOccurred(QLowEnergyService::ServiceError)), this, SLOT(serviceError(QLowEnergyService::ServiceError)));
 
         if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::ServiceClassUuid::CyclingPower)) {
             // Don't connect Cycling Power Service if there's already a controllable source that provides power.
@@ -1413,5 +1413,3 @@ BT40Device::sendSimulationParameters() {
         loadService->writeCharacteristic(loadCharacteristic, command);
     }
 }
-
-
