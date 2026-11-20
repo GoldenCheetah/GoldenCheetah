@@ -270,7 +270,7 @@ BT40Device::serviceScanDone()
         connect(service, SIGNAL(characteristicRead(QLowEnergyCharacteristic,QByteArray)), this, SLOT(updateValue(QLowEnergyCharacteristic,QByteArray)));
         connect(service, SIGNAL(descriptorWritten(QLowEnergyDescriptor,QByteArray)), this, SLOT(confirmedDescriptorWrite(QLowEnergyDescriptor,QByteArray)));
         connect(service, SIGNAL(characteristicWritten(QLowEnergyCharacteristic,QByteArray)), this, SLOT(confirmedCharacteristicWrite(QLowEnergyCharacteristic,QByteArray)));
-        connect(service, SIGNAL(error(QLowEnergyService::ServiceError)), this, SLOT(serviceError(QLowEnergyService::ServiceError)));
+        connect(service, SIGNAL(errorOccurred(QLowEnergyService::ServiceError)), this, SLOT(serviceError(QLowEnergyService::ServiceError)));
 
         if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::ServiceClassUuid::CyclingPower)) {
             // Don't connect Cycling Power Service if there's already a controllable source that provides power.
@@ -483,10 +483,13 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
                             commandDs.setByteOrder(QDataStream::LittleEndian);
                             commandDs << (quint8)FtmsControlPointCommand::FTMS_REQUEST_CONTROL;
 
-                            // Start notifications since command results will come on this char
+                        // Command results come on this char. The FTMS spec delivers them as
+                        // indications, so enable indications when supported, else notifications.
                             const QLowEnergyDescriptor notificationDesc = characteristic.descriptor(QBluetoothUuid::DescriptorType::ClientCharacteristicConfiguration);
                             if (notificationDesc.isValid()) {
-                                service->writeDescriptor(notificationDesc, QByteArray::fromHex("0100"));
+                                const bool useIndications = characteristic.properties() & QLowEnergyCharacteristic::Indicate;
+                                qDebug() << "Starting" << (useIndications ? "indication" : "notification") << "for FTMS control point";
+                                service->writeDescriptor(notificationDesc, QByteArray::fromHex(useIndications ? "0200" : "0100"));
                             }
 
                             loadService->writeCharacteristic(characteristic, command);
