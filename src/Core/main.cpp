@@ -423,6 +423,23 @@ main(int argc, char *argv[])
     }
 #endif
 
+    auto sslProtocols = []() {
+        QStringList protos;
+        for (const QSsl::SslProtocol &proto : QSslSocket::supportedProtocols()) {
+            protos << QDebug::toString(proto);
+        }
+        return protos.join(", ");
+    };
+    qInfo() << "SSL: Available backends:" << QStringList(QSslSocket::availableBackends()).join(", ");
+    qInfo() << "SSL: Default backend...:" << QSslSocket::activeBackend() << sslProtocols();
+    if (QSslSocket::activeBackend() != "openssl") {
+        if (QSslSocket::setActiveBackend("openssl")) {
+            qInfo() << "SSL: Selected backend..:" << QSslSocket::activeBackend() << sslProtocols();
+        } else {
+            qInfo() << "SSL: Failed to select backend 'openssl'";
+        }
+    }
+
     //XXXIdleEventFilter idleFilter;
     //XXXapplication->installEventFilter(&idleFilter);
 
