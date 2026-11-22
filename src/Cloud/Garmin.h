@@ -43,6 +43,7 @@ class Garmin : public CloudService {
         // now upload only and authenticates with a user and password
         int capabilities() const override { return OAuth | Download | Query; }
         int type() const override { return Activities | Measures; }
+        int activityFeatures() const override { return ActivityLabel; } //0
 
         // open/connect and close/disconnect
         bool open(QStringList &errors) override;

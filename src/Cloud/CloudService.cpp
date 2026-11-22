@@ -786,6 +786,7 @@ CloudServiceSyncDialog::CloudServiceSyncDialog(Context *context, CloudService *s
     rideListDown->headerItem()->setText(4, tr("Exists"));
     rideListDown->headerItem()->setText(5, tr("Status"));
     rideListDown->headerItem()->setText(6, tr("Workout Id"));
+    rideListDown->headerItem()->setText(7, tr("File Name"));
     rideListDown->setColumnCount(6);
     rideListDown->setSelectionMode(QAbstractItemView::SingleSelection);
     rideListDown->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
@@ -854,6 +855,7 @@ CloudServiceSyncDialog::CloudServiceSyncDialog(Context *context, CloudService *s
     rideListSync->headerItem()->setText(6, tr("Action"));
     rideListSync->headerItem()->setText(7, tr("Status"));
     rideListSync->headerItem()->setText(8, tr("Workout Id"));
+    rideListSync->headerItem()->setText(9, tr("File Name"));
     rideListSync->setColumnCount(8);
     rideListSync->setSelectionMode(QAbstractItemView::SingleSelection);
     rideListSync->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
@@ -1041,8 +1043,12 @@ CloudServiceSyncDialog::refreshClicked()
         connect (check, SIGNAL(stateChanged(int)), this, SLOT(refreshCount()));
         rideListDown->setItemWidget(add, 0, check);
 
-        add->setText(1, workouts[i]->name);
-        add->setTextAlignment(1, Qt::AlignCenter);
+
+        if (store->activityFeatures() & CloudService::ActivityLabel)
+            add->setText(1, workouts[i]->label);
+        else
+            add->setText(1, workouts[i]->name);
+        add->setTextAlignment(1, Qt::AlignLeft);
 
         add->setText(2, ridedatetime.toString(tr("MMM d, yyyy")));
         add->setTextAlignment(2, Qt::AlignLeft | Qt::AlignVCenter);
@@ -1093,6 +1099,7 @@ CloudServiceSyncDialog::refreshClicked()
         rideListDown->setItemWidget(add, 4, exists);
         add->setTextAlignment(4, Qt::AlignCenter);
         add->setText(6, workouts[i]->id); // download_id
+        add->setText(7, workouts[i]->name); // filename
 
         if (rideFiles.contains(targetnosuffix.mid(0,14))) exists->setChecked(true);
         else {
@@ -1105,8 +1112,11 @@ CloudServiceSyncDialog::refreshClicked()
             connect (check, SIGNAL(stateChanged(int)), this, SLOT(refreshSyncCount()));
             rideListSync->setItemWidget(sync, 0, check);
 
-            sync->setText(1, workouts[i]->name);
-            sync->setTextAlignment(1, Qt::AlignCenter);
+            if (store->activityFeatures() & CloudService::ActivityLabel)
+                sync->setText(1, workouts[i]->label);
+            else
+                sync->setText(1, workouts[i]->name);
+            sync->setTextAlignment(1, Qt::AlignLeft);
             sync->setText(2, ridedatetime.toString(tr("MMM d, yyyy")));
             sync->setTextAlignment(2, Qt::AlignLeft | Qt::AlignVCenter);
             sync->setText(3, ridedatetime.toString("hh:mm:ss"));
@@ -1130,6 +1140,7 @@ CloudServiceSyncDialog::refreshClicked()
             sync->setText(7, "");
 
             sync->setText(8, workouts[i]->id); // download_id
+            sync->setText(9, workouts[i]->name); // filename
         }
     }
 
@@ -1403,7 +1414,7 @@ CloudServiceSyncDialog::syncNext()
                 rideListSync->setCurrentItem(curr);
 
                 QByteArray *data = new QByteArray;
-                store->readFile(data, curr->text(1), curr->text(8)); // filename
+                store->readFile(data, curr->text(9), curr->text(8)); // filename
                 QApplication::processEvents();
 
             } else {
@@ -1485,7 +1496,7 @@ CloudServiceSyncDialog::downloadNext()
             progressLabel->setText(QString(tr("Downloaded %1 of %2")).arg(downloadcounter).arg(downloadtotal));
 
             QByteArray *data = new QByteArray; // gets deleted when read completes
-            store->readFile(data, curr->text(1), curr->text(6));
+            store->readFile(data, curr->text(7), curr->text(6));
             QApplication::processEvents();
             //delete data;
             return true;

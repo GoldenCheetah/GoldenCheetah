@@ -106,6 +106,10 @@ class CloudService : public QObject {
         enum { Activities=0x01, Measures=0x02, Calendar=0x04 } type_;
         virtual int type() const { return Activities; }
 
+        //additional features related to activities
+        enum ActivityFeature { ActivityLabel= 0x01 };
+        virtual int activityFeatures() const { return 0; }
+
         // open/connect and close/disconnect
         virtual bool open(QStringList &errors) { Q_UNUSED(errors); return false; }
         virtual bool close() { return false; }
