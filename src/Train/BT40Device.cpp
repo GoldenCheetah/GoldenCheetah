@@ -1063,8 +1063,8 @@ void BT40Device::setGradient(double g)
         qDebug() << tr("FTMS Device: Set gradient") << g;
         qint16 ftms_wind_speed = this->windSpeed * 1000; // in 0.001 m/s
         qint16 ftms_grade = this->gradient*100; // in 0.01 %
-        quint8 ftms_crr = this->rollingResistance; // 0.0001 unitless
-        quint8 ftms_cw = this->windResistance; // 0.01 Kg/m
+        quint8 ftms_crr = qBound(0, qRound(this->rollingResistance * 10000.0), 255); // 0.0001 unitless
+        quint8 ftms_cw = qBound(0, qRound(this->windResistance * 100.0), 255); // 0.01 Kg/m
         QByteArray command;
         QDataStream commandDs(&command, QIODevice::ReadWrite);
         commandDs.setByteOrder(QDataStream::LittleEndian);
@@ -1404,8 +1404,8 @@ BT40Device::sendSimulationParameters() {
         qDebug() << tr("FTMS Device: Send simulation parameteres");
         qint16 ftms_wind_speed = this->windSpeed * 1000; // in 0.001 m/s
         qint16 ftms_grade = this->gradient*100; // in 0.01 %
-        quint8 ftms_crr = this->rollingResistance; // 0.0001 unitless
-        quint8 ftms_cw = this->windResistance; // 0.01 Kg/m
+        quint8 ftms_crr = qBound(0, qRound(this->rollingResistance * 10000.0), 255); // 0.0001 unitless
+        quint8 ftms_cw = qBound(0, qRound(this->windResistance * 100.0), 255); // 0.01 Kg/m
         QByteArray command;
         QDataStream commandDs(&command, QIODevice::ReadWrite);
         commandDs.setByteOrder(QDataStream::LittleEndian);
