@@ -24,18 +24,20 @@
 #include <QString>
 #include <QDebug>
 #include <QThread>
-//#include <QMutex>
 #include <QFile>
 #include "KettlerRacerConnection.h"
 #include <QWidget>
+#include <QEvent>
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QWindow>
+#include <QThread>
 
-// --- Classe di supporto corretta per il trascinamento anche su Wayland/Linux ---
 class DragFilter : public QObject {
     Q_OBJECT
 public:
     DragFilter(QObject *parent = nullptr) : QObject(parent) {}
 signals:
-    // Definiamo il tipo di azione inviata (puoi usare un intero o l'enum se pubblico)
     void keyActionTriggered(int key);
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override {
@@ -43,7 +45,6 @@ protected:
         QString pollo = obj->objectName();
         if(pollo != "")qDebug() << "pollo " << pollo;
         if (!clickedWidget) return false;
-        // m_gearOverlay_RootWindowRisaliamo alla finestra radice ("m_gearOverlay_Root")
         QWidget *w = clickedWidget->window();
         if (!w) return false;
 
@@ -55,16 +56,15 @@ protected:
             if (pressedKey == Qt::Key_W || pressedKey == Qt::Key_S ||
                 pressedKey == Qt::Key_A || pressedKey == Qt::Key_D)
             {
-                // Emettiamo il segnale indicando quale tasto è stato premuto
+                // Emit
                 emit keyActionTriggered(pressedKey);
-                return true; // Blocca l'evento
+                return true;
             }
         }
         // mouse click
         if(event->type() == QEvent::MouseButtonPress) {
             QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
             if (mouseEvent->button() == Qt::LeftButton) {
-                // Chiediamo a Qt di agganciare il canale grafico nativo del sistema operativo
                 if (w->windowHandle()) {
                     w->windowHandle()->startSystemMove();
                     event->accept();
@@ -72,34 +72,6 @@ protected:
                 }
             }
         }
-        /*if (event->type() == QEvent::MouseButtonPress)
-        {
-            // 1) Gestisci solo eventi mouse
-            if (event->type() != QEvent::MouseButtonPress &&
-                event->type() != QEvent::MouseMove &&
-                event->type() != QEvent::MouseButtonRelease)
-            {
-                return QObject::eventFilter(obj, event);
-            }
-
-            // 2) Interessa solo l'overlay e i suoi figli
-            QWidget *w = qobject_cast<QWidget*>(obj);
-            if (!w || (w. != m_gearOverlay && !m_gearOverlay->isAncestorOf(w)))
-                return QObject::eventFilter(obj, event);
-
-            // 3) Da qui in poi gestisci solo l'overlay
-            if (event->type() == QEvent::MouseButtonPress) {
-                auto *me = static_cast<QMouseEvent*>(event);
-                if (me->button() == Qt::LeftButton && w->windowHandle()) {
-                    w->windowHandle()->startSystemMove();
-                    return true;   // ok mangiare il press: è sull'overlay
-                }
-            }
-
-            return QObject::eventFilter(obj, event);
-        }*/
-
-
         return QObject::eventFilter(obj, event);
     }
 };

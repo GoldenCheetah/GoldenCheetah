@@ -79,7 +79,6 @@ private:
     int m_pollInterval;
     void run();
     QTimer *m_timer;
-    QMutex m_mutex;
     QSerialPort *m_serial;
     bool pauseRead; // use instead m_mutex
     unsigned int m_load;
