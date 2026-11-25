@@ -26,6 +26,7 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QWindow>
+#include <QLabel>
 
 
 
