@@ -30,11 +30,11 @@ KettlerRacerController::KettlerRacerController(TrainSidebar *parent,  DeviceConf
     m_kettlerRacer = new KettlerRacer(this, dc ? dc->portSpec : "");
 
     m_kettlerRacer->setAthleteWeight(75);
-
+    if (!parent || !parent->context) return;
     connect(parent->context, SIGNAL(start()),
             m_kettlerRacer, SLOT(gearOverlay_getFocus()),
             Qt::QueuedConnection);
-
+    if (!parent || !parent->context || !parent->context->athlete) return;
     Athlete *a = parent->context->athlete;
     if (a) {
         double m = a->getWeight(QDate::currentDate());

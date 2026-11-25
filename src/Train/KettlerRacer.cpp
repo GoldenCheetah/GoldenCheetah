@@ -137,11 +137,12 @@ void KettlerRacer::createLabelGears()
     m_gearOverlay->setLayout(mainLayout);
 
     // dark style
+    m_gearOverlay->setObjectName("Gears");
+    m_gearOverlay->setAttribute(Qt::WA_StyledBackground, true);
     m_gearOverlay->setStyleSheet(
-        "QWidget#m_gearOverlay_Root { background-color: #1a1a1a; border: 2px solid #555555; border-radius: 8px; }"
+        "QWidget#Gears { background-color: #1a1a1a; border: 2px solid #555555; border-radius: 8px; }"
         "QLabel { background-color: transparent; border: none; color: #FFFFFF; font-family: Arial; font-size: 20px; font-weight: bold; }"
         );
-    m_gearOverlay->setObjectName("Gears");
 
     m_gearOverlay->show();
 
@@ -178,6 +179,7 @@ void KettlerRacer::gearOverlay_getFocus()
 {
     QTimer::singleShot(1000, m_gearOverlay, [this]() {
         if (m_gearOverlay) {
+            m_gearOverlay->grabKeyboard();
             m_gearOverlay->activateWindow();
             m_gearOverlay->raise();
             m_gearOverlay->setFocus();
