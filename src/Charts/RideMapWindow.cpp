@@ -474,7 +474,7 @@ RideMapWindow::forceReplot()
 {
     if (context->isCompareIntervals) {
         createHtml();
-        view->page()->setHtml(currentPage);
+        view->page()->setHtml(currentPage, QUrl("qrc:/"));
     } else {
         stale=true;
         rideSelected();
@@ -529,7 +529,7 @@ void RideMapWindow::loadRide()
     createHtml();
     buildPositionList();
 
-    view->page()->setHtml(currentPage);
+    view->page()->setHtml(currentPage, QUrl("qrc:/"));
 }
 
 void RideMapWindow::updateFrame()
@@ -1306,7 +1306,7 @@ RideMapWindow::compareIntervalsChanged
 
     if (oldCountCompareIntervals == 0 || countCompareIntervals == 0) {
         createHtml();
-        view->page()->setHtml(currentPage);
+        view->page()->setHtml(currentPage, QUrl("qrc:/"));
     }
 }
 
