@@ -237,24 +237,26 @@ QString GcCrashDialog::versionHTML()
 
     QString lib_version = tr(
             "<table>"
-            "<tr><td colspan=\"2\">QT</td><td>%1</td></tr>"
-            "<tr><td colspan=\"2\">QWT</td><td>%2</td></tr>"
-            "<tr><td colspan=\"2\">%3</td><td>%4</td></tr>"
-            "<tr><td colspan=\"2\">SRMIO</td><td>%5</td></tr>"
-            "<tr><td colspan=\"2\">D2XX</td><td>%6</td></tr>"
-            "<tr><td colspan=\"2\">ICAL</td><td>%9</td></tr>"
-            "<tr><td colspan=\"2\">USBXPRESS</td><td>%10</td></tr>"
-            "<tr><td colspan=\"2\">LIBUSB</td><td>%11</td></tr>"
-            "<tr><td colspan=\"2\">VIDEO</td><td>%13</td></tr>"
-            "<tr><td colspan=\"2\">SAMPLERATE</td><td>%14</td></tr>"
-            "<tr><td colspan=\"2\">SSL</td><td>%15</td></tr>"
-            "<tr><td colspan=\"2\">R</td><td>%16</td></tr>"
-            "<tr><td colspan=\"2\">Python</td><td>%18</td></tr>"
+            "<tr><td colspan=\"2\">Qt</td><td>%1</td></tr>"
+            "<tr><td colspan=\"2\">Qt WebEngine</td><td>%2</td></tr>"
+            "<tr><td colspan=\"2\">QWT</td><td>%3</td></tr>"
+            "<tr><td colspan=\"2\">%4</td><td>%5</td></tr>"
+            "<tr><td colspan=\"2\">SRMIO</td><td>%6</td></tr>"
+            "<tr><td colspan=\"2\">D2XX</td><td>%7</td></tr>"
+            "<tr><td colspan=\"2\">ICAL</td><td>%8</td></tr>"
+            "<tr><td colspan=\"2\">USBXPRESS</td><td>%9</td></tr>"
+            "<tr><td colspan=\"2\">LIBUSB</td><td>%10</td></tr>"
+            "<tr><td colspan=\"2\">VIDEO</td><td>%11</td></tr>"
+            "<tr><td colspan=\"2\">SAMPLERATE</td><td>%12</td></tr>"
+            "<tr><td colspan=\"2\">SSL</td><td>%13</td></tr>"
+            "<tr><td colspan=\"2\">R</td><td>%14</td></tr>"
+            "<tr><td colspan=\"2\">Python</td><td>%15</td></tr>"
             "<tr><td colspan=\"2\">LMFIT</td><td>7.0</td></tr>"
-            "<tr><td colspan=\"2\">GSL</td><td>%19</td></tr>"
+            "<tr><td colspan=\"2\">GSL</td><td>%16</td></tr>"
             "</table>"
             )
             .arg(QT_VERSION_STR)
+            .arg(qWebEngineVersion())
             .arg(QWT_VERSION_STR)
             .arg(COMPILER)
             .arg(COMPILER_VERSION)
