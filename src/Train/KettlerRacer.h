@@ -19,16 +19,62 @@
 
 #ifndef _GC_KettlerRacer_h
 #define _GC_KettlerRacer_h 1
-#include "GoldenCheetah.h"
+
 
 #include <QString>
 #include <QDebug>
 #include <QThread>
-#include <QMutex>
 #include <QFile>
 #include "KettlerRacerConnection.h"
-#include "RealtimeController.h"
+#include <QWidget>
+#include <QEvent>
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QWindow>
+#include <QThread>
 
+class DragFilter : public QObject {
+    Q_OBJECT
+public:
+    DragFilter(QObject *parent = nullptr) : QObject(parent) {}
+signals:
+    void keyActionTriggered(int key);
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) override {
+        QWidget *clickedWidget = qobject_cast<QWidget*>(obj);
+        QString pollo = obj->objectName();
+        if(pollo != "")qDebug() << "pollo " << pollo;
+        if (!clickedWidget) return false;
+        QWidget *w = clickedWidget->window();
+        if (!w) return false;
+
+        //key press
+        if (event->type() == QEvent::KeyPress) {
+            QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+            int pressedKey = keyEvent->key();
+
+            if (pressedKey == Qt::Key_W || pressedKey == Qt::Key_S ||
+                pressedKey == Qt::Key_A || pressedKey == Qt::Key_D)
+            {
+                // Emit
+                emit keyActionTriggered(pressedKey);
+                return true;
+            }
+        }
+        // mouse click
+        if(event->type() == QEvent::MouseButtonPress) {
+            QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+            if (mouseEvent->button() == Qt::LeftButton) {
+                if (w->windowHandle()) {
+                    w->windowHandle()->startSystemMove();
+                    event->accept();
+                    return true;
+                }
+            }
+        }
+        return QObject::eventFilter(obj, event);
+    }
+};
 class KettlerRacer : public QObject
 {
     Q_OBJECT
@@ -39,14 +85,16 @@ public:
     int start();
     int stop();
     int restart();
+    void setMode(int m);
 
     quint32 heartRate() {return m_heartRate;}
     quint32 power() {return m_power;}
     quint32 cadence() {return m_cadence;}
     double speed() {return m_speed;}
     bool discover(QString portName);
-
     void setLoad(double load);
+    void setGradient(double slope);
+    void setAthleteWeight(double m){m_athleteWeight=m;};
     bool isConnected();
 
 private:
@@ -56,6 +104,9 @@ private:
     quint32 m_cadence;
     double m_speed; // in km/h
     bool m_isKettlerRacerConnectionAlive;
+    QWidget *m_gearOverlay = nullptr;
+    void createLabelGears();
+    double m_athleteWeight;
 
 private slots:
     void newHeartRate(quint32);
@@ -63,6 +114,11 @@ private slots:
     void newCadence(quint32 cadence);
     void newSpeed(double speed);
     void onKettlerRacerConnectionFinished();
+public slots:
+    void gearOverlay_getFocus();
+
+//signals:
+    //void signalGradient(double gr);
 };
 
 #endif // _GC_KettlerRacer_h

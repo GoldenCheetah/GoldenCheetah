@@ -20,12 +20,23 @@
 
 
 #include "KettlerRacer.h"
+#include <QMouseEvent>
+#include <QTimer>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QPushButton>
+#include <QWindow>
+#include <QLabel>
+
+
 
 KettlerRacer::KettlerRacer(QObject *parent,  QString devname) : QObject(parent),
     m_heartRate(0),
     m_power(0),
     m_cadence(0),
-    m_isKettlerRacerConnectionAlive(true)
+    m_speed(0),
+    m_isKettlerRacerConnectionAlive(true), // Inizializziamo sempre a nullptr nel costruttore
+    m_gearOverlay(nullptr)
 {
     m_kettlerRacerConnection = new KettlerRacerConnection;
     m_kettlerRacerConnection->setSerialPort(devname);
@@ -36,26 +47,54 @@ KettlerRacer::KettlerRacer(QObject *parent,  QString devname) : QObject(parent),
     connect(m_kettlerRacerConnection, SIGNAL(finished()), this, SLOT(onKettlerRacerConnectionFinished()), Qt::QueuedConnection);
 }
 
-KettlerRacer::~KettlerRacer(){
-   m_kettlerRacerConnection->quit();
-   m_kettlerRacerConnection->deleteSerialPort();
-   delete m_kettlerRacerConnection;
+KettlerRacer::~KettlerRacer()
+{
+    if (m_gearOverlay) {
+        m_gearOverlay->close();
+        delete m_gearOverlay;
+        m_gearOverlay = nullptr;
+    }
+
+    if (m_kettlerRacerConnection)
+    {
+        if (m_kettlerRacerConnection->isRunning()) {
+            m_kettlerRacerConnection->quit();
+
+            if (!m_kettlerRacerConnection->wait(2000)) {
+                qWarning() << "Il thread non risponde, forzo la chiusura...";
+                m_kettlerRacerConnection->terminate();
+                m_kettlerRacerConnection->wait();
+            }
+        }
+        delete m_kettlerRacerConnection;
+        m_kettlerRacerConnection = nullptr;
+    }
 }
 
 int KettlerRacer::start()
 {
+    m_kettlerRacerConnection->setWeight(m_athleteWeight);
     m_kettlerRacerConnection->start();
+    createLabelGears();
+    m_kettlerRacerConnection->resetRead();
+    m_kettlerRacerConnection->setPollInterval(1000,1);
     return 0;
 }
 
 int KettlerRacer::restart()
 {
+    m_kettlerRacerConnection->resetRead();
     return 0;
 }
 
 int KettlerRacer::stop()
 {
-    m_kettlerRacerConnection->setLoad(25);
+    m_kettlerRacerConnection->resetRead();
+    if(m_gearOverlay){
+        m_gearOverlay->close();
+        delete m_gearOverlay;
+        m_gearOverlay = nullptr;
+    }
     return 0;
 }
 
@@ -77,6 +116,77 @@ void KettlerRacer::newPower(quint32 power)
 void KettlerRacer::newSpeed(double speed)
 {
     m_speed = speed;
+}
+
+void KettlerRacer::createLabelGears()
+{
+    if (m_gearOverlay) return;
+
+    m_gearOverlay = new QWidget();
+    m_gearOverlay->setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+    m_gearOverlay->resize(180, 75);
+    m_gearOverlay->move(40, 60);
+
+    QLabel *textLabel = new QLabel(m_gearOverlay);
+    //textLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
+    textLabel->setAlignment(Qt::AlignCenter);
+    textLabel->setText("34 x 36\nRapp: 0.94");
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(m_gearOverlay);
+    mainLayout->setContentsMargins(5, 5, 5, 5);
+    mainLayout->addWidget(textLabel);
+    m_gearOverlay->setLayout(mainLayout);
+
+    // dark style
+    m_gearOverlay->setObjectName("Gears");
+    m_gearOverlay->setAttribute(Qt::WA_StyledBackground, true);
+    m_gearOverlay->setStyleSheet(
+        "QWidget#Gears { background-color: #1a1a1a; border: 2px solid #555555; border-radius: 8px; }"
+        "QLabel { background-color: transparent; border: none; color: #FFFFFF; font-family: Arial; font-size: 20px; font-weight: bold; }"
+        );
+
+    m_gearOverlay->show();
+
+    DragFilter *filter = new DragFilter(m_gearOverlay);
+
+    // Install filter
+    m_gearOverlay->installEventFilter(filter);
+    //textLabel->installEventFilter(filter);
+    // filter on qapp
+    //if (qApp) qApp->installEventFilter(filter);
+
+
+    connect(filter, &DragFilter::keyActionTriggered,
+            m_kettlerRacerConnection, &KettlerRacerConnection::handleKeyPress,
+            Qt::QueuedConnection);
+
+    connect(m_kettlerRacerConnection, &KettlerRacerConnection::gearChanged, m_gearOverlay,
+            [this, textLabel](int front, int rear, double rapp) {
+                if (!m_gearOverlay || !textLabel) return;
+
+                textLabel->setText(
+                        QString::number(front)+" x "
+                        +QString::number(rear)
+                        +"\nRapp.= "+QString::number(rapp));
+
+                m_gearOverlay->raise();
+                m_gearOverlay->activateWindow();
+            },
+            Qt::QueuedConnection
+            );
+}
+
+void KettlerRacer::gearOverlay_getFocus()
+{
+    QTimer::singleShot(1000, m_gearOverlay, [this]() {
+        if (m_gearOverlay) {
+            m_gearOverlay->grabKeyboard();
+            m_gearOverlay->activateWindow();
+            m_gearOverlay->raise();
+            m_gearOverlay->setFocus();
+        }
+    });
+
 }
 
 /**
@@ -158,10 +268,29 @@ bool KettlerRacer::discover(QString portName)
     return found;
 }
 
+//from TrainSidebar::workoutTreeWidgetSelectionChanged()
+//set m_modee and timeer
+void KettlerRacer::setMode(int m)
+{
+    if (m==2) {
+        m_kettlerRacerConnection->setPollInterval(100,m);//slope
+        m_gearOverlay->show();
+        return;
+    }
+    m_kettlerRacerConnection->setPollInterval(1000,m);//erg
+    m_gearOverlay->hide();
+    return;
+}
 
 void KettlerRacer::setLoad(double load)
 {
     m_kettlerRacerConnection->setLoad((unsigned int)load);
+}
+
+//Used in KettlerRacerConnection::updateInternalSpeed()
+void KettlerRacer::setGradient(double slope)
+{
+    m_kettlerRacerConnection->setGradient(slope);
 }
 
 bool KettlerRacer::isConnected()
@@ -173,3 +302,4 @@ void KettlerRacer::onKettlerRacerConnectionFinished()
 {
     m_isKettlerRacerConnectionAlive = false;
 }
+

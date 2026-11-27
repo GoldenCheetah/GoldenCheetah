@@ -20,6 +20,7 @@
 #include "KettlerRacerController.h"
 #include "KettlerRacer.h"
 #include "RealtimeData.h"
+#include "Context.h"
 
 #include <QMessageBox>
 #include <QSerialPort>
@@ -27,6 +28,21 @@
 KettlerRacerController::KettlerRacerController(TrainSidebar *parent,  DeviceConfiguration *dc) : RealtimeController(parent, dc)
 {
     m_kettlerRacer = new KettlerRacer(this, dc ? dc->portSpec : "");
+
+    m_kettlerRacer->setAthleteWeight(75);
+    if (!parent || !parent->context) return;
+    connect(parent->context, SIGNAL(start()),
+            m_kettlerRacer, SLOT(gearOverlay_getFocus()),
+            Qt::QueuedConnection);
+    if (!parent || !parent->context || !parent->context->athlete) return;
+    Athlete *a = parent->context->athlete;
+    if (a) {
+        double m = a->getWeight(QDate::currentDate());
+        if (m <= 10.0) {
+            m = 85.0;
+        }
+        m_kettlerRacer->setAthleteWeight(m+8.4+0.1);//athlete + bicycle + sigari
+    }
 }
 
 bool KettlerRacerController::find()
@@ -34,26 +50,24 @@ bool KettlerRacerController::find()
     return false;
 }
 
-int
-KettlerRacerController::start()
+//from trainsidebar.connect
+int KettlerRacerController::start()
 {
     return m_kettlerRacer->start();
 }
 
-int
-KettlerRacerController::restart()
+int KettlerRacerController::restart()
 {
     return m_kettlerRacer->restart();
 }
 
-int
-KettlerRacerController::pause()
+int KettlerRacerController::pause()
 {
     return 0;
 }
 
-int
-KettlerRacerController::stop()
+//from trainsidebar.disconn
+int KettlerRacerController::stop()
 {
     return m_kettlerRacer->stop();
 }
@@ -70,14 +84,14 @@ bool KettlerRacerController::doesPull() { return true; }
 bool KettlerRacerController::doesLoad() { return true; }
 
 /*
- * gets called from the GUI to get updated telemetry.
+ * gets called from the GUI trainsidebar to get updated telemetry.
  * so whilst we are at it we check button status too and
  * act accordingly.
  *
  */
-void
-KettlerRacerController::getRealtimeData(RealtimeData &rtData)
+void KettlerRacerController::getRealtimeData(RealtimeData &rtData)
 {
+
     if (!m_kettlerRacer->isConnected())
     {
         //QMessageBox msgBox;
@@ -87,16 +101,34 @@ KettlerRacerController::getRealtimeData(RealtimeData &rtData)
         //parent->Stop(0);
         //return;
     }
-
     rtData.setWatts(m_kettlerRacer->power());
     rtData.setHr(m_kettlerRacer->heartRate());
     rtData.setCadence(m_kettlerRacer->cadence());
     rtData.setSpeed(m_kettlerRacer->speed());
+
+    return;
 }
 
-void KettlerRacerController::pushRealtimeData(RealtimeData &) { } // update realtime data with current values
+void KettlerRacerController::setMode(int m)
+{
+    this->mode=m;
+    m_kettlerRacer->setMode(m);
+    return;
+}
 
+//slope mode
+void KettlerRacerController::setGradient(double slope)
+{
+    m_kettlerRacer->setGradient(slope);
+    //emit m_kettlerRacer->signalGradient(slope);
+    //update new power for maintain speed
+}
+
+//erg mode load from trainsidebar
 void KettlerRacerController::setLoad(double load)
 {
     m_kettlerRacer->setLoad(load);
 }
+
+void KettlerRacerController::pushRealtimeData(RealtimeData &) { } // update realtime data with current values
+
